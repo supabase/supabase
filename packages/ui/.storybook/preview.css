@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.dark,
+.light,
+.light .docs-story,
+.dark .docs-story {
+  @apply bg-scale-200;
+}

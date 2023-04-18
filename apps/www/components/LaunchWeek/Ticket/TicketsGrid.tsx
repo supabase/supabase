@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useMobileViewport } from '../../../hooks/useMobileViewport'
+import { useBreakpoint } from 'common/hooks/useBreakpoint'
 import { UserData } from './hooks/use-conf-data'
 
 interface Props {
@@ -18,8 +18,8 @@ export default function TicketsGrid({ loadedUsers, isLoading, pageCount, offset 
     `${STORAGE_URL}/tickets/gallery/${
       isGold ? 'golden' : 'regular'
     }/${BUCKET_FOLDER_VERSION}/${username}.png`
-  const isMobile = useMobileViewport(768)
-  const isTablet = useMobileViewport(1024)
+  const isMobile = useBreakpoint(768)
+  const isTablet = useBreakpoint(1024)
 
   return (
     <div

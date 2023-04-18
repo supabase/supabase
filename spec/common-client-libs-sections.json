@@ -426,6 +426,13 @@
         "type": "function"
       },
       {
+        "id": "sign-in-with-apple",
+        "title": "Sign in with Apple",
+        "slug": "sign-in-with-apple",
+        "product": "auth",
+        "type": "function"
+      },
+      {
         "id": "sign-in-with-oauth",
         "title": "Sign in a user through OAuth",
         "slug": "auth-signinwithoauth",
@@ -858,6 +865,20 @@
         "id": "from-create-signed-urls",
         "title": "Create signed URLs",
         "slug": "storage-from-createsignedurls",
+        "product": "storage",
+        "type": "function"
+      },
+      {
+        "id": "from-create-signed-upload-url",
+        "title": "Create signed upload URL",
+        "slug": "storage-from-createsigneduploadurl",
+        "product": "storage",
+        "type": "function"
+      },
+      {
+        "id": "from-upload-to-signed-url",
+        "title": "Upload to a signed URL",
+        "slug": "storage-from-uploadtosignedurl",
         "product": "storage",
         "type": "function"
       },

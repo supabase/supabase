@@ -5,7 +5,9 @@
   "types": "./index.tsx",
   "license": "MIT",
   "scripts": {
+    "build-storybook": "build-storybook",
     "build:icons": "node --experimental-modules internals/populate-icons.js",
+    "storybook": "start-storybook -p 6006",
     "test": "jest"
   },
   "dependencies": {
@@ -44,11 +46,13 @@
     "tailwindcss-radix": "^1.6.0"
   },
   "devDependencies": {
+    "@storybook/react": "^6.5.16",
     "@testing-library/jest-dom": "^5.16.5",
     "@types/common-tags": "^1.8.1",
     "@types/react": "^17.0.37",
     "@types/react-dom": "^17.0.11",
     "sql-formatter": "^12.2.0",
+    "storybook-dark-mode": "^2.1.1",
     "typescript": "4.3.4"
   }
 }

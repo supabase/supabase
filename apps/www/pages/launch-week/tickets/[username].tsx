@@ -14,6 +14,7 @@ import TicketBrickWall from '~/components/LaunchWeek/LaunchSection/TicketBrickWa
 import { UserData } from '~/components/LaunchWeek/Ticket/hooks/use-conf-data'
 import LW7BgGraphic from '../../../components/LaunchWeek/LW7BgGraphic'
 import CTABanner from '../../../components/CTABanner'
+import { useTheme } from 'common/Providers'
 
 interface Props {
   user: UserData
@@ -29,6 +30,7 @@ const supabaseAdmin = createClient(
 )
 
 export default function UsernamePage({ user, users, ogImageUrl }: Props) {
+  const { isDarkMode } = useTheme()
   const { username, ticketNumber, name, golden, referrals, bg_image_id } = user
   const TITLE = `${name ? name + '’s' : 'Get your'} #SupaLaunchWeek Ticket`
   const DESCRIPTION = 'Supabase Launch Week 7 | 10–14 April 2023 | Generate your ticket. Win swag.'
@@ -43,7 +45,11 @@ export default function UsernamePage({ user, users, ogImageUrl }: Props) {
   }
 
   useEffect(() => {
-    document.body.className = 'dark bg-[#1C1C1C]'
+    document.body.className = '!dark bg-[#1C1C1C]'
+
+    return () => {
+      document.body.className = isDarkMode ? 'dark' : 'light'
+    }
   }, [])
 
   return (

@@ -34,7 +34,7 @@
   },
   "devDependencies": {
     "@types/json-stringify-safe": "^5.0.0",
-    "aws-sdk": "^2.1315.0",
+    "aws-sdk": "^2.1354.0",
     "eslint": "^7.32.0",
     "eslint-config-custom": "*",
     "json-stringify-safe": "^5.0.1",
