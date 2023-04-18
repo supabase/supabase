@@ -7,7 +7,7 @@ export const generateSettingsMenu = (
   project?: ProjectBase,
   isVaultEnabled: boolean = false
 ): ProductMenuGroup[] => {
-  const isProjectBuilding = project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY
+  const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
   const buildingUrl = `/project/${ref}/building`
 
   return [

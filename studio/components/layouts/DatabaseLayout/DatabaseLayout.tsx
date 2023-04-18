@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 
 import { useFlag, useStore, withAuth } from 'hooks'
-import BaseLayout from '../'
+import ProjectLayout from '../'
 import Error from 'components/ui/Error'
 import ProductMenu from 'components/ui/ProductMenu'
 import { generateDatabaseMenu } from './DatabaseMenu.utils'
@@ -62,14 +62,14 @@ const DatabaseLayout: FC<Props> = ({ title, children }) => {
 
   if (error) {
     return (
-      <BaseLayout>
+      <ProjectLayout>
         <Error error={error} />
-      </BaseLayout>
+      </ProjectLayout>
     )
   }
 
   return (
-    <BaseLayout
+    <ProjectLayout
       isLoading={!loaded}
       product="Database"
       productMenu={
@@ -79,7 +79,7 @@ const DatabaseLayout: FC<Props> = ({ title, children }) => {
       <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">
         {children}
       </main>
-    </BaseLayout>
+    </ProjectLayout>
   )
 }
 

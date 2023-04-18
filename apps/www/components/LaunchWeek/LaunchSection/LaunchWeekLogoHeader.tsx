@@ -1,10 +1,10 @@
 import classNames from 'classnames'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
-import { useMobileViewport } from '../../../hooks/useMobileViewport'
+import { useBreakpoint } from 'common/hooks/useBreakpoint'
 
 export function LaunchWeekLogoHeader() {
-  const isMobile = useMobileViewport(640)
+  const isMobile = useBreakpoint(640)
 
   return (
     <div className="flex flex-col gap-1 md:gap-2 items-center my-4 lg:pt-8 justify-start">
