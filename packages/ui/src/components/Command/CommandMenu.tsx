@@ -1,4 +1,3 @@
-import { useCommandState } from 'cmdk-supabase'
 import { useRouter } from 'next/router'
 import * as React from 'react'
 import { ElementRef, useRef } from 'react'
@@ -12,6 +11,7 @@ import { IconLifeBuoy } from './../Icon/icons/IconLifeBuoy'
 import { IconMonitor } from './../Icon/icons/IconMonitor'
 import { IconPhone } from './../Icon/icons/IconPhone'
 import { IconUser } from './../Icon/icons/IconUser'
+import { IconKey } from './../Icon/icons/IconKey'
 
 import AiCommand from './AiCommand'
 import sharedItems from './utils/shared-nav-items.json'
@@ -23,20 +23,23 @@ import {
   CommandItem,
   CommandLabel,
   CommandList,
-  CommandShortcut,
 } from './Command.utils'
-import { useCommandMenu } from './CommandMenuProvider'
-import DocsSearch from './DocsSearch'
-import DashboardTableEditor from './sections/DashboardTableEditor'
-import CommandMenuShortcuts from './CommandMenuShortcuts'
-import SearchOnlyItem from './SearchOnlyItem'
-import SearchableStudioItems from './SearchableStudioItems'
 import { COMMAND_ROUTES } from './Command.constants'
+import { useCommandMenu } from './CommandMenuProvider'
+
+import DocsSearch from './DocsSearch'
+import GenerateSQL from './GenerateSQL'
+import ThemeOptions from './ThemeOptions'
+import APIKeys from './APIKeys'
+import SearchableStudioItems from './SearchableStudioItems'
+import CommandMenuShortcuts from './CommandMenuShortcuts'
+import { BadgeExperimental } from './Command.Badges'
 
 export const CHAT_ROUTES = [
   COMMAND_ROUTES.AI, // this one is temporary
   COMMAND_ROUTES.AI_ASK_ANYTHING,
   COMMAND_ROUTES.AI_RLS_POLICY,
+  COMMAND_ROUTES.GENERATE_SQL,
 ]
 
 const iconPicker: { [key: string]: React.ReactNode } = {
@@ -51,40 +54,16 @@ const iconPicker: { [key: string]: React.ReactNode } = {
   products: <IconColumns />,
 }
 
-const projectRef = ''
+interface CommandMenuProps {
+  projectRef?: string
+}
 
-const CommandMenu = () => {
+const CommandMenu = ({ projectRef }: CommandMenuProps) => {
   const router = useRouter()
 
   const commandInputRef = useRef<ElementRef<typeof CommandInput>>(null)
-  const { isOpen, setIsOpen, actions, search, setSearch, pages, setPages, currentPage, site } =
+  const { isOpen, setIsOpen, search, setSearch, pages, setPages, currentPage, site } =
     useCommandMenu()
-
-  const ThemeOptions = ({ isSubItem = false }) => {
-    return (
-      <CommandGroup>
-        <SearchOnlyItem
-          isSubItem={isSubItem}
-          onSelect={() => {
-            actions.toggleTheme(true)
-            setIsOpen(false)
-          }}
-        >
-          Change Theme to dark
-        </SearchOnlyItem>
-        <SearchOnlyItem
-          isSubItem={isSubItem}
-          onSelect={() => {
-            actions.toggleTheme(false)
-            setIsOpen(false)
-          }}
-        >
-          Change Theme to light
-        </SearchOnlyItem>
-      </CommandGroup>
-    )
-  }
-
   const showCommandInput = !currentPage || !CHAT_ROUTES.includes(currentPage)
 
   return (
@@ -92,8 +71,12 @@ const CommandMenu = () => {
       <CommandDialog
         page={currentPage}
         visible={isOpen}
-        onInteractOutside={() => {
-          setIsOpen(!open)
+        onInteractOutside={(e) => {
+          // Only hide menu when clicking outside, not focusing outside
+          // Prevents Firefox dropdown issue that immediately closes menu after opening
+          if (e.type === 'dismissableLayer.pointerDownOutside') {
+            setIsOpen(!open)
+          }
         }}
         size={'xlarge'}
         className={'max-h-[70vh] lg:max-h-[50vh] overflow-hidden overflow-y-auto'}
@@ -113,6 +96,7 @@ const CommandMenu = () => {
               <CommandGroup heading="Documentation" forceMount>
                 <CommandItem
                   type="command"
+                  badge={<BadgeExperimental />}
                   onSelect={() => {
                     setPages([...pages, COMMAND_ROUTES.AI])
                   }}
@@ -192,12 +176,48 @@ const CommandMenu = () => {
               )}
 
               {site === 'studio' && (
+                <CommandGroup heading="Experimental">
+                  <CommandItem
+                    forceMount
+                    type="command"
+                    badge={<BadgeExperimental />}
+                    onSelect={() => setPages([...pages, COMMAND_ROUTES.GENERATE_SQL])}
+                  >
+                    <AiIcon className="text-scale-1100" />
+                    <CommandLabel>Generate SQL with Supabase AI</CommandLabel>
+                  </CommandItem>
+                </CommandGroup>
+              )}
+
+              {site === 'studio' && projectRef !== undefined && (
+                <CommandGroup heading="Project tools">
+                  <CommandItem
+                    forceMount
+                    type="command"
+                    onSelect={() => setPages([...pages, COMMAND_ROUTES.API_KEYS])}
+                  >
+                    <IconKey className="text-scale-1100" />
+                    <CommandLabel>Get API keys</CommandLabel>
+                  </CommandItem>
+                </CommandGroup>
+              )}
+
+              {site === 'studio' && (
                 <CommandGroup heading="Navigate">
                   {sharedItems.tools.map((item) => {
-                    const itemUrl = projectRef ? item.url.replace('_', projectRef) : item.url
+                    const itemUrl = (
+                      projectRef ? item.url.replace('_', projectRef) : item.url
+                    ).split('https://app.supabase.com')[1]
 
                     return (
-                      <CommandItem key={item.url} type="link" onSelect={() => router.push(itemUrl)}>
+                      <CommandItem
+                        key={item.url}
+                        type="link"
+                        onSelect={() => {
+                          router.push(item.url)
+                          setIsOpen(false)
+                        }}
+                      >
                         <IconArrowRight className="text-scale-900" />
                         <CommandLabel>
                           Go to <span className="font-bold"> {item.label}</span>
@@ -221,14 +241,16 @@ const CommandMenu = () => {
                 ))}
               </CommandGroup>
 
-              <CommandGroup heading="General">
-                {sharedItems.docsGeneral.map((item) => (
-                  <CommandItem key={item.url} type="link" onSelect={() => router.push(item.url)}>
-                    {item?.icon && iconPicker[item.icon]}
-                    <CommandLabel>{item.label}</CommandLabel>
-                  </CommandItem>
-                ))}
-              </CommandGroup>
+              {site === 'docs' && (
+                <CommandGroup heading="General">
+                  {sharedItems.docsGeneral.map((item) => (
+                    <CommandItem key={item.url} type="link" onSelect={() => router.push(item.url)}>
+                      {item?.icon && iconPicker[item.icon]}
+                      <CommandLabel>{item.label}</CommandLabel>
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              )}
 
               <CommandGroup heading="Settings">
                 <CommandItem type="link" onSelect={() => setPages([...pages, 'Theme'])}>
@@ -236,13 +258,16 @@ const CommandMenu = () => {
                   Change theme
                 </CommandItem>
               </CommandGroup>
+
               <ThemeOptions isSubItem />
-              {site === 'studio' && <SearchableStudioItems />}
+              {site === 'studio' && search && <SearchableStudioItems />}
             </>
           )}
           {currentPage === COMMAND_ROUTES.AI && <AiCommand />}
           {currentPage === COMMAND_ROUTES.DOCS_SEARCH && <DocsSearch />}
+          {currentPage === COMMAND_ROUTES.GENERATE_SQL && <GenerateSQL />}
           {currentPage === COMMAND_ROUTES.THEME && <ThemeOptions />}
+          {currentPage === COMMAND_ROUTES.API_KEYS && <APIKeys />}
         </CommandList>
       </CommandDialog>
     </>

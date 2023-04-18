@@ -1,4 +1,5 @@
-import { saveAs } from 'file-saver'
+import saveAs from 'file-saver'
+import Papa from 'papaparse'
 import { useState, ReactNode } from 'react'
 import {
   Button,
@@ -18,7 +19,6 @@ import SortPopover from './sort'
 import RefreshButton from './RefreshButton'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 import { Sort, Filter, SupaTable } from 'components/grid/types'
-import { exportRowsToCsv } from 'components/grid/utils'
 import { useDispatch, useTrackedState } from 'components/grid/store'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useTableRowDeleteMutation } from 'data/table-rows/table-row-delete-mutation'
@@ -142,7 +142,7 @@ const DefaultHeader = ({
                               <div
                                 className={[
                                   'border border-scale-1100 w-[15px] h-[4px] translate-x-0.5',
-                                  'transition duration-200 group-hover:border-brand-900 group-hover:translate-x-0',
+                                  'transition duration-200 group-data-[highlighted]:border-brand-900 group-data-[highlighted]:translate-x-0',
                                 ].join(' ')}
                               />
                             </div>
@@ -168,7 +168,7 @@ const DefaultHeader = ({
                               <div
                                 className={[
                                   'border border-scale-1100 w-[4px] h-[15px] -translate-y-0.5',
-                                  'transition duration-200 group-hover:border-brand-900 group-hover:translate-y-0',
+                                  'transition duration-200 group-data-[highlighted]:border-brand-900 group-data-[highlighted]:translate-y-0',
                                 ].join(' ')}
                               />
                             </div>
@@ -193,7 +193,7 @@ const DefaultHeader = ({
                               <IconArrowUp
                                 className={clsx(
                                   'transition duration-200 absolute bottom-0 right-0 translate-y-1 opacity-0 bg-brand-700 rounded-full',
-                                  'group-hover:translate-y-0 group-hover:text-brand-900 group-hover:opacity-100'
+                                  'group-data-[highlighted]:translate-y-0 group-data-[highlighted]:text-brand-900 group-data-[highlighted]:opacity-100'
                                 )}
                                 strokeWidth={3}
                                 size={12}
@@ -349,8 +349,18 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
     const rows = allRowsSelected
       ? await state.rowService!.fetchAllData(filters, sorts)
       : allRows.filter((x) => selectedRows.has(x.idx))
+    const formattedRows = rows.map((row) => {
+      const formattedRow = row
+      Object.keys(row).map((column) => {
+        if (typeof row[column] === 'object' && row[column] !== null)
+          formattedRow[column] = JSON.stringify(formattedRow[column])
+      })
+      return formattedRow
+    })
 
-    const csv = exportRowsToCsv(state.table!.columns, rows)
+    const csv = Papa.unparse(formattedRows, {
+      columns: state.table!.columns.map((column) => column.name),
+    })
     const csvData = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
     saveAs(csvData, `${state.table!.name}_rows.csv`)
     setIsExporting(false)

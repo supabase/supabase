@@ -256,7 +256,7 @@ export default {
 
   alert: {
     base: `
-      relative rounded border py-4 px-6
+      relative rounded-md border py-4 px-6
       flex space-x-4 items-start
     `,
     header: 'block text-sm font-normal mb-1',
@@ -275,10 +275,10 @@ export default {
         description: `text-amber-1100`,
       },
       info: {
-        base: `bg-blue-200 dark:bg-blue-100 border-blue-700`,
-        icon: `text-blue-900`,
-        header: `text-blue-1200`,
-        description: `text-blue-1100`,
+        base: `bg-scale-400 border-scale-500 dark:bg-scale-100 dark:border-scale-300`,
+        icon: `text-scale-900`,
+        header: `text-scale-1200`,
+        description: `text-scale-1100`,
       },
       success: {
         base: `bg-brand-300 dark:bg-brand-100 border-brand-700`,
@@ -353,7 +353,7 @@ export default {
         hover:text-scale-1200
       `,
       active: `
-        text-scale-1200
+        !text-scale-1200
         border-b-2 border-scale-1200
       `,
     },
@@ -1061,8 +1061,8 @@ export default {
       hover:bg-scale-700
     `,
     active: `
-      bg-brand-900
-      hover:bg-brand-900
+      !bg-brand-900
+      !hover:bg-brand-900
     `,
     handle_container: {
       tiny: 'h-4 w-7',
@@ -1081,11 +1081,11 @@ export default {
         transition
         ease-in-out duration-200
       `,
-      tiny: 'h-3 w-3',
-      small: 'h-5 w-5',
-      medium: 'h-5 w-5',
-      large: 'h-6 w-6',
-      xlarge: 'h-6 w-6',
+      tiny: '!h-3 !w-3',
+      small: '!h-5 !w-5',
+      medium: '!h-5 !w-5',
+      large: '!h-6 !w-6',
+      xlarge: '!h-6 !w-6',
     },
     handle_active: {
       tiny: ' translate-x-3 dark:bg-white',
@@ -1247,6 +1247,7 @@ export default {
       border-none
       focus:outline-none
     `,
+    disabled: `opacity-50 cursor-default`,
     label: `
       text-scale-900
       px-4 flex items-center space-x-2 py-1.5

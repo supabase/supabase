@@ -260,7 +260,7 @@ const ProUpgrade: FC<Props> = ({
                   </>
                 )}
               </div>
-              <div className="flex items-center justify-between gap-16 px-6 py-4 border rounded border-panel-border-light border-panel-border-dark bg-panel-body-light drop-shadow-sm dark:bg-panel-body-dark">
+              <div className="flex items-center justify-between gap-16 px-6 py-4 border rounded border-panel-border-light dark:border-panel-border-dark bg-panel-body-light drop-shadow-sm dark:bg-panel-body-dark">
                 <div>
                   <div className="flex items-center space-x-2">
                     <p>Spend cap</p>
@@ -321,7 +321,7 @@ const ProUpgrade: FC<Props> = ({
             </div>
           </div>
         </div>
-        <div className="w-[34rem]">
+        <div className="min-w-[440px]">
           <PaymentSummaryPanel
             isRefreshingPreview={isRefreshingPreview}
             subscriptionPreview={subscriptionPreview}

@@ -10,7 +10,7 @@ import { UserData } from './hooks/use-conf-data'
 import ReferralIndicator from '../ReferralIndicator'
 import useWinningChances from './hooks/useWinningChances'
 import { SITE_URL } from '~/lib/constants'
-import { useMobileViewport } from '../../../hooks/useMobileViewport'
+import { useBreakpoint } from 'common/hooks/useBreakpoint'
 
 type TicketGenerationState = 'default' | 'loading'
 
@@ -33,7 +33,7 @@ export default function Ticket({
   bgImageId,
   referrals,
 }: Props) {
-  const isMobile = useMobileViewport(1023)
+  const isMobile = useBreakpoint(1023)
   const [ticketGenerationState, setTicketGenerationState] =
     useState<TicketGenerationState>('default')
   const divRef = useRef<HTMLDivElement>(null)
@@ -42,7 +42,7 @@ export default function Ticket({
   return (
     <div
       className={[
-        `relative w-full max-w-[700px] lg:max-w-[1100px] flex flex-col items-center lg:grid lg:grid-cols-12 gap-4 lg:gap-8 lg:p-2 rounded-3xl backdrop-blur lg:items-stretch h-auto"`,
+        `relative w-full max-w-screen md:max-w-[700px] lg:max-w-[1100px] flex flex-col items-center lg:grid lg:grid-cols-12 gap-4 lg:gap-8 lg:p-2 rounded-3xl backdrop-blur lg:items-stretch h-auto"`,
         !isMobile && styles['ticket-hero'],
       ].join(' ')}
       id="wayfinding--ticket-visual-wrapper-container"
@@ -71,7 +71,7 @@ export default function Ticket({
           />
           {username && (
             <div className="w-full">
-              <TicketCopy username={username} />
+              <TicketCopy username={username} isGolden={golden} />
             </div>
           )}
         </div>
@@ -164,7 +164,7 @@ export default function Ticket({
                     href={`${SITE_URL}/${username ? '?referral=' + username : ''}`}
                     className={`flex items-center justify-center gap-2 text-[#2e2e2e]`}
                   >
-                    Get your ticket
+                    Go to Launch Week 7
                   </a>
                 </div>
               </>
