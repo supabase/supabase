@@ -35,7 +35,6 @@
     "clsx": "^1.2.1",
     "cmdk-supabase": "^0.2.2",
     "common-tags": "^1.8.2",
-    "deepmerge": "^4.2.2",
     "formik": "^2.2.9",
     "lodash": "^4.17.20",
     "lucide-react": "^0.124.0",
