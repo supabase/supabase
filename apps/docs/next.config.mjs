@@ -53,6 +53,7 @@ const nextConfig = {
       'github.com',
       'user-images.githubusercontent.com',
       'raw.githubusercontent.com',
+      'weweb-changelog.ghost.io',
     ],
   },
   experimental: {
@@ -76,6 +77,16 @@ const nextConfig = {
             value: 'DENY',
           },
         ],
+      },
+    ]
+  },
+  async redirects() {
+    return [
+      {
+        source: '/',
+        destination: '/docs',
+        basePath: false,
+        permanent: false,
       },
     ]
   },

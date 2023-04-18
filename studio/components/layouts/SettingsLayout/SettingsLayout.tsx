@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import { useStore, withAuth } from 'hooks'
 import { generateSettingsMenu } from './SettingsMenu.utils'
 
-import BaseLayout from '../'
+import ProjectLayout from '../'
 import ProductMenu from 'components/ui/ProductMenu'
 
 interface Props {
@@ -33,7 +33,7 @@ const SettingsLayout: FC<Props> = ({ title, children }) => {
   }, [ui.selectedProject?.ref])
 
   return (
-    <BaseLayout
+    <ProjectLayout
       title={title || 'Settings'}
       product="Settings"
       productMenu={<ProductMenu page={page} menu={menuRoutes} />}
@@ -41,7 +41,7 @@ const SettingsLayout: FC<Props> = ({ title, children }) => {
       <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">
         {children}
       </main>
-    </BaseLayout>
+    </ProjectLayout>
   )
 }
 

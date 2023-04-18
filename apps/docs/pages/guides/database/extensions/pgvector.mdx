@@ -60,13 +60,12 @@ To disable an extension, call `drop extension`.
 ### Create a table to store vectors
 
 ```sql
-create table
-  posts (
-    id serial primary key,
-    title text not null,
-    body text not null,
-    embedding vector (1536)
-  );
+create table posts (
+  id serial primary key,
+  title text not null,
+  body text not null,
+  embedding vector(1536)
+);
 ```
 
 ### Storing a vector / embedding

@@ -1,6 +1,5 @@
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
 import { STORAGE_KEY_PREFIX } from './constants'
-import { IMetaService } from './services/meta'
 import { InitialStateType } from './store/reducers'
 import { Dictionary, Sort, SupabaseGridProps, SupaColumn, SupaTable } from './types'
 import { getGridColumns } from './utils/gridColumns'
@@ -71,122 +70,50 @@ export async function initTable(
   props: SupabaseGridProps,
   state: InitialStateType,
   dispatch: (value: any) => void,
-  sort?: string[], // Come directly from URL param
-  filter?: string[] // Come directly from URL param
+  sort?: string[], // Comes directly from URL param
+  filter?: string[] // Comes directly from URL param
 ): Promise<{ savedState: { sorts?: string[]; filters?: string[] } }> {
-  function onInitTable(table: SupaTable, props: SupabaseGridProps) {
-    const savedState = props.storageRef
-      ? onLoadStorage(props.storageRef, table.name, table.schema)
-      : undefined
+  const savedState = props.storageRef
+    ? onLoadStorage(props.storageRef, props.table.name, props.table.schema)
+    : undefined
 
-    // Check for saved state on initial load and also, load sort and filters via URL param only if given
-    // Otherwise load from local storage to resume user session
-    if (
-      !state.isInitialComplete &&
-      sort === undefined &&
-      filter === undefined &&
-      (savedState?.sorts || savedState?.filters)
-    ) {
-      return {
-        savedState: {
-          sorts: savedState.sorts,
-          filters: savedState.filters,
-        },
-      }
-    }
-
-    const gridColumns = getGridColumns(table, {
-      editable: props.editable,
-      defaultWidth: props.gridProps?.defaultColumnWidth,
-      onAddColumn: props.editable ? props.onAddColumn : undefined,
-      onExpandJSONEditor: props.editable ? props.onExpandJSONEditor : () => {},
-    })
-
-    dispatch({
-      type: 'INIT_TABLE',
-      payload: {
-        table,
-        gridProps: props.gridProps,
-        gridColumns,
-        savedState,
-        editable: props.editable,
-        onSqlQuery: props.onSqlQuery,
-        onError: props.onError ?? defaultErrorHandler,
+  // Check for saved state on initial load and also, load sort and filters via URL param only if given
+  // Otherwise load from local storage to resume user session
+  if (
+    !state.isInitialComplete &&
+    sort === undefined &&
+    filter === undefined &&
+    (savedState?.sorts || savedState?.filters)
+  ) {
+    return {
+      savedState: {
+        sorts: savedState.sorts,
+        filters: savedState.filters,
       },
-    })
-
-    return { savedState: {} }
-  }
-
-  if (typeof props.table === 'string') {
-    const viewData = props.editable
-      ? await fetchEditableInfo(state.metaService!, props.table, props.schema)
-      : await fetchReadOnlyInfo(state.metaService!, props.table, props.schema)
-
-    if (viewData) {
-      return onInitTable(viewData, props)
-    } else {
-      if (props.onError) props.onError({ message: 'Failed to fetch data from view' })
     }
-  } else {
-    return onInitTable(props.table, props)
   }
+
+  const gridColumns = getGridColumns(props.table, {
+    editable: props.editable,
+    defaultWidth: props.gridProps?.defaultColumnWidth,
+    onAddColumn: props.editable ? props.onAddColumn : undefined,
+    onExpandJSONEditor: props.editable ? props.onExpandJSONEditor : () => {},
+  })
+
+  dispatch({
+    type: 'INIT_TABLE',
+    payload: {
+      table: props.table,
+      gridProps: props.gridProps,
+      gridColumns,
+      savedState,
+      editable: props.editable,
+      onSqlQuery: props.onSqlQuery,
+      onError: props.onError ?? defaultErrorHandler,
+    },
+  })
 
   return { savedState: {} }
-}
-
-async function fetchEditableInfo(
-  service: IMetaService,
-  tableName: string,
-  schema?: string
-): Promise<SupaTable | null> {
-  const resTable = await service.fetchInfo(tableName, schema)
-  const resColumns = await service.fetchColumns(tableName, schema)
-  const resPrimaryKeys = await service.fetchPrimaryKeys(tableName, schema)
-  const resRelationships = await service.fetchRelationships(tableName, schema)
-  if (
-    resTable.data &&
-    resColumns.data &&
-    resPrimaryKeys.data &&
-    resRelationships.data &&
-    resColumns.data.length > 0
-  ) {
-    const supaTable = parseSupaTable({
-      table: resTable.data,
-      columns: resColumns.data,
-      primaryKeys: resPrimaryKeys.data,
-      relationships: resRelationships.data,
-    })
-    return supaTable
-  }
-  return null
-}
-
-async function fetchReadOnlyInfo(
-  service: IMetaService,
-  name: string,
-  schema?: string
-): Promise<SupaTable | null> {
-  const { data } = await service.fetchColumns(name, schema)
-
-  if (data) {
-    const supaColumns: SupaColumn[] = data.map((x, index) => {
-      return {
-        name: x.name,
-        dataType: x.format,
-        format: x.format,
-        position: index,
-        isUpdatable: false,
-      }
-    })
-
-    return {
-      name: name,
-      schema: schema,
-      columns: supaColumns,
-    }
-  }
-  return null
 }
 
 export function parseSupaTable(
@@ -215,9 +142,12 @@ export function parseSupaTable(
       isEncrypted: encryptedColumns.includes(column.name),
       enum: column.enums,
       comment: column.comment,
-      targetTableSchema: null,
-      targetTableName: null,
-      targetColumnName: null,
+      foreignKey: {
+        targetTableSchema: null,
+        targetTableName: null,
+        targetColumnName: null,
+        deletionAction: undefined,
+      },
     }
     const primaryKey = primaryKeys.find((pk) => pk.name == column.name)
     temp.isPrimaryKey = !!primaryKey
@@ -230,9 +160,10 @@ export function parseSupaTable(
       )
     })
     if (relationship) {
-      temp.targetTableSchema = relationship.target_table_schema
-      temp.targetTableName = relationship.target_table_name
-      temp.targetColumnName = relationship.target_column_name
+      temp.foreignKey.targetTableSchema = relationship.target_table_schema
+      temp.foreignKey.targetTableName = relationship.target_table_name
+      temp.foreignKey.targetColumnName = relationship.target_column_name
+      temp.foreignKey.deletionAction = relationship.deletion_action
     }
     return temp
   })

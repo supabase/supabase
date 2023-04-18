@@ -2,15 +2,13 @@ import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
   id: 'pgroonga',
-  title: 'PGRoonga: Multilingual Full Text Search',
+  title: 'PGroonga: Multilingual Full Text Search',
   description: 'Full Text Search for multiple languages in PostgreSQL',
 }
 
 `PGroonga` is a PostgreSQL extension adding a full text search indexing method based on [Groonga](https://groonga.org). While native PostgreSQL supports full text indexing, it is limited to alphabet and digit based languages. `PGroonga` offers a wider range of character support making it viable for a superset of languages supported by PostgreSQL including Japanese, Chinese, etc.
 
-## Usage
-
-### Enable the extension
+## Enable the extension
 
 <Tabs
   scrollable
@@ -39,12 +37,10 @@ drop extension if exists pgroonga;
 Even though the SQL code is `create extension`, this is the equivalent of "enabling the extension".
 To disable an extension you can call `drop extension`.
 
-It's good practice to create the extension within a separate schema (like `extensions`) to keep your database clean.
-
 </TabPanel>
 </Tabs>
 
-### Creating a full text search index
+## Creating a full text search index
 
 Given a table with a `text` column:
 

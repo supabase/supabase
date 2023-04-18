@@ -36,6 +36,22 @@ export const meta = {
 
 </div>
 
+### Use Cases
+
+<div className="grid lg:grid-cols-12 gap-6 not-prose">
+  {useCases.map((item) => {
+    return (
+      <Link href={`${item.href}`} key={item.title} passHref>
+        <a className={'col-span-4'}>
+          <GlassPanel title={item.title} span="col-span-6" background={false} icon={item.icon}>
+            {item.description}
+          </GlassPanel>
+        </a>
+      </Link>
+    )
+  })}
+</div>
+
 ### Framework Quickstarts
 
 <div className="grid lg:grid-cols-12 gap-6 not-prose">
@@ -84,6 +100,27 @@ export const meta = {
   })}
 </div>
 
+export const useCases = [
+  {
+    title: 'OpenAI Vector Search',
+    href: '/guides/getting-started/openai/vector-search',
+    description: `Build your own custom ChatGPT with Next.js, OpenAI and pg_vector.`,
+    icon: '/docs/img/icons/openai_logo',
+  },
+  {
+    title: 'Subscription Payments (SaaS)',
+    href: 'https://github.com/vercel/nextjs-subscription-payments#nextjs-subscription-payments-starter',
+    description: `Clone, deploy, and fully customize a SaaS subscription application with Next.js.`,
+    icon: '/docs/img/icons/nextjs-icon',
+  },
+  {
+    title: 'Partner Gallery',
+    href: 'https://github.com/supabase-community/partner-gallery-example#supabase-partner-gallery-example',
+    description: `Postgres full-text search, image storage, and more.`,
+    icon: '/docs/img/icons/nextjs-icon',
+  },
+]
+
 export const quickstarts = [
   {
     title: 'React',
@@ -100,11 +137,39 @@ export const quickstarts = [
     icon: '/docs/img/icons/nextjs-icon',
   },
   {
+    title: 'RedwoodJS',
+    href: '/guides/getting-started/quickstarts/redwoodjs',
+    description:
+      'Learn how to create a Supabase project, add some sample data to your database using Prisma migration and seeds, and query the data from a RedwoodJS app.',
+    icon: '/docs/img/icons/redwood-icon',
+  },
+  {
     title: 'Flutter',
     href: '/guides/getting-started/quickstarts/flutter',
     description:
       'Learn how to create a Supabase project, add some sample data to your database, and query the data from a Flutter app.',
     icon: '/docs/img/icons/flutter-icon',
+  },
+  {
+    title: 'SvelteKit',
+    href: '/guides/getting-started/quickstarts/sveltekit',
+    description:
+      'Learn how to create a Supabase project, add some sample data to your database, and query the data from a SvelteKit app.',
+    icon: '/docs/img/icons/svelte-icon',
+  },
+  {
+    title: 'SolidJS',
+    href: '/guides/getting-started/quickstarts/solidjs',
+    description:
+      'Learn how to create a Supabase project, add some sample data to your database, and query the data from a SolidJS app.',
+    icon: '/docs/img/icons/solidjs-icon',
+  },
+  {
+    title: 'Vue',
+    href: '/guides/getting-started/quickstarts/solidjs',
+    description:
+      'Learn how to create a Supabase project, add some sample data to your database, and query the data from a Vue app.',
+    icon: '/docs/img/icons/vuejs-icon',
   },
 ]
 
@@ -217,6 +282,12 @@ export const resources = [
     hasLightIcon: true,
     href: '/guides/getting-started/architecture',
     description: "An overview of Supabase's architecture and product principles.",
+  },
+  {
+    title: 'Local Development',
+    hasLightIcon: true,
+    href: '/guides/cli/local-development',
+    description: 'Use the Supabase CLI to develop locally and collaborate between teams.',
   },
 ]
 

@@ -1,24 +1,33 @@
-import React, { FC, useState, useMemo, useCallback } from 'react'
+import React, { useState, useMemo, useCallback } from 'react'
 import { isEqual } from 'lodash'
 import update from 'immutability-helper'
 import { Button, IconList, IconChevronDown, Popover } from 'ui'
 import { useUrlState } from 'hooks'
 
 import SortRow from './SortRow'
-import { useTrackedState } from 'components/grid/store'
 import { DropdownControl } from 'components/grid/components/common'
-import { Sort } from 'components/grid/types'
+import { Sort, SupaTable } from 'components/grid/types'
 import { formatSortURLParams } from 'components/grid/SupabaseGrid.utils'
 
-const SortPopover: FC = () => {
-  const [{ sort: sorts }]: any = useUrlState({ arrayKeys: ['sort'] })
+export interface SortPopoverProps {
+  table: SupaTable
+  sorts: string[]
+  setParams: ReturnType<typeof useUrlState>[1]
+}
+
+const SortPopover = ({ table, sorts, setParams }: SortPopoverProps) => {
   const btnText =
     (sorts || []).length > 0
       ? `Sorted by ${sorts.length} rule${sorts.length > 1 ? 's' : ''}`
       : 'Sort'
 
   return (
-    <Popover size="large" align="start" className="sb-grid-sort-popover" overlay={<SortOverlay />}>
+    <Popover
+      size="large"
+      align="start"
+      className="sb-grid-sort-popover"
+      overlay={<SortOverlay table={table} sorts={sorts} setParams={setParams} />}
+    >
       <Button
         as="span"
         type={(sorts || []).length > 0 ? 'link' : 'text'}
@@ -33,19 +42,19 @@ const SortPopover: FC = () => {
     </Popover>
   )
 }
+
 export default SortPopover
 
-const SortOverlay: FC = () => {
-  const state = useTrackedState()
+export interface SortOverlayProps extends SortPopoverProps {}
 
-  const [{ sort: sortsFromUrl }, setParams] = useUrlState({ arrayKeys: ['sort'] })
+const SortOverlay = ({ table, sorts: sortsFromUrl, setParams }: SortOverlayProps) => {
   const initialSorts = useMemo(
     () => formatSortURLParams((sortsFromUrl as string[]) ?? []),
     [sortsFromUrl]
   )
   const [sorts, setSorts] = useState<Sort[]>(initialSorts)
 
-  const columns = state?.table?.columns!.filter((x) => {
+  const columns = table.columns!.filter((x) => {
     const found = sorts.find((y) => y.column == x.name)
     return !found
   })
@@ -100,6 +109,7 @@ const SortOverlay: FC = () => {
       {sorts.map((sort, index) => (
         <SortRow
           key={sort.column}
+          table={table}
           index={index}
           columnName={sort.column}
           sort={sort}
