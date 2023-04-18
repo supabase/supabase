@@ -22,16 +22,16 @@
 <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_803_16272" result="shape"/>
 </filter>
 <linearGradient id="paint0_linear_803_16272" x1="31.1991" y1="16.2818" x2="1193.07" y2="150.36" gradientUnits="userSpaceOnUse">
-<stop stop-color="#FFF249"/>
+<stop stopColor="#FFF249"/>
 <stop offset="1" stop-color="#DECD43"/>
 <stop offset="1" stop-color="#B19811"/>
 </linearGradient>
 <linearGradient id="paint1_linear_803_16272" x1="990.188" y1="-180.606" x2="834.844" y2="675.899" gradientUnits="userSpaceOnUse">
-<stop stop-color="#FEFFE3"/>
+<stop stopColor="#FEFFE3"/>
 <stop offset="1" stop-color="#C4AE38"/>
 </linearGradient>
 <linearGradient id="paint2_linear_803_16272" x1="487.939" y1="336.476" x2="811.91" y2="612.991" gradientUnits="userSpaceOnUse">
-<stop stop-color="#CDB644"/>
+<stop stopColor="#CDB644"/>
 <stop offset="1" stop-color="#BA9619" stop-opacity="0.28"/>
 </linearGradient>
 <clipPath id="clip0_803_16272">

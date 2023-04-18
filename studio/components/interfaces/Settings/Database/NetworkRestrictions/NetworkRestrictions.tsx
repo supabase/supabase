@@ -4,7 +4,8 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { Button, IconAlertCircle, IconExternalLink, IconGlobe, IconLock } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useParams } from 'hooks'
+import { checkPermissions } from 'hooks'
+import { useParams } from 'common/hooks'
 import Panel from 'components/ui/Panel'
 import { FormPanel, FormHeader } from 'components/ui/Forms'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
@@ -25,19 +26,21 @@ const AllowAllAccessButton: FC<{ disabled: boolean; onClick: (value: boolean) =>
       </Button>
     </Tooltip.Trigger>
     {disabled && (
-      <Tooltip.Content align="center" side="bottom">
-        <Tooltip.Arrow className="radix-tooltip-arrow" />
-        <div
-          className={[
-            'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-            'border border-scale-200 w-[250px]',
-          ].join(' ')}
-        >
-          <span className="text-xs text-scale-1200">
-            You need additional permissions to update network restrictions
-          </span>
-        </div>
-      </Tooltip.Content>
+      <Tooltip.Portal>
+        <Tooltip.Content align="center" side="bottom">
+          <Tooltip.Arrow className="radix-tooltip-arrow" />
+          <div
+            className={[
+              'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+              'border border-scale-200 w-[250px]',
+            ].join(' ')}
+          >
+            <span className="text-xs text-scale-1200">
+              You need additional permissions to update network restrictions
+            </span>
+          </div>
+        </Tooltip.Content>
+      </Tooltip.Portal>
     )}
   </Tooltip.Root>
 )
@@ -53,19 +56,21 @@ const DisallowAllAccessButton: FC<{ disabled: boolean; onClick: (value: boolean)
       </Button>
     </Tooltip.Trigger>
     {disabled && (
-      <Tooltip.Content align="center" side="bottom">
-        <Tooltip.Arrow className="radix-tooltip-arrow" />
-        <div
-          className={[
-            'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-            'border border-scale-200 w-[250px]',
-          ].join(' ')}
-        >
-          <span className="text-xs text-scale-1200">
-            You need additional permissions to update network restrictions
-          </span>
-        </div>
-      </Tooltip.Content>
+      <Tooltip.Portal>
+        <Tooltip.Content align="center" side="bottom">
+          <Tooltip.Arrow className="radix-tooltip-arrow" />
+          <div
+            className={[
+              'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+              'border border-scale-200 w-[250px]',
+            ].join(' ')}
+          >
+            <span className="text-xs text-scale-1200">
+              You need additional permissions to update network restrictions
+            </span>
+          </div>
+        </Tooltip.Content>
+      </Tooltip.Portal>
     )}
   </Tooltip.Root>
 )
@@ -82,7 +87,7 @@ const NetworkRestrictions = ({}) => {
   const canUpdateNetworkRestrictions = checkPermissions(PermissionAction.UPDATE, 'projects')
 
   const hasAccessToRestrictions = data?.entitlement === 'allowed'
-  const restrictedIps = data?.config.dbAllowedCidrs ?? []
+  const restrictedIps = data?.config?.dbAllowedCidrs ?? []
   const restrictionStatus = data?.status ?? ''
 
   const hasApplyError = restrictedIps.length === 0 && restrictionStatus === 'stored'
@@ -118,19 +123,21 @@ const NetworkRestrictions = ({}) => {
                 </Button>
               </Tooltip.Trigger>
               {!canUpdateNetworkRestrictions && (
-                <Tooltip.Content align="center" side="bottom">
-                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                  <div
-                    className={[
-                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                      'border border-scale-200 w-[250px]',
-                    ].join(' ')}
-                  >
-                    <span className="text-xs text-scale-1200">
-                      You need additional permissions to update network restrictions
-                    </span>
-                  </div>
-                </Tooltip.Content>
+                <Tooltip.Portal>
+                  <Tooltip.Content align="center" side="bottom">
+                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                    <div
+                      className={[
+                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                        'border border-scale-200 w-[250px]',
+                      ].join(' ')}
+                    >
+                      <span className="text-xs text-scale-1200">
+                        You need additional permissions to update network restrictions
+                      </span>
+                    </div>
+                  </Tooltip.Content>
+                </Tooltip.Portal>
               )}
             </Tooltip.Root>
           </div>

@@ -163,12 +163,10 @@ const ColumnManagement: FC<Props> = ({
         </div>
 
         {hasImportContent && (
-          <div className="my-2 opacity-75">
-            <p>
-              Your table will be created with {importContent?.rowCount?.toLocaleString()} rows and
-              the following {columns.length} columns.
-            </p>
-          </div>
+          <p className="text-sm text-scale-1000 my-2">
+            Your table will be created with {importContent?.rowCount?.toLocaleString()} rows and the
+            following {columns.length} columns.
+          </p>
         )}
 
         {primaryKeyColumns.length === 0 && (
@@ -202,20 +200,22 @@ const ColumnManagement: FC<Props> = ({
                     <IconHelpCircle size={15} strokeWidth={1.5} />
                   </h5>
                 </Tooltip.Trigger>
-                <Tooltip.Content side="bottom">
-                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                  <div
-                    className={[
-                      'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                      'border border-scale-200 ', //border
-                    ].join(' ')}
-                  >
-                    <span className="text-xs text-scale-1200">
-                      Recommended to use lowercase and use an underscore to separate words e.g.
-                      column_name
-                    </span>
-                  </div>
-                </Tooltip.Content>
+                <Tooltip.Portal>
+                  <Tooltip.Content side="bottom">
+                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                    <div
+                      className={[
+                        'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
+                        'border border-scale-200 ', //border
+                      ].join(' ')}
+                    >
+                      <span className="text-xs text-scale-1200">
+                        Recommended to use lowercase and use an underscore to separate words e.g.
+                        column_name
+                      </span>
+                    </div>
+                  </Tooltip.Content>
+                </Tooltip.Portal>
               </Tooltip.Root>
             </div>
             <div className="w-[25%]">
@@ -230,19 +230,22 @@ const ColumnManagement: FC<Props> = ({
                     <IconHelpCircle size={15} strokeWidth={1.5} />
                   </h5>
                 </Tooltip.Trigger>
-                <Tooltip.Content side="bottom">
-                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                  <div
-                    className={[
-                      'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                      'border border-scale-200 ', //border
-                    ].join(' ')}
-                  >
-                    <span className="text-xs text-scale-1200">
-                      Can be either a value or a SQL expression
-                    </span>
-                  </div>
-                </Tooltip.Content>
+                <Tooltip.Portal>
+                  <Tooltip.Content side="bottom">
+                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                    <div
+                      className={[
+                        'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
+                        'border border-scale-200 ', //border
+                      ].join(' ')}
+                    >
+                      <span className="text-xs text-scale-1200">
+                        Can either be a literal or an expression. When using an expression wrap your
+                        expression in brackets, e.g. (uuid_generate_v4())
+                      </span>
+                    </div>
+                  </Tooltip.Content>
+                </Tooltip.Portal>
               </Tooltip.Root>
             </div>
             <div className="w-[10%]">

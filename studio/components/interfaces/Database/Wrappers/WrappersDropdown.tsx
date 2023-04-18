@@ -6,7 +6,8 @@ import { Button, Dropdown, IconPlus } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useParams, checkPermissions } from 'hooks'
+import { checkPermissions } from 'hooks'
+import { useParams } from 'common/hooks'
 import { WRAPPERS } from './Wrappers.constants'
 
 interface Props {
@@ -26,19 +27,21 @@ const WrapperDropdown: FC<Props> = ({ buttonText = 'Add wrapper', align = 'end' 
             {buttonText}
           </Button>
         </Tooltip.Trigger>
-        <Tooltip.Content side="bottom">
-          <Tooltip.Arrow className="radix-tooltip-arrow" />
-          <div
-            className={[
-              'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-              'border border-scale-200',
-            ].join(' ')}
-          >
-            <span className="text-xs text-scale-1200">
-              You need additional permissions to add wrappers
-            </span>
-          </div>
-        </Tooltip.Content>
+        <Tooltip.Portal>
+          <Tooltip.Content side="bottom">
+            <Tooltip.Arrow className="radix-tooltip-arrow" />
+            <div
+              className={[
+                'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                'border border-scale-200',
+              ].join(' ')}
+            >
+              <span className="text-xs text-scale-1200">
+                You need additional permissions to add wrappers
+              </span>
+            </div>
+          </Tooltip.Content>
+        </Tooltip.Portal>
       </Tooltip.Root>
     )
   }

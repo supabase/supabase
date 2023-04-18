@@ -6,35 +6,23 @@ import Telemetry, { GoogleAnalyticsProps } from 'lib/telemetry'
 
 export interface IUiStore {
   language: 'en-US'
-  theme: 'dark' | 'light'
-  themeOption: 'dark' | 'light' | 'system'
-
   selectedProjectRef?: string
-  isDarkTheme: boolean
   selectedProject?: Project
   selectedProjectBaseInfo?: ProjectBase
   selectedOrganization?: Organization
   notification?: Notification
   permissions?: Permission[]
-
   googleAnalyticsProps?: GoogleAnalyticsProps
-
   load: () => void
-  setTheme: (theme: 'dark' | 'light') => void
-  onThemeOptionChange: (themeOption: 'dark' | 'light' | 'system') => void
   setProjectRef: (ref?: string) => void
   setOrganizationSlug: (slug?: string) => void
   setNotification: (notification: Notification) => string
   setProfile: (value: User) => void
   setPermissions: (permissions?: Permission[]) => void
-  setGaClientId: (clientId?: string) => void
 }
 export default class UiStore implements IUiStore {
   rootStore: IRootStore
   language: 'en-US' = 'en-US'
-  theme: 'dark' | 'light' = 'dark'
-  themeOption: 'dark' | 'light' | 'system' = 'dark'
-
   selectedProjectRef?: string
   selectedOrganizationSlug?: string
   notification?: Notification
@@ -95,10 +83,6 @@ export default class UiStore implements IUiStore {
     return undefined
   }
 
-  get isDarkTheme() {
-    return this.theme === 'dark'
-  }
-
   get googleAnalyticsProps() {
     return {
       screenResolution:
@@ -109,37 +93,6 @@ export default class UiStore implements IUiStore {
 
   load() {
     if (typeof window === 'undefined') return
-    const localStorageThemeOption = window.localStorage.getItem('theme')
-    if (localStorageThemeOption === 'system') {
-      this.themeOption = localStorageThemeOption
-      return this.setTheme(
-        window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-      )
-    }
-    if (localStorageThemeOption === 'light') {
-      this.themeOption = localStorageThemeOption
-      return this.setTheme('light')
-    }
-    window.localStorage.setItem('theme', 'dark')
-    this.themeOption = 'dark'
-    this.setTheme('dark')
-  }
-
-  setTheme(theme: 'dark' | 'light') {
-    document.body.classList.replace(this.theme, theme)
-    this.theme = theme
-  }
-
-  onThemeOptionChange(themeOption: 'dark' | 'light' | 'system') {
-    this.themeOption = themeOption
-    if (themeOption === 'system') {
-      window.localStorage.setItem('theme', 'system')
-      return this.setTheme(
-        window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-      )
-    }
-    window.localStorage.setItem('theme', themeOption)
-    this.setTheme(themeOption)
   }
 
   setProjectRef(ref?: string) {
@@ -162,14 +115,5 @@ export default class UiStore implements IUiStore {
 
   setPermissions(permissions?: any) {
     this.permissions = permissions
-  }
-
-  setGaClientId(clientId?: string) {
-    /**
-     * We need to access ga client_id from base.constructHeaders method
-     * in order to set custom header('ga_client_id).
-     * TODO: Do we have a better way than storing in local storage?
-     */
-    window.localStorage.setItem('ga_client_id', String(clientId))
   }
 }

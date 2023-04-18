@@ -130,7 +130,7 @@ import type { LayoutServerLoad } from './$types';
 
 export const load: LayoutServerLoad = async ({ locals: { getSession } }) => {
   return {
-    session: getSession()
+    session: await getSession()
   };
 };
 ```
@@ -176,14 +176,16 @@ Update your `src/routes/+layout.svelte`:
 	import { invalidate } from '$app/navigation'
 	import { onMount } from 'svelte'
 	import type { LayoutData } from './$types'
-	
+
 	export let data: LayoutData
 
-	$: ({ supabase } = data)
+	$: ({ supabase, session } = data)
 
 	onMount(() => {
-		const { data } = supabase.auth.onAuthStateChange(() => {
-			invalidate('supabase:auth')
+		const { data } = supabase.auth.onAuthStateChange((event, _session) => {
+			if (_session?.expires_at !== session?.expires_at) {
+				invalidate('supabase:auth')
+			}
 		})
 
 		return () => data.subscription.unsubscribe()
@@ -351,7 +353,7 @@ Create a new `src/routes/account/+page.svelte` file with the content below.
 
 		<div>
 			<label for="website">Website</label>
-			<input id="website" name="website" type="website" value={form?.website ?? website} />
+			<input id="website" name="website" type="url" value={form?.website ?? website} />
 		</div>
 
 		<div>

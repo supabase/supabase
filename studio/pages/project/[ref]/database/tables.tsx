@@ -1,3 +1,4 @@
+import { useQueryClient } from '@tanstack/react-query'
 import { useState, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import { isUndefined } from 'lodash'
@@ -5,15 +6,21 @@ import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 import { Modal } from 'ui'
 
 import { useStore } from 'hooks'
+import { sqlKeys } from 'data/sql/keys'
 
 import { DatabaseLayout } from 'components/layouts'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { TableList, ColumnList } from 'components/interfaces/Database'
 import { SidePanelEditor } from 'components/interfaces/TableGridEditor'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { NextPageWithLayout } from 'types'
 
 const DatabaseTables: NextPageWithLayout = () => {
   const { meta, ui } = useStore()
+
+  const { project } = useProjectContext()
+
+  const queryClient = useQueryClient()
 
   const [isDeleting, setIsDeleting] = useState<boolean>(false)
   const [selectedSchema, setSelectedSchema] = useState('public')
@@ -108,6 +115,21 @@ const DatabaseTables: NextPageWithLayout = () => {
           category: 'success',
           message: `Successfully removed ${selectedColumnToDelete.name}.`,
         })
+
+        queryClient.invalidateQueries(sqlKeys.query(project?.ref, ['foreign-key-constraints']))
+        await Promise.all([
+          meta.tables.loadById(selectedColumnToDelete!.table_id),
+          queryClient.invalidateQueries(
+            sqlKeys.query(project?.ref, [selectedTable!.schema, selectedTable!.name])
+          ),
+          queryClient.invalidateQueries(
+            sqlKeys.query(project?.ref, [
+              'table-definition',
+              selectedTable!.schema,
+              selectedTable!.name,
+            ])
+          ),
+        ])
       }
     } catch (error: any) {
       ui.setNotification({

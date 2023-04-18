@@ -1,10 +1,10 @@
 import Link from 'next/link'
-import { FC } from 'react'
 import { Alert, Badge, Button, IconPackage, Input } from 'ui'
 import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
 
-import { useFlag, useParams, useStore } from 'hooks'
+import { useFlag } from 'hooks'
+import { useParams } from 'common/hooks'
 import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import {
   FormHeader,
@@ -18,18 +18,23 @@ import PauseProjectButton from './PauseProjectButton'
 import RestartServerButton from './RestartServerButton'
 import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
 import { useProjectUpgradeEligibilityQuery } from 'data/config/project-upgrade-eligibility-query'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
-interface Props {}
+interface InfrastructureProps {}
 
-const Infrastructure: FC<Props> = ({}) => {
-  const { ui } = useStore()
+const Infrastructure = ({}: InfrastructureProps) => {
   const { ref } = useParams()
-
-  const project = ui.selectedProject
+  const { project } = useProjectContext()
   const { data: subscription } = useProjectSubscriptionQuery({ projectRef: ref })
   const isFreeProject = subscription?.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.FREE
 
-  const { data, isLoading } = useProjectUpgradeEligibilityQuery({ projectRef: ref })
+  const {
+    data,
+    isLoading: isLoadingUpgradeElibility,
+    isError,
+  } = useProjectUpgradeEligibilityQuery({
+    projectRef: ref,
+  })
   const { current_app_version, latest_app_version, requires_manual_intervention } = data || {}
   const isOnLatestVersion = current_app_version === latest_app_version
   const currentPgVersion = (current_app_version ?? '').split('supabase-postgres-')[1]
@@ -86,11 +91,13 @@ const Infrastructure: FC<Props> = ({}) => {
         </FormSection>
 
         <FormSection header={<FormSectionLabel>Postgres</FormSectionLabel>}>
-          <FormSectionContent loading={isLoading}>
+          <FormSectionContent loading={isLoadingUpgradeElibility}>
             <Input
               readOnly
               disabled
-              value={currentPgVersion}
+              value={
+                currentPgVersion ?? (isError ? 'Unable to fetch Postgres version of project' : '')
+              }
               label="Current version"
               actions={[
                 isOnLatestVersion && (
@@ -100,19 +107,21 @@ const Infrastructure: FC<Props> = ({}) => {
                         Latest
                       </Badge>
                     </Tooltip.Trigger>
-                    <Tooltip.Content side="bottom">
-                      <Tooltip.Arrow className="radix-tooltip-arrow" />
-                      <div
-                        className={[
-                          'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                          'border border-scale-200 w-[200px]',
-                        ].join(' ')}
-                      >
-                        <span className="text-xs text-scale-1200">
-                          Project is on the latest version of Postgres that Supabase supports
-                        </span>
-                      </div>
-                    </Tooltip.Content>
+                    <Tooltip.Portal>
+                      <Tooltip.Content side="bottom">
+                        <Tooltip.Arrow className="radix-tooltip-arrow" />
+                        <div
+                          className={[
+                            'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                            'border border-scale-200 w-[200px]',
+                          ].join(' ')}
+                        >
+                          <span className="text-xs text-scale-1200">
+                            Project is on the latest version of Postgres that Supabase supports
+                          </span>
+                        </div>
+                      </Tooltip.Content>
+                    </Tooltip.Portal>
                   </Tooltip.Root>
                 ),
               ]}

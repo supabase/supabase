@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url(../pages/launch-week/launchWeek.css);
+
 @font-face {
   font-family: 'custom-font';
   src: url(../../../packages/common/assets/fonts/CustomFont-Book.woff2) format('woff2'),
@@ -19,7 +21,7 @@
 }
 
 html {
-  scroll-behavior: smooth;
+  scroll-behavior: smooth !important;
 }
 
 body {
@@ -68,9 +70,26 @@ h6 { */
   @apply text-xl;
 }
 
+h1:not(.overwrite),
+h2:not(.overwrite),
+h3:not(.overwrite),
+h4:not(.overwrite),
+h5:not(.overwrite),
+h6:not(.overwrite) {
+  scroll-margin-top: 90px;
+}
+
 .h1:not(.prose *):not(.overwrite),
 .h2:not(.prose *):not(.overwrite) {
   line-height: 1.2 !important;
+}
+
+.toc-animate {
+  @apply !translate-x-1 !text-brand-900;
+}
+
+.prose-toc a {
+  transition: all 0.07s ease-in-out;
 }
 
 @media only screen and (max-width: 960px) {
@@ -225,9 +244,34 @@ table {
 *
 */
 .next-image--dynamic-fill {
+  display: block;
   width: 100%;
+  border-radius: 6px;
+  overflow: hidden;
   grid-column: 1 / -1;
 }
+.next-image--dynamic-fill.wide {
+  @apply my-0 max-w-none -mx-8 w-[calc(100%_+_4rem)];
+}
+@media (min-width: 560px) {
+  .next-image--dynamic-fill.wide {
+    width: calc(100% + 6rem);
+    margin: 0 -3rem;
+  }
+}
+@media (min-width: 1280px) {
+  .next-image--dynamic-fill.wide {
+    width: calc(100% + 10rem);
+    margin: 0 -5rem;
+  }
+}
+@media (min-width: 1535px) {
+  .next-image--dynamic-fill.wide {
+    width: calc(100% + 14rem);
+    margin: 0 -7rem;
+  }
+}
+
 .next-image--dynamic-fill > span {
   position: relative !important;
 }
@@ -691,4 +735,42 @@ launch week
       var(--colors-scale12) 100%
     );
   }
+
+  .gradient-text-pink-500 {
+    @apply text-transparent bg-clip-text bg-gradient-to-br from-[#c867ee] to-[#f6a4f3];
+  }
+
+  .gradient-text-purple-500 {
+    @apply text-transparent bg-clip-text bg-gradient-to-br from-[#902DFB] to-[#D87BF5];
+  }
+
+  .gradient-text-purple-800 {
+    @apply text-transparent bg-clip-text bg-gradient-to-br from-[#5900EA] to-[#A242E5];
+  }
+
+  .gradient-text-gold-500 {
+    background-image: -webkit-linear-gradient(45deg, #e4b641 100%, #f5bf0069 41%);
+  }
+
+  .radial-gradient-text-scale-500 {
+    background: radial-gradient(45% 100% at 50% 50%, #fff 30%, hsla(0, 0%, 100%, 0.35) 100%);
+  }
+  .radial-gradient-text-scale-600 {
+    background: radial-gradient(45% 100% at 50% 50%, #fff 30%, hsla(0, 0%, 100%, 0.6) 100%);
+  }
+}
+
+/* LW7 Tickets Slider */
+.ticket-brick-swiper .swiper-slide {
+  width: 230px;
+}
+
+@media (min-width: 768px) {
+  .ticket-brick-swiper .swiper-slide {
+    width: 450px;
+  }
+}
+
+.ticket-brick-swiper .swiper-wrapper {
+  transition-timing-function: linear;
 }
