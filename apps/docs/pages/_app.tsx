@@ -1,9 +1,7 @@
 import '../../../packages/ui/styles/themes/light.css'
 import '../../../packages/ui/styles/themes/dark.css'
 
-import '../styles/algolia-search.scss'
 import '../styles/ch.scss'
-import '../styles/docsearch.scss'
 import '../styles/main.scss?v=1.0.0'
 import '../styles/new-docs.scss'
 import '../styles/prism-okaidia.scss'
