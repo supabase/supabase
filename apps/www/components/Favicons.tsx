@@ -22,15 +22,15 @@ const Favicons = () => {
       {/* prettier-ignore */}
       <link rel="apple-touch-icon-precomposed" sizes="152x152" href={`${basePath}/favicon/apple-touch-icon-152x152.png`}/>
       {/* prettier-ignore */}
-      <link rel="icon" type="image/png" href={`${basePath}/favicon/favicon-196x196.png" sizes="196x196`}/>
+      <link rel="icon" type="image/png" href={`${basePath}/favicon/favicon-196x196.png`} sizes="196x196"/>
       {/* prettier-ignore */}
-      <link rel="icon" type="image/png" href={`${basePath}/favicon/favicon-96x96.png" sizes="96x96`}/>
+      <link rel="icon" type="image/png" href={`${basePath}/favicon/favicon-96x96.png`} sizes="96x96"/>
       {/* prettier-ignore */}
-      <link rel="icon" type="image/png" href={`${basePath}/favicon/favicon-32x32.png" sizes="32x32`}/>
+      <link rel="icon" type="image/png" href={`${basePath}/favicon/favicon-32x32.png`} sizes="32x32"/>
       {/* prettier-ignore */}
-      <link rel="icon" type="image/png" href={`${basePath}/favicon/favicon-16x16.png" sizes="16x16`}/>
+      <link rel="icon" type="image/png" href={`${basePath}/favicon/favicon-16x16.png`} sizes="16x16"/>
       {/* prettier-ignore */}
-      <link rel="icon" type="image/png" href={`${basePath}/favicon/favicon-128.png" sizes="128x128`}/>
+      <link rel="icon" type="image/png" href={`${basePath}/favicon/favicon-128.png`} sizes="128x128"/>
       <meta name="application-name" content="&nbsp;" />
       <meta name="msapplication-TileColor" content="#1E1E1E" />
       <meta name="msapplication-TileImage" content="mstile-144x144.png" />

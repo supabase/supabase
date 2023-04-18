@@ -43,10 +43,6 @@ export const Grid = memo(
       const dispatch = useDispatch()
       const state = useTrackedState()
 
-      // workaround to force state tracking on state.gridColumns
-      const columnHeaders = state.gridColumns.map((x) => `${x.key}_${x.frozen}`)
-      const { gridColumns, onError: onErrorFunc } = state
-
       function onColumnResize(index: number, width: number) {
         updateColumnResizeDebounced(index, width, dispatch)
       }
@@ -110,22 +106,6 @@ export const Grid = memo(
         }
       }
 
-      if (!columnHeaders || columnHeaders.length == 0) {
-        return (
-          <div
-            className="sb-grid-grid--loading"
-            style={{ width: width || '100%', height: height || '50vh' }}
-          >
-            <div className="sb-grid-grid--loading__inner flex items-center gap-2">
-              <div className="animate-spin text-scale-900">
-                <IconLoader />
-              </div>
-              <div className="text-sm text-scale-1100">Loading...</div>
-            </div>
-          </div>
-        )
-      }
-
       return (
         <div
           className={containerClass}
@@ -133,7 +113,7 @@ export const Grid = memo(
         >
           <DataGrid
             ref={ref}
-            columns={gridColumns}
+            columns={state.gridColumns}
             rows={rows ?? []}
             rowRenderer={RowRenderer}
             rowKeyGetter={rowKeyGetter}
