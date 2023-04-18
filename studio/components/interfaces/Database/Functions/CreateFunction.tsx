@@ -120,6 +120,7 @@ interface ICreateFunctionStore {
   formState: CreateFunctionFormState
   meta: any
   schemas: Dictionary<any>[]
+  isEditing: boolean
   onFormChange: (value: { key: string; value: any }) => void
   onFormArrayChange: (value: {
     operation: 'add' | 'delete' | 'update'
@@ -740,9 +741,11 @@ const InputDefinition: FC = observer(({}) => {
         <p className="text-sm text-scale-1100">
           The language below should be written in `{_localState!.formState.language.value}`.
         </p>
-        <p className="text-sm text-scale-1100">
-          Change the language in the Advanced Settings below.
-        </p>
+        {!_localState?.isEditing && (
+          <p className="text-sm text-scale-1100">
+            Change the language in the Advanced Settings below.
+          </p>
+        )}
       </div>
       <div className="h-40 border dark:border-dark">
         <SqlEditor

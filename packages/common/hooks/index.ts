@@ -1,3 +1,2 @@
-import React from 'react'
-
+export * from './useBreakpoint'
 export * from './useParams'

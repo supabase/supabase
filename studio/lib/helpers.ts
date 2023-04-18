@@ -153,10 +153,26 @@ export const snakeToCamel = (str: string) =>
     group.toUpperCase().replace('-', '').replace('_', '')
   )
 
-export const copyToClipboard = (str: string, callback = () => {}) => {
+/**
+ * Copy text content (string or Promise<string>) into Clipboard.
+ * Safari doesn't support write text into clipboard async, so if you need to load
+ * text content async before coping, please use Promise<string> for the 1st arg.
+ */
+export const copyToClipboard = (str: string | Promise<string>, callback = () => {}) => {
   const focused = window.document.hasFocus()
   if (focused) {
-    window.navigator?.clipboard?.writeText(str).then(callback)
+    if (window.ClipboardItem) {
+      const text = new ClipboardItem({
+        'text/plain': Promise.resolve(str).then((text) => new Blob([text], { type: 'text/plain' })),
+      })
+      window.navigator?.clipboard?.write([text]).then(callback)
+
+      return
+    }
+
+    Promise.resolve(str)
+      .then((text) => window.navigator?.clipboard?.writeText(text))
+      .then(callback)
   } else {
     console.warn('Unable to copy to clipboard')
   }
