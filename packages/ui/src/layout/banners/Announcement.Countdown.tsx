@@ -37,7 +37,7 @@ function CountdownBanner() {
           <div>
             <Link href="/launch-week">
               <a className="bg-white text-xs px-1.5 md:px-2.5 py-1 rounded-full text-[#9E44EF] shadow-none hover:shadow-mg cursor-pointer">
-                Now live
+                Explore
               </a>
             </Link>
           </div>
