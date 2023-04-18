@@ -1,6 +1,6 @@
 import { ReactNode, useMemo } from 'react'
 import { withAuth } from 'hooks'
-import { ProjectLayoutNonBlocking } from '../ProjectLayout/ProjectLayout'
+import { ProjectLayoutNonBlocking } from '../'
 import SQLEditorMenu from './SQLEditorMenu'
 
 export interface SQLEditorLayoutProps {

@@ -13,11 +13,12 @@ import {
   MessageStatus,
   useAiChat,
   Tabs,
+  UseAiChatOptions,
 } from 'ui'
 
 import { cn } from '../../../utils/cn'
 import { AiIcon, AiIconChat } from '../Command.icons'
-import { CommandItem } from '../Command.utils'
+import { CommandItem, useAutoInputFocus, useHistoryKeys } from '../Command.utils'
 import { useCommandMenu } from '../CommandMenuProvider'
 import { SAMPLE_QUERIES } from '../Command.constants'
 import SQLOutputActions from './SQLOutputActions'
@@ -25,10 +26,6 @@ import { generatePrompt } from './GenerateSQL.utils'
 import { ExcludeSchemaAlert, IncludeSchemaAlert, AiWarning } from '../Command.alerts'
 
 const GenerateSQL = () => {
-  // [Joshen] Temp hack to ensure that generatePrompt receives updated value
-  // of includeSchemaMetadata, needs to be fixed
-  const includeSchemaMetadataRef = useRef<any>()
-
   const [includeSchemaMetadata, setIncludeSchemaMetadata] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState<string>(SAMPLE_QUERIES[0].category)
 
@@ -39,18 +36,25 @@ const GenerateSQL = () => {
   const allowSendingSchemaMetadata =
     project?.ref !== undefined && flags?.allowCMDKDataOptIn && isOptedInToAI
 
+  const messageTemplate = useCallback<NonNullable<UseAiChatOptions['messageTemplate']>>(
+    (message) =>
+      generatePrompt(message, isOptedInToAI && includeSchemaMetadata ? definitions : undefined),
+    [isOptedInToAI, includeSchemaMetadata, definitions]
+  )
+
   const { submit, reset, messages, isResponding, hasError } = useAiChat({
-    messageTemplate: (message) => {
-      // [Joshen] Only pass the schema metadata at the start of the conversation if opted in
-      // Since the prompts are contextualized to the conversation, no need to keep sending it
-      return generatePrompt(
-        message,
-        isOptedInToAI && includeSchemaMetadataRef.current && messages.length === 0
-          ? definitions
-          : undefined
-      )
-    },
+    messageTemplate,
     setIsLoading,
+  })
+
+  const inputRef = useAutoInputFocus()
+
+  useHistoryKeys({
+    enable: !isResponding,
+    messages: messages
+      .filter(({ role }) => role === MessageRole.User)
+      .map(({ content }) => content),
+    setPrompt: setSearch,
   })
 
   const handleSubmit = useCallback(
@@ -68,7 +72,6 @@ const GenerateSQL = () => {
 
   useEffect(() => {
     if (search) handleSubmit(search)
-    includeSchemaMetadataRef.current = includeSchemaMetadata
   }, [])
 
   const formatAnswer = (answer: string) => {
@@ -267,12 +270,7 @@ const GenerateSQL = () => {
                 <Toggle
                   disabled={!isOptedInToAI || isLoading || isResponding}
                   checked={includeSchemaMetadata}
-                  onChange={() =>
-                    setIncludeSchemaMetadata((prev) => {
-                      includeSchemaMetadataRef.current = !prev
-                      return !prev
-                    })
-                  }
+                  onChange={() => setIncludeSchemaMetadata((prev) => !prev)}
                 />
               </div>
             ) : includeSchemaMetadata ? (
@@ -283,15 +281,7 @@ const GenerateSQL = () => {
           </div>
         )}
         <Input
-          inputRef={(inputElement) => {
-            if (inputElement) {
-              // We need to delay the focus until the end of the call stack
-              // due to order of operations
-              setTimeout(() => {
-                inputElement.focus()
-              }, 0)
-            }
-          }}
+          inputRef={inputRef}
           className="bg-scale-100 rounded mx-3 mb-4"
           autoFocus
           placeholder={
