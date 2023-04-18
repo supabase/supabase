@@ -1,75 +1,73 @@
 import React from 'react'
 
-import { Alert } from './../../../'
-
-// import ThemeProvider from '../../theme/themeContext'
+import Alert, { AlertProps } from './Alert'
 
 export default {
   title: 'Displays/Alerts',
   component: Alert,
 }
 
-export const Neutral = (args: any) => (
+export const Neutral = (args: AlertProps) => (
   <Alert {...args}>
     Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur amet labore.
   </Alert>
 )
 
-export const Success = (args: any) => (
+export const Success = (args: AlertProps) => (
   <Alert {...args}>
     Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur amet labore.
   </Alert>
 )
 
-export const SuccessWithIcon = (args: any) => (
+export const SuccessWithIcon = (args: AlertProps) => (
   <Alert {...args}>
     Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur amet labore.
   </Alert>
 )
 
-export const Danger = (args: any) => (
+export const Danger = (args: AlertProps) => (
   <Alert {...args}>
     Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur amet labore.
   </Alert>
 )
 
-export const DangerWithIcon = (args: any) => (
+export const DangerWithIcon = (args: AlertProps) => (
   <Alert {...args}>
     Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur amet labore.
   </Alert>
 )
 
-export const Info = (args: any) => (
+export const Info = (args: AlertProps) => (
   <Alert {...args}>
     Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur amet labore.
   </Alert>
 )
 
-export const InfoWithIcon = (args: any) => (
+export const InfoWithIcon = (args: AlertProps) => (
   <Alert {...args}>
     Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur amet labore.
   </Alert>
 )
 
-export const Warning = (args: any) => (
+export const Warning = (args: AlertProps) => (
   <Alert {...args}>
     Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur amet labore.
   </Alert>
 )
 
-export const WarningWithIcon = (args: any) => (
+export const WarningWithIcon = (args: AlertProps) => (
   <Alert {...args}>
     Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur amet labore.
   </Alert>
 )
 
-export const Closable = (args: any) => (
+export const Closable = (args: AlertProps) => (
   <Alert {...args}>
     Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur amet labore.
   </Alert>
 )
 
-export const WithAction = (args: any) => (
+export const WithAction = (args: AlertProps) => (
   <Alert {...args}>
     Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur amet labore.
   </Alert>

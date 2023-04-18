@@ -28,7 +28,7 @@ You need to install and configure the following dependencies on your machine to 
 
 - [Git](http://git-scm.com/)
 - [Node.js v16.x (LTS)](http://nodejs.org)
-- [npm](https://www.npmjs.com/) version 7+ or [Yarn](https://yarnpkg.com/)
+- [npm](https://www.npmjs.com/) version 8.x.x or [Yarn](https://yarnpkg.com/)
 
 ## Local development
 
@@ -57,7 +57,7 @@ To contribute code to [Supabase](https://supabase.com), you must fork the [Supab
 
 [Supabase](https://supabase.com) uses [Turborepo](https://turborepo.org/docs) to manage and run this monorepo.
 
-1. Install the dependences in the root of the repo.
+1. Install the dependencies in the root of the repo.
 
    ```sh
    npm install # install dependencies
@@ -113,7 +113,7 @@ Following the changes to the [Supabase docs](https://supabase.com/blog/new-supab
 
 - Inside of `apps/docs` create a `.env.local` file with the following: `NEXT_PUBLIC_NEW_DOCS=true`
 
-Now when you run a local devlopment docs server you will see the new docs site.
+Now when you run a local development docs server you will see the new docs site.
 
 ---
 
@@ -136,3 +136,9 @@ Create a new entry in the [`redirects.js`](https://github.com/supabase/supabase/
 ## Community channels
 
 Stuck somewhere? Have any questions? Join the [Discord Community Server](https://discord.supabase.com/) or the [Github Discussions](https://github.com/supabase/supabase/discussions). We are here to help!
+
+## Contributors
+
+<a href="https://github.com/supabase/supabase/graphs/contributors">
+   <img src="https://contributors.deno.dev/supabase/supabase?height=1200&width=1200&count=90" width="1200" height="1200" alt="contributors">
+</a>

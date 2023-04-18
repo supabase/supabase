@@ -1,22 +1,23 @@
-import { FC, useRef, useState } from 'react'
+import { useState } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { Listbox, IconLoader, Button, IconPlus, IconAlertCircle, IconCreditCard } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { checkPermissions, useStore } from 'hooks'
-import { PRICING_TIER_PRODUCT_IDS, STRIPE_PRODUCT_IDS } from 'lib/constants'
+import { BASE_PATH, PRICING_TIER_PRODUCT_IDS, STRIPE_PRODUCT_IDS } from 'lib/constants'
 import { SubscriptionPreview } from '../Billing.types'
 import { getProductPrice, validateSubscriptionUpdatePayload } from '../Billing.utils'
 import PaymentTotal from './PaymentTotal'
 import InformationBox from 'components/ui/InformationBox'
-import { SubscriptionAddon } from '../AddOns/AddOns.types'
+import { AddonPrice, SubscriptionAddon } from '../AddOns/AddOns.types'
 import { getPITRDays } from './PaymentSummaryPanel.utils'
 import ConfirmPaymentModal from './ConfirmPaymentModal'
 import { StripeSubscription } from '../Subscription/Subscription.types'
+import { useIsProjectActive } from 'components/layouts/ProjectLayout/ProjectContext'
 
 // [Joshen] PITR stuff can be undefined for now until we officially launch PITR self serve
 
-interface Props {
+interface PaymentSummaryPanelProps {
   isRefreshingPreview: boolean
   currentSubscription?: StripeSubscription
   subscriptionPreview?: SubscriptionPreview
@@ -56,7 +57,7 @@ interface Props {
 // [Joshen] Eventually if we do support more addons, it'll be better to generalize
 // the selectedComputeSize to an addOns array. But for now, we keep it simple, don't over-engineer too early
 
-const PaymentSummaryPanel: FC<Props> = ({
+const PaymentSummaryPanel = ({
   isRefreshingPreview,
   isSpendCapEnabled,
   currentSubscription,
@@ -77,9 +78,13 @@ const PaymentSummaryPanel: FC<Props> = ({
   onConfirmPayment,
   isSubmitting,
   captcha,
-}) => {
+}: PaymentSummaryPanelProps) => {
   const { ui } = useStore()
+  const isActive = useIsProjectActive()
   const projectRegion = ui.selectedProject?.region
+
+  // [Joshen] Point of refactor: Current plan can just be currentSubscription.tier
+  // Reduce one unnecessary prop
 
   const canUpdatePaymentMethods = checkPermissions(
     PermissionAction.BILLING_WRITE,
@@ -87,6 +92,24 @@ const PaymentSummaryPanel: FC<Props> = ({
   )
 
   const [showConfirmModal, setShowConfirmModal] = useState(false)
+
+  const selectedPlanCost =
+    selectedPlan !== undefined
+      ? selectedPlan.prices.find(
+          (price: AddonPrice) => price.id === selectedPlan.metadata.default_price_id
+        )?.unit_amount ?? 0
+      : currentSubscription?.tier.unit_amount ?? 0
+
+  const totalSelectedAddonCost = Object.keys(selectedAddons)
+    .map((productName) => {
+      const product = (selectedAddons as any)[productName]
+      const price = product.prices.find(
+        (price: AddonPrice) => price.id === product.metadata.default_price_id
+      )
+      return price
+    })
+    .reduce((a, b) => a + b.unit_amount, 0)
+  const totalMonthlyCost = selectedPlanCost + totalSelectedAddonCost
 
   const currentPITRDays =
     currentAddons.pitrDuration !== undefined ? getPITRDays(currentAddons.pitrDuration) : 0
@@ -104,6 +127,11 @@ const PaymentSummaryPanel: FC<Props> = ({
   const isChangingPITRDuration = currentAddons.pitrDuration?.id !== selectedAddons.pitrDuration?.id
   const isChangingCustomDomains =
     currentAddons.customDomains?.id !== selectedAddons.customDomains?.id
+
+  const togglingOnSpendCap =
+    currentPlan.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.PAYG &&
+    selectedPlan &&
+    selectedPlan.metadata.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.PRO
 
   // If it's enterprise we only only changing of add-ons
   const hasChangesToPlan = isEnterprise
@@ -301,6 +329,16 @@ const PaymentSummaryPanel: FC<Props> = ({
                   description="It will take up to 2 minutes for changes to take place, and your project will be unavailable during that time"
                 />
               )}
+
+              {togglingOnSpendCap && (
+                <InformationBox
+                  hideCollapse
+                  defaultVisibility
+                  icon={<IconAlertCircle strokeWidth={2} />}
+                  title="Enabling spend cap"
+                  description="Exceeding your plan's quota will result in service restrictions. With the spend cap disabled, you'll be charged for usage beyond the quota."
+                />
+              )}
             </div>
           </div>
         )}
@@ -308,6 +346,7 @@ const PaymentSummaryPanel: FC<Props> = ({
         <div className="w-full h-px bg-scale-600" />
 
         <PaymentTotal
+          totalMonthlyCost={totalMonthlyCost / 100}
           subscriptionPreview={subscriptionPreview}
           isRefreshingPreview={isRefreshingPreview}
           isSpendCapEnabled={isSpendCapEnabled}
@@ -340,20 +379,22 @@ const PaymentSummaryPanel: FC<Props> = ({
                   </Button>
                 </Tooltip.Trigger>
                 {!canUpdatePaymentMethods && (
-                  <Tooltip.Content side="bottom">
-                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                    <div
-                      className={[
-                        'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                        'w-48 border border-scale-200 text-center', //border
-                      ].join(' ')}
-                    >
-                      <span className="text-xs text-scale-1200">
-                        You need additional permissions to add new payment methods to this
-                        organization
-                      </span>
-                    </div>
-                  </Tooltip.Content>
+                  <Tooltip.Portal>
+                    <Tooltip.Content side="bottom">
+                      <Tooltip.Arrow className="radix-tooltip-arrow" />
+                      <div
+                        className={[
+                          'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
+                          'w-48 border border-scale-200 text-center', //border
+                        ].join(' ')}
+                      >
+                        <span className="text-xs text-scale-1200">
+                          You need additional permissions to add new payment methods to this
+                          organization
+                        </span>
+                      </div>
+                    </Tooltip.Content>
+                  </Tooltip.Portal>
                 )}
               </Tooltip.Root>
             </div>
@@ -369,7 +410,7 @@ const PaymentSummaryPanel: FC<Props> = ({
                     addOnBefore={() => {
                       return (
                         <img
-                          src={`/img/payment-methods/${method.card.brand
+                          src={`${BASE_PATH}/img/payment-methods/${method.card.brand
                             .replace(' ', '-')
                             .toLowerCase()}.png`}
                           width="32"
@@ -405,6 +446,7 @@ const PaymentSummaryPanel: FC<Props> = ({
                 size="medium"
                 loading={isSubmitting}
                 disabled={
+                  !isActive ||
                   isSubmitting ||
                   isLoadingPaymentMethods ||
                   !hasChangesToPlan ||
@@ -415,35 +457,29 @@ const PaymentSummaryPanel: FC<Props> = ({
                 Confirm payment
               </Button>
             </Tooltip.Trigger>
-            {!hasChangesToPlan ? (
-              <Tooltip.Content side="bottom">
-                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                <div
-                  className={[
-                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                    'border border-scale-200',
-                  ].join(' ')}
-                >
-                  <span className="text-xs text-scale-1200">
-                    No changes made to your subscription
-                  </span>
-                </div>
-              </Tooltip.Content>
-            ) : !selectedPaymentMethod ? (
-              <Tooltip.Content side="bottom">
-                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                <div
-                  className={[
-                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                    'border border-scale-200',
-                  ].join(' ')}
-                >
-                  <span className="text-xs text-scale-1200">Please select a payment method</span>
-                </div>
-              </Tooltip.Content>
-            ) : (
-              <></>
-            )}
+            {!hasChangesToPlan || !selectedPaymentMethod || !isActive ? (
+              <Tooltip.Portal>
+                <Tooltip.Content side="bottom">
+                  <Tooltip.Arrow className="radix-tooltip-arrow" />
+                  <div
+                    className={[
+                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                      'border border-scale-200',
+                    ].join(' ')}
+                  >
+                    <span className="text-xs text-scale-1200">
+                      {!hasChangesToPlan
+                        ? 'No changes made to your subscription'
+                        : !selectedPaymentMethod
+                        ? 'Please select a payment method'
+                        : !isActive
+                        ? 'Unable to update subscription as project is not active'
+                        : ''}
+                    </span>
+                  </div>
+                </Tooltip.Content>
+              </Tooltip.Portal>
+            ) : null}
           </Tooltip.Root>
         </div>
       </div>

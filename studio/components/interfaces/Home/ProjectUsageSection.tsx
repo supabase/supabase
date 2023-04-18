@@ -2,14 +2,22 @@ import { FC } from 'react'
 import { observer } from 'mobx-react-lite'
 import { IconLoader, IconAlertCircle } from 'ui'
 
-import { useParams } from 'hooks'
+import { useParams } from 'common/hooks'
 import { ProjectUsage, NewProjectPanel } from 'components/interfaces/Home'
 import InformationBox from 'components/ui/InformationBox'
-import { ProjectUsageResponse, useProjectUsageQuery } from 'data/usage/project-usage-query'
+import { ProjectUsageResponseUsageKeys, useProjectUsageQuery } from 'data/usage/project-usage-query'
 
 const ProjectUsageSection: FC = observer(({}) => {
   const { ref: projectRef } = useParams()
   const { data: usage, error: usageError, isLoading } = useProjectUsageQuery({ projectRef })
+
+  const usageColumns = [
+    'db_egress',
+    'storage_egress',
+    'monthly_active_users',
+    'realtime_message_count',
+    'func_invocations',
+  ]
 
   if (usageError) {
     return (
@@ -23,8 +31,8 @@ const ProjectUsageSection: FC = observer(({}) => {
   }
 
   const hasProjectData = usage
-    ? Object.keys(usage)
-        .map((key) => usage[key as keyof ProjectUsageResponse].usage)
+    ? usageColumns
+        .map((key) => usage[key as ProjectUsageResponseUsageKeys].usage)
         .some((usage) => (usage ?? 0) > 0)
     : false
 

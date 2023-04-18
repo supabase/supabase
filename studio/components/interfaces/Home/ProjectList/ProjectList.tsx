@@ -10,6 +10,7 @@ import { makeRandomString } from 'lib/helpers'
 import ProjectCard from './ProjectCard'
 import ShimmeringCard from './ShimmeringCard'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useOverdueInvoicesQuery } from 'data/invoices/invoices-query'
 
 interface Props {
   rewriteHref?: (projectRef: string) => string
@@ -19,6 +20,8 @@ const ProjectList: FC<Props> = ({ rewriteHref }) => {
   const { app, ui } = useStore()
   const { organizations, projects } = app
   const { isLoading: isLoadingProjects } = projects
+
+  const { data: allOverdueInvoices } = useOverdueInvoicesQuery({ enabled: IS_PLATFORM })
 
   const isLoadingPermissions = IS_PLATFORM ? (ui?.permissions ?? []).length === 0 : false
 
@@ -32,9 +35,24 @@ const ProjectList: FC<Props> = ({ rewriteHref }) => {
         const isEmpty = sortedProjects?.length == 0
         const canReadProjects = checkPermissions(PermissionAction.READ, 'projects', undefined, id)
 
+        const overdueInvoices = (allOverdueInvoices || []).filter((it) => it.organization_id === id)
+
         return (
           <div className="space-y-3" key={makeRandomString(5)}>
-            <h4 className="text-lg">{name}</h4>
+            <div className="flex space-x-4 items-center">
+              <h4 className="text-lg">{name}</h4>
+
+              {!!overdueInvoices.length && (
+                <div>
+                  <Link href={`/org/${slug}/invoices`}>
+                    <a>
+                      <Button type="danger">Outstanding Invoices</Button>
+                    </a>
+                  </Link>
+                </div>
+              )}
+            </div>
+
             {isLoadingPermissions || isLoadingProjects ? (
               <ul className="mx-auto grid grid-cols-1 gap-4 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
                 <ShimmeringCard />

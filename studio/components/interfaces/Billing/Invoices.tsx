@@ -1,10 +1,14 @@
 import { FC, useState, useEffect } from 'react'
 import { Button, Loading, IconFileText, IconDownload, IconChevronLeft, IconChevronRight } from 'ui'
+import Link from 'next/link'
 
 import { useStore } from 'hooks'
 import { API_URL } from 'lib/constants'
 import { get, head } from 'lib/common/fetch'
 import Table from 'components/to-be-cleaned/Table'
+
+import InvoiceStatusBadge from './InvoiceStatusBadge'
+import { Invoice, InvoiceStatus } from './Invoices.types'
 
 const PAGE_LIMIT = 10
 
@@ -18,7 +22,7 @@ const Invoices: FC<Props> = ({ projectRef }) => {
 
   const [page, setPage] = useState(1)
   const [count, setCount] = useState(0)
-  const [invoices, setInvoices] = useState<any>([])
+  const [invoices, setInvoices] = useState<Invoice[]>([])
 
   const offset = (page - 1) * PAGE_LIMIT
 
@@ -85,6 +89,9 @@ const Invoices: FC<Props> = ({ projectRef }) => {
             <Table.th key="header-date">Date</Table.th>,
             <Table.th key="header-amount">Amount due</Table.th>,
             <Table.th key="header-invoice">Invoice number</Table.th>,
+            <Table.th key="header-invoice" className="flex items-center">
+              Status
+            </Table.th>,
             <Table.th key="header-download" className="text-right"></Table.th>,
           ]}
           body={
@@ -98,7 +105,7 @@ const Invoices: FC<Props> = ({ projectRef }) => {
               </Table.tr>
             ) : (
               <>
-                {invoices.map((x: any) => {
+                {invoices.map((x) => {
                   return (
                     <Table.tr key={x.id}>
                       <Table.td>
@@ -117,11 +124,22 @@ const Invoices: FC<Props> = ({ projectRef }) => {
                       <Table.td>
                         <p>{x.number}</p>
                       </Table.td>
+                      <Table.td>
+                        <InvoiceStatusBadge status={x.status} />
+                      </Table.td>
                       <Table.td className="align-right">
                         <div className="flex items-center justify-end space-x-2">
+                          {[InvoiceStatus.UNCOLLECTIBLE, InvoiceStatus.OPEN].includes(x.status) && (
+                            <Link href={`https://redirect.revops.supabase.com/pay-invoice/${x.id}`}>
+                              <a target="_blank">
+                                <Button>Pay Now</Button>
+                              </a>
+                            </Link>
+                          )}
+
                           <Button
                             type="outline"
-                            icon={<IconDownload />}
+                            icon={<IconDownload size={16} strokeWidth={1.5} />}
                             onClick={() => fetchInvoice(x.id)}
                           />
                         </div>
@@ -130,7 +148,7 @@ const Invoices: FC<Props> = ({ projectRef }) => {
                   )
                 })}
                 <Table.tr key="navigation">
-                  <Table.td colSpan={5}>
+                  <Table.td colSpan={6}>
                     <div className="flex items-center justify-between">
                       <p className="text-sm opacity-50">
                         Showing {offset + 1} to {offset + invoices.length} out of {count} invoices

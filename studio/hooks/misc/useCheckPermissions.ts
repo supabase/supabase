@@ -1,4 +1,4 @@
-import { useFlag, useStore } from 'hooks'
+import { useStore } from 'hooks'
 import jsonLogic from 'json-logic-js'
 import { IS_PLATFORM } from 'lib/constants'
 

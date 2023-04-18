@@ -1,8 +1,8 @@
 // This example shows how to use Edge Functions to read incoming multipart/form-data request,
 // and write files to Supabase Storage and other fields to a database table.
 
-import { Application, Router } from 'https://deno.land/x/oak/mod.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { Application } from 'oak'
+import { createClient } from '@supabase/supabase-js'
 
 const MB = 1024 * 1024
 
@@ -25,9 +25,9 @@ app.use(async (ctx) => {
 
   const supabaseClient = createClient(
     // Supabase API URL - env var exported by default.
-    Deno.env.get('SUPABASE_URL') ?? '',
+    Deno.env.get('SUPABASE_URL')!,
     // Supabase API ANON KEY - env var exported by default.
-    Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+    Deno.env.get('SUPABASE_ANON_KEY')!
   )
 
   //upload image to Storage

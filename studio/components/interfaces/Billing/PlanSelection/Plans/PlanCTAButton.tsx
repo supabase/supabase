@@ -1,19 +1,20 @@
-import { FC } from 'react'
+import Link from 'next/link'
 import { Button, IconLoader } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 
 import { useFlag } from 'hooks'
 import { STRIPE_PRODUCT_IDS } from 'lib/constants'
 import { StripeProduct } from 'components/interfaces/Billing'
-import Link from 'next/link'
+import { useIsProjectActive } from 'components/layouts/ProjectLayout/ProjectContext'
 
-interface Props {
+interface PlanCTAButtonProps {
   plan: any
   currentPlan?: StripeProduct
   onSelectPlan: (plan: any) => void
 }
 
-const PlanCTAButton: FC<Props> = ({ plan, currentPlan, onSelectPlan }) => {
+const PlanCTAButton = ({ plan, currentPlan, onSelectPlan }: PlanCTAButtonProps) => {
+  const isActive = useIsProjectActive()
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
 
   const getButtonType = (plan: any, currentPlan: any) => {
@@ -84,7 +85,8 @@ const PlanCTAButton: FC<Props> = ({ plan, currentPlan, onSelectPlan }) => {
   const type = getButtonType(plan, currentPlan)
   const ctaText = getButtonText(plan, currentPlan)
   const disabled =
-    plan.id === STRIPE_PRODUCT_IDS.FREE && currentPlan.prod_id === STRIPE_PRODUCT_IDS.FREE
+    (!isActive && plan.name !== 'Enterprise') ||
+    (plan.id === STRIPE_PRODUCT_IDS.FREE && currentPlan.prod_id === STRIPE_PRODUCT_IDS.FREE)
 
   if (plan.name === 'Enterprise') {
     return (
@@ -111,20 +113,28 @@ const PlanCTAButton: FC<Props> = ({ plan, currentPlan, onSelectPlan }) => {
             {ctaText}
           </Button>
         </Tooltip.Trigger>
-        {!disabled && projectUpdateDisabled && (
-          <Tooltip.Content side="bottom">
-            <Tooltip.Arrow className="radix-tooltip-arrow" />
-            <div
-              className={[
-                'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                'border border-scale-200 w-[260px] flex items-center justify-center',
-              ].join(' ')}
-            >
-              <span className="text-xs text-scale-1200 text-center">
-                Subscription changes are currently disabled, our engineers are working on a fix
-              </span>
-            </div>
-          </Tooltip.Content>
+        {(projectUpdateDisabled || !isActive) && (
+          <Tooltip.Portal>
+            <Tooltip.Portal>
+              <Tooltip.Content side="bottom">
+                <Tooltip.Arrow className="radix-tooltip-arrow" />
+                <div
+                  className={[
+                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                    'border border-scale-200 w-[260px] flex items-center justify-center',
+                  ].join(' ')}
+                >
+                  <span className="text-xs text-scale-1200 text-center">
+                    {projectUpdateDisabled
+                      ? 'Subscription changes are currently disabled, our engineers are working on a fix'
+                      : !isActive
+                      ? 'Unable to update subscription as project is not active'
+                      : ''}
+                  </span>
+                </div>
+              </Tooltip.Content>
+            </Tooltip.Portal>
+          </Tooltip.Portal>
         )}
       </Tooltip.Root>
     </div>

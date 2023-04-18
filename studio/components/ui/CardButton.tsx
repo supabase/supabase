@@ -1,5 +1,5 @@
 import React, { FC } from 'react'
-import { IconChevronRight } from 'ui'
+import { IconChevronRight, IconLoader } from 'ui'
 import Link from 'next/link'
 
 interface Props {
@@ -14,6 +14,7 @@ interface Props {
   onClick?: () => void
   icon?: React.ReactNode
   containerHeightClassName?: string
+  loading?: boolean
 }
 
 const CardButton: FC<Props> = ({
@@ -28,6 +29,7 @@ const CardButton: FC<Props> = ({
   onClick,
   icon,
   containerHeightClassName = 'h-32',
+  loading = false,
 }) => {
   const LinkContainer = ({ children }: { children: React.ReactNode }) => (
     <Link href={linkHref}>
@@ -104,7 +106,7 @@ const CardButton: FC<Props> = ({
           group-hover:text-scale-1200
         "
         >
-          <IconChevronRight />
+          {loading ? <IconLoader className="animate-spin" /> : <IconChevronRight />}
         </div>
       )}
     </div>

@@ -71,7 +71,9 @@ const Success: FC<Props> = ({ sentCategory = '' }) => {
       </div>
       <div className="w-full pb-4 px-4 flex items-center justify-end">
         <Link href="/projects">
-          <Button>Go back to dashboard</Button>
+          <a>
+            <Button>Go back to dashboard</Button>
+          </a>
         </Link>
       </div>
     </div>
