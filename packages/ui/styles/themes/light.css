@@ -1,6 +1,28 @@
 :root {
-  --background-color-default: #fbfcfd;
-  --background-color-body: #f8f9fa;
-  --border-color-default: #eceef0;
-  --border-color-body: #e6e8eb;
+  --theme-variables-background: #fff;
+  --theme-variables-background-body: #fbfcfd;
+  --theme-variables-background-body-alt: #fff;
+  --theme-variables-text-body: #1a1d1e;
+  --lighten-default: 0.1;
+  --lighten-soft: 0.035;
+  --lighten-hard: 0.3;
+  --lighten-harder: 0.5;
+  --lighten-hardest: 0.65;
+  --darken-percentage: 0.2;
+  --utility-mix-positive: #000;
+  --utility-mix-negative: #fff;
+  --utility-github-background: #ffffff;
+  --text-override-lighten-strength: 5;
+  --text-default: #1a1d1e;
+  --text-body-light: #858787;
+  --text-body-lighter: #bfc0c0;
+  --text-body-lightest: #dfe0e0;
+  --background-color-default: #fff;
+  --background-color-body: #fbfcfd;
+  --background-color-body-alt: #fff;
+  --background-color-selection: #ebebeb;
+  --background-color-control: #fff;
+  --border-color-default: #ebebeb;
+  --border-color-body: #fbfcfd;
+  --border-color-control: #e2e2e2;
 }

@@ -1,5 +1,6 @@
-const branch = process.env.npm_config_branch || 'main'
-const url = `https://raw.githubusercontent.com/MildTomato/supabase-design-tokens/${branch}/tokens.json`
+const branch = 'feat/new-components'
+// using Math.random() in a param as GitHub caches raw content
+const url = `https://raw.githubusercontent.com/MildTomato/supabase-design-tokens/${branch}/tokens.json?v=${Math.random()}`
 
 console.log('branch to pull is:', branch)
 
