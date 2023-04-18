@@ -1,7 +1,7 @@
 import React from 'react'
 import styleHandler from '../theme/styleHandler'
 // @ts-ignore
-import { IconAlertCircle } from './../../../index'
+import { IconAlertCircle } from './../../components/Icon/icons/IconAlertCircle'
 
 interface Props {
   style?: React.CSSProperties
@@ -13,12 +13,7 @@ export default function InputErrorIcon({ style, size }: Props) {
 
   return (
     <div className={__styles.base} style={style}>
-      <IconAlertCircle
-        size={size}
-        strokeWidth={2}
-        // stroke={'#f56565'}
-        className=""
-      />
+      <IconAlertCircle size={size} strokeWidth={2} className="" />
     </div>
   )
 }
