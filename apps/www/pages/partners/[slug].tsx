@@ -37,8 +37,8 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     .eq('approved', true)
     .eq('slug', params!.slug as string)
     .single()
-
-  if (!partner) {
+    
+  if (!partner || process.env.npm_lifecycle_event === 'build') {
     return {
       notFound: true,
     }
