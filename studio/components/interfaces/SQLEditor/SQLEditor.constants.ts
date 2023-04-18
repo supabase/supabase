@@ -1,3 +1,4 @@
+import { SqlSnippets, UserContent } from 'types'
 import { SQLTemplate } from './SQLEditor.types'
 
 export const SQL_TEMPLATES: SQLTemplate[] = [
@@ -969,4 +970,207 @@ GRANT ALL ON TABLE next_auth.verification_tokens TO postgres;
 GRANT ALL ON TABLE next_auth.verification_tokens TO service_role;
 `.trim(),
   },
+  {
+    id: 16,
+    type: 'template',
+    title: 'Most frequently invoked',
+    description: 'Most frequently called queries in your database.',
+    sql: `-- Most frequently called queries
+
+-- A limit of 100 has been added below
+
+select
+    auth.rolname,
+    statements.query,
+    statements.calls,
+    -- -- Postgres 13, 14, 15
+    statements.total_exec_time + statements.total_plan_time as total_time,
+    statements.min_exec_time + statements.min_plan_time as min_time,
+    statements.max_exec_time + statements.max_plan_time as max_time,
+    statements.mean_exec_time + statements.mean_plan_time as mean_time,
+    -- -- Postgres <= 12
+    -- total_time,
+    -- min_time,
+    -- max_time,
+    -- mean_time,
+    statements.rows / statements.calls as avg_rows
+
+  from pg_stat_statements as statements
+    inner join pg_authid as auth on statements.userid = auth.oid
+  order by
+    statements.calls desc
+  limit
+    100;`,
+  },
+  {
+    id: 17,
+    type: 'template',
+    title: 'Most time consuming',
+    description: 'Aggregate time spent on a query type.',
+    sql: `-- Most time consuming queries
+
+-- A limit of 100 has been added below
+
+select
+    auth.rolname,
+    statements.query,
+    statements.calls,
+    statements.total_exec_time + statements.total_plan_time as total_time,
+    to_char(((statements.total_exec_time + statements.total_plan_time)/sum(statements.total_exec_time + statements.total_plan_time) over()) * 100, 'FM90D0') || '%' as prop_total_time
+  from pg_stat_statements as statements
+    inner join pg_authid as auth on statements.userid = auth.oid
+  order by
+    total_time desc
+  limit
+    100;`,
+  },
+  {
+    id: 18,
+    type: 'template',
+    title: 'Slowest execution time',
+    description: 'Slowest queries based on max execution time.',
+    sql: `-- Slowest queries by max execution time
+
+-- A limit of 100 has been added below
+
+select
+    auth.rolname,
+    statements.query,
+    statements.calls,
+    -- -- Postgres 13, 14, 15
+    statements.total_exec_time + statements.total_plan_time as total_time,
+    statements.min_exec_time + statements.min_plan_time as min_time,
+    statements.max_exec_time + statements.max_plan_time as max_time,
+    statements.mean_exec_time + statements.mean_plan_time as mean_time,
+    -- -- Postgres <= 12
+    -- total_time,
+    -- min_time,
+    -- max_time,
+    -- mean_time,
+    statements.rows / statements.calls as avg_rows
+  from pg_stat_statements as statements
+    inner join pg_authid as auth on statements.userid = auth.oid
+  order by
+    max_time desc
+  limit
+    100;`,
+  },
+  {
+    id: 19,
+    type: 'template',
+    title: 'Hit rate',
+    description: 'See your cache and index hit rate.',
+    sql: `-- Cache and index hit rate
+
+select
+    'index hit rate' as name,
+    (sum(idx_blks_hit)) / nullif(sum(idx_blks_hit + idx_blks_read),0) as ratio
+  from pg_statio_user_indexes
+  union all
+  select
+    'table hit rate' as name,
+    sum(heap_blks_hit) / nullif(sum(heap_blks_hit) + sum(heap_blks_read),0) as ratio
+  from pg_statio_user_tables;`,
+  },
+  {
+    id: 20,
+    type: 'quickstart',
+    title: 'OpenAI Vector Search',
+    description: 'Template for the Next.js OpenAI Doc Search Starter.',
+    sql: `
+-- Enable pg_vector extension
+create extension if not exists vector with schema public;
+
+-- Create tables 
+create table "public"."nods_page" (
+  id bigserial primary key,
+  parent_page_id bigint references public.nods_page,
+  path text not null unique,
+  checksum text,
+  meta jsonb,
+  type text,
+  source text
+);
+alter table "public"."nods_page" enable row level security;
+
+create table "public"."nods_page_section" (
+  id bigserial primary key,
+  page_id bigint not null references public.nods_page on delete cascade,
+  content text,
+  token_count int,
+  embedding vector(1536),
+  slug text,
+  heading text
+);
+alter table "public"."nods_page_section" enable row level security;
+
+-- Create embedding similarity search functions
+create or replace function match_page_sections(embedding vector(1536), match_threshold float, match_count int, min_content_length int)
+returns table (id bigint, page_id bigint, slug text, heading text, content text, similarity float)
+language plpgsql
+as $$
+#variable_conflict use_variable
+begin
+  return query
+  select
+    nods_page_section.id,
+    nods_page_section.page_id,
+    nods_page_section.slug,
+    nods_page_section.heading,
+    nods_page_section.content,
+    (nods_page_section.embedding <#> embedding) * -1 as similarity
+  from nods_page_section
+
+  -- We only care about sections that have a useful amount of content
+  where length(nods_page_section.content) >= min_content_length
+
+  -- The dot product is negative because of a Postgres limitation, so we negate it
+  and (nods_page_section.embedding <#> embedding) * -1 > match_threshold
+
+  -- OpenAI embeddings are normalized to length 1, so
+  -- cosine similarity and dot product will produce the same results.
+  -- Using dot product which can be computed slightly faster.
+  --
+  -- For the different syntaxes, see https://github.com/pgvector/pgvector
+  order by nods_page_section.embedding <#> embedding
+  
+  limit match_count;
+end;
+$$;
+
+create or replace function get_page_parents(page_id bigint)
+returns table (id bigint, parent_page_id bigint, path text, meta jsonb)
+language sql
+as $$
+  with recursive chain as (
+    select *
+    from nods_page 
+    where id = page_id
+
+    union all
+
+    select child.*
+      from nods_page as child
+      join chain on chain.parent_page_id = child.id 
+  )
+  select id, parent_page_id, path, meta
+  from chain;
+$$;
+`.trim(),
+  },
 ]
+
+export const SQL_SNIPPET_SCHEMA_VERSION = '1.0'
+
+export const NEW_SQL_SNIPPET_SKELETON: UserContent<SqlSnippets.Content> = {
+  name: 'New Query',
+  description: '',
+  type: 'sql',
+  visibility: 'user', // default to user scope
+  content: {
+    schema_version: SQL_SNIPPET_SCHEMA_VERSION,
+    content_id: '',
+    sql: 'this is a test',
+    favorite: false,
+  },
+}

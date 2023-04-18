@@ -1,8 +1,9 @@
-import { useStore } from 'hooks'
 import { observer } from 'mobx-react-lite'
 import Image from 'next/image'
 import Link from 'next/link'
 import { PropsWithChildren } from 'react'
+import { BASE_PATH } from 'lib/constants'
+import { useTheme } from 'common'
 
 type ForgotPasswordLayoutProps = {
   heading: string
@@ -18,9 +19,7 @@ const ForgotPasswordLayout = ({
   showHeadings = true,
   children,
 }: PropsWithChildren<ForgotPasswordLayoutProps>) => {
-  const {
-    ui: { theme },
-  } = useStore()
+  const { isDarkMode } = useTheme()
 
   return (
     <div className="flex-1 bg-scale-200 flex flex-col gap-8 lg:gap-16 xl:gap-32">
@@ -31,7 +30,11 @@ const ForgotPasswordLayout = ({
               <Link href={logoLinkToMarketingSite ? 'https://supabase.com' : '/projects'}>
                 <a>
                   <Image
-                    src={theme == 'dark' ? '/img/supabase-dark.svg' : '/img/supabase-light.svg'}
+                    src={
+                      isDarkMode
+                        ? `${BASE_PATH}/img/supabase-dark.svg`
+                        : `${BASE_PATH}/img/supabase-light.svg`
+                    }
                     alt=""
                     height={24}
                     width={120}

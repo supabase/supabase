@@ -6,7 +6,8 @@ import { PostgresTable, PostgresPolicy } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { NextPageWithLayout } from 'types'
-import { checkPermissions, useParams, useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
+import { useParams } from 'common/hooks'
 import { AuthLayout } from 'components/layouts'
 import { Policies } from 'components/interfaces/Auth/Policies'
 import NoPermission from 'components/ui/NoPermission'
@@ -138,14 +139,14 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
               icon={<IconSearch size="tiny" />}
             />
           </div>
-          <Button type="link" icon={<IconExternalLink size={14} strokeWidth={1.5} />}>
-            <a
-              target="_blank"
-              href="https://supabase.com/docs/learn/auth-deep-dive/auth-row-level-security"
-            >
+          <a
+            target="_blank"
+            href="https://supabase.com/docs/learn/auth-deep-dive/auth-row-level-security"
+          >
+            <Button type="link" icon={<IconExternalLink size={14} strokeWidth={1.5} />}>
               What is RLS?
-            </a>
-          </Button>
+            </Button>
+          </a>
         </div>
       </div>
       <Policies tables={filteredTables} hasTables={tables.length > 0} isLocked={isLocked} />

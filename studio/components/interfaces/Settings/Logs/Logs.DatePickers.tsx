@@ -48,8 +48,14 @@ const DatePickers: React.FC<Props> = ({ to, from, onChange, helpers }) => {
           <>
             <Dropdown.RadioGroup onChange={handleHelperChange} value={selectedHelper?.text || ''}>
               {helpers.map((helper) => (
-                <Dropdown.Radio key={helper.text} value={helper.text}>
-                  {helper.text}
+                <Dropdown.Radio key={helper.text} value={helper.text} disabled={helper.disabled}>
+                  <span
+                    className={[helper.disabled ? 'text-scale-1000 cursor-not-allowed' : ''].join(
+                      ' '
+                    )}
+                  >
+                    {helper.text}
+                  </span>
                 </Dropdown.Radio>
               ))}
             </Dropdown.RadioGroup>
