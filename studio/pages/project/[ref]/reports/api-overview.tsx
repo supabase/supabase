@@ -19,6 +19,7 @@ import { DatePickerToFrom, LogsEndpointParams } from 'components/interfaces/Sett
 import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
 import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
 import { useParams } from 'common/hooks'
+import { useStore } from 'hooks'
 import { isEqual } from 'lodash'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
@@ -87,8 +88,12 @@ export const ApiReport: NextPageWithLayout = () => {
 
 // hook to fetch data
 const useApiReport = () => {
+  const { ui } = useStore()
+  const projectRef = ui.selectedProject?.ref ?? 'default'
+
   const queryHooks = queriesFactory<keyof typeof PRESET_CONFIG.api.queries>(
-    PRESET_CONFIG.api.queries
+    PRESET_CONFIG.api.queries,
+    projectRef
   )
   const totalRequests = queryHooks.totalRequests()
   const errorCounts = queryHooks.errorCounts()
