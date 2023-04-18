@@ -4,7 +4,6 @@ import styleHandler from '../../lib/theme/styleHandler'
 
 export interface CollapsibleProps extends RadixCollapsible.CollapsibleProps {
   children: React.ReactNode
-  // onChange?: (e: boolean) => void
 }
 
 export const Collapsible = ({
@@ -13,12 +12,6 @@ export const Collapsible = ({
   className,
   ...props
 }: CollapsibleProps) => {
-  //   const [_open, setOpen] = React.useState(open)
-
-  // function handleOpenChange(e: boolean) {
-  //   console.log(e)
-  //   if (onChange) onChange(e)
-  // }
   return (
     <RadixCollapsible.Root
       defaultOpen={props.defaultOpen}
