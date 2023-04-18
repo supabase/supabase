@@ -123,6 +123,9 @@ const EdgeFunctionDetails: FC<Props> = () => {
           {({ isSubmitting, handleReset, values, initialValues, resetForm }: any) => {
             const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
 
+            // [Alaister] although this "technically" is breaking the rules of React hooks
+            // it won't error because the hooks are always rendered in the same order
+            // eslint-disable-next-line react-hooks/rules-of-hooks
             useEffect(() => {
               if (selectedFunction !== undefined) {
                 const formValues = {

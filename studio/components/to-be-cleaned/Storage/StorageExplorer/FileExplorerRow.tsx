@@ -122,6 +122,8 @@ const FileExplorerRow: FC<Props> = ({
   const isPreviewed = !isEmpty(selectedFilePreview) && isEqual(selectedFilePreview.id, item.id)
   const canUpdateFiles = checkPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
 
+  const { show } = useContextMenu()
+
   const onSelectFile = async (columnIndex: number, file: any) => {
     popColumnAtIndex(columnIndex)
     popOpenedFoldersAtIndex(columnIndex - 1)
@@ -153,14 +155,14 @@ const FileExplorerRow: FC<Props> = ({
     closeFilePreview()
   }
 
+  const inputRef = useRef<any>(null)
+  const [itemName, setItemName] = useState(item.name)
+
+  useEffect(() => {
+    if (inputRef.current) inputRef.current.select()
+  }, [])
+
   if (item.status === STORAGE_ROW_STATUS.EDITING) {
-    const inputRef = useRef<any>(null)
-    const [itemName, setItemName] = useState(item.name)
-
-    useEffect(() => {
-      if (inputRef.current) inputRef.current.select()
-    }, [])
-
     const onSetItemName = async (event: any) => {
       event.preventDefault()
       event.stopPropagation()
@@ -314,7 +316,6 @@ const FileExplorerRow: FC<Props> = ({
   const createdAt = item.created_at ? new Date(item.created_at).toLocaleString() : '-'
   const updatedAt = item.updated_at ? new Date(item.updated_at).toLocaleString() : '-'
 
-  const { show } = useContextMenu()
   const displayMenu = (event: any, rowType: any) => {
     show(event, {
       id:

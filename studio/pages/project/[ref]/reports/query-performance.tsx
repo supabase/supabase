@@ -7,7 +7,7 @@ import Table from 'components/to-be-cleaned/Table'
 import CopyButton from 'components/ui/CopyButton'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import { executeSql } from 'data/sql/execute-sql-query'
-import { useFlag } from 'hooks'
+import { useFlag, useStore } from 'hooks'
 import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
@@ -22,7 +22,9 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
   const [showResetgPgStatStatements, setShowResetgPgStatStatements] = useState(false)
   const tableIndexEfficiencyEnabled = useFlag('tableIndexEfficiency')
   const config = PRESET_CONFIG[Presets.QUERY_PERFORMANCE]
-  const hooks = queriesFactory(config.queries)
+  const { ui } = useStore()
+  const projectRef = ui.selectedProject?.ref ?? 'default'
+  const hooks = queriesFactory(config.queries, projectRef)
   const mostFrequentlyInvoked = hooks.mostFrequentlyInvoked()
   const mostTimeConsuming = hooks.mostTimeConsuming()
   const slowestExecutionTime = hooks.slowestExecutionTime()

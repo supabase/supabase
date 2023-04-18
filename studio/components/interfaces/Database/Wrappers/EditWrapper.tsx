@@ -207,6 +207,9 @@ const EditWrapper = () => {
 
         <Form id={formId} initialValues={initialValues} onSubmit={onSubmit}>
           {({ isSubmitting, handleReset, values, initialValues, resetForm }: any) => {
+            // [Alaister] although this "technically" is breaking the rules of React hooks
+            // it won't error because the hooks are always rendered in the same order
+            // eslint-disable-next-line react-hooks/rules-of-hooks
             const [loadingSecrets, setLoadingSecrets] = useState(false)
 
             const initialTables = formatWrapperTables(wrapper?.tables ?? [])
@@ -216,6 +219,9 @@ const EditWrapper = () => {
 
             const encryptedOptions = wrapperMeta.server.options.filter((option) => option.encrypted)
 
+            // [Alaister] although this "technically" is breaking the rules of React hooks
+            // it won't error because the hooks are always rendered in the same order
+            // eslint-disable-next-line react-hooks/rules-of-hooks
             useEffect(() => {
               const fetchEncryptedValues = async () => {
                 setLoadingSecrets(true)
