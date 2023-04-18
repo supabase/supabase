@@ -469,8 +469,6 @@ export default class MetaStore implements IMetaStore {
         category: 'error',
         message: `An error occurred while creating the column "${payload.name}"`,
       })
-      const query = `alter table "${selectedTable.name}" drop column if exists "${payload.name}";`
-      await this.rootStore.meta.query(query)
       return { error }
     }
   }
@@ -670,7 +668,6 @@ export default class MetaStore implements IMetaStore {
 
       // If the user is importing data via a spreadsheet
       if (!isUndefined(importContent)) {
-        console.log({ importContent })
         if (importContent.file && importContent.rowCount > 0) {
           // Via a CSV file
           const { error }: any = await this.insertRowsViaSpreadsheet(

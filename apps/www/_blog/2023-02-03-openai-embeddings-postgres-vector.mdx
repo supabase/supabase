@@ -69,7 +69,7 @@ Why is this useful? Once we have generated embeddings on multiple texts, it is t
 
 ## Embeddings in practice
 
-At a small scale, you could store your embeddings in a CSV file, load them into Python, and use a library like `numPy` to calculated similarity between them using something like cosine distance or dot product. OpenAI has a cookbook [example](https://github.com/openai/openai-cookbook/blob/main/examples/Semantic_text_search_using_embeddings.ipynb) that does just that. Unfortunately this likely won't scale well:
+At a small scale, you could store your embeddings in a CSV file, load them into Python, and use a library like `numPy` to calculate similarity between them using something like cosine distance or dot product. OpenAI has a cookbook [example](https://github.com/openai/openai-cookbook/blob/main/examples/Semantic_text_search_using_embeddings.ipynb) that does just that. Unfortunately this likely won't scale well:
 
 - What if I need to store and search over a large number of documents and embeddings (more than can fit in memory)?
 - What if I want to create/update/delete embeddings dynamically?

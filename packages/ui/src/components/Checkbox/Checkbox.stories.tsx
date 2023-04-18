@@ -1,5 +1,3 @@
-import React from 'react'
-
 import { Checkbox } from '.'
 
 export default {
@@ -78,9 +76,7 @@ export const size = (args: any) => (
   </Checkbox.Group>
 )
 
-export const withBeforeAndAfterLabels = (args: any) => (
-  <Checkbox.Group {...args} />
-)
+export const withBeforeAndAfterLabels = (args: any) => <Checkbox.Group {...args} />
 
 Default.args = {
   label: 'This is the label',
@@ -109,8 +105,7 @@ withGroupHorizontal.args = {
 size.args = {
   id: 'checkobox-q',
   label: 'Control the size of the checkboxes',
-  description:
-    'You can add a size just the Group component and it will affect the children',
+  description: 'You can add a size just the Group component and it will affect the children',
   disabled: false,
   className: 'font-sans',
   layout: 'horizontal',

@@ -1,11 +1,11 @@
 import { motion, useScroll, useTransform } from 'framer-motion'
 import Image from 'next/image'
-import { useMobileViewport } from '../../hooks/useMobileViewport'
+import { useBreakpoint } from 'common/hooks/useBreakpoint'
 import styles from './lw7-bg-graphic.module.css'
 
 export default function LW7BgGraphic() {
   const { scrollYProgress } = useScroll()
-  const isMobile = useMobileViewport(768)
+  const isMobile = useBreakpoint(768)
 
   const graphicsY = useTransform(
     scrollYProgress,

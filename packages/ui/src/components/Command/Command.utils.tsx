@@ -180,10 +180,11 @@ type CommandPrimitiveItemProps = React.ComponentPropsWithoutRef<typeof CommandPr
 
 export interface CommandItemProps extends CommandPrimitiveItemProps {
   type: 'link' | 'block-link' | 'command'
+  badge?: React.ReactNode
 }
 
 export const CommandItem = React.forwardRef<CommandPrimitiveItemElement, CommandItemProps>(
-  ({ className, type, ...props }, ref) => (
+  ({ className, type, children, badge, ...props }, ref) => (
     <CommandPrimitive.Item
       ref={ref}
       className={cn(
@@ -238,7 +239,12 @@ export const CommandItem = React.forwardRef<CommandPrimitiveItemElement, Command
         className
       )}
       {...props}
-    />
+    >
+      <div className="w-full flex flex-row justify-between items-center">
+        <div className="flex flex-row items-center">{children}</div>
+        {badge}
+      </div>
+    </CommandPrimitive.Item>
   )
 )
 
@@ -324,3 +330,94 @@ export const TextHighlighter = ({ text, query, ...props }: TextHighlighterProps)
 }
 
 TextHighlighter.displayName = 'TextHighlighter'
+
+export interface UseHistoryKeysOptions {
+  enable: boolean
+  messages: string[]
+  setPrompt: (prompt: string) => void
+}
+
+/**
+ * Enables a shell-style message history when hitting
+ * up/down on the keyboard
+ */
+export function useHistoryKeys({ enable, messages, setPrompt }: UseHistoryKeysOptions) {
+  // Message index when hitting up/down on the keyboard (shell style)
+  const [, setMessageSelectionIndex] = React.useState(0)
+
+  React.useEffect(() => {
+    if (enable) {
+      return
+    }
+
+    // Note: intentionally setting index to 1 greater than max index
+    setMessageSelectionIndex(messages.length)
+  }, [messages, enable])
+
+  React.useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      switch (e.key) {
+        case 'ArrowUp':
+          setMessageSelectionIndex((index) => {
+            const newIndex = Math.max(index - 1, 0)
+            setPrompt(messages[newIndex] ?? '')
+            return newIndex
+          })
+          return
+        case 'ArrowDown':
+          setMessageSelectionIndex((index) => {
+            const newIndex = Math.min(index + 1, messages.length)
+            setPrompt(messages[newIndex] ?? '')
+            return newIndex
+          })
+          return
+        default:
+          return
+      }
+    }
+
+    window.addEventListener('keydown', onKeyDown)
+
+    return () => {
+      window.removeEventListener('keydown', onKeyDown)
+    }
+  }, [messages])
+}
+
+/**
+ * Automatically focuses an input on key press
+ * and on load (after the call stack)
+ *
+ * @returns An input ref for the input to focus
+ */
+export function useAutoInputFocus() {
+  const [input, setInput] = React.useState<HTMLInputElement>()
+
+  // Use a callback-style ref to access the element when it mounts
+  const inputRef = React.useCallback((inputElement: HTMLInputElement) => {
+    if (inputElement) {
+      setInput(inputElement)
+
+      // We need to delay the focus until the end of the call stack
+      // due to order of operations
+      setTimeout(() => {
+        inputElement.focus()
+      }, 0)
+    }
+  }, [])
+
+  // Focus the input when typing from anywhere
+  React.useEffect(() => {
+    function onKeyDown() {
+      input?.focus()
+    }
+
+    window.addEventListener('keydown', onKeyDown)
+
+    return () => {
+      window.removeEventListener('keydown', onKeyDown)
+    }
+  }, [input])
+
+  return inputRef
+}

@@ -1,5 +1,6 @@
 import authors from 'lib/authors.json'
 import Image from 'next/image'
+import Link from 'next/link'
 import React from 'react'
 import Author from '~/types/author'
 import PostTypes from '~/types/post'
@@ -24,8 +25,8 @@ const BlogListItem = ({ post }: Props) => {
 
   return (
     <div>
-      <a href={`${post.path}`}>
-        <div className="group inline-block min-w-full">
+      <Link href={post.path}>
+        <a className="group inline-block min-w-full">
           <div className="flex flex-col space-y-6">
             <div className="flex flex-col space-y-3">
               <div
@@ -69,8 +70,8 @@ const BlogListItem = ({ post }: Props) => {
               })}
             </div>
           </div>
-        </div>
-      </a>
+        </a>
+      </Link>
     </div>
   )
 }
