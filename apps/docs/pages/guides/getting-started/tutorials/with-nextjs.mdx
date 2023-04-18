@@ -287,7 +287,7 @@ export default function Account({ session }) {
         <label htmlFor="website">Website</label>
         <input
           id="website"
-          type="website"
+          type="url"
           value={website || ''}
           onChange={(e) => setWebsite(e.target.value)}
         />
@@ -317,6 +317,8 @@ export default function Account({ session }) {
 <TabPanel id="ts" label="TypeScript">
 
 Let's create a new component for that called `Account.tsx` within a `components` folder.
+
+First, [generate type definitions from your database using the Supabase CLI](https://supabase.com/docs/guides/database/api/generating-types) to `../utils/database.types`.
 
 ```tsx title=components/Account.tsx
 import { useState, useEffect } from 'react'
@@ -415,7 +417,7 @@ export default function Account({ session }: { session: Session }) {
         <label htmlFor="website">Website</label>
         <input
           id="website"
-          type="website"
+          type="url"
           value={website || ''}
           onChange={(e) => setWebsite(e.target.value)}
         />

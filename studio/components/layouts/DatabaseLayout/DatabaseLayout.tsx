@@ -2,8 +2,8 @@ import { FC, ReactNode, useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 
+import ProjectLayout from '../'
 import { useStore, withAuth } from 'hooks'
-import BaseLayout from '../'
 import Error from 'components/ui/Error'
 import ProductMenu from 'components/ui/ProductMenu'
 import { generateDatabaseMenu } from './DatabaseMenu.utils'
@@ -16,7 +16,8 @@ interface Props {
 
 const DatabaseLayout: FC<Props> = ({ title, children }) => {
   const { meta, ui, vault, backups } = useStore()
-  const { isInitialized, isLoading, error } = meta.tables
+  const { isLoading } = meta.schemas
+  const { isInitialized, error } = meta.tables
   const project = ui.selectedProject
 
   const router = useRouter()
@@ -60,14 +61,14 @@ const DatabaseLayout: FC<Props> = ({ title, children }) => {
 
   if (error) {
     return (
-      <BaseLayout>
+      <ProjectLayout>
         <Error error={error} />
-      </BaseLayout>
+      </ProjectLayout>
     )
   }
 
   return (
-    <BaseLayout
+    <ProjectLayout
       isLoading={!loaded}
       product="Database"
       productMenu={<ProductMenu page={page} menu={generateDatabaseMenu(project)} />}
@@ -75,7 +76,7 @@ const DatabaseLayout: FC<Props> = ({ title, children }) => {
       <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">
         {children}
       </main>
-    </BaseLayout>
+    </ProjectLayout>
   )
 }
 

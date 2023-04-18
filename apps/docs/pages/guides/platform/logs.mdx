@@ -4,23 +4,16 @@ import { logConstants } from 'shared-data'
 export const meta = {
   id: 'logs',
   title: 'Logging',
-  description: 'Getting started with Supabase Platform Log Browser',
+  description: 'Getting started with Supabase Log Browser',
 }
 
 The Supabase Platform includes a Logs Explorer that allows log tracing and debugging. Log retention is based on your [project's pricing plan](https://supabase.com/pricing).
-
-<Admonition type="note">
-
-These features are not currently available for self-hosting and local development.<br/>
-This is on the roadmap and you can follow the progress in the [Logflare repository](https://github.com/Logflare/logflare).
-
-</Admonition>
 
 ## Product Logs
 
 Supabase provides a logging interface specific to each product. You can use simple regular expressions for keywords and patterns to search log event messages. You can also export and download the log events matching your query as a spreadsheet.
 
-{/* <!-- To update the screenshots, ensure that at least one log line is selected to display the metadata. Can use meme.town as an example. --> */}
+{/* <!-- To update screenshots, ensure that at least one log line is selected to display the metadata. Can use meme.town as an example. --> */}
 
 <Tabs
   scrollable
@@ -59,6 +52,12 @@ Supabase provides a logging interface specific to each product. You can use simp
 <TabPanel id="realtime" label="Realtime">
 
 [Realtime logs](https://app.supabase.com/project/_/logs/realtime-logs) show all server logs for your [Realtime API usage](../../guides/realtime).
+
+<Admonition type="note">
+
+Realtime connections are not logged by default. Turn on [Realtime connection logs per client](#logging-realtime-connections) with the `log_level` parameter.
+
+</Admonition>
 
 ![Realtime Logs](/docs/img/guides/platform/logs/logs-realtime.png)
 
@@ -125,6 +124,21 @@ alter role postgres reset pgaudit.log
 If any permission errors are encountered when executing `alter role postgres ...`, it is likely that your project has yet to receive the patch to the latest version of [supautils](https://github.com/supabase/supautils), which is currently being rolled out.
 
 </Admonition>
+
+## Logging Realtime Connections
+
+Realtime doesn't log new WebSocket connections or Channel joins by default. Enable connection logging per client by including an `info` `log_level` parameter when instantiating the Supabase client.
+
+```javascript
+import { createClient } from '@supabase/supabase-js'
+
+const options = {
+  realtime: {
+    log_level: 'info',
+  },
+}
+const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key', options)
+```
 
 ## Logs Explorer
 

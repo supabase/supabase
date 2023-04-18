@@ -9,7 +9,7 @@ interface Props extends Omit<React.HTMLAttributes<HTMLButtonElement>, 'size'> {
   disabled?: boolean
   layout?: 'horizontal' | 'vertical' | 'flex'
   error?: string
-  descriptionText?: string
+  descriptionText?: string | React.ReactNode
   label?: string | React.ReactNode
   afterLabel?: string
   beforeLabel?: string
@@ -128,7 +128,7 @@ function Toggle({
         type="button"
         id={id}
         name={name}
-        className={clsx(toggleClasses, disabled && 'opacity-50 cursor-default')}
+        className={clsx(...toggleClasses, disabled && 'opacity-50 cursor-default')}
         onClick={onClick}
         disabled={disabled}
         onBlur={handleBlurEvent}

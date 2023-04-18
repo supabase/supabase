@@ -137,7 +137,7 @@ function RadioGroup({
 interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
   label: string
   afterLabel?: string
-  beforeLabel?: string
+  beforeLabel?: string | React.ReactNode
   description?: string
   size?: 'tiny' | 'small' | 'medium' | 'large' | 'xlarge'
   hidden?: boolean

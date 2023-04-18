@@ -3,7 +3,7 @@ import { find, isUndefined, compact, isEqual, omitBy, isNull, isString } from 'l
 import { Dictionary } from 'components/grid'
 import type { PostgresTable } from '@supabase/postgres-meta'
 
-import { uuidv4, minifyJSON, tryParseJson } from 'lib/helpers'
+import { minifyJSON, tryParseJson } from 'lib/helpers'
 import { RowField } from './RowEditor.types'
 import {
   DATETIME_TYPES,
@@ -24,6 +24,10 @@ export const generateRowFields = (
     const value =
       isUndefined(row) && TEXT_TYPES.includes(column.format)
         ? null
+        : isUndefined(row) && column.format === 'bool' && !column.is_nullable
+        ? 'true'
+        : isUndefined(row) && column.format === 'bool' && column.is_nullable
+        ? 'null'
         : isUndefined(row)
         ? ''
         : DATETIME_TYPES.includes(column.format)
@@ -78,7 +82,7 @@ export const validateFields = (fields: RowField[]) => {
   return errors
 }
 
-const parseValue = (originalValue: string, format: string) => {
+const parseValue = (originalValue: any, format: string) => {
   try {
     if (originalValue === null || originalValue.length === 0) {
       return originalValue
@@ -87,7 +91,7 @@ const parseValue = (originalValue: string, format: string) => {
     } else if (typeof originalValue === 'object') {
       return JSON.stringify(originalValue)
     } else if (typeof originalValue === 'boolean') {
-      return (originalValue as any).toString()
+      return originalValue.toString()
     } else {
       return originalValue
     }
@@ -168,7 +172,8 @@ export const generateRowObjectFromFields = (
         rowObject[field.name] = tryParseJson(value)
       }
     } else if (field.format === 'bool' && value) {
-      rowObject[field.name] = value === 'true'
+      if (value === 'null') rowObject[field.name] = null
+      else rowObject[field.name] = value === 'true'
     } else if (DATETIME_TYPES.includes(field.format)) {
       // Seconds are missing if they are set to 0 in the HTML input
       // Need to format that first, before passing to dayjs

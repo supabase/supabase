@@ -5,8 +5,7 @@ import { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
 
 export const generateSettingsMenu = (ref: string, project?: ProjectBase): ProductMenuGroup[] => {
   const isVaultEnabled = useFlag('vaultExtension')
-
-  const isProjectBuilding = project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY
+  const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
   const buildingUrl = `/project/${ref}/building`
 
   return [

@@ -41,7 +41,7 @@ const App = () => <Auth supabaseClient={supabase} />
 
 This renders the Auth component without any styling.
 We recommend using one of the predefined themes to style the UI.
-Import the theme you want to use and pass it to the `appearence.theme` prop.
+Import the theme you want to use and pass it to the `appearance.theme` prop.
 
 ```js lines=4,16 title=/src/index.js
 import { Auth } from '@supabase/auth-ui-react'
@@ -66,7 +66,7 @@ const App = () => (
 
 ### Social Providers
 
-The Auth component also supports login with [offical social providers](../../auth#providers).
+The Auth component also supports login with [official social providers](../../auth#providers).
 
 ```js lines=13 title=/src/index.js
 import { createClient } from '@supabase/supabase-js'
@@ -109,7 +109,7 @@ There are several ways to customize Auth UI:
 
 ### Predefined themes
 
-Auth UI comes with several themes to customize the appearance. Each predefined theme comes with at least two variations, a `default` variation, and a `dark` variation. You can switch between these themes using the `theme` prop. Import the theme you want to use and pass it to the `appearence.theme` prop.
+Auth UI comes with several themes to customize the appearance. Each predefined theme comes with at least two variations, a `default` variation, and a `dark` variation. You can switch between these themes using the `theme` prop. Import the theme you want to use and pass it to the `appearance.theme` prop.
 
 ```js lines=2,13 title=/src/index.js
 import { createClient } from '@supabase/supabase-js'
@@ -260,6 +260,9 @@ const App = () => (
   <Auth
     supabaseClient={supabase}
     appearance={{
+      // If you want to extend the default styles instead of overriding it, set this to true
+      extend: false,
+      // Your custom classes
       className: {
         anchor: 'my-awesome-anchor',
         button: 'my-awesome-button',
@@ -321,6 +324,8 @@ const App = () => (
   />
 )
 ```
+
+Currently, translating error messages (e.g. "Invalid credentials") is not supported. Check [related issue.](https://github.com/supabase/auth-ui/issues/86)
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

@@ -123,7 +123,7 @@ const defaultTheme = {
 
           outline-none
           focus-visible:ring-1
-          focus-visible:z-50
+          focus-visible:z-10
           ring-scale-1100
         `,
         content: `
@@ -161,7 +161,7 @@ const defaultTheme = {
 
           outline-none
           focus-visible:ring-1
-          focus-visible:z-50
+          focus-visible:z-10
           ring-scale-1100
 
           transition-colors
@@ -222,30 +222,17 @@ const defaultTheme = {
       red: `bg-red-200 text-red-1100 border border-red-700`,
       crimson: `bg-crimson-200 text-crimson-1100 border border-crimson-700`,
       pink: `bg-pink-200 text-pink-1100 border border-pink-700`,
-      plum: `bg-plum-200 text-plum-1100 border border-plum-700`,
       purple: `bg-purple-200 text-purple-1100 border border-purple-700`,
       violet: `bg-violet-200 text-violet-1100 border border-violet-700`,
       indigo: `bg-indigo-200 text-indigo-1100 border border-indigo-700`,
       blue: `bg-blue-200 text-blue-1100 border border-blue-700`,
-      cyan: `bg-cyan-200 text-cyan-1100 border border-cyan-700`,
-      teal: `bg-teal-200 text-teal-1100 border border-teal-700`,
       green: `bg-green-200 text-green-1100 border border-green-700`,
-      grass: `bg-grass-200 text-grass-1100 border border-grass-700`,
-      brown: `bg-brown-200 text-brown-1100 border border-brown-700`,
       orange: `bg-orange-200 text-orange-1100 border border-orange-700`,
-      sky: `bg-sky-200 text-sky-1100 border border-sky-700`,
-      mint: `bg-mint-200 text-mint-1100 border border-mint-700`,
-      lime: `bg-lime-200 text-lime-1100 border border-lime-700`,
       yellow: `bg-yellow-200 text-yellow-1100 border border-yellow-700`,
       amber: `bg-amber-200 text-amber-1100 border border-amber-700`,
       gold: `bg-gold-200 text-gold-1100 border border-gold-700`,
-      bronze: `bg-bronze-200 text-bronze-1100 border border-bronze-700`,
       gray: `bg-gray-200 text-gray-1100 border border-gray-700`,
-      mauve: `bg-mauve-200 text-mauve-1100 border border-mauve-700`,
       slate: `bg-slate-200 text-slate-1100 border border-slate-700`,
-      sage: `bg-sage-200 text-sage-1100 border border-sage-700`,
-      olive: `bg-olive-200 text-olive-1100 border border-olive-700`,
-      sand: `bg-sand-200 text-sand-1100 border border-sand-700`,
     },
   },
 
@@ -256,7 +243,7 @@ const defaultTheme = {
 
   alert: {
     base: `
-      relative rounded border py-4 px-6
+      relative rounded-md border py-4 px-6
       flex space-x-4 items-start
     `,
     header: 'block text-sm font-normal mb-1',
@@ -275,10 +262,10 @@ const defaultTheme = {
         description: `text-amber-1100`,
       },
       info: {
-        base: `bg-blue-200 dark:bg-blue-100 border-blue-700`,
-        icon: `text-blue-900`,
-        header: `text-blue-1200`,
-        description: `text-blue-1100`,
+        base: `bg-scale-400 border-scale-500 dark:bg-scale-100 dark:border-scale-300`,
+        icon: `text-scale-900`,
+        header: `text-scale-1200`,
+        description: `text-scale-1100`,
       },
       success: {
         base: `bg-brand-300 dark:bg-brand-100 border-brand-700`,
@@ -353,7 +340,7 @@ const defaultTheme = {
         hover:text-scale-1200
       `,
       active: `
-        text-scale-1200
+        !text-scale-1200
         border-b-2 border-scale-1200
       `,
     },
@@ -369,6 +356,7 @@ const defaultTheme = {
         transition
         shadow-sm
         rounded
+        border
         focus:outline-none
         focus-visible:ring
         focus-visible:ring-scale-700
@@ -376,13 +364,13 @@ const defaultTheme = {
         `,
       inactive: `
         bg-scale-200
-        border border-scale-700 hover:border-scale-900
+        border-scale-700 hover:border-scale-900
         text-scale-900 hover:text-scale-1200
       `,
       active: `
-        bg-scale-1200
-        text-scale-200
-        border-scale-1200
+        bg-scale-600
+        text-scale-1200
+        border-scale-800
       `,
     },
     'rounded-pills': {
@@ -972,11 +960,11 @@ const defaultTheme = {
 
   sidepanel: {
     base: `
+      z-40
       bg-scale-100 dark:bg-scale-300
       flex flex-col
       fixed
       inset-y-0
-      max-w-full
       h-screen
       border-l border-overlay-border
       shadow-xl
@@ -1023,6 +1011,7 @@ const defaultTheme = {
       bg-scale-300 dark:bg-scale-500
     `,
     overlay: `
+      z-40
       fixed
       bg-scale-300
       dark:bg-scale-100
@@ -1059,8 +1048,8 @@ const defaultTheme = {
       hover:bg-scale-700
     `,
     active: `
-      bg-brand-900
-      hover:bg-brand-900
+      !bg-brand-900
+      !hover:bg-brand-900
     `,
     handle_container: {
       tiny: 'h-4 w-7',
@@ -1079,11 +1068,11 @@ const defaultTheme = {
         transition
         ease-in-out duration-200
       `,
-      tiny: 'h-3 w-3',
-      small: 'h-5 w-5',
-      medium: 'h-5 w-5',
-      large: 'h-6 w-6',
-      xlarge: 'h-6 w-6',
+      tiny: '!h-3 !w-3',
+      small: '!h-5 !w-5',
+      medium: '!h-5 !w-5',
+      large: '!h-6 !w-6',
+      xlarge: '!h-6 !w-6',
     },
     handle_active: {
       tiny: ' translate-x-3 dark:bg-white',
@@ -1210,12 +1199,12 @@ const defaultTheme = {
       data-open:text-scale-1200
     `,
     content: `
+      z-40
       bg-scale-100 dark:bg-scale-300
       border border-scale-300 dark:border-scale-500
       rounded
       shadow-lg
       py-1.5
-
       origin-dropdown
       data-open:animate-dropdown-content-show
       data-closed:animate-dropdown-content-hide
@@ -1245,6 +1234,7 @@ const defaultTheme = {
       border-none
       focus:outline-none
     `,
+    disabled: `opacity-50 cursor-default`,
     label: `
       text-scale-900
       px-4 flex items-center space-x-2 py-1.5
@@ -1297,6 +1287,7 @@ const defaultTheme = {
 
     `,
     content: `
+      z-40
       bg-scale-100 dark:bg-scale-300
       border border-scale-300 dark:border-scale-500
       rounded
@@ -1469,6 +1460,7 @@ const defaultTheme = {
       xxxlarge: `sm:align-middle sm:w-full max-w-7xl`,
     },
     overlay: `
+      z-40
       fixed
       bg-scale-300
       dark:bg-scale-100
@@ -1480,13 +1472,13 @@ const defaultTheme = {
       data-open:animate-fade-in-overlay-bg
     `,
     scroll_overlay: `
+      z-40
       fixed
       inset-0
       grid
       place-items-center
       overflow-y-auto
       data-open:animate-overlay-show data-closed:animate-overlay-hide
-      z-50
     `,
     separator: `
       w-full

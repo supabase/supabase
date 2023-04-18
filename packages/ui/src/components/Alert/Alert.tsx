@@ -5,12 +5,11 @@ import { IconInfo } from '../Icon/icons/IconInfo'
 import { IconX } from '../Icon/icons/IconX'
 
 // @ts-ignore
-// import AlertStyles from './Alert.module.css'
 import useStyles from '../../lib/theme/use-styles'
 import { IconAlertOctagon } from '../Icon/icons/IconAlertOctagon'
 import { IconCheckCircle } from '../Icon/icons/IconCheckCircle'
 
-interface Props {
+export interface AlertProps {
   variant?: 'success' | 'danger' | 'warning' | 'info' | 'neutral'
   className?: string
   title: string | React.ReactNode
@@ -38,7 +37,7 @@ function Alert({
   children,
   icon,
   actions,
-}: Props) {
+}: AlertProps) {
   let __styles = useStyles('alert')
 
   const [visible, setVisible] = useState(true)

@@ -159,8 +159,9 @@ const Modal = ({
         <Dialog.Overlay className={__styles.overlay} />
         <Dialog.Overlay className={__styles.scroll_overlay}>
           <Dialog.Content
-            className={[__styles.base, __styles.size[size]].join(' ')}
+            className={[__styles.base, __styles.size[size], className].join(' ')}
             onInteractOutside={props.onInteractOutside}
+            onEscapeKeyDown={props.onEscapeKeyDown}
           >
             {header && <div className={__styles.header}>{header}</div>}
             {/* <div

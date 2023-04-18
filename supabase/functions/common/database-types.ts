@@ -130,6 +130,22 @@ export interface Database {
           similarity: number
         }[]
       }
+      match_page_sections_v2: {
+        Args: {
+          embedding: unknown
+          match_threshold: number
+          min_content_length: number
+        }
+        Returns: {
+          content: string | null
+          embedding: unknown | null
+          heading: string | null
+          id: number
+          page_id: number
+          slug: string | null
+          token_count: number | null
+        }[]
+      }
       vector_avg: {
         Args: {
           "": number[]
@@ -178,7 +194,10 @@ export interface Database {
     Tables: {
       buckets: {
         Row: {
+          allowed_mime_types: string[] | null
+          avif_autodetection: boolean | null
           created_at: string | null
+          file_size_limit: number | null
           id: string
           name: string
           owner: string | null
@@ -186,7 +205,10 @@ export interface Database {
           updated_at: string | null
         }
         Insert: {
+          allowed_mime_types?: string[] | null
+          avif_autodetection?: boolean | null
           created_at?: string | null
+          file_size_limit?: number | null
           id: string
           name: string
           owner?: string | null
@@ -194,7 +216,10 @@ export interface Database {
           updated_at?: string | null
         }
         Update: {
+          allowed_mime_types?: string[] | null
+          avif_autodetection?: boolean | null
           created_at?: string | null
+          file_size_limit?: number | null
           id?: string
           name?: string
           owner?: string | null
