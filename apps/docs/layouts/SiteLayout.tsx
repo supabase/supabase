@@ -290,7 +290,7 @@ const NavContainer = memo(function NavContainer() {
           'top-0',
           'relative',
           'w-auto',
-          'border-r overflow-auto h-screen',
+          'border-r border-body overflow-auto h-screen',
           'backdrop-blur backdrop-filter bg-white-1200 dark:bg-blackA-300',
           'flex flex-col',
         ].join(' ')}
