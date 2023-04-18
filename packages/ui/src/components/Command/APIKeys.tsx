@@ -1,9 +1,9 @@
 import { CommandGroup } from 'cmdk-supabase'
 import { useCommandMenu } from './CommandMenuProvider'
-import SearchOnlyItem from './SearchOnlyItem'
 import { Badge } from '../Badge'
 import { CommandItem } from './Command.utils'
 import { IconAlertCircle } from './../Icon/icons/IconAlertCircle'
+import ChildItem from './ChildItem'
 
 const APIKeys = ({ isSubItem = false }) => {
   const { setIsOpen, project } = useCommandMenu()
@@ -21,7 +21,7 @@ const APIKeys = ({ isSubItem = false }) => {
   return (
     <CommandGroup>
       {apiKeys?.anon !== undefined && (
-        <SearchOnlyItem
+        <ChildItem
           isSubItem={isSubItem}
           onSelect={() => {
             copyToClipboard(apiKeys?.anon ?? '')
@@ -31,10 +31,10 @@ const APIKeys = ({ isSubItem = false }) => {
         >
           <p>Copy anonymous key</p>
           <Badge color="gray">Public</Badge>
-        </SearchOnlyItem>
+        </ChildItem>
       )}
       {apiKeys?.service !== undefined && (
-        <SearchOnlyItem
+        <ChildItem
           isSubItem={isSubItem}
           onSelect={() => {
             copyToClipboard(apiKeys?.service ?? '')
@@ -44,7 +44,7 @@ const APIKeys = ({ isSubItem = false }) => {
         >
           <p>Copy service key</p>
           <Badge color="red">Secret</Badge>
-        </SearchOnlyItem>
+        </ChildItem>
       )}
       {apiKeys?.anon === undefined && apiKeys?.service === undefined && (
         <CommandItem type="link" className="items-start">

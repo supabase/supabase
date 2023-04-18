@@ -6,7 +6,7 @@ interface Props {}
 
 const Connecting: FC<Props> = () => (
   <div className="w-full h-full flex flex-col items-center justify-center">
-    <div className="w-32">
+    <div className="w-28">
       <Lottie loop={true} autoplay={true} animationData={loadingAnim} />
     </div>
   </div>

@@ -1,3 +1,4 @@
+import React from 'react'
 import type {
   ChatCompletionResponseMessage,
   CreateChatCompletionResponse,
@@ -15,11 +16,12 @@ import {
 
 import { SSE } from 'sse.js'
 
-import { Button, IconAlertTriangle, IconCornerDownLeft, IconUser, Input } from 'ui'
+import { Alert, Button, IconAlertTriangle, IconCornerDownLeft, IconUser, Input } from 'ui'
 import { AiIcon, AiIconChat } from './Command.icons'
-import { CommandGroup, CommandItem } from './Command.utils'
+import { CommandGroup, CommandItem, useAutoInputFocus, useHistoryKeys } from './Command.utils'
 
 import { useCommandMenu } from './CommandMenuProvider'
+import { AiWarning } from './Command.alerts'
 
 import { cn } from './../../utils/cn'
 
@@ -250,7 +252,7 @@ export function useAiChat({
 
       setIsLoading?.(true)
     },
-    [currentMessageIndex, messages]
+    [currentMessageIndex, messages, messageTemplate]
   )
 
   function reset() {
@@ -272,11 +274,85 @@ export function useAiChat({
   }
 }
 
+/**
+ * Perform a one-off query to AI based on a snapshot of messages
+ */
+export function queryAi(messages: Message[], timeout = 0) {
+  return new Promise<string>((resolve, reject) => {
+    const eventSource = new SSE(`${edgeFunctionUrl}/ai-docs`, {
+      headers: {
+        apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '',
+        Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      payload: JSON.stringify({
+        messages: messages.map(({ role, content }) => ({ role, content })),
+      }),
+    })
+
+    let timeoutId: number | undefined
+
+    function handleError<T>(err: T) {
+      if (timeoutId) {
+        clearTimeout(timeoutId)
+      }
+      console.error(err)
+      reject(err)
+    }
+
+    if (timeout > 0) {
+      timeoutId = window.setTimeout(() => {
+        handleError(new Error('AI query timed out'))
+      }, timeout)
+    }
+
+    let answer = ''
+
+    eventSource.addEventListener('error', handleError)
+    eventSource.addEventListener('message', (e) => {
+      try {
+        if (e.data === '[DONE]') {
+          if (timeoutId) {
+            clearTimeout(timeoutId)
+          }
+          resolve(answer)
+          return
+        }
+
+        const completionResponse: CreateChatCompletionResponse = JSON.parse(e.data)
+        const [
+          {
+            delta: { content },
+          },
+        ] = completionResponse.choices as CreateChatCompletionResponseChoicesInnerDelta[]
+
+        if (content) {
+          answer += content
+        }
+      } catch (err) {
+        handleError(err)
+      }
+    })
+
+    eventSource.stream()
+  })
+}
+
 const AiCommand = () => {
   const { isLoading, setIsLoading, search, setSearch, MarkdownHandler } = useCommandMenu()
 
   const { submit, reset, messages, isResponding, hasError } = useAiChat({
     setIsLoading,
+  })
+
+  const inputRef = useAutoInputFocus()
+
+  useHistoryKeys({
+    enable: !isResponding,
+    messages: messages
+      .filter(({ role }) => role === MessageRole.User)
+      .map(({ content }) => content),
+    setPrompt: setSearch,
   })
 
   const handleSubmit = useCallback(
@@ -300,7 +376,7 @@ const AiCommand = () => {
 
   return (
     <div onClick={(e) => e.stopPropagation()}>
-      <div className={cn('relative mb-[62px] py-4 max-h-[720px] overflow-auto')}>
+      <div className={cn('relative mb-[145px] py-4 max-h-[720px] overflow-auto')}>
         {messages.map((message, index) => {
           switch (message.role) {
             case MessageRole.User:
@@ -390,8 +466,10 @@ const AiCommand = () => {
         <div className="[overflow-anchor:auto] h-px w-full"></div>
       </div>
       <div className="absolute bottom-0 w-full bg-scale-200 py-3">
+        {messages.length > 0 && !hasError && <AiWarning className="mb-3 mx-3" />}
         <Input
           className="bg-scale-100 rounded mx-3"
+          inputRef={inputRef}
           autoFocus
           placeholder={
             isLoading || isResponding ? 'Waiting on an answer...' : 'Ask Supabase AI a question...'

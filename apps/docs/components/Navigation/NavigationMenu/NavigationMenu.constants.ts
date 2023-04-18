@@ -1,13 +1,4 @@
-// import SupabaseJsV1Nav from 'data/nav/supabase-js/v1'
-// import SupabaseJsV2Nav from 'data/nav/supabase-js/v2'
-// import SupabaseDartV0Nav from 'data/nav/supabase-dart/v0'
-// import SupabaseDartV1Nav from 'data/nav/supabase-dart/v1'
-// import SupabaseCLINav from 'data/nav/supabase-cli'
-// import SupabaseAPINav from 'data/nav/supabase-api'
-// import AuthServerNav from 'data/nav/auth-server'
-// import StorageServerNav from 'data/nav/storage-server'
-
-import { NavMenu, References } from '../Navigation.types'
+import { References } from '../Navigation.types'
 
 export const REFERENCES: References = {
   javascript: {
@@ -587,6 +578,7 @@ export const functions = {
           name: 'Connecting directly to Postgres',
           url: '/guides/functions/connect-to-postgres',
         },
+        { name: 'Dart Edge on Supabase', url: '/guides/functions/dart-edge' },
       ],
     },
     {
@@ -683,6 +675,7 @@ export const storage = {
   items: [
     { name: 'Overview', url: '/guides/storage' },
     { name: 'Quickstart', url: '/guides/storage/quickstart' },
+    { name: 'Uploads', url: '/guides/storage/uploads' },
     { name: 'Access Control', url: '/guides/storage/access-control' },
     { name: 'CDN', url: '/guides/storage/cdn' },
     { name: 'Image Transformations', url: '/guides/storage/image-transformations' },
@@ -854,6 +847,12 @@ export const self_hosting = {
       items: [
         { name: 'Reference', url: '/reference/self-hosting-analytics/introduction', items: [] },
         { name: 'Configuration', url: '/guides/self-hosting/analytics/config', items: [] },
+      ],
+    },
+    {
+      name: 'Functions Server',
+      items: [
+        { name: 'Reference', url: '/reference/self-hosting-functions/introduction', items: [] },
       ],
     },
   ],
@@ -1087,6 +1086,13 @@ export const reference_self_hosting_analytics = {
   icon: 'reference-analytics',
   title: 'Self-Hosting Analytics',
   url: '/guides/reference/self-hosting/analytics',
+  parent: '/reference',
+}
+
+export const reference_self_hosting_functions = {
+  icon: 'reference-functions',
+  title: 'Self-Hosting Functions',
+  url: '/guides/reference/self-hosting/functions',
   parent: '/reference',
 }
 

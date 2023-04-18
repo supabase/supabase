@@ -33,6 +33,7 @@ import ThemeOptions from './ThemeOptions'
 import APIKeys from './APIKeys'
 import SearchableStudioItems from './SearchableStudioItems'
 import CommandMenuShortcuts from './CommandMenuShortcuts'
+import { BadgeExperimental } from './Command.Badges'
 
 export const CHAT_ROUTES = [
   COMMAND_ROUTES.AI, // this one is temporary
@@ -70,8 +71,12 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
       <CommandDialog
         page={currentPage}
         visible={isOpen}
-        onInteractOutside={() => {
-          setIsOpen(!open)
+        onInteractOutside={(e) => {
+          // Only hide menu when clicking outside, not focusing outside
+          // Prevents Firefox dropdown issue that immediately closes menu after opening
+          if (e.type === 'dismissableLayer.pointerDownOutside') {
+            setIsOpen(!open)
+          }
         }}
         size={'xlarge'}
         className={'max-h-[70vh] lg:max-h-[50vh] overflow-hidden overflow-y-auto'}
@@ -91,6 +96,7 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
               <CommandGroup heading="Documentation" forceMount>
                 <CommandItem
                   type="command"
+                  badge={<BadgeExperimental />}
                   onSelect={() => {
                     setPages([...pages, COMMAND_ROUTES.AI])
                   }}
@@ -174,6 +180,7 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
                   <CommandItem
                     forceMount
                     type="command"
+                    badge={<BadgeExperimental />}
                     onSelect={() => setPages([...pages, COMMAND_ROUTES.GENERATE_SQL])}
                   >
                     <AiIcon className="text-scale-1100" />
@@ -203,7 +210,14 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
                     ).split('https://app.supabase.com')[1]
 
                     return (
-                      <CommandItem key={item.url} type="link" onSelect={() => router.push(itemUrl)}>
+                      <CommandItem
+                        key={item.url}
+                        type="link"
+                        onSelect={() => {
+                          router.push(item.url)
+                          setIsOpen(false)
+                        }}
+                      >
                         <IconArrowRight className="text-scale-900" />
                         <CommandLabel>
                           Go to <span className="font-bold"> {item.label}</span>

@@ -11,7 +11,7 @@ export interface TableField {
 }
 
 export interface ImportContent {
-  file: File
+  file?: File
   headers: string[]
   rowCount: number
   rows: object[]

@@ -12,6 +12,7 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import { LaunchWeekLogoHeader } from '~/components/LaunchWeek/LaunchSection/LaunchWeekLogoHeader'
 import { UserData } from '~/components/LaunchWeek/Ticket/hooks/use-conf-data'
 import LW7BgGraphic from '~/components/LaunchWeek/LW7BgGraphic'
+import { useTheme } from 'common/Providers'
 
 const TicketContainer = dynamic(() => import('~/components/LaunchWeek/Ticket/TicketContainer'))
 const LW7Releases = dynamic(() => import('~/components/LaunchWeek/Releases/LW7/LW7Releases'))
@@ -39,6 +40,7 @@ export default function TicketHome({ users }: Props) {
   const [supabase, setSupabase] = useState<SupabaseClient | null>(null)
   const [session, setSession] = useState<Session | null>(null)
   const [isGolden, setIsGolden] = useState(false)
+  const { isDarkMode } = useTheme()
 
   const TITLE = 'Supabase LaunchWeek 7'
   const DESCRIPTION = 'Supabase Launch Week 7 | 10–14 April 2023'
@@ -80,9 +82,13 @@ export default function TicketHome({ users }: Props) {
   }, [supabase])
 
   useEffect(() => {
-    document.body.className = 'dark bg-[#1C1C1C]'
+    document.body.className = '!dark bg-[#1C1C1C]'
     if (typeof window !== 'undefined') {
       setIsGolden(localStorage?.getItem('isGolden') === 'true' ?? false)
+    }
+
+    return () => {
+      document.body.className = isDarkMode ? 'dark' : 'light'
     }
   }, [])
 
@@ -128,7 +134,7 @@ export default function TicketHome({ users }: Props) {
             />
           </div>
 
-          <div className="relative !w-full max-w-[100vw] !px-4 sm:max-w-xl md:max-w-2xl lg:max-w-7xl -mt-48 md:mt-[-460px] z-20 flex flex-col justify-around items-center !py-4 md:!py-8 gap-2 md:gap-4 !mx-auto">
+          <div className="relative !w-full max-w-[100vw] !px-4 sm:max-w-xl md:max-w-4xl lg:max-w-7xl -mt-48 md:mt-[-460px] z-20 flex flex-col justify-around items-center !py-4 md:!py-8 gap-2 md:gap-4 !mx-auto">
             <LW7Releases />
             <LaunchWeekPrizeSection className="pt-10" ticket={Ticket} />
           </div>

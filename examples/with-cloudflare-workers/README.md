@@ -17,7 +17,7 @@ In order to send a JSON response, we first stringify the object we get back from
 **Install Supabase JS**
 
 ```bash
-npm i @supabase-supabase-js
+npm i @supabase/supabase-js
 ```
 
 **Create a Cloudflare secret**
