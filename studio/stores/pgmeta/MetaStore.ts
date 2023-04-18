@@ -652,7 +652,7 @@ export default class MetaStore implements IMetaStore {
       // Then add the primary key constraints here to support composite keys
       const primaryKeyColumns = columns
         .filter((column: ColumnField) => column.isPrimaryKey)
-        .map((column: ColumnField) => `"${column.name}"`)
+        .map((column: ColumnField) => column.name)
       if (primaryKeyColumns.length > 0) {
         const primaryKeys = await this.addPrimaryKey(table.schema, table.name, primaryKeyColumns)
         if (primaryKeys.error) throw primaryKeys.error
@@ -752,11 +752,9 @@ export default class MetaStore implements IMetaStore {
     // Prepare a check to see if primary keys to the tables were updated or not
     const primaryKeyColumns = columns
       .filter((column) => column.isPrimaryKey)
-      .map((column) => `"${column.name}"`)
+      .map((column) => column.name)
     // @ts-ignore
-    const existingPrimaryKeyColumns = table.primary_keys.map(
-      (pk: PostgresPrimaryKey) => `"${pk.name}"`
-    )
+    const existingPrimaryKeyColumns = table.primary_keys.map((pk: PostgresPrimaryKey) => pk.name)
     const isPrimaryKeyUpdated = !isEqual(primaryKeyColumns, existingPrimaryKeyColumns)
 
     if (isPrimaryKeyUpdated) {
