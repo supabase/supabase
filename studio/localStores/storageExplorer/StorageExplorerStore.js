@@ -407,13 +407,15 @@ class StorageExplorerStore {
       })
     } else {
       // Need to generate signed URL, and might as well save it to cache as well
-      const signedUrl = await this.fetchFilePreview(file.name, expiresIn)
-
-      try {
-        let formattedUrl = new URL(signedUrl)
+      const signedUrlAsync = this.fetchFilePreview(file.name, expiresIn).then((signedUrl) => {
+        const formattedUrl = new URL(signedUrl)
         formattedUrl.searchParams.set('t', new Date().toISOString())
 
-        copyToClipboard(formattedUrl.toString(), () => {
+        return formattedUrl.toString()
+      })
+
+      try {
+        copyToClipboard(signedUrlAsync, () => {
           this.ui.setNotification({
             category: 'success',
             message: `Copied URL for ${file.name} to clipboard.`,
@@ -422,7 +424,7 @@ class StorageExplorerStore {
         })
         const fileCache = {
           id: file.id,
-          url: formattedUrl.toString(),
+          url: await signedUrlAsync,
           expiresIn: DEFAULT_EXPIRY,
           fetchedAt: Date.now(),
         }
