@@ -12,7 +12,7 @@ import supabase from '~/lib/supabase'
 import { Partner } from '~/types/partners'
 import Error404 from '../404'
 
-function Partner({ partner }: { partner: Partner }) {
+function PartnerPage({ partner }: { partner: Partner }) {
   if (!partner) return <Error404 />
   return (
     <>
@@ -115,12 +115,12 @@ function Partner({ partner }: { partner: Partner }) {
 
                 {partner.video && (
                   <div
-                    className="bg-scale-1000 relative w-full rounded-b-md shadow-lg"
+                    className="bg-scale-1000 relative w-full rounded-md shadow-lg"
                     style={{ padding: '56.25% 0 0 0', marginBottom: '1rem' }}
                   >
                     <iframe
                       title="Demo video showcasing Supabase"
-                      className="absolute h-full w-full rounded-b-md"
+                      className="absolute h-full w-full rounded-md"
                       src={`https://www.youtube-nocookie.com/embed/${partner.video}?autoplay=0&loop=0&controls=1&modestbranding=1&rel=0&disablekb=1`}
                       style={{ top: 0, left: 0 }}
                       frameBorder="0"
@@ -243,4 +243,4 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   }
 }
 
-export default Partner
+export default PartnerPage

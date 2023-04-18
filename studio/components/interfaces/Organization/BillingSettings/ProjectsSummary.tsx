@@ -3,7 +3,8 @@ import dayjs from 'dayjs'
 import { FC, useEffect } from 'react'
 import { IconChevronRight, IconLoader } from 'ui'
 
-import { useProjectSubscription, useStore } from 'hooks'
+import { useStore } from 'hooks'
+import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
 import Panel from 'components/ui/Panel'
 
 interface ProjectSummaryProps {
@@ -12,7 +13,11 @@ interface ProjectSummaryProps {
 
 const ProjectSummary: FC<ProjectSummaryProps> = ({ project }) => {
   const { ui } = useStore()
-  const { subscription, isLoading: loading, error } = useProjectSubscription(project.ref)
+  const {
+    data: subscription,
+    isLoading: loading,
+    error,
+  } = useProjectSubscriptionQuery({ projectRef: project.ref })
 
   const currentPeriodStart = subscription?.billing?.current_period_start ?? 0
   const currentPeriodEnd = subscription?.billing?.current_period_end ?? 0
@@ -21,13 +26,13 @@ const ProjectSummary: FC<ProjectSummaryProps> = ({ project }) => {
     if (error) {
       ui.setNotification({
         category: 'error',
-        message: `Failed to get project subscription: ${error?.message ?? 'unknown'}`,
+        message: `Failed to get project subscription: ${(error as any)?.message ?? 'unknown'}`,
       })
     }
   }, [error])
 
   return (
-    <div className="flex w-full items-center px-6 py-3">
+    <div className="flex items-center w-full px-6 py-3">
       <div className="w-[25%]">
         <p className="text-sm">{project.name}</p>
       </div>
@@ -47,8 +52,8 @@ const ProjectSummary: FC<ProjectSummaryProps> = ({ project }) => {
           </div>
           <div className="flex w-[15%] items-center justify-end">
             <Link href={`/project/${project.ref}/settings/billing/subscription`}>
-              <a className="group flex items-center space-x-2">
-                <p className="text-xs opacity-0 transition group-hover:opacity-100">View details</p>
+              <a className="flex items-center space-x-2 group">
+                <p className="text-xs transition opacity-0 group-hover:opacity-100">View details</p>
                 <IconChevronRight strokeWidth={1.5} />
               </a>
             </Link>
@@ -69,7 +74,7 @@ const ProjectsSummary: FC<ProjectsSummaryProps> = ({ projects }) => {
       <h4>Projects at a glance</h4>
       <Panel
         title={
-          <div className="flex w-full items-center">
+          <div className="flex items-center w-full">
             <div className="w-[25%]">
               <p className="text-sm opacity-50">Name</p>
             </div>

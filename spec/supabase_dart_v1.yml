@@ -2,7 +2,7 @@ openref: 0.1
 
 info:
   id: reference/dart
-  title: Getting started
+  title: Supabase Dart Client
   description: |
 
     Supabase Dart.
@@ -16,6 +16,41 @@ info:
       version: '0.0.1'
 
 functions:
+  - id: initializing
+    title: 'Initializing'
+    $ref: '@supabase/supabase-js.index.SupabaseClient.constructor'
+    description: |
+      You can initialize Supabase with the static `initialize()` method of `Supabase` class.
+
+      The Supabase client is your entrypoint to the rest of the Supabase functionality
+      and is the easiest way to interact with everything we offer within the Supabase ecosystem.
+
+    examples:
+      - id: flutter-initialize
+        name: For Flutter
+        code: |
+          ```dart
+          Future<void> main() async {
+            await Supabase.initialize(
+              url: 'https://xyzcompany.supabase.co',
+              anonKey: 'public-anon-key',
+            );
+
+            runApp(MyApp());
+          }
+
+          // Get a reference your Supabase client
+          final supabase = Supabase.instance.client;
+          ```
+      - id: for-other-dart-projects
+        name: For other Dart projects
+        code: |
+          ```dart
+          final supabase = SupabaseClient(
+            'https://xyzcompany.supabase.co',
+            'public-anon-key',
+          );
+          ```
   - id: sign-up
     title: 'signUp()'
     description: |
@@ -42,11 +77,32 @@ functions:
           final Session? session = res.session;
           final User? user = res.user;
           ```
-      - id: sign-up-with-third-party-providers
-        name: Sign up with third-party providers.
-        hideCodeBlock: true
-        description: |
-          If you are using Flutter, you can sign up with OAuth providers using the [`signInWithOAuth()`](/docs/reference/dart/auth-signinwithoauth) method available on `supabase_flutter`.
+      - id: sign-up-with-metadata
+        name: Sign up with additional metadata
+        isSpotlight: true
+        code: |
+          ```dart
+          final AuthResponse res = await supabase.auth.signUp(
+            email: 'example@email.com',
+            password: 'example-password',
+            data: {'username': 'my_user_name'},
+          );
+          final Session? session = res.session;
+          final User? user = res.user;
+          ```
+      - id: sign-up-with-redirect-url
+        name: Sign up with redirect URL
+        isSpotlight: true
+        code: |
+          ```dart
+          final AuthResponse res = await supabase.auth.signUp(
+            email: 'example@email.com',
+            password: 'example-password',
+            emailRedirectTo: 'com.supabase.myapp://callback',
+          );
+          final Session? session = res.session;
+          final User? user = res.user;
+          ```
 
   - id: sign-in-with-password
     title: 'signInWithPassword()'
@@ -108,6 +164,22 @@ functions:
           await supabase.auth.signInWithOtp(
             phone: '+13334445555',
           );
+          ```
+  - id: sign-in-with-apple
+    title: 'signInWithApple()'
+    description: |
+      Signs in a user using native Apple login.
+    notes: |
+      - You need to [register your bundle ID](https://developer.apple.com/help/account/manage-identifiers/register-an-app-id/) and add it to Supabase dashboard.
+      - This method is only available in iOS and macOS
+      - For other platforms, [signInWithOAuth()](https://supabase.com/docs/reference/dart/auth-signinwithoauth) should be used.
+    examples:
+      - id: sign-in-with-apple
+        name: Sign in with Apple
+        isSpotlight: true
+        code: |
+          ```dart
+          final AuthResponse = await supabase.auth.signInWithApple();
           ```
   - id: sign-in-with-oauth
     title: 'signInWithOAuth()'
@@ -680,7 +752,7 @@ functions:
       Subscribe to realtime changes in your database.
     title: 'on().subscribe()'
     notes: |
-      - Realtime is disabled by default for new Projects for better database performance and security. You can turn it on by [managing replication](/docs/guides/api#managing-realtime).
+      - Realtime is disabled by default for new Projects for better database performance and security. You can turn it on by [managing replication](/docs/guides/database/api#managing-realtime).
       - If you want to receive the "previous" data for updates and deletes, you will need to set `REPLICA IDENTITY` to `FULL`, like this: `ALTER TABLE your_table REPLICA IDENTITY FULL;`
     examples:
       - id: listen-to-all-database-changes
@@ -872,7 +944,7 @@ functions:
           ```dart
           supabase.from('countries')
             .stream(primaryKey: ['id'])
-            .order('name', ascending: true)
+            .order('name', { ascending: true })
             .listen((List<Map<String, dynamic>> data) {
             // Do something awesome with the data
           });
@@ -883,7 +955,7 @@ functions:
           ```dart
           supabase.from('countries')
             .stream(primaryKey: ['id'])
-            .order('name', ascending: true)
+            .order('name', { ascending: true })
             .limit(10)
             .listen((List<Map<String, dynamic>> data) {
             // Do something awesome with the data
@@ -1299,7 +1371,7 @@ functions:
           final data = await supabase
             .from('cities')
             .select('name, country_id')
-            .order('id',  ascending: false );
+            .order('id',  { ascending: false });
           ```
       - id: with-embedded-resources
         name: With embedded resources

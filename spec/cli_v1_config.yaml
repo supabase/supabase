@@ -346,7 +346,6 @@ parameters:
     title: 'functions.<function_name>.import_map'
     tags: ['edge-functions']
     required: false
-    default: 'true'
     description: |
       Specify the Deno import map file to use for the Function.
 

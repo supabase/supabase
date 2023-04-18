@@ -37,11 +37,11 @@ function TagBlogsPage(props: Props) {
       <DefaultLayout>
         <div className="container mx-auto px-8 py-16 sm:px-16 xl:px-20">
           <div className="text-scale-1000 flex space-x-1">
-            <p className="cursor-pointer">
+            <h1 className="cursor-pointer">
               <Link href="/blog">Blog</Link>
-            </p>
-            <p>/</p>
-            <p>{`${tag}`}</p>
+              <span className="px-2">/</span>
+              <span>{`${tag}`}</span>
+            </h1>
           </div>
           <ol className="grid grid-cols-12 gap-8 py-16 lg:gap-16">
             {blogs.map((blog: PostTypes, idx: number) => (

@@ -1,7 +1,6 @@
 import ReactMarkdown from 'react-markdown'
 
-import { IconDatabase, Tabs } from 'ui'
-import CodeBlock from '~/components/CodeBlock/CodeBlock'
+import { CodeBlock, IconDatabase, Tabs } from 'ui'
 
 import Options from '~/components/Options'
 import Param from '~/components/Params'
@@ -122,6 +121,8 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                         ? 'ts'
                         : example?.code?.startsWith('```dart')
                         ? 'dart'
+                        : example?.code?.startsWith('```c#')
+                        ? 'csharp'
                         : 'js'
                       //                     `
                       // import { createClient } from '@supabase/supabase-js'
@@ -154,7 +155,8 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                                   .replace(/```/g, '')
                                   .replace('js', '')
                                   .replace('ts', '')
-                                  .replace('dart', ''))}
+                                  .replace('dart', '')
+                                  .replace('c#', ''))}
                           </CodeBlock>
 
                           {((tables && tables.length > 0) || sql) && (

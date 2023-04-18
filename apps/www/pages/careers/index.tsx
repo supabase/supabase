@@ -8,7 +8,7 @@ import { Badge, Button, IconCheck } from 'ui'
 import Globe from '~/components/Globe'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import { useTheme } from '~/components/Providers'
+import { useTheme } from 'common/Providers'
 import career from '~/data/career.json'
 import Styles from './career.module.css'
 
@@ -101,21 +101,18 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
       <DefaultLayout>
         <div className="text-scale-1200">
           <div className="container relative mx-auto px-6 py-10 lg:pt-12 lg:px-16 xl:px-20 text-center space-y-4">
-            <span className="text-sm text-brand-900 md:text-base">Careers</span>
+            <h1 className="text-sm text-brand-900 md:text-base">
+              <span className="sr-only">Supabase </span>Careers
+            </h1>
             <h2 className="text-3xl md:text-4xl xl:text-5xl lg:max-w-2xl xl:max-w-3xl lg:mx-auto tracking-[-1.5px]">
-              We’re on a mission to build the best developer platform
+              We're on a mission to build the best developer platform
             </h2>
             <p className="text-sm md:text-base text-scale-1000 max-w-sm sm:max-w-md md:max-w-lg mx-auto">
               Explore remote possibilities and join our team to help us achieve it.
             </p>
-            <Button
-              as="a"
-              // @ts-ignore
-              href="#positions"
-              className="text-white xl:text-sm"
-            >
-              Open positions
-            </Button>
+            <a href="#positions">
+              <Button className="text-white xl:text-sm">Open positions</Button>
+            </a>
           </div>
 
           <SectionContainer>
@@ -321,7 +318,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                       <div
                         className={`${
                           Styles[`contributors-${i}`]
-                        } absolute w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-full border-[1.5px] border-scale-600 z-10 
+                        } absolute w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-full border-[1.5px] border-scale-600 z-10
                           transition-all hover:scale-105 drop-shadow-sm hover:drop-shadow-md
                         `}
                         key={i}

@@ -51,6 +51,9 @@ download.tsdoc.v2:
 	curl -sS https://supabase.github.io/storage-js/v2/spec.json > $(REPO_DIR)/enrichments/tsdoc_v2/storage.json
 	curl -sS https://supabase.github.io/functions-js/v2/spec.json > $(REPO_DIR)/enrichments/tsdoc_v2/functions.json
 
+download.analytics.v0:
+	curl -sS https://logflare.app/api/openapi > $(REPO_DIR)/analytics_v0_openapi.json
+
 ###############################################################################
 # Transform docs into working files
 ###############################################################################
@@ -64,6 +67,9 @@ dereference.auth.v1:
 
 dereference.storage.v0:
 	npx swagger-cli bundle --dereference --outfile $(REPO_DIR)/transforms/storage_v0_openapi_deparsed.json $(REPO_DIR)/storage_v0_openapi.json
+
+dereference.analytics.v0:
+	npx swagger-cli bundle --dereference --outfile $(REPO_DIR)/transforms/analytics_v0_openapi_deparsed.json $(REPO_DIR)/analytics_v0_openapi.json
 
 # No longer updated
 # dereference.tsdoc.v1:
@@ -112,6 +118,13 @@ combine-raw.tsdoc.v2:
 	$(REPO_DIR)/enrichments/tsdoc_v2/storage.json \
 	$(REPO_DIR)/enrichments/tsdoc_v2/functions.json \
 	> $(REPO_DIR)/enrichments/tsdoc_v2/combined_raw.json
+
+###############################################################################
+# Validate OpenAPI 3.0
+###############################################################################
+
+validate.analytics.v0:
+	npx swagger-cli validate --no-schema $(REPO_DIR)/analytics_v0_openapi.json
 
 ###############################################################################
 # Format everything - easier for git to track changes.

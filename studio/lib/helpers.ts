@@ -1,5 +1,4 @@
 import { v4 as _uuidV4 } from 'uuid'
-import { PostgresColumn } from '@supabase/postgres-meta'
 import { post } from 'lib/common/fetch'
 import { PASSWORD_STRENGTH, DEFAULT_MINIMUM_PASSWORD_STRENGTH, API_URL } from 'lib/constants'
 
@@ -111,7 +110,7 @@ export const filterSensitiveProjectProps = (project: any) => {
 }
 
 /**
- * Returns undefine if the string isn't parse-able
+ * Returns undefined if the string isn't parse-able
  */
 export const tryParseInt = (str: string) => {
   try {
@@ -121,7 +120,7 @@ export const tryParseInt = (str: string) => {
   }
 }
 
-// Used as checker for memoised components
+// Used as checker for memoized components
 export const propsAreEqual = (prevProps: any, nextProps: any) => {
   try {
     Object.keys(prevProps).forEach((key) => {
@@ -154,10 +153,26 @@ export const snakeToCamel = (str: string) =>
     group.toUpperCase().replace('-', '').replace('_', '')
   )
 
-export const copyToClipboard = (str: string, callback = () => {}) => {
+/**
+ * Copy text content (string or Promise<string>) into Clipboard.
+ * Safari doesn't support write text into clipboard async, so if you need to load
+ * text content async before coping, please use Promise<string> for the 1st arg.
+ */
+export const copyToClipboard = (str: string | Promise<string>, callback = () => {}) => {
   const focused = window.document.hasFocus()
   if (focused) {
-    window.navigator?.clipboard?.writeText(str).then(callback)
+    if (window.ClipboardItem) {
+      const text = new ClipboardItem({
+        'text/plain': Promise.resolve(str).then((text) => new Blob([text], { type: 'text/plain' })),
+      })
+      window.navigator?.clipboard?.write([text]).then(callback)
+
+      return
+    }
+
+    Promise.resolve(str)
+      .then((text) => window.navigator?.clipboard?.writeText(text))
+      .then(callback)
   } else {
     console.warn('Unable to copy to clipboard')
   }
@@ -213,5 +228,21 @@ export const detectBrowser = () => {
     return 'Firefox'
   } else if (navigator.userAgent.indexOf('Safari') !== -1) {
     return 'Safari'
+  }
+}
+
+export const detectOS = () => {
+  if (typeof navigator === 'undefined' || !navigator) return undefined
+
+  const userAgent = window.navigator.userAgent.toLowerCase()
+  const macosPlatforms = /(macintosh|macintel|macppc|mac68k|macos)/i
+  const windowsPlatforms = /(win32|win64|windows|wince)/i
+
+  if (macosPlatforms.test(userAgent)) {
+    return 'macos'
+  } else if (windowsPlatforms.test(userAgent)) {
+    return 'windows'
+  } else {
+    return undefined
   }
 }

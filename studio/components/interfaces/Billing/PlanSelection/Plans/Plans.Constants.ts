@@ -49,8 +49,6 @@ export const PRICING_META = {
       'No project pausing',
       'Email support',
     ],
-    additional: 'Need more? Turn off your spend cap to Pay As You Grow ',
-    scale: 'Additional fees apply for usage and storage beyond the limits above.',
   },
   [STRIPE_PRODUCT_IDS.TEAM]: {
     new: true,

@@ -5,6 +5,7 @@ export const meta = {
   title: 'Storage Image Transformations',
   description: 'Transform images with Storage',
   sidebar_label: 'Image Transformations',
+  video: 'https://www.youtube.com/v/dLqSmxX3r7I',
 }
 
 Supabase Storage offers the functionality to transform and resize images dynamically. Any image stored in your buckets can be transformed and optimized for fast delivery.
@@ -103,10 +104,8 @@ To get started, create a `supabase-image-loader.js` file in your NextJS project 
 ```ts
 const projectId = '' // your supabase project id
 
-export default function supabaseLoader({ src, width, height, quality }) {
-  return `https://${projectId}.supabase.co/storage/v1/render/image/public/${src}?width=${width}&height=${
-    height || 0
-  }&quality=${quality || 75}`
+export default function supabaseLoader({ src, width, quality }) {
+  return `https://${projectId}.supabase.co/storage/v1/render/image/public/${src}?width=${width}&quality=${quality || 75}`
 }
 ```
 

@@ -1,1 +1,1 @@
-apps/reference/static/.well-known/security.txt
+apps/docs/public/.well-known/security.txt
