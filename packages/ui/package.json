@@ -7,12 +7,12 @@
   "scripts": {
     "build:icons": "node --experimental-modules internals/populate-icons.js",
     "build-transform-global": "npx token-transformer tokens.json styles/tokens/01_base/global.json global",
-    "build-transform-dark": "npx token-transformer tokens.json styles/tokens/02_themes/dark.json global,exported/dark,theme global",
-    "build-transform-light": "npx token-transformer tokens.json styles/tokens/02_themes/light.json global,exported/light,theme global",
+    "build-transform-dark": "npx token-transformer tokens.json styles/tokens/02_themes/dark.json exported/root",
+    "build-transform-light": "npx token-transformer tokens.json styles/tokens/02_themes/light.json exported/root,exported/light",
     "build-transform-typography": "npx token-transformer tokens.json styles/tokens/03_semantic/typography.json global,typography global --resolveReferences=false",
     "build-transform": "npm run build-transform-dark && npm run build-transform-light",
     "build-tailwind": "node style-token.js",
-    "copy-tokens": "node copy-tokens.js --branch process.env.branch",
+    "copy-tokens": "node copy-tokens.js",
     "build-styles": "npm run copy-tokens && npm run build-transform && node style-token.js"
   },
   "dependencies": {
