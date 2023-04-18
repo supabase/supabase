@@ -275,7 +275,7 @@ export default {
         description: `text-amber-1100`,
       },
       info: {
-        base: `bg-scale-200 dark:bg-scale-100 border-scale-300`,
+        base: `bg-scale-400 border-scale-500 dark:bg-scale-100 dark:border-scale-300`,
         icon: `text-scale-900`,
         header: `text-scale-1200`,
         description: `text-scale-1100`,

@@ -22,7 +22,6 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import Prism from 'prism-react-renderer/prism'
 
 import Head from 'next/head'
-import Script from 'next/script'
 
 import { AppPropsWithLayout } from 'types'
 import { ThemeProvider } from 'common'
@@ -132,20 +131,6 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                 <meta name="viewport" content="initial-scale=1.0, width=device-width" />
               </Head>
               <Favicons />
-
-              <Script
-                src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID}`}
-                strategy="afterInteractive"
-              />
-              <Script id="google-analytics" strategy="afterInteractive">
-                {`
-                window.dataLayer = window.dataLayer || [];
-                function gtag(){window.dataLayer.push(arguments);}
-                gtag('js', new Date());
-
-                gtag('config', '${process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID}', { 'send_page_view': false });
-                `}
-              </Script>
 
               <PageTelemetry>
                 <TooltipProvider>
