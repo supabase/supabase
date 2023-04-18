@@ -347,12 +347,11 @@ const TableEditor: FC<Props> = ({
                 onUpdateField({ isRLSEnabled: !tableFields.isRLSEnabled })
                 setRlsConfirmVisible(false)
               }}
-              children={
-                <Modal.Content>
-                  <RLSDisableModalContent />
-                </Modal.Content>
-              }
-            />
+            >
+              <Modal.Content>
+                <RLSDisableModalContent />
+              </Modal.Content>
+            </ConfirmationModal>
           </div>
         </SidePanel.Content>
       </>

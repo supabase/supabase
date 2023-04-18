@@ -9,10 +9,9 @@ interface Props {
 }
 
 const LogEventChart: React.FC<Props> = ({ data, onBarClick }) => {
-  if (!data) return null
   // TODO: remove once endpoint returns iso timestamp directly
   const transformedData = useMemo(() => {
-    return data.map((d) => {
+    return data?.map((d) => {
       const iso = isUnixMicro(d.timestamp)
         ? unixMicroToIsoTimestamp(d.timestamp)
         : dayjs(d.timestamp).toISOString()
@@ -26,6 +25,8 @@ const LogEventChart: React.FC<Props> = ({ data, onBarClick }) => {
       }
     })
   }, [JSON.stringify(data)])
+
+  if (!data) return null
 
   return (
     <BarChart
