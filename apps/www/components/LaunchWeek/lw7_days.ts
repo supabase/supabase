@@ -34,7 +34,11 @@ const images = {
   '04-sso-02': '/images/launchweek/seven/day4/sso-support-02.png',
   '04-sso-02-mobile': '/images/launchweek/seven/day4/sso-support-02-mobile.png',
   '05-community-01-001': '/images/launchweek/seven/day5/community/community-01-01.jpg',
+  '05-community-01-001-mobile':
+    '/images/launchweek/seven/day5/community/community-01-01-mobile.jpg',
   '05-community-01-002': '/images/launchweek/seven/day5/community/community-01-02.png',
+  '05-community-01-002-mobile':
+    '/images/launchweek/seven/day5/community/community-01-02-mobile.png',
   '05-community-01-thumb': '/images/launchweek/seven/day5/community/community-thumb.jpg',
   '05-studio-01-thumb': '/images/launchweek/seven/day5/studio/studio-thumb.jpg',
   '05-studio-01-base': '/images/launchweek/seven/day5/studio/studio-01-commandK.jpg',
@@ -44,7 +48,7 @@ const images = {
   '05-studio-04-base': '/images/launchweek/seven/day5/studio/studio-04-apiAutodocs.jpg',
   '05-studio-05-base': '/images/launchweek/seven/day5/studio/studio-05-pgRoles.jpg',
   '05-studio-06-base': '/images/launchweek/seven/day5/studio/studio-06-casDeletes.jpg',
-  '05-studio-07-base': '/images/launchweek/seven/day5/studio/studio-07-graphiQL.jpg',
+  '05-studio-07-base': '/images/launchweek/seven/day5/studio/studio-07-graphiQL-02.jpg',
   '05-studio-08-base': '/images/launchweek/seven/day5/studio/studio-08-dbWebhooks.jpg',
   '05-studio-08-base-mobile':
     '/images/launchweek/seven/day5/studio/studio-08-dbWebhooks-mobile.jpg',
@@ -300,9 +304,11 @@ const days: WeekDayProps[] = [
             bg_layers: [
               {
                 img: images['05-community-01-001'],
+                mobileImg: images['05-community-01-001-mobile'],
               },
               {
                 img: images['05-community-01-002'],
+                mobileImg: images['05-community-01-002-mobile'],
               },
             ],
             steps: [],

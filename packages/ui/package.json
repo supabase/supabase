@@ -13,7 +13,9 @@
     "build-transform": "npm run build-transform-dark && npm run build-transform-light",
     "build-tailwind": "node style-token.js",
     "copy-tokens": "node copy-tokens.js",
-    "build-styles": "npm run copy-tokens && npm run build-transform && node style-token.js"
+    "build-styles": "npm run copy-tokens && npm run build-transform && node style-token.js",
+    "build-storybook": "build-storybook",
+    "storybook": "start-storybook -p 6006"
   },
   "dependencies": {
     "@headlessui/react": "^1.0.0",
@@ -51,6 +53,8 @@
     "tailwindcss-radix": "^1.6.0"
   },
   "devDependencies": {
+    "@storybook/react": "^6.5.16",
+    "storybook-dark-mode": "^2.1.1",
     "@types/common-tags": "^1.8.1",
     "@types/react": "^17.0.37",
     "@types/react-dom": "^17.0.11",

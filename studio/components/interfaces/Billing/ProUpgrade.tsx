@@ -321,7 +321,7 @@ const ProUpgrade: FC<Props> = ({
             </div>
           </div>
         </div>
-        <div className="w-[34rem]">
+        <div className="min-w-[440px]">
           <PaymentSummaryPanel
             isRefreshingPreview={isRefreshingPreview}
             subscriptionPreview={subscriptionPreview}
