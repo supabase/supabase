@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useMobileViewport } from '../../../hooks/useMobileViewport'
+import { useBreakpoint } from 'common/hooks/useBreakpoint'
 import { UserData } from './hooks/use-conf-data'
 
 interface Props {
@@ -18,8 +18,8 @@ export default function TicketsGrid({ loadedUsers, isLoading, pageCount, offset 
     `${STORAGE_URL}/tickets/gallery/${
       isGold ? 'golden' : 'regular'
     }/${BUCKET_FOLDER_VERSION}/${username}.png`
-  const isMobile = useMobileViewport(768)
-  const isTablet = useMobileViewport(1024)
+  const isMobile = useBreakpoint(768)
+  const isTablet = useBreakpoint(1024)
 
   return (
     <div
@@ -35,7 +35,11 @@ export default function TicketsGrid({ loadedUsers, isLoading, pageCount, offset 
         const recalculatedDelay = i >= pageCount * 2 ? (i - pageCount * (offset - 1)) / 15 : i / 15
 
         return (
-          <Link href={`/launch-week/tickets/${user.username}`} key={`${user.username}-000${i}`}>
+          <Link
+            href={`/launch-week/tickets/${user.username}`}
+            key={`${user.username}-000${i}`}
+            onClick={() => window.scrollTo(0, 0)}
+          >
             <motion.a
               className="relative w-full p-[1px] rounded-lg sm:rounded-xl overflow-hidden hover:cursor-pointer bg-gradient-to-b from-[#ffffff60] to-[#ffffff10]"
               initial={{ opacity: 0, y: 20, x: isOddRow ? 30 : -30 }}

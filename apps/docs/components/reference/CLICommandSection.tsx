@@ -14,6 +14,8 @@ export type Flag = {
   default_value: string
   accepted_values: AcceptedValue[]
   required?: boolean
+  /** Whether subcommands inherit this flag. */
+  inherit?: boolean
 }
 
 export type AcceptedValue = {
@@ -46,6 +48,14 @@ export type Command = {
 
 const CliCommandSection = (props) => {
   const command = spec.commands.find((x: any) => x.id === props.funcData.id)
+  const parentCommand = spec.commands.find(
+    (x: any) => x.subcommands && x.subcommands.find((y: any) => y === props.funcData.id)
+  )
+
+  const commandFlags = [
+    ...(parentCommand?.flags?.filter((x: any) => x.inherit) || []),
+    ...command.flags,
+  ]
 
   return (
     <RefSubLayout.Section
@@ -76,7 +86,7 @@ const CliCommandSection = (props) => {
               )}
             </header>
 
-            {command.subcommands.length > 0 && (
+            {command.subcommands?.length > 0 && (
               <div className="mb-3">
                 <h3 className="text-lg text-scale-1200 mb-3">Available Commands</h3>
                 <ul>
@@ -96,11 +106,11 @@ const CliCommandSection = (props) => {
                 </ul>
               </div>
             )}
-            {command.flags.length > 0 && (
+            {commandFlags.length > 0 && (
               <>
                 <h3 className="text-lg text-scale-1200 mb-3">Flags</h3>
                 <ul className="">
-                  {command.flags.map((flag: Flag) => (
+                  {commandFlags.map((flag: Flag) => (
                     <>
                       <li className="mt-0">
                         <Param {...flag} isOptional={!flag.required}>

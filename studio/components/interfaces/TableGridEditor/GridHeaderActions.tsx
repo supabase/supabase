@@ -41,7 +41,7 @@ const GridHeaderActions: FC<Props> = ({
         icon={<IconCode size={14} strokeWidth={2} />}
         onClick={handlePreviewToggle}
       >
-        API Quickstart
+        API
       </Button>
     )
   }
@@ -72,9 +72,7 @@ const GridHeaderActions: FC<Props> = ({
           </Tooltip.Portal>
         </Tooltip.Root>
       )}
-      <div className="mt-[1px]">
-        <RenderAPIPreviewToggle />
-      </div>
+
       <Link href={`/project/${projectRef}/auth/policies?search=${table.id}`}>
         <a>
           <Button
@@ -95,6 +93,9 @@ const GridHeaderActions: FC<Props> = ({
           </Button>
         </a>
       </Link>
+      <div className="mt-[1px]">
+        <RenderAPIPreviewToggle />
+      </div>
     </div>
   )
 }

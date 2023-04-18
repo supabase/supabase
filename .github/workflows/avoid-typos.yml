@@ -17,4 +17,8 @@ jobs:
           locale: "US"
           reporter: github-pr-review
           level: error
-          exclude: "*.css"
+          exclude: |
+            "*.css"
+            "**/package.json"
+            "**/package-lock.json"
+            ".git/*"

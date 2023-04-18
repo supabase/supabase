@@ -208,7 +208,8 @@ const TableGridEditor = ({
 
   const tableId = selectedTable?.id
 
-  const isViewSelected = entityType?.type === ENTITY_TYPE.VIEW
+  const isViewSelected =
+    entityType?.type === ENTITY_TYPE.VIEW || entityType?.type === ENTITY_TYPE.MATERIALIZED_VIEW
   const isTableSelected = entityType?.type === ENTITY_TYPE.TABLE
   const isForeignTableSelected = entityType?.type === ENTITY_TYPE.FOREIGN_TABLE
   const isLocked = meta.excludedSchemas.includes(entityType?.schema ?? '')
@@ -235,7 +236,7 @@ const TableGridEditor = ({
           {
             table: selectedTable as PostgresTable,
             columns: (selectedTable as PostgresTable).columns ?? [],
-            primaryKeys: (selectedTable as PostgresTable).primary_keys,
+            primaryKeys: (selectedTable as PostgresTable).primary_keys ?? [],
             relationships: formattedRelationships,
           },
           encryptedColumns
