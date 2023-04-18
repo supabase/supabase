@@ -14,7 +14,7 @@ export interface CommonChartProps<D>
   title?: string
   className?: string
   isLoading?: boolean
-  size?: 'small' | 'normal' | 'large'
+  size?: 'tiny' | 'small' | 'normal' | 'large'
 }
 
 export interface StackedChartProps<D> extends CommonChartProps<D> {

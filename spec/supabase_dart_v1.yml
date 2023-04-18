@@ -2,7 +2,7 @@ openref: 0.1
 
 info:
   id: reference/dart
-  title: Getting started
+  title: Supabase Dart Client
   description: |
 
     Supabase Dart.
@@ -39,7 +39,7 @@ functions:
             runApp(MyApp());
           }
 
-          // Get a reference your Supabase client 
+          // Get a reference your Supabase client
           final supabase = Supabase.instance.client;
           ```
       - id: for-other-dart-projects
@@ -77,11 +77,32 @@ functions:
           final Session? session = res.session;
           final User? user = res.user;
           ```
-      - id: sign-up-with-third-party-providers
-        name: Sign up with third-party providers.
-        hideCodeBlock: true
-        description: |
-          If you are using Flutter, you can sign up with OAuth providers using the [`signInWithOAuth()`](/docs/reference/dart/auth-signinwithoauth) method available on `supabase_flutter`.
+      - id: sign-up-with-metadata
+        name: Sign up with additional metadata
+        isSpotlight: true
+        code: |
+          ```dart
+          final AuthResponse res = await supabase.auth.signUp(
+            email: 'example@email.com',
+            password: 'example-password',
+            data: {'username': 'my_user_name'},
+          );
+          final Session? session = res.session;
+          final User? user = res.user;
+          ```
+      - id: sign-up-with-redirect-url
+        name: Sign up with redirect URL
+        isSpotlight: true
+        code: |
+          ```dart
+          final AuthResponse res = await supabase.auth.signUp(
+            email: 'example@email.com',
+            password: 'example-password',
+            emailRedirectTo: 'com.supabase.myapp://callback',
+          );
+          final Session? session = res.session;
+          final User? user = res.user;
+          ```
 
   - id: sign-in-with-password
     title: 'signInWithPassword()'
@@ -143,6 +164,22 @@ functions:
           await supabase.auth.signInWithOtp(
             phone: '+13334445555',
           );
+          ```
+  - id: sign-in-with-apple
+    title: 'signInWithApple()'
+    description: |
+      Signs in a user using native Apple login.
+    notes: |
+      - You need to [register your bundle ID](https://developer.apple.com/help/account/manage-identifiers/register-an-app-id/) and add it to Supabase dashboard.
+      - This method is only available in iOS and macOS
+      - For other platforms, [signInWithOAuth()](https://supabase.com/docs/reference/dart/auth-signinwithoauth) should be used.
+    examples:
+      - id: sign-in-with-apple
+        name: Sign in with Apple
+        isSpotlight: true
+        code: |
+          ```dart
+          final AuthResponse = await supabase.auth.signInWithApple();
           ```
   - id: sign-in-with-oauth
     title: 'signInWithOAuth()'

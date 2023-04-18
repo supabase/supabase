@@ -1,15 +1,15 @@
 import { NextPage } from 'next'
 import Image from 'next/image'
-import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
 import { Button } from 'ui'
 
 import { useStore } from 'hooks'
+import { BASE_PATH } from 'lib/constants'
+import { useTheme } from 'common'
 
 const Error404: NextPage = ({}) => {
-  const { ui } = useStore()
-  const { theme } = ui
-
+  const { isDarkMode } = useTheme()
   const [show404, setShow404] = useState<boolean>(false)
 
   useEffect(() => {
@@ -26,7 +26,11 @@ const Error404: NextPage = ({}) => {
             <div className="flex w-full items-center justify-between md:w-auto">
               <a href="/projects">
                 <Image
-                  src={theme == 'dark' ? '/img/supabase-dark.svg' : '/img/supabase-light.svg'}
+                  src={
+                    isDarkMode
+                      ? `${BASE_PATH}/img/supabase-dark.svg`
+                      : `${BASE_PATH}/img/supabase-light.svg`
+                  }
                   alt="supabase"
                   height={24}
                   width={120}

@@ -51,7 +51,10 @@ export type ProjectUsageResponse = {
   storage_size: StorageSize
   storage_egress: StorageEgress
   monthly_active_users: MonthlyActiveUsers
+  disk_volume_size_gb: number
 }
+
+export type ProjectUsageResponseUsageKeys = keyof Omit<ProjectUsageResponse, 'disk_volume_size_gb'>
 
 export async function getProjectUsage({ projectRef }: ProjectUsageVariables, signal?: AbortSignal) {
   if (!projectRef) {

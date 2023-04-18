@@ -2,32 +2,37 @@ import { ReactElement, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 
+import ProjectLayout from '../'
 import { useStore, withAuth } from 'hooks'
 import Error from 'components/ui/Error'
 import ProductMenu from 'components/ui/ProductMenu'
-import ProjectLayout from 'components/layouts/ProjectLayout/ProjectLayout'
 import { generateDocsMenu } from './DocsLayout.utils'
+import { PROJECT_STATUS } from 'lib/constants'
 
 function DocsLayout({ title, children }: { title: string; children: ReactElement }) {
   const router = useRouter()
   const { meta, ui } = useStore()
   const { data, isLoading, error } = meta.openApi
 
+  const isPaused = ui.selectedProject?.status === PROJECT_STATUS.INACTIVE
+
   const getPage = () => {
+    if (router.pathname.endsWith('graphiql')) return 'graphiql'
+
     const { page, resource } = router.query
     if (!page && !resource) return 'introduction'
     return (page || resource || '') as string
   }
 
   useEffect(() => {
-    if (ui.selectedProject?.ref) {
+    if (ui.selectedProject?.ref && !isPaused) {
       meta.openApi.load()
     }
   }, [ui.selectedProject?.ref])
 
   if (error) {
     return (
-      <ProjectLayout>
+      <ProjectLayout product="API Docs">
         <Error error={error} />
       </ProjectLayout>
     )

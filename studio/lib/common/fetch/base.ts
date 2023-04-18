@@ -12,6 +12,9 @@ export async function handleResponse<T>(
   response: Response,
   requestId: string
 ): Promise<SupaResponse<T>> {
+  const contentType = response.headers.get('Content-Type')
+  if (contentType === 'application/octet-stream') return response as any
+
   try {
     const resTxt = await response.text()
     try {
@@ -106,11 +109,6 @@ export async function constructHeaders(requestId: string, optionHeaders?: { [pro
   if (!hasAuthHeader) {
     const accessToken = await getAccessToken()
     if (accessToken) headers.Authorization = `Bearer ${accessToken}`
-  }
-
-  if (typeof window !== 'undefined') {
-    const gaClientId = window?.localStorage?.getItem('ga_client_id')
-    if (gaClientId && gaClientId !== 'undefined') headers['X-GA-Client-Id'] = gaClientId
   }
 
   return headers

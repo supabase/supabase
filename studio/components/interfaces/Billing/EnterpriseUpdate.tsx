@@ -272,7 +272,7 @@ const EnterpriseUpdate: FC<Props> = ({
             </div>
           </div>
         </div>
-        <div className="w-[34rem]">
+        <div className="min-w-[440px]">
           <PaymentSummaryPanel
             isSpendCapEnabled={true}
             isSubmitting={isSubmitting}

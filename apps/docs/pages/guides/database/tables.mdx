@@ -189,8 +189,14 @@ Use the "Bulk Loading" instructions if you are loading large data sets.
 insert into movies
   (name, description)
 values
-  ('The Empire Strikes Back', 'After the Rebels are brutally overpowered by the Empire on the ice planet Hoth, Luke Skywalker begins Jedi training with Yoda.'),
-  ('Return of the Jedi', 'After a daring mission to rescue Han Solo from Jabba the Hutt, the Rebels dispatch to Endor to destroy the second Death Star.');
+  (
+    'The Empire Strikes Back',
+    'After the Rebels are brutally overpowered by the Empire on the ice planet Hoth, Luke Skywalker begins Jedi training with Yoda.'
+  ),
+  (
+    'Return of the Jedi',
+    'After a daring mission to rescue Han Solo from Jabba the Hutt, the Rebels dispatch to Endor to destroy the second Death Star.'
+  );
 ```
 
 </TabPanel>
@@ -242,8 +248,17 @@ You would [connect](../../guides/database/connecting-to-postgres#direct-connecti
 
 ```bash
 psql -h DATABASE_URL -p 5432 -d postgres -U postgres \
-  -c "COPY movies FROM './movies.csv';"
+  -c "\COPY movies FROM './movies.csv';"
 ```
+
+Additionally use the `DELIMITER`, `HEADER` and `FORMAT` options as defined in the PostgreSQL [COPY](https://www.postgresql.org/docs/current/sql-copy.html) docs.
+
+```bash
+psql -h DATABASE_URL -p 5432 -d postgres -U postgres \
+  -c "\COPY movies FROM './movies.csv' WITH DELIMITER ',' CSV HEADER"
+```
+
+If you receive an error `FATAL:  password authentication failed for user "postgres"`, reset your database password in the Database Settings and try again.
 
 ## Joining tables with Foreign Keys
 
@@ -416,14 +431,15 @@ As a query becomes complex it becomes a hassle to call it. Especially when we ru
 
 ```sql
 select
-    students.name,
-    students.type,
-    courses.title,
-    courses.code,
-    grades.result
-from grades
-left join students on grades.student_id = students.id
-left join courses on grades.course_id = courses.id;
+  students.name,
+  students.type,
+  courses.title,
+  courses.code,
+  grades.result
+from
+  grades
+  left join students on grades.student_id = students.id
+  left join courses on grades.course_id = courses.id;
 ```
 
 We can run this instead:
@@ -440,14 +456,15 @@ Views ensure that the likelihood of mistakes decreases when repeatedly executing
 
 ```sql
 select
-    students.name,
-    students.type,
-    courses.title,
-    courses.code,
-    grades.result
-from grades
-    left join students on grades.student_id = students.id
-    left join courses on grades.course_id = courses.id
+  students.name,
+  students.type,
+  courses.title,
+  courses.code,
+  grades.result
+from
+  grades
+  left join students on grades.student_id = students.id
+  left join courses on grades.course_id = courses.id
 where courses.code != 'PG101';
 ```
 
@@ -469,13 +486,14 @@ Using our example above, a materialized view can be created like this:
 
 ```sql
 create materialized view transcripts as
-    select
-        students.name,
-        students.type,
-        courses.title,
-        courses.code,
-        grades.result
-    from grades
+  select
+    students.name,
+    students.type,
+    courses.title,
+    courses.code,
+    grades.result
+  from
+    grades
     left join students on grades.student_id = students.id
     left join courses on grades.course_id = courses.id;
 ```

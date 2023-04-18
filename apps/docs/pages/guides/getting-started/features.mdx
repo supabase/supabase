@@ -115,6 +115,10 @@ Unofficial libraries [supported by the community](https://github.com/supabase-co
 
 Supabase Storage makes it simple to store and serve files. [Docs](/docs/guides/storage).
 
+### Resumable uploads
+
+Upload large files easily using resumable uploads. [Docs](/docs/guides/storage/uploads).
+
 ### Storage CDN
 
 Cache large files using the Supabase CDN. [Docs](/docs/guides/storage-cdn).
@@ -149,35 +153,39 @@ Manage your projects programmatically. [Docs](/docs/reference/api).
 
 Both Postgres and the Supabase Platform are production-ready. Some tools we offer on top of Postgres are still under development.
 
-| Product                    | Feature                | Stage   |
-| -------------------------- | ---------------------- | ------- |
-| Database                   | Postgres               | `GA`    |
-| Database                   | Triggers               | `GA`    |
-| Database                   | Functions              | `GA`    |
-| Database                   | Extensions             | `GA`    |
-| Database                   | Full Text Search       | `GA`    |
-| Database                   | Webhooks               | `alpha` |
-| Database                   | Point-in-Time Recovery | `alpha` |
-| Database                   | Vault                  | `alpha` |
-| Studio                     |                        | `GA`    |
-| Realtime                   | Postgres Changes       | `GA`    |
-| Realtime                   | Broadcast              | `beta`  |
-| Realtime                   | Presence               | `beta`  |
-| Storage                    |                        | `GA`    |
-| Storage                    | S3 Backend             | `GA`    |
-| Storage                    | CDN                    | `GA`    |
-| Storage                    | Smart CDN              | `beta`  |
-| Storage                    | Image Transformations  | `beta`  |
-| Edge Functions             |                        | `beta`  |
-| Auth                       | OAuth Providers        | `beta`  |
-| Auth                       | Passwordless           | `beta`  |
-| Auth                       | Next.js Auth Helpers   | `alpha` |
-| Auth                       | SvelteKit Auth Helpers | `alpha` |
-| Auth                       | Remix Auth Helpers     | `alpha` |
-| Management API             |                        | `beta`  |
-| CLI                        |                        | `beta`  |
-| Client Library: JavaScript |                        | `GA`    |
-| Client Library: Dart       |                        | `beta`  |
+| Product                    | Feature                | Stage   | Available on self-hosted                    |
+| -------------------------- | ---------------------- | ------- | ------------------------------------------- |
+| Database                   | Postgres               | `GA`    | ✅                                          |
+| Database                   | Triggers               | `GA`    | ✅                                          |
+| Database                   | Functions              | `GA`    | ✅                                          |
+| Database                   | Extensions             | `GA`    | ✅                                          |
+| Database                   | Full Text Search       | `GA`    | ✅                                          |
+| Database                   | Webhooks               | `GA`    | ✅                                          |
+| Database                   | Point-in-Time Recovery | `alpha` | 🚧 [wal-g](https://github.com/wal-g/wal-g)  |
+| Database                   | Vault                  | `alpha` | ✅                                          |
+| Studio                     |                        | `GA`    | ✅                                          |
+| Realtime                   | Postgres Changes       | `GA`    | ✅                                          |
+| Realtime                   | Broadcast              | `beta`  | ✅                                          |
+| Realtime                   | Presence               | `beta`  | ✅                                          |
+| Storage                    |                        | `GA`    | ✅                                          |
+| Storage                    | S3 Backend             | `GA`    | ✅                                          |
+| Storage                    | CDN                    | `GA`    | 🚧 [Cloudflare](https://www.cloudflare.com) |
+| Storage                    | Smart CDN              | `beta`  | 🚧 [Cloudflare](https://www.cloudflare.com) |
+| Storage                    | Image Transformations  | `beta`  | ✅                                          |
+| Storage                    | Resumable Uploads      | `beta`  | ✅                                          |
+| Edge Functions             |                        | `beta`  | 🚧 [Deno Deploy](https://deno.com/deploy)   |
+| Auth                       | OAuth Providers        | `beta`  | ✅                                          |
+| Auth                       | Passwordless           | `beta`  | ✅                                          |
+| Auth                       | Next.js Auth Helpers   | `alpha` | ✅                                          |
+| Auth                       | SvelteKit Auth Helpers | `alpha` | ✅                                          |
+| Auth                       | Remix Auth Helpers     | `alpha` | ✅                                          |
+| Management API             |                        | `beta`  | N/A                                         |
+| CLI                        |                        | `beta`  | N/A                                         |
+| Client Library: JavaScript |                        | `GA`    | N/A                                         |
+| Client Library: Dart       |                        | `beta`  | N/A                                         |
+
+- ✅ = Fully Available
+- 🚧 = Available, but requires external tools or configuration
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
