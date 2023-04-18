@@ -10,24 +10,17 @@ const { default: flattenColorPalette } = require('tailwindcss/lib/util/flattenCo
 const excludedRadixColors = [
   'bronze',
   'brown',
-  'crimson',
   'cyan',
-  'gold',
   'grass',
   'olive',
   'mauve',
-  'indigo',
   'mint',
   'lime',
-  'pink',
   'plum',
-  'purple',
   'sage',
   'sand',
   'sky',
   'teal',
-  'tomato',
-  'violet',
 ]
 
 // generates fixed scales

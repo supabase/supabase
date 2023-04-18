@@ -22,7 +22,6 @@
     "@tailwindcss/forms": "^0.4.0",
     "@tailwindcss/typography": "^0.5.0",
     "autoprefixer": "^10.4.2",
-    "config": "*",
     "clsx": "^1.2.1",
     "cmdk-supabase": "^0.2.2",
     "common-tags": "^1.8.2",
