@@ -38,7 +38,7 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
 
   return (
     <div className="h-full">
-      <Results rows={result.rows} />
+      <Results id={id} rows={result.rows} />
     </div>
   )
 }
