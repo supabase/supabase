@@ -78,7 +78,10 @@ Filtering in SQL is endlessly flexible. We’ve taken two incremental steps to b
 
 ### `is null` and `is not null`
 
-`null` handling is notorious fiddly in both SQL and GraphQL. Despite that, there is common ground we can exploit. In `pg_graphql` each scalar data type has a dedicated filter type e.g. `IntFilter` , `StringFilter` . Each of those filter types now supports an `is` argument allowing filtering on if a value `is null` or `is not null` using `{is: NULL}` and `{is: NOT_NULL }` respectively.
+Handling `null` values can be tricky in both SQL and GraphQL. However, there are similarities we can take advantage of.
+In pg_graphql, every scalar data type has its own filter type, such as `IntFilter` and `StringFilter`.
+Each of these filter types now includes an `is` argument, which allows you to filter based on whether a value is null or not null.
+You can do this by using `{is: NULL}` for `null` values and `{is: NOT_NULL}` for non-`null` values.
 
 ```graphql
 enum FilterIs {
