@@ -106,7 +106,7 @@ to return all `blog`s where the `name` is `null`.
 
 ### **`like`**, **`ilike`**, and **`startsWith`**
 
-Text filtering options in `pg_graphql` have historically been restricted to equality checks. The hesitation was over concerns about exposing a default filter that is difficult to index. The combination of [citext](https://www.postgresql.org/docs/current/citext.html) and [PGroonga available on the platform](https://supabase.com/docs/guides/database/extensions/pgroonga) solves those scalability risks and enabled us to expand the `StringFilter` with options for `like` `ilike` and `startsWith`. 
+Text filtering options in `pg_graphql` have historically been restricted to equality checks. The hesitation was due to concerns about exposing a default filter that is difficult to index. The combination of [citext](https://www.postgresql.org/docs/current/citext.html) and [PGroonga available on the platform](https://supabase.com/docs/guides/database/extensions/pgroonga) solves those scalability risks and enabled us to expand the `StringFilter` with options for `like` `ilike` and `startsWith`. 
 
 ```graphql
 input StringFilter {
