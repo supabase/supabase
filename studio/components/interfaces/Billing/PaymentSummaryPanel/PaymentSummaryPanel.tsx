@@ -1,4 +1,4 @@
-import { FC, useState } from 'react'
+import { useState } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { Listbox, IconLoader, Button, IconPlus, IconAlertCircle, IconCreditCard } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
@@ -13,10 +13,11 @@ import { AddonPrice, SubscriptionAddon } from '../AddOns/AddOns.types'
 import { getPITRDays } from './PaymentSummaryPanel.utils'
 import ConfirmPaymentModal from './ConfirmPaymentModal'
 import { StripeSubscription } from '../Subscription/Subscription.types'
+import { useIsProjectActive } from 'components/layouts/ProjectLayout/ProjectContext'
 
 // [Joshen] PITR stuff can be undefined for now until we officially launch PITR self serve
 
-interface Props {
+interface PaymentSummaryPanelProps {
   isRefreshingPreview: boolean
   currentSubscription?: StripeSubscription
   subscriptionPreview?: SubscriptionPreview
@@ -56,7 +57,7 @@ interface Props {
 // [Joshen] Eventually if we do support more addons, it'll be better to generalize
 // the selectedComputeSize to an addOns array. But for now, we keep it simple, don't over-engineer too early
 
-const PaymentSummaryPanel: FC<Props> = ({
+const PaymentSummaryPanel = ({
   isRefreshingPreview,
   isSpendCapEnabled,
   currentSubscription,
@@ -77,8 +78,9 @@ const PaymentSummaryPanel: FC<Props> = ({
   onConfirmPayment,
   isSubmitting,
   captcha,
-}) => {
+}: PaymentSummaryPanelProps) => {
   const { ui } = useStore()
+  const isActive = useIsProjectActive()
   const projectRegion = ui.selectedProject?.region
 
   // [Joshen] Point of refactor: Current plan can just be currentSubscription.tier
@@ -444,6 +446,7 @@ const PaymentSummaryPanel: FC<Props> = ({
                 size="medium"
                 loading={isSubmitting}
                 disabled={
+                  !isActive ||
                   isSubmitting ||
                   isLoadingPaymentMethods ||
                   !hasChangesToPlan ||
@@ -454,7 +457,7 @@ const PaymentSummaryPanel: FC<Props> = ({
                 Confirm payment
               </Button>
             </Tooltip.Trigger>
-            {!hasChangesToPlan ? (
+            {!hasChangesToPlan || !selectedPaymentMethod || !isActive ? (
               <Tooltip.Portal>
                 <Tooltip.Content side="bottom">
                   <Tooltip.Arrow className="radix-tooltip-arrow" />
@@ -465,28 +468,18 @@ const PaymentSummaryPanel: FC<Props> = ({
                     ].join(' ')}
                   >
                     <span className="text-xs text-scale-1200">
-                      No changes made to your subscription
+                      {!hasChangesToPlan
+                        ? 'No changes made to your subscription'
+                        : !selectedPaymentMethod
+                        ? 'Please select a payment method'
+                        : !isActive
+                        ? 'Unable to update subscription as project is not active'
+                        : ''}
                     </span>
                   </div>
                 </Tooltip.Content>
               </Tooltip.Portal>
-            ) : !selectedPaymentMethod ? (
-              <Tooltip.Portal>
-                <Tooltip.Content side="bottom">
-                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                  <div
-                    className={[
-                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                      'border border-scale-200',
-                    ].join(' ')}
-                  >
-                    <span className="text-xs text-scale-1200">Please select a payment method</span>
-                  </div>
-                </Tooltip.Content>
-              </Tooltip.Portal>
-            ) : (
-              <></>
-            )}
+            ) : null}
           </Tooltip.Root>
         </div>
       </div>

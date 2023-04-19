@@ -71,8 +71,12 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
       <CommandDialog
         page={currentPage}
         visible={isOpen}
-        onInteractOutside={() => {
-          setIsOpen(!open)
+        onInteractOutside={(e) => {
+          // Only hide menu when clicking outside, not focusing outside
+          // Prevents Firefox dropdown issue that immediately closes menu after opening
+          if (e.type === 'dismissableLayer.pointerDownOutside') {
+            setIsOpen(!open)
+          }
         }}
         size={'xlarge'}
         className={'max-h-[70vh] lg:max-h-[50vh] overflow-hidden overflow-y-auto'}
