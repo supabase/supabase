@@ -21,7 +21,9 @@ In this article, we’ll walk through those features and show examples of each.
 
 ### View Support
 
-Prior to `v1.1` `pg_graphql` was restricted to reflecting standard tables. Following that release, views, materialized views, and foreign tables are similarly reflected in the GraphQL schema.
+Prior to `v1.1`, `pg_graphql` would only reflect standard tables. Since then, views, materialized views, and foreign tables are now also reflected in the GraphQL schema.
+
+For example:
 
 ```sql
 create view "ProjectOwner" as 
