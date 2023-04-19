@@ -38,7 +38,7 @@ create view "ProjectOwner" as
     acc.role = 'project_owner'
 ```
 
-Since all entities exposed by pg_graphql require primary keys, we must define that constraint for the view using a comment directive
+Since all entities exposed by `pg_graphql` require primary keys, we must define that constraint for the view. We do that using a comment directive:
 
 ```sql
 comment on view "ProjectOwner"
