@@ -888,6 +888,7 @@ export const integrations = {
         { name: 'Authsignal', url: '/guides/integrations/authsignal' },
         { name: 'Clerk', url: '/guides/integrations/clerk' },
         { name: 'keyri', url: '/guides/integrations/keyri' },
+        { name: 'Passage', url: '/guides/integrations/passage' },
         { name: 'Stytch', url: '/guides/integrations/stytch' },
         { name: 'SuperTokens', url: '/guides/integrations/supertokens' },
       ],
