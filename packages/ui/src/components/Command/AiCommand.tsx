@@ -18,7 +18,7 @@ import { SSE } from 'sse.js'
 
 import { Alert, Button, IconAlertTriangle, IconCornerDownLeft, IconUser, Input } from 'ui'
 import { AiIcon, AiIconChat } from './Command.icons'
-import { CommandGroup, CommandItem } from './Command.utils'
+import { CommandGroup, CommandItem, useAutoInputFocus, useHistoryKeys } from './Command.utils'
 
 import { useCommandMenu } from './CommandMenuProvider'
 import { AiWarning } from './Command.alerts'
@@ -252,7 +252,7 @@ export function useAiChat({
 
       setIsLoading?.(true)
     },
-    [currentMessageIndex, messages]
+    [currentMessageIndex, messages, messageTemplate]
   )
 
   function reset() {
@@ -343,6 +343,16 @@ const AiCommand = () => {
 
   const { submit, reset, messages, isResponding, hasError } = useAiChat({
     setIsLoading,
+  })
+
+  const inputRef = useAutoInputFocus()
+
+  useHistoryKeys({
+    enable: !isResponding,
+    messages: messages
+      .filter(({ role }) => role === MessageRole.User)
+      .map(({ content }) => content),
+    setPrompt: setSearch,
   })
 
   const handleSubmit = useCallback(
@@ -459,6 +469,7 @@ const AiCommand = () => {
         {messages.length > 0 && !hasError && <AiWarning className="mb-3 mx-3" />}
         <Input
           className="bg-scale-100 rounded mx-3"
+          inputRef={inputRef}
           autoFocus
           placeholder={
             isLoading || isResponding ? 'Waiting on an answer...' : 'Ask Supabase AI a question...'

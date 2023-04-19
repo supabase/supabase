@@ -1,7 +1,7 @@
 import React from 'react'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
-import { useMobileViewport } from '~/hooks/useMobileViewport'
+import { useBreakpoint } from 'common/hooks/useBreakpoint'
 import {
   ArrowTopRightSvg,
   CartTitle,
@@ -12,7 +12,7 @@ import {
 } from './components'
 
 import { WeekDayProps } from '~/components/LaunchWeek/lw7_days'
-import { opacityVariant4, scaleOpacityVariant, scaleOpacityVariant2 } from './LW7Releases'
+import { opacityVariant4, scaleOpacityVariant2 } from './LW7Releases'
 
 import styles from './day5.module.css'
 import Link from 'next/link'
@@ -28,15 +28,15 @@ const getDay5Motion = (index: number) => {
 
 const getDay5omt01Motion = (index: number) => {
   switch (index) {
-    case 0:
-      return scaleOpacityVariant
+    case 2:
+      return opacityVariant4
     default:
       return undefined
   }
 }
 const getDay5omt02Motion = (index: number) => {
   switch (index) {
-    case 0:
+    case 2:
       return opacityVariant4
     default:
       return undefined
@@ -44,8 +44,9 @@ const getDay5omt02Motion = (index: number) => {
 }
 
 const Day5 = ({ day }: { day: WeekDayProps }) => {
-  const isMobile = useMobileViewport(767)
-  const isTablet = useMobileViewport(1023)
+  const isMobile = useBreakpoint(767)
+  const isTablet = useBreakpoint(1023)
+  const isDesktop = useBreakpoint(1279)
 
   return (
     <>
@@ -397,7 +398,7 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
         </motion.div>
         <motion.div
           className={`
-                      relative overflow-hidden flex-1 flex flex-col items-center gap-5 lg:items-start justify-between text-xl sm:text-2xl md:text-xl shadow-lg
+                      relative overflow-hidden flex-1 flex flex-col items-center gap-5 md:items-start justify-between text-xl sm:text-2xl md:text-xl shadow-lg
                       w-full border rounded-xl px-4 sm:px-8 lg:px-14 py-10 text-center 
                       min-h-[350px] md:min-h-[220px] 
                     `}
@@ -409,10 +410,10 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
           <Link href={`${day.steps[1].blog}${day.steps[1].steps[6].url}`}>
             <a className="absolute inset-0 z-10" />
           </Link>
-          <div className="flex items-center text-center lg:text-left justify-between flex-col lg:flex-row lg:justify-start gap-3 text-white">
+          <div className="flex items-center text-center md:text-left justify-between flex-col md:flex-row md:justify-start gap-3 text-white">
             <CartTitle>{day.steps[1].steps[6].title}</CartTitle>
             <div className="flex gap-2">
-              <StyledArticleBadge className="lg:ml-2">
+              <StyledArticleBadge className="md:ml-2">
                 {day.steps[1].steps[6].badge}
               </StyledArticleBadge>
               <ChipLink
@@ -437,8 +438,8 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
                         ' '
                       )}
                       layout="fill"
-                      objectPosition={!!layer.mobileImg && isTablet ? '50% 50%' : '50% 50%'}
-                      objectFit="cover"
+                      objectPosition={isMobile ? '0% 50%' : isDesktop ? '100% 50%' : '0% 50%'}
+                      objectFit={isMobile ? 'cover' : isDesktop ? 'contain' : 'cover'}
                       quality={100}
                     />
                   </motion.div>
@@ -671,16 +672,19 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
               (layer, i) =>
                 !!layer.img && (
                   <motion.div
-                    className={['absolute inset-0 w-full h-full -z-10'].join(' ')}
+                    className={[
+                      'absolute inset-0 w-full h-full -z-10',
+                      i === 2 && '!mix-blend-overlay blur-2xl',
+                    ].join(' ')}
                     variants={getDay5omt01Motion(i)}
                   >
                     <Image
-                      src={!!layer.mobileImg && isTablet ? (layer.mobileImg as any) : layer.img}
+                      src={!!layer.mobileImg && isMobile ? (layer.mobileImg as any) : layer.img}
                       className={[`absolute w-full h-full -z-10 transition-all duration-300`].join(
                         ' '
                       )}
                       layout="fill"
-                      objectPosition={!!layer.mobileImg && isTablet ? '50% 50%' : '80% 50%'}
+                      objectPosition={!!layer.mobileImg && isMobile ? '50% 50%' : '80% 50%'}
                       objectFit="cover"
                       quality={100}
                     />
@@ -708,19 +712,22 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
               (layer, i) =>
                 !!layer.img && (
                   <motion.div
-                    className={['absolute inset-0 w-full h-full -z-10'].join(' ')}
+                    className={[
+                      'absolute inset-0 w-full h-full -z-10',
+                      i === 2 && '!mix-blend-overlay opacity-50 blur-2xl',
+                    ].join(' ')}
                     variants={getDay5omt02Motion(i)}
                   >
                     <Image
-                      src={!!layer.mobileImg && isTablet ? (layer.mobileImg as any) : layer.img}
+                      src={!!layer.mobileImg && isMobile ? (layer.mobileImg as any) : layer.img}
                       className={[`absolute w-full h-full -z-10 transition-all duration-300`].join(
                         ' '
                       )}
                       layout="fill"
                       objectPosition={
-                        i == 1 && !!layer.mobileImg && isTablet ? '50% 60%' : '80% 50%'
+                        i == 1 && !!layer.mobileImg && isMobile ? '50% 60%' : '80% 50%'
                       }
-                      objectFit={i == 1 && !!layer.mobileImg && isTablet ? 'contain' : 'cover'}
+                      objectFit={i == 1 && !!layer.mobileImg && isMobile ? 'contain' : 'cover'}
                       quality={100}
                     />
                   </motion.div>
