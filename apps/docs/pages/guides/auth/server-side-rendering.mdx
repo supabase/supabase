@@ -308,5 +308,5 @@ export default Page
 
 ### What flows is PKCE supported on?
 
-At present, PKCE is supported on the Magic Link, OAuth, Sign Up, and Password Recovery routes. We will be adding PKCE support to email_cha When using PKCE with Phone and email OTP routes, there is no change with respect to the implicit flow - an access token will be returned in the body.
+At present, PKCE is supported on the Magic Link, OAuth, Sign Up, and Password Recovery routes. These correspond to the `signInWithOtp`, `signInWithOAuth`, `signUp`, and `resetPasswordForEmail` methods on the Supabase-js library. When using PKCE with six digit Phone and Email OTP via the `verifyOtp` method, there is no change with respect to the implicit flow - an access token will be returned in the body.
 
