@@ -42,9 +42,6 @@ const PageTelemetry: FC = ({ children }) => {
 
       /**
        * Send page telemetry
-       *
-       * TODO: document.title is lagging behind routeChangeComplete
-       * that means the page title is the previous one instead of the new page title
        */
       post(`${API_URL}/telemetry/page`, {
         referrer: referrer,
