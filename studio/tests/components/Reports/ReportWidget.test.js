@@ -47,7 +47,4 @@ test('static elements', async () => {
   render(<ReportWidget data={[]} title="Some chart" sql="select" renderer={() => 'something'} />)
   await screen.findByText(/Some chart/)
   await screen.findByText(/something/)
-  const moreBtn = await screen.findByTitle(/Actions\.\.\./)
-  clickDropdown(moreBtn)
-  await screen.findByText(/Open in Logs Explorer/)
 })

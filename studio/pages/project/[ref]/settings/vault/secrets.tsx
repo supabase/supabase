@@ -3,7 +3,8 @@ import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { Tabs } from 'ui'
 
-import { useParams, useStore } from 'hooks'
+import { useStore } from 'hooks'
+import { useParams } from 'common/hooks'
 import { NextPageWithLayout } from 'types'
 import { SettingsLayout } from 'components/layouts'
 import { VaultToggle, SecretsManagement } from 'components/interfaces/Settings/Vault'
@@ -17,7 +18,7 @@ const VaultSettingsSecrets: NextPageWithLayout = () => {
 
   const vaultExtension = meta.extensions.byId('supabase_vault')
   const isLoading = meta.extensions.isLoading
-  const isEnabled = vaultExtension !== undefined && vaultExtension?.installed_version !== null
+  const isEnabled = vaultExtension !== undefined && vaultExtension.installed_version !== null
 
   useEffect(() => {
     if (isEnabled) {

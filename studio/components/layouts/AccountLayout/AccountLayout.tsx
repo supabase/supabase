@@ -75,14 +75,14 @@ const AccountLayout: FC<Props> = ({ children, title, breadcrumbs }) => {
             links: [
               {
                 isActive: router.pathname === `/account/me`,
-                icon: '/img/user.svg',
+                icon: `${router.basePath}/img/user.svg`,
                 label: 'Preferences',
                 href: `/account/me`,
                 key: `/account/me`,
               },
               {
                 isActive: router.pathname === `/account/tokens`,
-                icon: '/img/user.svg',
+                icon: `${router.basePath}/img/user.svg`,
                 label: 'Access Tokens',
                 href: `/account/tokens`,
                 key: `/account/tokens`,
@@ -97,16 +97,16 @@ const AccountLayout: FC<Props> = ({ children, title, breadcrumbs }) => {
       links: [
         {
           key: 'ext-guides',
-          icon: '/img/book.svg',
+          icon: `${router.basePath}/img/book.svg`,
           label: 'Guides',
           href: 'https://supabase.com/docs',
           isExternal: true,
         },
         {
           key: 'ext-guides',
-          icon: '/img/book-open.svg',
+          icon: `${router.basePath}/img/book-open.svg`,
           label: 'API Reference',
-          href: 'https://supabase.com/docs/guides/database/api',
+          href: 'https://supabase.com/docs/guides/api',
           isExternal: true,
         },
       ],
@@ -134,7 +134,6 @@ const AccountLayout: FC<Props> = ({ children, title, breadcrumbs }) => {
       <Head>
         <title>{title ? `${title} | Supabase` : 'Supabase'}</title>
         <meta name="description" content="Supabase Studio" />
-        <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className="flex h-full">
         <main

@@ -239,7 +239,7 @@
       },
       {
         "id": "supabase-functions-serve",
-        "title": "Serve a function",
+        "title": "Serve functions locally",
         "slug": "supabase-functions-serve",
         "type": "cli-command"
       },
@@ -282,6 +282,53 @@
         "id": "supabase-secrets-unset",
         "title": "Unset a secret",
         "slug": "supabase-secrets-unset",
+        "type": "cli-command"
+      }
+    ]
+  },
+  {
+    "title": "Authentication",
+    "items": [
+      {
+        "id": "supabase-sso",
+        "title": "Manage SSO on your project",
+        "slug": "supabase-sso",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-sso-list",
+        "title": "List all identity providers",
+        "slug": "supabase-sso-list",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-sso-show",
+        "title": "Show information for an identity providers",
+        "slug": "supabase-sso-show",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-sso-add",
+        "title": "Add an identity provider",
+        "slug": "supabase-sso-add",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-sso-update",
+        "title": "Update an identity provider",
+        "slug": "supabase-sso-update",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-sso-remove",
+        "title": "Remove an identity provider",
+        "slug": "supabase-sso-remove",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-sso-info",
+        "title": "See your project's SSO information",
+        "slug": "supabase-sso-info",
         "type": "cli-command"
       }
     ]
@@ -404,6 +451,29 @@
         "id": "supabase-network-restrictions-update",
         "title": "Update network restrictions",
         "slug": "supabase-network-restrictions-update",
+        "type": "cli-command"
+      }
+    ]
+  },
+  {
+    "title": "SSL Enforcement",
+    "items": [
+      {
+        "id": "supabase-ssl-enforcement",
+        "title": "Manage SSL enforcement configuration",
+        "slug": "supabase-ssl-enforcement",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-ssl-enforcement-get",
+        "title": "Get the current SSL enforcement configuration",
+        "slug": "supabase-ssl-enforcement-get",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-ssl-enforcement-update",
+        "title": "Update SSL enforcement configuration",
+        "slug": "supabase-ssl-enforcement-update",
         "type": "cli-command"
       }
     ]

@@ -1,6 +1,6 @@
 import { FC, useState, useEffect, Fragment } from 'react'
 import { observer } from 'mobx-react-lite'
-import { useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
 import { pluckObjectFields } from 'lib/helpers'
 import Loading from 'components/ui/Loading'
 import Panel from 'components/ui/Panel'
@@ -12,6 +12,7 @@ import ToggleField from 'components/to-be-cleaned/forms/ToggleField'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
 import { Input } from 'ui'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 interface Props {}
 
@@ -127,8 +128,12 @@ export const PgbouncerConfig: FC<ConfigProps> = observer(
   ({ projectRef, bouncerInfo, connectionInfo }) => {
     const { ui } = useStore()
 
+    const canUpdateConnectionPoolingConfiguration = checkPermissions(
+      PermissionAction.UPDATE,
+      'projects'
+    )
+
     const [updates, setUpdates] = useState<any>({
-      pgbouncer_enabled: bouncerInfo.pgbouncer_enabled,
       pool_mode: bouncerInfo.pool_mode || 'transaction',
       default_pool_size: bouncerInfo.default_pool_size || '',
       ignore_startup_parameters: bouncerInfo.ignore_startup_parameters || '',
@@ -153,11 +158,6 @@ export const PgbouncerConfig: FC<ConfigProps> = observer(
 
     const formSchema = {
       properties: {
-        pgbouncer_enabled: {
-          title: 'Enabled',
-          type: 'boolean',
-          help: 'Activates / deactivates Connection Pooling.',
-        },
         pool_mode: {
           title: 'Pool Mode',
           type: 'string',
@@ -170,16 +170,11 @@ export const PgbouncerConfig: FC<ConfigProps> = observer(
               label: 'Session',
               value: 'session',
             },
-            {
-              label: 'Statement',
-              value: 'statement',
-            },
           ],
         },
         ignore_startup_parameters: {
           title: 'Ignore Startup Parameters',
           type: 'string',
-          readOnly: true,
           help: 'Defaults are either blank or "extra_float_digits"',
         },
       },
@@ -198,18 +193,16 @@ export const PgbouncerConfig: FC<ConfigProps> = observer(
           onChangeModel={(model: any) => setUpdates(model)}
           onSubmit={(model: any) => updateConfig(model)}
           onReset={() => setUpdates(bouncerInfo)}
+          disabled={!canUpdateConnectionPoolingConfiguration}
+          disabledMessage="You need additional permissions to update connection pooling settings"
         >
           <div className="space-y-6 py-4">
-            <ToggleField name="pgbouncer_enabled" />
-
-            <Divider light />
-
-            {updates.pgbouncer_enabled && (
+            {bouncerInfo.pgbouncer_enabled && (
               <>
                 <AutoField
                   name="pool_mode"
                   showInlineError
-                  errorMessage="You must select one of the three options"
+                  errorMessage="You must select one of the two options"
                 />
                 <div className="!mt-1 flex" style={{ marginLeft: 'calc(33% + 0.5rem)' }}>
                   <p className="text-sm text-scale-900">

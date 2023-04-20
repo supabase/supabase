@@ -1,8 +1,12 @@
 import React, { useEffect, useState } from 'react'
-import { Button, IconCopy } from '../../../index'
+import { IconCopy } from '../Icon/icons/IconCopy'
+import { Button } from '../Button'
+
 import { FormLayout } from '../../lib/Layout/FormLayout'
+
 import InputErrorIcon from '../../lib/Layout/InputErrorIcon'
 import InputIconContainer from '../../lib/Layout/InputIconContainer'
+
 import { HIDDEN_PLACEHOLDER } from './../../lib/constants'
 
 import styleHandler from '../../lib/theme/styleHandler'
@@ -15,7 +19,7 @@ export interface Props extends Omit<React.InputHTMLAttributes<HTMLInputElement>,
   disabled?: boolean
   error?: string
   icon?: any
-  inputRef?: string
+  inputRef?: React.LegacyRef<HTMLInputElement>
   label?: string | React.ReactNode
   afterLabel?: string
   beforeLabel?: string
