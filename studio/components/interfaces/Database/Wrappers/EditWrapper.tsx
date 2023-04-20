@@ -207,6 +207,9 @@ const EditWrapper = () => {
 
         <Form id={formId} initialValues={initialValues} onSubmit={onSubmit}>
           {({ isSubmitting, handleReset, values, initialValues, resetForm }: any) => {
+            // [Alaister] although this "technically" is breaking the rules of React hooks
+            // it won't error because the hooks are always rendered in the same order
+            // eslint-disable-next-line react-hooks/rules-of-hooks
             const [loadingSecrets, setLoadingSecrets] = useState(false)
 
             const initialTables = formatWrapperTables(wrapper?.tables ?? [])
@@ -216,6 +219,9 @@ const EditWrapper = () => {
 
             const encryptedOptions = wrapperMeta.server.options.filter((option) => option.encrypted)
 
+            // [Alaister] although this "technically" is breaking the rules of React hooks
+            // it won't error because the hooks are always rendered in the same order
+            // eslint-disable-next-line react-hooks/rules-of-hooks
             useEffect(() => {
               const fetchEncryptedValues = async () => {
                 setLoadingSecrets(true)
@@ -327,7 +333,10 @@ const EditWrapper = () => {
                     ) : (
                       <div className="space-y-2">
                         {wrapperTables.map((table, i) => (
-                          <div className="flex items-center justify-between px-4 py-2 border rounded-md border-scale-600">
+                          <div
+                            key={`${table.schema_name}.${table.table_name}`}
+                            className="flex items-center justify-between px-4 py-2 border rounded-md border-scale-600"
+                          >
                             <div>
                               <p className="text-sm">
                                 {table.schema_name}.{table.table_name}

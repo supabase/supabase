@@ -119,7 +119,13 @@ const TableEditorMenu = ({
               onSelectSchema(name)
             }}
           >
-            <Listbox.Option disabled key="normal-schemas" value="normal-schemas" label="Schemas">
+            <Listbox.Option
+              disabled
+              key="normal-schemas"
+              value="normal-schemas"
+              label="Schemas"
+              className="!w-[200px]"
+            >
               <p className="text-xs text-scale-1100">Schemas</p>
             </Listbox.Option>
             {openSchemas.map((schema) => (
@@ -127,6 +133,7 @@ const TableEditorMenu = ({
                 key={schema.id}
                 value={schema.name}
                 label={schema.name}
+                className="!w-[200px]"
                 addOnBefore={() => <span className="text-scale-900 text-xs">schema</span>}
               >
                 <span className="text-scale-1200 text-xs">{schema.name}</span>
@@ -137,6 +144,7 @@ const TableEditorMenu = ({
               key="protected-schemas"
               value="protected-schemas"
               label="Protected schemas"
+              className="!w-[200px]"
             >
               <p className="text-xs text-scale-1100">Protected schemas</p>
             </Listbox.Option>
@@ -145,6 +153,7 @@ const TableEditorMenu = ({
                 key={schema.id}
                 value={schema.name}
                 label={schema.name}
+                className="!w-[200px]"
                 addOnBefore={() => <span className="text-scale-900 text-xs">schema</span>}
               >
                 <span className="text-scale-1200 text-xs">{schema.name}</span>

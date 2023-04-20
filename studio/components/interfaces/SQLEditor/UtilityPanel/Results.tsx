@@ -1,10 +1,25 @@
-import DataGrid from '@supabase/react-data-grid'
+import DataGrid, { Column } from '@supabase/react-data-grid'
 import { useKeyboardShortcuts } from 'hooks'
 import { copyToClipboard } from 'lib/helpers'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { Item, Menu, useContextMenu } from 'react-contexify'
+import { createPortal } from 'react-dom'
+import { IconClipboard } from 'ui'
 
-const Results = ({ rows }: { rows: readonly any[] }) => {
+const Results = ({ id, rows }: { id: string; rows: readonly any[] }) => {
+  const SQL_CONTEXT_EDITOR_ID = 'sql-context-menu-' + id
+
   const [cellPosition, setCellPosition] = useState<any>(undefined)
+
+  function onCopyCell() {
+    if (columns && cellPosition) {
+      const { idx, rowIdx } = cellPosition
+      const colKey = columns[idx].key
+      const cellValue = rows[rowIdx]?.[colKey] ?? ''
+      const value = formatClipboardValue(cellValue)
+      copyToClipboard(value)
+    }
+  }
 
   useKeyboardShortcuts(
     {
@@ -20,21 +35,40 @@ const Results = ({ rows }: { rows: readonly any[] }) => {
     ['INPUT', 'TEXTAREA'] as any
   )
 
+  const { show: showContextMenu } = useContextMenu()
+
   if (rows.length <= 0) {
     return (
       <div className="bg-table-header-light dark:bg-table-header-dark">
-        <p className="m-0 border-0 px-6 py-4 font-mono text-sm">Success. No rows returned</p>
+        <p className="m-0 border-0 px-6 py-4 font-mono text-sm">
+          Success. No rows returned
+        </p>
       </div>
     )
   }
 
   const formatter = (column: any, row: any) => {
-    return <span className="font-mono text-xs">{JSON.stringify(row[column])}</span>
+    return (
+      <span
+        className="font-mono text-xs w-full"
+        onContextMenu={(e) =>
+          showContextMenu(e, {
+            id: SQL_CONTEXT_EDITOR_ID,
+          })
+        }
+      >
+        {JSON.stringify(row[column])}
+      </span>
+    )
   }
   const columnRender = (name: string) => {
-    return <div className="flex h-full items-center justify-center font-mono">{name}</div>
+    return (
+      <div className="flex h-full items-center justify-center font-mono">
+        {name}
+      </div>
+    )
   }
-  const columns = Object.keys(rows[0]).map((key) => ({
+  const columns: Column<any, unknown>[] = Object.keys(rows[0]).map((key) => ({
     key,
     name: key,
     formatter: ({ row }: any) => formatter(key, row),
@@ -47,23 +81,30 @@ const Results = ({ rows }: { rows: readonly any[] }) => {
     setCellPosition(position)
   }
 
-  function onCopyCell() {
-    if (columns && cellPosition) {
-      const { idx, rowIdx } = cellPosition
-      const colKey = columns[idx].key
-      const cellValue = rows[rowIdx]?.[colKey] ?? ''
-      const value = formatClipboardValue(cellValue)
-      copyToClipboard(value)
-    }
-  }
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => {
+    if (!mounted) setMounted(true)
+  }, [])
 
   return (
-    <DataGrid
-      columns={columns}
-      rows={rows}
-      style={{ height: '100%' }}
-      onSelectedCellChange={onSelectedCellChange}
-    />
+    <>
+      <DataGrid
+        columns={columns}
+        rows={rows}
+        style={{ height: '100%' }}
+        onSelectedCellChange={onSelectedCellChange}
+      />
+      {mounted &&
+        createPortal(
+          <Menu id={SQL_CONTEXT_EDITOR_ID} animation={false}>
+            <Item onClick={onCopyCell}>
+              <IconClipboard size="tiny" />
+              <span className="ml-2 text-xs">Copy cell content</span>
+            </Item>
+          </Menu>,
+          document.body
+        )}
+    </>
   )
 }
 
