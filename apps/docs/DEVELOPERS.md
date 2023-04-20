@@ -96,6 +96,6 @@ On the Next.JS side of things, these work almost exactly the same as the client 
 
 #### Search
 
-Search is handled using a Supabase instance. During CI, [a script](https://github.com/supabase/supabase/blob/master/apps/docs/scripts/generate-embeddings.ts) aggregates all content sources (eg. guides, reference docs, etc), indexes them using OpenAI embeddings, and stores them in a Supabase database.
+Search is handled using a Supabase instance. During CI, [a script](https://github.com/supabase/supabase/blob/master/apps/docs/scripts/search/generate-embeddings.ts) aggregates all content sources (eg. guides, reference docs, etc), indexes them using OpenAI embeddings, and stores them in a Supabase database.
 
 At runtime, an [Edge Function](https://github.com/supabase/supabase/blob/master/supabase/functions) is executed that performs a similarity search between the user's query and the above content sources using [`pgvector`](https://github.com/pgvector/pgvector) embeddings.
