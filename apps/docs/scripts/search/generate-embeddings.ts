@@ -3,7 +3,7 @@ import dotenv from 'dotenv'
 import 'openai'
 import { Configuration, OpenAIApi } from 'openai'
 import { inspect } from 'util'
-import { fetchSources } from './search/sources'
+import { fetchSources } from './sources'
 
 dotenv.config()
 
