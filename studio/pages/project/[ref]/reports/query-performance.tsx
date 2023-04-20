@@ -1,3 +1,6 @@
+import { useParams } from 'common'
+import ReportHeader from 'components/interfaces/Reports/ReportHeader'
+import ReportPadding from 'components/interfaces/Reports/ReportPadding'
 import { PRESET_CONFIG } from 'components/interfaces/Reports/Reports.constants'
 import { Presets } from 'components/interfaces/Reports/Reports.types'
 import { queriesFactory } from 'components/interfaces/Reports/Reports.utils'
@@ -7,24 +10,21 @@ import Table from 'components/to-be-cleaned/Table'
 import CopyButton from 'components/ui/CopyButton'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import { executeSql } from 'data/sql/execute-sql-query'
-import { useFlag, useStore } from 'hooks'
+import { useFlag } from 'hooks'
 import { observer } from 'mobx-react-lite'
+import Link from 'next/link'
 import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { NextPageWithLayout } from 'types'
 import { Accordion, Button, IconAlertCircle, IconCheckCircle, Tabs } from 'ui'
-import ReportPadding from 'components/interfaces/Reports/ReportPadding'
-import ReportHeader from 'components/interfaces/Reports/ReportHeader'
-import Link from 'next/link'
 
 const QueryPerformanceReport: NextPageWithLayout = () => {
   const { project } = useProjectContext()
   const [showResetgPgStatStatements, setShowResetgPgStatStatements] = useState(false)
   const tableIndexEfficiencyEnabled = useFlag('tableIndexEfficiency')
   const config = PRESET_CONFIG[Presets.QUERY_PERFORMANCE]
-  const { ui } = useStore()
-  const projectRef = ui.selectedProject?.ref ?? 'default'
-  const hooks = queriesFactory(config.queries, projectRef)
+  const { ref: projectRef } = useParams()
+  const hooks = queriesFactory(config.queries, projectRef ?? 'default')
   const mostFrequentlyInvoked = hooks.mostFrequentlyInvoked()
   const mostTimeConsuming = hooks.mostTimeConsuming()
   const slowestExecutionTime = hooks.slowestExecutionTime()
