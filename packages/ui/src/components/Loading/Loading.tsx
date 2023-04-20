@@ -1,4 +1,4 @@
-import * as React from 'react'
+import React from 'react'
 import styleHandler from '../../lib/theme/styleHandler'
 import { IconLoader } from './../../../index'
 
@@ -6,7 +6,6 @@ interface Props {
   children: React.ReactNode
   active: boolean
 }
-
 export default function Loading({ children, active }: Props) {
   const __styles = styleHandler('loading')
 
@@ -23,7 +22,7 @@ export default function Loading({ children, active }: Props) {
   return (
     <div className={classNames.join(' ')}>
       <div className={contentClasses.join(' ')}>{children}</div>
-      {active && <IconLoader size="xlarge" className={spinnerClasses.join(' ')} />}
+      {active && <IconLoader size="xlarge" className={spinnerClasses} />}
     </div>
   )
 }

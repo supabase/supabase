@@ -109,7 +109,6 @@ const Invoices: FC<Props> = ({ projectRef }) => {
                   return (
                     <Table.tr key={x.id}>
                       <Table.td>
-                        {/* @ts-ignore Not sure if this is meant to be xxlarge or not */}
                         <IconFileText size="xxl" />
                       </Table.td>
                       <Table.td>
