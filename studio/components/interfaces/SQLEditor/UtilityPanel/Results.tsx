@@ -40,7 +40,9 @@ const Results = ({ id, rows }: { id: string; rows: readonly any[] }) => {
   if (rows.length <= 0) {
     return (
       <div className="bg-table-header-light dark:bg-table-header-dark">
-        <p className="m-0 border-0 px-6 py-4 font-mono text-sm">Success. No rows returned</p>
+        <p className="m-0 border-0 px-6 py-4 font-mono text-sm">
+          Success. No rows returned
+        </p>
       </div>
     )
   }
@@ -60,7 +62,11 @@ const Results = ({ id, rows }: { id: string; rows: readonly any[] }) => {
     )
   }
   const columnRender = (name: string) => {
-    return <div className="flex h-full items-center justify-center font-mono">{name}</div>
+    return (
+      <div className="flex h-full items-center justify-center font-mono">
+        {name}
+      </div>
+    )
   }
   const columns: Column<any, unknown>[] = Object.keys(rows[0]).map((key) => ({
     key,
@@ -90,11 +96,7 @@ const Results = ({ id, rows }: { id: string; rows: readonly any[] }) => {
       />
       {mounted &&
         createPortal(
-          <Menu
-            id={SQL_CONTEXT_EDITOR_ID}
-            animation={false}
-            className="!bg-scale-300 border border-scale-500"
-          >
+          <Menu id={SQL_CONTEXT_EDITOR_ID} animation={false}>
             <Item onClick={onCopyCell}>
               <IconClipboard size="tiny" />
               <span className="ml-2 text-xs">Copy cell content</span>
