@@ -11,7 +11,7 @@ const Footer = () => {
       <hr className="border-scale-400  mt-8"></hr>
       <div className="flex gap-4 items-center mt-6 justify-between">
         <div className="flex flex-col lg:flex-row gap-3 ">
-          <span className="text-xs text-scale-900">Supabase 2022</span>
+          <span className="text-xs text-scale-900">Supabase {new Date().getFullYear()}</span>
           <span className="text-xs text-scale-900">—</span>
           {footerData.map((item) => (
             <Link href={item.url} key={item.url}>
