@@ -42,10 +42,10 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
     ui.selectedProject?.subscription_tier === PRICING_TIER_PRODUCT_IDS.TEAM
 
   const showOverUsageBadge =
+    useFlag('overusageBadge') &&
     selectedProject?.subscription_tier !== undefined &&
     !projectHasNoLimits &&
-    resourcesExceededLimits.length > 0 &&
-    useFlag('overusageBadge')
+    resourcesExceededLimits.length > 0
 
   return (
     <div

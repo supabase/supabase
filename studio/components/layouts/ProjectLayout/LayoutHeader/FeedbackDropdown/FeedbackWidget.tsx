@@ -158,6 +158,7 @@ const FeedbackWidget: FC<Props> = ({
                 size="small"
                 overlay={[
                   <Dropdown.Item
+                    key="upload-screenshot"
                     icon={<IconUpload size={14} />}
                     onClick={() => {
                       if (uploadButtonRef.current) (uploadButtonRef.current as any).click()
@@ -166,6 +167,7 @@ const FeedbackWidget: FC<Props> = ({
                     Upload screenshot
                   </Dropdown.Item>,
                   <Dropdown.Item
+                    key="capture-screenshot"
                     icon={<IconCamera size={14} />}
                     onClick={() => captureScreenshot()}
                   >

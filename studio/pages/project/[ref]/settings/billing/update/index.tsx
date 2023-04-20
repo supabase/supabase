@@ -104,6 +104,10 @@ const BillingUpdate: NextPageWithLayout = () => {
     }
   }
 
+  // Team tier is enabled when the flag is turned on OR the user is already on the team tier (manually assigned by us)
+  const userIsOnTeamTier = subscription?.tier?.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.TEAM
+  const teamTierEnabled = useFlag('teamTier') || userIsOnTeamTier
+
   if (isLoadingProducts || isEnterprise) {
     return (
       <div className="flex items-center justify-center w-full h-full">
@@ -111,10 +115,6 @@ const BillingUpdate: NextPageWithLayout = () => {
       </div>
     )
   }
-
-  // Team tier is enabled when the flag is turned on OR the user is already on the team tier (manually assigned by us)
-  const userIsOnTeamTier = subscription?.tier?.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.TEAM
-  const teamTierEnabled = userIsOnTeamTier || useFlag('teamTier')
 
   const productTiers = (products?.tiers ?? []).filter(
     (tier) => teamTierEnabled || tier.id !== STRIPE_PRODUCT_IDS.TEAM
