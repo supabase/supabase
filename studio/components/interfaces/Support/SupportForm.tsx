@@ -355,7 +355,7 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
                           </a>
                         </Link>
                         <Link href="https://supabase.com/contact/enterprise">
-                          <a target="_blank">
+                          <a target="_blank" rel="noreferrer">
                             <Button type="default" icon={<IconExternalLink size={14} />}>
                               Enquire about Enterprise
                             </Button>
@@ -451,7 +451,7 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
                                 </div>
                                 <div>
                                   <Link href={library.url}>
-                                    <a target="_blank">
+                                    <a target="_blank" rel="noreferrer">
                                       <Button
                                         type="default"
                                         icon={<IconExternalLink size={14} strokeWidth={1.5} />}
@@ -478,7 +478,7 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
                             </div>
                             <div>
                               <Link href="https://github.com/supabase/supabase">
-                                <a target="_blank">
+                                <a target="_blank" rel="noreferrer">
                                   <Button
                                     type="default"
                                     icon={<IconExternalLink size={14} strokeWidth={1.5} />}
