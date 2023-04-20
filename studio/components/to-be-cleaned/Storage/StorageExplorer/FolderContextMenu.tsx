@@ -17,7 +17,7 @@ const FolderContextMenu: FC<Props> = ({ id = '' }) => {
   const canUpdateFiles = checkPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
 
   return (
-    <Menu id={id} animation="fade" className="!bg-scale-300 border border-scale-500">
+    <Menu id={id} animation="fade">
       {canUpdateFiles && (
         <Item onClick={({ props }) => setSelectedItemToRename(props.item)}>
           <IconEdit size="tiny" />
@@ -31,7 +31,7 @@ const FolderContextMenu: FC<Props> = ({ id = '' }) => {
       {canUpdateFiles && [
         <Separator key="separator" />,
         <Item key="delete" onClick={({ props }) => setSelectedItemsToDelete([props.item])}>
-          <IconTrash2 size="tiny" />
+          <IconTrash2 size="tiny" stroke="red" />
           <span className="ml-2 text-xs">Delete</span>
         </Item>,
       ]}
