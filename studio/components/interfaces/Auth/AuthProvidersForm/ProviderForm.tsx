@@ -87,7 +87,6 @@ const ProviderForm: FC<Props> = ({ provider }) => {
             <IconChevronUp
               className="text-scale-800 transition data-open-parent:rotate-0 data-closed-parent:rotate-180"
               strokeWidth={2}
-              /* @ts-ignore Unsure of what the intention was here */
               width={14}
             />
             <img
