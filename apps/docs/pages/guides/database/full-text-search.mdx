@@ -49,13 +49,26 @@ create table books (
   description text
 );
 
-insert into books (title, author, description)
+insert into books
+  (title, author, description)
 values
-  ('The Poky Little Puppy','Janette Sebring Lowrey','Puppy is slower than other, bigger animals.'),
-  ('The Tale of Peter Rabbit','Beatrix Potter','Rabbit eats some vegetables.'),
-  ('Tootle','Gertrude Crampton','Little toy train has big dreams.'),
-  ('Green Eggs and Ham','Dr. Seuss','Sam has changing food preferences and eats unusually colored food.'),
-  ('Harry Potter and the Goblet of Fire','J.K. Rowling','Fourth year of school starts, big drama ensues.');
+  (
+    'The Poky Little Puppy',
+    'Janette Sebring Lowrey',
+    'Puppy is slower than other, bigger animals.'
+  ),
+  ('The Tale of Peter Rabbit', 'Beatrix Potter', 'Rabbit eats some vegetables.'),
+  ('Tootle', 'Gertrude Crampton', 'Little toy train has big dreams.'),
+  (
+    'Green Eggs and Ham',
+    'Dr. Seuss',
+    'Sam has changing food preferences and eats unusually colored food.'
+  ),
+  (
+    'Harry Potter and the Goblet of Fire',
+    'J.K. Rowling',
+    'Fourth year of school starts, big drama ensues.'
+  );
 ```
 
 </TabPanel>
@@ -70,8 +83,7 @@ The functions we'll cover in this guide are:
 Converts your data into searchable "tokens". `to_tsvector()` stands for "to text search vector". For example:
 
 ```sql
-select to_tsvector('green eggs and ham')
-
+select to_tsvector('green eggs and ham');
 -- Returns 'egg':2 'green':1 'ham':4
 ```
 
@@ -215,6 +227,8 @@ final result = await client
 
 ### Search multiple columns
 
+Right now there is no direct way to use JavaScript or Dart to search through multiple columns but you can do it by creating [computed columns](https://postgrest.org/en/stable/api.html#computed-virtual-columns) on the database.
+
 To find all `books` where `description` or `title` contain the word `little`:
 
 <Tabs
@@ -233,6 +247,38 @@ from
 where
   to_tsvector(description || ' ' || title) -- concat columns, but be sure to include a space to separate them!
   @@ to_tsquery('little');
+```
+
+</TabPanel>
+<TabPanel id="js" label="JavaScript">
+
+```sql
+create function title_description(books) returns text as $$
+  select $1.title || ' ' || $1.description;
+$$ language sql immutable;
+```
+
+```js
+const { data, error } = await supabase
+  .from('books')
+  .select()
+  .textSearch('title_description', `little`)
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```sql
+create function title_description(books) returns text as $$
+  select $1.title || ' ' || $1.description;
+$$ language sql immutable;
+```
+
+```dart
+final result = await client
+  .from('books')
+  .select()
+  .textSearch('title_description', "little")
 ```
 
 </TabPanel>

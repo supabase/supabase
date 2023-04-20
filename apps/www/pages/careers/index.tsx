@@ -8,7 +8,7 @@ import { Badge, Button, IconCheck } from 'ui'
 import Globe from '~/components/Globe'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import { useTheme } from '~/components/Providers'
+import { useTheme } from 'common/Providers'
 import career from '~/data/career.json'
 import Styles from './career.module.css'
 
@@ -110,14 +110,9 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
             <p className="text-sm md:text-base text-scale-1000 max-w-sm sm:max-w-md md:max-w-lg mx-auto">
               Explore remote possibilities and join our team to help us achieve it.
             </p>
-            <Button
-              as="a"
-              // @ts-ignore
-              href="#positions"
-              className="text-white xl:text-sm"
-            >
-              Open positions
-            </Button>
+            <a href="#positions">
+              <Button className="text-white xl:text-sm">Open positions</Button>
+            </a>
           </div>
 
           <SectionContainer>

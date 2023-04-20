@@ -4,7 +4,7 @@ export interface CreateColumnPayload {
   tableId: number
   name: string
   type: string
-  check?: string
+  check?: string | null
   comment?: string
   defaultValue?: any
   defaultValueFormat?: 'expression' | 'literal'
@@ -19,6 +19,7 @@ export interface UpdateColumnPayload {
   name?: string
   comment?: string | null
   type?: string
+  check?: string | null
   dropDefault?: boolean
   defaultValue?: any
   defaultValueFormat?: 'expression' | 'literal'
@@ -56,13 +57,18 @@ export interface Field {
   foreignKey?: { table: string; column: string }
 }
 
+export interface ExtendedPostgresRelationship extends PostgresRelationship {
+  deletion_action: string
+}
+
 export interface ColumnField {
   id: string
   name: string
+  check: string | null
   comment?: string
   format: string
   defaultValue: string | null
-  foreignKey: PostgresRelationship | undefined
+  foreignKey: ExtendedPostgresRelationship | undefined
   isNullable: boolean
   isUnique: boolean
   isArray: boolean

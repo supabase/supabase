@@ -16,7 +16,7 @@ class MyDocument extends Document {
             rel="stylesheet"
             type="text/css"
             data-name="vs/editor/editor.main"
-            href="https://cdn.jsdelivr.net/npm/monaco-editor@0.28.1/min/vs/editor/editor.main.css"
+            href="https://cdn.jsdelivr.net/npm/monaco-editor@0.37.0/min/vs/editor/editor.main.css"
           />
           <link rel="stylesheet" type="text/css" href="/css/fonts.css" />
         </Head>
