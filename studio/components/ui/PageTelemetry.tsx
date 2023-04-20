@@ -6,15 +6,21 @@ import { useRouter } from 'next/router'
 import { FC, useEffect } from 'react'
 
 function sanitizePageViewRoute(_route?: string) {
-  const hashSplits = _route?.split('#')
-  if (hashSplits && hashSplits?.length > 1) {
-    const urlParams = new URLSearchParams(hashSplits[1])
-    if (urlParams?.get('access_token')) urlParams.set('access_token', 'xxxxx')
-    if (urlParams?.get('refresh_token')) urlParams.set('refresh_token', 'xxxxx')
-    if (urlParams?.get('token')) urlParams.set('token', 'xxxxx')
-    return urlParams?.toString() ?? _route
+  // remove all fragments
+  const noFragments = _route?.split('#')[0]
+  // remove sensitive params
+  const paramsSplits = noFragments?.split('?')
+  const hasParams = paramsSplits && paramsSplits?.length > 1
+
+  if (hasParams) {
+    const urlParams = new URLSearchParams(paramsSplits[1])
+    const sensitiveKeys = [...urlParams.keys()].filter((x) => x.includes('token'))
+    const sensitiveParams = ['code', ...sensitiveKeys]
+    sensitiveParams.forEach((name) => urlParams.delete(name))
+    return `${paramsSplits[0]}?${urlParams?.toString()}`
   }
-  return _route
+
+  return noFragments
 }
 
 const PageTelemetry: FC = ({ children }) => {
