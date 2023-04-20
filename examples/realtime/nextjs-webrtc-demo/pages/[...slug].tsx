@@ -20,14 +20,20 @@ import AudioVisualizer from '../components/AudioVisualizer'
 
 import type { RealtimeChannelSendResponse } from '@supabase/supabase-js'
 
+import { Copy, Mic, MoreVertical, Phone } from 'lucide-react'
+import { cn } from '../lib/cn'
+
 const MAX_ROOM_USERS = 5
 
 const currentUserId = nanoid()
 
 export interface User {
   color: string
-  hue: string
+  bg: string
+  'bg-strong': string
+  border: string
   stream?: MediaStream
+  text: string
   remotePeer?: SimplePeer.Instance
 }
 
@@ -39,6 +45,8 @@ const Room: NextPage = () => {
   const [roomId, setRoomId] = useState<string | undefined>(undefined)
   const [currentUserStream, setCurrentUserStream] = useState<MediaStream | undefined>(undefined)
   const [users, setUsers] = useState<{ [key: string]: User }>({})
+
+  const [mute, setMute] = useState<boolean | undefined>(false)
 
   const usersRef = useRef<{ [key: string]: User }>({})
 
@@ -57,10 +65,7 @@ const Room: NextPage = () => {
             const color = colors.length > 0 ? colors[index] : getRandomUniqueColor(userColors)
 
             acc[userId] = {
-              ...{
-                color: color.bg,
-                hue: color.hue,
-              },
+              ...color,
               ...existingUsers[userId],
             }
 
@@ -75,12 +80,40 @@ const Room: NextPage = () => {
     }
   }
 
+  // console.log('hello world')
+
   const signalRemotePeer = (remoteUser: string, channel: RealtimeChannel) => {
     const [initiator, _] = [currentUserId, remoteUser].sort()
+
     const peer = new SimplePeer({
       initiator: initiator === currentUserId,
       stream: currentUserStream,
     })
+
+    console.log('currentUserStream', currentUserStream)
+    // console.log('currentUserStream', currentUserStream?.addEventListener('mute'))
+
+    // console.log(peer.streams)
+
+    // peer.streams[0].addEventListener
+
+    peer.streams[0].addEventListener(
+      'mute',
+      (event) => {
+        // document.getElementById('timeline-widget').style.backgroundColor = '#aaa'
+        console.log(remoteUser, 'mute event', event)
+      },
+      false
+    )
+
+    peer.streams[0].addEventListener(
+      'unmute',
+      (event) => {
+        // document.getElementById('timeline-widget').style.backgroundColor = '#fff'
+        console.log(remoteUser, 'unmute event', event)
+      },
+      false
+    )
 
     peer.on('signal', (signal) => {
       channel.send({
@@ -132,6 +165,9 @@ const Room: NextPage = () => {
         video: false,
       })
       .then((stream) => {
+        // console.log('stream in useeffect', stream.getAudioTracks()[0])
+        stream.getAudioTracks()[0]?.addEventListener('mute', handleMuteEvent)
+        stream.getAudioTracks()[0]?.addEventListener('unmute', handleMuteEvent)
         setCurrentUserStream(stream)
       })
       .catch((error) => {
@@ -145,6 +181,37 @@ const Room: NextPage = () => {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  useEffect(() => {
+    if (!currentUserStream) return
+    const stream = currentUserStream
+    stream.getAudioTracks()[0].enabled = mute ? false : true
+    setCurrentUserStream(stream)
+  }, [mute])
+
+  // Define a handler function for mute events
+  function handleMuteEvent(event) {
+    console.log('handling mute event')
+    const track = event.target // Get the media track that triggered the event
+
+    if (track.kind === 'audio') {
+      if (track.enabled) {
+        // Audio track has been unmuted
+        console.log('Audio unmuted:', track.id)
+      } else {
+        // Audio track has been muted
+        console.log('Audio muted:', track.id)
+      }
+    } else if (track.kind === 'video') {
+      if (track.enabled) {
+        // Video track has been unmuted
+        console.log('Video unmuted:', track.id)
+      } else {
+        // Video track has been muted
+        console.log('Video muted:', track.id)
+      }
+    }
+  }
 
   useEffect(() => {
     const adminChannel = supabaseClient.channel('admin')
@@ -277,49 +344,97 @@ const Room: NextPage = () => {
   }
 
   return (
-    <div
-      className={[
-        'h-screen w-screen p-4 flex flex-col justify-between relative',
-        'max-h-screen max-w-screen overflow-hidden',
-      ].join(' ')}
-    >
-      <div
-        className="absolute h-full w-full left-0 top-0 pointer-events-none"
-        style={{
-          opacity: 0.02,
-          backgroundSize: '16px 16px',
-          backgroundImage:
-            'linear-gradient(to right, gray 1px, transparent 1px),\n    linear-gradient(to bottom, gray 1px, transparent 1px)',
-        }}
-      />
-      <div className="flex flex-col h-full justify-between">
-        {/* <div className="flex justify-between">
-          <WaitlistPopover />
-          <Users users={users} />
-        </div> */}
-        <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center space-x-2 pointer-events-none">
-          {Object.keys(users)
-            .filter((userId) => userId !== currentUserId)
-            .map((userId) => {
-              return <video key={userId} id={userId} autoPlay={true} />
+    <div className="h-screen w-screen bg-white">
+      {Object.keys(users)
+        .filter((userId) => userId !== currentUserId)
+        .map((userId) => {
+          return (
+            <video
+              className="absolute -z-50 left-0 top-0"
+              key={userId}
+              id={userId}
+              autoPlay={
+                // THIS WAS TURNED OFF
+                false
+              }
+            />
+          )
+        })}
+      <div className="w-full h-full flex flex-col gap-8 items-center justify-center">
+        <div className="w-full flex flex-row items-center justify-center gap-3">
+          {currentUserStream && users[currentUserId] ? (
+            <div key={currentUserId} className="bg-gray-100 ring-2 ring-offset-1 rounded-lg">
+              <AudioVisualizer
+                key={currentUserId}
+                user={{ ...users[currentUserId], stream: currentUserStream }}
+              />
+            </div>
+          ) : null}
+          {Object.entries(users)
+            .filter(([userId, user]) => userId !== currentUserId && user.stream)
+            .map(([userId, user]) => {
+              return <AudioVisualizer key={userId} user={user} />
             })}
-          <div className="flex flex-col space-y-4">
-            {Object.entries(users)
-              .filter(([userId, user]) => userId !== currentUserId && user.stream)
-              .map(([userId, user]) => {
-                return <AudioVisualizer key={userId} user={user} />
-              })}
+        </div>
+        <div className="bg-slate-50 rounded-full p-3">
+          <div className="flex flex-row gap-2">
+            <button
+              onClick={() => setMute(!mute)}
+              className={cn(
+                mute ? 'bg-red-500' : 'bg-white',
+                'border-slate-200',
+                'hover:border-slate-300',
+                'transition w-10 h-10 rounded-full  border hover:scale-[103%]',
+                'flex',
+                'justify-center items-center'
+              )}
+            >
+              <Mic size={21} />
+            </button>
+            <button
+              className={cn(
+                'border-slate-200',
+                'hover:border-slate-300',
+                'transition w-10 h-10 rounded-full bg-white border hover:scale-[103%]',
+                'flex',
+                'justify-center items-center'
+              )}
+            >
+              <MoreVertical size={21} />
+            </button>
+            <button
+              className={cn(
+                'bg-red-500',
+                'hover:bg-red-600',
+                'text-white',
+                'transition w-10 h-10 rounded-full border hover:scale-[103%]',
+                'flex',
+                'justify-center items-center'
+              )}
+            >
+              <Phone size={21} className={cn('rotate-[135deg]')} />
+            </button>
           </div>
         </div>
-
-        {currentUserStream && users[currentUserId] ? (
-          <div key={currentUserId} className="absolute">
-            <AudioVisualizer
-              key={currentUserId}
-              user={{ ...users[currentUserId], stream: currentUserStream }}
-            />
-          </div>
-        ) : null}
+        <div
+          className="h-10 relative text-xs w-[440px] 
+        bg-slate-50 p-3 py-1 rounded-full border border-slate-100 text-slate-500
+        flex items-center
+        "
+        >
+          <input
+            value={'https://example.com' + router.asPath}
+            className="w-full bg-transparent font-mono"
+          />
+          <button
+            className="
+          flex items-center gap-2
+          text-xs h-8 px-3 top-50 bottom-50 absolute right-1 bg-white border border-slate-300 rounded-full"
+          >
+            <Copy size={12} />
+            Copy URL
+          </button>
+        </div>
       </div>
     </div>
   )
