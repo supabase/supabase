@@ -17,23 +17,31 @@ export default function Avatar({
   const supabase = useSupabaseClient<Database>()
   const [avatarUrl, setAvatarUrl] = useState<Profiles['avatar_url']>(null)
   const [uploading, setUploading] = useState(false)
+  const [blobUrlCache, setBlobUrlCache] = useState<Record<string, string>>({})
 
   useEffect(() => {
     async function downloadImage(path: string) {
       try {
+        if (blobUrlCache[path]) {
+          setAvatarUrl(blobUrlCache[path])
+          return
+        }
+
         const { data, error } = await supabase.storage.from('avatars').download(path)
         if (error) {
           throw error
         }
+
         const url = URL.createObjectURL(data)
         setAvatarUrl(url)
+        setBlobUrlCache((prevCache) => ({ ...prevCache, [path]: url }))
       } catch (error) {
         console.log('Error downloading image: ', error)
       }
     }
 
     if (url) downloadImage(url)
-  }, [url, supabase.storage])
+  }, [url, supabase.storage, blobUrlCache])
 
   const uploadAvatar: React.ChangeEventHandler<HTMLInputElement> = async (event) => {
     try {

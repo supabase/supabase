@@ -10,8 +10,9 @@ const PageTelemetry: FC = ({ children }) => {
   const { ui } = useStore()
 
   useEffect(() => {
-    function handleRouteChange(url: string) {
-      handlePageTelemetry(url)
+    function handleRouteChange() {
+      // We want to send dynamic route path
+      handlePageTelemetry(router.route)
     }
 
     // Listen for page changes after a navigation or when the query changes
@@ -19,18 +20,19 @@ const PageTelemetry: FC = ({ children }) => {
     return () => {
       router.events.off('routeChangeComplete', handleRouteChange)
     }
-  }, [router.events])
+  }, [router])
 
   useEffect(() => {
-    /**
-     * Send page telemetry on first page load
-     * if the route is not ready. Don't need to send it will be picked up by router.event above
-     */
-    if (router.isReady) {
-      handlePageTelemetry(router.asPath)
-    }
+    // Send page telemetry on first page load
+    // We want to send dynamic route path
+    handlePageTelemetry(router.route)
   }, [])
 
+  /**
+   * send page_view event
+   *
+   * @param route: dynamic route path. Don't use the browser url
+   * */
   const handlePageTelemetry = async (route?: string) => {
     if (IS_PLATFORM) {
       /**
@@ -40,9 +42,6 @@ const PageTelemetry: FC = ({ children }) => {
 
       /**
        * Send page telemetry
-       *
-       * TODO: document.title is lagging behind routeChangeComplete
-       * that means the page title is the previous one instead of the new page title
        */
       post(`${API_URL}/telemetry/page`, {
         referrer: referrer,

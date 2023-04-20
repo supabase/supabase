@@ -10,7 +10,7 @@
     "format": "prettier --write \"pages/**/*.{js,jsx,ts,tsx,css,md,json}\""
   },
   "dependencies": {
-    "@supabase/auth-helpers-nextjs": "^0.5.4",
+    "@supabase/auth-helpers-nextjs": "^0.6.0",
     "@supabase/auth-helpers-react": "^0.3.1",
     "@supabase/auth-ui-react": "^0.2.7",
     "@supabase/supabase-js": "^2.7.1",
