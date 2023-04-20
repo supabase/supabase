@@ -11,20 +11,20 @@ const HeaderTitle: FC<Props> = ({ schema, table, isDuplicating }) => {
   if (!table) {
     return (
       <>
-        Create a new table under <code>{schema}</code>
+        Create a new table under <code className="text-sm">{schema}</code>
       </>
     )
   }
   if (isDuplicating) {
     return (
       <>
-        Duplicate table <code>{table.name}</code>
+        Duplicate table <code className="text-sm">{table.name}</code>
       </>
     )
   }
   return (
     <>
-      Update table <code>{table.name}</code>
+      Update table <code className="text-sm">{table.name}</code>
     </>
   )
 }
