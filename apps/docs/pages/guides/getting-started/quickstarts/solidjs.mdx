@@ -93,7 +93,7 @@ export const meta = {
 
         async function getCountries() {
           const { data } = await supabase.from("countries").select();
-          setCountries(data);
+          return data;
         }
       
         function App() {
