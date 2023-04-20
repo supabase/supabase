@@ -52,7 +52,7 @@ const UserAccessTokens: NextPageWithLayout = () => {
 
 UserAccessTokens.getLayout = (page) => (
   <AccountLayout
-    title="Supabase"
+    title="Access Tokens"
     breadcrumbs={[{ key: 'supabase-account-tokens', label: 'Access Tokens' }]}
   >
     {page}
