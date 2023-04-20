@@ -5,6 +5,18 @@ import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { FC, useEffect } from 'react'
 
+function sanitizePageViewRoute(_route?: string) {
+  const hashSplits = _route?.split('#')
+  if (hashSplits && hashSplits?.length > 1) {
+    const urlParams = new URLSearchParams(hashSplits[1])
+    if (urlParams?.get('access_token')) urlParams.set('access_token', 'xxxxx')
+    if (urlParams?.get('refresh_token')) urlParams.set('refresh_token', 'xxxxx')
+    if (urlParams?.get('token')) urlParams.set('token', 'xxxxx')
+    return urlParams?.toString() ?? _route
+  }
+  return _route
+}
+
 const PageTelemetry: FC = ({ children }) => {
   const router = useRouter()
   const { ui } = useStore()
@@ -35,8 +47,11 @@ const PageTelemetry: FC = ({ children }) => {
    *
    * @param route: the browser url
    * */
-  const handlePageTelemetry = async (route?: string) => {
+  const handlePageTelemetry = async (_route?: string) => {
     if (IS_PLATFORM) {
+      // filter out sensitive query params
+      const route = sanitizePageViewRoute(_route)
+
       /**
        * Get referrer from browser
        */
