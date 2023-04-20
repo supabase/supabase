@@ -37,16 +37,6 @@ const Results = ({ id, rows }: { id: string; rows: readonly any[] }) => {
 
   const { show: showContextMenu } = useContextMenu()
 
-  if (rows.length <= 0) {
-    return (
-      <div className="bg-table-header-light dark:bg-table-header-dark">
-        <p className="m-0 border-0 px-6 py-4 font-mono text-sm">
-          Success. No rows returned
-        </p>
-      </div>
-    )
-  }
-
   const formatter = (column: any, row: any) => {
     return (
       <span
@@ -62,11 +52,7 @@ const Results = ({ id, rows }: { id: string; rows: readonly any[] }) => {
     )
   }
   const columnRender = (name: string) => {
-    return (
-      <div className="flex h-full items-center justify-center font-mono">
-        {name}
-      </div>
-    )
+    return <div className="flex h-full items-center justify-center font-mono">{name}</div>
   }
   const columns: Column<any, unknown>[] = Object.keys(rows[0]).map((key) => ({
     key,
@@ -85,6 +71,14 @@ const Results = ({ id, rows }: { id: string; rows: readonly any[] }) => {
   useEffect(() => {
     if (!mounted) setMounted(true)
   }, [])
+
+  if (rows.length <= 0) {
+    return (
+      <div className="bg-table-header-light dark:bg-table-header-dark">
+        <p className="m-0 border-0 px-6 py-4 font-mono text-sm">Success. No rows returned</p>
+      </div>
+    )
+  }
 
   return (
     <>

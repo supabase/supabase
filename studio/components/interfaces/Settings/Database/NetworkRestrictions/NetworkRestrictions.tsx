@@ -107,7 +107,7 @@ const NetworkRestrictions = ({}) => {
           />
           <div className="flex items-center space-x-2 mb-6">
             <Link href="https://supabase.com/docs/guides/platform/network-restrictions">
-              <a target="_blank">
+              <a target="_blank" rel="noreferrer">
                 <Button type="default" icon={<IconExternalLink />}>
                   Documentation
                 </Button>

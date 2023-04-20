@@ -94,7 +94,7 @@ const VaultToggle: FC<Props> = () => {
                   <Link
                     href={`/support/new?ref=${ref}&category=sales&subject=Request%20for%20access%20to%20vault`}
                   >
-                    <a target="_blank">
+                    <a target="_blank" rel="noreferrer">
                       <Button type="primary">Contact us</Button>
                     </a>
                   </Link>
@@ -102,7 +102,7 @@ const VaultToggle: FC<Props> = () => {
               </div>
               <div className="flex items-center space-x-2 my-1 ml-[1px]">
                 <Link href="https://supabase.com/docs/guides/database/vault">
-                  <a target="_blank">
+                  <a target="_blank" rel="noreferrer">
                     <Button type="default" icon={<IconExternalLink />}>
                       About Vault
                     </Button>
@@ -113,7 +113,7 @@ const VaultToggle: FC<Props> = () => {
           ) : (
             <div className="flex items-center space-x-2">
               <Link href="https://supabase.com/docs/guides/database/vault">
-                <a target="_blank">
+                <a target="_blank" rel="noreferrer">
                   <Button type="default" icon={<IconExternalLink />}>
                     About Vault
                   </Button>

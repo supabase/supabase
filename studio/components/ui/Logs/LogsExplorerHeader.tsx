@@ -81,7 +81,7 @@ const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
                 respective source. Do note that to access nested keys, you would need to perform the
                 necessary{' '}
                 <Link href="https://supabase.com/docs/guides/platform/logs#unnesting-arrays">
-                  <a target="_blank" className="text-brand-900">
+                  <a target="_blank" rel="noreferrer" className="text-brand-900">
                     unnesting joins
                     <IconExternalLink
                       size="tiny"
