@@ -8,7 +8,8 @@ import { logDataFixture } from '../../fixtures'
 import { clickDropdown } from 'tests/helpers'
 import dayjs from 'dayjs'
 import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
-import { useParams } from 'hooks'
+jest.mock('common/hooks')
+import { useParams } from 'common/hooks'
 
 const defaultRouterMock = () => {
   const router = jest.fn()
@@ -170,6 +171,12 @@ test('query warnings', async () => {
   useParams.mockReturnValue(router.query)
   render(<LogsExplorerPage />)
   await screen.findByText('1 warning')
+})
+
+test('field reference', async () => {
+  render(<LogsExplorerPage />)
+  userEvent.click(await screen.findByText('Field Reference'))
+  await screen.findByText('metadata.request.cf.asOrganization')
 })
 
 describe.each(['FREE', 'PRO', 'TEAM', 'ENTERPRISE'])('upgrade modal for %s', (key) => {

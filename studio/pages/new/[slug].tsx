@@ -4,7 +4,7 @@ import { debounce, isUndefined, values } from 'lodash'
 import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import generator from 'generate-password'
-import { Button, Listbox, IconUsers, Input, Alert } from 'ui'
+import { Button, Listbox, IconUsers, Input, Alert, IconHelpCircle, Toggle } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { NextPageWithLayout } from 'types'
@@ -21,7 +21,8 @@ import {
   PRICING_TIER_FREE_KEY,
   PRICING_TIER_PRODUCT_IDS,
 } from 'lib/constants'
-import { useStore, useFlag, withAuth, checkPermissions, useParams } from 'hooks'
+import { useStore, useFlag, withAuth, checkPermissions } from 'hooks'
+import { useParams } from 'common/hooks'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 
 import { WizardLayoutWithoutAuth } from 'components/layouts'
@@ -33,6 +34,7 @@ import {
   NotOrganizationOwnerWarning,
   EmptyPaymentMethodWarning,
 } from 'components/interfaces/Organization/NewProject'
+import SpendCapModal from 'components/interfaces/Billing/SpendCapModal'
 
 const Wizard: NextPageWithLayout = () => {
   const router = useRouter()
@@ -45,6 +47,7 @@ const Wizard: NextPageWithLayout = () => {
     useFreeProjectLimitCheckQuery({ slug })
 
   const [projectName, setProjectName] = useState('')
+  const [postgresVersion, setPostgresVersion] = useState('')
   const [dbPass, setDbPass] = useState('')
   const [dbRegion, setDbRegion] = useState(REGIONS_DEFAULT)
   const [dbPricingTierKey, setDbPricingTierKey] = useState(PRICING_TIER_DEFAULT_KEY)
@@ -53,6 +56,10 @@ const Wizard: NextPageWithLayout = () => {
   const [passwordStrengthWarning, setPasswordStrengthWarning] = useState('')
   const [passwordStrengthScore, setPasswordStrengthScore] = useState(0)
   const [paymentMethods, setPaymentMethods] = useState<any[] | undefined>(undefined)
+
+  const [showSpendCapHelperModal, setShowSpendCapHelperModal] = useState(false)
+
+  const [isSpendCapEnabled, setIsSpendCapEnabled] = useState(true)
 
   const organizations = values(toJS(app.organizations.list()))
   const currentOrg = organizations.find((o: any) => o.slug === slug)
@@ -65,6 +72,8 @@ const Wizard: NextPageWithLayout = () => {
   const isEmptyPaymentMethod = paymentMethods ? !paymentMethods.length : false
   const isSelectFreeTier = dbPricingTierKey === PRICING_TIER_FREE_KEY
   const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
+
+  const showCustomVersionInput = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
 
   const canCreateProject =
     isAdmin && (!isSelectFreeTier || (isSelectFreeTier && !hasMembersExceedingFreeTierLimit))
@@ -147,14 +156,31 @@ const Wizard: NextPageWithLayout = () => {
 
   const onClickNext = async () => {
     setNewProjectLoading(true)
-    const data = {
+
+    const dbTier = dbPricingTierKey === 'PRO' && !isSpendCapEnabled ? 'PAYG' : dbPricingTierKey
+
+    const data: Record<string, any> = {
       cloud_provider: PROVIDERS.AWS.id, // hardcoded for DB instances to be under AWS
       org_id: currentOrg?.id,
       name: projectName,
       db_pass: dbPass,
       db_region: dbRegion,
-      db_pricing_tier_id: (PRICING_TIER_PRODUCT_IDS as any)[dbPricingTierKey],
+      db_pricing_tier_id: (PRICING_TIER_PRODUCT_IDS as any)[dbTier],
       kps_enabled: kpsEnabled,
+    }
+    if (postgresVersion) {
+      if (!postgresVersion.match(/1[2-9]\..*/)) {
+        setNewProjectLoading(false)
+        ui.setNotification({
+          category: 'error',
+          message: `Invalid Postgres version, should start with a number between 12-19, a dot and additional characters, i.e. 15.2 or 15.2.0-3`,
+        })
+        return
+      }
+
+      data['custom_supabase_internal_requests'] = {
+        ami: { search_tags: { 'tag:postgresVersion': postgresVersion } },
+      }
     }
     const response = await post(`${API_URL}/projects`, data)
     if (response.error) {
@@ -235,7 +261,7 @@ const Wizard: NextPageWithLayout = () => {
           <>
             <Panel.Content
               className={[
-                'Form section-block--body has-inputs-centered space-y-4 border-t border-b',
+                'space-y-4 border-t border-b',
                 'border-panel-border-interior-light dark:border-panel-border-interior-dark',
               ].join(' ')}
             >
@@ -266,7 +292,7 @@ const Wizard: NextPageWithLayout = () => {
               <>
                 <Panel.Content
                   className={[
-                    'Form section-block--body has-inputs-centered border-t border-b',
+                    'border-t border-b',
                     'border-panel-border-interior-light dark:border-panel-border-interior-dark',
                   ].join(' ')}
                 >
@@ -282,7 +308,34 @@ const Wizard: NextPageWithLayout = () => {
                   />
                 </Panel.Content>
 
-                <Panel.Content className="border-b Form section-block--body has-inputs-centered border-panel-border-interior-light dark:border-panel-border-interior-dark">
+                {showCustomVersionInput && (
+                  <Panel.Content
+                    className={[
+                      'border-t border-b',
+                      'border-panel-border-interior-light dark:border-panel-border-interior-dark',
+                    ].join(' ')}
+                  >
+                    <Input
+                      id="custom-postgres-version"
+                      layout="horizontal"
+                      label="Postgres Version"
+                      autoComplete="off"
+                      descriptionText={
+                        <p>
+                          Specify a custom version of Postgres (Defaults to the latest)
+                          <br />
+                          This is only applicable for local/staging projects
+                        </p>
+                      }
+                      type="text"
+                      placeholder="Postgres Version"
+                      value={postgresVersion}
+                      onChange={(event: any) => setPostgresVersion(event.target.value)}
+                    />
+                  </Panel.Content>
+                )}
+
+                <Panel.Content className="border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
                   <Input
                     id="password"
                     copy={dbPass.length > 0}
@@ -304,7 +357,7 @@ const Wizard: NextPageWithLayout = () => {
                   />
                 </Panel.Content>
 
-                <Panel.Content className="border-b Form section-block--body has-inputs-centered border-panel-border-interior-light dark:border-panel-border-interior-dark">
+                <Panel.Content className="border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
                   <Listbox
                     layout="horizontal"
                     label="Region"
@@ -324,7 +377,9 @@ const Wizard: NextPageWithLayout = () => {
                           addOnBefore={({ active, selected }: any) => (
                             <img
                               className="w-5 rounded-sm"
-                              src={`/img/regions/${Object.keys(availableRegions)[i]}.svg`}
+                              src={`${router.basePath}/img/regions/${
+                                Object.keys(availableRegions)[i]
+                              }.svg`}
                             />
                           )}
                         >
@@ -338,7 +393,7 @@ const Wizard: NextPageWithLayout = () => {
             )}
 
             {isAdmin && (
-              <Panel.Content className="Form section-block--body has-inputs-centered ">
+              <Panel.Content>
                 <Listbox
                   label="Pricing Plan"
                   layout="horizontal"
@@ -386,6 +441,46 @@ const Wizard: NextPageWithLayout = () => {
                   <EmptyPaymentMethodWarning stripeCustomerId={stripeCustomerId} />
                 )}
               </Panel.Content>
+            )}
+
+            {!isSelectFreeTier && (
+              <>
+                <Panel.Content className="border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
+                  <Toggle
+                    id="project-name"
+                    layout="horizontal"
+                    label={
+                      <div className="flex space-x-4">
+                        <span>Spend Cap</span>
+                        <IconHelpCircle
+                          size={16}
+                          strokeWidth={1.5}
+                          className="transition opacity-50 cursor-pointer hover:opacity-100"
+                          onClick={() => setShowSpendCapHelperModal(true)}
+                        />
+                      </div>
+                    }
+                    placeholder="Project name"
+                    checked={isSpendCapEnabled}
+                    onChange={() => setIsSpendCapEnabled(!isSpendCapEnabled)}
+                    descriptionText={
+                      <div>
+                        <p>
+                          By default, Pro projects have spend caps to control costs. When enabled,
+                          usage is limited to the plan's quota, with restrictions when limits are
+                          exceeded. To scale beyond Pro limits without restrictions, disable the
+                          spend cap and pay for over-usage beyond the quota.
+                        </p>
+                      </div>
+                    }
+                  />
+                </Panel.Content>
+
+                <SpendCapModal
+                  visible={showSpendCapHelperModal}
+                  onHide={() => setShowSpendCapHelperModal(false)}
+                />
+              </>
             )}
           </>
         )}

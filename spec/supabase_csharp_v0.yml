@@ -2,7 +2,7 @@ openref: 0.1
 
 info:
   id: reference/csharp
-  title: Getting started
+  title: Supabase C# Client
   description: |
 
     Supabase C#.
@@ -293,9 +293,9 @@ functions:
         isSpotlight: true
         code: |
           ```c#
-          var attrs = new UserAttributes 
-          { 
-            Data = new Dictionary<string, string> { {"example", "data" } } 
+          var attrs = new UserAttributes
+          {
+            Data = new Dictionary<string, string> { {"example", "data" } }
           };
           var response = await supabase.Auth.Update(attrs);
           ```
@@ -516,10 +516,10 @@ functions:
               public int CountryId { get; set; }
           }
 
-          var model = new City 
-          { 
-            Name = "The Shire", 
-            CountryId = 554 
+          var model = new City
+          {
+            Name = "The Shire",
+            CountryId = 554
           };
 
           await supabase.From<City>().Insert(model);
@@ -603,10 +603,10 @@ functions:
         isSpotlight: true
         code: |
           ```c#
-          var model = new City 
-          { 
-            Id = 554, 
-            Name = "Middle Earth" 
+          var model = new City
+          {
+            Id = 554,
+            Name = "Middle Earth"
           };
 
           await supabase.From<City>().Upsert(model);
@@ -620,10 +620,10 @@ functions:
         isSpotlight: true
         code: |
           ```c#
-          var model = new City 
-          { 
-            Id = 554, 
-            Name = "Middle Earth" 
+          var model = new City
+          {
+            Id = 554,
+            Name = "Middle Earth"
           };
 
           await supabase
@@ -637,10 +637,10 @@ functions:
           Allowed values for count option are `exact`, `planned` and `estimated`.
         code: |
           ```c#
-          var model = new City 
-          { 
-            Id = 554, 
-            Name = "Middle Earth" 
+          var model = new City
+          {
+            Id = 554,
+            Name = "Middle Earth"
           };
 
           await supabase
@@ -702,7 +702,7 @@ functions:
         isSpotlight: true
         code: |
           ```c#
-          class CursorBroadcast : BaseBroadcast 
+          class CursorBroadcast : BaseBroadcast
           {
               [JsonProperty("cursorX")]
               public int CursorX {get; set;}
@@ -714,7 +714,7 @@ functions:
           var channel = supabase.Realtime.Channel("any");
           var broadcast = channel.Register<CursorBroadcast>();
 
-          broadcast.OnBroadcast += (sender, _) => 
+          broadcast.OnBroadcast += (sender, _) =>
           {
             var data = broadcast.Current();
           };
@@ -729,7 +729,7 @@ functions:
         isSpotlight: true
         code: |
           ```c#
-            class UserPresence : BasePresence 
+            class UserPresence : BasePresence
             {
                 [JsonProperty("cursorX")]
                 public bool IsTyping {get; set;}
@@ -742,7 +742,7 @@ functions:
             var presenceKey = Guid.NewGuid().ToString();
             var presence = channel.Register<UserPresence>(presenceKey);
 
-            presence.OnSync += (sender, _) => 
+            presence.OnSync += (sender, _) =>
             {
               var state = presence.CurrentState;
             };

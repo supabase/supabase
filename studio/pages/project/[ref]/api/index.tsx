@@ -3,12 +3,12 @@ import { FC, createContext, useContext, useEffect, useState } from 'react'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 
 import { NextPageWithLayout } from 'types'
-import { checkPermissions, useParams, useStore } from 'hooks'
+import { useStore } from 'hooks'
+import { useParams } from 'common/hooks'
 import { snakeToCamel } from 'lib/helpers'
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { DocsLayout } from 'components/layouts'
 import { GeneralContent, ResourceContent, RpcContent } from 'components/interfaces/Docs'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useProjectJsonSchemaQuery } from 'data/docs/project-json-schema-query'
 import LangSelector from 'components/interfaces/Docs/LangSelector'
 
@@ -77,17 +77,12 @@ const DocView: FC<any> = observer(({}) => {
   const anonKey = apiService?.service_api_keys.find((x) => x.name === 'anon key')
     ? apiService.defaultApiKey
     : undefined
-  const swaggerUrl = data?.autoApiService?.restUrl
 
   const {
     data: jsonSchema,
     error: jsonSchemaError,
     refetch,
-  } = useProjectJsonSchemaQuery({
-    projectRef,
-    swaggerUrl,
-    apiKey: anonKey,
-  })
+  } = useProjectJsonSchemaQuery({ projectRef })
 
   useEffect(() => {
     PageState.setJsonSchema(jsonSchema)

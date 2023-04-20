@@ -1,20 +1,18 @@
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
-import { ThemeProvider } from 'common/Providers'
-import { DefaultSeo } from 'next-seo'
-import Head from 'next/head'
+import { AuthProvider, ThemeProvider } from 'common'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import { AppPropsWithLayout } from 'types'
-import ClippyProvider from '~/components/Clippy/ClippyProvider'
-import { SearchProvider } from '~/components/DocSearch'
+import { CommandMenuProvider } from 'ui'
+import components from '~/components'
 import Favicons from '~/components/Favicons'
 import SiteLayout from '~/layouts/SiteLayout'
-import { IS_PLATFORM } from '~/lib/constants'
+import { IS_PLATFORM, LOCAL_SUPABASE } from '~/lib/constants'
 import { post } from '~/lib/fetchWrappers'
-import '../styles/algolia-search.scss'
 import '../styles/ch.scss'
-import '../styles/docsearch.scss'
 import '../styles/main.scss?v=1.0.0'
 import '../styles/new-docs.scss'
 import '../styles/prism-okaidia.scss'
@@ -22,9 +20,11 @@ import '../styles/prism-okaidia.scss'
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const router = useRouter()
 
-  const [supabase] = useState(() => (IS_PLATFORM ? createBrowserSupabaseClient() : undefined))
+  const [supabase] = useState(() =>
+    IS_PLATFORM || LOCAL_SUPABASE ? createBrowserSupabaseClient() : undefined
+  )
 
-  function telemetry(route: string) {
+  function handlePageTelemetry(route: string) {
     return post(`https://api.supabase.io/platform/telemetry/page`, {
       referrer: document.referrer,
       title: document.title,
@@ -37,7 +37,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
       /*
        * handle telemetry
        */
-      telemetry(url)
+      handlePageTelemetry(url)
       /*
        * handle "scroll to top" behaviour on route change
        */
@@ -59,34 +59,44 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
     }
   }, [router.events])
 
+  useEffect(() => {
+    /**
+     * Send page telemetry on first page load
+     */
+    if (router.isReady) {
+      handlePageTelemetry(router.asPath)
+    }
+  }, [router.isReady])
+
   const SITE_TITLE = 'Supabase Documentation'
+
+  const AuthContainer = (props) => {
+    return IS_PLATFORM || LOCAL_SUPABASE ? (
+      <SessionContextProvider supabaseClient={supabase}>
+        <AuthProvider>{props.children}</AuthProvider>
+      </SessionContextProvider>
+    ) : (
+      <AuthProvider>{props.children}</AuthProvider>
+    )
+  }
 
   return (
     <>
       <Favicons />
-      {IS_PLATFORM ? (
-        <SessionContextProvider supabaseClient={supabase}>
-          <ThemeProvider>
-            <SearchProvider>
-              <ClippyProvider>
-                <SiteLayout>
-                  <Component {...pageProps} />
-                </SiteLayout>
-              </ClippyProvider>
-            </SearchProvider>
-          </ThemeProvider>
-        </SessionContextProvider>
-      ) : (
+      <AuthContainer>
         <ThemeProvider>
-          <SearchProvider>
-            <ClippyProvider>
-              <SiteLayout>
-                <Component {...pageProps} />
-              </SiteLayout>
-            </ClippyProvider>
-          </SearchProvider>
+          <CommandMenuProvider
+            site="docs"
+            MarkdownHandler={(props) => (
+              <ReactMarkdown remarkPlugins={[remarkGfm]} components={components} {...props} />
+            )}
+          >
+            <SiteLayout>
+              <Component {...pageProps} />
+            </SiteLayout>
+          </CommandMenuProvider>
         </ThemeProvider>
-      )}
+      </AuthContainer>
     </>
   )
 }

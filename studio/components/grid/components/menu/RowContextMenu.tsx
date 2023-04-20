@@ -1,17 +1,25 @@
-import * as React from 'react'
-import { Menu, Item, ItemParams, PredicateParams } from 'react-contexify'
+import { Menu, Item, ItemParams, PredicateParams, Separator } from 'react-contexify'
 import { IconTrash, IconClipboard, IconEdit } from 'ui'
 import { useDispatch, useTrackedState } from '../../store'
 import { formatClipboardValue, copyToClipboard } from '../../utils'
+import { useTableRowDeleteMutation } from 'data/table-rows/table-row-delete-mutation'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { SupaRow, SupaTable } from 'components/grid/types'
 
 export const ROW_CONTEXT_MENU_ID = 'row-context-menu-id'
 
-type RowContextMenuProps = {}
+export type RowContextMenuProps = {
+  table: SupaTable
+  rows: SupaRow[]
+}
 
-const RowContextMenu: React.FC<RowContextMenuProps> = ({}) => {
+const RowContextMenu = ({ table, rows }: RowContextMenuProps) => {
   const state = useTrackedState()
   const dispatch = useDispatch()
+
+  const { project } = useProjectContext()
+  const { mutateAsync: deleteRows } = useTableRowDeleteMutation()
 
   function onDeleteRow(p: ItemParams) {
     confirmAlert({
@@ -20,18 +28,24 @@ const RowContextMenu: React.FC<RowContextMenuProps> = ({}) => {
       onAsyncConfirm: async () => {
         const { props } = p
         const { rowIdx } = props
-        const row = state.rows[rowIdx]
-        if (!row) return
+        const row = rows[rowIdx]
+        if (!row || !project) return
 
-        const { error } = await state.rowService!.delete([row])
-        if (error) {
-          if (state.onError) state.onError(error)
-        } else {
+        try {
+          await deleteRows({
+            projectRef: project.ref,
+            connectionString: project.connectionString,
+            table,
+            rows: [row],
+          })
+
           dispatch({ type: 'REMOVE_ROWS', payload: { rowIdxs: [row.idx] } })
           dispatch({
             type: 'SELECTED_ROWS_CHANGE',
             payload: { selectedRows: new Set() },
           })
+        } catch (error) {
+          if (state.onError) state.onError(error)
         }
       },
     })
@@ -40,7 +54,7 @@ const RowContextMenu: React.FC<RowContextMenuProps> = ({}) => {
   function onEditRowClick(p: ItemParams) {
     const { props } = p
     const { rowIdx } = props
-    const row = state.rows[rowIdx]
+    const row = rows[rowIdx]
     if (state.onEditRow) state.onEditRow(row)
   }
 
@@ -58,7 +72,7 @@ const RowContextMenu: React.FC<RowContextMenuProps> = ({}) => {
     }
 
     const { rowIdx } = props
-    const row = state.rows[rowIdx]
+    const row = rows[rowIdx]
 
     const columnKey = state.gridColumns[state.selectedCellPosition?.idx as number].key
 
@@ -70,11 +84,7 @@ const RowContextMenu: React.FC<RowContextMenuProps> = ({}) => {
 
   return (
     <>
-      <Menu
-        id={ROW_CONTEXT_MENU_ID}
-        animation={false}
-        className="!bg-scale-300 border border-scale-500"
-      >
+      <Menu id={ROW_CONTEXT_MENU_ID} animation={false}>
         <Item onClick={onCopyCellContent}>
           <IconClipboard size="tiny" />
           <span className="ml-2 text-xs">Copy cell content</span>
@@ -83,6 +93,7 @@ const RowContextMenu: React.FC<RowContextMenuProps> = ({}) => {
           <IconEdit size="tiny" />
           <span className="ml-2 text-xs">Edit row</span>
         </Item>
+        <Separator />
         <Item onClick={onDeleteRow} hidden={isItemHidden} data="delete">
           <IconTrash size="tiny" stroke="red" />
           <span className="ml-2 text-xs">Delete row</span>

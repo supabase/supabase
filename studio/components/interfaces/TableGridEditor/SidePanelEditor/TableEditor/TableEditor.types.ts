@@ -11,9 +11,11 @@ export interface TableField {
 }
 
 export interface ImportContent {
-  file: File
+  file?: File
   headers: string[]
   rowCount: number
   rows: object[]
   columnTypeMap: Dictionary<any>
+  selectedHeaders: string[]
+  resolve: () => void
 }

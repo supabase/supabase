@@ -25,12 +25,11 @@
       {
         "title": "Database size",
         "tooltips": {
-          "main": "Billing is based on the average database size in GB throughout the billing period.",
-          "pro": "8 GB included, then $0.125 per GB"
+          "main": "Billing is based on the average database size in GB throughout the billing period."
         },
         "tiers": {
           "free": "500 MB",
-          "pro": "8 GB",
+          "pro": "8 GB, then $0.125 per GB",
           "enterprise": "Unlimited"
         }
       },
@@ -72,12 +71,11 @@
       {
         "title": "Database egress",
         "tooltips": {
-          "main": "Billing is based on the total sum of outgoing traffic of your database in GB throughout your billing period. Only download operations are counted towards the limit",
-          "pro": "50GB included per month, then $0.09 per GB"
+          "main": "Billing is based on the total sum of outgoing traffic of your database in GB throughout your billing period. Only download operations are counted towards the limit"
         },
         "tiers": {
           "free": "2GB",
-          "pro": "50GB",
+          "pro": "50 GB, then $0.09 per GB",
           "enterprise": "Unlimited"
         }
       }
@@ -99,12 +97,11 @@
       {
         "title": "MAUs",
         "tooltips": {
-          "main": "Distinct users requesting your API throughout the billing period.",
-          "pro": "100,000 included, then $0.00325 per MAU"
+          "main": "Distinct users requesting your API throughout the billing period."
         },
         "tiers": {
           "free": "50,000",
-          "pro": "100,000",
+          "pro": "100,000, then $0.00325 per MAU",
           "enterprise": "Unlimited"
         }
       },
@@ -158,6 +155,14 @@
         }
       },
       {
+        "title": "Single Sign-On (SAML 2.0)",
+        "tiers": {
+          "free": false,
+          "pro": "50 free, then $0.015 per MAU",
+          "enterprise": "Contact Us"
+        }
+      },
+      {
         "title": "Advanced security features",
         "tiers": {
           "free": false,
@@ -175,24 +180,22 @@
       {
         "title": "Storage",
         "tooltips": {
-          "pro": "100 GB included, then $0.021 per GB",
           "main": "The sum of all objects' size in your storage buckets."
         },
         "tiers": {
           "free": "1 GB",
-          "pro": "100 GB",
+          "pro": "100 GB, then $0.021 per GB",
           "enterprise": "Unlimited"
         }
       },
       {
         "title": "Storage egress",
         "tooltips": {
-          "main": "Total sum of outgoing traffic (egress) from your storage buckets, only download operations are counted.",
-          "pro": "200 GB included, then $0.09 per GB"
+          "main": "Total sum of outgoing traffic (egress) from your storage buckets, only download operations are counted."
         },
         "tiers": {
           "free": "2 GB",
-          "pro": "200 GB",
+          "pro": "200 GB, then $0.09 per GB",
           "enterprise": "Unlimited"
         }
       },
@@ -216,12 +219,11 @@
       {
         "title": "Asset transformations",
         "tooltips": {
-          "main": "Distinct count of all images that were transformed in the billing period, ignoring any transformations.",
-          "pro": "Unlimited for 100 origin images. $5 per 1000 origin images after the first 100"
+          "main": "Distinct count of all images that were transformed in the billing period, ignoring any transformations."
         },
         "tiers": {
           "free": false,
-          "pro": "Unlimited for 100 origin images"
+          "pro": "100 origin images, then $5 per 1000 origin images"
         }
       }
     ]
@@ -233,13 +235,12 @@
       {
         "title": "Invocations",
         "tooltips": {
-          "main": "Billing is based on the sum of all invocations, independent of response status, throughout your billing period.",
-          "pro": "2 Million per month, then $2 per 1 million invocations"
+          "main": "Billing is based on the sum of all invocations, independent of response status, throughout your billing period."
         },
         "main": "Billing is based on the sum of all invocations, independent of response status, throughout your billing period.",
         "tiers": {
           "free": "500K/month",
-          "pro": "2 Million/month",
+          "pro": "2 Million, then $2 per 1 Million",
           "enterprise": "Unlimited"
         }
       },
@@ -254,12 +255,11 @@
       {
         "title": "Number of functions",
         "tooltips": {
-          "main": "Billing is based on the maximum amount of functions at any point in time throughout your billing period.",
-          "pro": "100, then $10 per additional 100 functions"
+          "main": "Billing is based on the maximum amount of functions at any point in time throughout your billing period."
         },
         "tiers": {
           "free": "10",
-          "pro": "100",
+          "pro": "100, then $10 per additional 100",
           "enterprise": "Unlimited"
         }
       }
@@ -280,25 +280,22 @@
       {
         "title": "Concurrent Peak Connections",
         "tooltips": {
-          "main": "We only charge for successful connections - not connection attempts!",
-          "pro": "Up to 500, then $10 per 1000"
+          "main": "We only charge for successful connections - not connection attempts!"
         },
         "tiers": {
           "free": "200",
-          "pro": "500",
+          "pro": "500, then $10 per 1000",
           "enterprise": "Unlimited concurrent connections and volume discount"
         }
       },
       {
         "title": "Messages Per Month",
         "tooltips": {
-          "main": "Billing is based on the total sum of Realtime messages throughout your billing period.",
-          "free": "2 Million (including database)",
-          "pro": "5 Million, then $2.50 per million"
+          "main": "Billing is based on the total sum of Realtime messages throughout your billing period."
         },
         "tiers": {
           "free": "2 Million",
-          "pro": "5 Million",
+          "pro": "5 Million, then $2.50 per Million",
           "enterprise": "Volume discounts on messages"
         }
       },
@@ -426,7 +423,7 @@
         "tiers": {
           "free": false,
           "pro": "$10 per domain per month per project add on",
-          "enterprise": "1 included, additional $10/domain/month"
+          "enterprise": "1, additional $10/domain/month"
         }
       }
     ]

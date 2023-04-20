@@ -157,6 +157,15 @@ module.exports = ui({
             'a:hover': {
               textDecorationColor: 'var(--colors-brand9)',
             },
+            figcaption: {
+              color: 'var(--colors-scale9)',
+            },
+            'figure.quote-figure p:first-child': {
+              marginTop: '0 !important',
+            },
+            'figure.quote-figure p:last-child': {
+              marginBottom: '0 !important',
+            },
           },
         },
 
