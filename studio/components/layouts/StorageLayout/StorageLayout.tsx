@@ -1,19 +1,16 @@
 import { FC, ReactNode, useEffect } from 'react'
-import { useRouter } from 'next/router'
 import { find, filter, get as _get } from 'lodash'
 import { observer } from 'mobx-react-lite'
 
-import { useParams, useStore, withAuth } from 'hooks'
+import { useStore, withAuth } from 'hooks'
+import { useParams } from 'common/hooks'
 import { AutoApiService, useProjectApiQuery } from 'data/config/project-api-query'
-import BaseLayout from 'components/layouts'
-import ProjectLayout from '../ProjectLayout/ProjectLayout'
+import ProjectLayout from '../'
 import StorageMenu from './StorageMenu'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import { formatPoliciesForStorage } from 'components/to-be-cleaned/Storage/Storage.utils'
-import CreateBucketModal from 'components/to-be-cleaned/Storage/CreateBucketModal'
 import DeleteBucketModal from 'components/to-be-cleaned/Storage/DeleteBucketModal'
-import ToggleBucketPublicModal from 'components/to-be-cleaned/Storage/ToggleBucketPublicModal'
-import NoPermission from 'components/ui/NoPermission'
+import { PROJECT_STATUS } from 'lib/constants'
 
 interface Props {
   title: string
@@ -22,32 +19,28 @@ interface Props {
 
 const StorageLayout: FC<Props> = ({ title, children }) => {
   const { ui, meta } = useStore()
-  const router = useRouter()
   const { ref: projectRef } = useParams()
-
   const storageExplorerStore = useStorageStore()
   const {
     selectedBucketToEdit,
-    closeCreateBucketModal,
-    showCreateBucketModal,
     closeDeleteBucketModal,
     showDeleteBucketModal,
-    closeToggleBucketPublicModal,
-    showToggleBucketPublicModal,
-    createBucket,
     deleteBucket,
-    toggleBucketPublic,
     buckets,
   } = storageExplorerStore || {}
 
   const { data: settings, isLoading } = useProjectApiQuery({ projectRef })
   const apiService = settings?.autoApiService
 
+  const isPaused = ui.selectedProject?.status === PROJECT_STATUS.INACTIVE
+
   useEffect(() => {
     if (!isLoading && apiService) initializeStorageStore(apiService)
   }, [isLoading])
 
   const initializeStorageStore = async (apiService: AutoApiService) => {
+    if (isPaused) return
+
     if (apiService.endpoint) {
       storageExplorerStore.initStore(
         projectRef,
@@ -64,11 +57,6 @@ const StorageLayout: FC<Props> = ({ title, children }) => {
       })
     }
     storageExplorerStore.setLoaded(true)
-  }
-
-  const onSelectCreateBucket = async (bucketName: string, isPublic: boolean) => {
-    const bucket = await createBucket(bucketName, isPublic)
-    if (bucket !== undefined) router.push(`/project/${projectRef}/storage/buckets/${bucket.name}`)
   }
 
   const onSelectDeleteBucket = async (bucket: any) => {
@@ -95,35 +83,14 @@ const StorageLayout: FC<Props> = ({ title, children }) => {
     }
   }
 
-  // if (!isLoading && !canAccessStorage) {
-  //   return (
-  //     <BaseLayout>
-  //       <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">
-  //         <NoPermission isFullPage resourceText="access your project's storage" />
-  //       </main>
-  //     </BaseLayout>
-  //   )
-  // }
-
   return (
     <ProjectLayout title={title || 'Storage'} product="Storage" productMenu={<StorageMenu />}>
       {children}
-      <CreateBucketModal
-        visible={showCreateBucketModal}
-        onSelectCancel={closeCreateBucketModal}
-        onSelectSave={onSelectCreateBucket}
-      />
       <DeleteBucketModal
         visible={showDeleteBucketModal}
         bucket={selectedBucketToEdit}
         onSelectCancel={closeDeleteBucketModal}
         onSelectDelete={onSelectDeleteBucket}
-      />
-      <ToggleBucketPublicModal
-        visible={showToggleBucketPublicModal}
-        bucket={selectedBucketToEdit}
-        onSelectCancel={closeToggleBucketPublicModal}
-        onSelectSave={toggleBucketPublic}
       />
     </ProjectLayout>
   )

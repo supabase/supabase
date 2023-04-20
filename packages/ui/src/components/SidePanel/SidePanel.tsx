@@ -126,10 +126,16 @@ export function Separator() {
   return <div className={__styles.separator}></div>
 }
 
-export function Content({ children }: { children: React.ReactNode }) {
+export function Content({
+  children,
+  className,
+}: {
+  children: React.ReactNode
+  className?: string
+}) {
   let __styles = styleHandler('sidepanel')
 
-  return <div className={__styles.content}>{children}</div>
+  return <div className={[__styles.content, className].join(' ').trim()}>{children}</div>
 }
 
 SidePanel.Content = Content

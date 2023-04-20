@@ -9,7 +9,16 @@ export const meta = {
 
 This submodule provides convenience helpers for implementing user authentication in Remix applications.
 
-> Check out [this repo](https://github.com/supabase/auth-helpers/tree/main/examples/remix) for a full example.
+<div className="video-container">
+  <iframe
+    src="https://www.youtube-nocookie.com/embed/Viaed7XWCY8"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
+
+> For a complete implementation example, check out [this free egghead course](https://egghead.io/courses/build-a-realtime-chat-app-with-remix-and-supabase-d36e2618) or [this GitHub repo](https://github.com/supabase/auth-helpers/tree/main/examples/remix).
 
 ## Install the Remix helper library
 
@@ -317,32 +326,7 @@ And then we can share this instance across our application with Outlet Context.
 
 Since authentication happens client-side, we need to tell Remix to re-call all active loaders when the user signs in or out.
 
-Remix does this automatically when an action completes. Let's create an empty action.
-
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="js"
->
-
-<TabPanel id="js" label="JavaScript">
-
-```jsx title=app/routes/handle-supabase-auth.jsx
-export const action = () => null
-```
-
-</TabPanel>
-
-<TabPanel id="ts" label="TypeScript">
-
-```tsx title=app/routes/handle-supabase-auth.tsx
-export const action = () => null
-```
-
-</TabPanel>
-
-</Tabs>
+Remix provides a hook `useRevalidator` that can be used to revalidate all loaders on the current route.
 
 Now to determine when to submit a post request to this action, we need to compare the server and client state for the user's access token.
 
@@ -425,7 +409,7 @@ export const loader = async ({ request }: LoaderArgs) => {
 
 </Tabs>
 
-And then use a `fetcher` to simulate submitting a form to our action, inside the `onAuthStateChange` hook.
+And then use the revalidator, inside the `onAuthStateChange` hook.
 
 <Tabs
   scrollable
@@ -438,7 +422,7 @@ And then use a `fetcher` to simulate submitting a form to our action, inside the
 
 ```jsx title=app/root.jsx
 const { env, session } = useLoaderData()
-const fetcher = useFetcher()
+const { revalidate } = useRevalidator()
 
 const [supabase] = useState(() =>
   createBrowserClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY)
@@ -452,11 +436,7 @@ useEffect(() => {
   } = supabase.auth.onAuthStateChange((event, session) => {
     if (session?.access_token !== serverAccessToken) {
       // server and client are out of sync.
-      // Remix recalls active loaders after actions complete
-      fetcher.submit(null, {
-        method: 'post',
-        action: '/handle-supabase-auth',
-      })
+      revalidate()
     }
   })
 
@@ -472,7 +452,7 @@ useEffect(() => {
 
 ```tsx title=app/root.tsx
 const { env, session } = useLoaderData<typeof loader>()
-const fetcher = useFetcher()
+const { revalidate } = useRevalidator()
 
 const [supabase] = useState(() =>
   createBrowserClient<Database>(env.SUPABASE_URL, env.SUPABASE_ANON_KEY)
@@ -484,13 +464,9 @@ useEffect(() => {
   const {
     data: { subscription },
   } = supabase.auth.onAuthStateChange((event, session) => {
-    if (session?.access_token !== serverAccessToken) {
+    if (event !== "INITIAL_SESSION" && session?.access_token !== serverAccessToken) {
       // server and client are out of sync.
-      // Remix recalls active loaders after actions complete
-      fetcher.submit(null, {
-        method: 'post',
-        action: '/handle-supabase-auth',
-      })
+      revalidate()
     }
   })
 

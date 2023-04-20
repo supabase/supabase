@@ -15,6 +15,8 @@ import spec_dart_v0 from '~/../../spec/supabase_dart_v0.yml' assert { type: 'yml
 import spec_csharp_v0 from '~/../../spec/supabase_csharp_v0.yml' assert { type: 'yml' }
 // @ts-expect-error
 import spec_python_v2 from '~/../../spec/supabase_py_v2.yml' assert { type: 'yml' }
+// @ts-expect-error
+import spec_swift_v1 from '~/../../spec/supabase_swift_v1.yml' assert { type: 'yml' }
 
 // import { gen_v3 } from '~/lib/refGenerator/helpers'
 import apiCommonSections from '~/../../spec/common-api-sections.json'
@@ -22,6 +24,8 @@ import cliCommonSections from '~/../../spec/common-cli-sections.json'
 import libCommonSections from '~/../../spec/common-client-libs-sections.json'
 import authServerCommonSections from '~/../../spec/common-self-hosting-auth-sections.json'
 import realtimeServerCommonSections from '~/../../spec/common-self-hosting-realtime-sections.json'
+import analyticsServerCommonSections from '~/../../spec/common-self-hosting-analytics-sections.json'
+import functionsServerCommonSections from '~/../../spec/common-self-hosting-functions-sections.json'
 import storageServerCommonSections from '~/../../spec/common-self-hosting-storage-sections.json'
 import { flattenSections } from '~/lib/helpers'
 import NavigationMenuHome from './HomeMenu'
@@ -54,22 +58,28 @@ export type RefIdOptions =
   | 'reference_dart_v1'
   | 'reference_csharp_v0'
   | 'reference_python_v2'
+  | 'reference_swift_v1'
   | 'reference_cli'
   | 'reference_api'
   | 'reference_self_hosting_auth'
   | 'reference_self_hosting_storage'
   | 'reference_self_hosting_realtime'
+  | 'reference_self_hosting_analytics'
+  | 'reference_self_hosting_functions'
 
 export type RefKeyOptions =
   | 'javascript'
   | 'dart'
   | 'csharp'
   | 'python'
+  | 'swift'
   | 'cli'
   | 'api'
   | 'self-hosting-auth'
   | 'self-hosting-storage'
   | 'self-hosting-realtime'
+  | 'self-hosting-analytics'
+  | 'self-hosting-functions'
 
 const NavigationMenu = () => {
   const router = useRouter()
@@ -84,6 +94,9 @@ const NavigationMenu = () => {
         break
       case url.includes(`/docs/guides/database`) && url:
         menuState.setMenuLevelId('database')
+        break
+      case url.includes(`/docs/guides/api`) && url:
+        menuState.setMenuLevelId('api')
         break
       case url.includes(`/docs/guides/auth`) && url:
         menuState.setMenuLevelId('auth')
@@ -132,9 +145,13 @@ const NavigationMenu = () => {
       case url.includes(`/docs/reference/csharp`) && url:
         menuState.setMenuLevelId('reference_csharp_v0')
         break
-      // puthon v2 (latest)
+      // python v2 (latest)
       case url.includes(`/docs/reference/python`) && url:
         menuState.setMenuLevelId('reference_python_v2')
+        break
+      // swift v1 (latest)
+      case url.includes(`/docs/reference/swift`) && url:
+        menuState.setMenuLevelId('reference_swift_v1')
         break
       case url.includes(`/docs/reference/cli/config`) && url:
         menuState.setMenuLevelId('supabase_cli')
@@ -153,6 +170,12 @@ const NavigationMenu = () => {
         break
       case url.includes(`/docs/reference/self-hosting-realtime`) && url:
         menuState.setMenuLevelId('reference_self_hosting_realtime')
+        break
+      case url.includes(`/docs/reference/self-hosting-analytics`) && url:
+        menuState.setMenuLevelId('reference_self_hosting_analytics')
+        break
+      case url.includes(`/docs/reference/self-hosting-functions`) && url:
+        menuState.setMenuLevelId('reference_self_hosting_functions')
         break
 
       default:
@@ -174,6 +197,7 @@ const NavigationMenu = () => {
   const isHomeActive = 'home' === level
   const isGettingStartedActive = 'gettingstarted' === level
   const isDatabaseActive = 'database' === level
+  const isApiActive = 'api' === level
   const isAuthActive = 'auth' === level
   const isFunctionsActive = 'functions' === level
   const isRealtimeActive = 'realtime' === level
@@ -191,11 +215,14 @@ const NavigationMenu = () => {
   const isReference_Dart_V1 = 'reference_dart_v1' === level
   const isReference_Csharp_V0 = 'reference_csharp_v0' === level
   const isReference_Python_V2 = 'reference_python_v2' === level
+  const isReference_Swift_V1 = 'reference_swift_v1' === level
   const isReference_Cli = 'reference_cli' === level
   const isReference_Api = 'reference_api' === level
   const isReference_Self_Hosting_Auth = 'reference_self_hosting_auth' === level
   const isReference_Self_Hosting_Storage = 'reference_self_hosting_storage' === level
   const isReference_Self_Hosting_Realtime = 'reference_self_hosting_realtime' === level
+  const isReference_Self_Hosting_Analytics = 'reference_self_hosting_analytics' === level
+  const isReference_Self_Hosting_Functions = 'reference_self_hosting_functions' === level
 
   return (
     <div className={['flex relative', 'justify-center lg:justify-start'].join(' ')}>
@@ -203,9 +230,14 @@ const NavigationMenu = () => {
       <NavigationMenuHome active={isHomeActive} />
       <NavigationMenuGuideList id={'gettingstarted'} active={isGettingStartedActive} />
       <NavigationMenuGuideList id={'database'} active={isDatabaseActive} />
+      <NavigationMenuGuideList id={'api'} active={isApiActive} />
       <NavigationMenuGuideList id={'auth'} active={isAuthActive} />
       <NavigationMenuGuideList id={'functions'} active={isFunctionsActive} />
-      <NavigationMenuGuideList id={'realtime'} active={isRealtimeActive} />
+      <NavigationMenuGuideList
+        id={'realtime'}
+        active={isRealtimeActive}
+        value={['/guides/realtime/extensions']}
+      />
       <NavigationMenuGuideList id={'storage'} active={isStorageActive} />
       <NavigationMenuGuideList id={'supabase_cli'} active={issupabase_cliActive} />
       <NavigationMenuGuideList id={'platform'} active={isPlatformActive} />
@@ -254,7 +286,14 @@ const NavigationMenu = () => {
         lib="csharp"
         spec={spec_csharp_v0}
       />
-
+      <NavigationMenuRefList
+        key={'reference-swift-menu-v1'}
+        id={'reference_swift_v1'}
+        active={isReference_Swift_V1}
+        commonSections={libCommonSections}
+        lib="swift"
+        spec={spec_swift_v1}
+      />
       <NavigationMenuRefList
         key={'reference-python-menu-v2'}
         id={'reference_python_v2'}
@@ -299,6 +338,20 @@ const NavigationMenu = () => {
         active={isReference_Self_Hosting_Realtime}
         commonSections={realtimeServerCommonSections}
         lib="self-hosting-realtime"
+      />
+      <NavigationMenuRefList
+        key={'reference-self-hosting-analytics-menu'}
+        id={'reference_self_hosting_analytics'}
+        active={isReference_Self_Hosting_Analytics}
+        commonSections={analyticsServerCommonSections}
+        lib="self-hosting-analytics"
+      />
+      <NavigationMenuRefList
+        key={'reference-self-hosting-functions-menu'}
+        id={'reference_self_hosting_functions'}
+        active={isReference_Self_Hosting_Functions}
+        commonSections={functionsServerCommonSections}
+        lib="self-hosting-functions"
       />
     </div>
   )

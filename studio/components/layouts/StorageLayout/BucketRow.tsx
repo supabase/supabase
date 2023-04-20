@@ -1,76 +1,87 @@
-import { FC } from 'react'
-import { Badge, Dropdown, IconLoader, IconMoreVertical, IconTrash } from 'ui'
+import clsx from 'clsx'
+import Link from 'next/link'
+import { noop } from 'lodash'
+import { Badge, Button, Dropdown, IconChevronDown, IconEdit2, IconLoader, IconTrash } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { checkPermissions } from 'hooks'
-import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
 import { STORAGE_ROW_STATUS } from 'components/to-be-cleaned/Storage/Storage.constants'
 
-interface Props {
+interface BucketRowProps {
   bucket: any
   projectRef?: string
   isSelected: boolean
   onSelectDeleteBucket: (bucket: any) => void
-  onSelectToggleBucketPublic: (bucket: any) => void
+  onSelectEditBucket: (bucket: any) => void
 }
 
-const BucketRow: FC<Props> = ({
+const BucketRow = ({
   bucket = {},
   projectRef = '',
   isSelected = false,
-  onSelectDeleteBucket = () => {},
-  onSelectToggleBucketPublic = () => {},
-}) => {
+  onSelectDeleteBucket = noop,
+  onSelectEditBucket = noop,
+}: BucketRowProps) => {
   const canUpdateBuckets = checkPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
 
   return (
-    <ProductMenuItem
+    <div
       key={bucket.id}
-      name={
-        <div className="flex items-center justify-between space-x-2 truncate w-full">
-          <p className="truncate" title={bucket.name}>
-            {bucket.name}
-          </p>
-          {bucket.public && <Badge color="yellow">Public</Badge>}
-        </div>
-      }
-      url={`/project/${projectRef}/storage/buckets/${bucket.id}`}
-      isActive={isSelected}
-      action={
-        bucket.status === STORAGE_ROW_STATUS.LOADING ? (
+      className={clsx(
+        'group flex items-center justify-between rounded-md',
+        isSelected && 'text-scale-1200 bg-scale-300'
+      )}
+    >
+      <Link href={`/project/${projectRef}/storage/buckets/${bucket.id}`}>
+        <a className="py-1 px-3 w-full">
+          <div className="flex items-center justify-between space-x-2 truncate w-full">
+            <p
+              className="text-sm text-scale-1100 group-hover:text-scale-1200 transition truncate"
+              title={bucket.name}
+            >
+              {bucket.name}
+            </p>
+            {bucket.public && <Badge color="yellow">Public</Badge>}
+          </div>
+        </a>
+      </Link>
+      <div className="pr-3">
+        {bucket.status === STORAGE_ROW_STATUS.LOADING ? (
           <IconLoader className="animate-spin" size={16} strokeWidth={2} />
-        ) : canUpdateBuckets && bucket.status === STORAGE_ROW_STATUS.READY ? (
+        ) : canUpdateBuckets && bucket.status === STORAGE_ROW_STATUS.READY && isSelected ? (
           <Dropdown
             side="bottom"
             align="start"
             overlay={[
               <Dropdown.Item
                 key="toggle-private"
-                onClick={() => onSelectToggleBucketPublic(bucket)}
+                icon={<IconEdit2 size="tiny" />}
+                onClick={() => onSelectEditBucket(bucket)}
               >
-                {bucket.public ? 'Make private' : 'Make public'}
+                Edit bucket
               </Dropdown.Item>,
               <Dropdown.Separator key="bucket-separator" />,
               <Dropdown.Item
-                icon={<IconTrash size="tiny" />}
                 key="delete-bucket"
+                icon={<IconTrash size="tiny" />}
                 onClick={() => onSelectDeleteBucket(bucket)}
               >
                 Delete bucket
               </Dropdown.Item>,
             ]}
           >
-            <IconMoreVertical
-              className="opacity-0 group-hover:opacity-100"
-              size="tiny"
-              strokeWidth={2}
+            <Button
+              as="span"
+              type="text"
+              icon={<IconChevronDown size="tiny" strokeWidth={2} className="text-scale-1100" />}
+              style={{ padding: '3px' }}
             />
           </Dropdown>
         ) : (
-          <div />
-        )
-      }
-    />
+          <div className="w-5" />
+        )}
+      </div>
+    </div>
   )
 }
 

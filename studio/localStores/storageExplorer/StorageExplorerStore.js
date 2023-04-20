@@ -76,9 +76,7 @@ class StorageExplorerStore {
   endpoint = ''
 
   /* FE to toggle page level modals */
-  showCreateBucketModal = false
   showDeleteBucketModal = false
-  showToggleBucketPublicModal = false
 
   /* FE Cacheing for file previews */
   filePreviewCache = []
@@ -184,14 +182,6 @@ class StorageExplorerStore {
     this.loaded = val
   }
 
-  openCreateBucketModal = () => {
-    this.showCreateBucketModal = true
-  }
-
-  closeCreateBucketModal = () => {
-    this.showCreateBucketModal = false
-  }
-
   openDeleteBucketModal = (bucket) => {
     this.selectedBucketToEdit = bucket
     this.showDeleteBucketModal = true
@@ -199,15 +189,6 @@ class StorageExplorerStore {
 
   closeDeleteBucketModal = () => {
     this.showDeleteBucketModal = false
-  }
-
-  openToggleBucketPublicModal = (bucket) => {
-    this.selectedBucketToEdit = bucket
-    this.showToggleBucketPublicModal = true
-  }
-
-  closeToggleBucketPublicModal = () => {
-    this.showToggleBucketPublicModal = false
   }
 
   setSelectedBucket = (bucket) => {
@@ -366,7 +347,8 @@ class StorageExplorerStore {
   setFilePreview = async (file) => {
     const size = file.metadata?.size
     const mimeType = file.metadata?.mimetype
-    if (mimeType && size && this.selectedFilePreview.id !== file.id) {
+
+    if (mimeType && size) {
       // Skip fetching of file preview if file is too big
       if (size > PREVIEW_SIZE_LIMIT) {
         this.selectedFilePreview = { ...file, previewUrl: 'skipped' }
@@ -414,7 +396,7 @@ class StorageExplorerStore {
 
   copyFileURLToClipboard = async (file, expiresIn = 0) => {
     const filePreview = find(this.filePreviewCache, { id: file.id })
-    if (filePreview && expiresIn === 0) {
+    if (filePreview !== undefined && expiresIn === 0) {
       // Already generated signed URL
       copyToClipboard(filePreview.url, () => {
         this.ui.setNotification({
@@ -425,13 +407,15 @@ class StorageExplorerStore {
       })
     } else {
       // Need to generate signed URL, and might as well save it to cache as well
-      const signedUrl = await this.fetchFilePreview(file.name, expiresIn)
-
-      try {
-        let formattedUrl = new URL(signedUrl)
+      const signedUrlAsync = this.fetchFilePreview(file.name, expiresIn).then((signedUrl) => {
+        const formattedUrl = new URL(signedUrl)
         formattedUrl.searchParams.set('t', new Date().toISOString())
 
-        copyToClipboard(formattedUrl.toString(), () => {
+        return formattedUrl.toString()
+      })
+
+      try {
+        copyToClipboard(signedUrlAsync, () => {
           this.ui.setNotification({
             category: 'success',
             message: `Copied URL for ${file.name} to clipboard.`,
@@ -440,7 +424,7 @@ class StorageExplorerStore {
         })
         const fileCache = {
           id: file.id,
-          url: formattedUrl.toString(),
+          url: await signedUrlAsync,
           expiresIn: DEFAULT_EXPIRY,
           fetchedAt: Date.now(),
         }
@@ -457,15 +441,13 @@ class StorageExplorerStore {
   /* Methods that involve the storage client library */
   /* Bucket CRUD */
 
-  createBucket = async (bucketName, isPublic = false) => {
-    const res = await post(`${this.endpoint}/buckets`, { id: bucketName, public: isPublic })
+  createBucket = async (payload) => {
+    const res = await post(`${this.endpoint}/buckets`, payload)
     if (res.error) {
       this.ui.setNotification({ category: 'error', message: res.error.message })
-      this.closeCreateBucketModal()
-      return undefined
+      return res
     } else {
       await this.fetchBuckets()
-      this.closeCreateBucketModal()
       return res
     }
   }
@@ -518,18 +500,18 @@ class StorageExplorerStore {
     return true
   }
 
-  toggleBucketPublic = async (bucket) => {
-    const res = await patch(`${this.endpoint}/buckets/${bucket.id}`, { public: !bucket.public })
+  editBucket = async (bucket, payload) => {
+    const res = await patch(`${this.endpoint}/buckets/${bucket.id}`, payload)
     if (res.error) {
       this.ui.setNotification({ category: 'error', message: res.error.message })
-      return this.closeToggleBucketPublicModal()
+      return res
     }
 
-    await this.fetchBuckets()
+    this.openBucket({ ...bucket, ...payload })
+    this.fetchBuckets()
     this.clearFilePreviewCache()
-    this.closeToggleBucketPublicModal()
 
-    await this.openBucket({ ...bucket, public: !bucket.public })
+    return res
   }
 
   /* Files CRUD */
@@ -783,7 +765,7 @@ class StorageExplorerStore {
     let numberOfFilesMovedFail = 0
     this.clearSelectedItems()
 
-    const infoToastId = toast('Please do not close the browser until the delete is completed', {
+    const infoToastId = toast('Please do not close the browser until the move is completed', {
       duration: Infinity,
     })
 
@@ -971,6 +953,7 @@ class StorageExplorerStore {
               blob: new Blob([blob], { type: fileMimeType }),
             })
           } else {
+            console.error('Failed to download file', `${file.prefix}/${file.name}`)
             resolve(false)
           }
         })
@@ -993,8 +976,17 @@ class StorageExplorerStore {
 
     const zipFileWriter = new BlobWriter('application/zip')
     const zipWriter = new ZipWriter(zipFileWriter, { bufferedWrite: true })
+
+    if (downloadedFiles.length === 0) {
+      return this.ui.setNotification({
+        id: toastId,
+        category: 'error',
+        message: `Failed to download files from the ${folder.name}`,
+      })
+    }
+
     downloadedFiles.forEach((file) => {
-      zipWriter.add(`${file.prefix}/${file.name}`, new BlobReader(file.blob))
+      if (file.blob) zipWriter.add(`${file.prefix}/${file.name}`, new BlobReader(file.blob))
     })
 
     const blobURL = URL.createObjectURL(await zipWriter.close())
@@ -1120,7 +1112,7 @@ class StorageExplorerStore {
     } else {
       if (toastId) {
         this.ui.setNotification({
-          error: error,
+          error: res.error,
           id: toastId,
           category: 'error',
           message: `Failed to download ${fileName}`,
@@ -1149,14 +1141,25 @@ class StorageExplorerStore {
 
       if (res.error) {
         this.ui.setNotification({ category: 'error', message: res.error.message })
-      }
-      await this.refetchAllOpenedFolders()
+      } else {
+        this.ui.setNotification({
+          category: 'success',
+          message: `Successfully renamed "${originalName}" to "${newName}"`,
+        })
 
-      // Clear file preview cache if the renamed file exists in the cache
-      const updatedFilePreviewCache = this.filePreviewCache.filter(
-        (fileCache) => fileCache.id !== file.id
-      )
-      this.filePreviewCache = updatedFilePreviewCache
+        // Clear file preview cache if the renamed file exists in the cache
+        const updatedFilePreviewCache = this.filePreviewCache.filter(
+          (fileCache) => fileCache.id !== file.id
+        )
+        this.filePreviewCache = updatedFilePreviewCache
+
+        if (this.selectedFilePreview.name === originalName) {
+          const { previewUrl, ...fileData } = file
+          this.setFilePreview({ ...fileData, name: newName })
+        }
+
+        await this.refetchAllOpenedFolders()
+      }
     }
   }
 
@@ -1256,7 +1259,10 @@ class StorageExplorerStore {
           path: prefix,
           options,
         })
-        if (res.error) console.error('Error at fetchFoldersByPath:', error)
+        if (res.error) {
+          console.error('Error at fetchFoldersByPath:', res.error)
+          return []
+        }
         return res
       })
     )
@@ -1541,7 +1547,7 @@ class StorageExplorerStore {
 
   formatFolderItems = (items = []) => {
     const formattedItems =
-      items
+      (items ?? [])
         ?.filter((item) => item.name !== EMPTY_FOLDER_PLACEHOLDER_FILE_NAME)
         .map((item) => {
           const type = item.id ? STORAGE_ROW_TYPES.FILE : STORAGE_ROW_TYPES.FOLDER
@@ -1664,8 +1670,8 @@ class StorageExplorerStore {
 
   loadExplorerPreferences = () => {
     const localStorageKey = this.getLocalStorageKey()
-    const preferences = localStorage.getItem(localStorageKey)
-    if (preferences) {
+    const preferences = localStorage?.getItem(localStorageKey) ?? undefined
+    if (preferences !== undefined) {
       const { view, sortBy, sortByOrder } = JSON.parse(preferences)
       this.view = view
       this.sortBy = sortBy

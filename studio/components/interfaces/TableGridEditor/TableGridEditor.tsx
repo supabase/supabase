@@ -1,27 +1,42 @@
-import { FC, useRef, useEffect, useState } from 'react'
+import { useRef, useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
-import { find, isUndefined } from 'lodash'
-import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
+import { find, isUndefined, noop } from 'lodash'
+import type { PostgresColumn, PostgresRelationship, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { QueryKey, useQueryClient } from '@tanstack/react-query'
 
 import { SchemaView } from 'types'
-import { checkPermissions, useFlag, useStore, useParams } from 'hooks'
+import { checkPermissions, useFlag, useStore, useUrlState } from 'hooks'
+import useEntityType from 'hooks/misc/useEntityType'
+import { useParams } from 'common/hooks'
 import GridHeaderActions from './GridHeaderActions'
 import NotFoundState from './NotFoundState'
 import SidePanelEditor from './SidePanelEditor'
-import { Dictionary, parseSupaTable, SupabaseGrid, SupabaseGridRef } from 'components/grid'
-import { IconBookOpen, SidePanel } from 'ui'
-import ActionBar from './SidePanelEditor/ActionBar'
-import { GeneralContent, ResourceContent } from '../Docs'
-import { useProjectApiQuery } from 'data/config/project-api-query'
+import {
+  Dictionary,
+  parseSupaTable,
+  SupabaseGrid,
+  SupabaseGridRef,
+  SupaTable,
+} from 'components/grid'
+import { sqlKeys } from 'data/sql/keys'
 import { useProjectJsonSchemaQuery } from 'data/docs/project-json-schema-query'
-import { snakeToCamel } from 'lib/helpers'
+import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
 import { JsonEditValue } from './SidePanelEditor/RowEditor/RowEditor.types'
-import LangSelector from '../Docs/LangSelector'
-import GeneratingTypes from '../Docs/GeneratingTypes'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
+import {
+  ForeignKeyConstraint,
+  useForeignKeyConstraintsQuery,
+} from 'data/database/foreign-key-constraints-query'
+import { FOREIGN_KEY_DELETION_ACTION } from 'data/database/database-query-constants'
+import { ForeignRowSelectorProps } from './SidePanelEditor/RowEditor/ForeignRowSelector/ForeignRowSelector'
+import TwoOptionToggle from 'components/ui/TwoOptionToggle'
+import TableDefinition from './TableDefinition'
+import APIDocumentationPanel from './APIDocumentationPanel'
 
-interface Props {
+export interface TableGridEditorProps {
   /** Theme for the editor */
   theme?: 'dark' | 'light'
 
@@ -29,7 +44,7 @@ interface Props {
   selectedTable: any // PostgresTable | SchemaView
 
   /** Determines what side panel editor to show */
-  sidePanelKey?: 'row' | 'column' | 'table' | 'json'
+  sidePanelKey?: 'row' | 'column' | 'table' | 'json' | 'foreign-row-selector' | 'csv-import'
   /** Toggles if we're duplicating a table */
   isDuplicating: boolean
   /** Selected entities if we're editing a row, column or table */
@@ -37,6 +52,11 @@ interface Props {
   selectedColumnToEdit?: PostgresColumn
   selectedTableToEdit?: PostgresTable
   selectedValueForJsonEdit?: JsonEditValue
+  selectedForeignKeyToEdit?: {
+    foreignKey: NonNullable<ForeignRowSelectorProps['foreignKey']>
+    row: any
+    column: any
+  }
 
   onAddRow: () => void
   onEditRow: (row: Dictionary<any>) => void
@@ -44,10 +64,16 @@ interface Props {
   onEditColumn: (column: PostgresColumn) => void
   onDeleteColumn: (column: PostgresColumn) => void
   onExpandJSONEditor: (column: string, row: any) => void
+  onEditForeignKeyColumnValue: (args: {
+    foreignKey: NonNullable<ForeignRowSelectorProps['foreignKey']>
+    row: any
+    column: any
+  }) => void
   onClosePanel: () => void
+  onImportData: () => void
 }
 
-const TableGridEditor: FC<Props> = ({
+const TableGridEditor = ({
   theme = 'dark',
 
   selectedSchema,
@@ -58,38 +84,36 @@ const TableGridEditor: FC<Props> = ({
   selectedColumnToEdit,
   selectedTableToEdit,
   selectedValueForJsonEdit,
+  selectedForeignKeyToEdit,
 
-  onAddRow = () => {},
-  onEditRow = () => {},
-  onAddColumn = () => {},
-  onEditColumn = () => {},
-  onDeleteColumn = () => {},
-  onExpandJSONEditor = () => {},
-  onClosePanel = () => {},
-}) => {
+  onAddRow = noop,
+  onEditRow = noop,
+  onAddColumn = noop,
+  onEditColumn = noop,
+  onDeleteColumn = noop,
+  onExpandJSONEditor = noop,
+  onEditForeignKeyColumnValue = noop,
+  onClosePanel = noop,
+  onImportData = noop,
+}: TableGridEditorProps) => {
   const { meta, ui, vault } = useStore()
   const router = useRouter()
-  const { ref: projectRef, page, id } = useParams()
+  const { ref: projectRef, id } = useParams()
   const gridRef = useRef<SupabaseGridRef>(null)
 
-  const tables = meta.tables.list()
-
-  const { data: settings } = useProjectApiQuery({ projectRef: projectRef })
-
-  const autoApiService = {
-    ...settings?.autoApiService,
-    endpoint: `${settings?.autoApiService.protocol ?? 'https'}://${
-      settings?.autoApiService.endpoint ?? '-'
-    }`,
-  }
-  const DEFAULT_KEY = { name: 'hide', key: 'SUPABASE_KEY' }
-
+  const { project } = useProjectContext()
   const isVaultEnabled = useFlag('vaultExtension')
   const [encryptedColumns, setEncryptedColumns] = useState([])
   const [apiPreviewPanelOpen, setApiPreviewPanelOpen] = useState(false)
 
-  const [selectedLang, setSelectedLang] = useState<any>('js')
-  const [showApiKey, setShowApiKey] = useState<any>(DEFAULT_KEY)
+  const [{ view: selectedView = 'data' }, setUrlState] = useUrlState()
+  const setSelectedView = (view: string) => {
+    if (view === 'data') {
+      setUrlState({ view: undefined })
+    } else {
+      setUrlState({ view })
+    }
+  }
 
   const isReadOnly =
     !checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables') &&
@@ -100,47 +124,74 @@ const TableGridEditor: FC<Props> = ({
     setEncryptedColumns(columns)
   }
 
-  function getResourcesFromJsonSchema(value: any) {
-    const { paths } = value || {}
-    const functionPath = 'rpc/'
-    let resources: any = {}
+  const queryClient = useQueryClient()
+  const { mutate: mutateUpdateTableRow } = useTableRowUpdateMutation({
+    async onMutate({ projectRef, table, configuration, payload }) {
+      const primaryKeyColumns = new Set(Object.keys(configuration.identifiers))
 
-    Object.entries(paths || []).forEach(([name, val]) => {
-      let trimmed = name.slice(1)
-      let id = trimmed.replace(functionPath, '')
-      let displayName = id.replace(/_/g, ' ')
-      let camelCase = snakeToCamel(id)
-      let enriched = { id, displayName, camelCase }
-      if (!trimmed.length) return
-      else resources[id] = enriched
-    })
+      const queryKey = sqlKeys.query(projectRef, [
+        table.schema,
+        table.name,
+        { table: { name: table.name, schema: table.schema } },
+      ])
 
-    return resources
-  }
+      await queryClient.cancelQueries(queryKey)
 
-  const apiService = settings?.autoApiService
-  const anonKey = apiService?.service_api_keys.find((x) => x.name === 'anon key')
-    ? apiService.defaultApiKey
-    : undefined
-  const swaggerUrl = settings?.autoApiService?.restUrl
+      const previousRowsQueries = queryClient.getQueriesData<{ result: any[] }>(queryKey)
 
-  const {
-    data: jsonSchema,
-    error: jsonSchemaError,
-    refetch,
-  } = useProjectJsonSchemaQuery({
-    projectRef,
-    swaggerUrl,
-    apiKey: anonKey,
+      queryClient.setQueriesData<{ result: any[] }>(queryKey, (old) => {
+        return {
+          result:
+            old?.result.map((row) => {
+              // match primary keys
+              if (
+                Object.entries(row)
+                  .filter(([key]) => primaryKeyColumns.has(key))
+                  .every(([key, value]) => value === configuration.identifiers[key])
+              ) {
+                return { ...row, ...payload }
+              }
+
+              return row
+            }) ?? [],
+        }
+      })
+
+      return { previousRowsQueries }
+    },
+    onError(error, _variables, context) {
+      const { previousRowsQueries } = context as {
+        previousRowsQueries: [
+          QueryKey,
+          (
+            | {
+                result: any[]
+              }
+            | undefined
+          )
+        ][]
+      }
+
+      previousRowsQueries.forEach(([queryKey, previousRows]) => {
+        if (previousRows) {
+          queryClient.setQueriesData(queryKey, previousRows)
+        }
+        queryClient.invalidateQueries(queryKey)
+      })
+
+      onError(error)
+    },
   })
 
-  if (jsonSchemaError) console.log('jsonSchemaError', jsonSchemaError)
+  const { refetch } = useProjectJsonSchemaQuery({ projectRef })
+  const refreshDocs = async () => await refetch()
 
-  const resources = getResourcesFromJsonSchema(jsonSchema)
-
-  const refreshDocs = async () => {
-    await refetch()
-  }
+  const { data } = useForeignKeyConstraintsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    schema: selectedTable?.schema,
+  })
+  const foreignKeyMeta = data || []
 
   useEffect(() => {
     if (selectedTable !== undefined && selectedTable.id !== undefined && isVaultEnabled) {
@@ -148,19 +199,36 @@ const TableGridEditor: FC<Props> = ({
     }
   }, [selectedTable?.id])
 
+  const entityType = useEntityType(selectedTable?.id)
+
+  // NOTE: DO NOT PUT HOOKS AFTER THIS LINE
   if (isUndefined(selectedTable)) {
     return <NotFoundState id={Number(id)} />
   }
 
   const tableId = selectedTable?.id
 
-  // @ts-ignore
-  const schema = meta.schemas.list().find((schema) => schema.name === selectedSchema)
-  const isViewSelected = !Object.keys(selectedTable).includes('rls_enabled')
-  const isForeignTableSelected = meta.foreignTables.byId(selectedTable.id) !== undefined
-  const isLocked = meta.excludedSchemas.includes(schema?.name ?? '')
+  const isViewSelected =
+    entityType?.type === ENTITY_TYPE.VIEW || entityType?.type === ENTITY_TYPE.MATERIALIZED_VIEW
+  const isTableSelected = entityType?.type === ENTITY_TYPE.TABLE
+  const isForeignTableSelected = entityType?.type === ENTITY_TYPE.FOREIGN_TABLE
+  const isLocked = meta.excludedSchemas.includes(entityType?.schema ?? '')
   const canUpdateTables = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
-  const canEditViaTableEditor = !isViewSelected && !isForeignTableSelected && !isLocked
+  const canEditViaTableEditor = isTableSelected && !isLocked
+
+  // [Joshen] We can tweak below to eventually support composite keys as the data
+  // returned from foreignKeyMeta should be easy to deal with, rather than pg-meta
+  const formattedRelationships = (selectedTable?.relationships ?? []).map(
+    (relationship: PostgresRelationship) => {
+      const relationshipMeta = foreignKeyMeta.find(
+        (fk: ForeignKeyConstraint) => fk.id === relationship.id
+      )
+      return {
+        ...relationship,
+        deletion_action: relationshipMeta?.deletion_action ?? FOREIGN_KEY_DELETION_ACTION.NO_ACTION,
+      }
+    }
+  )
 
   const gridTable =
     !isViewSelected && !isForeignTableSelected
@@ -168,12 +236,17 @@ const TableGridEditor: FC<Props> = ({
           {
             table: selectedTable as PostgresTable,
             columns: (selectedTable as PostgresTable).columns ?? [],
-            primaryKeys: (selectedTable as PostgresTable).primary_keys,
-            relationships: (selectedTable as PostgresTable).relationships,
+            primaryKeys: (selectedTable as PostgresTable).primary_keys ?? [],
+            relationships: formattedRelationships,
           },
           encryptedColumns
         )
-      : (selectedTable as SchemaView).name
+      : parseSupaTable({
+          table: selectedTable as SchemaView,
+          columns: (selectedTable as SchemaView).columns ?? [],
+          primaryKeys: [],
+          relationships: [],
+        })
 
   const gridKey = `${selectedTable.schema}_${selectedTable.name}`
 
@@ -232,6 +305,37 @@ const TableGridEditor: FC<Props> = ({
     })
   }
 
+  const updateTableRow = (previousRow: any, updatedData: any) => {
+    if (!project) return
+
+    const enumArrayColumns = selectedTable.columns
+      .filter((column: any) => {
+        return (column?.enums ?? []).length > 0 && column.data_type.toLowerCase() === 'array'
+      })
+      .map((column: any) => column.name)
+
+    const identifiers = {} as Dictionary<any>
+    ;(selectedTable as PostgresTable).primary_keys.forEach(
+      (column) => (identifiers[column.name] = previousRow[column.name])
+    )
+
+    const configuration = { identifiers }
+
+    mutateUpdateTableRow({
+      projectRef: project.ref,
+      connectionString: project.connectionString,
+      table: gridTable as SupaTable,
+      configuration,
+      payload: updatedData,
+      enumArrayColumns,
+    })
+  }
+
+  /** [Joshen] We're going to need to refactor SupabaseGrid eventually to make the code here more readable
+   * For context we previously built the SupabaseGrid as a reusable npm component, but eventually decided
+   * to just integrate it directly into the dashboard. The header, and body (+footer) should be decoupled.
+   */
+
   return (
     <>
       <SupabaseGrid
@@ -245,24 +349,61 @@ const TableGridEditor: FC<Props> = ({
         table={gridTable}
         refreshDocs={refreshDocs}
         headerActions={
-          canEditViaTableEditor && (
-            <GridHeaderActions
-              table={selectedTable as PostgresTable}
-              apiPreviewPanelOpen={apiPreviewPanelOpen}
-              setApiPreviewPanelOpen={setApiPreviewPanelOpen}
-              refreshDocs={refreshDocs}
-            />
-          )
+          isTableSelected || isViewSelected || canEditViaTableEditor ? (
+            <>
+              {canEditViaTableEditor && (
+                <GridHeaderActions
+                  table={selectedTable as PostgresTable}
+                  apiPreviewPanelOpen={apiPreviewPanelOpen}
+                  setApiPreviewPanelOpen={setApiPreviewPanelOpen}
+                  refreshDocs={refreshDocs}
+                />
+              )}
+              {(isTableSelected || isViewSelected) && (
+                <>
+                  {canEditViaTableEditor && (
+                    <div className="h-[20px] w-px border-r border-scale-600"></div>
+                  )}
+                  <div>
+                    <TwoOptionToggle
+                      width={75}
+                      options={['definition', 'data']}
+                      activeOption={selectedView}
+                      borderOverride="border-gray-500"
+                      onClickOption={setSelectedView}
+                    />
+                  </div>
+                </>
+              )}
+            </>
+          ) : null
         }
         onAddColumn={onAddColumn}
         onEditColumn={onSelectEditColumn}
         onDeleteColumn={onSelectDeleteColumn}
         onAddRow={onAddRow}
+        updateTableRow={updateTableRow}
         onEditRow={onEditRow}
+        onImportData={onImportData}
         onError={onError}
         onSqlQuery={onSqlQuery}
         onExpandJSONEditor={onExpandJSONEditor}
-      />
+        onEditForeignKeyColumnValue={onEditForeignKeyColumnValue}
+        showCustomChildren={(isViewSelected || isTableSelected) && selectedView === 'definition'}
+        customHeader={
+          (isViewSelected || isTableSelected) && selectedView === 'definition' ? (
+            <div className="flex items-center space-x-2">
+              <p>
+                SQL Definition of <code className="text-sm">{selectedTable.name}</code>{' '}
+              </p>
+              <p className="text-scale-1000 text-sm">(Read only)</p>
+            </div>
+          ) : null
+        }
+      >
+        {(isViewSelected || isTableSelected) && <TableDefinition id={selectedTable?.id} />}
+      </SupabaseGrid>
+
       {!isUndefined(selectedSchema) && (
         <SidePanelEditor
           selectedSchema={selectedSchema}
@@ -272,6 +413,7 @@ const TableGridEditor: FC<Props> = ({
           selectedColumnToEdit={selectedColumnToEdit}
           selectedTableToEdit={selectedTableToEdit}
           selectedValueForJsonEdit={selectedValueForJsonEdit}
+          selectedForeignKeyToEdit={selectedForeignKeyToEdit}
           sidePanelKey={sidePanelKey}
           onRowCreated={onRowCreated}
           onRowUpdated={onRowUpdated}
@@ -281,81 +423,10 @@ const TableGridEditor: FC<Props> = ({
         />
       )}
 
-      <SidePanel
-        key="WrapperTableEditor"
-        size="xxlarge"
+      <APIDocumentationPanel
         visible={apiPreviewPanelOpen}
-        onCancel={() => setApiPreviewPanelOpen(false)}
-        header={
-          <span className="flex items-center gap-2">
-            <IconBookOpen size="tiny" />
-            API
-          </span>
-        }
-        customFooter={
-          <ActionBar
-            backButtonLabel="Close"
-            hideApply={true}
-            formId="wrapper-table-editor-form"
-            closePanel={() => setApiPreviewPanelOpen(false)}
-          />
-        }
-      >
-        <div className="Docs Docs--table-editor">
-          <SidePanel.Content>
-            {jsonSchemaError ? (
-              <div className="p-6 mx-auto text-center sm:w-full md:w-3/4">
-                <div className="text-scale-1000">
-                  <p>Error connecting to API</p>
-                  <p>{`${jsonSchemaError}`}</p>
-                </div>
-              </div>
-            ) : (
-              <>
-                {jsonSchema ? (
-                  <>
-                    <div className="sticky top-0 z-10 bg-scale-100 dark:bg-scale-300">
-                      <LangSelector
-                        selectedLang={selectedLang}
-                        setSelectedLang={setSelectedLang}
-                        showApiKey={showApiKey}
-                        setShowApiKey={setShowApiKey}
-                        apiKey={anonKey}
-                        autoApiService={autoApiService}
-                      />
-                    </div>
-                    <GeneralContent
-                      autoApiService={autoApiService}
-                      selectedLang={selectedLang}
-                      showApiKey={true}
-                      page={page}
-                    />
-
-                    <GeneratingTypes selectedLang={selectedLang} />
-
-                    {jsonSchema?.definitions && (
-                      <ResourceContent
-                        autoApiService={autoApiService}
-                        selectedLang={selectedLang}
-                        resourceId={tables.find((table) => table.id === Number(id))?.name}
-                        resources={resources}
-                        definitions={jsonSchema.definitions}
-                        paths={jsonSchema.paths}
-                        showApiKey={showApiKey.key}
-                        refreshDocs={refreshDocs}
-                      />
-                    )}
-                  </>
-                ) : (
-                  <div className="p-6 mx-auto text-center sm:w-full md:w-3/4">
-                    <h3 className="text-lg">Building docs ...</h3>
-                  </div>
-                )}
-              </>
-            )}
-          </SidePanel.Content>
-        </div>
-      </SidePanel>
+        onClose={() => setApiPreviewPanelOpen(false)}
+      />
     </>
   )
 }

@@ -3,9 +3,14 @@ import { find, isUndefined, compact, isEqual, omitBy, isNull, isString } from 'l
 import { Dictionary } from 'components/grid'
 import type { PostgresTable } from '@supabase/postgres-meta'
 
-import { uuidv4, minifyJSON, tryParseJson } from 'lib/helpers'
+import { minifyJSON, tryParseJson } from 'lib/helpers'
 import { RowField } from './RowEditor.types'
-import { DATETIME_TYPES, TIME_TYPES, TIMESTAMP_TYPES } from '../SidePanelEditor.constants'
+import {
+  DATETIME_TYPES,
+  TIME_TYPES,
+  TIMESTAMP_TYPES,
+  TEXT_TYPES,
+} from '../SidePanelEditor.constants'
 
 export const generateRowFields = (
   row: Dictionary<any> | undefined,
@@ -16,11 +21,18 @@ export const generateRowFields = (
   const primaryKeyColumns = primary_keys.map((key) => key.name)
 
   return table.columns!.map((column) => {
-    const value = isUndefined(row)
-      ? ''
-      : DATETIME_TYPES.includes(column.format)
-      ? convertPostgresDatetimeToInputDatetime(column.format, row[column.name])
-      : parseValue(row[column.name], column.format)
+    const value =
+      isUndefined(row) && TEXT_TYPES.includes(column.format)
+        ? null
+        : isUndefined(row) && column.format === 'bool' && !column.is_nullable
+        ? 'true'
+        : isUndefined(row) && column.format === 'bool' && column.is_nullable
+        ? 'null'
+        : isUndefined(row)
+        ? ''
+        : DATETIME_TYPES.includes(column.format)
+        ? convertPostgresDatetimeToInputDatetime(column.format, row[column.name])
+        : parseValue(row[column.name], column.format)
 
     const foreignKey = find(relationships, (relationship) => {
       return (
@@ -70,27 +82,7 @@ export const validateFields = (fields: RowField[]) => {
   return errors
 }
 
-// Currently only used in ReferenceRowViewer for rows outside of public schema
-export const generateRowFieldsWithoutColumnMeta = (row: any): RowField[] => {
-  const properties = Object.keys(row)
-  return properties.map((property) => {
-    return {
-      id: uuidv4(),
-      value: row[property] || '',
-      name: property,
-      comment: '',
-      format: '',
-      enums: [],
-      defaultValue: '',
-      foreignKey: undefined,
-      isNullable: false,
-      isIdentity: false,
-      isPrimaryKey: false,
-    }
-  })
-}
-
-const parseValue = (originalValue: string, format: string) => {
+const parseValue = (originalValue: any, format: string) => {
   try {
     if (originalValue === null || originalValue.length === 0) {
       return originalValue
@@ -99,7 +91,7 @@ const parseValue = (originalValue: string, format: string) => {
     } else if (typeof originalValue === 'object') {
       return JSON.stringify(originalValue)
     } else if (typeof originalValue === 'boolean') {
-      return (originalValue as any).toString()
+      return originalValue.toString()
     } else {
       return originalValue
     }
@@ -162,7 +154,14 @@ export const generateRowObjectFromFields = (
   const rowObject = {} as any
   fields.forEach((field) => {
     const isArray = field.format.startsWith('_')
-    const value = (field?.value ?? '').length === 0 ? null : field.value
+
+    // Do not convert empty field inputs to NULL for text types
+    // so that we discern NULL and EMPTY
+    const value = TEXT_TYPES.includes(field.format)
+      ? field.value
+      : (field?.value ?? '').length === 0
+      ? null
+      : field.value
 
     if (isArray && value !== null) {
       rowObject[field.name] = tryParseJson(value)
@@ -173,7 +172,8 @@ export const generateRowObjectFromFields = (
         rowObject[field.name] = tryParseJson(value)
       }
     } else if (field.format === 'bool' && value) {
-      rowObject[field.name] = value === 'true'
+      if (value === 'null') rowObject[field.name] = null
+      else rowObject[field.name] = value === 'true'
     } else if (DATETIME_TYPES.includes(field.format)) {
       // Seconds are missing if they are set to 0 in the HTML input
       // Need to format that first, before passing to dayjs
