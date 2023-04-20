@@ -667,4 +667,4 @@ export const TIER_QUERY_LIMITS: {
   ENTERPRISE: { text: '90 days', value: 90, unit: 'day', promptUpgrade: false },
 }
 
-export const SHOW_O11Y = IS_PLATFORM ? true : process.env.NEXT_PUBLIC_ENABLE_LOGS == 'true'
+export const SHOW_O11Y = IS_PLATFORM || process.env.NEXT_PUBLIC_ENABLE_LOGS == 'true'
