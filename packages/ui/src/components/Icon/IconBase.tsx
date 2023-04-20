@@ -1,25 +1,37 @@
-import * as React from 'react'
+import React from 'react'
 import styleHandler from '../../lib/theme/styleHandler'
 import { IconContext } from './IconContext'
 // @ts-ignore
 // import IconStyles from './Icon.module.css'
 
-export interface IconBaseProps {
+interface Props {
   className?: string
-  size?: 'tiny' | 'small' | 'medium' | 'large' | 'xlarge' | 'xxlarge' | 'xxxlarge' | number
+  size?:
+    | 'tiny'
+    | 'small'
+    | 'medium'
+    | 'large'
+    | 'xlarge'
+    | 'xxlarge'
+    | 'xxxlarge'
+    | number
   type?: string
   color?: string
   strokeWidth?: number
   fill?: string
   stroke?: string
-  background?: 'brand' | 'gray' | 'red' | 'yellow' | 'green' | 'blue' | 'indigo' | 'purple' | 'pink'
+  background?:
+    | 'brand'
+    | 'gray'
+    | 'red'
+    | 'yellow'
+    | 'green'
+    | 'blue'
+    | 'indigo'
+    | 'purple'
+    | 'pink'
   src?: React.ReactNode
   icon?: any
-  onClick?: (event: React.MouseEvent) => void
-  style?: React.CSSProperties
-  width?: number
-  height?: number
-  id?: string
 }
 
 interface StringMap {
@@ -38,7 +50,7 @@ function IconBase({
   src,
   icon,
   ...props
-}: IconBaseProps) {
+}: Props) {
   const __styles = styleHandler('icon')
 
   return (
@@ -73,10 +85,14 @@ function IconBase({
 
         // use size prop of this component if one exists
         if (size) {
-          iconSize = size ? (typeof size === 'string' ? defaultSizes[size] : size) : defaultSize
+          iconSize = size
+            ? typeof size === 'string'
+              ? defaultSizes[size]
+              : size
+            : defaultSize
         }
 
-        // conditional used for Icons with no color settings
+        // confitional used for Icons with no color settings
         // default these icons to use 'currentColor' ie, the text color
         const noColor = !color && !fill && !stroke
 
@@ -115,7 +131,11 @@ function IconBase({
           <IconComponent />
         )
 
-        return background ? <div className={__styles.container}>{Icon}</div> : Icon
+        return background ? (
+          <div className={__styles.container}>{Icon}</div>
+        ) : (
+          Icon
+        )
       }}
     </IconContext.Consumer>
   )
