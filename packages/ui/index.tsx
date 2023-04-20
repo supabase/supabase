@@ -26,7 +26,6 @@ export * from './src/components/Alert'
 export * from './src/components/Accordion'
 export * from './src/components/Collapsible'
 export * from './src/components/CodeBlock'
-// export * from './src/components/Breadcrumb'
 
 // NAV
 
@@ -39,14 +38,12 @@ export * from './src/components/SidePanel'
 export * from './src/components/Dropdown'
 export * from './src/components/ContextMenu'
 export * from './src/components/Popover'
-// export * from './src/components/Toast'
 
 // UTILITIES
 
 export * from './src/components/Space'
 export * from './src/components/Loading'
 export * from './src/components/Divider'
-// export * from './src/components/ThemeProvider'
 
 // DATA ENTRY
 
@@ -81,7 +78,6 @@ export * from './src/layout/banners'
 // export * from './src/components/Auth'
 
 // ICONS
-
 // export icons
 export * from './src/components/Icon/icons/IconActivity'
 export * from './src/components/Icon/icons/IconAirplay'
