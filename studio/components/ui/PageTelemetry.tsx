@@ -10,9 +10,8 @@ const PageTelemetry: FC = ({ children }) => {
   const { ui } = useStore()
 
   useEffect(() => {
-    function handleRouteChange() {
-      // We want to send dynamic route path
-      handlePageTelemetry(router.route)
+    function handleRouteChange(url: string) {
+      handlePageTelemetry(url)
     }
 
     // Listen for page changes after a navigation or when the query changes
@@ -24,14 +23,17 @@ const PageTelemetry: FC = ({ children }) => {
 
   useEffect(() => {
     // Send page telemetry on first page load
-    // We want to send dynamic route path
-    handlePageTelemetry(router.route)
-  }, [])
+    // Waiting for router ready before sending page_view
+    // if not the path will be dynamic route instead of the browser url
+    if (router.isReady) {
+      handlePageTelemetry(router.asPath)
+    }
+  }, [router.isReady])
 
   /**
    * send page_view event
    *
-   * @param route: dynamic route path. Don't use the browser url
+   * @param route: the browser url
    * */
   const handlePageTelemetry = async (route?: string) => {
     if (IS_PLATFORM) {
