@@ -168,7 +168,7 @@ Add the `Auth` component to your home page
 
 ```jsx title=pages/index.js
 import { Auth } from '@supabase/auth-ui-react'
-import { ThemeSupa } from "@supabase/auth-ui-shared";
+import { ThemeSupa } from '@supabase/auth-ui-shared'
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
 
 const Home = () => {
@@ -288,7 +288,7 @@ export default function Account({ session }) {
         <label htmlFor="website">Website</label>
         <input
           id="website"
-          type="website"
+          type="url"
           value={website || ''}
           onChange={(e) => setWebsite(e.target.value)}
         />
@@ -318,6 +318,8 @@ export default function Account({ session }) {
 <TabPanel id="ts" label="TypeScript">
 
 Let's create a new component for that called `Account.tsx` within a `components` folder.
+
+First, [generate type definitions from your database using the Supabase CLI](https://supabase.com/docs/guides/database/api/generating-types) to `../utils/database.types`.
 
 ```tsx title=components/Account.tsx
 import { useState, useEffect } from 'react'
@@ -416,7 +418,7 @@ export default function Account({ session }: { session: Session }) {
         <label htmlFor="website">Website</label>
         <input
           id="website"
-          type="website"
+          type="url"
           value={website || ''}
           onChange={(e) => setWebsite(e.target.value)}
         />
@@ -450,7 +452,8 @@ export default function Account({ session }: { session: Session }) {
 Now that we have all the components in place, let's update `pages/index.js`:
 
 ```jsx lines=3,14 title=pages/index.js
-import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
+import { Auth } from '@supabase/auth-ui-react'
+import { ThemeSupa } from '@supabase/auth-ui-shared'
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
 import Account from '../components/Account'
 

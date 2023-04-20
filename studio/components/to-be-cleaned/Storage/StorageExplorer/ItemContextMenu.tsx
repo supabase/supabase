@@ -45,7 +45,7 @@ const ItemContextMenu: FC<Props> = ({ id = '' }) => {
   }
 
   return (
-    <Menu id={id} animation="fade" className="!bg-scale-300 border border-scale-500">
+    <Menu id={id} animation="fade">
       {isPublic ? (
         <Item onClick={({ props }) => onHandleClick('copy', props.item)}>
           <IconClipboard size="tiny" />
@@ -81,27 +81,25 @@ const ItemContextMenu: FC<Props> = ({ id = '' }) => {
           </Item>
         </Submenu>
       )}
-      {canUpdateFiles && (
-        <>
-          <Item onClick={({ props }) => onHandleClick('rename', props.item)}>
-            <IconEdit size="tiny" />
-            <span className="ml-2 text-xs">Rename</span>
-          </Item>
-          <Item onClick={({ props }) => onHandleClick('move', props.item)}>
-            <IconMove size="tiny" />
-            <span className="ml-2 text-xs">Move</span>
-          </Item>
-          <Item onClick={({ props }) => onHandleClick('download', props.item)}>
-            <IconDownload size="tiny" />
-            <span className="ml-2 text-xs">Download</span>
-          </Item>
-          <Separator />
-          <Item onClick={({ props }) => setSelectedItemsToDelete([props.item])}>
-            <IconTrash2 size="tiny" />
-            <span className="ml-2 text-xs">Delete</span>
-          </Item>
-        </>
-      )}
+      {canUpdateFiles && [
+        <Item key="rename-file" onClick={({ props }) => onHandleClick('rename', props.item)}>
+          <IconEdit size="tiny" />
+          <span className="ml-2 text-xs">Rename</span>
+        </Item>,
+        <Item key="move-file" onClick={({ props }) => onHandleClick('move', props.item)}>
+          <IconMove size="tiny" />
+          <span className="ml-2 text-xs">Move</span>
+        </Item>,
+        <Item key="download-file" onClick={({ props }) => onHandleClick('download', props.item)}>
+          <IconDownload size="tiny" />
+          <span className="ml-2 text-xs">Download</span>
+        </Item>,
+        <Separator key="file-separator" />,
+        <Item key="delete-file" onClick={({ props }) => setSelectedItemsToDelete([props.item])}>
+          <IconTrash2 size="tiny" stroke="red" />
+          <span className="ml-2 text-xs">Delete</span>
+        </Item>,
+      ]}
     </Menu>
   )
 }

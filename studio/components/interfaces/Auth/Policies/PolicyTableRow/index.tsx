@@ -2,7 +2,6 @@ import { FC } from 'react'
 import type { PostgresTable, PostgresPolicy } from '@supabase/postgres-meta'
 import { observer } from 'mobx-react-lite'
 import { useStore } from 'hooks'
-
 import PolicyTableRowHeader from './PolicyTableRowHeader'
 import PolicyRow from './PolicyRow'
 import Panel from 'components/ui/Panel'
@@ -44,20 +43,22 @@ const PolicyTableRow: FC<Props> = ({
       {policies.length === 0 && (
         <div className="p-4 px-6 space-y-1">
           <p className="text-scale-1100 text-sm">No policies created yet</p>
-          {table.rls_enabled ? (
-            <p className="text-scale-1000 text-sm">
-              RLS is enabled - create a policy to allow access to this table.
-            </p>
-          ) : (
-            <Alert
-              withIcon
-              variant="warning"
-              className="!px-4 !py-3 !mt-3"
-              title="Warning: RLS is disabled"
-            >
-              Anonymous access is allowed to this table
-            </Alert>
-          )}
+          {!isLocked &&
+            (table.rls_enabled ? (
+              <p className="text-scale-1000 text-sm">
+                RLS is enabled - create a policy to allow access to this table.
+              </p>
+            ) : (
+              <Alert
+                withIcon
+                variant="warning"
+                className="!px-4 !py-3 !mt-3"
+                title="Warning: RLS is disabled. Your table is publicly readable and writable."
+              >
+                Anyone with the anon. key can modify or delete your data. You should turn on RLS and
+                create access policies to keep your data secure.
+              </Alert>
+            ))}
         </div>
       )}
 

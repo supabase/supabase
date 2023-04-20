@@ -19,9 +19,8 @@ This SQL query will show the current size of your Postgres database:
 
 ```sql
 select
-  sum(pg_database_size (pg_database.datname)) / (1024 * 1024) as db_size_mb
-from
-  pg_database;
+  sum(pg_database_size(pg_database.datname)) / (1024 * 1024) as db_size_mb
+from pg_database;
 ```
 
 This value is reported in the [database settings page](https://app.supabase.com/project/_/settings/database).
@@ -70,7 +69,7 @@ If you intend to import a lot of data into your database which requires multiple
 
 </Admonition>
 
-The maximum Disk Size for Pro Tier is 1024TB. If you need more than this, [contact us](https://app.supabase.com/support/new) to learn more about the Enterprise plan.
+The maximum Disk Size for Pro Tier is 64TB. If you need more than this, [contact us](https://app.supabase.com/support/new) to learn more about the Enterprise plan.
 
 ### Free Tier Behavior
 

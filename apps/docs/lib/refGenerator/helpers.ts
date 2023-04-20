@@ -267,6 +267,7 @@ export function gen_v3(spec: OpenAPIV3.Document, dest: string, { apiUrl }: { api
 }
 
 const slugify = (text: string) => {
+  if (!text) return ''
   return text
     .toString()
     .toLowerCase()
