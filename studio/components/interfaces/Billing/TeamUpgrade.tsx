@@ -52,7 +52,7 @@ const TeamUpgrade: FC<Props> = ({
   // Team tier is enabled when the flag is turned on OR the user is already on the team tier (manually assigned by us)
   const userIsOnTeamTier =
     currentSubscription?.tier?.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.TEAM
-  const teamTierEnabled = userIsOnTeamTier || useFlag('teamTier')
+  const teamTierEnabled = useFlag('teamTier') || userIsOnTeamTier
 
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const captchaRef = useRef<HCaptcha>(null)

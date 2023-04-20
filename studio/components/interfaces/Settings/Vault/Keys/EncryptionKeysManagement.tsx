@@ -108,6 +108,7 @@ const EncryptionKeysManagement: FC<Props> = ({}) => {
                 searchValue.length > 0
                   ? [
                       <Button
+                        key="clear"
                         size="tiny"
                         type="text"
                         icon={<IconX />}
