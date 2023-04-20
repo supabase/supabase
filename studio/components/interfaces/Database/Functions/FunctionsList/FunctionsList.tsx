@@ -24,10 +24,11 @@ const FunctionsList: FC<Props> = ({
 }) => {
   const { meta } = useStore()
   const [filterString, setFilterString] = useState<string>('')
-
+  const schemasToShow = ['public', 'auth']
   const functions = meta.functions.list(
-    (fn: PostgresFunction) => !meta.excludedSchemas.includes(fn.schema)
+    (fn: PostgresFunction) => schemasToShow.includes(fn.schema)
   )
+  console.log('functions: ', functions);
   const filteredFunctions = functions.filter((x: PostgresFunction) =>
     includes(x.name?.toLowerCase(), filterString.toLowerCase())
   )

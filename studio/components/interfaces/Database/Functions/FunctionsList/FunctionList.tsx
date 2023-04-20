@@ -24,11 +24,12 @@ const FunctionList: FC<Props> = ({
 }) => {
   const router = useRouter()
   const { ui, meta } = useStore()
-  const functions = meta.functions.list((fn: any) => !meta.excludedSchemas.includes(fn.schema))
+  const schemasToShow = ['public', 'auth']
+  const functions = meta.functions.list((fn: any) => schemasToShow.includes(fn.schema))
   const filteredFunctions = functions.filter((x: any) =>
     includes(x.name.toLowerCase(), filterString.toLowerCase())
   )
-  const _functions = filteredFunctions.filter((x) => x.schema == schema)
+  const _functions = filteredFunctions.filter((x: any) => x.schema == schema)
   const isApiDocumentAvailable = schema == 'public'
   const projectRef = ui.selectedProject?.ref
 
