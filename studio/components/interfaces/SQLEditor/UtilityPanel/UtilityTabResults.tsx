@@ -24,7 +24,9 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
     return (
       <div className="bg-table-header-light dark:bg-table-header-dark">
         <p className="m-0 border-0 px-6 py-4 font-mono">{result.error.message ?? result.error}</p>
-        {result.error.message?.includes('canceling statement due to statement timeout') && (
+        {(result.error.message ?? result.error)?.includes(
+          'canceling statement due to statement timeout'
+        ) && (
           <p className="m-0 border-0 px-6 py-4 font-mono">
             You can either{' '}
             <a
