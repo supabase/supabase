@@ -188,6 +188,7 @@ export function useAiChat({
           messages: messages
             .filter(({ status }) => status === MessageStatus.Complete)
             .map(({ role, content }) => ({ role, content }))
+            .slice(0, -1)
             .concat({ role: MessageRole.User, content: messageTemplate(query) }),
         }),
       })
