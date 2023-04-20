@@ -19,7 +19,6 @@ export interface IUiStore {
   setNotification: (notification: Notification) => string
   setProfile: (value: User) => void
   setPermissions: (permissions?: Permission[]) => void
-  setGaClientId: (clientId?: string) => void
 }
 export default class UiStore implements IUiStore {
   rootStore: IRootStore
@@ -116,14 +115,5 @@ export default class UiStore implements IUiStore {
 
   setPermissions(permissions?: any) {
     this.permissions = permissions
-  }
-
-  setGaClientId(clientId?: string) {
-    /**
-     * We need to access ga client_id from base.constructHeaders method
-     * in order to set custom header('ga_client_id).
-     * TODO: Do we have a better way than storing in local storage?
-     */
-    window.localStorage.setItem('ga_client_id', String(clientId))
   }
 }

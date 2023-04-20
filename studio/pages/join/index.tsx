@@ -181,7 +181,7 @@ const JoinOrganizationPage = () => {
       </div>
 
       <div
-        className={['border-t border-scale-400', isError ? 'bg-sand-100' : 'bg-transparent'].join(
+        className={['border-t border-scale-400', isError ? 'bg-scale-100' : 'bg-transparent'].join(
           ' '
         )}
       >

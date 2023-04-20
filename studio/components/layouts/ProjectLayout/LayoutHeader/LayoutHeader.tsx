@@ -97,7 +97,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
                   <div className="ml-2">
                     <Link href={`/project/${projectRef}/settings/billing/usage`}>
                       <a>
-                        <Badge color="red">Project has exceeded usage limits </Badge>
+                        <Badge color="red">Exceeding usage limits</Badge>
                       </a>
                     </Link>
                   </div>

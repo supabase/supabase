@@ -10,7 +10,14 @@ import {
   STORAGE_ROW_TYPES,
 } from '../Storage.constants'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
-import { IconFolderPlus } from 'ui'
+import {
+  IconEye,
+  IconChevronRight,
+  IconFolderPlus,
+  IconClipboard,
+  IconChevronsUp,
+  IconChevronsDown,
+} from 'ui'
 
 interface Props {
   id: string
@@ -57,21 +64,24 @@ const ColumnContextMenu: FC<Props> = ({ id = '' }) => {
   }
 
   return (
-    <Menu id={id} animation="fade" className="!bg-scale-300 border border-scale-500">
+    <Menu id={id} animation="fade">
       <Item onClick={({ props }) => onSelectCreateFolder(props.index)}>
         <IconFolderPlus size="tiny" />
         <span className="ml-2 text-xs">New folder</span>
       </Item>
       <Separator />
       <Item onClick={({ props }) => onSelectAllItemsInColumn(props.index)}>
+        <IconClipboard size="tiny" />
         <span className="ml-2 text-xs">Select all items</span>
       </Item>
       <Submenu
         label={
-          <div>
-            <span className="ml-2 text-xs">View</span>
+          <div className="flex items-center space-x-2">
+            <IconEye size="tiny" />
+            <span className="text-xs">View</span>
           </div>
         }
+        arrow={<IconChevronRight size="tiny" />}
       >
         <Item onClick={() => setView(STORAGE_VIEWS.COLUMNS)}>
           <span className="ml-2 text-xs">As columns</span>
@@ -82,10 +92,12 @@ const ColumnContextMenu: FC<Props> = ({ id = '' }) => {
       </Submenu>
       <Submenu
         label={
-          <div>
+          <div className="flex items-center space-x-2">
+            <IconChevronsDown size="tiny" />
             <span className="ml-2 text-xs">Sort by</span>
           </div>
         }
+        arrow={<IconChevronRight size="tiny" />}
       >
         <Item onClick={() => setSortBy(STORAGE_SORT_BY.NAME)}>
           <span className="ml-2 text-xs">Name</span>
@@ -102,10 +114,12 @@ const ColumnContextMenu: FC<Props> = ({ id = '' }) => {
       </Submenu>
       <Submenu
         label={
-          <div>
+          <div className="flex items-center space-x-2">
+            <IconChevronsUp size="tiny" />
             <span className="ml-2 text-xs">Sort by order</span>
           </div>
         }
+        arrow={<IconChevronRight size="tiny" />}
       >
         <Item onClick={() => setSortByOrder(STORAGE_SORT_BY_ORDER.ASC)}>
           <span className="ml-2 text-xs">Ascending</span>
