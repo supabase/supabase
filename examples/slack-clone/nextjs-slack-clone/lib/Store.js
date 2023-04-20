@@ -62,9 +62,9 @@ export const useStore = (props) => {
       .subscribe()
     // Cleanup on unmount
     return () => {
-      supabase.removeChannel(supabase.channel('public:messages'))
-      supabase.removeChannel(supabase.channel('public:users'))
-      supabase.removeChannel(supabase.channel('public:channels'))
+      supabase.removeChannel(supabase.channel(messageListener))
+      supabase.removeChannel(supabase.channel(userListener))
+      supabase.removeChannel(supabase.channel(channelListener))
     }
   }, [])
 
