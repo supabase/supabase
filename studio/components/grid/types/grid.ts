@@ -1,4 +1,5 @@
-import React from 'react'
+import { ForeignRowSelectorProps } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/ForeignRowSelector/ForeignRowSelector'
+import React, { ReactNode } from 'react'
 import { Dictionary } from './base'
 import { SupaRow, SupaTable } from './table'
 
@@ -15,7 +16,7 @@ export interface SupabaseGridProps {
   /**
    * database table swagger or table name
    */
-  table: SupaTable | string
+  table: SupaTable
   /**
    *
    * run sql query
@@ -74,6 +75,32 @@ export interface SupabaseGridProps {
    */
   refreshDocs: () => void
   onExpandJSONEditor: (column: string, row: SupaRow) => void
+  updateTableRow: (previousRow: any, updatedData: any) => void
+  onEditForeignKeyColumnValue: (args: {
+    foreignKey: NonNullable<ForeignRowSelectorProps['foreignKey']>
+    row: any
+    column: any
+  }) => void
+
+  /**
+   * Show custom component passed as children instead of the grid editor
+   */
+  showCustomChildren?: boolean
+
+  /**
+   * Custom header left most actions component
+   */
+  customHeader?: ReactNode
+
+  /**
+   * Custom component passed as children
+   */
+  children?: ReactNode
+
+  /**
+   * show import csv data button if available
+   */
+  onImportData?: () => void
 }
 
 export interface SupabaseGridRef {

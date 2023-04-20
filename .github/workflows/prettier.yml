@@ -51,3 +51,15 @@ jobs:
         #   reporter: github-pr-review
         #   level: warning
         #   command: npx prettier -c 'i18n/**/*.{js,jsx,ts,tsx,css,md,json}'
+
+  format-sql:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v3
+      - name: Install plugin
+        run: npm ci
+      - name: Run prettier
+        run: |-
+          # Check mdx files which contain sql code blocks
+          grep -lr '```sql' apps/docs/pages/**/*.mdx | xargs npx prettier -c

@@ -413,3 +413,28 @@
     }
   }
 }
+
+.form-field-markdown {
+  a {
+    @apply text-brand-900 transition opacity-75 hover:opacity-100 underline;
+  }
+}
+
+.view-icon {
+  rect {
+    @apply fill-blue-500 stroke-blue-500;
+  }
+  path,
+  circle {
+    @apply stroke-blue-900 fill-blue-500;
+  }
+}
+
+.table-icon {
+  rect {
+    @apply fill-green-1000 stroke-green-500;
+  }
+  line {
+    @apply stroke-green-500;
+  }
+}

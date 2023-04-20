@@ -105,7 +105,7 @@ export default function Account({ session }: { session: Session }) {
         <label htmlFor="website">Website</label>
         <input
           id="website"
-          type="website"
+          type="url"
           value={website || ''}
           onChange={(e) => setWebsite(e.target.value)}
         />

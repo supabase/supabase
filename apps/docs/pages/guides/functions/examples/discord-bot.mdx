@@ -2,7 +2,7 @@ import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
   id: 'examples-discord-bot',
-  title: 'Discord Bot',
+  title: 'Building a Discord Bot',
   description: 'Building a Slash Command Discord Bot with Edge Functions.',
   video: 'https://www.youtube.com/v/J24Bvo_m7DM',
 }
@@ -50,7 +50,7 @@ This will register a Slash Command named `hello` that accepts a parameter named 
 import { json, serve, validateRequest } from 'sift'
 // TweetNaCl is a cryptography library that we use to verify requests
 // from Discord.
-import nacl from 'nacl'
+import nacl from 'tweetnacl'
 
 enum DiscordCommandType {
   Ping = 1,

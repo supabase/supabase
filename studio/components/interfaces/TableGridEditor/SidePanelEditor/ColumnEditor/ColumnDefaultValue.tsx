@@ -52,10 +52,10 @@ const ColumnDefaultValue: FC<Props> = ({
     <InputWithSuggestions
       label="Default Value"
       layout="vertical"
-      description="Can either be a literal or an expression (e.g uuid_generate_v4())"
+      description="Can either be a literal or an expression. When using an expression wrap your expression in brackets, e.g. (uuid_generate_v4())"
       placeholder={
         typeof columnFields.defaultValue === 'string' && columnFields.defaultValue.length === 0
-          ? 'Empty string'
+          ? 'EMPTY'
           : 'NULL'
       }
       value={columnFields?.defaultValue ?? ''}
