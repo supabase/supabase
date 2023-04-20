@@ -11,7 +11,7 @@ const PageTelemetry: FC = ({ children }) => {
 
   useEffect(() => {
     function handleRouteChange() {
-      // We want to send dynamic route path instead of browser url
+      // We want to send dynamic route path
       handlePageTelemetry(router.route)
     }
 
@@ -24,14 +24,14 @@ const PageTelemetry: FC = ({ children }) => {
 
   useEffect(() => {
     // Send page telemetry on first page load
-    // We want to send dynamic route path instead of browser url
+    // We want to send dynamic route path
     handlePageTelemetry(router.route)
   }, [])
 
   /**
    * send page_view event
    *
-   * @param route: dynamic route path instead of browser url
+   * @param route: dynamic route path. Don't use the browser url
    * */
   const handlePageTelemetry = async (route?: string) => {
     if (IS_PLATFORM) {
