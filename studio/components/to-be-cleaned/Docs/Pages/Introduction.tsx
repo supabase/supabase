@@ -51,8 +51,9 @@ export default function Introduction({ autoApiService, selectedLang }: Props) {
           <div className="not-prose mb-6">
             <p>Read the reference documentation:</p>
             <div className="flex items-center gap-4 mt-2">
-              {libs.map((lib) => (
+              {libs.map((lib, i) => (
                 <a
+                  key={i}
                   href={lib.url}
                   target="_blank"
                   rel="noreferrer"

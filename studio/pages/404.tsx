@@ -4,7 +4,6 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { Button } from 'ui'
 
-import { useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import { useTheme } from 'common'
 
@@ -24,18 +23,20 @@ const Error404: NextPage = ({}) => {
         <nav className="relative flex items-center justify-between sm:h-10">
           <div className="flex flex-shrink-0 flex-grow items-center lg:flex-grow-0">
             <div className="flex w-full items-center justify-between md:w-auto">
-              <a href="/projects">
-                <Image
-                  src={
-                    isDarkMode
-                      ? `${BASE_PATH}/img/supabase-dark.svg`
-                      : `${BASE_PATH}/img/supabase-light.svg`
-                  }
-                  alt="supabase"
-                  height={24}
-                  width={120}
-                />
-              </a>
+              <Link href="/projects">
+                <a>
+                  <Image
+                    src={
+                      isDarkMode
+                        ? `${BASE_PATH}/img/supabase-dark.svg`
+                        : `${BASE_PATH}/img/supabase-light.svg`
+                    }
+                    alt="supabase"
+                    height={24}
+                    width={120}
+                  />
+                </a>
+              </Link>
             </div>
           </div>
         </nav>

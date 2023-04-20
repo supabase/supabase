@@ -213,6 +213,9 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
           isFreeProject &&
           ['Performance', 'Problem'].includes(values.category)
 
+        // [Alaister] although this "technically" is breaking the rules of React hooks
+        // it won't error because the hooks are always rendered in the same order
+        // eslint-disable-next-line react-hooks/rules-of-hooks
         useEffect(() => {
           if (values.projectRef === 'no-project') {
             const updatedValues = { ...values, organizationSlug: sortedOrganizations[0]?.slug }
