@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 
-import _announcement from '~/data/Announcement.json'
+import _announcement from './data/Announcement.json'
 import { IconX } from 'ui'
 import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'

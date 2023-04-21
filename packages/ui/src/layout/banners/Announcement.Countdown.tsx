@@ -1,8 +1,8 @@
 import React from 'react'
 import Link from 'next/link'
 import Countdown from 'react-countdown'
-import _announcement from '~/data/Announcement.json'
-import { AnnouncementProps } from '../../Nav/Announcement'
+import _announcement from './data/Announcement.json'
+import { AnnouncementProps } from './Announcement'
 import { useRouter } from 'next/router'
 
 interface CountdownStepProps {
