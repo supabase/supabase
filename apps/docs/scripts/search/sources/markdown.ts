@@ -110,7 +110,8 @@ export function processMdxForSearch(content: string): ProcessedMdx {
   })
 
   const meta = extractMetaExport(mdxTree)
-  const serializableMeta: Json = JSON.parse(JSON.stringify(meta))
+
+  const serializableMeta: Json = meta && JSON.parse(JSON.stringify(meta))
 
   // Remove all MDX elements from markdown
   const mdTree = filter(
