@@ -17,21 +17,35 @@ const FileExplorerRowEditing = ({ item, view, columnIndex }: FileExplorerRowEdit
   const inputRef = useRef<any>(null)
   const [itemName, setItemName] = useState(item.name)
 
-  const onSetItemName = async (event: any) => {
-    event.preventDefault()
-    event.stopPropagation()
+  const onSaveItemName = async (name: string, event?: any) => {
+    if (event) {
+      event.preventDefault()
+      event.stopPropagation()
+    }
+
     if (item.type === STORAGE_ROW_TYPES.FILE) {
-      await renameFile(item, itemName, columnIndex)
+      await renameFile(item, name, columnIndex)
     } else if (has(item, 'id')) {
       const itemWithColumnIndex = { ...item, columnIndex }
-      renameFolder(itemWithColumnIndex, itemName, columnIndex)
+      renameFolder(itemWithColumnIndex, name, columnIndex)
     } else {
-      addNewFolder(itemName, columnIndex)
+      addNewFolder(name, columnIndex)
     }
   }
 
   useEffect(() => {
     if (inputRef.current) inputRef.current.select()
+
+    // [Joshen] Esc should revert changes
+    const handleEsc = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        if (item?.id !== undefined) onSaveItemName(item.name)
+        else addNewFolder('', columnIndex)
+      }
+    }
+
+    window.addEventListener('keydown', handleEsc)
+    return () => window.removeEventListener('keydown', handleEsc)
   }, [])
 
   return (
@@ -45,7 +59,7 @@ const FileExplorerRowEditing = ({ item, view, columnIndex }: FileExplorerRowEdit
             mimeType={item.metadata?.mimetype}
           />
         </div>
-        <form className="h-9" onSubmit={onSetItemName}>
+        <form className="h-9" onSubmit={(event) => onSaveItemName(itemName, event)}>
           <input
             autoFocus
             ref={inputRef}
@@ -53,9 +67,13 @@ const FileExplorerRowEditing = ({ item, view, columnIndex }: FileExplorerRowEdit
             type="text"
             value={itemName}
             onChange={(event) => setItemName(event.target.value)}
-            onBlur={onSetItemName}
+            onBlur={(event) => onSaveItemName(itemName, event)}
           />
-          <button className="hidden" type="submit" onClick={onSetItemName} />
+          <button
+            className="hidden"
+            type="submit"
+            onClick={(event) => onSaveItemName(itemName, event)}
+          />
         </form>
       </div>
     </div>

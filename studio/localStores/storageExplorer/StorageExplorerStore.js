@@ -1125,7 +1125,7 @@ class StorageExplorerStore {
 
   renameFile = async (file, newName, columnIndex) => {
     const originalName = file.name
-    if (originalName === newName) {
+    if (originalName === newName || newName.length === 0) {
       this.updateRowStatus(originalName, STORAGE_ROW_STATUS.READY, columnIndex)
     } else {
       this.updateRowStatus(originalName, STORAGE_ROW_STATUS.LOADING, columnIndex, newName)
@@ -1576,8 +1576,6 @@ class StorageExplorerStore {
   }
 
   addTempRow = (type, name, status, columnIndex, metadata = {}, isPrepend = false) => {
-    console.log('addTempRow', { type, name, status })
-
     const updatedColumns = this.columns.map((column, idx) => {
       if (idx === columnIndex) {
         const tempRow = { type, name, status, metadata }
