@@ -6,7 +6,6 @@ on:
       - master
     paths:
       - 'supabase/functions/og-images/**'
-  workflow_dispatch:
 
 jobs:
   deploy:
