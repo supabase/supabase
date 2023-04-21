@@ -29,10 +29,7 @@ const HookList: FC<Props> = ({
   const { ui } = useStore()
   const { ref } = useParams()
   const { project } = useProjectContext()
-  const { data: hooks } = useDatabaseHooks({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
+  const { data: hooks } = useDatabaseHooks({ projectRef: project?.ref })
 
   const restUrl = ui.selectedProject?.restUrl
   const restUrlTld = new URL(restUrl as string).hostname.split('.').pop()
