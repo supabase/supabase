@@ -81,6 +81,12 @@ const CreateRolePanel: FC<Props> = ({ visible, onClose }) => {
           </Button>
         </div>
       }
+      onInteractOutside={(event) => {
+        const isToast = (event.target as Element)?.closest('#toast')
+        if (isToast) {
+          event.preventDefault()
+        }
+      }}
     >
       <Form
         validateOnBlur
