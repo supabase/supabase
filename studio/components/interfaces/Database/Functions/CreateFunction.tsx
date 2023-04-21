@@ -363,6 +363,12 @@ const CreateFunction: FC<CreateFunctionProps> = ({ func, visible, setVisible }) 
         className="hooks-sidepanel mr-0 transform transition-all duration-300 ease-in-out"
         loading={_localState.loading}
         onConfirm={handleSubmit}
+        onInteractOutside={(event) => {
+          const isToast = (event.target as Element)?.closest('#toast')
+          if (isToast) {
+            event.preventDefault()
+          }
+        }}
       >
         <CreateFunctionContext.Provider value={_localState}>
           <div className="mt-4 space-y-10">
