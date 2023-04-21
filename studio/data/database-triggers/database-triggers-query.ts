@@ -15,10 +15,10 @@ export async function getDatabaseTriggers(
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('projectRef is required')
-  if (!connectionString) throw new Error('connectionString is required')
+  // if (!connectionString) throw new Error('connectionString is required')
 
   let headers = new Headers()
-  headers.set('x-connection-encrypted', connectionString)
+  // headers.set('x-connection-encrypted', connectionString)
 
   console.log('getDatabaseTriggers', {
     API_URL,
@@ -38,7 +38,7 @@ export type DatabaseTriggersData = Awaited<ReturnType<typeof getDatabaseTriggers
 export type DatabaseTriggersError = unknown
 
 export const useDatabaseHooks = <TData = DatabaseTriggersData>(
-  { projectRef, connectionString }: DatabaseTriggersVariables,
+  { projectRef }: DatabaseTriggersVariables,
   {
     enabled = true,
     ...options
@@ -46,7 +46,7 @@ export const useDatabaseHooks = <TData = DatabaseTriggersData>(
 ) =>
   useQuery<DatabaseTriggersData, DatabaseTriggersError, TData>(
     databaseTriggerKeys.list(projectRef),
-    ({ signal }) => getDatabaseTriggers({ projectRef, connectionString }, signal),
+    ({ signal }) => getDatabaseTriggers({ projectRef }, signal),
     {
       // @ts-ignore
       select(data) {
@@ -54,14 +54,13 @@ export const useDatabaseHooks = <TData = DatabaseTriggersData>(
           (trigger) => trigger.function_schema === 'supabase_functions' && trigger.schema !== 'net'
         )
       },
-      enabled:
-        enabled && typeof projectRef !== 'undefined' && typeof connectionString !== 'undefined',
+      enabled: enabled && typeof projectRef !== 'undefined',
       ...options,
     }
   )
 
 export const useDatabaseTriggers = <TData = DatabaseTriggersData>(
-  { projectRef, connectionString }: DatabaseTriggersVariables,
+  { projectRef }: DatabaseTriggersVariables,
   {
     enabled = true,
     ...options
@@ -69,10 +68,9 @@ export const useDatabaseTriggers = <TData = DatabaseTriggersData>(
 ) =>
   useQuery<DatabaseTriggersData, DatabaseTriggersError, TData>(
     databaseTriggerKeys.list(projectRef),
-    ({ signal }) => getDatabaseTriggers({ projectRef, connectionString }, signal),
+    ({ signal }) => getDatabaseTriggers({ projectRef }, signal),
     {
-      enabled:
-        enabled && typeof projectRef !== 'undefined' && typeof connectionString !== 'undefined',
+      enabled: enabled && typeof projectRef !== 'undefined',
       ...options,
     }
   )
