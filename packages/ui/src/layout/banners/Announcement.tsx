@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import _announcement from './data/Announcement.json'
 import { IconX } from 'ui'
@@ -52,7 +52,7 @@ const Announcement = ({
   }
 
   function handleLink() {
-    router.push(announcement.link)
+    window.location.assign(announcement.link)
   }
 
   // Always show if on LW section
@@ -60,7 +60,7 @@ const Announcement = ({
     return null
   } else {
     return (
-      <div onClick={handleLink} className={['relative w-full cursor-pointer', className].join(' ')}>
+      <div onClick={handleLink} className={['relative w-full cursor-pointer', className].join(' ')} role="link" tabIndex={0}>
         {!isLaunchWeekSection && (
           <div
             className="absolute right-4 flex h-full items-center opacity-50 transition-opacity hover:opacity-100"
