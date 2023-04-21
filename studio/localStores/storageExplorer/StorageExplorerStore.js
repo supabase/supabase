@@ -927,6 +927,7 @@ class StorageExplorerStore {
     })
 
     const files = await this.getAllItemsAlongFolder(folder)
+
     this.ui.setNotification({
       id: toastId,
       category: 'loading',
@@ -1471,8 +1472,11 @@ class StorageExplorerStore {
       formattedPathToFolder = `${prefix}/${name}`
     }
 
+    // [Joshen] limit is set to 10k to optimize reduction of requests, we've done some experiments
+    // that prove that the time to fetch all files in a folder reduces as the batch size increases
+    // 10k however, is the hard limit at the API level.
     const options = {
-      limit: LIMIT,
+      limit: 10000,
       offset: OFFSET,
       sortBy: { column: this.sortBy, order: this.sortByOrder },
     }
