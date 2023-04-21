@@ -6,7 +6,6 @@ import { databaseTriggerKeys } from './keys'
 
 export type DatabaseTriggerCreateVariables = {
   projectRef: string
-  connectionString?: string
   payload: any
 }
 
@@ -14,15 +13,11 @@ type CreateDatabaseTriggerResponse = PostgresTrigger & { error?: any }
 
 export async function createDatabaseTrigger({
   projectRef,
-  connectionString,
   payload,
 }: DatabaseTriggerCreateVariables) {
   if (!projectRef) throw new Error('projectRef is required')
-  if (!connectionString) throw new Error('connectionString is required')
 
   let headers = new Headers()
-  headers.set('x-connection-encrypted', connectionString)
-
   const response = (await post(`${API_URL}/pg-meta/${projectRef}/triggers`, payload, {
     headers: Object.fromEntries(headers),
   })) as CreateDatabaseTriggerResponse

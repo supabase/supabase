@@ -30,14 +30,7 @@ const HooksList = ({
   deleteHook = () => {},
 }: HooksListProps) => {
   const { project } = useProjectContext()
-  const {
-    data: hooks,
-    isLoading,
-    isError,
-  } = useDatabaseHooks({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
+  const { data: hooks, isLoading, isError } = useDatabaseHooks({ projectRef: project?.ref })
 
   console.log({ hooks, isLoading, isError })
 

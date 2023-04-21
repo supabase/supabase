@@ -7,24 +7,15 @@ import { databaseTriggerKeys } from './keys'
 
 export type DatabaseTriggersVariables = {
   projectRef?: string
-  connectionString?: string
 }
 
 export async function getDatabaseTriggers(
-  { projectRef, connectionString }: DatabaseTriggersVariables,
+  { projectRef }: DatabaseTriggersVariables,
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('projectRef is required')
-  // if (!connectionString) throw new Error('connectionString is required')
 
   let headers = new Headers()
-  // headers.set('x-connection-encrypted', connectionString)
-
-  console.log('getDatabaseTriggers', {
-    API_URL,
-    endpoint: `${API_URL}/pg-meta/${projectRef}/triggers`,
-  })
-
   const response = (await get(`${API_URL}/pg-meta/${projectRef}/triggers`, {
     headers: Object.fromEntries(headers),
     signal,
