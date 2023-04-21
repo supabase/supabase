@@ -193,11 +193,7 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
     if (selectedHook === undefined) {
       try {
         setIsSubmitting(true)
-        await createDatabaseTrigger({
-          projectRef: project?.ref,
-          connectionString: project?.connectionString,
-          payload,
-        })
+        await createDatabaseTrigger({ projectRef: project?.ref, payload })
         ui.setNotification({
           category: 'success',
           message: `Successfully created new webhook "${values.name}"`,
