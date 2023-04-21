@@ -18,10 +18,9 @@ export async function createDatabaseTrigger({
   payload,
 }: DatabaseTriggerCreateVariables) {
   if (!projectRef) throw new Error('projectRef is required')
-  if (!connectionString) throw new Error('connectionString is required')
 
   let headers = new Headers()
-  headers.set('x-connection-encrypted', connectionString)
+  if (connectionString) headers.set('x-connection-encrypted', connectionString)
 
   const response = (await post(`${API_URL}/pg-meta/${projectRef}/triggers`, payload, {
     headers: Object.fromEntries(headers),
