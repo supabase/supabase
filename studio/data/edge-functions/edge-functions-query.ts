@@ -24,6 +24,10 @@ export async function getEdgeFunctions(
 ) {
   if (!projectRef) throw new Error('projectRef is required')
 
+  console.log('getEdgeFunctions', {
+    API_ADMIN_URL,
+    endpoint: `${API_ADMIN_URL}/projects/${projectRef}/functions`,
+  })
   const response = await get(`${API_ADMIN_URL}/projects/${projectRef}/functions`, {
     signal,
   })
