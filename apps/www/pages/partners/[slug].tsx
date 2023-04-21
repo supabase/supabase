@@ -1,11 +1,11 @@
-import {GetStaticPaths, GetStaticProps} from 'next'
+import { GetStaticPaths, GetStaticProps } from 'next'
 import 'swiper/swiper.min.css'
 import supabase from '~/lib/supabase'
-import {Partner} from '~/types/partners'
+import { Partner } from '~/types/partners'
 import Error404 from '../404'
 
 function PartnerPage() {
-  // Should be redirected to ./experts/:slug or ./integrations/:slug 
+  // Should be redirected to ./experts/:slug or ./integrations/:slug
   return <Error404 />
 }
 
@@ -37,7 +37,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     .eq('approved', true)
     .eq('slug', params!.slug as string)
     .single()
-    
+
   if (!partner || process.env.npm_lifecycle_event === 'build') {
     return {
       notFound: true,
@@ -45,11 +45,11 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   }
 
   let redirectUrl: string
-  switch(partner.type) {
-    case "technology":
+  switch (partner.type) {
+    case 'technology':
       redirectUrl = `/partners/integrations/${partner.slug}`
       break
-    case "expert":
+    case 'expert':
       redirectUrl = `/partners/experts/${partner.slug}`
       break
   }
@@ -57,8 +57,8 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   return {
     redirect: {
       permanent: false,
-      destination: redirectUrl
-    }
+      destination: redirectUrl,
+    },
   }
 }
 
