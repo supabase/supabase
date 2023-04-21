@@ -5,14 +5,31 @@ import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { FC, useEffect } from 'react'
 
+function sanitizePageViewRoute(_route?: string) {
+  // remove all fragments
+  const noFragments = _route?.split('#')[0]
+  // remove sensitive params
+  const paramsSplits = noFragments?.split('?')
+  const hasParams = paramsSplits && paramsSplits?.length > 1
+
+  if (hasParams) {
+    const urlParams = new URLSearchParams(paramsSplits[1])
+    const sensitiveKeys = [...urlParams.keys()].filter((x) => x.includes('token'))
+    const sensitiveParams = ['code', ...sensitiveKeys]
+    sensitiveParams.forEach((name) => urlParams.delete(name))
+    return `${paramsSplits[0]}?${urlParams?.toString()}`
+  }
+
+  return noFragments
+}
+
 const PageTelemetry: FC = ({ children }) => {
   const router = useRouter()
   const { ui } = useStore()
 
   useEffect(() => {
-    function handleRouteChange() {
-      // We want to send dynamic route path
-      handlePageTelemetry(router.route)
+    function handleRouteChange(url: string) {
+      handlePageTelemetry(url)
     }
 
     // Listen for page changes after a navigation or when the query changes
@@ -24,17 +41,23 @@ const PageTelemetry: FC = ({ children }) => {
 
   useEffect(() => {
     // Send page telemetry on first page load
-    // We want to send dynamic route path
-    handlePageTelemetry(router.route)
-  }, [])
+    // Waiting for router ready before sending page_view
+    // if not the path will be dynamic route instead of the browser url
+    if (router.isReady) {
+      handlePageTelemetry(router.asPath)
+    }
+  }, [router.isReady])
 
   /**
    * send page_view event
    *
-   * @param route: dynamic route path. Don't use the browser url
+   * @param route: the browser url
    * */
-  const handlePageTelemetry = async (route?: string) => {
+  const handlePageTelemetry = async (_route?: string) => {
     if (IS_PLATFORM) {
+      // filter out sensitive query params
+      const route = sanitizePageViewRoute(_route)
+
       /**
        * Get referrer from browser
        */
