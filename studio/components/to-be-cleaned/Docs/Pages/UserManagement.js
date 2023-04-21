@@ -167,7 +167,11 @@ export default function UserManagement({ autoApiService, selectedLang, showApiKe
           </p>
           <p>
             View all the available{' '}
-            <a href="https://supabase.com/docs/guides/auth#providers" target="_blank">
+            <a
+              href="https://supabase.com/docs/guides/auth#providers"
+              target="_blank"
+              rel="noreferrer"
+            >
               Third Party OAuth providers
             </a>
           </p>
@@ -177,25 +181,30 @@ export default function UserManagement({ autoApiService, selectedLang, showApiKe
           </p>
           <p>
             Generate your Client ID and secret from:{` `}
-            <a href="https://console.developers.google.com/apis/credentials" target="_blank">
+            <a
+              href="https://console.developers.google.com/apis/credentials"
+              target="_blank"
+              rel="noreferrer"
+            >
               Google
             </a>
             ,{` `}
-            <a href="https://github.com/settings/applications/new" target="_blank">
+            <a href="https://github.com/settings/applications/new" target="_blank" rel="noreferrer">
               GitHub
             </a>
             ,{` `}
-            <a href="https://gitlab.com/oauth/applications" target="_blank">
+            <a href="https://gitlab.com/oauth/applications" target="_blank" rel="noreferrer">
               GitLab
             </a>
             ,{` `}
-            <a href="https://developers.facebook.com/apps/" target="_blank">
+            <a href="https://developers.facebook.com/apps/" target="_blank" rel="noreferrer">
               Facebook
             </a>
             ,{` `}
             <a
               href="https://support.atlassian.com/bitbucket-cloud/docs/use-oauth-on-bitbucket-cloud/"
               target="_blank"
+              rel="noreferrer"
             >
               Bitbucket
             </a>

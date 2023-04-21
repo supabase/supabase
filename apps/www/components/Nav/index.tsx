@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
-import { Button, Badge, IconStar, IconChevronDown } from 'ui'
+import { Button, Badge, Announcement, AnnouncementCountdown, IconStar, IconChevronDown } from 'ui'
 import FlyOut from '~/components/UI/FlyOut'
 import Transition from 'lib/Transition'
 
@@ -10,8 +10,7 @@ import SolutionsData from 'data/Solutions.json'
 
 import Solutions from '~/components/Nav/Product'
 import Developers from '~/components/Nav/Developers'
-import Announcement from '~/components/Nav/Announcement'
-import CountdownBanner from '~/components/LaunchWeek/Banners/CountdownBanner'
+
 import ScrollProgress from '~/components/ScrollProgress'
 
 import { useIsLoggedIn, useTheme } from 'common'
@@ -19,6 +18,7 @@ import TextLink from '../TextLink'
 import Image from 'next/image'
 import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
+
 import * as supabaseLogoWordmarkWhite from 'common/assets/images/supabase-logo-wordmark--white.png'
 
 const Nav = () => {
@@ -198,7 +198,7 @@ const Nav = () => {
   return (
     <>
       <Announcement>
-        <CountdownBanner />
+        <AnnouncementCountdown />
       </Announcement>
       <div className="sticky top-0 z-40 transform" style={{ transform: 'translate3d(0,0,999px)' }}>
         <div
