@@ -20,6 +20,11 @@ export async function getDatabaseTriggers(
   let headers = new Headers()
   headers.set('x-connection-encrypted', connectionString)
 
+  console.log('getDatabaseTriggers', {
+    API_URL,
+    endpoint: `${API_URL}/pg-meta/${projectRef}/triggers`,
+  })
+
   const response = (await get(`${API_URL}/pg-meta/${projectRef}/triggers`, {
     headers: Object.fromEntries(headers),
     signal,
