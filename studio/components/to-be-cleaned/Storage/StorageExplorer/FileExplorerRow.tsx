@@ -1,5 +1,4 @@
-import { FC, useState, useRef, useEffect } from 'react'
-import { find, has, isEmpty, isEqual } from 'lodash'
+import { find, isEmpty, isEqual } from 'lodash'
 import {
   Checkbox,
   Dropdown,
@@ -33,8 +32,9 @@ import {
 import { formatBytes } from 'lib/helpers'
 import { BASE_PATH } from 'lib/constants'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
+import FileExplorerRowEditing from './FileExplorerRowEditing'
 
-const RowIcon = ({ view, status, fileType, mimeType }: any) => {
+export const RowIcon = ({ view, status, fileType, mimeType }: any) => {
   if (view === STORAGE_VIEWS.LIST && status === STORAGE_ROW_STATUS.LOADING) {
     return <IconLoader size={16} strokeWidth={2} className="animate-spin" />
   }
@@ -71,7 +71,7 @@ const RowIcon = ({ view, status, fileType, mimeType }: any) => {
   return <IconFile size={16} strokeWidth={2} />
 }
 
-interface Props {
+interface FileExplorerRowProps {
   index: number
   item: any
   view: string
@@ -81,7 +81,7 @@ interface Props {
   selectedFilePreview: any
 }
 
-const FileExplorerRow: FC<Props> = ({
+const FileExplorerRow = ({
   index: itemIndex,
   item = {},
   view = STORAGE_VIEWS.COLUMNS,
@@ -89,7 +89,7 @@ const FileExplorerRow: FC<Props> = ({
   selectedItems = [],
   openedFolders = [],
   selectedFilePreview = {},
-}) => {
+}: FileExplorerRowProps) => {
   const storageExplorerStore = useStorageStore()
   const {
     popColumnAtIndex,
@@ -98,9 +98,6 @@ const FileExplorerRow: FC<Props> = ({
     setFilePreview,
     closeFilePreview,
     clearSelectedItems,
-    addNewFolder,
-    renameFolder,
-    renameFile,
     selectedBucket,
     setSelectedItems,
     setSelectedItemsToDelete,
@@ -153,54 +150,6 @@ const FileExplorerRow: FC<Props> = ({
       setSelectedItems([...selectedItems, itemWithColumnIndex])
     }
     closeFilePreview()
-  }
-
-  const inputRef = useRef<any>(null)
-  const [itemName, setItemName] = useState(item.name)
-
-  useEffect(() => {
-    if (inputRef.current) inputRef.current.select()
-  }, [])
-
-  if (item.status === STORAGE_ROW_STATUS.EDITING) {
-    const onSetItemName = async (event: any) => {
-      event.preventDefault()
-      event.stopPropagation()
-      if (item.type === STORAGE_ROW_TYPES.FILE) {
-        await renameFile(item, itemName, columnIndex)
-      } else if (has(item, 'id')) {
-        renameFolder(itemWithColumnIndex, itemName, columnIndex)
-      } else {
-        addNewFolder(itemName, columnIndex)
-      }
-    }
-
-    return (
-      <div className="storage-row flex items-center justify-between rounded bg-gray-500">
-        <div className="flex h-full flex-grow items-center px-2.5">
-          <div className="">
-            <RowIcon
-              view={view}
-              status={item.status}
-              fileType={item.type}
-              mimeType={item.metadata?.mimetype}
-            />
-          </div>
-          <form className="h-9" onSubmit={onSetItemName}>
-            <input
-              autoFocus
-              ref={inputRef}
-              className="storage-row-input ml-3 h-full bg-inherit p-0 px-1 text-sm"
-              type="text"
-              value={itemName}
-              onChange={(event) => setItemName(event.target.value)}
-              onBlur={onSetItemName}
-            />
-            <button className="hidden" type="submit" onClick={onSetItemName} />
-          </form>
-        </div>
-      </div>
-    )
   }
 
   const rowOptions =
@@ -334,6 +283,10 @@ const FileExplorerRow: FC<Props> = ({
       : view === STORAGE_VIEWS.LIST && !item.isCorrupted
       ? `calc(100% - 50px)`
       : '100%'
+
+  if (item.status === STORAGE_ROW_STATUS.EDITING) {
+    return <FileExplorerRowEditing view={view} item={item} columnIndex={columnIndex} />
+  }
 
   return (
     <div

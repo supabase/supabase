@@ -302,7 +302,7 @@ class StorageExplorerStore {
     const formattedName = this.sanitizeNameForDuplicateInColumn(folderName, autofix, columnIndex)
     if (formattedName === null) return
 
-    if (!/^[a-zA-Z0-9_-]*$/.test(formattedName)) {
+    if (!/^[a-zA-Z0-9_-\s]*$/.test(formattedName)) {
       return this.ui.setNotification({
         message: 'Folder name contains invalid special characters',
         category: 'error',
@@ -1576,6 +1576,8 @@ class StorageExplorerStore {
   }
 
   addTempRow = (type, name, status, columnIndex, metadata = {}, isPrepend = false) => {
+    console.log('addTempRow', { type, name, status })
+
     const updatedColumns = this.columns.map((column, idx) => {
       if (idx === columnIndex) {
         const tempRow = { type, name, status, metadata }
