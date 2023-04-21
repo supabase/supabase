@@ -336,6 +336,12 @@ const CreateTrigger: FC<CreateTriggerProps> = ({ trigger, visible, setVisible })
         }
         loading={_localState.loading}
         onConfirm={handleSubmit}
+        onInteractOutside={(event) => {
+          const isToast = (event.target as Element)?.closest('#toast')
+          if (isToast) {
+            event.preventDefault()
+          }
+        }}
       >
         {hasPublicTables ? (
           <div className="">
