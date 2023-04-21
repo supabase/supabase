@@ -1,15 +1,15 @@
-import {marked} from 'marked'
-import {GetStaticPaths, GetStaticProps} from 'next'
-import {NextSeo} from 'next-seo'
+import { marked } from 'marked'
+import { GetStaticPaths, GetStaticProps } from 'next'
+import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Link from 'next/link'
-import {Swiper, SwiperSlide} from 'swiper/react'
+import { Swiper, SwiperSlide } from 'swiper/react'
 import 'swiper/swiper.min.css'
-import {IconChevronLeft, IconExternalLink} from 'ui'
+import { IconChevronLeft, IconExternalLink } from 'ui'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import supabase from '~/lib/supabase'
-import {Partner} from '~/types/partners'
+import { Partner } from '~/types/partners'
 import Error404 from '../../404'
 
 function Partner({ partner }: { partner: Partner }) {
@@ -150,9 +150,7 @@ function Partner({ partner }: { partner: Partner }) {
 
                   <div className="flex items-center justify-between py-2">
                     <span className="text-scale-900">Category</span>
-                    <Link
-                      href={`/partners/integrations#${partner.category.toLowerCase()}`}
-                    >
+                    <Link href={`/partners/integrations#${partner.category.toLowerCase()}`}>
                       <a className="text-brand-900 hover:text-brand-800 transition-colors">
                         {partner.category}
                       </a>
