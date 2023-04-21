@@ -1,7 +1,7 @@
 import DataGrid, { Column } from '@supabase/react-data-grid'
 import { useKeyboardShortcuts } from 'hooks'
 import { copyToClipboard } from 'lib/helpers'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Item, Menu, useContextMenu } from 'react-contexify'
 import { createPortal } from 'react-dom'
 import { IconClipboard } from 'ui'
@@ -54,7 +54,7 @@ const Results = ({ id, rows }: { id: string; rows: readonly any[] }) => {
   const columnRender = (name: string) => {
     return <div className="flex h-full items-center justify-center font-mono">{name}</div>
   }
-  const columns: Column<any, unknown>[] = Object.keys(rows[0]).map((key) => ({
+  const columns: Column<any, unknown>[] = Object.keys(rows?.[0] ?? []).map((key) => ({
     key,
     name: key,
     formatter: ({ row }: any) => formatter(key, row),
@@ -66,11 +66,6 @@ const Results = ({ id, rows }: { id: string; rows: readonly any[] }) => {
   function onSelectedCellChange(position: any) {
     setCellPosition(position)
   }
-
-  const [mounted, setMounted] = useState(false)
-  useEffect(() => {
-    if (!mounted) setMounted(true)
-  }, [])
 
   if (rows.length <= 0) {
     return (
@@ -88,7 +83,7 @@ const Results = ({ id, rows }: { id: string; rows: readonly any[] }) => {
         style={{ height: '100%' }}
         onSelectedCellChange={onSelectedCellChange}
       />
-      {mounted &&
+      {typeof window !== 'undefined' &&
         createPortal(
           <Menu id={SQL_CONTEXT_EDITOR_ID} animation={false}>
             <Item onClick={onCopyCell}>
