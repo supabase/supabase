@@ -20,9 +20,7 @@ toc_depth: 3
 
 </div>
 
-GraphQL support is now in general availability on the Supabase platform via our [open source](https://github.com/supabase/pg_graphql/) PostgreSQL extension, [`pg_graphql](https://supabase.github.io/pg_graphql/) (beta)`.
-
-![supameme.png](/images/blog/launch-week-4/tuesday-graphql/supameme.png)
+GraphQL support is now in general availability on the Supabase platform via our [open source](https://github.com/supabase/pg_graphql/) PostgreSQL extension, [`pg_graphql`](https://supabase.github.io/pg_graphql/).
 
 `pg_graphql` enables you to query existing PostgreSQL databases using GraphQL, either from within SQL or over HTTP:
 
@@ -203,9 +201,11 @@ Which has no duplication of data.
 
 The difference in payload size is negligible in this case, but as the number of 1-to-many joins grows, data duplication in the SQL response grows geometrically.
 
-**Queries are cached as [prepared statements](https://www.postgresql.org/docs/current/sql-prepare.html)**
+![supameme.png](/images/blog/launch-week-4/tuesday-graphql/supameme.png)
 
-After a GraphQL query is transpiled to SQL, it is added to the prepared statement cache so subsequent requests with the same structure (think pagination) can skip the transpilation step.
+**Queries are cached as prepared statements**
+
+After a GraphQL query is transpiled to SQL, it is added to the [prepared statement](https://www.postgresql.org/docs/current/sql-prepare.html) cache so subsequent requests with the same structure (think pagination) can skip the transpilation step.
 
 Using prepared statements also allows PostgreSQL to skip the overhead of computing a query plan. For small, on-index, queries,
 the query planning step can take several times as long as the query's execution time, so the saving is significant at scale.
