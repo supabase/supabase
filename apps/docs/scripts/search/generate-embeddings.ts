@@ -12,7 +12,12 @@ async function generateEmbeddings() {
   const args = process.argv.slice(2)
   const shouldRefresh = args.includes('--refresh')
 
-  const requiredEnvVars = ['NEXT_PUBLIC_SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY', 'OPENAI_KEY']
+  const requiredEnvVars = [
+    'NEXT_PUBLIC_SUPABASE_URL',
+    'SUPABASE_SERVICE_ROLE_KEY',
+    'OPENAI_KEY',
+    'GITHUB_ACCESS_TOKEN',
+  ]
 
   if (requiredEnvVars.some((name) => !process.env[name])) {
     throw new Error(
