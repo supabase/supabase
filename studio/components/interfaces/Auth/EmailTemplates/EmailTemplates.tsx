@@ -15,7 +15,11 @@ const EmailTemplates = observer(() => {
         />
         <div className="mb-6">
           <Button type="default" icon={<IconExternalLink size={14} strokeWidth={1.5} />}>
-            <a target="_blank" href="https://supabase.com/docs/guides/auth/auth-email-templates">
+            <a
+              target="_blank"
+              rel="noreferrer"
+              href="https://supabase.com/docs/guides/auth/auth-email-templates"
+            >
               Documentation
             </a>
           </Button>
