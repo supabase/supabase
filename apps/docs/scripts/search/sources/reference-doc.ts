@@ -2,7 +2,6 @@ import { createHash } from 'crypto'
 import { readFile } from 'fs/promises'
 import yaml from 'js-yaml'
 import { OpenAPIV3 } from 'openapi-types'
-import { Meta } from '..'
 import {
   ICommonFunc,
   IFunctionDefinition,
@@ -11,7 +10,7 @@ import {
 import { CliCommand, CliSpec } from '../../../generator/types/CliSpec'
 import { flattenSections } from '../../../lib/helpers'
 import { enrichedOperation, gen_v3 } from '../../../lib/refGenerator/helpers'
-import { BaseSource } from './base'
+import { BaseSource, Json } from './base'
 
 export abstract class ReferenceSource<SpecSection> extends BaseSource {
   type = 'reference' as const
@@ -19,7 +18,7 @@ export abstract class ReferenceSource<SpecSection> extends BaseSource {
   constructor(
     source: string,
     path: string,
-    public meta: Meta,
+    public meta: Json,
     public specFilePath: string,
     public sectionsFilePath: string
   ) {
