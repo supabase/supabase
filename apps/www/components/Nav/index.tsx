@@ -11,8 +11,6 @@ import SolutionsData from 'data/Solutions.json'
 import Solutions from '~/components/Nav/Product'
 import Developers from '~/components/Nav/Developers'
 
-import Announcement from '~/components/Nav/Announcement'
-import CountdownBanner from '~/components/LaunchWeek/Banners/CountdownBanner'
 import ScrollProgress from '~/components/ScrollProgress'
 
 import { useIsLoggedIn, useTheme } from 'common'
@@ -22,7 +20,6 @@ import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wo
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
 
 import * as supabaseLogoWordmarkWhite from 'common/assets/images/supabase-logo-wordmark--white.png'
-
 
 const Nav = () => {
   const { isDarkMode } = useTheme()
