@@ -22,7 +22,7 @@ const StorageMenu: FC<Props> = () => {
   const { ref, bucketId } = useParams()
   const [showCreateBucketModal, setShowCreateBucketModal] = useState(false)
   const [selectedBucketToEdit, setSelectedBucketToEdit] = useState<StorageBucket>()
-  const canCreateBuckets = checkPermissions(PermissionAction.UPDATE, 'projects')
+  const canCreateBuckets = checkPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
 
   const page = router.pathname.split('/')[4] as
     | undefined
