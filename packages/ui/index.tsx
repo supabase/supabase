@@ -60,6 +60,23 @@ export * from './src/components/Form'
 // CMD+K
 export * from './src/components/Command'
 
+// layout
+
+// banners
+export * from './src/layout/banners'
+
+// config
+
+// export { default as Config } from './../ui.config'
+
+// ARCHIVE
+
+// export * from './src/components/Textarea'
+
+// AUTH
+
+// export * from './src/components/Auth'
+
 // ICONS
 // export icons
 export * from './src/components/Icon/icons/IconActivity'
