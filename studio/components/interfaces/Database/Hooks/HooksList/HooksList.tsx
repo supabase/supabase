@@ -38,6 +38,9 @@ const HooksList = ({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+
+  console.log({ hooks, isLoading, isError })
+
   const [filterString, setFilterString] = useState<string>('')
 
   const filteredHooks = (hooks || []).filter((x: any) =>
