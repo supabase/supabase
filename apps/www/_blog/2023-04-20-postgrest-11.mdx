@@ -197,7 +197,7 @@ As you can see, `id` and `baz` took their default values.
 
 ## ANY/ALL filter modifiers
 
-To avoid unwieldy `OR` filters, you can now use `any` modifiers on various filters. Take the `like` filter as an example:
+As a shortcut to `OR` filters, you can now use `any` modifiers on various filters. Take the `like` filter as an example:
 
 ```jsx
 const res = await postgrest
@@ -209,7 +209,7 @@ const res = await postgrest
 This is equivalent to the following in SQL.
 
 ```sql
-SELECT * FROM users WHERE username like any('{%supa%,%kiwi%}');
+SELECT * FROM users WHERE username LIKE ANY('{%supa%,%kiwi%}');
 ```
 
 `any` modifiers are available for the `eq,like,ilike,gt,gte,lt,lte,match,imatch` filters.
