@@ -15,9 +15,7 @@ export async function getDatabaseTriggers(
 ) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  let headers = new Headers()
   const response = (await get(`${API_URL}/pg-meta/${projectRef}/triggers`, {
-    headers: Object.fromEntries(headers),
     signal,
   })) as PostgresTrigger[] | { error?: any }
 

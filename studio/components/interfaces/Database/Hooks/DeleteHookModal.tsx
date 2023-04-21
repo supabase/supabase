@@ -30,11 +30,7 @@ const DeleteHookModal = ({ selectedHook, visible, onClose }: DeleteHookModalProp
 
     try {
       setLoading(true)
-      await deleteDatabaseTrigger({
-        id,
-        projectRef: project.ref,
-        connectionString: project.connectionString,
-      })
+      await deleteDatabaseTrigger({ id, projectRef: project.ref })
       ui.setNotification({ category: 'success', message: `Successfully deleted ${name}` })
       onClose()
     } catch (error: any) {

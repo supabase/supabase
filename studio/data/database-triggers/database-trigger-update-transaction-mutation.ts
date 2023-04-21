@@ -9,7 +9,6 @@ import { quoteLiteral } from 'lib/pg-format'
 
 export type DatabaseTriggerUpdateVariables = {
   projectRef: string
-  connectionString?: string
   originalTrigger: any
   updatedTrigger: any
 }
@@ -32,12 +31,11 @@ COMMIT;
 
 export async function updateDatabaseTrigger({
   projectRef,
-  connectionString,
   originalTrigger,
   updatedTrigger,
 }: DatabaseTriggerUpdateVariables) {
   const sql = getDatabaseTriggerUpdateSQL({ originalTrigger, updatedTrigger })
-  const { result } = await executeSql({ projectRef, connectionString, sql })
+  const { result } = await executeSql({ projectRef, sql })
   return result
 }
 

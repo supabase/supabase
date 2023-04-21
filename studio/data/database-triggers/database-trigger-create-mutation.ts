@@ -17,10 +17,10 @@ export async function createDatabaseTrigger({
 }: DatabaseTriggerCreateVariables) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  let headers = new Headers()
-  const response = (await post(`${API_URL}/pg-meta/${projectRef}/triggers`, payload, {
-    headers: Object.fromEntries(headers),
-  })) as CreateDatabaseTriggerResponse
+  const response = (await post(
+    `${API_URL}/pg-meta/${projectRef}/triggers`,
+    payload
+  )) as CreateDatabaseTriggerResponse
 
   if (response.error) throw response.error
   return response as PostgresTrigger

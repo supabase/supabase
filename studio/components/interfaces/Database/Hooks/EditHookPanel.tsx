@@ -213,7 +213,6 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
         setIsSubmitting(true)
         await updateDatabaseTrigger({
           projectRef: project?.ref,
-          connectionString: project?.connectionString,
           originalTrigger: selectedHook,
           updatedTrigger: payload,
         })

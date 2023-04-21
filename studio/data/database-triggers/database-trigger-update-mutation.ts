@@ -7,7 +7,6 @@ import { databaseTriggerKeys } from './keys'
 export type DatabaseTriggerUpdateVariables = {
   id: number
   projectRef: string
-  connectionString?: string
   payload: any
 }
 
@@ -16,19 +15,15 @@ type UpdateDatabaseTriggerResponse = PostgresTrigger & { error?: any }
 export async function updateDatabaseTrigger({
   id,
   projectRef,
-  connectionString,
   payload,
 }: DatabaseTriggerUpdateVariables) {
   if (!id) throw new Error('id is required')
   if (!projectRef) throw new Error('projectRef is required')
-  if (!connectionString) throw new Error('connectionString is required')
 
-  let headers = new Headers()
-  headers.set('x-connection-encrypted', connectionString)
-
-  const response = (await patch(`${API_URL}/pg-meta/${projectRef}/triggers?id=${id}`, payload, {
-    headers: Object.fromEntries(headers),
-  })) as UpdateDatabaseTriggerResponse
+  const response = (await patch(
+    `${API_URL}/pg-meta/${projectRef}/triggers?id=${id}`,
+    payload
+  )) as UpdateDatabaseTriggerResponse
 
   if (response.error) throw response.error
   return response as PostgresTrigger

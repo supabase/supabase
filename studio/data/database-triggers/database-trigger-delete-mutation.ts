@@ -7,25 +7,17 @@ import { databaseTriggerKeys } from './keys'
 export type DatabaseTriggerDeleteVariables = {
   id: number
   projectRef: string
-  connectionString?: string
 }
 
 type DeleteDatabaseTriggerResponse = PostgresTrigger & { error?: any }
 
-export async function deleteDatabaseTrigger({
-  id,
-  projectRef,
-  connectionString,
-}: DatabaseTriggerDeleteVariables) {
+export async function deleteDatabaseTrigger({ id, projectRef }: DatabaseTriggerDeleteVariables) {
   if (!projectRef) throw new Error('projectRef is required')
-  if (!connectionString) throw new Error('connectionString is required')
 
-  let headers = new Headers()
-  headers.set('x-connection-encrypted', connectionString)
-
-  const response = (await delete_(`${API_URL}/pg-meta/${projectRef}/triggers?id=${id}`, undefined, {
-    headers: Object.fromEntries(headers),
-  })) as DeleteDatabaseTriggerResponse
+  const response = (await delete_(
+    `${API_URL}/pg-meta/${projectRef}/triggers?id=${id}`,
+    undefined
+  )) as DeleteDatabaseTriggerResponse
 
   if (response?.error) throw response.error
   return response as PostgresTrigger
