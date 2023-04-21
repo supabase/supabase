@@ -100,11 +100,17 @@ async function generateEmbeddings() {
           }
         }
 
-        // No content update required
-        // Update this page to the latest refresh version & timestamp
+        // No content/embedding update required on this page
+        // Update other meta info
         const { error: updatePageError } = await supabaseClient
           .from('page')
-          .update({ version: refreshVersion, last_refresh: refreshDate })
+          .update({
+            type,
+            source,
+            meta,
+            version: refreshVersion,
+            last_refresh: refreshDate,
+          })
           .filter('id', 'eq', existingPage.id)
 
         if (updatePageError) {
@@ -156,6 +162,8 @@ async function generateEmbeddings() {
             source,
             meta,
             parent_page_id: parentPage?.id,
+            version: refreshVersion,
+            last_refresh: refreshDate,
           },
           { onConflict: 'path' }
         )
