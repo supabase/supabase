@@ -44,7 +44,7 @@ You need to reload PostgREST config cache to apply these changes.
 NOTIFY pgrst, 'reload config';
 ```
 
-Now, suppose you have a big table and you apply a filter on an unindexed column:
+Now, suppose you do an expensive query, by having a big table and a filter on an unindexed column(this will cause a full table scan):
 
 ```jsx
 const { data, error } = await supabase
@@ -81,7 +81,7 @@ ALTER USER service_role SET plan_filter.statement_cost_limit = 0;
 NOTIFY pgrst, 'reload config'; -- reload postgREST config cache to apply changes
 ```
 
-Let’s repeat the previous example.
+Let’s repeat the previous expensive query.
 
 ```jsx
 const { data, error } = await supabase
@@ -178,7 +178,7 @@ const { error } = await supabase
   .select()
 ```
 
-And the respone will be:
+And the response will be:
 
 ```json
 [
@@ -214,7 +214,7 @@ SELECT * FROM users WHERE username LIKE ANY('{%supa%,%kiwi%}');
 
 `any` modifiers are available for the `eq,like,ilike,gt,gte,lt,lte,match,imatch` filters.
 
-For completeness, the `all` modifier is also added.
+For completeness, the `all` modifier is also included.
 
 ## Closing up
 
