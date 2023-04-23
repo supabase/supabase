@@ -666,7 +666,7 @@ const ListboxActivation: FC = observer(({}) => {
         value={'BEFORE'}
         label={'Before the event'}
         addOnBefore={() => (
-          <div className="flex  items-center justify-center rounded bg-scale-1200 p-1 text-scale-100 ">
+          <div className="flex items-center justify-center rounded bg-scale-1200 p-1 text-scale-100 ">
             <IconPauseCircle strokeWidth={2} size="small" />
           </div>
         )}
@@ -683,7 +683,7 @@ const ListboxActivation: FC = observer(({}) => {
         value={'AFTER'}
         label={'After the event'}
         addOnBefore={() => (
-          <div className="flex  items-center justify-center rounded bg-green-1200 p-1 text-scale-100 ">
+          <div className="flex items-center justify-center rounded bg-green-1200 p-1 text-scale-100 ">
             <IconPlayCircle strokeWidth={2} size="small" />
           </div>
         )}
@@ -724,18 +724,15 @@ const FunctionEmpty: FC = observer(({}) => {
     <button
       type="button"
       onClick={() => _localState!.setChooseFunctionFormVisible(true)}
-      className="relative w-full
-        rounded
-
-        border
-                  border-scale-600 bg-scale-200 px-5
-                  py-1
-                  shadow-sm
-                  transition-all
-                  hover:border-scale-700 hover:bg-scale-300
-                  dark:bg-scale-400 dark:hover:bg-scale-500
-
-                  "
+      className={[
+        'relative w-full',
+        'rounded',
+        'border border-scale-600',
+        'bg-scale-200 px-5 py-1',
+        'shadow-sm transition-all',
+        'hover:border-scale-700 hover:bg-scale-300',
+        'dark:bg-scale-400 dark:hover:bg-scale-500',
+      ].join(' ')}
     >
       <FormEmptyBox
         icon={<IconTerminal size={14} strokeWidth={2} />}
@@ -751,19 +748,13 @@ const FunctionWithArguments: FC = observer(({}) => {
   return (
     <>
       <div
-        className="
-
-
-              relative
-
-              flex
-              w-full items-center
-              justify-between space-x-3 rounded
-              border
-
-
-              border-scale-200 px-5
-              py-4 shadow-sm transition-shadow dark:border-scale-500"
+        className={[
+          'relative w-full',
+          'flex items-center justify-between',
+          'space-x-3 px-5 py-4',
+          'border border-scale-200 dark:border-scale-500',
+          'rounded shadow-sm transition-shadow',
+        ].join(' ')}
       >
         <div className="flex items-center gap-2">
           <div className="flex h-6 w-6 items-center justify-center rounded bg-scale-1200 text-scale-100 focus-within:bg-opacity-10">
