@@ -37,7 +37,7 @@ const DeleteBucketModal: FC<Props> = ({
       confirmString={bucket.name}
       loading={deleting}
       text={`This will delete your bucket called ${bucket.name}.`}
-      alert="You cannot recover this bucket once it is deleted!"
+      alert="all the contents of the bucket will be deleted and can't be recovered!"
       confirmLabel={`Delete bucket ${bucket.name}`}
     />
   )
