@@ -332,7 +332,7 @@ const TableEditorPage: NextPageWithLayout = () => {
                   recursively.
                 </p>
                 <Link href="https://www.postgresql.org/docs/current/ddl-depend.html">
-                  <a target="_blank">
+                  <a target="_blank" rel="noreferrer">
                     <Button size="tiny" type="default" icon={<IconExternalLink />}>
                       About dependency tracking
                     </Button>
@@ -380,7 +380,7 @@ const TableEditorPage: NextPageWithLayout = () => {
                   recursively.
                 </p>
                 <Link href="https://www.postgresql.org/docs/current/ddl-depend.html">
-                  <a target="_blank">
+                  <a target="_blank" rel="noreferrer">
                     <Button size="tiny" type="default" icon={<IconExternalLink />}>
                       About dependency tracking
                     </Button>
