@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - master
-      - feat/zero-downtime-embeddings-refresh
     paths:
       - '.github/workflows/search.yml'
       - 'supabase/migrations/**'
