@@ -45,7 +45,7 @@ export const gettingstarted = {
   items: [
     { name: 'Features', url: '/guides/getting-started/features' },
     { name: 'Architecture', url: '/guides/getting-started/architecture' },
-    // { name: 'Local Development', url: '/guides/cli/local-development' }, // Disabling this until we actually move the doc into this section
+    { name: 'Local Development', url: '/guides/getting-started/local-development' },
     {
       name: 'Framework Quickstarts',
       items: [
@@ -141,7 +141,6 @@ export const cli = {
   title: 'CLI',
   items: [
     { name: 'Overview', url: '/guides/cli' },
-    { name: 'Local Development', url: '/guides/cli/local-development' },
     { name: 'Managing Environments', url: '/guides/cli/managing-environments' },
   ],
 }
@@ -688,7 +687,6 @@ export const supabase_cli = {
   url: '/guides/cli',
   items: [
     { name: 'Overview', url: '/guides/cli' },
-    { name: 'Local Development', url: '/guides/cli/local-development' },
     { name: 'Managing Environments', url: '/guides/cli/managing-environments' },
     {
       name: 'Reference',
