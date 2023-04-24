@@ -208,7 +208,7 @@ const FeedbackWidget: FC<Props> = ({
             </a>
           </Link>{' '}
           or{' '}
-          <a href="https://supabase.com/docs" target="_blank">
+          <a href="https://supabase.com/docs" target="_blank" rel="noreferrer">
             <span className="cursor-pointer text-brand-900 transition-colors hover:text-brand-1200">
               browse our docs
             </span>

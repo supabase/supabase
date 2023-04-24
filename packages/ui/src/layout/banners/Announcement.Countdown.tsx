@@ -1,8 +1,8 @@
 import React from 'react'
 import Link from 'next/link'
 import Countdown from 'react-countdown'
-import _announcement from '~/data/Announcement.json'
-import { AnnouncementProps } from '../../Nav/Announcement'
+import _announcement from './data/Announcement.json'
+import { AnnouncementProps } from './Announcement'
 import { useRouter } from 'next/router'
 
 interface CountdownStepProps {
@@ -35,11 +35,9 @@ function CountdownBanner() {
         <div className="w-full flex gap-3 md:gap-6 items-center justify-center">
           <p>Supabase Launch Week 7</p>
           <div>
-            <Link href="/launch-week">
-              <a className="bg-white text-xs px-1.5 md:px-2.5 py-1 rounded-full text-[#9E44EF] shadow-none hover:shadow-mg cursor-pointer">
-                Explore
-              </a>
-            </Link>
+            <div className="bg-white text-xs px-1.5 md:px-2.5 py-1 rounded-full text-[#9E44EF] shadow-none hover:shadow-mg cursor-pointer">
+              Explore
+            </div>
           </div>
         </div>
       )
@@ -63,11 +61,9 @@ function CountdownBanner() {
           </div>
           {!isLaunchWeekPage && (
             <div className="hidden md:block">
-              <Link href="/launch-week">
-                <a className="bg-white text-xs px-1.5 md:px-2.5 py-1 rounded-full text-[#9E44EF] shadow-none hover:shadow-mg cursor-pointer">
-                  Get your ticket
-                </a>
-              </Link>
+              <div className="bg-white text-xs px-1.5 md:px-2.5 py-1 rounded-full text-[#9E44EF] shadow-none hover:shadow-mg cursor-pointer">
+                Get your ticket
+              </div>
             </div>
           )}
         </div>

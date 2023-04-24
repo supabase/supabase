@@ -99,7 +99,11 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
         </div>
 
         <Button type="default" icon={<IconExternalLink size={14} strokeWidth={1.5} />}>
-          <a target="_blank" href="https://supabase.com/docs/guides/platform/database-usage">
+          <a
+            target="_blank"
+            rel="noreferrer"
+            href="https://supabase.com/docs/guides/platform/database-usage"
+          >
             What is disk size?
           </a>
         </Button>
@@ -412,6 +416,7 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
                         <Button type="danger" className="mt-3">
                           <a
                             target="_blank"
+                            rel="noreferrer"
                             href="https://supabase.com/docs/guides/platform/database-usage#database-storage-management"
                           >
                             Upgrade this project
@@ -425,6 +430,7 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
                         >
                           <a
                             target="_blank"
+                            rel="noreferrer"
                             href="https://supabase.com/docs/guides/platform/database-usage#database-storage-management"
                           >
                             Database storage management docs

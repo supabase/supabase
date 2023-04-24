@@ -404,7 +404,12 @@ const Wizard: NextPageWithLayout = () => {
                   descriptionText={
                     <>
                       Select a plan that suits your needs.&nbsp;
-                      <a className="underline" target="_blank" href="https://supabase.com/pricing">
+                      <a
+                        className="underline"
+                        target="_blank"
+                        rel="noreferrer"
+                        href="https://supabase.com/pricing"
+                      >
                         More details
                       </a>
                       {!isSelectFreeTier && !isEmptyPaymentMethod && (
