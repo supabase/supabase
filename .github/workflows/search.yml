@@ -43,4 +43,4 @@ jobs:
 
       - name: Refresh embeddings
         working-directory: ./apps/docs
-        run: npx run embeddings
+        run: npm run embeddings
