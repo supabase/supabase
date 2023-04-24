@@ -28,10 +28,14 @@ function CountdownStep({ value, unit }: CountdownStepProps) {
 
 function CountdownButton({ dest, text }: CountdownButtonProps) {
   return (
-    <a onClick={(e) => e.stopPropagation()} href={dest} className="bg-white text-xs px-1.5 md:px-2.5 py-1 rounded-full text-[#9E44EF] shadow-none hover:shadow-mg cursor-pointer">
+    <a
+      onClick={(e) => e.stopPropagation()}
+      href={dest}
+      className="bg-white text-xs px-1.5 md:px-2.5 py-1 rounded-full text-[#9E44EF] shadow-none hover:shadow-mg cursor-pointer"
+    >
       {text}
     </a>
-  );
+  )
 }
 
 function CountdownBanner() {
