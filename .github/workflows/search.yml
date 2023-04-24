@@ -21,6 +21,7 @@ jobs:
       PROJECT_ID: ${{ secrets.SEARCH_SUPABASE_PROJECT_ID }}
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SEARCH_SUPABASE_URL }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SEARCH_SUPABASE_SERVICE_ROLE_KEY }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SEARCH_SUPABASE_DB_PASSWORD }}
 
     steps:
       - name: Check out repo
