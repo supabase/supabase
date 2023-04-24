@@ -4,8 +4,10 @@ on:
   push:
     branches:
       - master
+      - feat/zero-downtime-embeddings-refresh
     paths:
       - 'apps/docs/**'
+      - 'spec/**'
   workflow_dispatch:
 
 jobs:
@@ -29,8 +31,10 @@ jobs:
           node-version: 18
 
       - name: Download dependencies
-        working-directory: ./apps/docs
         run: npm ci
+
+      - name: Run migrations
+        run: npx supabase db push --project-ref $PROJECT_ID
 
       - name: Refresh embeddings
         working-directory: ./apps/docs
