@@ -22,7 +22,6 @@ export function TextEditor<TRow, TSummaryRow = unknown>({
   }, [])
 
   const saveChanges = useCallback((newValue: string | null) => {
-    console.log('saveChanges')
     onRowChange({ ...row, [column.key]: newValue }, true)
     setIsPopoverOpen(false)
   }, [])
