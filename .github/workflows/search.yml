@@ -1,0 +1,37 @@
+name: Generate Embeddings for Search
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'apps/docs/**'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      OPENAI_KEY: ${{ secrets.OPENAI_KEY }}
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      PROJECT_ID: ${{ secrets.SEARCH_SUPABASE_PROJECT_ID }}
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SEARCH_SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SEARCH_SUPABASE_SERVICE_ROLE_KEY }}
+
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v3
+
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Download dependencies
+        working-directory: ./apps/docs
+        run: npm ci
+
+      - name: Refresh embeddings
+        working-directory: ./apps/docs
+        run: npx run embeddings
