@@ -45,7 +45,7 @@ const PlanSelection: FC<Props> = ({ visible, tiers, currentPlan, onSelectPlan })
         </div>
         <div className="flex justify-center items-center mt-4">
           <Link href="https://supabase.com/pricing">
-            <a target="_blank">
+            <a target="_blank" rel="noreferrer">
               <Button
                 type="link"
                 icon={<IconExternalLink size={14} strokeWidth={1.5} />}
