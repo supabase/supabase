@@ -1,7 +1,8 @@
-import Countdown from 'react-countdown'
-import _announcement from './data/Announcement.json'
-import { AnnouncementProps } from './Announcement'
 import { useRouter } from 'next/router'
+import { PropsWithChildren } from 'react'
+import Countdown from 'react-countdown'
+import { AnnouncementProps } from './Announcement'
+import _announcement from './data/Announcement.json'
 
 interface CountdownStepProps {
   value: string | number
@@ -10,7 +11,6 @@ interface CountdownStepProps {
 
 interface CountdownButtonProps {
   dest: string
-  text: string
 }
 
 const announcement = _announcement as AnnouncementProps
@@ -26,14 +26,13 @@ function CountdownStep({ value, unit }: CountdownStepProps) {
   )
 }
 
-function CountdownButton({ dest, text }: CountdownButtonProps) {
+function CountdownButton({ children, dest }: PropsWithChildren<CountdownButtonProps>) {
   return (
     <a
-      onClick={(e) => e.stopPropagation()}
       href={dest}
       className="bg-white text-xs px-1.5 md:px-2.5 py-1 rounded-full text-[#9E44EF] shadow-none hover:shadow-mg cursor-pointer"
     >
-      {text}
+      {children}
     </a>
   )
 }
@@ -50,7 +49,7 @@ function CountdownBanner() {
         <div className="w-full flex gap-3 md:gap-6 items-center justify-center">
           <p>Supabase Launch Week 7</p>
           <div>
-            <CountdownButton dest="/launch-week" text="Explore" />
+            <CountdownButton dest="/launch-week">Explore</CountdownButton>
           </div>
         </div>
       )
@@ -74,7 +73,7 @@ function CountdownBanner() {
           </div>
           {!isLaunchWeekPage && (
             <div className="hidden md:block">
-              <CountdownButton dest="/launch-week" text="Get your ticket" />
+              <CountdownButton dest="/launch-week">Get your ticket</CountdownButton>
             </div>
           )}
         </div>
