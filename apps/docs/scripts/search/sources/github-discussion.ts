@@ -1,3 +1,4 @@
+import { createAppAuth } from '@octokit/auth-app'
 import { Octokit } from '@octokit/core'
 import { paginateGraphql } from '@octokit/plugin-paginate-graphql'
 import { createHash } from 'crypto'
@@ -28,7 +29,14 @@ export type DiscussionsResponse = {
  * Fetches GitHub discussions for a repository + category
  */
 export async function fetchDiscussions(owner: string, repo: string, categoryId: string) {
-  const octokit = new ExtendedOctokit({ auth: process.env.GITHUB_ACCESS_TOKEN })
+  const octokit = new ExtendedOctokit({
+    authStrategy: createAppAuth,
+    auth: {
+      appId: process.env.SEARCH_GITHUB_APP_ID,
+      installationId: process.env.SEARCH_GITHUB_APP_INSTALLATION_ID,
+      privateKey: process.env.SEARCH_GITHUB_APP_PRIVATE_KEY,
+    },
+  })
 
   const {
     repository: {

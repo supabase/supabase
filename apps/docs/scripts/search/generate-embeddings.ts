@@ -17,7 +17,9 @@ async function generateEmbeddings() {
     'NEXT_PUBLIC_SUPABASE_URL',
     'SUPABASE_SERVICE_ROLE_KEY',
     'OPENAI_KEY',
-    'GITHUB_ACCESS_TOKEN',
+    'SEARCH_GITHUB_APP_ID',
+    'SEARCH_GITHUB_APP_INSTALLATION_ID',
+    'SEARCH_GITHUB_APP_PRIVATE_KEY',
   ]
 
   if (requiredEnvVars.some((name) => !process.env[name])) {
