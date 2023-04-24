@@ -51,16 +51,15 @@ const Announcement = ({
     return setHidden(true)
   }
 
-  function handleLink() {
-    window.location.assign(announcement.link)
-  }
-
   // Always show if on LW section
   if (!isLaunchWeekSection && hidden) {
     return null
   } else {
     return (
-      <div onClick={handleLink} className={['relative w-full cursor-pointer', className].join(' ')} role="link" tabIndex={0}>
+      <a
+        href={announcement.link}
+        className={['relative w-full cursor-pointer', className].join(' ')}
+      >
         {!isLaunchWeekSection && (
           <div
             className="absolute right-4 flex h-full items-center opacity-50 transition-opacity hover:opacity-100"
@@ -70,7 +69,7 @@ const Announcement = ({
           </div>
         )}
         {children}
-      </div>
+      </a>
     )
   }
 }
