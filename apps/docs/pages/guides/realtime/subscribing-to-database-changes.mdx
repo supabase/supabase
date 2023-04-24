@@ -9,8 +9,8 @@ export const meta = {
 
 Supabase allows you to subscribe to real-time changes on your database from your client application.
 
-You can listen to database changes using the [Postgres Changes](/docs/guides/realtime/postgres-changes) extension. 
-The following video includes instructions for how to turn this feature on for your tables.
+You can listen to database changes using the [Postgres Changes](/docs/guides/realtime/postgres-changes) extension.
+The following video shows how you can enable this feature for your tables.
 
 ## Demo
 
@@ -22,6 +22,28 @@ The following video includes instructions for how to turn this feature on for yo
     allowFullScreen
   ></iframe>
 </div>
+
+## Setup
+
+You'll first need to create a `supabase_realtime` publication and add your tables (that you want to subscribe to) to the publication:
+
+```sql
+begin;
+
+-- remove the supabase_realtime publication
+drop
+  publication if exists supabase_realtime;
+
+-- re-create the supabase_realtime publication with no tables
+create publication supabase_realtime;
+
+commit;
+
+-- add a table called 'messages' to the publication
+-- (update this to match your tables)
+alter
+  publication supabase_realtime add table messages;
+```
 
 ## Streaming inserts
 
