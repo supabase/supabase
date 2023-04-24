@@ -8,6 +8,7 @@ on:
     paths:
       - 'apps/docs/**'
       - 'spec/**'
+      - '.github/workflows/search.yml'
   workflow_dispatch:
 
 jobs:
@@ -33,8 +34,11 @@ jobs:
       - name: Download dependencies
         run: npm ci
 
+      - name: Link Supabase project
+        run: npx supabase link --project-ref $PROJECT_ID
+
       - name: Run migrations
-        run: npx supabase db push --project-ref $PROJECT_ID
+        run: npx supabase db push
 
       - name: Refresh embeddings
         working-directory: ./apps/docs
