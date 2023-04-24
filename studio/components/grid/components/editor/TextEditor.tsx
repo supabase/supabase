@@ -22,6 +22,7 @@ export function TextEditor<TRow, TSummaryRow = unknown>({
   }, [])
 
   const saveChanges = useCallback((newValue: string | null) => {
+    console.log('saveChanges')
     onRowChange({ ...row, [column.key]: newValue }, true)
     setIsPopoverOpen(false)
   }, [])
@@ -62,7 +63,13 @@ export function TextEditor<TRow, TSummaryRow = unknown>({
             </div>
             <div className="space-y-1">
               {isNullable && (
-                <Button type="default" size="tiny" onClick={() => saveChanges(null)}>
+                <Button
+                  as="div"
+                  htmlType="button"
+                  type="default"
+                  size="tiny"
+                  onClick={(event) => saveChanges(null)}
+                >
                   Set to NULL
                 </Button>
               )}
