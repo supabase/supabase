@@ -242,6 +242,8 @@ async function generateEmbeddings() {
     }
   }
 
+  console.log(`Removing old pages and their sections`)
+
   // Delete pages that have been removed (and their sections via cascade)
   const { error: deletePageError } = await supabaseClient
     .from('page')
