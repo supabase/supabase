@@ -28,13 +28,13 @@ Let’s try it by setting a statement timeout and cost limit.
 `statement_timeout` aborts any statement that takes more than the specified amount of time. Let’s set it for the usual `anon`, `authenticated` and `service_role` roles:
 
 ```sql
--- anon users can only run queries that take 100 milliseconds max
+-- anonymous users can only run queries that take 100 milliseconds max
 alter role anon set statement_timeout = '100ms';
 
 -- authenticated users can only run queries that take 5 seconds max
 alter role authenticated set statement_timeout = '5s';
 
--- service_role users can only run queries that take 15 seconds max
+-- backend-only users can only run queries that take 15 seconds max
 alter role service_role set statement_timeout = '15s';
 ```
 
@@ -69,13 +69,13 @@ Then, after 5 seconds, the request will be aborted and the response will be:
 With `statement_timeout`, queries will still run for that length of time, consuming resources until they’re terminated. To prevent this, you can abort queries based on their plan cost — this is determined at the planning phase, before they get executed.
 
 ```sql
--- anon users can only run cheap queries
+-- anonymous users can only run cheap queries
 ALTER USER anon SET plan_filter.statement_cost_limit = 10000;
 
 -- authenticated users can run more expensive queries
 ALTER USER authenticated SET plan_filter.statement_cost_limit = 1e6;
 
--- service_role can run any query
+-- backend-only users can run any query
 ALTER USER service_role SET plan_filter.statement_cost_limit = 0;
 
 NOTIFY pgrst, 'reload config'; -- reload postgREST config cache to apply changes
@@ -109,7 +109,7 @@ By default, all queries in PostgREST run in a transaction with the default *Read
 
 ```sql
 BEGIN ISOLATION LEVEL READ COMMITTED;
--- <query>
+-- <your_query>
 COMMIT;
 ```
 
