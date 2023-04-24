@@ -1,13 +1,16 @@
-import React from 'react'
-import Link from 'next/link'
-import Countdown from 'react-countdown'
-import _announcement from './data/Announcement.json'
-import { AnnouncementProps } from './Announcement'
 import { useRouter } from 'next/router'
+import { PropsWithChildren } from 'react'
+import Countdown from 'react-countdown'
+import { AnnouncementProps } from './Announcement'
+import _announcement from './data/Announcement.json'
 
 interface CountdownStepProps {
   value: string | number
   unit: string
+}
+
+interface CountdownButtonProps {
+  dest: string
 }
 
 const announcement = _announcement as AnnouncementProps
@@ -23,6 +26,17 @@ function CountdownStep({ value, unit }: CountdownStepProps) {
   )
 }
 
+function CountdownButton({ children, dest }: PropsWithChildren<CountdownButtonProps>) {
+  return (
+    <a
+      href={dest}
+      className="bg-white text-xs px-1.5 md:px-2.5 py-1 rounded-full text-[#9E44EF] shadow-none hover:shadow-mg cursor-pointer"
+    >
+      {children}
+    </a>
+  )
+}
+
 function CountdownBanner() {
   const { pathname } = useRouter()
   const isLaunchWeekPage = pathname === '/launch-week'
@@ -35,9 +49,7 @@ function CountdownBanner() {
         <div className="w-full flex gap-3 md:gap-6 items-center justify-center">
           <p>Supabase Launch Week 7</p>
           <div>
-            <div className="bg-white text-xs px-1.5 md:px-2.5 py-1 rounded-full text-[#9E44EF] shadow-none hover:shadow-mg cursor-pointer">
-              Explore
-            </div>
+            <CountdownButton dest="/launch-week">Explore</CountdownButton>
           </div>
         </div>
       )
@@ -61,9 +73,7 @@ function CountdownBanner() {
           </div>
           {!isLaunchWeekPage && (
             <div className="hidden md:block">
-              <div className="bg-white text-xs px-1.5 md:px-2.5 py-1 rounded-full text-[#9E44EF] shadow-none hover:shadow-mg cursor-pointer">
-                Get your ticket
-              </div>
+              <CountdownButton dest="/launch-week">Get your ticket</CountdownButton>
             </div>
           )}
         </div>
