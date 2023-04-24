@@ -56,8 +56,8 @@ const Announcement = ({
     return null
   } else {
     return (
-      <a
-        href={announcement.link}
+      <div
+        onClick={() => window.location.assign(announcement.link)}
         className={['relative w-full cursor-pointer', className].join(' ')}
       >
         {!isLaunchWeekSection && (
@@ -69,7 +69,7 @@ const Announcement = ({
           </div>
         )}
         {children}
-      </a>
+      </div>
     )
   }
 }
