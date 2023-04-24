@@ -27,8 +27,7 @@ type Ssl = {
   id: string
   type: string
   method: string
-  // [Joshen] We should have all possible statuses here
-  status: 'pending_validation' | 'pending_deployment' | 'validation_timed_out' | string
+  status: 'pending_validation' | 'pending_deployment' | 'validation_timed_out'
   txt_name?: string
   txt_value?: string
   settings: Settings
