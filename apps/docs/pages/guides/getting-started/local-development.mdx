@@ -359,6 +359,10 @@ create table "public"."cities" (
 
 ```
 
+Alternately, you can view your table definitions directly from the Table Editor:
+
+![SQL Definition](/docs/img/guides/cli/sql-definitions.png)
+
 You can then copy this SQL into a new migration file, and run `supabase db reset` to apply the changes.
 
 The last step is deploying these changes to a live Supabase project.
@@ -407,6 +411,19 @@ If your project uses Edge Functions, you can deploy these using [`functions depl
 supabase functions deploy <function_name>
 ```
 
+### Use Auth locally
+
+To use Auth locally, update your project's `supabase/config.toml` file that gets created after running `supabase init`. Add any providers you want, and set enabled to `true`
+
+```bash config.toml
+[auth.external.github]
+enabled = true
+client_id = ""
+secret = ""
+```
+
+For these changes to take effect, you need to run `supabase stop` and `supabase start` again.
+
 ### Enabling Local Logging
 
 Local logs rely on the Supabase Analytics Server. This can be enabled via the CLI configuration, and requires a Google Cloud project and BigQuery access.
@@ -424,9 +441,9 @@ Requirements:
 
 Once you have these 3 items, follow these steps:
 
-1. Update your project's `config.toml` and fill in the following:
+First, update your project's `supabase/config.toml`:
 
-```
+```bash
 [analytics]
 enabled = true
 gcp_project_number = "123456"
@@ -434,9 +451,9 @@ gcp_project_id = "my-project-id"
 gcp_jwt_path = "supabase/gcloud.json"
 ```
 
-2. Place your service account key (a JSON file) at the corresponding path and ensure that it is correctly named.
+Next, place your service account key (a JSON file) at the corresponding path and ensure that it is correctly named.
 
-3. Start your local stack using `supabase start`
+Last, start your local stack using `supabase start`
 
 This will switch the logging drivers and will direct logs to the Analytics server. You will be able to view and query your logs via the Studio Logs Explorer and Logs UI.
 
