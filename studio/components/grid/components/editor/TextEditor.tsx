@@ -68,7 +68,7 @@ export function TextEditor<TRow, TSummaryRow = unknown>({
                   htmlType="button"
                   type="default"
                   size="tiny"
-                  onClick={(event) => saveChanges(null)}
+                  onClick={() => saveChanges(null)}
                 >
                   Set to NULL
                 </Button>
