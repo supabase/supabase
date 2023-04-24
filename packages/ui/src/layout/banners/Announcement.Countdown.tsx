@@ -27,6 +27,7 @@ function CountdownBanner() {
   const { pathname } = useRouter()
   const isLaunchWeekPage = pathname === '/launch-week'
   const isLaunchWeekSection = pathname.includes('launch-week')
+  const basePath = typeof window !== 'undefined' ? window.location.origin : ''
 
   const renderer = ({ days, hours, minutes, seconds, completed }: any) => {
     if (completed) {
@@ -35,7 +36,7 @@ function CountdownBanner() {
         <div className="w-full flex gap-3 md:gap-6 items-center justify-center">
           <p>Supabase Launch Week 7</p>
           <div>
-            <Link href="/launch-week">
+            <Link href={`${basePath}/launch-week`}>
               <a className="bg-white text-xs px-1.5 md:px-2.5 py-1 rounded-full text-[#9E44EF] shadow-none hover:shadow-mg cursor-pointer">
                 Explore
               </a>
@@ -63,7 +64,7 @@ function CountdownBanner() {
           </div>
           {!isLaunchWeekPage && (
             <div className="hidden md:block">
-              <Link href="/launch-week">
+              <Link href={`${basePath}/launch-week`}>
                 <a className="bg-white text-xs px-1.5 md:px-2.5 py-1 rounded-full text-[#9E44EF] shadow-none hover:shadow-mg cursor-pointer">
                   Get your ticket
                 </a>
