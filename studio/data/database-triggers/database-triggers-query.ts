@@ -15,10 +15,9 @@ export async function getDatabaseTriggers(
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('projectRef is required')
-  if (!connectionString) throw new Error('connectionString is required')
 
   let headers = new Headers()
-  headers.set('x-connection-encrypted', connectionString)
+  if (connectionString) headers.set('x-connection-encrypted', connectionString)
 
   const response = (await get(`${API_URL}/pg-meta/${projectRef}/triggers`, {
     headers: Object.fromEntries(headers),
