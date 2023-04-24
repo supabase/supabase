@@ -31,7 +31,11 @@ export const USAGE_BASED_PRODUCTS = [
         tooltip: (
           <span>
             Billing is based on the average daily database size in GB throughout the billing period.{' '}
-            <a href="https://supabase.com/docs/guides/platform/database-usage" target="_blank">
+            <a
+              href="https://supabase.com/docs/guides/platform/database-usage"
+              target="_blank"
+              rel="noreferrer"
+            >
               Docs
             </a>
           </span>

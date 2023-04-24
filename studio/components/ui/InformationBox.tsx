@@ -66,7 +66,7 @@ const InformationBox: FC<Props> = ({
 
             {url && (
               <Link href={url}>
-                <a target="_blank" className="pt-2">
+                <a target="_blank" rel="noreferrer" className="pt-2">
                   <Button type="default" icon={<IconExternalLink />}>
                     {urlLabel}
                   </Button>
