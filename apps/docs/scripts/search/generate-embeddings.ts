@@ -268,4 +268,9 @@ async function main() {
   await generateEmbeddings()
 }
 
-main().catch((err) => console.error(err))
+main().catch((err) => {
+  console.error(err)
+
+  // Exit with non-zero code
+  process.exit(1)
+})
