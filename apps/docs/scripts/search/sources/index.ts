@@ -1,3 +1,4 @@
+import { GitHubDiscussionSource, fetchDiscussions } from './github-discussion'
 import { MarkdownSource } from './markdown'
 import {
   CliReferenceSource,
@@ -13,6 +14,7 @@ export type SearchSource =
   | OpenApiReferenceSource
   | ClientLibReferenceSource
   | CliReferenceSource
+  | GitHubDiscussionSource
 
 /**
  * Fetches all the sources we want to index for search
@@ -71,6 +73,14 @@ export async function fetchSources() {
     .filter(({ path }) => !ignoredFiles.includes(path))
     .map((entry) => new MarkdownSource('guide', entry.path))
 
+  const githubDiscussionSources = (
+    await fetchDiscussions(
+      'supabase',
+      'supabase',
+      'DIC_kwDODMpXOc4CUvEr' // 'Troubleshooting' category
+    )
+  ).map((discussion) => new GitHubDiscussionSource('supabase/supabase', discussion))
+
   const sources: SearchSource[] = [
     openApiReferenceSource,
     jsLibReferenceSource,
@@ -78,6 +88,7 @@ export async function fetchSources() {
     pythonLibReferenceSource,
     cSharpLibReferenceSource,
     cliReferenceSource,
+    ...githubDiscussionSources,
     ...guideSources,
   ]
 
