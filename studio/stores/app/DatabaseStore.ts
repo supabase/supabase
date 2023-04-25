@@ -24,7 +24,7 @@ export default class DatabaseStore extends PostgresMetaInterface<any> {
   async getPoolingConfiguration(projectRef: string) {
     try {
       // Need to use project ref -> shouldn;t need to pass it in via argument
-      const url = `${API_URL}/props/pooling/${projectRef}/config`
+      const url = `${API_URL}/projects/${projectRef}/config/pgbouncer`
       const response = await get(url, { headers: this.headers })
       if (response.error) throw response.error
       return response
