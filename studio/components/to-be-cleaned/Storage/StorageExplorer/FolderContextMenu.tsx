@@ -29,8 +29,8 @@ const FolderContextMenu: FC<Props> = ({ id = '' }) => {
         <span className="ml-2 text-xs">Download</span>
       </Item>
       {canUpdateFiles && [
-        <Separator />,
-        <Item onClick={({ props }) => setSelectedItemsToDelete([props.item])}>
+        <Separator key="separator" />,
+        <Item key="delete" onClick={({ props }) => setSelectedItemsToDelete([props.item])}>
           <IconTrash2 size="tiny" stroke="red" />
           <span className="ml-2 text-xs">Delete</span>
         </Item>,

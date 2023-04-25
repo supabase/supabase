@@ -58,12 +58,11 @@ export default function RLSBannerWarning() {
             size="medium"
             onSelectCancel={() => setIsOpen(false)}
             onSelectConfirm={handleDismissWarning}
-            children={
-              <Modal.Content>
-                <RLSDisableModalContent />
-              </Modal.Content>
-            }
-          />
+          >
+            <Modal.Content>
+              <RLSDisableModalContent />
+            </Modal.Content>
+          </ConfirmationModal>
         </div>
       ) : (
         <></>

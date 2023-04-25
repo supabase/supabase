@@ -37,16 +37,16 @@ const TriggerList: FC<Props> = ({ filterString, schema, editTrigger, deleteTrigg
     <>
       {_triggers.map((x: any) => (
         <Table.tr key={x.id}>
-          <Table.td className="space-x-2 break-all">
-            <p>{x.name}</p>
+          <Table.td className="space-x-2">
+            <p title={x.name} className="truncate">
+              {x.name}
+            </p>
           </Table.td>
           <Table.td className="hidden lg:table-cell break-all">
-            <p>{x.table}</p>
+            <p title={x.table}>{x.table}</p>
           </Table.td>
           <Table.td className="hidden space-x-2 xl:table-cell">
-            <div className="flex flex-col">
-              <p>{x.function_name}</p>
-            </div>
+            <p title={x.function_name}>{x.function_name}</p>
           </Table.td>
           <Table.td className="hidden xl:table-cell">
             <div className="flex space-x-2">

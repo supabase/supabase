@@ -50,6 +50,13 @@ export function withAuth<T>(
       onSuccess(permissions) {
         ui.setPermissions(permissions)
       },
+      onError(error: any) {
+        ui.setNotification({
+          error,
+          category: 'error',
+          message: `Failed to fetch permissions: ${error.message}. Try refreshing your browser, or reach out to us via a support ticket if the issue persists`,
+        })
+      },
     })
 
     const isLoggedIn = Boolean(session)

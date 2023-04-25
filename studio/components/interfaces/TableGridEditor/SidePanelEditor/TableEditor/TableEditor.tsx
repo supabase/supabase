@@ -258,7 +258,7 @@ const TableEditor: FC<Props> = ({
                 )}
                 <p className="mt-4">
                   <Link href="https://supabase.com/docs/guides/auth/row-level-security">
-                    <a target="_blank">
+                    <a target="_blank" rel="noreferrer">
                       <Button type="default" icon={<IconBookOpen strokeWidth={1.5} />}>
                         RLS Documentation
                       </Button>
@@ -273,10 +273,13 @@ const TableEditor: FC<Props> = ({
                 className="!px-4 !py-3 mt-3"
                 title="You are allowing anonymous access to your table"
               >
-                <p>The table foo will be publicly writable and readable</p>
+                <p>
+                  {tableFields.name ? `The table ${tableFields.name}` : 'Your table'} will be
+                  publicly writable and readable
+                </p>
                 <p className="mt-4">
                   <Link href="https://supabase.com/docs/guides/auth/row-level-security">
-                    <a target="_blank">
+                    <a target="_blank" rel="noreferrer">
                       <Button type="default" icon={<IconBookOpen strokeWidth={1.5} />}>
                         RLS Documentation
                       </Button>
@@ -347,12 +350,11 @@ const TableEditor: FC<Props> = ({
                 onUpdateField({ isRLSEnabled: !tableFields.isRLSEnabled })
                 setRlsConfirmVisible(false)
               }}
-              children={
-                <Modal.Content>
-                  <RLSDisableModalContent />
-                </Modal.Content>
-              }
-            />
+            >
+              <Modal.Content>
+                <RLSDisableModalContent />
+              </Modal.Content>
+            </ConfirmationModal>
           </div>
         </SidePanel.Content>
       </>
