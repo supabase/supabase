@@ -91,7 +91,7 @@ export class GitHubDiscussionSource extends BaseSource {
     // Currently the discussion post itself is being considered as the answer
     // (as opposed to a comment marked as answer)
     // So we link the slug to the initial discussion post rather than a comment answer
-    const slug = `#discussion-${databaseId}`
+    const slug = `discussion-${databaseId}`
 
     // Format the discussion title + body as markdown for better embeddings + LLM response
     const content = `# ${title}\n${body}`
