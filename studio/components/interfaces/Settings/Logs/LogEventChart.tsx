@@ -1,5 +1,4 @@
-import { BarChart } from 'components/to-be-cleaned/Charts/ChartRenderer'
-import dayjs from 'dayjs'
+import BarChart from 'components/ui/Charts/BarChart'
 import { EventChartData, isUnixMicro, LogData, unixMicroToIsoTimestamp } from '.'
 import { useMemo } from 'react'
 
@@ -12,29 +11,25 @@ const LogEventChart: React.FC<Props> = ({ data, onBarClick }) => {
   // TODO: remove once endpoint returns iso timestamp directly
   const transformedData = useMemo(() => {
     return data?.map((d) => {
-      const iso = isUnixMicro(d.timestamp)
-        ? unixMicroToIsoTimestamp(d.timestamp)
-        : dayjs(d.timestamp).toISOString()
+      const iso = isUnixMicro(d.timestamp) ? unixMicroToIsoTimestamp(d.timestamp) : d.timestamp
 
       return {
         ...d,
         timestamp: iso,
-        // needed for bar chart
-        // TODO: remove once bar chart is refactored
-        period_start: iso,
       }
     })
   }, [JSON.stringify(data)])
 
-  if (!data) return null
+  if (!transformedData) return null
 
   return (
     <BarChart
       minimalHeader
-      chartSize="tiny"
+      size="tiny"
+      yAxisKey="count"
+      xAxisKey="timestamp"
       data={transformedData}
-      attribute="count"
-      label="Logs / Time"
+      title="Logs / Time"
       onBarClick={(v?: { activePayload?: { payload: any }[] }) => {
         if (!v || !v?.activePayload?.[0]?.payload) return
         const unixOrIsoTimestamp = v.activePayload[0].payload.timestamp
@@ -45,7 +40,6 @@ const LogEventChart: React.FC<Props> = ({ data, onBarClick }) => {
         onBarClick(isoTimestamp)
       }}
       customDateFormat="MMM D, HH:mm:s"
-      noDataMessage={''}
     />
   )
 }
