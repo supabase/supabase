@@ -3,6 +3,7 @@ import dotenv from 'dotenv'
 import 'openai'
 import { Configuration, OpenAIApi } from 'openai'
 import { inspect } from 'util'
+import { v4 as uuidv4 } from 'uuid'
 import { fetchSources } from './sources'
 
 dotenv.config()
@@ -32,6 +33,12 @@ async function generateEmbeddings() {
       },
     }
   )
+
+  // Use this version to track which pages to purge
+  // after the refresh
+  const refreshVersion = uuidv4()
+
+  const refreshDate = new Date()
 
   const embeddingSources = await fetchSources()
 
@@ -92,6 +99,24 @@ async function generateEmbeddings() {
             throw updatePageError
           }
         }
+
+        // No content/embedding update required on this page
+        // Update other meta info
+        const { error: updatePageError } = await supabaseClient
+          .from('page')
+          .update({
+            type,
+            source,
+            meta,
+            version: refreshVersion,
+            last_refresh: refreshDate,
+          })
+          .filter('id', 'eq', existingPage.id)
+
+        if (updatePageError) {
+          throw updatePageError
+        }
+
         continue
       }
 
@@ -137,6 +162,8 @@ async function generateEmbeddings() {
             source,
             meta,
             parent_page_id: parentPage?.id,
+            version: refreshVersion,
+            last_refresh: refreshDate,
           },
           { onConflict: 'path' }
         )
@@ -213,6 +240,18 @@ async function generateEmbeddings() {
       )
       console.error(err)
     }
+  }
+
+  console.log(`Removing old pages and their sections`)
+
+  // Delete pages that have been removed (and their sections via cascade)
+  const { error: deletePageError } = await supabaseClient
+    .from('page')
+    .delete()
+    .filter('version', 'neq', refreshVersion)
+
+  if (deletePageError) {
+    throw deletePageError
   }
 
   console.log('Embedding generation complete')
