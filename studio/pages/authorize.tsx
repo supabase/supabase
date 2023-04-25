@@ -25,6 +25,7 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
 
   return (
     <FormPanel
+      header={<p>Authorize API access for {apiAuthDetails.name}</p>}
       footer={
         <div className="flex items-center justify-end py-4 px-8">
           <div className="flex items-center space-x-2">
@@ -40,25 +41,23 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
     >
       <div className="w-full md:w-[500px] px-8 py-6 space-y-8">
         {/* API Authorization requester details */}
-        <div className="space-y-2">
-          <p>Authorize {apiAuthDetails.name}</p>
-          <div className="flex space-x-4">
-            <div>
-              <div className="rounded-md border border-scale-600 p-2.5 flex items-center">
-                <div
-                  className="w-8 h-8 md:w-10 md:h-10 bg-center bg-no-repeat bg-cover"
-                  style={{ backgroundImage: `url('${apiAuthDetails.icon}')` }}
-                ></div>
-              </div>
+
+        <div className="flex space-x-4">
+          <div>
+            <div className="rounded-md border border-scale-600 p-2.5 flex items-center">
+              <div
+                className="w-8 h-8 md:w-10 md:h-10 bg-center bg-no-repeat bg-cover"
+                style={{ backgroundImage: `url('${apiAuthDetails.icon}')` }}
+              ></div>
             </div>
-            <p className="text-sm text-scale-1100">
-              {apiAuthDetails.name} is requesting API access to an organization. The application
-              will be able to{' '}
-              <span className="text-scale-1200">
-                read and write the organization's settings and projects
-              </span>
-            </p>
           </div>
+          <p className="text-sm text-scale-1100">
+            {apiAuthDetails.name} is requesting API access to an organization. The application will
+            be able to{' '}
+            <span className="text-scale-1200">
+              read and write the organization's settings and projects
+            </span>
+          </p>
         </div>
 
         {/* Expiry warning */}

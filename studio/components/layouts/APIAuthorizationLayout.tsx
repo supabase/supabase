@@ -38,7 +38,6 @@ const APIAuthorizationLayout = ({ children }: PropsWithChildren<APIAuthorization
         </div>
         <Divider light />
         <div className="flex flex-col justify-center flex-grow mx-auto max-w-[90vw] md:max-w-xl h-full space-y-4">
-          <p>Authorize API Access</p>
           {children}
         </div>
       </main>
