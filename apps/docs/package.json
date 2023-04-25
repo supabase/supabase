@@ -94,6 +94,7 @@
     "ui": "*",
     "unist-builder": "^3.0.1",
     "unist-util-filter": "^4.0.1",
+    "uuid": "^9.0.0",
     "valtio": "^1.7.6"
   },
   "devDependencies": {
