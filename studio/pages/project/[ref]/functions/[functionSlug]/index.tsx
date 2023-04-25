@@ -7,7 +7,6 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { checkPermissions } from 'hooks'
 import { useParams } from 'common/hooks'
 import { ChartIntervals, NextPageWithLayout } from 'types'
-import { DATE_FORMAT } from 'lib/constants'
 import NoPermission from 'components/ui/NoPermission'
 import FunctionsLayout from 'components/layouts/FunctionsLayout'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
@@ -25,7 +24,6 @@ const CHART_INTERVALS: ChartIntervals[] = [
     label: '5 min',
     startValue: 1,
     startUnit: 'hour',
-    format: 'MMM D, h:mma',
   },
   { key: '15min', label: '15 min', startValue: 15, startUnit: 'min' },
   { key: '1hr', label: '1 hour', startValue: 1, startUnit: 'hour' },
@@ -36,10 +34,8 @@ const CHART_INTERVALS: ChartIntervals[] = [
 const PageLayout: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref: projectRef, functionSlug } = useParams()
-
   const [interval, setInterval] = useState<string>('15min')
   const selectedInterval = CHART_INTERVALS.find((i) => i.key === interval) || CHART_INTERVALS[1]
-
   const { data: selectedFunction } = useEdgeFunctionQuery({ projectRef, slug: functionSlug })
   const id = selectedFunction?.id
 
