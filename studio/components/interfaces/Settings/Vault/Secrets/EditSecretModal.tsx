@@ -96,6 +96,9 @@ const EditSecretModal: FC<Props> = ({ selectedSecret, onClose }) => {
         onSubmit={onUpdateSecret}
       >
         {({ isSubmitting, resetForm }: any) => {
+          // [Alaister] although this "technically" is breaking the rules of React hooks
+          // it won't error because the hooks are always rendered in the same order
+          // eslint-disable-next-line react-hooks/rules-of-hooks
           useEffect(() => {
             if (selectedSecret !== undefined && selectedSecret.decryptedSecret === undefined) {
               fetchSecretValue()

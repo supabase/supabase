@@ -1,6 +1,6 @@
 import Image from 'next/image'
-import { useState, useRef, useEffect } from 'react'
-import { PostgresTrigger } from '@supabase/postgres-meta'
+import { useState, useRef, useEffect, MutableRefObject } from 'react'
+import { PostgresTable, PostgresTrigger } from '@supabase/postgres-meta'
 import { Button, SidePanel, Form, Input, Listbox, Checkbox, Radio, Badge, Modal } from 'ui'
 
 import { useStore } from 'hooks'
@@ -13,7 +13,10 @@ import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { FormSection, FormSectionLabel, FormSectionContent } from 'components/ui/Forms'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
-import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
+import {
+  EdgeFunctionsResponse,
+  useEdgeFunctionsQuery,
+} from 'data/edge-functions/edge-functions-query'
 import { useDatabaseTriggerCreateMutation } from 'data/database-triggers/database-trigger-create-mutation'
 import { useDatabaseTriggerUpdateMutation } from 'data/database-triggers/database-trigger-update-transaction-mutation'
 
@@ -29,7 +32,7 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
   // [Joshen] Need to change to use RQ once Alaister's PR goes in
   const { ref } = useParams()
   const { meta, ui } = useStore()
-  const submitRef: any = useRef()
+  const submitRef = useRef<any>(null)
   const [isEdited, setIsEdited] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isClosingPanel, setIsClosingPanel] = useState(false)
@@ -278,181 +281,26 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
       >
         <Form validateOnBlur initialValues={initialValues} onSubmit={onSubmit} validate={validate}>
           {({ values, resetForm, errors }: any) => {
-            useEffect(() => {
-              if (values.function_type === 'http_request') {
-                if (selectedHook !== undefined) {
-                  const [url, method] = selectedHook.function_args
-                  const updatedValues = { ...values, http_url: url, http_method: method }
-                  resetForm({ values: updatedValues, initialValues: updatedValues })
-                } else {
-                  const updatedValues = { ...values, http_url: '' }
-                  resetForm({ values: updatedValues, initialValues: updatedValues })
-                }
-              } else if (values.function_type === 'supabase_function') {
-                const fnSlug = (functions ?? [])[0]?.slug
-                const defaultFunctionUrl = `https://${ref}.functions.supabase.${restUrlTld}/${fnSlug}`
-                const updatedValues = {
-                  ...values,
-                  http_url: isEdgeFunction(values.http_url) ? values.http_url : defaultFunctionUrl,
-                }
-                resetForm({ values: updatedValues, initialValues: updatedValues })
-              }
-            }, [values.function_type])
-
             return (
-              <div>
-                <FormSection
-                  header={<FormSectionLabel className="lg:!col-span-4">General</FormSectionLabel>}
-                >
-                  <FormSectionContent loading={false} className="lg:!col-span-8">
-                    <Input
-                      id="name"
-                      name="name"
-                      label="Name"
-                      descriptionText="Do not use spaces/whitespaces"
-                    />
-                  </FormSectionContent>
-                </FormSection>
-                <SidePanel.Separator />
-                <FormSection
-                  header={
-                    <FormSectionLabel
-                      className="lg:!col-span-4"
-                      description={
-                        <p className="text-sm text-scale-1000">
-                          Select which table and events will trigger your webhook
-                        </p>
-                      }
-                    >
-                      Conditions to fire webhook
-                    </FormSectionLabel>
-                  }
-                >
-                  <FormSectionContent loading={false} className="lg:!col-span-8">
-                    <Listbox
-                      size="medium"
-                      id="table_id"
-                      name="table_id"
-                      label="Table"
-                      descriptionText="This is the table the trigger will watch for changes. You can only select 1 table for a trigger."
-                    >
-                      <Listbox.Option
-                        key={'table-no-selection'}
-                        id={'table-no-selection'}
-                        label={'---'}
-                        value={'no-selection'}
-                      >
-                        ---
-                      </Listbox.Option>
-                      {tables.map((table) => (
-                        <Listbox.Option
-                          key={table.id}
-                          id={table.id.toString()}
-                          value={table.id}
-                          label={table.name}
-                        >
-                          <div className="flex items-center space-x-2">
-                            <p className="text-scale-1000">{table.schema}</p>
-                            <p className="text-scale-1200">{table.name}</p>
-                          </div>
-                        </Listbox.Option>
-                      ))}
-                    </Listbox>
-                    <Checkbox.Group
-                      id="events"
-                      name="events"
-                      label="Events"
-                      error={eventsError}
-                      descriptionText="These are the events that are watched by the webhook, only the events selected above will fire the webhook on the table you've selected."
-                    >
-                      {HOOK_EVENTS.map((event) => (
-                        <Checkbox
-                          key={event.value}
-                          value={event.value}
-                          label={event.label}
-                          description={event.description}
-                          checked={events.includes(event.value)}
-                          onChange={() => onUpdateSelectedEvents(event.value)}
-                        />
-                      ))}
-                    </Checkbox.Group>
-                  </FormSectionContent>
-                </FormSection>
-                <SidePanel.Separator />
-                <FormSection
-                  header={
-                    <FormSectionLabel className="lg:!col-span-4">
-                      Webhook configuration
-                    </FormSectionLabel>
-                  }
-                >
-                  <FormSectionContent loading={false} className="lg:!col-span-8">
-                    <Radio.Group
-                      id="function_type"
-                      name="function_type"
-                      label="Type of webhook"
-                      type="cards"
-                    >
-                      {AVAILABLE_WEBHOOK_TYPES.map((webhook) => (
-                        <Radio
-                          key={webhook.value}
-                          id={webhook.value}
-                          value={webhook.value}
-                          label=""
-                          beforeLabel={
-                            <div className="flex items-center space-x-5">
-                              <Image src={webhook.icon} layout="fixed" width="32" height="32" />
-                              <div className="flex-col space-y-0">
-                                <div className="flex space-x-2">
-                                  <p className="text-scale-1200">{webhook.label}</p>
-                                </div>
-                                <p className="text-scale-1000">{webhook.description}</p>
-                              </div>
-                            </div>
-                          }
-                        />
-                      ))}
-                    </Radio.Group>
-                  </FormSectionContent>
-                </FormSection>
-                <SidePanel.Separator />
-
-                <HTTPRequestFields
-                  type={values.function_type}
-                  errors={errors}
-                  httpHeaders={httpHeaders}
-                  httpParameters={httpParameters}
-                  onAddHeader={(header?: any) => {
-                    if (header) setHttpHeaders(httpHeaders.concat(header))
-                    else setHttpHeaders(httpHeaders.concat({ id: uuidv4(), name: '', value: '' }))
-                  }}
-                  onUpdateHeader={(idx, property, value) =>
-                    setHttpHeaders(
-                      httpHeaders.map((header, i) => {
-                        if (idx === i) return { ...header, [property]: value }
-                        else return header
-                      })
-                    )
-                  }
-                  onRemoveHeader={(idx) => setHttpHeaders(httpHeaders.filter((_, i) => idx !== i))}
-                  onAddParameter={() =>
-                    setHttpParameters(httpParameters.concat({ id: uuidv4(), name: '', value: '' }))
-                  }
-                  onUpdateParameter={(idx, property, value) =>
-                    setHttpParameters(
-                      httpParameters.map((param, i) => {
-                        if (idx === i) return { ...param, [property]: value }
-                        else return param
-                      })
-                    )
-                  }
-                  onRemoveParameter={(idx) =>
-                    setHttpParameters(httpParameters.filter((_, i) => idx !== i))
-                  }
-                />
-
-                <button ref={submitRef} type="submit" className="hidden" />
-              </div>
+              <FormContents
+                values={values}
+                resetForm={resetForm}
+                errors={errors}
+                projectRef={ref}
+                restUrlTld={restUrlTld}
+                functions={functions}
+                isEdgeFunction={isEdgeFunction}
+                tables={tables}
+                events={events}
+                eventsError={eventsError}
+                onUpdateSelectedEvents={onUpdateSelectedEvents}
+                httpHeaders={httpHeaders}
+                httpParameters={httpParameters}
+                setHttpHeaders={setHttpHeaders}
+                setHttpParameters={setHttpParameters}
+                submitRef={submitRef}
+                selectedHook={selectedHook}
+              />
             )
           }}
         </Form>
@@ -467,17 +315,222 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
           setIsEdited(false)
           onClose()
         }}
-        children={
-          <Modal.Content>
-            <p className="py-4 text-sm text-scale-1100">
-              There are unsaved changes. Are you sure you want to close the panel? Your changes will
-              be lost.
-            </p>
-          </Modal.Content>
-        }
-      />
+      >
+        <Modal.Content>
+          <p className="py-4 text-sm text-scale-1100">
+            There are unsaved changes. Are you sure you want to close the panel? Your changes will
+            be lost.
+          </p>
+        </Modal.Content>
+      </ConfirmationModal>
     </>
   )
 }
 
 export default EditHookPanel
+
+interface FormContentsProps {
+  values: any
+  resetForm: any
+  errors: any
+  projectRef?: string
+  restUrlTld?: string
+  selectedHook?: PostgresTrigger
+  functions: EdgeFunctionsResponse[] | undefined
+  isEdgeFunction: (url: string) => boolean
+  tables: PostgresTable[]
+  events: string[]
+  eventsError?: string
+  onUpdateSelectedEvents: (event: string) => void
+  httpHeaders: HTTPArgument[]
+  httpParameters: HTTPArgument[]
+  setHttpHeaders: (arr: HTTPArgument[]) => void
+  setHttpParameters: (arr: HTTPArgument[]) => void
+  submitRef: MutableRefObject<any>
+}
+
+const FormContents = ({
+  values,
+  resetForm,
+  errors,
+  projectRef,
+  restUrlTld,
+  selectedHook,
+  functions,
+  isEdgeFunction,
+  tables,
+  events,
+  eventsError,
+  onUpdateSelectedEvents,
+  httpHeaders,
+  httpParameters,
+  setHttpHeaders,
+  setHttpParameters,
+  submitRef,
+}: FormContentsProps) => {
+  useEffect(() => {
+    if (values.function_type === 'http_request') {
+      if (selectedHook !== undefined) {
+        const [url, method] = selectedHook.function_args
+        const updatedValues = { ...values, http_url: url, http_method: method }
+        resetForm({ values: updatedValues, initialValues: updatedValues })
+      } else {
+        const updatedValues = { ...values, http_url: '' }
+        resetForm({ values: updatedValues, initialValues: updatedValues })
+      }
+    } else if (values.function_type === 'supabase_function') {
+      const fnSlug = (functions ?? [])[0]?.slug
+      const defaultFunctionUrl = `https://${projectRef}.functions.supabase.${restUrlTld}/${fnSlug}`
+      const updatedValues = {
+        ...values,
+        http_url: isEdgeFunction(values.http_url) ? values.http_url : defaultFunctionUrl,
+      }
+      resetForm({ values: updatedValues, initialValues: updatedValues })
+    }
+  }, [values.function_type])
+
+  return (
+    <div>
+      <FormSection header={<FormSectionLabel className="lg:!col-span-4">General</FormSectionLabel>}>
+        <FormSectionContent loading={false} className="lg:!col-span-8">
+          <Input
+            id="name"
+            name="name"
+            label="Name"
+            descriptionText="Do not use spaces/whitespaces"
+          />
+        </FormSectionContent>
+      </FormSection>
+      <SidePanel.Separator />
+      <FormSection
+        header={
+          <FormSectionLabel
+            className="lg:!col-span-4"
+            description={
+              <p className="text-sm text-scale-1000">
+                Select which table and events will trigger your webhook
+              </p>
+            }
+          >
+            Conditions to fire webhook
+          </FormSectionLabel>
+        }
+      >
+        <FormSectionContent loading={false} className="lg:!col-span-8">
+          <Listbox
+            size="medium"
+            id="table_id"
+            name="table_id"
+            label="Table"
+            descriptionText="This is the table the trigger will watch for changes. You can only select 1 table for a trigger."
+          >
+            <Listbox.Option
+              key={'table-no-selection'}
+              id={'table-no-selection'}
+              label={'---'}
+              value={'no-selection'}
+            >
+              ---
+            </Listbox.Option>
+            {tables.map((table) => (
+              <Listbox.Option
+                key={table.id}
+                id={table.id.toString()}
+                value={table.id}
+                label={table.name}
+              >
+                <div className="flex items-center space-x-2">
+                  <p className="text-scale-1000">{table.schema}</p>
+                  <p className="text-scale-1200">{table.name}</p>
+                </div>
+              </Listbox.Option>
+            ))}
+          </Listbox>
+          <Checkbox.Group
+            id="events"
+            name="events"
+            label="Events"
+            error={eventsError}
+            descriptionText="These are the events that are watched by the webhook, only the events selected above will fire the webhook on the table you've selected."
+          >
+            {HOOK_EVENTS.map((event) => (
+              <Checkbox
+                key={event.value}
+                value={event.value}
+                label={event.label}
+                description={event.description}
+                checked={events.includes(event.value)}
+                onChange={() => onUpdateSelectedEvents(event.value)}
+              />
+            ))}
+          </Checkbox.Group>
+        </FormSectionContent>
+      </FormSection>
+      <SidePanel.Separator />
+      <FormSection
+        header={
+          <FormSectionLabel className="lg:!col-span-4">Webhook configuration</FormSectionLabel>
+        }
+      >
+        <FormSectionContent loading={false} className="lg:!col-span-8">
+          <Radio.Group id="function_type" name="function_type" label="Type of webhook" type="cards">
+            {AVAILABLE_WEBHOOK_TYPES.map((webhook) => (
+              <Radio
+                key={webhook.value}
+                id={webhook.value}
+                value={webhook.value}
+                label=""
+                beforeLabel={
+                  <div className="flex items-center space-x-5">
+                    <Image src={webhook.icon} layout="fixed" width="32" height="32" />
+                    <div className="flex-col space-y-0">
+                      <div className="flex space-x-2">
+                        <p className="text-scale-1200">{webhook.label}</p>
+                      </div>
+                      <p className="text-scale-1000">{webhook.description}</p>
+                    </div>
+                  </div>
+                }
+              />
+            ))}
+          </Radio.Group>
+        </FormSectionContent>
+      </FormSection>
+      <SidePanel.Separator />
+
+      <HTTPRequestFields
+        type={values.function_type}
+        errors={errors}
+        httpHeaders={httpHeaders}
+        httpParameters={httpParameters}
+        onAddHeader={(header?: any) => {
+          if (header) setHttpHeaders(httpHeaders.concat(header))
+          else setHttpHeaders(httpHeaders.concat({ id: uuidv4(), name: '', value: '' }))
+        }}
+        onUpdateHeader={(idx, property, value) =>
+          setHttpHeaders(
+            httpHeaders.map((header, i) => {
+              if (idx === i) return { ...header, [property]: value }
+              else return header
+            })
+          )
+        }
+        onRemoveHeader={(idx) => setHttpHeaders(httpHeaders.filter((_, i) => idx !== i))}
+        onAddParameter={() =>
+          setHttpParameters(httpParameters.concat({ id: uuidv4(), name: '', value: '' }))
+        }
+        onUpdateParameter={(idx, property, value) =>
+          setHttpParameters(
+            httpParameters.map((param, i) => {
+              if (idx === i) return { ...param, [property]: value }
+              else return param
+            })
+          )
+        }
+        onRemoveParameter={(idx) => setHttpParameters(httpParameters.filter((_, i) => idx !== i))}
+      />
+
+      <button ref={submitRef} type="submit" className="hidden" />
+    </div>
+  )
+}

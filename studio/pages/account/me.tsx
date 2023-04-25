@@ -22,7 +22,7 @@ const User: NextPageWithLayout = () => {
 
 User.getLayout = (page) => (
   <AccountLayout
-    title="Supabase"
+    title="Preferences"
     breadcrumbs={[
       {
         key: `supabase-settings`,
