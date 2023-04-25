@@ -9,7 +9,9 @@ on:
       - 'supabase/migrations/**'
       - 'apps/docs/**'
       - 'spec/**'
-  workflow_dispatch:
+  workflow_dispatch: {}
+  schedule:
+    - cron: '0 0 * * *'
 
 jobs:
   deploy:
