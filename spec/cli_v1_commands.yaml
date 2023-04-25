@@ -414,6 +414,16 @@ commands:
       Runs `pg_prove` in a container with unit test files volume mounted from `supabase/tests` directory. The test file can be suffixed by either `.sql` or `.pg` extension.
 
       Since each test is wrapped in its own transaction, it will be individually rolled back regardless of success or failure.
+    examples:
+      - id: basic-usage
+        name: Basic usage
+        code: supabase test db
+        response: |
+          /tmp/supabase/tests/nested/order_test.pg .. ok
+          /tmp/supabase/tests/pet_test.sql .......... ok
+          All tests successful.
+          Files=2, Tests=2,  6 wallclock secs ( 0.03 usr  0.01 sys +  0.05 cusr  0.02 csys =  0.11 CPU)
+          Result: PASS
     tags: []
     links: []
     usage: supabase test db
@@ -469,7 +479,8 @@ commands:
         response: |
           supabase local development setup is running.
 
-                  API URL: http://localhost:54321
+                   API URL: http://localhost:54321
+               GraphQL URL: http://localhost:54321/graphql/v1
                     DB URL: postgresql://postgres:postgres@localhost:54322/postgres
                 Studio URL: http://localhost:54323
               Inbucket URL: http://localhost:54324
@@ -483,6 +494,7 @@ commands:
           ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0"
           API_URL="http://localhost:54321"
           DB_URL="postgresql://postgres:postgres@localhost:54322/postgres"
+          GRAPHQL_URL="http://localhost:54321/graphql/v1"
           INBUCKET_URL="http://localhost:54324"
           JWT_SECRET="super-secret-jwt-token-with-at-least-32-characters-long"
           SERVICE_ROLE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU"
@@ -494,6 +506,7 @@ commands:
           Stopped services: [supabase_inbucket_cli supabase_rest_cli supabase_studio_cli]
           SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0"
           DB_URL="postgresql://postgres:postgres@localhost:54322/postgres"
+          GRAPHQL_URL="http://localhost:54321/graphql/v1"
           JWT_SECRET="super-secret-jwt-token-with-at-least-32-characters-long"
           SUPABASE_SERVICE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU"
     tags:
@@ -545,6 +558,7 @@ commands:
         name: Basic usage
         code: supabase start
         response: |
+          Creating custom roles supabase/roles.sql...
           Applying migration 20220810154536_employee.sql...
           Seeding data supabase/seed.sql...
           Started supabase local development setup.
@@ -554,13 +568,11 @@ commands:
         response: |
           Excluding container: supabase/studio:20221214-4eecc99
           Excluding container: darthsim/imgproxy:v3.8.0
-          Seeding data supabase/seed.sql...
           Started supabase local development setup.
       - id: ignore-health-check
         name: Ignore service health checks
         code: supabase start --ignore-health-check
         response: |
-          Seeding data supabase/seed.sql...
           service not healthy: [supabase_storage_cli]
           Started supabase local development setup.
     tags:
@@ -1448,6 +1460,18 @@ commands:
       Requires the local development stack to be started by running `supabase start`.
 
       Recreates the local Postgres container and applies all local migrations found in `supabase/migrations` directory. If test data is defined in `supabase/seed.sql`, it will be seeded after the migrations are run. Any other data or schema changes made during local development will be discarded.
+
+      Note that since postgres roles are cluster level entities, those changes will persist between resets. In order to reset custom roles, you need to restart the local development stack.
+    examples:
+      - id: basic-usage
+        name: Basic usage
+        code: supabase db reset
+        response: |
+          Resetting database...
+          Initialising schema...
+          Applying migration 20220810154537_create_employees_table.sql...
+          Seeding data supabase/seed.sql...
+          Finished supabase db reset on branch main.
     tags: []
     links: []
     usage: supabase db reset
@@ -1499,6 +1523,26 @@ commands:
       If you need to mutate the migration history table, such as deleting existing entries or inserting new entries without actually running the migration, use the `migration repair` command.
 
       Use the `--dry-run` flag to view the list of changes before applying.
+    examples:
+      - id: basic-usage
+        name: Basic usage
+        code: supabase db push
+        response: |
+          Linked project is up to date.
+      - id: self-hosted
+        name: Self hosted
+        code: supabase db push --db-url "postgres://user:pass@localhost:5432/postgres"
+        response: |
+          Pushing migration 20230410135622_create_employees_table.sql...
+          Finished supabase db push.
+      - id: dry-run
+        name: Dry run
+        code: supabase db push --dry-run
+        response: |
+          DRY RUN: migrations will *not* be pushed to the database.
+          Would push migration 20230410135622_create_employees_table.sql...
+          Would push migration 20230425064254_my_table.sql...
+          Finished supabase db push.
     tags: []
     links: []
     usage: supabase db push [flags]
@@ -1526,9 +1570,34 @@ commands:
 
       Requires the local development stack to be running when linting against the local database. To lint against a remote or self-hosted database, specify the `--linked` or `--db-url` flag respectively.
 
-      Runs `plpgsql_check` extension in the local Postgres container to check for errors in all schemas. The default lint level is error and is configurable via the `--level` flag.
+      Runs `plpgsql_check` extension in the local Postgres container to check for errors in all schemas. The default lint level is `warning` and can be raised to error via the `--level` flag.
 
       To lint against specific schemas only, pass in the `--schema` flag.
+    examples:
+      - id: basic-usage
+        name: Basic usage
+        code: supabase db lint
+        response: |
+          Linting schema: public
+
+          No schema errors found
+      - id: schema-warnings
+        name: Warnings for a specific schema
+        code: supabase db lint --level warning --schema storage
+        response: |
+          Linting schema: storage
+          [
+            {
+              "function": "storage.search",
+              "issues": [
+                {
+                  "level": "warning",
+                  "message": "unused variable \"_bucketid\"",
+                  "sqlState": "00000"
+                }
+              ]
+            }
+          ]
     tags: []
     links: []
     usage: supabase db lint [flags]
@@ -1565,6 +1634,25 @@ commands:
       Runs `pg_dump` in a container with additional flags to exclude Supabase managed schemas. The ignored schemas include auth, stroage, and those created by extensions.
 
       The default dump does not contain any data or custom roles. To dump those contents explicitly, specify either the `--data-only` and `--role-only` flag.
+    examples:
+      - id: basic-usage
+        name: Basic usage
+        code: supabase db dump -f supabase/schema.sql
+        response: |
+          Dumping schemas from remote database...
+          Dumped schema to supabase/schema.sql.
+      - id: role-only
+        name: Role only
+        code: supabase db dump -f supabase/roles.sql --role-only
+        response: |
+          Dumping roles from remote database...
+          Dumped schema to supabase/roles.sql.
+      - id: data-only
+        name: Data only
+        code: supabase db dump -f supabase/seed.sql --data-only
+        response: |
+          Dumping data from remote database...
+          Dumped schema to supabase/seed.sql.
     tags: []
     links: []
     usage: supabase db dump [flags]
@@ -1608,6 +1696,39 @@ commands:
       - Changes to publication
       - Changes to storage buckets
       - Views with `security_invoker` attributes
+    examples:
+      - id: basic-usage
+        name: Basic usage
+        code: supabase db diff -f my_table
+        response: |
+          Connecting to local database...
+          Creating shadow database...
+          Applying migration 20230425064254_remote_commit.sql...
+          Diffing schemas: auth,extensions,public,storage
+          Finished supabase db diff on branch main.
+
+          No schema changes found
+      - id: linked-project
+        name: Against linked project
+        code: supabase db diff -f my_table --linked
+        response: |
+          Connecting to local database...
+          Creating shadow database...
+          Diffing schemas: auth,extensions,public,storage
+          Finished supabase db diff on branch main.
+
+          WARNING: The diff tool is not foolproof, so you may need to manually rearrange and modify the generated migration.
+          Run supabase db reset to verify that the new migration does not generate errors.
+      - id: specific-schema
+        name: For a specific schema
+        code: supabase db diff -f my_table --schema auth
+        response: |
+          Connecting to local database...
+          Creating shadow database...
+          Diffing schemas: auth
+          Finished supabase db diff on branch main.
+
+          No schema changes found
     tags: []
     links: []
     usage: supabase db diff [flags]
