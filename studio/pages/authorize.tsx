@@ -21,7 +21,37 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
     name: 'Cloudflare',
   }
 
+  // [Joshen] To be replaced with actual API call above
+  const isApiAuthDetailsError = false
   const isExpired = false
+
+  if (auth_id === undefined) {
+    return (
+      <FormPanel header={<p>Authorization for API access</p>}>
+        <div className="w-[500px] px-8 py-6">
+          <Alert withIcon variant="warning" title="Missing authorization ID">
+            Please provide a valid authorization ID in the URL
+          </Alert>
+        </div>
+      </FormPanel>
+    )
+  }
+
+  if (isApiAuthDetailsError) {
+    return (
+      <FormPanel header={<p>Authorization for API access</p>}>
+        <div className="w-[500px] px-8 py-6">
+          <Alert
+            withIcon
+            variant="warning"
+            title="Failed to fetch details for API authorization request"
+          >
+            Please retry your authorization request from the requesting app
+          </Alert>
+        </div>
+      </FormPanel>
+    )
+  }
 
   return (
     <FormPanel
