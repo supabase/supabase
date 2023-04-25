@@ -68,10 +68,8 @@ const ConnectionPooling: FC<Props> = () => {
     )
   }
 
-  const { project } = poolingConfiguration
-
   // for older projects
-  if (!project.pgbouncer_enabled && project.pool_mode == null)
+  if (!poolingConfiguration.pgbouncer_enabled && poolingConfiguration.pool_mode == null)
     return (
       <Panel
         title={
@@ -85,7 +83,7 @@ const ConnectionPooling: FC<Props> = () => {
         </Panel.Content>
       </Panel>
     )
-  const formModel = project
+  const formModel = poolingConfiguration
   const DB_FIELDS = ['db_host', 'db_name', 'db_port', 'db_user', 'inserted_at']
   const connectionInfo = pluckObjectFields(formModel, DB_FIELDS)
   const BOUNCER_FIELDS = [
@@ -137,6 +135,7 @@ export const PgbouncerConfig: FC<ConfigProps> = observer(
       pool_mode: bouncerInfo.pool_mode || 'transaction',
       default_pool_size: bouncerInfo.default_pool_size || '',
       ignore_startup_parameters: bouncerInfo.ignore_startup_parameters || '',
+      pgbouncer_enabled: bouncerInfo.pgbouncer_enabled,
     })
 
     const updateConfig = async (updatedConfig: any) => {
@@ -148,7 +147,7 @@ export const PgbouncerConfig: FC<ConfigProps> = observer(
         if (response.error) {
           throw response.error
         } else {
-          setUpdates({ ...response.project })
+          setUpdates({ ...response })
           ui.setNotification({ category: 'success', message: 'Successfully saved settings' })
         }
       } catch (error: any) {
