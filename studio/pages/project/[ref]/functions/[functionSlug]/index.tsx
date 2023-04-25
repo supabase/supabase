@@ -27,10 +27,10 @@ const CHART_INTERVALS: ChartIntervals[] = [
     startUnit: 'hour',
     format: 'MMM D, h:mma',
   },
-  { key: '15min', label: '15 min', startValue: 24, startUnit: 'hour', format: 'MMM D, ha' },
-  { key: '1hr', label: '1 hour', startValue: 7, startUnit: 'day', format: 'MMM D' },
-  { key: '1day', label: '1 day', startValue: 7, startUnit: 'day', format: 'MMM D' },
-  { key: '7day', label: '7 days', startValue: 7, startUnit: 'day', format: 'MMM D' },
+  { key: '15min', label: '15 min', startValue: 15, startUnit: 'min' },
+  { key: '1hr', label: '1 hour', startValue: 1, startUnit: 'hour' },
+  { key: '1day', label: '1 day', startValue: 1, startUnit: 'day' },
+  { key: '7day', label: '7 days', startValue: 7, startUnit: 'day' },
 ]
 
 const PageLayout: NextPageWithLayout = () => {
@@ -49,7 +49,6 @@ const PageLayout: NextPageWithLayout = () => {
     interval: selectedInterval.key,
   })
   const isChartLoading = !data?.result && !error ? true : false
-  console.log(isChartLoading)
   const chartData = useMemo(() => {
     return (data?.result || []).map((d: any) => ({
       ...d,
@@ -57,11 +56,10 @@ const PageLayout: NextPageWithLayout = () => {
     }))
   }, [data?.result])
 
-  const startDate = dayjs()
-    .subtract(selectedInterval.startValue, selectedInterval.startUnit)
-    .format(DATE_FORMAT)
-  const endDate = dayjs().format(DATE_FORMAT)
-
+  const startDate = dayjs().subtract(
+    selectedInterval.startValue,
+    selectedInterval.startUnit as dayjs.ManipulateType
+  )
   const canReadFunction = checkPermissions(PermissionAction.FUNCTIONS_READ, functionSlug as string)
   if (!canReadFunction) {
     return <NoPermission isFullPage resourceText="access this edge function" />
@@ -99,47 +97,45 @@ const PageLayout: NextPageWithLayout = () => {
         </span>
       </div>
       <div className="">
-        {startDate && endDate && (
-          <>
-            <div className="grid grid-cols-1 md:grid-cols-2 md:gap-4 lg:grid-cols-2 lg:gap-8">
-              <ReportWidget
-                title="Execution time"
-                tooltip="Average execution time of function invocations"
-                data={chartData}
-                isLoading={isChartLoading}
-                renderer={(props) => (
-                  <AreaChart
-                    className="w-full"
-                    xAxisKey="timestamp"
-                    yAxisKey="avg_execution_time"
-                    data={props.data}
-                    format="ms"
-                    highlightedValue={meanBy(props.data, 'avg_execution_time')}
-                  />
-                )}
+        <div className="grid grid-cols-1 md:grid-cols-2 md:gap-4 lg:grid-cols-2 lg:gap-8">
+          <ReportWidget
+            title="Execution time"
+            tooltip="Average execution time of function invocations"
+            data={chartData}
+            isLoading={isChartLoading}
+            renderer={(props) => (
+              <AreaChart
+                className="w-full"
+                xAxisKey="timestamp"
+                yAxisKey="avg_execution_time"
+                data={props.data}
+                format="ms"
+                highlightedValue={meanBy(props.data, 'avg_execution_time')}
               />
-              <ReportWidget
-                title="Invocations"
-                data={chartData}
-                isLoading={isChartLoading}
-                renderer={(props) => (
-                  <BarChart
-                    className="w-full"
-                    xAxisKey="timestamp"
-                    yAxisKey="count"
-                    data={props.data}
-                    highlightedValue={sumBy(props.data, 'count')}
-                    onBarClick={(v) => {
-                      router.push(
-                        `/project/${projectRef}/functions/${functionSlug}/invocations?ite=${v.timestamp}`
-                      )
-                    }}
-                  />
-                )}
+            )}
+          />
+          <ReportWidget
+            title="Invocations"
+            data={chartData}
+            isLoading={isChartLoading}
+            renderer={(props) => (
+              <BarChart
+                className="w-full"
+                xAxisKey="timestamp"
+                yAxisKey="count"
+                data={props.data}
+                highlightedValue={sumBy(props.data, 'count')}
+                onBarClick={(v) => {
+                  router.push(
+                    `/project/${projectRef}/functions/${functionSlug}/invocations?its=${startDate.toISOString()}&ite=${
+                      v.timestamp
+                    }`
+                  )
+                }}
               />
-            </div>
-          </>
-        )}
+            )}
+          />
+        </div>
       </div>
     </div>
   )
