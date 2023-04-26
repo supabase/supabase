@@ -88,6 +88,50 @@ const { data, error } = await supabase.functions.invoke('hello-world', {
 
 After invoking your Edge Function you should see the response `{ "message":"Hello Functions!" }`.
 
+## Setting Up Your Environment
+
+You can follow the [Deno guide](https://deno.com/manual@v1.32.5/getting_started/setup_your_environment) for setting up your development environment with your favorite editor/IDE.
+
+When developing with VS Code inside of an existing application, you can utilize [multi-root workspaces](https://code.visualstudio.com/docs/editor/workspaces#_multiroot-workspaces).
+
+<div className="video-container">
+  <iframe
+    src="https://www.youtube-nocookie.com/embed/lFhU3L8VoSQ"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
+
+For example, see this `edge-functions.code-workspace` configuration for a CRA (create react app) client with Supabase Edge Functions. You can find the complete example on [GitHub](https://github.com/supabase/supabase/tree/master/examples/edge-functions).
+
+```json
+{
+  "folders": [
+    {
+      "name": "project-root",
+      "path": "./"
+    },
+    {
+      "name": "client",
+      "path": "app"
+    },
+    {
+      "name": "supabase-functions",
+      "path": "supabase/functions"
+    }
+  ],
+  "settings": {
+    "files.exclude": {
+      "node_modules/": true,
+      "app/": true,
+      "supabase/functions/": true
+    },
+    "deno.importMap": "./supabase/functions/import_map.json"
+  }
+}
+```
+
 ## Database Functions vs Edge Functions
 
 For data-intensive operations we recommend using [Database Functions](/docs/guides/database/functions), which are executed within your database
