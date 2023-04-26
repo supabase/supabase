@@ -20,7 +20,10 @@ const FeedbackDropdown = () => {
   return (
     <Popover
       open={isOpen}
-      onOpenChange={(e) => setIsOpen(e)}
+      onOpenChange={(e) => {
+        setIsOpen(e)
+        if (!e) setScreenshot(undefined)
+      }}
       size="content"
       side="bottom"
       align="end"

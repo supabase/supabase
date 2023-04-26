@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { groupBy } from 'lodash'
 import { useState } from 'react'
 import { Button, IconExternalLink } from 'ui'
 import { observer } from 'mobx-react-lite'
@@ -11,7 +12,6 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import WrappersDropdown from './WrappersDropdown'
 import WrappersDisabledState from './WrappersDisabledState'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { groupBy } from 'lodash'
 
 const Wrappers = () => {
   const { meta } = useStore()
@@ -31,9 +31,9 @@ const Wrappers = () => {
 
   const isWrappersEnabled =
     wrappersExtension !== undefined &&
-    wrappersExtension?.installed_version !== null &&
+    wrappersExtension.installed_version !== null &&
     vaultExtension !== undefined &&
-    vaultExtension?.installed_version !== null
+    vaultExtension.installed_version !== null
 
   return (
     <div>
@@ -46,7 +46,7 @@ const Wrappers = () => {
         </div>
         <div className="flex items-center space-x-2">
           <Link href="">
-            <a target="_blank">
+            <a target="_blank" rel="noreferrer">
               <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
                 Documentation
               </Button>

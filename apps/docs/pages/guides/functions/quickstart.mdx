@@ -5,6 +5,7 @@ export const meta = {
   title: 'Edge Functions Quickstart',
   description: 'Globally distributed TypeScript Functions.',
   sidebar_label: 'Quickstart',
+  video: 'https://www.youtube.com/v/rzglqRdZUQE',
 }
 
 Learn how to build an Edge Function locally and deploy it to the Supabase Platform in less than 7 minutes.
@@ -24,11 +25,11 @@ Follow the steps to prepare your Supabase project on your local machine.
 
 - Install the Supabase CLI. [Docs](/docs/guides/cli).
 - Login to the CLI using the command: `supabase login`. [Docs](/docs/reference/cli/usage#supabase-login).
-- Initialize Supabase inside your project using the command: `supabase init`. [Docs](/docs/guides/cli/local-development#getting-started).
+- Initialize Supabase inside your project using the command: `supabase init`. [Docs](/docs/guides/getting-started/local-development#getting-started).
 - Link to your Remote Project using the command `supabase link --project-ref your-project-ref`. [Docs](/docs/reference/cli/usage#supabase-link).
 - Optional: Setup your environment: Follow [this setup guide](https://deno.land/manual/getting_started/setup_your_environment) to integrate the Deno language server with your editor.
 
-## Create a function
+## Create an Edge Function
 
 Let's create a new Edge Function called `hello-world` inside your project:
 
@@ -126,9 +127,9 @@ Edge Functions supports `GET`, `POST`, `PUT`, `PATCH`, `DELETE`, and `OPTIONS`. 
 
 - Deno Deploy limitations
   - Deno does not support outgoing connections to ports `25`, `465`, and `587`.
-  - Cannot write to File System
+  - Cannot read or write to File System
+  - NPM modules are not supported.
 - Edge Functions
-  - Local development - only one function at a time
   - Serving of HTML content is not supported (`GET` requests that return `text/html` will be rewritten to `text/plain`).
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />

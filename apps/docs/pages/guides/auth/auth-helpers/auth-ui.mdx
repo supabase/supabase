@@ -23,7 +23,7 @@ It supports custom themes and extensible styles to match your brand and aestheti
 Install the latest version of [supabase-js](/docs/reference/javascript) and the Auth UI package:
 
 ```bash
-npm install @supabase/supabase-js @supabase/auth-ui-react
+npm install @supabase/supabase-js @supabase/auth-ui-react @supabase/auth-ui-shared
 ```
 
 ### Import the Auth component
@@ -34,24 +34,21 @@ Pass `supabaseClient` from `@supabase/supabase-js` as a prop to the component.
 import { createClient } from '@supabase/supabase-js'
 import { Auth } from '@supabase/auth-ui-react'
 
-const supabase = createClient(
-  '<INSERT PROJECT URL>',
-  '<INSERT PROJECT ANON API KEY>'
-)
+const supabase = createClient('<INSERT PROJECT URL>', '<INSERT PROJECT ANON API KEY>')
 
 const App = () => <Auth supabaseClient={supabase} />
 ```
 
 This renders the Auth component without any styling.
 We recommend using one of the predefined themes to style the UI.
-Import the theme you want to use and pass it to the `appearence.theme` prop.
+Import the theme you want to use and pass it to the `appearance.theme` prop.
 
 ```js lines=4,16 title=/src/index.js
+import { Auth } from '@supabase/auth-ui-react'
 import {
-  Auth,
   // Import predefined theme
   ThemeSupa,
-} from '@supabase/auth-ui-react'
+} from '@supabase/auth-ui-shared'
 
 const supabase = createClient(
   '<INSERT PROJECT URL>',
@@ -69,25 +66,35 @@ const App = () => (
 
 ### Social Providers
 
-The Auth component also supports login with [offical social providers](../../auth#providers).
+The Auth component also supports login with [official social providers](../../auth#providers).
 
 ```js lines=13 title=/src/index.js
 import { createClient } from '@supabase/supabase-js'
-import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
+import { Auth } from '@supabase/auth-ui-react'
+import { ThemeSupa } from '@supabase/auth-ui-shared'
 
-const supabase = createClient(
-  '<INSERT PROJECT URL>',
-  '<INSERT PROJECT ANON API KEY>'
-)
+const supabase = createClient('<INSERT PROJECT URL>', '<INSERT PROJECT ANON API KEY>')
 
 const App = () => (
   <Auth
     supabaseClient={supabase}
     appearance={{ theme: ThemeSupa }}
-    providers={['google', 'facebook', 'twitter']} 
+    providers={['google', 'facebook', 'twitter']}
   />
 )
 ```
+
+### Supported Views
+
+The Auth component is currently shipped with the following views:
+
+- [Email Login](../auth-email)
+- [Magic Link login](../auth-magic-link)
+- [Social Login](../social-login)
+- Update password
+- Forgotten password
+
+We are planning on adding more views in the future.  Follow along on that [repo](https://github.com/supabase/auth-ui).
 
 ## Customization
 
@@ -102,11 +109,12 @@ There are several ways to customize Auth UI:
 
 ### Predefined themes
 
-Auth UI comes with several themes to customize the appearance. Each predefined theme comes with at least two variations, a `default` variation, and a `dark` variation. You can switch between these themes using the `theme` prop. Import the theme you want to use and pass it to the `appearence.theme` prop.
+Auth UI comes with several themes to customize the appearance. Each predefined theme comes with at least two variations, a `default` variation, and a `dark` variation. You can switch between these themes using the `theme` prop. Import the theme you want to use and pass it to the `appearance.theme` prop.
 
 ```js lines=2,13 title=/src/index.js
 import { createClient } from '@supabase/supabase-js'
-import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
+import { Auth } from '@supabase/auth-ui-react'
+import { ThemeSupa } from '@supabase/auth-ui-shared'
 
 const supabase = createClient(
   '<INSERT PROJECT URL>',
@@ -134,7 +142,8 @@ Auth UI comes with two theme variations: `default` and `dark`. You can switch be
 
 ```js lines=14 title=/src/index.js
 import { createClient } from '@supabase/supabase-js'
-import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
+import { Auth } from '@supabase/auth-ui-react'
+import { ThemeSupa } from '@supabase/auth-ui-shared'
 
 const supabase = createClient(
   '<INSERT PROJECT URL>',
@@ -155,16 +164,14 @@ If you don't pass a value to `theme` it uses the `"default"` theme. You can pass
 
 ### Override themes
 
-Auth UI themes can be overridden using variable tokens. See the [list of variable tokens](https://github.com/supabase-community/auth-ui/blob/main/packages/react/common/theming/Themes.tsx).
+Auth UI themes can be overridden using variable tokens. See the [list of variable tokens](https://github.com/supabase/auth-ui/blob/main/packages/shared/src/theming/Themes.ts).
 
 ```js lines=14-21 title=/src/index.js
 import { createClient } from '@supabase/supabase-js'
-import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
+import { Auth } from '@supabase/auth-ui-react'
+import { ThemeSupa } from '@supabase/auth-ui-shared'
 
-const supabase = createClient(
-  '<INSERT PROJECT URL>',
-  '<INSERT PROJECT ANON API KEY>'
-)
+const supabase = createClient('<INSERT PROJECT URL>', '<INSERT PROJECT ANON API KEY>')
 
 const App = () => (
   <Auth
@@ -189,7 +196,7 @@ If you created your own theme, you may not need to override any of the them.
 ### Create your own theme [#create-theme]
 
 You can create your own theme by following the same structure within a `appearance.theme` property.
-See the list of [tokens within a theme](https://github.com/supabase-community/auth-ui/blob/main/packages/react/common/theming/Themes.tsx).
+See the list of [tokens within a theme](https://github.com/supabase/auth-ui/blob/main/packages/shared/src/theming/Themes.ts).
 
 ```js title=/src/index.js
 import { createClient } from '@supabase/supabase-js'
@@ -247,15 +254,15 @@ You can use custom CSS classes for the following elements:
 import { createClient } from '@supabase/supabase-js'
 import { Auth } from '@supabase/auth-ui-react'
 
-const supabase = createClient(
-  '<INSERT PROJECT URL>',
-  '<INSERT PROJECT ANON API KEY>'
-)
+const supabase = createClient('<INSERT PROJECT URL>', '<INSERT PROJECT ANON API KEY>')
 
 const App = () => (
   <Auth
     supabaseClient={supabase}
     appearance={{
+      // If you want to extend the default styles instead of overriding it, set this to true
+      extend: false,
+      // Your custom classes
       className: {
         anchor: 'my-awesome-anchor',
         button: 'my-awesome-button',
@@ -275,10 +282,7 @@ You can use custom CSS inline styles for the following elements:
 import { createClient } from '@supabase/supabase-js'
 import { Auth } from '@supabase/auth-ui-react'
 
-const supabase = createClient(
-  '<INSERT PROJECT URL>',
-  '<INSERT PROJECT ANON API KEY>'
-)
+const supabase = createClient('<INSERT PROJECT URL>', '<INSERT PROJECT ANON API KEY>')
 
 const App = () => (
   <Auth
@@ -296,16 +300,13 @@ const App = () => (
 
 ### Custom labels [#custom-labels]
 
-You can use custom labels with `localization.variables`. See the [list of labels](https://github.com/supabase-community/auth-ui/blob/main/packages/react/common/lib/Localization/en.json) that can be overwritten.
+You can use custom labels with `localization.variables`. See the [list of labels](https://github.com/supabase/auth-ui/blob/main/packages/shared/src/localization/en.json) that can be overwritten.
 
 ```js title=/src/index.js
 import { createClient } from '@supabase/supabase-js'
 import { Auth } from '@supabase/auth-ui-react'
 
-const supabase = createClient(
-  '<INSERT PROJECT URL>',
-  '<INSERT PROJECT ANON API KEY>'
-)
+const supabase = createClient('<INSERT PROJECT URL>', '<INSERT PROJECT ANON API KEY>')
 
 const App = () => (
   <Auth
@@ -323,6 +324,8 @@ const App = () => (
   />
 )
 ```
+
+Currently, translating error messages (e.g. "Invalid credentials") is not supported. Check [related issue.](https://github.com/supabase/auth-ui/issues/86)
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

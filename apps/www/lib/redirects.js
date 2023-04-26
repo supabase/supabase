@@ -618,7 +618,7 @@ module.exports = [
   {
     permanent: true,
     source: '/_app',
-    destination: 'https://app.supabase.com',
+    destination: 'https://supabase.com/dashboard',
   },
   {
     permanent: true,
@@ -1155,7 +1155,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/reference/cli/about',
-    destination: '/docs/reference/cli',
+    destination: '/docs/reference/cli/introduction',
   },
   {
     permanent: true,
@@ -1165,118 +1165,44 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-help',
-    destination: '/docs/reference/cli/usage',
-  },
-  {
-    permanent: true,
-    source: '/docs/reference/cli/supabase-login',
-    destination: '/docs/reference/cli/usage',
-  },
-  {
-    permanent: true,
-    source: '/docs/reference/cli/supabase-link',
-    destination: '/docs/reference/cli/usage',
-  },
-  {
-    permanent: true,
-    source: '/docs/reference/cli/supabase-init',
-    destination: '/docs/reference/cli/usage',
-  },
-  {
-    permanent: true,
-    source: '/docs/reference/cli/supabase-start',
-    destination: '/docs/reference/cli/usage',
+    destination: '/docs/reference/cli/global-flags',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-branch-list',
-    destination: '/docs/reference/cli/usage',
+    destination: '/docs/reference/supabase-db',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-branch-create',
-    destination: '/docs/reference/cli/usage',
+    destination: '/docs/reference/supabase-db',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-branch-delete',
-    destination: '/docs/reference/cli/usage',
+    destination: '/docs/reference/supabase-db',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-switch',
-    destination: '/docs/reference/cli/usage',
+    destination: '/docs/reference/supabase-db',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-changes',
-    destination: '/docs/reference/cli/usage',
+    destination: '/docs/reference/supabase-db',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-commit',
-    destination: '/docs/reference/cli/usage',
+    destination: '/docs/reference/supabase-db',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-remote-set',
-    destination: '/docs/reference/cli/usage',
+    destination: '/docs/reference/supabase-db',
   },
-  {
-    permanent: true,
-    source: '/docs/reference/cli/supabase-functions-delete',
-    destination: '/docs/reference/cli/usage',
-  },
-  {
-    permanent: true,
-    source: '/docs/reference/cli/supabase-functions-deploy',
-    destination: '/docs/reference/cli/usage',
-  },
-  {
-    permanent: true,
-    source: '/docs/reference/cli/supabase-functions-new',
-    destination: '/docs/reference/cli/usage',
-  },
-  {
-    permanent: true,
-    source: '/docs/reference/cli/supabase-functions-serve',
-    destination: '/docs/reference/cli/usage',
-  },
-  {
-    permanent: true,
-    source: '/docs/reference/cli/supabase-migration-new',
-    destination: '/docs/reference/cli/usage',
-  },
-  {
-    permanent: true,
-    source: '/docs/reference/cli/supabase-orgs-list',
-    destination: '/docs/reference/cli/usage',
-  },
-  {
-    permanent: true,
-    source: '/docs/reference/cli/supabase-projects-list',
-    destination: '/docs/reference/cli/usage',
-  },
-  {
-    permanent: true,
-    source: '/docs/reference/cli/supabase-projects-create',
-    destination: '/docs/reference/cli/usage',
-  },
-  {
-    permanent: true,
-    source: '/docs/reference/cli/supabase-secrets-list',
-    destination: '/docs/reference/cli/usage',
-  },
-  {
-    permanent: true,
-    source: '/docs/reference/cli/supabase-secrets-set',
-    destination: '/docs/reference/cli/usage',
-  },
-  {
-    permanent: true,
-    source: '/docs/reference/cli/supabase-secrets-unset',
-    destination: '/docs/reference/cli/usage',
-  },
+
   {
     permanent: true,
     source: '/docs/reference/tools/reference-auth',
@@ -1294,13 +1220,13 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/docs/guides/realtime/broadcast',
-    destination: '/docs/guides/realtime#broadcast',
+    source: '/docs/guides/realtime#broadcast',
+    destination: '/docs/guides/realtime/broadcast',
   },
   {
     permanent: true,
-    source: '/docs/guides/realtime/presence',
-    destination: '/docs/guides/realtime#presence',
+    source: '/docs/guides/realtime#presence',
+    destination: '/docs/guides/realtime/presence',
   },
   {
     permanent: true,
@@ -1532,17 +1458,17 @@ module.exports = [
   {
     permanent: true,
     source: '/sign-in',
-    destination: 'https://app.supabase.com/sign-in',
+    destination: 'https://supabase.com/dashboard/sign-in',
   },
   {
     permanent: true,
     source: '/sign-up',
-    destination: 'https://app.supabase.com/sign-up',
+    destination: 'https://supabase.com/dashboard/sign-up',
   },
   {
     permanent: true,
     source: '/forgot-password',
-    destination: 'https://app.supabase.com/forgot-password',
+    destination: 'https://supabase.com/dashboard/forgot-password',
   },
   {
     permanent: true,
@@ -1562,7 +1488,7 @@ module.exports = [
   {
     permanent: true,
     source: '/projects',
-    destination: 'https://app.supabase.com/projects',
+    destination: 'https://supabase.com/dashboard/projects',
   },
   // START docs 2.0, moving pages in to structure
   {
@@ -1605,7 +1531,7 @@ module.exports = [
     source: '/docs/guides/auth/passwordless-login/phone-sms-otp-messagebird',
     destination: '/docs/guides/auth/phone-login/messagebird',
   },
-  { permanent: true, source: '/docs/guides/auth', destination: '/docs/guides/auth/overview' },
+  { permanent: true, source: '/docs/guides/auth/overview', destination: '/docs/guides/auth' },
   {
     permanent: true,
     source: '/docs/guides/auth/auth-messagebird',
@@ -1713,6 +1639,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/getting-started',
+    destination: '/docs/guides/getting-started/architecture',
+  },
+  {
+    permanent: true,
     source: '/docs/architecture',
     destination: '/docs/guides/getting-started/architecture',
   },
@@ -1788,6 +1719,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/tutorials',
+    destination: '/docs/guides/getting-started#tutorials',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/hosting/overview',
     destination: '/docs/guides/self-hosting',
   },
@@ -1808,18 +1744,18 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/docs/guides/cli',
-    destination: '/docs/guides/resources/supabase-cli',
+    source: '/docs/guides/resources/supabase-cli',
+    destination: '/docs/guides/cli',
   },
   {
     permanent: true,
-    source: '/docs/guides/cli/local-development',
-    destination: '/docs/guides/resources/supabase-cli/local-development',
+    source: '/docs/guides/resources/supabase-cli/local-development',
+    destination: '/docs/guides/cli/local-development',
   },
   {
     permanent: true,
-    source: '/docs/guides/cli/managing-environments',
-    destination: '/docs/guides/resources/supabase-cli/managing-environments',
+    source: '/docs/guides/resources/supabase-cli/managing-environments',
+    destination: '/docs/guides/cli/managing-environments',
   },
   {
     permanent: true,
@@ -1844,37 +1780,37 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/reference/javascript',
-    destination: '/docs/reference/javascript/introduction',
+    destination: '/docs/reference/javascript/start',
   },
   {
     permanent: true,
     source: '/docs/reference/dart',
-    destination: '/docs/reference/dart/introduction',
+    destination: '/docs/reference/dart/start',
   },
   {
     permanent: true,
     source: '/docs/reference/cli',
-    destination: '/docs/reference/cli/introduction',
+    destination: '/docs/reference/cli/start',
   },
   {
     permanent: true,
     source: '/docs/reference/api',
-    destination: '/docs/reference/api/introduction',
+    destination: '/docs/reference/api/start',
   },
   {
     permanent: true,
     source: '/docs/reference/auth',
-    destination: '/docs/reference/auth/introduction',
+    destination: '/docs/reference/self-hosting-auth/start',
   },
   {
     permanent: true,
     source: '/docs/reference/storage',
-    destination: '/docs/reference/storage/introduction',
+    destination: '/docs/reference/self-hosting-storage/start',
   },
   {
     permanent: true,
     source: '/docs/reference/realtime',
-    destination: '/docs/reference/realtime/introduction',
+    destination: '/docs/reference/self-hosting-realtime/start',
   },
   {
     permanent: true,
@@ -1900,5 +1836,81 @@ module.exports = [
     permanent: true,
     source: '/docs/reference/dart/upgrade-guide',
     destination: '/docs/reference/dart/v0/upgrade-guide',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/examples',
+    destination: '/docs/guides/resources/examples',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/javascript/v0/rpc',
+    destination: '/docs/reference/javascript/rpc',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/database-usage',
+    destination: '/docs/guides/platform/database-size',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/resources/postgres/dropping-all-tables-in-schema',
+    destination: '/docs/guides/database/postgres/dropping-all-tables-in-schema',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/resources/postgres/first-row-in-group',
+    destination: '/docs/guides/database/postgres/first-row-in-group',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/resources/postgres/which-version-of-postgres',
+    destination: '/docs/guides/database/postgres/which-version-of-postgres',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/realtime/broadcast',
+    destination: '/docs/guides/realtime/extensions/broadcast',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/realtime/presence',
+    destination: '/docs/guides/realtime/extensions/presence',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/realtime/postgres-changes',
+    destination: '/docs/guides/realtime/extensions/postgres-changes',
+  },
+  // Serverless APIs
+  {
+    permanent: true,
+    source: '/docs/guides/database/api',
+    destination: '/docs/guides/api',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/api/generating-types',
+    destination: '/docs/guides/api/rest/generating-types',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/api/generating-types',
+    destination: '/docs/guides/api/rest/generating-types',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/dashibase',
+    destination: '/docs',
+  },
+  {
+    permanent: true,
+    source: '/docs/support',
+    destination: '/support',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/cli/local-development',
+    destination: '/docs/guides/getting-started/local-development',
   },
 ]

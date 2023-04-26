@@ -1,9 +1,12 @@
 import Link from 'next/link'
 import { observer } from 'mobx-react-lite'
+import * as Tooltip from '@radix-ui/react-tooltip'
 import { FC, Fragment, useState, useEffect } from 'react'
 import { IconSearch, Input, Button, Listbox, IconLoader, IconExternalLink, IconX } from 'ui'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useStore, useParams } from 'hooks'
+import { useStore, checkPermissions } from 'hooks'
+import { useParams } from 'common/hooks'
 import SecretRow from './SecretRow'
 import EditSecretModal from './EditSecretModal'
 import DeleteSecretModal from './DeleteSecretModal'
@@ -21,6 +24,8 @@ const SecretsManagement: FC<Props> = ({}) => {
   const [showAddSecretModal, setShowAddSecretModal] = useState(false)
   const [selectedSecretToEdit, setSelectedSecretToEdit] = useState<any>()
   const [selectedSecretToRemove, setSelectedSecretToRemove] = useState<any>()
+
+  const canManageSecrets = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
   useEffect(() => {
     if (search !== undefined) setSearchValue(search)
@@ -58,6 +63,7 @@ const SecretsManagement: FC<Props> = ({}) => {
                 searchValue.length > 0
                   ? [
                       <Button
+                        key="clear"
                         size="tiny"
                         type="text"
                         icon={<IconX />}
@@ -99,15 +105,40 @@ const SecretsManagement: FC<Props> = ({}) => {
           </div>
           <div className="flex items-center space-x-2">
             <Link href="https://supabase.com/docs/guides/database/vault">
-              <a target="_blank">
+              <a target="_blank" rel="noreferrer">
                 <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
                   Vault Documentation
                 </Button>
               </a>
             </Link>
-            <Button type="primary" onClick={() => setShowAddSecretModal(true)}>
-              Add new secret
-            </Button>
+            <Tooltip.Root delayDuration={0}>
+              <Tooltip.Trigger>
+                <Button
+                  type="primary"
+                  disabled={!canManageSecrets}
+                  onClick={() => setShowAddSecretModal(true)}
+                >
+                  Add new secret
+                </Button>
+              </Tooltip.Trigger>
+              {!canManageSecrets && (
+                <Tooltip.Portal>
+                  <Tooltip.Content side="bottom">
+                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                    <div
+                      className={[
+                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                        'border border-scale-200',
+                      ].join(' ')}
+                    >
+                      <span className="text-xs text-scale-1200">
+                        You need additional permissions to add secrets
+                      </span>
+                    </div>
+                  </Tooltip.Content>
+                </Tooltip.Portal>
+              )}
+            </Tooltip.Root>
           </div>
         </div>
 

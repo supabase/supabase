@@ -27,8 +27,8 @@
         "url": "/pricing"
       },
       {
-        "text": "Beta",
-        "url": "/beta"
+        "text": "Launch Week 7",
+        "url": "/launch-week"
       }
     ]
   },
@@ -104,6 +104,10 @@
       {
         "text": "Blog",
         "url": "/blog"
+      },
+      {
+        "text": "Customer Stories",
+        "url": "/customers"
       },
       {
         "text": "Careers",

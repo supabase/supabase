@@ -1,5 +1,5 @@
 import PostgresMetaInterface from '../common/PostgresMetaInterface'
-import { PostgresColumn } from '@supabase/postgres-meta'
+import type { PostgresColumn } from '@supabase/postgres-meta'
 import { IRootStore } from '../RootStore'
 
 export default class ColumnStore extends PostgresMetaInterface<PostgresColumn> {

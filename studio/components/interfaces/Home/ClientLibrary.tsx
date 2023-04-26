@@ -1,5 +1,6 @@
 import { FC } from 'react'
 import { IconBookOpen, IconGitHub, Button, Badge } from 'ui'
+import { BASE_PATH } from 'lib/constants'
 
 interface Props {
   language: string
@@ -13,7 +14,7 @@ const ClientLibrary: FC<Props> = ({ language, releaseState, officialSupport, doc
   return (
     <div className="flex items-start space-x-6">
       <img
-        src={`/img/libraries/${language.toLowerCase()}-icon.svg`}
+        src={`${BASE_PATH}/img/libraries/${language.toLowerCase()}-icon.svg`}
         alt={`${language} logo`}
         width="21"
       />
@@ -30,13 +31,13 @@ const ClientLibrary: FC<Props> = ({ language, releaseState, officialSupport, doc
         </div>
         <div className="space-x-1">
           {docsUrl && (
-            <a href={docsUrl} target="_blank">
+            <a href={docsUrl} target="_blank" rel="noreferrer">
               <Button icon={<IconBookOpen />} type="default">
                 Docs
               </Button>
             </a>
           )}
-          <a href={gitUrl} target="_blank">
+          <a href={gitUrl} target="_blank" rel="noreferrer">
             <Button icon={<IconGitHub />} type="default">
               See GitHub
             </Button>

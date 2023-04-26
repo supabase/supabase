@@ -5,13 +5,17 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { Button, IconExternalLink } from 'ui'
 
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { checkPermissions, useParams, useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
+import { useParams } from 'common/hooks'
+import { BASE_PATH } from 'lib/constants'
+import { useTheme } from 'common'
 
 interface Props {}
 
 const VaultToggle: FC<Props> = () => {
   const { meta, ui } = useStore()
   const { ref } = useParams()
+  const { isDarkMode } = useTheme()
   const [isEnabling, setIsEnabling] = useState(false)
   const canToggleVault = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'extensions')
 
@@ -62,9 +66,9 @@ const VaultToggle: FC<Props> = () => {
         style={{
           backgroundSize: isNotAvailable ? '50%' : '40%',
           backgroundPosition: '100% 24%',
-          backgroundImage: ui.isDarkTheme
-            ? 'url("/img/vault-dark.png")'
-            : 'url("/img/vault-light.png")',
+          backgroundImage: isDarkMode
+            ? `url("${BASE_PATH}/img/vault-dark.png")`
+            : `url("${BASE_PATH}/img/vault-light.png")`,
         }}
       >
         <div className="w-3/5 space-y-8">
@@ -90,7 +94,7 @@ const VaultToggle: FC<Props> = () => {
                   <Link
                     href={`/support/new?ref=${ref}&category=sales&subject=Request%20for%20access%20to%20vault`}
                   >
-                    <a target="_blank">
+                    <a target="_blank" rel="noreferrer">
                       <Button type="primary">Contact us</Button>
                     </a>
                   </Link>
@@ -98,7 +102,7 @@ const VaultToggle: FC<Props> = () => {
               </div>
               <div className="flex items-center space-x-2 my-1 ml-[1px]">
                 <Link href="https://supabase.com/docs/guides/database/vault">
-                  <a target="_blank">
+                  <a target="_blank" rel="noreferrer">
                     <Button type="default" icon={<IconExternalLink />}>
                       About Vault
                     </Button>
@@ -109,7 +113,7 @@ const VaultToggle: FC<Props> = () => {
           ) : (
             <div className="flex items-center space-x-2">
               <Link href="https://supabase.com/docs/guides/database/vault">
-                <a target="_blank">
+                <a target="_blank" rel="noreferrer">
                   <Button type="default" icon={<IconExternalLink />}>
                     About Vault
                   </Button>
@@ -127,19 +131,21 @@ const VaultToggle: FC<Props> = () => {
                   </Button>
                 </Tooltip.Trigger>
                 {!canToggleVault && (
-                  <Tooltip.Content side="bottom">
-                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                    <div
-                      className={[
-                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                        'border border-scale-200',
-                      ].join(' ')}
-                    >
-                      <span className="text-xs text-scale-1200">
-                        You need additional permissions to enable Vault for this project
-                      </span>
-                    </div>
-                  </Tooltip.Content>
+                  <Tooltip.Portal>
+                    <Tooltip.Content side="bottom">
+                      <Tooltip.Arrow className="radix-tooltip-arrow" />
+                      <div
+                        className={[
+                          'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                          'border border-scale-200',
+                        ].join(' ')}
+                      >
+                        <span className="text-xs text-scale-1200">
+                          You need additional permissions to enable Vault for this project
+                        </span>
+                      </div>
+                    </Tooltip.Content>
+                  </Tooltip.Portal>
                 )}
               </Tooltip.Root>
             </div>

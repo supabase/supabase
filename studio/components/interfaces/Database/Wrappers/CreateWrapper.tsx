@@ -6,7 +6,8 @@ import { observer } from 'mobx-react-lite'
 import { Button, Form, Input, IconArrowLeft, IconExternalLink, IconEdit, IconTrash } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useParams, useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
+import { useParams } from 'common/hooks'
 import {
   FormPanel,
   FormActions,
@@ -36,7 +37,7 @@ const CreateWrapper = () => {
   const [selectedTableToEdit, setSelectedTableToEdit] = useState()
   const [formErrors, setFormErrors] = useState<{ [k: string]: string }>({})
 
-  const canCreateWrapper = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'extensions')
+  const canCreateWrapper = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'wrappers')
 
   const wrapperMeta = WRAPPERS.find((wrapper) => wrapper.name === type)
   const initialValues =
@@ -142,7 +143,7 @@ const CreateWrapper = () => {
           <h3 className="mb-2 text-xl text-scale-1200">Create a {wrapperMeta?.label} Wrapper</h3>
           <div className="flex items-center space-x-2">
             <Link href="https://supabase.github.io/wrappers/stripe/">
-              <a target="_blank">
+              <a target="_blank" rel="noreferrer">
                 <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
                   Documentation
                 </Button>
@@ -164,6 +165,7 @@ const CreateWrapper = () => {
                       isSubmitting={isSubmitting}
                       hasChanges={hasChanges}
                       handleReset={handleReset}
+                      disabled={!canCreateWrapper}
                       helper={
                         !canCreateWrapper
                           ? 'You need additional permissions to create a foreign data wrapper'
@@ -227,7 +229,10 @@ const CreateWrapper = () => {
                     ) : (
                       <div className="space-y-2">
                         {newTables.map((table, i) => (
-                          <div className="flex items-center justify-between px-4 py-2 border rounded-md border-scale-600">
+                          <div
+                            key={`${table.schema_name}.${table.table_name}`}
+                            className="flex items-center justify-between px-4 py-2 border rounded-md border-scale-600"
+                          >
                             <div>
                               <p className="text-sm">
                                 {table.schema_name}.{table.table_name}

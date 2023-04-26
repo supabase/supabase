@@ -1,17 +1,16 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-  id: 'with-nextjs',
-  title: 'Quickstart: Next.js',
+  title: 'Build a User Management App with NextJS',
   description: 'Learn how to use Supabase in your Next App.',
-  sidebar_label: 'Next.js',
+  video: 'https://www.youtube.com/v/0Fs96oZ4se0',
 }
 
 <QuickstartIntro />
 
 ![Supabase User Management example](/docs/img/user-management-demo.png)
 
-### Video Guide
+## Video Guide
 
 <div class="video-container">
   <iframe
@@ -22,9 +21,10 @@ export const meta = {
   ></iframe>
 </div>
 
-### GitHub
-
-Should you get stuck while working through the guide, refer to [this repo](https://github.com/supabase/supabase/tree/master/examples/user-management/nextjs-ts-user-management).
+<Admonition type="note">
+  If you get stuck while working through this guide, refer to the [full example on
+  GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/nextjs-ts-user-management).
+</Admonition>
 
 <ProjectSetup />
 
@@ -126,6 +126,7 @@ export default MyApp
 Wrap your `pages/_app.tsx` component with the `SessionContextProvider` component:
 
 ```jsx lines=2,8 title=pages/_app.tsx
+import '../styles/globals.css';
 import { useState } from 'react'
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
 import { SessionContextProvider, Session } from '@supabase/auth-helpers-react'
@@ -166,7 +167,8 @@ npm install @supabase/auth-ui-react
 Add the `Auth` component to your home page
 
 ```jsx title=pages/index.js
-import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
+import { Auth } from '@supabase/auth-ui-react'
+import { ThemeSupa } from '@supabase/auth-ui-shared'
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
 
 const Home = () => {
@@ -286,7 +288,7 @@ export default function Account({ session }) {
         <label htmlFor="website">Website</label>
         <input
           id="website"
-          type="website"
+          type="url"
           value={website || ''}
           onChange={(e) => setWebsite(e.target.value)}
         />
@@ -316,6 +318,8 @@ export default function Account({ session }) {
 <TabPanel id="ts" label="TypeScript">
 
 Let's create a new component for that called `Account.tsx` within a `components` folder.
+
+First, [generate type definitions from your database using the Supabase CLI](https://supabase.com/docs/guides/database/api/generating-types) to `../utils/database.types`.
 
 ```tsx title=components/Account.tsx
 import { useState, useEffect } from 'react'
@@ -414,7 +418,7 @@ export default function Account({ session }: { session: Session }) {
         <label htmlFor="website">Website</label>
         <input
           id="website"
-          type="website"
+          type="url"
           value={website || ''}
           onChange={(e) => setWebsite(e.target.value)}
         />
@@ -448,7 +452,8 @@ export default function Account({ session }: { session: Session }) {
 Now that we have all the components in place, let's update `pages/index.js`:
 
 ```jsx lines=3,14 title=pages/index.js
-import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
+import { Auth } from '@supabase/auth-ui-react'
+import { ThemeSupa } from '@supabase/auth-ui-shared'
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
 import Account from '../components/Account'
 
@@ -718,17 +723,19 @@ return (
 )
 ```
 
-## Next steps
+### Storage management
+
+<StorageManagement />
 
 At this stage you have a fully functional application!
 
-- See the complete [example on GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/nextjs-ts-user-management) and deploy it to Vercel.
-- Explore the [pre-built Auth UI for React](/docs/guides/auth/auth-helpers/auth-ui).
-- Explore the [Auth Helpers for Next.js](/docs/guides/auth/auth-helpers/nextjs).
-- Explore the [Supabase Cache Helpers](https://github.com/psteinroe/supabase-cache-helpers).
-- See the [Next.js Subscription Payments Starter](https://github.com/vercel/nextjs-subscription-payments) template on GitHub.
-- Got a question? [Ask here](https://github.com/supabase/supabase/discussions).
-- Sign in: [app.supabase.com](https://app.supabase.com)
+## See also
+
+- See the complete [example on GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/nextjs-ts-user-management) and deploy it to Vercel
+- Explore the [pre-built Auth UI for React](/docs/guides/auth/auth-helpers/auth-ui)
+- Explore the [Auth Helpers for Next.js](/docs/guides/auth/auth-helpers/nextjs)
+- Explore the [Supabase Cache Helpers](https://github.com/psteinroe/supabase-cache-helpers)
+- See the [Next.js Subscription Payments Starter](https://github.com/vercel/nextjs-subscription-payments) template on GitHub
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

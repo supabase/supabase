@@ -1,29 +1,29 @@
-import { FC } from 'react'
+import { FC, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { useStore } from 'hooks'
-import {
-  Badge,
-  Button,
-  Dropdown,
-  Menu,
-  IconLoader,
-  IconMoreVertical,
-  Alert,
-  IconEdit,
-  IconTrash,
-} from 'ui'
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { Button, Menu, Alert, IconEdit } from 'ui'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
-import { STORAGE_ROW_STATUS } from 'components/to-be-cleaned/Storage/Storage.constants'
+import { checkPermissions } from 'hooks'
+import { useParams } from 'common/hooks'
+import BucketRow from './BucketRow'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
+import { StorageBucket } from 'components/interfaces/Storage/Storage.types'
+import EditBucketModal from 'components/interfaces/Storage/EditBucketModal'
+import CreateBucketModal from 'components/interfaces/Storage/CreateBucketModal'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 
 interface Props {}
 
 const StorageMenu: FC<Props> = () => {
   const router = useRouter()
-  const { ref, bucketId } = router.query
+  const { ref, bucketId } = useParams()
+  const [showCreateBucketModal, setShowCreateBucketModal] = useState(false)
+  const [selectedBucketToEdit, setSelectedBucketToEdit] = useState<StorageBucket>()
+  const canCreateBuckets = checkPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
+
   const page = router.pathname.split('/')[4] as
     | undefined
     | 'policies'
@@ -31,140 +31,109 @@ const StorageMenu: FC<Props> = () => {
     | 'usage'
     | 'logs'
 
-  const { ui } = useStore()
-  const projectRef = ui.selectedProject?.ref
-
   const storageExplorerStore = useStorageStore()
-  const {
-    loaded,
-    buckets,
-    openCreateBucketModal,
-    openDeleteBucketModal,
-    openToggleBucketPublicModal,
-  } = storageExplorerStore || {}
+  const { loaded, buckets, openDeleteBucketModal } = storageExplorerStore || {}
 
   return (
-    <Menu type="pills" className="my-6 flex flex-grow flex-col px-5">
-      <div className="mb-6 px-2">
-        <Button
-          block
-          type="default"
-          icon={
-            <div className="text-scale-900">
-              <IconEdit size={14} />
-            </div>
-          }
-          style={{ justifyContent: 'start' }}
-          onClick={openCreateBucketModal}
-        >
-          New bucket
-        </Button>
-      </div>
-      <div className="space-y-6">
-        <div className="">
-          <div>
-            <Menu.Group title="All buckets" />
-            {!loaded ? (
-              <div className="flex items-center space-x-2 py-2 px-2">
-                <IconLoader className="animate-spin" size={14} strokeWidth={2} />
-                <span className="text-sm">Loading buckets</span>
-              </div>
-            ) : (
-              <>
-                {buckets.length === 0 && (
-                  <div className="px-2">
-                    <Alert title="No buckets available">
-                      Buckets that you create will appear here
-                    </Alert>
+    <>
+      <Menu type="pills" className="my-6 flex flex-grow flex-col px-5">
+        <div className="mb-6 px-2">
+          <Tooltip.Root delayDuration={0}>
+            <Tooltip.Trigger className="w-full">
+              <Button
+                block
+                type="default"
+                icon={
+                  <div className="text-scale-900">
+                    <IconEdit size={14} />
                   </div>
-                )}
-                {buckets.map((bucket: any, idx: number) => {
-                  const isSelected = bucketId === bucket.id
-                  return (
-                    <BucketRow
-                      key={`${idx}_${bucket.id}`}
-                      bucket={bucket}
-                      projectRef={ref}
-                      isSelected={isSelected}
-                      onSelectDeleteBucket={openDeleteBucketModal}
-                      onSelectToggleBucketPublic={openToggleBucketPublicModal}
-                    />
-                  )
-                })}
-              </>
+                }
+                disabled={!canCreateBuckets}
+                style={{ justifyContent: 'start' }}
+                onClick={() => setShowCreateBucketModal(true)}
+              >
+                New bucket
+              </Button>
+            </Tooltip.Trigger>
+            {!canCreateBuckets && (
+              <Tooltip.Portal>
+                <Tooltip.Content side="bottom">
+                  <Tooltip.Arrow className="radix-tooltip-arrow" />
+                  <div
+                    className={[
+                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                      'border border-scale-200',
+                    ].join(' ')}
+                  >
+                    <span className="text-xs text-scale-1200">
+                      You need additional permissions to create buckets
+                    </span>
+                  </div>
+                </Tooltip.Content>
+              </Tooltip.Portal>
             )}
+          </Tooltip.Root>
+        </div>
+        <div className="space-y-6">
+          <div className="">
+            <div>
+              <Menu.Group title="All buckets" />
+              {!loaded ? (
+                <div className="space-y-2">
+                  <ShimmeringLoader className="!py-2.5" />
+                  <ShimmeringLoader className="!py-2.5 w-3/4" />
+                  <ShimmeringLoader className="!py-2.5 w-1/2" />
+                </div>
+              ) : (
+                <>
+                  {buckets.length === 0 && (
+                    <div className="px-2">
+                      <Alert title="No buckets available">
+                        Buckets that you create will appear here
+                      </Alert>
+                    </div>
+                  )}
+                  {buckets.map((bucket: any, idx: number) => {
+                    const isSelected = bucketId === bucket.id
+                    return (
+                      <BucketRow
+                        key={`${idx}_${bucket.id}`}
+                        bucket={bucket}
+                        projectRef={ref}
+                        isSelected={isSelected}
+                        onSelectDeleteBucket={openDeleteBucketModal}
+                        onSelectEditBucket={() => setSelectedBucketToEdit(bucket)}
+                      />
+                    )
+                  })}
+                </>
+              )}
+            </div>
+          </div>
+          <div className="h-px w-full bg-scale-500"></div>
+          <div className="">
+            <Menu.Group title="Configuration" />
+            <Link href={`/project/${ref}/storage/policies`}>
+              <Menu.Item rounded active={page === 'policies'}>
+                <p className="truncate">Policies</p>
+              </Menu.Item>
+            </Link>
           </div>
         </div>
-        <div className="h-px w-full bg-scale-500"></div>
-        <div className="">
-          <Menu.Group title="Configuration" />
-          <Link href={`/project/${projectRef}/storage/policies`}>
-            <Menu.Item rounded active={page === 'policies'}>
-              <p className="truncate">Policies</p>
-            </Menu.Item>
-          </Link>
-        </div>
-      </div>
-    </Menu>
+      </Menu>
+
+      <CreateBucketModal
+        visible={showCreateBucketModal}
+        onClose={() => setShowCreateBucketModal(false)}
+      />
+
+      <EditBucketModal
+        visible={selectedBucketToEdit !== undefined}
+        bucket={selectedBucketToEdit}
+        onClose={() => setSelectedBucketToEdit(undefined)}
+      />
+    </>
   )
 }
 
 export default observer(StorageMenu)
-
-const BucketRow = ({
-  bucket = {},
-  projectRef = '',
-  isSelected = false,
-  onSelectDeleteBucket = () => {},
-  onSelectToggleBucketPublic = () => {},
-}: any) => {
-  return (
-    <ProductMenuItem
-      key={bucket.id}
-      name={
-        <div className="flex items-center justify-between space-x-2 truncate w-full">
-          <p className="truncate" title={bucket.name}>
-            {bucket.name}
-          </p>
-          {bucket.public && <Badge color="yellow">Public</Badge>}
-        </div>
-      }
-      url={`/project/${projectRef}/storage/buckets/${bucket.id}`}
-      isActive={isSelected}
-      action={
-        bucket.status === STORAGE_ROW_STATUS.LOADING ? (
-          <IconLoader className="animate-spin" size={16} strokeWidth={2} />
-        ) : bucket.status === STORAGE_ROW_STATUS.READY ? (
-          <Dropdown
-            side="bottom"
-            align="start"
-            overlay={[
-              <Dropdown.Item
-                key="toggle-private"
-                onClick={() => onSelectToggleBucketPublic(bucket)}
-              >
-                {bucket.public ? 'Make private' : 'Make public'}
-              </Dropdown.Item>,
-              <Dropdown.Separator key="bucket-separator" />,
-              <Dropdown.Item
-                icon={<IconTrash size="tiny" />}
-                key="delete-bucket"
-                onClick={() => onSelectDeleteBucket(bucket)}
-              >
-                Delete bucket
-              </Dropdown.Item>,
-            ]}
-          >
-            <IconMoreVertical
-              className="opacity-0 group-hover:opacity-100"
-              size="tiny"
-              strokeWidth={2}
-            />
-          </Dropdown>
-        ) : (
-          <div />
-        )
-      }
-    />
-  )
-}

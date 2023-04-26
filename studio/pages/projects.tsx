@@ -12,7 +12,7 @@ const ProjectsPage: NextPageWithLayout = () => {
 
   return (
     <>
-      {app.organizations.isLoading ? (
+      {!app.organizations.isInitialized ? (
         <div className="flex h-full items-center justify-center space-x-2">
           <Connecting />
         </div>
@@ -38,7 +38,7 @@ const ProjectsPage: NextPageWithLayout = () => {
 
 ProjectsPage.getLayout = (page) => (
   <AccountLayout
-    title="Supabase"
+    title="Dashboard"
     breadcrumbs={[
       {
         key: `supabase-projects`,

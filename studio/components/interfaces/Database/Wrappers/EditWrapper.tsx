@@ -16,7 +16,8 @@ import {
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { VaultSecret } from 'types'
-import { checkPermissions, useImmutableValue, useParams, useStore } from 'hooks'
+import { checkPermissions, useImmutableValue, useStore } from 'hooks'
+import { useParams } from 'common/hooks'
 import { useFDWsQuery } from 'data/fdw/fdws-query'
 import { useFDWUpdateMutation } from 'data/fdw/fdw-update-mutation'
 
@@ -65,7 +66,7 @@ const EditWrapper = () => {
   const [selectedTableToEdit, setSelectedTableToEdit] = useState()
   const [formErrors, setFormErrors] = useState<{ [k: string]: string }>({})
 
-  const canCreateWrapper = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'extensions')
+  const canUpdateWrapper = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'wrappers')
 
   const initialValues =
     wrapperMeta !== undefined
@@ -195,7 +196,7 @@ const EditWrapper = () => {
           <h3 className="mb-2 text-xl text-scale-1200">Edit wrapper: {wrapper.name}</h3>
           <div className="flex items-center space-x-2">
             <Link href="https://supabase.github.io/wrappers/stripe/">
-              <a target="_blank">
+              <a target="_blank" rel="noreferrer">
                 <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
                   Documentation
                 </Button>
@@ -206,6 +207,9 @@ const EditWrapper = () => {
 
         <Form id={formId} initialValues={initialValues} onSubmit={onSubmit}>
           {({ isSubmitting, handleReset, values, initialValues, resetForm }: any) => {
+            // [Alaister] although this "technically" is breaking the rules of React hooks
+            // it won't error because the hooks are always rendered in the same order
+            // eslint-disable-next-line react-hooks/rules-of-hooks
             const [loadingSecrets, setLoadingSecrets] = useState(false)
 
             const initialTables = formatWrapperTables(wrapper?.tables ?? [])
@@ -215,6 +219,9 @@ const EditWrapper = () => {
 
             const encryptedOptions = wrapperMeta.server.options.filter((option) => option.encrypted)
 
+            // [Alaister] although this "technically" is breaking the rules of React hooks
+            // it won't error because the hooks are always rendered in the same order
+            // eslint-disable-next-line react-hooks/rules-of-hooks
             useEffect(() => {
               const fetchEncryptedValues = async () => {
                 setLoadingSecrets(true)
@@ -248,7 +255,7 @@ const EditWrapper = () => {
 
             return (
               <FormPanel
-                disabled={!canCreateWrapper}
+                disabled={!canUpdateWrapper}
                 footer={
                   <div className="flex px-8 py-4">
                     <FormActions
@@ -259,9 +266,10 @@ const EditWrapper = () => {
                         handleReset()
                         setWrapperTables(initialTables)
                       }}
+                      disabled={!canUpdateWrapper}
                       helper={
-                        !canCreateWrapper
-                          ? 'You need additional permissions to create a foreign data wrapper'
+                        !canUpdateWrapper
+                          ? 'You need additional permissions to edit a foreign data wrapper'
                           : undefined
                       }
                     />
@@ -325,7 +333,10 @@ const EditWrapper = () => {
                     ) : (
                       <div className="space-y-2">
                         {wrapperTables.map((table, i) => (
-                          <div className="flex items-center justify-between px-4 py-2 border rounded-md border-scale-600">
+                          <div
+                            key={`${table.schema_name}.${table.table_name}`}
+                            className="flex items-center justify-between px-4 py-2 border rounded-md border-scale-600"
+                          >
                             <div>
                               <p className="text-sm">
                                 {table.schema_name}.{table.table_name}

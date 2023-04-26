@@ -22,7 +22,7 @@ interface CustomProps {
   children?: React.ReactNode
   header?: string | React.ReactNode
   visible: boolean
-  size?: 'medium' | 'large' | 'xlarge'
+  size?: 'medium' | 'large' | 'xlarge' | 'xxlarge'
   loading?: boolean
   align?: 'right' | 'left'
   hideFooter?: boolean
@@ -67,7 +67,12 @@ const SidePanel = ({
       <Button disabled={loading} type="default" onClick={() => (onCancel ? onCancel() : null)}>
         {cancelText}
       </Button>
-      <Button loading={loading} onClick={() => (onConfirm ? onConfirm() : null)}>
+      <Button
+        htmlType="submit"
+        disabled={loading}
+        loading={loading}
+        onClick={() => (onConfirm ? onConfirm() : null)}
+      >
         {confirmText}
       </Button>
     </div>
@@ -104,7 +109,11 @@ const SidePanel = ({
           onCloseAutoFocus={props.onCloseAutoFocus}
           onEscapeKeyDown={props.onEscapeKeyDown}
           onPointerDownOutside={props.onPointerDownOutside}
-          onInteractOutside={props.onInteractOutside}
+          onInteractOutside={(event) => {
+            const isToast = (event.target as Element)?.closest('#toast')
+            if (isToast) event.preventDefault()
+            if (props.onInteractOutside) props.onInteractOutside(event)
+          }}
         >
           {header && <header className={__styles.header}>{header}</header>}
           <div className={__styles.contents}>{children}</div>
@@ -121,10 +130,16 @@ export function Separator() {
   return <div className={__styles.separator}></div>
 }
 
-export function Content({ children }: { children: React.ReactNode }) {
+export function Content({
+  children,
+  className,
+}: {
+  children: React.ReactNode
+  className?: string
+}) {
   let __styles = styleHandler('sidepanel')
 
-  return <div className={__styles.content}>{children}</div>
+  return <div className={[__styles.content, className].join(' ').trim()}>{children}</div>
 }
 
 SidePanel.Content = Content

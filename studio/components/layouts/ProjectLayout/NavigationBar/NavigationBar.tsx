@@ -13,16 +13,18 @@ import {
   generateToolRoutes,
 } from './NavigationBar.utils'
 import NavigationIconButton from './NavigationIconButton'
-import { useParams } from 'hooks/misc/useParams'
+import { useParams } from 'common/hooks'
+import { useTheme } from 'common'
 
 interface Props {}
 
 const NavigationBar: FC<Props> = ({}) => {
   const router = useRouter()
-  const { ref: projectRef } = useParams()
   const { ui } = useStore()
-  const projectBaseInfo = ui.selectedProjectBaseInfo
+  const { isDarkMode, toggleTheme } = useTheme()
+  const { ref: projectRef } = useParams()
 
+  const projectBaseInfo = ui.selectedProjectBaseInfo
   const ongoingIncident = useFlag('ongoingIncident')
 
   const activeRoute = router.pathname.split('/')[3]
@@ -42,7 +44,7 @@ const NavigationBar: FC<Props> = ({}) => {
         <Link href="/projects">
           <a className="block">
             <img
-              src="/img/supabase-logo.svg"
+              src={`${router.basePath}/img/supabase-logo.svg`}
               alt="Supabase"
               className="mx-auto h-[40px] w-6 cursor-pointer rounded"
             />
@@ -102,10 +104,11 @@ const NavigationBar: FC<Props> = ({}) => {
               <Dropdown.Label>Theme</Dropdown.Label>
               <Dropdown.RadioGroup
                 key="theme"
-                value={ui.themeOption}
-                onChange={(e: any) => ui.onThemeOptionChange(e)}
+                value={isDarkMode ? 'dark' : 'light'}
+                onChange={(e: any) => toggleTheme(e === 'dark')}
               >
-                <Dropdown.Radio value="system">System default</Dropdown.Radio>
+                {/* [Joshen] Removing system default for now, needs to be supported in useTheme from common packages */}
+                {/* <Dropdown.Radio value="system">System default</Dropdown.Radio> */}
                 <Dropdown.Radio value="dark">Dark</Dropdown.Radio>
                 <Dropdown.Radio value="light">Light</Dropdown.Radio>
               </Dropdown.RadioGroup>

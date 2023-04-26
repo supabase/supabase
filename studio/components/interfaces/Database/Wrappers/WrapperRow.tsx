@@ -1,10 +1,13 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { FC } from 'react'
-import { Collapsible, IconChevronUp, Button, IconExternalLink, IconTrash, IconEdit } from 'ui'
 import { partition } from 'lodash'
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { Collapsible, IconChevronUp, Button, IconExternalLink, IconTrash, IconEdit } from 'ui'
 
-import { useParams, useStore } from 'hooks'
+import { useStore, checkPermissions } from 'hooks'
+import { useParams } from 'common/hooks'
 import { WrapperMeta } from './Wrappers.types'
 import { FDW } from 'data/fdw/fdws-query'
 import { useFDWDeleteMutation } from 'data/fdw/fdw-delete-mutation'
@@ -23,6 +26,8 @@ const WrapperRow: FC<Props> = ({ wrappers = [], wrapperMeta, isOpen, onOpen }) =
   const { ref } = useParams()
   const { project } = useProjectContext()
   const { mutateAsync: deleteFDW } = useFDWDeleteMutation()
+
+  const canManageWrappers = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'wrappers')
 
   const onDeleteWrapper = (wrapper: any) => {
     confirmAlert({
@@ -141,7 +146,7 @@ const WrapperRow: FC<Props> = ({ wrappers = [], wrapperMeta, isOpen, onOpen }) =
                       </p>
                       <div className="flex flex-wrap gap-2">
                         {wrapper.tables.map((table: any) => (
-                          <Link href={`/project/${ref}/editor/${table.id}`}>
+                          <Link key={table.id} href={`/project/${ref}/editor/${table.id}`}>
                             <a>
                               <div
                                 key={table.id}
@@ -156,21 +161,73 @@ const WrapperRow: FC<Props> = ({ wrappers = [], wrapperMeta, isOpen, onOpen }) =
                     </div>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <Link href={`/project/${ref}/database/wrappers/${wrapper.id}`}>
-                      <a>
+                    {canManageWrappers ? (
+                      <Link href={`/project/${ref}/database/wrappers/${wrapper.id}`}>
+                        <a>
+                          <Button
+                            type="default"
+                            icon={<IconEdit strokeWidth={1.5} />}
+                            className="py-2"
+                          />
+                        </a>
+                      </Link>
+                    ) : (
+                      <Tooltip.Root delayDuration={0}>
+                        <Tooltip.Trigger>
+                          <Button
+                            type="default"
+                            disabled
+                            icon={<IconEdit strokeWidth={1.5} />}
+                            className="py-2"
+                          />
+                        </Tooltip.Trigger>
+                        {!canManageWrappers && (
+                          <Tooltip.Portal>
+                            <Tooltip.Content side="bottom">
+                              <Tooltip.Arrow className="radix-tooltip-arrow" />
+                              <div
+                                className={[
+                                  'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                                  'border border-scale-200',
+                                ].join(' ')}
+                              >
+                                <span className="text-xs text-scale-1200">
+                                  You need additional permissions to edit wrappers
+                                </span>
+                              </div>
+                            </Tooltip.Content>
+                          </Tooltip.Portal>
+                        )}
+                      </Tooltip.Root>
+                    )}
+                    <Tooltip.Root delayDuration={0}>
+                      <Tooltip.Trigger>
                         <Button
                           type="default"
-                          icon={<IconEdit strokeWidth={1.5} />}
+                          disabled={!canManageWrappers}
+                          icon={<IconTrash strokeWidth={1.5} />}
                           className="py-2"
+                          onClick={() => onDeleteWrapper(wrapper)}
                         />
-                      </a>
-                    </Link>
-                    <Button
-                      type="default"
-                      icon={<IconTrash strokeWidth={1.5} />}
-                      className="py-2"
-                      onClick={() => onDeleteWrapper(wrapper)}
-                    />
+                      </Tooltip.Trigger>
+                      {!canManageWrappers && (
+                        <Tooltip.Portal>
+                          <Tooltip.Content side="bottom">
+                            <Tooltip.Arrow className="radix-tooltip-arrow" />
+                            <div
+                              className={[
+                                'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                                'border border-scale-200',
+                              ].join(' ')}
+                            >
+                              <span className="text-xs text-scale-1200">
+                                You need additional permissions to add wrappers
+                              </span>
+                            </div>
+                          </Tooltip.Content>
+                        </Tooltip.Portal>
+                      )}
+                    </Tooltip.Root>
                   </div>
                 </div>
               )

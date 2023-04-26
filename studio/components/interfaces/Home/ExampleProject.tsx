@@ -1,7 +1,7 @@
 import { FC } from 'react'
-import { IconChevronRight } from 'ui'
-import { useStore } from 'hooks'
+import { IconChevronRight, useTheme } from 'ui'
 import Link from 'next/link'
+import { BASE_PATH } from 'lib/constants'
 
 interface Props {
   framework: string
@@ -11,12 +11,11 @@ interface Props {
 }
 
 const ExampleProject: FC<Props> = ({ framework, title, description, url }) => {
-  const { ui } = useStore()
-  const { isDarkTheme } = ui
+  const { isDarkMode } = useTheme()
 
   return (
     <Link href={url}>
-      <a target="_blank">
+      <a target="_blank" rel="noreferrer">
         <div
           className={[
             'group relative',
@@ -29,8 +28,12 @@ const ExampleProject: FC<Props> = ({ framework, title, description, url }) => {
           <div className="mr-4 flex flex-col">
             <img
               className="transition-all group-hover:scale-110"
-              src={`/img/libraries/${framework.toLowerCase()}${
-                ['expo', 'nextjs'].includes(framework.toLowerCase()) ? (isDarkTheme ? '-dark' : '') : ''
+              src={`${BASE_PATH}/img/libraries/${framework.toLowerCase()}${
+                ['expo', 'nextjs'].includes(framework.toLowerCase())
+                  ? isDarkMode
+                    ? '-dark'
+                    : ''
+                  : ''
               }-icon.svg`}
               alt={`${framework} logo`}
               width={26}

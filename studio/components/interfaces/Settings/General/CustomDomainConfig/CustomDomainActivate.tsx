@@ -78,7 +78,7 @@ const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivate
         <Panel.Content className="w-full">
           <div className="flex items-center justify-between">
             <Link href="https://supabase.com/docs/guides/platform/custom-domains">
-              <a target="_blank">
+              <a target="_blank" rel="noreferrer">
                 <Button type="default" icon={<IconExternalLink />}>
                   Documentation
                 </Button>
@@ -89,6 +89,7 @@ const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivate
                 type="default"
                 onClick={onCancelCustomDomain}
                 loading={isDeleting}
+                disabled={isDeleting}
                 className="self-end"
               >
                 Cancel
@@ -110,6 +111,7 @@ const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivate
                     />
                   </svg>
                 }
+                disabled={isDeleting}
                 onClick={() => setIsActivateConfirmModalVisible(true)}
                 className="self-end"
               >

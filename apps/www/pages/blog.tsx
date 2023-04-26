@@ -100,6 +100,7 @@ function Blog(props: any) {
         ]}
       />
       <DefaultLayout>
+        <h1 className="sr-only">Supabase blog</h1>
         <div className="overflow-hidden py-12">
           <div className="container mx-auto mt-16 px-8 sm:px-16 xl:px-20">
             <div className="mx-auto ">
@@ -165,6 +166,7 @@ function FeaturedThumb(blog: PostTypes) {
               src={`/images/blog/` + (blog.thumb ? blog.thumb : blog.image)}
               layout="fill"
               objectFit="cover"
+              alt="blog thumbnail"
             />
           </div>
           <div className="flex flex-col space-y-2">

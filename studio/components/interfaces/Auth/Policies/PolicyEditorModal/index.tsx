@@ -1,7 +1,7 @@
 import { Modal } from 'ui'
 import { FC, useState, useEffect } from 'react'
 import { isEmpty } from 'lodash'
-import { PostgresRole } from '@supabase/postgres-meta'
+import type { PostgresRole } from '@supabase/postgres-meta'
 
 import { useStore } from 'hooks'
 import PolicyEditorModalTitle from './PolicyEditorModalTitle'
@@ -183,12 +183,6 @@ const PolicyEditorModal: FC<Props> = ({
         />,
       ]}
       onCancel={onSelectCancel}
-      onInteractOutside={(event) => {
-        const isToast = (event.target as Element)?.closest('#toast')
-        if (isToast) {
-          event.preventDefault()
-        }
-      }}
     >
       <div className="">
         {view === POLICY_MODAL_VIEWS.SELECTION ? (

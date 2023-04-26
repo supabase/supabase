@@ -1,4 +1,4 @@
-import { Tabs } from 'ui'
+import { Button, IconExternalLink, Tabs } from 'ui'
 import { observer } from 'mobx-react-lite'
 
 import { TEMPLATES_SCHEMAS } from 'stores/authConfig/schema'
@@ -8,10 +8,23 @@ import TemplateEditor from './TemplateEditor'
 const EmailTemplates = observer(() => {
   return (
     <div>
-      <FormHeader
-        title="Email Templates"
-        description="Customize the emails that will be sent out to your users."
-      />
+      <div className="flex justify-between items-center">
+        <FormHeader
+          title="Email Templates"
+          description="Customize the emails that will be sent out to your users."
+        />
+        <div className="mb-6">
+          <Button type="default" icon={<IconExternalLink size={14} strokeWidth={1.5} />}>
+            <a
+              target="_blank"
+              rel="noreferrer"
+              href="https://supabase.com/docs/guides/auth/auth-email-templates"
+            >
+              Documentation
+            </a>
+          </Button>
+        </div>
+      </div>
       <FormPanel>
         <Tabs
           scrollable

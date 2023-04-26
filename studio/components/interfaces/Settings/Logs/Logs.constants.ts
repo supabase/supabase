@@ -1,7 +1,9 @@
 import dayjs from 'dayjs'
+import { IS_PLATFORM } from 'lib/constants'
 import { DatetimeHelper, FilterTableSet, LogTemplate } from '.'
 
-export const LOGS_EXPLORER_DOCS_URL = "https://supabase.com/docs/guides/platform/logs#querying-with-the-logs-explorer"
+export const LOGS_EXPLORER_DOCS_URL =
+  'https://supabase.com/docs/guides/platform/logs#querying-with-the-logs-explorer'
 
 export const LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD = 4
 
@@ -200,6 +202,28 @@ limit 100
 `,
     for: ['database'],
   },
+  {
+    label: 'Storage Object Requests',
+    description: 'Number of requests done on Storage Objects',
+    mode: 'custom',
+    searchString: `select
+    r.method as http_verb,
+    r.path as filepath,
+    count(*) as num_requests
+  from edge_logs
+    cross join unnest(metadata) as m
+    cross join unnest(m.request) AS r
+    cross join unnest(r.headers) AS h
+  where
+    path like '%rest/v1/object%'
+  group by 
+    r.path, r.method
+  order by
+    num_requests desc
+  limit 100
+`,
+    for: ['api'],
+  },
 ]
 
 export const LOG_TYPE_LABEL_MAPPING: { [k: string]: string } = {
@@ -250,22 +274,23 @@ export const SQL_FILTER_TEMPLATES: any = {
     'severity.log': `metadata.level = 'log'`,
     'severity.info': `metadata.level = 'info'`,
     'severity.debug': `metadata.level = 'debug'`,
+    'severity.warn': `metadata.level = 'warn'`,
   },
   auth_logs: {
     ..._SQL_FILTER_COMMON,
-    "severity.error": `REGEXP_CONTAINS(event_message, "level.{3}error|level.{3}fatal")`,
-    "severity.warning": `REGEXP_CONTAINS(event_message, "level.{3}warning")`,
-    "severity.info": `REGEXP_CONTAINS(event_message, "level.{3}info")`,
-    "status_code.server_error": `REGEXP_CONTAINS(event_message, "status.{3}5[0-9]{2}`,
-    "status_code.client_error": `REGEXP_CONTAINS(event_message, "status.{3}4[0-9]{2}")`,
-    "status_code.redirection": `REGEXP_CONTAINS(event_message, "status.{3}3[0-9]{2}")`,
-    "status_code.success": `REGEXP_CONTAINS(event_message, "status.{3}2[0-9]{2}")`,
-    "endpoints.admin": `REGEXP_CONTAINS(event_message, "path.{3}/admin")`,
-    "endpoints.signup": `REGEXP_CONTAINS(event_message, "path.{3}/signup|path.{3}/invite|path.{3}/verify")`,
-    "endpoints.authentication": `REGEXP_CONTAINS(event_message, "path.{3}/token|path.{3}/authorize|path.{3}/callback|path.{3}/otp|path.{3}/magiclink")`,
-    "endpoints.recover": `REGEXP_CONTAINS(event_message, "path.{3}/recover")`,
-    "endpoints.user": `REGEXP_CONTAINS(event_message, "path.{3}/user")`,
-    "endpoints.logout": `REGEXP_CONTAINS(event_message, "path.{3}/logout")`,
+    'severity.error': `REGEXP_CONTAINS(event_message, "level.{3}error|level.{3}fatal")`,
+    'severity.warning': `REGEXP_CONTAINS(event_message, "level.{3}warning")`,
+    'severity.info': `REGEXP_CONTAINS(event_message, "level.{3}info")`,
+    'status_code.server_error': `REGEXP_CONTAINS(event_message, "status.{3}5[0-9]{2}")`,
+    'status_code.client_error': `REGEXP_CONTAINS(event_message, "status.{3}4[0-9]{2}")`,
+    'status_code.redirection': `REGEXP_CONTAINS(event_message, "status.{3}3[0-9]{2}")`,
+    'status_code.success': `REGEXP_CONTAINS(event_message, "status.{3}2[0-9]{2}")`,
+    'endpoints.admin': `REGEXP_CONTAINS(event_message, "path.{3}/admin")`,
+    'endpoints.signup': `REGEXP_CONTAINS(event_message, "path.{3}/signup|path.{3}/invite|path.{3}/verify")`,
+    'endpoints.authentication': `REGEXP_CONTAINS(event_message, "path.{3}/token|path.{3}/authorize|path.{3}/callback|path.{3}/otp|path.{3}/magiclink")`,
+    'endpoints.recover': `REGEXP_CONTAINS(event_message, "path.{3}/recover")`,
+    'endpoints.user': `REGEXP_CONTAINS(event_message, "path.{3}/user")`,
+    'endpoints.logout': `REGEXP_CONTAINS(event_message, "path.{3}/logout")`,
   },
   realtime_logs: {
     ..._SQL_FILTER_COMMON,
@@ -278,7 +303,7 @@ export const SQL_FILTER_TEMPLATES: any = {
   },
   pgbouncer_logs: {
     ..._SQL_FILTER_COMMON,
-  }
+  },
 }
 
 export enum LogsTableName {
@@ -289,8 +314,8 @@ export enum LogsTableName {
   AUTH = 'auth_logs',
   REALTIME = 'realtime_logs',
   STORAGE = 'storage_logs',
-  PGBOUNCER = "pgbouncer_logs",
-  POSTGREST = "postgrest_logs"
+  PGBOUNCER = 'pgbouncer_logs',
+  POSTGREST = 'postgrest_logs',
 }
 
 export const LOGS_TABLES = {
@@ -302,7 +327,7 @@ export const LOGS_TABLES = {
   realtime: LogsTableName.REALTIME,
   storage: LogsTableName.STORAGE,
   postgrest: LogsTableName.POSTGREST,
-  pgbouncer: LogsTableName.PGBOUNCER
+  pgbouncer: LogsTableName.PGBOUNCER,
 }
 
 export const LOGS_SOURCE_DESCRIPTION = {
@@ -473,22 +498,27 @@ export const FILTER_OPTIONS: FilterTableSet = {
         {
           key: 'error',
           label: 'Error',
-          description: 'Show all events that have error severity',
+          description: 'Show all events that are "error" severity',
+        },
+        {
+          key: 'warn',
+          label: 'Warning',
+          description: 'Show all events that are "warn" severity',
         },
         {
           key: 'info',
           label: 'Info',
-          description: 'Show all events that have error severity',
+          description: 'Show all events that are "info" severity',
         },
         {
           key: 'debug',
           label: 'Debug',
-          description: 'Show all events that have error severity',
+          description: 'Show all events that are "debug" severity',
         },
         {
           key: 'log',
           label: 'Log',
-          description: 'Show all events that are log severity',
+          description: 'Show all events that are "log" severity',
         },
       ],
     },
@@ -559,7 +589,7 @@ export const FILTER_OPTIONS: FilterTableSet = {
         },
         {
           key: 'recover',
-          label: "Password Recovery",
+          label: 'Password Recovery',
           description: 'Show all password recovery requests',
         },
         {
@@ -579,7 +609,7 @@ export const FILTER_OPTIONS: FilterTableSet = {
         },
       ],
     },
-  }
+  },
 }
 
 export const LOGS_TAILWIND_CLASSES = {
@@ -636,3 +666,5 @@ export const TIER_QUERY_LIMITS: {
   TEAM: { text: '90 days', value: 90, unit: 'day', promptUpgrade: false },
   ENTERPRISE: { text: '90 days', value: 90, unit: 'day', promptUpgrade: false },
 }
+
+export const SHOW_O11Y = IS_PLATFORM || process.env.NEXT_PUBLIC_ENABLE_LOGS == 'true'

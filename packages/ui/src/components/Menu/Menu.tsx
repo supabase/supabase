@@ -1,5 +1,4 @@
 import React from 'react'
-import { Space } from '../Space'
 import Typography from '../Typography'
 import { MenuContextProvider, useMenuContext } from './MenuContext'
 
@@ -8,11 +7,12 @@ import styleHandler from '../../lib/theme/styleHandler'
 interface MenuProps {
   children: React.ReactNode
   className?: string
+  ulClassName?: string
   style?: React.CSSProperties
   type?: 'text' | 'pills' | 'border'
 }
 
-function Menu({ children, className, style, type = 'text' }: MenuProps) {
+function Menu({ children, className, ulClassName, style, type = 'text' }: MenuProps) {
   return (
     <nav
       role="menu"
@@ -23,7 +23,7 @@ function Menu({ children, className, style, type = 'text' }: MenuProps) {
       style={style}
     >
       <MenuContextProvider type={type}>
-        <ul>{children}</ul>
+        <ul className={ulClassName}>{children}</ul>
       </MenuContextProvider>
     </nav>
   )
@@ -86,7 +86,7 @@ export function Item({
         onClick={onClick}
         aria-current={active ? 'page' : undefined}
       >
-        {icon && <span className={iconClasses.join(' ')}>{icon}</span>}
+        {icon && <div className={`${iconClasses.join(' ')} min-w-fit`}>{icon}</div>}
         <span className={contentClasses.join(' ')}>{children}</span>
       </a>
     </li>
@@ -103,9 +103,7 @@ export function Group({ children, icon, title }: GroupProps) {
   const __styles = styleHandler('menu')
   const { type } = useMenuContext()
   return (
-    <div
-      className={[__styles.group.base, __styles.group.variants[type]].join(' ')}
-    >
+    <div className={[__styles.group.base, __styles.group.variants[type]].join(' ')}>
       {icon && <span className={__styles.group.icon}>{icon}</span>}
       <span className={__styles.group.content}>{title}</span>
       {children}

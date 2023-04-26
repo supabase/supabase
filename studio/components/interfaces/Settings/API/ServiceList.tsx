@@ -1,37 +1,34 @@
-import { FC, useEffect, useRef } from 'react'
-import { useRouter } from 'next/router'
+import { useQueryClient } from '@tanstack/react-query'
 import { JwtSecretUpdateError, JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
+import { useEffect, useRef } from 'react'
 import { IconAlertCircle, Input } from 'ui'
 
-import {
-  useStore,
-  useProjectSettings,
-  useProjectPostgrestConfig,
-  useJwtSecretUpdateStatus,
-} from 'hooks'
+import { useStore } from 'hooks'
+import { useParams } from 'common/hooks'
+import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
 
+import { useProjectApiQuery } from 'data/config/project-api-query'
+import { configKeys } from 'data/config/keys'
 import Panel from 'components/ui/Panel'
-import PostgrestConfig from './PostgrestConfig'
 import { DisplayApiSettings } from 'components/ui/ProjectSettings'
 import { JWT_SECRET_UPDATE_ERROR_MESSAGES } from './API.constants'
-import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
-import { IS_PLATFORM } from 'lib/constants'
 import JWTSettings from './JWTSettings'
+import PostgrestConfig from './PostgrestConfig'
 
-interface Props {
-  projectRef: string
-}
-
-const ServiceList: FC<Props> = ({ projectRef }) => {
+const ServiceList = () => {
   const { ui } = useStore()
-  const router = useRouter()
-  const { ref } = router.query
+  const client = useQueryClient()
 
-  const { services, isError, mutateSettings } = useProjectSettings(ref as string | undefined)
-  const { mutateConfig } = useProjectPostgrestConfig(ref as string | undefined)
-  const { jwtSecretUpdateError, jwtSecretUpdateStatus }: any = useJwtSecretUpdateStatus(ref)
+  const { ref: projectRef } = useParams()
+  const { data: settings, isError } = useProjectApiQuery({
+    projectRef,
+  })
 
-  const previousJwtSecretUpdateStatus = useRef()
+  const { data } = useJwtSecretUpdatingStatusQuery({ projectRef })
+  const jwtSecretUpdateStatus = data?.jwtSecretUpdateStatus
+  const jwtSecretUpdateError = data?.jwtSecretUpdateError
+
+  const previousJwtSecretUpdateStatus = useRef<JwtSecretUpdateStatus>()
   const { Failed, Updated, Updating } = JwtSecretUpdateStatus
   const jwtSecretUpdateErrorMessage =
     JWT_SECRET_UPDATE_ERROR_MESSAGES[jwtSecretUpdateError as JwtSecretUpdateError]
@@ -40,8 +37,10 @@ const ServiceList: FC<Props> = ({ projectRef }) => {
     if (previousJwtSecretUpdateStatus.current === Updating) {
       switch (jwtSecretUpdateStatus) {
         case Updated:
-          mutateConfig()
-          mutateSettings()
+          client.invalidateQueries(configKeys.api(projectRef))
+          client.invalidateQueries(configKeys.settings(projectRef))
+          client.invalidateQueries(configKeys.postgrest(projectRef))
+
           ui.setNotification({ category: 'success', message: 'Successfully updated JWT secret' })
           break
         case Failed:
@@ -57,18 +56,17 @@ const ServiceList: FC<Props> = ({ projectRef }) => {
   }, [jwtSecretUpdateStatus])
 
   // Get the API service
-  const API_SERVICE_ID = 1
-  const apiService = services ? services.find((x: any) => x.app.id == API_SERVICE_ID) : {}
-  const apiConfig = apiService?.app_config
+  const apiService = settings?.autoApiService
+  const apiUrl = `${apiService?.protocol ?? 'https'}://${apiService?.endpoint ?? '-'}`
 
   return (
     <div>
-      <h3 className="text-scale-1200 mb-6 text-xl">API Settings</h3>
+      <h3 className="mb-6 text-xl text-scale-1200">API Settings</h3>
       <section>
         <Panel title={<h5 className="mb-0">Project URL</h5>}>
           <Panel.Content>
             {isError ? (
-              <div className="flex items-center justify-center space-x-2 py-4">
+              <div className="flex items-center justify-center py-4 space-x-2">
                 <IconAlertCircle size={16} strokeWidth={1.5} />
                 <p className="text-sm text-scale-1100">Failed to retrieve project URL</p>
               </div>
@@ -79,9 +77,7 @@ const ServiceList: FC<Props> = ({ projectRef }) => {
                 readOnly
                 disabled
                 className="input-mono"
-                value={`${IS_PLATFORM ? 'https' : PROJECT_ENDPOINT_PROTOCOL}://${
-                  apiConfig?.endpoint ?? '-'
-                }`}
+                value={apiUrl}
                 descriptionText="A RESTful endpoint for querying and managing your database."
                 layout="horizontal"
               />

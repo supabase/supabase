@@ -1,5 +1,4 @@
 const { withSentryConfig } = require('@sentry/nextjs')
-const withPlugins = require('next-compose-plugins')
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
 })
@@ -7,12 +6,28 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 // this is required to use shared packages in the packages directory
 const withTM = require('next-transpile-modules')(['ui', 'common'])
 
+// Required for nextjs standalone build
+const path = require('path')
+
 // This file sets a custom webpack configuration to use your Next.js app
 // with Sentry.
 // https://nextjs.org/docs/api-reference/next.config.js/introduction
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
+const csp = [
+  "frame-ancestors 'none';",
+  // IS_PLATFORM
+  process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' ? 'upgrade-insecure-requests;' : '',
+]
+  .filter(Boolean)
+  .join(' ')
+
+/**
+ * @type {import('next').NextConfig}
+ */
 const nextConfig = {
+  basePath: process.env.NEXT_PUBLIC_BASE_PATH,
+  output: 'standalone',
   async redirects() {
     return [
       {
@@ -116,6 +131,11 @@ const nextConfig = {
         permanent: true,
       },
       {
+        source: '/project/:ref/sql/templates',
+        destination: '/project/:ref/sql',
+        permanent: true,
+      },
+      {
         source: '/org/:slug/settings',
         destination: '/org/:slug/general',
         permanent: true,
@@ -130,6 +150,14 @@ const nextConfig = {
           {
             key: 'X-Frame-Options',
             value: 'DENY',
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'no-sniff',
+          },
+          {
+            key: 'Content-Security-Policy',
+            value: csp,
           },
           {
             key: 'Referrer-Policy',
@@ -150,12 +178,14 @@ const nextConfig = {
   images: {
     domains: ['github.com'],
   },
+  // Ref: https://nextjs.org/docs/advanced-features/output-file-tracing#caveats
+  experimental: {
+    outputFileTracingRoot: path.join(__dirname, '../../'),
+  },
 }
 
 // Export all config
-const plugins = [[withBundleAnalyzer({})], withTM()]
-
-const moduleExports = withPlugins(plugins, nextConfig)
+const moduleExports = withTM(withBundleAnalyzer(nextConfig))
 
 const sentryWebpackPluginOptions = {
   // Additional config options for the Sentry Webpack plugin. Keep in mind that
@@ -175,4 +205,4 @@ const sentryWebpackPluginOptions = {
 module.exports =
   process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
     ? withSentryConfig(moduleExports, sentryWebpackPluginOptions)
-    : withPlugins([withTM()], nextConfig)
+    : withTM(nextConfig)

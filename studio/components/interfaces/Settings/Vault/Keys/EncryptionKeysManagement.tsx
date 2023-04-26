@@ -1,6 +1,7 @@
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import { observer } from 'mobx-react-lite'
+import * as Tooltip from '@radix-ui/react-tooltip'
 import { FC, Fragment, useEffect, useState } from 'react'
 import {
   Alert,
@@ -11,13 +12,14 @@ import {
   Modal,
   Form,
   IconTrash,
-  Badge,
   IconKey,
   IconLoader,
   IconX,
   IconExternalLink,
 } from 'ui'
-import { useParams, useStore } from 'hooks'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useStore, checkPermissions } from 'hooks'
+import { useParams } from 'common/hooks'
 import Divider from 'components/ui/Divider'
 
 const DEFAULT_KEY_NAME = 'No description provided'
@@ -33,6 +35,8 @@ const EncryptionKeysManagement: FC<Props> = ({}) => {
   const [showAddKeyModal, setShowAddKeyModal] = useState(false)
   const [selectedKeyToRemove, setSelectedKeyToRemove] = useState<any>()
   const [isDeletingKey, setIsDeletingKey] = useState(false)
+
+  const canManageKeys = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
   useEffect(() => {
     if (id !== undefined) setSearchValue(id)
@@ -104,6 +108,7 @@ const EncryptionKeysManagement: FC<Props> = ({}) => {
                 searchValue.length > 0
                   ? [
                       <Button
+                        key="clear"
                         size="tiny"
                         type="text"
                         icon={<IconX />}
@@ -137,15 +142,40 @@ const EncryptionKeysManagement: FC<Props> = ({}) => {
           </div>
           <div className="flex items-center space-x-2">
             <Link href="https://supabase.com/docs/guides/database/vault">
-              <a target="_blank">
+              <a target="_blank" rel="noreferrer">
                 <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
                   Vault Documentation
                 </Button>
               </a>
             </Link>
-            <Button type="primary" onClick={() => setShowAddKeyModal(true)}>
-              Add new key
-            </Button>
+            <Tooltip.Root delayDuration={0}>
+              <Tooltip.Trigger>
+                <Button
+                  type="primary"
+                  disabled={!canManageKeys}
+                  onClick={() => setShowAddKeyModal(true)}
+                >
+                  Add new key
+                </Button>
+              </Tooltip.Trigger>
+              {!canManageKeys && (
+                <Tooltip.Portal>
+                  <Tooltip.Content side="bottom">
+                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                    <div
+                      className={[
+                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                        'border border-scale-200',
+                      ].join(' ')}
+                    >
+                      <span className="text-xs text-scale-1200">
+                        You need additional permissions to add keys
+                      </span>
+                    </div>
+                  </Tooltip.Content>
+                </Tooltip.Portal>
+              )}
+            </Tooltip.Root>
           </div>
         </div>
 
@@ -178,12 +208,34 @@ const EncryptionKeysManagement: FC<Props> = ({}) => {
                         <p className="text-sm text-scale-1100">
                           Added on {dayjs(key.created).format('MMM D, YYYY')}
                         </p>
-                        <Button
-                          type="default"
-                          className="py-2"
-                          icon={<IconTrash />}
-                          onClick={() => setSelectedKeyToRemove(key)}
-                        />
+                        <Tooltip.Root delayDuration={0}>
+                          <Tooltip.Trigger>
+                            <Button
+                              type="default"
+                              className="py-2"
+                              icon={<IconTrash />}
+                              disabled={!canManageKeys}
+                              onClick={() => setSelectedKeyToRemove(key)}
+                            />
+                          </Tooltip.Trigger>
+                          {!canManageKeys && (
+                            <Tooltip.Portal>
+                              <Tooltip.Content side="bottom">
+                                <Tooltip.Arrow className="radix-tooltip-arrow" />
+                                <div
+                                  className={[
+                                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                                    'border border-scale-200',
+                                  ].join(' ')}
+                                >
+                                  <span className="text-xs text-scale-1200">
+                                    You need additional permissions to delete keys
+                                  </span>
+                                </div>
+                              </Tooltip.Content>
+                            </Tooltip.Portal>
+                          )}
+                        </Tooltip.Root>
                       </div>
                     </div>
                     {idx !== keys.length - 1 && <Divider light />}

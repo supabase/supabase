@@ -2,6 +2,7 @@ import Snippets from 'components/to-be-cleaned/Docs/Snippets'
 import CodeSnippet from 'components/to-be-cleaned/Docs/CodeSnippet'
 import Param from 'components/to-be-cleaned/Docs/Param'
 import Description from 'components/to-be-cleaned/Docs/Description'
+import { IconTable } from 'ui'
 
 const ResourceContent = ({
   autoApiService,
@@ -29,12 +30,18 @@ const ResourceContent = ({
 
   return (
     <>
-      <h2 className="text-scale-1200mt-0">
-        <span className="px-6 py-2 text-2xl">{resourceId}</span>
+      <h2 className="doc-section__table-name text-scale-1200 mt-0 flex items-center px-6 gap-2">
+        <span className="bg-slate-300 dark:bg-slate-400 p-2 rounded-lg">
+          <IconTable size="small" />
+        </span>
+        <span className="text-2xl font-bold">{resourceId}</span>
       </h2>
 
       <div className="doc-section">
-        <article className="text ">
+        <article className="text">
+          <label className="font-mono text-xs uppercase text-scale-900 inline-block mb-2">
+            Description
+          </label>
           <Description
             content={description}
             metadata={{ table: resourceId }}
@@ -47,7 +54,7 @@ const ResourceContent = ({
         <div>
           {properties.map((x) => (
             <div className="doc-section py-4" key={x.id}>
-              <article className="text">
+              <div className="text">
                 <Param
                   key={x.id}
                   name={x.id}
@@ -61,8 +68,8 @@ const ResourceContent = ({
                   }}
                   onDesciptionUpdated={refreshDocs}
                 />
-              </article>
-              <article className="code">
+              </div>
+              <div className="code">
                 <CodeSnippet
                   selectedLang={selectedLang}
                   snippet={Snippets.readColumns({
@@ -73,7 +80,7 @@ const ResourceContent = ({
                     columnName: x.id,
                   })}
                 />
-              </article>
+              </div>
             </div>
           ))}
         </div>
@@ -87,8 +94,12 @@ const ResourceContent = ({
                 To read rows in <code>{resourceId}</code>, use the <code>select</code> method.
               </p>
               <p>
-                <a href="https://supabase.com/docs/client/select" target="_blank">
-                  Learn more.
+                <a
+                  href="https://supabase.com/docs/reference/javascript/select"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Learn more
                 </a>
               </p>
             </article>
@@ -120,8 +131,12 @@ const ResourceContent = ({
               <h4 className="mt-0 text-white">Filtering</h4>
               <p>Supabase provides a wide range of filters.</p>
               <p>
-                <a href="https://supabase.com/docs/client/using-filters" target="_blank">
-                  Learn more.
+                <a
+                  href="https://supabase.com/docs/reference/javascript/using-filters"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Learn more
                 </a>
               </p>
             </article>
@@ -147,8 +162,12 @@ const ResourceContent = ({
                 <code>insert</code> will also return the replaced values for UPSERT.
               </p>
               <p>
-                <a href="https://supabase.com/docs/client/insert" target="_blank">
-                  Learn more.
+                <a
+                  href="https://supabase.com/docs/reference/javascript/insert"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Learn more
                 </a>
               </p>
             </article>
@@ -183,8 +202,12 @@ const ResourceContent = ({
                 <code>update</code> will also return the replaced values for UPDATE.
               </p>
               <p>
-                <a href="https://supabase.com/docs/client/update" target="_blank">
-                  Learn more.
+                <a
+                  href="https://supabase.com/docs/reference/javascript/update"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Learn more
                 </a>
               </p>
             </article>
@@ -207,8 +230,12 @@ const ResourceContent = ({
                 default, so remember to specify your filters!
               </p>
               <p>
-                <a href="https://supabase.com/docs/client/delete" target="_blank">
-                  Learn more.
+                <a
+                  href="https://supabase.com/docs/reference/javascript/delete"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Learn more
                 </a>
               </p>
             </article>
@@ -221,64 +248,55 @@ const ResourceContent = ({
           </div>
         </>
       )}
-      <>
-        <h3 className="text-scale-1200 mt-4 px-6">Subscribe to changes</h3>
-        <div className="doc-section">
-          <article className="text ">
-            <p>
-              Supabase provides realtime functionality and broadcasts database changes to authorized
-              users depending on Row Level Security (RLS) policies.
-            </p>
-            <p>
-              <a href="https://supabase.com/docs/client/subscribe" target="_blank">
-                Learn more.
-              </a>
-            </p>
-          </article>
-          <article className="code">
-            <CodeSnippet
-              selectedLang={selectedLang}
-              snippet={Snippets.subscribeAll(resourceMeta.camelCase, resourceId)}
-            />
-            <CodeSnippet
-              selectedLang={selectedLang}
-              snippet={Snippets.subscribeInserts(resourceMeta.camelCase, resourceId)}
-            />
-            <CodeSnippet
-              selectedLang={selectedLang}
-              snippet={Snippets.subscribeUpdates(resourceMeta.camelCase, resourceId)}
-            />
-            <CodeSnippet
-              selectedLang={selectedLang}
-              snippet={Snippets.subscribeDeletes(resourceMeta.camelCase, resourceId)}
-            />
-            <CodeSnippet
-              selectedLang={selectedLang}
-              snippet={Snippets.subscribeEq(
-                resourceMeta.camelCase,
-                resourceId,
-                'column_name',
-                'someValue'
-              )}
-            />
-          </article>
-        </div>
-      </>
-      <>
-        <h3 className="text-scale-1200 mt-4 px-6">Much more</h3>
-        <div className="doc-section py-4">
-          <article className="text ">
-            <p>
-              These docs are a work in progress! See our{' '}
-              <a href="https://supabase.com/docs/" target="_blank">
-                docs
-              </a>{' '}
-              for the additional functionality Supabase has to offer.
-            </p>
-          </article>
-          <article className="code"></article>
-        </div>
-      </>
+      {(methods.includes('DELETE') || methods.includes('POST') || methods.includes('PATCH')) && (
+        <>
+          <h3 className="text-scale-1200 mt-4 px-6">Subscribe to changes</h3>
+          <div className="doc-section">
+            <article className="text ">
+              <p>
+                Supabase provides realtime functionality and broadcasts database changes to
+                authorized users depending on Row Level Security (RLS) policies.
+              </p>
+              <p>
+                <a
+                  href="https://supabase.com/docs/reference/javascript/subscribe"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Learn more
+                </a>
+              </p>
+            </article>
+            <article className="code">
+              <CodeSnippet
+                selectedLang={selectedLang}
+                snippet={Snippets.subscribeAll(resourceMeta.camelCase, resourceId)}
+              />
+              <CodeSnippet
+                selectedLang={selectedLang}
+                snippet={Snippets.subscribeInserts(resourceMeta.camelCase, resourceId)}
+              />
+              <CodeSnippet
+                selectedLang={selectedLang}
+                snippet={Snippets.subscribeUpdates(resourceMeta.camelCase, resourceId)}
+              />
+              <CodeSnippet
+                selectedLang={selectedLang}
+                snippet={Snippets.subscribeDeletes(resourceMeta.camelCase, resourceId)}
+              />
+              <CodeSnippet
+                selectedLang={selectedLang}
+                snippet={Snippets.subscribeEq(
+                  resourceMeta.camelCase,
+                  resourceId,
+                  'column_name',
+                  'someValue'
+                )}
+              />
+            </article>
+          </div>
+        </>
+      )}
     </>
   )
 }

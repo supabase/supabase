@@ -6,7 +6,7 @@ import { Button, Input, Toggle, IconSearch, IconAlertCircle } from 'ui'
 import { checkPermissions, useStore } from 'hooks'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 import Table from 'components/to-be-cleaned/Table'
-import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
+import NoSearchResults from 'components/ui/NoSearchResults'
 import InformationBox from 'components/ui/InformationBox'
 
 interface Props {
@@ -83,7 +83,7 @@ const PublicationsList: FC<Props> = ({ onSelectPublication = () => {} }) => {
         </div>
       </div>
       {publications.length === 0 ? (
-        <NoSearchResults />
+        <NoSearchResults searchString={filterString} onResetFilter={() => setFilterString('')} />
       ) : (
         <div className="overflow-hidden rounded">
           <Table
@@ -92,18 +92,10 @@ const PublicationsList: FC<Props> = ({ onSelectPublication = () => {} }) => {
               <Table.th key="header.id" className="hidden lg:table-cell">
                 System ID
               </Table.th>,
-              <Table.th key="header.insert" className="text-center">
-                Insert
-              </Table.th>,
-              <Table.th key="header.update" className="text-center">
-                Update
-              </Table.th>,
-              <Table.th key="header.delete" className="text-center">
-                Delete
-              </Table.th>,
-              <Table.th key="header.truncate" className="text-center">
-                Truncate
-              </Table.th>,
+              <Table.th key="header.insert">Insert</Table.th>,
+              <Table.th key="header.update">Update</Table.th>,
+              <Table.th key="header.delete">Delete</Table.th>,
+              <Table.th key="header.truncate">Truncate</Table.th>,
               <Table.th key="header.source" className="text-right">
                 Source
               </Table.th>,
@@ -118,16 +110,12 @@ const PublicationsList: FC<Props> = ({ onSelectPublication = () => {} }) => {
                 </Table.td>
                 {publicationEvents.map((event) => (
                   <Table.td key={event.key}>
-                    <div className="flex justify-center">
-                      <Toggle
-                        size="tiny"
-                        checked={x[event.key]}
-                        disabled={!canUpdatePublications}
-                        onChange={() =>
-                          toggleListenEvent(x, event.event.toLowerCase(), x[event.key])
-                        }
-                      />
-                    </div>
+                    <Toggle
+                      size="tiny"
+                      checked={x[event.key]}
+                      disabled={!canUpdatePublications}
+                      onChange={() => toggleListenEvent(x, event.event.toLowerCase(), x[event.key])}
+                    />
                   </Table.td>
                 ))}
                 <Table.td className="px-4 py-3 pr-2">

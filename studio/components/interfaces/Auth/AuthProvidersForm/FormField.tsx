@@ -1,3 +1,4 @@
+import { BASE_PATH } from 'lib/constants'
 import { FC, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { Button, Input, InputNumber, Toggle, Listbox, IconEye, IconEyeOff } from 'ui'
@@ -11,9 +12,9 @@ interface Props {
 }
 
 const FormField: FC<Props> = ({ name, properties, formValues, disabled = false }) => {
-  if (properties.show && formValues[properties.show.key] !== properties.show.matches) return <></>
-
   const [hidden, setHidden] = useState(!!properties.isSecret)
+
+  if (properties.show && formValues[properties.show.key] !== properties.show.matches) return null
 
   switch (properties.type) {
     case 'string':
@@ -102,7 +103,17 @@ const FormField: FC<Props> = ({ name, properties, formValues, disabled = false }
           name={name}
           disabled={disabled}
           label={properties.title}
-          descriptionText={properties.description}
+          descriptionText={
+            properties.description ? (
+              <ReactMarkdown
+                unwrapDisallowed
+                disallowedElements={['p']}
+                className="form-field-markdown"
+              >
+                {properties.description}
+              </ReactMarkdown>
+            ) : null
+          }
         />
       )
 
@@ -113,7 +124,17 @@ const FormField: FC<Props> = ({ name, properties, formValues, disabled = false }
           name={name}
           disabled={disabled}
           label={properties.title}
-          descriptionText={properties.description}
+          descriptionText={
+            properties.description ? (
+              <ReactMarkdown
+                unwrapDisallowed
+                disallowedElements={['p']}
+                className="form-field-markdown"
+              >
+                {properties.description}
+              </ReactMarkdown>
+            ) : null
+          }
           defaultValue={properties.enum[0]}
         >
           {properties.enum.map((option: Enum) => {
@@ -123,7 +144,9 @@ const FormField: FC<Props> = ({ name, properties, formValues, disabled = false }
                 key={option.value}
                 label={option.label}
                 value={option.value}
-                addOnBefore={() => <img className="h-6 w-6" src={`/img/icons/${option.icon}`} />}
+                addOnBefore={() => (
+                  <img className="h-6 w-6" src={`${BASE_PATH}/img/icons/${option.icon}`} />
+                )}
               >
                 {option.label}
               </Listbox.Option>
