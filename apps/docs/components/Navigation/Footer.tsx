@@ -12,7 +12,7 @@ const Footer = () => {
       <div className="flex gap-4 items-center mt-6 justify-between">
         <div className="flex flex-col lg:flex-row gap-3 ">
           <Link href="https://supabase.com/">
-            <a className="text-xs text-scale-900">Supabase</a>
+            <a className="text-xs text-scale-900">&copy; Supabase Inc</a>
           </Link>
           <span className="text-xs text-scale-900">—</span>
           {footerData.map((item) => (
