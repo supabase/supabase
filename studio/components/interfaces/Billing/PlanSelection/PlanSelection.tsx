@@ -30,7 +30,7 @@ const PlanSelection: FC<Props> = ({ visible, tiers, currentPlan, onSelectPlan })
       enterTo="transform opacity-100 translate-x-0"
     >
       <div>
-        <h4 className="text-lg mb-8">Change your project's subscription</h4>
+        <h4 className="text-lg">Change your project's subscription</h4>
         <div className={`grid py-8 grid-cols-2 ${gridCols}`}>
           {formattedTiers.map((plan) => {
             return (

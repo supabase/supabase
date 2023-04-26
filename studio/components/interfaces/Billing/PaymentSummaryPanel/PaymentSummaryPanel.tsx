@@ -14,6 +14,7 @@ import { getPITRDays } from './PaymentSummaryPanel.utils'
 import ConfirmPaymentModal from './ConfirmPaymentModal'
 import { StripeSubscription } from '../Subscription/Subscription.types'
 import { useIsProjectActive } from 'components/layouts/ProjectLayout/ProjectContext'
+import clsx from 'clsx'
 
 // [Joshen] PITR stuff can be undefined for now until we officially launch PITR self serve
 
@@ -178,7 +179,11 @@ const PaymentSummaryPanel = ({
   return (
     <>
       <div
-        className="w-full px-6 py-10 space-y-8 overflow-y-auto border-l bg-panel-body-light dark:bg-panel-body-dark lg:px-12"
+        className={clsx(
+          'bg-panel-body-light dark:bg-panel-body-dark overflow-y-auto border-l',
+          'px-6 lg:px-12 py-10 space-y-8',
+          'min-w-[450px] max-w-[450px] 2xl:min-w-[630px] 2xl:max-w-[630px]'
+        )}
         style={{ height: 'calc(100vh - 57px)' }}
       >
         <p>Payment Summary</p>
