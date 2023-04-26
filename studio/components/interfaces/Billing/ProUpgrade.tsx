@@ -321,43 +321,41 @@ const ProUpgrade: FC<Props> = ({
             </div>
           </div>
         </div>
-        <div className="min-w-[440px]">
-          <PaymentSummaryPanel
-            isRefreshingPreview={isRefreshingPreview}
-            subscriptionPreview={subscriptionPreview}
-            isSpendCapEnabled={isSpendCapEnabled}
-            // Current subscription configuration based on DB
-            currentPlan={currentSubscription.tier}
-            currentAddons={currentAddons}
-            currentSubscription={currentSubscription}
-            // Selected subscription configuration based on UI
-            selectedPlan={selectedTier}
-            selectedAddons={selectedAddons}
-            paymentMethods={paymentMethods}
-            isLoadingPaymentMethods={isLoadingPaymentMethods}
-            selectedPaymentMethod={selectedPaymentMethodId}
-            onSelectPaymentMethod={setSelectedPaymentMethodId}
-            onSelectAddNewPaymentMethod={() => {
-              setShowAddPaymentMethodModal(true)
-            }}
-            beforeConfirmPayment={beforeConfirmPayment}
-            onConfirmPayment={onConfirmPayment}
-            isSubmitting={isSubmitting}
-            captcha={
-              <HCaptcha
-                ref={captchaRef}
-                sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
-                size="invisible"
-                onVerify={(token) => {
-                  setCaptchaToken(token)
-                }}
-                onExpire={() => {
-                  setCaptchaToken(null)
-                }}
-              />
-            }
-          />
-        </div>
+        <PaymentSummaryPanel
+          isRefreshingPreview={isRefreshingPreview}
+          subscriptionPreview={subscriptionPreview}
+          isSpendCapEnabled={isSpendCapEnabled}
+          // Current subscription configuration based on DB
+          currentPlan={currentSubscription.tier}
+          currentAddons={currentAddons}
+          currentSubscription={currentSubscription}
+          // Selected subscription configuration based on UI
+          selectedPlan={selectedTier}
+          selectedAddons={selectedAddons}
+          paymentMethods={paymentMethods}
+          isLoadingPaymentMethods={isLoadingPaymentMethods}
+          selectedPaymentMethod={selectedPaymentMethodId}
+          onSelectPaymentMethod={setSelectedPaymentMethodId}
+          onSelectAddNewPaymentMethod={() => {
+            setShowAddPaymentMethodModal(true)
+          }}
+          beforeConfirmPayment={beforeConfirmPayment}
+          onConfirmPayment={onConfirmPayment}
+          isSubmitting={isSubmitting}
+          captcha={
+            <HCaptcha
+              ref={captchaRef}
+              sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
+              size="invisible"
+              onVerify={(token) => {
+                setCaptchaToken(token)
+              }}
+              onExpire={() => {
+                setCaptchaToken(null)
+              }}
+            />
+          }
+        />
       </Transition>
 
       <AddNewPaymentMethodModal
