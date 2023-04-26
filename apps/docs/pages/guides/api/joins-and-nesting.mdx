@@ -127,7 +127,7 @@ GET https://[REF].supabase.co/rest/v1/countries?select=id,name,cities(id,name)
 
 ## Many-to-many joins
 
-The Serverless APIs will detect many-to-many joins. For example, if you have a database which stored teams of users (where each user could below to many teams):
+The Serverless APIs will detect many-to-many joins. For example, if you have a database which stored teams of users (where each user could belong to many teams):
 
 ```sql
 create table

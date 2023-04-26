@@ -48,7 +48,7 @@ export default function GeneratingTypes({ selectedLang }: Props) {
       <h2 className="doc-heading flex items-center justify-between">
         <span>Generating types</span>
         <Link href="https://supabase.com/docs/guides/database/api/generating-types">
-          <a target="_blank">
+          <a target="_blank" rel="noreferrer">
             <Button type="default" icon={<IconExternalLink />}>
               Documentation
             </Button>
