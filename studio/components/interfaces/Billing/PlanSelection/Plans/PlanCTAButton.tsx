@@ -14,7 +14,7 @@ interface PlanCTAButtonProps {
 }
 
 const PlanCTAButton = ({ plan, currentPlan, onSelectPlan }: PlanCTAButtonProps) => {
-  const isActive = useIsProjectActive()
+  const isProjectActive = useIsProjectActive()
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
 
   const getButtonType = (plan: any, currentPlan: any) => {
@@ -85,7 +85,7 @@ const PlanCTAButton = ({ plan, currentPlan, onSelectPlan }: PlanCTAButtonProps) 
   const type = getButtonType(plan, currentPlan)
   const ctaText = getButtonText(plan, currentPlan)
   const disabled =
-    (!isActive && plan.name !== 'Enterprise') ||
+    (!isProjectActive && plan.name !== 'Enterprise') ||
     (plan.id === STRIPE_PRODUCT_IDS.FREE && currentPlan.prod_id === STRIPE_PRODUCT_IDS.FREE)
 
   if (plan.name === 'Enterprise') {
@@ -113,7 +113,7 @@ const PlanCTAButton = ({ plan, currentPlan, onSelectPlan }: PlanCTAButtonProps) 
             {ctaText}
           </Button>
         </Tooltip.Trigger>
-        {(projectUpdateDisabled || !isActive) && (
+        {(projectUpdateDisabled || !isProjectActive) && (
           <Tooltip.Portal>
             <Tooltip.Portal>
               <Tooltip.Content side="bottom">
@@ -127,7 +127,7 @@ const PlanCTAButton = ({ plan, currentPlan, onSelectPlan }: PlanCTAButtonProps) 
                   <span className="text-xs text-scale-1200 text-center">
                     {projectUpdateDisabled
                       ? 'Subscription changes are currently disabled, our engineers are working on a fix'
-                      : !isActive
+                      : !isProjectActive
                       ? 'Unable to update subscription as project is not active'
                       : ''}
                   </span>

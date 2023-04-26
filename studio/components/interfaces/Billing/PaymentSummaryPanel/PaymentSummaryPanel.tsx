@@ -3,7 +3,7 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { Listbox, IconLoader, Button, IconPlus, IconAlertCircle, IconCreditCard } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useStore } from 'hooks'
+import { checkPermissions, useFlag, useStore } from 'hooks'
 import { BASE_PATH, PRICING_TIER_PRODUCT_IDS, STRIPE_PRODUCT_IDS } from 'lib/constants'
 import { SubscriptionPreview } from '../Billing.types'
 import { getProductPrice, validateSubscriptionUpdatePayload } from '../Billing.utils'
@@ -93,6 +93,7 @@ const PaymentSummaryPanel = ({
   )
 
   const [showConfirmModal, setShowConfirmModal] = useState(false)
+  const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
 
   const selectedPlanCost =
     selectedPlan !== undefined
@@ -452,6 +453,7 @@ const PaymentSummaryPanel = ({
                 loading={isSubmitting}
                 disabled={
                   !isActive ||
+                  projectUpdateDisabled ||
                   isSubmitting ||
                   isLoadingPaymentMethods ||
                   !hasChangesToPlan ||
@@ -479,6 +481,8 @@ const PaymentSummaryPanel = ({
                         ? 'Please select a payment method'
                         : !isActive
                         ? 'Unable to update subscription as project is not active'
+                        : projectUpdateDisabled
+                        ? 'Subscription changes are currently disabled. Our engineers are working on a fix.'
                         : ''}
                     </span>
                   </div>
