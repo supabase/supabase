@@ -577,7 +577,16 @@ export const functions = {
           name: 'Connecting directly to Postgres',
           url: '/guides/functions/connect-to-postgres',
         },
+      ],
+    },
+    {
+      name: 'Third-Party Tools',
+      url: undefined,
+      items: [
         { name: 'Dart Edge on Supabase', url: '/guides/functions/dart-edge' },
+        { name: 'Browserless.io', url: '/guides/functions/examples/screenshots' },
+        { name: 'OpenAI API', url: '/guides/functions/examples/openai' },
+        { name: 'Upstash Redis', url: '/guides/functions/examples/upstash-redis' },
       ],
     },
     {
