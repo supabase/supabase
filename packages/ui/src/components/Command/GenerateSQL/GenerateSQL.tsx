@@ -282,7 +282,7 @@ const GenerateSQL = () => {
         )}
         <Input
           inputRef={inputRef}
-          className="bg-scale-100 rounded mx-3 mb-4"
+          className="bg-scale-100 rounded mx-3 mb-4 [&_input]:pr-32 md:[&_input]:pr-40"
           autoFocus
           placeholder={
             isLoading || isResponding
@@ -298,7 +298,7 @@ const GenerateSQL = () => {
                     search ? 'opacity-100' : 'opacity-0'
                   }`}
                 >
-                  <span className={`text-scale-1100 transition-opacity ${search.length > 25 ? 'opacity-0' : 'opacity-100'}`}>Submit message</span>
+                  <span className="text-scale-1100">Submit message</span>
                   <div className="hidden text-scale-1100 md:flex items-center justify-center h-6 w-6 rounded bg-scale-500">
                     <IconCornerDownLeft size={12} strokeWidth={1.5} />
                   </div>
