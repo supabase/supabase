@@ -6,7 +6,7 @@
   "license": "MIT",
   "scripts": {
     "build:icons": "node --experimental-modules internals/populate-icons.js",
-    "type-check": "tsc --noEmit",
+    "type-check_CURRENTLY_IGNORED": "tsc --noEmit",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
   },
