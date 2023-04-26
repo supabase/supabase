@@ -472,6 +472,10 @@ export const database = {
           url: '/guides/database/postgres/indexes',
         },
         {
+          name: 'Cascade Deletes',
+          url: '/guides/database/postgres/cascade-deletes',
+        },
+        {
           name: 'Drop All Tables in Schema',
           url: '/guides/database/postgres/dropping-all-tables-in-schema',
         },
