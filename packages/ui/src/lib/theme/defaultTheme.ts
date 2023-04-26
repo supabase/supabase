@@ -879,7 +879,7 @@ export default {
             horizontal: 'flex flex-row space-x-2',
           },
         },
-        group: `flex flex-row gap-3`,
+        group: `grid grid-cols-12 gap-3`,
         base: `
           transition
           border border-scale-700 hover:border-scale-900

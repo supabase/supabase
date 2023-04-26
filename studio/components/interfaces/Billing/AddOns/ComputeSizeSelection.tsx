@@ -75,7 +75,7 @@ const ComputeSizeSelection: FC<Props> = ({
           </div>
           <div className="">
             <Link
-              href={`/support/new?ref=${ref}&category=sales&subject=Disable%20custom%20domains%20`}
+              href={`/support/new?ref=${ref}&category=sales&subject=Disable%20custom%20domains`}
             >
               <a>
                 <Button>Contact us</Button>
