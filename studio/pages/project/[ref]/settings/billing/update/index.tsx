@@ -31,7 +31,6 @@ const BillingUpdate: NextPageWithLayout = () => {
   const [subscription, setSubscription] = useState<StripeSubscription>()
   const [selectedPlan, setSelectedPlan] = useState<any>()
 
-  const isTeams = subscription?.tier?.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.TEAM
   const isEnterprise = subscription?.tier?.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
 
   useEffect(() => {
@@ -44,8 +43,6 @@ const BillingUpdate: NextPageWithLayout = () => {
   useEffect(() => {
     if (isEnterprise) {
       router.push(`/project/${projectRef}/settings/billing/update/enterprise`)
-    } else if (isTeams) {
-      router.push(`/project/${projectRef}/settings/billing/update/team`)
     }
   }, [subscription])
 

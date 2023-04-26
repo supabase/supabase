@@ -43,9 +43,8 @@ const Subscription: FC<Props> = ({ showProjectName = false }) => {
   const { data: usage } = useProjectUsageQuery({ projectRef })
 
   const isPayg = subscription?.tier.prod_id === STRIPE_PRODUCT_IDS.PAYG
-  const isTeams = subscription?.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.TEAM
   const isEnterprise = subscription?.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
-  const canOnlyUpdateAddons = isTeams || isEnterprise
+  const canOnlyUpdateAddons = isEnterprise
 
   const addOns = subscription?.addons ?? []
   const paid = subscription && subscription.tier.unit_amount > 0
@@ -72,8 +71,6 @@ const Subscription: FC<Props> = ({ showProjectName = false }) => {
 
   const subscriptionUpdateURL = isEnterprise
     ? `/project/${projectRef}/settings/billing/update/enterprise`
-    : isTeams
-    ? `/project/${projectRef}/settings/billing/update/team`
     : `/project/${projectRef}/settings/billing/update`
 
   useEffect(() => {
