@@ -15,14 +15,15 @@ import {
   StyledArticleBadge,
 } from './components'
 
-import { useMobileViewport } from '../../../../hooks/useMobileViewport'
+import { useBreakpoint } from 'common/hooks/useBreakpoint'
 import { motion } from 'framer-motion'
+import Day5 from './Day5'
 
-const defaultEase = [0.25, 0.25, 0, 1]
-const defaultDuratonIn = 0.25
-const defaultDuratonOut = 0.1
+export const defaultEase = [0.25, 0.25, 0, 1]
+export const defaultDuratonIn = 0.25
+export const defaultDuratonOut = 0.1
 
-const opacityVariant = {
+export const opacityVariant = {
   default: { opacity: 0.9, ease: defaultEase, duration: defaultDuratonOut },
   hover: {
     opacity: 1,
@@ -32,7 +33,7 @@ const opacityVariant = {
     },
   },
 }
-const opacityVariant2 = {
+export const opacityVariant2 = {
   default: { opacity: 0, ease: defaultEase, duration: defaultDuratonOut },
   hover: {
     opacity: 0.2,
@@ -42,7 +43,7 @@ const opacityVariant2 = {
     },
   },
 }
-const opacityVariant3 = {
+export const opacityVariant3 = {
   default: { opacity: 0, ease: defaultEase, duration: defaultDuratonOut },
   hover: {
     opacity: 1,
@@ -52,7 +53,7 @@ const opacityVariant3 = {
     },
   },
 }
-const opacityVariant4 = {
+export const opacityVariant4 = {
   default: { opacity: 0.3, ease: defaultEase, duration: defaultDuratonOut },
   hover: {
     opacity: 1,
@@ -62,7 +63,7 @@ const opacityVariant4 = {
     },
   },
 }
-const scaleOpacityVariant = {
+export const scaleOpacityVariant = {
   default: { scale: 1, opacity: 0.9, ease: defaultEase, duration: defaultDuratonOut },
   hover: {
     scale: 1.05,
@@ -73,13 +74,24 @@ const scaleOpacityVariant = {
     },
   },
 }
-const aiImageMobileVariant = {
+export const scaleOpacityVariant2 = {
+  default: { scale: 1, opacity: 0.8, ease: defaultEase, duration: defaultDuratonOut },
+  hover: {
+    scale: 1.025,
+    opacity: 1,
+    transition: {
+      duration: defaultDuratonIn,
+      ease: defaultEase,
+    },
+  },
+}
+export const aiImageMobileVariant = {
   default: { scale: 0.9 },
   hover: {
     scale: 0.9,
   },
 }
-const moveX10 = {
+export const moveX10 = {
   default: { x: 0, ease: defaultEase, duration: defaultDuratonOut },
   hover: {
     x: 10,
@@ -132,8 +144,7 @@ const getDay4Motion = (index: number) => {
 
 export default function LW7Releases() {
   const [preRelease, day1, day2, day3, day4, day5] = days
-  const isMobile = useMobileViewport(767)
-  const isTablet = useMobileViewport(1023)
+  const isTablet = useBreakpoint(1023)
   const showAll = false
   const publishedSections =
     days
@@ -183,13 +194,13 @@ export default function LW7Releases() {
                 </svg>
               </div>
               <div className="flex flex-col lg:flex-row ml-2 sm:ml-4">
-                <span className="text-white mr-2">Supabase AI Hackathon has begun. Join now!</span>
+                <span className="text-white mr-2">Supabase AI Hackathon</span>
               </div>
             </div>
             <div className="flex w-full sm:w-auto justify-center gap-2 z-10">
               <ChipLink href={'/blog/launch-week-7-hackathon'}>
                 Blog post
-                <div className="bg-[#313131] rounded-full inline-block p-1 ml-2">
+                <div className="bg-[#313131] rounded-full hidden sm:inline-block p-1 ml-2">
                   <PencilSvg />
                 </div>
               </ChipLink>
@@ -227,7 +238,7 @@ export default function LW7Releases() {
               </div>
             </div>
             <div className="flex w-full sm:w-auto justify-center gap-2 z-10">
-              <ChipLink href="#lw-7-prizes" className="pr-3 !justify-center">
+              <ChipLink href="#lw-7-prizes" className="!pr-3 !justify-center">
                 More info
               </ChipLink>
             </div>
@@ -412,7 +423,6 @@ export default function LW7Releases() {
                       <StyledArticleBadge className="lg:ml-2">New</StyledArticleBadge>
                     </div>
                     <SectionButtons
-                      docs={day1.steps[0].docs}
                       blog={day1.steps[0].blog}
                       video={day1.steps[0].video}
                       hackernews={day1.steps[0].hackernews}
@@ -500,7 +510,6 @@ export default function LW7Releases() {
                       <StyledArticleBadge className="lg:ml-2">New</StyledArticleBadge>
                     </div>
                     <SectionButtons
-                      docs={day2.steps[0].docs}
                       blog={day2.steps[0].blog}
                       video={day2.steps[0].video}
                       hackernews={day2.steps[0].hackernews}
@@ -744,7 +753,7 @@ export default function LW7Releases() {
               className="h-[79px]"
               id={day5.d.toString()}
             >
-              <div></div>
+              <Day5 day={day5} />
             </Accordion.Item>
           </div>
         </Accordion>

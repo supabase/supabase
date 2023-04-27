@@ -72,7 +72,7 @@ Click `Save` to create the new table.
 Now we want to make sure that only the `todos` owner, the user's `wallet_address`, can access their todos. The key component of the this RLS policy is the expression
 
 ```sql
-((jwt() ->> 'walletAddress'::text) = wallet_address)
+((auth.jwt() ->> 'walletAddress'::text) = wallet_address)
 ```
 
 This expression checks that the wallet address in the requesting JWT access token is the same as the `wallet_address` in the `todos` table.

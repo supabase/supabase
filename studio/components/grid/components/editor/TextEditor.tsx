@@ -62,7 +62,13 @@ export function TextEditor<TRow, TSummaryRow = unknown>({
             </div>
             <div className="space-y-1">
               {isNullable && (
-                <Button type="default" size="tiny" onClick={() => saveChanges(null)}>
+                <Button
+                  as="div"
+                  htmlType="button"
+                  type="default"
+                  size="tiny"
+                  onClick={() => saveChanges(null)}
+                >
                   Set to NULL
                 </Button>
               )}

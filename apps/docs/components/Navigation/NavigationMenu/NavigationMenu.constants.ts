@@ -45,7 +45,7 @@ export const gettingstarted = {
   items: [
     { name: 'Features', url: '/guides/getting-started/features' },
     { name: 'Architecture', url: '/guides/getting-started/architecture' },
-    // { name: 'Local Development', url: '/guides/cli/local-development' }, // Disabling this until we actually move the doc into this section
+    { name: 'Local Development', url: '/guides/getting-started/local-development' },
     {
       name: 'Framework Quickstarts',
       items: [
@@ -141,7 +141,6 @@ export const cli = {
   title: 'CLI',
   items: [
     { name: 'Overview', url: '/guides/cli' },
-    { name: 'Local Development', url: '/guides/cli/local-development' },
     { name: 'Managing Environments', url: '/guides/cli/managing-environments' },
   ],
 }
@@ -581,6 +580,16 @@ export const functions = {
       ],
     },
     {
+      name: 'Third-Party Tools',
+      url: undefined,
+      items: [
+        { name: 'Dart Edge on Supabase', url: '/guides/functions/dart-edge' },
+        { name: 'Browserless.io', url: '/guides/functions/examples/screenshots' },
+        { name: 'OpenAI API', url: '/guides/functions/examples/openai' },
+        { name: 'Upstash Redis', url: '/guides/functions/examples/upstash-redis' },
+      ],
+    },
+    {
       name: 'Examples',
       url: '/guides/functions/examples',
       items: [
@@ -687,7 +696,6 @@ export const supabase_cli = {
   url: '/guides/cli',
   items: [
     { name: 'Overview', url: '/guides/cli' },
-    { name: 'Local Development', url: '/guides/cli/local-development' },
     { name: 'Managing Environments', url: '/guides/cli/managing-environments' },
     {
       name: 'Reference',
@@ -887,6 +895,7 @@ export const integrations = {
         { name: 'Authsignal', url: '/guides/integrations/authsignal' },
         { name: 'Clerk', url: '/guides/integrations/clerk' },
         { name: 'keyri', url: '/guides/integrations/keyri' },
+        { name: 'Passage', url: '/guides/integrations/passage' },
         { name: 'Stytch', url: '/guides/integrations/stytch' },
         { name: 'SuperTokens', url: '/guides/integrations/supertokens' },
       ],

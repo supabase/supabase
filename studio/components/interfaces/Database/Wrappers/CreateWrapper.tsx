@@ -144,7 +144,7 @@ const CreateWrapper = () => {
           <h3 className="mb-2 text-xl text-scale-1200">Create a {wrapperMeta.label} Wrapper</h3>
           <div className="flex items-center space-x-2">
             <Link href={wrapperMeta.docsUrl}>
-              <a target="_blank">
+              <a target="_blank" rel="noreferrer">
                 <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
                   Documentation
                 </Button>
@@ -230,7 +230,10 @@ const CreateWrapper = () => {
                     ) : (
                       <div className="space-y-2">
                         {newTables.map((table, i) => (
-                          <div className="flex items-center justify-between px-4 py-2 border rounded-md border-scale-600">
+                          <div
+                            key={`${table.schema_name}.${table.table_name}`}
+                            className="flex items-center justify-between px-4 py-2 border rounded-md border-scale-600"
+                          >
                             <div>
                               <p className="text-sm">
                                 {table.schema_name}.{table.table_name}

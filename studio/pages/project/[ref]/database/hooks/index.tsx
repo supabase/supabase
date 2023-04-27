@@ -1,4 +1,5 @@
 import clsx from 'clsx'
+import { IconLoader } from 'ui'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
@@ -14,8 +15,6 @@ import HooksList from 'components/interfaces/Database/Hooks/HooksList/HooksList'
 import DeleteHookModal from 'components/interfaces/Database/Hooks/DeleteHookModal'
 import EditHookPanel from 'components/interfaces/Database/Hooks/EditHookPanel'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
-import AlphaPreview from 'components/to-be-cleaned/AlphaPreview'
-import { IconLoader } from 'ui'
 
 const HooksPage: NextPageWithLayout = () => {
   const { meta, ui } = useStore()

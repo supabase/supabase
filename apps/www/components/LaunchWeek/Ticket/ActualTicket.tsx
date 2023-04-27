@@ -10,7 +10,7 @@ import { UserData } from './hooks/use-conf-data'
 import ReferralIndicator from '../ReferralIndicator'
 import useWinningChances from './hooks/useWinningChances'
 import { SITE_URL } from '~/lib/constants'
-import { useMobileViewport } from '../../../hooks/useMobileViewport'
+import { useBreakpoint } from 'common/hooks/useBreakpoint'
 
 type TicketGenerationState = 'default' | 'loading'
 
@@ -33,7 +33,7 @@ export default function Ticket({
   bgImageId,
   referrals,
 }: Props) {
-  const isMobile = useMobileViewport(1023)
+  const isMobile = useBreakpoint(1023)
   const [ticketGenerationState, setTicketGenerationState] =
     useState<TicketGenerationState>('default')
   const divRef = useRef<HTMLDivElement>(null)
