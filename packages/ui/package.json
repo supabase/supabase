@@ -42,15 +42,17 @@
     "sse.js": "^0.6.1",
     "tailwind-merge": "^1.10.0",
     "tailwindcss": "^3.0.15",
-    "tailwindcss-radix": "^1.6.0"
+    "tailwindcss-radix": "^1.6.0",
+    "react-countdown": "^2.3.5"
   },
   "devDependencies": {
     "@storybook/react": "^6.5.16",
-    "storybook-dark-mode": "^2.1.1",
     "@types/common-tags": "^1.8.1",
     "@types/react": "^17.0.37",
+    "@types/react-copy-to-clipboard": "^5.0.4",
     "@types/react-dom": "^17.0.11",
     "sql-formatter": "^12.2.0",
+    "storybook-dark-mode": "^2.1.1",
     "typescript": "4.3.4"
   }
 }
