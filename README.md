@@ -231,7 +231,7 @@ Our approach for client libraries is modular. Each sub-library is a standalone i
 - [Norwegian (Bokmål) / Norsk (Bokmål)](/i18n/README.nb-no.md)
 - [Persian / فارسی](/i18n/README.fa.md)
 - [Polish / Polski](/i18n/README.pl.md)
-- [Portuguese / Portuguese](/i18n/README.pt.md)
+- [Portuguese / Português](/i18n/README.pt.md)
 - [Portuguese (Brazilian) / Português Brasileiro](/i18n/README.pt-br.md)
 - [Romanian / Română](/i18n/README.ro.md)
 - [Russian / Pусский](/i18n/README.ru.md)
