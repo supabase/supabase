@@ -93,6 +93,7 @@ export const CodeBlock = ({
           <SyntaxHighlighter
             language={lang}
             wrapLines={true}
+            // @ts-ignore
             style={monokaiTheme}
             className={[
               'code-block border p-4 w-full !my-0 !bg-scale-300',
