@@ -189,8 +189,9 @@ function useLogsPreview(
     'timestamp',
     'count',
     0,
-    params.iso_timestamp_start,
-    params.iso_timestamp_end
+    params.iso_timestamp_start ,
+    // default to current time if not set
+    params.iso_timestamp_end || new Date().toISOString()
   )
 
   return [
