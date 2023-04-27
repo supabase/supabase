@@ -73,6 +73,19 @@ export const USAGE_BASED_PRODUCTS = [
           </span>
         ),
       },
+      {
+        key: 'monthly_active_sso_users',
+        attribute: 'total_auth_billing_period_sso_mau',
+        title: 'Monthly Single Sign-On Users',
+        units: 'absolute',
+        costPerUnit: 0.015,
+        tooltip: (
+          <span>
+            The amount of distinct Single Sign-On users requesting your API throughout the billing period. Resets
+            at the beginning of every billing period.
+          </span>
+        ),
+      },
     ],
   },
   {
