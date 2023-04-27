@@ -26,7 +26,7 @@ The “pluggable” part refers to the ability for developers to develop their o
 
 ## Current progress for pluggable storage
 
-PostgreSQL received basic support for pluggable storage in version 12 with the goal of [adding ZHeap](https://anarazel.de/talks/2019-05-30-pgcon-pluggable-table-storage/pluggable.pdf). Andres Freund and several contributors provided some excellent refactoring, improving various APIs for table access methods (TAM).
+In version 12, PostgreSQL introduced basic support for pluggable storage with the goal of [adding ZHeap](https://anarazel.de/talks/2019-05-30-pgcon-pluggable-table-storage/pluggable.pdf). Andres Freund and several contributors enabled that feature by refactoring and expanding a variety of table access method (TAM) APIs.
 
 ZHeap offered a lot of promise, providing an undo log and solving some long-term table bloat issues in Postgres. The code [was released](https://github.com/EnterpriseDB/zheap) with [promising results](https://www.pgcon.org/2018/schedule/attachments/501_zheap-a-new-storage-format-postgresql-5.pdf).
 
