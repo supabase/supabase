@@ -68,8 +68,8 @@ export default function Form({ validate, ...props }: Props) {
         handleBlur={formik.handleBlur}
         touched={formik.touched}
         fieldLevelValidation={handleFieldLevelValidation}
-        // children={rest.children}
-        children={props.children({
+      >
+        {props.children({
           /** map of field names to specific error for that field */
           errors: formik.errors, // errors,
           // /** map of field names to whether the field has been touched */
@@ -91,7 +91,7 @@ export default function Form({ validate, ...props }: Props) {
           /** Manually sets a fields value */
           setFieldValue: formik.setFieldValue,
         })}
-      />
+      </FormContextProvider>
     </form>
   )
 }

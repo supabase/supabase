@@ -1,14 +1,14 @@
 import React from 'react'
 import { IconAirplay } from '../Icon/icons/IconAirplay'
 
-import Avatar from './Avatar'
+import Avatar, { AvatarProps } from './Avatar'
 
 export default {
   title: 'General/Avatar',
   component: Avatar,
 }
 
-export const Image = (args: any) => {
+export const Image = (args: AvatarProps) => {
   return (
     <>
       <Avatar {...args} />
@@ -16,7 +16,7 @@ export const Image = (args: any) => {
   )
 }
 
-export const Text = (args: any) => {
+export const Text = (args: AvatarProps) => {
   return (
     <>
       <Avatar {...args} />
@@ -24,7 +24,7 @@ export const Text = (args: any) => {
   )
 }
 
-export const Icon = (args: any) => {
+export const Icon = (args: AvatarProps) => {
   return (
     <>
       <Avatar {...args} />
@@ -32,7 +32,7 @@ export const Icon = (args: any) => {
   )
 }
 
-export const Fallback = (args: any) => {
+export const Fallback = (args: AvatarProps) => {
   return (
     <>
       <Avatar {...args} />

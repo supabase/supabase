@@ -24,6 +24,24 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
     return (
       <div className="bg-table-header-light dark:bg-table-header-dark">
         <p className="m-0 border-0 px-6 py-4 font-mono">{result.error.message ?? result.error}</p>
+        {(result.error.message ?? result.error)?.includes(
+          'canceling statement due to statement timeout'
+        ) && (
+          <p className="m-0 border-0 px-6 py-4 font-mono">
+            You can either{' '}
+            <a
+              className="underline"
+              href="https://supabase.com/docs/guides/platform/performance#examining-query-performance"
+            >
+              optimize your query
+            </a>
+            , or{' '}
+            <a className="underline" href="https://supabase.com/docs/guides/database/timeouts">
+              increase the statement timeout
+            </a>
+            .
+          </p>
+        )}
       </div>
     )
   } else if (!result) {
@@ -38,7 +56,7 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
 
   return (
     <div className="h-full">
-      <Results rows={result.rows} />
+      <Results id={id} rows={result.rows} />
     </div>
   )
 }

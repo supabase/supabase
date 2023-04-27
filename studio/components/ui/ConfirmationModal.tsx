@@ -1,8 +1,7 @@
-import { Modal, Button, Space } from 'ui'
-import { MouseEventHandler } from 'react'
-import { FC, useState, useEffect } from 'react'
+import { MouseEventHandler, PropsWithChildren, useEffect, useState } from 'react'
+import { Button, Modal } from 'ui'
 
-interface Props {
+export interface ConfirmationModalProps {
   visible: boolean
   danger?: boolean
   header: string | JSX.Element
@@ -12,10 +11,9 @@ interface Props {
   buttonLoadingLabel?: string
   onSelectCancel: () => void
   onSelectConfirm: () => void
-  children?: React.ReactNode
 }
 
-const ConfirmationModal: FC<Props> = ({
+const ConfirmationModal = ({
   visible = false,
   danger = false,
   header = '',
@@ -26,7 +24,7 @@ const ConfirmationModal: FC<Props> = ({
   onSelectCancel = () => {},
   onSelectConfirm = () => {},
   children,
-}) => {
+}: PropsWithChildren<ConfirmationModalProps>) => {
   useEffect(() => {
     if (visible) {
       setLoading(false)
@@ -65,8 +63,9 @@ const ConfirmationModal: FC<Props> = ({
           </Button>
         </div>
       }
-      children={children}
-    />
+    >
+      {children}
+    </Modal>
   )
 }
 

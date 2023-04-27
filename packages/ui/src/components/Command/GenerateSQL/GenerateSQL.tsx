@@ -13,21 +13,19 @@ import {
   MessageStatus,
   useAiChat,
   Tabs,
+  UseAiChatOptions,
 } from 'ui'
 
 import { cn } from '../../../utils/cn'
 import { AiIcon, AiIconChat } from '../Command.icons'
-import { CommandItem } from '../Command.utils'
+import { CommandItem, useAutoInputFocus, useHistoryKeys } from '../Command.utils'
 import { useCommandMenu } from '../CommandMenuProvider'
 import { SAMPLE_QUERIES } from '../Command.constants'
 import SQLOutputActions from './SQLOutputActions'
 import { generatePrompt } from './GenerateSQL.utils'
+import { ExcludeSchemaAlert, IncludeSchemaAlert, AiWarning } from '../Command.alerts'
 
 const GenerateSQL = () => {
-  // [Joshen] Temp hack to ensure that generatePrompt receives updated value
-  // of includeSchemaMetadata, needs to be fixed
-  const includeSchemaMetadataRef = useRef<any>()
-
   const [includeSchemaMetadata, setIncludeSchemaMetadata] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState<string>(SAMPLE_QUERIES[0].category)
 
@@ -38,18 +36,25 @@ const GenerateSQL = () => {
   const allowSendingSchemaMetadata =
     project?.ref !== undefined && flags?.allowCMDKDataOptIn && isOptedInToAI
 
+  const messageTemplate = useCallback<NonNullable<UseAiChatOptions['messageTemplate']>>(
+    (message) =>
+      generatePrompt(message, isOptedInToAI && includeSchemaMetadata ? definitions : undefined),
+    [isOptedInToAI, includeSchemaMetadata, definitions]
+  )
+
   const { submit, reset, messages, isResponding, hasError } = useAiChat({
-    messageTemplate: (message) => {
-      // [Joshen] Only pass the schema metadata at the start of the conversation if opted in
-      // Since the prompts are contextualized to the conversation, no need to keep sending it
-      return generatePrompt(
-        message,
-        isOptedInToAI && includeSchemaMetadataRef.current && messages.length === 0
-          ? definitions
-          : undefined
-      )
-    },
+    messageTemplate,
     setIsLoading,
+  })
+
+  const inputRef = useAutoInputFocus()
+
+  useHistoryKeys({
+    enable: !isResponding,
+    messages: messages
+      .filter(({ role }) => role === MessageRole.User)
+      .map(({ content }) => content),
+    setPrompt: setSearch,
   })
 
   const handleSubmit = useCallback(
@@ -67,7 +72,6 @@ const GenerateSQL = () => {
 
   useEffect(() => {
     if (search) handleSubmit(search)
-    includeSchemaMetadataRef.current = includeSchemaMetadata
   }, [])
 
   const formatAnswer = (answer: string) => {
@@ -85,8 +89,8 @@ const GenerateSQL = () => {
     <div onClick={(e) => e.stopPropagation()}>
       <div
         className={cn(
-          'relative py-4 max-h-[550px] overflow-auto',
-          allowSendingSchemaMetadata ? 'mb-[83px]' : 'mb-[42px]'
+          'relative py-4 max-h-[420px] overflow-auto',
+          allowSendingSchemaMetadata ? 'mb-[155px]' : 'mb-[64px]'
         )}
       >
         {messages.map((message, i) => {
@@ -118,7 +122,8 @@ const GenerateSQL = () => {
                 message.status === MessageStatus.Complete
                   ? formatAnswer(unformattedAnswer)
                   : unformattedAnswer
-              const cantHelp = answer === "Sorry, I don't know how to help with that."
+              const cantHelp =
+                answer.replace(/^-- /, '') === "Sorry, I don't know how to help with that."
 
               return (
                 <div className="px-4 [overflow-anchor:none] mb-6">
@@ -145,13 +150,20 @@ const GenerateSQL = () => {
                         </div>
                       ) : (
                         <div className="space-y-2 flex-grow max-w-[93%]">
-                          <CodeBlock
-                            hideCopy
-                            language="sql"
-                            className="relative prose dark:prose-dark bg-scale-300 max-w-none"
-                          >
-                            {answer}
-                          </CodeBlock>
+                          <div className="-space-y-px">
+                            <CodeBlock
+                              hideCopy
+                              language="sql"
+                              className="
+                                relative prose dark:prose-dark bg-scale-300 max-w-none !mb-0
+                                !rounded-b-none
+                                
+                              "
+                            >
+                              {answer}
+                            </CodeBlock>
+                            <AiWarning className="!rounded-t-none border-scale-400" />
+                          </div>
                           {message.status === MessageStatus.Complete && (
                             <SQLOutputActions answer={answer} messages={messages.slice(0, i + 1)} />
                           )}
@@ -191,9 +203,19 @@ const GenerateSQL = () => {
                         <CommandItem
                           type="command"
                           onSelect={() => {
-                            handleSubmit(query)
+                            if (!search) {
+                              handleSubmit(query)
+                            }
                           }}
-                          onKeyDown={(e) => e.keyCode === 13 && handleSubmit(query)}
+                          onKeyDown={(e) => {
+                            switch (e.key) {
+                              case 'Enter':
+                                if (!search || isLoading || isResponding) return
+                                return handleSubmit(query)
+                              default:
+                                return
+                            }
+                          }}
                           forceMount
                           key={query.replace(/\s+/g, '_')}
                         >
@@ -229,9 +251,10 @@ const GenerateSQL = () => {
         <div className="[overflow-anchor:auto] h-px w-full"></div>
       </div>
 
-      <div className="absolute bottom-0 w-full bg-scale-200 py-3">
+      <div className="absolute bottom-0 w-full bg-scale-200 pt-4">
+        {/* {messages.length > 0 && !hasError && <AiWarning className="mb-4 mx-4" />} */}
         {allowSendingSchemaMetadata && (
-          <>
+          <div className="mb-4">
             {messages.length === 0 ? (
               <div className="flex items-center justify-between px-6 py-3">
                 <div>
@@ -247,45 +270,19 @@ const GenerateSQL = () => {
                 <Toggle
                   disabled={!isOptedInToAI || isLoading || isResponding}
                   checked={includeSchemaMetadata}
-                  onChange={() =>
-                    setIncludeSchemaMetadata((prev) => {
-                      includeSchemaMetadataRef.current = !prev
-                      return !prev
-                    })
-                  }
+                  onChange={() => setIncludeSchemaMetadata((prev) => !prev)}
                 />
               </div>
+            ) : includeSchemaMetadata ? (
+              <IncludeSchemaAlert />
             ) : (
-              <div className="flex items-center justify-between px-6 py-3">
-                <div>
-                  <p className="text-sm">
-                    Table names, column names and their corresponding data types{' '}
-                    <span
-                      className={cn(includeSchemaMetadata ? 'text-brand-900' : 'text-amber-900')}
-                    >
-                      {includeSchemaMetadata ? 'are' : 'are not'} included
-                    </span>{' '}
-                    in this conversation
-                  </p>
-                  <p className="text-sm text-scale-1100">
-                    Start a new conversation to change this configuration
-                  </p>
-                </div>
-              </div>
+              <ExcludeSchemaAlert />
             )}
-          </>
+          </div>
         )}
         <Input
-          inputRef={(inputElement) => {
-            if (inputElement) {
-              // We need to delay the focus until the end of the call stack
-              // due to order of operations
-              setTimeout(() => {
-                inputElement.focus()
-              }, 0)
-            }
-          }}
-          className="bg-scale-100 rounded mx-3"
+          inputRef={inputRef}
+          className="bg-scale-100 rounded mx-3 mb-4"
           autoFocus
           placeholder={
             isLoading || isResponding
