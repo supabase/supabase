@@ -10,6 +10,6 @@ const useFillTimeseriesSorted = (...args: Parameters<typeof fillTimeseries>) => 
     return filled.sort((a, b) => {
       return (new Date(a[args[1]]) as any) - (new Date(b[args[1]]) as any)
     })
-  }, [JSON.stringify(args[0])])
+  }, [JSON.stringify(args[0]), ...args])
 }
 export default useFillTimeseriesSorted
