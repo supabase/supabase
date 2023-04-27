@@ -27,7 +27,7 @@ export const formatWrapperTables = (tables: any[]) => {
 
     return {
       index,
-      columns: table.columns.map((column: any) => column.name),
+      columns: table.columns,
       is_new_schema: false,
       object: objectValue,
       schema: table.schema,

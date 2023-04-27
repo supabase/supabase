@@ -56,7 +56,6 @@ const EditWrapper = () => {
   const foundWrapper = wrappers.find((w) => Number(w.id) === Number(id))
   // this call to useImmutableValue should be removed if the redirect after update is also removed
   const wrapper = useImmutableValue(foundWrapper)
-
   const wrapperMeta = WRAPPERS.find((w) => w.handlerName === wrapper?.handler)
 
   const { mutateAsync: updateFDW, isLoading: isSaving } = useFDWUpdateMutation()
