@@ -327,12 +327,12 @@ const ForeignKeySelector: FC<Props> = ({ column, visible = false, closePanel, sa
                     </p>
                     <p className="mt-2">
                       <a
-                        href="https://supabase.com/docs/guides/database/postgres/cascade-deletes"
+                        href="https://supabase.com/docs/guides/database/postgres/on-delete-constraint-behavior"
                         target="_blank"
                         rel="noreferrer"
                         className="text-brand-900 opacity-75"
                       >
-                        Learn more about cascade deletes
+                        Learn more about ON DELETE
                       </a>
                     </p>
                   </>
