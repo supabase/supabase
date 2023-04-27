@@ -1,12 +1,12 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-  title: 'Cascade deletes',
-  description: 'Understand the types of foreign key deletes',
+  title: 'On Delete Constraint Behaviour',
+  description: 'Understand the types of foreign key constraint deletes',
   footerHelpType: 'postgres',
 }
 
-There are 5 options for cascade deletes:
+There are 5 options for foreign key constraint deletes:
 
 1. **CASCADE:** When a row is deleted from the parent table, all related rows in the child table(s) are deleted as well.
 2. **RESTRICT:** When a row is deleted from the parent table, the delete operation is aborted if there are any related rows in the child table(s).
