@@ -140,10 +140,13 @@ export const PgbouncerConfig: FC<ConfigProps> = observer(
 
     const updateConfig = async (updatedConfig: any) => {
       try {
-        const response = await patch(
-          `${API_URL}/projects/${projectRef}/config/pgbouncer`,
-          updatedConfig
-        )
+        const response = await patch(`${API_URL}/projects/${projectRef}/config/pgbouncer`, {
+          pgbouncer_enabled: updatedConfig.pgbouncer_enabled,
+          default_pool_size: updatedConfig.default_pool_size,
+          ignore_startup_parameters: updatedConfig.ignore_startup_parameters,
+          pool_mode: updatedConfig.pool_mode,
+          max_client_conn: updatedConfig.max_client_conn,
+        })
         if (response.error) {
           throw response.error
         } else {
