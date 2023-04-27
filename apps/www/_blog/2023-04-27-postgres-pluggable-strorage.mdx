@@ -49,10 +49,11 @@ Right now, pluggable storage requires a a fork of Postgres. But there are severa
 - There have been community updates for [custom resource managers](https://git.postgresql.org/gitweb/?p=postgresql.git;a=commitdiff;h=5c279a6d350205cc98f91fb8e1d3e4442a6b25d1) that expand [write-ahead log (WAL)](https://www.postgresql.org/docs/current/wal-intro.html) support for TAM.
 - The creators at [OrioleDB](https://github.com/orioledb/orioledb) started with a fork of Postgres and have been quietly upstreaming the code that is required to make pluggable storage a reality. They are solving many “[wicked Postgres problems](https://www.slideshare.net/AlexanderKorotkov/solving-postgresql-wicked-problems)” with [dual pointers](https://www.orioledata.com/blog/buffer-management/) instead of buffer mapping, row-level WAL instead of block-level WAL, undo logs instead of bloat-prone MVCC, and index-organized tables instead of heap. In Postgres 14 their patchset was about 5,000 lines of code (this represents the total number of changes required in their fork). In the upcoming Postgres 16 release, it is around 2,000 lines of code. That means that around 60% of the code is already committed to the Postgres core. (Disclosure: Supabase started [sponsoring OrioleDB](https://supabase.com/blog/supabase-series-b#where-were-going) in 2022).
 
-<aside>
-ℹ️ Alexander Korotkov, the maintainer of OrioleDB, will be talking at PGCON 23 about some of the [changes](https://www.pgcon.org/events/pgcon_2023/schedule/session/470-future-of-table-access-methods/) they are making.
+<div className="bg-gray-300 rounded-lg px-6 py-2 italic">
 
-</aside>
+Alexander Korotkov, the maintainer of OrioleDB, will be talking at PGCON 23 about some of the [changes](https://www.pgcon.org/events/pgcon_2023/schedule/session/470-future-of-table-access-methods/) they are making.
+
+</div>
 
 ## Timelines for pluggable storage
 
