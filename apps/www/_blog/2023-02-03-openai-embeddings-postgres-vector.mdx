@@ -104,7 +104,7 @@ Soon we're going to need to perform a similarity search over these embeddings. L
 ```sql
 create or replace function match_documents (
   query_embedding vector(1536),
-  similarity_threshold float,
+  match_threshold float,
   match_count int
 )
 returns table (
@@ -117,12 +117,12 @@ as $$
 begin
   return query
   select
-    id,
-    content,
+    documents.id,
+    documents.content,
     1 - (documents.embedding <=> query_embedding) as similarity
   from documents
-  where 1 - (documents.embedding <=> query_embedding) > similarity_threshold
-  order by documents.embedding <=> query_embedding
+  where 1 - (documents.embedding <=> query_embedding) > match_threshold
+  order by similarity desc
   limit match_count;
 end;
 $$;
