@@ -289,6 +289,7 @@ const TableForm = ({
                   })
                 ) : (
                   <WrapperDynamicColumns
+                    initialColumns={values.columns}
                     onChange={(columns) => {
                       setFieldValue('columns', columns)
                     }}
