@@ -89,6 +89,7 @@ export const CodeBlock = ({
       )}
       {className ? (
         <div className="relative max-w-[90vw] md:max-w-none overflow-auto">
+          {/* @ts-ignore */}
           <SyntaxHighlighter
             language={lang}
             wrapLines={true}
