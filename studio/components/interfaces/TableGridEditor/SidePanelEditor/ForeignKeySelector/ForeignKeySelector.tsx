@@ -332,7 +332,7 @@ const ForeignKeySelector: FC<Props> = ({ column, visible = false, closePanel, sa
                         rel="noreferrer"
                         className="text-brand-900 opacity-75"
                       >
-                        Learn more about ON DELETE
+                        Learn more about ON DELETE actions
                       </a>
                     </p>
                   </>
