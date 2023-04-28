@@ -1,10 +1,10 @@
 import dayjs from 'dayjs'
 import { observer } from 'mobx-react-lite'
-import { FC, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { IconArrowRight, Loading } from 'ui'
 
-import { Project, NextPageWithLayout } from 'types'
-import { useStore } from 'hooks'
+import { NextPageWithLayout } from 'types'
+import { useStore, useFlag } from 'hooks'
 import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
 import { STRIPE_PRODUCT_IDS, TIME_PERIODS_REPORTS, TIME_PERIODS_BILLING } from 'lib/constants'
 import { SettingsLayout } from 'components/layouts'
@@ -14,13 +14,12 @@ import { PAYGUsage } from 'components/interfaces/Billing'
 import ProjectUsageBars from 'components/interfaces/Settings/ProjectUsageBars/ProjectUsageBars'
 
 const ProjectBillingUsage: NextPageWithLayout = () => {
-  const { ui } = useStore()
-  const project = ui.selectedProject
+  const showUsageV2 = useFlag('usageV2')
 
   return (
     <div className="w-full h-full overflow-y-auto content">
       <div className="w-full mx-auto">
-        <Settings project={project} />
+        <Settings />
       </div>
     </div>
   )
@@ -32,12 +31,9 @@ ProjectBillingUsage.getLayout = (page) => (
 
 export default observer(ProjectBillingUsage)
 
-interface SettingsProps {
-  project?: Project
-}
-
-const Settings: FC<SettingsProps> = ({ project }) => {
+const Settings = () => {
   const { ui } = useStore()
+  const project = ui.selectedProject
 
   const {
     data: subscription,
