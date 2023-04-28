@@ -26,7 +26,7 @@ const DisabledStateForFreeTier: FC<Props> = ({ projectRef, category }) => {
                 </a>
               </Link>
               <Link href="https://supabase.com/pricing">
-                <a target="_blank">
+                <a target="_blank" rel="noreferrer">
                   <Button type="default" icon={<IconExternalLink size={14} />}>
                     About the Pro tier
                   </Button>

@@ -21,10 +21,9 @@ export async function updateDatabaseTrigger({
 }: DatabaseTriggerUpdateVariables) {
   if (!id) throw new Error('id is required')
   if (!projectRef) throw new Error('projectRef is required')
-  if (!connectionString) throw new Error('connectionString is required')
 
   let headers = new Headers()
-  headers.set('x-connection-encrypted', connectionString)
+  if (connectionString) headers.set('x-connection-encrypted', connectionString)
 
   const response = (await patch(`${API_URL}/pg-meta/${projectRef}/triggers?id=${id}`, payload, {
     headers: Object.fromEntries(headers),

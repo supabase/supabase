@@ -9,8 +9,14 @@ interface Props {
 
 const PolicyEditorFooter: FC<Props> = ({ showTemplates, onViewTemplates, onReviewPolicy }) => (
   <div className="flex justify-between items-center border-t px-6 py-4 dark:border-dark">
-    <a href='https://supabase.com/docs/learn/auth-deep-dive/auth-policies' target="_blank">
-      <Button type='link' icon={<IconExternalLink size={14} strokeWidth={1.5} />}>Documentation</Button>
+    <a
+      href="https://supabase.com/docs/learn/auth-deep-dive/auth-policies"
+      target="_blank"
+      rel="noreferrer"
+    >
+      <Button type="link" icon={<IconExternalLink size={14} strokeWidth={1.5} />}>
+        Documentation
+      </Button>
     </a>
     <div className="flex w-full items-center justify-end gap-2">
       {showTemplates && (
