@@ -7,8 +7,6 @@ import logConstants from 'shared-data/logConstants'
 import BackwardIterator from 'components/ui/CodeEditor/Providers/BackwardIterator'
 import uniqBy from 'lodash/uniqBy'
 import { useEffect } from 'react'
-import utc from 'dayjs/plugin/utc'
-dayjs.extend(utc)
 
 /**
  * Convert a micro timestamp from number/string to iso timestamp
@@ -383,7 +381,7 @@ export const fillTimeseries = (
   const truncationSample = timeseriesData.length > 0 ? timeseriesData[0][timestampKey] : min || max
   const truncation = getTimestampTruncation(truncationSample)
 
-  let newData = timeseriesData.map((datum) => {
+  const newData = timeseriesData.map((datum) => {
     const iso = dayjs.utc(datum[timestampKey]).toISOString()
     datum[timestampKey] = iso
     return datum
@@ -413,7 +411,7 @@ export const getTimestampTruncation = (datetime: string): 'second' | 'minute' | 
     }
     return acc
   }, 0)
-  let truncation = {
+  const truncation = {
     0: 'second' as const,
     1: 'minute' as const,
     2: 'hour' as const,
