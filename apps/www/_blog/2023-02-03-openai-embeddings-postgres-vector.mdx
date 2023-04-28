@@ -13,7 +13,7 @@ toc_depth: 3
 
 A new PostgreSQL extension is now available in Supabase: [`pgvector`](https://github.com/pgvector/pgvector), an open-source vector similarity search.
 
-The exponential progress of AI functionality over the past year has inspired many new real world applications. One specific challenge has been the ability to store and query _embeddings_ at scale. 
+The exponential progress of AI functionality over the past year has inspired many new real world applications. One specific challenge has been the ability to store and query _embeddings_ at scale.
 In this post we'll explain what embeddings are, why we might want to use them, and how we can store and query them in PostgreSQL using `pgvector`.
 
 ## What are embeddings?
@@ -91,7 +91,7 @@ Next let's create a table to store our documents and their embeddings:
 create table documents (
   id bigserial primary key,
   content text,
-  embedding vector (1536)
+  embedding vector(1536)
 );
 ```
 
@@ -147,7 +147,7 @@ Once your table starts to grow with embeddings, you will likely want to add an i
 Each distance operator requires a different type of index. We expect to order by cosine distance, so we need `vector_cosine_ops` index. A good starting number of lists is 4 \* sqrt(table_rows):
 
 ```sql
-create index on documents 
+create index on documents
 using ivfflat (embedding vector_cosine_ops)
 with (lists = 100);
 ```

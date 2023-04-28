@@ -139,9 +139,7 @@ const channel = supabase
   .subscribe()
 ```
 
-<Admonition type="note">
-  This filter uses Postgres' `=`.
-</Admonition>
+<Admonition type="note">This filter uses Postgres' `=`.</Admonition>
 
 ### neq
 
@@ -165,9 +163,7 @@ const channel = supabase
   .subscribe()
 ```
 
-<Admonition type="note">
-  This filter uses Postgres' `!=`.
-</Admonition>
+<Admonition type="note">This filter uses Postgres' `!=`.</Admonition>
 
 ### lt
 
@@ -244,7 +240,8 @@ const channel = supabase
 ```
 
 <Admonition type="note">
-  This filter uses Postgres' `>` so it works for non-numeric types but make sure to check the expected behavior of the compared data's type.
+  This filter uses Postgres' `>` so it works for non-numeric types but make sure to check the
+  expected behavior of the compared data's type.
 </Admonition>
 
 ### gte
@@ -270,7 +267,8 @@ const channel = supabase
 ```
 
 <Admonition type="note">
-  This filter uses Postgres' `>=` so it works for non-numeric types but make sure to check the expected behavior of the compared data's type.
+  This filter uses Postgres' `>=` so it works for non-numeric types but make sure to check the
+  expected behavior of the compared data's type.
 </Admonition>
 
 ### in
