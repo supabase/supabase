@@ -1,12 +1,12 @@
 import BarChart, { BarChartProps } from 'components/ui/Charts/BarChart'
 import { EventChartData, isUnixMicro, LogData, unixMicroToIsoTimestamp } from '.'
 
-interface Props {
+export interface LogEventChartProps {
   data: EventChartData[]
   onBarClick: (isoTimestamp: string) => void
 }
 
-const LogEventChart: React.FC<Props> = ({ data, onBarClick }) => (
+const LogEventChart = ({ data, onBarClick }: LogEventChartProps) => (
   <BarChart
     minimalHeader
     size="tiny"
