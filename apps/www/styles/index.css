@@ -150,7 +150,7 @@ h6:not(.overwrite) {
 }
 
 .section--bg {
-  @apply bg-scale-100 dark:bg-scale-200;
+  @apply bg-scale-100 dark:bg-scale-100;
   position: relative;
   height: 100%;
   width: 100%;
