@@ -105,17 +105,16 @@ A common use case with SSO is to use the UUID of the identity provider as the id
 For example, let's say you have a table like:
 
 ```sql
-CREATE TABLE
-  organization_settings (
-    -- the organization's unique ID
-    id UUID NOT NULL PRIMARY KEY,
-    -- the organization's SSO identity provider
-    sso_provider_id UUID UNIQUE,
-    -- name of the organization
-    name TEXT,
-    -- billing plan (paid, free, enterprise)
-    billing_plan TEXT
-  );
+create table organization_settings (
+  -- the organization's unique ID
+  id uuid not null primary key,
+  -- the organization's SSO identity provider
+  sso_provider_id uuid unique,
+  -- name of the organization
+  name text,
+  -- billing plan (paid, free, enterprise)
+  billing_plan text
+);
 ```
 
 You can use the information present in the user's JWT to scope down which rows from this table the user can see, without doing any additional user management:

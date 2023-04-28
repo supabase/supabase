@@ -17,7 +17,7 @@ Whenever you create a new database in Postgres, you are actually [basing it off 
 This database, `template1`, and another, called `template0`, are standard system databases that exist in every newly created database cluster. Don't believe me? Why not quickly [spin up a database](/docs/postgres/server/about) and see it for yourself with this query:
 
 ```sql
-SELECT * FROM pg_database;
+select * from pg_database;
 ```
 
 In this post, we'll explore these template databases and see how we can make full use of their potential. We'll even look into creating a template database of our own.

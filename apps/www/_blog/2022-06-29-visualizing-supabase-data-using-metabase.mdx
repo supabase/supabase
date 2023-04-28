@@ -100,10 +100,11 @@ Next, under the database, select "SupabaseDB".
 We will be using the following SQL query:
 
 ```sql
-SELECT "Vendor".vendor_name, product_name, "Vendor".total_employees
-FROM "Product"
-LEFT JOIN "Vendor" on "Product".vendor_id = "Vendor".vendor_id
-WHERE "Vendor".total_employees
+select "Vendor".vendor_name, product_name, "Vendor".total_employees
+from
+  "Product"
+  left join "Vendor" on "Product".vendor_id = "Vendor".vendor_id
+where "Vendor".total_employees;
 ```
 
 This query should fetch us the vendor name and the product where the number of employees for a given vendor is less than 110.

@@ -443,17 +443,16 @@ A likely requirement from the original scenario that we've completely ignored is
 In SQL:
 
 ```sql hideCopy
-BEGIN;
+begin;
 
-CREATE TABLE posts_seen_by_users (
-  post_id bigint REFERENCES posts(id),
-  user_id bigint REFERENCES users(id),
-  seen_count bigint NOT NULL DEFAULT 0 CHECK (seen_count > 0),
-
-  PRIMARY KEY (post_id, user_id)
+create table posts_seen_by_users (
+  post_id bigint references posts (id),
+  user_id bigint references users (id),
+  seen_count bigint not null default 0 check (seen_count > 0),
+  primary key (post_id, user_id)
 );
 
-COMMIT;
+commit;
 ```
 
 #### Caveats

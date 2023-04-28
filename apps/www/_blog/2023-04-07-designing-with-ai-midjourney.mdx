@@ -111,49 +111,42 @@ Since this table includes email addresses, we secure it using [RLS](https://supa
 By creating a view, we can selectively publicize parts of our table and also compute some additional values on the fly:
 
 ```sql
-drop
-  view if exists lw7_tickets_golden;
+drop view if exists lw7_tickets_golden;
 
-create
-or replace view lw7_tickets_golden as
-with
-  lw7_referrals as (
-    select
-      referred_by,
-      count(*) as referrals
-    from
-      lw7_tickets
-    where
-      referred_by is not null
-    group by
-      referred_by
-  )
-select
-  lw7_tickets."id",
-  lw7_tickets."name",
-  lw7_tickets."username",
-  lw7_tickets."ticketNumber",
-  lw7_tickets."createdAt",
-  lw7_tickets."sharedOnTwitter",
-  lw7_tickets."sharedOnLinkedIn",
-  lw7_tickets."bg_image_id",
-  case
-    when lw7_referrals.referrals is null then 0
-    ELSE lw7_referrals.referrals
-  end as referrals,
-  case
-    when lw7_tickets."sharedOnTwitter" is not null
-    and lw7_tickets."sharedOnLinkedIn" is not null then true
-    else false
-  end as golden
-from
-  lw7_tickets
-  left outer join lw7_referrals on lw7_tickets.username = lw7_referrals.referred_by;
+create or replace view lw7_tickets_golden as
+  with
+    lw7_referrals as (
+      select
+        referred_by,
+        count(*) as referrals
+      from lw7_tickets
+      where referred_by is not null
+      group by referred_by
+    )
+  select
+    lw7_tickets."id",
+    lw7_tickets."name",
+    lw7_tickets."username",
+    lw7_tickets."ticketNumber",
+    lw7_tickets."createdAt",
+    lw7_tickets."sharedOnTwitter",
+    lw7_tickets."sharedOnLinkedIn",
+    lw7_tickets."bg_image_id",
+    case
+      when lw7_referrals.referrals is null then 0
+      else lw7_referrals.referrals
+    end as referrals,
+    case
+      when lw7_tickets."sharedOnTwitter" is not null
+      and lw7_tickets."sharedOnLinkedIn" is not null then true
+      else false
+    end as golden
+  from
+    lw7_tickets
+    left outer join lw7_referrals on lw7_tickets.username = lw7_referrals.referred_by;
 
-select
-  *
-from
-  lw7_tickets_golden
+select *
+from lw7_tickets_golden;
 ```
 
 We can now retrieve that username by using the following code:

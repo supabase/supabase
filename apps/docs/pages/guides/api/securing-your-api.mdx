@@ -49,10 +49,8 @@ To confirm that safeupdate is enabled for API queries, run the following query:
 select
   usename,
   useconfig
-from
-  pg_shadow
-where
-  usename = 'authenticator';
+from pg_shadow
+where usename = 'authenticator';
 ```
 
 The expected value for `useconfig` should be:

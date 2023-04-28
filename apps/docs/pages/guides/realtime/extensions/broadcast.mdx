@@ -25,8 +25,7 @@ const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY
 
 const channel = supabase.channel('test')
 
-channel.on('broadcast', { event: 'supa' }, (payload) => console.log(payload))
-  .subscribe()
+channel.on('broadcast', { event: 'supa' }, (payload) => console.log(payload)).subscribe()
 ```
 
 ## Send Messages
@@ -69,7 +68,8 @@ const channel = supabase.channel('test', {
   },
 })
 
-channel.on('broadcast', { event: 'supa' }, (payload) => console.log(payload))
+channel
+  .on('broadcast', { event: 'supa' }, (payload) => console.log(payload))
   .subscribe((status) => {
     if (status === 'SUBSCRIBED') {
       channel.send({

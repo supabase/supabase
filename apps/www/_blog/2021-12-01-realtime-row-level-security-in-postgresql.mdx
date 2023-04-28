@@ -67,6 +67,7 @@ create policy todo_select_policy
 
 which is equivalent to adding
 
+{/* prettier-ignore */}
 ```sql hideCopy
 select *
 from todos
@@ -116,7 +117,7 @@ To maximize throughput, the query used to evaluate if a row is visible to a subs
 For example:
 
 ```sql hideCopy
-select exists(select 1 from some_table where id = 806);
+select exists (select 1 from some_table where id = 806);
 ```
 
 When more than one subscriber exists, the query is wrapped in a [prepared statement](https://www.postgresql.org/docs/13/sql-prepare.html) to remove the cost of the PostgreSQL

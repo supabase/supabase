@@ -39,7 +39,6 @@ The next and third major version, announced today on new Supabase Realtime Day, 
 Presence is great for showing when your users are online. When a user connects or disconnects (even accidentally!), the server automatically detects this and let's everyone else know.
 Presence is powered by [CRDTs](https://crdt.tech/) (Conflict-free Replicated Data Type) on a distributed cluster useful for storing synced data across nodes.
 
-
 ### Broadcast
 
 ![realtime-multiplayer-broadcast.png](/images/blog/launch-week-4/friday-realtime/realtime-multiplayer-broadcast.png)
@@ -50,7 +49,7 @@ In Realtime, connected users communicate with other subscribing & publishing to 
 ### Extensions
 
 In this version of Realtime we're re-architecting the way that we listen to PostgreSQL databases by opening the WebSocket functionality for general use.
-Instead of only using WebSockets to broadcast database changes, we are now moving the PostgreSQL listener to an “extension” architecture. This opens up numerous new ways of extending the server. 
+Instead of only using WebSockets to broadcast database changes, we are now moving the PostgreSQL listener to an “extension” architecture. This opens up numerous new ways of extending the server.
 Here are just a few that we've heard:
 
 - Multiple Postgres: listen to multiple PostgreSQL databases at the same time.

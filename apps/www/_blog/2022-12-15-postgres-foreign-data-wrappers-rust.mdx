@@ -143,14 +143,11 @@ You can even join remote data with your local tables to enrich existing operatio
 ```sql
 select
   users.id,
-	count(order_history.event)
+  count(order_history.event)
 from
-	snowflake.order_history
-join
-	auth.users on auth.users.id = snowflake.order_history.user_id
-where
-  order_history.event = 'purchase' and
-  order_history.user_id = '<some_user_id>';
+  snowflake.order_history
+  join auth.users on auth.users.id = snowflake.order_history.user_id
+where order_history.event = 'purchase' and order_history.user_id = '<some_user_id>';
 ```
 
 We can either run these queries on demand or, for better query performance, we can run them in the background (using something like [pg_cron](https://supabase.com/docs/guides/database/extensions/pgcron)), and materialize the data into a local table.

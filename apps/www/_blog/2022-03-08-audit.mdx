@@ -31,9 +31,9 @@ To demonstrate what we're working towards, the following example shows what we'l
 
 ```sql
 -- create a table
-create table public.members(
-    id int primary key,
-    name text not null
+create table public.members (
+  id int primary key,
+  name text not null
 );
 
 -- Enable auditing on the new table
@@ -44,10 +44,15 @@ Produce some records to audit
 
 ```sql
 -- create a new record
-insert into public.members(id, name) values (1, 'foo');
+insert into public.members
+  (id, name)
+values
+  (1, 'foo');
 
 -- edit the record
-update public.members set name = 'bar' where id = 1;
+update public.members
+set name = 'bar'
+where id = 1;
 
 -- delete the record
 delete from public.members;
@@ -56,7 +61,7 @@ delete from public.members;
 Review the audit log
 
 ```sql
-select * from audit.record_history
+select * from audit.record_history;
 ```
 
 ```markdown
@@ -227,14 +232,12 @@ Finally, we index the `record_id` and `old_record_id` columns that contain these
 
 ```sql
 -- index record_id for fast searching
-create index record_version_record_id
-    on audit.record_version(record_id)
-    where record_id is not null;
+create index record_version_record_id on audit.record_version (record_id)
+where record_id is not null;
 
 -- index old_record_id for fast searching
-create index record_version_old_record_id
-	on audit.record_version(record_id)
-  where old_record_id is not null;
+create index record_version_old_record_id on audit.record_version (record_id)
+where old_record_id is not null;
 ```
 
 ### Enrollment

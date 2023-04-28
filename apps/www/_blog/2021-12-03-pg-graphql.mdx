@@ -18,9 +18,9 @@ toc_depth: 3
 <div className="bg-gray-300 rounded-lg px-6 py-2 italic">
 
 🆕 `pg_graphql` is now generally available and has undergone significant enhancements since this announcement. Here is what is new:
-	
-	- [pg_graphql v1.0](https://supabase.com/blog/pg-graphql-v1)
-	- [New Features in pg_graphql v1.2](https://supabase.com/blog/whats-new-in-pg-graphql-v1-2)
+
+- [pg_graphql v1.0](https://supabase.com/blog/pg-graphql-v1)
+- [New Features in pg_graphql v1.2](https://supabase.com/blog/whats-new-in-pg-graphql-v1-2)
 
 </div>
 
@@ -35,7 +35,6 @@ Today we're open sourcing [`pg_graphql`](https://github.com/supabase/pg_graphql)
 - open source
 
 Interested? You're [3 commands away](https://supabase.github.io/pg_graphql/quickstart/) from a live [GraphiQL](https://graphql-dotnet.github.io/docs/getting-started/graphiql/) demo.
-
 
 ## Motivation
 
@@ -85,11 +84,11 @@ As a limited example of how the reflection engine works, here's how it converts 
 
 ```sql hideCopy
 # schema.sql
-create table account(
-    id serial primary key,
-    email varchar(255) not null,
-    created_at timestamp not null,
-    updated_at timestamp not null
+create table account (
+  id serial primary key,
+  email varchar(255) not null,
+  created_at timestamp not null,
+  updated_at timestamp not null
 );
 ```
 
@@ -179,6 +178,7 @@ We're opting to expose the function over HTTP through PostgREST but you could al
 
 When it comes to APIs, performance counts. Here are some figures from [Apache Bench](https://www.tutorialspoint.com/apache_bench/apache_bench_quick_guide.htm) showing 2,205 requests/second on a 4 core machine with 16 GB of memory.
 
+{/* prettier-ignore */}
 ```markdown hideCopy
 Concurrency Level:      8
 Time taken for tests:   3.628 seconds
