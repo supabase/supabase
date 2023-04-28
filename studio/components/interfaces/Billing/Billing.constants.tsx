@@ -31,7 +31,11 @@ export const USAGE_BASED_PRODUCTS = [
         tooltip: (
           <span>
             Billing is based on the average daily database size in GB throughout the billing period.{' '}
-            <a href="https://supabase.com/docs/guides/platform/database-usage" target="_blank">
+            <a
+              href="https://supabase.com/docs/guides/platform/database-usage"
+              target="_blank"
+              rel="noreferrer"
+            >
               Docs
             </a>
           </span>
@@ -65,6 +69,19 @@ export const USAGE_BASED_PRODUCTS = [
         tooltip: (
           <span>
             The amount of distinct users requesting your API throughout the billing period. Resets
+            at the beginning of every billing period.
+          </span>
+        ),
+      },
+      {
+        key: 'monthly_active_sso_users',
+        attribute: 'total_auth_billing_period_sso_mau',
+        title: 'Monthly Single Sign-On Users',
+        units: 'absolute',
+        costPerUnit: 0.015,
+        tooltip: (
+          <span>
+            The amount of distinct Single Sign-On users requesting your API throughout the billing period. Resets
             at the beginning of every billing period.
           </span>
         ),

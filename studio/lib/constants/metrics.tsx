@@ -152,6 +152,12 @@ export const METRICS = [
     category: METRIC_CATEGORIES.API_AUTH,
   },
   {
+    key: 'total_auth_billing_period_sso_mau',
+    label: 'Auth Monthly Active SSO User',
+    provider: 'daily-stats',
+    category: METRIC_CATEGORIES.API_AUTH,
+  },
+  {
     key: 'total_auth_ingress',
     label: 'Auth Ingress',
     provider: 'daily-stats',
