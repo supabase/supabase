@@ -2,7 +2,7 @@ import { getSortedPosts, getAllCategories } from '~/lib/posts'
 import PostTypes from '~/types/post'
 import Container from 'components/Container'
 import Layout from '~/components/Layouts/Default'
-import Hero from 'components/Hero'
+import Hero from 'components/Hero/Hero'
 
 import Features from 'components/Features/index'
 import BuiltExamples from 'components/BuiltWithSupabase/index'
