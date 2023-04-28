@@ -12,13 +12,13 @@
   height: 200vh;
   margin-left: -50%;
   transform: translateY(0);
-  background-image: linear-gradient(to right, #07edfc20 45%, #07edfc20 50%, #07edfc20 55%);
+  background-image: linear-gradient(to right, #07edfc 45%, transparent 50%, #07edfc 55%);
   -webkit-mask-image: linear-gradient(90deg, #000 0.3px, transparent 0),
     linear-gradient(180deg, #000 0.3px, transparent 0);
   mask-image: linear-gradient(90deg, #000 0.3px, #000 0),
     linear-gradient(180deg, #000 0.3px, #000 0);
-  -webkit-mask-size: 40px 40px;
-  mask-size: 40px 40px;
+  -webkit-mask-size: 30px 30px;
+  mask-size: 30px 30px;
   overflow: hidden;
   -webkit-mask-repeat: repeat;
   mask-repeat: repeat;
@@ -30,6 +30,29 @@
   -webkit-mask-position: 50% 0;
   mask-position: 50% 0;
   animation: animate-grid 30s linear infinite;
+}
+
+.gradient {
+  position: absolute;
+  user-select: none;
+  pointer-events: none;
+  inset: 0px;
+  z-index: -3;
+  opacity: 0.6;
+  filter: blur(140px);
+  transform: translateZ(0px);
+  background: radial-gradient(ellipse 50% 45% at 50% 40%, #3ecf8e, rgba(0, 0, 0, 0));
+}
+
+.triangle-shape {
+  width: 200vw;
+  height: 200vw;
+  transform: rotate(45deg) translate3d(-100vw, -100vw, 0);
+  background: radial-gradient(
+    ellipse 64% 64% at 40% 40%,
+    var(--colors-brand1),
+    var(--colors-scale1)
+  );
 }
 
 @media (min-width: 1024px) {
