@@ -254,48 +254,52 @@ const ExitSurvey = ({ freeTier, subscription, onSelectBack }: ExitSurveyProps) =
                     name="message"
                     label="Anything else that we can improve on?"
                   />
-                  <div className="flex items-center space-x-2">
-                    <Button
-                      htmlType="button"
-                      type="default"
-                      onClick={() => router.push(`/project/${projectRef}/settings/billing/update`)}
-                    >
-                      Cancel
-                    </Button>
-                    <Tooltip.Root delayDuration={0}>
-                      <Tooltip.Trigger className="w-full">
-                        <Button
-                          type="danger"
-                          htmlType="submit"
-                          loading={isSubmitting}
-                          disabled={projectUpdateDisabled || isSubmitting}
-                        >
-                          Confirm downgrade
-                        </Button>
-                      </Tooltip.Trigger>
-                      {projectUpdateDisabled ? (
-                        <Tooltip.Portal>
-                          <Tooltip.Content side="bottom">
-                            <Tooltip.Arrow className="radix-tooltip-arrow" />
-                            <div
-                              className={[
-                                'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                                'border border-scale-200',
-                              ].join(' ')}
-                            >
-                              <span className="text-xs text-scale-1200">
-                                Subscription changes are currently disabled. Our engineers are
-                                working on a fix.
-                              </span>
-                            </div>
-                          </Tooltip.Content>
-                        </Tooltip.Portal>
-                      ) : null}
-                    </Tooltip.Root>
+                  <div className="flex items-center justify-between">
                     <p className="text-xs text-scale-900">
                       The unused amount for the remaining of your billing cycle will be refunded as
                       credits
                     </p>
+                    <div className="flex items-center space-x-2">
+                      <Button
+                        htmlType="button"
+                        type="default"
+                        onClick={() =>
+                          router.push(`/project/${projectRef}/settings/billing/update`)
+                        }
+                      >
+                        Cancel
+                      </Button>
+                      <Tooltip.Root delayDuration={0}>
+                        <Tooltip.Trigger className="w-full">
+                          <Button
+                            type="danger"
+                            htmlType="submit"
+                            loading={isSubmitting}
+                            disabled={projectUpdateDisabled || isSubmitting}
+                          >
+                            Confirm downgrade
+                          </Button>
+                        </Tooltip.Trigger>
+                        {projectUpdateDisabled ? (
+                          <Tooltip.Portal>
+                            <Tooltip.Content side="bottom">
+                              <Tooltip.Arrow className="radix-tooltip-arrow" />
+                              <div
+                                className={[
+                                  'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                                  'border border-scale-200',
+                                ].join(' ')}
+                              >
+                                <span className="text-xs text-scale-1200">
+                                  Subscription changes are currently disabled. Our engineers are
+                                  working on a fix.
+                                </span>
+                              </div>
+                            </Tooltip.Content>
+                          </Tooltip.Portal>
+                        ) : null}
+                      </Tooltip.Root>
+                    </div>
                   </div>
                   <div className="self-center">
                     <HCaptcha
