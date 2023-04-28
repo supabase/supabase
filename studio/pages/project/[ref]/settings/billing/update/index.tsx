@@ -31,8 +31,7 @@ const BillingUpdate: NextPageWithLayout = () => {
   const [subscription, setSubscription] = useState<StripeSubscription>()
   const [selectedPlan, setSelectedPlan] = useState<any>()
 
-  const isEnterprise =
-    subscription && subscription.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
+  const isEnterprise = subscription?.tier?.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
 
   useEffect(() => {
     if (projectRef) {

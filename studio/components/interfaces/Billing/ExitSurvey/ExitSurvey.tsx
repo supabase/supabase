@@ -1,10 +1,11 @@
-import { FC, useReducer, useState, useEffect, useRef } from 'react'
+import { useReducer, useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/router'
 import { includes, without } from 'lodash'
 import { Transition } from '@headlessui/react'
+import * as Tooltip from '@radix-ui/react-tooltip'
 import { Button, Form, Input, Modal, IconArrowLeft, Alert } from 'ui'
 
-import { useStore } from 'hooks'
+import { useFlag, useStore } from 'hooks'
 import { post, patch } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import { CANCELLATION_REASONS } from '../Billing.constants'
@@ -13,13 +14,13 @@ import { SubscriptionPreview } from '../Billing.types'
 import { StripeSubscription } from 'components/interfaces/Billing'
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 
-interface Props {
+interface ExitSurveyProps {
   freeTier: any
   subscription?: StripeSubscription
   onSelectBack: () => void
 }
 
-const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
+const ExitSurvey = ({ freeTier, subscription, onSelectBack }: ExitSurveyProps) => {
   const router = useRouter()
   const { app, ui } = useStore()
   const projectId = ui.selectedProject?.id ?? -1
@@ -27,6 +28,7 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
 
   const captchaRef = useRef<HCaptcha>(null)
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
+  const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
 
   const formRef = useRef<any>()
 
@@ -252,26 +254,52 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
                     name="message"
                     label="Anything else that we can improve on?"
                   />
-                  <div className="flex items-center space-x-2">
-                    <Button
-                      htmlType="button"
-                      type="default"
-                      onClick={() => router.push(`/project/${projectRef}/settings/billing/update`)}
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      type="danger"
-                      htmlType="submit"
-                      loading={isSubmitting}
-                      disabled={isSubmitting}
-                    >
-                      Confirm downgrade
-                    </Button>
+                  <div className="flex items-center justify-between">
                     <p className="text-xs text-scale-900">
                       The unused amount for the remaining of your billing cycle will be refunded as
                       credits
                     </p>
+                    <div className="flex items-center space-x-2">
+                      <Button
+                        htmlType="button"
+                        type="default"
+                        onClick={() =>
+                          router.push(`/project/${projectRef}/settings/billing/update`)
+                        }
+                      >
+                        Cancel
+                      </Button>
+                      <Tooltip.Root delayDuration={0}>
+                        <Tooltip.Trigger className="w-full">
+                          <Button
+                            type="danger"
+                            htmlType="submit"
+                            loading={isSubmitting}
+                            disabled={projectUpdateDisabled || isSubmitting}
+                          >
+                            Confirm downgrade
+                          </Button>
+                        </Tooltip.Trigger>
+                        {projectUpdateDisabled ? (
+                          <Tooltip.Portal>
+                            <Tooltip.Content side="bottom">
+                              <Tooltip.Arrow className="radix-tooltip-arrow" />
+                              <div
+                                className={[
+                                  'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                                  'border border-scale-200',
+                                ].join(' ')}
+                              >
+                                <span className="text-xs text-scale-1200">
+                                  Subscription changes are currently disabled. Our engineers are
+                                  working on a fix.
+                                </span>
+                              </div>
+                            </Tooltip.Content>
+                          </Tooltip.Portal>
+                        ) : null}
+                      </Tooltip.Root>
+                    </div>
                   </div>
                   <div className="self-center">
                     <HCaptcha
