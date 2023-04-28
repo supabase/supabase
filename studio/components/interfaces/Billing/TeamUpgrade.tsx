@@ -1,4 +1,4 @@
-import { FC, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Transition } from '@headlessui/react'
 import { useRouter } from 'next/router'
 
@@ -25,27 +25,24 @@ import {
   formatCustomDomainOptions,
   formatPITROptions,
 } from './AddOns/AddOns.utils'
-import BackButton from 'components/ui/BackButton'
 import SupportPlan from './AddOns/SupportPlan'
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 
 // Do not allow compute size changes for af-south-1
 
-interface Props {
+interface TeamUpgradeProps {
   products: { tiers: any[]; addons: SubscriptionAddon[] }
   paymentMethods?: PaymentMethod[]
   currentSubscription: StripeSubscription
   isLoadingPaymentMethods: boolean
-  onSelectBack: () => void
 }
 
-const TeamUpgrade: FC<Props> = ({
+const TeamUpgrade = ({
   products,
   paymentMethods,
   currentSubscription,
   isLoadingPaymentMethods,
-  onSelectBack,
-}) => {
+}: TeamUpgradeProps) => {
   const { app, ui } = useStore()
   const router = useRouter()
 
@@ -225,8 +222,7 @@ const TeamUpgrade: FC<Props> = ({
       >
         <div className="flex-grow mt-10">
           <div className="relative space-y-4">
-            <div className="px-32 mx-auto space-y-4 2xl:max-w-5xl">
-              <BackButton onClick={() => onSelectBack()} />
+            <div className="relative px-32 mx-auto space-y-4 2xl:max-w-5xl">
               <h4 className="text-lg text-scale-900 !mb-8">Change your project's subscription</h4>
             </div>
 
@@ -291,43 +287,41 @@ const TeamUpgrade: FC<Props> = ({
             </div>
           </div>
         </div>
-        <div className="min-w-[440px]">
-          <PaymentSummaryPanel
-            isRefreshingPreview={isRefreshingPreview}
-            subscriptionPreview={subscriptionPreview}
-            isSpendCapEnabled={false}
-            // Current subscription configuration based on DB
-            currentPlan={currentSubscription.tier}
-            currentAddons={currentAddons}
-            currentSubscription={currentSubscription}
-            // Selected subscription configuration based on UI
-            selectedPlan={selectedTier}
-            selectedAddons={selectedAddons}
-            paymentMethods={paymentMethods}
-            isLoadingPaymentMethods={isLoadingPaymentMethods}
-            selectedPaymentMethod={selectedPaymentMethodId}
-            onSelectPaymentMethod={setSelectedPaymentMethodId}
-            onSelectAddNewPaymentMethod={() => {
-              setShowAddPaymentMethodModal(true)
-            }}
-            beforeConfirmPayment={beforeConfirmPayment}
-            onConfirmPayment={onConfirmPayment}
-            isSubmitting={isSubmitting}
-            captcha={
-              <HCaptcha
-                ref={captchaRef}
-                sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
-                size="invisible"
-                onVerify={(token) => {
-                  setCaptchaToken(token)
-                }}
-                onExpire={() => {
-                  setCaptchaToken(null)
-                }}
-              />
-            }
-          />
-        </div>
+        <PaymentSummaryPanel
+          isRefreshingPreview={isRefreshingPreview}
+          subscriptionPreview={subscriptionPreview}
+          isSpendCapEnabled={false}
+          // Current subscription configuration based on DB
+          currentPlan={currentSubscription.tier}
+          currentAddons={currentAddons}
+          currentSubscription={currentSubscription}
+          // Selected subscription configuration based on UI
+          selectedPlan={selectedTier}
+          selectedAddons={selectedAddons}
+          paymentMethods={paymentMethods}
+          isLoadingPaymentMethods={isLoadingPaymentMethods}
+          selectedPaymentMethod={selectedPaymentMethodId}
+          onSelectPaymentMethod={setSelectedPaymentMethodId}
+          onSelectAddNewPaymentMethod={() => {
+            setShowAddPaymentMethodModal(true)
+          }}
+          beforeConfirmPayment={beforeConfirmPayment}
+          onConfirmPayment={onConfirmPayment}
+          isSubmitting={isSubmitting}
+          captcha={
+            <HCaptcha
+              ref={captchaRef}
+              sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
+              size="invisible"
+              onVerify={(token) => {
+                setCaptchaToken(token)
+              }}
+              onExpire={() => {
+                setCaptchaToken(null)
+              }}
+            />
+          }
+        />
       </Transition>
 
       <AddNewPaymentMethodModal
