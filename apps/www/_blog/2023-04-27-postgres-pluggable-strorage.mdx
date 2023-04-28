@@ -47,7 +47,7 @@ Even without a full API for pluggable storage, there are a couple of solutions a
 Right now, pluggable storage requires a a fork of Postgres. But there are several initiatives in the Postgres community that we’re excited about.
 
 - There have been community updates for [custom resource managers](https://git.postgresql.org/gitweb/?p=postgresql.git;a=commitdiff;h=5c279a6d350205cc98f91fb8e1d3e4442a6b25d1) that expand [write-ahead log (WAL)](https://www.postgresql.org/docs/current/wal-intro.html) support for TAM.
-- The creators at [OrioleDB](https://github.com/orioledb/orioledb) started with a fork of Postgres and have been quietly upstreaming code that would make pluggable storage a reality. In Postgres 14 their patchset was ~5,000 lines of code (this represents the total number of changes required in their fork). In the upcoming Postgres 16 release, it is ~2,000 lines of code. That means that around 60% of the code is already committed to the Postgres core. (Disclosure: Supabase started [sponsoring OrioleDB](https://supabase.com/blog/supabase-series-b#where-were-going) in 2022).
+- The creators at [OrioleDB](https://github.com/orioledb/orioledb) started with a fork of Postgres and have been quietly upstreaming code that would make pluggable storage a reality. In Postgres 14 their patchset was ~5,000 lines of code, representing the total number of changes required in their fork. In the upcoming Postgres 16 release, it is ~2,000 lines of code. That means that around 60% of the code is already committed to the Postgres core. (Disclosure: Supabase started [sponsoring OrioleDB](https://supabase.com/blog/supabase-series-b#where-were-going) in 2022).
 
 <div className="bg-gray-300 rounded-lg px-6 py-2 italic">
 
