@@ -632,4 +632,40 @@ export const WRAPPERS: WrapperMeta[] = [
       },
     ],
   },
+  {
+    name: 'clickhouse_wrapper',
+    handlerName: 'click_house_fdw_handler',
+    validatorName: 'click_house_fdw_validator',
+    icon: '/img/icons/clickhouse-icon.svg',
+    extensionName: 'ClickHouseFdw',
+    label: 'ClickHouse',
+    docsUrl: 'https://supabase.github.io/wrappers/clickhouse/',
+    server: {
+      options: [
+        {
+          name: 'conn_string',
+          label: 'ClickHouse Connection String',
+          required: true,
+          encrypted: true,
+          hidden: false,
+        },
+      ],
+    },
+    tables: [
+      {
+        label: 'ClickHouse Table',
+        description: 'Map to a ClickHouse Table',
+        options: [
+          {
+            name: 'table',
+            label: 'ClickHouse Table Name',
+            editable: true,
+            required: true,
+            placeholder: 'my_clickhouse_table',
+            type: 'text',
+          },
+        ],
+      },
+    ],
+  },
 ]
