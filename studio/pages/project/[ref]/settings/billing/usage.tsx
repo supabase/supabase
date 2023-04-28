@@ -12,9 +12,12 @@ import LoadingUI from 'components/ui/Loading'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import { PAYGUsage } from 'components/interfaces/Billing'
 import ProjectUsageBars from 'components/interfaces/Settings/ProjectUsageBars/ProjectUsageBars'
+import Usage from 'components/interfaces/BillingV2/Usage/Usage'
 
 const ProjectBillingUsage: NextPageWithLayout = () => {
-  const showUsageV2 = useFlag('usageV2')
+  const showNewUsageUI = useFlag('usagev2')
+
+  if (showNewUsageUI) return <Usage />
 
   return (
     <div className="w-full h-full overflow-y-auto content">
