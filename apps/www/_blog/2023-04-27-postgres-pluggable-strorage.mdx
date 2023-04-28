@@ -28,14 +28,13 @@ The “pluggable” part refers to the ability for developers to develop their o
 
 In version 12, PostgreSQL introduced basic support for pluggable storage with the goal of [adding ZHeap](https://anarazel.de/talks/2019-05-30-pgcon-pluggable-table-storage/pluggable.pdf). Andres Freund and several contributors enabled that feature by refactoring and expanding a variety of table access method (TAM) APIs.
 
-ZHeap offered a lot of promise, providing an undo log and solving some long-term table bloat issues in Postgres. The code [was released](https://github.com/EnterpriseDB/zheap) with [promising results](https://www.pgcon.org/2018/schedule/attachments/501_zheap-a-new-storage-format-postgresql-5.pdf).
+ZHeap [was released](https://github.com/EnterpriseDB/zheap) with [promising results](https://www.pgcon.org/2018/schedule/attachments/501_zheap-a-new-storage-format-postgresql-5.pdf), providing an undo log and solving some long-term table bloat issues in Postgres.
 
-This implementation requires more work for a true pluggable storage solution. In particular:
+While it was a great start, unfortunately it appears that the work on ZHeap and the TAM API [has stalled](https://twitter.com/andy_pavlo/status/1590703943176589312).
+This leaves a few holes in that need to be fixed before the community can use the TAM API for pluggable storage. In particular:
 
-- The TAM API doesn’t provide much flexibility for working with indexes. For example, when you update a row, an index update is an all-or-nothing procedure. This was infamously highlighted by Uber in their “[switching from Postgres to MySQL](https://www.uber.com/blog/postgres-to-mysql-migration/)” in 2016.
-- Row versions need to be identified the pairing of a block number and offset number. This means you can’t implement useful functions, like an index-organized table or undo-based versioning.
-
-While It was a great start, it appears that the [work on ZHeap has stalled](https://twitter.com/andy_pavlo/status/1590703943176589312).
+- The TAM API doesn’t provide much flexibility for working with indexes. For example, when you update a row an index update is an all-or-nothing procedure.
+- Row versions need to be identified by the pairing of a block number and offset number. This means you can’t implement some useful functions, like an index-organized table or undo-based versioning.
 
 Even without a full API for pluggable storage, there are a couple of solutions available on the market today:
 
