@@ -49,9 +49,16 @@ jobs:
     steps:
       - name: Check out repo
         uses: actions/checkout@v3
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+      - name: Download dependencies
+        run: npm ci
       - name: Run prettier
         run: |-
-          npx prettier -c 'i18n/**/*.{js,jsx,ts,tsx,css,md,json}'
+          npx prettier -c 'i18n/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'
         # uses: EPMatt/reviewdog-action-prettier@v1
         # with:
         #   github_token: ${{ secrets.github_token }}
