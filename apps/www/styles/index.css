@@ -25,7 +25,7 @@ html {
 }
 
 body {
-  @apply bg-scale-200;
+  @apply bg-scale-100;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

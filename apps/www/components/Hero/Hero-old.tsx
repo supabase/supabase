@@ -1,12 +1,10 @@
 import { Button, IconBookOpen } from 'ui'
 import { useRouter } from 'next/router'
-import Link from 'next/link'
-import SectionContainer from './Layouts/SectionContainer'
 import Telemetry, { TelemetryEvent } from '~/lib/telemetry'
-import gaEvents from '~/lib/gaEvents'
 import { useTelemetryProps } from 'common/hooks/useTelemetryProps'
+import SectionContainer from '../Layouts/SectionContainer'
 
-const Hero = () => {
+const HeroOld = () => {
   const router = useRouter()
   const { basePath } = router
   const telemetryProps = useTelemetryProps()
@@ -130,4 +128,4 @@ const Hero = () => {
   )
 }
 
-export default Hero
+export default HeroOld

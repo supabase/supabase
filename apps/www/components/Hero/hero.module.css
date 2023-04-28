@@ -1,0 +1,51 @@
+.hero-container {
+  position: absolute;
+  z-index: -6;
+  overflow: hidden;
+  inset: 0;
+  transition: perspective 3s ease 0s;
+}
+
+.hero-grid-lines {
+  position: absolute;
+  width: 200vw;
+  height: 200vh;
+  margin-left: -50%;
+  transform: translateY(0);
+  background-image: linear-gradient(to right, #07edfc20 45%, #07edfc20 50%, #07edfc20 55%);
+  -webkit-mask-image: linear-gradient(90deg, #000 0.3px, transparent 0),
+    linear-gradient(180deg, #000 0.3px, transparent 0);
+  mask-image: linear-gradient(90deg, #000 0.3px, #000 0),
+    linear-gradient(180deg, #000 0.3px, #000 0);
+  -webkit-mask-size: 40px 40px;
+  mask-size: 40px 40px;
+  overflow: hidden;
+  -webkit-mask-repeat: repeat;
+  mask-repeat: repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  inset: -100% 0;
+  background-position-y: 100%;
+  -webkit-mask-position: 50% 0;
+  mask-position: 50% 0;
+  animation: animate-grid 30s linear infinite;
+}
+
+@media (min-width: 1024px) {
+  .hero-grid-lines {
+    animation-duration: 30s;
+    -webkit-mask-size: 55px 55px;
+    mask-size: 55px 55px;
+  }
+}
+
+@keyframes animate-grid {
+  0% {
+    transform: translateY(200px);
+  }
+
+  to {
+    transform: translateY(0);
+  }
+}
