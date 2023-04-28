@@ -472,8 +472,8 @@ export const database = {
           url: '/guides/database/postgres/indexes',
         },
         {
-          name: 'On Delete Constraint Behavior',
-          url: '/guides/database/postgres/on-delete-constraint-behavior',
+          name: 'Cascade Deletes',
+          url: '/guides/database/postgres/cascade-deletes',
         },
         {
           name: 'Drop All Tables in Schema',
