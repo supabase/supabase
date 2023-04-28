@@ -41,7 +41,8 @@
   opacity: 0.6;
   filter: blur(140px);
   transform: translateZ(0px);
-  background: radial-gradient(ellipse 50% 45% at 50% 40%, #3ecf8e, rgba(0, 0, 0, 0));
+  background: radial-gradient(ellipse 50% 60% at 50% 70%, #3ecf8e, transparent),
+    radial-gradient(ellipse 70% 80% at 50% 50%, #3ecf8e, transparent);
 }
 
 .triangle-shape {

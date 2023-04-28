@@ -13,7 +13,7 @@ const Hero = () => {
         <div className="relative">
           <div className="mx-auto">
             <div className="mx-auto max-w-2xl lg:col-span-6 lg:flex lg:items-center justify-center text-center">
-              <div className="md:h-[40vh] md:min-h-[300px] md:max-h-[400px] md:py-4 flex flex-col items-center justify-center sm:mx-auto md:w-3/4 lg:mx-0 lg:w-full gap-4 lg:gap-8">
+              <div className="lg:h-[40vh] lg:min-h-[300px] lg:max-h-[400px] md:py-4 flex flex-col items-center justify-center sm:mx-auto md:w-3/4 lg:mx-0 lg:w-full gap-4 lg:gap-8">
                 <div>
                   <h1
                     className="
