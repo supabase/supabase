@@ -12,7 +12,7 @@
   height: 200vh;
   margin-left: -50%;
   transform: translateY(0);
-  background-image: linear-gradient(to right, #07edfc 45%, transparent 50%, #07edfc 55%);
+  background-image: linear-gradient(to right, #026269 45%, transparent 50%, #026269 55%);
   -webkit-mask-image: linear-gradient(90deg, #000 0.3px, transparent 0),
     linear-gradient(180deg, #000 0.3px, transparent 0);
   mask-image: linear-gradient(90deg, #000 0.3px, #000 0),
@@ -42,7 +42,7 @@
   filter: blur(140px);
   transform: translateZ(0px);
   background: radial-gradient(ellipse 50% 60% at 50% 70%, #3ecf8e, transparent),
-    radial-gradient(ellipse 70% 80% at 50% 50%, #3ecf8e, transparent);
+    radial-gradient(ellipse 70% 80% at 50% 50%, #1d7a50, transparent);
 }
 
 .shape-gradient {
@@ -53,18 +53,7 @@
   opacity: 0.3;
   height: 700px;
   filter: blur(40px);
-  background: radial-gradient(ellipse 50% 50% at 50% 50%, #3ecf8e50, transparent);
-}
-
-.triangle-shape {
-  width: 200vw;
-  height: 200vw;
-  transform: rotate(45deg) translate3d(-100vw, -100vw, 0);
-  background: radial-gradient(
-    ellipse 64% 64% at 40% 40%,
-    var(--colors-brand1),
-    var(--colors-scale1)
-  );
+  background: radial-gradient(ellipse 50% 50% at 50% 50%, #3ecf8e20, transparent);
 }
 
 @media (min-width: 1024px) {

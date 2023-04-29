@@ -209,7 +209,7 @@ const Nav = () => {
         />
         <nav
           className={[
-            `border-scale-400 border-b backdrop-blur-sm transition-opacity`,
+            `border-scale-300 border-b backdrop-blur-sm transition-opacity`,
             showLaunchWeekNavMode && '!opacity-100 !border-[#e0d2f430]',
           ].join(' ')}
         >
