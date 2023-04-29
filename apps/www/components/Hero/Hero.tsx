@@ -1,15 +1,25 @@
-import { Button, IconBookOpen } from 'ui'
+import { useEffect, useRef } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
+import { Button, IconBookOpen } from 'ui'
 import SectionContainer from '../Layouts/SectionContainer'
 import styles from './hero.module.css'
+import { useWindowSize } from 'react-use'
 
 const Hero = () => {
-  const { basePath } = useRouter()
+  const divRef = useRef(null)
+  const { width } = useWindowSize()
+
+  useEffect(() => {
+    const newHeight =
+      width < 800 ? 100000 / width + 50 : width > 1800 ? 30000 / width : (70000 / width) * 2
+    if (divRef?.current) {
+      ;(divRef.current as HTMLDivElement).style.height = `${Math.round(newHeight)}px`
+    }
+  }, [width])
 
   return (
     <div className="relative">
-      <SectionContainer className="">
+      <SectionContainer>
         <div className="relative">
           <div className="mx-auto">
             <div className="mx-auto max-w-2xl lg:col-span-6 lg:flex lg:items-center justify-center text-center">
@@ -86,8 +96,13 @@ const Hero = () => {
         ].join(' ')}
       >
         <div className="absolute w-screen h-screen">
-          <div className="w-full h-[200px] md:h-[250px] lg:h-[150px] xl:h-[50px] 2xl:h-0 bg-[#171717]" />
-          <div className={['2xl:-mt-48'].join(' ')}>
+          <div className={['w-full top-0', styles['shape-gradient']].join(' ')} />
+          <div
+            ref={divRef}
+            // className="w-full h-[200px] md:h-[250px] lg:h-[150px] xl:h-[50px] 2xl:h-0 bg-[#171717]"
+            className="w-full bg-[#171717]"
+          />
+          <div className={['2xl:-mt-52'].join(' ')}>
             <svg
               className={['', styles['triangle-svg']].join(' ')}
               preserveAspectRatio="none"
@@ -107,7 +122,7 @@ const Hero = () => {
       </div>
       <div
         className={[
-          'absolute top-0 left-0 w-full h-[600px] md:h-[800px] overflow-hidden pointer-events-none',
+          'absolute top-0 left-0 w-full h-[600px] lg:h-[800px] overflow-hidden pointer-events-none',
           styles['hero-container'],
         ].join(' ')}
       >
