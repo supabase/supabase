@@ -8,6 +8,7 @@ import Image from 'next/image'
 import SectionContainer from '../Layouts/SectionContainer'
 import { motion } from 'framer-motion'
 import BackedBy from '../BackedBy'
+import { useBreakpoint } from 'common'
 
 const Card = ({
   classname,
@@ -27,7 +28,7 @@ const Card = ({
   <Link href={url}>
     <a
       className={[
-        'relative col-span-1 lg:col-span-4 h-[460px] flex flex-col gap-5 lg:flex-row',
+        'relative col-span-1 lg:col-span-4 h-[360px] md:h-[460px] flex flex-col gap-5 lg:flex-row',
         classname,
       ].join(' ')}
       onClick={onClick}
@@ -95,13 +96,14 @@ const Features = () => {
         )
     }
   }
+  const isSm = useBreakpoint(640)
 
   return (
     <SectionContainer className="space-y-8 max-w-7xl pt-4 md:!pt-0">
       <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6 lg:grid-cols-6">
         <Card
           url={Solutions['database'].url}
-          title={'PostgreSQL Database'}
+          title={Solutions['database'].name}
           subtitle="Every project is a full Postgres database, the world's most trusted relational database."
           onClick={() => sendTelemetryEvent(name)}
           image={
@@ -111,8 +113,8 @@ const Features = () => {
                   src="/images/index/database-dark-hover.jpg"
                   alt="Supabase Postgres Database, hover image with glow"
                   layout="fill"
-                  objectPosition="50% 50%"
-                  objectFit="cover"
+                  objectPosition={isSm ? 'bottom' : '50% 50%'}
+                  objectFit={isSm ? 'contain' : 'cover'}
                   quality={100}
                 />
               </motion.div>
@@ -120,8 +122,8 @@ const Features = () => {
                 src="/images/index/database-dark.jpg"
                 alt="Supabase Postgres Database"
                 layout="fill"
-                objectPosition="50% 50%"
-                objectFit="cover"
+                objectPosition={isSm ? 'bottom' : '50% 50%'}
+                objectFit={isSm ? 'contain' : 'cover'}
                 quality={100}
               />
             </div>
@@ -196,8 +198,8 @@ const Features = () => {
                   src="/images/index/edge-dark-hover.jpg"
                   alt="Supabase Edge Functions feature, hover image with glow"
                   layout="fill"
-                  objectPosition="50% 50%"
-                  objectFit="cover"
+                  objectPosition={isSm ? 'bottom' : '50% 50%'}
+                  objectFit={isSm ? 'contain' : 'cover'}
                   quality={100}
                 />
               </motion.div>
@@ -205,8 +207,8 @@ const Features = () => {
                 src="/images/index/edge-dark.jpg"
                 alt="Supabase Edge Functions feature"
                 layout="fill"
-                objectPosition="50% 50%"
-                objectFit="cover"
+                objectPosition={isSm ? 'bottom' : '50% 50%'}
+                objectFit={isSm ? 'contain' : 'cover'}
                 quality={100}
               />
             </div>
