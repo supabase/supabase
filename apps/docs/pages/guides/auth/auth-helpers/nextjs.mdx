@@ -87,7 +87,7 @@ import { useState } from 'react'
 
 function MyApp({ Component, pageProps }) {
   // Create a new supabase browser client on every first render.
-  const [supabaseClient] = useState(() => createBrowserSupabaseClient())
+  const [supabaseClient] = useState(() => createBrowserSupabaseClient()
 
   return (
     <SessionContextProvider
