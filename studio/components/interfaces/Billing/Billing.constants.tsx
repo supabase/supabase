@@ -81,8 +81,8 @@ export const USAGE_BASED_PRODUCTS = [
         costPerUnit: 0.015,
         tooltip: (
           <span>
-            The amount of distinct Single Sign-On users requesting your API throughout the billing period. Resets
-            at the beginning of every billing period.
+            The amount of distinct Single Sign-On users requesting your API throughout the billing
+            period. Resets at the beginning of every billing period.
           </span>
         ),
       },
@@ -123,15 +123,15 @@ export const USAGE_BASED_PRODUCTS = [
       {
         key: 'storage_image_render_count',
         attribute: 'total_storage_image_render_count',
-        title: 'Storage Images Transformed',
+        title: 'Storage Image Transformations',
         units: 'absolute',
         costPerUnit: 0.005,
         tooltip: (
           <span>
-            We distinctly count all images that were transformed in the billing period, ignoring any
-            transformations. If you transform one image with different transformations (i.e. once
-            with height=50 and once with height=150), it only counts as one. We only count the
-            unique (origin) images being transformed.
+            We distinctly count all images transformed in the billing period, ignoring any
+            transformations. Transforming one image with different transformations (i.e. once with
+            height=50 and once with height=150), only counts as one. Resets at the beginning of
+            every billing period.
           </span>
         ),
       },
