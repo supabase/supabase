@@ -39,10 +39,10 @@ const FlyOut = (props: Props) => {
               className="dark:border-scale-500 absolute inset-0 flex border-b sm:flex-col lg:flex-row"
               aria-hidden="true"
             >
-              <div className="dark:bg-scale-200 dark:border-scale-400 border-r bg-white sm:h-1/2 sm:w-full lg:h-full lg:w-1/2" />
+              <div className="dark:bg-scale-100 dark:border-scale-400 border-r bg-white sm:h-1/2 sm:w-full lg:h-full lg:w-1/2" />
               <div
                 className={`${
-                  singleBgColor ? 'dark:bg-scale-200 bg-white' : 'dark:bg-scale-200 bg-gray-50'
+                  singleBgColor ? 'dark:bg-scale-100 bg-white' : 'dark:bg-scale-200 bg-gray-50'
                 } sm:h-1/2 sm:w-full lg:h-full lg:w-1/2`}
               />
             </div>
