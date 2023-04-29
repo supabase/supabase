@@ -45,6 +45,17 @@
     radial-gradient(ellipse 70% 80% at 50% 50%, #3ecf8e, transparent);
 }
 
+.shape-gradient {
+  position: absolute;
+  user-select: none;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.3;
+  height: 700px;
+  filter: blur(40px);
+  background: radial-gradient(ellipse 50% 50% at 50% 50%, #3ecf8e50, transparent);
+}
+
 .triangle-shape {
   width: 200vw;
   height: 200vw;
