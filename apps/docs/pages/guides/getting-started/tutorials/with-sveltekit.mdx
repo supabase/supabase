@@ -311,9 +311,9 @@ Create a new `src/routes/account/+page.svelte` file with the content below.
 	export let data: PageData;
 	export let form: ActionData;
 
-	let { session, profile } = data;
+	let { session, profile, supabase } = data;
 
-  let profileForm: any;
+	let profileForm: any;
 	let loading = false;
 	let fullName: string | null = profile?.full_name;
 	let username: string | null = profile?.username;
