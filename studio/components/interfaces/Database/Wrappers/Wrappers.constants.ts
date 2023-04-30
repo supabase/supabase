@@ -643,7 +643,7 @@ export const WRAPPERS: WrapperMeta[] = [
     server: {
       options: [
         {
-          name: 'conn_string',
+          name: 'conn_string_id',
           label: 'ClickHouse Connection String',
           required: true,
           encrypted: true,
