@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { noop, partition } from 'lodash'
+import { observer } from 'mobx-react-lite'
 import {
   Button,
   Dropdown,
@@ -19,7 +20,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { useParams } from 'common/hooks'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { checkPermissions, useLocalStorage } from 'hooks'
+import { checkPermissions, useLocalStorage, useStore } from 'hooks'
 import InfiniteList from 'components/ui/InfiniteList'
 import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
 import { Entity } from 'data/entity-types/entity-type-query'
@@ -41,6 +42,7 @@ const TableEditorMenu = ({
   onDeleteTable = noop,
   onDuplicateTable = noop,
 }: TableEditorMenuProps) => {
+  const { meta } = useStore()
   const { id } = useParams()
   const snap = useTableEditorStateSnapshot()
 
@@ -90,6 +92,8 @@ const TableEditorMenu = ({
 
   const schema = schemas?.find((schema) => schema.name === snap.selectedSchemaName)
   const canCreateTables = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
+
+  const isLoadingTableMetadata = id ? !meta.tables.byId(id) : true
 
   const refreshTables = async () => {
     await refetch()
@@ -352,7 +356,7 @@ const TableEditorMenu = ({
                 onEditTable,
                 onDeleteTable,
                 onDuplicateTable,
-                isLoadingTableMetadata: false, // TODO(alaister)
+                isLoadingTableMetadata,
               }}
               getItemSize={() => 28}
               hasNextPage={hasNextPage}
@@ -366,4 +370,4 @@ const TableEditorMenu = ({
   )
 }
 
-export default TableEditorMenu
+export default observer(TableEditorMenu)
