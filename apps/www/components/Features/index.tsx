@@ -99,7 +99,7 @@ const Features = () => {
   const isSm = useBreakpoint(640)
 
   return (
-    <SectionContainer className="space-y-8 max-w-7xl mt-24 !pt-0">
+    <SectionContainer className="space-y-8 max-w-7xl mt-24 lg:mt-0 !pt-0">
       <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6 lg:grid-cols-6">
         <Card
           url={Solutions['database'].url}
