@@ -1,10 +1,11 @@
 import React, { useEffect, useRef } from 'react'
 import styles from './hero.module.css'
 import { useWindowSize } from 'react-use'
-import { useBreakpoint } from 'common'
+import { useBreakpoint, useTheme } from 'common'
 
 const HeroBackground = () => {
   const spacerRef = useRef(null)
+  const { isDarkMode } = useTheme()
   const { width } = useWindowSize()
   const isSm = useBreakpoint(640)
 
@@ -23,7 +24,7 @@ const HeroBackground = () => {
     'M2.16005e-05 -0.000998163L1680 0.129286V234L890.763 1012.41C859.46 1043.28 809.108 1043.11 778.018 1012.02L-0.000248139 234.001L2.16005e-05 -0.000998163Z'
 
   const svgGridOptions = {
-    color: '#02828b',
+    color: isDarkMode ? '#008d97' : '#005359',
     boxWidth: width ? width * 7 : 7500,
     boxHeight: width ? width * 5 : 6000,
     xLines: isSm ? 20 : 50,
