@@ -4,7 +4,11 @@ import { Modal } from 'ui'
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { PrivilegesData, PrivilegesDataResponse } from 'data/database/privileges-query'
+import {
+  PrivilegesData,
+  PrivilegesDataResponse,
+  getPrivilegesQueryKey,
+} from 'data/database/privileges-query'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { sqlKeys } from 'data/sql/keys'
 import { PrivilegesDataUI } from './Privileges.types'
@@ -27,7 +31,14 @@ const PrivilegesModal: FC<Props> = (props) => {
   const { project } = useProjectContext()
   const { mutate, isLoading } = useExecuteSqlMutation({
     onMutate: async () => {
-      const queryKey = sqlKeys.query(ref, ['privileges'])
+      const queryKey = sqlKeys.query(
+        ref,
+        getPrivilegesQueryKey({
+          schema: props.changes.schema,
+          table: props.changes.table,
+          role: props.changes.role,
+        })
+      )
       await queryClient.cancelQueries(queryKey)
 
       const previous = queryClient.getQueryData<PrivilegesData>(queryKey)

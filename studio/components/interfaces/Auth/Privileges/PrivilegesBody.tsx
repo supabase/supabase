@@ -6,7 +6,7 @@ import { PrivilegeColumnUI } from './Privileges.types'
 import PrivilegesTable from './PrivilegesTable'
 
 interface Props {
-  privileges: Record<string, PrivilegeColumnUI[]>
+  columns: PrivilegeColumnUI[]
   hasChanges: boolean
   table?: PostgresTable
   onChange: (table: string, columnName: string, privileges: string[]) => void
@@ -36,7 +36,7 @@ const PrivilegesBody: FC<Props> = (props) => {
         </div>
       </div>
       <PrivilegesTable
-        columns={props.privileges[table.name]}
+        columns={props.columns}
         onToggle={(column, privileges) => handleToggle(table.name, column, privileges)}
       />
     </section>

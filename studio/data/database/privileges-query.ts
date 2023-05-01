@@ -2,7 +2,8 @@ import { UseQueryOptions } from '@tanstack/react-query'
 import { useCallback } from 'react'
 import { ExecuteSqlData, useExecuteSqlPrefetch, useExecuteSqlQuery } from '../sql/execute-sql-query'
 
-const sql = /* SQL */ `
+const getPrivilegesQuery = (params: { schema: string; table: string; role: string }) =>
+  /* SQL */ `
   -- Column-specific privileges
   WITH column_privileges AS (
     SELECT
@@ -100,47 +101,21 @@ const sql = /* SQL */ `
       table_name,
       role_name,
       privilege_type
-  ),
-  json_tables AS (
-    SELECT
-      schema_name,
-      role_name,
-      table_name,
-      jsonb_object_agg(privilege_type, columns) AS privileges
-    FROM
-      json_privileges
-    GROUP BY
-      schema_name,
-      role_name,
-      table_name
-  ),
-  json_roles AS (
-    SELECT
-      schema_name,
-      role_name,
-      jsonb_object_agg(table_name, privileges) AS tables
-    FROM
-      json_tables
-    GROUP BY
-      schema_name,
-      role_name
-  ),
-  json_schemas AS (
-    SELECT
-      schema_name,
-      jsonb_object_agg(role_name, tables) AS roles
-    FROM
-      json_roles
-    GROUP BY
-      schema_name
   )
   SELECT
-    jsonb_object_agg(schema_name, roles) AS result_json
+    jsonb_object_agg(privilege_type, columns) AS result_json
   FROM
-    json_schemas;
+    json_privileges
+  WHERE
+    schema_name = '${params.schema}'
+    AND role_name = '${params.role}'
+    AND table_name = '${params.table}';
 `.trim()
 
 export type PrivilegesVariables = {
+  schema: string
+  table: string
+  role: string
   projectRef?: string
   connectionString?: string
 }
@@ -152,30 +127,34 @@ export type PrivilegeColumn = {
 }
 
 export type PrivilegesDataResponse = {
-  result: [{ result_json: PrivilegesData }]
+  result: [{ result_json: PrivilegesData | null }]
 }
 
-export type PrivilegesData = Record<
-  string,
-  Record<string, Record<string, Record<string, PrivilegeColumn[]>>>
->
+export type PrivilegesData = Record<string, PrivilegeColumn[]>
 
 export type PrivilegesError = unknown
 
+export const getPrivilegesQueryKey = ({ schema, table, role }: PrivilegesVariables) => [
+  'privileges',
+  schema,
+  table,
+  role,
+]
+
 export const usePrivilegesQuery = <TData extends PrivilegesData = PrivilegesData>(
-  { projectRef, connectionString }: PrivilegesVariables,
+  { projectRef, connectionString, schema, table, role }: PrivilegesVariables,
   options: UseQueryOptions<ExecuteSqlData, PrivilegesError, TData> = {}
 ) => {
   return useExecuteSqlQuery(
     {
       projectRef,
       connectionString,
-      sql: sql,
-      queryKey: ['privileges'],
+      sql: getPrivilegesQuery({ schema, table, role }),
+      queryKey: getPrivilegesQueryKey({ schema, table, role }),
     },
     {
       select(data) {
-        return data.result[0].result_json
+        return data.result[0].result_json ?? {}
       },
       ...options,
     }
@@ -186,12 +165,12 @@ export const usePrivilegesQueryPrefetch = () => {
   const prefetch = useExecuteSqlPrefetch()
 
   return useCallback(
-    ({ projectRef, connectionString }: PrivilegesVariables) =>
+    ({ projectRef, connectionString, schema, table, role }: PrivilegesVariables) =>
       prefetch({
         projectRef,
         connectionString,
-        sql: sql,
-        queryKey: ['privileges'],
+        sql: getPrivilegesQuery({ schema, table, role }),
+        queryKey: getPrivilegesQueryKey({ schema, table, role }),
       }),
     [prefetch]
   )
