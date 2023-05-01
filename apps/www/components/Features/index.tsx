@@ -19,7 +19,7 @@ const Card = ({
   url,
 }: {
   title: string
-  subtitle: string
+  subtitle: string | React.ReactNode
   url: string
   image: any
   onClick: any
@@ -35,14 +35,14 @@ const Card = ({
     >
       <motion.div
         className={`relative overflow-hidden group/2 flex-1 flex flex-col items-center gap-5 lg:items-start justify-between bg-scale-100
-                  w-full border dark:border-scale-300 border-scale-400 rounded-xl h-full px-2 sm:px-6 py-12 shadow-lg`}
+                  w-full border dark:border-scale-300 border-scale-400 rounded-xl h-full px-6 py-12 shadow-lg`}
         initial="default"
         animate="default"
         whileHover="hover"
       >
-        <div className="relative z-10 flex flex-col items-center mx-auto max-w-sm text-center gap-2 text-scale-1200">
+        <div className="relative z-10 flex flex-col items-center mx-auto text-center gap-2 text-scale-1200">
           <h3 className="text-xl">{title}</h3>
-          <p className="text-sm text-scale-1100">{subtitle}</p>
+          <p className="text-sm text-scale-900">{subtitle}</p>
         </div>
         {image}
       </motion.div>
@@ -104,7 +104,13 @@ const Features = () => {
         <Card
           url={Solutions['database'].url}
           title={Solutions['database'].name}
-          subtitle="Every project is a full Postgres database, the world's most trusted relational database."
+          subtitle={
+            <>
+              Every project is a full Postgres database,
+              <br className="inline-block sm:hidden md:inline-block" /> the world's most trusted
+              relational database.
+            </>
+          }
           onClick={() => sendTelemetryEvent(name)}
           image={
             <div className="absolute inset-0 z-0">
@@ -132,7 +138,13 @@ const Features = () => {
         <Card
           url={Solutions['authentication'].url}
           title={Solutions['authentication'].name}
-          subtitle={Solutions['authentication'].description}
+          subtitle={
+            <>
+              Add user sign ups and logins,
+              <br className="inline-block sm:hidden md:inline-block" /> securing your data with Row
+              Level Security.
+            </>
+          }
           image={
             <div className="absolute inset-0 z-0">
               <motion.div className="absolute inset-0 z-10" variants={opacityVariant}>
@@ -160,7 +172,13 @@ const Features = () => {
         <Card
           url={Solutions['storage'].url}
           title={Solutions['storage'].name}
-          subtitle={Solutions['storage'].description}
+          subtitle={
+            <>
+              Store, organize, and serve large files.
+              <br className="inline-block sm:hidden md:inline-block" /> Any media, including videos
+              and images.
+            </>
+          }
           image={
             <div className="absolute inset-0 z-0">
               <motion.div className="absolute inset-0 z-10" variants={opacityVariant}>
