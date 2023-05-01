@@ -82,7 +82,7 @@ The APIs will automatically detect relationships based on the foreign keys:
 const { data, error } = await supabase.from('countries').select(`
   id, 
   name, 
-  cities ( id, name )
+  cities:id ( id, name )
 `)
 ```
 
