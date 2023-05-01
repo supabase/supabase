@@ -22,6 +22,55 @@ const HeroBackground = () => {
   const svgPath =
     'M2.16005e-05 -0.000998163L1680 0.129286V234L890.763 1012.41C859.46 1043.28 809.108 1043.11 778.018 1012.02L-0.000248139 234.001L2.16005e-05 -0.000998163Z'
 
+  const svgGridOptions = {
+    color: '#02828b',
+    boxWidth: width ? width * 7 : 7500,
+    boxHeight: width ? width * 5 : 6000,
+    xLines: isSm ? 20 : 50,
+    yLines: isSm ? 65 : 130,
+    strokeWidth: 1,
+  }
+
+  const GridSVG = () => (
+    <svg
+      preserveAspectRatio="none"
+      width="100%"
+      height="100%"
+      viewBox={`0 0 ${svgGridOptions.boxWidth} ${svgGridOptions.boxHeight}`}
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      {[...new Array(svgGridOptions.yLines)].map((_: any, i: number) => {
+        const y = (svgGridOptions.boxWidth * i) / svgGridOptions.yLines
+        return (
+          <line
+            key={`y-${i}`}
+            x1={svgGridOptions.boxHeight}
+            y1={y}
+            x2="0"
+            y2={y}
+            stroke={svgGridOptions.color}
+            strokeWidth={svgGridOptions.strokeWidth}
+          />
+        )
+      })}
+      {[...new Array(svgGridOptions.xLines)].map((_: any, i: number) => {
+        const x = (svgGridOptions.boxHeight * i) / svgGridOptions.xLines
+        return (
+          <line
+            key={`x-${i}`}
+            x1={x}
+            y1={svgGridOptions.boxWidth}
+            x2={x}
+            y2="0"
+            stroke={svgGridOptions.color}
+            strokeWidth={svgGridOptions.strokeWidth}
+          />
+        )
+      })}
+    </svg>
+  )
+
   return (
     <>
       <div
@@ -90,7 +139,7 @@ const HeroBackground = () => {
       </div>
       <div
         className={[
-          'absolute top-0 left-0 w-full h-[600px] lg:h-[800px] overflow-hidden pointer-events-none',
+          'absolute inset-0 w-full h-[600px] lg:h-[800px] overflow-hidden pointer-events-none',
           styles['hero-container'],
         ].join(' ')}
       >
@@ -117,7 +166,9 @@ const HeroBackground = () => {
               right: 0,
             }}
           >
-            <div className={[styles['hero-grid-lines']].join(' ')} />
+            <div className={[styles['hero-grid-lines']].join(' ')}>
+              <GridSVG />
+            </div>
           </div>
         </div>
       </div>
