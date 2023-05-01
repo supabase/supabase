@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react'
 import styles from './hero.module.css'
 import { useWindowSize } from 'react-use'
 import { useBreakpoint, useTheme } from 'common'
+import { motion } from 'framer-motion'
 
 const HeroBackground = () => {
   const spacerRef = useRef(null)
@@ -24,7 +25,7 @@ const HeroBackground = () => {
     'M2.16005e-05 -0.000998163L1680 0.129286V234L890.763 1012.41C859.46 1043.28 809.108 1043.11 778.018 1012.02L-0.000248139 234.001L2.16005e-05 -0.000998163Z'
 
   const svgGridOptions = {
-    color: isDarkMode ? '#008d97' : '#005359',
+    color: isDarkMode ? '#00c6d4' : '#005359',
     boxWidth: width ? width * 7 : 7500,
     boxHeight: width ? width * 5 : 6000,
     xLines: isSm ? 20 : 50,
@@ -58,17 +59,106 @@ const HeroBackground = () => {
       {[...new Array(svgGridOptions.xLines)].map((_: any, i: number) => {
         const x = (svgGridOptions.boxHeight * i) / svgGridOptions.xLines
         return (
-          <line
-            key={`x-${i}`}
-            x1={x}
-            y1={svgGridOptions.boxWidth}
-            x2={x}
-            y2="0"
-            stroke={svgGridOptions.color}
-            strokeWidth={svgGridOptions.strokeWidth}
-          />
+          <>
+            <line
+              key={`x-${i}`}
+              x1={x}
+              y1={svgGridOptions.boxWidth}
+              x2={x}
+              y2="0"
+              stroke={svgGridOptions.color}
+              strokeWidth={svgGridOptions.strokeWidth}
+            />
+            {isSm
+              ? i === 9 && (
+                  <line
+                    x1={x}
+                    y1={svgGridOptions.boxWidth}
+                    x2={x}
+                    y2="0"
+                    stroke="url(#electric-pulse)"
+                    strokeLinecap="round"
+                    strokeWidth={4}
+                  />
+                )
+              : i === 25 && (
+                  <line
+                    x1={x}
+                    y1={svgGridOptions.boxWidth}
+                    x2={x}
+                    y2="0"
+                    stroke="url(#electric-pulse)"
+                    strokeLinecap="round"
+                    strokeWidth={4}
+                  />
+                )}
+            {isSm
+              ? i === 14 && (
+                  <line
+                    x1={x}
+                    y1={svgGridOptions.boxWidth}
+                    x2={x}
+                    y2="0"
+                    stroke="url(#electric-pulse-2)"
+                    strokeLinecap="round"
+                    strokeWidth={4}
+                  />
+                )
+              : i === 33 && (
+                  <line
+                    x1={x}
+                    y1={svgGridOptions.boxWidth}
+                    x2={x}
+                    y2="0"
+                    stroke="url(#electric-pulse-2)"
+                    strokeLinecap="round"
+                    strokeWidth={4}
+                  />
+                )}
+          </>
         )
       })}
+      <defs>
+        <motion.linearGradient
+          animate={{
+            x2: [svgGridOptions.boxWidth / 2, 0, svgGridOptions.boxWidth / 2],
+            x1: [svgGridOptions.boxWidth / 2, 0, svgGridOptions.boxWidth / 2],
+            y1: [svgGridOptions.boxHeight, svgGridOptions.boxHeight / 3, 0],
+            y2: [svgGridOptions.boxHeight, svgGridOptions.boxHeight / 2, 0],
+          }}
+          transition={{
+            duration: isSm ? 3 : 5,
+            repeat: Infinity,
+            ease: 'linear',
+          }}
+          id="electric-pulse"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stopColor={svgGridOptions.color} stopOpacity="0" />
+          <stop stopColor={svgGridOptions.color} stopOpacity="0.8" />
+          <stop offset="1" stopColor="#3E9BCF" stopOpacity="0" />
+        </motion.linearGradient>
+        <motion.linearGradient
+          animate={{
+            x2: [svgGridOptions.boxWidth / 2, 0, svgGridOptions.boxWidth / 2],
+            x1: [svgGridOptions.boxWidth / 2, 0, svgGridOptions.boxWidth / 2],
+            y1: [svgGridOptions.boxHeight, svgGridOptions.boxHeight / 3, 0],
+            y2: [svgGridOptions.boxHeight, svgGridOptions.boxHeight / 2, 0],
+          }}
+          transition={{
+            duration: isSm ? 3 : 5,
+            repeat: Infinity,
+            ease: 'linear',
+            delay: 2,
+          }}
+          id="electric-pulse-2"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stopColor={svgGridOptions.color} stopOpacity="0" />
+          <stop stopColor={svgGridOptions.color} stopOpacity="0.8" />
+          <stop offset="1" stopColor="#3E9BCF" stopOpacity="0" />
+        </motion.linearGradient>
+      </defs>
     </svg>
   )
 
