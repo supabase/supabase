@@ -1,7 +1,6 @@
 import Link from 'next/link'
 import { Button, IconBookOpen } from 'ui'
 import SectionContainer from '../Layouts/SectionContainer'
-import BackedBy from '../BackedBy'
 import { motion } from 'framer-motion'
 import HeroBackground from './HeroBackground'
 
@@ -49,7 +48,6 @@ const Hero = () => (
                   </a>
                 </Link>
               </div>
-              <BackedBy className="hidden md:block" />
             </div>
           </div>
         </div>
