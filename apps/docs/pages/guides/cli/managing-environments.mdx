@@ -186,13 +186,6 @@ You need a _new_ project for staging. A project which has already been modified 
 
 ### Configure GitHub Actions
 
-The Supabase CLI requires a few environment variables to run in non-interactive mode.
-
-- `SUPABASE_ACCESS_TOKEN` is your personal access token
-- `SUPABASE_DB_PASSWORD` is your project specific database password
-
-We recommend adding these as [encrypted secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets) to your GitHub Actions runners.
-
 Create the following files inside the `.github/workflows` directory:
 
 <Tabs
@@ -307,13 +300,17 @@ jobs:
 
 The full example code is available in the [demo repository](https://github.com/supabase/supabase-action-example).
 
-Commit these files to git and push to your `main` branch on GitHub. Update these environment variables to match your Supabase projects:
+Commit these files to git and push to your `main` branch on GitHub. 
 
-- `SUPABASE_ACCESS_TOKEN`
-- `PRODUCTION_PROJECT_ID`
-- `PRODUCTION_DB_PASSWORD`
-- `STAGING_PROJECT_ID`
-- `STAGING_DB_PASSWORD`
+#### Environment variables
+
+Note that the Supabase CLI requires a the `SUPABASE_ACCESS_TOKEN` and `SUPABASE_DB_PASSWORD` environment variables to run in non-interactive mode. Add the following variables to your your GitHub Actions [encrypted secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets).
+
+- `SUPABASE_ACCESS_TOKEN` - your personal access token
+- `PRODUCTION_PROJECT_ID` - the production specific project id
+- `PRODUCTION_DB_PASSWORD` - the production specific database password
+- `STAGING_PROJECT_ID` - the staging specific project id
+- `STAGING_DB_PASSWORD` - the staging specific database password
 
 When configured correctly, your repository will have CI and Release workflows that trigger on new commits pushed to `main` and `develop` branches.
 
@@ -340,7 +337,7 @@ Once the test error is resolved, merge this PR and watch the deployment in actio
 
 After verifying your staging project has successfully migrated, create another PR from `develop` to `main` and merge it to deploy the migration to the production project.
 
-The `release` job applies all new migration scripts merged in `supabase/migrations` directory to a linked Supabase project. You can control which project the job links to via `PROJECT_ID` environment variable.
+The `release` job applies all new migration scripts merged in `supabase/migrations` directory to a linked Supabase project. You can control which project the job links to via `PRODUCTION_PROJECT_ID` environment variable.
 
 ## Troubleshooting
 
