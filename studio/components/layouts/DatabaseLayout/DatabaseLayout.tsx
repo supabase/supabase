@@ -57,7 +57,6 @@ const DatabaseLayout: FC<Props> = ({ title, children }) => {
 
   return (
     <ProjectLayout
-      // isLoading={!loaded}
       product="Database"
       productMenu={
         <ProductMenu page={page} menu={generateDatabaseMenu(project, foreignDataWrappersEnabled)} />
