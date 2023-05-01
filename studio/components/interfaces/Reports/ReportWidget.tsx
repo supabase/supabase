@@ -1,11 +1,12 @@
 import { NextRouter, useRouter } from 'next/router'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Button, IconExternalLink, IconHelpCircle } from 'ui'
+import { Button, Collapsible, IconExternalLink, IconHelpCircle } from 'ui'
 
 import { BaseReportParams } from './Reports.types'
 import { LogsEndpointParams } from '../Settings/Logs'
 import Panel from 'components/ui/Panel'
 import LoadingOpacity from 'components/ui/LoadingOpacity'
+import { useState } from 'react'
 
 export interface ReportWidgetProps<T = any> {
   data: T[]
@@ -14,6 +15,8 @@ export interface ReportWidgetProps<T = any> {
   tooltip?: string
   className?: string
   renderer: (props: ReportWidgetRendererProps) => React.ReactNode
+  expandable?: (props: ReportWidgetRendererProps) => React.ReactNode
+  expandableText?: string
   // omitting params will hide the "View in logs explorer" button
   params?: BaseReportParams | LogsEndpointParams
   isLoading: boolean
@@ -28,7 +31,6 @@ const ReportWidget: React.FC<ReportWidgetProps> = (props) => {
   const router = useRouter()
   const { ref } = router.query
   const projectRef = ref as string
-
   return (
     <Panel
       noMargin
@@ -104,6 +106,17 @@ const ReportWidget: React.FC<ReportWidgetProps> = (props) => {
         <LoadingOpacity className="w-full" active={props.isLoading}>
           {props.data === undefined ? null : props.renderer({ ...props, router, projectRef })}
         </LoadingOpacity>
+
+        {props.expandable && (
+          <Collapsible>
+            <Collapsible.Trigger asChild>
+              <Button>{props.expandableText || 'Expand'}</Button>
+            </Collapsible.Trigger>
+            <Collapsible.Content>
+              {props.expandable && props.expandable({ ...props, router, projectRef })}
+            </Collapsible.Content>
+          </Collapsible>
+        )}
       </Panel.Content>
     </Panel>
   )
