@@ -9,6 +9,7 @@ import { QueryKey, useQueryClient } from '@tanstack/react-query'
 import { SchemaView } from 'types'
 import { checkPermissions, useFlag, useStore, useUrlState } from 'hooks'
 import useEntityType from 'hooks/misc/useEntityType'
+import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { useParams } from 'common/hooks'
 import GridHeaderActions from './GridHeaderActions'
 import NotFoundState from './NotFoundState'
@@ -23,25 +24,25 @@ import {
 import { sqlKeys } from 'data/sql/keys'
 import { useProjectJsonSchemaQuery } from 'data/docs/project-json-schema-query'
 import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
-import { JsonEditValue } from './SidePanelEditor/RowEditor/RowEditor.types'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import {
   ForeignKeyConstraint,
   useForeignKeyConstraintsQuery,
 } from 'data/database/foreign-key-constraints-query'
 import { FOREIGN_KEY_DELETION_ACTION } from 'data/database/database-query-constants'
-import { ForeignRowSelectorProps } from './SidePanelEditor/RowEditor/ForeignRowSelector/ForeignRowSelector'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
 import TwoOptionToggle from 'components/ui/TwoOptionToggle'
+import { ERROR_PRIMARY_KEY_NOTFOUND } from 'components/grid/constants'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { JsonEditValue } from './SidePanelEditor/RowEditor/RowEditor.types'
+import { ForeignRowSelectorProps } from './SidePanelEditor/RowEditor/ForeignRowSelector/ForeignRowSelector'
 import TableDefinition from './TableDefinition'
 import APIDocumentationPanel from './APIDocumentationPanel'
-import { ERROR_PRIMARY_KEY_NOTFOUND } from 'components/grid/constants'
 
 export interface TableGridEditorProps {
   /** Theme for the editor */
   theme?: 'dark' | 'light'
 
-  selectedSchema?: string
   selectedTable: any // PostgresTable | SchemaView
 
   /** Determines what side panel editor to show */
@@ -76,8 +77,6 @@ export interface TableGridEditorProps {
 
 const TableGridEditor = ({
   theme = 'dark',
-
-  selectedSchema,
   selectedTable,
   sidePanelKey,
   isDuplicating,
@@ -97,12 +96,13 @@ const TableGridEditor = ({
   onClosePanel = noop,
   onImportData = noop,
 }: TableGridEditorProps) => {
+  const { project } = useProjectContext()
+  const snap = useTableEditorStateSnapshot()
   const { meta, ui, vault } = useStore()
   const router = useRouter()
   const { ref: projectRef, id } = useParams()
   const gridRef = useRef<SupabaseGridRef>(null)
 
-  const { project } = useProjectContext()
   const isVaultEnabled = useFlag('vaultExtension')
   const [encryptedColumns, setEncryptedColumns] = useState([])
   const [apiPreviewPanelOpen, setApiPreviewPanelOpen] = useState(false)
@@ -213,7 +213,7 @@ const TableGridEditor = ({
     entityType?.type === ENTITY_TYPE.VIEW || entityType?.type === ENTITY_TYPE.MATERIALIZED_VIEW
   const isTableSelected = entityType?.type === ENTITY_TYPE.TABLE
   const isForeignTableSelected = entityType?.type === ENTITY_TYPE.FOREIGN_TABLE
-  const isLocked = meta.excludedSchemas.includes(entityType?.schema ?? '')
+  const isLocked = EXCLUDED_SCHEMAS.includes(entityType?.schema ?? '')
   const canUpdateTables = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
   const canEditViaTableEditor = isTableSelected && !isLocked
 
@@ -411,9 +411,8 @@ const TableGridEditor = ({
         {(isViewSelected || isTableSelected) && <TableDefinition id={selectedTable?.id} />}
       </SupabaseGrid>
 
-      {!isUndefined(selectedSchema) && (
+      {!isUndefined(snap.selectedSchemaName) && (
         <SidePanelEditor
-          selectedSchema={selectedSchema}
           isDuplicating={isDuplicating}
           selectedTable={selectedTable as PostgresTable}
           selectedRowToEdit={selectedRowToEdit}

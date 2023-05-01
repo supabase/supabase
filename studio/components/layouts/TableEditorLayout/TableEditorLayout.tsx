@@ -8,7 +8,7 @@ import { checkPermissions, useStore } from 'hooks'
 import { useParams } from 'common/hooks'
 import { Entity } from 'data/entity-types/entity-type-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
-import { useIsTableLoaded, useTableEditorStateSnapshot } from 'state/table-editor'
+import { useIsTableLoaded, useTableEditorGlobalStateSnapshot } from 'state/table-editor-global'
 import ProjectLayout from '../'
 import TableEditorMenu from './TableEditorMenu'
 import NoPermission from 'components/ui/NoPermission'
@@ -18,8 +18,6 @@ import useLatest from 'hooks/misc/useLatest'
 import useTableRowsPrefetchWrapper from './TableEditorLayout.utils'
 
 export interface TableEditorLayoutProps {
-  selectedSchema?: string
-  onSelectSchema: (schema: string) => void
   onAddTable: () => void
   onEditTable: (table: Entity) => void
   onDeleteTable: (table: Entity) => void
@@ -27,8 +25,6 @@ export interface TableEditorLayoutProps {
 }
 
 const TableEditorLayout = ({
-  selectedSchema,
-  onSelectSchema = noop,
   onAddTable = noop,
   onEditTable = noop,
   onDeleteTable = noop,
@@ -40,7 +36,7 @@ const TableEditorLayout = ({
   const { ref, id: _id } = useParams()
   const id = _id ? Number(_id) : undefined
 
-  const snap = useTableEditorStateSnapshot()
+  const snap = useTableEditorGlobalStateSnapshot()
   const canReadTables = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'tables')
 
   const vaultExtension = meta.extensions.byId('supabase_vault')
@@ -48,7 +44,6 @@ const TableEditorLayout = ({
 
   useEffect(() => {
     if (ui.selectedProject?.ref) {
-      meta.schemas.load()
       meta.types.load()
       meta.policies.load()
       meta.publications.load()
@@ -125,8 +120,6 @@ const TableEditorLayout = ({
       product="Table editor"
       productMenu={
         <TableEditorMenu
-          selectedSchema={selectedSchema}
-          onSelectSchema={onSelectSchema}
           onAddTable={onAddTable}
           onEditTable={onEditTable}
           onDeleteTable={onDeleteTable}

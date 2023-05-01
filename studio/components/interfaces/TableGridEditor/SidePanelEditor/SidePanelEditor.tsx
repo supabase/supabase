@@ -27,7 +27,6 @@ import ForeignRowSelector, {
 } from './RowEditor/ForeignRowSelector/ForeignRowSelector'
 
 export interface SidePanelEditorProps {
-  selectedSchema: string
   selectedTable?: PostgresTable
   selectedRowToEdit?: Dictionary<any>
   selectedColumnToEdit?: PostgresColumn
@@ -51,7 +50,6 @@ export interface SidePanelEditorProps {
 }
 
 const SidePanelEditor = ({
-  selectedSchema,
   selectedTable,
   selectedRowToEdit,
   selectedColumnToEdit,
@@ -551,7 +549,6 @@ const SidePanelEditor = ({
       )}
       <TableEditor
         table={selectedTableToEdit}
-        selectedSchema={selectedSchema}
         isDuplicating={isDuplicating}
         visible={sidePanelKey === 'table'}
         closePanel={onClosePanel}

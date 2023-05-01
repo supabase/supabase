@@ -11,14 +11,15 @@ import { TableEditorLayout } from 'components/layouts'
 import { EmptyState, SidePanelEditor } from 'components/interfaces/TableGridEditor'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { ProjectContextFromParamsProvider } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
 
 const TableEditorPage: NextPageWithLayout = () => {
+  const snap = useTableEditorStateSnapshot()
   const { meta, ui } = useStore()
   const projectRef = ui.selectedProject?.ref
   const [sidePanelKey, setSidePanelKey] = useState<'row' | 'column' | 'table'>()
   const [isDeleting, setIsDeleting] = useState<boolean>(false)
   const [isDuplicating, setIsDuplicating] = useState<boolean>(false)
-  const [selectedSchema, setSelectedSchema] = useState<string>('public')
   const [selectedTableToEdit, setSelectedTableToEdit] = useState<PostgresTable>()
   const [selectedTableToDelete, setSelectedTableToDelete] = useState<PostgresTable>()
 
@@ -63,7 +64,7 @@ const TableEditorPage: NextPageWithLayout = () => {
         category: 'success',
         message: `Successfully deleted ${selectedTableToDelete!.name}`,
       })
-      await meta.views.loadBySchema(selectedSchema)
+      await meta.views.loadBySchema(snap.selectedSchemaName)
     } catch (error: any) {
       ui.setNotification({
         category: 'error',
@@ -74,14 +75,12 @@ const TableEditorPage: NextPageWithLayout = () => {
 
   return (
     <TableEditorLayout
-      selectedSchema={selectedSchema}
-      onSelectSchema={setSelectedSchema}
       onAddTable={onAddTable}
       onEditTable={onEditTable}
       onDeleteTable={onDeleteTable}
       onDuplicateTable={onDuplicateTable}
     >
-      <EmptyState selectedSchema={selectedSchema} onAddTable={onAddTable} />
+      <EmptyState onAddTable={onAddTable} />
       {/* On this page it'll only handle tables */}
       <ConfirmationModal
         danger
@@ -96,7 +95,6 @@ const TableEditorPage: NextPageWithLayout = () => {
         onSelectConfirm={onConfirmDeleteTable}
       />
       <SidePanelEditor
-        selectedSchema={selectedSchema}
         isDuplicating={isDuplicating}
         selectedTableToEdit={selectedTableToEdit}
         sidePanelKey={sidePanelKey}

@@ -1,6 +1,7 @@
 import { useParams } from 'common/hooks'
 import { useStore } from 'hooks'
 import { PROJECT_STATUS } from 'lib/constants'
+import { TableEditorStateContextProvider } from 'state/table-editor'
 import { observer } from 'mobx-react-lite'
 import { createContext, PropsWithChildren, useContext, useMemo } from 'react'
 import { Project } from 'types'
@@ -43,7 +44,13 @@ export const ProjectContextProvider = observer(
       }
     }, [ui.selectedProject?.ref, projectRef])
 
-    return <ProjectContext.Provider value={value}>{children}</ProjectContext.Provider>
+    return (
+      <ProjectContext.Provider value={value}>
+        <TableEditorStateContextProvider key={`table-editor-state-${projectRef}`}>
+          {children}
+        </TableEditorStateContextProvider>
+      </ProjectContext.Provider>
+    )
   }
 )
 

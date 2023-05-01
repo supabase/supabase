@@ -12,6 +12,7 @@ import type {
 
 import { useFlag, useStore } from 'hooks'
 import { useParams } from 'common/hooks'
+import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import ActionBar from '../ActionBar'
 import HeaderTitle from './HeaderTitle'
 import ColumnType from './ColumnType'
@@ -35,7 +36,6 @@ import {
 } from '../SidePanelEditor.types'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms'
 import { EncryptionKeySelector } from 'components/interfaces/Settings/Vault'
-
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 
@@ -84,9 +84,7 @@ const ColumnEditor = ({
   const foreignKeyMeta = data || []
 
   const keys = vault.listKeys()
-  const enumTypes = meta.types.list(
-    (type: PostgresType) => !meta.excludedSchemas.includes(type.schema)
-  )
+  const enumTypes = meta.types.list((type: PostgresType) => !EXCLUDED_SCHEMAS.includes(type.schema))
 
   const [pgsodiumExtension] = meta.extensions.list(
     (ext: PostgresExtension) => ext.name.toLowerCase() === 'pgsodium'

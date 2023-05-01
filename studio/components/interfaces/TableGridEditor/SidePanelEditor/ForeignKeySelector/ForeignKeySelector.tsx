@@ -1,19 +1,21 @@
-import React, { FC, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { get, find, isEmpty, sortBy } from 'lodash'
 import { Dictionary } from 'components/grid'
-import { SidePanel, Input, Listbox, IconHelpCircle, IconDatabase, Toggle } from 'ui'
+import { SidePanel, Input, Listbox, IconHelpCircle, IconDatabase } from 'ui'
 import type { PostgresTable, PostgresColumn, PostgresSchema } from '@supabase/postgres-meta'
 
 import { useStore } from 'hooks'
+import { FOREIGN_KEY_DELETION_ACTION } from 'data/database/database-query-constants'
+import { useSchemasQuery } from 'data/database/schemas-query'
+import InformationBox from 'components/ui/InformationBox'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ActionBar from '../ActionBar'
 import { ForeignKey } from './ForeignKeySelector.types'
 import { ColumnField } from '../SidePanelEditor.types'
-import InformationBox from 'components/ui/InformationBox'
-import { FOREIGN_KEY_DELETION_ACTION } from 'data/database/database-query-constants'
 import { FOREIGN_KEY_DELETION_OPTIONS } from './ForeignKeySelector.constants'
 import { generateDeletionActionDescription } from './ForeignKeySelector.utils'
 
-interface Props {
+export interface ForeignKeySelectorProps {
   column: ColumnField
   metadata?: any
   visible: boolean
@@ -23,7 +25,13 @@ interface Props {
   ) => void
 }
 
-const ForeignKeySelector: FC<Props> = ({ column, visible = false, closePanel, saveChanges }) => {
+const ForeignKeySelector = ({
+  column,
+  visible = false,
+  closePanel,
+  saveChanges,
+}: ForeignKeySelectorProps) => {
+  const { project } = useProjectContext()
   const { meta } = useStore()
   const [errors, setErrors] = useState<any>({})
   const [selectedForeignKey, setSelectedForeignKey] = useState<ForeignKey>({
@@ -33,7 +41,10 @@ const ForeignKeySelector: FC<Props> = ({ column, visible = false, closePanel, sa
     deletionAction: FOREIGN_KEY_DELETION_ACTION.NO_ACTION,
   })
 
-  const schemas = meta.schemas.list()
+  const { data: schemas } = useSchemasQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
   const tables = meta.tables.list(
     (table: PostgresTable) => table.schema === selectedForeignKey.schema
   )
@@ -190,7 +201,7 @@ const ForeignKeySelector: FC<Props> = ({ column, visible = false, closePanel, sa
             error={errors.schema}
             onChange={(value: string) => updateSelectedSchema(value)}
           >
-            {schemas.map((schema: PostgresSchema) => {
+            {schemas?.map((schema: PostgresSchema) => {
               return (
                 <Listbox.Option
                   key={schema.id}

@@ -1,4 +1,4 @@
-import { FC, ReactNode, useState, useEffect } from 'react'
+import { useState, useEffect, PropsWithChildren } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 
@@ -8,12 +8,11 @@ import Error from 'components/ui/Error'
 import ProductMenu from 'components/ui/ProductMenu'
 import { generateAuthMenu } from './AuthLayout.utils'
 
-interface Props {
+export interface AuthLayoutProps {
   title?: string
-  children: ReactNode
 }
 
-const AuthLayout: FC<Props> = ({ title, children }) => {
+const AuthLayout = ({ title, children }: PropsWithChildren<AuthLayoutProps>) => {
   const { ui, meta } = useStore()
   const { isInitialized, isLoading, error } = meta.tables
   const projectRef = ui.selectedProject?.ref ?? 'default'
@@ -28,7 +27,6 @@ const AuthLayout: FC<Props> = ({ title, children }) => {
       meta.policies.load()
       meta.tables.load()
       meta.roles.load()
-      meta.schemas.load()
     }
   }, [ui.selectedProject?.ref])
 

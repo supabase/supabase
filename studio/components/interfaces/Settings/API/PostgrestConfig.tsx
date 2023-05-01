@@ -1,4 +1,4 @@
-import { useContext, FC, useEffect } from 'react'
+import { useEffect } from 'react'
 import { indexOf } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { Input, Form, IconAlertCircle, InputNumber } from 'ui'
@@ -8,8 +8,8 @@ import { checkPermissions, useStore } from 'hooks'
 import { useParams } from 'common/hooks'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 import { useProjectPostgrestConfigUpdateMutation } from 'data/config/project-postgrest-config-update-mutation'
+import { useSchemasQuery } from 'data/database/schemas-query'
 import MultiSelect from 'components/ui/MultiSelect'
-import { PageContext } from 'pages/project/[ref]/settings/api'
 
 import {
   FormActions,
@@ -18,18 +18,21 @@ import {
   FormSectionContent,
   FormSectionLabel,
 } from 'components/ui/Forms'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
-interface Props {}
-
-const PostgrestConfig: FC<Props> = ({}) => {
-  const PageState: any = useContext(PageContext)
+const PostgrestConfig = () => {
+  const { project } = useProjectContext()
   const { ui } = useStore()
-  const { meta } = PageState
 
   const { ref: projectRef } = useParams()
 
   const formId = 'project-postgres-config'
   const { data: config, isError } = useProjectPostgrestConfigQuery({ projectRef })
+
+  const { data: schemas } = useSchemasQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
 
   const initialValues = {
     db_schema: '',
@@ -68,15 +71,12 @@ const PostgrestConfig: FC<Props> = ({}) => {
   const permanentSchema = ['public', 'storage']
   const hiddenSchema = ['auth', 'pgbouncer', 'hooks', 'extensions']
   const schema =
-    meta.schemas
-      .list(
-        (x: any) => {
-          const find = indexOf(hiddenSchema, x.name)
-          if (find < 0) return x
-        },
-        { allSchemas: true }
-      )
-      .map((x: any) => {
+    schemas
+      ?.filter((x) => {
+        const find = indexOf(hiddenSchema, x.name)
+        if (find < 0) return x
+      })
+      .map((x) => {
         return {
           id: x.id,
           value: x.name,

@@ -1,19 +1,18 @@
-import { FC } from 'react'
-import { observer } from 'mobx-react-lite'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { checkPermissions, useLocalStorage, useStore } from 'hooks'
+import { checkPermissions, useLocalStorage } from 'hooks'
+import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
-interface Props {
-  selectedSchema: string
+export interface EmptyStateProps {
   onAddTable: () => void
 }
 
-const EmptyState: FC<Props> = ({ selectedSchema, onAddTable }) => {
-  const { meta } = useStore()
-  const isProtectedSchema = meta.excludedSchemas.includes(selectedSchema)
+const EmptyState = ({ onAddTable }: EmptyStateProps) => {
+  const snap = useTableEditorStateSnapshot()
+  const isProtectedSchema = EXCLUDED_SCHEMAS.includes(snap.selectedSchemaName)
   const canCreateTables =
     !isProtectedSchema && checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
@@ -27,7 +26,7 @@ const EmptyState: FC<Props> = ({ selectedSchema, onAddTable }) => {
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      schema: selectedSchema,
+      schema: snap.selectedSchemaName,
       sort,
     },
     {
@@ -65,4 +64,4 @@ const EmptyState: FC<Props> = ({ selectedSchema, onAddTable }) => {
   )
 }
 
-export default observer(EmptyState)
+export default EmptyState

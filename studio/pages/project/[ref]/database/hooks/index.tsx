@@ -1,12 +1,12 @@
 import clsx from 'clsx'
 import { IconLoader } from 'ui'
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { NextPageWithLayout } from 'types'
 import { checkPermissions, useStore } from 'hooks'
+import { useParams } from 'common'
 import { API_URL } from 'lib/constants'
 import { post } from 'lib/common/fetch'
 import { DatabaseLayout } from 'components/layouts'
@@ -15,20 +15,30 @@ import HooksList from 'components/interfaces/Database/Hooks/HooksList/HooksList'
 import DeleteHookModal from 'components/interfaces/Database/Hooks/DeleteHookModal'
 import EditHookPanel from 'components/interfaces/Database/Hooks/EditHookPanel'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
+import { useSchemasQuery } from 'data/database/schemas-query'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
 const HooksPage: NextPageWithLayout = () => {
+  const { project } = useProjectContext()
   const { meta, ui } = useStore()
 
-  const router = useRouter()
-  const { ref } = router.query
-  const schemas = meta.schemas.list()
-  const { isLoading: isLoadingSchemas } = meta.schemas
+  const { ref: projectRef } = useParams()
+
+  const {
+    data: schemas,
+    isLoading: isSchemasLoading,
+    refetch,
+  } = useSchemasQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
 
   const [selectedHook, setSelectedHook] = useState<any>()
   const [showCreateHookForm, setShowCreateHookForm] = useState<boolean>(false)
   const [showDeleteHookForm, setShowDeleteHookForm] = useState<boolean>(false)
 
-  const isHooksEnabled = schemas.some((schema: any) => schema.name === 'supabase_functions')
+  const isHooksEnabled =
+    schemas?.some((schema: any) => schema.name === 'supabase_functions') ?? false
   const canReadWebhooks = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'triggers')
   const canCreateWebhooks = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'triggers')
 
@@ -37,14 +47,14 @@ const HooksPage: NextPageWithLayout = () => {
   }, [ui.selectedProject?.ref])
 
   const enableHooksForProject = async () => {
-    const res = await post(`${API_URL}/database/${ref}/hook-enable`, {})
+    const res = await post(`${API_URL}/database/${projectRef}/hook-enable`, {})
     if (res.error) {
       ui.setNotification({
         category: 'error',
         message: `Failed to enable webhooks: ${res.error.message}`,
       })
     } else {
-      meta.schemas.load()
+      refetch()
       ui.setNotification({
         category: 'success',
         message: `Successfully enabled webhooks`,
@@ -71,7 +81,7 @@ const HooksPage: NextPageWithLayout = () => {
     return <NoPermission isFullPage resourceText="view database webhooks" />
   }
 
-  if (isLoadingSchemas) {
+  if (isSchemasLoading) {
     return (
       <div className="w-full h-full flex items-center justify-center space-x-2">
         <IconLoader className="animate-spin" size="tiny" strokeWidth={1.5} />

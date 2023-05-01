@@ -1,5 +1,5 @@
-import { FC, useState } from 'react'
-import { uniqBy, map as lodashMap, includes } from 'lodash'
+import { useState } from 'react'
+import { uniqBy, map as lodashMap, includes, noop } from 'lodash'
 import { Button, IconSearch, IconLoader, Input } from 'ui'
 import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
@@ -7,26 +7,26 @@ import { PostgresFunction } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { checkPermissions, useStore } from 'hooks'
-import AlphaPreview from 'components/to-be-cleaned/AlphaPreview'
+import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import SchemaTable from './SchemaTable'
 
-interface Props {
+export interface FunctionsListProps {
   createFunction: () => void
   editFunction: (fn: PostgresFunction) => void
   deleteFunction: (fn: PostgresFunction) => void
 }
 
-const FunctionsList: FC<Props> = ({
-  createFunction = () => {},
-  editFunction = () => {},
-  deleteFunction = () => {},
-}) => {
+const FunctionsList = ({
+  createFunction = noop,
+  editFunction = noop,
+  deleteFunction = noop,
+}: FunctionsListProps) => {
   const { meta } = useStore()
   const [filterString, setFilterString] = useState<string>('')
 
   const functions = meta.functions.list(
-    (fn: PostgresFunction) => !meta.excludedSchemas.includes(fn.schema)
+    (fn: PostgresFunction) => !EXCLUDED_SCHEMAS.includes(fn.schema)
   )
   const filteredFunctions = functions.filter((x: PostgresFunction) =>
     includes(x.name?.toLowerCase(), filterString.toLowerCase())
