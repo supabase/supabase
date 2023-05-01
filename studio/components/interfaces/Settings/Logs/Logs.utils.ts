@@ -65,7 +65,7 @@ const getDotKeys = (obj: { [k: string]: unknown }, parent?: string): string[] =>
  *
  * @returns a where statement with WHERE clause.
  */
-const _genWhereStatement = (table: LogsTableName, filters: Filters) => {
+export const _genWhereStatement = (table: LogsTableName, filters: Filters) => {
   const keys = Object.keys(filters)
   const filterTemplates = SQL_FILTER_TEMPLATES[table]
   const _resolveTemplateToStatement = (dotKey: string): string | null => {
@@ -145,6 +145,13 @@ export const genDefaultQuery = (table: LogsTableName, filters: Filters) => {
 
     case 'function_logs':
       return `select id, ${table}.timestamp, event_message, metadata.event_type, metadata.function_id, metadata.level from ${table}
+  cross join unnest(metadata) as metadata
+  ${where}
+  limit 100
+    `
+
+    case 'auth_logs':
+      return `select id, ${table}.timestamp, event_message from ${table}
   cross join unnest(metadata) as metadata
   ${where}
   limit 100
