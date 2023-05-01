@@ -7,7 +7,7 @@ import HeroBackground from './HeroBackground'
 
 const Hero = () => (
   <div className="relative">
-    <SectionContainer className="md:py-16 lg:py-20">
+    <SectionContainer className="pt-12 md:py-16 lg:py-20">
       <div className="relative">
         <div className="mx-auto">
           <div className="mx-auto max-w-2xl lg:col-span-6 lg:flex lg:items-center justify-center text-center">
