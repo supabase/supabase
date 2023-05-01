@@ -11,6 +11,10 @@ import { useParams } from 'common/hooks'
 import { AuthLayout } from 'components/layouts'
 import { Policies } from 'components/interfaces/Auth/Policies'
 import NoPermission from 'components/ui/NoPermission'
+import { useSchemasQuery } from 'data/database/schemas-query'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 
 /**
  * Filter tables by table name and policy name
@@ -48,26 +52,31 @@ const onFilterTables = (
 }
 
 const AuthPoliciesPage: NextPageWithLayout = () => {
+  const { project } = useProjectContext()
+  const snap = useTableEditorStateSnapshot()
   const { meta } = useStore()
   const { search } = useParams()
-  const [selectedSchema, setSelectedSchema] = useState<string>('public')
   const [searchString, setSearchString] = useState<string>('')
 
   useEffect(() => {
     if (search) setSearchString(search)
   }, [search])
 
-  const schemas = meta.schemas.list()
+  const { data: schemas } = useSchemasQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
   const [protectedSchemas, openSchemas] = partition(schemas, (schema) =>
-    meta.excludedSchemas.includes(schema?.name ?? '')
+    EXCLUDED_SCHEMAS.includes(schema?.name ?? '')
   )
-  // @ts-ignore
-  const schema = schemas.find((schema) => schema.name === selectedSchema)
+  const schema = schemas?.find((schema) => schema.name === snap.selectedSchemaName)
   const isLocked = protectedSchemas.some((s) => s.id === schema?.id)
 
   const policies = meta.policies.list()
 
-  const tables = meta.tables.list((table: { schema: string }) => table.schema === selectedSchema)
+  const tables = meta.tables.list(
+    (table: { schema: string }) => table.schema === snap.selectedSchemaName
+  )
   const filteredTables = onFilterTables(tables, policies, searchString)
 
   const canReadPolicies = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'policies')
@@ -84,9 +93,9 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
             <div className="w-[230px]">
               <Listbox
                 size="small"
-                value={selectedSchema}
+                value={snap.selectedSchemaName}
                 onChange={(schema: string) => {
-                  setSelectedSchema(schema)
+                  snap.setSelectedSchemaName(schema)
                   setSearchString('')
                 }}
                 icon={isLocked && <IconLock size={14} strokeWidth={2} />}

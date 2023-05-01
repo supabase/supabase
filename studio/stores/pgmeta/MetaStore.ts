@@ -18,7 +18,6 @@ import { ResponseError } from 'types'
 
 import { IRootStore } from '../RootStore'
 import ColumnStore from './ColumnStore'
-import SchemaStore from './SchemaStore'
 import TableStore, { ITableStore } from './TableStore'
 import OpenApiStore, { IOpenApiStore } from './OpenApiStore'
 import { IPostgresMetaInterface } from '../common/PostgresMetaInterface'
@@ -51,12 +50,9 @@ const BATCH_SIZE = 1000
 const CHUNK_SIZE = 1024 * 1024 * 0.1 // 0.1MB
 
 export interface IMetaStore {
-  excludedSchemas: string[]
-
   openApi: IOpenApiStore
   tables: ITableStore
   columns: IPostgresMetaInterface<PostgresColumn>
-  schemas: IPostgresMetaInterface<PostgresSchema>
   views: IViewStore
   materializedViews: IMaterializedViewStore
   foreignTables: IForeignTableStore
@@ -150,7 +146,6 @@ export default class MetaStore implements IMetaStore {
   openApi: OpenApiStore
   tables: TableStore
   columns: ColumnStore
-  schemas: SchemaStore
   views: ViewStore
   materializedViews: MaterializedViewStore
   foreignTables: ForeignTableStore
@@ -168,23 +163,6 @@ export default class MetaStore implements IMetaStore {
   connectionString?: string
   baseUrl: string
   headers: { [prop: string]: any }
-
-  // [Joshen] I'm going to treat this as a list of system schemas
-  excludedSchemas = [
-    'auth',
-    'extensions',
-    'information_schema',
-    'net',
-    'pgsodium',
-    'pgsodium_masks',
-    'pgbouncer',
-    'realtime',
-    'storage',
-    'supabase_functions',
-    'vault',
-    'graphql',
-    'graphql_public',
-  ]
 
   constructor(rootStore: IRootStore, options: { projectRef: string; connectionString?: string }) {
     const { projectRef, connectionString } = options
@@ -204,7 +182,6 @@ export default class MetaStore implements IMetaStore {
     )
     this.tables = new TableStore(this.rootStore, `${this.baseUrl}/tables`, this.headers)
     this.columns = new ColumnStore(this.rootStore, `${this.baseUrl}/columns`, this.headers)
-    this.schemas = new SchemaStore(this.rootStore, `${this.baseUrl}/schemas`, this.headers)
     this.views = new ViewStore(this.rootStore, `${this.baseUrl}/views`, this.headers)
     this.materializedViews = new MaterializedViewStore(
       this.rootStore,
@@ -237,9 +214,7 @@ export default class MetaStore implements IMetaStore {
     )
     this.types = new TypesStore(this.rootStore, `${this.baseUrl}/types`, this.headers)
 
-    makeObservable(this, {
-      excludedSchemas: observable,
-    })
+    makeObservable(this)
   }
 
   /**
@@ -988,9 +963,6 @@ export default class MetaStore implements IMetaStore {
 
     this.columns.setUrl(`${this.baseUrl}/columns`)
     this.columns.setHeaders(this.headers)
-
-    this.schemas.setUrl(`${this.baseUrl}/schemas`)
-    this.schemas.setHeaders(this.headers)
 
     this.views.setUrl(`${this.baseUrl}/views`)
     this.views.setHeaders(this.headers)

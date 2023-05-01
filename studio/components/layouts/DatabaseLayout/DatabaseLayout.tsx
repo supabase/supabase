@@ -16,8 +16,7 @@ interface Props {
 
 const DatabaseLayout: FC<Props> = ({ title, children }) => {
   const { meta, ui, vault, backups } = useStore()
-  const { isLoading } = meta.schemas
-  const { isInitialized, error } = meta.tables
+  const { error } = meta.tables
   const project = ui.selectedProject
 
   const router = useRouter()
@@ -27,12 +26,8 @@ const DatabaseLayout: FC<Props> = ({ title, children }) => {
   const isVaultEnabled = vaultExtension !== undefined && vaultExtension.installed_version !== null
   const foreignDataWrappersEnabled = useFlag('foreignDataWrappers')
 
-  const [loaded, setLoaded] = useState<boolean>(isInitialized)
-
   useEffect(() => {
     if (ui.selectedProject?.ref) {
-      // Eventually should only load the required stores based on the pages
-      meta.schemas.load()
       meta.tables.load()
 
       meta.roles.load()
@@ -52,14 +47,6 @@ const DatabaseLayout: FC<Props> = ({ title, children }) => {
     }
   }, [ui.selectedProject?.ref, isVaultEnabled])
 
-  // Optimization required: load logic should be at the page level
-  // e.g backups page is waiting for meta.tables to load finish when it doesnt even need that data
-  useEffect(() => {
-    if (!isLoading && !loaded) {
-      setLoaded(true)
-    }
-  }, [isLoading])
-
   if (error) {
     return (
       <ProjectLayout>
@@ -70,7 +57,7 @@ const DatabaseLayout: FC<Props> = ({ title, children }) => {
 
   return (
     <ProjectLayout
-      isLoading={!loaded}
+      // isLoading={!loaded}
       product="Database"
       productMenu={
         <ProductMenu page={page} menu={generateDatabaseMenu(project, foreignDataWrappersEnabled)} />

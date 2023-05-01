@@ -23,7 +23,6 @@ const DatabaseTables: NextPageWithLayout = () => {
   const queryClient = useQueryClient()
 
   const [isDeleting, setIsDeleting] = useState<boolean>(false)
-  const [selectedSchema, setSelectedSchema] = useState('public')
   const [selectedTable, setSelectedTable] = useState<any>()
   const [sidePanelKey, setSidePanelKey] = useState<'column' | 'table'>()
 
@@ -147,8 +146,6 @@ const DatabaseTables: NextPageWithLayout = () => {
       <div className="p-4">
         {isUndefined(selectedTable) ? (
           <TableList
-            selectedSchema={selectedSchema}
-            onSelectSchema={setSelectedSchema}
             onAddTable={onAddTable}
             onEditTable={onEditTable}
             onDeleteTable={onDeleteTable}
@@ -198,7 +195,6 @@ const DatabaseTables: NextPageWithLayout = () => {
       </ConfirmationModal>
       <SidePanelEditor
         sidePanelKey={sidePanelKey}
-        selectedSchema={selectedSchema}
         selectedTable={selectedTable}
         onColumnSaved={onColumnUpdated}
         closePanel={onClosePanel}

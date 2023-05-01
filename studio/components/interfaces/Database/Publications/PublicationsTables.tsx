@@ -1,21 +1,22 @@
-import { FC, useState } from 'react'
+import { useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { Button, Input, IconChevronLeft, IconSearch, IconAlertCircle } from 'ui'
 import type { PostgresPublication } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { checkPermissions, useStore } from 'hooks'
-import PublicationsTableItem from './PublicationsTableItem'
+import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import Table from 'components/to-be-cleaned/Table'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import InformationBox from 'components/ui/InformationBox'
+import PublicationsTableItem from './PublicationsTableItem'
 
-interface Props {
+export interface PublicationsTablesProps {
   selectedPublication: PostgresPublication
   onSelectBack: () => void
 }
 
-const PublicationsTables: FC<Props> = ({ selectedPublication, onSelectBack }) => {
+const PublicationsTables = ({ selectedPublication, onSelectBack }: PublicationsTablesProps) => {
   const { meta } = useStore()
   const [filterString, setFilterString] = useState<string>('')
 
@@ -26,10 +27,10 @@ const PublicationsTables: FC<Props> = ({ selectedPublication, onSelectBack }) =>
 
   const tables =
     filterString.length === 0
-      ? meta.tables.list((table: any) => !meta.excludedSchemas.includes(table.schema))
+      ? meta.tables.list((table: any) => !EXCLUDED_SCHEMAS.includes(table.schema))
       : meta.tables.list(
           (table: any) =>
-            !meta.excludedSchemas.includes(table.schema) && table.name.includes(filterString)
+            !EXCLUDED_SCHEMAS.includes(table.schema) && table.name.includes(filterString)
         )
 
   // const publication = selectedPublication

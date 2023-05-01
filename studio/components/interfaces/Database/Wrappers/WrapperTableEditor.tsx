@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
 import { Form, IconDatabase, Input, Listbox, SidePanel, Modal, IconPlus } from 'ui'
-import { useStore } from 'hooks'
+import { useSchemasQuery } from 'data/database/schemas-query'
+import ActionBar from 'components/interfaces/TableGridEditor/SidePanelEditor/ActionBar'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { Table, TableOption } from './Wrappers.types'
 import { makeValidateRequired } from './Wrappers.utils'
-import ActionBar from 'components/interfaces/TableGridEditor/SidePanelEditor/ActionBar'
 
 export type WrapperTableEditorProps = {
   visible: boolean
@@ -126,8 +127,11 @@ const TableForm = ({
   onSubmit: OnSubmitFn
   initialData: any
 }) => {
-  const { meta } = useStore()
-  const schemas = meta.schemas.list()
+  const { project } = useProjectContext()
+  const { data: schemas } = useSchemasQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
 
   const requiredOptions =
     table.options.filter((option) => option.editable && option.required && !option.defaultValue) ??
@@ -173,8 +177,8 @@ const TableForm = ({
                 Create a new schema
               </Listbox.Option>
               <Modal.Separator />
-              {/* @ts-ignore */}
-              {schemas.map((schema: PostgresSchema) => {
+
+              {schemas?.map((schema) => {
                 return (
                   <Listbox.Option
                     key={schema.id}

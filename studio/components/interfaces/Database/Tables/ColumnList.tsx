@@ -1,15 +1,17 @@
-import { FC, useState } from 'react'
+import { useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
+import { noop } from 'lodash'
 import { Input, Button, IconSearch, IconPlus, IconChevronLeft, IconEdit3, IconTrash } from 'ui'
 import type { PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { useStore, checkPermissions } from 'hooks'
+import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import Table from 'components/to-be-cleaned/Table'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 
-interface Props {
+export interface ColumnListProps {
   selectedTable: PostgresTable
   onSelectBack: () => void
   onAddColumn: () => void
@@ -17,13 +19,13 @@ interface Props {
   onDeleteColumn: (column: any) => void
 }
 
-const ColumnList: FC<Props> = ({
+const ColumnList = ({
   selectedTable,
-  onSelectBack = () => {},
-  onAddColumn = () => {},
-  onEditColumn = () => {},
-  onDeleteColumn = () => {},
-}) => {
+  onSelectBack = noop,
+  onAddColumn = noop,
+  onEditColumn = noop,
+  onDeleteColumn = noop,
+}: ColumnListProps) => {
   const { meta } = useStore()
   const [filterString, setFilterString] = useState<string>('')
   const columns =
@@ -31,7 +33,7 @@ const ColumnList: FC<Props> = ({
       ? selectedTable.columns
       : selectedTable.columns?.filter((column: any) => column.name.includes(filterString))) ?? []
 
-  const isLocked = meta.excludedSchemas.includes(selectedTable.schema ?? '')
+  const isLocked = EXCLUDED_SCHEMAS.includes(selectedTable.schema ?? '')
   const canUpdateColumns = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
 
   return (

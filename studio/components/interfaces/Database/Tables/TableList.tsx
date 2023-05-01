@@ -1,4 +1,4 @@
-import { FC, useState } from 'react'
+import { useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import {
   Button,
@@ -12,45 +12,50 @@ import {
   IconLock,
   IconCheck,
 } from 'ui'
-import { partition } from 'lodash'
+import { noop, partition } from 'lodash'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import type { PostgresTable, PostgresSchema } from '@supabase/postgres-meta'
 
 import { useStore, checkPermissions } from 'hooks'
+import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
 import Table from 'components/to-be-cleaned/Table'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
-import type { PostgresTable, PostgresSchema } from '@supabase/postgres-meta'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { useSchemasQuery } from 'data/database/schemas-query'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
-interface Props {
-  selectedSchema: string
-  onSelectSchema: (schema: string) => void
+export interface TableListProps {
   onAddTable: () => void
   onEditTable: (table: any) => void
   onDeleteTable: (table: any) => void
   onOpenTable: (table: any) => void
 }
 
-const TableList: FC<Props> = ({
-  selectedSchema,
-  onSelectSchema = () => {},
-  onAddTable = () => {},
-  onEditTable = () => {},
-  onDeleteTable = () => {},
-  onOpenTable = () => {},
-}) => {
+const TableList = ({
+  onAddTable = noop,
+  onEditTable = noop,
+  onDeleteTable = noop,
+  onOpenTable = noop,
+}: TableListProps) => {
+  const { project } = useProjectContext()
+  const snap = useTableEditorStateSnapshot()
   const { meta } = useStore()
   const { isLoading } = meta.tables
   const [filterString, setFilterString] = useState<string>('')
   const canUpdateTables = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
-  const schemas: PostgresSchema[] = meta.schemas.list()
+  const { data: schemas } = useSchemasQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
   const [protectedSchemas, openSchemas] = partition(schemas, (schema) =>
-    meta.excludedSchemas.includes(schema?.name ?? '')
+    EXCLUDED_SCHEMAS.includes(schema?.name ?? '')
   )
 
   const allTables: PostgresTable[] = meta.tables.list(
-    (table: PostgresTable) => table.schema === selectedSchema
+    (table: PostgresTable) => table.schema === snap.selectedSchemaName
   )
   const tables =
     filterString.length === 0
@@ -62,8 +67,8 @@ const TableList: FC<Props> = ({
   const realtimePublication = publications.find(
     (publication) => publication.name === 'supabase_realtime'
   )
-  // @ts-ignore
-  const schema = schemas.find((schema) => schema.name === selectedSchema)
+
+  const schema = schemas?.find((schema) => schema.name === snap.selectedSchemaName)
   const isLocked = protectedSchemas.some((s) => s.id === schema?.id)
 
   return (
@@ -73,8 +78,8 @@ const TableList: FC<Props> = ({
           <div className="w-[230px]">
             <Listbox
               size="small"
-              value={selectedSchema}
-              onChange={onSelectSchema}
+              value={snap.selectedSchemaName}
+              onChange={snap.setSelectedSchemaName}
               icon={isLocked && <IconLock size={14} strokeWidth={2} />}
             >
               <Listbox.Option disabled key="normal-schemas" value="normal-schemas" label="Schemas">

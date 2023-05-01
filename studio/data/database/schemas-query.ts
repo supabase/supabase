@@ -1,60 +1,50 @@
-import { useCallback } from 'react'
-import { UseQueryOptions } from '@tanstack/react-query'
-import { ExecuteSqlData, useExecuteSqlPrefetch, useExecuteSqlQuery } from '../sql/execute-sql-query'
-
-export type Schema = {
-  name: string
-}
-
-export const getSchemasQuery = () => {
-  const sql = /* SQL */ `
-  SELECT nspname as name
-  FROM pg_namespace
-  WHERE
-    nspname not in ('information_schema', 'pg_catalog', 'pg_toast')
-    AND nspname not like 'pg_temp_%'
-    AND nspname not like 'pg_toast_temp_%'
-    AND has_schema_privilege(oid, 'CREATE, USAGE')
-  ORDER BY nspname;
-`.trim()
-
-  return sql
-}
+import { PostgresSchema } from '@supabase/postgres-meta'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { get } from 'lib/common/fetch'
+import { API_URL } from 'lib/constants'
+import { databaseKeys } from './keys'
 
 export type SchemasVariables = {
   projectRef?: string
   connectionString?: string
 }
 
-export type SchemasData = { result: Schema[] }
+export type Schema = PostgresSchema
+
+export type SchemasResponse = Schema[] | { error?: any }
+
+export async function getSchemas(
+  { projectRef, connectionString }: SchemasVariables,
+  signal?: AbortSignal
+) {
+  if (!projectRef) {
+    throw new Error('projectRef is required')
+  }
+
+  let headers = new Headers()
+  if (connectionString) headers.set('x-connection-encrypted', connectionString)
+
+  const response = (await get(`${API_URL}/pg-meta/${projectRef}/schemas`, {
+    headers: Object.fromEntries(headers),
+    signal,
+  })) as SchemasResponse
+
+  if (!Array.isArray(response) && response.error) {
+    throw response.error
+  }
+
+  return response as PostgresSchema[]
+}
+
+export type SchemasData = Awaited<ReturnType<typeof getSchemas>>
 export type SchemasError = unknown
 
-export const useSchemasQuery = <TData extends SchemasData = SchemasData>(
+export const useSchemasQuery = <TData = SchemasData>(
   { projectRef, connectionString }: SchemasVariables,
-  options: UseQueryOptions<ExecuteSqlData, SchemasError, TData> = {}
-) => {
-  return useExecuteSqlQuery(
-    {
-      projectRef,
-      connectionString,
-      sql: getSchemasQuery(),
-      queryKey: ['schemas'],
-    },
-    options
+  { enabled = true, ...options }: UseQueryOptions<SchemasData, SchemasError, TData> = {}
+) =>
+  useQuery<SchemasData, SchemasError, TData>(
+    databaseKeys.schemaList(projectRef),
+    ({ signal }) => getSchemas({ projectRef, connectionString }, signal),
+    { enabled: enabled && typeof projectRef !== 'undefined', ...options }
   )
-}
-
-export const useSchemasPrefetch = () => {
-  const prefetch = useExecuteSqlPrefetch()
-
-  return useCallback(
-    ({ projectRef, connectionString }: SchemasVariables) =>
-      prefetch({
-        projectRef,
-        connectionString,
-        sql: getSchemasQuery(),
-        queryKey: ['schemas'],
-      }),
-    [prefetch]
-  )
-}

@@ -1,4 +1,3 @@
-import { FC } from 'react'
 import { useRouter } from 'next/router'
 import { includes } from 'lodash'
 import { Button, Dropdown, IconEdit3, IconFileText, IconMoreVertical, IconTrash } from 'ui'
@@ -7,24 +6,25 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { checkPermissions, useStore } from 'hooks'
+import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import Table from 'components/to-be-cleaned/Table'
 
-interface Props {
+export interface FunctionListProps {
   schema: string
   filterString: string
   editFunction: (fn: any) => void
   deleteFunction: (fn: any) => void
 }
 
-const FunctionList: FC<Props> = ({
+const FunctionList = ({
   schema,
   filterString,
   editFunction = () => {},
   deleteFunction = () => {},
-}) => {
+}: FunctionListProps) => {
   const router = useRouter()
   const { ui, meta } = useStore()
-  const functions = meta.functions.list((fn: any) => !meta.excludedSchemas.includes(fn.schema))
+  const functions = meta.functions.list((fn: any) => !EXCLUDED_SCHEMAS.includes(fn.schema))
   const filteredFunctions = functions.filter((x: any) =>
     includes(x.name.toLowerCase(), filterString.toLowerCase())
   )

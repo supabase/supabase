@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react'
 import { noop, partition } from 'lodash'
-import { observer } from 'mobx-react-lite'
 import {
   Button,
   Dropdown,
@@ -17,19 +16,19 @@ import {
 } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import type { PostgresSchema } from '@supabase/postgres-meta'
 
 import { useParams } from 'common/hooks'
-import { checkPermissions, useStore, useLocalStorage } from 'hooks'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { checkPermissions, useLocalStorage } from 'hooks'
+import InfiniteList from 'components/ui/InfiniteList'
 import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
 import { Entity } from 'data/entity-types/entity-type-query'
+import { useSchemasQuery } from 'data/database/schemas-query'
+import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
-import InfiniteList from 'components/ui/InfiniteList'
 import EntityListItem from './EntityListItem'
 
 export interface TableEditorMenuProps {
-  selectedSchema?: string
-  onSelectSchema: (schema: string) => void
   onAddTable: () => void
   onEditTable: (table: Entity) => void
   onDeleteTable: (table: Entity) => void
@@ -37,15 +36,13 @@ export interface TableEditorMenuProps {
 }
 
 const TableEditorMenu = ({
-  selectedSchema,
-  onSelectSchema = noop,
   onAddTable = noop,
   onEditTable = noop,
   onDeleteTable = noop,
   onDuplicateTable = noop,
 }: TableEditorMenuProps) => {
-  const { meta } = useStore()
   const { id } = useParams()
+  const snap = useTableEditorStateSnapshot()
 
   const [searchText, setSearchText] = useState<string>('')
   const [sort, setSort] = useLocalStorage<'alphabetical' | 'grouped-alphabetical'>(
@@ -67,7 +64,7 @@ const TableEditorMenu = ({
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      schema: selectedSchema,
+      schema: snap.selectedSchemaName,
       search: searchText || undefined,
       sort,
     },
@@ -82,19 +79,24 @@ const TableEditorMenu = ({
     [data?.pages]
   )
 
-  const schemas: PostgresSchema[] = meta.schemas.list()
+  const {
+    data: schemas,
+    isLoading: isSchemasLoading,
+    isSuccess: isSchemasSuccess,
+  } = useSchemasQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
 
-  const schema = schemas.find((schema) => schema.name === selectedSchema)
+  const schema = schemas?.find((schema) => schema.name === snap.selectedSchemaName)
   const canCreateTables = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
-
-  const isLoadingTableMetadata = id ? !meta.tables.byId(id) : true
 
   const refreshTables = async () => {
     await refetch()
   }
 
   const [protectedSchemas, openSchemas] = partition(schemas, (schema) =>
-    meta.excludedSchemas.includes(schema?.name ?? '')
+    EXCLUDED_SCHEMAS.includes(schema?.name ?? '')
   )
   const isLocked = protectedSchemas.some((s) => s.id === schema?.id)
 
@@ -105,18 +107,20 @@ const TableEditorMenu = ({
     >
       {/* Schema selection dropdown */}
       <div className="px-3 mx-4">
-        {!meta.schemas.isInitialized ? (
+        {isSchemasLoading && (
           <div className="flex h-[26px] items-center space-x-3 rounded border border-gray-500 px-3">
             <IconLoader className="animate-spin" size={12} />
             <span className="text-xs text-scale-900">Loading schemas...</span>
           </div>
-        ) : (
+        )}
+
+        {isSchemasSuccess && (
           <Listbox
             size="tiny"
-            value={selectedSchema}
+            value={snap.selectedSchemaName}
             onChange={(name: string) => {
               setSearchText('')
-              onSelectSchema(name)
+              snap.setSelectedSchemaName(name)
             }}
           >
             <Listbox.Option
@@ -348,7 +352,7 @@ const TableEditorMenu = ({
                 onEditTable,
                 onDeleteTable,
                 onDuplicateTable,
-                isLoadingTableMetadata,
+                isLoadingTableMetadata: false, // TODO(alaister)
               }}
               getItemSize={() => 28}
               hasNextPage={hasNextPage}
@@ -362,4 +366,4 @@ const TableEditorMenu = ({
   )
 }
 
-export default observer(TableEditorMenu)
+export default TableEditorMenu

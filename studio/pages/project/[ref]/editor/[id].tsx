@@ -24,6 +24,7 @@ import {
 } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ForeignRowSelectorProps } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/ForeignRowSelector/ForeignRowSelector'
 import { useTheme } from 'common'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
 
 const TableEditorPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -32,11 +33,11 @@ const TableEditorPage: NextPageWithLayout = () => {
   const [_, setParams] = useUrlState({ arrayKeys: ['filter', 'sort'] })
 
   const { project } = useProjectContext()
+  const snap = useTableEditorStateSnapshot()
 
   const queryClient = useQueryClient()
 
   const { meta, ui } = useStore()
-  const [selectedSchema, setSelectedSchema] = useState<string>()
 
   const [isDeleting, setIsDeleting] = useState<boolean>(false)
   const [isDuplicating, setIsDuplicating] = useState<boolean>(false)
@@ -75,11 +76,11 @@ const TableEditorPage: NextPageWithLayout = () => {
         .find((table) => table.id === Number(id))
     : undefined
 
-  useEffect(() => {
-    if (selectedTable && 'schema' in selectedTable) {
-      setSelectedSchema(selectedTable.schema)
-    }
-  }, [selectedTable?.name])
+  // useEffect(() => {
+  //   if (selectedTable && 'schema' in selectedTable) {
+  //     setSelectedSchema(selectedTable.schema)
+  //   }
+  // }, [selectedTable?.name])
 
   const onAddRow = () => {
     setSidePanelKey('row')
@@ -221,7 +222,7 @@ const TableEditorPage: NextPageWithLayout = () => {
         ),
       ])
 
-      if (selectedSchema) await meta.views.loadBySchema(selectedSchema)
+      if (snap.selectedSchemaName) await meta.views.loadBySchema(snap.selectedSchemaName)
     } catch (error: any) {
       ui.setNotification({
         category: 'error',
@@ -240,7 +241,9 @@ const TableEditorPage: NextPageWithLayout = () => {
       const response: any = await meta.tables.del(selectedTableToDelete.id, isDeleteWithCascade)
       if (response.error) throw response.error
 
-      const tables = meta.tables.list((table: PostgresTable) => table.schema === selectedSchema)
+      const tables = meta.tables.list(
+        (table: PostgresTable) => table.schema === snap.selectedSchemaName
+      )
 
       await queryClient.invalidateQueries(entityTypeKeys.list(projectRef))
 
@@ -254,7 +257,7 @@ const TableEditorPage: NextPageWithLayout = () => {
         category: 'success',
         message: `Successfully deleted table "${selectedTableToDelete.name}"`,
       })
-      if (selectedSchema) await meta.views.loadBySchema(selectedSchema)
+      if (snap.selectedSchemaName) await meta.views.loadBySchema(snap.selectedSchemaName)
     } catch (error: any) {
       ui.setNotification({
         error,
@@ -269,15 +272,12 @@ const TableEditorPage: NextPageWithLayout = () => {
 
   return (
     <TableEditorLayout
-      selectedSchema={selectedSchema}
-      onSelectSchema={setSelectedSchema}
       onAddTable={onAddTable}
       onEditTable={onEditTable}
       onDeleteTable={onDeleteTable}
       onDuplicateTable={onDuplicateTable}
     >
       <TableGridEditor
-        selectedSchema={selectedSchema}
         selectedTable={selectedTable}
         sidePanelKey={sidePanelKey}
         isDuplicating={isDuplicating}

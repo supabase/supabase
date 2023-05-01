@@ -28,10 +28,6 @@ const ApiSettings: NextPageWithLayout = () => {
   PageContext.project = project
   if (meta) PageState.meta = meta
 
-  useEffect(() => {
-    if (project?.ref) meta.schemas.load()
-  }, [project?.ref])
-
   return (
     <PageContext.Provider value={PageState}>
       <div className="flex flex-col gap-8 px-5 py-6 mx-auto 1xl:px-28 lg:px-16 xl:px-24 2xl:px-32">
