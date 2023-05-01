@@ -13,12 +13,11 @@
   margin-left: -50%;
   transform: translateY(0);
   background-image: linear-gradient(to right, #026269 45%, transparent 50%, #026269 55%);
-  -webkit-mask-image: linear-gradient(90deg, #000 0.3px, transparent 0),
-    linear-gradient(180deg, #000 0.3px, transparent 0);
-  mask-image: linear-gradient(90deg, #000 0.3px, #000 0),
-    linear-gradient(180deg, #000 0.3px, #000 0);
-  -webkit-mask-size: 30px 30px;
-  mask-size: 30px 30px;
+  -webkit-mask-image: linear-gradient(90deg, #000 1px, transparent 0),
+    linear-gradient(180deg, #000 1px, transparent 0);
+  mask-image: linear-gradient(90deg, #000 1px, #000 0), linear-gradient(180deg, #000 1px, #000 0);
+  -webkit-mask-size: 25px 25px;
+  mask-size: 25px 25px;
   overflow: hidden;
   -webkit-mask-repeat: repeat;
   mask-repeat: repeat;
@@ -59,8 +58,8 @@
 @media (min-width: 1024px) {
   .hero-grid-lines {
     animation-duration: 30s;
-    -webkit-mask-size: 55px 55px;
-    mask-size: 55px 55px;
+    -webkit-mask-size: 40px 40px;
+    mask-size: 40px 40px;
   }
 }
 

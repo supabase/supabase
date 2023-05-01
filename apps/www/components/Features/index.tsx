@@ -40,9 +40,9 @@ const Card = ({
         animate="default"
         whileHover="hover"
       >
-        <div className="relative z-10 flex flex-col items-center mx-auto max-w-xs text-center gap-2 text-scale-1200">
-          <h3 className="xs:text-2xl text-xl">{title}</h3>
-          <p className="text-sm lg:text-base text-scale-1100">{subtitle}</p>
+        <div className="relative z-10 flex flex-col items-center mx-auto max-w-sm text-center gap-2 text-scale-1200">
+          <h3 className="text-xl">{title}</h3>
+          <p className="text-sm text-scale-1100">{subtitle}</p>
         </div>
         {image}
       </motion.div>
@@ -99,7 +99,7 @@ const Features = () => {
   const isSm = useBreakpoint(640)
 
   return (
-    <SectionContainer className="space-y-8 max-w-7xl pt-8 md:!pt-0">
+    <SectionContainer className="space-y-8 max-w-7xl mt-24 !pt-0">
       <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6 lg:grid-cols-6">
         <Card
           url={Solutions['database'].url}
@@ -215,7 +215,7 @@ const Features = () => {
           }
         />
       </dl>
-      <BackedBy className="block md:hidden" />
+      <BackedBy className="pt-8" layout="horizontal" />
     </SectionContainer>
   )
 }

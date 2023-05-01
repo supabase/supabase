@@ -1,24 +1,26 @@
 import React, { useEffect, useRef } from 'react'
 import styles from './hero.module.css'
 import { useWindowSize } from 'react-use'
+import { useBreakpoint } from 'common'
 
 const HeroBackground = () => {
-  const divRef = useRef(null)
+  const spacerRef = useRef(null)
   const { width } = useWindowSize()
+  const isSm = useBreakpoint(640)
 
   useEffect(() => {
     const divHeight =
       width < 768 ? 50000 / width : width > 1800 ? 30000 / width : (70000 / width) * 2
 
-    if (divRef?.current) {
-      ;(divRef.current as HTMLDivElement).style.height = `${Math.round(divHeight)}px`
+    if (spacerRef?.current) {
+      ;(spacerRef.current as HTMLDivElement).style.height = `${Math.round(divHeight)}px`
     }
   }, [width])
 
   const svgTraceWidth = 1680
   const svgTraceHeight = 915
   const svgPath =
-    'M2.16005e-05 -0.000998163L1680 0.129286V234L834.197 1068.2L-0.000248139 234.001L2.16005e-05 -0.000998163Z'
+    'M2.16005e-05 -0.000998163L1680 0.129286V234L890.763 1012.41C859.46 1043.28 809.108 1043.11 778.018 1012.02L-0.000248139 234.001L2.16005e-05 -0.000998163Z'
 
   return (
     <>
@@ -29,7 +31,8 @@ const HeroBackground = () => {
       >
         <div className="absolute w-screen h-screen">
           <div className={['w-full top-0 relative z-0', styles['shape-gradient']].join(' ')} />
-          <div ref={divRef} className="relative w-full bg-scale-100" />
+          <div className="absolute bottom-0 z-[1] w-full h-1/3 bg-gradient-to-t from-scale-100 to-transparent" />
+          <div ref={spacerRef} className="relative w-full bg-scale-100" />
           <div className={['2xl:-mt-52'].join(' ')}>
             <svg
               className={['-mt-1 relative z-[-2]', styles['triangle-svg']].join(' ')}
@@ -44,7 +47,7 @@ const HeroBackground = () => {
                 d={svgPath}
                 stroke="url(#electric-trace)"
                 strokeLinecap="round"
-                strokeWidth="2"
+                strokeWidth={isSm ? '4' : '2'}
               />
               <path
                 d={svgPath}
@@ -55,7 +58,7 @@ const HeroBackground = () => {
               <path d={svgPath} fill="var(--colors-scale1)" />
               <defs>
                 <linearGradient
-                  x1={svgTraceWidth / 2 - 100}
+                  x1={isSm ? svgTraceWidth : svgTraceWidth / 2 - 100}
                   y1={svgTraceHeight / 2}
                   x2={0}
                   y2={svgTraceHeight / 2}
@@ -63,21 +66,23 @@ const HeroBackground = () => {
                   gradientUnits="userSpaceOnUse"
                 >
                   <stop stopColor="#3ecf8e" stopOpacity="0" />
-                  <stop stopColor="#3ecf8e" stopOpacity="0.8" />
+                  <stop offset="0.5" stopColor="#3ecf8e" stopOpacity="0.8" />
                   <stop offset="1" stopColor="#3E9BCF" stopOpacity="0" />
                 </linearGradient>
-                <linearGradient
-                  x1={svgTraceWidth + 100}
-                  y1={svgTraceHeight / 2}
-                  x2={svgTraceWidth / 2}
-                  y2={svgTraceHeight / 2}
-                  id="electric-trace-right"
-                  gradientUnits="userSpaceOnUse"
-                >
-                  <stop stopColor="#3ecf8e" stopOpacity="0" />
-                  <stop stopColor="#3ecf8e" stopOpacity="0.8" />
-                  <stop offset="1" stopColor="#3E9BCF" stopOpacity="0" />
-                </linearGradient>
+                {!isSm && (
+                  <linearGradient
+                    x1={svgTraceWidth + 100}
+                    y1={svgTraceHeight / 2}
+                    x2={svgTraceWidth / 2}
+                    y2={svgTraceHeight / 2}
+                    id="electric-trace-right"
+                    gradientUnits="userSpaceOnUse"
+                  >
+                    <stop stopColor="#3ecf8e" stopOpacity="0" />
+                    <stop stopColor="#3ecf8e" stopOpacity="0.8" />
+                    <stop offset="1" stopColor="#3E9BCF" stopOpacity="0" />
+                  </linearGradient>
+                )}
               </defs>
             </svg>
           </div>
@@ -97,11 +102,11 @@ const HeroBackground = () => {
           ].join(' ')}
         >
           <div
-            className="z-[100] absolute inset-0 [--gradient-stop-1:0px] [--gradient-stop-2:50%]"
+            className="z-[100] absolute inset-0"
             style={{
               background: 'linear-gradient(to top, rgba(0,0,0,0) 0px, #000000 50%)',
             }}
-          ></div>
+          />
           <div
             style={{
               transform: 'rotateX(85deg)',
@@ -112,7 +117,7 @@ const HeroBackground = () => {
               right: 0,
             }}
           >
-            <div className={[styles['hero-grid-lines']].join(' ')}></div>
+            <div className={[styles['hero-grid-lines']].join(' ')} />
           </div>
         </div>
       </div>
