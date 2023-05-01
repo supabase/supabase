@@ -208,23 +208,30 @@ name: CI
 
 on:
   pull_request:
+  push:
+    branches:
+      - main
+      - develop
   workflow_dispatch:
 
 jobs:
   test:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v3
 
       - uses: supabase/setup-cli@v1
+        with:
+          version: latest
 
-      - name: Start Supabase local development setup
-        run: supabase start
+      - run: supabase db start
+      - run: supabase db lint
 
-      - name: Verify generated types are up-to-date
+      - name: Verify generated types are checked in
         run: |
-          supabase gen types typescript --local > types.ts
-          if [ "$(git diff --ignore-space-at-eol types.ts | wc -l)" -gt "0" ]; then
+          supabase gen types typescript --local > types.gen.ts
+          if ! git diff --ignore-space-at-eol --exit-code --quiet types.gen.ts; then
             echo "Detected uncommitted changes after build. See status below:"
             git diff
             exit 1
@@ -244,22 +251,23 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy:
-    runs-on: ubuntu-22.04
+  release:
+    runs-on: ubuntu-latest
 
     env:
       SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
       SUPABASE_DB_PASSWORD: ${{ secrets.STAGING_DB_PASSWORD }}
-      STAGING_PROJECT_ID: abcdefghijklmnopqrst
+      STAGING_PROJECT_ID: ${{ secrets.STAGING_PROJECT_ID }}
 
     steps:
       - uses: actions/checkout@v3
 
       - uses: supabase/setup-cli@v1
+        with:
+          version: latest
 
-      - run: |
-          supabase link --project-ref $STAGING_PROJECT_ID
-          supabase db push
+      - run: supabase link --project-ref $STAGING_PROJECT_ID
+      - run: supabase db push
 ```
 
 </TabPanel>
@@ -275,22 +283,23 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy:
-    runs-on: ubuntu-22.04
+  release:
+    runs-on: ubuntu-latest
 
     env:
       SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
       SUPABASE_DB_PASSWORD: ${{ secrets.PRODUCTION_DB_PASSWORD }}
-      PRODUCTION_PROJECT_ID: abcdefghijklmnopqrst
+      PRODUCTION_PROJECT_ID: ${{ secrets.PRODUCTION_PROJECT_ID }}
 
     steps:
       - uses: actions/checkout@v3
 
       - uses: supabase/setup-cli@v1
+        with:
+          version: latest
 
-      - run: |
-          supabase link --project-ref $PRODUCTION_PROJECT_ID
-          supabase db push
+      - run: supabase link --project-ref $PRODUCTION_PROJECT_ID
+      - run: supabase db push
 ```
 
 </TabPanel>
