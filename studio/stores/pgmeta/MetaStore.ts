@@ -1,5 +1,5 @@
 import Papa from 'papaparse'
-import { makeObservable, observable } from 'mobx'
+import { makeObservable } from 'mobx'
 import { find, isUndefined, isEqual, isEmpty, chunk } from 'lodash'
 import { Query } from 'components/grid/query/Query'
 
@@ -8,7 +8,6 @@ import type {
   PostgresTable,
   PostgresRelationship,
   PostgresPrimaryKey,
-  PostgresSchema,
 } from '@supabase/postgres-meta'
 
 import { IS_PLATFORM, API_URL } from 'lib/constants'
@@ -214,7 +213,7 @@ export default class MetaStore implements IMetaStore {
     )
     this.types = new TypesStore(this.rootStore, `${this.baseUrl}/types`, this.headers)
 
-    makeObservable(this)
+    makeObservable(this, {})
   }
 
   /**
