@@ -50,7 +50,7 @@ const TableList = ({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const [protectedSchemas, openSchemas] = partition(schemas, (schema) =>
+  const [protectedSchemas, openSchemas] = partition(schemas ?? [], (schema) =>
     EXCLUDED_SCHEMAS.includes(schema?.name ?? '')
   )
 
@@ -85,7 +85,6 @@ const TableList = ({
               <Listbox.Option disabled key="normal-schemas" value="normal-schemas" label="Schemas">
                 <p className="text-sm">Schemas</p>
               </Listbox.Option>
-              {/* @ts-ignore */}
               {openSchemas.map((schema) => (
                 <Listbox.Option
                   key={schema.id}
