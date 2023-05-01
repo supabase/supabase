@@ -1,28 +1,23 @@
 import React, { useEffect, useRef } from 'react'
 import styles from './hero.module.css'
 import { useWindowSize } from 'react-use'
-import { useTheme } from 'common'
-import { motion } from 'framer-motion'
 
 const HeroBackground = () => {
   const divRef = useRef(null)
-  const { isDarkMode } = useTheme()
   const { width } = useWindowSize()
 
   useEffect(() => {
-    const newHeight =
-      width < 768 ? 100000 / width : width > 1800 ? 30000 / width : (70000 / width) * 2
+    const divHeight =
+      width < 768 ? 50000 / width : width > 1800 ? 30000 / width : (70000 / width) * 2
 
     if (divRef?.current) {
-      ;(divRef.current as HTMLDivElement).style.height = `${Math.round(newHeight)}px`
-      console.log(width, newHeight)
+      ;(divRef.current as HTMLDivElement).style.height = `${Math.round(divHeight)}px`
     }
   }, [width])
 
   const svgTraceWidth = 1680
   const svgTraceHeight = 915
   const svgPath =
-    // 'M2.16005e-05 -0.000998163L1680 0.129286V234L834.197 1068.2L-0.000248139 234.001L2.16005e-05 -0.000998163Z'
     'M2.16005e-05 -0.000998163L1680 0.129286V234L834.197 1068.2L-0.000248139 234.001L2.16005e-05 -0.000998163Z'
 
   return (
@@ -59,44 +54,6 @@ const HeroBackground = () => {
               />
               <path d={svgPath} fill="var(--colors-scale1)" />
               <defs>
-                {/* 
-                // Animated trace
-                <motion.linearGradient
-                  animate={{
-                    x2: [
-                      -svgTraceWidth / 2,
-                      svgTraceWidth / 3,
-                      // (svgTraceWidth / 5) * 2,
-                      svgTraceWidth,
-                      svgTraceWidth,
-                    ],
-                    x1: [0, svgTraceWidth / 2, svgTraceWidth * 1.5, svgTraceWidth * 1.5],
-                    y1: [
-                      svgTraceHeight / 2,
-                      svgTraceHeight / 2,
-                      svgTraceHeight / 2,
-                      svgTraceHeight / 2,
-                    ],
-                    y2: [
-                      svgTraceHeight / 2,
-                      svgTraceHeight / 2,
-                      svgTraceHeight / 2,
-                      svgTraceHeight / 2,
-                    ],
-                  }}
-                  transition={{
-                    duration: 6,
-                    repeat: Infinity,
-                    ease: 'linear',
-                    delay: 4,
-                  }}
-                  id="electric-trace"
-                  gradientUnits="userSpaceOnUse"
-                >
-                  <stop stopColor="#3ecf8e" stopOpacity="0" />
-                  <stop stopColor="#3ecf8e" stopOpacity="0.8" />
-                  <stop offset="1" stopColor="#3E9BCF" stopOpacity="0" />
-                </motion.linearGradient> */}
                 <linearGradient
                   x1={svgTraceWidth / 2 - 100}
                   y1={svgTraceHeight / 2}
