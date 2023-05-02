@@ -91,7 +91,7 @@ const levelsData = {
     icon: '/docs/img/icons/menu/reference-python',
     name: 'Python Reference v2.0',
   },
-  reference_swift_v1: {
+  reference_swift_v0: {
     icon: '/docs/img/icons/menu/reference-swift',
     name: 'Swift Reference v1.0',
   },
