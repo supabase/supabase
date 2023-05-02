@@ -81,6 +81,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
           request.path as path,
           request.method as method,
           request.search as search,
+          response.status_code as status_code,
           count(t.id) as count
         from edge_logs t
           cross join unnest(metadata) as m
@@ -89,11 +90,11 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
           cross join unnest(request.headers) as headers
           ${generateRexepWhere(filters)}
         group by
-          request.path, request.method, request.search
+          request.path, request.method, request.search, response.status_code
         order by
           count desc
         limit
-        5
+        3
         `
       },
       errorCounts: {
@@ -138,7 +139,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
         order by
           count desc
         limit
-        5
+        3
         `
       },
       responseSpeed: {
