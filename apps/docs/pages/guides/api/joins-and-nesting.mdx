@@ -138,9 +138,9 @@ create table
 
 create table
   members (
-    "id" serial primary key,
     "user_id" int references users,
-    "team_id" int references teams
+    "team_id" int references teams,
+    primary key(user_id, team_id)
   );
 ```
 

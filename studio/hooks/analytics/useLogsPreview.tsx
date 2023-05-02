@@ -15,10 +15,12 @@ import {
   LogsTableName,
   PREVIEWER_DATEPICKER_HELPERS,
 } from 'components/interfaces/Settings/Logs'
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react'
+import { Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from 'react'
 import { API_URL } from 'lib/constants'
 import { get } from 'lib/common/fetch'
 import dayjs from 'dayjs'
+import useFillTimeseriesSorted from './useFillTimeseriesSorted'
+import useTimeseriesUnixToIso from './useTimeseriesUnixToIso'
 
 interface Data {
   logData: LogData[]
@@ -29,7 +31,7 @@ interface Data {
   filters: Filters
   params: LogsEndpointParams
   oldestTimestamp?: string
-  eventChartData: EventChartData[] | null
+  eventChartData: EventChartData[]
 }
 interface Handlers {
   loadOlder: () => void
@@ -176,6 +178,22 @@ function useLogsPreview(
       setFilters({ ...newFilters, ...filterOverride })
     }
   }
+
+  const normalizedEventChartData = useTimeseriesUnixToIso(
+    eventChartResponse?.result || [],
+    'timestamp'
+  )
+
+  const eventChartData = useFillTimeseriesSorted(
+    normalizedEventChartData,
+    'timestamp',
+    'count',
+    0,
+    params.iso_timestamp_start ,
+    // default to current time if not set
+    params.iso_timestamp_end || new Date().toISOString()
+  )
+
   return [
     {
       newCount,
@@ -186,7 +204,7 @@ function useLogsPreview(
       filters,
       params,
       oldestTimestamp: oldestTimestamp ? String(oldestTimestamp) : undefined,
-      eventChartData: eventChartResponse?.result || null,
+      eventChartData,
     },
     {
       setFilters: handleSetFilters,
