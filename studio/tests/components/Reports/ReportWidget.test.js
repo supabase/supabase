@@ -3,11 +3,10 @@ import { useRouter } from 'next/router'
 import { screen } from '@testing-library/react'
 import { render } from '../../helpers'
 import ReportWidget from 'components/interfaces/Reports/ReportWidget'
+import userEvent from '@testing-library/user-event'
 beforeEach(() => {
   // reset mocks between tests
   get.mockReset()
-  useRouter.mockReset()
-  useRouter.mockReturnValue(defaultRouterMock())
 })
 
 test('static elements', async () => {
@@ -16,13 +15,8 @@ test('static elements', async () => {
   await screen.findByText(/something/)
 })
 
-test("lazy load component expandable", async ()=>{
-  const Expandable = ()=> "expanded"
-  render(<ReportWidget data={[]} renderer={() => null} expandable={Expandable} />)
-  await screen.findByText(/Expand/)
-})
-
-test("customize expandable text", async ()=>{
-  render(<ReportWidget data={[]} renderer={() => null} expandable={()=> null} expandableText="open_me"/>)
-  await screen.findByText(/open_me/)
+test("append", async ()=>{
+  const appendable = ()=> "some text"
+  render(<ReportWidget data={[]} renderer={() => null} append={appendable} />)
+  await screen.findByText(/some text/)
 })
