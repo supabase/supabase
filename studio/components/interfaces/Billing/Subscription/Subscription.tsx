@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
+import Link from 'next/link'
 import { FC, useEffect } from 'react'
-import { useRouter } from 'next/router'
 import { Button, Loading } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
@@ -23,7 +23,6 @@ interface Props {
 }
 
 const Subscription: FC<Props> = ({ showProjectName = false }) => {
-  const router = useRouter()
   const { ui } = useStore()
   const { ref: projectRef } = useParams()
   const isActive = useIsProjectActive()
@@ -41,10 +40,12 @@ const Subscription: FC<Props> = ({ showProjectName = false }) => {
     isLoading: loading,
     error,
   } = useProjectSubscriptionQuery({ projectRef: ui.selectedProject?.ref })
-  const { data: usage, isLoading: loadingUsage } = useProjectUsageQuery({ projectRef })
+  const { data: usage } = useProjectUsageQuery({ projectRef })
 
   const isPayg = subscription?.tier.prod_id === STRIPE_PRODUCT_IDS.PAYG
+  const isTeam = subscription?.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.TEAM
   const isEnterprise = subscription?.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
+  const canOnlyUpdateAddons = isTeam || isEnterprise
 
   const addOns = subscription?.addons ?? []
   const paid = subscription && subscription.tier.unit_amount > 0
@@ -69,6 +70,12 @@ const Subscription: FC<Props> = ({ showProjectName = false }) => {
     return basePlanCost + totalAddOnCost + totalUsageCost
   }
 
+  const subscriptionUpdateURL = isEnterprise
+    ? `/project/${projectRef}/settings/billing/update/enterprise`
+    : isTeam
+    ? `/project/${projectRef}/settings/billing/update/team`
+    : `/project/${projectRef}/settings/billing/update`
+
   useEffect(() => {
     if (error) {
       ui.setNotification({
@@ -92,18 +99,16 @@ const Subscription: FC<Props> = ({ showProjectName = false }) => {
             <div className="flex flex-col items-end space-y-2">
               <Tooltip.Root delayDuration={0}>
                 <Tooltip.Trigger>
-                  <Button
-                    disabled={!canUpdateSubscription || projectUpdateDisabled || !isActive}
-                    onClick={() => {
-                      const url = isEnterprise
-                        ? `/project/${projectRef}/settings/billing/update/enterprise`
-                        : `/project/${projectRef}/settings/billing/update`
-                      router.push(url)
-                    }}
-                    type="primary"
-                  >
-                    {isEnterprise ? 'Change add-ons' : 'Change subscription'}
-                  </Button>
+                  <Link href={subscriptionUpdateURL}>
+                    <a>
+                      <Button
+                        type="primary"
+                        disabled={!canUpdateSubscription || projectUpdateDisabled || !isActive}
+                      >
+                        {canOnlyUpdateAddons ? 'Change add-ons' : 'Change subscription'}
+                      </Button>
+                    </a>
+                  </Link>
                 </Tooltip.Trigger>
                 {!canUpdateSubscription || projectUpdateDisabled || !isActive ? (
                   <Tooltip.Portal>
