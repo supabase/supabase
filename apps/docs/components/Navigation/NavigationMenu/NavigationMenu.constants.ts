@@ -22,7 +22,7 @@ export const REFERENCES: References = {
   swift: {
     name: 'Swift',
     library: 'supabase-swift',
-    versions: ['v1'],
+    versions: ['v0'],
     icon: '/docs/img/libraries/swift-icon.svg',
   },
   cli: {
@@ -472,6 +472,10 @@ export const database = {
           url: '/guides/database/postgres/indexes',
         },
         {
+          name: 'Cascade Deletes',
+          url: '/guides/database/postgres/cascade-deletes',
+        },
+        {
           name: 'Drop All Tables in Schema',
           url: '/guides/database/postgres/dropping-all-tables-in-schema',
         },
@@ -587,6 +591,7 @@ export const functions = {
         { name: 'Browserless.io', url: '/guides/functions/examples/screenshots' },
         { name: 'OpenAI API', url: '/guides/functions/examples/openai' },
         { name: 'Upstash Redis', url: '/guides/functions/examples/upstash-redis' },
+        { name: 'Type-Safe SQL with Kysely', url: '/guides/functions/kysely-postgres' },
       ],
     },
     {
@@ -1049,7 +1054,7 @@ export const reference_python_v2 = {
   parent: '/reference',
 }
 
-export const reference_swift_v1 = {
+export const reference_swift_v0 = {
   icon: 'reference-swift',
   title: 'swift',
   url: 'guides/reference/swift',
@@ -1172,7 +1177,7 @@ export const references = [
       },
       {
         label: 'supabase-swift',
-        versions: ['v1'],
+        versions: ['v0'],
         description: 'something about the reference',
         icon: '/docs/img/icons/swift-icon.svg',
         url: '/reference/swift/start',
