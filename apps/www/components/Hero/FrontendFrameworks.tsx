@@ -44,7 +44,7 @@ const frameworks = [
 const FrontendFrameworks = ({ className }: { className?: string }) => {
   return (
     <div className={['flex text-center flex-col items-center', className].join(' ')}>
-      <small className="small">Use Supabase with any frontend</small>
+      <small className="small">Works seamlessly with +30 frameworks</small>
       <div className="w-full sm:max-w-lg mt-4 md:mt-3 lg:ml-0">
         <div className="flex flex-wrap items-center justify-center gap-2 sm:flex-nowrap">
           {frameworks.map((framework) => (
