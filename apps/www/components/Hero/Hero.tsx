@@ -1,8 +1,8 @@
 import Link from 'next/link'
 import { Button, IconBookOpen } from 'ui'
 import SectionContainer from '../Layouts/SectionContainer'
-import { motion } from 'framer-motion'
 import HeroBackground from './HeroBackground'
+import FrontendFrameworks from './FrontendFrameworks'
 
 const Hero = () => (
   <div className="relative">
@@ -24,7 +24,7 @@ const Hero = () => (
                     Scale to millions.
                   </span>
                 </h1>
-                <p className="py-2 text-scale-1200 !mb-0 mt-1.5 text-sm sm:mt-5 sm:text-base lg:text-lg">
+                <p className="pt-2 text-scale-1200 !mb-0 mt-1.5 text-sm sm:mt-5 sm:text-base lg:text-lg">
                   Supabase is an open source Firebase alternative for building secure and performant
                   Postgres backends with minimal configuration.
                 </p>
@@ -45,6 +45,7 @@ const Hero = () => (
                   </a>
                 </Link>
               </div>
+              <FrontendFrameworks className="mt-4 lg:mt-6" />
             </div>
           </div>
         </div>
