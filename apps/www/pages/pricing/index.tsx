@@ -69,7 +69,6 @@ export default function IndexPage() {
         '8GB database & 100GB file storage',
         '50GB bandwidth',
         '5GB file uploads',
-        'Social OAuth providers',
         '100,000 monthly active users',
         '2M Edge Function invocations',
         'Daily backups',
