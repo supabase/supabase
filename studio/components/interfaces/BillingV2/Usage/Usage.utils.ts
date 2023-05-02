@@ -6,7 +6,7 @@ export const generateUsageData = (attribute: string, days: number): DataPoint[] 
   return tempArray.map((x, idx) => {
     return {
       loopId: (idx + 1).toString(),
-      period_start: '',
+      period_start: `${idx + 1}`,
       [attribute]: Math.floor(Math.random() * 100).toString(),
     }
   })

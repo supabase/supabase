@@ -49,10 +49,18 @@ export type DailyStatsVariables = {
   startDate?: string
   endDate?: string
   interval?: string
+  dateFormat?: string
 }
 
 export async function getDailyStats(
-  { projectRef, attribute, startDate, endDate, interval = '1d' }: DailyStatsVariables,
+  {
+    projectRef,
+    attribute,
+    startDate,
+    endDate,
+    interval = '1d',
+    dateFormat = 'DD MMM',
+  }: DailyStatsVariables,
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('Project ref is required')

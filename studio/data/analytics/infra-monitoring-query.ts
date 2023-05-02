@@ -4,13 +4,16 @@ import { API_URL } from 'lib/constants'
 import { useCallback } from 'react'
 import { analyticsKeys } from './keys'
 import { AnalyticsData } from './constants'
+import dayjs from 'dayjs'
 
 export type InfraMonitoringVariables = {
   projectRef?: string
-  attribute?: 'cpu_usage' | 'disk_io_budget' | 'ram_usage'
+  attribute: 'cpu_usage' | 'disk_io_budget' | 'ram_usage'
   startDate?: string
   endDate?: string
   interval?: string
+  dateFormat?: string
+  modifier?: (x: number) => number
 }
 
 export async function getInfraMonitoring(
@@ -20,7 +23,7 @@ export async function getInfraMonitoring(
   if (!projectRef) throw new Error('Project ref is required')
   if (!attribute) throw new Error('Attribute is required')
   if (!startDate) throw new Error('Start date is required')
-  if (!endDate) throw new Error('Start date is required')
+  if (!endDate) throw new Error('End date is required')
 
   const data = await get(
     `${API_URL}/projects/${projectRef}/infra-monitoring?attribute=${attribute}&startDate=${encodeURIComponent(
@@ -36,7 +39,15 @@ export type InfraMonitoringData = Awaited<ReturnType<typeof getInfraMonitoring>>
 export type InfraMonitoringError = unknown
 
 export const useInfraMonitoringQuery = <TData = InfraMonitoringData>(
-  { projectRef, attribute, startDate, endDate, interval = '1d' }: InfraMonitoringVariables,
+  {
+    projectRef,
+    attribute,
+    startDate,
+    endDate,
+    interval = '1d',
+    dateFormat = 'DD MMM',
+    modifier,
+  }: InfraMonitoringVariables,
   {
     enabled = true,
     ...options
@@ -47,7 +58,26 @@ export const useInfraMonitoringQuery = <TData = InfraMonitoringData>(
     ({ signal }) =>
       getInfraMonitoring({ projectRef, attribute, startDate, endDate, interval }, signal),
     {
-      enabled: enabled && typeof projectRef !== 'undefined',
+      enabled:
+        enabled &&
+        typeof projectRef !== 'undefined' &&
+        typeof attribute !== 'undefined' &&
+        typeof startDate !== 'undefined' &&
+        typeof endDate !== 'undefined',
+      // @ts-ignore
+      select(data) {
+        return {
+          ...data,
+          data: data.data.map((x) => {
+            return {
+              ...x,
+              [attribute]:
+                modifier !== undefined ? modifier(Number(x[attribute])) : Number(x[attribute]),
+              period_start: dayjs(x.period_start).format(dateFormat),
+            }
+          }),
+        }
+      },
       ...options,
     }
   )
