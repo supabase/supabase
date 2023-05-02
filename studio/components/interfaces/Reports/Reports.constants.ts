@@ -147,8 +147,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
         sql: (filters) => `
         select
           cast(timestamp_trunc(t.timestamp, hour) as datetime) as timestamp,
-          avg(response.origin_time) as avg,
-          APPROX_QUANTILES(response.origin_time, 100) as quantiles
+          avg(response.origin_time) as avg
         FROM
           edge_logs t
           cross join unnest(metadata) as m
