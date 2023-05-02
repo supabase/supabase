@@ -1,24 +1,21 @@
 import Solutions from 'data/Solutions.json'
-<<<<<<< HEAD
 import Telemetry from '~/lib/telemetry'
 import gaEvents from '~/lib/gaEvents'
 import { useTelemetryProps } from 'common/hooks/useTelemetryProps'
 import { useRouter } from 'next/router'
-import Link from 'next/link'
-=======
->>>>>>> 57f0cd67d (chore: improve performance and accessibility)
 import Image from 'next/image'
 import SectionContainer from '../Layouts/SectionContainer'
 import { motion } from 'framer-motion'
 import BackedBy from '../BackedBy'
-import { useBreakpoint } from 'common'
+import { useBreakpoint, useTheme } from 'common'
 import FeatureCard from './FeatureCard'
 
 const opacityVariant = {
-  default: { opacity: 0 },
+  default: { opacity: 1, filter: 'grayscale(1)', transition: { duration: 0.1 } },
   hover: {
     opacity: 1,
-    transition: { duration: 0.2 },
+    filter: 'grayscale(0)',
+    transition: { duration: 0.15 },
   },
 }
 
@@ -61,6 +58,7 @@ const Features = () => {
     }
   }
   const isSm = useBreakpoint(640)
+  const { isDarkMode } = useTheme()
 
   return (
     <SectionContainer className="space-y-8 max-w-7xl mt-24 lg:mt-0 !pt-0">
@@ -77,26 +75,20 @@ const Features = () => {
           }
           onClick={() => sendTelemetryEvent(name)}
           image={
-            <div className="absolute inset-0 z-0">
-              <motion.div className="absolute inset-0 z-10" variants={opacityVariant}>
-                <Image
-                  src="/images/index/database-dark-hover.jpg"
-                  alt="Supabase Postgres Database, hover image with glow"
-                  layout="fill"
-                  objectPosition={isSm ? 'bottom' : '50% 50%'}
-                  objectFit={isSm ? 'contain' : 'cover'}
-                  quality={95}
-                />
-              </motion.div>
+            <motion.div className="absolute inset-0 z-0" variants={opacityVariant}>
               <Image
-                src="/images/index/database-dark.jpg"
-                alt="Supabase Postgres Database"
+                src={
+                  isDarkMode
+                    ? '/images/index/database-dark-hover.jpg'
+                    : '/images/index/database-light-hover.jpg'
+                }
+                alt="Supabase Postgres Database, hover image with glow"
                 layout="fill"
                 objectPosition={isSm ? 'bottom' : '50% 50%'}
                 objectFit={isSm ? 'contain' : 'cover'}
-                quality={95}
+                quality={100}
               />
-            </div>
+            </motion.div>
           }
           classname="col-span-full md:col-span-3"
         />
@@ -111,23 +103,19 @@ const Features = () => {
             </>
           }
           image={
-            <div className="absolute inset-0 z-0">
-              <motion.div className="absolute inset-0 z-10" variants={opacityVariant}>
-                <Image
-                  src="/images/index/auth-dark-hover.jpg"
-                  alt="Supabase Authentication feature, hover image with glow"
-                  layout="fill"
-                  objectPosition="50% 50%"
-                  objectFit="cover"
-                />
-              </motion.div>
+            <motion.div className="absolute inset-0 z-0" variants={opacityVariant}>
               <Image
-                src="/images/index/auth-dark.jpg"
+                src={
+                  isDarkMode
+                    ? '/images/index/auth-dark-hover.jpg'
+                    : '/images/index/auth-light-hover.jpg'
+                }
+                alt="Supabase Authentication feature, hover image with glow"
                 layout="fill"
                 objectPosition="50% 50%"
                 objectFit="cover"
               />
-            </div>
+            </motion.div>
           }
           classname="md:col-span-3 lg:!col-span-2"
           onClick={() => sendTelemetryEvent(name)}
@@ -137,33 +125,27 @@ const Features = () => {
           title={Solutions['storage'].name}
           subtitle={
             <>
-              Store, organize, and serve large files.
-              <br className="inline-block sm:hidden lg:inline-block" /> Any media, including videos
-              and images.
+              Store, organize, and serve large files,
+              <br className="inline-block sm:hidden lg:inline-block" /> from videos to images.
             </>
           }
           image={
-            <div className="absolute inset-0 z-0">
-              <motion.div className="absolute inset-0 z-10" variants={opacityVariant}>
-                <Image
-                  src="/images/index/storage-dark-hover.jpg"
-                  alt="Supabase Storage feature, hover image with glow"
-                  layout="fill"
-                  objectPosition="50% 50%"
-                  objectFit="cover"
-                  quality={95}
-                />
-              </motion.div>
+            <motion.div className="absolute inset-0 z-0" variants={opacityVariant}>
               <Image
-                src="/images/index/storage-dark.jpg"
-                alt="Supabase Storage feature"
+                src={
+                  isDarkMode
+                    ? '/images/index/storage-dark-hover.jpg'
+                    : '/images/index/storage-light-hover.jpg'
+                }
+                alt="Supabase Storage feature, hover image with glow"
                 layout="fill"
                 objectPosition="50% 50%"
                 objectFit="cover"
+                quality={95}
               />
-            </div>
+            </motion.div>
           }
-          classname="md:!col-span-2"
+          classname="md:!col-span-2 md:h-[390px]"
           onClick={() => sendTelemetryEvent(name)}
         />
         <FeatureCard
@@ -171,61 +153,57 @@ const Features = () => {
           title={Solutions['edge-functions'].name}
           subtitle={
             <>
-              Write custom code without deploying
-              <br className="inline-block sm:hidden lg:inline-block" /> or scaling servers.
+              Easily write custom code
+              <br className="inline-block sm:hidden lg:inline-block" /> without deploying or scaling
+              servers.
             </>
           }
           onClick={() => sendTelemetryEvent(name)}
           image={
-            <div className="absolute inset-0 z-0">
-              <motion.div className="absolute inset-0 z-10" variants={opacityVariant}>
-                <Image
-                  src="/images/index/edge-dark-hover.jpg"
-                  alt="Supabase Edge Functions feature, hover image with glow"
-                  layout="fill"
-                  objectPosition={isSm ? 'bottom' : '50% 50%'}
-                  objectFit={isSm ? 'contain' : 'cover'}
-                  quality={90}
-                />
-              </motion.div>
+            <motion.div className="absolute inset-0 z-0" variants={opacityVariant}>
               <Image
-                src="/images/index/edge-dark.jpg"
-                alt="Supabase Edge Functions feature"
+                src={
+                  isDarkMode
+                    ? '/images/index/edge-dark-hover.jpg'
+                    : '/images/index/edge-light-hover.jpg'
+                }
+                alt="Supabase Edge Functions feature, hover image with glow"
                 layout="fill"
                 objectPosition={isSm ? 'bottom' : '50% 50%'}
                 objectFit={isSm ? 'contain' : 'cover'}
                 quality={90}
               />
-            </div>
+            </motion.div>
           }
-          classname="md:!col-span-2"
+          classname="md:!col-span-2 md:h-[390px]"
         />
         <FeatureCard
           url={Solutions['realtime'].url}
           title={Solutions['realtime'].name}
-          subtitle={Solutions['realtime'].description}
+          subtitle={
+            <>
+              Build multiplayer experiences
+              <br className="inline-block sm:hidden lg:inline-block" /> with realtime data
+              synchronization.
+            </>
+          }
           image={
-            <div className="absolute inset-0 z-0">
-              <motion.div className="absolute inset-0 z-10" variants={opacityVariant}>
-                <Image
-                  src="/images/index/realtime-dark-hover.jpg"
-                  alt="Supabase Edge Functions feature, hover image with glow"
-                  layout="fill"
-                  objectPosition={isSm ? 'bottom' : '50% 50%'}
-                  objectFit={isSm ? 'contain' : 'cover'}
-                />
-              </motion.div>
+            <motion.div className="absolute inset-0 z-0" variants={opacityVariant}>
               <Image
-                src="/images/index/realtime-dark.jpg"
-                alt="Supabase Edge Functions feature"
+                src={
+                  isDarkMode
+                    ? '/images/index/realtime-dark-hover.jpg'
+                    : '/images/index/realtime-light-hover.jpg'
+                }
+                alt="Supabase Edge Functions feature, hover image with glow"
                 layout="fill"
                 objectPosition={isSm ? 'bottom' : '50% 50%'}
                 objectFit={isSm ? 'contain' : 'cover'}
                 quality={95}
               />
-            </div>
+            </motion.div>
           }
-          classname="md:!col-span-2"
+          classname="md:!col-span-2 md:h-[390px]"
         />
       </dl>
       <BackedBy className="pt-8" layout="horizontal" />

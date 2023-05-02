@@ -113,7 +113,7 @@ const HeroGrid = () => {
             y2: [svgGridOptions.boxHeight, svgGridOptions.boxHeight / 2, 0],
           }}
           transition={{
-            duration: isSm ? 3 : 5,
+            duration: isSm ? 4 : 5,
             repeat: Infinity,
             ease: 'linear',
           }}
@@ -132,7 +132,7 @@ const HeroGrid = () => {
             y2: [svgGridOptions.boxHeight, svgGridOptions.boxHeight / 2, 0],
           }}
           transition={{
-            duration: isSm ? 3 : 5,
+            duration: isSm ? 4 : 5,
             repeat: Infinity,
             ease: 'linear',
             delay: 2,
