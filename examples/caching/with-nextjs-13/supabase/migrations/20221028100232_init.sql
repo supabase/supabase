@@ -1,5 +1,5 @@
 create table if not exists articles (
-  id uuid default uuid_generate_v4() primary key,
+  id uuid default gen_random_uuid() primary key,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,
   title text not null,
   content text not null,
