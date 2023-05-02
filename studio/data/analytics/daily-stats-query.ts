@@ -4,10 +4,11 @@ import { API_URL } from 'lib/constants'
 import { useCallback } from 'react'
 import { analyticsKeys } from './keys'
 import { AnalyticsData } from './constants'
+import dayjs from 'dayjs'
 
 export type DailyStatsVariables = {
   projectRef?: string
-  attribute?:
+  attribute:
     | 'total_realtime_egress'
     | 'total_realtime_requests'
     | 'total_realtime_ingress'
@@ -50,17 +51,11 @@ export type DailyStatsVariables = {
   endDate?: string
   interval?: string
   dateFormat?: string
+  modifier?: (x: number) => number
 }
 
 export async function getDailyStats(
-  {
-    projectRef,
-    attribute,
-    startDate,
-    endDate,
-    interval = '1d',
-    dateFormat = 'DD MMM',
-  }: DailyStatsVariables,
+  { projectRef, attribute, startDate, endDate, interval = '1d' }: DailyStatsVariables,
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('Project ref is required')
@@ -82,14 +77,44 @@ export type DailyStatsData = Awaited<ReturnType<typeof getDailyStats>>
 export type DailyStatsError = unknown
 
 export const useDailyStatsQuery = <TData = DailyStatsData>(
-  { projectRef, attribute, startDate, endDate, interval = '1d' }: DailyStatsVariables,
+  {
+    projectRef,
+    attribute,
+    startDate,
+    endDate,
+    interval = '1d',
+    dateFormat,
+    modifier,
+  }: DailyStatsVariables,
   { enabled = true, ...options }: UseQueryOptions<DailyStatsData, DailyStatsError, TData> = {}
 ) =>
   useQuery<DailyStatsData, DailyStatsError, TData>(
     analyticsKeys.dailyStats(projectRef, { attribute, startDate, endDate, interval }),
     ({ signal }) => getDailyStats({ projectRef, attribute, startDate, endDate, interval }, signal),
     {
-      enabled: enabled && typeof projectRef !== 'undefined',
+      enabled:
+        enabled &&
+        typeof projectRef !== 'undefined' &&
+        typeof attribute !== 'undefined' &&
+        typeof startDate !== 'undefined' &&
+        typeof endDate !== 'undefined',
+      // @ts-ignore
+      select(data) {
+        return {
+          ...data,
+          data: data.data.map((x) => {
+            return {
+              ...x,
+              [attribute]:
+                modifier !== undefined ? modifier(Number(x[attribute])) : Number(x[attribute]),
+              period_start:
+                Number(x.period_start) > 0
+                  ? dayjs(x.period_start).format(dateFormat)
+                  : x.period_start,
+            }
+          }),
+        }
+      },
       ...options,
     }
   )
