@@ -38,11 +38,13 @@ import { JsonEditValue } from './SidePanelEditor/RowEditor/RowEditor.types'
 import { ForeignRowSelectorProps } from './SidePanelEditor/RowEditor/ForeignRowSelector/ForeignRowSelector'
 import TableDefinition from './TableDefinition'
 import APIDocumentationPanel from './APIDocumentationPanel'
+import Connecting from 'components/ui/Loading/Loading'
 
 export interface TableGridEditorProps {
   /** Theme for the editor */
   theme?: 'dark' | 'light'
 
+  isLoadingSelectedTable?: boolean
   selectedTable: any // PostgresTable | SchemaView
 
   /** Determines what side panel editor to show */
@@ -77,6 +79,7 @@ export interface TableGridEditorProps {
 
 const TableGridEditor = ({
   theme = 'dark',
+  isLoadingSelectedTable = false,
   selectedTable,
   sidePanelKey,
   isDuplicating,
@@ -201,6 +204,10 @@ const TableGridEditor = ({
   }, [selectedTable?.id])
 
   const entityType = useEntityType(selectedTable?.id)
+
+  if (isLoadingSelectedTable) {
+    return <Connecting />
+  }
 
   // NOTE: DO NOT PUT HOOKS AFTER THIS LINE
   if (isUndefined(selectedTable)) {

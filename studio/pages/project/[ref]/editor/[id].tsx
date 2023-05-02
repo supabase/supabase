@@ -1,9 +1,9 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { isUndefined, isNaN } from 'lodash'
+import { isUndefined } from 'lodash'
 import { Alert, Button, Checkbox, IconExternalLink, Modal } from 'ui'
 import type { PostgresTable, PostgresColumn } from '@supabase/postgres-meta'
 
@@ -25,11 +25,13 @@ import {
 import { ForeignRowSelectorProps } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/ForeignRowSelector/ForeignRowSelector'
 import { useTheme } from 'common'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
+import useTable from 'hooks/misc/useTable'
 
 const TableEditorPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { isDarkMode } = useTheme()
-  const { id, ref: projectRef } = useParams()
+  const { id: _id, ref: projectRef } = useParams()
+  const id = _id ? Number(_id) : undefined
   const [_, setParams] = useUrlState({ arrayKeys: ['filter', 'sort'] })
 
   const { project } = useProjectContext()
@@ -59,28 +61,7 @@ const TableEditorPage: NextPageWithLayout = () => {
     column: any
   }>()
 
-  const tables: PostgresTable[] = meta.tables.list()
-  const views: SchemaView[] = meta.views.list()
-  const materializedViews = meta.materializedViews.list()
-  const foreignTables: Partial<PostgresTable>[] = meta.foreignTables.list()
-
-  const selectedTable = !isNaN(Number(id))
-    ? // @ts-ignore
-      tables
-        // @ts-ignore
-        .concat(views)
-        // @ts-ignore
-        .concat(materializedViews)
-        // @ts-ignore
-        .concat(foreignTables)
-        .find((table) => table.id === Number(id))
-    : undefined
-
-  // useEffect(() => {
-  //   if (selectedTable && 'schema' in selectedTable) {
-  //     setSelectedSchema(selectedTable.schema)
-  //   }
-  // }, [selectedTable?.name])
+  const { data: selectedTable, isLoading } = useTable(id)
 
   const onAddRow = () => {
     setSidePanelKey('row')
@@ -278,6 +259,7 @@ const TableEditorPage: NextPageWithLayout = () => {
       onDuplicateTable={onDuplicateTable}
     >
       <TableGridEditor
+        isLoadingSelectedTable={isLoading}
         selectedTable={selectedTable}
         sidePanelKey={sidePanelKey}
         isDuplicating={isDuplicating}
