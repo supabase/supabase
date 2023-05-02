@@ -8,6 +8,7 @@ import {
 import { Button, Collapsible, IconChevronRight } from 'ui'
 import { queryParamsToObject } from '../Reports.utils'
 import { Fragment } from 'react'
+import useFillTimeseriesSorted from 'hooks/analytics/useFillTimeseriesSorted'
 
 export const renderTotalRequests = (
   props: ReportWidgetProps<{
@@ -18,13 +19,21 @@ export const renderTotalRequests = (
   const total = props.data.reduce((acc, datum) => {
     return acc + datum.count
   }, 0)
+  const data = useFillTimeseriesSorted(
+    props.data,
+    'timestamp',
+    'count',
+    0,
+    props.params?.iso_timestamp_start,
+    props.params?.iso_timestamp_end
+  )
   return (
     <BarChart
       size="small"
       minimalHeader
       highlightedValue={total}
       className="w-full"
-      data={props.data}
+      data={data}
       yAxisKey="count"
       xAxisKey="timestamp"
       displayDateInUtc
@@ -92,13 +101,23 @@ export const renderErrorCounts = (
   const total = props.data.reduce((acc, datum) => {
     return acc + datum.count
   }, 0)
+
+  const data = useFillTimeseriesSorted(
+    props.data,
+    'timestamp',
+    'count',
+    0,
+    props.params?.iso_timestamp_start,
+    props.params?.iso_timestamp_end
+  )
+
   return (
     <BarChart
       size="small"
       minimalHeader
       className="w-full"
       highlightedValue={total}
-      data={props.data}
+      data={data}
       yAxisKey="count"
       xAxisKey="timestamp"
       displayDateInUtc
@@ -116,6 +135,16 @@ export const renderResponseSpeed = (
     timestamp: datum.timestamp,
     avg: datum.avg,
   }))
+
+  const data = useFillTimeseriesSorted(
+    transformedData,
+    'timestamp',
+    'avg',
+    0,
+    props.params?.iso_timestamp_start,
+    props.params?.iso_timestamp_end
+  )
+
   const lastAvg = props.data[props.data.length - 1]?.avg
   return (
     <BarChart
@@ -124,7 +153,7 @@ export const renderResponseSpeed = (
       format="ms"
       minimalHeader
       className="w-full"
-      data={transformedData}
+      data={data}
       yAxisKey="avg"
       xAxisKey="timestamp"
       displayDateInUtc
@@ -171,14 +200,18 @@ const RouteTdContent = (datum: RouteTdContentProps) => (
       </div>
     </Collapsible.Trigger>
     <Collapsible.Content className="pt-2">
-      <pre className={`syntax-highlight overflow-auto rounded bg-scale-300 p-2 !text-xs`}>
-        <div
-          className="text-wrap"
-          dangerouslySetInnerHTML={{
-            __html: jsonSyntaxHighlight(queryParamsToObject(datum.search)),
-          }}
-        />
-      </pre>
+      {datum.search ? (
+        <pre className={`syntax-highlight overflow-auto rounded bg-scale-300 p-2 !text-xs`}>
+          <div
+            className="text-wrap"
+            dangerouslySetInnerHTML={{
+              __html: jsonSyntaxHighlight(queryParamsToObject(datum.search)),
+            }}
+          />
+        </pre>
+      ) : (
+        <p className="text-xs text-scale-900">No query paramters in this request</p>
+      )}
     </Collapsible.Content>
   </Collapsible>
 )
