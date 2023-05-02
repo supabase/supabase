@@ -193,13 +193,23 @@ Now lets add the  Cloudflare Turnstile component to the JSX section of our code
 <Turnstile />
 ```
 
-We will pass it the sitekey we copied from the Cloudflare website as a property along with a onVerify property which takes a callback function. This callback function will have a token as one of its properties. Let's set the token in the state using `setCaptchaToken`
+We will pass it the sitekey we copied from the Cloudflare website as a property along with a `onVerify` property which takes a callback function. This callback function will have a token as one of its properties. Let's set the token in the state using `setCaptchaToken`
 
 ```jsx
 <Turnstile
   sitekey="your-sitekey"
   onVerify={(token) => { setCaptchaToken(token) }
 />
+```
+
+We can now use the captchaToken we receive in our Supabase `signUp` function.
+
+```jsx
+await supabase.auth.signUp({
+  email,
+  password,
+  options: { captchaToken },
+})
 ```
 
 To test locally, you will need to add localhost to the domain whitelist as per the [Cloudflare docs](https://developers.cloudflare.com/turnstile/reference/testing/)
