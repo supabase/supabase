@@ -3,7 +3,6 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
 import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
 import BarChart from './BarChart'
-import { generateUsageData } from './Usage.utils'
 
 const Infrastructure = () => {
   const { ref } = useParams()
@@ -12,26 +11,29 @@ const Infrastructure = () => {
   const startDate = new Date((current_period_start ?? 0) * 1000).toISOString()
   const endDate = new Date((current_period_end ?? 0) * 1000).toISOString()
 
+  const CPU_USAGE_KEY = 'cpu_usage'
   const { data: cpuUsageData, isLoading: isLoadingCpuUsageData } = useInfraMonitoringQuery({
     projectRef: ref,
-    attribute: 'cpu_usage',
+    attribute: CPU_USAGE_KEY,
     interval: '1d',
     startDate,
     endDate,
     modifier: (x: number) => x * 100,
   })
 
+  const MEMORY_USAGE_KEY = 'ram_usage'
   const { data: memoryUsageData, isLoading: isLoadingMemoryUsageData } = useInfraMonitoringQuery({
     projectRef: ref,
-    attribute: 'ram_usage',
+    attribute: MEMORY_USAGE_KEY,
     interval: '1d',
     startDate,
     endDate,
   })
 
+  const DISK_IO_BUDGET_KEY = 'disk_io_budget'
   const { data: ioBudgetData, isLoading: isLoadingIoBudgetData } = useInfraMonitoringQuery({
     projectRef: ref,
-    attribute: 'disk_io_budget',
+    attribute: DISK_IO_BUDGET_KEY,
     interval: '1d',
     startDate,
     endDate,
@@ -71,7 +73,7 @@ const Infrastructure = () => {
                 </div>
               ) : (
                 <BarChart
-                  attribute="cpu_usage"
+                  attribute={CPU_USAGE_KEY}
                   data={cpuUsageData?.data ?? []}
                   unit={cpuUsageData?.format}
                   yDomain={[0, 100]}
@@ -105,7 +107,7 @@ const Infrastructure = () => {
                 </div>
               ) : (
                 <BarChart
-                  attribute="ram_usage"
+                  attribute={MEMORY_USAGE_KEY}
                   data={memoryUsageData?.data ?? []}
                   unit={memoryUsageData?.format}
                   yDomain={[0, 100]}
@@ -139,7 +141,7 @@ const Infrastructure = () => {
                 </div>
               ) : (
                 <BarChart
-                  attribute="disk_io_budget"
+                  attribute={DISK_IO_BUDGET_KEY}
                   data={ioBudgetData?.data ?? []}
                   unit={ioBudgetData?.format}
                   yDomain={[0, 100]}

@@ -17,23 +17,42 @@ const Activity = () => {
   const startDate = new Date((current_period_start ?? 0) * 1000).toISOString()
   const endDate = new Date((current_period_end ?? 0) * 1000).toISOString()
 
-  // [JOSHEN TODO] Attribute needs to change after confirming with team o11y if this is implemented
+  const MAU_KEY = 'total_auth_billing_period_mau'
   const { monthly_active_users } = usage ?? {}
   const mauExcess = (monthly_active_users?.usage ?? 0) - (monthly_active_users?.limit ?? 0)
   const { data: mauData, isLoading: isLoadingMauData } = useDailyStatsQuery({
     projectRef: ref,
-    attribute: 'total_auth_billing_period_mau',
+    attribute: MAU_KEY,
     interval: '1d',
     startDate,
     endDate,
   })
 
+  const ASSET_TRANSFORMATIONS_KEY = 'total_storage_image_render_count'
   const { storage_image_render_count } = usage ?? {}
   const assetTransformationExcess =
     (storage_image_render_count?.usage ?? 0) - (storage_image_render_count?.limit ?? 0)
+  const { data: assetTransformationsData, isLoading: isLoadingAssetTransformationsData } =
+    useDailyStatsQuery({
+      projectRef: ref,
+      attribute: ASSET_TRANSFORMATIONS_KEY,
+      interval: '1d',
+      startDate,
+      endDate,
+    })
 
+  const FUNC_INVOCATIONS_KEY = 'total_func_invocations'
   const { func_invocations } = usage ?? {}
   const funcInvocationsExcess = (func_invocations?.usage ?? 0) - (func_invocations?.limit ?? 0)
+  const { data: funcInvocationsData, isLoading: isLoadingFuncInvocationsData } = useDailyStatsQuery(
+    {
+      projectRef: ref,
+      attribute: FUNC_INVOCATIONS_KEY,
+      interval: '1d',
+      startDate,
+      endDate,
+    }
+  )
 
   return (
     <>
@@ -46,7 +65,7 @@ const Activity = () => {
         </div>
       </div>
 
-      {/* MONTHLY ACTIVE USERS - need to fix if no value yet (API will return period_start as 0 in first data point) */}
+      {/* MONTHLY ACTIVE USERS */}
       <div className="border-b">
         <div className="1xl:px-28 mx-auto flex flex-col gap-10 px-5 lg:px-16 2xl:px-32 py-16">
           <div className="grid grid-cols-12">
@@ -101,7 +120,7 @@ const Activity = () => {
                 </div>
               ) : (
                 <BarChart
-                  attribute="total_auth_billing_period_mau"
+                  attribute={MAU_KEY}
                   data={mauData?.data ?? []}
                   unit={undefined}
                   yDomain={[0, 100]}
@@ -112,7 +131,7 @@ const Activity = () => {
         </div>
       </div>
 
-      {/* ASSET TRANSFORMATIONS - need to show actual data */}
+      {/* ASSET TRANSFORMATIONS */}
       <div className="border-b">
         <div className="1xl:px-28 mx-auto flex flex-col gap-10 px-5 lg:px-16 2xl:px-32 py-16">
           <div className="grid grid-cols-12">
@@ -143,9 +162,13 @@ const Activity = () => {
                     <p className="text-xs text-scale-1000">
                       Included in {subscription?.tier.name.toLowerCase()}
                     </p>
-                    <p className="text-xs">
-                      {(storage_image_render_count?.limit ?? 0).toLocaleString()}
-                    </p>
+                    {storage_image_render_count?.limit === -1 ? (
+                      <p className="text-xs">None</p>
+                    ) : (
+                      <p className="text-xs">
+                        {(storage_image_render_count?.limit ?? 0).toLocaleString()}
+                      </p>
+                    )}
                   </div>
                   <div className="flex items-center justify-between border-b py-1">
                     <p className="text-xs text-scale-1000">Used</p>
@@ -156,7 +179,8 @@ const Activity = () => {
                   <div className="flex items-center justify-between py-1">
                     <p className="text-xs text-scale-1000">Extra volume used this month</p>
                     <p className="text-xs">
-                      {(assetTransformationExcess < 0
+                      {((storage_image_render_count?.limit ?? 0) === -1 ||
+                      assetTransformationExcess < 0
                         ? 0
                         : assetTransformationExcess
                       ).toLocaleString()}
@@ -164,38 +188,34 @@ const Activity = () => {
                   </div>
                 </div>
               </div>
-              <div className="space-y-1">
-                <p>Asset transformations over time</p>
-                <p className="text-sm text-scale-1000">Some description here</p>
-              </div>
-              {isLoadingMauData ? (
-                <div className="space-y-2">
-                  <ShimmeringLoader />
-                  <ShimmeringLoader className="w-3/4" />
-                  <ShimmeringLoader className="w-1/2" />
-                </div>
-              ) : (
-                <BarChart
-                  attribute="disk_io_budget"
-                  data={generateUsageData('disk_io_budget', 30)}
-                  unit={undefined}
-                  yDomain={[0, 100]}
-                  reference={{
-                    value: 65,
-                    label: 'FREE QUOTA',
-                    x: 60,
-                    y: 49,
-                    width: 200,
-                    height: 24,
-                  }}
-                />
+              {storage_image_render_count?.available_in_plan && (
+                <>
+                  <div className="space-y-1">
+                    <p>Asset transformations over time</p>
+                    <p className="text-sm text-scale-1000">Some description here</p>
+                  </div>
+                  {isLoadingAssetTransformationsData ? (
+                    <div className="space-y-2">
+                      <ShimmeringLoader />
+                      <ShimmeringLoader className="w-3/4" />
+                      <ShimmeringLoader className="w-1/2" />
+                    </div>
+                  ) : (
+                    <BarChart
+                      attribute={MAU_KEY}
+                      data={assetTransformationsData?.data ?? []}
+                      unit={undefined}
+                      yDomain={[0, 100]}
+                    />
+                  )}
+                </>
               )}
             </div>
           </div>
         </div>
       </div>
 
-      {/* EDGE FUNCTIONS INVOCATIONS - need to show actual data */}
+      {/* EDGE FUNCTIONS INVOCATIONS */}
       <div className="border-b">
         <div className="1xl:px-28 mx-auto flex flex-col gap-10 px-5 lg:px-16 2xl:px-32 py-16">
           <div className="grid grid-cols-12">
@@ -244,7 +264,7 @@ const Activity = () => {
                 <p>Edge function invocations over time</p>
                 <p className="text-sm text-scale-1000">Some description here</p>
               </div>
-              {isLoadingMauData ? (
+              {isLoadingFuncInvocationsData ? (
                 <div className="space-y-2">
                   <ShimmeringLoader />
                   <ShimmeringLoader className="w-3/4" />
@@ -252,20 +272,71 @@ const Activity = () => {
                 </div>
               ) : (
                 <BarChart
-                  attribute="disk_io_budget"
-                  data={generateUsageData('disk_io_budget', 30)}
+                  attribute={FUNC_INVOCATIONS_KEY}
+                  data={funcInvocationsData?.data ?? []}
                   unit={undefined}
                   yDomain={[0, 100]}
-                  reference={{
-                    value: 65,
-                    label: 'FREE QUOTA',
-                    x: 60,
-                    y: 49,
-                    width: 200,
-                    height: 24,
-                  }}
                 />
               )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Sample Chart */}
+      <div className="border-b">
+        <div className="1xl:px-28 mx-auto flex flex-col gap-10 px-5 lg:px-16 2xl:px-32 py-16">
+          <div className="grid grid-cols-12">
+            <div className="col-span-5">
+              <div className="sticky top-16">
+                <p className="text-base">Sample Chart</p>
+                <p className="text-sm text-scale-1000">Some description here</p>
+              </div>
+            </div>
+            <div className="col-span-7 space-y-6">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm">Sample quota usage</p>
+                  <Button type="default" size="tiny" onClick={() => {}}>
+                    Upgrade project
+                  </Button>
+                </div>
+                <SparkBar type="horizontal" barClass="bg-scale-1200" value={75} max={100} />
+                <div>
+                  <div className="flex items-center justify-between border-b py-1">
+                    <p className="text-xs text-scale-1000">
+                      Included in {subscription?.tier.name.toLowerCase()}
+                    </p>
+                    <p className="text-xs">{(10000).toLocaleString()}</p>
+                  </div>
+                  <div className="flex items-center justify-between border-b py-1">
+                    <p className="text-xs text-scale-1000">Used</p>
+                    <p className="text-xs">0</p>
+                  </div>
+                  <div className="flex items-center justify-between py-1">
+                    <p className="text-xs text-scale-1000">Extra volume used this month</p>
+                    <p className="text-xs">0</p>
+                  </div>
+                </div>
+              </div>
+              <div className="space-y-1">
+                <p>Sample usage over time</p>
+                <p className="text-sm text-scale-1000">Some description here</p>
+              </div>
+              <BarChart
+                attribute="sample_data"
+                data={generateUsageData('sample_data', 30)}
+                unit={undefined}
+                yDomain={[0, 100]}
+                reference={{
+                  value: 65,
+                  label: 'FREE QUOTA',
+                  x: 60,
+                  y: 49,
+                  width: 200,
+                  height: 24,
+                }}
+              />
             </div>
           </div>
         </div>

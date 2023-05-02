@@ -9,9 +9,22 @@ import dayjs from 'dayjs'
 export type DailyStatsVariables = {
   projectRef?: string
   attribute:
-    | 'total_realtime_egress'
-    | 'total_realtime_requests'
+    | 'total_db_egress_bytes'
+    | 'total_db_size_bytes'
+
+    // Realtime
     | 'total_realtime_ingress'
+    | 'total_realtime_egress'
+    | 'total_realtime_message_count'
+    | 'total_realtime_peak_connection'
+    | 'total_realtime_requests'
+    | 'total_realtime_get_requests'
+    | 'total_realtime_post_requests'
+    | 'total_realtime_patch_requests'
+    | 'total_realtime_delete_requests'
+    | 'total_realtime_options_requests'
+
+    // Rest
     | 'total_rest_ingress'
     | 'total_rest_egress'
     | 'total_rest_requests'
@@ -20,18 +33,26 @@ export type DailyStatsVariables = {
     | 'total_rest_patch_requests'
     | 'total_rest_delete_requests'
     | 'total_rest_options_requests'
+
+    // Auth
     | 'total_auth_billing_period_mau'
     | 'total_auth_billing_period_sso_mau'
     | 'total_auth_ingress'
     | 'total_auth_egress'
+    | 'total_auth_texts'
+    | 'total_auth_users'
+    | 'total_auth_emails'
     | 'total_auth_requests'
     | 'total_auth_get_requests'
     | 'total_auth_post_requests'
     | 'total_auth_patch_requests'
     | 'total_auth_delete_requests'
     | 'total_auth_options_requests'
+
+    // Storage
     | 'total_storage_ingress'
     | 'total_storage_egress'
+    | 'total_storage_size_bytes'
     | 'total_storage_image_render_count'
     | 'total_storage_requests'
     | 'total_storage_get_requests'
@@ -39,6 +60,15 @@ export type DailyStatsVariables = {
     | 'total_storage_patch_requests'
     | 'total_storage_delete_requests'
     | 'total_storage_options_requests'
+
+    // Edge functions
+    | 'total_func_count'
+    | 'total_func_invocations'
+    | 'total_func_exec_time_ms'
+    | 'total_func_ingress'
+    | 'total_func_egress'
+
+    // Combined
     | 'total_ingress'
     | 'total_egress'
     | 'total_requests'
@@ -100,6 +130,7 @@ export const useDailyStatsQuery = <TData = DailyStatsData>(
         typeof endDate !== 'undefined',
       // @ts-ignore
       select(data) {
+        // [JOSHEN TODO] if no data, pad with empty data
         return {
           ...data,
           data: data.data.map((x) => {
