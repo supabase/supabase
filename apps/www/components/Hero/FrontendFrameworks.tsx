@@ -15,9 +15,9 @@ const frameworks = [
     docs: '/docs/guides/getting-started/quickstarts/reactjs',
   },
   {
-    name: 'redwood',
-    icon: '/images/logos/frameworks/redwood.svg',
-    docs: '/docs/guides/getting-started/quickstarts/redwood',
+    name: 'nuxtjs',
+    icon: '/images/logos/frameworks/nuxtjs.svg',
+    docs: '/docs/guides/getting-started/quickstarts/nuxtjs',
   },
   {
     name: 'flutter',
@@ -30,9 +30,9 @@ const frameworks = [
     docs: '/docs/guides/getting-started/quickstarts/sveltekit',
   },
   {
-    name: 'solidjs',
-    icon: '/images/logos/frameworks/solidjs.svg',
-    docs: '/docs/guides/getting-started/quickstarts/solidjs',
+    name: 'expo',
+    icon: '/images/logos/frameworks/expo.svg',
+    docs: '/docs/guides/getting-started/tutorials/with-expo',
   },
   {
     name: 'vue',
@@ -44,7 +44,7 @@ const frameworks = [
 const FrontendFrameworks = ({ className }: { className?: string }) => {
   return (
     <div className={['flex text-center flex-col items-center', className].join(' ')}>
-      <small className="small">Works seamlessly with +30 frameworks</small>
+      <small className="small">Works seamlessly with +20 frameworks</small>
       <div className="w-full sm:max-w-lg mt-4 md:mt-3 lg:ml-0">
         <div className="flex flex-wrap items-center justify-center gap-2 sm:flex-nowrap">
           {frameworks.map((framework) => (
