@@ -26,3 +26,16 @@ test('refresh button', async () => {
   userEvent.click(await screen.findByText(/Refresh/))
   await waitFor(() => expect(get).toBeCalled())
 })
+
+test('expandable tables', async () => {
+  get.mockImplementation(async (_url) => [
+    { data: [{ timestamp: new Date().toISOString(), count: 123 }] },
+  ])
+  const expandables = await screen.findByText('View API requests')
+  const first = expandables[0]
+  get.mockImplementationOnce(async (_url) => [{ data: [{ path: '/my-path', count: 22 }] }])
+  userEvent.click(first)
+  await screen.findByText('Hide API Requests')
+  await screen.findByText(/\/my\-path/)
+  await screen.findByText(/22/)
+})
