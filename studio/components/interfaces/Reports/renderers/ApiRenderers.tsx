@@ -43,6 +43,8 @@ export const renderTopApiRoutes = (
     path: string
     search: string
     count: number
+    // used for response speed table only
+    avg?: number
   }>
 ) => {
   if (props.data.length === 0) return null
@@ -54,6 +56,9 @@ export const renderTopApiRoutes = (
         <>
           <Table.th className={headerClasses}>Request</Table.th>
           <Table.th className={headerClasses + ' text-right'}>Count</Table.th>
+          {props.data[0].avg !== undefined && (
+            <Table.th className={headerClasses + ' text-right'}>Avg</Table.th>
+          )}
         </>
       }
       body={
@@ -67,6 +72,11 @@ export const renderTopApiRoutes = (
                 <Table.td className={[cellClasses, 'text-right align-top'].join(' ')}>
                   {datum.count}
                 </Table.td>
+                {props.data[0].avg !== undefined && (
+                  <Table.td className={[cellClasses, 'text-right align-top'].join(' ')}>
+                    {Number(datum.avg).toFixed(2)}ms
+                  </Table.td>
+                )}
               </Table.tr>
             </>
           ))}

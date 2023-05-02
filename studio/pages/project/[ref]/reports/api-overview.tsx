@@ -66,7 +66,7 @@ export const ApiReport: NextPageWithLayout = () => {
         data={report.data.totalRequests || []}
         renderer={renderTotalRequests}
         append={renderTopApiRoutes}
-        appendProps={{data: report.data.topRoutes || [] }}
+        appendProps={{ data: report.data.topRoutes || [] }}
       />
       <ReportWidget
         isLoading={report.isLoading}
@@ -75,7 +75,7 @@ export const ApiReport: NextPageWithLayout = () => {
         tooltip="Error responses with 4XX or 5XX status codes"
         data={report.data.errorCounts || []}
         renderer={renderErrorCounts}
-        appendProps={{data: report.data.topErrorRoutes || [] }}
+        appendProps={{ data: report.data.topErrorRoutes || [] }}
         append={renderTopApiRoutes}
       />
       <ReportWidget
@@ -85,6 +85,8 @@ export const ApiReport: NextPageWithLayout = () => {
         tooltip="Average response speed (in miliseconds) of a request"
         data={report.data.responseSpeed || []}
         renderer={renderResponseSpeed}
+        appendProps={{ data: report.data.topSlowRoutes || [] }}
+        append={renderTopApiRoutes}
       />
     </ReportPadding>
   )
@@ -103,7 +105,15 @@ const useApiReport = () => {
   const errorCounts = queryHooks.errorCounts()
   const topErrorRoutes = queryHooks.topErrorRoutes()
   const responseSpeed = queryHooks.responseSpeed()
-  const activeHooks = [totalRequests, topRoutes, errorCounts, responseSpeed]
+  const topSlowRoutes = queryHooks.topSlowRoutes()
+  const activeHooks = [
+    totalRequests,
+    topRoutes,
+    errorCounts,
+    topErrorRoutes,
+    responseSpeed,
+    topSlowRoutes,
+  ]
   const [filters, setFilters] = useState<ReportFilterItem[]>([])
   const addFilter = (filter: ReportFilterItem) => {
     // use a deep equal when comparing objects.
@@ -147,6 +157,10 @@ const useApiReport = () => {
     if (responseSpeed[1].changeQuery) {
       responseSpeed[1].changeQuery(PRESET_CONFIG.api.queries.responseSpeed.sql(filters))
     }
+
+    if (topSlowRoutes[1].changeQuery) {
+      topSlowRoutes[1].changeQuery(PRESET_CONFIG.api.queries.topSlowRoutes.sql(filters))
+    }
   }, [JSON.stringify(filters)])
 
   const handleRefresh = async () => {
@@ -167,6 +181,7 @@ const useApiReport = () => {
       responseSpeed: responseSpeed[0].logData,
       topRoutes: topRoutes[0].logData,
       topErrorRoutes: topErrorRoutes[0].logData,
+      topSlowRoutes: topSlowRoutes[0].logData,
     },
     params: {
       totalRequests: totalRequests[0].params,
@@ -174,6 +189,7 @@ const useApiReport = () => {
       responseSpeed: responseSpeed[0].params,
       topRoutes: topRoutes[0].params,
       topErrorRoutes: topErrorRoutes[0].params,
+      topSlowRoutes: topSlowRoutes[0].params,
     },
     mergeParams: handleSetParams,
     filters,

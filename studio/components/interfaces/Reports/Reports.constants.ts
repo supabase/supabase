@@ -162,6 +162,30 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
           timestamp ASC
       `,
       },
+      topSlowRoutes: {
+        queryType: "logs",
+        sql: (filters)=> `
+        select
+          request.path as path,
+          request.method as method,
+          request.search as search,
+          response.status_code as status_code,
+          count(t.id) as count,
+          avg(response.origin_time) as avg
+        from edge_logs t
+          cross join unnest(metadata) as m
+          cross join unnest(m.response) as response
+          cross join unnest(m.request) as request
+          cross join unnest(request.headers) as headers
+        ${generateRexepWhere(filters)}
+        group by
+          request.path, request.method, request.search, response.status_code
+        order by
+          avg desc
+        limit
+        3
+        `
+      },
     },
   },
   [Presets.AUTH]: {
