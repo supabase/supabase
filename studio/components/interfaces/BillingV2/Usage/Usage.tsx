@@ -3,11 +3,12 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
 import { useEffect, useRef, useState } from 'react'
-import { Button, IconCheckCircle, Listbox } from 'ui'
+import { Button, IconCheckCircle, IconLoader, Listbox } from 'ui'
 import Infrastructure from './Infrastructure'
 import Bandwidth from './Bandwidth'
 import SizeAndCounts from './SizeAndCounts'
 import Activity from './Activity'
+import clsx from 'clsx'
 
 const Usage = () => {
   const { ref } = useParams()
@@ -19,7 +20,9 @@ const Usage = () => {
   const activityRef = useRef<HTMLDivElement>(null)
 
   const { data: projects, isLoading, isSuccess } = useProjectsQuery()
-  const { data: subscription } = useProjectSubscriptionQuery({ projectRef: ref })
+  const { data: subscription, isLoading: isLoadingSubscription } = useProjectSubscriptionQuery({
+    projectRef: selectedProjectRef,
+  })
 
   useEffect(() => {}, [isSuccess])
 
@@ -50,11 +53,32 @@ const Usage = () => {
 
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              {/* <Billing cycle picker /> */}
+              <Listbox
+                size="small"
+                id="billingCycle"
+                name="billingCycle"
+                value={'current'}
+                className="!w-[200px]"
+                onChange={() => {}}
+              >
+                <Listbox.Option label="Current billing cycle" value="current">
+                  Current billing cycle
+                </Listbox.Option>
+                <Listbox.Option label="Previous billing cycle" value="previous">
+                  Previous billing cycle
+                </Listbox.Option>
+              </Listbox>
               {isLoading ? (
                 <ShimmeringLoader className="w-[200px]" />
               ) : (
-                <Listbox size="small" value={ref} onChange={() => {}} className="w-[200px]">
+                <Listbox
+                  size="small"
+                  id="projectRef"
+                  name="projectRef"
+                  value={selectedProjectRef}
+                  onChange={setSelectedProjectRef}
+                  className="w-[200px]"
+                >
                   {(projects ?? []).map((project) => (
                     <Listbox.Option
                       key={project.ref}
@@ -67,9 +91,13 @@ const Usage = () => {
                   ))}
                 </Listbox>
               )}
-              {subscription !== undefined && (
-                <p className="text-sm">Project is on {subscription.tier.name}</p>
-              )}
+              {isLoadingSubscription ? (
+                <IconLoader className="animate-spin" size={14} />
+              ) : subscription !== undefined ? (
+                <p className={clsx('text-sm transition', isLoadingSubscription && 'opacity-50')}>
+                  Project is on {subscription.tier.name}
+                </p>
+              ) : null}
             </div>
             <div className="flex items-center space-x-2">
               <Button type="default">View invoices</Button>
