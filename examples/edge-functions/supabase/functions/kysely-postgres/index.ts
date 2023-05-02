@@ -31,7 +31,7 @@ const pool = new Pool(
   {
     tls: { caCertificates: [Deno.env.get('DB_SSL_CERT')!] },
     database: 'postgres',
-    hostname: 'db.bljghubhkofddfrezkhn.supabase.co',
+    hostname: Deno.env.get('DB_HOSTNAME'),
     user: 'postgres',
     port: 5432,
     password: Deno.env.get('DB_PASSWORD'),
