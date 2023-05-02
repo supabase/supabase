@@ -19,7 +19,7 @@ export const getSortedPosts = (
   const postDirectory = path.join(process.cwd(), directory)
 
   //Reads all the files in the post directory
-  const fileNames = fs.readdirSync(postDirectory)
+  const fileNames = fs.readdirSync(postDirectory).filter((fileName) => fileName.endsWith('.mdx'))
 
   // categories stored in this array
 
@@ -93,7 +93,7 @@ export const getAllPostSlugs = (directory: Directories) => {
   //Finding directory named "blog" from the current working directory of Node.
   const postDirectory = path.join(process.cwd(), directory)
 
-  const fileNames = fs.readdirSync(postDirectory)
+  const fileNames = fs.readdirSync(postDirectory).filter((fileName) => fileName.endsWith('.mdx'))
 
   const files = fileNames.map((filename) => {
     const dates =
