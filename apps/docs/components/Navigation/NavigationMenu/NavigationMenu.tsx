@@ -292,7 +292,7 @@ const NavigationMenu = () => {
         active={isReference_Swift_V0}
         commonSections={libCommonSections}
         lib="swift"
-        spec={spec_swift_v1}
+        spec={spec_swift_v0}
       />
       <NavigationMenuRefList
         key={'reference-python-menu-v2'}
