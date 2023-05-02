@@ -113,13 +113,11 @@ export const renderResponseSpeed = (
   props: ReportWidgetProps<{
     timestamp: string
     avg: number
-    quantiles: number[]
   }>
 ) => {
   const transformedData = props.data.map((datum) => ({
     timestamp: datum.timestamp,
-    avg: datum.avg,
-    median: datum.quantiles[49],
+    avg: datum.avg
   }))
   const lastAvg = props.data[props.data.length - 1]?.avg
   return (
