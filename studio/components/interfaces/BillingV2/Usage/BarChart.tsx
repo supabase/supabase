@@ -7,6 +7,7 @@ import {
   XAxis,
   Bar,
   ReferenceLine,
+  Cell,
 } from 'recharts'
 
 // [Joshen] I don't think I should be replacing ChartHandler just yet as the styling of the usage charts
@@ -25,17 +26,37 @@ export interface BarChartProps {
   data: DataPoint[]
   attribute: string
   reference?: Reference
+  unit?: string
+  yDomain?: number[]
 }
 
-const BarChart = ({ data, attribute, reference }: BarChartProps) => {
+const BarChart = ({ data, attribute, reference, unit, yDomain }: BarChartProps) => {
   return (
     <div className="w-full h-[200px]">
       <ResponsiveContainer width="100%" height={200}>
-        <ComposedChart data={data} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
-          <CartesianGrid vertical={false} strokeDasharray="3 3" />
-          <XAxis dataKey="" />
-          <YAxis width={28} axisLine={false} tickLine={{ stroke: 'none' }} />
-          <Bar dataKey={attribute} fill="#EEE" />
+        <ComposedChart data={data} margin={{ top: 0, right: 0, left: 10, bottom: 0 }}>
+          <CartesianGrid vertical={false} strokeDasharray="3 3" className="stroke-scale-800" />
+          <XAxis dataKey="period_start" />
+          <YAxis
+            width={28}
+            axisLine={false}
+            tickLine={{ stroke: 'none' }}
+            domain={yDomain}
+            unit={unit}
+          />
+          <Bar dataKey={attribute}>
+            {data.map((entry) => {
+              return (
+                <Cell
+                  className={
+                    reference !== undefined && Number(entry[attribute]) >= reference.value
+                      ? 'fill-amber-900'
+                      : 'fill-scale-1200'
+                  }
+                />
+              )
+            })}
+          </Bar>
           {reference && (
             <ReferenceLine
               y={reference.value}
@@ -46,7 +67,7 @@ const BarChart = ({ data, attribute, reference }: BarChartProps) => {
                   width={reference.width}
                   height={reference.height}
                 >
-                  <div className="text-[0.7rem] font-bold text-amber-900 bg-amber-300 w-fit p-1.5 py-0.5 rounded-md">
+                  <div className="text-[0.7rem] font-bold text-scale-1200 bg-scale-100 w-fit p-1.5 py-0.5 rounded-md">
                     {reference.label}
                   </div>
                 </foreignObject>

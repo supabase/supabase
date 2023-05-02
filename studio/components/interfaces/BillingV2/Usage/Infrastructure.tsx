@@ -1,46 +1,62 @@
 import { useParams } from 'common'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
+import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
 import dayjs from 'dayjs'
 import { DATE_FORMAT } from 'lib/constants'
 import BarChart from './BarChart'
-import { generateUsageData } from './Usage.utils'
 
 const Infrastructure = () => {
   const { ref } = useParams()
+  const { data: subscription } = useProjectSubscriptionQuery({ projectRef: ref })
+  const { current_period_start, current_period_end } = subscription?.billing ?? {}
+  const startDate = new Date((current_period_start ?? 0) * 1000).toISOString()
+  const endDate = new Date((current_period_end ?? 0) * 1000).toISOString()
 
-  const currentDate = 1682669326710 / 1000
-  const startDate = dayjs.unix(currentDate).subtract(24, 'hour').format(DATE_FORMAT)
-  const endDate = dayjs.unix(currentDate).format(DATE_FORMAT)
-
-  const { data: ioBudgetData, isLoading: isLoadingIoBudgetData } = useInfraMonitoringQuery({
+  const { data: cpuUsageData, isLoading: isLoadingCpuUsageData } = useInfraMonitoringQuery({
     projectRef: ref,
-    attribute: 'disk_io_budget',
+    attribute: 'cpu_usage',
     startDate,
     endDate,
-    interval: '1h',
+    interval: '1d',
+    modifier: (x: number) => x * 100,
+  })
+
+  const { data: memoryUsageData, isLoading: isLoadingMemoryUsageData } = useInfraMonitoringQuery({
+    projectRef: ref,
+    attribute: 'ram_usage',
+    startDate,
+    endDate,
+    interval: '1d',
   })
 
   return (
     <>
       <div className="border-b">
         <div className="1xl:px-28 mx-auto flex flex-col gap-10 px-5 lg:px-16 2xl:px-32 py-16">
+          <div className="sticky top-16">
+            <p className="text-base">Infrastructure</p>
+            <p className="text-sm text-scale-1000">Some description here</p>
+          </div>
+        </div>
+      </div>
+
+      {/* CPU USAGE */}
+      <div className="border-b">
+        <div className="1xl:px-28 mx-auto flex flex-col gap-10 px-5 lg:px-16 2xl:px-32 py-16">
           <div className="grid grid-cols-12">
             <div className="col-span-5">
               <div className="sticky top-16">
-                <p className="text-base">IO Budget</p>
+                <p className="text-base">CPU</p>
                 <p className="text-sm text-scale-1000">Some description here</p>
               </div>
             </div>
             <div className="col-span-7 space-y-6">
               <div className="space-y-1">
-                <p>IO budget per day</p>
-                <p className="text-sm text-scale-1000">
-                  Just FYI for now its a percentage for IO budget, which is different from what the
-                  figma designs are (in minutes). We will need o11y or infra to help update this
-                </p>
+                <p>Max CPU usage each day</p>
+                <p className="text-sm text-scale-1000">Some description here</p>
               </div>
-              {isLoadingIoBudgetData ? (
+              {isLoadingCpuUsageData ? (
                 <div className="space-y-2">
                   <ShimmeringLoader />
                   <ShimmeringLoader className="w-3/4" />
@@ -48,16 +64,44 @@ const Infrastructure = () => {
                 </div>
               ) : (
                 <BarChart
-                  attribute="disk_io_budget"
-                  data={generateUsageData('disk_io_budget', 30)}
-                  reference={{
-                    value: 65,
-                    label: 'FREE QUOTA',
-                    x: 60,
-                    y: 49,
-                    width: 200,
-                    height: 24,
-                  }}
+                  attribute="cpu_usage"
+                  data={cpuUsageData?.data ?? []}
+                  unit={cpuUsageData?.format}
+                  yDomain={[0, 100]}
+                />
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* MEMORY USAGE */}
+      <div className="border-b">
+        <div className="1xl:px-28 mx-auto flex flex-col gap-10 px-5 lg:px-16 2xl:px-32 py-16">
+          <div className="grid grid-cols-12">
+            <div className="col-span-5">
+              <div className="sticky top-16">
+                <p className="text-base">Memory</p>
+                <p className="text-sm text-scale-1000">Some description here</p>
+              </div>
+            </div>
+            <div className="col-span-7 space-y-6">
+              <div className="space-y-1">
+                <p>Max memory usage each day</p>
+                <p className="text-sm text-scale-1000">Some description here</p>
+              </div>
+              {isLoadingMemoryUsageData ? (
+                <div className="space-y-2">
+                  <ShimmeringLoader />
+                  <ShimmeringLoader className="w-3/4" />
+                  <ShimmeringLoader className="w-1/2" />
+                </div>
+              ) : (
+                <BarChart
+                  attribute="ram_usage"
+                  data={memoryUsageData?.data ?? []}
+                  unit={memoryUsageData?.format}
+                  yDomain={[0, 100]}
                 />
               )}
             </div>

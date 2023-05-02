@@ -446,9 +446,6 @@
 }
 .recharts-reference-line {
   line {
-    @apply stroke-amber-900;
-  }
-  text {
-    @apply text-xs fill-amber-900 bg-amber-600;
+    @apply stroke-scale-1000;
   }
 }

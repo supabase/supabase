@@ -5,6 +5,9 @@ import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscrip
 import { useEffect, useState } from 'react'
 import { Button, IconCheckCircle, Listbox } from 'ui'
 import Infrastructure from './Infrastructure'
+import Bandwidth from './Bandwidth'
+import SizeAndCounts from './SizeAndCounts'
+import Activity from './Activity'
 
 const Usage = () => {
   const { ref } = useParams()
@@ -72,22 +75,9 @@ const Usage = () => {
       </div>
 
       <Infrastructure />
-
-      <div className="border-b">
-        <div className="1xl:px-28 mx-auto flex flex-col gap-10 px-5 lg:px-16 2xl:px-32 py-16">
-          Segment 2
-        </div>
-      </div>
-      <div className="border-b">
-        <div className="1xl:px-28 mx-auto flex flex-col gap-10 px-5 lg:px-16 2xl:px-32 py-16">
-          Segment 3
-        </div>
-      </div>
-      <div className="border-b">
-        <div className="1xl:px-28 mx-auto flex flex-col gap-10 px-5 lg:px-16 2xl:px-32 py-16">
-          Segment 4
-        </div>
-      </div>
+      {/* <Bandwidth />
+      <SizeAndCounts />
+      <Activity /> */}
     </>
   )
 }
