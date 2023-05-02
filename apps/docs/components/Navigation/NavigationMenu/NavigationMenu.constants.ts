@@ -591,6 +591,7 @@ export const functions = {
         { name: 'Browserless.io', url: '/guides/functions/examples/screenshots' },
         { name: 'OpenAI API', url: '/guides/functions/examples/openai' },
         { name: 'Upstash Redis', url: '/guides/functions/examples/upstash-redis' },
+        { name: 'Type-Safe SQL with Kysely', url: '/guides/functions/kysely-postgres' },
       ],
     },
     {
