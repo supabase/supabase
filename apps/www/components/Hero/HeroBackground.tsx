@@ -14,7 +14,13 @@ const HeroBackground = () => {
 
   useEffect(() => {
     const divHeight =
-      width < 768 ? 50000 / width : width > 1800 ? 30000 / width : (70000 / width) * 2
+      width < 768
+        ? 50000 / width
+        : width > 2100
+        ? 0
+        : width > 1800
+        ? 30000 / width
+        : (70000 / width) * 2
 
     if (spacerRef?.current) {
       ;(spacerRef.current as HTMLDivElement).style.height = `${Math.round(divHeight)}px`
@@ -36,8 +42,9 @@ const HeroBackground = () => {
         <div className="absolute w-screen h-screen">
           <div className={['w-full top-0 relative z-0', styles['shape-gradient']].join(' ')} />
           <div className="absolute bottom-0 z-[1] w-full h-1/3 bg-gradient-to-t from-scale-100 to-transparent" />
+          <div className="absolute hidden 4xl:block top-0 z-[1] w-full h-[100px] bg-gradient-to-b from-scale-100 to-transparent" />
           <div ref={spacerRef} className="relative w-full bg-scale-100" />
-          <div className={['2xl:-mt-52'].join(' ')}>
+          <div className={['2xl:-mt-[10vw] 4xl:-mt-[16vw]'].join(' ')}>
             <svg
               className={['-mt-1 relative z-[-2]', styles['triangle-svg']].join(' ')}
               preserveAspectRatio="none"
