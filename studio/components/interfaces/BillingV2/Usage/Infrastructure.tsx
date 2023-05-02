@@ -3,6 +3,7 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
 import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
 import BarChart from './BarChart'
+import { generateUsageData } from './Usage.utils'
 
 const Infrastructure = () => {
   const { ref } = useParams()
