@@ -2,7 +2,7 @@ import { useParams } from 'common'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Button, IconCheckCircle, Listbox } from 'ui'
 import Infrastructure from './Infrastructure'
 import Bandwidth from './Bandwidth'
@@ -13,10 +13,34 @@ const Usage = () => {
   const { ref } = useParams()
   const [selectedProjectRef, setSelectedProjectRef] = useState<string>(ref as string)
 
+  const infrastructureRef = useRef<HTMLDivElement>(null)
+  const bandwidthRef = useRef<HTMLDivElement>(null)
+  const sizeAndCountsRef = useRef<HTMLDivElement>(null)
+  const activityRef = useRef<HTMLDivElement>(null)
+
   const { data: projects, isLoading, isSuccess } = useProjectsQuery()
   const { data: subscription } = useProjectSubscriptionQuery({ projectRef: ref })
 
   useEffect(() => {}, [isSuccess])
+
+  const scrollTo = (id: 'infra' | 'bandwidth' | 'sizeCount' | 'activity') => {
+    switch (id) {
+      case 'infra':
+        if (infrastructureRef.current)
+          infrastructureRef.current.scrollIntoView({ behavior: 'smooth' })
+        break
+      case 'bandwidth':
+        if (bandwidthRef.current) bandwidthRef.current.scrollIntoView({ behavior: 'smooth' })
+        break
+      case 'sizeCount':
+        if (sizeAndCountsRef.current)
+          sizeAndCountsRef.current.scrollIntoView({ behavior: 'smooth' })
+        break
+      case 'activity':
+        if (activityRef.current) activityRef.current.scrollIntoView({ behavior: 'smooth' })
+        break
+    }
+  }
 
   return (
     <>
@@ -54,19 +78,31 @@ const Usage = () => {
           </div>
 
           <div className="flex items-center space-x-6 !mt-2">
-            <div className="flex items-center opacity-50 space-x-2 py-3 hover:opacity-100 transition cursor-pointer">
+            <div
+              onClick={() => scrollTo('infra')}
+              className="flex items-center opacity-50 space-x-2 py-3 hover:opacity-100 transition cursor-pointer"
+            >
               <IconCheckCircle size={15} strokeWidth={2} className="text-brand-900" />
               <p className="text-sm">Infrastructure</p>
             </div>
-            <div className="flex items-center opacity-50 space-x-2 py-3 hover:opacity-100 transition cursor-pointer">
+            <div
+              onClick={() => scrollTo('bandwidth')}
+              className="flex items-center opacity-50 space-x-2 py-3 hover:opacity-100 transition cursor-pointer"
+            >
               <IconCheckCircle size={15} strokeWidth={2} className="text-brand-900" />
               <p className="text-sm">Bandwidth</p>
             </div>
-            <div className="flex items-center opacity-50 space-x-2 py-3 hover:opacity-100 transition cursor-pointer">
+            <div
+              onClick={() => scrollTo('sizeCount')}
+              className="flex items-center opacity-50 space-x-2 py-3 hover:opacity-100 transition cursor-pointer"
+            >
               <IconCheckCircle size={15} strokeWidth={2} className="text-brand-900" />
               <p className="text-sm">Size & Counts</p>
             </div>
-            <div className="flex items-center opacity-50 space-x-2 py-3 hover:opacity-100 transition cursor-pointer">
+            <div
+              onClick={() => scrollTo('activity')}
+              className="flex items-center opacity-50 space-x-2 py-3 hover:opacity-100 transition cursor-pointer"
+            >
               <IconCheckCircle size={15} strokeWidth={2} className="text-brand-900" />
               <p className="text-sm">Activity</p>
             </div>
@@ -74,10 +110,18 @@ const Usage = () => {
         </div>
       </div>
 
-      <Infrastructure />
-      <Bandwidth />
-      <SizeAndCounts />
-      <Activity />
+      <div ref={infrastructureRef}>
+        <Infrastructure />
+      </div>
+      <div ref={bandwidthRef}>
+        <Bandwidth />
+      </div>
+      <div ref={sizeAndCountsRef}>
+        <SizeAndCounts />
+      </div>
+      <div ref={activityRef}>
+        <Activity />
+      </div>
     </>
   )
 }
