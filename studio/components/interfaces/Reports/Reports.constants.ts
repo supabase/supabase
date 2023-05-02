@@ -116,6 +116,31 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
           timestamp ASC
         `,
       },
+      topErrorRoutes: {
+        queryType: "logs",
+        sql: (filters)=> `
+        select
+          request.path as path,
+          request.method as method,
+          request.search as search,
+          response.status_code as status_code,
+          count(t.id) as count
+        from edge_logs t
+          cross join unnest(metadata) as m
+          cross join unnest(m.response) as response
+          cross join unnest(m.request) as request
+          cross join unnest(request.headers) as headers
+        where
+          response.status_code >= 400
+        ${generateRexepWhere(filters, false)}
+        group by
+          request.path, request.method, request.search, response.status_code
+        order by
+          count desc
+        limit
+        5
+        `
+      },
       responseSpeed: {
         queryType: 'logs',
         sql: (filters) => `
