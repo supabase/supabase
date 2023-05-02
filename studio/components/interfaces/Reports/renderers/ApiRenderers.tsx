@@ -3,14 +3,11 @@ import BarChart from 'components/ui/Charts/BarChart'
 import Table from 'components/to-be-cleaned/Table'
 import {
   jsonSyntaxHighlight,
-  ResponseCodeFormatter,
   TextFormatter,
 } from 'components/interfaces/Settings/Logs/LogsFormatters'
 import { Button, Collapsible, IconChevronRight } from 'ui'
 import { queryParamsToObject } from '../Reports.utils'
-import Loading from 'components/ui/Loading'
-import { LoadingLine } from 'ui/src/components/Command/LoadingLine'
-import LoadingOpacity from 'components/ui/LoadingOpacity'
+import { Fragment } from 'react'
 
 export const renderTotalRequests = (
   props: ReportWidgetProps<{
@@ -64,7 +61,7 @@ export const renderTopApiRoutes = (
       body={
         <>
           {props.data.map((datum) => (
-            <>
+            <Fragment key={datum.path + (datum.search || '')}>
               <Table.tr className="p-0">
                 <Table.td className={[cellClasses].join(' ')}>
                   <RouteTdContent {...datum} />
@@ -78,7 +75,7 @@ export const renderTopApiRoutes = (
                   </Table.td>
                 )}
               </Table.tr>
-            </>
+            </Fragment>
           ))}
         </>
       }
@@ -117,7 +114,7 @@ export const renderResponseSpeed = (
 ) => {
   const transformedData = props.data.map((datum) => ({
     timestamp: datum.timestamp,
-    avg: datum.avg
+    avg: datum.avg,
   }))
   const lastAvg = props.data[props.data.length - 1]?.avg
   return (
@@ -145,7 +142,7 @@ const RouteTdContent = (datum: RouteTdContentProps) => (
   <Collapsible>
     <Collapsible.Trigger asChild>
       <div className="flex gap-2">
-        <Button type="text" className=" !py-0 !p-1" title="Show more route details">
+        <Button as="span" type="text" className=" !py-0 !p-1" title="Show more route details">
           <IconChevronRight
             size={14}
             className="transition data-open-parent:rotate-90 data-closed-parent:rotate-0"
