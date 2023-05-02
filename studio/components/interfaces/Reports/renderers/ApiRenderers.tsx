@@ -210,7 +210,7 @@ const RouteTdContent = (datum: RouteTdContentProps) => (
           />
         </pre>
       ) : (
-        <p className="text-xs text-scale-900">No query paramters in this request</p>
+        <p className="text-xs text-scale-900">No query parameters in this request</p>
       )}
     </Collapsible.Content>
   </Collapsible>
