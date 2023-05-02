@@ -79,8 +79,8 @@ const Features = () => {
               <Image
                 src={
                   isDarkMode
-                    ? '/images/index/database-dark-hover.jpg'
-                    : '/images/index/database-light-hover.jpg'
+                    ? '/images/index/database-dark.jpg'
+                    : '/images/index/database-light.jpg'
                 }
                 alt="Supabase Postgres Database, hover image with glow"
                 layout="fill"
@@ -105,11 +105,7 @@ const Features = () => {
           image={
             <motion.div className="absolute inset-0 z-0" variants={opacityVariant}>
               <Image
-                src={
-                  isDarkMode
-                    ? '/images/index/auth-dark-hover.jpg'
-                    : '/images/index/auth-light-hover.jpg'
-                }
+                src={isDarkMode ? '/images/index/auth-dark.jpg' : '/images/index/auth-light.jpg'}
                 alt="Supabase Authentication feature, hover image with glow"
                 layout="fill"
                 objectPosition="50% 50%"
@@ -133,9 +129,7 @@ const Features = () => {
             <motion.div className="absolute inset-0 z-0" variants={opacityVariant}>
               <Image
                 src={
-                  isDarkMode
-                    ? '/images/index/storage-dark-hover.jpg'
-                    : '/images/index/storage-light-hover.jpg'
+                  isDarkMode ? '/images/index/storage-dark.jpg' : '/images/index/storage-light.jpg'
                 }
                 alt="Supabase Storage feature, hover image with glow"
                 layout="fill"
@@ -145,7 +139,7 @@ const Features = () => {
               />
             </motion.div>
           }
-          classname="md:!col-span-2 md:h-[390px]"
+          classname="md:!col-span-2 md:h-[350px] lg:h-[390px]"
           onClick={() => sendTelemetryEvent(name)}
         />
         <FeatureCard
@@ -162,11 +156,7 @@ const Features = () => {
           image={
             <motion.div className="absolute inset-0 z-0" variants={opacityVariant}>
               <Image
-                src={
-                  isDarkMode
-                    ? '/images/index/edge-dark-hover.jpg'
-                    : '/images/index/edge-light-hover.jpg'
-                }
+                src={isDarkMode ? '/images/index/edge-dark.jpg' : '/images/index/edge-light.jpg'}
                 alt="Supabase Edge Functions feature, hover image with glow"
                 layout="fill"
                 objectPosition={isSm ? 'bottom' : '50% 50%'}
@@ -175,7 +165,7 @@ const Features = () => {
               />
             </motion.div>
           }
-          classname="md:!col-span-2 md:h-[390px]"
+          classname="md:!col-span-2 md:h-[350px] lg:h-[390px]"
         />
         <FeatureCard
           url={Solutions['realtime'].url}
@@ -192,18 +182,18 @@ const Features = () => {
               <Image
                 src={
                   isDarkMode
-                    ? '/images/index/realtime-dark-hover.jpg'
-                    : '/images/index/realtime-light-hover.jpg'
+                    ? '/images/index/realtime-dark.jpg'
+                    : '/images/index/realtime-light.jpg'
                 }
                 alt="Supabase Edge Functions feature, hover image with glow"
                 layout="fill"
-                objectPosition={isSm ? 'bottom' : '50% 50%'}
-                objectFit={isSm ? 'contain' : 'cover'}
+                objectPosition="50% 50%"
+                objectFit="cover"
                 quality={95}
               />
             </motion.div>
           }
-          classname="md:!col-span-2 md:h-[390px]"
+          classname="md:!col-span-2 md:h-[350px] lg:h-[390px]"
         />
       </dl>
       <BackedBy className="pt-8" layout="horizontal" />
