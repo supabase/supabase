@@ -16,23 +16,23 @@ const SizeAndCounts = () => {
   const startDate = new Date((current_period_start ?? 0) * 1000).toISOString()
   const endDate = new Date((current_period_end ?? 0) * 1000).toISOString()
 
-  // [JOSHEN TODO] Attribute needs to change after confirming with team o11y if this is implemented
+  const TOTAL_DB_SIZE_KEY = 'total_db_size_bytes'
   const { db_size } = usage ?? {}
   const dbSizeExcess = (db_size?.usage ?? 0) - (db_size?.limit ?? 0)
   const { data: dbSizeData, isLoading: isLoadingDbSizeData } = useDailyStatsQuery({
     projectRef: ref,
-    attribute: 'total_rest_egress',
+    attribute: TOTAL_DB_SIZE_KEY,
     interval: '1d',
     startDate,
     endDate,
   })
 
-  // [JOSHEN TODO] Attribute needs to change after confirming with team o11y if this is implemented
+  const TOTAL_STORAGE_SIZE_KEY = 'total_storage_size_bytes'
   const { storage_size } = usage ?? {}
   const storageSizeExcess = (storage_size?.usage ?? 0) - (storage_size?.limit ?? 0)
   const { data: storageSizeData, isLoading: isLoadingStorageSizeData } = useDailyStatsQuery({
     projectRef: ref,
-    attribute: 'total_storage_egress',
+    attribute: TOTAL_STORAGE_SIZE_KEY,
     interval: '1d',
     startDate,
     endDate,
@@ -104,7 +104,7 @@ const SizeAndCounts = () => {
                 </div>
               ) : (
                 <BarChart
-                  attribute="total_rest_egress"
+                  attribute={TOTAL_DB_SIZE_KEY}
                   data={dbSizeData?.data ?? []}
                   unit={undefined}
                   yDomain={[0, 100]}
@@ -172,7 +172,7 @@ const SizeAndCounts = () => {
                 </div>
               ) : (
                 <BarChart
-                  attribute="total_rest_egress"
+                  attribute={TOTAL_STORAGE_SIZE_KEY}
                   data={storageSizeData?.data ?? []}
                   unit={undefined}
                   yDomain={[0, 100]}

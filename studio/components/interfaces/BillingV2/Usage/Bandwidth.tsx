@@ -1,12 +1,12 @@
 import { useParams } from 'common'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import SparkBar from 'components/ui/SparkBar'
 import { useDailyStatsQuery } from 'data/analytics/daily-stats-query'
 import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
 import { useProjectUsageQuery } from 'data/usage/project-usage-query'
-import BarChart from './BarChart'
-import { Button } from 'ui'
-import SparkBar from 'components/ui/SparkBar'
 import { formatBytes } from 'lib/helpers'
+import { Button } from 'ui'
+import BarChart from './BarChart'
 
 const Bandwidth = () => {
   const { ref } = useParams()
@@ -16,21 +16,24 @@ const Bandwidth = () => {
   const startDate = new Date((current_period_start ?? 0) * 1000).toISOString()
   const endDate = new Date((current_period_end ?? 0) * 1000).toISOString()
 
+  // [JOSHEN TODO] Double check if this is the right attribute
+  const DB_EGRESS_KEY = 'total_db_egress_bytes'
   const { db_egress } = usage ?? {}
   const dbEgressExcess = (db_egress?.usage ?? 0) - (db_egress?.limit ?? 0)
   const { data: dbEgressData, isLoading: isLoadingDbEgressData } = useDailyStatsQuery({
     projectRef: ref,
-    attribute: 'total_rest_egress',
+    attribute: DB_EGRESS_KEY,
     interval: '1d',
     startDate,
     endDate,
   })
 
+  const STORAGE_EGRESS_KEY = 'total_storage_egress'
   const { storage_egress } = usage ?? {}
   const storageEgressExcess = (storage_egress?.usage ?? 0) - (storage_egress?.limit ?? 0)
   const { data: storageEgressData, isLoading: isLoadingStorageEgressData } = useDailyStatsQuery({
     projectRef: ref,
-    attribute: 'total_storage_egress',
+    attribute: STORAGE_EGRESS_KEY,
     interval: '1d',
     startDate,
     endDate,
@@ -104,7 +107,7 @@ const Bandwidth = () => {
                 </div>
               ) : (
                 <BarChart
-                  attribute="total_rest_egress"
+                  attribute={DB_EGRESS_KEY}
                   data={dbEgressData?.data ?? []}
                   unit={undefined}
                   yDomain={[0, 100]}
@@ -172,7 +175,7 @@ const Bandwidth = () => {
                 </div>
               ) : (
                 <BarChart
-                  attribute="total_rest_egress"
+                  attribute={STORAGE_EGRESS_KEY}
                   data={storageEgressData?.data ?? []}
                   unit={undefined}
                   yDomain={[0, 100]}
