@@ -75,6 +75,8 @@ export const ApiReport: NextPageWithLayout = () => {
         tooltip="Error responses with 4XX or 5XX status codes"
         data={report.data.errorCounts || []}
         renderer={renderErrorCounts}
+        appendProps={{data: report.data.topErrorRoutes || [] }}
+        append={renderTopApiRoutes}
       />
       <ReportWidget
         isLoading={report.isLoading}
@@ -99,6 +101,7 @@ const useApiReport = () => {
   const totalRequests = queryHooks.totalRequests()
   const topRoutes = queryHooks.topRoutes()
   const errorCounts = queryHooks.errorCounts()
+  const topErrorRoutes = queryHooks.topErrorRoutes()
   const responseSpeed = queryHooks.responseSpeed()
   const activeHooks = [totalRequests, topRoutes, errorCounts, responseSpeed]
   const [filters, setFilters] = useState<ReportFilterItem[]>([])
@@ -137,6 +140,10 @@ const useApiReport = () => {
     if (errorCounts[1].changeQuery) {
       errorCounts[1].changeQuery(PRESET_CONFIG.api.queries.errorCounts.sql(filters))
     }
+
+    if (topErrorRoutes[1].changeQuery) {
+      topErrorRoutes[1].changeQuery(PRESET_CONFIG.api.queries.topErrorRoutes.sql(filters))
+    }
     if (responseSpeed[1].changeQuery) {
       responseSpeed[1].changeQuery(PRESET_CONFIG.api.queries.responseSpeed.sql(filters))
     }
@@ -159,12 +166,14 @@ const useApiReport = () => {
       errorCounts: errorCounts[0].logData,
       responseSpeed: responseSpeed[0].logData,
       topRoutes: topRoutes[0].logData,
+      topErrorRoutes: topErrorRoutes[0].logData,
     },
     params: {
       totalRequests: totalRequests[0].params,
       errorCounts: errorCounts[0].params,
       responseSpeed: responseSpeed[0].params,
       topRoutes: topRoutes[0].params,
+      topErrorRoutes: topErrorRoutes[0].params,
     },
     mergeParams: handleSetParams,
     filters,

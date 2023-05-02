@@ -3,10 +3,14 @@ import BarChart from 'components/ui/Charts/BarChart'
 import Table from 'components/to-be-cleaned/Table'
 import {
   jsonSyntaxHighlight,
+  ResponseCodeFormatter,
   TextFormatter,
 } from 'components/interfaces/Settings/Logs/LogsFormatters'
 import { Button, Collapsible, IconChevronRight } from 'ui'
 import { queryParamsToObject } from '../Reports.utils'
+import Loading from 'components/ui/Loading'
+import { LoadingLine } from 'ui/src/components/Command/LoadingLine'
+import LoadingOpacity from 'components/ui/LoadingOpacity'
 
 export const renderTotalRequests = (
   props: ReportWidgetProps<{
@@ -34,40 +38,41 @@ export const renderTotalRequests = (
 export const renderTopApiRoutes = (
   props: ReportWidgetRendererProps<{
     method: string
+    // shown for error table but not all requests table
+    status_code?: number
     path: string
     search: string
     count: number
   }>
 ) => {
+  if (props.data.length === 0) return null
   const headerClasses = '!text-xs !py-2 p-0 font-bold !bg-scale-400'
-  const cellClasses = '!text-xs !py-2 truncate'
+  const cellClasses = '!text-xs !py-2'
   return (
-    <>
-      <Table
-        head={
-          <>
-            <Table.th className={headerClasses}>Request</Table.th>
-            <Table.th className={headerClasses + ' text-right'}>Count</Table.th>
-          </>
-        }
-        body={
-          <>
-            {props.data.map((datum) => (
-              <>
-                <Table.tr className="p-0">
-                  <Table.td className={[cellClasses].join(' ')}>
-                    <RouteTdContent {...datum} />
-                  </Table.td>
-                  <Table.td className={[cellClasses, 'text-right align-top'].join(' ')}>
-                    {datum.count}
-                  </Table.td>
-                </Table.tr>
-              </>
-            ))}
-          </>
-        }
-      />
-    </>
+    <Table
+      head={
+        <>
+          <Table.th className={headerClasses}>Request</Table.th>
+          <Table.th className={headerClasses + ' text-right'}>Count</Table.th>
+        </>
+      }
+      body={
+        <>
+          {props.data.map((datum) => (
+            <>
+              <Table.tr className="p-0">
+                <Table.td className={[cellClasses].join(' ')}>
+                  <RouteTdContent {...datum} />
+                </Table.td>
+                <Table.td className={[cellClasses, 'text-right align-top'].join(' ')}>
+                  {datum.count}
+                </Table.td>
+              </Table.tr>
+            </>
+          ))}
+        </>
+      }
+    />
   )
 }
 
@@ -124,6 +129,7 @@ export const renderResponseSpeed = (
 
 interface RouteTdContentProps {
   method: string
+  status_code?: number
   path: string
   search: string
 }
@@ -138,10 +144,22 @@ const RouteTdContent = (datum: RouteTdContentProps) => (
           />
         </Button>
         <TextFormatter className="w-10 h-4 text-center rounded bg-scale-500" value={datum.method} />
-        <div>
+        {datum.status_code && (
+          <TextFormatter
+            className={`w-10 h-4 text-center rounded ${
+              datum.status_code >= 400
+                ? 'bg-orange-500'
+                : datum.status_code >= 300
+                ? 'bg-yellow-500'
+                : 'bg-green-500'
+            }`}
+            value={String(datum.status_code)}
+          />
+        )}
+        <div className=" truncate max-w-sm lg:max-w-lg">
           <TextFormatter className="text-scale-1100" value={datum.path} />
           <TextFormatter
-            className="max-w-sm text-scale-900"
+            className="max-w-sm text-scale-900 truncate "
             value={decodeURIComponent(datum.search || '')}
           />
         </div>
