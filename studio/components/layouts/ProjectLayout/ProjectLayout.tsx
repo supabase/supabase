@@ -26,6 +26,7 @@ export interface ProjectLayoutProps {
   hideHeader?: boolean
   hideIconBar?: boolean
   children: ReactNode
+  selectedTable?: string
 }
 
 const ProjectLayout = ({
@@ -36,12 +37,13 @@ const ProjectLayout = ({
   children,
   hideHeader = false,
   hideIconBar = false,
+  selectedTable,
 }: ProjectLayoutProps) => {
   const { ui } = useStore()
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const ongoingIncident = useFlag('ongoingIncident')
-  const projectName = ui.selectedProject?.name
+  const organizationName = ui.selectedOrganization?.name
 
   const isPaused = ui.selectedProject?.status === PROJECT_STATUS.INACTIVE
   const ignorePausedState =
@@ -52,7 +54,13 @@ const ProjectLayout = ({
     <ProjectContextProvider projectRef={projectRef}>
       <Head>
         <title>
-          {title ? `${title} | Supabase` : projectName ? `${projectName} | Supabase` : 'Supabase'}
+          {title
+            ? `${title} | Supabase`
+            : selectedTable
+            ? `${selectedTable} | ${organizationName} | Supabase`
+            : organizationName
+            ? `${organizationName} | Supabase`
+            : 'Supabase'}
         </title>
         <meta name="description" content="Supabase Studio" />
       </Head>
