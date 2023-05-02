@@ -1,54 +1,18 @@
 import Solutions from 'data/Solutions.json'
+<<<<<<< HEAD
 import Telemetry from '~/lib/telemetry'
 import gaEvents from '~/lib/gaEvents'
 import { useTelemetryProps } from 'common/hooks/useTelemetryProps'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
+=======
+>>>>>>> 57f0cd67d (chore: improve performance and accessibility)
 import Image from 'next/image'
 import SectionContainer from '../Layouts/SectionContainer'
 import { motion } from 'framer-motion'
 import BackedBy from '../BackedBy'
 import { useBreakpoint } from 'common'
-
-const Card = ({
-  classname,
-  title,
-  subtitle,
-  image,
-  onClick,
-  url,
-}: {
-  title: string
-  subtitle: string | React.ReactNode
-  url: string
-  image: any
-  onClick: any
-  classname?: string
-}) => (
-  <Link href={url}>
-    <a
-      className={[
-        'relative col-span-1 lg:col-span-4 h-[360px] md:h-[460px] flex flex-col gap-5 lg:flex-row',
-        classname,
-      ].join(' ')}
-      onClick={onClick}
-    >
-      <motion.div
-        className={`relative overflow-hidden group/2 flex-1 flex flex-col items-center gap-5 lg:items-start justify-between bg-scale-100
-                  w-full border dark:border-scale-300 border-scale-400 rounded-xl h-full px-6 py-12 shadow-lg`}
-        initial="default"
-        animate="default"
-        whileHover="hover"
-      >
-        <div className="relative z-10 flex flex-col items-center mx-auto text-center gap-2 text-scale-1200">
-          <h3 className="text-xl">{title}</h3>
-          <p className="text-sm text-scale-900">{subtitle}</p>
-        </div>
-        {image}
-      </motion.div>
-    </a>
-  </Link>
-)
+import FeatureCard from './FeatureCard'
 
 const opacityVariant = {
   default: { opacity: 0 },
@@ -100,14 +64,14 @@ const Features = () => {
 
   return (
     <SectionContainer className="space-y-8 max-w-7xl mt-24 lg:mt-0 !pt-0">
-      <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6 lg:grid-cols-6">
-        <Card
+      <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-4 lg:gap-6 md:grid-cols-6">
+        <FeatureCard
           url={Solutions['database'].url}
           title={Solutions['database'].name}
           subtitle={
             <>
               Every project is a full Postgres database,
-              <br className="inline-block sm:hidden md:inline-block" /> the world's most trusted
+              <br className="inline-block sm:hidden lg:inline-block" /> the world's most trusted
               relational database.
             </>
           }
@@ -121,7 +85,7 @@ const Features = () => {
                   layout="fill"
                   objectPosition={isSm ? 'bottom' : '50% 50%'}
                   objectFit={isSm ? 'contain' : 'cover'}
-                  quality={100}
+                  quality={95}
                 />
               </motion.div>
               <Image
@@ -130,18 +94,19 @@ const Features = () => {
                 layout="fill"
                 objectPosition={isSm ? 'bottom' : '50% 50%'}
                 objectFit={isSm ? 'contain' : 'cover'}
-                quality={100}
+                quality={95}
               />
             </div>
           }
+          classname="col-span-full md:col-span-3"
         />
-        <Card
+        <FeatureCard
           url={Solutions['authentication'].url}
           title={Solutions['authentication'].name}
           subtitle={
             <>
               Add user sign ups and logins,
-              <br className="inline-block sm:hidden md:inline-block" /> securing your data with Row
+              <br className="inline-block sm:hidden lg:inline-block" /> securing your data with Row
               Level Security.
             </>
           }
@@ -154,7 +119,6 @@ const Features = () => {
                   layout="fill"
                   objectPosition="50% 50%"
                   objectFit="cover"
-                  quality={100}
                 />
               </motion.div>
               <Image
@@ -162,20 +126,19 @@ const Features = () => {
                 layout="fill"
                 objectPosition="50% 50%"
                 objectFit="cover"
-                quality={100}
               />
             </div>
           }
-          classname="lg:!col-span-2"
+          classname="md:col-span-3 lg:!col-span-2"
           onClick={() => sendTelemetryEvent(name)}
         />
-        <Card
+        <FeatureCard
           url={Solutions['storage'].url}
           title={Solutions['storage'].name}
           subtitle={
             <>
               Store, organize, and serve large files.
-              <br className="inline-block sm:hidden md:inline-block" /> Any media, including videos
+              <br className="inline-block sm:hidden lg:inline-block" /> Any media, including videos
               and images.
             </>
           }
@@ -188,7 +151,7 @@ const Features = () => {
                   layout="fill"
                   objectPosition="50% 50%"
                   objectFit="cover"
-                  quality={100}
+                  quality={95}
                 />
               </motion.div>
               <Image
@@ -197,17 +160,21 @@ const Features = () => {
                 layout="fill"
                 objectPosition="50% 50%"
                 objectFit="cover"
-                quality={100}
               />
             </div>
           }
-          classname="lg:!col-span-2"
+          classname="md:!col-span-2"
           onClick={() => sendTelemetryEvent(name)}
         />
-        <Card
+        <FeatureCard
           url={Solutions['edge-functions'].url}
           title={Solutions['edge-functions'].name}
-          subtitle={Solutions['edge-functions'].description}
+          subtitle={
+            <>
+              Write custom code without deploying
+              <br className="inline-block sm:hidden lg:inline-block" /> or scaling servers.
+            </>
+          }
           onClick={() => sendTelemetryEvent(name)}
           image={
             <div className="absolute inset-0 z-0">
@@ -218,7 +185,7 @@ const Features = () => {
                   layout="fill"
                   objectPosition={isSm ? 'bottom' : '50% 50%'}
                   objectFit={isSm ? 'contain' : 'cover'}
-                  quality={100}
+                  quality={90}
                 />
               </motion.div>
               <Image
@@ -227,10 +194,38 @@ const Features = () => {
                 layout="fill"
                 objectPosition={isSm ? 'bottom' : '50% 50%'}
                 objectFit={isSm ? 'contain' : 'cover'}
-                quality={100}
+                quality={90}
               />
             </div>
           }
+          classname="md:!col-span-2"
+        />
+        <FeatureCard
+          url={Solutions['realtime'].url}
+          title={Solutions['realtime'].name}
+          subtitle={Solutions['realtime'].description}
+          image={
+            <div className="absolute inset-0 z-0">
+              <motion.div className="absolute inset-0 z-10" variants={opacityVariant}>
+                <Image
+                  src="/images/index/realtime-dark-hover.jpg"
+                  alt="Supabase Edge Functions feature, hover image with glow"
+                  layout="fill"
+                  objectPosition={isSm ? 'bottom' : '50% 50%'}
+                  objectFit={isSm ? 'contain' : 'cover'}
+                />
+              </motion.div>
+              <Image
+                src="/images/index/realtime-dark.jpg"
+                alt="Supabase Edge Functions feature"
+                layout="fill"
+                objectPosition={isSm ? 'bottom' : '50% 50%'}
+                objectFit={isSm ? 'contain' : 'cover'}
+                quality={95}
+              />
+            </div>
+          }
+          classname="md:!col-span-2"
         />
       </dl>
       <BackedBy className="pt-8" layout="horizontal" />

@@ -1,19 +1,20 @@
-import { getSortedPosts, getAllCategories } from '~/lib/posts'
+import dynamic from 'next/dynamic'
+import { getSortedPosts } from '~/lib/posts'
 import PostTypes from '~/types/post'
-import Container from 'components/Container'
+import Container from '~/components/Container'
 import Layout from '~/components/Layouts/Default'
-import Hero from 'components/Hero/Hero'
-
-import Features from 'components/Features/index'
-import BuiltExamples from 'components/BuiltWithSupabase/index'
-import MadeForDevelopers from 'components/MadeForDevelopers/index'
-import AdminAccess from 'components/AdminAccess/index'
-import CTABanner from 'components/CTABanner/index'
-import CustomerStories from 'components/CustomerStories'
-import TwitterSocialSection from '~/components/TwitterSocialSection'
+import Hero from '~/components/Hero/Hero'
 
 // Import Swiper styles if swiper used on page
 import 'swiper/swiper.min.css'
+
+const Features = dynamic(() => import('components/Features/index'))
+const BuiltExamples = dynamic(() => import('components/BuiltWithSupabase/index'))
+const MadeForDevelopers = dynamic(() => import('components/MadeForDevelopers/index'))
+const AdminAccess = dynamic(() => import('components/AdminAccess/index'))
+const CTABanner = dynamic(() => import('components/CTABanner/index'))
+const CustomerStories = dynamic(() => import('components/CustomerStories'))
+const TwitterSocialSection = dynamic(() => import('~/components/TwitterSocialSection'))
 
 type Props = { customerStories: PostTypes[] }
 
