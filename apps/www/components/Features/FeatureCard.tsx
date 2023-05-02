@@ -34,7 +34,7 @@ const FeatureCard = ({
       >
         <div className="relative z-10 flex flex-col items-center mx-auto text-center gap-2 text-scale-1200">
           <dt>
-            <h3 className="text-xl">{title}</h3>
+            <h2 className="text-xl">{title}</h2>
           </dt>
           <dd>
             <p className="text-sm text-scale-900">{subtitle}</p>
