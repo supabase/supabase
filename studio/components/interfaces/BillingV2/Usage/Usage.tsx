@@ -77,7 +77,7 @@ const Usage = () => {
       <Infrastructure />
       <Bandwidth />
       <SizeAndCounts />
-      {/* <Activity /> */}
+      <Activity />
     </>
   )
 }
