@@ -91,7 +91,11 @@ export type DiscussionsResponse = {
 /**
  * Fetches GitHub discussions for a repository + category
  */
-export async function fetchDiscussions(owner: string, repo: string, categoryId: string) {
+export async function fetchDiscussions(
+  owner: string,
+  repo: string,
+  categoryId: string
+) {
   const octokit = new ExtendedOctokit({
     authStrategy: createAppAuth,
     auth: {
