@@ -1,0 +1,219 @@
+---
+title: 'Supabase Clippy: leveraging GitHub Discussions'
+description: Solving AI hallucination with GitHub Discussions.
+author: gregnr
+tags:
+  - AI
+  - search
+  - docs
+date: '2023-05-03'
+toc_depth: 2
+---
+
+Earlier this year we launched Supabase Clippy, now known as Supabase AI, to provide personalized assistance to Supabase users as they build their applications.
+
+However, one of the biggest challenges we faced post-launch was Supabase AI providing inaccurate information to users - commonly referred to as "hallucination".
+
+[screenshot of bad response]
+
+If you've played with LLMs like ChatGPT, you've likely experienced this at some point. It's not that the model is unsure of its answer - its actually quite the opposite. The model will confidently reply with a made-up answer that is entirely false.
+
+How do we solve this?
+
+## First iteration
+
+If you've read our post on [Vector Embeddings](https://supabase.com/blog/openai-embeddings-postgres-vector), you'll know that Supabase AI works using retrieval-augmented generation (context injection):
+
+1. Based on the user's query, first search the Supabase documentation for the top X most related content.
+2. Inject this as context into the LLM prompt, along with the user's query itself
+
+This technique accomplishes a couple of useful things:
+
+1. It primes the prompt with information we want the model to respond with
+2. It uses up-to-date information every single query
+
+As long as the embedding search comes up with relevant results, the AI in turn will respond with a well-formed accurate answer. But unfortunately if no results come back or the results aren't a perfect match, Supabase AI can form some confusing responses.
+
+One attempt to combat this is with a bit of prompt design. We provide the model with instructions on how to respond to the user's query, particularly using the phrase:
+
+> If you are unsure and the answer is not explicitly written in the documentation, say "Sorry, I don't know how to help with that.”
+
+We've found this works pretty good, though it's not perfect. Human language is complex, and LLM's still aren't perfect at understanding intent and reading “between the lines”. For example, sometimes the knowledge search will come back with similar-looking results, but don't actually address the real question. What do you do in these situations?
+
+## Next iteration
+
+Ultimately the best way to prevent models from making up wrong answers is… to give it the right information in the first place! This might sound obvious, and perhaps unhelpful at the surface level. But if we dig into this for a second - what if we changed our approach from:
+
+- “How do we make the model smarter?” and
+- “How do we engineer the perfect prompt?”
+
+to:
+
+- “How can we give the model the best information?” and
+- “How can we make it easy to add more information?”
+
+## GitHub Discussions
+
+One of the most effective ways we've found to share information and collaborate with our users is through GitHub Discussions. It's an open community where users and contributors can work together to solve problems.
+
+Because this content is based on real problems and biases toward problem solving, it's an ideal content source for Supabase search and AI. So Supabase has added GitHub Discussions as a new knowledge source for search and AI responses. Going forward, anytime you use Supabase search or ask Supabase AI a question, related GitHub Discussions will now appear in the results.
+
+To start, we filter the discussions to only those posted in the [Troubleshooting](https://github.com/orgs/supabase/discussions/categories/troubleshooting) category, which we've opened to a few contributors who have volunteered to help pilot this effort. We found that without a bit of moderation, some threads end up with a marked answer that is out of date or sometimes incorrect - not ideal if our goal is to improve accuracy. In the future we hope to find ways to pull in more discussions.
+
+Below is the GraphQL function we use to fetch GitHub Discussions for a category:
+
+```tsx
+import { createAppAuth } from '@octokit/auth-app'
+import { Octokit } from '@octokit/core'
+import { paginateGraphql } from '@octokit/plugin-paginate-graphql'
+
+export const ExtendedOctokit = Octokit.plugin(paginateGraphql)
+export type ExtendedOctokit = InstanceType<typeof ExtendedOctokit>
+
+export type Discussion = {
+  id: string
+  updatedAt: string
+  url: string
+  title: string
+  body: string
+  databaseId: number
+}
+
+export type DiscussionsResponse = {
+  repository: {
+    discussions: {
+      totalCount: number
+      nodes: Discussion[]
+    }
+  }
+}
+
+/**
+ * Fetches GitHub discussions for a repository + category
+ */
+export async function fetchDiscussions(owner: string, repo: string, categoryId: string) {
+  const octokit = new ExtendedOctokit({
+    authStrategy: createAppAuth,
+    auth: {
+      appId: process.env.SEARCH_GITHUB_APP_ID,
+      installationId: process.env.SEARCH_GITHUB_APP_INSTALLATION_ID,
+      privateKey: process.env.SEARCH_GITHUB_APP_PRIVATE_KEY,
+    },
+  })
+
+  const {
+    repository: {
+      discussions: { nodes: discussions },
+    },
+  } = await octokit.graphql.paginate<DiscussionsResponse>(
+    `
+      query categoryDiscussions($cursor: String, $owner: String!, $repo: String!, $categoryId: ID!) {
+        repository(owner: $owner, name: $repo) {
+          discussions(first: 100, after: $cursor, categoryId: $categoryId) {
+            totalCount
+            nodes {
+              id
+              updatedAt
+              url
+              title
+              body
+              databaseId
+            }
+            pageInfo {
+              hasNextPage
+              endCursor
+            }
+          }
+        }
+      }
+    `,
+    {
+      owner,
+      repo,
+      categoryId,
+    }
+  )
+
+  return discussions
+}
+```
+
+To learn more about how this function integrates into the embeddings pipeline, [check out the PR](https://github.com/supabase/supabase/pull/13874).
+
+## Higher quality, faster
+
+Now anytime we encounter an incorrect AI response, we can immediately post a GitHub Discussion that clarifies the topic and provides a correct answer. As soon as the new post is indexed in search, Supabase AI will immediately have a correct answer for the same question.
+
+You can use the following GitHub Action to automate this process:
+
+```yaml
+name: Generate Embeddings for Search
+
+on:
+	# Trigger a re-index any time the docs change
+  push:
+    branches:
+      - master
+    paths:
+      - '.github/workflows/search.yml'
+      - 'supabase/migrations/**'
+      - 'apps/docs/**'
+      - 'spec/**'
+
+	# Allow triggering a re-index manually
+  workflow_dispatch: {}
+
+	# Re-index once per day
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      OPENAI_KEY: ${{ secrets.OPENAI_KEY }}
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      PROJECT_ID: ${{ secrets.SEARCH_SUPABASE_PROJECT_ID }}
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SEARCH_SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SEARCH_SUPABASE_SERVICE_ROLE_KEY }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SEARCH_SUPABASE_DB_PASSWORD }}
+      SEARCH_GITHUB_APP_ID: ${{ secrets.SEARCH_GITHUB_APP_ID }}
+      SEARCH_GITHUB_APP_INSTALLATION_ID: ${{ secrets.SEARCH_GITHUB_APP_INSTALLATION_ID }}
+      SEARCH_GITHUB_APP_PRIVATE_KEY: ${{ secrets.SEARCH_GITHUB_APP_PRIVATE_KEY }}
+
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v3
+
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Download dependencies
+        run: npm ci
+
+      - name: Link Supabase project
+        run: npx supabase link --project-ref $PROJECT_ID
+
+      - name: Run migrations
+        run: npx supabase db push
+
+      - name: Refresh embeddings
+        working-directory: ./apps/docs
+        run: npm run embeddings
+```
+
+This action will re-run once per day as well as when any docs are updated. In the future, we can even trigger this action [when a new GitHub Discussion is posted](https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#discussion). We will likely want additional short-circuiting logic that only runs if the discussion was posted to the Troubleshooting category - otherwise we will end up with a lot of unnecessary invocations.
+
+## Final thoughts
+
+The best part of this approach is that we can equip the community to quickly and easily contribute to the knowledge base and help ensure that Supabase AI is providing accurate and helpful responses. As we continue to iterate and improve upon this approach, we hope it will lead to higher quality responses, faster turnaround times, and a more engaged and collaborative community.
+
+## More AI content
+
+- [Storing OpenAI embeddings in Postgres with pgvector](https://supabase.com/blog/openai-embeddings-postgres-vector)
+- [Supabase Clippy: ChatGPT for Supabase Docs](https://supabase.com/blog/chatgpt-supabase-docs)
+- [Designing with AI: Generating unique artwork for every user](https://supabase.com/blog/designing-with-ai-midjourney)
+- [The Supabase AI Hackathon](https://supabase.com/blog/launch-week-7-hackathon)
