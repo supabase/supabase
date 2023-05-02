@@ -22,7 +22,7 @@ export const REFERENCES: References = {
   swift: {
     name: 'Swift',
     library: 'supabase-swift',
-    versions: ['v1'],
+    versions: ['v0'],
     icon: '/docs/img/libraries/swift-icon.svg',
   },
   cli: {
@@ -1176,7 +1176,7 @@ export const references = [
       },
       {
         label: 'supabase-swift',
-        versions: ['v1'],
+        versions: ['v0'],
         description: 'something about the reference',
         icon: '/docs/img/icons/swift-icon.svg',
         url: '/reference/swift/start',
