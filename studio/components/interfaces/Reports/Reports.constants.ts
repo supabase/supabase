@@ -74,6 +74,28 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
         ORDER BY
           timestamp ASC`,
       },
+      topRoutes: {
+        queryType: "logs",
+        sql: (filters)=> `
+        select
+          request.path as path,
+          request.method as method,
+          request.search as search,
+          count(t.id) as count
+        from edge_logs t
+          cross join unnest(metadata) as m
+          cross join unnest(m.response) as response
+          cross join unnest(m.request) as request
+          cross join unnest(request.headers) as headers
+          ${generateRexepWhere(filters)}
+        group by
+          request.path, request.method, request.search
+        order by
+          count desc
+        limit
+        5
+        `
+      },
       errorCounts: {
         queryType: 'logs',
         sql: (filters) => `

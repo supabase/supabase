@@ -15,14 +15,15 @@ export interface ReportWidgetProps<T = any> {
   tooltip?: string
   className?: string
   renderer: (props: ReportWidgetRendererProps) => React.ReactNode
-  expandable?: (props: ReportWidgetRendererProps) => React.ReactNode
-  expandableText?: string
+  append?: (props: ReportWidgetRendererProps) => React.ReactNode
+  // for overriding props, such as data
+  appendProps?: Partial<ReportWidgetRendererProps>
   // omitting params will hide the "View in logs explorer" button
   params?: BaseReportParams | LogsEndpointParams
   isLoading: boolean
 }
 
-export interface ReportWidgetRendererProps extends ReportWidgetProps {
+export interface ReportWidgetRendererProps<T = any> extends ReportWidgetProps<T> {
   router: NextRouter
   projectRef: string
 }
@@ -99,7 +100,7 @@ const ReportWidget: React.FC<ReportWidgetProps> = (props) => {
                   </div>
                 </Tooltip.Content>
               </Tooltip.Portal>
-            </Tooltip.Root>
+          </Tooltip.Root>
           )}
         </div>
 
@@ -107,16 +108,8 @@ const ReportWidget: React.FC<ReportWidgetProps> = (props) => {
           {props.data === undefined ? null : props.renderer({ ...props, router, projectRef })}
         </LoadingOpacity>
 
-        {props.expandable && (
-          <Collapsible>
-            <Collapsible.Trigger asChild>
-              <Button>{props.expandableText || 'Expand'}</Button>
-            </Collapsible.Trigger>
-            <Collapsible.Content>
-              {props.expandable && props.expandable({ ...props, router, projectRef })}
-            </Collapsible.Content>
-          </Collapsible>
-        )}
+        {props.append &&
+          props.append({ ...props, ...(props.appendProps || {}), router, projectRef })}
       </Panel.Content>
     </Panel>
   )
