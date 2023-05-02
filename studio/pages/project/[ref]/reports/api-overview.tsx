@@ -12,6 +12,7 @@ import {
   renderTotalRequests,
   renderErrorCounts,
   renderResponseSpeed,
+  renderTopApiRoutes,
 } from 'components/interfaces/Reports/renderers/ApiRenderers'
 import { useState, useEffect } from 'react'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
@@ -64,6 +65,8 @@ export const ApiReport: NextPageWithLayout = () => {
         title="Total Requests"
         data={report.data.totalRequests || []}
         renderer={renderTotalRequests}
+        append={renderTopApiRoutes}
+        appendProps={{data: report.data.topRoutes || [] }}
       />
       <ReportWidget
         isLoading={report.isLoading}
@@ -94,9 +97,10 @@ const useApiReport = () => {
     projectRef ?? 'default'
   )
   const totalRequests = queryHooks.totalRequests()
+  const topRoutes = queryHooks.topRoutes()
   const errorCounts = queryHooks.errorCounts()
   const responseSpeed = queryHooks.responseSpeed()
-  const activeHooks = [totalRequests, errorCounts, responseSpeed]
+  const activeHooks = [totalRequests, topRoutes, errorCounts, responseSpeed]
   const [filters, setFilters] = useState<ReportFilterItem[]>([])
   const addFilter = (filter: ReportFilterItem) => {
     // use a deep equal when comparing objects.
@@ -127,6 +131,9 @@ const useApiReport = () => {
     if (totalRequests[1].changeQuery) {
       totalRequests[1].changeQuery(PRESET_CONFIG.api.queries.totalRequests.sql(filters))
     }
+    if (topRoutes[1].changeQuery) {
+      topRoutes[1].changeQuery(PRESET_CONFIG.api.queries.topRoutes.sql(filters))
+    }
     if (errorCounts[1].changeQuery) {
       errorCounts[1].changeQuery(PRESET_CONFIG.api.queries.errorCounts.sql(filters))
     }
@@ -151,11 +158,13 @@ const useApiReport = () => {
       totalRequests: totalRequests[0].logData,
       errorCounts: errorCounts[0].logData,
       responseSpeed: responseSpeed[0].logData,
+      topRoutes: topRoutes[0].logData,
     },
     params: {
       totalRequests: totalRequests[0].params,
       errorCounts: errorCounts[0].params,
       responseSpeed: responseSpeed[0].params,
+      topRoutes: topRoutes[0].params,
     },
     mergeParams: handleSetParams,
     filters,
