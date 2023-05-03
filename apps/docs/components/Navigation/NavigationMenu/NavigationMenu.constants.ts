@@ -295,6 +295,7 @@ export const auth = {
             },
           ],
         },
+        { name: 'Password Reset', url: '/guides/auth/auth-password-reset' },
         { name: 'Email Templates', url: '/guides/auth/auth-email-templates' },
       ],
     },
