@@ -128,8 +128,7 @@ const Activity = ({ projectRef }: ActivityProps) => {
         return (
           <SectionContent
             key={attribute.key}
-            title={attribute.name}
-            description={attribute.description}
+            section={attribute}
             includedInPlan={usageMeta.available_in_plan}
           >
             <div className="space-y-2">
