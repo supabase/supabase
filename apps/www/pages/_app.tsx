@@ -5,7 +5,7 @@ import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import Meta from '~/components/Favicons'
 import '../styles/index.css'
-import { post } from './../lib/fetchWrapper'
+import { post } from '~/lib/fetchWrapper'
 import { AuthProvider, ThemeProvider } from 'common'
 import Head from 'next/head'
 
