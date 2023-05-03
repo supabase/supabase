@@ -116,7 +116,7 @@ export const USAGE_CATEGORIES: {
       {
         key: 'monthly_active_users',
         attribute: 'total_auth_billing_period_mau',
-        name: 'Monthly active users (MAU)',
+        name: 'Monthly active users',
         unit: 'absolute',
         description:
           'The amount of distinct users requesting your API throughout the billing period. Resets at the beginning of every billing period.',
@@ -125,7 +125,7 @@ export const USAGE_CATEGORIES: {
       {
         key: 'monthly_active_sso_users',
         attribute: 'total_auth_billing_period_sso_mau',
-        name: 'Monthly active single sign-on (SSO) users',
+        name: 'Monthly active single sign-on users',
         unit: 'absolute',
         description:
           'The amount of distinct Single Sign-On users requesting your API throughout the billing period. Resets at the beginning of every billing period.',
