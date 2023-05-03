@@ -1,31 +1,29 @@
-import { useState } from 'react'
+import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 import { QueryKey, useQueryClient } from '@tanstack/react-query'
-import { find, isEmpty, isUndefined, noop } from 'lodash'
-import { Dictionary } from 'components/grid'
-import { Modal } from 'ui'
-import type { PostgresTable, PostgresColumn } from '@supabase/postgres-meta'
+import { isEmpty, isUndefined, noop } from 'lodash'
+import { useState } from 'react'
 
-import { useStore, useUrlState } from 'hooks'
+import { Dictionary } from 'components/grid'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { entityTypeKeys } from 'data/entity-types/keys'
+import { sqlKeys } from 'data/sql/keys'
 import { useTableRowCreateMutation } from 'data/table-rows/table-row-create-mutation'
 import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
-import { RowEditor, ColumnEditor, TableEditor, SpreadsheetImport } from '.'
-import { ImportContent } from './TableEditor/TableEditor.types'
+import { tableKeys } from 'data/tables/keys'
+import { useStore, useUrlState } from 'hooks'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { Modal } from 'ui'
+import { ColumnEditor, RowEditor, SpreadsheetImport, TableEditor } from '.'
+import ForeignRowSelector from './RowEditor/ForeignRowSelector/ForeignRowSelector'
+import JsonEdit from './RowEditor/JsonEditor/JsonEditor'
 import {
   ColumnField,
   CreateColumnPayload,
   ExtendedPostgresRelationship,
   UpdateColumnPayload,
 } from './SidePanelEditor.types'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
-import JsonEdit from './RowEditor/JsonEditor/JsonEditor'
-import { JsonEditValue } from './RowEditor/RowEditor.types'
-import { sqlKeys } from 'data/sql/keys'
-import ForeignRowSelector, {
-  ForeignRowSelectorProps,
-} from './RowEditor/ForeignRowSelector/ForeignRowSelector'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { ImportContent } from './TableEditor/TableEditor.types'
 
 export interface SidePanelEditorProps {
   selectedTable?: PostgresTable
@@ -53,7 +51,6 @@ const SidePanelEditor = ({
   const [isEdited, setIsEdited] = useState<boolean>(false)
   const [isClosingPanel, setIsClosingPanel] = useState<boolean>(false)
 
-  const tables = meta.tables.list()
   const enumArrayColumns = (selectedTable?.columns ?? [])
     .filter((column) => {
       return (column?.enums ?? []).length > 0 && column.data_type.toLowerCase() === 'array'
@@ -256,7 +253,7 @@ const SidePanelEditor = ({
       }
       queryClient.invalidateQueries(sqlKeys.query(project?.ref, ['foreign-key-constraints']))
       await Promise.all([
-        meta.tables.loadById(selectedTable!.id),
+        queryClient.invalidateQueries(tableKeys.table(project?.ref, selectedTable!.id)),
         queryClient.invalidateQueries(
           sqlKeys.query(project?.ref, [selectedTable!.schema, selectedTable!.name])
         ),

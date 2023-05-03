@@ -1,15 +1,16 @@
 import { useState } from 'react'
-import { SidePanel, IconBookOpen } from 'ui'
 
-import { useStore } from 'hooks'
 import { useParams } from 'common/hooks'
-import { GeneralContent, ResourceContent } from '../Docs'
-import LangSelector from '../Docs/LangSelector'
-import GeneratingTypes from '../Docs/GeneratingTypes'
-import ActionBar from './SidePanelEditor/ActionBar'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useProjectJsonSchemaQuery } from 'data/docs/project-json-schema-query'
+import { useTableQuery } from 'data/tables/table-query'
 import { snakeToCamel } from 'lib/helpers'
+import { IconBookOpen, SidePanel } from 'ui'
+import { GeneralContent, ResourceContent } from '../Docs'
+import GeneratingTypes from '../Docs/GeneratingTypes'
+import LangSelector from '../Docs/LangSelector'
+import ActionBar from './SidePanelEditor/ActionBar'
 
 interface APIDocumentationPanelProps {
   visible: boolean
@@ -17,8 +18,16 @@ interface APIDocumentationPanelProps {
 }
 
 const APIDocumentationPanel = ({ visible, onClose }: APIDocumentationPanelProps) => {
-  const { meta } = useStore()
-  const { ref, page, id } = useParams()
+  const { project } = useProjectContext()
+  const { ref, page, id: _id } = useParams()
+  const id = _id ? Number(_id) : undefined
+
+  const { data: table } = useTableQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    id,
+  })
+
   const {
     data: jsonSchema,
     error: jsonSchemaError,
@@ -30,7 +39,6 @@ const APIDocumentationPanel = ({ visible, onClose }: APIDocumentationPanelProps)
   const [selectedLang, setSelectedLang] = useState<any>('js')
   const [showApiKey, setShowApiKey] = useState<any>(DEFAULT_KEY)
 
-  const tables = meta.tables.list()
   const autoApiService = {
     ...settings?.autoApiService,
     endpoint: `${settings?.autoApiService.protocol ?? 'https'}://${
@@ -118,7 +126,7 @@ const APIDocumentationPanel = ({ visible, onClose }: APIDocumentationPanelProps)
                     <ResourceContent
                       autoApiService={autoApiService}
                       selectedLang={selectedLang}
-                      resourceId={tables.find((table) => table.id === Number(id))?.name}
+                      resourceId={table?.name}
                       resources={resources}
                       definitions={jsonSchema.definitions}
                       paths={jsonSchema.paths}

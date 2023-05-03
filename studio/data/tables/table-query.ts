@@ -1,8 +1,9 @@
 import { PostgresTable } from '@supabase/postgres-meta'
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { tableKeys } from './keys'
+import { useCallback } from 'react'
 
 export type TableVariables = {
   id?: number
@@ -55,3 +56,24 @@ export const useTableQuery = <TData = TableData>(
       ...options,
     }
   )
+
+/**
+ * useGetTable
+ * Tries to get a table from the react-query cache, or loads it from the server if it's not cached.
+ */
+export function useGetTable({
+  projectRef,
+  connectionString,
+}: Pick<TableVariables, 'projectRef' | 'connectionString'>) {
+  const queryClient = useQueryClient()
+
+  return useCallback(
+    (id: NonNullable<TableVariables['id']>) => {
+      return queryClient.fetchQuery({
+        queryKey: tableKeys.table(projectRef, id),
+        queryFn: ({ signal }) => getTable({ id, projectRef, connectionString }, signal),
+      })
+    },
+    [connectionString, projectRef, queryClient]
+  )
+}

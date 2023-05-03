@@ -1,32 +1,44 @@
+import { FormatterProps } from '@supabase/react-data-grid'
 import Link from 'next/link'
 import { PropsWithChildren } from 'react'
-import { FormatterProps } from '@supabase/react-data-grid'
+
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { useParams } from 'common/hooks'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useTableQuery } from 'data/tables/table-query'
+import { Button, IconArrowRight } from 'ui'
 import { SupaRow } from '../../types'
 import { NullValue } from '../common'
-import * as Tooltip from '@radix-ui/react-tooltip'
-import { Button, IconArrowRight } from 'ui'
-import { useStore } from 'hooks'
-import { useParams } from 'common/hooks'
+import { useTablesQuery } from 'data/tables/tables-query'
 
 export const ForeignKeyFormatter = (props: PropsWithChildren<FormatterProps<SupaRow, unknown>>) => {
-  const { ref, id } = useParams()
-  const { meta } = useStore()
+  const { project } = useProjectContext()
+  const { ref: projectRef, id: _id } = useParams()
+  const id = _id ? Number(_id) : undefined
 
   const { row, column } = props
-  const selectedTable = meta.tables.byId(id as string)
+
+  const { data: selectedTable } = useTableQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    id,
+  })
   const relationship = (selectedTable?.relationships ?? []).find(
     (r) =>
       r.source_schema === selectedTable?.schema &&
       r.source_table_name === selectedTable?.name &&
       r.source_column_name === column.name
   )
-  const targetTable = meta.tables
-    .list()
-    .find(
-      (table) =>
-        table.schema === relationship?.target_table_schema &&
-        table.name === relationship.target_table_name
-    )
+  const { data: tables } = useTablesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    schema: relationship?.target_table_schema,
+  })
+  const targetTable = tables?.find(
+    (table) =>
+      table.schema === relationship?.target_table_schema &&
+      table.name === relationship.target_table_name
+  )
 
   const value = row[column.key]
 
@@ -39,7 +51,7 @@ export const ForeignKeyFormatter = (props: PropsWithChildren<FormatterProps<Supa
         <Tooltip.Root delayDuration={0}>
           <Tooltip.Trigger>
             <Link
-              href={`/project/${ref}/editor/${targetTable?.id}?filter=${relationship?.target_column_name}%3Aeq%3A${value}`}
+              href={`/project/${projectRef}/editor/${targetTable?.id}?filter=${relationship?.target_column_name}%3Aeq%3A${value}`}
             >
               <a>
                 <Button

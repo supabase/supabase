@@ -1,55 +1,36 @@
-import { useState, useEffect, PropsWithChildren } from 'react'
+import { useEffect, PropsWithChildren } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 
 import ProjectLayout from '../'
 import { useStore, withAuth } from 'hooks'
-import Error from 'components/ui/Error'
 import ProductMenu from 'components/ui/ProductMenu'
 import { generateAuthMenu } from './AuthLayout.utils'
+import { useParams } from 'common'
 
 export interface AuthLayoutProps {
   title?: string
 }
 
 const AuthLayout = ({ title, children }: PropsWithChildren<AuthLayoutProps>) => {
+  const { ref: projectRef } = useParams()
   const { ui, meta } = useStore()
-  const { isInitialized, isLoading, error } = meta.tables
-  const projectRef = ui.selectedProject?.ref ?? 'default'
 
   const router = useRouter()
   const page = router.pathname.split('/')[4]
 
-  const [loaded, setLoaded] = useState<boolean>(isInitialized)
-
   useEffect(() => {
     if (ui.selectedProject?.ref) {
       meta.policies.load()
-      meta.tables.load()
       meta.roles.load()
     }
   }, [ui.selectedProject?.ref])
 
-  useEffect(() => {
-    if (!isLoading && !loaded) {
-      setLoaded(true)
-    }
-  }, [isLoading])
-
-  if (error) {
-    return (
-      <ProjectLayout>
-        <Error error={error} />
-      </ProjectLayout>
-    )
-  }
-
   return (
     <ProjectLayout
-      isLoading={!loaded}
       title={title || 'Authentication'}
       product="Authentication"
-      productMenu={<ProductMenu page={page} menu={generateAuthMenu(projectRef)} />}
+      productMenu={<ProductMenu page={page} menu={generateAuthMenu(projectRef ?? 'default')} />}
     >
       <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">
         {children}
