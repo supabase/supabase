@@ -43,6 +43,7 @@ const ProjectLayout = ({
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const ongoingIncident = useFlag('ongoingIncident')
+  const projectName = ui.selectedProject?.name
   const organizationName = ui.selectedOrganization?.name
 
   const isPaused = ui.selectedProject?.status === PROJECT_STATUS.INACTIVE
@@ -57,7 +58,9 @@ const ProjectLayout = ({
           {title
             ? `${title} | Supabase`
             : selectedTable
-            ? `${selectedTable} | ${organizationName} | Supabase`
+            ? `${selectedTable} | ${projectName} | ${organizationName} | Supabase`
+            : projectName
+            ? `${projectName} | ${organizationName} | Supabase`
             : organizationName
             ? `${organizationName} | Supabase`
             : 'Supabase'}
