@@ -54,6 +54,7 @@ const Usage = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <Listbox
+                disabled
                 size="small"
                 id="billingCycle"
                 name="billingCycle"
@@ -139,16 +140,16 @@ const Usage = () => {
       </div>
 
       <div ref={infrastructureRef}>
-        <Infrastructure />
+        <Infrastructure projectRef={selectedProjectRef} />
       </div>
       <div ref={bandwidthRef}>
-        <Bandwidth />
+        <Bandwidth projectRef={selectedProjectRef} />
       </div>
       <div ref={sizeAndCountsRef}>
-        <SizeAndCounts />
+        <SizeAndCounts projectRef={selectedProjectRef} />
       </div>
       <div ref={activityRef}>
-        <Activity />
+        <Activity projectRef={selectedProjectRef} />
       </div>
     </>
   )

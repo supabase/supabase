@@ -10,10 +10,13 @@ import SectionContent from './SectionContent'
 import SectionHeader from './SectionHeader'
 import { generateUsageData } from './Usage.utils'
 
-const Activity = () => {
-  const { ref } = useParams()
-  const { data: usage } = useProjectUsageQuery({ projectRef: ref })
-  const { data: subscription } = useProjectSubscriptionQuery({ projectRef: ref })
+export interface ActivityProps {
+  projectRef: string
+}
+
+const Activity = ({ projectRef }: ActivityProps) => {
+  const { data: usage } = useProjectUsageQuery({ projectRef })
+  const { data: subscription } = useProjectSubscriptionQuery({ projectRef })
   const { current_period_start, current_period_end } = subscription?.billing ?? {}
   const startDate = new Date((current_period_start ?? 0) * 1000).toISOString()
   const endDate = new Date((current_period_end ?? 0) * 1000).toISOString()
@@ -22,7 +25,7 @@ const Activity = () => {
   const { monthly_active_users } = usage ?? {}
   const mauExcess = (monthly_active_users?.usage ?? 0) - (monthly_active_users?.limit ?? 0)
   const { data: mauData, isLoading: isLoadingMauData } = useDailyStatsQuery({
-    projectRef: ref,
+    projectRef,
     attribute: MAU_KEY,
     interval: '1d',
     startDate,
@@ -35,7 +38,7 @@ const Activity = () => {
     (storage_image_render_count?.usage ?? 0) - (storage_image_render_count?.limit ?? 0)
   const { data: assetTransformationsData, isLoading: isLoadingAssetTransformationsData } =
     useDailyStatsQuery({
-      projectRef: ref,
+      projectRef,
       attribute: ASSET_TRANSFORMATIONS_KEY,
       interval: '1d',
       startDate,
@@ -47,7 +50,7 @@ const Activity = () => {
   const funcInvocationsExcess = (func_invocations?.usage ?? 0) - (func_invocations?.limit ?? 0)
   const { data: funcInvocationsData, isLoading: isLoadingFuncInvocationsData } = useDailyStatsQuery(
     {
-      projectRef: ref,
+      projectRef,
       attribute: FUNC_INVOCATIONS_KEY,
       interval: '1d',
       startDate,

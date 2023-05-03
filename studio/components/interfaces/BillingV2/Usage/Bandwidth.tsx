@@ -9,12 +9,14 @@ import { Button } from 'ui'
 import BarChart from './BarChart'
 import SectionContent from './SectionContent'
 import SectionHeader from './SectionHeader'
-import { Y_DOMAIN_CEILING_MULTIPLIER } from './Usage.constants'
 
-const Bandwidth = () => {
-  const { ref } = useParams()
-  const { data: usage } = useProjectUsageQuery({ projectRef: ref })
-  const { data: subscription } = useProjectSubscriptionQuery({ projectRef: ref })
+export interface BandwidthProps {
+  projectRef: string
+}
+
+const Bandwidth = ({ projectRef }: BandwidthProps) => {
+  const { data: usage } = useProjectUsageQuery({ projectRef })
+  const { data: subscription } = useProjectSubscriptionQuery({ projectRef })
   const { current_period_start, current_period_end } = subscription?.billing ?? {}
   const startDate = new Date((current_period_start ?? 0) * 1000).toISOString()
   const endDate = new Date((current_period_end ?? 0) * 1000).toISOString()
@@ -24,7 +26,7 @@ const Bandwidth = () => {
   const { db_egress } = usage ?? {}
   const dbEgressExcess = (db_egress?.usage ?? 0) - (db_egress?.limit ?? 0)
   const { data: dbEgressData, isLoading: isLoadingDbEgressData } = useDailyStatsQuery({
-    projectRef: ref,
+    projectRef,
     attribute: DB_EGRESS_KEY,
     interval: '1d',
     startDate,
@@ -35,7 +37,7 @@ const Bandwidth = () => {
   const { storage_egress } = usage ?? {}
   const storageEgressExcess = (storage_egress?.usage ?? 0) - (storage_egress?.limit ?? 0)
   const { data: storageEgressData, isLoading: isLoadingStorageEgressData } = useDailyStatsQuery({
-    projectRef: ref,
+    projectRef,
     attribute: STORAGE_EGRESS_KEY,
     interval: '1d',
     startDate,
