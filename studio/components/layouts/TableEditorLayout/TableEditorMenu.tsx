@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react'
-import { noop, partition } from 'lodash'
-import { observer } from 'mobx-react-lite'
+import { partition } from 'lodash'
 import {
   Button,
   Dropdown,
@@ -20,29 +19,17 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { useParams } from 'common/hooks'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { checkPermissions, useLocalStorage, useStore } from 'hooks'
+import { checkPermissions, useLocalStorage } from 'hooks'
 import InfiniteList from 'components/ui/InfiniteList'
 import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
-import { Entity } from 'data/entity-types/entity-type-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import EntityListItem from './EntityListItem'
 
-export interface TableEditorMenuProps {
-  onAddTable: () => void
-  onEditTable: (table: Entity) => void
-  onDeleteTable: (table: Entity) => void
-  onDuplicateTable: (table: Entity) => void
-}
+export interface TableEditorMenuProps {}
 
-const TableEditorMenu = ({
-  onAddTable = noop,
-  onEditTable = noop,
-  onDeleteTable = noop,
-  onDuplicateTable = noop,
-}: TableEditorMenuProps) => {
-  const { meta } = useStore()
+const TableEditorMenu = ({}: TableEditorMenuProps) => {
   const { id } = useParams()
   const snap = useTableEditorStateSnapshot()
 
@@ -92,8 +79,6 @@ const TableEditorMenu = ({
 
   const schema = schemas?.find((schema) => schema.name === snap.selectedSchemaName)
   const canCreateTables = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
-
-  const isLoadingTableMetadata = id ? !meta.tables.byId(id) : true
 
   const refreshTables = async () => {
     await refetch()
@@ -189,7 +174,7 @@ const TableEditorMenu = ({
                   }
                   type="default"
                   style={{ justifyContent: 'start' }}
-                  onClick={onAddTable}
+                  onClick={snap.onAddTable}
                 >
                   New table
                 </Button>
@@ -353,10 +338,6 @@ const TableEditorMenu = ({
               itemProps={{
                 projectRef: project?.ref,
                 id: Number(id),
-                onEditTable,
-                onDeleteTable,
-                onDuplicateTable,
-                isLoadingTableMetadata,
               }}
               getItemSize={() => 28}
               hasNextPage={hasNextPage}
@@ -370,4 +351,4 @@ const TableEditorMenu = ({
   )
 }
 
-export default observer(TableEditorMenu)
+export default TableEditorMenu

@@ -25,21 +25,10 @@ import { sqlKeys } from 'data/sql/keys'
 import ForeignRowSelector, {
   ForeignRowSelectorProps,
 } from './RowEditor/ForeignRowSelector/ForeignRowSelector'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
 
 export interface SidePanelEditorProps {
   selectedTable?: PostgresTable
-  selectedRowToEdit?: Dictionary<any>
-  selectedColumnToEdit?: PostgresColumn
-  selectedTableToEdit?: PostgresTable
-  selectedValueForJsonEdit?: JsonEditValue
-  selectedForeignKeyToEdit?: {
-    foreignKey: NonNullable<ForeignRowSelectorProps['foreignKey']>
-    row: any
-    column: any
-  }
-  sidePanelKey?: 'row' | 'column' | 'table' | 'json' | 'foreign-row-selector' | 'csv-import'
-  isDuplicating?: boolean
-  closePanel: () => void
   onRowCreated?: (row: Dictionary<any>) => void
   onRowUpdated?: (row: Dictionary<any>, idx: number) => void
 
@@ -51,19 +40,12 @@ export interface SidePanelEditorProps {
 
 const SidePanelEditor = ({
   selectedTable,
-  selectedRowToEdit,
-  selectedColumnToEdit,
-  selectedTableToEdit,
-  selectedValueForJsonEdit,
-  selectedForeignKeyToEdit,
-  sidePanelKey,
-  isDuplicating = false,
-  closePanel,
   onRowCreated = noop,
   onRowUpdated = noop,
   onTableCreated = noop,
   onColumnSaved = noop,
 }: SidePanelEditorProps) => {
+  const snap = useTableEditorStateSnapshot()
   const [_, setParams] = useUrlState({ arrayKeys: ['filter', 'sort'] })
   const { meta, ui } = useStore()
   const queryClient = useQueryClient()
@@ -82,7 +64,7 @@ const SidePanelEditor = ({
   const { mutateAsync: createTableRows } = useTableRowCreateMutation()
   const { mutateAsync: updateTableRow } = useTableRowUpdateMutation({
     async onMutate({ projectRef, table, configuration, payload }) {
-      closePanel()
+      snap.closeSidePanel()
 
       const primaryKeyColumns = new Set(Object.keys(configuration.identifiers))
 
@@ -199,12 +181,13 @@ const SidePanelEditor = ({
     onComplete()
     if (!saveRowError) {
       setIsEdited(false)
-      closePanel()
+      snap.closeSidePanel()
     }
   }
 
   const onSaveJSON = async (value: string | number) => {
-    if (selectedTable === undefined || selectedValueForJsonEdit === undefined) return
+    if (selectedTable === undefined || !(snap.sidePanel?.type === 'json')) return
+    const selectedValueForJsonEdit = snap.sidePanel.jsonValue
 
     try {
       const { row, column } = selectedValueForJsonEdit
@@ -220,7 +203,8 @@ const SidePanelEditor = ({
   }
 
   const onSaveForeignRow = async (value: any) => {
-    if (selectedTable === undefined || selectedForeignKeyToEdit === undefined) return
+    if (selectedTable === undefined || !(snap.sidePanel?.type === 'foreign-row-selector')) return
+    const selectedForeignKeyToEdit = snap.sidePanel.foreignKey
 
     try {
       const { row, column } = selectedForeignKeyToEdit
@@ -242,6 +226,8 @@ const SidePanelEditor = ({
     configuration: { columnId?: string; isEncrypted: boolean; keyId?: string; keyName?: string },
     resolve: any
   ) => {
+    const selectedColumnToEdit = snap.sidePanel?.type === 'column' && snap.sidePanel.column
+
     const { columnId, ...securityConfig } = configuration
     const response = isNewRecord
       ? await meta.createColumn(
@@ -285,7 +271,7 @@ const SidePanelEditor = ({
       ])
       onColumnSaved(configuration.isEncrypted)
       setIsEdited(false)
-      closePanel()
+      snap.closeSidePanel()
     }
 
     if (configuration.isEncrypted && selectedTable?.schema) {
@@ -336,8 +322,12 @@ const SidePanelEditor = ({
       configuration
 
     try {
-      if (isDuplicating) {
-        const duplicateTable = find(tables, { id: tableId }) as PostgresTable
+      if (
+        snap.sidePanel?.type === 'table' &&
+        snap.sidePanel.mode === 'duplicate' &&
+        selectedTable
+      ) {
+        const duplicateTable = selectedTable
 
         toastId = ui.setNotification({
           category: 'loading',
@@ -384,15 +374,15 @@ const SidePanelEditor = ({
         })
 
         onTableCreated(table)
-      } else if (selectedTableToEdit) {
+      } else if (selectedTable) {
         toastId = ui.setNotification({
           category: 'loading',
-          message: `Updating table: ${selectedTableToEdit?.name}...`,
+          message: `Updating table: ${selectedTable?.name}...`,
         })
 
         const { table, hasError }: any = await meta.updateTable(
           toastId,
-          selectedTableToEdit,
+          selectedTable,
           payload,
           columns,
           isRealtimeEnabled
@@ -408,13 +398,13 @@ const SidePanelEditor = ({
           queryClient.invalidateQueries(sqlKeys.query(project?.ref, ['foreign-key-constraints']))
           await Promise.all([
             queryClient.invalidateQueries(
-              sqlKeys.query(project?.ref, [selectedTableToEdit.schema, selectedTableToEdit.name])
+              sqlKeys.query(project?.ref, [selectedTable.schema, selectedTable.name])
             ),
             queryClient.invalidateQueries(
               sqlKeys.query(project?.ref, [
                 'table-definition',
-                selectedTableToEdit.schema,
-                selectedTableToEdit.name,
+                selectedTable.schema,
+                selectedTable.name,
               ])
             ),
             queryClient.invalidateQueries(entityTypeKeys.list(project?.ref)),
@@ -434,7 +424,7 @@ const SidePanelEditor = ({
 
     if (!saveTableError) {
       setIsEdited(false)
-      closePanel()
+      snap.closeSidePanel()
     }
 
     resolve()
@@ -514,14 +504,14 @@ const SidePanelEditor = ({
       message: `Successfully imported ${rowCount} rows of data into ${selectedTable.name}`,
     })
     resolve()
-    closePanel()
+    snap.closeSidePanel()
   }
 
   const onClosePanel = () => {
     if (isEdited) {
       setIsClosingPanel(true)
     } else {
-      closePanel()
+      snap.closeSidePanel()
     }
   }
 
@@ -529,9 +519,9 @@ const SidePanelEditor = ({
     <>
       {!isUndefined(selectedTable) && (
         <RowEditor
-          row={selectedRowToEdit}
+          row={snap.sidePanel?.type === 'row' ? snap.sidePanel.row : undefined}
           selectedTable={selectedTable}
-          visible={sidePanelKey === 'row'}
+          visible={snap.sidePanel?.type === 'row'}
           closePanel={onClosePanel}
           saveChanges={saveRow}
           updateEditorDirty={() => setIsEdited(true)}
@@ -539,41 +529,58 @@ const SidePanelEditor = ({
       )}
       {!isUndefined(selectedTable) && (
         <ColumnEditor
-          column={selectedColumnToEdit}
+          column={
+            snap.sidePanel?.type === 'column'
+              ? (snap.sidePanel.column as PostgresColumn)
+              : undefined
+          }
           selectedTable={selectedTable}
-          visible={sidePanelKey === 'column'}
+          visible={snap.sidePanel?.type === 'column'}
           closePanel={onClosePanel}
           saveChanges={saveColumn}
           updateEditorDirty={() => setIsEdited(true)}
         />
       )}
       <TableEditor
-        table={selectedTableToEdit}
-        isDuplicating={isDuplicating}
-        visible={sidePanelKey === 'table'}
+        table={
+          snap.sidePanel?.type === 'table' &&
+          (snap.sidePanel.mode === 'edit' || snap.sidePanel.mode === 'duplicate')
+            ? selectedTable
+            : undefined
+        }
+        isDuplicating={snap.sidePanel?.type === 'table' && snap.sidePanel.mode === 'duplicate'}
+        visible={snap.sidePanel?.type === 'table'}
         closePanel={onClosePanel}
         saveChanges={saveTable}
         updateEditorDirty={() => setIsEdited(true)}
       />
       <JsonEdit
-        visible={sidePanelKey === 'json'}
-        column={selectedValueForJsonEdit?.column ?? ''}
-        jsonString={selectedValueForJsonEdit?.jsonString ?? ''}
+        visible={snap.sidePanel?.type === 'json'}
+        column={(snap.sidePanel?.type === 'json' && snap.sidePanel.jsonValue.column) || ''}
+        jsonString={(snap.sidePanel?.type === 'json' && snap.sidePanel.jsonValue.jsonString) || ''}
         backButtonLabel="Cancel"
         applyButtonLabel="Save changes"
         closePanel={onClosePanel}
         onSaveJSON={onSaveJSON}
       />
       <ForeignRowSelector
-        key={`foreign-row-selector-${selectedForeignKeyToEdit?.foreignKey?.id ?? 'null'}`}
-        visible={sidePanelKey === 'foreign-row-selector'}
-        foreignKey={selectedForeignKeyToEdit?.foreignKey}
+        key={`foreign-row-selector-${
+          (snap.sidePanel?.type === 'foreign-row-selector' &&
+            snap.sidePanel.foreignKey.foreignKey.id) ||
+          'null'
+        }`}
+        visible={snap.sidePanel?.type === 'foreign-row-selector'}
+        foreignKey={
+          snap.sidePanel?.type === 'foreign-row-selector'
+            ? snap.sidePanel.foreignKey.foreignKey
+            : undefined
+        }
         closePanel={onClosePanel}
         onSelect={onSaveForeignRow}
       />
       <SpreadsheetImport
-        visible={sidePanelKey === 'csv-import'}
-        selectedTable={selectedTableToEdit}
+        visible={snap.sidePanel?.type === 'csv-import'}
+        selectedTable={selectedTable}
         saveContent={onImportData}
         closePanel={onClosePanel}
         updateEditorDirty={setIsEdited}
@@ -586,7 +593,7 @@ const SidePanelEditor = ({
         onSelectConfirm={() => {
           setIsClosingPanel(false)
           setIsEdited(false)
-          closePanel()
+          snap.closeSidePanel()
         }}
       >
         <Modal.Content>

@@ -1,206 +1,82 @@
-import { useQueryClient } from '@tanstack/react-query'
-import { useState, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
-import { isUndefined } from 'lodash'
-import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
-import { Modal } from 'ui'
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
 
-import { useStore } from 'hooks'
-import { sqlKeys } from 'data/sql/keys'
-
-import { DatabaseLayout } from 'components/layouts'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
-import { TableList, ColumnList } from 'components/interfaces/Database'
+import { useParams } from 'common'
+import { ColumnList, TableList } from 'components/interfaces/Database'
 import { SidePanelEditor } from 'components/interfaces/TableGridEditor'
+import DeleteConfirmationDialogs from 'components/interfaces/TableGridEditor/DeleteConfirmationDialogs'
+import { DatabaseLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { Table, useTableQuery } from 'data/tables/table-query'
+import { useStore } from 'hooks'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { NextPageWithLayout } from 'types'
 
 const DatabaseTables: NextPageWithLayout = () => {
-  const { meta, ui } = useStore()
-
   const { project } = useProjectContext()
+  const snap = useTableEditorStateSnapshot()
+  const { meta } = useStore()
 
-  const queryClient = useQueryClient()
+  const router = useRouter()
+  const { id: _id, ref: projectRef } = useParams()
+  const id = _id ? Number(_id) : undefined
 
-  const [isDeleting, setIsDeleting] = useState<boolean>(false)
-  const [selectedTable, setSelectedTable] = useState<any>()
-  const [sidePanelKey, setSidePanelKey] = useState<'column' | 'table'>()
-
-  const [selectedColumnToEdit, setSelectedColumnToEdit] = useState<PostgresColumn>()
-  const [selectedTableToEdit, setSelectedTableToEdit] = useState<PostgresTable>()
-
-  const [selectedColumnToDelete, setSelectedColumnToDelete] = useState<PostgresColumn>()
-  const [selectedTableToDelete, setSelectedTableToDelete] = useState<PostgresTable>()
+  const { data: selectedTable } = useTableQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    id,
+  })
 
   useEffect(() => {
-    if (ui.selectedProject?.ref) {
+    if (project?.ref) {
       meta.types.load()
     }
-  }, [ui.selectedProject?.ref])
+  }, [project?.ref])
 
-  const onAddTable = () => {
-    setSidePanelKey('table')
-    setSelectedTableToEdit(undefined)
-  }
-
-  const onEditTable = (table: PostgresTable) => {
-    setSidePanelKey('table')
-    setSelectedTableToEdit(table)
-  }
-
-  const onDeleteTable = (table: PostgresTable) => {
-    setIsDeleting(true)
-    setSelectedTableToDelete(table)
-  }
-
-  const onAddColumn = () => {
-    setSidePanelKey('column')
-    setSelectedColumnToEdit(undefined)
-  }
-
-  const onEditColumn = (column: PostgresColumn) => {
-    setSidePanelKey('column')
-    setSelectedColumnToEdit(column)
-  }
-
-  const onDeleteColumn = (column: PostgresColumn) => {
-    setIsDeleting(true)
-    setSelectedColumnToDelete(column)
-  }
-
-  const onColumnUpdated = async () => {
-    if (selectedTable === undefined) return
-
-    const updatedTable = await meta.tables.loadById(selectedTable.id)
-    setSelectedTable(updatedTable)
-  }
-
-  const onClosePanel = () => setSidePanelKey(undefined)
-
-  const onConfirmDeleteTable = async () => {
-    try {
-      if (isUndefined(selectedTableToDelete)) return
-
-      const response: any = await meta.tables.del(selectedTableToDelete.id)
-      if (response.error) {
-        throw response.error
-      } else {
-        ui.setNotification({
-          category: 'success',
-          message: `Successfully removed ${selectedTableToDelete.name}.`,
-        })
-      }
-    } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to delete ${selectedTableToDelete?.name}: ${error.message}`,
-      })
-    } finally {
-      setIsDeleting(false)
-      setSelectedTableToDelete(undefined)
-    }
-  }
-
-  const onConfirmDeleteColumn = async () => {
-    try {
-      if (isUndefined(selectedColumnToDelete)) return
-
-      const response: any = await meta.columns.del(selectedColumnToDelete.id)
-      if (response.error) {
-        throw response.error
-      } else {
-        onColumnUpdated()
-        ui.setNotification({
-          category: 'success',
-          message: `Successfully removed ${selectedColumnToDelete.name}.`,
-        })
-
-        queryClient.invalidateQueries(sqlKeys.query(project?.ref, ['foreign-key-constraints']))
-        await Promise.all([
-          meta.tables.loadById(selectedColumnToDelete!.table_id),
-          queryClient.invalidateQueries(
-            sqlKeys.query(project?.ref, [selectedTable!.schema, selectedTable!.name])
-          ),
-          queryClient.invalidateQueries(
-            sqlKeys.query(project?.ref, [
-              'table-definition',
-              selectedTable!.schema,
-              selectedTable!.name,
-            ])
-          ),
-        ])
-      }
-    } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to delete ${selectedColumnToDelete?.name}: ${error.message}`,
-      })
-    } finally {
-      setIsDeleting(false)
-      setSelectedColumnToDelete(undefined)
-    }
+  const setSelectedTable = (table: Table | undefined) => {
+    router.replace({
+      pathname: router.pathname,
+      query: table
+        ? {
+            ...router.query,
+            id: table.id,
+          }
+        : {
+            ...router.query,
+            id: undefined, // TODO(alaister): needs full removal of ?id= from the url
+          },
+    })
   }
 
   return (
     <>
       <div className="p-4">
-        {isUndefined(selectedTable) ? (
-          <TableList
-            onAddTable={onAddTable}
-            onEditTable={onEditTable}
-            onDeleteTable={onDeleteTable}
-            onOpenTable={setSelectedTable}
-          />
-        ) : (
+        {id !== undefined && selectedTable !== undefined ? (
           <ColumnList
             selectedTable={selectedTable}
-            onAddColumn={onAddColumn}
-            onEditColumn={onEditColumn}
-            onDeleteColumn={onDeleteColumn}
+            onAddColumn={snap.onAddColumn}
+            onEditColumn={snap.onEditColumn}
+            onDeleteColumn={snap.onDeleteColumn}
             onSelectBack={() => setSelectedTable(undefined)}
+          />
+        ) : (
+          <TableList
+            onAddTable={snap.onAddTable}
+            onEditTable={(table) => {
+              setSelectedTable(table)
+              snap.onEditTable()
+            }}
+            onDeleteTable={(table) => {
+              setSelectedTable(table)
+              snap.onDeleteTable()
+            }}
+            onOpenTable={setSelectedTable}
           />
         )}
       </div>
-      <ConfirmationModal
-        danger
-        visible={isDeleting && !isUndefined(selectedTableToDelete)}
-        header={
-          <span className="break-words">{`Confirm deletion of table "${selectedTableToDelete?.name}"`}</span>
-        }
-        buttonLabel="Delete"
-        buttonLoadingLabel="Deleting"
-        onSelectCancel={() => setIsDeleting(false)}
-        onSelectConfirm={onConfirmDeleteTable}
-      >
-        <Modal.Content>
-          <p className="py-4 text-sm text-scale-1100">
-            Are you sure you want to delete the selected table? This action cannot be undone.
-          </p>
-        </Modal.Content>
-      </ConfirmationModal>
-      <ConfirmationModal
-        danger
-        visible={isDeleting && !isUndefined(selectedColumnToDelete)}
-        header={`Confirm deletion of column "${selectedColumnToDelete?.name}"`}
-        buttonLabel="Delete"
-        buttonLoadingLabel="Deleting"
-        onSelectCancel={() => setIsDeleting(false)}
-        onSelectConfirm={onConfirmDeleteColumn}
-      >
-        <Modal.Content>
-          <p className="py-4 text-sm text-scale-1100">
-            Are you sure you want to delete the selected column? This action cannot be undone.
-          </p>
-        </Modal.Content>
-      </ConfirmationModal>
-      <SidePanelEditor
-        sidePanelKey={sidePanelKey}
-        selectedTable={selectedTable}
-        onColumnSaved={onColumnUpdated}
-        closePanel={onClosePanel}
-        selectedColumnToEdit={selectedColumnToEdit}
-        selectedTableToEdit={selectedTableToEdit}
-      />
+      <DeleteConfirmationDialogs projectRef={projectRef} selectedTable={selectedTable} />
+      <SidePanelEditor selectedTable={selectedTable} />
     </>
   )
 }
