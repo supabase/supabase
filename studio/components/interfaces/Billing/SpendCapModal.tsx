@@ -127,7 +127,7 @@ const SpendCapModal: FC<Props> = ({ visible, onHide }) => {
                   <p className="w-[25%] text-sm">$0.09/GB</p>
                 </div>
                 <div className="flex items-center px-4 py-1">
-                  <p className="w-[50%] text-sm">Asset transformations</p>
+                  <p className="w-[50%] text-sm">Storage Image Transformations</p>
                   <p className="w-[25%] text-sm">100 origin images</p>
                   <p className="w-[25%] text-sm">$5 per 1000 origin images</p>
                 </div>
