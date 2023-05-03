@@ -1,7 +1,7 @@
 import { useRef, useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
-import { find, isUndefined, noop } from 'lodash'
+import { find, isUndefined } from 'lodash'
 import type { PostgresColumn, PostgresRelationship, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { QueryKey, useQueryClient } from '@tanstack/react-query'
@@ -34,70 +34,23 @@ import { useTableEditorStateSnapshot } from 'state/table-editor'
 import TwoOptionToggle from 'components/ui/TwoOptionToggle'
 import { ERROR_PRIMARY_KEY_NOTFOUND } from 'components/grid/constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { JsonEditValue } from './SidePanelEditor/RowEditor/RowEditor.types'
-import { ForeignRowSelectorProps } from './SidePanelEditor/RowEditor/ForeignRowSelector/ForeignRowSelector'
 import TableDefinition from './TableDefinition'
 import APIDocumentationPanel from './APIDocumentationPanel'
 import Connecting from 'components/ui/Loading/Loading'
+import { TableLike } from 'hooks/misc/useTable'
 
 export interface TableGridEditorProps {
   /** Theme for the editor */
   theme?: 'dark' | 'light'
 
   isLoadingSelectedTable?: boolean
-  selectedTable: any // PostgresTable | SchemaView
-
-  /** Determines what side panel editor to show */
-  sidePanelKey?: 'row' | 'column' | 'table' | 'json' | 'foreign-row-selector' | 'csv-import'
-  /** Toggles if we're duplicating a table */
-  isDuplicating: boolean
-  /** Selected entities if we're editing a row, column or table */
-  selectedRowToEdit?: Dictionary<any>
-  selectedColumnToEdit?: PostgresColumn
-  selectedTableToEdit?: PostgresTable
-  selectedValueForJsonEdit?: JsonEditValue
-  selectedForeignKeyToEdit?: {
-    foreignKey: NonNullable<ForeignRowSelectorProps['foreignKey']>
-    row: any
-    column: any
-  }
-
-  onAddRow: () => void
-  onEditRow: (row: Dictionary<any>) => void
-  onAddColumn: () => void
-  onEditColumn: (column: PostgresColumn) => void
-  onDeleteColumn: (column: PostgresColumn) => void
-  onExpandJSONEditor: (column: string, row: any) => void
-  onEditForeignKeyColumnValue: (args: {
-    foreignKey: NonNullable<ForeignRowSelectorProps['foreignKey']>
-    row: any
-    column: any
-  }) => void
-  onClosePanel: () => void
-  onImportData: () => void
+  selectedTable?: TableLike
 }
 
 const TableGridEditor = ({
   theme = 'dark',
   isLoadingSelectedTable = false,
   selectedTable,
-  sidePanelKey,
-  isDuplicating,
-  selectedRowToEdit,
-  selectedColumnToEdit,
-  selectedTableToEdit,
-  selectedValueForJsonEdit,
-  selectedForeignKeyToEdit,
-
-  onAddRow = noop,
-  onEditRow = noop,
-  onAddColumn = noop,
-  onEditColumn = noop,
-  onDeleteColumn = noop,
-  onExpandJSONEditor = noop,
-  onEditForeignKeyColumnValue = noop,
-  onClosePanel = noop,
-  onImportData = noop,
 }: TableGridEditorProps) => {
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
@@ -214,8 +167,6 @@ const TableGridEditor = ({
     return <NotFoundState id={Number(id)} />
   }
 
-  const tableId = selectedTable?.id
-
   const isViewSelected =
     entityType?.type === ENTITY_TYPE.VIEW || entityType?.type === ENTITY_TYPE.MATERIALIZED_VIEW
   const isTableSelected = entityType?.type === ENTITY_TYPE.TABLE
@@ -226,17 +177,18 @@ const TableGridEditor = ({
 
   // [Joshen] We can tweak below to eventually support composite keys as the data
   // returned from foreignKeyMeta should be easy to deal with, rather than pg-meta
-  const formattedRelationships = (selectedTable?.relationships ?? []).map(
-    (relationship: PostgresRelationship) => {
-      const relationshipMeta = foreignKeyMeta.find(
-        (fk: ForeignKeyConstraint) => fk.id === relationship.id
-      )
-      return {
-        ...relationship,
-        deletion_action: relationshipMeta?.deletion_action ?? FOREIGN_KEY_DELETION_ACTION.NO_ACTION,
-      }
+  const formattedRelationships = (
+    ('relationships' in selectedTable && selectedTable.relationships) ||
+    []
+  ).map((relationship: PostgresRelationship) => {
+    const relationshipMeta = foreignKeyMeta.find(
+      (fk: ForeignKeyConstraint) => fk.id === relationship.id
+    )
+    return {
+      ...relationship,
+      deletion_action: relationshipMeta?.deletion_action ?? FOREIGN_KEY_DELETION_ACTION.NO_ACTION,
     }
-  )
+  })
 
   const gridTable =
     !isViewSelected && !isForeignTableSelected
@@ -284,26 +236,21 @@ const TableGridEditor = ({
   }
 
   const onSelectEditColumn = async (name: string) => {
-    // For some reason, selectedTable here is stale after adding a table
-    // temporary workaround is to list grab the selected table again
-    const tables: PostgresTable[] = meta.tables.list()
-    // @ts-ignore
-    const table = tables.find((table) => table.id === Number(tableId))
-    const column = find(table!.columns, { name }) as PostgresColumn
+    const column = find(selectedTable?.columns ?? [], { name }) as PostgresColumn
     if (column) {
-      onEditColumn(column)
+      snap.onEditColumn(column)
     } else {
-      console.error(`Unable to find column ${name} in ${table?.name}`)
+      console.error(`Unable to find column ${name} in ${selectedTable?.name}`)
     }
   }
 
   const onSelectDeleteColumn = async (name: string) => {
-    // For some reason, selectedTable here is stale after adding a table
-    // temporary workaround is to list grab the selected table again
-    const tables: PostgresTable[] = meta.tables.list()
-    const table = tables.find((table) => table.id === Number(tableId))
-    const column = find(table!.columns, { name }) as PostgresColumn
-    onDeleteColumn(column)
+    const column = find(selectedTable?.columns ?? [], { name }) as PostgresColumn
+    if (column) {
+      snap.onDeleteColumn(column)
+    } else {
+      console.error(`Unable to find column ${name} in ${selectedTable?.name}`)
+    }
   }
 
   const onError = (error: any) => {
@@ -316,11 +263,14 @@ const TableGridEditor = ({
   const updateTableRow = (previousRow: any, updatedData: any) => {
     if (!project) return
 
-    const enumArrayColumns = selectedTable.columns
-      .filter((column: any) => {
-        return (column?.enums ?? []).length > 0 && column.data_type.toLowerCase() === 'array'
-      })
-      .map((column: any) => column.name)
+    const enumArrayColumns =
+      ('columns' in selectedTable &&
+        selectedTable.columns
+          ?.filter((column) => {
+            return (column?.enums ?? []).length > 0 && column.data_type.toLowerCase() === 'array'
+          })
+          .map((column) => column.name)) ||
+      []
 
     const identifiers = {} as Dictionary<any>
     ;(selectedTable as PostgresTable).primary_keys.forEach(
@@ -392,17 +342,19 @@ const TableGridEditor = ({
             </>
           ) : null
         }
-        onAddColumn={onAddColumn}
+        onAddColumn={snap.onAddColumn}
         onEditColumn={onSelectEditColumn}
         onDeleteColumn={onSelectDeleteColumn}
-        onAddRow={onAddRow}
+        onAddRow={snap.onAddRow}
         updateTableRow={updateTableRow}
-        onEditRow={onEditRow}
-        onImportData={onImportData}
+        onEditRow={snap.onEditRow}
+        onImportData={snap.onImportData}
         onError={onError}
         onSqlQuery={onSqlQuery}
-        onExpandJSONEditor={onExpandJSONEditor}
-        onEditForeignKeyColumnValue={onEditForeignKeyColumnValue}
+        onExpandJSONEditor={(column, row) =>
+          snap.onExpandJSONEditor({ column, row, jsonString: JSON.stringify(row[column]) || '' })
+        }
+        onEditForeignKeyColumnValue={snap.onEditForeignKeyColumnValue}
         showCustomChildren={(isViewSelected || isTableSelected) && selectedView === 'definition'}
         customHeader={
           (isViewSelected || isTableSelected) && selectedView === 'definition' ? (
@@ -420,19 +372,11 @@ const TableGridEditor = ({
 
       {!isUndefined(snap.selectedSchemaName) && (
         <SidePanelEditor
-          isDuplicating={isDuplicating}
           selectedTable={selectedTable as PostgresTable}
-          selectedRowToEdit={selectedRowToEdit}
-          selectedColumnToEdit={selectedColumnToEdit}
-          selectedTableToEdit={selectedTableToEdit}
-          selectedValueForJsonEdit={selectedValueForJsonEdit}
-          selectedForeignKeyToEdit={selectedForeignKeyToEdit}
-          sidePanelKey={sidePanelKey}
           onRowCreated={onRowCreated}
           onRowUpdated={onRowUpdated}
           onColumnSaved={onColumnSaved}
           onTableCreated={onTableCreated}
-          closePanel={onClosePanel}
         />
       )}
 

@@ -6,28 +6,17 @@ import { Entity } from 'data/entity-types/entity-type-query'
 import Link from 'next/link'
 import { Dropdown, IconEdit, IconCopy, IconLock, IconTrash, IconChevronDown } from 'ui'
 import { BASE_PATH } from 'lib/constants'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
 
 export interface EntityListItemProps {
   id: number
   projectRef: string
   item: Entity
   isLocked: boolean
-  onEditTable: (table: Entity) => void
-  onDeleteTable: (table: Entity) => void
-  onDuplicateTable: (table: Entity) => void
-  isLoadingTableMetadata?: boolean
 }
 
-const EntityListItem = ({
-  id,
-  projectRef,
-  item: entity,
-  isLocked,
-  onEditTable,
-  onDeleteTable,
-  onDuplicateTable,
-  isLoadingTableMetadata,
-}: EntityListItemProps) => {
+const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListItemProps) => {
+  const snap = useTableEditorStateSnapshot()
   const isActive = Number(id) === entity.id
   const formatTooltipText = (entityType: string) => {
     return Object.entries(ENTITY_TYPE)
@@ -137,9 +126,8 @@ const EntityListItem = ({
                 icon={<IconEdit size="tiny" />}
                 onClick={(e) => {
                   e.stopPropagation()
-                  onEditTable(entity)
+                  snap.onEditTable()
                 }}
-                disabled={isLoadingTableMetadata}
               >
                 Edit Table
               </Dropdown.Item>,
@@ -148,9 +136,8 @@ const EntityListItem = ({
                 icon={<IconCopy size="tiny" />}
                 onClick={(e) => {
                   e.stopPropagation()
-                  onDuplicateTable(entity)
+                  snap.onDuplicateTable()
                 }}
-                disabled={isLoadingTableMetadata}
               >
                 Duplicate Table
               </Dropdown.Item>,
@@ -170,9 +157,8 @@ const EntityListItem = ({
                 icon={<IconTrash size="tiny" />}
                 onClick={(e) => {
                   e.stopPropagation()
-                  onDeleteTable(entity)
+                  snap.onDeleteTable()
                 }}
-                disabled={isLoadingTableMetadata}
               >
                 Delete Table
               </Dropdown.Item>,

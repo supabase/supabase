@@ -1,28 +1,15 @@
 import { PropsWithChildren, useEffect } from 'react'
-import { noop } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { checkPermissions, useStore } from 'hooks'
-import { Entity } from 'data/entity-types/entity-type-query'
-import ProjectLayout from '../'
+import { ProjectLayoutWithAuth } from '../'
 import TableEditorMenu from './TableEditorMenu'
 import NoPermission from 'components/ui/NoPermission'
 
-export interface TableEditorLayoutProps {
-  onAddTable: () => void
-  onEditTable: (table: Entity) => void
-  onDeleteTable: (table: Entity) => void
-  onDuplicateTable: (table: Entity) => void
-}
+export interface TableEditorLayoutProps {}
 
-const TableEditorLayout = ({
-  onAddTable = noop,
-  onEditTable = noop,
-  onDeleteTable = noop,
-  onDuplicateTable = noop,
-  children,
-}: PropsWithChildren<TableEditorLayoutProps>) => {
+const TableEditorLayout = ({ children }: PropsWithChildren<TableEditorLayoutProps>) => {
   const { vault, meta, ui } = useStore()
 
   const canReadTables = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'tables')
@@ -47,26 +34,16 @@ const TableEditorLayout = ({
 
   if (!canReadTables) {
     return (
-      <ProjectLayout>
+      <ProjectLayoutWithAuth>
         <NoPermission isFullPage resourceText="view tables from this project" />
-      </ProjectLayout>
+      </ProjectLayoutWithAuth>
     )
   }
 
   return (
-    <ProjectLayout
-      product="Table editor"
-      productMenu={
-        <TableEditorMenu
-          onAddTable={onAddTable}
-          onEditTable={onEditTable}
-          onDeleteTable={onDeleteTable}
-          onDuplicateTable={onDuplicateTable}
-        />
-      }
-    >
+    <ProjectLayoutWithAuth product="Table editor" productMenu={<TableEditorMenu />}>
       {children}
-    </ProjectLayout>
+    </ProjectLayoutWithAuth>
   )
 }
 

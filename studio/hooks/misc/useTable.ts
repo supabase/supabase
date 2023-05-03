@@ -1,10 +1,15 @@
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
-import { useForeignTableQuery } from 'data/foreign-tables/foreign-table-query'
-import { useMaterializedViewQuery } from 'data/materialized-views/materialized-view-query'
-import { useTableQuery } from 'data/tables/table-query'
-import { useViewQuery } from 'data/views/view-query'
+import { ForeignTable, useForeignTableQuery } from 'data/foreign-tables/foreign-table-query'
+import {
+  MaterializedView,
+  useMaterializedViewQuery,
+} from 'data/materialized-views/materialized-view-query'
+import { Table, useTableQuery } from 'data/tables/table-query'
+import { View, useViewQuery } from 'data/views/view-query'
 import useEntityType from './useEntityType'
+
+export type TableLike = Table | View | MaterializedView | ForeignTable
 
 /**
  * A hook that loads all table-like objects. e.g. tables, views, materialized views, etc...
