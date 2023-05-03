@@ -1,6 +1,5 @@
 import { observer } from 'mobx-react-lite'
-import { useRouter } from 'next/router'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 import { useParams } from 'common'
 import { ColumnList, TableList } from 'components/interfaces/Database'
@@ -8,7 +7,7 @@ import { SidePanelEditor } from 'components/interfaces/TableGridEditor'
 import DeleteConfirmationDialogs from 'components/interfaces/TableGridEditor/DeleteConfirmationDialogs'
 import { DatabaseLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { Table, useTableQuery } from 'data/tables/table-query'
+import { Table } from 'data/tables/table-query'
 import { useStore } from 'hooks'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { NextPageWithLayout } from 'types'
@@ -18,15 +17,7 @@ const DatabaseTables: NextPageWithLayout = () => {
   const snap = useTableEditorStateSnapshot()
   const { meta } = useStore()
 
-  const router = useRouter()
-  const { id: _id, ref: projectRef } = useParams()
-  const id = _id ? Number(_id) : undefined
-
-  const { data: selectedTable } = useTableQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-    id,
-  })
+  const { ref: projectRef } = useParams()
 
   useEffect(() => {
     if (project?.ref) {
@@ -34,25 +25,13 @@ const DatabaseTables: NextPageWithLayout = () => {
     }
   }, [project?.ref])
 
-  const setSelectedTable = (table: Table | undefined) => {
-    router.replace({
-      pathname: router.pathname,
-      query: table
-        ? {
-            ...router.query,
-            id: table.id,
-          }
-        : {
-            ...router.query,
-            id: undefined, // TODO(alaister): needs full removal of ?id= from the url
-          },
-    })
-  }
+  const [selectedTable, setSelectedTable] = useState<Table | undefined>(undefined)
+  const [selectedTableToEdit, setSelectedTableToEdit] = useState<Table | undefined>(undefined)
 
   return (
     <>
       <div className="p-4">
-        {id !== undefined && selectedTable !== undefined ? (
+        {selectedTable !== undefined ? (
           <ColumnList
             selectedTable={selectedTable}
             onAddColumn={snap.onAddColumn}
@@ -64,19 +43,19 @@ const DatabaseTables: NextPageWithLayout = () => {
           <TableList
             onAddTable={snap.onAddTable}
             onEditTable={(table) => {
-              setSelectedTable(table)
+              setSelectedTableToEdit(table)
               snap.onEditTable()
             }}
             onDeleteTable={(table) => {
-              setSelectedTable(table)
+              setSelectedTableToEdit(table)
               snap.onDeleteTable()
             }}
             onOpenTable={setSelectedTable}
           />
         )}
       </div>
-      <DeleteConfirmationDialogs projectRef={projectRef} selectedTable={selectedTable} />
-      <SidePanelEditor selectedTable={selectedTable} />
+      <DeleteConfirmationDialogs projectRef={projectRef} selectedTable={selectedTableToEdit} />
+      <SidePanelEditor selectedTable={selectedTableToEdit} />
     </>
   )
 }
