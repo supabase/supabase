@@ -1,7 +1,6 @@
 import dynamic from 'next/dynamic'
 import { getSortedPosts } from '~/lib/posts'
 import PostTypes from '~/types/post'
-import Container from '~/components/Container'
 import Layout from '~/components/Layouts/Default'
 import Hero from '~/components/Hero/Hero'
 
@@ -20,20 +19,16 @@ type Props = { customerStories: PostTypes[] }
 
 const Index = ({ customerStories }: Props) => {
   return (
-    <>
-      <Layout>
-        <Container>
-          <Hero />
-          <Features />
-          <TwitterSocialSection />
-          <BuiltExamples />
-          <MadeForDevelopers />
-          <AdminAccess />
-          <CustomerStories customerStories={customerStories} />
-          <CTABanner />
-        </Container>
-      </Layout>
-    </>
+    <Layout>
+      <Hero />
+      <Features />
+      <TwitterSocialSection />
+      <BuiltExamples />
+      <MadeForDevelopers />
+      <AdminAccess />
+      <CustomerStories customerStories={customerStories} />
+      <CTABanner />
+    </Layout>
   )
 }
 
