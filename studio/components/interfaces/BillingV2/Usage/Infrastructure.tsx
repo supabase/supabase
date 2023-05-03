@@ -4,110 +4,94 @@ import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscrip
 import BarChart from './BarChart'
 import SectionContent from './SectionContent'
 import SectionHeader from './SectionHeader'
+import { USAGE_CATEGORIES } from './Usage.constants'
 
 export interface InfrastructureProps {
   projectRef: string
 }
+
+// [Joshen] Need to update the IO budget chart to show burst mbps and duration next time
 
 const Infrastructure = ({ projectRef }: InfrastructureProps) => {
   const { data: subscription } = useProjectSubscriptionQuery({ projectRef })
   const { current_period_start, current_period_end } = subscription?.billing ?? {}
   const startDate = new Date((current_period_start ?? 0) * 1000).toISOString()
   const endDate = new Date((current_period_end ?? 0) * 1000).toISOString()
+  const categoryMeta = USAGE_CATEGORIES.find((category) => category.key === 'infra')
 
-  const CPU_USAGE_KEY = 'cpu_usage'
   const { data: cpuUsageData, isLoading: isLoadingCpuUsageData } = useInfraMonitoringQuery({
     projectRef,
-    attribute: CPU_USAGE_KEY,
+    attribute: 'cpu_usage',
     interval: '1d',
     startDate,
     endDate,
   })
 
-  const MEMORY_USAGE_KEY = 'ram_usage'
   const { data: memoryUsageData, isLoading: isLoadingMemoryUsageData } = useInfraMonitoringQuery({
     projectRef,
-    attribute: MEMORY_USAGE_KEY,
+    attribute: 'ram_usage',
     interval: '1d',
     startDate,
     endDate,
   })
 
-  const DISK_IO_BUDGET_KEY = 'disk_io_budget'
   const { data: ioBudgetData, isLoading: isLoadingIoBudgetData } = useInfraMonitoringQuery({
     projectRef,
-    attribute: DISK_IO_BUDGET_KEY,
+    attribute: 'disk_io_budget',
     interval: '1d',
     startDate,
     endDate,
   })
+
+  const chartMeta: any = {
+    cpu_usage: { isLoading: isLoadingCpuUsageData, data: cpuUsageData?.data ?? [] },
+    ram_usage: { isLoading: isLoadingMemoryUsageData, data: memoryUsageData?.data ?? [] },
+    disk_io_budget: { isLoading: isLoadingIoBudgetData, data: ioBudgetData?.data ?? [] },
+  }
+
+  if (categoryMeta === undefined) return null
 
   return (
     <>
       <SectionHeader title="Infrastructure" description="Some description here" />
-
-      <SectionContent title="CPU" description="Some description here">
-        <div className="space-y-1">
-          <p>Max CPU usage each day</p>
-          <p className="text-sm text-scale-1000">Some description here</p>
-        </div>
-        {isLoadingCpuUsageData ? (
-          <div className="space-y-2">
-            <ShimmeringLoader />
-            <ShimmeringLoader className="w-3/4" />
-            <ShimmeringLoader className="w-1/2" />
-          </div>
-        ) : (
-          <BarChart
-            attribute={CPU_USAGE_KEY}
-            data={cpuUsageData?.data ?? []}
-            unit={cpuUsageData?.format}
-            yLimit={100}
-          />
-        )}
-      </SectionContent>
-
-      <SectionContent title="Memory" description="Some description here">
-        <div className="space-y-1">
-          <p>Max memory usage each day</p>
-          <p className="text-sm text-scale-1000">Some description here</p>
-        </div>
-        {isLoadingMemoryUsageData ? (
-          <div className="space-y-2">
-            <ShimmeringLoader />
-            <ShimmeringLoader className="w-3/4" />
-            <ShimmeringLoader className="w-1/2" />
-          </div>
-        ) : (
-          <BarChart
-            attribute={MEMORY_USAGE_KEY}
-            data={memoryUsageData?.data ?? []}
-            unit={memoryUsageData?.format}
-            yLimit={100}
-          />
-        )}
-      </SectionContent>
-
-      <SectionContent title="IO Budget" description="Some description here">
-        <div className="space-y-1">
-          <p>Disk IO budget per day</p>
-          <p className="text-sm text-scale-1000">Some description here</p>
-        </div>
-        {isLoadingIoBudgetData ? (
-          <div className="space-y-2">
-            <ShimmeringLoader />
-            <ShimmeringLoader className="w-3/4" />
-            <ShimmeringLoader className="w-1/2" />
-          </div>
-        ) : (
-          <BarChart
-            attribute={DISK_IO_BUDGET_KEY}
-            data={ioBudgetData?.data ?? []}
-            unit={ioBudgetData?.format}
-            yLimit={100}
-          />
-        )}
-      </SectionContent>
+      {categoryMeta.attributes.map((attribute) => {
+        return (
+          <SectionContent key={attribute.key} section={attribute}>
+            <div className="space-y-1">
+              {attribute.key === 'disk_io_budget' ? (
+                <p>{attribute.name} remaining per day</p>
+              ) : (
+                <p>
+                  Max{' '}
+                  <span className={attribute.key === 'ram_usage' ? 'lowercase' : ''}>
+                    {attribute.name}
+                  </span>{' '}
+                  usage each day
+                </p>
+              )}
+              {attribute.chartDescription.split('\n').map((paragraph, idx) => (
+                <p key={`para-${idx}`} className="text-sm text-scale-1000">
+                  {paragraph}
+                </p>
+              ))}
+            </div>
+            {chartMeta[attribute.key].isLoading ? (
+              <div className="space-y-2">
+                <ShimmeringLoader />
+                <ShimmeringLoader className="w-3/4" />
+                <ShimmeringLoader className="w-1/2" />
+              </div>
+            ) : (
+              <BarChart
+                attribute={attribute.attribute}
+                data={chartMeta[attribute.key]?.data ?? []}
+                yFormatter={(value) => `${value}%`}
+                yLimit={100}
+              />
+            )}
+          </SectionContent>
+        )
+      })}
     </>
   )
 }

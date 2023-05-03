@@ -62,11 +62,7 @@ const Bandwidth = ({ projectRef }: BandwidthProps) => {
         const usageExcess = (usageMeta?.usage ?? 0) - (usageMeta?.limit ?? 0)
 
         return (
-          <SectionContent
-            key={attribute.key}
-            title={attribute.name}
-            description={attribute.description}
-          >
+          <SectionContent key={attribute.key} section={attribute}>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
