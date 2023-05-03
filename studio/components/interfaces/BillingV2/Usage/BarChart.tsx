@@ -28,9 +28,10 @@ export interface BarChartProps {
   reference?: Reference
   unit?: string
   yDomain?: number[]
+  yFormatter?: (value: number) => string
 }
 
-const BarChart = ({ data, attribute, reference, unit, yDomain }: BarChartProps) => {
+const BarChart = ({ data, attribute, reference, unit, yDomain, yFormatter }: BarChartProps) => {
   return (
     <div className="w-full h-[200px]">
       <ResponsiveContainer width="100%" height={200}>
@@ -43,6 +44,7 @@ const BarChart = ({ data, attribute, reference, unit, yDomain }: BarChartProps) 
             tickLine={{ stroke: 'none' }}
             domain={yDomain}
             unit={unit}
+            tickFormatter={yFormatter}
           />
           <Bar dataKey={attribute}>
             {data.map((entry) => {

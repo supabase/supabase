@@ -7,6 +7,8 @@ import { useProjectUsageQuery } from 'data/usage/project-usage-query'
 import { formatBytes } from 'lib/helpers'
 import { Button } from 'ui'
 import BarChart from './BarChart'
+import SectionContent from './SectionContent'
+import SectionHeader from './SectionHeader'
 
 const Bandwidth = () => {
   const { ref } = useParams()
@@ -41,150 +43,120 @@ const Bandwidth = () => {
 
   return (
     <>
-      <div className="border-b">
-        <div className="1xl:px-28 mx-auto flex flex-col gap-10 px-5 lg:px-16 2xl:px-32 py-16">
-          <div className="sticky top-16">
-            <p className="text-base">Bandwidth</p>
-            <p className="text-sm text-scale-1000">Some description here</p>
-          </div>
-        </div>
-      </div>
+      <SectionHeader title="Bandwidth" description="Some description here" />
 
-      {/* DATABASE EGRESS - need to fix if no value yet (API will return period_start as 0 in first data point) */}
-      <div className="border-b">
-        <div className="1xl:px-28 mx-auto flex flex-col gap-10 px-5 lg:px-16 2xl:px-32 py-16">
-          <div className="grid grid-cols-12">
-            <div className="col-span-5">
-              <div className="sticky top-16">
-                <p className="text-base">Database Egress</p>
-                <p className="text-sm text-scale-1000">Some description here</p>
-              </div>
+      <SectionContent title="Database Egress" description="Some description here">
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <p className="text-sm">Egress {subscription?.tier.key.toLowerCase()} quota usage</p>
+            <Button type="default" size="tiny" onClick={() => {}}>
+              Upgrade project
+            </Button>
+          </div>
+          <SparkBar
+            type="horizontal"
+            barClass="bg-scale-1200"
+            value={db_egress?.usage ?? 0}
+            max={db_egress?.limit ?? 0}
+          />
+          <div>
+            <div className="flex items-center justify-between border-b py-1">
+              <p className="text-xs text-scale-1000">
+                Included in {subscription?.tier.name.toLowerCase()}
+              </p>
+              <p className="text-xs">{formatBytes(db_egress?.limit ?? 0)}</p>
             </div>
-            <div className="col-span-7 space-y-6">
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <p className="text-sm">
-                    Egress {subscription?.tier.key.toLowerCase()} quota usage
-                  </p>
-                  <Button type="default" size="tiny" onClick={() => {}}>
-                    Upgrade project
-                  </Button>
-                </div>
-                <SparkBar
-                  type="horizontal"
-                  barClass="bg-scale-1200"
-                  value={db_egress?.usage ?? 0}
-                  max={db_egress?.limit ?? 0}
-                />
-                <div>
-                  <div className="flex items-center justify-between border-b py-1">
-                    <p className="text-xs text-scale-1000">
-                      Included in {subscription?.tier.name.toLowerCase()}
-                    </p>
-                    <p className="text-xs">{formatBytes(db_egress?.limit ?? 0)}</p>
-                  </div>
-                  <div className="flex items-center justify-between border-b py-1">
-                    <p className="text-xs text-scale-1000">Used</p>
-                    <p className="text-xs">{formatBytes(db_egress?.usage ?? 0)}</p>
-                  </div>
-                  <div className="flex items-center justify-between py-1">
-                    <p className="text-xs text-scale-1000">Extra volume used this month</p>
-                    <p className="text-xs">
-                      {dbEgressExcess < 0 ? formatBytes(0) : formatBytes(dbEgressExcess)}
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div className="space-y-1">
-                <p>Database egress over time</p>
-                <p className="text-sm text-scale-1000">Some description here</p>
-              </div>
-              {isLoadingDbEgressData ? (
-                <div className="space-y-2">
-                  <ShimmeringLoader />
-                  <ShimmeringLoader className="w-3/4" />
-                  <ShimmeringLoader className="w-1/2" />
-                </div>
-              ) : (
-                <BarChart
-                  attribute={DB_EGRESS_KEY}
-                  data={dbEgressData?.data ?? []}
-                  unit={undefined}
-                  yDomain={[0, 100]}
-                />
-              )}
+            <div className="flex items-center justify-between border-b py-1">
+              <p className="text-xs text-scale-1000">Used</p>
+              <p className="text-xs">{formatBytes(db_egress?.usage ?? 0)}</p>
+            </div>
+            <div className="flex items-center justify-between py-1">
+              <p className="text-xs text-scale-1000">Extra volume used this month</p>
+              <p className="text-xs">
+                {dbEgressExcess < 0 ? formatBytes(0) : formatBytes(dbEgressExcess)}
+              </p>
             </div>
           </div>
         </div>
-      </div>
+        <div className="space-y-1">
+          <p>Database egress over time</p>
+          <p className="text-sm text-scale-1000">Some description here</p>
+        </div>
+        {isLoadingDbEgressData ? (
+          <div className="space-y-2">
+            <ShimmeringLoader />
+            <ShimmeringLoader className="w-3/4" />
+            <ShimmeringLoader className="w-1/2" />
+          </div>
+        ) : (
+          // [Joshen] TODO
+          // - Provide a way to format y axis (bytes)
+          // - Fix the y axis cartesian grid intervals if possible (atm it looks random)
+          // - the max Y domain could be dynamic (slightly above limit, but take the usage + some threshold if above limit)
+          <BarChart
+            attribute={DB_EGRESS_KEY}
+            data={dbEgressData?.data ?? []}
+            unit={undefined}
+            yDomain={[0, db_egress?.limit ?? 0]}
+            yFormatter={(value) => formatBytes(value)}
+          />
+        )}
+      </SectionContent>
 
-      {/* STORAGE EGRESS - need to fix if no value yet (API will return period_start as 0 in first data point) */}
-      <div className="border-b">
-        <div className="1xl:px-28 mx-auto flex flex-col gap-10 px-5 lg:px-16 2xl:px-32 py-16">
-          <div className="grid grid-cols-12">
-            <div className="col-span-5">
-              <div className="sticky top-16">
-                <p className="text-base">Storage Egress</p>
-                <p className="text-sm text-scale-1000">Some description here</p>
-              </div>
+      <SectionContent title="Storage Egress" description="Some description here">
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <p className="text-sm">
+              Storage egress {subscription?.tier.key.toLowerCase()} quota usage
+            </p>
+            <Button type="default" size="tiny" onClick={() => {}}>
+              Upgrade project
+            </Button>
+          </div>
+          <SparkBar
+            type="horizontal"
+            barClass="bg-scale-1200"
+            value={storage_egress?.usage ?? 0}
+            max={storage_egress?.limit ?? 0}
+          />
+          <div>
+            <div className="flex items-center justify-between border-b py-1">
+              <p className="text-xs text-scale-1000">
+                Included in {subscription?.tier.name.toLowerCase()}
+              </p>
+              <p className="text-xs">{formatBytes(storage_egress?.limit ?? 0)}</p>
             </div>
-            <div className="col-span-7 space-y-6">
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <p className="text-sm">
-                    Storage egress {subscription?.tier.key.toLowerCase()} quota usage
-                  </p>
-                  <Button type="default" size="tiny" onClick={() => {}}>
-                    Upgrade project
-                  </Button>
-                </div>
-                <SparkBar
-                  type="horizontal"
-                  barClass="bg-scale-1200"
-                  value={storage_egress?.usage ?? 0}
-                  max={storage_egress?.limit ?? 0}
-                />
-                <div>
-                  <div className="flex items-center justify-between border-b py-1">
-                    <p className="text-xs text-scale-1000">
-                      Included in {subscription?.tier.name.toLowerCase()}
-                    </p>
-                    <p className="text-xs">{formatBytes(storage_egress?.limit ?? 0)}</p>
-                  </div>
-                  <div className="flex items-center justify-between border-b py-1">
-                    <p className="text-xs text-scale-1000">Used</p>
-                    <p className="text-xs">{formatBytes(storage_egress?.usage ?? 0)}</p>
-                  </div>
-                  <div className="flex items-center justify-between py-1">
-                    <p className="text-xs text-scale-1000">Extra volume used this month</p>
-                    <p className="text-xs">
-                      {storageEgressExcess < 0 ? formatBytes(0) : formatBytes(storageEgressExcess)}
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div className="space-y-1">
-                <p>Storage egress over time</p>
-                <p className="text-sm text-scale-1000">Some description here</p>
-              </div>
-              {isLoadingStorageEgressData ? (
-                <div className="space-y-2">
-                  <ShimmeringLoader />
-                  <ShimmeringLoader className="w-3/4" />
-                  <ShimmeringLoader className="w-1/2" />
-                </div>
-              ) : (
-                <BarChart
-                  attribute={STORAGE_EGRESS_KEY}
-                  data={storageEgressData?.data ?? []}
-                  unit={undefined}
-                  yDomain={[0, 100]}
-                />
-              )}
+            <div className="flex items-center justify-between border-b py-1">
+              <p className="text-xs text-scale-1000">Used</p>
+              <p className="text-xs">{formatBytes(storage_egress?.usage ?? 0)}</p>
+            </div>
+            <div className="flex items-center justify-between py-1">
+              <p className="text-xs text-scale-1000">Extra volume used this month</p>
+              <p className="text-xs">
+                {storageEgressExcess < 0 ? formatBytes(0) : formatBytes(storageEgressExcess)}
+              </p>
             </div>
           </div>
         </div>
-      </div>
+        <div className="space-y-1">
+          <p>Storage egress over time</p>
+          <p className="text-sm text-scale-1000">Some description here</p>
+        </div>
+        {isLoadingStorageEgressData ? (
+          <div className="space-y-2">
+            <ShimmeringLoader />
+            <ShimmeringLoader className="w-3/4" />
+            <ShimmeringLoader className="w-1/2" />
+          </div>
+        ) : (
+          <BarChart
+            attribute={STORAGE_EGRESS_KEY}
+            data={storageEgressData?.data ?? []}
+            unit={undefined}
+            yDomain={[0, 100]}
+          />
+        )}
+      </SectionContent>
     </>
   )
 }
