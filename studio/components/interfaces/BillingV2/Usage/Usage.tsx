@@ -1,14 +1,18 @@
+import clsx from 'clsx'
 import { useParams } from 'common'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
-import { useEffect, useRef, useState } from 'react'
-import { Button, IconCheckCircle, IconLoader, Listbox } from 'ui'
-import Infrastructure from './Infrastructure'
-import Bandwidth from './Bandwidth'
-import SizeAndCounts from './SizeAndCounts'
+import Link from 'next/link'
+import { useRef, useState } from 'react'
+import { Button, IconAlertCircle, IconCheckCircle, IconLoader, Listbox } from 'ui'
 import Activity from './Activity'
-import clsx from 'clsx'
+import Bandwidth from './Bandwidth'
+import Infrastructure from './Infrastructure'
+import SizeAndCounts from './SizeAndCounts'
+import { useProjectUsageQuery } from 'data/usage/project-usage-query'
+import { getUsageStatus } from './Usage.utils'
+import { USAGE_CATEGORIES, USAGE_STATUS } from './Usage.constants'
 
 const Usage = () => {
   const { ref } = useParams()
@@ -19,12 +23,11 @@ const Usage = () => {
   const sizeAndCountsRef = useRef<HTMLDivElement>(null)
   const activityRef = useRef<HTMLDivElement>(null)
 
-  const { data: projects, isLoading, isSuccess } = useProjectsQuery()
+  const { data: projects, isLoading } = useProjectsQuery()
+  const { data: usage } = useProjectUsageQuery({ projectRef: ref })
   const { data: subscription, isLoading: isLoadingSubscription } = useProjectSubscriptionQuery({
     projectRef: selectedProjectRef,
   })
-
-  useEffect(() => {}, [isSuccess])
 
   const scrollTo = (id: 'infra' | 'bandwidth' | 'sizeCount' | 'activity') => {
     switch (id) {
@@ -101,40 +104,39 @@ const Usage = () => {
               ) : null}
             </div>
             <div className="flex items-center space-x-2">
-              <Button type="default">View invoices</Button>
-              <Button type="default">View billing</Button>
+              <Link href={`/project/${ref}/settings/billing/invoices`}>
+                <a>
+                  <Button type="default">View invoices</Button>
+                </a>
+              </Link>
+              <Link href={`/project/${ref}/settings/billing/subscription`}>
+                <a>
+                  <Button type="default">View billing</Button>
+                </a>
+              </Link>
             </div>
           </div>
 
           <div className="flex items-center space-x-6 !mt-2">
-            <div
-              onClick={() => scrollTo('infra')}
-              className="flex items-center opacity-50 space-x-2 py-3 hover:opacity-100 transition cursor-pointer"
-            >
-              <IconCheckCircle size={15} strokeWidth={2} className="text-brand-900" />
-              <p className="text-sm">Infrastructure</p>
-            </div>
-            <div
-              onClick={() => scrollTo('bandwidth')}
-              className="flex items-center opacity-50 space-x-2 py-3 hover:opacity-100 transition cursor-pointer"
-            >
-              <IconCheckCircle size={15} strokeWidth={2} className="text-brand-900" />
-              <p className="text-sm">Bandwidth</p>
-            </div>
-            <div
-              onClick={() => scrollTo('sizeCount')}
-              className="flex items-center opacity-50 space-x-2 py-3 hover:opacity-100 transition cursor-pointer"
-            >
-              <IconCheckCircle size={15} strokeWidth={2} className="text-brand-900" />
-              <p className="text-sm">Size & Counts</p>
-            </div>
-            <div
-              onClick={() => scrollTo('activity')}
-              className="flex items-center opacity-50 space-x-2 py-3 hover:opacity-100 transition cursor-pointer"
-            >
-              <IconCheckCircle size={15} strokeWidth={2} className="text-brand-900" />
-              <p className="text-sm">Activity</p>
-            </div>
+            {USAGE_CATEGORIES.map((category) => {
+              const status = getUsageStatus(category.attributes, usage)
+              return (
+                <div
+                  key={category.key}
+                  onClick={() => scrollTo(category.key)}
+                  className="flex items-center opacity-50 space-x-2 py-3 hover:opacity-100 transition cursor-pointer"
+                >
+                  {status === USAGE_STATUS.NORMAL ? (
+                    <IconCheckCircle size={15} strokeWidth={2} className="text-brand-900" />
+                  ) : status === USAGE_STATUS.APPROACHING ? (
+                    <IconAlertCircle size={15} strokeWidth={2} className="text-amber-900" />
+                  ) : status === USAGE_STATUS.EXCEEDED ? (
+                    <IconAlertCircle size={15} strokeWidth={2} className="text-red-900" />
+                  ) : null}
+                  <p className="text-sm">{category.name}</p>
+                </div>
+              )
+            })}
           </div>
         </div>
       </div>

@@ -59,6 +59,22 @@ export const useProjectUsageQuery = <TData = ProjectUsageData>(
     ({ signal }) => getProjectUsage({ projectRef }, signal),
     {
       enabled: enabled && typeof projectRef !== 'undefined',
+      // @ts-ignore, ensure that all usage values are numbers
+      select(data) {
+        const formattedData: any = {}
+        Object.keys(data).forEach((attribute: any) => {
+          const originalAttributeData = (data as any)[attribute]
+          const attributeData =
+            typeof originalAttributeData === 'object'
+              ? ({
+                  ...originalAttributeData,
+                  usage: Number((data as any)[attribute].usage),
+                } as UsageMetric)
+              : originalAttributeData
+          formattedData[attribute] = attributeData
+        })
+        return formattedData as ProjectUsageResponse
+      },
       ...options,
     }
   )
