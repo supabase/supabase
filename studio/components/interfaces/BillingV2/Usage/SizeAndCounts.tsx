@@ -8,21 +8,19 @@ import {
   UsageMetric,
   useProjectUsageQuery,
 } from 'data/usage/project-usage-query'
+import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
+import Link from 'next/link'
 import { Badge, Button, IconAlertTriangle, IconExternalLink } from 'ui'
 import { USAGE_APPROACHING_THRESHOLD } from '../Billing.constants'
 import BarChart from './BarChart'
 import SectionContent from './SectionContent'
 import SectionHeader from './SectionHeader'
 import { USAGE_CATEGORIES } from './Usage.constants'
-import Link from 'next/link'
 
 export interface SizeAndCountsProps {
   projectRef: string
 }
-
-// [Joshen TODO] If it's a paid tier, need to add information about disk size
-// Reference to ProjectUsageBars or reports/database.tsx
 
 const SizeAndCounts = ({ projectRef }: SizeAndCountsProps) => {
   const { data: usage } = useProjectUsageQuery({ projectRef })
@@ -32,27 +30,37 @@ const SizeAndCounts = ({ projectRef }: SizeAndCountsProps) => {
   const endDate = new Date((current_period_end ?? 0) * 1000).toISOString()
   const categoryMeta = USAGE_CATEGORIES.find((category) => category.key === 'sizeCount')
 
-  const TOTAL_DB_SIZE_KEY = 'total_db_size_bytes'
   const { data: dbSizeData, isLoading: isLoadingDbSizeData } = useDailyStatsQuery({
     projectRef,
-    attribute: TOTAL_DB_SIZE_KEY,
+    attribute: 'total_db_size_bytes',
     interval: '1d',
     startDate,
     endDate,
   })
 
-  const TOTAL_STORAGE_SIZE_KEY = 'total_storage_size_bytes'
   const { data: storageSizeData, isLoading: isLoadingStorageSizeData } = useDailyStatsQuery({
     projectRef,
-    attribute: TOTAL_STORAGE_SIZE_KEY,
+    attribute: 'total_storage_size_bytes',
     interval: '1d',
     startDate,
     endDate,
   })
 
-  if (categoryMeta === undefined) return null
+  const { data: functionCountData, isLoading: isLoadingFunctionCountData } = useDailyStatsQuery({
+    projectRef,
+    attribute: 'total_func_count',
+    interval: '1d',
+    startDate,
+    endDate,
+  })
 
-  console.log({ usage })
+  const chartMeta: any = {
+    db_size: { isLoading: isLoadingDbSizeData, data: dbSizeData?.data ?? [] },
+    storage_size: { isLoading: isLoadingStorageSizeData, data: storageSizeData?.data ?? [] },
+    func_count: { isLoading: isLoadingFunctionCountData, data: functionCountData?.data ?? [] },
+  }
+
+  if (categoryMeta === undefined) return null
 
   return (
     <>
@@ -63,10 +71,6 @@ const SizeAndCounts = ({ projectRef }: SizeAndCountsProps) => {
         const usageRatio =
           typeof usageMeta !== 'number' ? (usageMeta?.usage ?? 0) / (usageMeta?.limit ?? 0) : 0
         const usageExcess = (usageMeta?.usage ?? 0) - (usageMeta?.limit ?? 0)
-
-        const isLoadingData =
-          attribute.key === 'db_size' ? isLoadingDbSizeData : isLoadingStorageSizeData
-        const usageData = attribute.key === 'db_size' ? dbSizeData : storageSizeData
 
         return (
           <SectionContent
@@ -113,45 +117,60 @@ const SizeAndCounts = ({ projectRef }: SizeAndCountsProps) => {
                   <p className="text-xs text-scale-1000">
                     Included in {subscription?.tier.name.toLowerCase()}
                   </p>
-                  <p className="text-xs">{formatBytes(usageMeta?.limit ?? 0)}</p>
+                  <p className="text-xs">
+                    {attribute.unit === 'bytes'
+                      ? formatBytes(usageMeta?.limit ?? 0)
+                      : (usageMeta?.limit ?? 0).toLocaleString()}
+                  </p>
                 </div>
                 <div className="flex items-center justify-between border-b py-1">
                   <p className="text-xs text-scale-1000">Used</p>
-                  <p className="text-xs">{formatBytes(usageMeta?.usage ?? 0)}</p>
+                  <p className="text-xs">
+                    {attribute.unit === 'bytes'
+                      ? formatBytes(usageMeta?.usage ?? 0)
+                      : (usageMeta?.usage ?? 0).toLocaleString()}
+                  </p>
                 </div>
                 <div className="flex items-center justify-between py-1">
                   <p className="text-xs text-scale-1000">Extra volume used this month</p>
                   <p className="text-xs">
-                    {usageExcess < 0 ? formatBytes(0) : formatBytes(usageExcess)}
+                    {usageExcess < 0
+                      ? attribute.unit === 'bytes'
+                        ? formatBytes(0)
+                        : 0
+                      : attribute.unit === 'bytes'
+                      ? formatBytes(usageExcess)
+                      : usageExcess.toLocaleString()}
                   </p>
                 </div>
               </div>
             </div>
 
-            {attribute.key === 'db_size' && (
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <p className="text-sm">Disk size:</p>
-                  <p className="text-sm">{usage?.disk_volume_size_gb} GB</p>
-                  <Badge color="green" size="small">
-                    Auto-scaling
-                  </Badge>
+            {attribute.key === 'db_size' &&
+              subscription?.tier.supabase_prod_id !== PRICING_TIER_PRODUCT_IDS.FREE && (
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <p className="text-sm">Disk size:</p>
+                    <p className="text-sm">{usage?.disk_volume_size_gb} GB</p>
+                    <Badge color="green" size="small">
+                      Auto-scaling
+                    </Badge>
+                  </div>
+                  <Link href="https://supabase.com/docs/guides/platform/database-usage#disk-management">
+                    <a>
+                      <Button size="tiny" type="default" icon={<IconExternalLink size={14} />}>
+                        What is disk size?
+                      </Button>
+                    </a>
+                  </Link>
                 </div>
-                <Link href="https://supabase.com/docs/guides/platform/database-usage#disk-management">
-                  <a>
-                    <Button size="tiny" type="default" icon={<IconExternalLink size={14} />}>
-                      What is disk size?
-                    </Button>
-                  </a>
-                </Link>
-              </div>
-            )}
+              )}
 
             <div className="space-y-1">
               <p>{attribute.name} over time</p>
               <p className="text-sm text-scale-1000">{attribute.chartDescription}</p>
             </div>
-            {isLoadingData ? (
+            {chartMeta[attribute.key].isLoading ? (
               <div className="space-y-2">
                 <ShimmeringLoader />
                 <ShimmeringLoader className="w-3/4" />
@@ -160,13 +179,15 @@ const SizeAndCounts = ({ projectRef }: SizeAndCountsProps) => {
             ) : (
               <BarChart
                 hasQuota
-                attribute={
-                  attribute.key === 'db_egress' ? TOTAL_DB_SIZE_KEY : TOTAL_STORAGE_SIZE_KEY
-                }
-                data={usageData?.data ?? []}
+                attribute={attribute.attribute}
+                data={chartMeta[attribute.key]?.data ?? []}
                 yLimit={usageMeta?.limit ?? 0}
                 yLeftMargin={14}
-                yFormatter={(value) => formatBytes(value, 1, 'GB').replace(/\s/g, '')}
+                yFormatter={(value) =>
+                  attribute.unit === 'bytes'
+                    ? formatBytes(value, 1, 'GB').replace(/\s/g, '')
+                    : value.toLocaleString()
+                }
               />
             )}
           </SectionContent>
