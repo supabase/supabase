@@ -28,14 +28,33 @@ export interface BarChartProps {
   reference?: Reference
   unit?: string
   yDomain?: number[]
+  yLeftMargin?: number
   yFormatter?: (value: number) => string
 }
 
-const BarChart = ({ data, attribute, reference, unit, yDomain, yFormatter }: BarChartProps) => {
+const BarChart = ({
+  data,
+  attribute,
+  reference,
+  unit,
+  yDomain,
+  yLeftMargin = 10,
+  yFormatter,
+}: BarChartProps) => {
+  const ticks =
+    yDomain !== undefined
+      ? [
+          yDomain[0],
+          (yDomain[1] - yDomain[0]) * 0.25,
+          (yDomain[1] - yDomain[0]) * 0.5,
+          (yDomain[1] - yDomain[0]) * 0.75,
+          yDomain[1],
+        ]
+      : undefined
   return (
     <div className="w-full h-[200px]">
       <ResponsiveContainer width="100%" height={200}>
-        <ComposedChart data={data} margin={{ top: 0, right: 0, left: 10, bottom: 0 }}>
+        <ComposedChart data={data} margin={{ top: 0, right: 0, left: yLeftMargin, bottom: 0 }}>
           <CartesianGrid vertical={false} strokeDasharray="3 3" className="stroke-scale-800" />
           <XAxis dataKey="period_start" />
           <YAxis
@@ -44,6 +63,7 @@ const BarChart = ({ data, attribute, reference, unit, yDomain, yFormatter }: Bar
             tickLine={{ stroke: 'none' }}
             domain={yDomain}
             unit={unit}
+            ticks={ticks}
             tickFormatter={yFormatter}
           />
           <Bar dataKey={attribute}>

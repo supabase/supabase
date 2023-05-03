@@ -107,7 +107,9 @@ const Activity = () => {
             attribute={MAU_KEY}
             data={mauData?.data ?? []}
             unit={undefined}
-            yDomain={[0, 100]}
+            yDomain={[0, monthly_active_users?.limit ?? 0]}
+            yLeftMargin={18}
+            yFormatter={(value) => value.toLocaleString()}
           />
         )}
       </SectionContent>
@@ -173,7 +175,7 @@ const Activity = () => {
                 attribute={MAU_KEY}
                 data={assetTransformationsData?.data ?? []}
                 unit={undefined}
-                yDomain={[0, 100]}
+                yDomain={[0, storage_image_render_count?.limit ?? 0]}
               />
             )}
           </>
@@ -230,7 +232,9 @@ const Activity = () => {
             attribute={FUNC_INVOCATIONS_KEY}
             data={funcInvocationsData?.data ?? []}
             unit={undefined}
-            yDomain={[0, 100]}
+            yDomain={[0, func_invocations?.limit ?? 0]}
+            yLeftMargin={26}
+            yFormatter={(value) => value.toLocaleString()}
           />
         )}
       </SectionContent>

@@ -20,7 +20,6 @@ const Infrastructure = () => {
     interval: '1d',
     startDate,
     endDate,
-    modifier: (x: number) => x * 100,
   })
 
   const MEMORY_USAGE_KEY = 'ram_usage'
