@@ -3,6 +3,7 @@ import { useParams } from 'common'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
+import { useProjectUsageQuery } from 'data/usage/project-usage-query'
 import Link from 'next/link'
 import { useRef, useState } from 'react'
 import { Button, IconAlertCircle, IconCheckCircle, IconLoader, Listbox } from 'ui'
@@ -10,9 +11,8 @@ import Activity from './Activity'
 import Bandwidth from './Bandwidth'
 import Infrastructure from './Infrastructure'
 import SizeAndCounts from './SizeAndCounts'
-import { useProjectUsageQuery } from 'data/usage/project-usage-query'
-import { getUsageStatus } from './Usage.utils'
 import { USAGE_CATEGORIES, USAGE_STATUS } from './Usage.constants'
+import { getUsageStatus } from './Usage.utils'
 
 const Usage = () => {
   const { ref } = useParams()

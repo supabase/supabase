@@ -1,10 +1,10 @@
 import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import dayjs from 'dayjs'
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { useCallback } from 'react'
-import { analyticsKeys } from './keys'
 import { AnalyticsData } from './constants'
-import dayjs from 'dayjs'
+import { analyticsKeys } from './keys'
 
 export type DailyStatsVariables = {
   projectRef?: string
@@ -141,19 +141,21 @@ export const useDailyStatsQuery = <TData = DailyStatsData>(
             return {
               loopId: idx,
               period_start: dayjs(startDate).add(idx, 'day').format(dateFormat),
+              periodStartFormatted: dayjs(startDate).add(idx, 'day').format(dateFormat),
               [attribute]: 0,
             }
           })
-          return { ...data, data: mockData }
+          return { ...data, data: mockData, hasNoData: true }
         } else {
           return {
             ...data,
+            hasNoData: false,
             data: data.data.map((x) => {
               return {
                 ...x,
                 [attribute]:
                   modifier !== undefined ? modifier(Number(x[attribute])) : Number(x[attribute]),
-                period_start:
+                periodStartFormatted:
                   Number(x.period_start) > 0
                     ? dayjs(x.period_start).format(dateFormat)
                     : x.period_start,

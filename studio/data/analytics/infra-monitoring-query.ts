@@ -1,10 +1,10 @@
 import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import dayjs from 'dayjs'
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { useCallback } from 'react'
-import { analyticsKeys } from './keys'
 import { AnalyticsData } from './constants'
-import dayjs from 'dayjs'
+import { analyticsKeys } from './keys'
 
 export type InfraMonitoringVariables = {
   projectRef?: string
@@ -73,7 +73,7 @@ export const useInfraMonitoringQuery = <TData = InfraMonitoringData>(
               ...x,
               [attribute]:
                 modifier !== undefined ? modifier(Number(x[attribute])) : Number(x[attribute]),
-              period_start: dayjs(x.period_start).format(dateFormat),
+              periodStartFormatted: dayjs(x.period_start).format(dateFormat),
             }
           }),
         }

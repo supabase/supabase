@@ -8,6 +8,7 @@ import {
   UsageMetric,
   useProjectUsageQuery,
 } from 'data/usage/project-usage-query'
+import dayjs from 'dayjs'
 import { Button, IconAlertTriangle } from 'ui'
 import { USAGE_APPROACHING_THRESHOLD } from '../Billing.constants'
 import BarChart from './BarChart'
@@ -84,31 +85,37 @@ const Activity = ({ projectRef }: ActivityProps) => {
     monthly_active_users: {
       isLoading: isLoadingMauData,
       data: mauData?.data ?? [],
+      showLastUpdated: mauData?.hasNoData === false,
       margin: 18,
     },
     monthly_active_sso_users: {
       isLoading: isLoadingMauSSOData,
       data: mauSSOData?.data ?? [],
+      showLastUpdated: mauSSOData?.hasNoData === false,
       margin: 20,
     },
     storage_image_render_count: {
       isLoading: isLoadingAssetTransformationsData,
       data: assetTransformationsData?.data ?? [],
+      showLastUpdated: assetTransformationsData?.hasNoData === false,
       margin: 0,
     },
     func_invocations: {
       isLoading: isLoadingFuncInvocationsData,
       data: funcInvocationsData?.data ?? [],
+      showLastUpdated: funcInvocationsData?.hasNoData === false,
       margin: 26,
     },
     realtime_message_count: {
       isLoading: isLoadingRealtimeMessagesData,
       data: realtimeMessagesData?.data ?? [],
+      showLastUpdated: realtimeMessagesData?.hasNoData === false,
       margin: 38,
     },
     realtime_peak_connection: {
       isLoading: isLoadingRealtimeConnectionsData,
       data: realtimeConnectionsData?.data ?? [],
+      showLastUpdated: realtimeConnectionsData?.hasNoData === false,
       margin: 0,
     },
   }
@@ -124,6 +131,19 @@ const Activity = ({ projectRef }: ActivityProps) => {
         const usageRatio =
           typeof usageMeta !== 'number' ? (usageMeta?.usage ?? 0) / (usageMeta?.limit ?? 0) : 0
         const usageExcess = (usageMeta?.usage ?? 0) - (usageMeta?.limit ?? 0)
+
+        const chartData = chartMeta[attribute.key]?.data ?? []
+
+        // [Joshen] Ideally this should come from the API imo, foresee some discrepancies
+        const lastZeroValue = chartData.find(
+          (x: any) => x.loopId > 0 && x[attribute.attribute] === 0
+        )
+        const lastKnownValue =
+          lastZeroValue !== undefined
+            ? dayjs(lastZeroValue.period_start)
+                .subtract(1, 'day')
+                .format('DD MMM YYYY, HH:mma (ZZ)')
+            : undefined
 
         return (
           <SectionContent
@@ -195,7 +215,16 @@ const Activity = ({ projectRef }: ActivityProps) => {
               <>
                 <div className="space-y-1">
                   <p>{attribute.name} over time</p>
-                  <p className="text-sm text-scale-1000">{attribute.chartDescription}</p>
+                  {attribute.chartDescription.split('\n').map((paragraph, idx) => (
+                    <p key={`para-${idx}`} className="text-sm text-scale-1000">
+                      {paragraph}
+                    </p>
+                  ))}
+                  {lastKnownValue !== undefined && chartMeta[attribute.key].showLastUpdated && (
+                    <span className="text-sm text-scale-1000">
+                      Last updated at: {lastKnownValue}
+                    </span>
+                  )}
                 </div>
                 {chartMeta[attribute.key].isLoading ? (
                   <div className="space-y-2">
@@ -207,7 +236,7 @@ const Activity = ({ projectRef }: ActivityProps) => {
                   <BarChart
                     hasQuota
                     attribute={attribute.attribute}
-                    data={chartMeta[attribute.key]?.data ?? []}
+                    data={chartData}
                     yLimit={usageMeta?.limit ?? 0}
                     yLeftMargin={chartMeta[attribute.key].margin}
                     yFormatter={(value) => value.toLocaleString()}

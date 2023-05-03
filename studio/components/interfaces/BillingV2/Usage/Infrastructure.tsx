@@ -1,6 +1,7 @@
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
 import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
+import dayjs from 'dayjs'
 import BarChart from './BarChart'
 import SectionContent from './SectionContent'
 import SectionHeader from './SectionHeader'
@@ -44,9 +45,18 @@ const Infrastructure = ({ projectRef }: InfrastructureProps) => {
   })
 
   const chartMeta: any = {
-    cpu_usage: { isLoading: isLoadingCpuUsageData, data: cpuUsageData?.data ?? [] },
-    ram_usage: { isLoading: isLoadingMemoryUsageData, data: memoryUsageData?.data ?? [] },
-    disk_io_budget: { isLoading: isLoadingIoBudgetData, data: ioBudgetData?.data ?? [] },
+    cpu_usage: {
+      isLoading: isLoadingCpuUsageData,
+      data: cpuUsageData?.data ?? [],
+    },
+    ram_usage: {
+      isLoading: isLoadingMemoryUsageData,
+      data: memoryUsageData?.data ?? [],
+    },
+    disk_io_budget: {
+      isLoading: isLoadingIoBudgetData,
+      data: ioBudgetData?.data ?? [],
+    },
   }
 
   if (categoryMeta === undefined) return null
@@ -55,6 +65,19 @@ const Infrastructure = ({ projectRef }: InfrastructureProps) => {
     <>
       <SectionHeader title="Infrastructure" description="Some description here" />
       {categoryMeta.attributes.map((attribute) => {
+        const chartData = chartMeta[attribute.key]?.data ?? []
+
+        // [Joshen] Ideally this should come from the API imo, foresee some discrepancies
+        const lastZeroValue = chartData.find(
+          (x: any) => x.loopId > 0 && x[attribute.attribute] === 0
+        )
+        const lastKnownValue =
+          lastZeroValue !== undefined
+            ? dayjs(lastZeroValue.period_start)
+                .subtract(1, 'day')
+                .format('DD MMM YYYY, HH:mma (ZZ)')
+            : undefined
+
         return (
           <SectionContent key={attribute.key} section={attribute}>
             <div className="space-y-1">
@@ -74,6 +97,9 @@ const Infrastructure = ({ projectRef }: InfrastructureProps) => {
                   {paragraph}
                 </p>
               ))}
+              {lastKnownValue !== undefined && (
+                <span className="text-sm text-scale-1000">Last updated at: {lastKnownValue}</span>
+              )}
             </div>
             {chartMeta[attribute.key].isLoading ? (
               <div className="space-y-2">
@@ -84,7 +110,7 @@ const Infrastructure = ({ projectRef }: InfrastructureProps) => {
             ) : (
               <BarChart
                 attribute={attribute.attribute}
-                data={chartMeta[attribute.key]?.data ?? []}
+                data={chartData}
                 yFormatter={(value) => `${value}%`}
                 yLimit={100}
               />

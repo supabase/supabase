@@ -8,6 +8,7 @@ import {
   UsageMetric,
   useProjectUsageQuery,
 } from 'data/usage/project-usage-query'
+import dayjs from 'dayjs'
 import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 import Link from 'next/link'
@@ -55,9 +56,21 @@ const SizeAndCounts = ({ projectRef }: SizeAndCountsProps) => {
   })
 
   const chartMeta: any = {
-    db_size: { isLoading: isLoadingDbSizeData, data: dbSizeData?.data ?? [] },
-    storage_size: { isLoading: isLoadingStorageSizeData, data: storageSizeData?.data ?? [] },
-    func_count: { isLoading: isLoadingFunctionCountData, data: functionCountData?.data ?? [] },
+    db_size: {
+      isLoading: isLoadingDbSizeData,
+      data: dbSizeData?.data ?? [],
+      showLastUpdated: dbSizeData?.hasNoData === false,
+    },
+    storage_size: {
+      isLoading: isLoadingStorageSizeData,
+      data: storageSizeData?.data ?? [],
+      showLastUpdated: storageSizeData?.hasNoData === false,
+    },
+    func_count: {
+      isLoading: isLoadingFunctionCountData,
+      data: functionCountData?.data ?? [],
+      showLastUpdated: functionCountData?.hasNoData === false,
+    },
   }
 
   if (categoryMeta === undefined) return null
@@ -71,6 +84,19 @@ const SizeAndCounts = ({ projectRef }: SizeAndCountsProps) => {
         const usageRatio =
           typeof usageMeta !== 'number' ? (usageMeta?.usage ?? 0) / (usageMeta?.limit ?? 0) : 0
         const usageExcess = (usageMeta?.usage ?? 0) - (usageMeta?.limit ?? 0)
+
+        const chartData = chartMeta[attribute.key]?.data ?? []
+
+        // [Joshen] Ideally this should come from the API imo, foresee some discrepancies
+        const lastZeroValue = chartData.find(
+          (x: any) => x.loopId > 0 && x[attribute.attribute] === 0
+        )
+        const lastKnownValue =
+          lastZeroValue !== undefined
+            ? dayjs(lastZeroValue.period_start)
+                .subtract(1, 'day')
+                .format('DD MMM YYYY, HH:mma (ZZ)')
+            : undefined
 
         return (
           <SectionContent key={attribute.key} section={attribute}>
@@ -164,7 +190,14 @@ const SizeAndCounts = ({ projectRef }: SizeAndCountsProps) => {
 
             <div className="space-y-1">
               <p>{attribute.name} over time</p>
-              <p className="text-sm text-scale-1000">{attribute.chartDescription}</p>
+              {attribute.chartDescription.split('\n').map((paragraph, idx) => (
+                <p key={`para-${idx}`} className="text-sm text-scale-1000">
+                  {paragraph}
+                </p>
+              ))}
+              {lastKnownValue !== undefined && chartMeta[attribute.key].showLastUpdated && (
+                <span className="text-sm text-scale-1000">Last updated at: {lastKnownValue}</span>
+              )}
             </div>
             {chartMeta[attribute.key].isLoading ? (
               <div className="space-y-2">
@@ -176,7 +209,7 @@ const SizeAndCounts = ({ projectRef }: SizeAndCountsProps) => {
               <BarChart
                 hasQuota
                 attribute={attribute.attribute}
-                data={chartMeta[attribute.key]?.data ?? []}
+                data={chartData}
                 yLimit={usageMeta?.limit ?? 0}
                 yLeftMargin={14}
                 yFormatter={(value) =>
