@@ -1,14 +1,13 @@
 import { DataPoint } from 'data/analytics/constants'
 import {
-  ResponsiveContainer,
-  ComposedChart,
-  CartesianGrid,
-  YAxis,
-  XAxis,
   Bar,
-  ReferenceLine,
+  CartesianGrid,
   Cell,
-  Label,
+  ComposedChart,
+  ReferenceLine,
+  ResponsiveContainer,
+  XAxis,
+  YAxis,
 } from 'recharts'
 import { Y_DOMAIN_CEILING_MULTIPLIER } from './Usage.constants'
 
@@ -50,7 +49,7 @@ const BarChart = ({
       <ResponsiveContainer width="100%" height={200}>
         <ComposedChart data={data} margin={{ top: 0, right: 0, left: yLeftMargin, bottom: 0 }}>
           <CartesianGrid vertical={false} strokeDasharray="3 3" className="stroke-scale-800" />
-          <XAxis dataKey="period_start" />
+          <XAxis dataKey="periodStartFormatted" />
           <YAxis
             width={28}
             axisLine={false}

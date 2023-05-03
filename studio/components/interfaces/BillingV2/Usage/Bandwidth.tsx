@@ -8,6 +8,7 @@ import {
   UsageMetric,
   useProjectUsageQuery,
 } from 'data/usage/project-usage-query'
+import dayjs from 'dayjs'
 import { USAGE_APPROACHING_THRESHOLD } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 import { Button, IconAlertTriangle } from 'ui'
@@ -45,8 +46,16 @@ const Bandwidth = ({ projectRef }: BandwidthProps) => {
   })
 
   const chartMeta: any = {
-    db_egress: { isLoading: isLoadingDbEgressData, data: dbEgressData?.data ?? [] },
-    storage_egress: { isLoading: isLoadingStorageEgressData, data: storageEgressData?.data ?? [] },
+    db_egress: {
+      isLoading: isLoadingDbEgressData,
+      data: dbEgressData?.data ?? [],
+      showLastUpdated: dbEgressData?.hasNoData === false,
+    },
+    storage_egress: {
+      isLoading: isLoadingStorageEgressData,
+      data: storageEgressData?.data ?? [],
+      showLastUpdated: storageEgressData?.hasNoData === false,
+    },
   }
 
   if (categoryMeta === undefined) return null
@@ -60,6 +69,19 @@ const Bandwidth = ({ projectRef }: BandwidthProps) => {
         const usageRatio =
           typeof usageMeta !== 'number' ? (usageMeta?.usage ?? 0) / (usageMeta?.limit ?? 0) : 0
         const usageExcess = (usageMeta?.usage ?? 0) - (usageMeta?.limit ?? 0)
+
+        const chartData = chartMeta[attribute.key]?.data ?? []
+
+        // [Joshen] Ideally this should come from the API imo, foresee some discrepancies
+        const lastZeroValue = chartData.find(
+          (x: any) => x.loopId > 0 && x[attribute.attribute] === 0
+        )
+        const lastKnownValue =
+          lastZeroValue !== undefined
+            ? dayjs(lastZeroValue.period_start)
+                .subtract(1, 'day')
+                .format('DD MMM YYYY, HH:mma (ZZ)')
+            : undefined
 
         return (
           <SectionContent key={attribute.key} section={attribute}>
@@ -118,7 +140,14 @@ const Bandwidth = ({ projectRef }: BandwidthProps) => {
             </div>
             <div className="space-y-1">
               <p>{attribute.name} over time</p>
-              <p className="text-sm text-scale-1000">{attribute.chartDescription}</p>
+              {attribute.chartDescription.split('\n').map((paragraph, idx) => (
+                <p key={`para-${idx}`} className="text-sm text-scale-1000">
+                  {paragraph}
+                </p>
+              ))}
+              {lastKnownValue !== undefined && chartMeta[attribute.key].showLastUpdated && (
+                <span className="text-sm text-scale-1000">Last updated at: {lastKnownValue}</span>
+              )}
             </div>
             {chartMeta[attribute.key]?.isLoading ? (
               <div className="space-y-2">
@@ -130,7 +159,7 @@ const Bandwidth = ({ projectRef }: BandwidthProps) => {
               <BarChart
                 hasQuota
                 attribute={attribute.attribute}
-                data={chartMeta[attribute.key]?.data ?? []}
+                data={chartData}
                 yLimit={usageMeta?.limit ?? 0}
                 yLeftMargin={14}
                 yFormatter={(value) => formatBytes(value, 1, 'GB').replace(/\s/g, '')}

@@ -49,7 +49,7 @@ export const USAGE_CATEGORIES: {
         description:
           'SSD Disks are attached to your servers and the disk performance of your workload is determined by the Disk IO bandwidth of this connection.',
         chartDescription:
-          'If the remaining bandwidth is less than 100%, it indicates that your workload has burst beyond the baseline IO throughput during the day.\nIf this metric drops to zero, the workload has used up all the burst IO throughput minutes during the day and is running at the baseline performance.\nThe amount of remaining bandwidth resets at the beginning of each day, and the data shown here is refreshed over a period of 24 hours.',
+          'The amount of remaining bandwidth resets at the beginning of each day, and the data shown here is refreshed over a period of 24 hours.',
       },
     ],
   },
