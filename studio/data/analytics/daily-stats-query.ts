@@ -113,7 +113,7 @@ export const useDailyStatsQuery = <TData = DailyStatsData>(
     startDate,
     endDate,
     interval = '1d',
-    dateFormat,
+    dateFormat = 'DD MMM',
     modifier,
   }: DailyStatsVariables,
   { enabled = true, ...options }: UseQueryOptions<DailyStatsData, DailyStatsError, TData> = {}
@@ -130,20 +130,34 @@ export const useDailyStatsQuery = <TData = DailyStatsData>(
         typeof endDate !== 'undefined',
       // @ts-ignore
       select(data) {
-        // [JOSHEN TODO] if no data, pad with empty data
-        return {
-          ...data,
-          data: data.data.map((x) => {
+        const noDataYet = Number(data.data[0].period_start) === 0
+
+        if (noDataYet) {
+          const days = dayjs(endDate).diff(dayjs(startDate), 'days')
+          const tempArray = new Array(days).fill(0)
+          const mockData = tempArray.map((x, idx) => {
             return {
-              ...x,
-              [attribute]:
-                modifier !== undefined ? modifier(Number(x[attribute])) : Number(x[attribute]),
-              period_start:
-                Number(x.period_start) > 0
-                  ? dayjs(x.period_start).format(dateFormat)
-                  : x.period_start,
+              loopId: idx,
+              period_start: dayjs(startDate).add(idx, 'day').format(dateFormat),
+              [attribute]: 0,
             }
-          }),
+          })
+          return { ...data, data: mockData }
+        } else {
+          return {
+            ...data,
+            data: data.data.map((x) => {
+              return {
+                ...x,
+                [attribute]:
+                  modifier !== undefined ? modifier(Number(x[attribute])) : Number(x[attribute]),
+                period_start:
+                  Number(x.period_start) > 0
+                    ? dayjs(x.period_start).format(dateFormat)
+                    : x.period_start,
+              }
+            }),
+          }
         }
       },
       ...options,
