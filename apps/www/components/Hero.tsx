@@ -1,5 +1,4 @@
 import { Button, IconBookOpen } from 'ui'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
 import SectionContainer from './Layouts/SectionContainer'
 import Telemetry, { GoogleAnalyticsEvent } from '~/lib/telemetry'
@@ -10,8 +9,8 @@ const Hero = () => {
   const router = useRouter()
   const googleAnalyticsProps = useGoogleAnalyticsProps()
 
-  const trackAndNavigate = (url: string, event: GoogleAnalyticsEvent) => {
-    Telemetry.sendEvent(event, googleAnalyticsProps)
+  const trackAndNavigate = async (url: string, event: GoogleAnalyticsEvent) => {
+    await Telemetry.sendEvent(event, googleAnalyticsProps)
     router.push(url)
   }
 
