@@ -1,5 +1,5 @@
 import { post } from '~/lib/fetchWrapper'
-import { API_URL, IS_PROD } from 'lib/constants'
+import { API_URL, IS_PROD, IS_PREVIEW } from 'lib/constants'
 
 export interface GoogleAnalyticsEvent {
   category: string
@@ -17,7 +17,7 @@ export interface GoogleAnalyticsProps {
 // but uses different ENV variables for www
 
 const sendEvent = (event: GoogleAnalyticsEvent, gaProps: GoogleAnalyticsProps) => {
-  if (!IS_PROD) return
+  if (!IS_PROD && !IS_PREVIEW) return
 
   const { category, action, label, value } = event
 
