@@ -370,7 +370,7 @@ const TableGridEditor = ({
         {(isViewSelected || isTableSelected) && <TableDefinition id={selectedTable?.id} />}
       </SupabaseGrid>
 
-      {!isUndefined(snap.selectedSchemaName) && (
+      {snap.selectedSchemaName !== undefined && (
         <SidePanelEditor
           selectedTable={selectedTable as PostgresTable}
           onRowCreated={onRowCreated}

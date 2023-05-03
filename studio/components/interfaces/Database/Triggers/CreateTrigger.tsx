@@ -22,6 +22,8 @@ import FormEmptyBox from 'components/ui/FormBoxEmpty'
 import NoTableState from 'components/ui/States/NoTableState'
 import { useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
+import { useTablesQuery } from 'data/tables/tables-query'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
 class CreateTriggerFormState {
   id: number | undefined
@@ -248,27 +250,32 @@ type CreateTriggerProps = {
 } & any
 
 const CreateTrigger: FC<CreateTriggerProps> = ({ trigger, visible, setVisible }) => {
+  const { project } = useProjectContext()
   const { ui, meta } = useStore()
   const _localState = useLocalObservable(() => new CreateTriggerStore())
   _localState.meta = meta as any
 
-  // for the empty 'no tables' state link
-  const router = useRouter()
-  const { ref } = router.query
+  useTablesQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    },
+    {
+      onSuccess(tables) {
+        if (_localState.tables.length <= 0) {
+          _localState.setTables(tables)
+        }
+      },
+    }
+  )
 
   useEffect(() => {
-    const fetchTables = async () => {
-      await (_localState!.meta as any)!.tables!.load()
-      const tables = (_localState!.meta as any)!.tables.list()
-      _localState.setTables(tables)
-    }
     const fetchFunctions = async () => {
       await (_localState.meta as any).functions.load()
       const triggerFuncs = (_localState!.meta as any)!.functions.listTriggerFunctions()
       _localState.setTriggerFunctions(triggerFuncs)
     }
 
-    fetchTables()
     fetchFunctions()
   }, [])
 

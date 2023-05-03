@@ -1,30 +1,30 @@
-import { useState } from 'react'
-import { observer } from 'mobx-react-lite'
-import {
-  Button,
-  IconPlus,
-  Input,
-  IconSearch,
-  IconTrash,
-  IconEdit3,
-  IconColumns,
-  Listbox,
-  IconLock,
-  IconCheck,
-} from 'ui'
-import { noop, partition } from 'lodash'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import type { PostgresTable, PostgresSchema } from '@supabase/postgres-meta'
+import { noop, partition } from 'lodash'
+import { observer } from 'mobx-react-lite'
+import { useState } from 'react'
+import {
+  Button,
+  IconCheck,
+  IconColumns,
+  IconEdit3,
+  IconLock,
+  IconPlus,
+  IconSearch,
+  IconTrash,
+  Input,
+  Listbox,
+} from 'ui'
 
-import { useStore, checkPermissions } from 'hooks'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
-import Table from 'components/to-be-cleaned/Table'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
+import Table from 'components/to-be-cleaned/Table'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useSchemasQuery } from 'data/database/schemas-query'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useTablesQuery } from 'data/tables/tables-query'
+import { checkPermissions, useStore } from 'hooks'
+import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
 
 export interface TableListProps {
   onAddTable: () => void
@@ -42,7 +42,6 @@ const TableList = ({
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
   const { meta } = useStore()
-  const { isLoading } = meta.tables
   const [filterString, setFilterString] = useState<string>('')
   const canUpdateTables = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
@@ -54,14 +53,24 @@ const TableList = ({
     EXCLUDED_SCHEMAS.includes(schema?.name ?? '')
   )
 
-  const allTables: PostgresTable[] = meta.tables.list(
-    (table: PostgresTable) => table.schema === snap.selectedSchemaName
+  const {
+    data: tables,
+    isLoading,
+    isSuccess,
+  } = useTablesQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      schema: snap.selectedSchemaName,
+    },
+    {
+      select(tables) {
+        return filterString.length === 0
+          ? tables
+          : tables.filter((table) => table.name.includes(filterString))
+      },
+    }
   )
-  const tables =
-    filterString.length === 0
-      ? allTables
-      : // @ts-ignore
-        allTables.filter((table: PostgresTable) => table.name.includes(filterString))
 
   const publications = meta.publications.list()
   const realtimePublication = publications.find(
@@ -159,129 +168,133 @@ const TableList = ({
         )}
       </div>
 
-      {isLoading ? (
+      {isLoading && (
         <div className="py-4 space-y-2">
           <ShimmeringLoader />
           <ShimmeringLoader className="w-3/4" />
           <ShimmeringLoader className="w-1/2" />
         </div>
-      ) : tables.length === 0 ? (
-        <NoSearchResults />
-      ) : (
-        <div className="my-4 w-full">
-          <Table
-            head={[
-              <Table.th key="name">Name</Table.th>,
-              <Table.th key="description" className="hidden lg:table-cell">
-                Description
-              </Table.th>,
-              <Table.th key="rows" className="hidden xl:table-cell">
-                Rows (Estimated)
-              </Table.th>,
-              <Table.th key="size" className="hidden xl:table-cell">
-                Size (Estimated)
-              </Table.th>,
-              <Table.th key="realtime" className="hidden xl:table-cell text-center">
-                Realtime Enabled
-              </Table.th>,
-              <Table.th key="buttons"></Table.th>,
-            ]}
-            body={tables.map((x: any, i: any) => (
-              <Table.tr key={x.id}>
-                <Table.td>
-                  <p title={x.name}>{x.name}</p>
-                </Table.td>
-                <Table.td className="hidden max-w-sm truncate lg:table-cell break-all whitespace-normal">
-                  {x.comment !== null ? (
-                    <p title={x.comment}>{x.comment}</p>
-                  ) : (
-                    <p className="text-scale-800">No description</p>
-                  )}
-                </Table.td>
-                <Table.td className="hidden xl:table-cell">
-                  <code className="text-sm">{x.live_rows_estimate ?? x.live_row_count}</code>
-                </Table.td>
-                <Table.td className="hidden xl:table-cell">
-                  <code className="text-sm">{x.size}</code>
-                </Table.td>
-                <Table.td className="hidden xl:table-cell text-center">
-                  {(realtimePublication?.tables ?? []).find((table: any) => table.id === x.id) && (
-                    <div className="flex justify-center">
-                      <IconCheck strokeWidth={2} />
-                    </div>
-                  )}
-                </Table.td>
-                <Table.td>
-                  <div className="flex justify-end gap-2">
-                    <Button
-                      type="default"
-                      iconRight={<IconColumns />}
-                      className="whitespace-nowrap hover:border-gray-500"
-                      style={{ paddingTop: 3, paddingBottom: 3 }}
-                      onClick={() => onOpenTable(x)}
-                    >
-                      {x.columns.length} columns
-                    </Button>
+      )}
+      {isSuccess &&
+        (tables.length === 0 ? (
+          <NoSearchResults />
+        ) : (
+          <div className="my-4 w-full">
+            <Table
+              head={[
+                <Table.th key="name">Name</Table.th>,
+                <Table.th key="description" className="hidden lg:table-cell">
+                  Description
+                </Table.th>,
+                <Table.th key="rows" className="hidden xl:table-cell">
+                  Rows (Estimated)
+                </Table.th>,
+                <Table.th key="size" className="hidden xl:table-cell">
+                  Size (Estimated)
+                </Table.th>,
+                <Table.th key="realtime" className="hidden xl:table-cell text-center">
+                  Realtime Enabled
+                </Table.th>,
+                <Table.th key="buttons"></Table.th>,
+              ]}
+              body={tables.map((x: any, i: any) => (
+                <Table.tr key={x.id}>
+                  <Table.td>
+                    <p title={x.name}>{x.name}</p>
+                  </Table.td>
+                  <Table.td className="hidden max-w-sm truncate lg:table-cell break-all whitespace-normal">
+                    {x.comment !== null ? (
+                      <p title={x.comment}>{x.comment}</p>
+                    ) : (
+                      <p className="text-scale-800">No description</p>
+                    )}
+                  </Table.td>
+                  <Table.td className="hidden xl:table-cell">
+                    <code className="text-sm">{x.live_rows_estimate ?? x.live_row_count}</code>
+                  </Table.td>
+                  <Table.td className="hidden xl:table-cell">
+                    <code className="text-sm">{x.size}</code>
+                  </Table.td>
+                  <Table.td className="hidden xl:table-cell text-center">
+                    {(realtimePublication?.tables ?? []).find(
+                      (table: any) => table.id === x.id
+                    ) && (
+                      <div className="flex justify-center">
+                        <IconCheck strokeWidth={2} />
+                      </div>
+                    )}
+                  </Table.td>
+                  <Table.td>
+                    <div className="flex justify-end gap-2">
+                      <Button
+                        type="default"
+                        iconRight={<IconColumns />}
+                        className="whitespace-nowrap hover:border-gray-500"
+                        style={{ paddingTop: 3, paddingBottom: 3 }}
+                        onClick={() => onOpenTable(x)}
+                      >
+                        {x.columns.length} columns
+                      </Button>
 
-                    <Tooltip.Root delayDuration={0}>
-                      <Tooltip.Trigger>
-                        <Button
-                          type="text"
-                          icon={<IconEdit3 />}
-                          style={{ padding: 5 }}
-                          disabled={!canUpdateTables || isLocked}
-                          onClick={() => onEditTable(x)}
-                        />
-                      </Tooltip.Trigger>
-                      {!canUpdateTables && (
-                        <Tooltip.Portal>
-                          <Tooltip.Content side="bottom">
-                            <Tooltip.Arrow className="radix-tooltip-arrow" />
-                            <div
-                              className={[
-                                'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                                'border border-scale-200',
-                              ].join(' ')}
-                            >
-                              <span className="text-xs text-scale-1200">
-                                You need additional permissions to edit tables
-                              </span>
-                            </div>
-                          </Tooltip.Content>
-                        </Tooltip.Portal>
-                      )}
-                    </Tooltip.Root>
+                      <Tooltip.Root delayDuration={0}>
+                        <Tooltip.Trigger>
+                          <Button
+                            type="text"
+                            icon={<IconEdit3 />}
+                            style={{ padding: 5 }}
+                            disabled={!canUpdateTables || isLocked}
+                            onClick={() => onEditTable(x)}
+                          />
+                        </Tooltip.Trigger>
+                        {!canUpdateTables && (
+                          <Tooltip.Portal>
+                            <Tooltip.Content side="bottom">
+                              <Tooltip.Arrow className="radix-tooltip-arrow" />
+                              <div
+                                className={[
+                                  'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                                  'border border-scale-200',
+                                ].join(' ')}
+                              >
+                                <span className="text-xs text-scale-1200">
+                                  You need additional permissions to edit tables
+                                </span>
+                              </div>
+                            </Tooltip.Content>
+                          </Tooltip.Portal>
+                        )}
+                      </Tooltip.Root>
 
-                    <Tooltip.Root delayDuration={0}>
-                      <Tooltip.Trigger>
-                        <Button
-                          type="text"
-                          icon={<IconTrash />}
-                          style={{ padding: 5 }}
-                          disabled={!canUpdateTables || isLocked}
-                          onClick={() => onDeleteTable(x)}
-                        />
-                      </Tooltip.Trigger>
-                      {!canUpdateTables && (
-                        <Tooltip.Portal>
-                          <Tooltip.Content side="bottom">
-                            <Tooltip.Arrow className="radix-tooltip-arrow" />
-                            <div
-                              className={[
-                                'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                                'border border-scale-200',
-                              ].join(' ')}
-                            >
-                              <span className="text-xs text-scale-1200">
-                                You need additional permissions to delete tables
-                              </span>
-                            </div>
-                          </Tooltip.Content>
-                        </Tooltip.Portal>
-                      )}
-                    </Tooltip.Root>
+                      <Tooltip.Root delayDuration={0}>
+                        <Tooltip.Trigger>
+                          <Button
+                            type="text"
+                            icon={<IconTrash />}
+                            style={{ padding: 5 }}
+                            disabled={!canUpdateTables || isLocked}
+                            onClick={() => onDeleteTable(x)}
+                          />
+                        </Tooltip.Trigger>
+                        {!canUpdateTables && (
+                          <Tooltip.Portal>
+                            <Tooltip.Content side="bottom">
+                              <Tooltip.Arrow className="radix-tooltip-arrow" />
+                              <div
+                                className={[
+                                  'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                                  'border border-scale-200',
+                                ].join(' ')}
+                              >
+                                <span className="text-xs text-scale-1200">
+                                  You need additional permissions to delete tables
+                                </span>
+                              </div>
+                            </Tooltip.Content>
+                          </Tooltip.Portal>
+                        )}
+                      </Tooltip.Root>
 
-                    {/* <Button
+                      {/* <Button
                       type="text"
                       icon={<IconEdit3 />}
                       style={{ padding: 5 }}
@@ -295,13 +308,13 @@ const TableList = ({
                       disabled={isLocked}
                       onClick={() => onDeleteTable(x)}
                     /> */}
-                  </div>
-                </Table.td>
-              </Table.tr>
-            ))}
-          />
-        </div>
-      )}
+                    </div>
+                  </Table.td>
+                </Table.tr>
+              ))}
+            />
+          </div>
+        ))}
     </>
   )
 }

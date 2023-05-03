@@ -1,14 +1,16 @@
-import { useState } from 'react'
-import { observer } from 'mobx-react-lite'
-import { Button, Input, IconChevronLeft, IconSearch, IconAlertCircle } from 'ui'
 import type { PostgresPublication } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useState } from 'react'
 
-import { checkPermissions, useStore } from 'hooks'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
-import Table from 'components/to-be-cleaned/Table'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
+import Table from 'components/to-be-cleaned/Table'
 import InformationBox from 'components/ui/InformationBox'
+import Connecting from 'components/ui/Loading/Loading'
+import { useTablesQuery } from 'data/tables/tables-query'
+import { checkPermissions } from 'hooks'
+import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { Button, IconAlertCircle, IconChevronLeft, IconSearch, Input } from 'ui'
 import PublicationsTableItem from './PublicationsTableItem'
 
 export interface PublicationsTablesProps {
@@ -17,7 +19,7 @@ export interface PublicationsTablesProps {
 }
 
 const PublicationsTables = ({ selectedPublication, onSelectBack }: PublicationsTablesProps) => {
-  const { meta } = useStore()
+  const { project } = useProjectContext()
   const [filterString, setFilterString] = useState<string>('')
 
   const canUpdatePublications = checkPermissions(
@@ -25,13 +27,25 @@ const PublicationsTables = ({ selectedPublication, onSelectBack }: PublicationsT
     'publications'
   )
 
-  const tables =
-    filterString.length === 0
-      ? meta.tables.list((table: any) => !EXCLUDED_SCHEMAS.includes(table.schema))
-      : meta.tables.list(
-          (table: any) =>
-            !EXCLUDED_SCHEMAS.includes(table.schema) && table.name.includes(filterString)
+  const {
+    data: tables,
+    isLoading,
+    isSuccess,
+  } = useTablesQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    },
+    {
+      select(tables) {
+        return tables.filter((table) =>
+          filterString.length === 0
+            ? !EXCLUDED_SCHEMAS.includes(table.schema)
+            : !EXCLUDED_SCHEMAS.includes(table.schema) && table.name.includes(filterString)
         )
+      },
+    }
+  )
 
   // const publication = selectedPublication
   // const enabledForAllTables = publication.tables == null
@@ -91,19 +105,25 @@ const PublicationsTables = ({ selectedPublication, onSelectBack }: PublicationsT
           )}
         </div>
       </div>
-      {tables.length === 0 ? (
-        <NoSearchResults />
-      ) : (
-        <div>
-          <Table
-            head={[
-              <Table.th key="header-name">Name</Table.th>,
-              <Table.th key="header-schema">Schema</Table.th>,
-              <Table.th key="header-desc" className="hidden text-left lg:table-cell">
-                Description
-              </Table.th>,
-              <Table.th key="header-all">
-                {/* Temporarily disable All tables toggle for publications. See https://github.com/supabase/supabase/pull/7233.
+      {isLoading && (
+        <div className="mt-8">
+          <Connecting />
+        </div>
+      )}
+      {isSuccess &&
+        (tables.length === 0 ? (
+          <NoSearchResults />
+        ) : (
+          <div>
+            <Table
+              head={[
+                <Table.th key="header-name">Name</Table.th>,
+                <Table.th key="header-schema">Schema</Table.th>,
+                <Table.th key="header-desc" className="hidden text-left lg:table-cell">
+                  Description
+                </Table.th>,
+                <Table.th key="header-all">
+                  {/* Temporarily disable All tables toggle for publications. See https://github.com/supabase/supabase/pull/7233.
               <div className="flex flex-row space-x-3 items-center justify-end">
                 <div className="text-xs leading-4 font-medium text-gray-400 text-right ">
                   All Tables
@@ -117,20 +137,20 @@ const PublicationsTables = ({ selectedPublication, onSelectBack }: PublicationsT
                   onChange={() => toggleReplicationForAllTables(publication, enabledForAllTables)}
                 />
               </div> */}
-              </Table.th>,
-            ]}
-            body={tables.map((table: any, i: number) => (
-              <PublicationsTableItem
-                key={table.id}
-                table={table}
-                selectedPublication={selectedPublication}
-              />
-            ))}
-          />
-        </div>
-      )}
+                </Table.th>,
+              ]}
+              body={tables.map((table: any, i: number) => (
+                <PublicationsTableItem
+                  key={table.id}
+                  table={table}
+                  selectedPublication={selectedPublication}
+                />
+              ))}
+            />
+          </div>
+        ))}
     </>
   )
 }
 
-export default observer(PublicationsTables)
+export default PublicationsTables

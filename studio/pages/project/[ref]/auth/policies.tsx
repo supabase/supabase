@@ -1,20 +1,22 @@
-import { useState, useEffect } from 'react'
-import { partition } from 'lodash'
-import { Button, Listbox, IconSearch, Input, IconExternalLink, IconLock } from 'ui'
-import { observer } from 'mobx-react-lite'
-import { PostgresTable, PostgresPolicy } from '@supabase/postgres-meta'
+import { PostgresPolicy, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { partition } from 'lodash'
+import { observer } from 'mobx-react-lite'
+import { useEffect, useState } from 'react'
 
-import { NextPageWithLayout } from 'types'
-import { checkPermissions, useStore } from 'hooks'
 import { useParams } from 'common/hooks'
-import { AuthLayout } from 'components/layouts'
 import { Policies } from 'components/interfaces/Auth/Policies'
+import { AuthLayout } from 'components/layouts'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import Connecting from 'components/ui/Loading/Loading'
 import NoPermission from 'components/ui/NoPermission'
 import { useSchemasQuery } from 'data/database/schemas-query'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { useTablesQuery } from 'data/tables/tables-query'
+import { checkPermissions, useStore } from 'hooks'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { NextPageWithLayout } from 'types'
+import { Button, IconExternalLink, IconLock, IconSearch, Input, Listbox } from 'ui'
 
 /**
  * Filter tables by table name and policy name
@@ -74,10 +76,17 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
 
   const policies = meta.policies.list()
 
-  const tables = meta.tables.list(
-    (table: { schema: string }) => table.schema === snap.selectedSchemaName
-  )
-  const filteredTables = onFilterTables(tables, policies, searchString)
+  const {
+    data: tables,
+    isLoading,
+    isSuccess,
+  } = useTablesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    schema: snap.selectedSchemaName,
+  })
+
+  const filteredTables = onFilterTables(tables ?? [], policies, searchString)
 
   const canReadPolicies = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'policies')
 
@@ -159,7 +168,10 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
           </a>
         </div>
       </div>
-      <Policies tables={filteredTables} hasTables={tables.length > 0} isLocked={isLocked} />
+      {isLoading && <Connecting />}
+      {isSuccess && (
+        <Policies tables={filteredTables} hasTables={tables.length > 0} isLocked={isLocked} />
+      )}
     </div>
   )
 }

@@ -1,4 +1,3 @@
-import type { PostgresTable } from '@supabase/postgres-meta'
 import { useQueryClient } from '@tanstack/react-query'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -7,10 +6,12 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { entityTypeKeys } from 'data/entity-types/keys'
 import { sqlKeys } from 'data/sql/keys'
+import { useGetTables } from 'data/tables/tables-query'
 import { useStore, useUrlState } from 'hooks'
 import { TableLike } from 'hooks/misc/useTable'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { Alert, Button, Checkbox, IconExternalLink, Modal } from 'ui'
+import { tableKeys } from 'data/tables/keys'
 
 export type DeleteConfirmationDialogsProps = {
   projectRef?: string
@@ -30,6 +31,11 @@ const DeleteConfirmationDialogs = ({
   const queryClient = useQueryClient()
 
   const { meta, ui } = useStore()
+
+  const getTables = useGetTables({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
 
   const removeDeletedColumnFromFiltersAndSorts = (columnName: string) => {
     setParams((prevParams) => {
@@ -71,7 +77,9 @@ const DeleteConfirmationDialogs = ({
 
       queryClient.invalidateQueries(sqlKeys.query(project?.ref, ['foreign-key-constraints']))
       await Promise.all([
-        meta.tables.loadById(selectedColumnToDelete!.table_id),
+        queryClient.invalidateQueries(
+          tableKeys.table(project?.ref, selectedColumnToDelete!.table_id)
+        ),
         queryClient.invalidateQueries(
           sqlKeys.query(project?.ref, [selectedTable!.schema, selectedTable!.name])
         ),
@@ -105,9 +113,7 @@ const DeleteConfirmationDialogs = ({
       const response: any = await meta.tables.del(selectedTableToDelete.id, isDeleteWithCascade)
       if (response.error) throw response.error
 
-      const tables = meta.tables.list(
-        (table: PostgresTable) => table.schema === snap.selectedSchemaName
-      )
+      const tables = await getTables(snap.selectedSchemaName)
 
       await queryClient.invalidateQueries(entityTypeKeys.list(projectRef))
 

@@ -1,10 +1,9 @@
-import { FC, ReactNode, useEffect, useState } from 'react'
+import { FC, ReactNode, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 
 import { useFlag, useStore, withAuth } from 'hooks'
 import ProjectLayout from '../'
-import Error from 'components/ui/Error'
 import ProductMenu from 'components/ui/ProductMenu'
 import { generateDatabaseMenu } from './DatabaseMenu.utils'
 import { IS_PLATFORM } from 'lib/constants'
@@ -16,7 +15,6 @@ interface Props {
 
 const DatabaseLayout: FC<Props> = ({ title, children }) => {
   const { meta, ui, vault, backups } = useStore()
-  const { error } = meta.tables
   const project = ui.selectedProject
 
   const router = useRouter()
@@ -28,8 +26,6 @@ const DatabaseLayout: FC<Props> = ({ title, children }) => {
 
   useEffect(() => {
     if (ui.selectedProject?.ref) {
-      meta.tables.load()
-
       meta.roles.load()
       meta.triggers.load()
       meta.extensions.load()
@@ -46,14 +42,6 @@ const DatabaseLayout: FC<Props> = ({ title, children }) => {
       vault.load()
     }
   }, [ui.selectedProject?.ref, isVaultEnabled])
-
-  if (error) {
-    return (
-      <ProjectLayout>
-        <Error error={error} />
-      </ProjectLayout>
-    )
-  }
 
   return (
     <ProjectLayout

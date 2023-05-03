@@ -1,18 +1,18 @@
-import { useEffect, useState } from 'react'
-import { get, find, isEmpty, sortBy } from 'lodash'
+import type { PostgresColumn, PostgresSchema, PostgresTable } from '@supabase/postgres-meta'
 import { Dictionary } from 'components/grid'
-import { SidePanel, Input, Listbox, IconHelpCircle, IconDatabase } from 'ui'
-import type { PostgresTable, PostgresColumn, PostgresSchema } from '@supabase/postgres-meta'
+import { find, get, isEmpty, sortBy } from 'lodash'
+import { useEffect, useState } from 'react'
+import { IconDatabase, IconHelpCircle, Input, Listbox, SidePanel } from 'ui'
 
-import { useStore } from 'hooks'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import InformationBox from 'components/ui/InformationBox'
 import { FOREIGN_KEY_DELETION_ACTION } from 'data/database/database-query-constants'
 import { useSchemasQuery } from 'data/database/schemas-query'
-import InformationBox from 'components/ui/InformationBox'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useTablesQuery } from 'data/tables/tables-query'
 import ActionBar from '../ActionBar'
-import { ForeignKey } from './ForeignKeySelector.types'
 import { ColumnField } from '../SidePanelEditor.types'
 import { FOREIGN_KEY_DELETION_OPTIONS } from './ForeignKeySelector.constants'
+import { ForeignKey } from './ForeignKeySelector.types'
 import { generateDeletionActionDescription } from './ForeignKeySelector.utils'
 
 export interface ForeignKeySelectorProps {
@@ -32,7 +32,6 @@ const ForeignKeySelector = ({
   saveChanges,
 }: ForeignKeySelectorProps) => {
   const { project } = useProjectContext()
-  const { meta } = useStore()
   const [errors, setErrors] = useState<any>({})
   const [selectedForeignKey, setSelectedForeignKey] = useState<ForeignKey>({
     schema: 'public',
@@ -45,9 +44,11 @@ const ForeignKeySelector = ({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const tables = meta.tables.list(
-    (table: PostgresTable) => table.schema === selectedForeignKey.schema
-  )
+  const { data: tables } = useTablesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    schema: selectedForeignKey.schema,
+  })
 
   const foreignKey = column?.foreignKey
   const selectedTable: PostgresTable | undefined = find(tables, {
@@ -57,11 +58,6 @@ const ForeignKeySelector = ({
   const selectedColumn: PostgresColumn | undefined = find(selectedTable?.columns ?? [], {
     name: selectedForeignKey?.column,
   })
-
-  useEffect(() => {
-    // make sure the public schemas are loaded initially
-    meta.tables.loadBySchema('public')
-  }, [])
 
   useEffect(() => {
     // Reset the state of the side panel
@@ -87,7 +83,6 @@ const ForeignKeySelector = ({
   }, [visible])
 
   const updateSelectedSchema = (schema: string) => {
-    meta.tables.loadBySchema(schema)
     const updatedForeignKey = {
       schema,
       table: '',
