@@ -8,26 +8,19 @@ import {
   Bar,
   ReferenceLine,
   Cell,
+  Label,
 } from 'recharts'
+import { Y_DOMAIN_CEILING_MULTIPLIER } from './Usage.constants'
 
-// [Joshen] I don't think I should be replacing ChartHandler just yet as the styling of the usage charts
-// are slightly different from that on the other pages, just in case.
-
-interface Reference {
-  value: number
-  label: string
-  width: number
-  height: number
-  x: number
-  y: number
-}
+// [Joshen] This BarChart is specifically for usage, hence not a reusable component, and not
+// replacing the existing BarChart in ui/Charts
 
 export interface BarChartProps {
   data: DataPoint[]
   attribute: string
-  reference?: Reference
   unit?: string
-  yDomain?: number[]
+  hasQuota?: boolean
+  yLimit?: number
   yLeftMargin?: number
   yFormatter?: (value: number) => string
 }
@@ -35,22 +28,23 @@ export interface BarChartProps {
 const BarChart = ({
   data,
   attribute,
-  reference,
   unit,
-  yDomain,
+  hasQuota = false,
+  yLimit,
   yLeftMargin = 10,
   yFormatter,
 }: BarChartProps) => {
+  const yMin = 0 // We can consider passing this as a prop if there's a use case in the future
+  const yMax = (yLimit ?? 0) * Y_DOMAIN_CEILING_MULTIPLIER
+
+  const yDomain = [yMin, yLimit ?? 0]
   const ticks =
-    yDomain !== undefined
-      ? [
-          yDomain[0],
-          (yDomain[1] - yDomain[0]) * 0.25,
-          (yDomain[1] - yDomain[0]) * 0.5,
-          (yDomain[1] - yDomain[0]) * 0.75,
-          yDomain[1],
-        ]
+    yLimit !== undefined && hasQuota
+      ? [yMin, (yMax - yMin) * 0.25, (yMax - yMin) * 0.5, (yMax - yMin) * 0.75, yMax].map((x) =>
+          Math.ceil(x)
+        )
       : undefined
+
   return (
     <div className="w-full h-[200px]">
       <ResponsiveContainer width="100%" height={200}>
@@ -71,7 +65,7 @@ const BarChart = ({
               return (
                 <Cell
                   className={
-                    reference !== undefined && Number(entry[attribute]) >= reference.value
+                    yLimit !== undefined && Number(entry[attribute]) >= yLimit
                       ? 'fill-amber-900'
                       : 'fill-scale-1200'
                   }
@@ -79,21 +73,21 @@ const BarChart = ({
               )
             })}
           </Bar>
-          {reference && (
+          {hasQuota && yLimit && (
             <ReferenceLine
-              y={reference.value}
-              label={
+              y={yLimit}
+              label={(props) => (
                 <foreignObject
-                  x={reference.x}
-                  y={reference.y}
-                  width={reference.width}
-                  height={reference.height}
+                  x={props.viewBox.x + 30}
+                  y={props.viewBox.y - 10}
+                  width={200}
+                  height={24}
                 >
                   <div className="text-[0.7rem] font-bold text-scale-1200 bg-scale-100 w-fit p-1.5 py-0.5 rounded-md">
-                    {reference.label}
+                    PLAN QUOTA
                   </div>
                 </foreignObject>
-              }
+              )}
             />
           )}
         </ComposedChart>
