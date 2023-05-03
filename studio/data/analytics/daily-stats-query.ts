@@ -11,6 +11,7 @@ export type DailyStatsVariables = {
   attribute:
     | 'total_db_egress_bytes'
     | 'total_db_size_bytes'
+    | 'total_egress_modified'
 
     // Realtime
     | 'total_realtime_ingress'

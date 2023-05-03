@@ -27,35 +27,91 @@ const Activity = ({ projectRef }: ActivityProps) => {
   const endDate = new Date((current_period_end ?? 0) * 1000).toISOString()
   const categoryMeta = USAGE_CATEGORIES.find((category) => category.key === 'activity')
 
-  const MAU_KEY = 'total_auth_billing_period_mau'
   const { data: mauData, isLoading: isLoadingMauData } = useDailyStatsQuery({
     projectRef,
-    attribute: MAU_KEY,
+    attribute: 'total_auth_billing_period_mau',
     interval: '1d',
     startDate,
     endDate,
   })
 
-  const ASSET_TRANSFORMATIONS_KEY = 'total_storage_image_render_count'
+  const { data: mauSSOData, isLoading: isLoadingMauSSOData } = useDailyStatsQuery({
+    projectRef,
+    attribute: 'total_auth_billing_period_sso_mau',
+    interval: '1d',
+    startDate,
+    endDate,
+  })
+
   const { data: assetTransformationsData, isLoading: isLoadingAssetTransformationsData } =
     useDailyStatsQuery({
       projectRef,
-      attribute: ASSET_TRANSFORMATIONS_KEY,
+      attribute: 'total_storage_image_render_count',
       interval: '1d',
       startDate,
       endDate,
     })
 
-  const FUNC_INVOCATIONS_KEY = 'total_func_invocations'
   const { data: funcInvocationsData, isLoading: isLoadingFuncInvocationsData } = useDailyStatsQuery(
     {
       projectRef,
-      attribute: FUNC_INVOCATIONS_KEY,
+      attribute: 'total_func_invocations',
       interval: '1d',
       startDate,
       endDate,
     }
   )
+
+  const { data: realtimeMessagesData, isLoading: isLoadingRealtimeMessagesData } =
+    useDailyStatsQuery({
+      projectRef,
+      attribute: 'total_realtime_message_count',
+      interval: '1d',
+      startDate,
+      endDate,
+    })
+
+  const { data: realtimeConnectionsData, isLoading: isLoadingRealtimeConnectionsData } =
+    useDailyStatsQuery({
+      projectRef,
+      attribute: 'total_realtime_peak_connection',
+      interval: '1d',
+      startDate,
+      endDate,
+    })
+
+  const chartMeta: any = {
+    monthly_active_users: {
+      isLoading: isLoadingMauData,
+      data: mauData?.data ?? [],
+      margin: 18,
+    },
+    monthly_active_sso_users: {
+      isLoading: isLoadingMauSSOData,
+      data: mauSSOData?.data ?? [],
+      margin: 20,
+    },
+    storage_image_render_count: {
+      isLoading: isLoadingAssetTransformationsData,
+      data: assetTransformationsData?.data ?? [],
+      margin: 0,
+    },
+    func_invocations: {
+      isLoading: isLoadingFuncInvocationsData,
+      data: funcInvocationsData?.data ?? [],
+      margin: 26,
+    },
+    realtime_message_count: {
+      isLoading: isLoadingRealtimeMessagesData,
+      data: realtimeMessagesData?.data ?? [],
+      margin: 38,
+    },
+    realtime_peak_connection: {
+      isLoading: isLoadingRealtimeConnectionsData,
+      data: realtimeConnectionsData?.data ?? [],
+      margin: 0,
+    },
+  }
 
   if (categoryMeta === undefined) return null
 
@@ -68,19 +124,6 @@ const Activity = ({ projectRef }: ActivityProps) => {
         const usageRatio =
           typeof usageMeta !== 'number' ? (usageMeta?.usage ?? 0) / (usageMeta?.limit ?? 0) : 0
         const usageExcess = (usageMeta?.usage ?? 0) - (usageMeta?.limit ?? 0)
-
-        const isLoadingData =
-          attribute.key === 'monthly_active_users'
-            ? isLoadingMauData
-            : attribute.key === 'storage_image_render_count'
-            ? isLoadingAssetTransformationsData
-            : isLoadingFuncInvocationsData
-        const usageData =
-          attribute.key === 'monthly_active_users'
-            ? mauData
-            : attribute.key === 'storage_image_render_count'
-            ? assetTransformationsData
-            : funcInvocationsData
 
         return (
           <SectionContent
@@ -154,7 +197,7 @@ const Activity = ({ projectRef }: ActivityProps) => {
                   <p>{attribute.name} over time</p>
                   <p className="text-sm text-scale-1000">{attribute.chartDescription}</p>
                 </div>
-                {isLoadingData ? (
+                {chartMeta[attribute.key].isLoading ? (
                   <div className="space-y-2">
                     <ShimmeringLoader />
                     <ShimmeringLoader className="w-3/4" />
@@ -163,22 +206,10 @@ const Activity = ({ projectRef }: ActivityProps) => {
                 ) : (
                   <BarChart
                     hasQuota
-                    attribute={
-                      attribute.key === 'monthly_active_users'
-                        ? MAU_KEY
-                        : attribute.key === 'storage_image_render_count'
-                        ? ASSET_TRANSFORMATIONS_KEY
-                        : FUNC_INVOCATIONS_KEY
-                    }
-                    data={usageData?.data ?? []}
+                    attribute={attribute.attribute}
+                    data={chartMeta[attribute.key]?.data ?? []}
                     yLimit={usageMeta?.limit ?? 0}
-                    yLeftMargin={
-                      attribute.key === 'monthly_active_users'
-                        ? 18
-                        : attribute.key === 'storage_image_render_count'
-                        ? undefined
-                        : 26
-                    }
+                    yLeftMargin={chartMeta[attribute.key].margin}
                     yFormatter={(value) => value.toLocaleString()}
                   />
                 )}

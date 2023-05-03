@@ -28,24 +28,26 @@ const Bandwidth = ({ projectRef }: BandwidthProps) => {
   const endDate = new Date((current_period_end ?? 0) * 1000).toISOString()
   const categoryMeta = USAGE_CATEGORIES.find((category) => category.key === 'bandwidth')
 
-  // [JOSHEN TODO] Double check if this is the right attribute
-  const DB_EGRESS_KEY = 'total_db_egress_bytes'
   const { data: dbEgressData, isLoading: isLoadingDbEgressData } = useDailyStatsQuery({
     projectRef,
-    attribute: DB_EGRESS_KEY,
+    attribute: 'total_egress_modified',
     interval: '1d',
     startDate,
     endDate,
   })
 
-  const STORAGE_EGRESS_KEY = 'total_storage_egress'
   const { data: storageEgressData, isLoading: isLoadingStorageEgressData } = useDailyStatsQuery({
     projectRef,
-    attribute: STORAGE_EGRESS_KEY,
+    attribute: 'total_storage_egress',
     interval: '1d',
     startDate,
     endDate,
   })
+
+  const chartMeta: any = {
+    db_egress: { isLoading: isLoadingDbEgressData, data: dbEgressData?.data ?? [] },
+    storage_egress: { isLoading: isLoadingStorageEgressData, data: storageEgressData?.data ?? [] },
+  }
 
   if (categoryMeta === undefined) return null
 
@@ -58,10 +60,6 @@ const Bandwidth = ({ projectRef }: BandwidthProps) => {
         const usageRatio =
           typeof usageMeta !== 'number' ? (usageMeta?.usage ?? 0) / (usageMeta?.limit ?? 0) : 0
         const usageExcess = (usageMeta?.usage ?? 0) - (usageMeta?.limit ?? 0)
-
-        const isLoadingData =
-          attribute.key === 'db_egress' ? isLoadingDbEgressData : isLoadingStorageEgressData
-        const usageData = attribute.key === 'db_egress' ? dbEgressData : storageEgressData
 
         return (
           <SectionContent
@@ -126,7 +124,7 @@ const Bandwidth = ({ projectRef }: BandwidthProps) => {
               <p>{attribute.name} over time</p>
               <p className="text-sm text-scale-1000">{attribute.chartDescription}</p>
             </div>
-            {isLoadingData ? (
+            {chartMeta[attribute.key]?.isLoading ? (
               <div className="space-y-2">
                 <ShimmeringLoader />
                 <ShimmeringLoader className="w-3/4" />
@@ -135,8 +133,8 @@ const Bandwidth = ({ projectRef }: BandwidthProps) => {
             ) : (
               <BarChart
                 hasQuota
-                attribute={attribute.key === 'db_egress' ? DB_EGRESS_KEY : STORAGE_EGRESS_KEY}
-                data={usageData?.data ?? []}
+                attribute={attribute.attribute}
+                data={chartMeta[attribute.key]?.data ?? []}
                 yLimit={usageMeta?.limit ?? 0}
                 yLeftMargin={14}
                 yFormatter={(value) => formatBytes(value, 1, 'GB').replace(/\s/g, '')}
