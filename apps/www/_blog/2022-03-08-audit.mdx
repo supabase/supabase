@@ -206,7 +206,7 @@ as $$
         case
             when rec is null then null
 						-- if no primary key exists, use a random uuid
-            when pkey_cols = array[]::text[] then uuid_generate_v4()
+            when pkey_cols = array[]::text[] then gen_random_uuid()
             else (
                 select
                     uuid_generate_v5(
