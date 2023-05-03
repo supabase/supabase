@@ -9,10 +9,10 @@ import {
 import ReportWidget from 'components/interfaces/Reports/ReportWidget'
 import { queriesFactory } from 'components/interfaces/Reports/Reports.utils'
 import {
-  renderTotalRequests,
-  renderErrorCounts,
-  renderResponseSpeed,
-  renderTopApiRoutes,
+  TotalRequestsChartRenderer,
+  ErrorCountsChartRenderer,
+  ResponseSpeedChartRenderer,
+  TopApiRoutesRenderer,
 } from 'components/interfaces/Reports/renderers/ApiRenderers'
 import { useState, useEffect } from 'react'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
@@ -64,8 +64,8 @@ export const ApiReport: NextPageWithLayout = () => {
         params={report.params.totalRequests}
         title="Total Requests"
         data={report.data.totalRequests || []}
-        renderer={renderTotalRequests}
-        append={renderTopApiRoutes}
+        renderer={TotalRequestsChartRenderer}
+        append={TopApiRoutesRenderer}
         appendProps={{ data: report.data.topRoutes || [] }}
       />
       <ReportWidget
@@ -74,9 +74,9 @@ export const ApiReport: NextPageWithLayout = () => {
         title="Response Errors"
         tooltip="Error responses with 4XX or 5XX status codes"
         data={report.data.errorCounts || []}
-        renderer={renderErrorCounts}
+        renderer={ErrorCountsChartRenderer}
         appendProps={{ data: report.data.topErrorRoutes || [] }}
-        append={renderTopApiRoutes}
+        append={TopApiRoutesRenderer}
       />
       <ReportWidget
         isLoading={report.isLoading}
@@ -84,9 +84,9 @@ export const ApiReport: NextPageWithLayout = () => {
         title="Response Speed"
         tooltip="Average response speed (in miliseconds) of a request"
         data={report.data.responseSpeed || []}
-        renderer={renderResponseSpeed}
+        renderer={ResponseSpeedChartRenderer}
         appendProps={{ data: report.data.topSlowRoutes || [] }}
-        append={renderTopApiRoutes}
+        append={TopApiRoutesRenderer}
       />
     </ReportPadding>
   )

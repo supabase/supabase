@@ -10,7 +10,7 @@ import { queryParamsToObject } from '../Reports.utils'
 import { Fragment } from 'react'
 import useFillTimeseriesSorted from 'hooks/analytics/useFillTimeseriesSorted'
 
-export const renderTotalRequests = (
+export const TotalRequestsChartRenderer = (
   props: ReportWidgetProps<{
     timestamp: string
     count: number
@@ -41,7 +41,7 @@ export const renderTotalRequests = (
   )
 }
 
-export const renderTopApiRoutes = (
+export const TopApiRoutesRenderer = (
   props: ReportWidgetRendererProps<{
     method: string
     // shown for error table but not all requests table
@@ -92,7 +92,7 @@ export const renderTopApiRoutes = (
   )
 }
 
-export const renderErrorCounts = (
+export const ErrorCountsChartRenderer = (
   props: ReportWidgetProps<{
     timestamp: string
     count: number
@@ -125,7 +125,7 @@ export const renderErrorCounts = (
   )
 }
 
-export const renderResponseSpeed = (
+export const ResponseSpeedChartRenderer = (
   props: ReportWidgetProps<{
     timestamp: string
     avg: number
