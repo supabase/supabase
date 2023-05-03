@@ -9,12 +9,13 @@ import {
   useProjectUsageQuery,
 } from 'data/usage/project-usage-query'
 import { formatBytes } from 'lib/helpers'
-import { Button, IconAlertTriangle } from 'ui'
+import { Badge, Button, IconAlertTriangle, IconExternalLink } from 'ui'
 import { USAGE_APPROACHING_THRESHOLD } from '../Billing.constants'
 import BarChart from './BarChart'
 import SectionContent from './SectionContent'
 import SectionHeader from './SectionHeader'
 import { USAGE_CATEGORIES } from './Usage.constants'
+import Link from 'next/link'
 
 export interface SizeAndCountsProps {
   projectRef: string
@@ -50,6 +51,8 @@ const SizeAndCounts = ({ projectRef }: SizeAndCountsProps) => {
   })
 
   if (categoryMeta === undefined) return null
+
+  console.log({ usage })
 
   return (
     <>
@@ -124,6 +127,26 @@ const SizeAndCounts = ({ projectRef }: SizeAndCountsProps) => {
                 </div>
               </div>
             </div>
+
+            {attribute.key === 'db_size' && (
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <p className="text-sm">Disk size:</p>
+                  <p className="text-sm">{usage?.disk_volume_size_gb} GB</p>
+                  <Badge color="green" size="small">
+                    Auto-scaling
+                  </Badge>
+                </div>
+                <Link href="https://supabase.com/docs/guides/platform/database-usage#disk-management">
+                  <a>
+                    <Button size="tiny" type="default" icon={<IconExternalLink size={14} />}>
+                      What is disk size?
+                    </Button>
+                  </a>
+                </Link>
+              </div>
+            )}
+
             <div className="space-y-1">
               <p>{attribute.name} over time</p>
               <p className="text-sm text-scale-1000">{attribute.chartDescription}</p>
