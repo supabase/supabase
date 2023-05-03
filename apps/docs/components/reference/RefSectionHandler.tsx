@@ -8,6 +8,7 @@ import RefFunctionSection from '~/components/reference/RefFunctionSection'
 import RefSubLayout from '~/layouts/ref/RefSubLayout'
 import ApiOperationSection from './ApiOperationSection'
 import CliCommandSection from './CLICommandSection'
+import OldVersionAlert from './OldVersionAlert'
 import { IAPISpec, ICommonFunc, IRefStaticDoc, ISpec, TypeSpec } from './Reference.types'
 
 interface RefSectionHandlerProps {
@@ -16,6 +17,7 @@ interface RefSectionHandlerProps {
   typeSpec?: TypeSpec
   pageProps: { docs: IRefStaticDoc[] }
   type: 'client-lib' | 'cli' | 'api'
+  isOldVersion?: boolean
 }
 
 const RefSectionHandler = (props: RefSectionHandlerProps) => {
@@ -58,6 +60,7 @@ const RefSectionHandler = (props: RefSectionHandlerProps) => {
         />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
+      {props.isOldVersion && <OldVersionAlert />}
       <RefSubLayout>
         {props.sections.map((x, i) => {
           switch (x.type) {
