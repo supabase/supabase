@@ -1,12 +1,14 @@
 import { useParams } from 'common'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import BarChart from './BarChart'
+import SparkBar from 'components/ui/SparkBar'
 import { useDailyStatsQuery } from 'data/analytics/daily-stats-query'
 import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
 import { useProjectUsageQuery } from 'data/usage/project-usage-query'
-import SparkBar from 'components/ui/SparkBar'
 import { formatBytes } from 'lib/helpers'
 import { Button } from 'ui'
+import BarChart from './BarChart'
+import SectionContent from './SectionContent'
+import SectionHeader from './SectionHeader'
 
 const SizeAndCounts = () => {
   const { ref } = useParams()
@@ -40,148 +42,113 @@ const SizeAndCounts = () => {
 
   return (
     <>
-      <div className="border-b">
-        <div className="1xl:px-28 mx-auto flex flex-col gap-10 px-5 lg:px-16 2xl:px-32 py-16">
-          <div className="sticky top-16">
-            <p className="text-base">Size & Counts</p>
-            <p className="text-sm text-scale-1000">Some description here</p>
-          </div>
-        </div>
-      </div>
+      <SectionHeader title="Size & Counts" description="Some description here" />
 
-      {/* DATABASE SIZE - need to fix if no value yet (API will return period_start as 0 in first data point) */}
-      <div className="border-b">
-        <div className="1xl:px-28 mx-auto flex flex-col gap-10 px-5 lg:px-16 2xl:px-32 py-16">
-          <div className="grid grid-cols-12">
-            <div className="col-span-5">
-              <div className="sticky top-16">
-                <p className="text-base">Database size</p>
-                <p className="text-sm text-scale-1000">Some description here</p>
-              </div>
+      <SectionContent title="Database Size" description="Some description here">
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <p className="text-sm">Database size per day</p>
+            <Button type="default" size="tiny" onClick={() => {}}>
+              Upgrade project
+            </Button>
+          </div>
+          <SparkBar
+            type="horizontal"
+            barClass="bg-scale-1200"
+            value={db_size?.usage ?? 0}
+            max={db_size?.limit ?? 0}
+          />
+          <div>
+            <div className="flex items-center justify-between border-b py-1">
+              <p className="text-xs text-scale-1000">
+                Included in {subscription?.tier.name.toLowerCase()}
+              </p>
+              <p className="text-xs">{formatBytes(db_size?.limit ?? 0)}</p>
             </div>
-            <div className="col-span-7 space-y-6">
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <p className="text-sm">Database size per day</p>
-                  <Button type="default" size="tiny" onClick={() => {}}>
-                    Upgrade project
-                  </Button>
-                </div>
-                <SparkBar
-                  type="horizontal"
-                  barClass="bg-scale-1200"
-                  value={db_size?.usage ?? 0}
-                  max={db_size?.limit ?? 0}
-                />
-                <div>
-                  <div className="flex items-center justify-between border-b py-1">
-                    <p className="text-xs text-scale-1000">
-                      Included in {subscription?.tier.name.toLowerCase()}
-                    </p>
-                    <p className="text-xs">{formatBytes(db_size?.limit ?? 0)}</p>
-                  </div>
-                  <div className="flex items-center justify-between border-b py-1">
-                    <p className="text-xs text-scale-1000">Used</p>
-                    <p className="text-xs">{formatBytes(db_size?.usage ?? 0)}</p>
-                  </div>
-                  <div className="flex items-center justify-between py-1">
-                    <p className="text-xs text-scale-1000">Extra volume used this month</p>
-                    <p className="text-xs">
-                      {dbSizeExcess < 0 ? formatBytes(0) : formatBytes(dbSizeExcess)}
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div className="space-y-1">
-                <p>Database egress over time</p>
-                <p className="text-sm text-scale-1000">Some description here</p>
-              </div>
-              {isLoadingDbSizeData ? (
-                <div className="space-y-2">
-                  <ShimmeringLoader />
-                  <ShimmeringLoader className="w-3/4" />
-                  <ShimmeringLoader className="w-1/2" />
-                </div>
-              ) : (
-                <BarChart
-                  attribute={TOTAL_DB_SIZE_KEY}
-                  data={dbSizeData?.data ?? []}
-                  unit={undefined}
-                  yDomain={[0, 100]}
-                />
-              )}
+            <div className="flex items-center justify-between border-b py-1">
+              <p className="text-xs text-scale-1000">Used</p>
+              <p className="text-xs">{formatBytes(db_size?.usage ?? 0)}</p>
+            </div>
+            <div className="flex items-center justify-between py-1">
+              <p className="text-xs text-scale-1000">Extra volume used this month</p>
+              <p className="text-xs">
+                {dbSizeExcess < 0 ? formatBytes(0) : formatBytes(dbSizeExcess)}
+              </p>
             </div>
           </div>
         </div>
-      </div>
+        <div className="space-y-1">
+          <p>Database egress over time</p>
+          <p className="text-sm text-scale-1000">Some description here</p>
+        </div>
+        {isLoadingDbSizeData ? (
+          <div className="space-y-2">
+            <ShimmeringLoader />
+            <ShimmeringLoader className="w-3/4" />
+            <ShimmeringLoader className="w-1/2" />
+          </div>
+        ) : (
+          <BarChart
+            attribute={TOTAL_DB_SIZE_KEY}
+            data={dbSizeData?.data ?? []}
+            unit={undefined}
+            yDomain={[0, 100]}
+          />
+        )}
+      </SectionContent>
 
-      {/* STORAGE SIZE - need to fix if no value yet (API will return period_start as 0 in first data point) */}
-      <div className="border-b">
-        <div className="1xl:px-28 mx-auto flex flex-col gap-10 px-5 lg:px-16 2xl:px-32 py-16">
-          <div className="grid grid-cols-12">
-            <div className="col-span-5">
-              <div className="sticky top-16">
-                <p className="text-base">Storage size</p>
-                <p className="text-sm text-scale-1000">Some description here</p>
-              </div>
+      <SectionContent title="Storage Size" description="Some description here">
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <p className="text-sm">Storage {subscription?.tier.key.toLowerCase()} quota usage</p>
+            <Button type="default" size="tiny" onClick={() => {}}>
+              Upgrade project
+            </Button>
+          </div>
+          <SparkBar
+            type="horizontal"
+            barClass="bg-scale-1200"
+            value={storage_size?.usage ?? 0}
+            max={storage_size?.limit ?? 0}
+          />
+          <div>
+            <div className="flex items-center justify-between border-b py-1">
+              <p className="text-xs text-scale-1000">
+                Included in {subscription?.tier.name.toLowerCase()}
+              </p>
+              <p className="text-xs">{formatBytes(storage_size?.limit ?? 0)}</p>
             </div>
-            <div className="col-span-7 space-y-6">
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <p className="text-sm">
-                    Storage {subscription?.tier.key.toLowerCase()} quota usage
-                  </p>
-                  <Button type="default" size="tiny" onClick={() => {}}>
-                    Upgrade project
-                  </Button>
-                </div>
-                <SparkBar
-                  type="horizontal"
-                  barClass="bg-scale-1200"
-                  value={storage_size?.usage ?? 0}
-                  max={storage_size?.limit ?? 0}
-                />
-                <div>
-                  <div className="flex items-center justify-between border-b py-1">
-                    <p className="text-xs text-scale-1000">
-                      Included in {subscription?.tier.name.toLowerCase()}
-                    </p>
-                    <p className="text-xs">{formatBytes(storage_size?.limit ?? 0)}</p>
-                  </div>
-                  <div className="flex items-center justify-between border-b py-1">
-                    <p className="text-xs text-scale-1000">Used</p>
-                    <p className="text-xs">{formatBytes(storage_size?.usage ?? 0)}</p>
-                  </div>
-                  <div className="flex items-center justify-between py-1">
-                    <p className="text-xs text-scale-1000">Extra volume used this month</p>
-                    <p className="text-xs">
-                      {storageSizeExcess < 0 ? formatBytes(0) : formatBytes(storageSizeExcess)}
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div className="space-y-1">
-                <p>Storage size over time</p>
-                <p className="text-sm text-scale-1000">Some description here</p>
-              </div>
-              {isLoadingStorageSizeData ? (
-                <div className="space-y-2">
-                  <ShimmeringLoader />
-                  <ShimmeringLoader className="w-3/4" />
-                  <ShimmeringLoader className="w-1/2" />
-                </div>
-              ) : (
-                <BarChart
-                  attribute={TOTAL_STORAGE_SIZE_KEY}
-                  data={storageSizeData?.data ?? []}
-                  unit={undefined}
-                  yDomain={[0, 100]}
-                />
-              )}
+            <div className="flex items-center justify-between border-b py-1">
+              <p className="text-xs text-scale-1000">Used</p>
+              <p className="text-xs">{formatBytes(storage_size?.usage ?? 0)}</p>
+            </div>
+            <div className="flex items-center justify-between py-1">
+              <p className="text-xs text-scale-1000">Extra volume used this month</p>
+              <p className="text-xs">
+                {storageSizeExcess < 0 ? formatBytes(0) : formatBytes(storageSizeExcess)}
+              </p>
             </div>
           </div>
         </div>
-      </div>
+        <div className="space-y-1">
+          <p>Storage size over time</p>
+          <p className="text-sm text-scale-1000">Some description here</p>
+        </div>
+        {isLoadingStorageSizeData ? (
+          <div className="space-y-2">
+            <ShimmeringLoader />
+            <ShimmeringLoader className="w-3/4" />
+            <ShimmeringLoader className="w-1/2" />
+          </div>
+        ) : (
+          <BarChart
+            attribute={TOTAL_STORAGE_SIZE_KEY}
+            data={storageSizeData?.data ?? []}
+            unit={undefined}
+            yDomain={[0, 100]}
+          />
+        )}
+      </SectionContent>
     </>
   )
 }
