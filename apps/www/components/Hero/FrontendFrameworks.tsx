@@ -5,37 +5,37 @@ import ReactTooltip from 'react-tooltip'
 
 const frameworks = [
   {
-    name: 'nextjs',
+    name: 'Next.js',
     icon: '/images/logos/frameworks/nextjs.svg',
     docs: '/docs/guides/getting-started/quickstarts/nextjs',
   },
   {
-    name: 'react',
+    name: 'React',
     icon: '/images/logos/frameworks/react.svg',
     docs: '/docs/guides/getting-started/quickstarts/reactjs',
   },
   {
-    name: 'nuxtjs',
+    name: 'Nuxt',
     icon: '/images/logos/frameworks/nuxtjs.svg',
     docs: '/docs/guides/getting-started/quickstarts/nuxtjs',
   },
   {
-    name: 'flutter',
+    name: 'Flutter',
     icon: '/images/logos/frameworks/flutter.svg',
     docs: '/docs/guides/getting-started/quickstarts/flutter',
   },
   {
-    name: 'svelte',
+    name: 'Svelte',
     icon: '/images/logos/frameworks/svelte.svg',
     docs: '/docs/guides/getting-started/quickstarts/sveltekit',
   },
   {
-    name: 'expo',
+    name: 'Expo',
     icon: '/images/logos/frameworks/expo.svg',
     docs: '/docs/guides/getting-started/tutorials/with-expo',
   },
   {
-    name: 'vue',
+    name: 'Vue',
     icon: '/images/logos/frameworks/vue.svg',
     docs: '/docs/guides/getting-started/quickstarts/vue',
   },
