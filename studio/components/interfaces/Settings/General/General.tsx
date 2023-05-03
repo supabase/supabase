@@ -25,7 +25,9 @@ const General: FC<Props> = ({}) => {
   const canUpdateProject = checkPermissions(PermissionAction.UPDATE, 'projects')
 
   const onSubmit = async (values: any, { resetForm }: any) => {
-    const response = await post(`${API_URL}/projects/${project?.ref}/update`, { name: values.name })
+    const response = await post(`${API_URL}/projects/${project?.ref}/update`, {
+      name: values.name.trim(),
+    })
     if (response.error) {
       ui.setNotification({
         category: 'error',
