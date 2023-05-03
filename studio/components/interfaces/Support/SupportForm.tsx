@@ -47,6 +47,7 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
   const [uploadedDataUrls, setUploadedDataUrls] = useState<string[]>([])
   const [selectedServices, setSelectedServices] = useState<string[]>([])
+  const [respondToEmail, setRespondToEmail] = useState<string>('')
 
   // Get all orgs and projects from global store
   const sortedOrganizations = app.organizations.list()
@@ -74,6 +75,12 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
       objectUrls.forEach((url: any) => URL.revokeObjectURL(url))
     }
   }, [uploadedFiles])
+
+  useEffect(() => {
+    get(`${API_URL}/profile`).then((data) => {
+      setRespondToEmail(data.primary_email)
+    })
+  }, [respondToEmail])
 
   if (!isInitialized) {
     return (
@@ -576,6 +583,11 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
                       </div>
                     </div>
                     <div className="px-6">
+                      <div className="flex justify-end">
+                        <p className="block text-sm text-scale-1000 mt-0 mb-2">
+                          We will contact you at {respondToEmail}.
+                        </p>
+                      </div>
                       <div className="flex justify-end">
                         <Button
                           htmlType="submit"
