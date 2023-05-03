@@ -10,10 +10,13 @@ import BarChart from './BarChart'
 import SectionContent from './SectionContent'
 import SectionHeader from './SectionHeader'
 
-const SizeAndCounts = () => {
-  const { ref } = useParams()
-  const { data: usage } = useProjectUsageQuery({ projectRef: ref })
-  const { data: subscription } = useProjectSubscriptionQuery({ projectRef: ref })
+export interface SizeAndCountsProps {
+  projectRef: string
+}
+
+const SizeAndCounts = ({ projectRef }: SizeAndCountsProps) => {
+  const { data: usage } = useProjectUsageQuery({ projectRef })
+  const { data: subscription } = useProjectSubscriptionQuery({ projectRef })
   const { current_period_start, current_period_end } = subscription?.billing ?? {}
   const startDate = new Date((current_period_start ?? 0) * 1000).toISOString()
   const endDate = new Date((current_period_end ?? 0) * 1000).toISOString()
@@ -22,7 +25,7 @@ const SizeAndCounts = () => {
   const { db_size } = usage ?? {}
   const dbSizeExcess = (db_size?.usage ?? 0) - (db_size?.limit ?? 0)
   const { data: dbSizeData, isLoading: isLoadingDbSizeData } = useDailyStatsQuery({
-    projectRef: ref,
+    projectRef,
     attribute: TOTAL_DB_SIZE_KEY,
     interval: '1d',
     startDate,
@@ -33,7 +36,7 @@ const SizeAndCounts = () => {
   const { storage_size } = usage ?? {}
   const storageSizeExcess = (storage_size?.usage ?? 0) - (storage_size?.limit ?? 0)
   const { data: storageSizeData, isLoading: isLoadingStorageSizeData } = useDailyStatsQuery({
-    projectRef: ref,
+    projectRef,
     attribute: TOTAL_STORAGE_SIZE_KEY,
     interval: '1d',
     startDate,

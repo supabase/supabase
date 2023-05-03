@@ -1,4 +1,3 @@
-import { useParams } from 'common'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
 import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
@@ -6,16 +5,19 @@ import BarChart from './BarChart'
 import SectionContent from './SectionContent'
 import SectionHeader from './SectionHeader'
 
-const Infrastructure = () => {
-  const { ref } = useParams()
-  const { data: subscription } = useProjectSubscriptionQuery({ projectRef: ref })
+export interface InfrastructureProps {
+  projectRef: string
+}
+
+const Infrastructure = ({ projectRef }: InfrastructureProps) => {
+  const { data: subscription } = useProjectSubscriptionQuery({ projectRef })
   const { current_period_start, current_period_end } = subscription?.billing ?? {}
   const startDate = new Date((current_period_start ?? 0) * 1000).toISOString()
   const endDate = new Date((current_period_end ?? 0) * 1000).toISOString()
 
   const CPU_USAGE_KEY = 'cpu_usage'
   const { data: cpuUsageData, isLoading: isLoadingCpuUsageData } = useInfraMonitoringQuery({
-    projectRef: ref,
+    projectRef,
     attribute: CPU_USAGE_KEY,
     interval: '1d',
     startDate,
@@ -24,7 +26,7 @@ const Infrastructure = () => {
 
   const MEMORY_USAGE_KEY = 'ram_usage'
   const { data: memoryUsageData, isLoading: isLoadingMemoryUsageData } = useInfraMonitoringQuery({
-    projectRef: ref,
+    projectRef,
     attribute: MEMORY_USAGE_KEY,
     interval: '1d',
     startDate,
@@ -33,7 +35,7 @@ const Infrastructure = () => {
 
   const DISK_IO_BUDGET_KEY = 'disk_io_budget'
   const { data: ioBudgetData, isLoading: isLoadingIoBudgetData } = useInfraMonitoringQuery({
-    projectRef: ref,
+    projectRef,
     attribute: DISK_IO_BUDGET_KEY,
     interval: '1d',
     startDate,
