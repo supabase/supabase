@@ -120,6 +120,7 @@ const Usage = () => {
           <div className="flex items-center space-x-6 !mt-2">
             {USAGE_CATEGORIES.map((category) => {
               const status = getUsageStatus(category.attributes, usage)
+
               return (
                 <div
                   key={category.key}
@@ -141,6 +142,12 @@ const Usage = () => {
         </div>
       </div>
 
+      {/* 
+        [Joshen] Could potentially run a map here based on USAGE_CATEGORIES, rather than defining each section 
+        but thinking it's gonna "cover up" too much details and make it harder to add attribute specific components
+        e.g for database size, we also need to show disk volume size. Not to mention that are little nuances across
+        each attribute RE formatting (bytes vs locale string)
+      */}
       <div ref={infrastructureRef}>
         <Infrastructure projectRef={selectedProjectRef} />
       </div>

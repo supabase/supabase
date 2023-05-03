@@ -12,7 +12,7 @@ const SectionContent = ({ title, description, children }: PropsWithChildren<Sect
         <div className="grid grid-cols-12">
           <div className="col-span-5">
             <div className="sticky top-16">
-              <p className="text-base">{title}</p>
+              <p className="text-base capitalize">{title}</p>
               <p className="text-sm text-scale-1000">{description}</p>
             </div>
           </div>

@@ -1,9 +1,9 @@
 import { DataPoint } from 'data/analytics/constants'
 import { ProjectUsageResponse } from 'data/usage/project-usage-query'
 import { USAGE_APPROACHING_THRESHOLD } from '../Billing.constants'
-import { USAGE_STATUS } from './Usage.constants'
+import { CategoryAttribute, USAGE_STATUS } from './Usage.constants'
 
-// [Joshen] This is just for development
+// [Joshen] This is just for development to generate some test data for chart rendering
 export const generateUsageData = (attribute: string, days: number): DataPoint[] => {
   const tempArray = new Array(days).fill(0)
   return tempArray.map((x, idx) => {
@@ -15,11 +15,11 @@ export const generateUsageData = (attribute: string, days: number): DataPoint[] 
   })
 }
 
-export const getUsageStatus = (attributes: string[], usage?: ProjectUsageResponse) => {
+export const getUsageStatus = (attributes: CategoryAttribute[], usage?: ProjectUsageResponse) => {
   if (!usage) return USAGE_STATUS.NORMAL
 
   const attributeStatuses = attributes.map((attribute) => {
-    const usageMeta = usage?.[attribute as keyof ProjectUsageResponse]
+    const usageMeta = usage?.[attribute.key as keyof ProjectUsageResponse]
     const usageRatio =
       typeof usageMeta !== 'number' ? (usageMeta?.usage ?? 0) / (usageMeta?.limit ?? 0) : 0
     if (usageRatio >= 1) return USAGE_STATUS.EXCEEDED
