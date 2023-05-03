@@ -90,15 +90,14 @@ const Bandwidth = () => {
           </div>
         ) : (
           // [Joshen] TODO
-          // - Provide a way to format y axis (bytes)
-          // - Fix the y axis cartesian grid intervals if possible (atm it looks random)
           // - the max Y domain could be dynamic (slightly above limit, but take the usage + some threshold if above limit)
           <BarChart
             attribute={DB_EGRESS_KEY}
             data={dbEgressData?.data ?? []}
             unit={undefined}
             yDomain={[0, db_egress?.limit ?? 0]}
-            yFormatter={(value) => formatBytes(value)}
+            yLeftMargin={14}
+            yFormatter={(value) => formatBytes(value, 1, 'GB').replace(/\s/g, '')}
           />
         )}
       </SectionContent>
@@ -153,7 +152,9 @@ const Bandwidth = () => {
             attribute={STORAGE_EGRESS_KEY}
             data={storageEgressData?.data ?? []}
             unit={undefined}
-            yDomain={[0, 100]}
+            yDomain={[0, storage_egress?.limit ?? 0]}
+            yLeftMargin={14}
+            yFormatter={(value) => formatBytes(value, 1, 'GB').replace(/\s/g, '')}
           />
         )}
       </SectionContent>
