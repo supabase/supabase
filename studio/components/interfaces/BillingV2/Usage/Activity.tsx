@@ -130,6 +130,7 @@ const Activity = ({ projectRef }: ActivityProps) => {
             key={attribute.key}
             title={attribute.name}
             description={attribute.description}
+            includedInPlan={usageMeta.available_in_plan}
           >
             <div className="space-y-2">
               <div className="flex items-center justify-between">
