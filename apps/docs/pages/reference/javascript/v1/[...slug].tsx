@@ -17,6 +17,7 @@ export default function JSReference(props) {
       typeSpec={typeSpec}
       pageProps={props}
       type="client-lib"
+      isOldVersion
     />
   )
 }
