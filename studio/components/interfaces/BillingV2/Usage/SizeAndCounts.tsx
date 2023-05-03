@@ -14,6 +14,9 @@ export interface SizeAndCountsProps {
   projectRef: string
 }
 
+// [Joshen TODO] If it's a paid tier, need to add information about disk size
+// Reference to ProjectUsageBars or reports/database.tsx
+
 const SizeAndCounts = ({ projectRef }: SizeAndCountsProps) => {
   const { data: usage } = useProjectUsageQuery({ projectRef })
   const { data: subscription } = useProjectSubscriptionQuery({ projectRef })

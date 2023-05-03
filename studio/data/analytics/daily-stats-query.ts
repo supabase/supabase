@@ -132,6 +132,7 @@ export const useDailyStatsQuery = <TData = DailyStatsData>(
       select(data) {
         const noDataYet = Number(data.data[0].period_start) === 0
 
+        // [Joshen] Ideally handled by API, like infra-monitoring
         if (noDataYet) {
           const days = dayjs(endDate).diff(dayjs(startDate), 'days')
           const tempArray = new Array(days).fill(0)
