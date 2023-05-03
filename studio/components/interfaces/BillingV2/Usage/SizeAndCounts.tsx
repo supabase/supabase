@@ -89,10 +89,11 @@ const SizeAndCounts = () => {
           </div>
         ) : (
           <BarChart
+            hasQuota
             attribute={TOTAL_DB_SIZE_KEY}
             data={dbSizeData?.data ?? []}
             unit={undefined}
-            yDomain={[0, db_size?.limit ?? 0]}
+            yLimit={db_size?.limit ?? 0}
             yLeftMargin={14}
             yFormatter={(value) => formatBytes(value, 1, 'GB').replace(/\s/g, '')}
           />
@@ -144,10 +145,11 @@ const SizeAndCounts = () => {
           </div>
         ) : (
           <BarChart
+            hasQuota
             attribute={TOTAL_STORAGE_SIZE_KEY}
             data={storageSizeData?.data ?? []}
             unit={undefined}
-            yDomain={[0, storage_size?.limit ?? 0]}
+            yLimit={storage_size?.limit ?? 0}
             yLeftMargin={14}
             yFormatter={(value) => formatBytes(value, 1, 'GB').replace(/\s/g, '')}
           />

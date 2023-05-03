@@ -60,7 +60,7 @@ const Infrastructure = () => {
             attribute={CPU_USAGE_KEY}
             data={cpuUsageData?.data ?? []}
             unit={cpuUsageData?.format}
-            yDomain={[0, 100]}
+            yLimit={100}
           />
         )}
       </SectionContent>
@@ -81,7 +81,7 @@ const Infrastructure = () => {
             attribute={MEMORY_USAGE_KEY}
             data={memoryUsageData?.data ?? []}
             unit={memoryUsageData?.format}
-            yDomain={[0, 100]}
+            yLimit={100}
           />
         )}
       </SectionContent>
@@ -102,7 +102,7 @@ const Infrastructure = () => {
             attribute={DISK_IO_BUDGET_KEY}
             data={ioBudgetData?.data ?? []}
             unit={ioBudgetData?.format}
-            yDomain={[0, 100]}
+            yLimit={100}
           />
         )}
       </SectionContent>

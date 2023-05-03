@@ -104,10 +104,10 @@ const Activity = () => {
           </div>
         ) : (
           <BarChart
+            hasQuota
             attribute={MAU_KEY}
             data={mauData?.data ?? []}
-            unit={undefined}
-            yDomain={[0, monthly_active_users?.limit ?? 0]}
+            yLimit={monthly_active_users?.limit ?? 0}
             yLeftMargin={18}
             yFormatter={(value) => value.toLocaleString()}
           />
@@ -172,10 +172,10 @@ const Activity = () => {
               </div>
             ) : (
               <BarChart
-                attribute={MAU_KEY}
+                hasQuota
+                attribute={ASSET_TRANSFORMATIONS_KEY}
                 data={assetTransformationsData?.data ?? []}
-                unit={undefined}
-                yDomain={[0, storage_image_render_count?.limit ?? 0]}
+                yLimit={storage_image_render_count?.limit ?? 0}
               />
             )}
           </>
@@ -229,10 +229,11 @@ const Activity = () => {
           </div>
         ) : (
           <BarChart
+            hasQuota
             attribute={FUNC_INVOCATIONS_KEY}
             data={funcInvocationsData?.data ?? []}
             unit={undefined}
-            yDomain={[0, func_invocations?.limit ?? 0]}
+            yLimit={func_invocations?.limit ?? 0}
             yLeftMargin={26}
             yFormatter={(value) => value.toLocaleString()}
           />
@@ -277,21 +278,15 @@ const Activity = () => {
               </div>
               <div className="space-y-1">
                 <p>Sample usage over time</p>
-                <p className="text-sm text-scale-1000">Some description here</p>
+                <p className="text-sm text-scale-1000">
+                  Some description here to explain what this metric is about
+                </p>
               </div>
               <BarChart
+                hasQuota
                 attribute="sample_data"
                 data={generateUsageData('sample_data', 30)}
-                unit={undefined}
-                yDomain={[0, 100]}
-                reference={{
-                  value: 65,
-                  label: 'FREE QUOTA',
-                  x: 60,
-                  y: 49,
-                  width: 200,
-                  height: 24,
-                }}
+                yLimit={70}
               />
             </div>
           </div>

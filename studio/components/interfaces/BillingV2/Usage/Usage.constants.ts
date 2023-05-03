@@ -1,0 +1,1 @@
+export const Y_DOMAIN_CEILING_MULTIPLIER = 4 / 3

@@ -9,6 +9,7 @@ import { Button } from 'ui'
 import BarChart from './BarChart'
 import SectionContent from './SectionContent'
 import SectionHeader from './SectionHeader'
+import { Y_DOMAIN_CEILING_MULTIPLIER } from './Usage.constants'
 
 const Bandwidth = () => {
   const { ref } = useParams()
@@ -89,13 +90,12 @@ const Bandwidth = () => {
             <ShimmeringLoader className="w-1/2" />
           </div>
         ) : (
-          // [Joshen] TODO
-          // - the max Y domain could be dynamic (slightly above limit, but take the usage + some threshold if above limit)
           <BarChart
+            hasQuota
             attribute={DB_EGRESS_KEY}
             data={dbEgressData?.data ?? []}
             unit={undefined}
-            yDomain={[0, db_egress?.limit ?? 0]}
+            yLimit={db_egress?.limit ?? 0}
             yLeftMargin={14}
             yFormatter={(value) => formatBytes(value, 1, 'GB').replace(/\s/g, '')}
           />
@@ -149,10 +149,11 @@ const Bandwidth = () => {
           </div>
         ) : (
           <BarChart
+            hasQuota
             attribute={STORAGE_EGRESS_KEY}
             data={storageEgressData?.data ?? []}
             unit={undefined}
-            yDomain={[0, storage_egress?.limit ?? 0]}
+            yLimit={storage_egress?.limit ?? 0}
             yLeftMargin={14}
             yFormatter={(value) => formatBytes(value, 1, 'GB').replace(/\s/g, '')}
           />
