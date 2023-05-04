@@ -239,6 +239,7 @@ export const genChartQuery = (
 
   return `
 SELECT
+-- event-chart
   timestamp_trunc(t.timestamp, ${trunc}) as timestamp,
   count(t.timestamp) as count
 FROM
@@ -367,7 +368,7 @@ export const useEditorHints = () => {
 export const fillTimeseries = (
   timeseriesData: any[],
   timestampKey: string,
-  valueKey: string,
+  valueKey: string | string[],
   defaultValue: number,
   min?: string,
   max?: string
@@ -390,10 +391,21 @@ export const fillTimeseries = (
   const diff = maxDate.diff(minDate, truncation as dayjs.UnitType)
   for (let i = 0; i <= diff; i++) {
     const dateToMaybeAdd = minDate.add(i, truncation as dayjs.ManipulateType)
+
+    const keys = typeof valueKey === 'string' ? [valueKey] : valueKey
+
+    const toMerge = keys.reduce(
+      (acc, key) => ({
+        ...acc,
+        [key]: defaultValue,
+      }),
+      {}
+    )
+
     if (!dates.find((d) => isEqual(d, dateToMaybeAdd))) {
       newData.push({
         [timestampKey]: dateToMaybeAdd.toISOString(),
-        [valueKey]: defaultValue,
+        ...toMerge,
       })
     }
   }
