@@ -63,7 +63,7 @@ const Infrastructure = ({ projectRef }: InfrastructureProps) => {
 
   return (
     <>
-      <SectionHeader title="Infrastructure" description="Some description here" />
+      <SectionHeader title={categoryMeta.name} description={categoryMeta.description} />
       {categoryMeta.attributes.map((attribute) => {
         const chartData = chartMeta[attribute.key]?.data ?? []
 

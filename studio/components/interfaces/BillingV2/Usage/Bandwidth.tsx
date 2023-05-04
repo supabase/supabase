@@ -62,7 +62,7 @@ const Bandwidth = ({ projectRef }: BandwidthProps) => {
 
   return (
     <>
-      <SectionHeader title="Bandwidth" description="Some description here" />
+      <SectionHeader title={categoryMeta.name} description={categoryMeta.description} />
 
       {categoryMeta.attributes.map((attribute) => {
         const usageMeta = usage?.[attribute.key as keyof ProjectUsageResponse] as UsageMetric

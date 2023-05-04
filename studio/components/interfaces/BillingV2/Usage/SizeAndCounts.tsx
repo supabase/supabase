@@ -77,7 +77,7 @@ const SizeAndCounts = ({ projectRef }: SizeAndCountsProps) => {
 
   return (
     <>
-      <SectionHeader title="Size & Counts" description="Some description here" />
+      <SectionHeader title={categoryMeta.name} description={categoryMeta.description} />
 
       {categoryMeta.attributes.map((attribute) => {
         const usageMeta = usage?.[attribute.key as keyof ProjectUsageResponse] as UsageMetric
