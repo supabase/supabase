@@ -270,6 +270,7 @@ const TableEditorPage: NextPageWithLayout = () => {
   return (
     <TableEditorLayout
       selectedSchema={selectedSchema}
+      selectedTable={selectedTable?.name}
       onSelectSchema={setSelectedSchema}
       onAddTable={onAddTable}
       onEditTable={onEditTable}
