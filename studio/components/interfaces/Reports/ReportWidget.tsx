@@ -1,12 +1,10 @@
 import { NextRouter, useRouter } from 'next/router'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Button, Collapsible, IconExternalLink, IconHelpCircle } from 'ui'
-
+import { Button, IconExternalLink, IconHelpCircle } from 'ui'
 import { BaseReportParams } from './Reports.types'
 import { LogsEndpointParams } from '../Settings/Logs'
 import Panel from 'components/ui/Panel'
 import LoadingOpacity from 'components/ui/LoadingOpacity'
-import { useState } from 'react'
 
 export interface ReportWidgetProps<T = any> {
   data: T[]
@@ -100,7 +98,7 @@ const ReportWidget: React.FC<ReportWidgetProps> = (props) => {
                   </div>
                 </Tooltip.Content>
               </Tooltip.Portal>
-          </Tooltip.Root>
+            </Tooltip.Root>
           )}
         </div>
 
