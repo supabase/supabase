@@ -18,8 +18,8 @@ const SectionContent = ({
   return (
     <div className="border-b">
       <div className="1xl:px-28 mx-auto flex flex-col gap-10 px-5 lg:px-16 2xl:px-32 py-16">
-        <div className="grid grid-cols-12 gap-x-6">
-          <div className="col-span-5">
+        <div className="grid grid-cols-12 gap-6">
+          <div className="col-span-12 md:col-span-5">
             <div className="sticky top-16 space-y-6">
               <div className="space-y-1">
                 <div className="flex items-center space-x-2">
@@ -47,7 +47,7 @@ const SectionContent = ({
               )}
             </div>
           </div>
-          <div className="col-span-7 space-y-6">{children}</div>
+          <div className="col-span-12 md:col-span-7 space-y-6">{children}</div>
         </div>
       </div>
     </div>
