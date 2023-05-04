@@ -64,7 +64,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
      * Send page telemetry on first page load
      */
     if (router.isReady) {
-      handlePageTelemetry(router.asPath)
+      handlePageTelemetry(router.basePath + router.asPath)
     }
   }, [router.isReady])
 
