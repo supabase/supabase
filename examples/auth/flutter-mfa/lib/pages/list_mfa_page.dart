@@ -55,7 +55,9 @@ class ListMFAPage extends StatelessWidget {
                                 onPressed: () async {
                                   await supabase.auth.mfa.unenroll(factor.id);
                                   await supabase.auth.signOut();
-                                  context.go(RegisterPage.route);
+                                  if (context.mounted) {
+                                    context.go(RegisterPage.route);
+                                  }
                                 },
                                 child: const Text('delete'),
                               ),
