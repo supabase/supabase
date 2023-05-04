@@ -67,8 +67,6 @@ const BarChart = ({
               const { active, payload } = props
               if (active && payload && payload.length) {
                 const dataPeriod = dayjs(payload[0].payload.period_start)
-                if (dataPeriod.isAfter(dayjs())) return null
-
                 const value =
                   unit === 'percentage'
                     ? Number(payload[0].value).toFixed(2)
@@ -79,9 +77,13 @@ const BarChart = ({
                     <p className="text-xs text-scale-1000">
                       {attribute === 'disk_io_budget' ? `Remaining IO budget:` : `${name}:`}
                     </p>
-                    <p className="text-xl">
-                      {yFormatter !== undefined ? yFormatter(value) : value}
-                    </p>
+                    {dataPeriod.isAfter(dayjs()) ? (
+                      <p className="text-scale-1000 text-lg">No data yet</p>
+                    ) : (
+                      <p className="text-xl">
+                        {yFormatter !== undefined ? yFormatter(value) : value}
+                      </p>
+                    )}
                     <p className="text-xs text-scale-1100 mt-1">
                       {dataPeriod.format('DD MMM YYYY')}
                     </p>
