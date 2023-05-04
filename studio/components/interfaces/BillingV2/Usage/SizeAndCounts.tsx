@@ -31,6 +31,13 @@ const SizeAndCounts = ({ projectRef }: SizeAndCountsProps) => {
   const endDate = new Date((current_period_end ?? 0) * 1000).toISOString()
   const categoryMeta = USAGE_CATEGORIES.find((category) => category.key === 'sizeCount')
 
+  const upgradeUrl =
+    subscription?.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
+      ? `/project/${projectRef}/settings/billing/enterprise`
+      : subscription?.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.TEAM
+      ? `/project/${projectRef}/settings/billing/team`
+      : `/project/${projectRef}/settings/billing/update`
+
   const { data: dbSizeData, isLoading: isLoadingDbSizeData } = useDailyStatsQuery({
     projectRef,
     attribute: 'total_db_size_bytes',
@@ -118,9 +125,13 @@ const SizeAndCounts = ({ projectRef }: SizeAndCountsProps) => {
                     </div>
                   ) : null}
                 </div>
-                <Button type="default" size="tiny" onClick={() => {}}>
-                  Upgrade project
-                </Button>
+                <Link href={upgradeUrl}>
+                  <a>
+                    <Button type="default" size="tiny">
+                      Upgrade project
+                    </Button>
+                  </a>
+                </Link>
               </div>
               <SparkBar
                 type="horizontal"
