@@ -1,7 +1,6 @@
 import { NextRouter, useRouter } from 'next/router'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { Button, IconExternalLink, IconHelpCircle } from 'ui'
-
 import { BaseReportParams } from './Reports.types'
 import { LogsEndpointParams } from '../Settings/Logs'
 import Panel from 'components/ui/Panel'
@@ -14,12 +13,15 @@ export interface ReportWidgetProps<T = any> {
   tooltip?: string
   className?: string
   renderer: (props: ReportWidgetRendererProps) => React.ReactNode
+  append?: (props: ReportWidgetRendererProps) => React.ReactNode
+  // for overriding props, such as data
+  appendProps?: Partial<ReportWidgetRendererProps>
   // omitting params will hide the "View in logs explorer" button
   params?: BaseReportParams | LogsEndpointParams
   isLoading: boolean
 }
 
-export interface ReportWidgetRendererProps extends ReportWidgetProps {
+export interface ReportWidgetRendererProps<T = any> extends ReportWidgetProps<T> {
   router: NextRouter
   projectRef: string
 }
@@ -28,7 +30,6 @@ const ReportWidget: React.FC<ReportWidgetProps> = (props) => {
   const router = useRouter()
   const { ref } = router.query
   const projectRef = ref as string
-
   return (
     <Panel
       noMargin
@@ -104,6 +105,9 @@ const ReportWidget: React.FC<ReportWidgetProps> = (props) => {
         <LoadingOpacity className="w-full" active={props.isLoading}>
           {props.data === undefined ? null : props.renderer({ ...props, router, projectRef })}
         </LoadingOpacity>
+
+        {props.append &&
+          props.append({ ...props, ...(props.appendProps || {}), router, projectRef })}
       </Panel.Content>
     </Panel>
   )

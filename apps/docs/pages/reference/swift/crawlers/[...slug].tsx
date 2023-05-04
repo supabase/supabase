@@ -1,7 +1,7 @@
 import clientLibsCommonSections from '~/../../spec/common-client-libs-sections.json'
 import typeSpec from '~/../../spec/enrichments/tsdoc_v2/combined.json'
 // @ts-expect-error
-import spec from '~/../../spec/supabase_swift_v1.yml' assert { type: 'yml' }
+import spec from '~/../../spec/supabase_swift_v0.yml' assert { type: 'yml' }
 import RefSectionHandler from '~/components/reference/RefSectionHandler'
 import { flattenSections } from '~/lib/helpers'
 import handleRefGetStaticPaths from '~/lib/mdx/handleRefStaticPaths'

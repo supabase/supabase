@@ -126,9 +126,7 @@ Create a new `src/routes/+layout.server.ts` file to handle the session on the se
 
 ```ts title=src/routes/+layout.server.ts
 // src/routes/+layout.server.ts
-import type { LayoutServerLoad } from './$types';
-
-export const load: LayoutServerLoad = async ({ locals: { getSession } }) => {
+export const load = async ({ locals: { getSession } }) => {
   return {
     session: await getSession()
   };
@@ -147,9 +145,8 @@ import {
   PUBLIC_SUPABASE_URL
 } from '$env/static/public';
 import { createSupabaseLoadClient } from '@supabase/auth-helpers-sveltekit';
-import type { LayoutLoad } from './$types';
 
-export const load: LayoutLoad = async ({ fetch, data, depends }) => {
+export const load = async ({ fetch, data, depends }) => {
   depends('supabase:auth');
 
   const supabase = createSupabaseLoadClient({
@@ -173,23 +170,22 @@ Update your `src/routes/+layout.svelte`:
 <!-- src/routes/+layout.svelte -->
 <script lang="ts">
 	import '../styles.css';
-	import { invalidate } from '$app/navigation'
-	import { onMount } from 'svelte'
-	import type { LayoutData } from './$types'
+	import { invalidate } from '$app/navigation';
+	import { onMount } from 'svelte';
 
-	export let data: LayoutData
+	export let data;
 
-	$: ({ supabase, session } = data)
+	$: ({ supabase, session } = data);
 
 	onMount(() => {
 		const { data } = supabase.auth.onAuthStateChange((event, _session) => {
 			if (_session?.expires_at !== session?.expires_at) {
-				invalidate('supabase:auth')
+				invalidate('supabase:auth');
 			}
-		})
+		});
 
-		return () => data.subscription.unsubscribe()
-	})
+		return () => data.subscription.unsubscribe();
+	});
 </script>
 
 <svelte:head>
@@ -220,9 +216,8 @@ Add the `Auth` component to your home page
 <script lang="ts">
 	import { Auth } from '@supabase/auth-ui-svelte';
 	import { ThemeSupa } from '@supabase/auth-ui-shared';
-	import type { PageData } from './$types';
 
-	export let data: PageData;
+	export let data;
 </script>
 
 <svelte:head>
@@ -251,9 +246,8 @@ and send it over to the server. This all happens behind the scenes and isn't som
 ```ts
 // src/routes/+page.server.ts
 import { redirect } from '@sveltejs/kit';
-import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ url, locals: { getSession } }) => {
+export const load = async ({ url, locals: { getSession } }) => {
 	const session = await getSession();
 
     // if the user is already logged in return them to the account page
@@ -277,9 +271,8 @@ This page is used for waiting while your client-side code inside of `src/routes/
 	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
-	import type { PageData } from './$types';
 
-	export let data: PageData;
+	export let data;
 	$: {
 		const redirectTo = $page.url.searchParams.get('redirect');
 
@@ -305,26 +298,33 @@ Create a new `src/routes/account/+page.svelte` file with the content below.
 ```svelte title=src/routes/account/+page.svelte
 <!-- src/routes/account/+page.svelte -->
 <script lang="ts">
-	import { enhance } from '$app/forms';
-	import type { ActionData, PageData } from './$types';
+	import { enhance, type SubmitFunction } from '$app/forms';
 
-	export let data: PageData;
-	export let form: ActionData;
+	export let data;
+	export let form;
 
-	let { session, profile } = data;
+	let { session, supabase, profile } = data;
 
-  let profileForm: any;
+  	let profileForm: any;
 	let loading = false;
-	let fullName: string | null = profile?.full_name;
-	let username: string | null = profile?.username;
-	let website: string | null = profile?.website;
-	let avatarUrl: string | null = profile?.avatar_url;
+	let fullName: string = profile?.full_name ?? '';
+	let username: string = profile?.username ?? '';
+	let website: string = profile?.website ?? '';
+	let avatarUrl: string = profile?.avatar_url ?? '';
 
-	function handleSubmit() {
+	const handleSubmit: SubmitFunction = () => {
 		loading = true;
 		return async () => {
 			loading = false;
-		};
+		}
+	}
+
+	const handleSignOut: SubmitFunction = () => {
+		loading = true;
+		return async ({ update }) => {
+			loading = false;
+			update();
+		}
 	}
 </script>
 
@@ -366,7 +366,7 @@ Create a new `src/routes/account/+page.svelte` file with the content below.
 		</div>
 	</form>
 
-	<form method="post" action="?/signout" use:enhance={handleSubmit}>
+	<form method="post" action="?/signout" use:enhance={handleSignOut}>
 		<div>
 			<button class="button block" disabled={loading}>Sign Out</button>
 		</div>
@@ -379,9 +379,8 @@ and handle all our form actions through the `actions` object.
 
 ```ts
 import { fail, redirect } from '@sveltejs/kit';
-import type { Actions, PageServerLoad } from './$types';
 
-export const load = (async ({ locals: { supabase, getSession } }) => {
+export const load = async ({ locals: { supabase, getSession } }) => {
 	const session = await getSession();
 
 	if (!session) {
@@ -395,7 +394,7 @@ export const load = (async ({ locals: { supabase, getSession } }) => {
 		.single();
 
 	return { session, profile };
-}) satisfies PageServerLoad;
+};
 
 export const actions = {
 	update: async ({ request, locals: { supabase, getSession } }) => {
@@ -439,7 +438,7 @@ export const actions = {
 			throw redirect(303, '/');
 		}
 	}
-} satisfies Actions;
+};
 ```
 
 ### Launch!
