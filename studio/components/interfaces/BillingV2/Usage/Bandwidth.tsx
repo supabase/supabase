@@ -54,11 +54,13 @@ const Bandwidth = ({ projectRef }: BandwidthProps) => {
     db_egress: {
       isLoading: isLoadingDbEgressData,
       data: dbEgressData?.data ?? [],
+      margin: 16,
       showLastUpdated: dbEgressData?.hasNoData === false,
     },
     storage_egress: {
       isLoading: isLoadingStorageEgressData,
       data: storageEgressData?.data ?? [],
+      margin: 14,
       showLastUpdated: storageEgressData?.hasNoData === false,
     },
   }
@@ -174,7 +176,7 @@ const Bandwidth = ({ projectRef }: BandwidthProps) => {
                 attribute={attribute.attribute}
                 data={chartData}
                 yLimit={usageMeta?.limit ?? 0}
-                yLeftMargin={14}
+                yLeftMargin={chartMeta[attribute.key].margin}
                 yFormatter={(value) => formatBytes(value, 1, 'GB').replace(/\s/g, '')}
               />
             )}
