@@ -77,7 +77,9 @@ const BarChart = ({
                     <p className="text-xs text-scale-1000">
                       {attribute === 'disk_io_budget' ? `Remaining IO budget:` : `${name}:`}
                     </p>
-                    {dataPeriod.isAfter(dayjs()) ? (
+                    {dayjs(dataPeriod.format('DD MMM YYYY')).isAfter(
+                      dayjs(dayjs().format('DD MMM YYYY'))
+                    ) ? (
                       <p className="text-scale-1000 text-lg">No data yet</p>
                     ) : (
                       <p className="text-xl">

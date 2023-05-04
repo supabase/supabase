@@ -124,7 +124,7 @@ const Activity = ({ projectRef }: ActivityProps) => {
 
   return (
     <>
-      <SectionHeader title="Activity" description="Some description here" />
+      <SectionHeader title={categoryMeta.name} description={categoryMeta.description} />
 
       {categoryMeta.attributes.map((attribute) => {
         const usageMeta = usage?.[attribute.key as keyof ProjectUsageResponse] as UsageMetric

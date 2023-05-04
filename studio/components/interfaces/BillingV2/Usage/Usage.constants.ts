@@ -15,21 +15,24 @@ export interface CategoryAttribute {
   description: string
   chartDescription: string
 }
+
 export const USAGE_CATEGORIES: {
   key: 'infra' | 'bandwidth' | 'sizeCount' | 'activity'
   name: string
+  description: string
   attributes: CategoryAttribute[]
 }[] = [
   {
     key: 'infra',
     name: 'Infrastructure',
+    description: 'Usage statistics related to your Postgres server',
     attributes: [
       {
         key: 'cpu_usage',
         attribute: 'cpu_usage',
         name: 'CPU',
         unit: 'percentage',
-        description: 'Some description here',
+        description: 'CPU usage of your server',
         chartDescription: 'The data shown here is refreshed over a period of 24 hours.',
       },
       {
@@ -37,7 +40,7 @@ export const USAGE_CATEGORIES: {
         attribute: 'ram_usage',
         name: 'Memory',
         unit: 'percentage',
-        description: 'Some description here',
+        description: 'Memory usage of your server',
         chartDescription: 'The data shown here is refreshed over a period of 24 hours.',
       },
       {
@@ -56,6 +59,7 @@ export const USAGE_CATEGORIES: {
   {
     key: 'bandwidth',
     name: 'Bandwidth',
+    description: 'Amount of data transmitted over network connections',
     attributes: [
       {
         key: 'db_egress',
@@ -81,6 +85,7 @@ export const USAGE_CATEGORIES: {
   {
     key: 'sizeCount',
     name: 'Size & Counts',
+    description: 'Amount of resources your project is consuming',
     attributes: [
       {
         key: 'db_size',
@@ -115,6 +120,7 @@ export const USAGE_CATEGORIES: {
   {
     key: 'activity',
     name: 'Activity',
+    description: 'Usage statistics that reflect the activity of your project',
     attributes: [
       {
         key: 'monthly_active_users',
