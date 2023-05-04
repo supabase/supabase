@@ -45,7 +45,7 @@ const withMDX = nextMdx({
   },
 })
 
-// /** @type {NextConfig} */
+/** @type {import('next').NextConfig} nextConfig */
 const nextConfig = {
   // Append the default value with md extensions
   pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
@@ -64,6 +64,11 @@ const nextConfig = {
   },
   experimental: {
     mdxRs: true,
+    modularizeImports: {
+      lodash: {
+        transform: 'lodash/{{member}}',
+      },
+    },
   },
   async headers() {
     return [
