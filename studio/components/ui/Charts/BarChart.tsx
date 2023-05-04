@@ -43,12 +43,12 @@ const BarChart: React.FC<BarChartProps> = ({
   const resolvedHighlightedLabel =
     (focusDataIndex !== null &&
       data &&
-      data[focusDataIndex] &&
+      data[focusDataIndex] !== undefined &&
       day(data[focusDataIndex][xAxisKey]).format(customDateFormat)) ||
     highlightedLabel
 
   const resolvedHighlightedValue =
-    (focusDataIndex !== null ? data[focusDataIndex]?.[yAxisKey] : null) || highlightedValue
+    (focusDataIndex !== null ? data[focusDataIndex]?.[yAxisKey] : highlightedValue) 
 
   return (
     <div className={['flex flex-col gap-3', className].join(' ')}>
