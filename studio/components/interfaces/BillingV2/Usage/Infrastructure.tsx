@@ -80,9 +80,47 @@ const Infrastructure = ({ projectRef }: InfrastructureProps) => {
 
         return (
           <SectionContent key={attribute.key} section={attribute}>
+            {attribute.key === 'disk_io_budget' && (
+              // [Joshen] Eventually should show the overview of the io bandwidth in mbps for burst, baseline and duration
+              <>
+                <div className="space-y-1">
+                  <p>What is Disk IO Bandwidth?</p>
+                  <p className="text-sm text-scale-1000">
+                    Smaller compute instances can burst up to the maximum disk IO bandwidth for 30
+                    minutes in a day. Beyond that, the performance reverts to the baseline disk IO
+                    bandwidth.
+                  </p>
+                </div>
+                {/* <div>
+                  <div className="flex items-center justify-between border-b py-1">
+                    <p className="text-xs text-scale-1000">
+                      Included in {subscription?.tier.name.toLowerCase()}
+                    </p>
+                    {usageMeta?.limit === -1 ? (
+                      <p className="text-xs">None</p>
+                    ) : (
+                      <p className="text-xs">{(usageMeta?.limit ?? 0).toLocaleString()}</p>
+                    )}
+                  </div>
+                  <div className="flex items-center justify-between border-b py-1">
+                    <p className="text-xs text-scale-1000">Used</p>
+                    <p className="text-xs">{(usageMeta?.usage ?? 0).toLocaleString()}</p>
+                  </div>
+                  <div className="flex items-center justify-between py-1">
+                    <p className="text-xs text-scale-1000">Extra volume used this month</p>
+                    <p className="text-xs">
+                      {((usageMeta?.limit ?? 0) === -1 || usageExcess < 0
+                        ? 0
+                        : usageExcess
+                      ).toLocaleString()}
+                    </p>
+                  </div>
+                </div> */}
+              </>
+            )}
             <div className="space-y-1">
               {attribute.key === 'disk_io_budget' ? (
-                <p>{attribute.name} remaining per day</p>
+                <p>IO Budget remaining each day</p>
               ) : (
                 <p>
                   Max{' '}
