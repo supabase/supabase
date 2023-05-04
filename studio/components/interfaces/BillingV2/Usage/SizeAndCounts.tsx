@@ -18,6 +18,7 @@ import BarChart from './BarChart'
 import SectionContent from './SectionContent'
 import SectionHeader from './SectionHeader'
 import { USAGE_CATEGORIES } from './Usage.constants'
+import { getUpgradeUrl } from './Usage.utils'
 
 export interface SizeAndCountsProps {
   projectRef: string
@@ -31,12 +32,7 @@ const SizeAndCounts = ({ projectRef }: SizeAndCountsProps) => {
   const endDate = new Date((current_period_end ?? 0) * 1000).toISOString()
   const categoryMeta = USAGE_CATEGORIES.find((category) => category.key === 'sizeCount')
 
-  const upgradeUrl =
-    subscription?.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
-      ? `/project/${projectRef}/settings/billing/update/enterprise`
-      : subscription?.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.TEAM
-      ? `/project/${projectRef}/settings/billing/update/team`
-      : `/project/${projectRef}/settings/billing/update/pro`
+  const upgradeUrl = getUpgradeUrl(projectRef, subscription)
 
   const { data: dbSizeData, isLoading: isLoadingDbSizeData } = useDailyStatsQuery({
     projectRef,

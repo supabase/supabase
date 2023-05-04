@@ -2,6 +2,8 @@ import { DataPoint } from 'data/analytics/constants'
 import { ProjectUsageResponse } from 'data/usage/project-usage-query'
 import { USAGE_APPROACHING_THRESHOLD } from '../Billing.constants'
 import { CategoryAttribute, USAGE_STATUS } from './Usage.constants'
+import { StripeSubscription } from 'components/interfaces/Billing'
+import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 
 // [Joshen] This is just for development to generate some test data for chart rendering
 export const generateUsageData = (attribute: string, days: number): DataPoint[] => {
@@ -31,4 +33,14 @@ export const getUsageStatus = (attributes: CategoryAttribute[], usage?: ProjectU
   else if (attributeStatuses.find((x) => x === USAGE_STATUS.APPROACHING))
     return USAGE_STATUS.APPROACHING
   else return USAGE_STATUS.NORMAL
+}
+
+export const getUpgradeUrl = (projectRef: string, subscription?: StripeSubscription) => {
+  if (!subscription) return `/project/${projectRef}/settings/billing/update`
+
+  return subscription?.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
+    ? `/project/${projectRef}/settings/billing/update/enterprise`
+    : subscription?.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.TEAM
+    ? `/project/${projectRef}/settings/billing/update/team`
+    : `/project/${projectRef}/settings/billing/update/pro`
 }
