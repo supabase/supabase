@@ -15,14 +15,14 @@ export async function getProjects(signal?: AbortSignal) {
   return data as Project[]
 }
 
-export type OrganizationRolesData = Awaited<ReturnType<typeof getProjects>>
-export type OrganizationRolesError = unknown
+export type ProjectsData = Awaited<ReturnType<typeof getProjects>>
+export type ProjectsError = unknown
 
-export const useProjectsQuery = <TData = OrganizationRolesData>({
+export const useProjectsQuery = <TData = ProjectsData>({
   enabled = true,
   ...options
-}: UseQueryOptions<OrganizationRolesData, OrganizationRolesError, TData> = {}) =>
-  useQuery<OrganizationRolesData, OrganizationRolesError, TData>(
+}: UseQueryOptions<ProjectsData, ProjectsError, TData> = {}) =>
+  useQuery<ProjectsData, ProjectsError, TData>(
     projectKeys.list(),
     ({ signal }) => getProjects(signal),
     { enabled: enabled, ...options }

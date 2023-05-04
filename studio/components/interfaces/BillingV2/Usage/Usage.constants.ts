@@ -10,7 +10,7 @@ export interface CategoryAttribute {
   key: string // Property from project usage
   attribute: string // For querying against stats-daily / infra-monitoring
   name: string
-  unit: 'bytes' | 'absolute'
+  unit: 'bytes' | 'absolute' | 'percentage'
   docsUrl?: string
   description: string
   chartDescription: string
@@ -28,7 +28,7 @@ export const USAGE_CATEGORIES: {
         key: 'cpu_usage',
         attribute: 'cpu_usage',
         name: 'CPU',
-        unit: 'absolute',
+        unit: 'percentage',
         description: 'Some description here',
         chartDescription: 'The data shown here is refreshed over a period of 24 hours.',
       },
@@ -36,7 +36,7 @@ export const USAGE_CATEGORIES: {
         key: 'ram_usage',
         attribute: 'ram_usage',
         name: 'Memory',
-        unit: 'absolute',
+        unit: 'percentage',
         description: 'Some description here',
         chartDescription: 'The data shown here is refreshed over a period of 24 hours.',
       },
@@ -44,7 +44,7 @@ export const USAGE_CATEGORIES: {
         key: 'disk_io_budget',
         attribute: 'disk_io_budget',
         name: 'Disk IO bandwidth',
-        unit: 'absolute',
+        unit: 'percentage',
         docsUrl: 'https://supabase.com/docs/guides/platform/compute-add-ons#disk-io-bandwidth',
         description:
           'SSD Disks are attached to your servers and the disk performance of your workload is determined by the Disk IO bandwidth of this connection.',
