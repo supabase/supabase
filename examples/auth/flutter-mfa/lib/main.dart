@@ -10,9 +10,8 @@ import 'package:mfa_app/pages/mfa/enroll_page.dart';
 
 void main() async {
   await Supabase.initialize(
-    url: 'https://mmovxqiqcxyufdudlcnl.supabase.co',
-    anonKey:
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1tb3Z4cWlxY3h5dWZkdWRsY25sIiwicm9sZSI6ImFub24iLCJpYXQiOjE2ODMwMzYzMjIsImV4cCI6MTk5ODYxMjMyMn0.gJbycbKjVT0L4_csVRjyYBxnUU3X1ZCMwbxMi7962Rw',
+    url: 'YOUR_SUPABASE_URL',
+    anonKey: 'YOUR_ANON_KEY',
   );
   runApp(const MyApp());
 }
@@ -57,11 +56,6 @@ final _router = GoRouter(
     // A user without a session should be redirected to the register page
     if (session == null) {
       return RegisterPage.route;
-    }
-
-    // user with a session can visit /mfa route
-    if (state.location.contains('/mfa') == true) {
-      return null;
     }
 
     final assuranceLevelData =
