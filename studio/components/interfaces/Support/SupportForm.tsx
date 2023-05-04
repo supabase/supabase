@@ -22,6 +22,7 @@ import { useStore, useFlag } from 'hooks'
 import { post, get } from 'lib/common/fetch'
 import { detectBrowser } from 'lib/helpers'
 import { API_URL, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
+import { useProfileQuery } from 'data/profile/profile-query'
 
 import Divider from 'components/ui/Divider'
 import Connecting from 'components/ui/Loading'
@@ -76,11 +77,11 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
     }
   }, [uploadedFiles])
 
-  useEffect(() => {
-    get(`${API_URL}/profile`).then((data) => {
-      setRespondToEmail(data.primary_email)
-    })
-  }, [respondToEmail])
+  useProfileQuery({
+    onSuccess(profile) {
+      setRespondToEmail(profile.primary_email)
+    },
+  })
 
   if (!isInitialized) {
     return (
