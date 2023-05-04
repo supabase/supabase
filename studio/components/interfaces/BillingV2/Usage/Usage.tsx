@@ -17,6 +17,9 @@ import dayjs from 'dayjs'
 
 const Usage = () => {
   const { ref } = useParams()
+
+  // [Joshen] Using a state here for now as in the future, we'd have this usage page support showing
+  // stats for different projects. So we'll pass the selected ref as a prop into the individual components
   const [selectedProjectRef, setSelectedProjectRef] = useState<string>(ref as string)
 
   const infrastructureRef = useRef<HTMLDivElement>(null)
@@ -24,7 +27,6 @@ const Usage = () => {
   const sizeAndCountsRef = useRef<HTMLDivElement>(null)
   const activityRef = useRef<HTMLDivElement>(null)
 
-  const { data: projects, isLoading } = useProjectsQuery()
   const { data: usage } = useProjectUsageQuery({ projectRef: ref })
   const { data: subscription, isLoading: isLoadingSubscription } = useProjectSubscriptionQuery({
     projectRef: selectedProjectRef,
@@ -75,30 +77,6 @@ const Usage = () => {
                   Previous billing cycle
                 </Listbox.Option>
               </Listbox>
-              {isLoading ? (
-                <ShimmeringLoader className="w-[200px]" />
-              ) : (
-                <Listbox
-                  disabled
-                  size="small"
-                  id="projectRef"
-                  name="projectRef"
-                  value={selectedProjectRef}
-                  onChange={setSelectedProjectRef}
-                  className="w-[200px]"
-                >
-                  {(projects ?? []).map((project) => (
-                    <Listbox.Option
-                      key={project.ref}
-                      value={project.ref}
-                      label={project.name}
-                      className="!w-[200px]"
-                    >
-                      {project.name}
-                    </Listbox.Option>
-                  ))}
-                </Listbox>
-              )}
               {isLoadingSubscription ? (
                 <IconLoader className="animate-spin" size={14} />
               ) : subscription !== undefined ? (
@@ -106,7 +84,7 @@ const Usage = () => {
                   <p className={clsx('text-sm transition', isLoadingSubscription && 'opacity-50')}>
                     Project is on {subscription.tier.name}
                   </p>
-                  <p className="text-xs text-scale-1000">
+                  <p className="text-sm text-scale-1000">
                     {billingCycleStart.format('DD MMM YY')} - {billingCycleEnd.format('DD MMM YY')}
                   </p>
                 </div>
