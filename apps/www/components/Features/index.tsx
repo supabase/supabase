@@ -28,7 +28,6 @@ const Features = () => {
           googleAnalyticsProps
         )
       case 'Edge Functions':
-        console.log('edge!!')
         return await Telemetry.sendEvent(
           gaEvents['www_hp_subhero_products_edgeFunctions'],
           googleAnalyticsProps
