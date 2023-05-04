@@ -155,7 +155,7 @@ export const USAGE_CATEGORIES: {
         name: 'Edge function invocations',
         unit: 'absolute',
         description:
-          'Every single serverless function invocation independent of response status is counted. ',
+          'Every single serverless function invocation independent of response status is counted.',
         chartDescription:
           'Billing is based on the sum of all invocations throughout your billing period. The data shown here is refreshed over a period of 24 hours.',
       },
