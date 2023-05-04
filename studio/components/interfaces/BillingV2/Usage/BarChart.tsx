@@ -91,9 +91,10 @@ const BarChart = ({
             }}
           />
           <Bar dataKey={attribute}>
-            {data.map((entry) => {
+            {data.map((entry, idx) => {
               return (
                 <Cell
+                  key={`cell-${attribute}-${idx}`}
                   className={
                     yLimit !== undefined && Number(entry[attribute]) >= yLimit
                       ? 'fill-amber-900'
