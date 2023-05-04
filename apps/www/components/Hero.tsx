@@ -54,7 +54,7 @@ const Hero = () => {
                           </Button>
                         </a>
                       </Link>
-                      <Link href="'/docs'" as="'/docs'" passHref>
+                      <Link href="/docs" as="/docs" passHref>
                         <a
                           onClick={() => sendTelemetryEvent(gaEvents['www_hp_hero_documentation'])}
                         >
