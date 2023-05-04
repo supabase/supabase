@@ -129,7 +129,7 @@ export const useDailyStatsQuery = <TData = DailyStatsData>(
         typeof attribute !== 'undefined' &&
         typeof startDate !== 'undefined' &&
         typeof endDate !== 'undefined',
-      // @ts-ignore
+
       select(data) {
         const noDataYet = Number(data.data[0].period_start) === 0
 
@@ -145,7 +145,7 @@ export const useDailyStatsQuery = <TData = DailyStatsData>(
               [attribute]: 0,
             }
           })
-          return { ...data, data: mockData, hasNoData: true }
+          return { ...data, data: mockData, hasNoData: true } as TData
         } else {
           return {
             ...data,
@@ -161,7 +161,7 @@ export const useDailyStatsQuery = <TData = DailyStatsData>(
                     : x.period_start,
               }
             }),
-          }
+          } as TData
         }
       },
       ...options,
