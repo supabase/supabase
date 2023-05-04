@@ -9,7 +9,7 @@ import {
   useProjectUsageQuery,
 } from 'data/usage/project-usage-query'
 import dayjs from 'dayjs'
-import { PRICING_TIER_PRODUCT_IDS, USAGE_APPROACHING_THRESHOLD } from 'lib/constants'
+import { USAGE_APPROACHING_THRESHOLD } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 import Link from 'next/link'
 import { Button, IconAlertTriangle } from 'ui'
@@ -17,6 +17,7 @@ import BarChart from './BarChart'
 import SectionContent from './SectionContent'
 import SectionHeader from './SectionHeader'
 import { USAGE_CATEGORIES } from './Usage.constants'
+import { getUpgradeUrl } from './Usage.utils'
 
 export interface BandwidthProps {
   projectRef: string
@@ -30,12 +31,7 @@ const Bandwidth = ({ projectRef }: BandwidthProps) => {
   const endDate = new Date((current_period_end ?? 0) * 1000).toISOString()
   const categoryMeta = USAGE_CATEGORIES.find((category) => category.key === 'bandwidth')
 
-  const upgradeUrl =
-    subscription?.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
-      ? `/project/${projectRef}/settings/billing/update/enterprise`
-      : subscription?.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.TEAM
-      ? `/project/${projectRef}/settings/billing/update/team`
-      : `/project/${projectRef}/settings/billing/update/pro`
+  const upgradeUrl = getUpgradeUrl(projectRef, subscription)
 
   const { data: dbEgressData, isLoading: isLoadingDbEgressData } = useDailyStatsQuery({
     projectRef,

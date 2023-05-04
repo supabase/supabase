@@ -157,16 +157,16 @@ const Usage = () => {
         e.g for database size, we also need to show disk volume size. Not to mention that are little nuances across
         each attribute RE formatting (bytes vs locale string)
       */}
-      <div ref={infrastructureRef}>
+      <div id="infrastructure" ref={infrastructureRef}>
         <Infrastructure projectRef={selectedProjectRef} />
       </div>
-      <div ref={bandwidthRef}>
+      <div id="bandwidth" ref={bandwidthRef}>
         <Bandwidth projectRef={selectedProjectRef} />
       </div>
-      <div ref={sizeAndCountsRef}>
+      <div id="size_and_counts" ref={sizeAndCountsRef}>
         <SizeAndCounts projectRef={selectedProjectRef} />
       </div>
-      <div ref={activityRef}>
+      <div id="activity" ref={activityRef}>
         <Activity projectRef={selectedProjectRef} />
       </div>
     </>
