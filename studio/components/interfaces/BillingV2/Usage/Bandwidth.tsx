@@ -106,7 +106,7 @@ const Bandwidth = ({ projectRef }: BandwidthProps) => {
                   ) : usageRatio >= USAGE_APPROACHING_THRESHOLD ? (
                     <div className="flex items-center space-x-2 min-w-[115px]">
                       <IconAlertTriangle size={14} strokeWidth={2} className="text-amber-900" />
-                      <p className="text-sm text-red-900">Reaching limit</p>
+                      <p className="text-sm text-red-900">Approaching limit</p>
                     </div>
                   ) : null}
                 </div>
