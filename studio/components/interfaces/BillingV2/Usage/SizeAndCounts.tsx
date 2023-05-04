@@ -208,6 +208,8 @@ const SizeAndCounts = ({ projectRef }: SizeAndCountsProps) => {
             ) : (
               <BarChart
                 hasQuota
+                name={attribute.name}
+                unit={attribute.unit}
                 attribute={attribute.attribute}
                 data={chartData}
                 yLimit={usageMeta?.limit ?? 0}

@@ -158,6 +158,8 @@ const Bandwidth = ({ projectRef }: BandwidthProps) => {
             ) : (
               <BarChart
                 hasQuota
+                name={attribute.name}
+                unit={attribute.unit}
                 attribute={attribute.attribute}
                 data={chartData}
                 yLimit={usageMeta?.limit ?? 0}

@@ -6,26 +6,30 @@ import {
   ComposedChart,
   ReferenceLine,
   ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
 } from 'recharts'
 import { Y_DOMAIN_CEILING_MULTIPLIER } from './Usage.constants'
+import dayjs from 'dayjs'
 
 // [Joshen] This BarChart is specifically for usage, hence not a reusable component, and not
 // replacing the existing BarChart in ui/Charts
 
 export interface BarChartProps {
   data: DataPoint[]
+  name: string // Used within the tooltip
   attribute: string
-  unit?: string
+  unit: 'bytes' | 'absolute' | 'percentage'
   hasQuota?: boolean
   yLimit?: number
   yLeftMargin?: number
-  yFormatter?: (value: number) => string
+  yFormatter?: (value: number | string) => string
 }
 
 const BarChart = ({
   data,
+  name,
   attribute,
   unit,
   hasQuota = false,
@@ -55,9 +59,36 @@ const BarChart = ({
             axisLine={false}
             tickLine={{ stroke: 'none' }}
             domain={yDomain}
-            unit={unit}
             ticks={ticks}
             tickFormatter={yFormatter}
+          />
+          <Tooltip
+            content={(props) => {
+              const { active, payload } = props
+              if (active && payload && payload.length) {
+                const dataPeriod = dayjs(payload[0].payload.period_start)
+                if (dataPeriod.isAfter(dayjs())) return null
+
+                const value =
+                  unit === 'percentage'
+                    ? Number(payload[0].value).toFixed(2)
+                    : Number(payload[0].value)
+
+                return (
+                  <div className="w-[170px] border bg-scale-300 rounded-md px-2 py-2">
+                    <p className="text-xs text-scale-1000">
+                      {attribute === 'disk_io_budget' ? `Remaining IO budget:` : `${name}:`}
+                    </p>
+                    <p className="text-xl">
+                      {yFormatter !== undefined ? yFormatter(value) : value}
+                    </p>
+                    <p className="text-xs text-scale-1100 mt-1">
+                      {dataPeriod.format('DD MMM YYYY')}
+                    </p>
+                  </div>
+                )
+              } else return null
+            }}
           />
           <Bar dataKey={attribute}>
             {data.map((entry) => {

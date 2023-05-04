@@ -109,6 +109,8 @@ const Infrastructure = ({ projectRef }: InfrastructureProps) => {
               </div>
             ) : (
               <BarChart
+                name={attribute.name}
+                unit={attribute.unit}
                 attribute={attribute.attribute}
                 data={chartData}
                 yFormatter={(value) => `${value}%`}

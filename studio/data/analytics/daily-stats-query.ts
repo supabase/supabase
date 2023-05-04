@@ -140,7 +140,7 @@ export const useDailyStatsQuery = <TData = DailyStatsData>(
           const mockData = tempArray.map((x, idx) => {
             return {
               loopId: idx,
-              period_start: dayjs(startDate).add(idx, 'day').format(dateFormat),
+              period_start: dayjs(startDate).add(idx, 'day').format('DD MMM YYYY'),
               periodStartFormatted: dayjs(startDate).add(idx, 'day').format(dateFormat),
               [attribute]: 0,
             }
