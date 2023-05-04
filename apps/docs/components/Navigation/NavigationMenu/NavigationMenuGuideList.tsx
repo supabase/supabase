@@ -13,6 +13,10 @@ interface Props {
 const NavigationMenuGuideList: React.FC<Props> = ({ id, active, value }) => {
   const router = useRouter()
 
+  if (!active) {
+    return null
+  }
+
   const menu = NavItems[id]
 
   // get url
