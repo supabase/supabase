@@ -103,12 +103,12 @@ const Usage = () => {
               ) : null}
             </div>
             <div className="flex items-center space-x-2">
-              <Link href={`/project/${ref}/settings/billing/invoices`}>
+              <Link href={`/project/${selectedProjectRef}/settings/billing/invoices`}>
                 <a>
                   <Button type="default">View invoices</Button>
                 </a>
               </Link>
-              <Link href={`/project/${ref}/settings/billing/subscription`}>
+              <Link href={`/project/${selectedProjectRef}/settings/billing/subscription`}>
                 <a>
                   <Button type="default">View billing</Button>
                 </a>
