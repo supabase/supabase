@@ -64,7 +64,6 @@ export const useInfraMonitoringQuery = <TData = InfraMonitoringData>(
         typeof attribute !== 'undefined' &&
         typeof startDate !== 'undefined' &&
         typeof endDate !== 'undefined',
-      // @ts-ignore
       select(data) {
         return {
           ...data,
@@ -76,7 +75,7 @@ export const useInfraMonitoringQuery = <TData = InfraMonitoringData>(
               periodStartFormatted: dayjs(x.period_start).format(dateFormat),
             }
           }),
-        }
+        } as TData
       },
       ...options,
     }
