@@ -149,7 +149,7 @@ const Activity = ({ projectRef }: ActivityProps) => {
           <SectionContent
             key={attribute.key}
             section={attribute}
-            includedInPlan={usageMeta.available_in_plan}
+            includedInPlan={usageMeta?.available_in_plan}
           >
             <div className="space-y-2">
               <div className="flex items-center justify-between">
@@ -211,7 +211,7 @@ const Activity = ({ projectRef }: ActivityProps) => {
                 </div>
               </div>
             </div>
-            {usageMeta.available_in_plan && (
+            {usageMeta?.available_in_plan && (
               <>
                 <div className="space-y-1">
                   <p>{attribute.name} over time</p>

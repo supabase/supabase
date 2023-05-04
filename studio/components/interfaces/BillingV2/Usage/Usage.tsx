@@ -6,7 +6,7 @@ import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscrip
 import { useProjectUsageQuery } from 'data/usage/project-usage-query'
 import Link from 'next/link'
 import { useRef, useState } from 'react'
-import { Button, IconAlertCircle, IconCheckCircle, IconLoader, Listbox } from 'ui'
+import { Button, IconAlertCircle, IconCheckCircle, IconLoader, Listbox, Toggle } from 'ui'
 import Activity from './Activity'
 import Bandwidth from './Bandwidth'
 import Infrastructure from './Infrastructure'
@@ -53,7 +53,6 @@ const Usage = () => {
       <div className="border-b">
         <div className="1xl:px-28 mx-auto flex flex-col px-5 lg:px-16 2xl:px-32 pt-6 space-y-4">
           <h3 className="text-scale-1200 text-xl">Usage</h3>
-
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <Listbox
