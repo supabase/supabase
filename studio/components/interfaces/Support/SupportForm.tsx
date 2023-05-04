@@ -48,7 +48,6 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
   const [uploadedDataUrls, setUploadedDataUrls] = useState<string[]>([])
   const [selectedServices, setSelectedServices] = useState<string[]>([])
-  const [respondToEmail, setRespondToEmail] = useState<string>('')
 
   // Get all orgs and projects from global store
   const sortedOrganizations = app.organizations.list()
@@ -77,11 +76,8 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
     }
   }, [uploadedFiles])
 
-  useProfileQuery({
-    onSuccess(profile) {
-      setRespondToEmail(profile.primary_email)
-    },
-  })
+  const { data: profile } = useProfileQuery()
+  const respondToEmail = profile?.primary_email ?? 'your email'
 
   if (!isInitialized) {
     return (
