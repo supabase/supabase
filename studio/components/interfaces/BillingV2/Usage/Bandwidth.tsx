@@ -9,7 +9,7 @@ import {
   useProjectUsageQuery,
 } from 'data/usage/project-usage-query'
 import dayjs from 'dayjs'
-import { USAGE_APPROACHING_THRESHOLD } from 'lib/constants'
+import { PRICING_TIER_PRODUCT_IDS, USAGE_APPROACHING_THRESHOLD } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 import Link from 'next/link'
 import { Button, IconAlertTriangle } from 'ui'
@@ -32,6 +32,7 @@ const Bandwidth = ({ projectRef }: BandwidthProps) => {
   const categoryMeta = USAGE_CATEGORIES.find((category) => category.key === 'bandwidth')
 
   const upgradeUrl = getUpgradeUrl(projectRef, subscription)
+  const isFreeTier = subscription?.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.FREE
 
   const { data: dbEgressData, isLoading: isLoadingDbEgressData } = useDailyStatsQuery({
     projectRef,
@@ -107,13 +108,15 @@ const Bandwidth = ({ projectRef }: BandwidthProps) => {
                     </div>
                   ) : null}
                 </div>
-                <Link href={upgradeUrl}>
-                  <a>
-                    <Button type="default" size="tiny">
-                      Upgrade project
-                    </Button>
-                  </a>
-                </Link>
+                {isFreeTier && (
+                  <Link href={upgradeUrl}>
+                    <a>
+                      <Button type="default" size="tiny">
+                        Upgrade project
+                      </Button>
+                    </a>
+                  </Link>
+                )}
               </div>
               <SparkBar
                 type="horizontal"
