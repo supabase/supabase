@@ -44,7 +44,7 @@ export async function getProjectLogStats(
   return response as ProjectLogStatsResponse
 }
 
-export type ProjectLogStatsData = Awaited<ReturnType<ProjectLogStatsResponse>>
+export type ProjectLogStatsData = Awaited<ReturnType<typeof getProjectLogStats>>
 export type ProjectLogStatsError = unknown
 
 export const useProjectLogStatsQuery = <TData = ProjectLogStatsData>(
