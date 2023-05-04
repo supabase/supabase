@@ -1,17 +1,17 @@
 import { Button, IconBookOpen } from 'ui'
 import { useRouter } from 'next/router'
+import Link from 'next/link'
 import SectionContainer from './Layouts/SectionContainer'
 import Telemetry, { GoogleAnalyticsEvent } from '~/lib/telemetry'
 import gaEvents from '~/lib/gaEvents'
 import useGoogleAnalyticsProps from '~/hooks/useGoogleAnalyticsProps'
 
 const Hero = () => {
-  const router = useRouter()
+  const { basePath } = useRouter()
   const googleAnalyticsProps = useGoogleAnalyticsProps()
 
-  const trackAndNavigate = async (url: string, event: GoogleAnalyticsEvent) => {
+  const sendTelemetryEvent = async (event: GoogleAnalyticsEvent) => {
     await Telemetry.sendEvent(event, googleAnalyticsProps)
-    router.push(url)
   }
 
   return (
@@ -47,28 +47,22 @@ const Hero = () => {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Button
-                        size="small"
-                        className="text-white"
-                        onClick={() =>
-                          trackAndNavigate(
-                            'https://app.supabase.com',
-                            gaEvents['www_hp_hero_startProject']
-                          )
-                        }
-                      >
-                        Start your project
-                      </Button>
-                      <Button
-                        size="small"
-                        type="default"
-                        icon={<IconBookOpen />}
-                        onClick={() =>
-                          trackAndNavigate('/docs', gaEvents['www_hp_hero_documentation'])
-                        }
-                      >
-                        Documentation
-                      </Button>
+                      <Link href="https://app.supabase.com" as="https://app.supabase.com" passHref>
+                        <a onClick={() => sendTelemetryEvent(gaEvents['www_hp_hero_startProject'])}>
+                          <Button size="small" className="text-white">
+                            Start your project
+                          </Button>
+                        </a>
+                      </Link>
+                      <Link href="'/docs'" as="'/docs'" passHref>
+                        <a
+                          onClick={() => sendTelemetryEvent(gaEvents['www_hp_hero_documentation'])}
+                        >
+                          <Button size="small" type="default" icon={<IconBookOpen />}>
+                            Documentation
+                          </Button>
+                        </a>
+                      </Link>
                     </div>
                     <div className="flex flex-col gap-4">
                       <small className="small text-xs">backed by</small>
@@ -76,22 +70,22 @@ const Hero = () => {
                         <div className="flex flex-wrap items-center justify-start gap-y-8 sm:flex-nowrap">
                           <img
                             className="h-8 pr-5 sm:h-8 md:pr-10"
-                            src={`${router.basePath}/images/logos/yc--grey.png`}
+                            src={`${basePath}/images/logos/yc--grey.png`}
                             alt="Y Combinator"
                           />
                           <img
                             className="relative h-5 pr-5 sm:h-5 md:pr-10"
-                            src={`${router.basePath}/images/logos/mozilla--grey.png`}
+                            src={`${basePath}/images/logos/mozilla--grey.png`}
                             alt="Mozilla"
                           />
                           <img
                             className="relative h-5 pr-5 sm:h-5 md:pr-10"
-                            src={`${router.basePath}/images/logos/coatue.png`}
+                            src={`${basePath}/images/logos/coatue.png`}
                             alt="Coatue"
                           />
                           <img
                             className="relative h-6 pr-5 sm:h-6 md:pr-10"
-                            src={`${router.basePath}/images/logos/felicis.png`}
+                            src={`${basePath}/images/logos/felicis.png`}
                             alt="Felicis"
                           />
                         </div>
