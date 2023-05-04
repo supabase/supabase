@@ -9,6 +9,8 @@ import {
   useProjectUsageQuery,
 } from 'data/usage/project-usage-query'
 import dayjs from 'dayjs'
+import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
+import Link from 'next/link'
 import { Button, IconAlertTriangle } from 'ui'
 import { USAGE_APPROACHING_THRESHOLD } from '../Billing.constants'
 import BarChart from './BarChart'
@@ -27,6 +29,13 @@ const Activity = ({ projectRef }: ActivityProps) => {
   const startDate = new Date((current_period_start ?? 0) * 1000).toISOString()
   const endDate = new Date((current_period_end ?? 0) * 1000).toISOString()
   const categoryMeta = USAGE_CATEGORIES.find((category) => category.key === 'activity')
+
+  const upgradeUrl =
+    subscription?.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
+      ? `/project/${projectRef}/settings/billing/enterprise`
+      : subscription?.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.TEAM
+      ? `/project/${projectRef}/settings/billing/team`
+      : `/project/${projectRef}/settings/billing/update`
 
   const { data: mauData, isLoading: isLoadingMauData } = useDailyStatsQuery({
     projectRef,
@@ -169,9 +178,13 @@ const Activity = ({ projectRef }: ActivityProps) => {
                     </div>
                   ) : null}
                 </div>
-                <Button type="default" size="tiny" onClick={() => {}}>
-                  Upgrade project
-                </Button>
+                <Link href={upgradeUrl}>
+                  <a>
+                    <Button type="default" size="tiny">
+                      Upgrade project
+                    </Button>
+                  </a>
+                </Link>
               </div>
               <SparkBar
                 type="horizontal"
