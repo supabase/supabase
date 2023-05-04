@@ -162,10 +162,11 @@ export const copyToClipboard = (str: string | Promise<string>, callback = () => 
   const focused = window.document.hasFocus()
   if (focused) {
     if (window.ClipboardItem) {
-      const text = new ClipboardItem({
-        'text/plain': Promise.resolve(str).then((text) => new Blob([text], { type: 'text/plain' })),
-      })
-      window.navigator?.clipboard?.write([text]).then(callback)
+      Promise.resolve(str)
+        .then((text) => new Blob([text], { type: 'text/plain' }))
+        .then((blob) => new ClipboardItem({ 'text/plain': blob }))
+        .then((text) => window.navigator?.clipboard?.write([text]))
+        .then(callback)
 
       return
     }
@@ -177,6 +178,7 @@ export const copyToClipboard = (str: string | Promise<string>, callback = () => 
     console.warn('Unable to copy to clipboard')
   }
 }
+
 
 export async function passwordStrength(value: string) {
   let message = ''
