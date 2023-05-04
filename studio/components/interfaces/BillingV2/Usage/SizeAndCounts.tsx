@@ -33,6 +33,7 @@ const SizeAndCounts = ({ projectRef }: SizeAndCountsProps) => {
   const categoryMeta = USAGE_CATEGORIES.find((category) => category.key === 'sizeCount')
 
   const upgradeUrl = getUpgradeUrl(projectRef, subscription)
+  const isFreeTier = subscription?.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.FREE
 
   const { data: dbSizeData, isLoading: isLoadingDbSizeData } = useDailyStatsQuery({
     projectRef,
@@ -124,13 +125,15 @@ const SizeAndCounts = ({ projectRef }: SizeAndCountsProps) => {
                     </div>
                   ) : null}
                 </div>
-                <Link href={upgradeUrl}>
-                  <a>
-                    <Button type="default" size="tiny">
-                      Upgrade project
-                    </Button>
-                  </a>
-                </Link>
+                {isFreeTier && (
+                  <Link href={upgradeUrl}>
+                    <a>
+                      <Button type="default" size="tiny">
+                        Upgrade project
+                      </Button>
+                    </a>
+                  </Link>
+                )}
               </div>
               <SparkBar
                 type="horizontal"

@@ -17,6 +17,7 @@ import SectionContent from './SectionContent'
 import SectionHeader from './SectionHeader'
 import { USAGE_CATEGORIES } from './Usage.constants'
 import { getUpgradeUrl } from './Usage.utils'
+import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 
 export interface ActivityProps {
   projectRef: string
@@ -31,6 +32,7 @@ const Activity = ({ projectRef }: ActivityProps) => {
   const categoryMeta = USAGE_CATEGORIES.find((category) => category.key === 'activity')
 
   const upgradeUrl = getUpgradeUrl(projectRef, subscription)
+  const isFreeTier = subscription?.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.FREE
 
   const { data: mauData, isLoading: isLoadingMauData } = useDailyStatsQuery({
     projectRef,
@@ -173,13 +175,15 @@ const Activity = ({ projectRef }: ActivityProps) => {
                     </div>
                   ) : null}
                 </div>
-                <Link href={upgradeUrl}>
-                  <a>
-                    <Button type="default" size="tiny">
-                      Upgrade project
-                    </Button>
-                  </a>
-                </Link>
+                {isFreeTier && (
+                  <Link href={upgradeUrl}>
+                    <a>
+                      <Button type="default" size="tiny">
+                        Upgrade project
+                      </Button>
+                    </a>
+                  </Link>
+                )}
               </div>
               <SparkBar
                 type="horizontal"
