@@ -1,4 +1,4 @@
-import { APP_NAME, DESCRIPTION } from 'lib/constants'
+import { API_URL, APP_NAME, DESCRIPTION } from 'lib/constants'
 import { DefaultSeo } from 'next-seo'
 import { AppProps } from 'next/app'
 import { useRouter } from 'next/router'
@@ -13,7 +13,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter()
 
   function handlePageTelemetry(route: string) {
-    return post(`https://api.supabase.io/platform/telemetry/page`, {
+    return post(`${API_URL}/telemetry/page`, {
       referrer: document.referrer,
       title: document.title,
       route,
