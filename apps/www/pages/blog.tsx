@@ -50,7 +50,7 @@ export async function getStaticProps() {
 }
 
 function Blog(props: any) {
-  const categoryId = useParams()?.categoryId
+  const tag = useParams()?.tag
   const [category, setCategory] = useState('all')
   const [blogs, setBlogs] = useState(props.blogs)
 
@@ -65,7 +65,7 @@ function Blog(props: any) {
     if (category === 'all') {
       router.replace('/blog', undefined, { shallow: true, scroll: false })
     } else {
-      router.query.categoryId = category
+      router.query.tag = category
       router.replace(router, undefined, { shallow: true, scroll: false })
     }
 
@@ -80,10 +80,10 @@ function Blog(props: any) {
   }, [category])
 
   useEffect(() => {
-    if (router.isReady && categoryId && categoryId !== 'all') {
-      setCategory(categoryId)
+    if (router.isReady && tag && tag !== 'all') {
+      setCategory(tag)
     }
-  }, [categoryId, router.isReady])
+  }, [tag, router.isReady])
 
   const meta_title = 'Supabase Blog: Open Source Firebase alternative Blog'
   const meta_description = 'Get all your Supabase News on the Supabase blog.'
@@ -135,8 +135,8 @@ function Blog(props: any) {
                     defaultActiveId={'all'}
                     activeId={category}
                   >
-                    {props.categories.map((categoryId: string) => (
-                      <Tabs.Panel id={categoryId} key={categoryId} label={categoryId} />
+                    {props.categories.map((tag: string) => (
+                      <Tabs.Panel id={tag} key={tag} label={tag} />
                     ))}
                   </Tabs>
                 </div>
