@@ -32,10 +32,10 @@ const Bandwidth = ({ projectRef }: BandwidthProps) => {
 
   const upgradeUrl =
     subscription?.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
-      ? `/project/${projectRef}/settings/billing/enterprise`
+      ? `/project/${projectRef}/settings/billing/update/enterprise`
       : subscription?.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.TEAM
-      ? `/project/${projectRef}/settings/billing/team`
-      : `/project/${projectRef}/settings/billing/update`
+      ? `/project/${projectRef}/settings/billing/update/team`
+      : `/project/${projectRef}/settings/billing/update/pro`
 
   const { data: dbEgressData, isLoading: isLoadingDbEgressData } = useDailyStatsQuery({
     projectRef,

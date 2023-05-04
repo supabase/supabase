@@ -33,10 +33,10 @@ const SizeAndCounts = ({ projectRef }: SizeAndCountsProps) => {
 
   const upgradeUrl =
     subscription?.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
-      ? `/project/${projectRef}/settings/billing/enterprise`
+      ? `/project/${projectRef}/settings/billing/update/enterprise`
       : subscription?.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.TEAM
-      ? `/project/${projectRef}/settings/billing/team`
-      : `/project/${projectRef}/settings/billing/update`
+      ? `/project/${projectRef}/settings/billing/update/team`
+      : `/project/${projectRef}/settings/billing/update/pro`
 
   const { data: dbSizeData, isLoading: isLoadingDbSizeData } = useDailyStatsQuery({
     projectRef,
@@ -65,16 +65,19 @@ const SizeAndCounts = ({ projectRef }: SizeAndCountsProps) => {
   const chartMeta: any = {
     db_size: {
       isLoading: isLoadingDbSizeData,
+      margin: 14,
       data: dbSizeData?.data ?? [],
       showLastUpdated: dbSizeData?.hasNoData === false,
     },
     storage_size: {
       isLoading: isLoadingStorageSizeData,
+      margin: 14,
       data: storageSizeData?.data ?? [],
       showLastUpdated: storageSizeData?.hasNoData === false,
     },
     func_count: {
       isLoading: isLoadingFunctionCountData,
+      margin: 0,
       data: functionCountData?.data ?? [],
       showLastUpdated: functionCountData?.hasNoData === false,
     },
@@ -224,7 +227,7 @@ const SizeAndCounts = ({ projectRef }: SizeAndCountsProps) => {
                 attribute={attribute.attribute}
                 data={chartData}
                 yLimit={usageMeta?.limit ?? 0}
-                yLeftMargin={14}
+                yLeftMargin={chartMeta[attribute.key].margin}
                 yFormatter={(value) =>
                   attribute.unit === 'bytes'
                     ? formatBytes(value, 1, 'GB').replace(/\s/g, '')

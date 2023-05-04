@@ -13,6 +13,7 @@ import Infrastructure from './Infrastructure'
 import SizeAndCounts from './SizeAndCounts'
 import { USAGE_CATEGORIES, USAGE_STATUS } from './Usage.constants'
 import { getUsageStatus } from './Usage.utils'
+import dayjs from 'dayjs'
 
 const Usage = () => {
   const { ref } = useParams()
@@ -28,6 +29,9 @@ const Usage = () => {
   const { data: subscription, isLoading: isLoadingSubscription } = useProjectSubscriptionQuery({
     projectRef: selectedProjectRef,
   })
+
+  const billingCycleStart = dayjs.unix(subscription?.billing?.current_period_start ?? 0).utc()
+  const billingCycleEnd = dayjs.unix(subscription?.billing?.current_period_end ?? 0).utc()
 
   const scrollTo = (id: 'infra' | 'bandwidth' | 'sizeCount' | 'activity') => {
     switch (id) {
@@ -75,6 +79,7 @@ const Usage = () => {
                 <ShimmeringLoader className="w-[200px]" />
               ) : (
                 <Listbox
+                  disabled
                   size="small"
                   id="projectRef"
                   name="projectRef"
@@ -97,9 +102,14 @@ const Usage = () => {
               {isLoadingSubscription ? (
                 <IconLoader className="animate-spin" size={14} />
               ) : subscription !== undefined ? (
-                <p className={clsx('text-sm transition', isLoadingSubscription && 'opacity-50')}>
-                  Project is on {subscription.tier.name}
-                </p>
+                <div>
+                  <p className={clsx('text-sm transition', isLoadingSubscription && 'opacity-50')}>
+                    Project is on {subscription.tier.name}
+                  </p>
+                  <p className="text-xs text-scale-1000">
+                    {billingCycleStart.format('DD MMM YY')} - {billingCycleEnd.format('DD MMM YY')}
+                  </p>
+                </div>
               ) : null}
             </div>
             <div className="flex items-center space-x-2">
@@ -127,7 +137,7 @@ const Usage = () => {
                   className="flex items-center opacity-50 space-x-2 py-3 hover:opacity-100 transition cursor-pointer"
                 >
                   {status === USAGE_STATUS.NORMAL ? (
-                    <IconCheckCircle size={15} strokeWidth={2} className="text-brand-900" />
+                    <IconCheckCircle size={15} strokeWidth={2} className="text-scale-1100" />
                   ) : status === USAGE_STATUS.APPROACHING ? (
                     <IconAlertCircle size={15} strokeWidth={2} className="text-amber-900" />
                   ) : status === USAGE_STATUS.EXCEEDED ? (
