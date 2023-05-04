@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useState } from 'react'
-import { IconArrowRight, Loading } from 'ui'
+import { IconArrowRight, Loading, Toggle } from 'ui'
 
 import { NextPageWithLayout } from 'types'
 import { useStore, useFlag } from 'hooks'
@@ -15,15 +15,30 @@ import ProjectUsageBars from 'components/interfaces/Settings/ProjectUsageBars/Pr
 import Usage from 'components/interfaces/BillingV2/Usage/Usage'
 
 const ProjectBillingUsage: NextPageWithLayout = () => {
-  const showNewUsageUI = useFlag('usagev2')
-
-  if (showNewUsageUI) return <Usage />
+  const enableUsageV2 = useFlag('usagev2')
+  const [showNewUsageUI, setShowNewUsageUI] = useState(enableUsageV2)
 
   return (
-    <div className="w-full h-full overflow-y-auto content">
-      <div className="w-full mx-auto">
-        <Settings />
-      </div>
+    <div className="relative">
+      {enableUsageV2 && (
+        <div className="absolute top-[1.9rem] right-16 flex items-center space-x-3">
+          <Toggle
+            size="tiny"
+            checked={showNewUsageUI}
+            onChange={() => setShowNewUsageUI(!showNewUsageUI)}
+          />
+          <p className="text-xs text-scale-1100 -translate-y-[1px]">Preview new interface</p>
+        </div>
+      )}
+      {enableUsageV2 && showNewUsageUI ? (
+        <Usage />
+      ) : (
+        <div className="w-full h-full overflow-y-auto content">
+          <div className="w-full mx-auto">
+            <Settings />
+          </div>
+        </div>
+      )}
     </div>
   )
 }
