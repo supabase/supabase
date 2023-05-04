@@ -13,7 +13,8 @@ const OldVersionAlert = () => {
   return (
     <div className="sticky top-10 z-10 lg:top-14 lg:w-1/2">
       <Admonition type="caution">
-        You&apos;re viewing an older version of this library.&nbsp;
+        You&apos;re viewing an older version of this library.
+        <br />
         <Link href={latestVersionUrl}>
           <a className="underline decoration-brand-700 underline-offset-4 decoration-1">
             Switch to the latest
