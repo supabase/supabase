@@ -151,7 +151,7 @@ test.each([
     len: 2,
     min: '2023-04-26T18:00:00.000Z',
     max: '2023-04-26T19:00:00.000Z',
-    keys: ['count', 'other'],
+    valKey: ['count', 'other'],
     includes: [
       { timestamp: '2023-04-26T18:00:00.000Z', count: 0, other: 0 },
       { timestamp: '2023-04-26T19:00:00.000Z', count: 0, other: 0 },
