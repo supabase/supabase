@@ -121,7 +121,7 @@ const ContentLink = React.memo(function ContentLink(props: any) {
 
   return (
     <li>
-      <Link href={`${props.url}`} passHref>
+      <Link href={props.url} passHref>
         <a
           className={[
             'cursor-pointer transition text-sm',

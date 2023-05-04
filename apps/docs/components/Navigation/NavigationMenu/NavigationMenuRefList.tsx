@@ -25,6 +25,10 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
   active,
   spec,
 }) => {
+  if (!active) {
+    return null
+  }
+
   const filteredSections = commonSections.filter((section) => {
     return !section.excludes?.includes(id)
   })

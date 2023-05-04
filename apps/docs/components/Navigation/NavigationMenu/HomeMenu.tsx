@@ -144,6 +144,10 @@ const NavigationMenuHome = ({ active }) => {
   const router = useRouter()
   const { isDarkMode } = useTheme()
 
+  if (!active) {
+    return null
+  }
+
   return (
     <div
       className={[
