@@ -6,6 +6,12 @@ import rehypeSlug from 'rehype-slug'
 
 import withTM from 'next-transpile-modules'
 import withYaml from 'next-plugin-yaml'
+import configureBundleAnalyzer from '@next/bundle-analyzer'
+
+const withBundleAnalyzer = configureBundleAnalyzer({
+  enabled: process.env.ANALYZE === 'true',
+})
+
 // import admonitions from 'remark-admonitions'
 
 // import { remarkCodeHike } from '@code-hike/mdx'
@@ -92,9 +98,14 @@ const nextConfig = {
   },
 }
 
-// next.config.js
-export default () => {
-  // const plugins = [withMDX]/
-  const plugins = [withTM(['ui', 'common', '@supabase/auth-helpers-nextjs']), withMDX, withYaml]
+const configExport = () => {
+  const plugins = [
+    withTM(['ui', 'common', '@supabase/auth-helpers-nextjs']),
+    withMDX,
+    withYaml,
+    withBundleAnalyzer,
+  ]
   return plugins.reduce((acc, next) => next(acc), nextConfig)
 }
+
+export default configExport
