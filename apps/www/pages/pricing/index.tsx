@@ -393,7 +393,10 @@ export default function IndexPage() {
         </div>
       </div>
 
-      <div className="sm:py-18 container relative mx-auto px-4 py-16 shadow-sm md:py-24 lg:px-12 lg:pt-32 lg:pb-12">
+      <div
+        id="addons"
+        className="sm:py-18 container relative mx-auto px-4 py-16 shadow-sm md:py-24 lg:px-12 lg:pt-32 lg:pb-12"
+      >
         <div>
           <div className="text-center">
             <h2 className="text-scale-1200 text-3xl">Easily customizable add-ons</h2>
@@ -466,7 +469,10 @@ export default function IndexPage() {
           </div>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-8 items-center mt-12 lg:mt-8 max-w-6xl mx-auto">
+        <div
+          id="cost-control"
+          className="grid lg:grid-cols-2 gap-8 items-center mt-12 lg:mt-8 max-w-6xl mx-auto"
+        >
           <div>
             <span className="bg-brand-500 text-brand-1100 rounded-md bg-opacity-30 inline-block  dark:bg-scale-400 dark:text-scale-1100 py-0.5 px-2 text-xs mt-2">
               Available for Pro plan
@@ -877,7 +883,7 @@ export default function IndexPage() {
             </div>
           </div>
         </div>
-        <div className="border-t">
+        <div id="faq" className="border-t">
           <div className="mx-auto max-w-5xl gap-y-10 gap-x-10 lg:grid-cols-2">
             <div className="sm:py-18 mx-auto px-6 py-16 md:py-24 lg:px-16 lg:py-24 xl:px-20">
               <h2 className="h3 text-center">Frequently asked questions</h2>
