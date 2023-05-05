@@ -79,7 +79,7 @@ const Infrastructure = ({ projectRef }: InfrastructureProps) => {
             : undefined
 
         return (
-          <SectionContent key={attribute.key} section={attribute}>
+          <SectionContent key={attribute.key} section={attribute} lastKnownValue={lastKnownValue}>
             {attribute.key === 'disk_io_budget' && (
               // [Joshen] Eventually should show the overview of the io bandwidth in mbps for burst, baseline and duration
               <>
@@ -91,31 +91,6 @@ const Infrastructure = ({ projectRef }: InfrastructureProps) => {
                     bandwidth.
                   </p>
                 </div>
-                {/* <div>
-                  <div className="flex items-center justify-between border-b py-1">
-                    <p className="text-xs text-scale-1000">
-                      Included in {subscription?.tier.name.toLowerCase()}
-                    </p>
-                    {usageMeta?.limit === -1 ? (
-                      <p className="text-xs">None</p>
-                    ) : (
-                      <p className="text-xs">{(usageMeta?.limit ?? 0).toLocaleString()}</p>
-                    )}
-                  </div>
-                  <div className="flex items-center justify-between border-b py-1">
-                    <p className="text-xs text-scale-1000">Used</p>
-                    <p className="text-xs">{(usageMeta?.usage ?? 0).toLocaleString()}</p>
-                  </div>
-                  <div className="flex items-center justify-between py-1">
-                    <p className="text-xs text-scale-1000">Extra volume used this month</p>
-                    <p className="text-xs">
-                      {((usageMeta?.limit ?? 0) === -1 || usageExcess < 0
-                        ? 0
-                        : usageExcess
-                      ).toLocaleString()}
-                    </p>
-                  </div>
-                </div> */}
               </>
             )}
             <div className="space-y-1">

@@ -6,11 +6,13 @@ import Link from 'next/link'
 export interface SectionContent {
   section: CategoryAttribute
   includedInPlan?: boolean
+  lastKnownValue?: string
 }
 
 const SectionContent = ({
   section,
   includedInPlan,
+  lastKnownValue,
   children,
 }: PropsWithChildren<SectionContent>) => {
   const { name, description, docsUrl } = section
@@ -44,6 +46,9 @@ const SectionContent = ({
                     </a>
                   </Link>
                 </div>
+              )}
+              {lastKnownValue !== undefined && (
+                <p className="text-xs text-scale-1000">Last updated at: {lastKnownValue}</p>
               )}
             </div>
           </div>
