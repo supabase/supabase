@@ -3,19 +3,13 @@ import { memo, useEffect } from 'react'
 import { menuState, useMenuLevelId } from '~/hooks/useMenuState'
 import NavigationMenuGuideList from './NavigationMenuGuideList'
 import NavigationMenuRefList from './NavigationMenuRefList'
-// @ts-expect-error
+
 import spec_js_v2 from '~/../../spec/supabase_js_v2.yml' assert { type: 'yml' }
-// @ts-expect-error
 import spec_js_v1 from '~/../../spec/supabase_js_v1.yml' assert { type: 'yml' }
-// @ts-expect-error
 import spec_dart_v1 from '~/../../spec/supabase_dart_v1.yml' assert { type: 'yml' }
-// @ts-expect-error
 import spec_dart_v0 from '~/../../spec/supabase_dart_v0.yml' assert { type: 'yml' }
-// @ts-expect-error
 import spec_csharp_v0 from '~/../../spec/supabase_csharp_v0.yml' assert { type: 'yml' }
-// @ts-expect-error
 import spec_python_v2 from '~/../../spec/supabase_py_v2.yml' assert { type: 'yml' }
-// @ts-expect-error
 import spec_swift_v0 from '~/../../spec/supabase_swift_v0.yml' assert { type: 'yml' }
 
 // import { gen_v3 } from '~/lib/refGenerator/helpers'

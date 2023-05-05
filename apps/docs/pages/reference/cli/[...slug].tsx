@@ -1,4 +1,3 @@
-// @ts-expect-error
 import spec from '~/../../spec/cli_v1_commands.yaml' assert { type: 'yml' }
 
 import { flattenSections } from '~/lib/helpers'

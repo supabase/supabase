@@ -1,6 +1,5 @@
 import clientLibsCommonSections from '~/../../spec/common-client-libs-sections.json'
 import typeSpec from '~/../../spec/enrichments/tsdoc_v2/combined.json'
-// @ts-expect-error
 import spec from '~/../../spec/supabase_dart_v0.yml' assert { type: 'yml' }
 import RefSectionHandler from '~/components/reference/RefSectionHandler'
 import { flattenSections } from '~/lib/helpers'
