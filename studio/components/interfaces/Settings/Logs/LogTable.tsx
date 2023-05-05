@@ -15,6 +15,7 @@ import DefaultErrorRenderer from './LogsErrorRenderers/DefaultErrorRenderer'
 import FunctionsLogsColumnRender from './LogColumnRenderers/FunctionsLogsColumnRender'
 import FunctionsEdgeColumnRender from './LogColumnRenderers/FunctionsEdgeColumnRender'
 import AuthColumnRenderer from './LogColumnRenderers/AuthColumnRenderer'
+import { isEqual } from 'lodash'
 
 interface Props {
   data?: Array<LogData | Object>
@@ -59,7 +60,6 @@ const LogTable = ({
   onHistogramToggle,
   isHistogramShowing,
   isLoading,
-  showDownload,
   error,
   projectRef,
   params,
@@ -144,8 +144,10 @@ const LogTable = ({
   }, [stringData])
 
   useEffect(() => {
-    if (!hasId || data === null) return
-    if (focusedLog && !(focusedLog.id in logMap)) {
+    if (!data) return
+    const found = data.find((datum) => isEqual(datum, focusedLog))
+    if (!found) {
+      // close selection panel if not found in dataset
       setFocusedLog(null)
     }
   }, [stringData])
@@ -163,17 +165,7 @@ const LogTable = ({
 
   const RowRenderer = useMemo(() => {
     return (props: RowRendererProps<any>) => (
-      <Row
-        {...props}
-        isRowSelected={false}
-        selectedCellIdx={undefined}
-        className={[
-          'font-mono tracking-tight cursor-pointer',
-          props.selectedCellIdx !== undefined
-            ? '!bg-scale-800'
-            : '!bg-scale-200 hover:!bg-scale-300',
-        ].join(' ')}
-      />
+      <Row {...props} isRowSelected={false} selectedCellIdx={undefined} />
     )
   }, [])
 
@@ -290,7 +282,12 @@ const LogTable = ({
             }
             columns={columns as any}
             rowClass={(row: LogData) =>
-              row.id === focusedLog?.id ? '!bg-scale-400 rdg-row--focused' : 'cursor-pointer'
+              [
+                'font-mono tracking-tight',
+                isEqual(row, focusedLog)
+                  ? '!bg-scale-800 rdg-row--focused'
+                  : ' !bg-scale-200 hover:!bg-scale-300 cursor-pointer',
+              ].join(' ')
             }
             rows={logDataRows}
             rowKeyGetter={(r) => {

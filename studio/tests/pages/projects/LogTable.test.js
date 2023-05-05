@@ -68,6 +68,18 @@ test('can display standard preview table columns', async () => {
   await expect(screen.findByText(fakeMicroTimestamp)).rejects.toThrow()
 })
 
+test("closes the selection if the selected row's data changes", async () => {
+  const { rerender } = render(
+    <LogTable queryType="auth" data={[{ id: '12345', event_message: 'some event message' }]} />
+  )
+  const text = await screen.findByText(/some event message/)
+  userEvent.click(text)
+  await screen.findByText('Copy')
+  rerender(<LogTable data={[{ id: '12346', event_message: 'some other message' }]} />)
+  await expect(screen.findByText(/some event message/)).rejects.toThrow()
+  await screen.findByText(/some other message/)
+})
+
 test.each([
   {
     queryType: 'functions',
