@@ -118,6 +118,7 @@ const BillingUpdateTeam: NextPageWithLayout = () => {
       currentSubscription={subscription}
       isLoadingPaymentMethods={isLoadingPaymentMethods}
       paymentMethods={paymentMethods || []}
+      onPaymentMethodAdded={() => getPaymentMethods()}
     />
   )
 }

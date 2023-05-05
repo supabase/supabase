@@ -112,14 +112,14 @@ const Wizard: NextPageWithLayout = () => {
     }
   }, [])
 
-  useEffect(() => {
-    async function getPaymentMethods(slug: string) {
-      const { data: paymentMethods, error } = await get(`${API_URL}/organizations/${slug}/payments`)
-      if (!error) {
-        setPaymentMethods(paymentMethods)
-      }
+  async function getPaymentMethods(slug: string) {
+    const { data: paymentMethods, error } = await get(`${API_URL}/organizations/${slug}/payments`)
+    if (!error) {
+      setPaymentMethods(paymentMethods)
     }
+  }
 
+  useEffect(() => {
     if (slug) {
       getPaymentMethods(slug as string)
     }
@@ -145,6 +145,12 @@ const Wizard: NextPageWithLayout = () => {
 
   function onDbPricingPlanChange(value: string) {
     setDbPricingTierKey(value)
+  }
+
+  function onPaymentMethodAdded() {
+    if (slug) {
+      return getPaymentMethods(slug)
+    }
   }
 
   async function checkPasswordStrength(value: any) {
@@ -443,7 +449,7 @@ const Wizard: NextPageWithLayout = () => {
                 )}
 
                 {!isSelectFreeTier && isEmptyPaymentMethod && (
-                  <EmptyPaymentMethodWarning stripeCustomerId={stripeCustomerId} />
+                  <EmptyPaymentMethodWarning onPaymentMethodAdded={onPaymentMethodAdded} />
                 )}
               </Panel.Content>
             )}
