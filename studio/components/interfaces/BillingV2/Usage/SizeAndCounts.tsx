@@ -14,11 +14,11 @@ import { formatBytes } from 'lib/helpers'
 import Link from 'next/link'
 import { Badge, Button, IconAlertTriangle, IconExternalLink } from 'ui'
 import { USAGE_APPROACHING_THRESHOLD } from '../Billing.constants'
-import BarChart from './BarChart'
+import UsageBarChart from './UsageBarChart'
 import SectionContent from './SectionContent'
 import SectionHeader from './SectionHeader'
 import { USAGE_CATEGORIES } from './Usage.constants'
-import { getUpgradeUrl } from './Usage.utils'
+import { generateUsageData, getUpgradeUrl } from './Usage.utils'
 
 export interface SizeAndCountsProps {
   projectRef: string
@@ -34,6 +34,8 @@ const SizeAndCounts = ({ projectRef }: SizeAndCountsProps) => {
 
   const upgradeUrl = getUpgradeUrl(projectRef, subscription)
   const isFreeTier = subscription?.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.FREE
+  const isProTier = subscription?.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.PRO
+  const exceededLimitStyle = isFreeTier || isProTier ? 'text-red-900' : 'text-amber-900'
 
   const { data: dbSizeData, isLoading: isLoadingDbSizeData } = useDailyStatsQuery({
     projectRef,
@@ -115,13 +117,13 @@ const SizeAndCounts = ({ projectRef }: SizeAndCountsProps) => {
                   </p>
                   {usageRatio >= 1 ? (
                     <div className="flex items-center space-x-2 min-w-[115px]">
-                      <IconAlertTriangle size={14} strokeWidth={2} className="text-red-900" />
-                      <p className="text-sm text-red-900">Exceeded limit</p>
+                      <IconAlertTriangle size={14} strokeWidth={2} className={exceededLimitStyle} />
+                      <p className={`text-sm ${exceededLimitStyle}`}>Exceeded limit</p>
                     </div>
                   ) : usageRatio >= USAGE_APPROACHING_THRESHOLD ? (
                     <div className="flex items-center space-x-2 min-w-[115px]">
                       <IconAlertTriangle size={14} strokeWidth={2} className="text-amber-900" />
-                      <p className="text-sm text-red-900">Approaching limit</p>
+                      <p className="text-sm text-amber-900">Approaching limit</p>
                     </div>
                   ) : null}
                 </div>
@@ -219,7 +221,7 @@ const SizeAndCounts = ({ projectRef }: SizeAndCountsProps) => {
                 <ShimmeringLoader className="w-1/2" />
               </div>
             ) : (
-              <BarChart
+              <UsageBarChart
                 hasQuota
                 name={attribute.name}
                 unit={attribute.unit}
@@ -232,11 +234,22 @@ const SizeAndCounts = ({ projectRef }: SizeAndCountsProps) => {
                     ? formatBytes(value, 1, 'GB').replace(/\s/g, '')
                     : value.toLocaleString()
                 }
+                quotaWarningType={isFreeTier || isProTier ? 'danger' : 'warning'}
               />
             )}
           </SectionContent>
         )
       })}
+      <UsageBarChart
+        hasQuota
+        name={'Sample'}
+        unit={'percentage'}
+        attribute={'sample_data'}
+        data={generateUsageData('sample_data', 30)}
+        yLimit={50}
+        yLeftMargin={0}
+        quotaWarningType={isFreeTier || isProTier ? 'danger' : 'warning'}
+      />
     </>
   )
 }

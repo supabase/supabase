@@ -2,7 +2,7 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
 import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
 import dayjs from 'dayjs'
-import BarChart from './BarChart'
+import UsageBarChart from './UsageBarChart'
 import SectionContent from './SectionContent'
 import SectionHeader from './SectionHeader'
 import { USAGE_CATEGORIES } from './Usage.constants'
@@ -146,7 +146,7 @@ const Infrastructure = ({ projectRef }: InfrastructureProps) => {
                 <ShimmeringLoader className="w-1/2" />
               </div>
             ) : (
-              <BarChart
+              <UsageBarChart
                 name={attribute.name}
                 unit={attribute.unit}
                 attribute={attribute.attribute}

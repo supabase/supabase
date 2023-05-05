@@ -128,8 +128,9 @@ export const USAGE_CATEGORIES: {
         name: 'Monthly active users',
         unit: 'absolute',
         description:
-          'The amount of distinct users requesting your API throughout the billing period. Resets at the beginning of every billing period.',
-        chartDescription: 'The data shown here is refreshed over a period of 24 hours.',
+          'The amount of distinct users requesting your API throughout the billing period.',
+        chartDescription:
+          'The data shown here is refreshed over a period of 24 hours and resets at the beginning of every billing period.',
       },
       {
         key: 'monthly_active_sso_users',
@@ -137,8 +138,9 @@ export const USAGE_CATEGORIES: {
         name: 'Monthly active single sign-on users',
         unit: 'absolute',
         description:
-          'The amount of distinct Single Sign-On users requesting your API throughout the billing period. Resets at the beginning of every billing period.',
-        chartDescription: 'The data shown here is refreshed over a period of 24 hours.',
+          'The amount of distinct Single Sign-On users requesting your API throughout the billing period.',
+        chartDescription:
+          'The data shown here is refreshed over a period of 24 hours and resets at the beginning of every billing period.',
       },
       {
         key: 'storage_image_render_count',
