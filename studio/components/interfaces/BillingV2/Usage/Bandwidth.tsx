@@ -1,6 +1,7 @@
 import clsx from 'clsx'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import SparkBar from 'components/ui/SparkBar'
+import { DataPoint } from 'data/analytics/constants'
 import { useDailyStatsQuery } from 'data/analytics/daily-stats-query'
 import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
 import {
@@ -13,11 +14,11 @@ import { PRICING_TIER_PRODUCT_IDS, USAGE_APPROACHING_THRESHOLD } from 'lib/const
 import { formatBytes } from 'lib/helpers'
 import Link from 'next/link'
 import { Button, IconAlertTriangle } from 'ui'
-import UsageBarChart from './UsageBarChart'
 import SectionContent from './SectionContent'
 import SectionHeader from './SectionHeader'
 import { USAGE_CATEGORIES } from './Usage.constants'
 import { getUpgradeUrl } from './Usage.utils'
+import UsageBarChart from './UsageBarChart'
 
 export interface BandwidthProps {
   projectRef: string
@@ -52,18 +53,20 @@ const Bandwidth = ({ projectRef }: BandwidthProps) => {
     endDate,
   })
 
-  const chartMeta: any = {
+  const chartMeta: {
+    [key: string]: { data: DataPoint[]; margin: number; isLoading: boolean; hasNoData: boolean }
+  } = {
     db_egress: {
-      isLoading: isLoadingDbEgressData,
       data: dbEgressData?.data ?? [],
       margin: 16,
-      showLastUpdated: dbEgressData?.hasNoData === false,
+      isLoading: isLoadingDbEgressData,
+      hasNoData: dbEgressData?.hasNoData ?? false,
     },
     storage_egress: {
-      isLoading: isLoadingStorageEgressData,
       data: storageEgressData?.data ?? [],
       margin: 14,
-      showLastUpdated: storageEgressData?.hasNoData === false,
+      isLoading: isLoadingStorageEgressData,
+      hasNoData: storageEgressData?.hasNoData ?? false,
     },
   }
 
@@ -86,14 +89,14 @@ const Bandwidth = ({ projectRef }: BandwidthProps) => {
           (x: any) => x.loopId > 0 && x[attribute.attribute] === 0
         )
         const lastKnownValue =
-          lastZeroValue !== undefined
+          lastZeroValue !== undefined && !chartMeta[attribute.key]?.hasNoData
             ? dayjs(lastZeroValue.period_start)
                 .subtract(1, 'day')
                 .format('DD MMM YYYY, HH:mma (ZZ)')
             : undefined
 
         return (
-          <SectionContent key={attribute.key} section={attribute}>
+          <SectionContent key={attribute.key} section={attribute} lastKnownValue={lastKnownValue}>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
@@ -164,9 +167,6 @@ const Bandwidth = ({ projectRef }: BandwidthProps) => {
                   {paragraph}
                 </p>
               ))}
-              {lastKnownValue !== undefined && chartMeta[attribute.key].showLastUpdated && (
-                <span className="text-sm text-scale-1000">Last updated at: {lastKnownValue}</span>
-              )}
             </div>
             {chartMeta[attribute.key]?.isLoading ? (
               <div className="space-y-2">

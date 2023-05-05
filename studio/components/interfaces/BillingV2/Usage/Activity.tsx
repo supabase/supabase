@@ -18,6 +18,7 @@ import SectionHeader from './SectionHeader'
 import { USAGE_CATEGORIES } from './Usage.constants'
 import { getUpgradeUrl } from './Usage.utils'
 import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
+import { DataPoint } from 'data/analytics/constants'
 
 export interface ActivityProps {
   projectRef: string
@@ -89,41 +90,43 @@ const Activity = ({ projectRef }: ActivityProps) => {
       endDate,
     })
 
-  const chartMeta: any = {
+  const chartMeta: {
+    [key: string]: { data: DataPoint[]; margin: number; isLoading: boolean; hasNoData: boolean }
+  } = {
     monthly_active_users: {
       isLoading: isLoadingMauData,
       data: mauData?.data ?? [],
-      showLastUpdated: mauData?.hasNoData === false,
+      hasNoData: mauData?.hasNoData ?? false,
       margin: 18,
     },
     monthly_active_sso_users: {
       isLoading: isLoadingMauSSOData,
       data: mauSSOData?.data ?? [],
-      showLastUpdated: mauSSOData?.hasNoData === false,
+      hasNoData: mauSSOData?.hasNoData ?? false,
       margin: 20,
     },
     storage_image_render_count: {
       isLoading: isLoadingAssetTransformationsData,
       data: assetTransformationsData?.data ?? [],
-      showLastUpdated: assetTransformationsData?.hasNoData === false,
+      hasNoData: assetTransformationsData?.hasNoData ?? false,
       margin: 0,
     },
     func_invocations: {
       isLoading: isLoadingFuncInvocationsData,
       data: funcInvocationsData?.data ?? [],
-      showLastUpdated: funcInvocationsData?.hasNoData === false,
+      hasNoData: funcInvocationsData?.hasNoData ?? false,
       margin: 26,
     },
     realtime_message_count: {
       isLoading: isLoadingRealtimeMessagesData,
       data: realtimeMessagesData?.data ?? [],
-      showLastUpdated: realtimeMessagesData?.hasNoData === false,
+      hasNoData: realtimeMessagesData?.hasNoData ?? false,
       margin: 38,
     },
     realtime_peak_connection: {
       isLoading: isLoadingRealtimeConnectionsData,
       data: realtimeConnectionsData?.data ?? [],
-      showLastUpdated: realtimeConnectionsData?.hasNoData === false,
+      hasNoData: realtimeConnectionsData?.hasNoData ?? false,
       margin: 0,
     },
   }
@@ -147,7 +150,7 @@ const Activity = ({ projectRef }: ActivityProps) => {
           (x: any) => x.loopId > 0 && x[attribute.attribute] === 0
         )
         const lastKnownValue =
-          lastZeroValue !== undefined
+          lastZeroValue !== undefined && !chartMeta[attribute.key]?.hasNoData
             ? dayjs(lastZeroValue.period_start)
                 .subtract(1, 'day')
                 .format('DD MMM YYYY, HH:mma (ZZ)')
@@ -240,11 +243,6 @@ const Activity = ({ projectRef }: ActivityProps) => {
                       {paragraph}
                     </p>
                   ))}
-                  {lastKnownValue !== undefined && chartMeta[attribute.key].showLastUpdated && (
-                    <span className="text-sm text-scale-1000">
-                      Last updated at: {lastKnownValue}
-                    </span>
-                  )}
                 </div>
                 {chartMeta[attribute.key].isLoading ? (
                   <div className="space-y-2">

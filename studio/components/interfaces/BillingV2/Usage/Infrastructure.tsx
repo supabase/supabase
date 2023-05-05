@@ -1,4 +1,5 @@
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { DataPoint } from 'data/analytics/constants'
 import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
 import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
 import dayjs from 'dayjs'
@@ -62,7 +63,7 @@ const Infrastructure = ({ projectRef }: InfrastructureProps) => {
     ] ?? 100
   )
 
-  const chartMeta: any = {
+  const chartMeta: { [key: string]: { data: DataPoint[]; isLoading: boolean } } = {
     cpu_usage: {
       isLoading: isLoadingCpuUsageData,
       data: cpuUsageData?.data ?? [],
@@ -182,9 +183,6 @@ const Infrastructure = ({ projectRef }: InfrastructureProps) => {
                   {paragraph}
                 </p>
               ))}
-              {lastKnownValue !== undefined && (
-                <span className="text-sm text-scale-1000">Last updated at: {lastKnownValue}</span>
-              )}
             </div>
             {chartMeta[attribute.key].isLoading ? (
               <div className="space-y-2">
