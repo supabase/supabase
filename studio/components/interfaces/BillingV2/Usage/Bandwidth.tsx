@@ -97,9 +97,7 @@ const Bandwidth = ({ projectRef }: BandwidthProps) => {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
-                  <p className="text-sm">
-                    {attribute.name} {subscription?.tier.key.toLowerCase()} quota usage
-                  </p>
+                  <p className="text-sm">{attribute.name} quota usage</p>
                   {usageRatio >= 1 ? (
                     <div className="flex items-center space-x-2 min-w-[115px]">
                       <IconAlertTriangle size={14} strokeWidth={2} className={exceededLimitStyle} />
