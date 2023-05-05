@@ -104,7 +104,7 @@ function CustomerStoriesPage(props: any) {
               >
                 <h1 className="text-scale-1200 mb-3 text-3xl">Customer stories</h1>
                 <h2 className="text-scale-1100 text-xl">
-                  Discover how Supabase is being used around the world to quickly create outstanding
+                  Discover case studies on how Supabase is being used around the world to quickly create outstanding
                   products and set new industry standards.
                 </h2>
               </motion.div>
