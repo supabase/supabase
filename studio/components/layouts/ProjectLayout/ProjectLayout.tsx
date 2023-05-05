@@ -139,6 +139,8 @@ const ContentWrapper = observer(({ isLoading, children }: ContentWrapperProps) =
     '/project/[ref]/settings/general',
     '/project/[ref]/settings/database',
     '/project/[ref]/settings/billing/subscription',
+    '/project/[ref]/settings/billing/usage',
+    '/project/[ref]/settings/billing/invoices',
     '/project/[ref]/settings/billing/update',
     '/project/[ref]/settings/billing/update/free',
     '/project/[ref]/settings/billing/update/pro',
