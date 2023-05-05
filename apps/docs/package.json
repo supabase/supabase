@@ -47,6 +47,9 @@
     "@mdx-js/loader": "^1.6.22",
     "@mdx-js/react": "^1.6.22",
     "@next/mdx": "^12.0.4",
+    "@octokit/auth-app": "^4.0.9",
+    "@octokit/core": "^4.2.0",
+    "@octokit/plugin-paginate-graphql": "^2.0.1",
     "@radix-ui/react-accordion": "^1.0.1",
     "@supabase/auth-helpers-nextjs": "^0.5.6",
     "@supabase/auth-helpers-react": "^0.3.1",
@@ -94,6 +97,7 @@
     "ui": "*",
     "unist-builder": "^3.0.1",
     "unist-util-filter": "^4.0.1",
+    "uuid": "^9.0.0",
     "valtio": "^1.7.6"
   },
   "devDependencies": {

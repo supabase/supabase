@@ -162,7 +162,7 @@ const Wizard: NextPageWithLayout = () => {
     const data: Record<string, any> = {
       cloud_provider: PROVIDERS.AWS.id, // hardcoded for DB instances to be under AWS
       org_id: currentOrg?.id,
-      name: projectName,
+      name: projectName.trim(),
       db_pass: dbPass,
       db_region: dbRegion,
       db_pricing_tier_id: (PRICING_TIER_PRODUCT_IDS as any)[dbTier],

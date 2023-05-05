@@ -3,7 +3,7 @@ import Solutions from 'data/Solutions.json'
 import { NextSeo } from 'next-seo'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
@@ -15,7 +15,7 @@ import ComputePricingModal from '~/components/Pricing/ComputePricingModal'
 
 export default function IndexPage() {
   const router = useRouter()
-  const { basePath } = useRouter()
+  const { basePath, asPath } = useRouter()
   const { isDarkMode } = useTheme()
   const [showComputeModal, setShowComputeModal] = useState(false)
   const [activeMobileTier, setActiveMobileTier] = useState('Free')
@@ -23,6 +23,27 @@ export default function IndexPage() {
   const meta_title = 'Pricing & fees | Supabase'
   const meta_description =
     'Explore Supabase fees and pricing information. Find our competitive pricing tiers, with no hidden pricing. We have generous free tiers for those getting started, and Pay As You Go for those scaling up.'
+
+  // Ability to scroll into pricing sections like storage
+  useEffect(() => {
+    /**
+     * As we render a mobile and a desktop row for each item and just display based on screen size, we cannot navigate by simple id hash
+     * on both mobile and desktop. To handle both cases, we actually need to check screen size
+     */
+
+    const hash = asPath.split('#')[1]
+    if (!hash) return
+
+    let device = 'desktop'
+    if (window.matchMedia('screen and (max-width: 1024px)').matches) {
+      device = 'mobile'
+    }
+
+    const element = document.querySelector(`#${hash}-${device}`)
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }, [asPath])
 
   /**
    * @mildtomato same plan metadata is also in /studio dashboard
@@ -42,12 +63,14 @@ export default function IndexPage() {
       description: 'Perfect for passion projects & simple websites.',
       preface: 'Get started with:',
       features: [
+        'Social OAuth providers',
         'Up to 500MB database & 1GB file storage',
         'Up to 2GB bandwidth',
         'Up to 50MB file uploads',
-        'Social OAuth providers',
         '50,000 monthly active users',
         'Up to 500K Edge Function invocations',
+        '200 concurrent Realtime connections',
+        '2 million Realtime messages',
         '1-day log retention',
         'Community support',
       ],
@@ -66,16 +89,17 @@ export default function IndexPage() {
       priceMonthly: 25,
       description: 'For production applications with the option to scale.',
       features: [
+        'No project pausing',
         '8GB database & 100GB file storage',
         '50GB bandwidth',
         '5GB file uploads',
-        'Social OAuth providers',
         '100,000 monthly active users',
         '2M Edge Function invocations',
-        'Daily backups',
+        '500 concurrent Realtime connections',
+        '5 million Realtime messages',
         '7-day log retention',
-        'No project pausing',
         'Email support',
+        'Daily backups',
       ],
       scale: 'Additional fees apply for usage and storage beyond the limits above.',
       shutdown: '',
@@ -511,41 +535,49 @@ export default function IndexPage() {
                     category={pricing.database}
                     tier={'free'}
                     icon={Solutions['database'].icon}
+                    sectionId="database"
                   />
                   <PricingTableRowMobile
                     category={pricing.auth}
                     tier={'free'}
                     icon={Solutions['authentication'].icon}
+                    sectionId="auth"
                   />
                   <PricingTableRowMobile
                     category={pricing.storage}
                     tier={'free'}
                     icon={Solutions['storage'].icon}
+                    sectionId="storage"
                   />
                   <PricingTableRowMobile
                     category={pricing.realtime}
                     tier={'free'}
                     icon={Solutions['realtime'].icon}
+                    sectionId="realtime"
                   />
                   <PricingTableRowMobile
                     category={pricing['edge-functions']}
                     tier={'free'}
                     icon={Solutions['edge-functions'].icon}
+                    sectionId="edge-functions"
                   />
                   <PricingTableRowMobile
                     category={pricing.dashboard}
                     tier={'free'}
                     icon={pricing.dashboard.icon}
+                    sectionId="dashboard"
                   />
                   <PricingTableRowMobile
                     category={pricing.security}
                     tier={'free'}
                     icon={pricing.security.icon}
+                    sectionId="security"
                   />
                   <PricingTableRowMobile
                     category={pricing.support}
                     tier={'free'}
                     icon={pricing.support.icon}
+                    sectionId="support"
                   />
                 </>
               )}
@@ -766,32 +798,43 @@ export default function IndexPage() {
                   <PricingTableRowDesktop
                     category={pricing.database}
                     icon={Solutions['database'].icon}
+                    sectionId="database"
                   />
                   <PricingTableRowDesktop
                     category={pricing.auth}
                     icon={Solutions['authentication'].icon}
+                    sectionId="auth"
                   />
                   <PricingTableRowDesktop
                     category={pricing.storage}
                     icon={Solutions['storage'].icon}
+                    sectionId="storage"
                   />
                   <PricingTableRowDesktop
                     category={pricing.realtime}
                     icon={Solutions['realtime'].icon}
+                    sectionId="realtime"
                   />
                   <PricingTableRowDesktop
                     category={pricing['edge-functions']}
                     icon={Solutions['edge-functions'].icon}
+                    sectionId="edge-functions"
                   />
                   <PricingTableRowDesktop
                     category={pricing.dashboard}
                     icon={pricing.dashboard.icon}
+                    sectionId="dashboard"
                   />
                   <PricingTableRowDesktop
                     category={pricing.security}
                     icon={pricing.security.icon}
+                    sectionId="security"
                   />
-                  <PricingTableRowDesktop category={pricing.support} icon={pricing.support.icon} />
+                  <PricingTableRowDesktop
+                    category={pricing.support}
+                    icon={pricing.support.icon}
+                    sectionId="support"
+                  />
                 </tbody>
                 <tfoot>
                   <tr className="border-scale-200 dark:border-scale-600 border-t">

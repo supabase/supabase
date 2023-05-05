@@ -1,3 +1,4 @@
+import { GitHubDiscussionSource, fetchDiscussions } from './github-discussion'
 import { MarkdownSource } from './markdown'
 import {
   CliReferenceSource,
@@ -13,6 +14,7 @@ export type SearchSource =
   | OpenApiReferenceSource
   | ClientLibReferenceSource
   | CliReferenceSource
+  | GitHubDiscussionSource
 
 /**
  * Fetches all the sources we want to index for search
@@ -58,6 +60,14 @@ export async function fetchSources() {
     '../../spec/common-client-libs-sections.json'
   )
 
+  const swiftLibReferenceSource = new ClientLibReferenceSource(
+    'swift-lib',
+    '/reference/swift',
+    { title: 'Swift Reference' },
+    '../../spec/supabase_swift_v0.yml',
+    '../../spec/common-client-libs-sections.json'
+  )
+
   const cliReferenceSource = new CliReferenceSource(
     'cli',
     '/reference/cli',
@@ -71,13 +81,23 @@ export async function fetchSources() {
     .filter(({ path }) => !ignoredFiles.includes(path))
     .map((entry) => new MarkdownSource('guide', entry.path))
 
+  const githubDiscussionSources = (
+    await fetchDiscussions(
+      'supabase',
+      'supabase',
+      'DIC_kwDODMpXOc4CUvEr' // 'Troubleshooting' category
+    )
+  ).map((discussion) => new GitHubDiscussionSource('supabase/supabase', discussion))
+
   const sources: SearchSource[] = [
     openApiReferenceSource,
     jsLibReferenceSource,
     dartLibReferenceSource,
     pythonLibReferenceSource,
     cSharpLibReferenceSource,
+    swiftLibReferenceSource,
     cliReferenceSource,
+    ...githubDiscussionSources,
     ...guideSources,
   ]
 

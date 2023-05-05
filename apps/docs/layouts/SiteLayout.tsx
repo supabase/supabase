@@ -8,7 +8,6 @@ import { memo, useEffect } from 'react'
 import Footer from '~/components/Navigation/Footer'
 import { menuState, useMenuLevelId, useMenuMobileOpen } from '~/hooks/useMenuState'
 import Head from 'next/head'
-import { Announcement, AnnouncementCountdown } from 'ui'
 
 const levelsData = {
   home: {
@@ -91,7 +90,7 @@ const levelsData = {
     icon: '/docs/img/icons/menu/reference-python',
     name: 'Python Reference v2.0',
   },
-  reference_swift_v1: {
+  reference_swift_v0: {
     icon: '/docs/img/icons/menu/reference-swift',
     name: 'Swift Reference v1.0',
   },
@@ -325,11 +324,6 @@ const SiteLayout = ({ children }) => {
         <title>Supabase Docs</title>
       </Head>
       <main>
-        <div>
-          <Announcement>
-            <AnnouncementCountdown />
-          </Announcement>
-        </div>
         <div className="flex flex-row h-screen">
           <NavContainer />
           <Container>
