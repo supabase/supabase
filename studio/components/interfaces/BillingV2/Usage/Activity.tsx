@@ -12,7 +12,7 @@ import dayjs from 'dayjs'
 import Link from 'next/link'
 import { Button, IconAlertTriangle } from 'ui'
 import { USAGE_APPROACHING_THRESHOLD } from '../Billing.constants'
-import BarChart from './BarChart'
+import UsageBarChart from './UsageBarChart'
 import SectionContent from './SectionContent'
 import SectionHeader from './SectionHeader'
 import { USAGE_CATEGORIES } from './Usage.constants'
@@ -33,6 +33,8 @@ const Activity = ({ projectRef }: ActivityProps) => {
 
   const upgradeUrl = getUpgradeUrl(projectRef, subscription)
   const isFreeTier = subscription?.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.FREE
+  const isProTier = subscription?.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.PRO
+  const exceededLimitStyle = isFreeTier || isProTier ? 'text-red-900' : 'text-amber-900'
 
   const { data: mauData, isLoading: isLoadingMauData } = useDailyStatsQuery({
     projectRef,
@@ -165,13 +167,13 @@ const Activity = ({ projectRef }: ActivityProps) => {
                   </p>
                   {usageRatio >= 1 ? (
                     <div className="flex items-center space-x-2 min-w-[115px]">
-                      <IconAlertTriangle size={14} strokeWidth={2} className="text-red-900" />
-                      <p className="text-sm text-red-900">Exceeded limit</p>
+                      <IconAlertTriangle size={14} strokeWidth={2} className={exceededLimitStyle} />
+                      <p className={`text-sm ${exceededLimitStyle}`}>Exceeded limit</p>
                     </div>
                   ) : usageRatio >= USAGE_APPROACHING_THRESHOLD ? (
                     <div className="flex items-center space-x-2 min-w-[115px]">
                       <IconAlertTriangle size={14} strokeWidth={2} className="text-amber-900" />
-                      <p className="text-sm text-red-900">Approaching limit</p>
+                      <p className="text-sm text-amber-900">Approaching limit</p>
                     </div>
                   ) : null}
                 </div>
@@ -245,7 +247,7 @@ const Activity = ({ projectRef }: ActivityProps) => {
                     <ShimmeringLoader className="w-1/2" />
                   </div>
                 ) : (
-                  <BarChart
+                  <UsageBarChart
                     hasQuota
                     name={attribute.name}
                     unit={attribute.unit}
@@ -254,6 +256,7 @@ const Activity = ({ projectRef }: ActivityProps) => {
                     yLimit={usageMeta?.limit ?? 0}
                     yLeftMargin={chartMeta[attribute.key].margin}
                     yFormatter={(value) => value.toLocaleString()}
+                    quotaWarningType={isFreeTier || isProTier ? 'danger' : 'warning'}
                   />
                 )}
               </>

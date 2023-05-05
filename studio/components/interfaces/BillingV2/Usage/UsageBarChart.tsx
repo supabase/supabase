@@ -16,7 +16,7 @@ import dayjs from 'dayjs'
 // [Joshen] This BarChart is specifically for usage, hence not a reusable component, and not
 // replacing the existing BarChart in ui/Charts
 
-export interface BarChartProps {
+export interface UsageBarChartProps {
   data: DataPoint[]
   name: string // Used within the tooltip
   attribute: string
@@ -25,9 +25,10 @@ export interface BarChartProps {
   yLimit?: number
   yLeftMargin?: number
   yFormatter?: (value: number | string) => string
+  quotaWarningType?: 'warning' | 'danger'
 }
 
-const BarChart = ({
+const UsageBarChart = ({
   data,
   name,
   attribute,
@@ -36,9 +37,11 @@ const BarChart = ({
   yLimit,
   yLeftMargin = 10,
   yFormatter,
-}: BarChartProps) => {
+  quotaWarningType = 'warning',
+}: UsageBarChartProps) => {
   const yMin = 0 // We can consider passing this as a prop if there's a use case in the future
   const yMax = (yLimit ?? 0) * Y_DOMAIN_CEILING_MULTIPLIER
+  const quotaWarningClass = quotaWarningType === 'warning' ? 'fill-amber-900' : 'fill-red-900'
 
   const yDomain = [yMin, yLimit ?? 0]
   const ticks =
@@ -101,7 +104,7 @@ const BarChart = ({
                   key={`cell-${attribute}-${idx}`}
                   className={
                     yLimit !== undefined && Number(entry[attribute]) >= yLimit
-                      ? 'fill-amber-900'
+                      ? quotaWarningClass
                       : 'fill-scale-1200'
                   }
                 />
@@ -131,4 +134,4 @@ const BarChart = ({
   )
 }
 
-export default BarChart
+export default UsageBarChart
