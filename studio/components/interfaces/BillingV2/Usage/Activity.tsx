@@ -94,40 +94,40 @@ const Activity = ({ projectRef }: ActivityProps) => {
     [key: string]: { data: DataPoint[]; margin: number; isLoading: boolean; hasNoData: boolean }
   } = {
     monthly_active_users: {
-      isLoading: isLoadingMauData,
       data: mauData?.data ?? [],
-      hasNoData: mauData?.hasNoData ?? false,
       margin: 18,
+      isLoading: isLoadingMauData,
+      hasNoData: mauData?.hasNoData ?? false,
     },
     monthly_active_sso_users: {
-      isLoading: isLoadingMauSSOData,
       data: mauSSOData?.data ?? [],
-      hasNoData: mauSSOData?.hasNoData ?? false,
       margin: 20,
+      isLoading: isLoadingMauSSOData,
+      hasNoData: mauSSOData?.hasNoData ?? false,
     },
     storage_image_render_count: {
-      isLoading: isLoadingAssetTransformationsData,
       data: assetTransformationsData?.data ?? [],
-      hasNoData: assetTransformationsData?.hasNoData ?? false,
       margin: 0,
+      isLoading: isLoadingMauSSOData,
+      hasNoData: assetTransformationsData?.hasNoData ?? false,
     },
     func_invocations: {
-      isLoading: isLoadingFuncInvocationsData,
       data: funcInvocationsData?.data ?? [],
-      hasNoData: funcInvocationsData?.hasNoData ?? false,
       margin: 26,
+      isLoading: isLoadingFuncInvocationsData,
+      hasNoData: funcInvocationsData?.hasNoData ?? false,
     },
     realtime_message_count: {
-      isLoading: isLoadingRealtimeMessagesData,
       data: realtimeMessagesData?.data ?? [],
-      hasNoData: realtimeMessagesData?.hasNoData ?? false,
       margin: 38,
+      isLoading: isLoadingRealtimeMessagesData,
+      hasNoData: realtimeMessagesData?.hasNoData ?? false,
     },
     realtime_peak_connection: {
-      isLoading: isLoadingRealtimeConnectionsData,
       data: realtimeConnectionsData?.data ?? [],
-      hasNoData: realtimeConnectionsData?.hasNoData ?? false,
       margin: 0,
+      isLoading: isLoadingRealtimeConnectionsData,
+      hasNoData: realtimeConnectionsData?.hasNoData ?? false,
     },
   }
 
