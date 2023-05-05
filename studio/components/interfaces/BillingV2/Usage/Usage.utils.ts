@@ -42,5 +42,7 @@ export const getUpgradeUrl = (projectRef: string, subscription?: StripeSubscript
     ? `/project/${projectRef}/settings/billing/update/enterprise`
     : subscription?.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.TEAM
     ? `/project/${projectRef}/settings/billing/update/team`
+    : subscription?.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.FREE
+    ? `/project/${projectRef}/settings/billing/update`
     : `/project/${projectRef}/settings/billing/update/pro`
 }

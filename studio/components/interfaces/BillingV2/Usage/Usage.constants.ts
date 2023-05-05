@@ -182,3 +182,49 @@ export const USAGE_CATEGORIES: {
     ],
   },
 ]
+
+// [Joshen] Ideally live in common package for www as well
+export const COMPUTE_INSTANCE_SPECS: {
+  [key: string]: { maxBandwidth: number; baseBandwidth: number }
+} = {
+  addon_instance_micro: {
+    maxBandwidth: 2606,
+    baseBandwidth: 87,
+  },
+  addon_instance_small: {
+    maxBandwidth: 2606,
+    baseBandwidth: 174,
+  },
+  addon_instance_medium: {
+    maxBandwidth: 2606,
+    baseBandwidth: 347,
+  },
+  addon_instance_large: {
+    maxBandwidth: 4750,
+    baseBandwidth: 630,
+  },
+  addon_instance_xlarge: {
+    maxBandwidth: 4750,
+    baseBandwidth: 1188,
+  },
+  addon_instance_xxlarge: {
+    maxBandwidth: 4750,
+    baseBandwidth: 2375,
+  },
+  addon_instance_4xlarge: {
+    maxBandwidth: 4750,
+    baseBandwidth: 4750,
+  },
+  addon_instance_8xlarge: {
+    maxBandwidth: 9500,
+    baseBandwidth: 9500,
+  },
+  addon_instance_12xlarge: {
+    maxBandwidth: 14250,
+    baseBandwidth: 14250,
+  },
+  addon_instance_16xlarge: {
+    maxBandwidth: 19000,
+    baseBandwidth: 19000,
+  },
+}
