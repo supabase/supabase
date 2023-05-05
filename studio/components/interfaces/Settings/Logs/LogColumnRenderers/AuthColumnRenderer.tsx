@@ -9,7 +9,7 @@ import {
 export default [
   {
     formatter: (data: {
-      row: PreviewLogData & { level: string; msg: string; status: number; path: string }
+      row: PreviewLogData & { level: string; msg: string | null; status: number; path: string }
     }) => {
       return (
         <RowLayout>
@@ -18,7 +18,8 @@ export default [
           <TextFormatter
             className="w-full"
             value={`${data.row.path ? data.row.path + ' | ' : ''}${
-              data.row.msg.trim() || data.row.event_message
+              // not all log events have metadata.msg
+              data.row.msg?.trim() || data.row.event_message
             }`}
           />
         </RowLayout>
