@@ -12,6 +12,7 @@ import Infrastructure from './Infrastructure'
 import SizeAndCounts from './SizeAndCounts'
 import { USAGE_CATEGORIES, USAGE_STATUS } from './Usage.constants'
 import { getUsageStatus } from './Usage.utils'
+import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
 
 const Usage = () => {
   const { ref } = useParams()
@@ -29,6 +30,22 @@ const Usage = () => {
   const { data: subscription, isLoading: isLoadingSubscription } = useProjectSubscriptionQuery({
     projectRef: selectedProjectRef,
   })
+
+  const { current_period_start, current_period_end } = subscription?.billing ?? {}
+  const startDate = new Date((current_period_start ?? 0) * 1000).toISOString()
+  const endDate = new Date((current_period_end ?? 0) * 1000).toISOString()
+  const { data: ioBudgetData } = useInfraMonitoringQuery({
+    projectRef: selectedProjectRef,
+    attribute: 'disk_io_budget',
+    interval: '1d',
+    startDate,
+    endDate,
+  })
+  const currentDayIoBudget = Number(
+    ioBudgetData?.data.find((x) => x.periodStartFormatted === dayjs().format('DD MMM'))?.[
+      'disk_io_budget'
+    ] ?? 100
+  )
 
   const billingCycleStart = dayjs.unix(subscription?.billing?.current_period_start ?? 0).utc()
   const billingCycleEnd = dayjs.unix(subscription?.billing?.current_period_end ?? 0).utc()
@@ -104,7 +121,14 @@ const Usage = () => {
 
           <div className="flex items-center space-x-6 !mt-2">
             {USAGE_CATEGORIES.map((category) => {
-              const status = getUsageStatus(category.attributes, usage)
+              const infraStatus =
+                currentDayIoBudget <= 0
+                  ? USAGE_STATUS.EXCEEDED
+                  : currentDayIoBudget <= 20
+                  ? USAGE_STATUS.APPROACHING
+                  : USAGE_STATUS.NORMAL
+              const status =
+                category.key === 'infra' ? infraStatus : getUsageStatus(category.attributes, usage)
 
               return (
                 <div
