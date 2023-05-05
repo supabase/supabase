@@ -3,7 +3,7 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { Listbox, IconLoader, Button, IconPlus, IconAlertCircle, IconCreditCard } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useStore } from 'hooks'
+import { checkPermissions, useFlag, useStore } from 'hooks'
 import { BASE_PATH, PRICING_TIER_PRODUCT_IDS, STRIPE_PRODUCT_IDS } from 'lib/constants'
 import { SubscriptionPreview } from '../Billing.types'
 import { getProductPrice, validateSubscriptionUpdatePayload } from '../Billing.utils'
@@ -14,6 +14,7 @@ import { getPITRDays } from './PaymentSummaryPanel.utils'
 import ConfirmPaymentModal from './ConfirmPaymentModal'
 import { StripeSubscription } from '../Subscription/Subscription.types'
 import { useIsProjectActive } from 'components/layouts/ProjectLayout/ProjectContext'
+import clsx from 'clsx'
 
 // [Joshen] PITR stuff can be undefined for now until we officially launch PITR self serve
 
@@ -92,6 +93,7 @@ const PaymentSummaryPanel = ({
   )
 
   const [showConfirmModal, setShowConfirmModal] = useState(false)
+  const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
 
   const selectedPlanCost =
     selectedPlan !== undefined
@@ -178,7 +180,11 @@ const PaymentSummaryPanel = ({
   return (
     <>
       <div
-        className="w-full px-6 py-10 space-y-8 overflow-y-auto border-l bg-panel-body-light dark:bg-panel-body-dark lg:px-12"
+        className={clsx(
+          'bg-panel-body-light dark:bg-panel-body-dark overflow-y-auto border-l',
+          'px-6 lg:px-12 py-10 space-y-8',
+          'min-w-[450px] max-w-[450px] 2xl:min-w-[630px] 2xl:max-w-[630px]'
+        )}
         style={{ height: 'calc(100vh - 57px)' }}
       >
         <p>Payment Summary</p>
@@ -447,6 +453,7 @@ const PaymentSummaryPanel = ({
                 loading={isSubmitting}
                 disabled={
                   !isActive ||
+                  projectUpdateDisabled ||
                   isSubmitting ||
                   isLoadingPaymentMethods ||
                   !hasChangesToPlan ||
@@ -474,6 +481,8 @@ const PaymentSummaryPanel = ({
                         ? 'Please select a payment method'
                         : !isActive
                         ? 'Unable to update subscription as project is not active'
+                        : projectUpdateDisabled
+                        ? 'Subscription changes are currently disabled. Our engineers are working on a fix.'
                         : ''}
                     </span>
                   </div>

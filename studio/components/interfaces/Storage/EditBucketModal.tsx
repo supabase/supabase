@@ -105,6 +105,9 @@ const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => 
           isSubmitting: boolean
           resetForm: any
         }) => {
+          // [Alaister] although this "technically" is breaking the rules of React hooks
+          // it won't error because the hooks are always rendered in the same order
+          // eslint-disable-next-line react-hooks/rules-of-hooks
           useEffect(() => {
             if (visible && bucket !== undefined) {
               const { value: fileSizeLimit } = convertFromBytes(bucket.file_size_limit ?? 0)

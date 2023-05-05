@@ -11,6 +11,9 @@ import { NEW_REPORT_SKELETON } from './Reports.constants'
  */
 export const createReport = async ({ router }: any) => {
   const { ref } = router.query
+  // [Alaister] despite it's name, useProjectContentStore is not a real react hook
+  // so we can safely disable the eslint rule here
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const contentStore = useProjectContentStore(ref)
   const { data: newReport, error } = await contentStore.create(NEW_REPORT_SKELETON)
 
@@ -30,6 +33,9 @@ export const createReport = async ({ router }: any) => {
  */
 export const deleteReport = async ({ router, id }: any) => {
   const { ref } = router.query
+  // [Alaister] despite it's name, useProjectContentStore is not a real react hook
+  // so we can safely disable the eslint rule here
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const contentStore = useProjectContentStore(ref)
   const { data: delReport, error } = await contentStore.del(id)
 

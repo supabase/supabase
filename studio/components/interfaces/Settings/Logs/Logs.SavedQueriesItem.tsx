@@ -4,6 +4,7 @@ import { Button, IconChevronRight, IconMaximize2, IconPlay } from 'ui'
 import Table from 'components/to-be-cleaned/Table'
 import { useRouter } from 'next/router'
 import SqlSnippetCode from './Logs.SqlSnippetCode'
+import { timestampLocalFormatter, TimestampLocalFormatter } from './LogsFormatters'
 
 interface Props {
   item: any
@@ -33,12 +34,12 @@ const SavedQueriesItem: FC<Props> = ({ item }: Props) => {
         </Table.td>
         <Table.td className="">
           <span className="text-scale-1100">
-            {dayjs(item.inserted_at).format('DD MMM, YYYY HH:mm')}
+            {timestampLocalFormatter(item.inserted_at)}
           </span>
         </Table.td>
         <Table.td className="">
           <span className="text-scale-1100">
-            {dayjs(item.updated_at).format('DD MMM, YYYY HH:mm')}
+            {timestampLocalFormatter(item.updated_at)}
           </span>
         </Table.td>
         <Table.td className=" text-right">

@@ -3672,7 +3672,7 @@
           "sources": [
             {
               "fileName": "src/GoTrueClient.ts",
-              "line": 400,
+              "line": 410,
               "character": 8
             }
           ],
@@ -3724,7 +3724,7 @@
           "sources": [
             {
               "fileName": "src/GoTrueClient.ts",
-              "line": 613,
+              "line": 625,
               "character": 8
             }
           ],
@@ -3762,7 +3762,7 @@
                               "sources": [
                                 {
                                   "fileName": "src/GoTrueClient.ts",
-                                  "line": 615,
+                                  "line": 627,
                                   "character": 8
                                 }
                               ],
@@ -3784,7 +3784,7 @@
                                       "sources": [
                                         {
                                           "fileName": "src/GoTrueClient.ts",
-                                          "line": 616,
+                                          "line": 628,
                                           "character": 10
                                         }
                                       ],
@@ -3814,7 +3814,7 @@
                               "sources": [
                                 {
                                   "fileName": "src/GoTrueClient.ts",
-                                  "line": 618,
+                                  "line": 630,
                                   "character": 8
                                 }
                               ],
@@ -3851,7 +3851,7 @@
                               "sources": [
                                 {
                                   "fileName": "src/GoTrueClient.ts",
-                                  "line": 621,
+                                  "line": 633,
                                   "character": 8
                                 }
                               ],
@@ -3873,7 +3873,7 @@
                                       "sources": [
                                         {
                                           "fileName": "src/GoTrueClient.ts",
-                                          "line": 622,
+                                          "line": 634,
                                           "character": 10
                                         }
                                       ],
@@ -3902,7 +3902,7 @@
                               "sources": [
                                 {
                                   "fileName": "src/GoTrueClient.ts",
-                                  "line": 624,
+                                  "line": 636,
                                   "character": 8
                                 }
                               ],
@@ -3940,7 +3940,7 @@
                               "sources": [
                                 {
                                   "fileName": "src/GoTrueClient.ts",
-                                  "line": 627,
+                                  "line": 639,
                                   "character": 8
                                 }
                               ],
@@ -3962,7 +3962,7 @@
                                       "sources": [
                                         {
                                           "fileName": "src/GoTrueClient.ts",
-                                          "line": 628,
+                                          "line": 640,
                                           "character": 10
                                         }
                                       ],
@@ -3991,7 +3991,7 @@
                               "sources": [
                                 {
                                   "fileName": "src/GoTrueClient.ts",
-                                  "line": 630,
+                                  "line": 642,
                                   "character": 8
                                 }
                               ],
@@ -4029,7 +4029,7 @@
           "sources": [
             {
               "fileName": "src/GoTrueClient.ts",
-              "line": 676,
+              "line": 688,
               "character": 8
             }
           ],
@@ -4125,7 +4125,7 @@
           "sources": [
             {
               "fileName": "src/GoTrueClient.ts",
-              "line": 987,
+              "line": 1000,
               "character": 2
             }
           ],
@@ -4227,7 +4227,7 @@
                       "sources": [
                         {
                           "fileName": "src/GoTrueClient.ts",
-                          "line": 988,
+                          "line": 1001,
                           "character": 4
                         }
                       ],
@@ -4249,7 +4249,7 @@
                               "sources": [
                                 {
                                   "fileName": "src/GoTrueClient.ts",
-                                  "line": 988,
+                                  "line": 1001,
                                   "character": 12
                                 }
                               ],
@@ -4292,7 +4292,7 @@
           "sources": [
             {
               "fileName": "src/GoTrueClient.ts",
-              "line": 822,
+              "line": 834,
               "character": 8
             }
           ],
@@ -4336,7 +4336,7 @@
                           "sources": [
                             {
                               "fileName": "src/GoTrueClient.ts",
-                              "line": 822,
+                              "line": 834,
                               "character": 42
                             }
                           ],
@@ -4382,7 +4382,7 @@
           "sources": [
             {
               "fileName": "src/GoTrueClient.ts",
-              "line": 1027,
+              "line": 1040,
               "character": 8
             }
           ],
@@ -4440,7 +4440,7 @@
                           "sources": [
                             {
                               "fileName": "src/GoTrueClient.ts",
-                              "line": 1031,
+                              "line": 1044,
                               "character": 6
                             }
                           ],
@@ -4463,7 +4463,7 @@
                           "sources": [
                             {
                               "fileName": "src/GoTrueClient.ts",
-                              "line": 1030,
+                              "line": 1043,
                               "character": 6
                             }
                           ],
@@ -4509,7 +4509,7 @@
                               "sources": [
                                 {
                                   "fileName": "src/GoTrueClient.ts",
-                                  "line": 1035,
+                                  "line": 1048,
                                   "character": 8
                                 }
                               ],
@@ -4533,7 +4533,7 @@
                               "sources": [
                                 {
                                   "fileName": "src/GoTrueClient.ts",
-                                  "line": 1036,
+                                  "line": 1049,
                                   "character": 8
                                 }
                               ],
@@ -4570,7 +4570,7 @@
                               "sources": [
                                 {
                                   "fileName": "src/GoTrueClient.ts",
-                                  "line": 1038,
+                                  "line": 1051,
                                   "character": 8
                                 }
                               ],
@@ -4588,7 +4588,7 @@
                               "sources": [
                                 {
                                   "fileName": "src/GoTrueClient.ts",
-                                  "line": 1038,
+                                  "line": 1051,
                                   "character": 20
                                 }
                               ],
@@ -4627,7 +4627,7 @@
           "sources": [
             {
               "fileName": "src/GoTrueClient.ts",
-              "line": 758,
+              "line": 770,
               "character": 8
             }
           ],
@@ -4669,7 +4669,7 @@
                           "sources": [
                             {
                               "fileName": "src/GoTrueClient.ts",
-                              "line": 759,
+                              "line": 771,
                               "character": 4
                             }
                           ],
@@ -4687,7 +4687,7 @@
                           "sources": [
                             {
                               "fileName": "src/GoTrueClient.ts",
-                              "line": 760,
+                              "line": 772,
                               "character": 4
                             }
                           ],
@@ -4733,7 +4733,7 @@
           "sources": [
             {
               "fileName": "src/GoTrueClient.ts",
-              "line": 430,
+              "line": 440,
               "character": 8
             }
           ],
@@ -4792,7 +4792,7 @@
           "sources": [
             {
               "fileName": "src/GoTrueClient.ts",
-              "line": 386,
+              "line": 396,
               "character": 8
             }
           ],
@@ -4845,7 +4845,7 @@
           "sources": [
             {
               "fileName": "src/GoTrueClient.ts",
-              "line": 478,
+              "line": 488,
               "character": 8
             }
           ],
@@ -4899,7 +4899,7 @@
           "sources": [
             {
               "fileName": "src/GoTrueClient.ts",
-              "line": 336,
+              "line": 346,
               "character": 8
             }
           ],
@@ -4953,7 +4953,7 @@
           "sources": [
             {
               "fileName": "src/GoTrueClient.ts",
-              "line": 584,
+              "line": 596,
               "character": 8
             }
           ],
@@ -5007,7 +5007,7 @@
           "sources": [
             {
               "fileName": "src/GoTrueClient.ts",
-              "line": 962,
+              "line": 974,
               "character": 8
             }
           ],
@@ -5043,7 +5043,7 @@
                           "sources": [
                             {
                               "fileName": "src/GoTrueClient.ts",
-                              "line": 962,
+                              "line": 974,
                               "character": 29
                             }
                           ],
@@ -5144,7 +5144,7 @@
           "sources": [
             {
               "fileName": "src/GoTrueClient.ts",
-              "line": 1325,
+              "line": 1346,
               "character": 8
             }
           ],
@@ -5157,7 +5157,7 @@
               "flags": {},
               "comment": {
                 "shortText": "Starts an auto-refresh process in the background. The session is checked\nevery few seconds. Close to the time of expiration a process is started to\nrefresh the session. If refreshing fails it will be retried for as long as\nnecessary.",
-                "text": "If you set the {@link GoTrueClientOptions#autoRefreshToken} you don't need\nto call this function, it will be called for you.\n\nOn browsers the refresh process works only when the tab/window is in the\nforeground to conserve resources as well as prevent race conditions and\nflooding auth with requests. If you call this method any managed\nvisibility change callback will be removed and you must manage visibility\nchanges on your own.\n\nOn non-browser platforms the refresh process works *continuously* in the\nbackground, which may not be desirable. You should hook into your\nplatform's foreground indication mechanism and call these methods\nappropriately to conserve resources.\n\n{@see #stopAutoRefresh}\n"
+                "text": "If you set the {@link GoTrueClientOptions#autoRefreshToken} you don't need\nto call this function, it will be called for you.\n\nOn browsers the refresh process works only when the tab/window is in the\nforeground to conserve resources as well as prevent race conditions and\nflooding auth with requests. If you call this method any managed\nvisibility change callback will be removed and you must manage visibility\nchanges on your own.\n\nOn non-browser platforms the refresh process works *continuously* in the\nbackground, which may not be desireable. You should hook into your\nplatform's foreground indication mechanism and call these methods\nappropriately to conserve resources.\n\n{@see #stopAutoRefresh}\n"
               },
               "type": {
                 "type": "reference",
@@ -5183,7 +5183,7 @@
           "sources": [
             {
               "fileName": "src/GoTrueClient.ts",
-              "line": 1338,
+              "line": 1359,
               "character": 8
             }
           ],
@@ -5222,7 +5222,7 @@
           "sources": [
             {
               "fileName": "src/GoTrueClient.ts",
-              "line": 705,
+              "line": 717,
               "character": 8
             }
           ],
@@ -5275,7 +5275,7 @@
                           "sources": [
                             {
                               "fileName": "src/GoTrueClient.ts",
-                              "line": 708,
+                              "line": 720,
                               "character": 6
                             }
                           ],
@@ -5322,7 +5322,7 @@
           "sources": [
             {
               "fileName": "src/GoTrueClient.ts",
-              "line": 531,
+              "line": 543,
               "character": 8
             }
           ],
