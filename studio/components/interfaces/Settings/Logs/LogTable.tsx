@@ -161,14 +161,21 @@ const LogTable = ({
     }
   }, [stringData])
 
-  const RowRenderer = (props: RowRendererProps<any>) => {
-    return (
+  const RowRenderer = useMemo(() => {
+    return (props: RowRendererProps<any>) => (
       <Row
         {...props}
-        className="font-mono tracking-tight cursor-pointer !bg-scale-200 hover:!bg-scale-300"
+        isRowSelected={false}
+        selectedCellIdx={undefined}
+        className={[
+          'font-mono tracking-tight cursor-pointer',
+          props.selectedCellIdx !== undefined
+            ? '!bg-scale-800'
+            : '!bg-scale-200 hover:!bg-scale-300',
+        ].join(' ')}
       />
     )
-  }
+  }, [])
 
   const LogsExplorerTableHeader = () => (
     <div className="flex w-full items-center justify-between rounded-tl rounded-tr border-t border-l border-r bg-scale-100 px-5 py-2 dark:bg-scale-300">
@@ -268,10 +275,11 @@ const LogTable = ({
           `}
             rowHeight={40}
             headerRowHeight={queryType ? 0 : 28}
-            onSelectedCellChange={({ idx, rowIdx }) => {
+            onSelectedCellChange={({ rowIdx }) => {
               if (!hasId) return
               setFocusedLog(data[rowIdx] as LogData)
             }}
+            selectedRows={new Set([])}
             noRowsFallback={
               !isLoading ? (
                 <div className="mx-auto flex h-full w-full items-center justify-center space-y-12 py-4 transition-all delay-200 duration-500">
@@ -286,11 +294,11 @@ const LogTable = ({
             }
             rows={logDataRows}
             rowKeyGetter={(r) => {
-              if (!hasId) return Object.keys(r)[0]
+              if (!hasId) return JSON.stringify(r)
               const row = r as LogData
               return row.id
             }}
-            onRowClick={(r) => setFocusedLog(r)}
+            onRowClick={setFocusedLog}
             rowRenderer={RowRenderer}
           />
           {logDataRows.length > 0 ? (
