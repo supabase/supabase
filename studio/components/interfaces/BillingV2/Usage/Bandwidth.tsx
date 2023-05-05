@@ -120,35 +120,41 @@ const Bandwidth = ({ projectRef }: BandwidthProps) => {
                   </Link>
                 )}
               </div>
-              <SparkBar
-                type="horizontal"
-                barClass={clsx(
-                  usageRatio >= 1
-                    ? 'bg-red-900'
-                    : usageRatio >= USAGE_APPROACHING_THRESHOLD
-                    ? 'bg-amber-900'
-                    : 'bg-scale-1100'
-                )}
-                value={usageMeta?.usage ?? 0}
-                max={usageMeta?.limit ?? 0}
-              />
+              {usageMeta?.limit > 0 && (
+                <SparkBar
+                  type="horizontal"
+                  barClass={clsx(
+                    usageRatio >= 1
+                      ? 'bg-red-900'
+                      : usageRatio >= USAGE_APPROACHING_THRESHOLD
+                      ? 'bg-amber-900'
+                      : 'bg-scale-1100'
+                  )}
+                  value={usageMeta?.usage ?? 0}
+                  max={usageMeta?.limit ?? 0}
+                />
+              )}
               <div>
                 <div className="flex items-center justify-between border-b py-1">
                   <p className="text-xs text-scale-1000">
                     Included in {subscription?.tier.name.toLowerCase()}
                   </p>
-                  <p className="text-xs">{formatBytes(usageMeta?.limit ?? 0)}</p>
+                  <p className="text-xs">
+                    {usageMeta?.limit === 0 ? 'Unlimited' : formatBytes(usageMeta?.limit ?? 0)}
+                  </p>
                 </div>
-                <div className="flex items-center justify-between border-b py-1">
+                <div className="flex items-center justify-between py-1">
                   <p className="text-xs text-scale-1000">Used</p>
                   <p className="text-xs">{formatBytes(usageMeta?.usage ?? 0)}</p>
                 </div>
-                <div className="flex items-center justify-between py-1">
-                  <p className="text-xs text-scale-1000">Extra volume used this month</p>
-                  <p className="text-xs">
-                    {usageExcess < 0 ? formatBytes(0) : formatBytes(usageExcess)}
-                  </p>
-                </div>
+                {usageMeta?.limit > 0 && (
+                  <div className="flex items-center justify-between border-t py-1">
+                    <p className="text-xs text-scale-1000">Extra volume used this month</p>
+                    <p className="text-xs">
+                      {usageExcess < 0 ? formatBytes(0) : formatBytes(usageExcess)}
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
             <div className="space-y-1">
@@ -170,7 +176,7 @@ const Bandwidth = ({ projectRef }: BandwidthProps) => {
               </div>
             ) : (
               <UsageBarChart
-                hasQuota
+                hasQuota={usageMeta?.limit > 0}
                 name={attribute.name}
                 unit={attribute.unit}
                 attribute={attribute.attribute}

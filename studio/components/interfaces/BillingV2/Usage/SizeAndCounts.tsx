@@ -135,18 +135,20 @@ const SizeAndCounts = ({ projectRef }: SizeAndCountsProps) => {
                   </Link>
                 )}
               </div>
-              <SparkBar
-                type="horizontal"
-                barClass={clsx(
-                  usageRatio >= 1
-                    ? 'bg-red-900'
-                    : usageRatio >= USAGE_APPROACHING_THRESHOLD
-                    ? 'bg-amber-900'
-                    : 'bg-scale-1100'
-                )}
-                value={usageMeta?.usage ?? 0}
-                max={usageMeta?.limit ?? 0}
-              />
+              {usageMeta.limit > 0 && (
+                <SparkBar
+                  type="horizontal"
+                  barClass={clsx(
+                    usageRatio >= 1
+                      ? 'bg-red-900'
+                      : usageRatio >= USAGE_APPROACHING_THRESHOLD
+                      ? 'bg-amber-900'
+                      : 'bg-scale-1100'
+                  )}
+                  value={usageMeta?.usage ?? 0}
+                  max={usageMeta?.limit ?? 0}
+                />
+              )}
               <div>
                 <div className="flex items-center justify-between border-b py-1">
                   <p className="text-xs text-scale-1000">
@@ -158,7 +160,7 @@ const SizeAndCounts = ({ projectRef }: SizeAndCountsProps) => {
                       : (usageMeta?.limit ?? 0).toLocaleString()}
                   </p>
                 </div>
-                <div className="flex items-center justify-between border-b py-1">
+                <div className="flex items-center justify-between py-1">
                   <p className="text-xs text-scale-1000">Used</p>
                   <p className="text-xs">
                     {attribute.unit === 'bytes'
@@ -166,18 +168,20 @@ const SizeAndCounts = ({ projectRef }: SizeAndCountsProps) => {
                       : (usageMeta?.usage ?? 0).toLocaleString()}
                   </p>
                 </div>
-                <div className="flex items-center justify-between py-1">
-                  <p className="text-xs text-scale-1000">Extra volume used this month</p>
-                  <p className="text-xs">
-                    {usageExcess < 0
-                      ? attribute.unit === 'bytes'
-                        ? formatBytes(0)
-                        : 0
-                      : attribute.unit === 'bytes'
-                      ? formatBytes(usageExcess)
-                      : usageExcess.toLocaleString()}
-                  </p>
-                </div>
+                {usageMeta.limit > 0 && (
+                  <div className="flex items-center justify-between border-t py-1">
+                    <p className="text-xs text-scale-1000">Extra volume used this month</p>
+                    <p className="text-xs">
+                      {usageExcess < 0
+                        ? attribute.unit === 'bytes'
+                          ? formatBytes(0)
+                          : 0
+                        : attribute.unit === 'bytes'
+                        ? formatBytes(usageExcess)
+                        : usageExcess.toLocaleString()}
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -238,16 +242,6 @@ const SizeAndCounts = ({ projectRef }: SizeAndCountsProps) => {
           </SectionContent>
         )
       })}
-      <UsageBarChart
-        hasQuota
-        name={'Sample'}
-        unit={'percentage'}
-        attribute={'sample_data'}
-        data={generateUsageData('sample_data', 30)}
-        yLimit={50}
-        yLeftMargin={0}
-        quotaWarningType={isFreeTier || isProTier ? 'danger' : 'warning'}
-      />
     </>
   )
 }
