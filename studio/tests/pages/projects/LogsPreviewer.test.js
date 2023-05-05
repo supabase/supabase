@@ -104,7 +104,7 @@ test.each([
         status: 300,
       }
     }),
-    tableTexts: [/auth\-path/, /some event_message/, /INFO/],
+    tableTexts: [/auth\-path/, /some metadata_msg/, /INFO/],
     selectionTexts: [
       /auth\-path/,
       /some metadata_msg/,
