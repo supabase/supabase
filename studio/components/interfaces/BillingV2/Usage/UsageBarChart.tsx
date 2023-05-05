@@ -101,7 +101,7 @@ const UsageBarChart = ({
                 <Cell
                   key={`${entry.period_start}`}
                   className={
-                    yLimit !== undefined && Number(entry[attribute]) >= yLimit
+                    yLimit !== undefined && Number(entry[attribute]) >= yLimit && hasQuota
                       ? quotaWarningClass
                       : 'fill-scale-1200'
                   }
