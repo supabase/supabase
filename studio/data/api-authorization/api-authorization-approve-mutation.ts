@@ -1,21 +1,29 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import { post } from 'lib/common/fetch'
 import { API_ADMIN_URL } from 'lib/constants'
-// import { resourceKeys } from './keys'
 
 export type ApiAuthorizationApproveVariables = {
   id: string
+  organization_id: string
 }
 
-export async function approveApiAuthorization({ id }: ApiAuthorizationApproveVariables) {
+export type ApiAuthorizationApproveResponse = {
+  url: string
+}
+
+export async function approveApiAuthorization({
+  id,
+  organization_id,
+}: ApiAuthorizationApproveVariables) {
   if (!id) throw new Error('Authorization ID is required')
+  if (!organization_id) throw new Error('Organization slug is required')
 
   const response = await post(
-    `${API_ADMIN_URL}/oauth/authorization/${id}?skip_browser_redirect=true`,
-    {}
+    `${API_ADMIN_URL}/oauth/authorizations/${id}?skip_browser_redirect=true`,
+    { organization_id }
   )
   if (response.error) throw response.error
-  return response
+  return response as ApiAuthorizationApproveResponse
 }
 
 type ApiAuthorizationApproveData = Awaited<ReturnType<typeof approveApiAuthorization>>
@@ -27,17 +35,8 @@ export const useApiAuthorizationApproveMutation = ({
   UseMutationOptions<ApiAuthorizationApproveData, unknown, ApiAuthorizationApproveVariables>,
   'mutationFn'
 > = {}) => {
-  const queryClient = useQueryClient()
-
   return useMutation<ApiAuthorizationApproveData, unknown, ApiAuthorizationApproveVariables>(
     (vars) => approveApiAuthorization(vars),
-    {
-      async onSuccess(data, variables, context) {
-        // const { id } = variables
-        // await queryClient.invalidateQueries(networkRestrictionKeys.list(projectRef))
-        // await onSuccess?.(data, variables, context)
-      },
-      ...options,
-    }
+    options
   )
 }
