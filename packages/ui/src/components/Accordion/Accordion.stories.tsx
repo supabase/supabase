@@ -1,8 +1,6 @@
 import React from 'react'
 
-import { Accordion } from '.'
-import { Typography } from '../Typography'
-import { IconArrowUp } from '../Icon/icons/IconArrowUp'
+import Accordion, { AccordionProps } from './Accordion'
 import { Badge } from '../Badge'
 
 export default {
@@ -10,7 +8,7 @@ export default {
   component: Accordion,
 }
 
-export const OneItem = (args: any) => (
+export const OneItem = (args: AccordionProps) => (
   <Accordion {...args} justified={false}>
     <Accordion.Item
       header={
@@ -31,7 +29,7 @@ export const OneItem = (args: any) => (
   </Accordion>
 )
 
-export const MultipleItems = (args: any) => (
+export const MultipleItems = (args: AccordionProps) => (
   <Accordion {...args} openBehaviour="multiple">
     <Accordion.Item
       header={
@@ -88,7 +86,7 @@ export const MultipleItems = (args: any) => (
   </Accordion>
 )
 
-export const Bordered = (args: any) => (
+export const Bordered = (args: AccordionProps) => (
   <Accordion {...args}>
     <Accordion.Item
       header={
@@ -149,7 +147,7 @@ Bordered.args = {
   type: 'bordered',
 }
 
-export const LeftAlignedChevron = (args: any) => (
+export const LeftAlignedChevron = (args: AccordionProps) => (
   <Accordion {...args} justified={false} chevronAlign="left">
     <Accordion.Item
       header={

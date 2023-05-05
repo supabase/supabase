@@ -64,6 +64,9 @@ const TemplateEditor: FC<Props> = ({ template }) => {
   return (
     <Form id={formId} className="!border-t-0" initialValues={INITIAL_VALUES} onSubmit={onSubmit}>
       {({ isSubmitting, resetForm, values, initialValues }: any) => {
+        // [Alaister] although this "technically" is breaking the rules of React hooks
+        // it won't error because the hooks are always rendered in the same order
+        // eslint-disable-next-line react-hooks/rules-of-hooks
         useEffect(() => {
           // Form is reset once remote data is loaded in store
           resetForm({
@@ -85,7 +88,7 @@ const TemplateEditor: FC<Props> = ({ template }) => {
                   const property = properties[x]
                   if (property.type === 'string') {
                     return (
-                      <div className="space-y-3">
+                      <div key={x} className="space-y-3">
                         <label className="col-span-12 text-sm text-scale-1200 lg:col-span-5">
                           {property.title}
                         </label>

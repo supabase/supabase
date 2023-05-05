@@ -1,12 +1,13 @@
 import { ProjectBase } from 'types'
-import { useFlag } from 'hooks'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
 
-export const generateSettingsMenu = (ref: string, project?: ProjectBase): ProductMenuGroup[] => {
-  const isVaultEnabled = useFlag('vaultExtension')
-
-  const isProjectBuilding = project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY
+export const generateSettingsMenu = (
+  ref: string,
+  project?: ProjectBase,
+  isVaultEnabled: boolean = false
+): ProductMenuGroup[] => {
+  const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
   const buildingUrl = `/project/${ref}/building`
 
   return [

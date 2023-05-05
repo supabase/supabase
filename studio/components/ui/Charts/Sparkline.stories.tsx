@@ -32,8 +32,8 @@ export const Sparkline = () => (
         { title: 'Normal', props: {} },
         { title: 'Large', props: { size: 'large' as const } },
         { title: 'No data', props: { data: [] } },
-      ].map(({ title, props }) => (
-        <div className="w-32 h-72">
+      ].map(({ title, props }, i) => (
+        <div key={i} className="w-32 h-72">
           <ExampleName>{title}</ExampleName>
           <div className="w-full h-full mt-4">
             <Chart {...PROPS} {...props} />

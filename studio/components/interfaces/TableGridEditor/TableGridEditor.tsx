@@ -35,6 +35,7 @@ import { ForeignRowSelectorProps } from './SidePanelEditor/RowEditor/ForeignRowS
 import TwoOptionToggle from 'components/ui/TwoOptionToggle'
 import TableDefinition from './TableDefinition'
 import APIDocumentationPanel from './APIDocumentationPanel'
+import { ERROR_PRIMARY_KEY_NOTFOUND } from 'components/grid/constants'
 
 export interface TableGridEditorProps {
   /** Theme for the editor */
@@ -236,7 +237,7 @@ const TableGridEditor = ({
           {
             table: selectedTable as PostgresTable,
             columns: (selectedTable as PostgresTable).columns ?? [],
-            primaryKeys: (selectedTable as PostgresTable).primary_keys,
+            primaryKeys: (selectedTable as PostgresTable).primary_keys ?? [],
             relationships: formattedRelationships,
           },
           encryptedColumns
@@ -320,6 +321,12 @@ const TableGridEditor = ({
     )
 
     const configuration = { identifiers }
+    if (Object.keys(identifiers).length === 0) {
+      return ui.setNotification({
+        category: 'error',
+        message: ERROR_PRIMARY_KEY_NOTFOUND,
+      })
+    }
 
     mutateUpdateTableRow({
       projectRef: project.ref,

@@ -74,6 +74,29 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
         ORDER BY
           timestamp ASC`,
       },
+      topRoutes: {
+        queryType: "logs",
+        sql: (filters)=> `
+        select
+          request.path as path,
+          request.method as method,
+          request.search as search,
+          response.status_code as status_code,
+          count(t.id) as count
+        from edge_logs t
+          cross join unnest(metadata) as m
+          cross join unnest(m.response) as response
+          cross join unnest(m.request) as request
+          cross join unnest(request.headers) as headers
+          ${generateRexepWhere(filters)}
+        group by
+          request.path, request.method, request.search, response.status_code
+        order by
+          count desc
+        limit
+        3
+        `
+      },
       errorCounts: {
         queryType: 'logs',
         sql: (filters) => `
@@ -94,13 +117,37 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
           timestamp ASC
         `,
       },
+      topErrorRoutes: {
+        queryType: "logs",
+        sql: (filters)=> `
+        select
+          request.path as path,
+          request.method as method,
+          request.search as search,
+          response.status_code as status_code,
+          count(t.id) as count
+        from edge_logs t
+          cross join unnest(metadata) as m
+          cross join unnest(m.response) as response
+          cross join unnest(m.request) as request
+          cross join unnest(request.headers) as headers
+        where
+          response.status_code >= 400
+        ${generateRexepWhere(filters, false)}
+        group by
+          request.path, request.method, request.search, response.status_code
+        order by
+          count desc
+        limit
+        3
+        `
+      },
       responseSpeed: {
         queryType: 'logs',
         sql: (filters) => `
         select
           cast(timestamp_trunc(t.timestamp, hour) as datetime) as timestamp,
-          avg(response.origin_time) as avg,
-          APPROX_QUANTILES(response.origin_time, 100) as quantiles
+          avg(response.origin_time) as avg
         FROM
           edge_logs t
           cross join unnest(metadata) as m
@@ -113,6 +160,30 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
         ORDER BY
           timestamp ASC
       `,
+      },
+      topSlowRoutes: {
+        queryType: "logs",
+        sql: (filters)=> `
+        select
+          request.path as path,
+          request.method as method,
+          request.search as search,
+          response.status_code as status_code,
+          count(t.id) as count,
+          avg(response.origin_time) as avg
+        from edge_logs t
+          cross join unnest(metadata) as m
+          cross join unnest(m.response) as response
+          cross join unnest(m.request) as request
+          cross join unnest(request.headers) as headers
+        ${generateRexepWhere(filters)}
+        group by
+          request.path, request.method, request.search, response.status_code
+        order by
+          avg desc
+        limit
+        3
+        `
       },
     },
   },

@@ -24,10 +24,10 @@ const SchemaTable: FC<Props> = ({ filterString, schema, editTrigger, deleteTrigg
         className="table-fixed px-6"
         head={
           <>
-            <Table.th key="name" className="space-x-4">
+            <Table.th key="name" className="w-[25%] space-x-4">
               Name
             </Table.th>
-            <Table.th key="table" className="hidden lg:table-cell">
+            <Table.th key="table" className="hidden w-[13%] lg:table-cell">
               Table
             </Table.th>
             <Table.th key="function" className="hidden xl:table-cell">

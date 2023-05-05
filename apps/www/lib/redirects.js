@@ -1903,4 +1903,14 @@ module.exports = [
     source: '/docs/guides/integrations/dashibase',
     destination: '/docs',
   },
+  {
+    permanent: true,
+    source: '/docs/support',
+    destination: '/support',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/cli/local-development',
+    destination: '/docs/guides/getting-started/local-development',
+  },
 ]

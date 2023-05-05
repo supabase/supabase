@@ -1,6 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useTheme } from 'common'
-import { useStore } from 'hooks'
 import { usePushNext } from 'hooks/misc/useAutoAuthRedirect'
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import { auth, getReturnToPath, STORAGE_KEY } from 'lib/gotrue'
@@ -111,11 +110,16 @@ const SignInLayout = ({
             </div>
 
             <div className="items-center hidden space-x-3 md:ml-10 md:flex md:pr-4">
-              <Link href="https://supabase.com/docs" passHref>
-                <Button type="default" icon={<IconFileText />} as="a" target="_blank">
-                  Documentation
-                </Button>
-              </Link>
+              <Button
+                as="a"
+                href="https://supabase.com/docs"
+                target="_blank"
+                rel="noreferrer"
+                type="default"
+                icon={<IconFileText />}
+              >
+                Documentation
+              </Button>
             </div>
           </nav>
         </div>

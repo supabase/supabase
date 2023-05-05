@@ -288,8 +288,8 @@ export default class MetaStore implements IMetaStore {
   }
 
   async addPrimaryKey(schema: string, table: string, columns: string[]) {
-    const primaryKeyColumns = columns.join(',')
-    const query = `ALTER TABLE "${schema}"."${table}" ADD PRIMARY KEY (${primaryKeyColumns})`
+    const primaryKeyColumns = columns.join('","')
+    const query = `ALTER TABLE "${schema}"."${table}" ADD PRIMARY KEY ("${primaryKeyColumns}")`
     return await this.query(query)
   }
 
@@ -469,8 +469,6 @@ export default class MetaStore implements IMetaStore {
         category: 'error',
         message: `An error occurred while creating the column "${payload.name}"`,
       })
-      const query = `alter table "${selectedTable.name}" drop column if exists "${payload.name}";`
-      await this.rootStore.meta.query(query)
       return { error }
     }
   }
@@ -501,11 +499,15 @@ export default class MetaStore implements IMetaStore {
           const removePK = await this.removePrimaryKey(column.schema, column.table)
           if (removePK.error) throw removePK.error
         }
+
         const primaryKeyColumns = isPrimaryKey
           ? existingPrimaryKeys.concat([column.name])
           : existingPrimaryKeys.filter((x) => x !== column.name)
-        const addPK = await this.addPrimaryKey(column.schema, column.table, primaryKeyColumns)
-        if (addPK.error) throw addPK.error
+
+        if (primaryKeyColumns.length) {
+          const addPK = await this.addPrimaryKey(column.schema, column.table, primaryKeyColumns)
+          if (addPK.error) throw addPK.error
+        }
       }
 
       // For updating of foreign key relationship, we remove the original one by default
@@ -650,7 +652,7 @@ export default class MetaStore implements IMetaStore {
       // Then add the primary key constraints here to support composite keys
       const primaryKeyColumns = columns
         .filter((column: ColumnField) => column.isPrimaryKey)
-        .map((column: ColumnField) => `"${column.name}"`)
+        .map((column: ColumnField) => column.name)
       if (primaryKeyColumns.length > 0) {
         const primaryKeys = await this.addPrimaryKey(table.schema, table.name, primaryKeyColumns)
         if (primaryKeys.error) throw primaryKeys.error
@@ -666,7 +668,6 @@ export default class MetaStore implements IMetaStore {
 
       // If the user is importing data via a spreadsheet
       if (!isUndefined(importContent)) {
-        console.log({ importContent })
         if (importContent.file && importContent.rowCount > 0) {
           // Via a CSV file
           const { error }: any = await this.insertRowsViaSpreadsheet(
@@ -751,11 +752,9 @@ export default class MetaStore implements IMetaStore {
     // Prepare a check to see if primary keys to the tables were updated or not
     const primaryKeyColumns = columns
       .filter((column) => column.isPrimaryKey)
-      .map((column) => `"${column.name}"`)
+      .map((column) => column.name)
     // @ts-ignore
-    const existingPrimaryKeyColumns = table.primary_keys.map(
-      (pk: PostgresPrimaryKey) => `"${pk.name}"`
-    )
+    const existingPrimaryKeyColumns = table.primary_keys.map((pk: PostgresPrimaryKey) => pk.name)
     const isPrimaryKeyUpdated = !isEqual(primaryKeyColumns, existingPrimaryKeyColumns)
 
     if (isPrimaryKeyUpdated) {

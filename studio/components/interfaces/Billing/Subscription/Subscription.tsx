@@ -1,42 +1,31 @@
 import dayjs from 'dayjs'
-import { FC } from 'react'
-import { useRouter } from 'next/router'
+import Link from 'next/link'
+import { FC, useEffect } from 'react'
 import { Button, Loading } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useFlag } from 'hooks'
+import { checkPermissions, useFlag, useStore } from 'hooks'
 import { useParams } from 'common/hooks'
 import { STRIPE_PRODUCT_IDS } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 
 import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import CostBreakdownRow from './CostBreakdownRow'
-import { StripeSubscription } from './Subscription.types'
 import NoPermission from 'components/ui/NoPermission'
 import { USAGE_BASED_PRODUCTS } from 'components/interfaces/Billing/Billing.constants'
 import { ProjectUsageResponseUsageKeys, useProjectUsageQuery } from 'data/usage/project-usage-query'
+import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
+import { useIsProjectActive } from 'components/layouts/ProjectLayout/ProjectContext'
 
 interface Props {
-  project: any
-  subscription: StripeSubscription
-  loading?: boolean
   showProjectName?: boolean
-  currentPeriodStart: number
-  currentPeriodEnd: number
 }
 
-const Subscription: FC<Props> = ({
-  project,
-  subscription,
-  loading = false,
-  showProjectName = false,
-  currentPeriodStart,
-  currentPeriodEnd,
-}) => {
-  const router = useRouter()
-
+const Subscription: FC<Props> = ({ showProjectName = false }) => {
+  const { ui } = useStore()
   const { ref: projectRef } = useParams()
+  const isActive = useIsProjectActive()
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
 
   const canReadSubscription = checkPermissions(PermissionAction.READ, 'subscriptions')
@@ -45,14 +34,25 @@ const Subscription: FC<Props> = ({
     'stripe.subscriptions'
   )
 
-  const { data: usage, isLoading: loadingUsage } = useProjectUsageQuery({ projectRef })
+  const project = ui.selectedProject
+  const {
+    data: subscription,
+    isLoading: loading,
+    error,
+  } = useProjectSubscriptionQuery({ projectRef: ui.selectedProject?.ref })
+  const { data: usage } = useProjectUsageQuery({ projectRef })
 
   const isPayg = subscription?.tier.prod_id === STRIPE_PRODUCT_IDS.PAYG
-  const isEnterprise = subscription.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
+  const isTeam = subscription?.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.TEAM
+  const isEnterprise = subscription?.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
+  const canOnlyUpdateAddons = isTeam || isEnterprise
 
   const addOns = subscription?.addons ?? []
   const paid = subscription && subscription.tier.unit_amount > 0
-  const basePlanCost = subscription?.tier.unit_amount / 100
+  const basePlanCost = (subscription?.tier.unit_amount ?? 0) / 100
+
+  const currentPeriodStart = subscription?.billing.current_period_start ?? 0
+  const currentPeriodEnd = subscription?.billing.current_period_end ?? 0
 
   const deriveTotalCost = (): number => {
     const totalAddOnCost = addOns
@@ -70,34 +70,47 @@ const Subscription: FC<Props> = ({
     return basePlanCost + totalAddOnCost + totalUsageCost
   }
 
+  const subscriptionUpdateURL = isEnterprise
+    ? `/project/${projectRef}/settings/billing/update/enterprise`
+    : isTeam
+    ? `/project/${projectRef}/settings/billing/update/team`
+    : `/project/${projectRef}/settings/billing/update`
+
+  useEffect(() => {
+    if (error) {
+      ui.setNotification({
+        category: 'error',
+        message: `Failed to get project subscription: ${(error as any)?.message ?? 'unknown'}`,
+      })
+    }
+  }, [error])
+
   return (
-    <Loading active={loading || loadingUsage}>
+    <Loading active={loading}>
       <div className="w-full mb-8 overflow-hidden border rounded border-panel-border-light dark:border-panel-border-dark">
         <div className="bg-panel-body-light dark:bg-panel-body-dark">
           <div className="flex items-center justify-between px-6 pt-4">
             <div className="flex flex-col">
               <p className="text-sm text-scale-1100">
-                {showProjectName ? project.name : 'Current subscription'}
+                {showProjectName ? project?.name ?? '' : 'Current subscription'}
               </p>
               <h3 className="mb-0 text-xl">{subscription?.tier.name ?? '-'}</h3>
             </div>
             <div className="flex flex-col items-end space-y-2">
               <Tooltip.Root delayDuration={0}>
                 <Tooltip.Trigger>
-                  <Button
-                    disabled={!canUpdateSubscription || projectUpdateDisabled}
-                    onClick={() => {
-                      const url = isEnterprise
-                        ? `/project/${project.ref}/settings/billing/update/enterprise`
-                        : `/project/${project.ref}/settings/billing/update`
-                      router.push(url)
-                    }}
-                    type="primary"
-                  >
-                    {isEnterprise ? 'Change add-ons' : 'Change subscription'}
-                  </Button>
+                  <Link href={subscriptionUpdateURL}>
+                    <a>
+                      <Button
+                        type="primary"
+                        disabled={!canUpdateSubscription || projectUpdateDisabled || !isActive}
+                      >
+                        {canOnlyUpdateAddons ? 'Change add-ons' : 'Change subscription'}
+                      </Button>
+                    </a>
+                  </Link>
                 </Tooltip.Trigger>
-                {!canUpdateSubscription || projectUpdateDisabled ? (
+                {!canUpdateSubscription || projectUpdateDisabled || !isActive ? (
                   <Tooltip.Portal>
                     <Tooltip.Content side="bottom">
                       <Tooltip.Arrow className="radix-tooltip-arrow" />
@@ -116,6 +129,8 @@ const Subscription: FC<Props> = ({
                             </>
                           ) : !canUpdateSubscription ? (
                             'You need additional permissions to amend subscriptions'
+                          ) : !isActive ? (
+                            'Unable to update subscription as project is not active'
                           ) : (
                             ''
                           )}
@@ -140,7 +155,12 @@ const Subscription: FC<Props> = ({
           <div className="px-6 pb-4 mt-2">
             <p className="text-sm text-scale-1100">
               See our{' '}
-              <a href="https://supabase.com/pricing" target="_blank" className="underline">
+              <a
+                href="https://supabase.com/pricing"
+                target="_blank"
+                rel="noreferrer"
+                className="underline"
+              >
                 pricing
               </a>{' '}
               for a more detailed analysis of what Supabase has on offer.

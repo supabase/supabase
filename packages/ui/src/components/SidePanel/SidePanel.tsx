@@ -109,7 +109,11 @@ const SidePanel = ({
           onCloseAutoFocus={props.onCloseAutoFocus}
           onEscapeKeyDown={props.onEscapeKeyDown}
           onPointerDownOutside={props.onPointerDownOutside}
-          onInteractOutside={props.onInteractOutside}
+          onInteractOutside={(event) => {
+            const isToast = (event.target as Element)?.closest('#toast')
+            if (isToast) event.preventDefault()
+            if (props.onInteractOutside) props.onInteractOutside(event)
+          }}
         >
           {header && <header className={__styles.header}>{header}</header>}
           <div className={__styles.contents}>{children}</div>

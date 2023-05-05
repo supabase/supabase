@@ -104,6 +104,9 @@ const AddRestrictionModal: FC<Props> = ({
 
           const isValidCIDR = isValidBlockSize && !isPrivate && addressRange !== undefined
 
+          // [Alaister] although this "technically" is breaking the rules of React hooks
+          // it won't error because the hooks are always rendered in the same order
+          // eslint-disable-next-line react-hooks/rules-of-hooks
           const [isFetchingAddress, setIsFetchingAddress] = useState(false)
 
           const getClientIpAddress = async () => {

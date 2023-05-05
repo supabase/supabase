@@ -152,6 +152,12 @@ export const METRICS = [
     category: METRIC_CATEGORIES.API_AUTH,
   },
   {
+    key: 'total_auth_billing_period_sso_mau',
+    label: 'Auth Monthly Active SSO User',
+    provider: 'daily-stats',
+    category: METRIC_CATEGORIES.API_AUTH,
+  },
+  {
     key: 'total_auth_ingress',
     label: 'Auth Ingress',
     provider: 'daily-stats',
@@ -211,7 +217,7 @@ export const METRICS = [
   },
   {
     key: 'total_storage_image_render_count',
-    label: 'Storage Images Transformed',
+    label: 'Storage Image Transformations',
     provider: 'daily-stats',
     category: METRIC_CATEGORIES.API_STORAGE,
   },

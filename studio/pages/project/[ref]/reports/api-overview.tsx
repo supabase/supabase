@@ -9,16 +9,17 @@ import {
 import ReportWidget from 'components/interfaces/Reports/ReportWidget'
 import { queriesFactory } from 'components/interfaces/Reports/Reports.utils'
 import {
-  renderTotalRequests,
-  renderErrorCounts,
-  renderResponseSpeed,
+  TotalRequestsChartRenderer,
+  ErrorCountsChartRenderer,
+  ResponseSpeedChartRenderer,
+  TopApiRoutesRenderer,
 } from 'components/interfaces/Reports/renderers/ApiRenderers'
 import { useState, useEffect } from 'react'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import { DatePickerToFrom, LogsEndpointParams } from 'components/interfaces/Settings/Logs'
 import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
 import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
-import { useParams } from 'common/hooks'
+import { useParams } from 'common'
 import { isEqual } from 'lodash'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
@@ -63,7 +64,9 @@ export const ApiReport: NextPageWithLayout = () => {
         params={report.params.totalRequests}
         title="Total Requests"
         data={report.data.totalRequests || []}
-        renderer={renderTotalRequests}
+        renderer={TotalRequestsChartRenderer}
+        append={TopApiRoutesRenderer}
+        appendProps={{ data: report.data.topRoutes || [] }}
       />
       <ReportWidget
         isLoading={report.isLoading}
@@ -71,7 +74,9 @@ export const ApiReport: NextPageWithLayout = () => {
         title="Response Errors"
         tooltip="Error responses with 4XX or 5XX status codes"
         data={report.data.errorCounts || []}
-        renderer={renderErrorCounts}
+        renderer={ErrorCountsChartRenderer}
+        appendProps={{ data: report.data.topErrorRoutes || [] }}
+        append={TopApiRoutesRenderer}
       />
       <ReportWidget
         isLoading={report.isLoading}
@@ -79,7 +84,9 @@ export const ApiReport: NextPageWithLayout = () => {
         title="Response Speed"
         tooltip="Average response speed (in miliseconds) of a request"
         data={report.data.responseSpeed || []}
-        renderer={renderResponseSpeed}
+        renderer={ResponseSpeedChartRenderer}
+        appendProps={{ data: report.data.topSlowRoutes || [] }}
+        append={TopApiRoutesRenderer}
       />
     </ReportPadding>
   )
@@ -87,13 +94,26 @@ export const ApiReport: NextPageWithLayout = () => {
 
 // hook to fetch data
 const useApiReport = () => {
+  const { ref: projectRef } = useParams()
+
   const queryHooks = queriesFactory<keyof typeof PRESET_CONFIG.api.queries>(
-    PRESET_CONFIG.api.queries
+    PRESET_CONFIG.api.queries,
+    projectRef ?? 'default'
   )
   const totalRequests = queryHooks.totalRequests()
+  const topRoutes = queryHooks.topRoutes()
   const errorCounts = queryHooks.errorCounts()
+  const topErrorRoutes = queryHooks.topErrorRoutes()
   const responseSpeed = queryHooks.responseSpeed()
-  const activeHooks = [totalRequests, errorCounts, responseSpeed]
+  const topSlowRoutes = queryHooks.topSlowRoutes()
+  const activeHooks = [
+    totalRequests,
+    topRoutes,
+    errorCounts,
+    topErrorRoutes,
+    responseSpeed,
+    topSlowRoutes,
+  ]
   const [filters, setFilters] = useState<ReportFilterItem[]>([])
   const addFilter = (filter: ReportFilterItem) => {
     // use a deep equal when comparing objects.
@@ -124,11 +144,22 @@ const useApiReport = () => {
     if (totalRequests[1].changeQuery) {
       totalRequests[1].changeQuery(PRESET_CONFIG.api.queries.totalRequests.sql(filters))
     }
+    if (topRoutes[1].changeQuery) {
+      topRoutes[1].changeQuery(PRESET_CONFIG.api.queries.topRoutes.sql(filters))
+    }
     if (errorCounts[1].changeQuery) {
       errorCounts[1].changeQuery(PRESET_CONFIG.api.queries.errorCounts.sql(filters))
     }
+
+    if (topErrorRoutes[1].changeQuery) {
+      topErrorRoutes[1].changeQuery(PRESET_CONFIG.api.queries.topErrorRoutes.sql(filters))
+    }
     if (responseSpeed[1].changeQuery) {
       responseSpeed[1].changeQuery(PRESET_CONFIG.api.queries.responseSpeed.sql(filters))
+    }
+
+    if (topSlowRoutes[1].changeQuery) {
+      topSlowRoutes[1].changeQuery(PRESET_CONFIG.api.queries.topSlowRoutes.sql(filters))
     }
   }, [JSON.stringify(filters)])
 
@@ -148,11 +179,17 @@ const useApiReport = () => {
       totalRequests: totalRequests[0].logData,
       errorCounts: errorCounts[0].logData,
       responseSpeed: responseSpeed[0].logData,
+      topRoutes: topRoutes[0].logData,
+      topErrorRoutes: topErrorRoutes[0].logData,
+      topSlowRoutes: topSlowRoutes[0].logData,
     },
     params: {
       totalRequests: totalRequests[0].params,
       errorCounts: errorCounts[0].params,
       responseSpeed: responseSpeed[0].params,
+      topRoutes: topRoutes[0].params,
+      topErrorRoutes: topErrorRoutes[0].params,
+      topSlowRoutes: topSlowRoutes[0].params,
     },
     mergeParams: handleSetParams,
     filters,
