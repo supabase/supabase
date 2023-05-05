@@ -144,7 +144,6 @@ const ContentLink = React.memo(function ContentLink(props: any) {
 })
 
 const Content = (props) => {
-  console.log(props)
   const { menu, id } = props
 
   return (
@@ -168,7 +167,6 @@ const Content = (props) => {
       <Link href={menu.url ?? ''} passHref>
         <a>
           <div className="flex items-center gap-3 my-3 text-brand-900">
-            {console.log(menu)}
             <HomeMenuIconPicker icon={menu.icon} />
             <HeaderLink title={menu.title} url={menu.url} id={id} />
           </div>
