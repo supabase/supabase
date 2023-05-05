@@ -159,74 +159,78 @@ const Activity = ({ projectRef }: ActivityProps) => {
             section={attribute}
             includedInPlan={usageMeta?.available_in_plan}
           >
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  <p className="text-sm">
-                    {attribute.name} {subscription?.tier.key.toLowerCase()} quota usage
-                  </p>
-                  {usageRatio >= 1 ? (
-                    <div className="flex items-center space-x-2 min-w-[115px]">
-                      <IconAlertTriangle size={14} strokeWidth={2} className={exceededLimitStyle} />
-                      <p className={`text-sm ${exceededLimitStyle}`}>Exceeded limit</p>
-                    </div>
-                  ) : usageRatio >= USAGE_APPROACHING_THRESHOLD ? (
-                    <div className="flex items-center space-x-2 min-w-[115px]">
-                      <IconAlertTriangle size={14} strokeWidth={2} className="text-amber-900" />
-                      <p className="text-sm text-amber-900">Approaching limit</p>
-                    </div>
-                  ) : null}
-                </div>
-                {isFreeTier && (
-                  <Link href={upgradeUrl}>
-                    <a>
-                      <Button type="default" size="tiny">
-                        Upgrade project
-                      </Button>
-                    </a>
-                  </Link>
-                )}
-              </div>
-              <SparkBar
-                type="horizontal"
-                barClass={clsx(
-                  usageRatio >= 1
-                    ? 'bg-red-900'
-                    : usageRatio >= USAGE_APPROACHING_THRESHOLD
-                    ? 'bg-amber-900'
-                    : 'bg-scale-1100'
-                )}
-                value={usageMeta?.usage ?? 0}
-                max={usageMeta?.limit ?? 0}
-              />
-              <div>
-                <div className="flex items-center justify-between border-b py-1">
-                  <p className="text-xs text-scale-1000">
-                    Included in {subscription?.tier.name.toLowerCase()}
-                  </p>
-                  {usageMeta?.limit === -1 ? (
-                    <p className="text-xs">None</p>
-                  ) : (
-                    <p className="text-xs">{(usageMeta?.limit ?? 0).toLocaleString()}</p>
-                  )}
-                </div>
-                <div className="flex items-center justify-between border-b py-1">
-                  <p className="text-xs text-scale-1000">Used</p>
-                  <p className="text-xs">{(usageMeta?.usage ?? 0).toLocaleString()}</p>
-                </div>
-                <div className="flex items-center justify-between py-1">
-                  <p className="text-xs text-scale-1000">Extra volume used this month</p>
-                  <p className="text-xs">
-                    {((usageMeta?.limit ?? 0) === -1 || usageExcess < 0
-                      ? 0
-                      : usageExcess
-                    ).toLocaleString()}
-                  </p>
-                </div>
-              </div>
-            </div>
             {usageMeta?.available_in_plan && (
               <>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-4">
+                      <p className="text-sm">
+                        {attribute.name} {subscription?.tier.key.toLowerCase()} quota usage
+                      </p>
+                      {usageRatio >= 1 ? (
+                        <div className="flex items-center space-x-2 min-w-[115px]">
+                          <IconAlertTriangle
+                            size={14}
+                            strokeWidth={2}
+                            className={exceededLimitStyle}
+                          />
+                          <p className={`text-sm ${exceededLimitStyle}`}>Exceeded limit</p>
+                        </div>
+                      ) : usageRatio >= USAGE_APPROACHING_THRESHOLD ? (
+                        <div className="flex items-center space-x-2 min-w-[115px]">
+                          <IconAlertTriangle size={14} strokeWidth={2} className="text-amber-900" />
+                          <p className="text-sm text-amber-900">Approaching limit</p>
+                        </div>
+                      ) : null}
+                    </div>
+                    {isFreeTier && (
+                      <Link href={upgradeUrl}>
+                        <a>
+                          <Button type="default" size="tiny">
+                            Upgrade project
+                          </Button>
+                        </a>
+                      </Link>
+                    )}
+                  </div>
+                  <SparkBar
+                    type="horizontal"
+                    barClass={clsx(
+                      usageRatio >= 1
+                        ? 'bg-red-900'
+                        : usageRatio >= USAGE_APPROACHING_THRESHOLD
+                        ? 'bg-amber-900'
+                        : 'bg-scale-1100'
+                    )}
+                    value={usageMeta?.usage ?? 0}
+                    max={usageMeta?.limit ?? 0}
+                  />
+                  <div>
+                    <div className="flex items-center justify-between border-b py-1">
+                      <p className="text-xs text-scale-1000">
+                        Included in {subscription?.tier.name.toLowerCase()}
+                      </p>
+                      {usageMeta?.limit === -1 ? (
+                        <p className="text-xs">None</p>
+                      ) : (
+                        <p className="text-xs">{(usageMeta?.limit ?? 0).toLocaleString()}</p>
+                      )}
+                    </div>
+                    <div className="flex items-center justify-between border-b py-1">
+                      <p className="text-xs text-scale-1000">Used</p>
+                      <p className="text-xs">{(usageMeta?.usage ?? 0).toLocaleString()}</p>
+                    </div>
+                    <div className="flex items-center justify-between py-1">
+                      <p className="text-xs text-scale-1000">Extra volume used this month</p>
+                      <p className="text-xs">
+                        {((usageMeta?.limit ?? 0) === -1 || usageExcess < 0
+                          ? 0
+                          : usageExcess
+                        ).toLocaleString()}
+                      </p>
+                    </div>
+                  </div>
+                </div>
                 <div className="space-y-1">
                   <p>{attribute.name} over time</p>
                   {attribute.chartDescription.split('\n').map((paragraph, idx) => (
