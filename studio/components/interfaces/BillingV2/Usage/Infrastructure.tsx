@@ -59,7 +59,7 @@ const Infrastructure = ({ projectRef }: InfrastructureProps) => {
   const currentDayIoBudget = Number(
     ioBudgetData?.data.find((x) => x.periodStartFormatted === dayjs().format('DD MMM'))?.[
       'disk_io_budget'
-    ] ?? 0
+    ] ?? 100
   )
 
   const chartMeta: any = {
@@ -100,7 +100,6 @@ const Infrastructure = ({ projectRef }: InfrastructureProps) => {
           <SectionContent key={attribute.key} section={attribute} lastKnownValue={lastKnownValue}>
             {attribute.key === 'disk_io_budget' && (
               <>
-                {/* The condition should be that if the disk io budget for TODAY has crossed some threshold */}
                 {currentDayIoBudget <= 0 ? (
                   <Alert withIcon variant="danger" title="IO Budget for today has been used up">
                     <p className="mb-4">
