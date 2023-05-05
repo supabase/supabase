@@ -131,6 +131,7 @@ test('custom sql querying', async () => {
       expect(get).toHaveBeenCalledWith(expect.stringContaining('sql='), expect.anything())
       expect(get).toHaveBeenCalledWith(expect.stringContaining('select'), expect.anything())
       expect(get).toHaveBeenCalledWith(expect.stringContaining('edge_logs'), expect.anything())
+      expect(get).toHaveBeenCalledWith(expect.stringContaining(encodeURIComponent("my_count")), expect.anything())
       expect(get).toHaveBeenCalledWith(
         expect.stringContaining('iso_timestamp_start'),
         expect.anything()
@@ -157,6 +158,40 @@ test('custom sql querying', async () => {
 
   // should not see chronological features
   await expect(screen.findByText(/Load older/)).rejects.toThrow()
+})
+
+test("bug: can edit query after selecting a log", async ()=>{
+  get.mockImplementation((url) => {
+    if (url.includes('sql=') && url.includes('select') && !url.includes("limit 222")) {
+      return {
+        result: [ { my_count: 12345 }],
+      }
+    }
+    return { result: [] }
+  })
+  const { container } = render(<LogsExplorerPage />)
+  // run default query
+  userEvent.click(await screen.findByText('Run'))
+  const rowValue = await screen.findByText(/12345/) // row value
+  // open up an show selection panel
+  await userEvent.click(rowValue)
+  await screen.findByText(/Copy/)
+
+  // change the query
+  let editor = container.querySelector('.monaco-editor')
+  // type new query
+  userEvent.click(editor)
+  userEvent.type(editor, ' something')
+  userEvent.click(await screen.findByText('Run'))
+
+  await waitFor(
+    () => {
+      expect(get).toHaveBeenCalledWith(expect.stringContaining(encodeURIComponent("something")), expect.anything())
+    },
+    { timeout: 1000 }
+  )
+  // closes the selection panel
+  await expect(screen.findByText(/Copy/)).rejects.toThrow()
 })
 
 test('query warnings', async () => {
