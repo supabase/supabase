@@ -1,6 +1,16 @@
-export function IconMenuHome() {
+type HomeMenuIcon = {
+  width?: number
+  height?: number
+}
+export function IconMenuHome({ width = 16, height = 16 }: HomeMenuIcon) {
   return (
-    <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      viewBox="0 0 16 16"
+      width={width}
+      height={height}
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
       <path
         d="M5.889 13.83V8h4.222v5.83M3 5.494v8.338h10V5.54L7.994 2.02 3 5.493Z"
         stroke="currentColor"
@@ -11,9 +21,15 @@ export function IconMenuHome() {
   )
 }
 
-export function IconMenuApi() {
+export function IconMenuApi({ width = 16, height = 16 }: HomeMenuIcon) {
   return (
-    <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      viewBox="0 0 16 16"
+      width={width}
+      height={height}
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
       <path
         d="M2.923 10.927A5.833 5.833 0 0 1 2.14 8m2.877-5.046A5.833 5.833 0 0 1 8 2.14m5.13 3.025c.465.84.73 1.807.73 2.835m-2.883 5.049A5.832 5.832 0 0 1 8 13.859m6.172-10.027a2 2 0 1 1-4 0 2 2 0 0 1 4 0ZM5.81 12.148a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm8.362 0a2 2 0 1 1-4 0 2 2 0 0 1 4 0ZM5.81 3.832a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z"
         stroke="currentColor"
@@ -24,9 +40,15 @@ export function IconMenuApi() {
   )
 }
 
-export function IconMenuAuth() {
+export function IconMenuAuth({ width = 16, height = 16 }: HomeMenuIcon) {
   return (
-    <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      viewBox="0 0 16 16"
+      width={width}
+      height={height}
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
       <path
         d="M3.494 9.975h5m-5 0v2h5v-2m-5 0v-2h5v2M10 5V3a2 2 0 1 0-4 0v2m6.473 0v9h-9V5h9Z"
         stroke="currentColor"
@@ -37,9 +59,15 @@ export function IconMenuAuth() {
   )
 }
 
-export function IconMenuCli() {
+export function IconMenuCli({ width = 16, height = 16 }: HomeMenuIcon) {
   return (
-    <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      viewBox="0 0 16 16"
+      width={width}
+      height={height}
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
       <path
         d="m5.266 5.552 2.4 2.401-2.4 2.402M8 10.149h3M2 2h12v12H2V2Z"
         stroke="currentColor"
@@ -50,9 +78,15 @@ export function IconMenuCli() {
   )
 }
 
-export function IconMenuCsharp() {
+export function IconMenuCsharp({ width = 16, height = 16 }: HomeMenuIcon) {
   return (
-    <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      viewBox="0 0 16 16"
+      width={width}
+      height={height}
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
       <path
         fillRule="evenodd"
         clipRule="evenodd"
@@ -63,9 +97,15 @@ export function IconMenuCsharp() {
   )
 }
 
-export function IconMenuDatabase() {
+export function IconMenuDatabase({ width = 16, height = 16 }: HomeMenuIcon) {
   return (
-    <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      viewBox="0 0 16 16"
+      width={width}
+      height={height}
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
       <path
         d="M3.502 6h8.996v4H3.502V6ZM3 10.002h10v4H3v-4ZM3 2h10v4H3V2Z"
         stroke="currentColor"
@@ -76,9 +116,15 @@ export function IconMenuDatabase() {
   )
 }
 
-export function IconMenuServerlessApis() {
+export function IconMenuServerlessApis({ width = 16, height = 16 }: HomeMenuIcon) {
   return (
-    <svg width="14" height="14" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      viewBox="0 0 16 16"
+      width={width}
+      height={height}
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
       <path
         d="M1.923 9.927A5.833 5.833 0 0 1 1.14 7m2.877-5.046A5.833 5.833 0 0 1 7 1.14m5.13 3.025c.465.84.73 1.807.73 2.835m-2.883 5.049A5.832 5.832 0 0 1 7 12.859m6.172-10.027a2 2 0 1 1-4 0 2 2 0 0 1 4 0ZM4.81 11.148a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm8.362 0a2 2 0 1 1-4 0 2 2 0 0 1 4 0ZM4.81 2.832a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z"
         stroke="currentColor"
@@ -89,9 +135,15 @@ export function IconMenuServerlessApis() {
   )
 }
 
-export function IconMenuEdgeFunctions() {
+export function IconMenuEdgeFunctions({ width = 16, height = 16 }: HomeMenuIcon) {
   return (
-    <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      viewBox="0 0 16 16"
+      width={width}
+      height={height}
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
       <path
         d="M1.857 11.36a7 7 0 0 1 9.41-9.551M4.774 14.212a7 7 0 0 0 9.41-9.497m-8.812 7.845a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm9.296-9.13a2 2 0 1 1-4 0 2 2 0 0 1 4 0ZM12.5 8a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Z"
         stroke="currentColor"
@@ -102,9 +154,15 @@ export function IconMenuEdgeFunctions() {
   )
 }
 
-export function IconMenuExtensions() {
+export function IconMenuExtensions({ width = 16, height = 16 }: HomeMenuIcon) {
   return (
-    <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      viewBox="0 0 16 16"
+      width={width}
+      height={height}
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
       <path
         d="M11.418 2.098v5m-2.5-2.5h5m-11.836-2.5h5v5h-5v-5Zm5.185 9.145a2.685 2.685 0 1 1-5.37 0 2.685 2.685 0 0 1 5.37 0Zm1.651-2.396h5v5h-5v-5Z"
         stroke="currentColor"
@@ -115,9 +173,15 @@ export function IconMenuExtensions() {
   )
 }
 
-export function IconMenuFlutter() {
+export function IconMenuFlutter({ width = 16, height = 16 }: HomeMenuIcon) {
   return (
-    <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      viewBox="0 0 16 16"
+      width={width}
+      height={height}
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
       <path
         fillRule="evenodd"
         clipRule="evenodd"
@@ -128,9 +192,15 @@ export function IconMenuFlutter() {
   )
 }
 
-export function IconMenuGettingStarted() {
+export function IconMenuGettingStarted({ width = 16, height = 16 }: HomeMenuIcon) {
   return (
-    <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      viewBox="0 0 16 16"
+      width={width}
+      height={height}
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
       <path
         d="m13.429 8-4.681 2.702-4.681 2.703V2.594l4.68 2.703 4.682 2.702Z"
         stroke="currentColor"
@@ -141,9 +211,15 @@ export function IconMenuGettingStarted() {
   )
 }
 
-export function IconMenuIntegrations() {
+export function IconMenuIntegrations({ width = 16, height = 16 }: HomeMenuIcon) {
   return (
-    <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      viewBox="0 0 16 16"
+      width={width}
+      height={height}
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
       <path
         d="M11.83 1.453v5.619m-2.809-2.81h5.62M1.338 1.454h5.62v5.619h-5.62V1.453Zm5.827 10.278a3.017 3.017 0 1 1-6.035 0 3.017 3.017 0 0 1 6.035 0ZM9.02 9.038h5.62v5.619H9.02V9.038Z"
         stroke="currentColor"
@@ -154,9 +230,15 @@ export function IconMenuIntegrations() {
   )
 }
 
-export function IconMenuJavascript() {
+export function IconMenuJavascript({ width = 16, height = 16 }: HomeMenuIcon) {
   return (
-    <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      width={width}
+      height={height}
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 16 16"
+    >
       <path
         fillRule="evenodd"
         clipRule="evenodd"
@@ -166,9 +248,16 @@ export function IconMenuJavascript() {
     </svg>
   )
 }
-export function IconMenuPlatform() {
+
+export function IconMenuPlatform({ width = 16, height = 16 }: HomeMenuIcon) {
   return (
-    <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      viewBox="0 0 16 16"
+      width={width}
+      height={height}
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
       <path
         d="M11.556 5.554 13.77 7.14l-5.772 4.04-5.737-4.04 2.199-1.587M3.313 7.888.813 9.72l6.996 4.926 7.039-4.926-2.33-1.682M3.285 4.74 8 8.061l4.742-3.32L8 1.338 3.286 4.74Z"
         stroke="currentColor"
@@ -179,9 +268,15 @@ export function IconMenuPlatform() {
   )
 }
 
-export function IconMenuPython() {
+export function IconMenuPython({ width = 16, height = 16 }: HomeMenuIcon) {
   return (
-    <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      viewBox="0 0 16 16"
+      width={width}
+      height={height}
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
       <path
         fillRule="evenodd"
         clipRule="evenodd"
@@ -192,9 +287,15 @@ export function IconMenuPython() {
   )
 }
 
-export function IconMenuRealtime() {
+export function IconMenuRealtime({ width = 16, height = 16 }: HomeMenuIcon) {
   return (
-    <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      viewBox="0 0 16 16"
+      width={width}
+      height={height}
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
       <path
         d="M5.362.984v2.35m-1.866.144L1.365 1.282m2.052 3.92H1.052m8.023 9.653L4.557 4.523 15 9.115l-4.748 1.182-1.177 4.558Z"
         stroke="currentColor"
@@ -205,9 +306,15 @@ export function IconMenuRealtime() {
   )
 }
 
-export function IconMenuResources() {
+export function IconMenuResources({ width = 16, height = 16 }: HomeMenuIcon) {
   return (
-    <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      viewBox="0 0 16 16"
+      width={width}
+      height={height}
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
       <path
         d="M13 12V5l-.009-3H3v10.5m0 0A1.5 1.5 0 0 0 4.5 14H13v-1.65L12.991 11H4.5A1.5 1.5 0 0 0 3 12.5ZM5.005 2v4l1.5-1.695L8.005 6V2h-3Z"
         stroke="currentColor"
@@ -218,9 +325,15 @@ export function IconMenuResources() {
   )
 }
 
-export function IconMenuSelfHosting() {
+export function IconMenuSelfHosting({ width = 16, height = 16 }: HomeMenuIcon) {
   return (
-    <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      viewBox="0 0 16 16"
+      width={width}
+      height={height}
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
       <path
         d="M13.041 14.37v-2.285a3.245 3.245 0 0 0-3.244-3.244M7.317 10H3v4h3.552v-1.916a3.257 3.257 0 0 1 3.245-3.244m0 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4ZM8 6H3V2h10v4h-1.43M3.502 6v4"
         stroke="currentColor"
@@ -231,9 +344,15 @@ export function IconMenuSelfHosting() {
   )
 }
 
-export function IconMenuStorage() {
+export function IconMenuStorage({ width = 16, height = 16 }: HomeMenuIcon) {
   return (
-    <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      viewBox="0 0 16 16"
+      width={width}
+      height={height}
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
       <path
         d="M13 7.616V5.6l-3.618-3.6H3v4.03m9.964-.447L9.38 2v3.584h3.584ZM1.974 6v8h12V7.509h-7.59l-1.533-1.51H1.974Z"
         stroke="currentColor"
@@ -244,9 +363,15 @@ export function IconMenuStorage() {
   )
 }
 
-export function IconMenuSwift() {
+export function IconMenuSwift({ width = 16, height = 16 }: HomeMenuIcon) {
   return (
-    <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      viewBox="0 0 16 16"
+      width={width}
+      height={height}
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
       <path
         fillRule="evenodd"
         clipRule="evenodd"

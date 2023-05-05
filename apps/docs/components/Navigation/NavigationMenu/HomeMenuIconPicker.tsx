@@ -21,55 +21,61 @@ import {
   IconMenuSwift,
 } from './HomeMenuIcons'
 
-function getMenuIcon(menuKey: string) {
+function getMenuIcon(menuKey: string, width: number = 16, height: number = 16) {
   switch (menuKey) {
     case 'home':
-      return <IconMenuHome />
+      return <IconMenuHome width={width} height={height} />
     case 'getting-started':
-      return <IconMenuGettingStarted />
+      return <IconMenuGettingStarted width={width} height={height} />
     case 'database':
-      return <IconMenuDatabase />
+      return <IconMenuDatabase width={width} height={height} />
     case 'serverless-apis':
-      return <IconMenuServerlessApis />
+      return <IconMenuServerlessApis width={width} height={height} />
     case 'auth':
-      return <IconMenuAuth />
+      return <IconMenuAuth width={width} height={height} />
     case 'edge-functions':
-      return <IconMenuEdgeFunctions />
+      return <IconMenuEdgeFunctions width={width} height={height} />
     case 'realtime':
-      return <IconMenuRealtime />
+      return <IconMenuRealtime width={width} height={height} />
     case 'storage':
-      return <IconMenuStorage />
+      return <IconMenuStorage width={width} height={height} />
     case 'platform':
-      return <IconMenuPlatform />
+      return <IconMenuPlatform width={width} height={height} />
     case 'resources':
-      return <IconMenuResources />
+      return <IconMenuResources width={width} height={height} />
     case 'self-hosting':
-      return <IconMenuSelfHosting />
+      return <IconMenuSelfHosting width={width} height={height} />
     case 'integrations':
-      return <IconMenuIntegrations />
-    case 'javascript':
-      return <IconMenuJavascript />
-    case 'dart':
-      return <IconMenuFlutter />
-    case 'python':
-      return <IconMenuPython />
-    case 'csharp':
-      return <IconMenuCsharp />
-    case 'swift':
-      return <IconMenuSwift />
-    case 'api':
-      return <IconMenuApi />
-    case 'cli':
-      return <IconMenuCli />
+      return <IconMenuIntegrations width={width} height={height} />
+    case 'reference-javascript':
+      return <IconMenuJavascript width={width} height={height} />
+    case 'reference-dart':
+      return <IconMenuFlutter width={width} height={height} />
+    case 'reference-python':
+      return <IconMenuPython width={width} height={height} />
+    case 'reference-csharp':
+      return <IconMenuCsharp width={width} height={height} />
+    case 'reference-swift':
+      return <IconMenuSwift width={width} height={height} />
+    case 'reference-api':
+      return <IconMenuApi width={width} height={height} />
+    case 'reference-cli':
+      return <IconMenuCli width={width} height={height} />
     default:
-      return <IconMenuPlatform />
+      return <IconMenuPlatform width={width} height={height} />
   }
 }
 
 type HomeMenuIconPickerProps = {
   icon: string
+  width?: number
+  height?: number
 }
 
-export default function HomeMenuIconPicker({ icon }: HomeMenuIconPickerProps) {
-  return getMenuIcon(icon)
+export default function HomeMenuIconPicker({
+  icon,
+  width = 16,
+  height = 16,
+}: HomeMenuIconPickerProps) {
+  return getMenuIcon(icon, width, height)
 }

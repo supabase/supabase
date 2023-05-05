@@ -16,20 +16,7 @@ import React, { Fragment } from 'react'
 import { generateAllowedClientLibKeys } from '~/lib/refGenerator/helpers'
 import { isFuncNotInLibraryOrVersion } from './NavigationMenu.utils'
 import { cn } from 'ui/src/utils/cn'
-
-const HeaderImage = React.memo(function HeaderImage(props: any) {
-  const router = useRouter()
-  const { isDarkMode } = useTheme()
-
-  return (
-    <Image
-      alt={props.icon}
-      width={15}
-      height={15}
-      src={`${router.basePath}` + `/img/icons/menu/${props.icon}${isDarkMode ? '' : '-light'}.svg`}
-    />
-  )
-})
+import HomeMenuIconPicker from './HomeMenuIconPicker'
 
 const HeaderLink = React.memo(function HeaderLink(props: any) {
   return (
@@ -266,7 +253,7 @@ const Content: React.FC<INavigationMenuRefList> = ({ id, lib, commonSections, sp
       </Link>
 
       <div className="flex items-center gap-3 my-3">
-        <HeaderImage icon={menu.icon} />
+        <HomeMenuIconPicker icon={menu.icon} width={21} height={21} />
         <HeaderLink title={menu.title} url={menu.url} id={id} />
         <RevVersionDropdown />
       </div>
