@@ -80,9 +80,7 @@ const UsageBarChart = ({
                     <p className="text-xs text-scale-1000">
                       {attribute === 'disk_io_budget' ? `Remaining IO budget:` : `${name}:`}
                     </p>
-                    {dayjs(dataPeriod.format('DD MMM YYYY')).isAfter(
-                      dayjs(dayjs().format('DD MMM YYYY'))
-                    ) ? (
+                    {dataPeriod.startOf('day').isAfter(dayjs().startOf('day')) ? (
                       <p className="text-scale-1000 text-lg">No data yet</p>
                     ) : (
                       <p className="text-xl">
@@ -98,10 +96,10 @@ const UsageBarChart = ({
             }}
           />
           <Bar dataKey={attribute}>
-            {data.map((entry, idx) => {
+            {data.map((entry) => {
               return (
                 <Cell
-                  key={`cell-${attribute}-${idx}`}
+                  key={`${entry.period_start}`}
                   className={
                     yLimit !== undefined && Number(entry[attribute]) >= yLimit
                       ? quotaWarningClass
