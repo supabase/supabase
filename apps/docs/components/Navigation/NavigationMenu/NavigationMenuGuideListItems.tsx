@@ -5,20 +5,7 @@ import { useRouter } from 'next/router'
 import React, { useEffect, useRef } from 'react'
 import { IconChevronLeft } from '~/../../packages/ui'
 import * as Accordion from '@radix-ui/react-accordion'
-
-const HeaderImage = React.memo(function HeaderImage(props: any) {
-  const router = useRouter()
-  const { isDarkMode } = useTheme()
-
-  return (
-    <Image
-      alt={props.icon}
-      width={15}
-      height={15}
-      src={`${router.basePath}` + `/img/icons/menu/${props.icon}${isDarkMode ? '' : '-light'}.svg`}
-    />
-  )
-})
+import HomeMenuIconPicker from './HomeMenuIconPicker'
 
 const HeaderLink = React.memo(function HeaderLink(props: {
   title: string
@@ -157,6 +144,7 @@ const ContentLink = React.memo(function ContentLink(props: any) {
 })
 
 const Content = (props) => {
+  console.log(props)
   const { menu, id } = props
 
   return (
@@ -179,8 +167,9 @@ const Content = (props) => {
 
       <Link href={menu.url ?? ''} passHref>
         <a>
-          <div className="flex items-center gap-3 my-3">
-            <HeaderImage icon={menu.icon} />
+          <div className="flex items-center gap-3 my-3 text-brand-900">
+            {console.log(menu)}
+            <HomeMenuIconPicker icon={menu.icon} />
             <HeaderLink title={menu.title} url={menu.url} id={id} />
           </div>
         </a>
