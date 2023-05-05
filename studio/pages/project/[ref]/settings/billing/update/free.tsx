@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 
 import { NextPageWithLayout } from 'types'
-import { useStore, useFlag } from 'hooks'
+import { useStore } from 'hooks'
 import { get } from 'lib/common/fetch'
 import { API_URL, PRICING_TIER_PRODUCT_IDS, STRIPE_PRODUCT_IDS } from 'lib/constants'
 
@@ -16,8 +16,6 @@ const BillingUpdateFree: NextPageWithLayout = () => {
   const router = useRouter()
   const projectRef = ui.selectedProject?.ref
 
-  const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
-
   const [products, setProducts] = useState<{ tiers: any[]; addons: any[] }>()
   const [subscription, setSubscription] = useState<StripeSubscription>()
 
@@ -25,9 +23,7 @@ const BillingUpdateFree: NextPageWithLayout = () => {
     subscription && subscription.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
 
   useEffect(() => {
-    if (projectUpdateDisabled) {
-      router.push(`/project/${projectRef}/settings/billing/update`)
-    } else if (projectRef) {
+    if (projectRef) {
       getStripeProducts()
       getSubscription()
     }

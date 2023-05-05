@@ -38,6 +38,7 @@ interface Props {
   paymentMethods?: PaymentMethod[]
   currentSubscription: StripeSubscription
   isLoadingPaymentMethods: boolean
+  onPaymentMethodAdded: () => void
   onSelectBack: () => void
 }
 
@@ -47,6 +48,7 @@ const ProUpgrade: FC<Props> = ({
   currentSubscription,
   isLoadingPaymentMethods,
   onSelectBack,
+  onPaymentMethodAdded,
 }) => {
   const { app, ui } = useStore()
   const router = useRouter()
@@ -115,6 +117,11 @@ const ProUpgrade: FC<Props> = ({
     currentSubscription.tier.prod_id === STRIPE_PRODUCT_IDS.PAYG
 
   const isChangingComputeSize = currentAddons.computeSize?.id !== selectedAddons.computeSize.id
+
+  const onLocalPaymentMethodAdded = () => {
+    setShowAddPaymentMethodModal(false)
+    return onPaymentMethodAdded()
+  }
 
   useEffect(() => {
     if (!isLoadingPaymentMethods && paymentMethods && paymentMethods.length > 0) {
@@ -321,49 +328,48 @@ const ProUpgrade: FC<Props> = ({
             </div>
           </div>
         </div>
-        <div className="min-w-[440px]">
-          <PaymentSummaryPanel
-            isRefreshingPreview={isRefreshingPreview}
-            subscriptionPreview={subscriptionPreview}
-            isSpendCapEnabled={isSpendCapEnabled}
-            // Current subscription configuration based on DB
-            currentPlan={currentSubscription.tier}
-            currentAddons={currentAddons}
-            currentSubscription={currentSubscription}
-            // Selected subscription configuration based on UI
-            selectedPlan={selectedTier}
-            selectedAddons={selectedAddons}
-            paymentMethods={paymentMethods}
-            isLoadingPaymentMethods={isLoadingPaymentMethods}
-            selectedPaymentMethod={selectedPaymentMethodId}
-            onSelectPaymentMethod={setSelectedPaymentMethodId}
-            onSelectAddNewPaymentMethod={() => {
-              setShowAddPaymentMethodModal(true)
-            }}
-            beforeConfirmPayment={beforeConfirmPayment}
-            onConfirmPayment={onConfirmPayment}
-            isSubmitting={isSubmitting}
-            captcha={
-              <HCaptcha
-                ref={captchaRef}
-                sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
-                size="invisible"
-                onVerify={(token) => {
-                  setCaptchaToken(token)
-                }}
-                onExpire={() => {
-                  setCaptchaToken(null)
-                }}
-              />
-            }
-          />
-        </div>
+        <PaymentSummaryPanel
+          isRefreshingPreview={isRefreshingPreview}
+          subscriptionPreview={subscriptionPreview}
+          isSpendCapEnabled={isSpendCapEnabled}
+          // Current subscription configuration based on DB
+          currentPlan={currentSubscription.tier}
+          currentAddons={currentAddons}
+          currentSubscription={currentSubscription}
+          // Selected subscription configuration based on UI
+          selectedPlan={selectedTier}
+          selectedAddons={selectedAddons}
+          paymentMethods={paymentMethods}
+          isLoadingPaymentMethods={isLoadingPaymentMethods}
+          selectedPaymentMethod={selectedPaymentMethodId}
+          onSelectPaymentMethod={setSelectedPaymentMethodId}
+          onSelectAddNewPaymentMethod={() => {
+            setShowAddPaymentMethodModal(true)
+          }}
+          beforeConfirmPayment={beforeConfirmPayment}
+          onConfirmPayment={onConfirmPayment}
+          isSubmitting={isSubmitting}
+          captcha={
+            <HCaptcha
+              ref={captchaRef}
+              sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
+              size="invisible"
+              onVerify={(token) => {
+                setCaptchaToken(token)
+              }}
+              onExpire={() => {
+                setCaptchaToken(null)
+              }}
+            />
+          }
+        />
       </Transition>
 
       <AddNewPaymentMethodModal
         visible={showAddPaymentMethodModal}
         returnUrl={`${getURL()}/project/${projectRef}/settings/billing/update/pro`}
         onCancel={() => setShowAddPaymentMethodModal(false)}
+        onConfirm={() => onLocalPaymentMethodAdded()}
       />
 
       {/* Spend caps helper modal */}

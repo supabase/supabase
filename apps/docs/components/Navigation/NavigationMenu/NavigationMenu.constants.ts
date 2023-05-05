@@ -22,7 +22,7 @@ export const REFERENCES: References = {
   swift: {
     name: 'Swift',
     library: 'supabase-swift',
-    versions: ['v1'],
+    versions: ['v0'],
     icon: '/docs/img/libraries/swift-icon.svg',
   },
   cli: {
@@ -45,7 +45,7 @@ export const gettingstarted = {
   items: [
     { name: 'Features', url: '/guides/getting-started/features' },
     { name: 'Architecture', url: '/guides/getting-started/architecture' },
-    // { name: 'Local Development', url: '/guides/cli/local-development' }, // Disabling this until we actually move the doc into this section
+    { name: 'Local Development', url: '/guides/getting-started/local-development' },
     {
       name: 'Framework Quickstarts',
       items: [
@@ -141,7 +141,6 @@ export const cli = {
   title: 'CLI',
   items: [
     { name: 'Overview', url: '/guides/cli' },
-    { name: 'Local Development', url: '/guides/cli/local-development' },
     { name: 'Managing Environments', url: '/guides/cli/managing-environments' },
   ],
 }
@@ -473,6 +472,10 @@ export const database = {
           url: '/guides/database/postgres/indexes',
         },
         {
+          name: 'Cascade Deletes',
+          url: '/guides/database/postgres/cascade-deletes',
+        },
+        {
           name: 'Drop All Tables in Schema',
           url: '/guides/database/postgres/dropping-all-tables-in-schema',
         },
@@ -578,7 +581,17 @@ export const functions = {
           name: 'Connecting directly to Postgres',
           url: '/guides/functions/connect-to-postgres',
         },
+      ],
+    },
+    {
+      name: 'Third-Party Tools',
+      url: undefined,
+      items: [
         { name: 'Dart Edge on Supabase', url: '/guides/functions/dart-edge' },
+        { name: 'Browserless.io', url: '/guides/functions/examples/screenshots' },
+        { name: 'OpenAI API', url: '/guides/functions/examples/openai' },
+        { name: 'Upstash Redis', url: '/guides/functions/examples/upstash-redis' },
+        { name: 'Type-Safe SQL with Kysely', url: '/guides/functions/kysely-postgres' },
       ],
     },
     {
@@ -688,7 +701,6 @@ export const supabase_cli = {
   url: '/guides/cli',
   items: [
     { name: 'Overview', url: '/guides/cli' },
-    { name: 'Local Development', url: '/guides/cli/local-development' },
     { name: 'Managing Environments', url: '/guides/cli/managing-environments' },
     {
       name: 'Reference',
@@ -888,6 +900,7 @@ export const integrations = {
         { name: 'Authsignal', url: '/guides/integrations/authsignal' },
         { name: 'Clerk', url: '/guides/integrations/clerk' },
         { name: 'keyri', url: '/guides/integrations/keyri' },
+        { name: 'Passage', url: '/guides/integrations/passage' },
         { name: 'Stytch', url: '/guides/integrations/stytch' },
         { name: 'SuperTokens', url: '/guides/integrations/supertokens' },
       ],
@@ -1041,7 +1054,7 @@ export const reference_python_v2 = {
   parent: '/reference',
 }
 
-export const reference_swift_v1 = {
+export const reference_swift_v0 = {
   icon: 'reference-swift',
   title: 'swift',
   url: 'guides/reference/swift',
@@ -1164,7 +1177,7 @@ export const references = [
       },
       {
         label: 'supabase-swift',
-        versions: ['v1'],
+        versions: ['v0'],
         description: 'something about the reference',
         icon: '/docs/img/icons/swift-icon.svg',
         url: '/reference/swift/start',
