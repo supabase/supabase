@@ -2,10 +2,14 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
 import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
 import dayjs from 'dayjs'
-import UsageBarChart from './UsageBarChart'
+import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
+import Link from 'next/link'
+import { Alert, Button } from 'ui'
 import SectionContent from './SectionContent'
 import SectionHeader from './SectionHeader'
-import { USAGE_CATEGORIES } from './Usage.constants'
+import { COMPUTE_INSTANCE_SPECS, USAGE_CATEGORIES } from './Usage.constants'
+import { getUpgradeUrl } from './Usage.utils'
+import UsageBarChart from './UsageBarChart'
 
 export interface InfrastructureProps {
   projectRef: string
@@ -19,6 +23,14 @@ const Infrastructure = ({ projectRef }: InfrastructureProps) => {
   const startDate = new Date((current_period_start ?? 0) * 1000).toISOString()
   const endDate = new Date((current_period_end ?? 0) * 1000).toISOString()
   const categoryMeta = USAGE_CATEGORIES.find((category) => category.key === 'infra')
+
+  const upgradeUrl = getUpgradeUrl(projectRef, subscription)
+  const isFreeTier = subscription?.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.FREE
+  const currentComputeInstance = subscription?.addons.find((addon) =>
+    addon.supabase_prod_id.includes('_instance_')
+  )
+  const currentComputeInstanceSpecs =
+    COMPUTE_INSTANCE_SPECS[currentComputeInstance?.supabase_prod_id ?? 'addon_instance_micro']
 
   const { data: cpuUsageData, isLoading: isLoadingCpuUsageData } = useInfraMonitoringQuery({
     projectRef,
@@ -43,6 +55,12 @@ const Infrastructure = ({ projectRef }: InfrastructureProps) => {
     startDate,
     endDate,
   })
+
+  const currentDayIoBudget = Number(
+    ioBudgetData?.data.find((x) => x.periodStartFormatted === dayjs().format('DD MMM'))?.[
+      'disk_io_budget'
+    ] ?? 0
+  )
 
   const chartMeta: any = {
     cpu_usage: {
@@ -81,8 +99,40 @@ const Infrastructure = ({ projectRef }: InfrastructureProps) => {
         return (
           <SectionContent key={attribute.key} section={attribute} lastKnownValue={lastKnownValue}>
             {attribute.key === 'disk_io_budget' && (
-              // [Joshen] Eventually should show the overview of the io bandwidth in mbps for burst, baseline and duration
               <>
+                {/* The condition should be that if the disk io budget for TODAY has crossed some threshold */}
+                {currentDayIoBudget <= 0 ? (
+                  <Alert withIcon variant="danger" title="IO Budget for today has been used up">
+                    <p className="mb-4">
+                      Your workload has used up all the burst IO throughput minutes during the day
+                      and is running at the baseline performance. If you need consistent disk
+                      performance, consider upgrading to a larger compute add-on.
+                    </p>
+                    <Link href={upgradeUrl}>
+                      <a>
+                        <Button type="danger">
+                          {isFreeTier ? 'Upgrade project' : 'Change compute add-on'}
+                        </Button>
+                      </a>
+                    </Link>
+                  </Alert>
+                ) : currentDayIoBudget <= 20 ? (
+                  <Alert withIcon variant="warning" title="IO Budget for today is running out">
+                    <p className="mb-4">
+                      Your workload is about to use up all the burst IO throughput minutes during
+                      the day. Once this is completely used up, your workload will run at the
+                      baseline performance. If you need consistent disk performance, consider
+                      upgrading to a larger compute add-on.
+                    </p>
+                    <Link href={upgradeUrl}>
+                      <a>
+                        <Button type="warning">
+                          {isFreeTier ? 'Upgrade project' : 'Change compute add-on'}
+                        </Button>
+                      </a>
+                    </Link>
+                  </Alert>
+                ) : null}
                 <div className="space-y-1">
                   <p>What is Disk IO Bandwidth?</p>
                   <p className="text-sm text-scale-1000">
@@ -90,6 +140,29 @@ const Infrastructure = ({ projectRef }: InfrastructureProps) => {
                     minutes in a day. Beyond that, the performance reverts to the baseline disk IO
                     bandwidth.
                   </p>
+                </div>
+                <div>
+                  <p className="text-sm mb-2">Overview</p>
+                  <div className="flex items-center justify-between border-b py-1">
+                    <p className="text-xs text-scale-1000">Current compute instance</p>
+                    <p className="text-xs">{currentComputeInstance?.name ?? 'Micro'}</p>
+                  </div>
+                  <div className="flex items-center justify-between border-b py-1">
+                    <p className="text-xs text-scale-1000">Maximum IO Bandwidth (burst limit)</p>
+                    <p className="text-xs">
+                      {currentComputeInstanceSpecs.maxBandwidth.toLocaleString()} Mbps
+                    </p>
+                  </div>
+                  <div className="flex items-center justify-between border-b py-1">
+                    <p className="text-xs text-scale-1000">Baseline IO Bandwidth</p>
+                    <p className="text-xs">
+                      {currentComputeInstanceSpecs.baseBandwidth.toLocaleString()} Mbps
+                    </p>
+                  </div>
+                  <div className="flex items-center justify-between py-1">
+                    <p className="text-xs text-scale-1000">Daily burst time limit</p>
+                    <p className="text-xs">30 mins</p>
+                  </div>
                 </div>
               </>
             )}
