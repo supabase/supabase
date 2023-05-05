@@ -19,6 +19,7 @@ import SectionContent from './SectionContent'
 import SectionHeader from './SectionHeader'
 import { USAGE_CATEGORIES } from './Usage.constants'
 import { generateUsageData, getUpgradeUrl } from './Usage.utils'
+import { DataPoint } from 'data/analytics/constants'
 
 export interface SizeAndCountsProps {
   projectRef: string
@@ -61,24 +62,26 @@ const SizeAndCounts = ({ projectRef }: SizeAndCountsProps) => {
     endDate,
   })
 
-  const chartMeta: any = {
+  const chartMeta: {
+    [key: string]: { data: DataPoint[]; margin: number; isLoading: boolean; hasNoData: boolean }
+  } = {
     db_size: {
       isLoading: isLoadingDbSizeData,
       margin: 14,
       data: dbSizeData?.data ?? [],
-      showLastUpdated: dbSizeData?.hasNoData === false,
+      hasNoData: dbSizeData?.hasNoData ?? false,
     },
     storage_size: {
       isLoading: isLoadingStorageSizeData,
       margin: 14,
       data: storageSizeData?.data ?? [],
-      showLastUpdated: storageSizeData?.hasNoData === false,
+      hasNoData: storageSizeData?.hasNoData ?? false,
     },
     func_count: {
       isLoading: isLoadingFunctionCountData,
       margin: 0,
       data: functionCountData?.data ?? [],
-      showLastUpdated: functionCountData?.hasNoData === false,
+      hasNoData: functionCountData?.hasNoData ?? false,
     },
   }
 
@@ -101,14 +104,14 @@ const SizeAndCounts = ({ projectRef }: SizeAndCountsProps) => {
           (x: any) => x.loopId > 0 && x[attribute.attribute] === 0
         )
         const lastKnownValue =
-          lastZeroValue !== undefined
+          lastZeroValue !== undefined && !chartMeta[attribute.key]?.hasNoData
             ? dayjs(lastZeroValue.period_start)
                 .subtract(1, 'day')
                 .format('DD MMM YYYY, HH:mma (ZZ)')
             : undefined
 
         return (
-          <SectionContent key={attribute.key} section={attribute}>
+          <SectionContent key={attribute.key} section={attribute} lastKnownValue={lastKnownValue}>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
@@ -212,9 +215,6 @@ const SizeAndCounts = ({ projectRef }: SizeAndCountsProps) => {
                   {paragraph}
                 </p>
               ))}
-              {lastKnownValue !== undefined && chartMeta[attribute.key].showLastUpdated && (
-                <span className="text-sm text-scale-1000">Last updated at: {lastKnownValue}</span>
-              )}
             </div>
             {chartMeta[attribute.key].isLoading ? (
               <div className="space-y-2">
