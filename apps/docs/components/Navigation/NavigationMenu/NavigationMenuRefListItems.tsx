@@ -1,7 +1,7 @@
 import * as Accordion from '@radix-ui/react-accordion'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { IconChevronLeft } from 'ui'
+import { IconChevronLeft, IconChevronUp } from 'ui'
 import * as NavItems from './NavigationMenu.constants'
 
 import { find } from 'lodash'
@@ -15,6 +15,7 @@ import { RefIdOptions, RefKeyOptions } from './NavigationMenu'
 import React, { Fragment } from 'react'
 import { generateAllowedClientLibKeys } from '~/lib/refGenerator/helpers'
 import { isFuncNotInLibraryOrVersion } from './NavigationMenu.utils'
+import { cn } from 'ui/src/utils/cn'
 
 const HeaderImage = React.memo(function HeaderImage(props: any) {
   const router = useRouter()
@@ -31,8 +32,6 @@ const HeaderImage = React.memo(function HeaderImage(props: any) {
 })
 
 const HeaderLink = React.memo(function HeaderLink(props: any) {
-  const router = useRouter()
-
   return (
     <span className={['text-base text-brand-1200 ', !props.title && 'capitalize'].join(' ')}>
       {props.title ?? props.id}
@@ -46,6 +45,8 @@ const FunctionLink = React.memo(function FunctionLink({
   icon,
   library,
   slug,
+  isParent = false,
+  isSubItem = false,
 }: {
   title: string
   name?: string
@@ -54,6 +55,8 @@ const FunctionLink = React.memo(function FunctionLink({
   product?: string
   library: string
   slug: string
+  isParent: boolean
+  isSubItem: boolean
 }) {
   const router = useRouter()
   const activeAccordianItem = useMenuActiveRefId()
@@ -70,16 +73,29 @@ const FunctionLink = React.memo(function FunctionLink({
 
   const active = activeAccordianItem === id
   return (
-    <li key={id} className="function-link-item">
+    <li key={id} className="function-link-item leading-5">
       <Link href={`/reference/${library}/${version ? version + '/' : ''}${slug}`} passHref>
         <a
-          className={[
-            'cursor-pointer transition text-sm hover:text-brand-900 flex gap-3',
-            active ? 'text-brand-900' : 'text-scale-1000',
-          ].join(' ')}
+          className={cn(
+            'cursor-pointer transition text-sm hover:text-scale-1200 gap-3 relative',
+            isParent ? 'flex justify-between' : 'leading-3',
+            active ? 'text-brand-900' : 'text-scale-1000'
+          )}
         >
           {icon && <Image width={16} height={16} alt={icon} src={`${router.basePath}${icon}`} />}
           {title}
+          {active && !isSubItem && (
+            <div
+              aria-hidden="true"
+              className="absolute -left-[13px] top-0 bottom-0 w-[1px] bg-brand-1000"
+            ></div>
+          )}
+          {isParent && (
+            <IconChevronUp
+              width={16}
+              className="data-open-parent:rotate-0 data-closed-parent:rotate-90 transition"
+            />
+          )}
         </a>
       </Link>
     </li>
@@ -121,26 +137,37 @@ const RenderLink = React.memo(function RenderLink(props: any) {
       value={active ? props.id : ''}
     >
       <Accordion.Item key={props.id + '-accordian-item'} value={props.id}>
-        <FunctionLink library={props.lib} title={props.title} id={props.id} slug={props.slug} />
-        <Accordion.Content
-          key={props.id + '-sub-items-accordion-container'}
-          className="transition data-open:animate-slide-down data-closed:animate-slide-up ml-2"
-        >
-          {props.items &&
-            props.items
-              .filter((item) => props.allowedKeys.includes(item.id))
-              .map((item) => {
-                return (
-                  <FunctionLink
-                    key={item.title}
-                    library={props.lib}
-                    title={item.title}
-                    id={item.id}
-                    slug={item.slug}
-                  />
-                )
-              })}
-        </Accordion.Content>
+        <FunctionLink
+          library={props.lib}
+          title={props.title}
+          id={props.id}
+          slug={props.slug}
+          isParent={props.items}
+          isSubItem={true}
+        />
+        {props.items && (
+          <Accordion.Content
+            key={props.id + '-sub-items-accordion-container'}
+            className="transition data-open:animate-slide-down data-closed:animate-slide-up border-l border-scale-600 pl-3 ml-1 data-open:mt-2 grid gap-2.5"
+          >
+            {props.items &&
+              props.items
+                .filter((item) => props.allowedKeys.includes(item.id))
+                .map((item) => {
+                  return (
+                    <FunctionLink
+                      key={item.title}
+                      library={props.lib}
+                      title={item.title}
+                      id={item.id}
+                      slug={item.slug}
+                      isParent={false}
+                      isSubItem={false}
+                    />
+                  )
+                })}
+          </Accordion.Content>
+        )}
       </Accordion.Item>
     </Accordion.Root>
   )
@@ -244,7 +271,7 @@ const Content: React.FC<INavigationMenuRefList> = ({ id, lib, commonSections, sp
         <RevVersionDropdown />
       </div>
 
-      <ul className="function-link-list flex flex-col gap-1">
+      <ul className="function-link-list flex flex-col gap-2">
         {sections.map((fn: any, fnIndex) => {
           // run allow check
           if (isFuncNotInLibraryOrVersion(fn.id, fn.type, allowedKeys)) {
