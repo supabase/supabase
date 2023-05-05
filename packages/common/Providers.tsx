@@ -5,8 +5,6 @@ export interface UseThemeProps {
   /**
    * Toggle between dark mode and light mode.
    *
-   * ---
-   *
    * If `darkMode` left `undefined`, toggles between modes.
    *
    * If `darkMode` set, forces
@@ -31,11 +29,11 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
 
   useEffect(() => {
     const key = localStorage.getItem('supabaseDarkMode')
+    const mode = key === 'true'
 
-    // Default to dark mode if no preference config
-    const mode = !key || key === 'true'
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
 
-    toggleTheme(mode)
+    prefersDark ? toggleTheme(true) : toggleTheme(mode)
   }, [])
 
   const toggleTheme: UseThemeProps['toggleTheme'] = (darkMode) => {

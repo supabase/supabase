@@ -3,6 +3,7 @@ import dotenv from 'dotenv'
 import 'openai'
 import { Configuration, OpenAIApi } from 'openai'
 import { inspect } from 'util'
+import { v4 as uuidv4 } from 'uuid'
 import { fetchSources } from './sources'
 
 dotenv.config()
@@ -12,7 +13,14 @@ async function generateEmbeddings() {
   const args = process.argv.slice(2)
   const shouldRefresh = args.includes('--refresh')
 
-  const requiredEnvVars = ['NEXT_PUBLIC_SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY', 'OPENAI_KEY']
+  const requiredEnvVars = [
+    'NEXT_PUBLIC_SUPABASE_URL',
+    'SUPABASE_SERVICE_ROLE_KEY',
+    'OPENAI_KEY',
+    'SEARCH_GITHUB_APP_ID',
+    'SEARCH_GITHUB_APP_INSTALLATION_ID',
+    'SEARCH_GITHUB_APP_PRIVATE_KEY',
+  ]
 
   if (requiredEnvVars.some((name) => !process.env[name])) {
     throw new Error(
@@ -32,6 +40,12 @@ async function generateEmbeddings() {
       },
     }
   )
+
+  // Use this version to track which pages to purge
+  // after the refresh
+  const refreshVersion = uuidv4()
+
+  const refreshDate = new Date()
 
   const embeddingSources = await fetchSources()
 
@@ -92,6 +106,24 @@ async function generateEmbeddings() {
             throw updatePageError
           }
         }
+
+        // No content/embedding update required on this page
+        // Update other meta info
+        const { error: updatePageError } = await supabaseClient
+          .from('page')
+          .update({
+            type,
+            source,
+            meta,
+            version: refreshVersion,
+            last_refresh: refreshDate,
+          })
+          .filter('id', 'eq', existingPage.id)
+
+        if (updatePageError) {
+          throw updatePageError
+        }
+
         continue
       }
 
@@ -137,6 +169,8 @@ async function generateEmbeddings() {
             source,
             meta,
             parent_page_id: parentPage?.id,
+            version: refreshVersion,
+            last_refresh: refreshDate,
           },
           { onConflict: 'path' }
         )
@@ -215,6 +249,18 @@ async function generateEmbeddings() {
     }
   }
 
+  console.log(`Removing old pages and their sections`)
+
+  // Delete pages that have been removed (and their sections via cascade)
+  const { error: deletePageError } = await supabaseClient
+    .from('page')
+    .delete()
+    .filter('version', 'neq', refreshVersion)
+
+  if (deletePageError) {
+    throw deletePageError
+  }
+
   console.log('Embedding generation complete')
 }
 
@@ -222,4 +268,9 @@ async function main() {
   await generateEmbeddings()
 }
 
-main().catch((err) => console.error(err))
+main().catch((err) => {
+  console.error(err)
+
+  // Exit with non-zero code
+  process.exit(1)
+})
