@@ -1,29 +1,101 @@
 import { useParams } from 'common'
-
-import { withAuth } from 'hooks'
-import { NextPageWithLayout } from 'types'
-import { FormPanel } from 'components/ui/Forms'
 import APIAuthorizationLayout from 'components/layouts/APIAuthorizationLayout'
-import { Alert, Button, Listbox } from 'ui'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { FormPanel } from 'components/ui/Forms'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { useApiAuthorizationApproveMutation } from 'data/api-authorization/api-authorization-approve-mutation'
+import { useApiAuthorizationDeclineMutation } from 'data/api-authorization/api-authorization-decline-mutation'
 import { useApiAuthorizationQuery } from 'data/api-authorization/api-authorization-query'
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import dayjs from 'dayjs'
+import { useStore, withAuth } from 'hooks'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
+import { NextPageWithLayout } from 'types'
+import { Alert, Button, Listbox } from 'ui'
+
+// Need to handle if no organizations in account
+// Need to handle if not logged in yet state
 
 const APIAuthorizationPage: NextPageWithLayout = () => {
+  const { ui } = useStore()
+  const router = useRouter()
   const { auth_id } = useParams()
-  const { data: organizations, isLoading: isLoadingOrganizations } = useOrganizationsQuery()
-  // const { data: apiAuthDetails, isLoading, isSuccess, isError } = useApiAuthorizationQuery({ id: auth_id })
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [selectedOrg, setSelectedOrg] = useState<string>()
 
-  // [Joshen] To be replaced with actual API call above
-  const apiAuthDetails = {
-    icon: 'https://cdn-icons-png.flaticon.com/512/5969/5969044.png',
-    host: 'cloudflare.com',
-    name: 'Cloudflare',
+  const { data: organizations, isLoading: isLoadingOrganizations } = useOrganizationsQuery()
+  const { data: requester, isLoading, isError } = useApiAuthorizationQuery({ id: auth_id })
+  const isApproved = requester?.approved_at !== null
+  const isInvalid = requester?.name.length === 0 && requester.expires_at.length === 0
+  const isExpired = dayjs().isAfter(dayjs(requester?.expires_at))
+
+  const { mutateAsync: approveRequest } = useApiAuthorizationApproveMutation()
+  const { mutateAsync: declineRequest } = useApiAuthorizationDeclineMutation()
+
+  useEffect(() => {
+    if (!isLoadingOrganizations) {
+      setSelectedOrg(organizations?.[0].slug ?? undefined)
+    }
+  }, [isLoadingOrganizations])
+
+  const onApproveRequest = async () => {
+    if (!auth_id) {
+      return ui.setNotification({
+        category: 'error',
+        message: 'Unable to approve request: auth_id is missing ',
+      })
+    }
+    if (!selectedOrg) {
+      return ui.setNotification({
+        category: 'error',
+        message: 'Unable to approve request: No organization selected',
+      })
+    }
+
+    try {
+      setIsSubmitting(true)
+      const res = await approveRequest({ id: auth_id, organization_id: selectedOrg })
+      router.push(res.url)
+    } catch (error: any) {
+      ui.setNotification({
+        category: 'error',
+        message: `Failed to approve request: ${error.message}`,
+      })
+      setIsSubmitting(false)
+    }
   }
 
-  // [Joshen] To be replaced with actual API call above
-  const isApiAuthDetailsError = false
-  const isExpired = false
+  const onDeclineRequest = async () => {
+    if (!auth_id)
+      return ui.setNotification({
+        category: 'error',
+        message: 'Unable to decline request: auth_id is missing ',
+      })
+
+    try {
+      setIsSubmitting(true)
+      await declineRequest({ id: auth_id })
+      router.push('/projects')
+    } catch (error: any) {
+      ui.setNotification({
+        category: 'error',
+        message: `Failed to decline request: ${error.message}`,
+      })
+      setIsSubmitting(false)
+    }
+  }
+
+  if (isLoading) {
+    return (
+      <FormPanel header={<p>Authorize API access</p>}>
+        <div className="w-[500px] px-8 py-6 space-y-2">
+          <ShimmeringLoader />
+          <ShimmeringLoader className="w-3/4" />
+          <ShimmeringLoader className="w-1/2" />
+        </div>
+      </FormPanel>
+    )
+  }
 
   if (auth_id === undefined) {
     return (
@@ -37,9 +109,9 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
     )
   }
 
-  if (isApiAuthDetailsError) {
+  if (isInvalid || isError) {
     return (
-      <FormPanel header={<p>Authorization for API access</p>}>
+      <FormPanel header={<p>Authorize API access</p>}>
         <div className="w-[500px] px-8 py-6">
           <Alert
             withIcon
@@ -53,17 +125,43 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
     )
   }
 
+  if (isApproved) {
+    const approvedOrganization = organizations?.find(
+      (org) => org.slug === requester.approved_organization_slug
+    )
+
+    return (
+      <FormPanel header={<p>Authorize API access for {requester?.name}</p>}>
+        <div className="w-full md:w-[500px] px-8 py-6 space-y-8">
+          <Alert withIcon variant="success" title="This authorization request has been approved">
+            <p>
+              {requester.name} has read and write access to the organization "
+              {approvedOrganization?.name ?? 'Unknown'}" and all of its projects
+            </p>
+            <p className="mt-2">
+              Approved on: {dayjs(requester.approved_at).format('DD MMM YYYY HH:mm:ss (ZZ)')}
+            </p>
+          </Alert>
+        </div>
+      </FormPanel>
+    )
+  }
+
   return (
     <FormPanel
-      header={<p>Authorize API access for {apiAuthDetails.name}</p>}
+      header={<p>Authorize API access for {requester?.name}</p>}
       footer={
         <div className="flex items-center justify-end py-4 px-8">
           <div className="flex items-center space-x-2">
-            <Button type="default" disabled={isExpired} onClick={() => {}}>
+            <Button type="default" disabled={isSubmitting || isExpired} onClick={onDeclineRequest}>
               Decline
             </Button>
-            <Button disabled={isExpired} onClick={() => {}}>
-              Authorize {apiAuthDetails.name}
+            <Button
+              loading={isSubmitting}
+              disabled={isSubmitting || isExpired}
+              onClick={onApproveRequest}
+            >
+              Authorize {requester?.name}
             </Button>
           </div>
         </div>
@@ -76,23 +174,26 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
           <div>
             <div className="rounded-md border border-scale-600 p-2.5 flex items-center">
               <div
-                className="w-8 h-8 md:w-10 md:h-10 bg-center bg-no-repeat bg-cover"
-                style={{ backgroundImage: `url('${apiAuthDetails.icon}')` }}
-              ></div>
+                className="w-8 h-8 md:w-10 md:h-10 bg-center bg-no-repeat bg-cover flex items-center justify-center"
+                // [Joshen] For when we support icons
+                // style={{ backgroundImage: `url('${requester?.icon}')` }}
+              >
+                <p className="text-scale-1000 text-lg">{requester?.name[0]}</p>
+              </div>
             </div>
           </div>
           <p className="text-sm text-scale-1100">
-            {apiAuthDetails.name} is requesting API access to an organization. The application will
-            be able to{' '}
-            <span className="text-scale-1200">
-              read and write the organization's settings and projects
+            {requester?.name} ({requester?.domain}) is requesting API access to an organization. The
+            application will be able to{' '}
+            <span className="text-amber-1200">
+              read and write the organization's settings and all of its projects.
             </span>
           </p>
         </div>
 
         {/* Expiry warning */}
         {isExpired && (
-          <Alert withIcon variant="warning" title="This authorization is expired">
+          <Alert withIcon variant="warning" title="This authorization request is expired">
             Please retry your authorization request from the requesting app
           </Alert>
         )}
@@ -104,12 +205,17 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
             <ShimmeringLoader className="w-3/4" />
           </div>
         ) : (
-          <Listbox label="Select an organization to grant API access to" disabled={isExpired}>
+          <Listbox
+            label="Select an organization to grant API access to"
+            value={selectedOrg}
+            disabled={isExpired}
+            onChange={setSelectedOrg}
+          >
             {(organizations ?? []).map((organization) => (
               <Listbox.Option
                 key={organization.id}
                 label={organization.name}
-                value={organization.id}
+                value={organization.slug}
               >
                 {organization.name}
               </Listbox.Option>

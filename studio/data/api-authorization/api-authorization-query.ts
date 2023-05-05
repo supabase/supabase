@@ -9,7 +9,12 @@ export type ApiAuthorizationVariables = {
 }
 
 export type ApiAuthorizationResponse = {
-  id: string
+  name: string
+  website: string
+  domain: string
+  expires_at: string
+  approved_at: string | null
+  approved_organization_slug?: string
 }
 
 export async function getApiAuthorizationDetails(
@@ -18,8 +23,25 @@ export async function getApiAuthorizationDetails(
 ) {
   if (!id) throw new Error('Authorization ID is required')
 
-  const response = await get(`${API_ADMIN_URL}/oauth/authorization/${id}`, { signal })
-  if (response.error) throw response.error
+  const response = await get(`${API_ADMIN_URL}/oauth/authorizations/${id}`, { signal })
+  if (response.error) {
+    // 404 is a valid error in which the auth id is invalid
+    const isInvalid =
+      (response.error as any)?.code === 404 &&
+      (response.error as any)?.message?.includes('OAuth authorization request does not exist')
+
+    if (isInvalid) {
+      return {
+        name: '',
+        website: '',
+        domain: '',
+        expires_at: '',
+        approved_at: null,
+      } as ApiAuthorizationResponse
+    }
+
+    throw response.error
+  }
   return response as ApiAuthorizationResponse
 }
 
