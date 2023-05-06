@@ -85,18 +85,6 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
     }
   }
 
-  if (isLoading) {
-    return (
-      <FormPanel header={<p>Authorize API access</p>}>
-        <div className="w-[500px] px-8 py-6 space-y-2">
-          <ShimmeringLoader />
-          <ShimmeringLoader className="w-3/4" />
-          <ShimmeringLoader className="w-1/2" />
-        </div>
-      </FormPanel>
-    )
-  }
-
   if (auth_id === undefined) {
     return (
       <FormPanel header={<p>Authorization for API access</p>}>
@@ -104,6 +92,18 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
           <Alert withIcon variant="warning" title="Missing authorization ID">
             Please provide a valid authorization ID in the URL
           </Alert>
+        </div>
+      </FormPanel>
+    )
+  }
+
+  if (isLoading) {
+    return (
+      <FormPanel header={<p>Authorize API access</p>}>
+        <div className="w-[500px] px-8 py-6 space-y-2">
+          <ShimmeringLoader />
+          <ShimmeringLoader className="w-3/4" />
+          <ShimmeringLoader className="w-1/2" />
         </div>
       </FormPanel>
     )
