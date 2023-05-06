@@ -1,5 +1,5 @@
-import '../../../packages/ui/styles/themes/light.css'
-import '../../../packages/ui/styles/themes/dark.css'
+import '../../../packages/ui/build/css/themes/light.css'
+import '../../../packages/ui/build/css/themes/dark.css'
 
 import '../styles/ch.scss'
 import '../styles/main.scss?v=1.0.0'
