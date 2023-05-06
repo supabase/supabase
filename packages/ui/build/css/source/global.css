@@ -1,0 +1,114 @@
+/**
+ * Do not edit directly
+ * Generated on Sat, 06 May 2023 10:29:24 GMT
+ */
+
+:root {
+  --contentWidthScreenXl: 1128px;
+  --tableHeaderHorizontal: 32px;
+  --actionBarHorizontal: 32px;
+  --actionBarVertical: 21px;
+  --base: 16;
+  --inputSmHeight: 28px;
+  --datatableRowheight: 28px; /* Height of datatable rows */
+  --modalDropShadow: 1px 4px 4px 4px rgba(0,0,0,0.15);
+  --formInputDisabled: 0.33;
+  --iconWidthDefault: 1px;
+  --iconBg: 0.15; /* Transuclent bg of icons */
+  --iconMd: 18px;
+  --iconSm: 16px;
+  --iconXs: 12px;
+  --textDecorationNone: none;
+  --textCaseUppercase: uppercase;
+  --textCaseNone: none;
+  --fontSize2: 48.829px;
+  --fontSize1: 39.063px;
+  --fontSize0: 14px;
+  --innerShadowTextNew: inset 0 0.5px 0.5px 0 #00000026;
+  --innerShadowLabelCopy: inset 0 1px 1px 0 #858585;
+  --fontWeightsHeadingMono: 500;
+  --fontWeightsInter2: Book;
+  --fontWeightsInter1: 500;
+  --fontWeightsRoboto0: 400;
+  --fontWeightsBodyBold: 700;
+  --fontWeightsBodyRegular: 400;
+  --fontWeightsHeadingBold: 700;
+  --fontWeightsHeadingRegular: 400;
+  --paragraphSpacingH2: 26;
+  --paragraphSpacingH1: 32;
+  --paragraphSpacing1: 32;
+  --paragraphSpacing0: 26;
+  --letterSpacing8: 0.08em;
+  --letterSpacingDecreased: -0.05em;
+  --letterSpacingIncreased: 0.1em;
+  --letterSpacingDefault: 0;
+  --letterSpacing1: -0.02em;
+  --letterSpacing0: 0em;
+  --lineHeightsHeading: 1.1;
+  --lineHeights0: 1.1;
+  --fontFamiliesMono: Office Code Pro;
+  --fontFamiliesBody2: Circular Std;
+  --fontFamiliesRoboto: Roboto;
+  --fontFamiliesBody: Circular Std;
+  --fontFamiliesHeading: Inter;
+  --opacityHigh: 0.9;
+  --opacityMd: 0.5;
+  --opacityLow: 0.1;
+  --borderWidthLg: 8px;
+  --borderWidthMd: 4px;
+  --borderWidthSm: 2px;
+  --borderWidthXs: 1px;
+  --borderWidthNone: 0;
+  --borderRadiusXs: 2px;
+  --borderRadiusXl: 16px;
+  --borderRadiusLg: 8px;
+  --borderRadiusSm: 4px;
+  --sizingXs: 4px;
+  --sizingScale: 1.5px;
+  --spacingXs: 4px;
+  --spacingScale: 2px;
+  --panel2: var(--borderRadiusSm);
+  --optionsIcon: var(--iconMd); /* Size of product/dropdown icons icons */
+  --datatableHeadericon: var(--iconSm);
+  --panel: var(--borderRadiusXs);
+  --fontSizes9xl: 128;
+  --fontSizes8xl: 96;
+  --fontSizes7xl: 72;
+  --fontSizes6xl: 60;
+  --fontSizesXs: 12;
+  --fontSizesSm: 14;
+  --fontSizesBase: var(--base);
+  --fontSizesLg: 18;
+  --fontSizesXl: 20;
+  --fontSizes2xl: 24;
+  --fontSizes3xl: 30;
+  --fontSizes4xl: 36;
+  --fontSizes5xl: 48;
+  --lineHeights9xl: 128;
+  --lineHeights8xl: 96;
+  --lineHeights7xl: 72;
+  --lineHeights6xl: 60;
+  --lineHeights5xl: 48;
+  --lineHeights4xl: 40;
+  --lineHeights3xl: var(--base) *2.25;
+  --lineHeights2xl: 32;
+  --lineHeightsXl: 28;
+  --lineHeightsLg: 28;
+  --lineHeightsSm: 20;
+  --lineHeightsXs: var(--base);
+  --lineHeightsBase: 24;
+  --borderRadiusTableHeader: var(--borderRadiusSm);
+  --sizingSm: 6px;
+  --spacingSm: 8px;
+  --sizingMd: 9px;
+  --spacingMd: 16px;
+  --controllerVertical: var(--spacingMd);
+  --tabsHorizontal: var(--spacingMd);
+  --sizingLg: 13.5px;
+  --spacingLg: 3var(--spacingScale);
+  --contentHorizontal: var(--spacingLg);
+  --contentVertical: var(--spacingLg);
+  --sizingXl: 20.25px;
+  --spacingXl: 64px;
+  --xxl: 128px;
+}

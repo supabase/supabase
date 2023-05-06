@@ -1,7 +1,7 @@
 const ui = require('./ui.config.js')
 const deepMerge = require('deepmerge')
 
-const color = require('./../ui/styles/tw-extend/color')
+const color = require('./../ui/build/css/tw-extend/color')
 
 function generateTwColorClasses(globalKey, twAttributes) {
   let classes = {}
@@ -16,8 +16,6 @@ function generateTwColorClasses(globalKey, twAttributes) {
   })
   return classes
 }
-
-console.log(generateTwColorClasses('borderColor', color))
 
 const uiConfig = ui({
   mode: 'JIT',

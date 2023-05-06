@@ -16,5 +16,8 @@
     "eslint-plugin-react": "7.28.0",
     "tailwindcss-radix": "^2.0.0",
     "@tailwindcss/typography": "^0.5.2"
+  },
+  "devDependencies": {
+    "glob": "^8.1.0"
   }
 }
