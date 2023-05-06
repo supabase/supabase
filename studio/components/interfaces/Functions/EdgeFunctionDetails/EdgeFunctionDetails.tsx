@@ -123,6 +123,9 @@ const EdgeFunctionDetails: FC<Props> = () => {
           {({ isSubmitting, handleReset, values, initialValues, resetForm }: any) => {
             const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
 
+            // [Alaister] although this "technically" is breaking the rules of React hooks
+            // it won't error because the hooks are always rendered in the same order
+            // eslint-disable-next-line react-hooks/rules-of-hooks
             useEffect(() => {
               if (selectedFunction !== undefined) {
                 const formValues = {
@@ -132,6 +135,7 @@ const EdgeFunctionDetails: FC<Props> = () => {
                 resetForm({ values: formValues, initialValues: formValues })
               }
             }, [selectedFunction])
+
             return (
               <>
                 <FormPanel
@@ -209,7 +213,7 @@ const EdgeFunctionDetails: FC<Props> = () => {
                         </p>
                         <div className="!mt-4">
                           <Link href="https://supabase.com/docs/guides/functions/import-maps">
-                            <a target="_blank">
+                            <a target="_blank" rel="noreferrer">
                               <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
                                 More about import maps
                               </Button>

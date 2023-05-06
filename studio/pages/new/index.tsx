@@ -42,8 +42,7 @@ const Wizard: NextPageWithLayout = () => {
   const [newOrgLoading, setNewOrgLoading] = useState(false)
 
   function validateOrgName(name: any) {
-    const value = name ? name.trim() : ''
-    return value.length >= 1
+    return name.length >= 1
   }
 
   function onOrgNameChange(e: any) {
@@ -60,7 +59,8 @@ const Wizard: NextPageWithLayout = () => {
 
   async function onClickSubmit(e: any) {
     e.preventDefault()
-    const isOrgNameValid = validateOrgName(orgName)
+    const trimmedOrgName = orgName ? orgName.trim() : ''
+    const isOrgNameValid = validateOrgName(trimmedOrgName)
     if (!isOrgNameValid) {
       ui.setNotification({ category: 'error', message: 'Organization name is empty' })
       return
@@ -68,7 +68,7 @@ const Wizard: NextPageWithLayout = () => {
 
     setNewOrgLoading(true)
     const response = await post(`${API_URL}/organizations`, {
-      name: orgName,
+      name: trimmedOrgName,
       kind: orgKind,
       ...(orgKind == 'COMPANY' ? { size: orgSize } : {}),
     })

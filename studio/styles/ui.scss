@@ -430,3 +430,14 @@
     @apply stroke-green-500;
   }
 }
+
+.recharts-cartesian-axis-tick {
+  text {
+    @apply text-xs;
+  }
+}
+.recharts-reference-line {
+  line {
+    @apply stroke-scale-1000;
+  }
+}

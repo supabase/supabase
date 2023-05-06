@@ -22,6 +22,7 @@ import { useStore, useFlag } from 'hooks'
 import { post, get } from 'lib/common/fetch'
 import { detectBrowser } from 'lib/helpers'
 import { API_URL, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
+import { useProfileQuery } from 'data/profile/profile-query'
 
 import Divider from 'components/ui/Divider'
 import Connecting from 'components/ui/Loading'
@@ -74,6 +75,9 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
       objectUrls.forEach((url: any) => URL.revokeObjectURL(url))
     }
   }, [uploadedFiles])
+
+  const { data: profile } = useProfileQuery()
+  const respondToEmail = profile?.primary_email ?? 'your email'
 
   if (!isInitialized) {
     return (
@@ -213,6 +217,9 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
           isFreeProject &&
           ['Performance', 'Problem'].includes(values.category)
 
+        // [Alaister] although this "technically" is breaking the rules of React hooks
+        // it won't error because the hooks are always rendered in the same order
+        // eslint-disable-next-line react-hooks/rules-of-hooks
         useEffect(() => {
           if (values.projectRef === 'no-project') {
             const updatedValues = { ...values, organizationSlug: sortedOrganizations[0]?.slug }
@@ -352,7 +359,7 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
                           </a>
                         </Link>
                         <Link href="https://supabase.com/contact/enterprise">
-                          <a target="_blank">
+                          <a target="_blank" rel="noreferrer">
                             <Button type="default" icon={<IconExternalLink size={14} />}>
                               Enquire about Enterprise
                             </Button>
@@ -448,7 +455,7 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
                                 </div>
                                 <div>
                                   <Link href={library.url}>
-                                    <a target="_blank">
+                                    <a target="_blank" rel="noreferrer">
                                       <Button
                                         type="default"
                                         icon={<IconExternalLink size={14} strokeWidth={1.5} />}
@@ -475,7 +482,7 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
                             </div>
                             <div>
                               <Link href="https://github.com/supabase/supabase">
-                                <a target="_blank">
+                                <a target="_blank" rel="noreferrer">
                                   <Button
                                     type="default"
                                     icon={<IconExternalLink size={14} strokeWidth={1.5} />}
@@ -573,6 +580,11 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
                       </div>
                     </div>
                     <div className="px-6">
+                      <div className="flex justify-end">
+                        <p className="block text-sm text-scale-1000 mt-0 mb-2">
+                          We will contact you at {respondToEmail}.
+                        </p>
+                      </div>
                       <div className="flex justify-end">
                         <Button
                           htmlType="submit"

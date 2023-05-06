@@ -114,6 +114,7 @@ const SideBarContent = observer(() => {
                   side="bottom"
                   overlay={[
                     <Dropdown.Item
+                      key="new-ai-query"
                       onClick={() => {
                         setIsOpen(true)
                         setPages([COMMAND_ROUTES.GENERATE_SQL])

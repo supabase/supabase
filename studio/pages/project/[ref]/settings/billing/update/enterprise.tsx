@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 
-import { useStore, useFlag } from 'hooks'
+import { useStore } from 'hooks'
 import { NextPageWithLayout } from 'types'
 import { API_URL, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import { get } from 'lib/common/fetch'
@@ -18,7 +18,6 @@ const BillingUpdateEnterprise: NextPageWithLayout = () => {
 
   const projectRef = ui.selectedProject?.ref
   const orgSlug = ui.selectedOrganization?.slug
-  const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
 
   const [isLoadingPaymentMethods, setIsLoadingPaymentMethods] = useState(false)
   const [subscription, setSubscription] = useState<StripeSubscription>()
@@ -29,9 +28,7 @@ const BillingUpdateEnterprise: NextPageWithLayout = () => {
     subscription && subscription.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
 
   useEffect(() => {
-    if (projectUpdateDisabled) {
-      router.push(`/project/${projectRef}/settings/billing/update`)
-    } else if (projectRef) {
+    if (projectRef) {
       getStripeProducts()
       getSubscription()
     }
@@ -114,6 +111,7 @@ const BillingUpdateEnterprise: NextPageWithLayout = () => {
       currentSubscription={subscription}
       isLoadingPaymentMethods={isLoadingPaymentMethods}
       paymentMethods={paymentMethods || []}
+      onPaymentMethodAdded={() => getPaymentMethods()}
     />
   )
 }

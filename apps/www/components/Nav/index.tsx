@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
-import { Button, Badge, IconStar, IconChevronDown } from 'ui'
+import { Button, Badge, Announcement, AnnouncementCountdown, IconStar, IconChevronDown } from 'ui'
 import FlyOut from '~/components/UI/FlyOut'
 import Transition from 'lib/Transition'
 
@@ -10,8 +10,7 @@ import SolutionsData from 'data/Solutions.json'
 
 import Solutions from '~/components/Nav/Product'
 import Developers from '~/components/Nav/Developers'
-import Announcement from '~/components/Nav/Announcement'
-import CountdownBanner from '~/components/LaunchWeek/Banners/CountdownBanner'
+
 import ScrollProgress from '~/components/ScrollProgress'
 
 import { useIsLoggedIn, useTheme } from 'common'
@@ -19,6 +18,7 @@ import TextLink from '../TextLink'
 import Image from 'next/image'
 import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
+
 import * as supabaseLogoWordmarkWhite from 'common/assets/images/supabase-logo-wordmark--white.png'
 
 const Nav = () => {
@@ -198,7 +198,7 @@ const Nav = () => {
   return (
     <>
       <Announcement>
-        <CountdownBanner />
+        <AnnouncementCountdown />
       </Announcement>
       <div className="sticky top-0 z-40 transform" style={{ transform: 'translate3d(0,0,999px)' }}>
         <div
@@ -261,6 +261,18 @@ const Nav = () => {
                       ].join(' ')}
                     >
                       Pricing
+                    </a>
+                  </Link>
+                  <Link href="/docs">
+                    <a
+                      className={[
+                        `text-scale-1200 hover:text-brand-900 hover:border-brand-900 dark:text-dark-100 dark:hover:border-dark-100 inline-flex items-center
+                        border-b-2 border-transparent p-5 px-1
+                        text-sm font-medium`,
+                        showLaunchWeekNavMode && '!text-white',
+                      ].join(' ')}
+                    >
+                      Docs
                     </a>
                   </Link>
                   <Link href="/blog">
@@ -406,7 +418,14 @@ const Nav = () => {
                       Pricing
                     </a>
                   </Link>
-
+                  <Link href="/docs">
+                    <a
+                      target="_blank"
+                      className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white"
+                    >
+                      Docs
+                    </a>
+                  </Link>
                   <Link href="https://github.com/supabase/supabase">
                     <a
                       target="_blank"
