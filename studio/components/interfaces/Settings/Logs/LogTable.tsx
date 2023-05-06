@@ -150,8 +150,6 @@ const LogTable = ({
     }
   }, [stringData])
 
-  if (!data) return null
-
   // [Joshen] Hmm quite hacky now, but will do
   const maxHeight = !queryType ? 'calc(100vh - 42px - 10rem)' : 'calc(100vh - 42px - 3rem)'
 
@@ -251,6 +249,8 @@ const LogTable = ({
       </div>
     </div>
   )
+
+  if (!data) return null
 
   return (
     <>

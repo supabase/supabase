@@ -47,6 +47,7 @@
     "postcss-loader": "^7.2.4",
     "prop-types": "^15.7.2",
     "react-copy-to-clipboard": "^5.1.0",
+    "react-countdown": "^2.3.5",
     "react-feather": "^2.0.10",
     "react-markdown": "^8.0.3",
     "react-syntax-highlighter": "^15.5.0",
@@ -68,15 +69,17 @@
     "@tokens-studio/sd-transforms": "^0.8.5",
     "@types/common-tags": "^1.8.1",
     "@types/react": "^17.0.37",
+    "@types/react-copy-to-clipboard": "^5.0.4",
     "@types/react-dom": "^17.0.11",
     "color2k": "^2.0.1",
     "copyfiles": "^2.4.1",
     "expr-eval": "^2.0.2",
     "glob": "^8.1.0",
-    "sql-formatter": "^12.2.0",
     "storybook": "^7.0.5",
     "storybook-dark-mode": "^3.0.0",
     "style-dictionary": "^3.7.1",
+    "@types/react-syntax-highlighter": "^15.5.6",
+    "sql-formatter": "^12.2.0",
     "typescript": "4.3.4"
   }
 }

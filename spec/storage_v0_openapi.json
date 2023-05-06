@@ -91,8 +91,9 @@
                   },
                   "allowed_mime_types": {
                     "type": "array",
-                    "items": { "type": "string" },
-                    "examples": [["image/png", "image/jpg"]]
+                    "nullable": true,
+                    "examples": [["image/png", "image/jpg"]],
+                    "items": { "type": "string" }
                   }
                 },
                 "required": ["name"]

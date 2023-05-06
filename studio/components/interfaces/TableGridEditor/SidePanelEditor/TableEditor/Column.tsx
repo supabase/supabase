@@ -214,7 +214,7 @@ const Column: FC<Props> = ({
                     </>
                   )}
 
-                  {isNewRecord && (
+                  {column.isNewColumn && (
                     <>
                       <Checkbox
                         label="Is Unique"

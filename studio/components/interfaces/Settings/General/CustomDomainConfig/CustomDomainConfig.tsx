@@ -5,7 +5,10 @@ import { IconAlertCircle } from 'ui'
 import { useStore } from 'hooks'
 import { useParams } from 'common/hooks'
 import { useProjectApiQuery } from 'data/config/project-api-query'
-import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
+import {
+  CustomDomainResponse,
+  useCustomDomainsQuery,
+} from 'data/custom-domains/custom-domains-query'
 import Panel from 'components/ui/Panel'
 import { FormHeader } from 'components/ui/Forms'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
@@ -75,7 +78,9 @@ const CustomDomainConfig = () => {
         <Panel>
           {isSuccess && (
             <div className="flex flex-col">
-              {(data.status === '2_initiated' || data.status === '3_challenge_verified') && (
+              {(data.status === '1_not_started' ||
+                data.status === '2_initiated' ||
+                data.status === '3_challenge_verified') && (
                 <CustomDomainVerify
                   projectRef={ref}
                   customDomain={data.customDomain}
