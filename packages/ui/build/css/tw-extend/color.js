@@ -1,0 +1,21 @@
+module.exports = {
+"theme-variables-brand": "var(--themeVariablesBrand, #2b825b);",
+"theme-variables-background": "var(--themeVariablesBackground, #232323);",
+"theme-variables-background-body": "var(--themeVariablesBackgroundBody, #1c1c1c);",
+"theme-variables-background-body-alt": "var(--themeVariablesBackgroundBodyAlt, #161616);",
+"theme-variables-text-body": "var(--themeVariablesTextBody, #ededed);",
+"backgroundColor-DEFAULT": "var(--backgroundColorDefault, #232323);",
+"backgroundColor-body": "var(--backgroundColorBody, #1c1c1c);",
+"backgroundColor-body-alt": "var(--backgroundColorBodyAlt, #161616);",
+"backgroundColor-selection": "var(--backgroundColorSelection, lch(18 0 0));",
+"backgroundColor-control": "var(--backgroundColorControl, lch(9.6 0 0));",
+"borderColor-DEFAULT": "var(--borderColorDefault, lch(18 0 0));",
+"borderColor-body": "var(--borderColorBody, lch(14.8 0 0));",
+"borderColor-control": "var(--borderColorControl, lch(22.1 0 0));",
+"text-DEFAULT": "var(--textDefault, #ededed);",
+"text-body-light": "var(--textBodyLight, lch(65.6 0 0));",
+"text-body-lighter": "var(--textBodyLighter, lch(46.9 0 0));",
+"text-body-lightest": "var(--textBodyLightest, lch(32.8 0 0));",
+"utility-mix-positive": "var(--utilityMixPositive, #fff);",
+"utility-mix-negative": "var(--utilityMixNegative, #000);"
+}

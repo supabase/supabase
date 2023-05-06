@@ -1,0 +1,34 @@
+/**
+ * Do not edit directly
+ * Generated on Sat, 06 May 2023 10:29:24 GMT
+ */
+
+.light {
+  --utilityGithubBackground: #ffffff;
+  --utilityMixNegative: #fff;
+  --utilityMixPositive: #000;
+  --darkenPercentage: 0.2;
+  --lightenHardest: 0.65;
+  --lightenHarder: 0.5;
+  --lightenHard: 0.3;
+  --lightenSoft: 0.035;
+  --lightenDefault: 0.1;
+  --textOverrideLightenStrength: 5;
+  --themeVariablesTextBody: #1a1d1e; /* og color is colors.Slate.Dark.2 */
+  --themeVariablesBackgroundBodyAlt: #fff; /*  og color is colors.Gray.Dark.1 */
+  --themeVariablesBackgroundBody: #f8f9fa; /* og color is colors.Slate.Light.2 */
+  --themeVariablesBackground: #fbfcfd; /* og color is  colors.Slate.Light.1 */
+  --themeVariablesBrand: #2b825b;
+  --textDefault: var(--themeVariablesTextBody);
+  --backgroundColorBodyAlt: var(--themeVariablesBackgroundBodyAlt);
+  --backgroundColorBody: var(--themeVariablesBackgroundBody); /* Background color used for the main page body. */
+  --backgroundColorDefault: var(--themeVariablesBackground); /* Default background color for any container. */
+  --textBodyLightest: lch(68.7 0.61 224);
+  --textBodyLighter: lch(55.2 0.87 224);
+  --textBodyLight: lch(37.3 1.22 224);
+  --borderColorBody: lch(94.4 0.62 251);
+  --borderColorDefault: lch(95.4 0.62 251); /* Default border color */
+  --backgroundColorControl: lch(99.2 0.45 251);
+  --backgroundColorSelection: lch(95.4 0.62 251);
+  --borderColorControl: lch(92.1 0.6 251);
+}

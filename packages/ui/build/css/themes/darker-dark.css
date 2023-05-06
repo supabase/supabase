@@ -1,0 +1,33 @@
+/**
+ * Do not edit directly
+ * Generated on Sat, 06 May 2023 10:29:24 GMT
+ */
+
+.darker-dark {
+  --utilityMixNegative: #000;
+  --utilityMixPositive: #fff;
+  --darkenPercentage: 0.2;
+  --lightenHardest: 0.65;
+  --lightenHarder: 0.5;
+  --lightenHard: 0.3;
+  --lightenSoft: 0.05;
+  --lightenDefault: 0.1;
+  --textOverrideLightenStrength: 0;
+  --themeVariablesTextBody: #ebebeb; /* $colors.Gray.Dark.12 */
+  --themeVariablesBackgroundBodyAlt: #161616; /* $colors.Gray.Dark.1 */
+  --themeVariablesBackgroundBody: #000; /* $colors.Gray.Dark.2 */
+  --themeVariablesBackground: #141414; /* $colors.Gray.Dark.3 */
+  --themeVariablesBrand: #d626dc;
+  --textDefault: var(--themeVariablesTextBody);
+  --backgroundColorBodyAlt: var(--themeVariablesBackgroundBodyAlt);
+  --backgroundColorBody: var(--themeVariablesBackgroundBody); /* Background color used for the main page body. */
+  --backgroundColorDefault: var(--themeVariablesBackground); /* Default background color for any container. */
+  --textBodyLightest: lch(32.6 0 0);
+  --textBodyLighter: lch(46.5 0 0);
+  --textBodyLight: lch(65.1 0 0);
+  --borderColorBody: lch(5 0 0);
+  --borderColorDefault: lch(11 0 0); /* Default border color */
+  --backgroundColorControl: lch(4.42 0 0);
+  --backgroundColorSelection: lch(11 0 0);
+  --borderColorControl: lch(15.4 0 0);
+}
