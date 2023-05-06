@@ -1,0 +1,10 @@
+{
+  "tokenSetOrder": [
+    "global",
+    "typography",
+    "global-two",
+    "root",
+    "light",
+    "darker-dark"
+  ]
+}

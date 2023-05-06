@@ -1,0 +1,30 @@
+{
+  "theme-variables": {
+    "brand": {
+      "value": "#d626dc",
+      "type": "color"
+    },
+    "background": {
+      "value": "#141414",
+      "type": "color",
+      "description": "$colors.Gray.Dark.3"
+    },
+    "background-body": {
+      "value": "#000",
+      "type": "color",
+      "description": "$colors.Gray.Dark.2"
+    },
+    "background-body-alt": {
+      "value": "#161616",
+      "type": "color",
+      "description": "$colors.Gray.Dark.1"
+    },
+    "text": {
+      "body": {
+        "value": "#ebebeb",
+        "type": "color",
+        "description": "$colors.Gray.Dark.12"
+      }
+    }
+  }
+}

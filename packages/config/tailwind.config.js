@@ -17,6 +17,8 @@ function generateTwColorClasses(globalKey, twAttributes) {
   return classes
 }
 
+console.log(generateTwColorClasses('borderColor', color))
+
 const uiConfig = ui({
   mode: 'JIT',
   darkMode: 'class',

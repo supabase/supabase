@@ -15,7 +15,8 @@
     "copy-tokens": "node copy-tokens.js",
     "build-styles": "npm run copy-tokens && npm run build-transform && node style-token.js",
     "build-storybook": "storybook build",
-    "storybook": "storybook dev -p 6006"
+    "storybook": "storybook dev -p 6006",
+    "build-tokens": "node build-tokens.js"
   },
   "dependencies": {
     "@headlessui/react": "^1.0.0",
@@ -34,8 +35,10 @@
     "autoprefixer": "^10.4.14",
     "clsx": "^1.2.1",
     "cmdk-supabase": "^0.2.2",
+    "colorjs.io": "^0.4.3",
     "common-tags": "^1.8.2",
     "config": "*",
+    "d": "^1.0.1",
     "formik": "^2.2.9",
     "lodash": "^4.17.20",
     "lucide-react": "^0.124.0",
@@ -62,6 +65,7 @@
     "@storybook/addon-styling": "^1.0.1",
     "@storybook/react": "^7.0.5",
     "@storybook/react-webpack5": "^7.0.5",
+    "@tokens-studio/sd-transforms": "^0.8.5",
     "@types/common-tags": "^1.8.1",
     "@types/react": "^17.0.37",
     "@types/react-dom": "^17.0.11",
