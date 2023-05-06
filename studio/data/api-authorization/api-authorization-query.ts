@@ -24,29 +24,12 @@ export async function getApiAuthorizationDetails(
   if (!id) throw new Error('Authorization ID is required')
 
   const response = await get(`${API_ADMIN_URL}/oauth/authorizations/${id}`, { signal })
-  if (response.error) {
-    // 404 is a valid error in which the auth id is invalid
-    const isInvalid =
-      (response.error as any)?.code === 404 &&
-      (response.error as any)?.message?.includes('OAuth authorization request does not exist')
-
-    if (isInvalid) {
-      return {
-        name: '',
-        website: '',
-        domain: '',
-        expires_at: '',
-        approved_at: null,
-      } as ApiAuthorizationResponse
-    }
-
-    throw response.error
-  }
+  if (response.error) throw response.error
   return response as ApiAuthorizationResponse
 }
 
 export type ResourceData = Awaited<ReturnType<typeof getApiAuthorizationDetails>>
-export type ResourceError = unknown
+export type ResourceError = { errorEventId: string; message: string }
 
 export const useApiAuthorizationQuery = <TData = ResourceData>(
   { id }: ApiAuthorizationVariables,
