@@ -1,0 +1,23 @@
+{
+  "menu-item-section": {
+    "value": "5px",
+    "type": "spacing"
+  },
+  "context-menu": {
+    "value": "6px",
+    "type": "borderRadius"
+  },
+  "dropShadow": {
+    "context-menu": {
+      "value": {
+        "x": "0",
+        "y": "2",
+        "blur": "5",
+        "spread": "3",
+        "color": "rgba(0,0,0,0.1)",
+        "type": "dropShadow"
+      },
+      "type": "boxShadow"
+    }
+  }
+}

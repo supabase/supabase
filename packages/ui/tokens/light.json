@@ -1,0 +1,61 @@
+{
+  "theme-variables": {
+    "background": {
+      "value": "#fbfcfd",
+      "type": "color",
+      "description": "og color is  colors.Slate.Light.1"
+    },
+    "background-body": {
+      "value": "#f8f9fa",
+      "type": "color",
+      "description": "og color is colors.Slate.Light.2"
+    },
+    "background-body-alt": {
+      "value": "#fff",
+      "type": "color"
+    },
+    "text": {
+      "body": {
+        "value": "#1a1d1e",
+        "type": "color",
+        "description": "og color is colors.Slate.Dark.2"
+      }
+    }
+  },
+  "lighten": {
+    "DEFAULT": {
+      "value": "0.1",
+      "type": "other"
+    },
+    "soft": {
+      "value": "0.035",
+      "type": "other"
+    }
+  },
+  "darken-percentage": {
+    "value": "0.2",
+    "type": "other"
+  },
+  "utility": {
+    "mix-positive": {
+      "value": "#000",
+      "type": "color"
+    },
+    "mix-negative": {
+      "value": "#fff",
+      "type": "color"
+    },
+    "github": {
+      "background": {
+        "value": "#ffffff",
+        "type": "color"
+      }
+    }
+  },
+  "text": {
+    "override-lighten-strength": {
+      "value": "5",
+      "type": "other"
+    }
+  }
+}
