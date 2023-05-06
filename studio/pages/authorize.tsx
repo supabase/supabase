@@ -24,9 +24,8 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
   const [selectedOrg, setSelectedOrg] = useState<string>()
 
   const { data: organizations, isLoading: isLoadingOrganizations } = useOrganizationsQuery()
-  const { data: requester, isLoading, isError } = useApiAuthorizationQuery({ id: auth_id })
+  const { data: requester, isLoading, isError, error } = useApiAuthorizationQuery({ id: auth_id })
   const isApproved = requester?.approved_at !== null
-  const isInvalid = requester?.name.length === 0 && requester.expires_at.length === 0
   const isExpired = dayjs().isAfter(dayjs(requester?.expires_at))
 
   const { mutateAsync: approveRequest } = useApiAuthorizationApproveMutation()
@@ -75,6 +74,7 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
     try {
       setIsSubmitting(true)
       await declineRequest({ id: auth_id })
+      ui.setNotification({ category: 'success', message: 'Declined API authorization request' })
       router.push('/projects')
     } catch (error: any) {
       ui.setNotification({
@@ -109,7 +109,7 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
     )
   }
 
-  if (isInvalid || isError) {
+  if (isError) {
     return (
       <FormPanel header={<p>Authorize API access</p>}>
         <div className="w-[500px] px-8 py-6">
@@ -118,7 +118,8 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
             variant="warning"
             title="Failed to fetch details for API authorization request"
           >
-            Please retry your authorization request from the requesting app
+            <p>Please retry your authorization request from the requesting app</p>
+            {error !== undefined && <p className="mt-2">Error: {error?.message}</p>}
           </Alert>
         </div>
       </FormPanel>
