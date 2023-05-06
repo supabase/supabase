@@ -5,73 +5,74 @@
 
 ---
 
-# Supabase
+# سپابیس(Supabase) 
 
-[Supabase](https://supabase.com) is an open source Firebase alternative. We're building the features of Firebase using enterprise-grade open source tools.
+سپابیس  ایک کھلے سورس فائربیس کا متبادل ہے۔ ہم فائربیس کی خصوصیات کو اینٹرپرائز گریڈ کھلے سورس ٹولز کی مدد سے تعمیر کر رہے ہیں۔
 
-- [x] Hosted Postgres Database. [Docs](https://supabase.com/docs/guides/database)
-- [x] Authentication and Authorization. [Docs](https://supabase.com/docs/guides/auth)
-- [x] Auto-generated APIs.
+- [x] [Docs](https://supabase.com/docs/guides/database) میزبان پوسٹگریس ڈیٹابیس.
+- [x] [Docs](https://supabase.com/docs/guides/auth) توثیق اور اختیارات.
+- [x] خودکار تشکیل شدہ API۔
   - [x] REST. [Docs](https://supabase.com/docs/guides/database/api#rest-api)
   - [x] GraphQL. [Docs](https://supabase.com/docs/guides/database/api#graphql-api)
-  - [x] Realtime subscriptions. [Docs](https://supabase.com/docs/guides/database/api#realtime-api)
-- [x] Functions.
-  - [x] Database Functions. [Docs](https://supabase.com/docs/guides/database/functions)
-  - [x] Edge Functions [Docs](https://supabase.com/docs/guides/functions)
-- [x] File Storage. [Docs](https://supabase.com/docs/guides/storage)
-- [x] Dashboard
+  - [x] [Docs](https://supabase.com/docs/guides/database/api#realtime-api) ریل ٹائم سبسکرپشنز
+- [x] فنکشنز.
+  - [x] [Docs](https://supabase.com/docs/guides/database/functions) ڈیٹابیس فنکشنز
+  - [x] [Docs](https://supabase.com/docs/guides/functions) ایج فنکشنز
+- [x] [Docs](https://supabase.com/docs/guides/storage) فائل ذخیرہ 
+- [x] ڈیش بورڈ
 
-![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
+![سپابیس ڈیش بورڈ](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
-## Documentation
+## تحریریات
 
-For full documentation, visit [supabase.com/docs](https://supabase.com/docs)
+مکمل دستاویزات کے لئے، دیکھیں: [supabase.com/docs](https://supabase.com/docs)
 
-To see how to Contribute, visit [Getting Started](./DEVELOPERS.md)
+مشارکت کیسے کرنی ہے، دیکھنے کے لئے، دیکھیں: [Getting Started](./DEVELOPERS.md)
 
-## Community & Support
+## کمیونٹی اور حمایت
 
-- [Community Forum](https://github.com/supabase/supabase/discussions). Best for: help with building, discussion about database best practices.
-- [GitHub Issues](https://github.com/supabase/supabase/issues). Best for: bugs and errors you encounter using Supabase.
-- [Email Support](https://supabase.com/docs/support#business-support). Best for: problems with your database or infrastructure.
-- [Discord](https://discord.supabase.com). Best for: sharing your applications and hanging out with the community.
+- [Community Forum](https://github.com/supabase/supabase/discussions). بہترین ہے: تعمیر کے ساتھ مدد، ڈیٹابیس کے بہترین اصولوں پر گفتگو۔
+- [GitHub Issues](https://github.com/supabase/supabase/issues). بہترین چیز: سپابیس استعمال کرتے ہوئے بگز اور خرابیوں کے لئے۔
+- [Email Support](https://supabase.com/docs/support#business-support). بہترین چیز: آپ کے ڈیٹابیس یا زیرساخت کے مسائل کے لئے۔
+- [Discord](https://discord.supabase.com). بہترین چیز: اپنے اطلاقات کو شیئر کرنے اور کمیونٹی کے ساتھ وقت گزارنے کے لئے۔
 
-## Status
+## حالت 
 
-- [x] Alpha: We are testing Supabase with a closed set of customers
-- [x] Public Alpha: Anyone can sign up over at [app.supabase.com](https://app.supabase.com). But go easy on us, there are a few kinks
-- [x] Public Beta: Stable enough for most non-enterprise use-cases
-- [ ] Public: General Availability [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
+- [x] آلفا: ہم سپابیس کو ایک محدود تعداد کے گاہکوں کے ساتھ ٹیسٹ کر رہے ہیں۔
+- [x] عوامی بیٹا: زیادہ تر غیر اینٹرپرائز استعمال کی صورت میں کافی مستحکم
+- [x] عوامی آلفا: [app.supabase.com](https://app.supabase.com).
+- [ ] عمومی دستیابی [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
 
-We are currently in Public Beta. Watch "releases" of this repo to get notified of major updates.
+ہم فی الحال عوامی بیٹا میں ہیں۔ "ریپوزیٹری کی ریلیزز" کا مشاہدہ کریں تاکہ آپ کو بڑی تازہ ترین اپ ڈیٹس کی اطلاع مل سکے۔
+
 
 <kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="Watch this repo"/></kbd>
 
 ---
 
-## How it works
+## کام کرنے کا طریقہ عمل
 
-Supabase is a combination of open source tools. We’re building the features of Firebase using enterprise-grade, open source products. If the tools and communities exist, with an MIT, Apache 2, or equivalent open license, we will use and support that tool. If the tool doesn't exist, we build and open source it ourselves. Supabase is not a 1-to-1 mapping of Firebase. Our aim is to give developers a Firebase-like developer experience using open source tools.
+Supabase ایک کھلے سورس ٹولز کا مجموعہ ہے۔ ہم فائربیس کی خصوصیات کو اینٹرپرائز گریڈ، کھلے سورس مصنوعات کی مدد سے تعمیر کر رہے ہیں۔ اگر ٹولز اور کمیونٹی موجود ہوں اور ان کا MIT، Apache 2 یا مماثل کھلے لائسنس ہو، تو ہم وہی ٹول استعمال کریں گے اور اسے حمایت بھی کریں گے۔ اگر ٹول موجود نہ ہو، تو ہم خود اسے تعمیر کریں گے اور کھلے سورس کریں گے۔ Supabase فائربیس کی ایک سے ایک میپنگ نہیں ہے۔ ہمارا مقصد ڈویلپرز کو کھلے سورس ٹولز کی استعمال سے فائربیس جیسی ڈویلپر تجربہ فراہم کرنا ہے۔
 
-**Architecture**
+**معماری**
 
-Supabase is a [hosted platform](https://app.supabase.com). You can sign up and start using Supabase without installing anything.
-You can also [self-host](https://supabase.com/docs/guides/hosting/overview) and [develop locally](https://supabase.com/docs/guides/local-development).
+Supabase ایک میزبان پلیٹفارم ہے۔ آپ سائن اپ کرکے اور کچھ بھی انسٹال کیے بغیر Supabase کا استعمال شروع کرسکتے ہیں۔
+آپ بھی [خود میزبانی](https://supabase.com/docs/guides/hosting/overview) اور [مقامی طور پر ترقی کریں](https://supabase.com/docs/guides/local-development).
 
 ![Architecture](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
 
-- [PostgreSQL](https://www.postgresql.org/) is an object-relational database system with over 30 years of active development that has earned it a strong reputation for reliability, feature robustness, and performance.
-- [Realtime](https://github.com/supabase/realtime) is an Elixir server that allows you to listen to PostgreSQL inserts, updates, and deletes using websockets. Realtime polls Postgres' built-in replication functionality for database changes, converts changes to JSON, then broadcasts the JSON over websockets to authorized clients.
-- [PostgREST](http://postgrest.org/) is a web server that turns your PostgreSQL database directly into a RESTful API
-- [pg_graphql](http://github.com/supabase/pg_graphql/) a PostgreSQL extension that exposes a GraphQL API
-- [Storage](https://github.com/supabase/storage-api) provides a RESTful interface for managing Files stored in S3, using Postgres to manage permissions.
-- [postgres-meta](https://github.com/supabase/postgres-meta) is a RESTful API for managing your Postgres, allowing you to fetch tables, add roles, and run queries, etc.
-- [GoTrue](https://github.com/netlify/gotrue) is an SWT based API for managing users and issuing SWT tokens.
-- [Kong](https://github.com/Kong/kong) is a cloud-native API gateway.
+- ایک اشیائی-تعلقی ڈیٹابیس سسٹم ہے جس کی کارکردگی کو تجربہ کے لیے 30 سال سے زیادہ کا وقت ہوا ہے۔ یہ مستحکمی، مکمل خصوصیتوں کا مضبوط ہونا اور کارکردگی کی بابت مضبوط عہدے کی حاصلی کی وجہ سے مشہوری حاصل کر چکا ہے۔ [PostgreSQL](https://www.postgresql.org/)
+- ایک الکسیر سرور ہے جو آپ کو ویب سوکٹس کی استعمال سے پوسٹگریسکیوال کے انسرٹس، اپ ڈیٹس اور ڈیلیٹس پر سننے کی اجازت دیتا ہے۔ ریل ٹائم پولز پوسٹگریس کی تشکیل شدہ تکراری کارکردگی کو ڈیٹابیس تبدیلیوں کے لئے استعمال کرتا ہے، تبدیلیوں کو JSON میں تبدیل کرتا ہے اور پھر تصدیق شدہ کلائنٹس کو JSON کو ویب سوکٹس پر براڈکاسٹ کرتا ہے۔ [Realtime](https://github.com/supabase/realtime) 
+- [PostgREST](http://postgrest.org/) یہ ایک ویب سرور ہے جو آپ کے پوسٹگریسکیوال ڈیٹابیس کو براہِ راست ایک ریسٹفل API میں تبدیل کرتا ہے۔
+- [pg_graphql](http://github.com/supabase/pg_graphql/) یہ ایک پوسٹگریسکیوال ایکسٹینشن ہے جو ایک GraphQL API کو ظاہر کرتا ہے۔
+- [Storage](https://github.com/supabase/storage-api) یہ S3 میں محفوظ کیے گئے فائلوں کو منظم کرنے کے لئے ایک RESTful انٹرفیس فراہم کرتا ہے، جبکہ اجازتوں کو منظم کرنے کے لئے پوسٹگریس استعمال کی جاتی ہے۔
+- [postgres-meta](https://github.com/supabase/postgres-meta) یہ آپ کے پوسٹگریس کو منظم کرنے کے لئے ایک RESTful API ہے، جس کے ذریعے آپ تاکیدوں کو حاصل کر سکتے ہیں، رولز شامل کر سکتے ہیں اور کوئریز چلا سکتے ہیں وغیرہ۔
+- [GoTrue](https://github.com/netlify/gotrue) یہ ایک SWT بیسڈ API ہے جو صارفین کو منظم کرنے اور SWT ٹوکنز جاری کرنے کے لئے استعمال ہوتا ہے۔ (Urdu)
+- [Kong](https://github.com/Kong/kong)یہ ایک کلاؤڈ-نیٹو API گیٹ وے ہے۔ (Urdu)
 
-#### Client libraries
+#### کلائنٹ لائبریریز
 
-Our approach for client libraries is modular. Each sub-library is a standalone implementation for a single external system. This is one of the ways we support existing tools.
+ہمارا تعامل کلائنٹ لائبریریز کے لئے ماڈیولر ہے۔ ہر ذیلی لائبریری ایک مستقل نظام کے لئے ایک الگ انداز کارکردگی کی پیشکش ہے۔ یہ ایک ترکیب ہے جس کے ذریعے ہم موجودہ آلات کی حمایت کرتے ہیں۔
 
 <table style="table-layout:fixed; white-space: nowrap;">
   <tr>
@@ -205,51 +206,9 @@ Our approach for client libraries is modular. Each sub-library is a standalone i
 <!--- Remove this list if you're translating to another language, it's hard to keep updated across multiple files-->
 <!--- Keep only the link to the list of translation files-->
 
-## Translations
-
-- [Arabic | العربية](/i18n/README.ar.md)
-- [Albanian / Shqip](/i18n/README.sq.md)
-- [Bangla / বাংলা](/i18n/README.bn.md)
-- [Bulgarian / Български](/i18n/README.bg.md)
-- [Catalan / Català](/i18n/README.ca.md)
-- [Danish / Dansk](/i18n/README.da.md)
-- [Dutch / Nederlands](/i18n/README.nl.md)
-- [English](https://github.com/supabase/supabase)
-- [Finnish / Suomalainen](/i18n/README.fi.md)
-- [French / Français](/i18n/README.fr.md)
-- [German / Deutsch](/i18n/README.de.md)
-- [Greek / Ελληνικά](/i18n/README.gr.md)
-- [Hebrew / עברית](/i18n/README.he.md)
-- [Hindi / हिंदी](/i18n/README.hi.md)
-- [Hungarian / Magyar](/i18n/README.hu.md)
-- [Nepali / नेपाली](/i18n/README.ne.md)
-- [Indonesian / Bahasa Indonesia](/i18n/README.id.md)
-- [Italian / Italiano](/i18n/README.it.md)
-- [Japanese / 日本語](/i18n/README.jp.md)
-- [Korean / 한국어](/i18n/README.ko.md)
-- [Malay / Bahasa Malaysia](/i18n/README.ms.md)
-- [Norwegian (Bokmål) / Norsk (Bokmål)](/i18n/README.nb-no.md)
-- [Persian / فارسی](/i18n/README.fa.md)
-- [Polish / Polski](/i18n/README.pl.md)
-- [Portuguese / Português](/i18n/README.pt.md)
-- [Portuguese (Brazilian) / Português Brasileiro](/i18n/README.pt-br.md)
-- [Romanian / Română](/i18n/README.ro.md)
-- [Russian / Pусский](/i18n/README.ru.md)
-- [Serbian / Srpski](/i18n/README.sr.md)
-- [Sinhala / සිංහල](/i18n/README.si.md)
-- [Spanish / Español](/i18n/README.es.md)
-- [Simplified Chinese / 简体中文](/i18n/README.zh-cn.md)
-- [Swedish / Svenska](/i18n/README.sv.md)
-- [Thai / ไทย](/i18n/README.th.md)
-- [Traditional Chinese / 繁体中文](/i18n/README.zh-tw.md)
-- [Turkish / Türkçe](/i18n/README.tr.md)
-- [Ukrainian / Українська](/i18n/README.uk.md)
-- [Urdu / اردو](/i18n/README.ur.md)
-- [Vietnamese / Tiếng Việt](/i18n/README.vi-vn.md)
-- [List of translations](/i18n/languages.md) <!--- Keep only this -->
 
 ---
 
-## Sponsors
+## سپانسرز 
 
-[![New Sponsor](https://user-images.githubusercontent.com/10214025/90518111-e74bbb00-e198-11ea-8f88-c9e3c1aa4b5b.png)](https://github.com/sponsors/supabase)
+[![نئے سپانسر](https://user-images.githubusercontent.com/10214025/90518111-e74bbb00-e198-11ea-8f88-c9e3c1aa4b5b.png)](https://github.com/sponsors/supabase)
