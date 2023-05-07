@@ -12,6 +12,7 @@ const clientLibFiles = [
   { fileName: 'supabase_py_v2', label: 'python', version: 'v2', versionSlug: false },
   { fileName: 'supabase_csharp_v0', label: 'csharp', version: 'v0', versionSlug: false },
   { fileName: 'supabase_swift_v0', label: 'swift', version: 'v0', versionSlug: false },
+  { fileName: 'supabase_kt_v0', label: 'kotlin', version: 'v0', versionSlug: false },
 ]
 
 export function generateReferencePages() {

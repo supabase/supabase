@@ -123,6 +123,13 @@ const home = [
       community: true,
     },
     {
+      label: 'Kotlin',
+      icon: '/img/icons/menu/reference-kotlin',
+      href: '/reference/kotlin/introduction',
+      level: 'reference_kotlin',
+      community: true,
+    },
+    {
       label: 'Tools',
     },
     {
