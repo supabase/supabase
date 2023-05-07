@@ -17,6 +17,8 @@ import spec_csharp_v0 from '~/../../spec/supabase_csharp_v0.yml' assert { type: 
 import spec_python_v2 from '~/../../spec/supabase_py_v2.yml' assert { type: 'yml' }
 // @ts-expect-error
 import spec_swift_v0 from '~/../../spec/supabase_swift_v0.yml' assert { type: 'yml' }
+// @ts-expect-error
+import spec_kotlin_v0 from '~/../../spec/supabase_kt_v0.yml' assert { type: 'yml' }
 
 // import { gen_v3 } from '~/lib/refGenerator/helpers'
 import apiCommonSections from '~/../../spec/common-api-sections.json'
@@ -59,6 +61,7 @@ export type RefIdOptions =
   | 'reference_csharp_v0'
   | 'reference_python_v2'
   | 'reference_swift_v0'
+  | 'reference_kotlin_v0'
   | 'reference_cli'
   | 'reference_api'
   | 'reference_self_hosting_auth'
@@ -73,6 +76,7 @@ export type RefKeyOptions =
   | 'csharp'
   | 'python'
   | 'swift'
+  | 'kotlin'
   | 'cli'
   | 'api'
   | 'self-hosting-auth'
@@ -153,6 +157,10 @@ const NavigationMenu = () => {
       case url.includes(`/docs/reference/swift`) && url:
         menuState.setMenuLevelId('reference_swift_v0')
         break
+      // kotlin v1 (latest)
+      case url.includes(`/docs/reference/kotlin`) && url:
+        menuState.setMenuLevelId('reference_kotlin_v0')
+        break
       case url.includes(`/docs/reference/cli/config`) && url:
         menuState.setMenuLevelId('supabase_cli')
         break
@@ -216,6 +224,7 @@ const NavigationMenu = () => {
   const isReference_Csharp_V0 = 'reference_csharp_v0' === level
   const isReference_Python_V2 = 'reference_python_v2' === level
   const isReference_Swift_V0 = 'reference_swift_v0' === level
+  const isReference_Kotlin_V0 = 'reference_kotlin_v0' === level
   const isReference_Cli = 'reference_cli' === level
   const isReference_Api = 'reference_api' === level
   const isReference_Self_Hosting_Auth = 'reference_self_hosting_auth' === level
@@ -293,6 +302,14 @@ const NavigationMenu = () => {
         commonSections={libCommonSections}
         lib="swift"
         spec={spec_swift_v0}
+      />
+      <NavigationMenuRefList
+        key={'reference-kt-menu-v0'}
+        id={'reference_kotlin_v0'}
+        active={isReference_Kotlin_V0}
+        commonSections={libCommonSections}
+        lib="kotlin"
+        spec={spec_kotlin_v0}
       />
       <NavigationMenuRefList
         key={'reference-python-menu-v2'}

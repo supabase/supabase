@@ -133,11 +133,23 @@ export const CLIENT_LIBRARIES = [
     libraries: [
       {
         name: 'postgrest-kt',
-        url: 'https://github.com/supabase-community/postgrest-kt',
+        url: 'https://github.com/supabase-community/supabase-kt/Postgrest',
       },
       {
         name: 'gotrue-kt',
-        url: 'https://github.com/supabase-community/gotrue-kt',
+        url: 'https://github.com/supabase-community/supabase-kt/GoTrue',
+      },
+      {
+        name: 'storage-kt',
+        url: 'https://github.com/supabase-community/supabase-kt/Storage',
+      },
+      {
+        name: 'realtime-kt',
+        url: 'https://github.com/supabase-community/supabase-kt/Realtime',
+      },
+      {
+        name: 'functions-kt',
+        url: 'https://github.com/supabase-community/supabase-kt/Functions',
       },
     ],
   },

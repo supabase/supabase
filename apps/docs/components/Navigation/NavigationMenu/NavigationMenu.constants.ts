@@ -25,6 +25,12 @@ export const REFERENCES: References = {
     versions: ['v0'],
     icon: '/docs/img/libraries/swift-icon.svg',
   },
+  kotlin: {
+    name: 'Kotlin',
+    library: 'supabase-kt',
+    versions: ['v0'],
+    icon: '/docs/img/libraries/kotlin-icon.svg',
+  },
   cli: {
     name: 'CLI',
     library: undefined,
@@ -985,6 +991,13 @@ export const reference = {
           items: [],
           icon: '/img/icons/menu/reference-swift',
         },
+        {
+          name: 'supabase-kt',
+          url: '/reference/kotlin/start',
+          level: 'reference_kotlin',
+          items: [],
+          icon: '/img/icons/menu/reference-kotlin',
+        },
         // {
         //   name: 'supabase-python',
         //   url: '/reference/python/start',
@@ -1058,6 +1071,13 @@ export const reference_swift_v0 = {
   icon: 'reference-swift',
   title: 'swift',
   url: 'guides/reference/swift',
+  parent: '/reference',
+}
+
+export const reference_kotlin_v0 = {
+  icon: 'reference-kotlin',
+  title: 'kotlin',
+  url: 'guides/reference/kotlin',
   parent: '/reference',
 }
 
@@ -1181,6 +1201,13 @@ export const references = [
         description: 'something about the reference',
         icon: '/docs/img/icons/swift-icon.svg',
         url: '/reference/swift/start',
+      },
+      {
+        label: 'supabase-kt',
+        versions: ['v0'],
+        description: 'something about the reference',
+        icon: '/docs/img/icons/kotlin-icon.svg',
+        url: '/reference/kotlin/start',
       },
     ],
   },
