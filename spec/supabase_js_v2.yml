@@ -571,7 +571,7 @@ functions:
     title: 'exchangeCodeForSession()'
     $ref: '@supabase/gotrue-js.GoTrueClient.exchangeCodeForSession'
     notes: |
-      - Used when `flowType` is set to True in client options.
+      - Used when `flowType` is set to `pkce` in client options.
     examples:
       - id: exchange-auth-code
         name: Exchange Auth Code
