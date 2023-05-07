@@ -142,8 +142,7 @@ Supabase е [хоствана платформа](https://app.supabase.com). М�
   <tr>
     <td>Kotlin</td>
     <td>-</td>
-    <td><a href="https://github.com/supabase-community/postgrest-kt" target="_blank" rel="noopener noreferrer">postgrest-kt</a></td>
-    <td><a href="https://github.com/supabase-community/gotrue-kt" target="_blank" rel="noopener noreferrer">gotrue-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Realtime" target="_blank" rel="noopener noreferrer">realtime-kt</a></td>
     <td>-</td>
     <td>-</td>
   </tr>
