@@ -113,10 +113,8 @@ returns table (
   content text,
   similarity float
 )
-language plpgsql
+language sql stable
 as $$
-begin
-  return query
   select
     documents.id,
     documents.content,
@@ -125,7 +123,6 @@ begin
   where 1 - (documents.embedding <=> query_embedding) > match_threshold
   order by similarity desc
   limit match_count;
-end;
 $$;
 ```
 
