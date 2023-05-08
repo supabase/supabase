@@ -3,6 +3,10 @@ const deepMerge = require('deepmerge')
 
 const color = require('./../ui/build/css/tw-extend/color')
 
+/**
+ * Generates Tailwind colors for the theme
+ * adds <alpha-value> as part of the hsl value
+ */
 function generateTwColorClasses(globalKey, twAttributes) {
   let classes = {}
   Object.values(twAttributes).map((attr, i) => {
@@ -14,11 +18,17 @@ function generateTwColorClasses(globalKey, twAttributes) {
       }
     }
   })
+  /**
+   * mutate object into nested object for tailwind theme structure
+   */
   const nestedClasses = kebabToNested(classes)
   // return, but nest the keys if they are kebab case named
   return nestedClasses
 }
 
+/**
+ * Helper to convert kebab named keys in object to nested nodes
+ */
 function kebabToNested(obj) {
   const result = {}
   for (const [key, value] of Object.entries(obj)) {
@@ -43,10 +53,16 @@ function kebabToNested(obj) {
   return result
 }
 
+/**
+ * Main theme config
+ */
 const uiConfig = ui({
   mode: 'JIT',
   darkMode: 'class',
   theme: {
+    /**
+     * Spread all theme colors and custom generated colors into theme
+     */
     textColor: (theme) => ({
       ...theme('colors'),
       ...generateTwColorClasses('textColor', color),
