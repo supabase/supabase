@@ -1,7 +1,6 @@
 import { useTheme, UseThemeProps } from 'common'
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
 import CommandMenu from './CommandMenu'
-import { ReactMarkdownOptions } from 'react-markdown/lib/react-markdown'
 
 export interface CommandMenuContextValue {
   isOpen: boolean
@@ -28,10 +27,6 @@ export interface CommandMenuContextValue {
    * Opt in flag to use additional metadata in AI prompts
    */
   isOptedInToAI: boolean
-
-  // to do: remove this prop
-  // this is a temporary hack as ReactMarkdown fails our jest tests if we import the package within this UI package
-  MarkdownHandler: (props: ReactMarkdownOptions) => JSX.Element
 
   // Optional callback to save a generated SQL output
   saveGeneratedSQL?: (answer: string, title: string) => Promise<void>
@@ -67,11 +62,6 @@ export interface CommandMenuProviderProps {
    */
   metadata?: { definitions?: string; flags?: { [key: string]: string } }
   /**
-   * TODO: remove this prop, temporary hack as ReactMarkdown fails our jest tests
-   * if we import the package directly within this UI package
-   */
-  MarkdownHandler: (props: ReactMarkdownOptions) => JSX.Element
-  /**
    * Call back when save SQL snippet button is selected
    */
   saveGeneratedSQL?: (answer: string, title: string) => Promise<void>
@@ -84,7 +74,6 @@ const CommandMenuProvider = ({
   apiKeys,
   metadata,
   isOptedInToAI = false,
-  MarkdownHandler,
   saveGeneratedSQL,
 }: PropsWithChildren<CommandMenuProviderProps>) => {
   const [isOpen, setIsOpen] = useState(false)
@@ -116,7 +105,6 @@ const CommandMenuProvider = ({
         project,
         metadata,
         isOptedInToAI,
-        MarkdownHandler,
         saveGeneratedSQL,
       }}
     >
