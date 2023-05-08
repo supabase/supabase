@@ -122,6 +122,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
     },
     [supabase]
   )
+  //
 
   return (
     <QueryClientProvider client={queryClient}>
