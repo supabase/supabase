@@ -1967,4 +1967,3 @@ module.exports = [
     destination: '/customers',
   },
 ]
-]
