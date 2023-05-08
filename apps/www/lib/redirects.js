@@ -1944,7 +1944,7 @@ module.exports = [
   {
     permanent: true,
     source: '/blog/epsilon3-self-hosting',
-    destination: '/customers/epilson3',
+    destination: '/customers/epsilon3',
   },
   {
     permanent: true,
