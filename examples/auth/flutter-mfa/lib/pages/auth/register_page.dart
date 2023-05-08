@@ -72,7 +72,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     .showSnackBar(SnackBar(content: Text(error.message)));
               } catch (error) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Unexpected error occured')));
+                    const SnackBar(content: Text('Unexpected error occurred')));
               }
               if (mounted) {
                 setState(() {
