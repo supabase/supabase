@@ -8,6 +8,8 @@ const semanticFiles = glob.sync(`tokens/semantic/**/*.json`)
 const { registerTransforms } = require('@tokens-studio/sd-transforms')
 const StyleDictionary = require('style-dictionary')
 
+const Color = require('color')
+
 const supportedTokenTypeList = [
   'spacing',
   'sizing',
@@ -38,6 +40,23 @@ const formatTailwindValue = (tokenType, value) => {
 }
 
 /**
+ * Custom format that generates tailwind friendly colors so we can add <alpha-value>
+ * in the config later
+ * https://tailwindcss.com/docs/customizing-colors#using-css-variables
+ */
+StyleDictionary.registerTransform({
+  name: 'color/rgb',
+  type: 'value',
+  matcher: (prop) => prop.type === 'color',
+  transformer: (prop) => {
+    console.log('I AM COLOR', prop)
+    // return prop.value
+    const color = Color(prop.original.value).hsl()
+    return color.string()
+  },
+})
+
+/**
  * Custom format that generate tailwind color config based on css variables
  */
 StyleDictionary.registerFormat({
@@ -49,7 +68,10 @@ StyleDictionary.registerFormat({
       `{\n${dictionary.allProperties
         .map((token) => {
           const value = formatTailwindValue(token.type, token.value)
-          return `"${token.path.slice(0).join('-')}": "var(--${token.name}, ${value});"`
+          return `"${token.path.slice(0).join('-')}": {
+  cssVariable: "var(--${token.name})",
+  value: "${value}"
+}`
         })
         .join(',\n')}\n}`
     )
@@ -95,7 +117,23 @@ function getStyleDictionaryConfig(
     source: sourceFiles,
     platforms: {
       css: {
-        transformGroup: 'tokens-studio',
+        // transformGroup: 'tokens-studio',
+        transforms: [
+          'ts/descriptionToComment',
+          'ts/size/px',
+          'ts/opacity',
+          'ts/size/lineheight',
+          'ts/type/fontWeight',
+          'ts/resolveMath',
+          'ts/size/css/letterspacing',
+          'ts/typography/css/shorthand',
+          'ts/border/css/shorthand',
+          'ts/shadow/css/shorthand',
+          'ts/color/css/hexrgba',
+          'ts/color/modifiers',
+          'name/cti/kebab',
+          'color/rgb',
+        ],
         buildPath: 'build/css/',
         files: [
           {
@@ -189,13 +227,7 @@ function getTypographyConfig() {
     source: [...semanticFiles, ...sourceFiles],
     platforms: {
       css: {
-        transforms: [
-          // 'resolveMath',
-          // 'size/px',
-          // 'type/fontWeight',
-          // 'size/letterspacing',
-          'name/cti/kebab',
-        ],
+        transforms: ['name/cti/kebab'],
         transformGroup: 'tokens-studio',
         buildPath: 'build/css/',
         files: [

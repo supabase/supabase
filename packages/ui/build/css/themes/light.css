@@ -1,34 +1,34 @@
 /**
  * Do not edit directly
- * Generated on Mon, 08 May 2023 14:44:29 GMT
+ * Generated on Mon, 08 May 2023 16:23:48 GMT
  */
 
 .light {
-  --utilityGithubBackground: #ffffff;
-  --utilityMixNegative: #fff;
-  --utilityMixPositive: #000;
-  --darkenPercentage: 0.2;
-  --lightenHardest: 0.65;
-  --lightenHarder: 0.5;
-  --lightenHard: 0.3;
-  --lightenSoft: 0.035;
-  --lightenDefault: 0.1;
-  --textOverrideLightenStrength: 5;
-  --themeVariablesTextBody: #1a1d1e; /* og color is colors.Slate.Dark.2 */
-  --themeVariablesBackgroundBodyAlt: #fff; /*  og color is colors.Gray.Dark.1 */
-  --themeVariablesBackgroundBody: #f8f9fa; /* og color is colors.Slate.Light.2 */
-  --themeVariablesBackground: #fbfcfd; /* og color is  colors.Slate.Light.1 */
-  --themeVariablesBrand: #2b825b;
-  --textColorBodyDefault: var(--themeVariablesTextBody);
-  --backgroundColorBodyAlt: var(--themeVariablesBackgroundBodyAlt);
-  --backgroundColorBody: var(--themeVariablesBackgroundBody); /* Background color used for the main page body. */
-  --backgroundColorDefault: var(--themeVariablesBackground); /* Default background color for any container. */
-  --textColorBodyLightest: lch(68.7 0.61 224);
-  --textColorBodyLighter: lch(55.2 0.87 224);
-  --textColorBodyLight: lch(37.3 1.22 224);
-  --borderColorBody: lch(94.4 0.62 251);
-  --borderColorDefault: lch(95.4 0.62 251); /* Default border color */
-  --backgroundColorControl: lch(99.2 0.45 251);
-  --backgroundColorSelection: lch(95.4 0.62 251);
-  --borderColorControl: lch(92.1 0.6 251);
+  --utility-github-background: 0deg 0% 100%;
+  --utility-mix-negative: 0deg 0% 100%;
+  --utility-mix-positive: 0deg 0% 0%;
+  --darken-percentage: 0.2;
+  --lighten-hardest: 0.65;
+  --lighten-harder: 0.5;
+  --lighten-hard: 0.3;
+  --lighten-soft: 0.035;
+  --lighten-default: 0.1;
+  --text-override-lighten-strength: 5;
+  --theme-variables-text-body: 195deg 7.1% 11%; /* og color is colors.Slate.Dark.2 */
+  --theme-variables-background-body-alt: 0deg 0% 100%; /*  og color is colors.Gray.Dark.1 */
+  --theme-variables-background-body: 210deg 16.7% 97.6%; /* og color is colors.Slate.Light.2 */
+  --theme-variables-background: 210deg 33.3% 98.8%; /* og color is  colors.Slate.Light.1 */
+  --theme-variables-brand: 153.1deg 50.3% 33.9%;
+  --text-color-body-default: var(--theme-variables-text-body);
+  --background-color-body-alt: var(--theme-variables-background-body-alt);
+  --background-color-body: var(--theme-variables-background-body); /* Background color used for the main page body. */
+  --background-color-default: var(--theme-variables-background); /* Default background color for any container. */
+  --text-color-body-lightest: 195deg 1% 65.6%;
+  --text-color-body-lighter: 195deg 1% 51.8%;
+  --text-color-body-light: 195deg 1.9% 34.3%;
+  --border-color-body: 210deg 6.1% 93.7%;
+  --border-color-default: 210deg 7.5% 94.9%; /* Default border color */
+  --background-color-control: 210deg 33.3% 99.2%;
+  --background-color-selection: 210deg 7.5% 94.9%;
+  --border-color-control: 210deg 4.1% 91.2%;
 }
