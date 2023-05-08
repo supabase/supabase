@@ -1934,7 +1934,7 @@ module.exports = [
   {
     permanent: true,
     source: '/blog/case-study-roboflow',
-    destination: '/customers/roboflow',
+    destination: '/customers',
   },
   {
     permanent: true,
