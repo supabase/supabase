@@ -1913,19 +1913,19 @@ module.exports = [
     source: '/docs/guides/cli/local-development',
     destination: '/docs/guides/getting-started/local-development',
   },
-    
-    // old case studies moved to /customers
-  
+
+  // old case studies moved to /customers
+
   {
     permanent: true,
     source: '/blog/case-study-monitoro',
     destination: '/customers',
-  },   
+  },
   {
     permanent: true,
     source: '/blog/case-study-tayfa',
     destination: '/customers',
-  },   
+  },
   {
     permanent: true,
     source: '/blog/case-study-xendit',
