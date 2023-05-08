@@ -7,6 +7,8 @@ import type { PostgresPolicy, PostgresTable } from '@supabase/postgres-meta'
 import { useStore, checkPermissions } from 'hooks'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
+import { RLS_ACKNOWLEDGED_KEY } from 'components/grid/constants'
+
 interface Props {
   table: PostgresTable
   apiPreviewPanelOpen: boolean
@@ -27,6 +29,9 @@ const GridHeaderActions: FC<Props> = ({
   const isReadOnly =
     !checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables') &&
     !checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
+
+  const isAcknowledged =
+    localStorage?.getItem(`${RLS_ACKNOWLEDGED_KEY}-${table.id}`) === 'true' ?? false
 
   function handlePreviewToggle() {
     setApiPreviewPanelOpen(!apiPreviewPanelOpen)
@@ -80,6 +85,16 @@ const GridHeaderActions: FC<Props> = ({
               {`${policies.length} active RLS polic${
                 policies.length > 1 || policies.length == 0 ? 'ies' : 'y'
               }`}
+            </Button>
+          </a>
+        </Link>
+      )}
+
+      {isAcknowledged && !table.rls_enabled && (
+        <Link href={`/project/${projectRef}/auth/policies?search=${table.id}`}>
+          <a>
+            <Button type="warning" icon={<IconAlertCircle strokeWidth={2} size={14} />}>
+              RLS is not enabled
             </Button>
           </a>
         </Link>
