@@ -4,9 +4,6 @@ const plugin = require('tailwindcss/plugin')
 const radixUiColors = require('@radix-ui/colors')
 const brandColors = require('./default-colors')
 
-// import token variables
-const tokenColors = require('./../ui/styles/tw-extend/color')
-
 const { default: flattenColorPalette } = require('tailwindcss/lib/util/flattenColorPalette')
 
 // exclude these colors from the included set from Radix
@@ -293,7 +290,6 @@ const uiConfig = {
         ...colorClasses,
         'hi-contrast': `var(--colors-fixed-scale12)`,
         'lo-contrast': `var(--colors-fixed-scale1)`,
-        ...tokenColors,
       },
     },
   },
