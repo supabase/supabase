@@ -1,5 +1,6 @@
 import { post } from '~/lib/fetchWrapper'
 import { API_URL, IS_PROD, IS_PREVIEW } from 'lib/constants'
+import { BrowserTabTracker } from 'browser-session-tabs'
 
 export interface GoogleAnalyticsEvent {
   category: string
@@ -29,6 +30,7 @@ const sendEvent = (event: GoogleAnalyticsEvent, gaProps: GoogleAnalyticsProps) =
     ga: {
       screen_resolution: gaProps?.screenResolution,
       language: gaProps?.language,
+      session_id: BrowserTabTracker.sessionId,
     },
   })
 }

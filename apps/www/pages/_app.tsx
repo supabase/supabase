@@ -23,6 +23,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
       ga: {
         screen_resolution: googleAnalyticsProps?.screenResolution,
         language: googleAnalyticsProps?.language,
+        session_id: BrowserTabTracker.sessionId,
       },
     })
   }
