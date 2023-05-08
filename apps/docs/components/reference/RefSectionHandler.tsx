@@ -8,10 +8,10 @@ import RefFunctionSection from '~/components/reference/RefFunctionSection'
 import RefSubLayout from '~/layouts/ref/RefSubLayout'
 import ApiOperationSection from './ApiOperationSection'
 import CliCommandSection from './CLICommandSection'
-import { IAPISpec, ICommonFunc, IRefStaticDoc, ISpec, TypeSpec } from './Reference.types'
+import { IAPISpec, ICommonSection, IRefStaticDoc, ISpec, TypeSpec } from './Reference.types'
 
 interface RefSectionHandlerProps {
-  sections: ICommonFunc[]
+  sections: ICommonSection[]
   spec?: ISpec | IAPISpec
   typeSpec?: TypeSpec
   pageProps: { docs: IRefStaticDoc[] }
@@ -59,46 +59,48 @@ const RefSectionHandler = (props: RefSectionHandlerProps) => {
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
       <RefSubLayout>
-        {props.sections.map((x, i) => {
-          switch (x.type) {
+        {props.sections.map((section, i) => {
+          const sectionType = section.type
+          switch (sectionType) {
             case 'markdown':
-              const markdownData = props.pageProps.docs.find((doc) => doc.id === x.id)
+              const markdownData = props.pageProps.docs.find((doc) => doc.id === section.id)
 
-              return <RefEducationSection key={x.id + i} item={x} markdownContent={markdownData} />
-              break
+              return (
+                <RefEducationSection
+                  key={section.id + i}
+                  item={section}
+                  markdownContent={markdownData}
+                />
+              )
             case 'function':
               return (
                 <RefFunctionSection
-                  key={x.id + i}
-                  funcData={x}
-                  commonFuncData={x}
+                  key={section.id + i}
+                  funcData={section}
+                  commonFuncData={section}
                   spec={props.spec}
                   typeSpec={props.typeSpec}
                 />
               )
             case 'cli-command':
-              return <CliCommandSection key={x.id + i} funcData={x} commonFuncData={x} />
-              break
+              return (
+                <CliCommandSection
+                  key={section.id + i}
+                  funcData={section}
+                  commonFuncData={section}
+                />
+              )
             case 'operation':
               return (
                 <ApiOperationSection
-                  key={x.id + i}
-                  funcData={x}
-                  commonFuncData={x}
+                  key={section.id + i}
+                  funcData={section}
+                  commonFuncData={section}
                   spec={props.spec}
                 />
               )
             default:
-              return (
-                <RefFunctionSection
-                  key={x.id + i}
-                  funcData={x}
-                  commonFuncData={x}
-                  spec={props.spec}
-                  typeSpec={props.typeSpec}
-                />
-              )
-              break
+              throw new Error(`Unknown common section type '${sectionType}'`)
           }
         })}
       </RefSubLayout>

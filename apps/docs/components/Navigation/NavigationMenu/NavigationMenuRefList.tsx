@@ -1,31 +1,51 @@
-// import apiCommonSections from '~/../../spec/common-client-libs-sections.json'
-
-import { RefIdOptions, RefKeyOptions } from './NavigationMenu'
+import { Json } from '~/types'
 import NavigationMenuRefListItems from './NavigationMenuRefListItems'
 
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import { ICommonBase, ICommonItem } from '~/components/reference/Reference.types'
 
-interface INavigationMenuRefList {
-  id: RefIdOptions
-  lib: RefKeyOptions
-  commonSections: any[] // to do type up
-
-  // the keys of menu items that are allowed to be shown on the side menu
-  // if undefined, we show all the menu items
-  allowedClientKeys?: string[]
-  active: boolean
-  spec?: any
+interface NavigationMenuRefListProps {
+  id: string
+  basePath: string
+  commonSectionsImport: () => Promise<ICommonBase[]>
+  specImport?: () => Promise<Json>
 }
 
-const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
+const NavigationMenuRefList = ({
   id,
-  lib,
-  commonSections,
+  basePath,
+  commonSectionsImport,
+  specImport,
+}: NavigationMenuRefListProps) => {
+  const [commonSections, setCommonSections] = useState<ICommonItem[]>()
+  const [spec, setSpec] = useState<Json>()
 
-  active,
-  spec,
-}) => {
-  if (!active) {
+  // Dynamic imports allow for code splitting which
+  // dramatically reduces app bundle size
+  useEffect(() => {
+    async function fetchCommonSections() {
+      const commonSections = await commonSectionsImport()
+      setCommonSections(commonSections as ICommonItem[])
+    }
+    fetchCommonSections()
+  }, [commonSectionsImport])
+
+  useEffect(() => {
+    if (!specImport) {
+      return
+    }
+    async function fetchSpec() {
+      const spec = await specImport()
+      setSpec(spec)
+    }
+    fetchSpec()
+  }, [specImport])
+
+  if (!commonSections) {
+    return null
+  }
+
+  if (specImport && !spec) {
     return null
   }
 
@@ -34,19 +54,13 @@ const NavigationMenuRefList: React.FC<INavigationMenuRefList> = ({
   })
 
   return (
-    <div
-      className={[
-        'transition-all duration-150 ease-out',
-        // enabled
-        active && 'opacity-100 ml-0 delay-150 h-auto',
-        // move menu back to margin-left
-        // level === 'home' && 'ml-12',
-        // disabled
-        // level !== 'home' && level !== id ? '-ml-8' : '',
-        !active ? 'opacity-0 invisible absolute h-0 overflow-hidden' : '',
-      ].join(' ')}
-    >
-      <NavigationMenuRefListItems id={id} lib={lib} commonSections={filteredSections} spec={spec} />
+    <div className="transition-all duration-150 ease-out opacity-100 ml-0 delay-150 h-auto">
+      <NavigationMenuRefListItems
+        id={id}
+        commonSections={filteredSections}
+        spec={spec}
+        basePath={basePath}
+      />
     </div>
   )
 }

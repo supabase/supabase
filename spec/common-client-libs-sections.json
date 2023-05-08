@@ -51,6 +51,7 @@
     ]
   },
   {
+    "type": "category",
     "title": "Database",
     "items": [
       {
@@ -375,6 +376,7 @@
     ]
   },
   {
+    "type": "category",
     "title": "Auth",
     "items": [
       {
@@ -688,6 +690,7 @@
     ]
   },
   {
+    "type": "category",
     "title": "Functions",
     "items": [
       {
@@ -700,6 +703,7 @@
     ]
   },
   {
+    "type": "category",
     "title": "Realtime",
     "items": [
       {
@@ -761,6 +765,7 @@
     ]
   },
   {
+    "type": "category",
     "title": "Storage",
     "items": [
       {
@@ -892,6 +897,7 @@
     ]
   },
   {
+    "type": "category",
     "title": "Misc",
     "excludes": [
       "reference_dart_v1",

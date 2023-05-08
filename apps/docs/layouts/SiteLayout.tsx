@@ -4,10 +4,10 @@ import Link from 'next/link'
 import NavigationMenu from '~/components/Navigation/NavigationMenu/NavigationMenu'
 import TopNavBarRef from '~/components/Navigation/NavigationMenu/TopNavBarRef'
 
-import { memo, useEffect } from 'react'
+import Head from 'next/head'
+import { PropsWithChildren, memo } from 'react'
 import Footer from '~/components/Navigation/Footer'
 import { menuState, useMenuLevelId, useMenuMobileOpen } from '~/hooks/useMenuState'
-import Head from 'next/head'
 
 const levelsData = {
   home: {
@@ -207,25 +207,6 @@ const MobileMenuBackdrop = memo(function MobileMenuBackdrop() {
   )
 })
 
-const SideMenu = memo(function SideMenu() {
-  return (
-    <div
-      className={[
-        'transition-all ease-out duration-200',
-        'absolute left-0 right-0 h-screen',
-        'px-5 pl-5 py-16',
-        'top-[0px]',
-        'bg-scale-200',
-        // desktop styles
-        'lg:relative lg:top-0 lg:left-0 lg:pb-10 lg:px-10 lg:pt-0 lg:flex',
-        'lg:opacity-100 lg:visible',
-      ].join(' ')}
-    >
-      <NavigationMenu />
-    </div>
-  )
-})
-
 const HeaderLogo = memo(function HeaderLogo() {
   const { isDarkMode } = useTheme()
   return (
@@ -311,13 +292,26 @@ const NavContainer = memo(function NavContainer() {
             </div>
           </div>
         </div>
-        <SideMenu />
+        <div
+          className={[
+            'transition-all ease-out duration-200',
+            'absolute left-0 right-0 h-screen',
+            'px-5 pl-5 py-16',
+            'top-[0px]',
+            'bg-scale-200',
+            // desktop styles
+            'lg:relative lg:top-0 lg:left-0 lg:pb-10 lg:px-10 lg:pt-0 lg:flex',
+            'lg:opacity-100 lg:visible',
+          ].join(' ')}
+        >
+          <NavigationMenu />
+        </div>
       </div>
     </div>
   )
 })
 
-const SiteLayout = ({ children }) => {
+const SiteLayout = ({ children }: PropsWithChildren<{}>) => {
   return (
     <>
       <Head>
