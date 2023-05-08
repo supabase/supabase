@@ -6,9 +6,9 @@
   "license": "MIT",
   "scripts": {
     "build:icons": "node --experimental-modules internals/populate-icons.js",
-    "build-tokens": "node build-tokens.js",
-    "copy-tokens": "node copy-tokens.js",
-    "cleanse-css-for-tailwind": "node cleanse-css-for-tailwind.js",
+    "build-tokens": "node internals/tokens/build-tokens.js",
+    "copy-tokens": "node internals/tokens/copy-tokens.js",
+    "cleanse-css-for-tailwind": "node internals/tokens/cleanse-css-for-tailwind.js",
     "generate-styles": "npm run copy-tokens && npm run build-tokens && npm run cleanse-css-for-tailwind",
     "build-storybook": "storybook build",
     "storybook": "storybook dev -p 6006"
