@@ -1,18 +1,66 @@
 module.exports = {
-"fontSizes-5xl": "var(--fontSizes5xl, 48);",
-"fontSizes-4xl": "var(--fontSizes4xl, 36);",
-"fontSizes-3xl": "var(--fontSizes3xl, 30);",
-"fontSizes-2xl": "var(--fontSizes2xl, 24);",
-"fontSizes-xl": "var(--fontSizesXl, 20);",
-"fontSizes-lg": "var(--fontSizesLg, 18);",
-"fontSizes-base": "var(--fontSizesBase, 16);",
-"fontSizes-sm": "var(--fontSizesSm, 14);",
-"fontSizes-xs": "var(--fontSizesXs, 12);",
-"fontSizes-6xl": "var(--fontSizes6xl, 60);",
-"fontSizes-7xl": "var(--fontSizes7xl, 72);",
-"fontSizes-8xl": "var(--fontSizes8xl, 96);",
-"fontSizes-9xl": "var(--fontSizes9xl, 128);",
-"fontSize-0": "var(--fontSize0, 14px);",
-"fontSize-1": "var(--fontSize1, 39.063px);",
-"fontSize-2": "var(--fontSize2, 48.829px);"
+"fontSizes-5xl": {
+  cssVariable: "var(--font-sizes-5xl)",
+  value: "48"
+},
+"fontSizes-4xl": {
+  cssVariable: "var(--font-sizes-4xl)",
+  value: "36"
+},
+"fontSizes-3xl": {
+  cssVariable: "var(--font-sizes-3xl)",
+  value: "30"
+},
+"fontSizes-2xl": {
+  cssVariable: "var(--font-sizes-2xl)",
+  value: "24"
+},
+"fontSizes-xl": {
+  cssVariable: "var(--font-sizes-xl)",
+  value: "20"
+},
+"fontSizes-lg": {
+  cssVariable: "var(--font-sizes-lg)",
+  value: "18"
+},
+"fontSizes-base": {
+  cssVariable: "var(--font-sizes-base)",
+  value: "16"
+},
+"fontSizes-sm": {
+  cssVariable: "var(--font-sizes-sm)",
+  value: "14"
+},
+"fontSizes-xs": {
+  cssVariable: "var(--font-sizes-xs)",
+  value: "12"
+},
+"fontSizes-6xl": {
+  cssVariable: "var(--font-sizes-6xl)",
+  value: "60"
+},
+"fontSizes-7xl": {
+  cssVariable: "var(--font-sizes-7xl)",
+  value: "72"
+},
+"fontSizes-8xl": {
+  cssVariable: "var(--font-sizes-8xl)",
+  value: "96"
+},
+"fontSizes-9xl": {
+  cssVariable: "var(--font-sizes-9xl)",
+  value: "128"
+},
+"fontSize-0": {
+  cssVariable: "var(--font-size-0)",
+  value: "14px"
+},
+"fontSize-1": {
+  cssVariable: "var(--font-size-1)",
+  value: "39.063px"
+},
+"fontSize-2": {
+  cssVariable: "var(--font-size-2)",
+  value: "48.829px"
+}
 }

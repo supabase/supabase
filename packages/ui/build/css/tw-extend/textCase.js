@@ -1,4 +1,10 @@
 module.exports = {
-"textCase-none": "var(--textCaseNone, none);",
-"textCase-uppercase": "var(--textCaseUppercase, uppercase);"
+"textCase-none": {
+  cssVariable: "var(--text-case-none)",
+  value: "none"
+},
+"textCase-uppercase": {
+  cssVariable: "var(--text-case-uppercase)",
+  value: "uppercase"
+}
 }

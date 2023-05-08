@@ -1,3 +1,6 @@
 module.exports = {
-"textDecoration-none": "var(--textDecorationNone, none);"
+"textDecoration-none": {
+  cssVariable: "var(--text-decoration-none)",
+  value: "none"
+}
 }

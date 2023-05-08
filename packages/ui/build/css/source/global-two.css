@@ -1,10 +1,10 @@
 /**
  * Do not edit directly
- * Generated on Mon, 08 May 2023 14:44:29 GMT
+ * Generated on Mon, 08 May 2023 16:23:48 GMT
  */
 
 :root {
-  --dropShadowContextMenu: 0 2px 5px 3px rgba(0,0,0,0.1);
-  --contextMenu: 6px;
-  --menuItemSection: 5px;
+  --drop-shadow-context-menu: 0 2px 5px 3px rgba(0,0,0,0.1);
+  --context-menu: 6px;
+  --menu-item-section: 5px;
 }

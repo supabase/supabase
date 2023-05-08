@@ -38,7 +38,7 @@ async function getTokensFile() {
   const promises = TOKEN_FILES_METADATA.map((tokenMetadata, i) => {
     return new Promise((resolve, reject) => {
       https
-        .get(baseUrl + tokenMetadata.fileName, (res) => {
+        .get(baseUrl + tokenMetadata.fileName + `?e=${Math.random()}`, (res) => {
           let data = ''
           res.on('data', (chunk) => {
             data += chunk

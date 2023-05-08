@@ -8,6 +8,7 @@
     "build:icons": "node --experimental-modules internals/populate-icons.js",
     "build-tokens": "node build-tokens.js",
     "copy-tokens": "node copy-tokens.js",
+    "cleanse-css-for-tailwind": "node cleanse-css-for-tailwind.js",
     "generate-styles": "npm run copy-tokens && npm run build-tokens",
     "build-storybook": "storybook build",
     "storybook": "storybook dev -p 6006"
@@ -29,6 +30,7 @@
     "autoprefixer": "^10.4.14",
     "clsx": "^1.2.1",
     "cmdk-supabase": "^0.2.2",
+    "color": "^4.2.3",
     "colorjs.io": "^0.4.3",
     "common-tags": "^1.8.2",
     "config": "*",
@@ -65,15 +67,15 @@
     "@types/react": "^17.0.37",
     "@types/react-copy-to-clipboard": "^5.0.4",
     "@types/react-dom": "^17.0.11",
+    "@types/react-syntax-highlighter": "^15.5.6",
     "color2k": "^2.0.1",
     "copyfiles": "^2.4.1",
     "expr-eval": "^2.0.2",
     "glob": "^8.1.0",
+    "sql-formatter": "^12.2.0",
     "storybook": "^7.0.5",
     "storybook-dark-mode": "^3.0.0",
     "style-dictionary": "^3.7.1",
-    "@types/react-syntax-highlighter": "^15.5.6",
-    "sql-formatter": "^12.2.0",
     "typescript": "4.3.4"
   }
 }

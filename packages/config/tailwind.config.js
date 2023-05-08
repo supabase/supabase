@@ -10,7 +10,7 @@ function generateTwColorClasses(globalKey, twAttributes) {
     if (attrKey.includes(globalKey)) {
       classes = {
         ...classes,
-        [attrKey.split('-').splice(1).join('-')]: attr,
+        [attrKey.split('-').splice(1).join('-')]: `hsl(${attr.cssVariable} / <alpha-value>)`,
       }
     }
   })
@@ -47,6 +47,14 @@ const uiConfig = ui({
   mode: 'JIT',
   darkMode: 'class',
   theme: {
+    textColor: (theme) => ({
+      ...theme('colors'),
+      ...generateTwColorClasses('textColor', color),
+    }),
+    accentColor: (theme) => ({
+      ...theme('colors'),
+      ...generateTwColorClasses('accentColor', color),
+    }),
     backgroundColor: (theme) => ({
       ...theme('colors'),
       ...generateTwColorClasses('backgroundColor', color),
@@ -55,9 +63,37 @@ const uiConfig = ui({
       ...theme('colors'),
       ...generateTwColorClasses('borderColor', color),
     }),
-    textColor: (theme) => ({
+    boxShadowColor: (theme) => ({
       ...theme('colors'),
-      ...generateTwColorClasses('textColor', color),
+      ...generateTwColorClasses('boxShadowColor', color),
+    }),
+    caretColor: (theme) => ({
+      ...theme('colors'),
+      ...generateTwColorClasses('caretColor', color),
+    }),
+    divideColor: (theme) => ({
+      ...theme('colors'),
+      ...generateTwColorClasses('divideColor', color),
+    }),
+    outlineColor: (theme) => ({
+      ...theme('colors'),
+      ...generateTwColorClasses('outlineColor', color),
+    }),
+    placeholderColor: (theme) => ({
+      ...theme('colors'),
+      ...generateTwColorClasses('placeholderColor', color),
+    }),
+    ringColor: (theme) => ({
+      ...theme('colors'),
+      ...generateTwColorClasses('ringColor', color),
+    }),
+    ringOffsetColor: (theme) => ({
+      ...theme('colors'),
+      ...generateTwColorClasses('ringOffsetColor', color),
+    }),
+    textDecorationColor: (theme) => ({
+      ...theme('colors'),
+      ...generateTwColorClasses('textDecorationColor', color),
     }),
     extend: {
       typography: ({ theme }) => ({
