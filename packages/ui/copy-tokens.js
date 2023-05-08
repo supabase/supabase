@@ -13,13 +13,13 @@ const baseUrl = `https://raw.githubusercontent.com/MildTomato/supabase-design-to
  * Files that need to be copied over from Tokens repo
  */
 const TOKEN_FILES_METADATA = [
-  // figma tokens misc config files
+  // figma tokens misc config files (comment out for now)
   { fileName: '$metadata.json', type: 'config' },
   { fileName: '$themes.json', type: 'config' },
-  // source files
+  // source files (comment out for now)
   { fileName: 'global.json', type: 'source' },
   { fileName: 'global-two.json', type: 'source' },
-  // semantic
+  // semantic (comment out for now)
   { fileName: 'typography.json', type: 'semantic' },
   // themes
   { fileName: 'root.json', type: 'theme' }, // root theme

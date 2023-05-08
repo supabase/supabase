@@ -25,40 +25,6 @@ const supportedTokenTypeList = [
   'textDecoration',
 ]
 
-// old one
-
-// registerTransforms(StyleDictionary)
-
-// const sd = StyleDictionary.extend({
-//   source: 'tokens/%themeTokenSets%',
-//   platforms: {
-//     css: {
-//       transformGroup: 'tokens-studio',
-//       prefix: 'sd',
-//       buildPath: 'build/css/',
-//       files: [
-//         {
-//           destination: '_variables-%theme%.css',
-//           format: 'css/variables',
-//         },
-//       ],
-//     },
-//     js: {
-//       transformGroup: 'tokens-studio',
-//       buildPath: 'build/js/',
-//       files: [
-//         {
-//           destination: 'variables-%theme%.js',
-//           format: 'javascript/es6',
-//         },
-//       ],
-//     },
-//   },
-// })
-
-// sd.cleanAllPlatforms()
-// sd.buildAllPlatforms()
-
 registerTransforms(StyleDictionary)
 
 const formatTailwindValue = (tokenType, value) => {
@@ -153,6 +119,10 @@ function fileNameCleaner(fileName) {
   return fileName.split('/').pop().replace('.json', '')
 }
 
+/**
+ * BUILD SOURCE FILES
+ */
+
 sourceFiles.map(function (filePath) {
   const fileName = fileNameCleaner(filePath)
   const SD = StyleDictionary.extend(
@@ -161,10 +131,9 @@ sourceFiles.map(function (filePath) {
   SD.buildAllPlatforms()
 })
 
-// semanticFiles.map(function (file) {
-//   const SD = StyleDictionary.extend(getStyleDictionaryConfig(file, 'semantic', false))
-//   SD.buildAllPlatforms()
-// })
+/**
+ * BUILD THEME FILE
+ */
 
 themeFiles.map(function (filePath, i) {
   const buildTailwindFiles = filePath.includes('root') // i === 0
@@ -182,3 +151,65 @@ themeFiles.map(function (filePath, i) {
   )
   SD.buildAllPlatforms()
 })
+
+function convertToVariableIfNeeded(value) {
+  if (value.startsWith('{') && value.endsWith('}')) {
+    return `var(--${value.slice(1, -1).split('.').join('-')})`
+  }
+  return value
+}
+
+/**
+ * BUILD TYPOGRAPHY FILES
+ */
+
+/**
+ * Format for css typography classes
+ * This generates theme-independent css classes so we're fine with just using css variables here
+ */
+StyleDictionary.registerFormat({
+  name: 'css/typographyClasses',
+  formatter: (dictionary, config) =>
+    dictionary.allProperties
+      .map((prop) => {
+        return `
+.${prop.name} {
+  font: var(--${prop.name});
+  letter-spacing: ${convertToVariableIfNeeded(prop.original.value.letterSpacing)};
+  text-transform: ${convertToVariableIfNeeded(prop.original.value.textCase)};
+  text-decoration: ${convertToVariableIfNeeded(prop.original.value.textDecoration)};
+}`
+      })
+      .join('\n'),
+})
+
+function getTypographyConfig() {
+  console.log('Building: typography')
+  return {
+    source: [...semanticFiles, ...sourceFiles],
+    platforms: {
+      css: {
+        transforms: [
+          // 'resolveMath',
+          // 'size/px',
+          // 'type/fontWeight',
+          // 'size/letterspacing',
+          'name/cti/kebab',
+        ],
+        transformGroup: 'tokens-studio',
+        buildPath: 'build/css/',
+        files: [
+          {
+            destination: `source/typography-classes.css`,
+            format: 'css/typographyClasses',
+            selector: ':root',
+            filter: (token) => token.type === 'typography',
+          },
+        ],
+      },
+    },
+  }
+}
+
+const typographyBuild = StyleDictionary.extend(getTypographyConfig())
+typographyBuild.buildAllPlatforms()
