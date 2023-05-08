@@ -38,6 +38,7 @@ interface Props {
   paymentMethods?: PaymentMethod[]
   currentSubscription: StripeSubscription
   isLoadingPaymentMethods: boolean
+  onPaymentMethodAdded: () => void
   onSelectBack: () => void
 }
 
@@ -47,6 +48,7 @@ const ProUpgrade: FC<Props> = ({
   currentSubscription,
   isLoadingPaymentMethods,
   onSelectBack,
+  onPaymentMethodAdded,
 }) => {
   const { app, ui } = useStore()
   const router = useRouter()
@@ -115,6 +117,11 @@ const ProUpgrade: FC<Props> = ({
     currentSubscription.tier.prod_id === STRIPE_PRODUCT_IDS.PAYG
 
   const isChangingComputeSize = currentAddons.computeSize?.id !== selectedAddons.computeSize.id
+
+  const onLocalPaymentMethodAdded = () => {
+    setShowAddPaymentMethodModal(false)
+    return onPaymentMethodAdded()
+  }
 
   useEffect(() => {
     if (!isLoadingPaymentMethods && paymentMethods && paymentMethods.length > 0) {
@@ -362,6 +369,7 @@ const ProUpgrade: FC<Props> = ({
         visible={showAddPaymentMethodModal}
         returnUrl={`${getURL()}/project/${projectRef}/settings/billing/update/pro`}
         onCancel={() => setShowAddPaymentMethodModal(false)}
+        onConfirm={() => onLocalPaymentMethodAdded()}
       />
 
       {/* Spend caps helper modal */}
