@@ -126,7 +126,7 @@ const AddNewSecretModal: FC<Props> = ({ visible, onClose }) => {
                   />
                   <InformationBox
                     icon={<IconHelpCircle size={18} strokeWidth={2} />}
-                    url="https://supabase.com/docs/guides/database/vault"
+                    url="https://github.com/supabase/vault"
                     urlLabel="Vault documentation"
                     title="What is a key?"
                     description={
