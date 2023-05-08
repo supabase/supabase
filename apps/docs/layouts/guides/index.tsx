@@ -1,10 +1,11 @@
 import { MDXProvider } from '@mdx-js/react'
 import { NextSeo } from 'next-seo'
 import Head from 'next/head'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { FC, useEffect, useRef, useState } from 'react'
-import { IconExternalLink } from 'ui'
+import { IconExternalLink, IconPlay, IconPlayCircle } from 'ui'
 import components from '~/components'
 import { highlightSelectedTocItem } from '~/components/CustomHTMLElements/CustomHTMLElements.utils'
 import FooterHelpCallout, { FooterHelpCalloutType } from '~/components/FooterHelpCallout'
@@ -20,6 +21,7 @@ interface Props {
     subtitle?: string
     footerHelpType?: FooterHelpCalloutType
     video?: string
+    tocVideo?: string
     canonical?: string
   }
   children: any
@@ -35,8 +37,9 @@ const Layout: FC<Props> = (props) => {
   const [tocList, setTocList] = useState([])
 
   const { asPath } = useRouter()
-
   const router = useRouter()
+
+  const [openVideoLightbox, setOpenVideoLightbox] = useState(false)
 
   const EDIT_BUTTON_EXCLUDE_LIST = ['/404']
 
@@ -63,6 +66,7 @@ const Layout: FC<Props> = (props) => {
   }, [])
 
   const hasTableOfContents = tocList.length > 0
+  const tocVideoPreview = `http://img.youtube.com/vi/${props.meta.tocVideo}/0.jpg`
 
   // page type, ie, Auth, Database, Storage etc
   const ogPageType = asPath.split('/')[2]
@@ -103,6 +107,30 @@ const Layout: FC<Props> = (props) => {
           },
         }}
       />
+      {openVideoLightbox && (
+        <div
+          className="fixed px-12 py-24 z-50 inset-0 w-screen h-screen bg-scale-100/90 backdrop-blur-md flex items-center justify-center hover:cursor-pointer"
+          onClick={() => setOpenVideoLightbox(false)}
+        >
+          <div className="w-full max-w-4xl flex items-center justify-center">
+            <div className="relative w-full">
+              <button
+                onClick={() => setOpenVideoLightbox(false)}
+                className="text-scale-1100 hover:text-scale-1200 absolute -top-8 right-0"
+              >
+                <p className="text-xs">Close</p>
+              </button>
+              <div className="video-container overflow-hidden rounded-xl">
+                <iframe
+                  src={`https://www.youtube-nocookie.com/embed/${props.meta.tocVideo}`}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       <div className={['grid grid-cols-12 relative gap-4'].join(' ')}>
         <div
           className={[
@@ -157,6 +185,29 @@ const Layout: FC<Props> = (props) => {
             ].join(' ')}
           >
             <div className="border-l">
+              {props.meta?.tocVideo && !!tocVideoPreview && (
+                <div className="relative mb-6 pl-5">
+                  <div
+                    className="video-container overflow-hidden rounded hover:cursor-pointer"
+                    onClick={() => setOpenVideoLightbox(true)}
+                  >
+                    <div
+                      className={`absolute inset-0 z-10 text-scale-1100 transition-colors group-hover/toc-video:text-scale-1200 flex flex-col items-center justify-center gap-3 backdrop-blur-sm
+                                  before:content[''] before:-z-10 before:absolute before:inset-0 before:bg-scale-100 before:opacity-30 hover:before:opacity-50 before:transition-opacity`}
+                    >
+                      <IconPlay strokeWidth={2} size="small" />
+                      <p className="text-sm">Watch video guide</p>
+                    </div>
+                    <Image
+                      src={tocVideoPreview}
+                      alt={''}
+                      layout="fill"
+                      objectFit="cover"
+                      className="absolute inset-0"
+                    />
+                  </div>
+                </div>
+              )}
               <span className="block font-mono text-xs uppercase text-scale-1200 px-5 mb-6">
                 On this page
               </span>

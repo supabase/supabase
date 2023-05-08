@@ -4,6 +4,7 @@ export const meta = {
   title: 'Build a User Management App with NextJS',
   description: 'Learn how to use Supabase in your Next App.',
   video: 'https://www.youtube.com/v/0Fs96oZ4se0',
+  tocVideo: '0Fs96oZ4se0',
 }
 
 <QuickstartIntro />
@@ -126,7 +127,7 @@ export default MyApp
 Wrap your `pages/_app.tsx` component with the `SessionContextProvider` component:
 
 ```jsx lines=2,8 title=pages/_app.tsx
-import '../styles/globals.css';
+import '../styles/globals.css'
 import { useState } from 'react'
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
 import { SessionContextProvider, Session } from '@supabase/auth-helpers-react'

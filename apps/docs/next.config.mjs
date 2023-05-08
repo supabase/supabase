@@ -54,6 +54,7 @@ const nextConfig = {
       'user-images.githubusercontent.com',
       'raw.githubusercontent.com',
       'weweb-changelog.ghost.io',
+      'img.youtube.com',
     ],
   },
   experimental: {
