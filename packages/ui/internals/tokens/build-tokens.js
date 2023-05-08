@@ -10,21 +10,24 @@ const StyleDictionary = require('style-dictionary')
 
 const Color = require('color')
 
+/**
+ * uncomment tailwind types as they become available
+ */
 const supportedTokenTypeList = [
-  'spacing',
-  'sizing',
-  'borderRadius',
-  'borderWidth',
+  // 'spacing',
+  // 'sizing',
+  // 'borderRadius',
+  // 'borderWidth',
   'color',
-  'opacity',
-  'fontFamilies',
-  'lineHeights',
-  'letterSpacing',
-  'paragraphSpacing',
-  'fontWeights',
-  'fontSizes',
-  'textCase',
-  'textDecoration',
+  // 'opacity',
+  // 'fontFamilies',
+  // 'lineHeights',
+  // 'letterSpacing',
+  // 'paragraphSpacing',
+  // 'fontWeights',
+  // 'fontSizes',
+  // 'textCase',
+  // 'textDecoration',
 ]
 
 registerTransforms(StyleDictionary)
@@ -49,8 +52,6 @@ StyleDictionary.registerTransform({
   type: 'value',
   matcher: (prop) => prop.type === 'color',
   transformer: (prop) => {
-    console.log('I AM COLOR', prop)
-    // return prop.value
     const color = Color(prop.original.value).hsl()
     return color.string()
   },
