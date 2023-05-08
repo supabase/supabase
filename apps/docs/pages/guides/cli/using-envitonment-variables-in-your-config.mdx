@@ -1,0 +1,34 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  id: 'using-envitonment-variables-in-your-config',
+  title: 'Using environment variables in your config.toml',
+  description: 'How to use environment variables in your config.toml with the Supabase CLI.'
+}
+
+The Supabase CLI can use environment variables from your `.env` file in your project's root directory inside 
+your `config.toml` file.
+
+You can reference your environment variable by using the `env()` function.
+
+Inside of your `.env` file you add the environment variable as you normally would
+```env
+GITHUB_CLIENT_ID=""
+GITHUB_SECRET=""
+```
+
+And then reference them inside of your `config.toml`
+```toml
+[auth.external.github]
+enabled = true
+client_id = "env(GITHUB_CLIENT_ID)"
+secret = "env(GITHUB_SECRET)"
+# Overrides the default auth redirectUrl.
+redirect_uri = ""
+```
+
+These same environment variables will be referenced by the `supabase start` command from the Supabase CLI.
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page
