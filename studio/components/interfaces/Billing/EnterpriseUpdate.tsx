@@ -33,6 +33,7 @@ interface Props {
   paymentMethods?: PaymentMethod[]
   currentSubscription: StripeSubscription
   isLoadingPaymentMethods: boolean
+  onPaymentMethodAdded: () => void
 }
 
 const EnterpriseUpdate: FC<Props> = ({
@@ -40,6 +41,7 @@ const EnterpriseUpdate: FC<Props> = ({
   paymentMethods,
   currentSubscription,
   isLoadingPaymentMethods,
+  onPaymentMethodAdded,
 }) => {
   const { app, ui } = useStore()
   const router = useRouter()
@@ -91,6 +93,11 @@ const EnterpriseUpdate: FC<Props> = ({
   const [showAddPaymentMethodModal, setShowAddPaymentMethodModal] = useState(false)
 
   const isChangingComputeSize = currentAddons.computeSize?.id !== selectedAddons.computeSize.id
+
+  const onLocalPaymentMethodAdded = () => {
+    setShowAddPaymentMethodModal(false)
+    return onPaymentMethodAdded()
+  }
 
   useEffect(() => {
     getSubscriptionPreview()
@@ -312,6 +319,7 @@ const EnterpriseUpdate: FC<Props> = ({
         visible={showAddPaymentMethodModal}
         returnUrl={`${getURL()}/project/${projectRef}/settings/billing/update/pro`}
         onCancel={() => setShowAddPaymentMethodModal(false)}
+        onConfirm={() => onLocalPaymentMethodAdded()}
       />
     </>
   )
