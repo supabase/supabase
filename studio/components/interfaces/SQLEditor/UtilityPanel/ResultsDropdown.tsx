@@ -10,6 +10,7 @@ import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 // @ts-ignore
 import MarkdownTable from 'markdown-table'
 import { useGoogleAnalyticsProps } from 'common'
+import { useRouter } from 'next/router'
 
 export type ResultsDropdownProps = {
   id: string
@@ -22,6 +23,7 @@ const ResultsDropdown = ({ id }: ResultsDropdownProps) => {
   const result = snap.results?.[id]?.[0] ?? undefined
   const { ui } = useStore()
   const csvRef = useRef<CSVLink & HTMLAnchorElement & { link: HTMLAnchorElement }>(null)
+  const router = useRouter()
 
   const csvData = useMemo(
     () => (result?.rows ? compact(Array.from(result.rows || [])) : ''),
@@ -32,7 +34,8 @@ const ResultsDropdown = ({ id }: ResultsDropdownProps) => {
     csvRef.current?.link.click()
     Telemetry.sendEvent(
       { category: 'sql_editor', action: 'sql_download_csv', label: '' },
-      googleAnalyticsProps
+      googleAnalyticsProps,
+      router
     )
   }
 
@@ -55,7 +58,8 @@ const ResultsDropdown = ({ id }: ResultsDropdownProps) => {
         ui.setNotification({ category: 'success', message: 'Copied results to clipboard' })
         Telemetry.sendEvent(
           { category: 'sql_editor', action: 'sql_copy_as_markdown', label: '' },
-          googleAnalyticsProps
+          googleAnalyticsProps,
+          router
         )
       })
     }
