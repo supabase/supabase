@@ -104,6 +104,7 @@ const BillingSettings = () => {
           paymentMethods={paymentMethods || []}
           onDefaultMethodUpdated={setCustomer}
           onPaymentMethodsDeleted={() => getPaymentMethods()}
+          onPaymentMethodAdded={() => getPaymentMethods()}
         />
 
         <BillingEmail />
