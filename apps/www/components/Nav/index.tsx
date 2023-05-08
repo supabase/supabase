@@ -263,6 +263,18 @@ const Nav = () => {
                       Pricing
                     </a>
                   </Link>
+                  <Link href="/docs">
+                    <a
+                      className={[
+                        `text-scale-1200 hover:text-brand-900 hover:border-brand-900 dark:text-dark-100 dark:hover:border-dark-100 inline-flex items-center
+                        border-b-2 border-transparent p-5 px-1
+                        text-sm font-medium`,
+                        showLaunchWeekNavMode && '!text-white',
+                      ].join(' ')}
+                    >
+                      Docs
+                    </a>
+                  </Link>
                   <Link href="/blog">
                     <a
                       className={[
@@ -406,7 +418,14 @@ const Nav = () => {
                       Pricing
                     </a>
                   </Link>
-
+                  <Link href="/docs">
+                    <a
+                      target="_blank"
+                      className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white"
+                    >
+                      Docs
+                    </a>
+                  </Link>
                   <Link href="https://github.com/supabase/supabase">
                     <a
                       target="_blank"

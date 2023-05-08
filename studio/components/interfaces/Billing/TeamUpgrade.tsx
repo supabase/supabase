@@ -35,6 +35,7 @@ interface TeamUpgradeProps {
   paymentMethods?: PaymentMethod[]
   currentSubscription: StripeSubscription
   isLoadingPaymentMethods: boolean
+  onPaymentMethodAdded: () => void
 }
 
 const TeamUpgrade = ({
@@ -42,6 +43,7 @@ const TeamUpgrade = ({
   paymentMethods,
   currentSubscription,
   isLoadingPaymentMethods,
+  onPaymentMethodAdded,
 }: TeamUpgradeProps) => {
   const { app, ui } = useStore()
   const router = useRouter()
@@ -158,6 +160,11 @@ const TeamUpgrade = ({
 
     setIsSubmitting(false)
     return true
+  }
+
+  const onLocalPaymentMethodAdded = () => {
+    setShowAddPaymentMethodModal(false)
+    return onPaymentMethodAdded()
   }
 
   const onConfirmPayment = async () => {
@@ -328,6 +335,7 @@ const TeamUpgrade = ({
         visible={showAddPaymentMethodModal}
         returnUrl={`${getURL()}/project/${projectRef}/settings/billing/update/team`}
         onCancel={() => setShowAddPaymentMethodModal(false)}
+        onConfirm={() => onLocalPaymentMethodAdded()}
       />
     </>
   )

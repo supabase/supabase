@@ -119,6 +119,7 @@ const BillingUpdatePro: NextPageWithLayout = () => {
       isLoadingPaymentMethods={isLoadingPaymentMethods}
       paymentMethods={paymentMethods || []}
       onSelectBack={() => router.push(`/project/${projectRef}/settings/billing/update`)}
+      onPaymentMethodAdded={() => getPaymentMethods()}
     />
   )
 }
