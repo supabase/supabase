@@ -215,7 +215,7 @@ const SideMenu = memo(function SideMenu() {
         'absolute left-0 right-0 h-screen',
         'px-5 pl-5 py-16',
         'top-[0px]',
-        'bg-body',
+        'bg-scale-200',
         // desktop styles
         'lg:relative lg:top-0 lg:left-0 lg:pb-10 lg:px-10 lg:pt-0 lg:flex',
         'lg:opacity-100 lg:visible',
@@ -290,7 +290,7 @@ const NavContainer = memo(function NavContainer() {
           'top-0',
           'relative',
           'w-auto',
-          'border-r border-body overflow-auto h-screen',
+          'border-r overflow-auto h-screen',
           'backdrop-blur backdrop-filter bg-white-1200 dark:bg-blackA-300',
           'flex flex-col',
         ].join(' ')}
