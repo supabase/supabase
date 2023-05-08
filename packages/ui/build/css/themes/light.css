@@ -1,6 +1,6 @@
 /**
  * Do not edit directly
- * Generated on Sat, 06 May 2023 10:29:24 GMT
+ * Generated on Sat, 06 May 2023 12:08:53 GMT
  */
 
 .light {
@@ -19,13 +19,13 @@
   --themeVariablesBackgroundBody: #f8f9fa; /* og color is colors.Slate.Light.2 */
   --themeVariablesBackground: #fbfcfd; /* og color is  colors.Slate.Light.1 */
   --themeVariablesBrand: #2b825b;
-  --textDefault: var(--themeVariablesTextBody);
+  --textColorBodyDefault: var(--themeVariablesTextBody);
   --backgroundColorBodyAlt: var(--themeVariablesBackgroundBodyAlt);
   --backgroundColorBody: var(--themeVariablesBackgroundBody); /* Background color used for the main page body. */
   --backgroundColorDefault: var(--themeVariablesBackground); /* Default background color for any container. */
-  --textBodyLightest: lch(68.7 0.61 224);
-  --textBodyLighter: lch(55.2 0.87 224);
-  --textBodyLight: lch(37.3 1.22 224);
+  --textColorBodyLightest: lch(68.7 0.61 224);
+  --textColorBodyLighter: lch(55.2 0.87 224);
+  --textColorBodyLight: lch(37.3 1.22 224);
   --borderColorBody: lch(94.4 0.62 251);
   --borderColorDefault: lch(95.4 0.62 251); /* Default border color */
   --backgroundColorControl: lch(99.2 0.45 251);

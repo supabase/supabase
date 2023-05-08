@@ -1,9 +1,9 @@
 /**
  * Do not edit directly
- * Generated on Sat, 06 May 2023 10:29:24 GMT
+ * Generated on Sat, 06 May 2023 12:08:53 GMT
  */
 
-.darker-dark {
+.dark {
   --utilityMixNegative: #000;
   --utilityMixPositive: #fff;
   --darkenPercentage: 0.2;
@@ -18,13 +18,17 @@
   --themeVariablesBackgroundBody: #000; /* $colors.Gray.Dark.2 */
   --themeVariablesBackground: #141414; /* $colors.Gray.Dark.3 */
   --themeVariablesBrand: #d626dc;
-  --textDefault: var(--themeVariablesTextBody);
+  --textColorBodyDefault: var(--themeVariablesTextBody);
   --backgroundColorBodyAlt: var(--themeVariablesBackgroundBodyAlt);
-  --backgroundColorBody: var(--themeVariablesBackgroundBody); /* Background color used for the main page body. */
-  --backgroundColorDefault: var(--themeVariablesBackground); /* Default background color for any container. */
-  --textBodyLightest: lch(32.6 0 0);
-  --textBodyLighter: lch(46.5 0 0);
-  --textBodyLight: lch(65.1 0 0);
+  --backgroundColorBody: var(
+    --themeVariablesBackgroundBody
+  ); /* Background color used for the main page body. */
+  --backgroundColorDefault: var(
+    --themeVariablesBackground
+  ); /* Default background color for any container. */
+  --textColorBodyLightest: lch(32.6 0 0);
+  --textColorBodyLighter: lch(46.5 0 0);
+  --textColorBodyLight: lch(65.1 0 0);
   --borderColorBody: lch(5 0 0);
   --borderColorDefault: lch(11 0 0); /* Default border color */
   --backgroundColorControl: lch(4.42 0 0);
