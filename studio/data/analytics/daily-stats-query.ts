@@ -131,7 +131,7 @@ export const useDailyStatsQuery = <TData = DailyStatsData>(
         typeof endDate !== 'undefined',
 
       select(data) {
-        const noDataYet = Number(data.data[0].period_start) === 0
+        const noDataYet = data.data[0].id === undefined
 
         // [Joshen] Ideally handled by API, like infra-monitoring
         if (noDataYet) {
@@ -155,10 +155,7 @@ export const useDailyStatsQuery = <TData = DailyStatsData>(
                 ...x,
                 [attribute]:
                   modifier !== undefined ? modifier(Number(x[attribute])) : Number(x[attribute]),
-                periodStartFormatted:
-                  Number(x.period_start) > 0
-                    ? dayjs(x.period_start).format(dateFormat)
-                    : x.period_start,
+                periodStartFormatted: dayjs(x.period_start).format(dateFormat),
               }
             }),
           } as TData
