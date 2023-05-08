@@ -6,19 +6,34 @@ import { useEffect } from 'react'
 import Meta from '~/components/Favicons'
 import '../styles/index.css'
 import { post } from '~/lib/fetchWrapper'
-import { AuthProvider, ThemeProvider } from 'common'
+import { AuthProvider, ThemeProvider, useGoogleAnalyticsProps } from 'common'
+import { BrowserTabTracker } from 'browser-session-tabs'
+import { v4 as uuidv4 } from 'uuid'
 import Head from 'next/head'
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter()
+  const googleAnalyticsProps = useGoogleAnalyticsProps()
 
   function handlePageTelemetry(route: string) {
     return post(`${API_URL}/telemetry/page`, {
       referrer: document.referrer,
       title: document.title,
       route,
+      ga: {
+        screen_resolution: googleAnalyticsProps?.screenResolution,
+        language: googleAnalyticsProps?.language,
+      },
     })
   }
+
+  useEffect(() => {
+    // Generate browser session id for anon tracking
+    BrowserTabTracker.initialize({
+      storageKey: 'supabase.browser.session',
+      sessionIdGenerator: () => uuidv4(),
+    })
+  }, [])
 
   useEffect(() => {
     function handleRouteChange(url: string) {
