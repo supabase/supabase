@@ -7,11 +7,12 @@ import gaEvents from '~/lib/gaEvents'
 import { useGoogleAnalyticsProps } from 'common/hooks/useGoogleAnalyticsProps'
 
 const Hero = () => {
-  const { basePath } = useRouter()
+  const router = useRouter()
+  const { basePath } = router
   const googleAnalyticsProps = useGoogleAnalyticsProps()
 
   const sendTelemetryEvent = async (event: GoogleAnalyticsEvent) => {
-    await Telemetry.sendEvent(event, googleAnalyticsProps)
+    await Telemetry.sendEvent(event, googleAnalyticsProps, router)
   }
 
   return (

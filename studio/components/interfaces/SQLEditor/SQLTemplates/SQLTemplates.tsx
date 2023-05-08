@@ -78,7 +78,8 @@ const SQLTemplates = observer(() => {
                     action: 'script_clicked',
                     label: x.title,
                   },
-                  googleAnalyticsProps
+                  googleAnalyticsProps,
+                  router
                 )
               }}
             />
@@ -112,7 +113,8 @@ const SQLTemplates = observer(() => {
                     action: 'quickstart_clicked',
                     label: x.title,
                   },
-                  googleAnalyticsProps
+                  googleAnalyticsProps,
+                  router
                 )
               }}
             />

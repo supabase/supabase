@@ -6,8 +6,10 @@ import SectionContainer from '../Layouts/SectionContainer'
 import ProductIcon from '../ProductIcon'
 import TextLink from '../TextLink'
 import { useGoogleAnalyticsProps } from 'common/hooks/useGoogleAnalyticsProps'
+import { useRouter } from 'next/router'
 
 const Features = () => {
+  const router = useRouter()
   const googleAnalyticsProps = useGoogleAnalyticsProps()
 
   const sendTelemetryEvent = async (product: any) => {
@@ -15,27 +17,32 @@ const Features = () => {
       case 'Database':
         return await Telemetry.sendEvent(
           gaEvents['www_hp_subhero_products_database'],
-          googleAnalyticsProps
+          googleAnalyticsProps,
+          router
         )
       case 'Authentication':
         return await Telemetry.sendEvent(
           gaEvents['www_hp_subhero_products_auth'],
-          googleAnalyticsProps
+          googleAnalyticsProps,
+          router
         )
       case 'Storage':
         return await Telemetry.sendEvent(
           gaEvents['www_hp_subhero_products_storage'],
-          googleAnalyticsProps
+          googleAnalyticsProps,
+          router
         )
       case 'Edge Functions':
         return await Telemetry.sendEvent(
           gaEvents['www_hp_subhero_products_edgeFunctions'],
-          googleAnalyticsProps
+          googleAnalyticsProps,
+          router
         )
       case 'Realtime':
         return await Telemetry.sendEvent(
           gaEvents['www_hp_subhero_products_realtime'],
-          googleAnalyticsProps
+          googleAnalyticsProps,
+          router
         )
     }
   }
