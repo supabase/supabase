@@ -12,10 +12,10 @@ module.exports = {
 "borderColor-DEFAULT": "var(--borderColorDefault, lch(18 0 0));",
 "borderColor-body": "var(--borderColorBody, lch(14.8 0 0));",
 "borderColor-control": "var(--borderColorControl, lch(22.1 0 0));",
-"text-DEFAULT": "var(--textDefault, #ededed);",
-"text-body-light": "var(--textBodyLight, lch(65.6 0 0));",
-"text-body-lighter": "var(--textBodyLighter, lch(46.9 0 0));",
-"text-body-lightest": "var(--textBodyLightest, lch(32.8 0 0));",
+"textColor-body-DEFAULT": "var(--textColorBodyDefault, #ededed);",
+"textColor-body-light": "var(--textColorBodyLight, lch(65.6 0 0));",
+"textColor-body-lighter": "var(--textColorBodyLighter, lch(46.9 0 0));",
+"textColor-body-lightest": "var(--textColorBodyLightest, lch(32.8 0 0));",
 "utility-mix-positive": "var(--utilityMixPositive, #fff);",
 "utility-mix-negative": "var(--utilityMixNegative, #000);"
 }

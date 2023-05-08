@@ -174,7 +174,7 @@ themeFiles.map(function (filePath, i) {
     getStyleDictionaryConfig(
       // determine wether to include the root theme properties with each theme
       rootTheme ? [filePath] : ['tokens/themes/root.json', filePath],
-      rootTheme ? 'darkasdsd' : fileName,
+      rootTheme ? 'dark' : fileName,
       'themes',
       buildTailwindFiles,
       false

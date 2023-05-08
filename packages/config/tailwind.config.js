@@ -14,17 +14,39 @@ function generateTwColorClasses(globalKey, twAttributes) {
       }
     }
   })
-  return classes
+  const nestedClasses = kebabToNested(classes)
+  // return, but nest the keys if they are kebab case named
+  return nestedClasses
+}
+
+function kebabToNested(obj) {
+  const result = {}
+  for (const [key, value] of Object.entries(obj)) {
+    const parts = key.split('-')
+    let currentObj = result
+    for (let i = 0; i < parts.length; i++) {
+      const part = parts[i]
+      if (!currentObj[part]) {
+        currentObj[part] = {}
+      }
+      if (i === parts.length - 1) {
+        if (typeof value === 'object') {
+          currentObj[part] = nestObject(value)
+        } else {
+          currentObj[part] = value
+        }
+      } else {
+        currentObj = currentObj[part]
+      }
+    }
+  }
+  return result
 }
 
 const uiConfig = ui({
   mode: 'JIT',
   darkMode: 'class',
   theme: {
-    accentColor: (theme) => ({
-      ...theme('colors'),
-      ...generateTwColorClasses('accentColor', color),
-    }),
     backgroundColor: (theme) => ({
       ...theme('colors'),
       ...generateTwColorClasses('backgroundColor', color),
@@ -33,37 +55,9 @@ const uiConfig = ui({
       ...theme('colors'),
       ...generateTwColorClasses('borderColor', color),
     }),
-    boxShadowColor: (theme) => ({
-      ...theme('colors'),
-      ...generateTwColorClasses('boxShadowColor', color),
-    }),
-    caretColor: (theme) => ({
-      ...theme('colors'),
-      ...generateTwColorClasses('caretColor', color),
-    }),
-    divideColor: (theme) => ({
-      ...theme('colors'),
-      ...generateTwColorClasses('divideColor', color),
-    }),
-    outlineColor: (theme) => ({
-      ...theme('colors'),
-      ...generateTwColorClasses('outlineColor', color),
-    }),
-    ringColor: (theme) => ({
-      ...theme('colors'),
-      ...generateTwColorClasses('ringColor', color),
-    }),
-    ringOffsetColor: (theme) => ({
-      ...theme('colors'),
-      ...generateTwColorClasses('ringOffsetColor', color),
-    }),
     textColor: (theme) => ({
       ...theme('colors'),
       ...generateTwColorClasses('textColor', color),
-    }),
-    textDecorationColor: (theme) => ({
-      ...theme('colors'),
-      ...generateTwColorClasses('textDecorationColor', color),
     }),
     extend: {
       typography: ({ theme }) => ({

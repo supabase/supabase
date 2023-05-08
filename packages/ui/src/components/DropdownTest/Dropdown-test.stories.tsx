@@ -1,18 +1,18 @@
 import React, { useState } from 'react'
-import { Dropdown } from './'
+import { Dropdown } from '.'
 import { Button } from '../Button'
 import { Input } from '../Input'
 
-import { IconSettings } from './../Icon/icons/IconSettings'
-import { IconLogOut } from './../Icon/icons/IconLogOut'
-import { IconChevronDown } from './../Icon/icons/IconChevronDown'
-import { IconChevronRight } from './../Icon/icons/IconChevronRight'
-import { IconHardDrive } from './../Icon/icons/IconHardDrive'
-import { IconLogIn } from './../Icon/icons/IconLogIn'
-import { IconSearch } from './../Icon/icons/IconSearch'
+import { IconSettings } from '../Icon/icons/IconSettings'
+import { IconLogOut } from '../Icon/icons/IconLogOut'
+import { IconChevronDown } from '../Icon/icons/IconChevronDown'
+import { IconChevronRight } from '../Icon/icons/IconChevronRight'
+import { IconHardDrive } from '../Icon/icons/IconHardDrive'
+import { IconLogIn } from '../Icon/icons/IconLogIn'
+import { IconSearch } from '../Icon/icons/IconSearch'
 
 export default {
-  title: 'Navigation/Dropdown',
+  title: 'Navigation/DropdownTest',
   component: Dropdown,
 }
 
@@ -25,13 +25,8 @@ const DemoContainer = ({ children }: { children: React.ReactNode }) => (
   >
     <div
       className="
-      bg border 
-
       p-3 px-5 
-      shadow-sm 
-      rounded-md 
-      flex 
-      gap-4 
+      bg-scale-300 border border-scale-600 rounded flex gap-4 
       justify-between
       items-center
       w-3/4
@@ -58,9 +53,9 @@ export const DefaultFull = (args: any) => {
         overlay={[
           <Dropdown.Misc>
             <div>
-              <span className="block text-body">Signed in as </span>
+              <span className="block">Signed in as </span>
 
-              <span className="text-body-light">tom@example.com </span>
+              <span>tom@example.com </span>
             </div>
           </Dropdown.Misc>,
           <Dropdown.Separator />,

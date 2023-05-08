@@ -116,13 +116,13 @@
       }
     }
   },
-  "text": {
-    "DEFAULT": {
+  "textColor": {
+    "body-DEFAULT": {
       "value": "{theme-variables.text.body}",
       "type": "color"
     },
     "body-light": {
-      "value": "{text.DEFAULT}",
+      "value": "{textColor.body-DEFAULT}",
       "type": "color",
       "$extensions": {
         "studio.tokens": {
@@ -136,7 +136,7 @@
       }
     },
     "body-lighter": {
-      "value": "{text.DEFAULT}",
+      "value": "{textColor.body-DEFAULT}",
       "type": "color",
       "$extensions": {
         "studio.tokens": {
@@ -150,7 +150,7 @@
       }
     },
     "body-lightest": {
-      "value": "{text.DEFAULT}",
+      "value": "{textColor.body-DEFAULT}",
       "type": "color",
       "$extensions": {
         "studio.tokens": {
@@ -162,7 +162,9 @@
           }
         }
       }
-    },
+    }
+  },
+  "text": {
     "override-lighten-strength": {
       "value": "0",
       "type": "other"
