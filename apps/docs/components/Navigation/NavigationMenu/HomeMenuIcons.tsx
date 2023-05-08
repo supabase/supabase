@@ -381,3 +381,22 @@ export function IconMenuSwift({ width = 16, height = 16 }: HomeMenuIcon) {
     </svg>
   )
 }
+
+export function IconMenuStatus({ width = 16, height = 16 }: HomeMenuIcon) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 16 16"
+      width={width}
+      height={height}
+      fill="none"
+    >
+      <path
+        stroke="currentColor"
+        strokeLinejoin="bevel"
+        strokeMiterlimit="10"
+        d="M8.99 1.133a7.866 7.866 0 1 0 6.133 2.94l-6.77 6.77-1.956-1.958m2.67-4.688a4.789 4.789 0 1 0 3.98 2.124"
+      />
+    </svg>
+  )
+}

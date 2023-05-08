@@ -118,7 +118,7 @@ export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
       community: true,
     },
     {
-      label: 'Tools',
+      label: 'Tools reference',
     },
     {
       label: 'Management API',
@@ -131,6 +131,13 @@ export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
       icon: 'reference-cli',
       href: '/guides/cli',
       level: 'reference_javascript',
+    },
+  ],
+  [
+    {
+      label: 'Status',
+      icon: 'status',
+      href: 'https://status.supabase.com/',
     },
   ],
 ]

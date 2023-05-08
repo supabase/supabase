@@ -19,6 +19,7 @@ import {
   IconMenuServerlessApis,
   IconMenuStorage,
   IconMenuSwift,
+  IconMenuStatus,
 } from './HomeMenuIcons'
 
 function getMenuIcon(menuKey: string, width: number = 16, height: number = 16) {
@@ -61,6 +62,8 @@ function getMenuIcon(menuKey: string, width: number = 16, height: number = 16) {
       return <IconMenuApi width={width} height={height} />
     case 'reference-cli':
       return <IconMenuCli width={width} height={height} />
+    case 'status':
+      return <IconMenuStatus width={width} height={height} />
     default:
       return <IconMenuPlatform width={width} height={height} />
   }
