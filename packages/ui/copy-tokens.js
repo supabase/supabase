@@ -14,17 +14,17 @@ const baseUrl = `https://raw.githubusercontent.com/MildTomato/supabase-design-to
  */
 const TOKEN_FILES_METADATA = [
   // figma tokens misc config files (comment out for now)
-  { fileName: '$metadata.json', type: 'config' },
-  { fileName: '$themes.json', type: 'config' },
+  // { fileName: '$metadata.json', type: 'config' },
+  // { fileName: '$themes.json', type: 'config' },
   // source files (comment out for now)
-  { fileName: 'global.json', type: 'source' },
-  { fileName: 'global-two.json', type: 'source' },
+  // { fileName: 'global.json', type: 'source' },
+  // { fileName: 'global-two.json', type: 'source' },
   // semantic (comment out for now)
-  { fileName: 'typography.json', type: 'semantic' },
+  // { fileName: 'typography.json', type: 'semantic' },
   // themes
   { fileName: 'root.json', type: 'theme' }, // root theme
   { fileName: 'light.json', type: 'theme' },
-  { fileName: 'darker-dark.json', type: 'theme' },
+  // { fileName: 'darker-dark.json', type: 'theme' },
 ]
 
 const PATHS = {
