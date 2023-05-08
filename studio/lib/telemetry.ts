@@ -1,6 +1,7 @@
 import { post } from 'lib/common/fetch'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { User } from 'types'
+import { BrowserTabTracker } from 'browser-session-tabs'
 
 export interface GoogleAnalyticsProps {
   screenResolution?: string
@@ -28,6 +29,7 @@ const sendEvent = (
     ga: {
       screen_resolution: gaProps?.screenResolution,
       language: gaProps?.language,
+      session_id: BrowserTabTracker.sessionId,
     },
   })
 }
@@ -44,6 +46,7 @@ const sendIdentify = (user: User, gaProps?: GoogleAnalyticsProps) => {
     ga: {
       screen_resolution: gaProps?.screenResolution,
       language: gaProps?.language,
+      session_id: BrowserTabTracker.sessionId,
     },
   })
 }

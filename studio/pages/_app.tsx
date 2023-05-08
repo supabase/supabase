@@ -50,6 +50,8 @@ import Favicons from 'components/head/Favicons'
 import { IS_PLATFORM } from 'lib/constants'
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
 import { createClient } from '@supabase/supabase-js'
+import { BrowserTabTracker } from 'browser-session-tabs'
+import { v4 as uuidv4 } from 'uuid'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
@@ -73,6 +75,14 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   )
 
   const getSavingState = () => rootStore.content.savingState
+
+  useEffect(() => {
+    // Generate browser session id for anon tracking
+    BrowserTabTracker.initialize({
+      storageKey: 'supabase.browser.session',
+      sessionIdGenerator: () => uuidv4(),
+    })
+  }, [])
 
   // prompt the user if they try and leave with unsaved content store changes
   useEffect(() => {

@@ -12,6 +12,8 @@ import Favicons from '~/components/Favicons'
 import SiteLayout from '~/layouts/SiteLayout'
 import { API_URL, IS_PLATFORM, LOCAL_SUPABASE } from '~/lib/constants'
 import { post } from '~/lib/fetchWrappers'
+import { BrowserTabTracker } from 'browser-session-tabs'
+import { v4 as uuidv4 } from 'uuid'
 import '../styles/ch.scss'
 import '../styles/main.scss?v=1.0.0'
 import '../styles/new-docs.scss'
@@ -33,9 +35,18 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
       ga: {
         screen_resolution: googleAnalyticsProps?.screenResolution,
         language: googleAnalyticsProps?.language,
+        session_id: BrowserTabTracker.sessionId,
       },
     })
   }
+
+  useEffect(() => {
+    // Generate browser session id for anon tracking
+    BrowserTabTracker.initialize({
+      storageKey: 'supabase.browser.session',
+      sessionIdGenerator: () => uuidv4(),
+    })
+  }, [])
 
   useEffect(() => {
     function handleRouteChange(url: string) {
