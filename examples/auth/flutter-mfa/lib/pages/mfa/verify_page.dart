@@ -77,7 +77,7 @@ class _MFAVerifyPageState extends State<MFAVerifyPage> {
                     .showSnackBar(SnackBar(content: Text(error.message)));
               } catch (error) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Unexpected error occured')));
+                    const SnackBar(content: Text('Unexpected error occurred')));
               }
             },
           ),
