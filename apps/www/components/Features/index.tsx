@@ -1,11 +1,11 @@
 import { Badge } from 'ui'
 import Solutions from 'data/Solutions.json'
-import useGoogleAnalyticsProps from '~/hooks/useGoogleAnalyticsProps'
 import Telemetry from '~/lib/telemetry'
 import gaEvents from '~/lib/gaEvents'
 import SectionContainer from '../Layouts/SectionContainer'
 import ProductIcon from '../ProductIcon'
 import TextLink from '../TextLink'
+import { useGoogleAnalyticsProps } from 'common/hooks/useGoogleAnalyticsProps'
 
 const Features = () => {
   const googleAnalyticsProps = useGoogleAnalyticsProps()

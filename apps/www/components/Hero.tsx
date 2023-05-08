@@ -4,7 +4,7 @@ import Link from 'next/link'
 import SectionContainer from './Layouts/SectionContainer'
 import Telemetry, { GoogleAnalyticsEvent } from '~/lib/telemetry'
 import gaEvents from '~/lib/gaEvents'
-import useGoogleAnalyticsProps from '~/hooks/useGoogleAnalyticsProps'
+import { useGoogleAnalyticsProps } from 'common/hooks/useGoogleAnalyticsProps'
 
 const Hero = () => {
   const { basePath } = useRouter()
