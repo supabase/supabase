@@ -1,5 +1,8 @@
 export const APP_NAME = 'Supabase'
 export const DESCRIPTION = 'The Open Source Alternative to Firebase.'
+export const IS_PROD = process.env.NEXT_PUBLIC_VERCEL_ENV === 'production'
+export const IS_PREVIEW = process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
+export const API_URL = process.env.NEXT_PUBLIC_API_URL
 
 // Launch Weeek
 export const SAMPLE_TICKET_NUMBER = 1234

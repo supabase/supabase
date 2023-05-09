@@ -1,10 +1,19 @@
-import { Button, IconBookOpen, Space } from 'ui'
-import Link from 'next/link'
+import { Button, IconBookOpen } from 'ui'
 import { useRouter } from 'next/router'
+import Link from 'next/link'
 import SectionContainer from './Layouts/SectionContainer'
+import Telemetry, { GoogleAnalyticsEvent } from '~/lib/telemetry'
+import gaEvents from '~/lib/gaEvents'
+import { useGoogleAnalyticsProps } from 'common/hooks/useGoogleAnalyticsProps'
 
 const Hero = () => {
-  const { basePath } = useRouter()
+  const router = useRouter()
+  const { basePath } = router
+  const googleAnalyticsProps = useGoogleAnalyticsProps()
+
+  const sendTelemetryEvent = async (event: GoogleAnalyticsEvent) => {
+    await Telemetry.sendEvent(event, googleAnalyticsProps, router)
+  }
 
   return (
     <div className="overflow-hidden">
@@ -40,14 +49,16 @@ const Hero = () => {
                     </div>
                     <div className="flex items-center gap-2">
                       <Link href="https://app.supabase.com" as="https://app.supabase.com" passHref>
-                        <a>
+                        <a onClick={() => sendTelemetryEvent(gaEvents['www_hp_hero_startProject'])}>
                           <Button size="small" className="text-white">
                             Start your project
                           </Button>
                         </a>
                       </Link>
                       <Link href="/docs" as="/docs" passHref>
-                        <a>
+                        <a
+                          onClick={() => sendTelemetryEvent(gaEvents['www_hp_hero_documentation'])}
+                        >
                           <Button size="small" type="default" icon={<IconBookOpen />}>
                             Documentation
                           </Button>

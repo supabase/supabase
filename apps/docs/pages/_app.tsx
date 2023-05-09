@@ -1,6 +1,6 @@
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
-import { AuthProvider, ThemeProvider } from 'common'
+import { AuthProvider, ThemeProvider, useGoogleAnalyticsProps } from 'common'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
@@ -10,8 +10,10 @@ import { CommandMenuProvider } from 'ui'
 import components from '~/components'
 import Favicons from '~/components/Favicons'
 import SiteLayout from '~/layouts/SiteLayout'
-import { IS_PLATFORM, LOCAL_SUPABASE } from '~/lib/constants'
+import { API_URL, IS_PLATFORM, LOCAL_SUPABASE } from '~/lib/constants'
 import { post } from '~/lib/fetchWrappers'
+import { BrowserTabTracker } from 'browser-session-tabs'
+import { v4 as uuidv4 } from 'uuid'
 import '../styles/ch.scss'
 import '../styles/main.scss?v=1.0.0'
 import '../styles/new-docs.scss'
@@ -19,18 +21,32 @@ import '../styles/prism-okaidia.scss'
 
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const router = useRouter()
+  const googleAnalyticsProps = useGoogleAnalyticsProps()
 
   const [supabase] = useState(() =>
     IS_PLATFORM || LOCAL_SUPABASE ? createBrowserSupabaseClient() : undefined
   )
 
   function handlePageTelemetry(route: string) {
-    return post(`https://api.supabase.io/platform/telemetry/page`, {
+    return post(`${API_URL}/telemetry/page`, {
       referrer: document.referrer,
       title: document.title,
       route,
+      ga: {
+        screen_resolution: googleAnalyticsProps?.screenResolution,
+        language: googleAnalyticsProps?.language,
+        session_id: BrowserTabTracker.sessionId,
+      },
     })
   }
+
+  useEffect(() => {
+    // Generate browser session id for anon tracking
+    BrowserTabTracker.initialize({
+      storageKey: 'supabase.browser.session',
+      sessionIdGenerator: () => uuidv4(),
+    })
+  }, [])
 
   useEffect(() => {
     function handleRouteChange(url: string) {
