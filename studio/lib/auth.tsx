@@ -1,18 +1,20 @@
 import {
   AuthContext as AuthContextInternal,
   AuthProvider as AuthProviderInternal,
-  AuthProviderProps,
   gotrueClient,
+  useGoogleAnalyticsProps,
 } from 'common'
 import { useProfileQuery } from 'data/profile/profile-query'
 import { useStore } from 'hooks'
 import { PropsWithChildren, useEffect } from 'react'
 import { GOTRUE_ERRORS, IS_PLATFORM } from './constants'
+import Telemetry from 'lib/telemetry'
 
 export const AuthContext = AuthContextInternal
 
 export const AuthProvider = ({ children }: PropsWithChildren<{}>) => {
   const { ui, app } = useStore()
+  const googleAnalyticsProps = useGoogleAnalyticsProps()
 
   // Check for unverified GitHub users after a GitHub sign in
   useEffect(() => {
@@ -34,7 +36,7 @@ export const AuthProvider = ({ children }: PropsWithChildren<{}>) => {
   // Track telemetry for the current user
   useProfileQuery({
     onSuccess(profile) {
-      ui.setProfile(profile)
+      Telemetry.sendIdentify(profile, googleAnalyticsProps)
 
       // [Joshen] Temp fix: For new users, the GET profile call also creates a default org
       // But because the dashboard's logged in state is using gotrue as the source of truth

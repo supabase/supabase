@@ -1,24 +1,40 @@
-import { APP_NAME, DESCRIPTION } from 'lib/constants'
+import { API_URL, APP_NAME, DESCRIPTION } from 'lib/constants'
 import { DefaultSeo } from 'next-seo'
 import { AppProps } from 'next/app'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import Meta from '~/components/Favicons'
 import '../styles/index.css'
-import { post } from './../lib/fetchWrapper'
-import { AuthProvider, ThemeProvider } from 'common'
+import { post } from '~/lib/fetchWrapper'
+import { AuthProvider, ThemeProvider, useGoogleAnalyticsProps } from 'common'
+import { BrowserTabTracker } from 'browser-session-tabs'
+import { v4 as uuidv4 } from 'uuid'
 import Head from 'next/head'
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter()
+  const googleAnalyticsProps = useGoogleAnalyticsProps()
 
   function handlePageTelemetry(route: string) {
-    return post(`https://api.supabase.io/platform/telemetry/page`, {
+    return post(`${API_URL}/telemetry/page`, {
       referrer: document.referrer,
       title: document.title,
       route,
+      ga: {
+        screen_resolution: googleAnalyticsProps?.screenResolution,
+        language: googleAnalyticsProps?.language,
+        session_id: BrowserTabTracker.sessionId,
+      },
     })
   }
+
+  useEffect(() => {
+    // Generate browser session id for anon tracking
+    BrowserTabTracker.initialize({
+      storageKey: 'supabase.browser.session',
+      sessionIdGenerator: () => uuidv4(),
+    })
+  }, [])
 
   useEffect(() => {
     function handleRouteChange(url: string) {
