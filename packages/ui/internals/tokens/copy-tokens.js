@@ -22,9 +22,9 @@ const TOKEN_FILES_METADATA = [
   // semantic (comment out for now)
   // { fileName: 'typography.json', type: 'semantic' },
   // themes
-  { fileName: 'root.json', type: 'theme' }, // root theme
-  { fileName: 'light.json', type: 'theme' },
-  // { fileName: 'darker-dark.json', type: 'theme' },
+  { fileName: 'root.json', type: 'theme', subdirectory: 'new/' }, // root theme
+  { fileName: 'light.json', type: 'theme', subdirectory: 'new/' },
+  // { fileName: 'darker-dark.json', type: 'theme', subdirectory: 'new/' },
 ]
 
 const PATHS = {
@@ -38,21 +38,24 @@ async function getTokensFile() {
   const promises = TOKEN_FILES_METADATA.map((tokenMetadata, i) => {
     return new Promise((resolve, reject) => {
       https
-        .get(baseUrl + tokenMetadata.fileName + `?e=${Math.random()}`, (res) => {
-          let data = ''
-          res.on('data', (chunk) => {
-            data += chunk
-          })
-          res.on('end', () => {
-            fs.writeFile(
-              `./tokens/${PATHS[tokenMetadata.type]}${tokenMetadata.fileName}`,
-              data,
-              'utf8',
-              () => {}
-            )
-            resolve(data)
-          })
-        })
+        .get(
+          baseUrl + tokenMetadata.subdirectory + tokenMetadata.fileName + `?e=${Math.random()}`,
+          (res) => {
+            let data = ''
+            res.on('data', (chunk) => {
+              data += chunk
+            })
+            res.on('end', () => {
+              fs.writeFile(
+                `./tokens/${PATHS[tokenMetadata.type]}${tokenMetadata.fileName}`,
+                data,
+                'utf8',
+                () => {}
+              )
+              resolve(data)
+            })
+          }
+        )
         .on('error', (err) => {
           reject(err)
         })
