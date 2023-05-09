@@ -1,6 +1,6 @@
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
-import { AuthProvider, ThemeProvider, useGoogleAnalyticsProps } from 'common'
+import { AuthProvider, ThemeProvider, useTelemetryProps } from 'common'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
@@ -21,7 +21,7 @@ import '../styles/prism-okaidia.scss'
 
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const router = useRouter()
-  const googleAnalyticsProps = useGoogleAnalyticsProps()
+  const telemetryProps = useTelemetryProps()
 
   const [supabase] = useState(() =>
     IS_PLATFORM || LOCAL_SUPABASE ? createBrowserSupabaseClient() : undefined
@@ -33,8 +33,8 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
       title: document.title,
       route,
       ga: {
-        screen_resolution: googleAnalyticsProps?.screenResolution,
-        language: googleAnalyticsProps?.language,
+        screen_resolution: telemetryProps?.screenResolution,
+        language: telemetryProps?.language,
         session_id: BrowserTabTracker.sessionId,
       },
     })

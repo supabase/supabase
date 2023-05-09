@@ -1,10 +1,10 @@
-import { GoogleAnalyticsEvent } from './telemetry'
+import { TelemetryEvent } from './telemetry'
 
-interface GoogleAnalyticsEventType {
-  [key: string]: GoogleAnalyticsEvent
+interface TelemetryEventType {
+  [key: string]: TelemetryEvent
 }
 
-const GoogleAnalyticsEvents: GoogleAnalyticsEventType = {
+const TelemetryEvents: TelemetryEventType = {
   www_hp_hero_startProject: {
     action: 'www_hp_hero_startProject',
     category: 'link',
@@ -42,4 +42,4 @@ const GoogleAnalyticsEvents: GoogleAnalyticsEventType = {
   },
 }
 
-export default GoogleAnalyticsEvents
+export default TelemetryEvents

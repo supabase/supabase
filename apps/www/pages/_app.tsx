@@ -6,14 +6,14 @@ import { useEffect } from 'react'
 import Meta from '~/components/Favicons'
 import '../styles/index.css'
 import { post } from '~/lib/fetchWrapper'
-import { AuthProvider, ThemeProvider, useGoogleAnalyticsProps } from 'common'
+import { AuthProvider, ThemeProvider, useTelemetryProps } from 'common'
 import { BrowserTabTracker } from 'browser-session-tabs'
 import { v4 as uuidv4 } from 'uuid'
 import Head from 'next/head'
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter()
-  const googleAnalyticsProps = useGoogleAnalyticsProps()
+  const telemetryProps = useTelemetryProps()
 
   function handlePageTelemetry(route: string) {
     return post(`${API_URL}/telemetry/page`, {
@@ -21,8 +21,8 @@ export default function MyApp({ Component, pageProps }: AppProps) {
       title: document.title,
       route,
       ga: {
-        screen_resolution: googleAnalyticsProps?.screenResolution,
-        language: googleAnalyticsProps?.language,
+        screen_resolution: telemetryProps?.screenResolution,
+        language: telemetryProps?.language,
         session_id: BrowserTabTracker.sessionId,
       },
     })

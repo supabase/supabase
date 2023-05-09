@@ -4,7 +4,7 @@ import { User } from 'types'
 import { BrowserTabTracker } from 'browser-session-tabs'
 import { NextRouter } from 'next/router'
 
-export interface GoogleAnalyticsProps {
+export interface TelemetryProps {
   screenResolution?: string
   language: string
 }
@@ -16,7 +16,7 @@ const sendEvent = (
     label: string
     value?: string
   },
-  gaProps: GoogleAnalyticsProps,
+  gaProps: TelemetryProps,
   router: NextRouter
 ) => {
   if (!IS_PLATFORM) return
@@ -43,7 +43,7 @@ const sendEvent = (
  * TODO: GA4 doesn't have identify method.
  * We may or may not need gaClientId here. Confirm later
  */
-const sendIdentify = (user: User, gaProps?: GoogleAnalyticsProps) => {
+const sendIdentify = (user: User, gaProps?: TelemetryProps) => {
   if (!IS_PLATFORM) return
 
   return post(`${API_URL}/telemetry/identify`, {
