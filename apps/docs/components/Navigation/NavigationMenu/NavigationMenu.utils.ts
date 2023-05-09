@@ -11,7 +11,10 @@ export function isFuncNotInLibraryOrVersion(id, type, allowedKeys) {
  * Recursively filter common sections and their sub items based on
  * what is available in their spec
  */
-export function deepFilterSections(sections: ICommonItem[], specFunctionIds: string[]) {
+export function deepFilterSections<T extends ICommonItem>(
+  sections: T[],
+  specFunctionIds: string[]
+): T[] {
   return sections
     .filter(
       (section) =>

@@ -178,7 +178,7 @@ const NavigationMenuRefListItems = ({
                   <Divider />
                   <SideMenuTitle title={section.title} />
                   {section.items.map((item) => (
-                    <RenderLink section={item} basePath={basePath} />
+                    <RenderLink key={item.id} section={item} basePath={basePath} />
                   ))}
                 </>
               ) : (
