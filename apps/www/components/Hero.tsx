@@ -2,17 +2,17 @@ import { Button, IconBookOpen } from 'ui'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 import SectionContainer from './Layouts/SectionContainer'
-import Telemetry, { GoogleAnalyticsEvent } from '~/lib/telemetry'
+import Telemetry, { TelemetryEvent } from '~/lib/telemetry'
 import gaEvents from '~/lib/gaEvents'
-import { useGoogleAnalyticsProps } from 'common/hooks/useGoogleAnalyticsProps'
+import { useTelemetryProps } from 'common/hooks/useTelemetryProps'
 
 const Hero = () => {
   const router = useRouter()
   const { basePath } = router
-  const googleAnalyticsProps = useGoogleAnalyticsProps()
+  const telemetryProps = useTelemetryProps()
 
-  const sendTelemetryEvent = async (event: GoogleAnalyticsEvent) => {
-    await Telemetry.sendEvent(event, googleAnalyticsProps, router)
+  const sendTelemetryEvent = async (event: TelemetryEvent) => {
+    await Telemetry.sendEvent(event, telemetryProps, router)
   }
 
   return (
