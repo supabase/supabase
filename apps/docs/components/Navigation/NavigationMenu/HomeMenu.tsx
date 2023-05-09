@@ -48,7 +48,7 @@ const NavigationMenuHome = ({ active }) => {
                             <li
                               className={[
                                 'group flex items-center gap-2',
-                                'text-sm transition-all duration-150 text-scale-1200 hover:text-scale-1000 dark:hover:text-scale-1100 hover:cursor-pointer ',
+                                'text-sm transition-all duration-150 text-scale-1100 hover:text-scale-1200  hover:cursor-pointer ',
                               ].join(' ')}
                             >
                               {link?.icon && <HomeMenuIconPicker icon={link.icon} />}
