@@ -1,13 +1,14 @@
-import { getAllDocs } from '../docs'
+import { ICommonSection } from '~/components/reference/Reference.types'
 
-async function handleRefGetStaticPaths() {
-  let docs = getAllDocs()
-
+async function handleRefGetStaticPaths(sections: ICommonSection[], libraryPath: string) {
   return {
-    paths: docs.map(() => {
+    paths: sections.map((section) => {
       return {
         params: {
-          slug: docs.map((d) => d.slug),
+          slug: libraryPath
+            .split('/')
+            .filter((dir) => !!dir)
+            .concat(section.slug),
         },
       }
     }),

@@ -9,6 +9,7 @@ import { useRouter } from 'next/router'
 import RefSEO from '~/components/reference/RefSEO'
 
 const sections = flattenSections(clientLibsCommonSections)
+const libraryPath = '/javascript'
 
 export default function JSReference(props) {
   const router = useRouter()
@@ -35,9 +36,9 @@ export default function JSReference(props) {
 }
 
 export async function getStaticProps() {
-  return handleRefStaticProps(sections, '/javascript')
+  return handleRefStaticProps(sections, libraryPath)
 }
 
-export function getStaticPaths() {
-  return handleRefGetStaticPaths()
+export async function getStaticPaths() {
+  return handleRefGetStaticPaths(sections, libraryPath)
 }
