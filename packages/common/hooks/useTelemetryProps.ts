@@ -2,7 +2,7 @@ import { useRouter } from 'next/router'
 
 const isBrowser = typeof window !== 'undefined'
 
-export function useGoogleAnalyticsProps() {
+export function useTelemetryProps() {
   const { locale } = useRouter()
 
   return {
