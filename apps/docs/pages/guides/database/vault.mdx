@@ -59,7 +59,7 @@ You might be wondering, ok then where are the keys stored? Supabase creates and 
 Using the vault is as simple as `INSERT`ing data into the
 `vault.secret` table.
 
-```
+```sql
 postgres=> INSERT INTO vault.secrets (secret) VALUES ('s3kre3t_k3y') RETURNING *;
 -[ RECORD 1 ]-------------------------------------------------------------
 id          | d91596b8-1047-446c-b9c0-66d98af6d001
@@ -75,7 +75,7 @@ updated_at  | 2022-12-14 02:29:21.3625+00
 There is also a handy function for creating secrets called
 `vault.create_secret()`:
 
-```
+```sql
 postgres=> select vault.create_secret('another_s3kre3t');
 -[ RECORD 1 ]-+-------------------------------------
 create_secret | c9b00867-ca8b-44fc-a81d-d20b8169be17
@@ -88,7 +88,7 @@ The function returns the UUID of the new secret.
 
 Secrets can also have an optional _unique_ name, or an optional description.  These are also arguments to `vault.create_secret()`:
 
-```
+```sql
 postgres=> select vault.create_secret('another_s3kre3t', 'unique_name', 'This is the description');
 -[ RECORD 1 ]-+-------------------------------------
 create_secret | 7095d222-efe5-4cd5-b5c6-5755b451e223
@@ -109,7 +109,7 @@ updated_at  | 2022-12-14 02:34:23.85159+00
 
 If you look in the `vault.secrets` table, you will see that your data is stored encrypted. To decrypt the data, there is an automatically created view `vault.decrypted_secrets`.  This view will decrypt secret data on the fly:
 
-```
+```sql
 postgres=> select * from vault.decrypted_secrets order by created_at desc limit 3;
 -[ RECORD 1 ]----+-----------------------------------------------------------------
 id               | 7095d222-efe5-4cd5-b5c6-5755b451e223
@@ -151,7 +151,7 @@ You should ensure that you protect access to this view with the appropriate SQL 
 
 A secret can be updated with the `vault.update_secret()` function, this function makes updating secrets easy, just provide the secret UUID as the first argument, and then an updated secret, updated optional unique name, or updated description:
 
-```
+```sql
 postgres=> select vault.update_secret('7095d222-efe5-4cd5-b5c6-5755b451e223', 'n3w_upd@ted_s3kret',
     'updated_unique_name', 'This is the updated description');
 -[ RECORD 1 ]-+-
@@ -176,7 +176,7 @@ To encrypt data, you need a *key id*.  You can use the default key id created au
 
 Both `vault.create_secret()` and `vault.update_secret()` take an optional fourth `new_key_id` argument.  This argument can be used to store a different key id for the secret instead of the default value.
 
-```
+```sql
 postgres=> select vault.create_secret('another_s3kre3t_key', 'another_unique_name',
    'This is another description', (pgsodium.create_key()).id);
 -[ RECORD 1 ]-+-------------------------------------
@@ -191,7 +191,7 @@ When you insert secrets into the vault table with an INSERT statement, those sta
 
 While turning off statement logging does hinder you if you're used to looking at the logs to debug your application, it provides a much higher level of security by ensuring that your data does not leak out of the database and into the logs.  This is especially critical with encrypted column data, because the statement logs will contain the *unencrypted* secrets.  If you *must* store that data encrypted, then you *must* turn off statement logging.
 
-```
+```sql
 ALTER SYSTEM SET statement_log = 'none';
 ```
 

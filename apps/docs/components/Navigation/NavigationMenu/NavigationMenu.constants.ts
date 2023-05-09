@@ -358,7 +358,7 @@ export const database = {
     { name: 'Database Webhooks', url: '/guides/database/webhooks' },
     { name: 'Full Text Search', url: '/guides/database/full-text-search' },
     { name: 'Database Testing', url: '/guides/database/testing' },
-    { name: 'Vault', url: '/guides/database/vault' },
+    { name: 'Managing Secrets with Vault', url: '/guides/database/vault' },
     { name: 'Column Encryption', url: '/guides/database/column-encryption' },
     {
       name: 'Extensions',

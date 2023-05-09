@@ -80,7 +80,7 @@ select * from pgsodium.crypto_aead_det_encrypt (
 
 This produces the following encrypted “ciphertext” using the `aead-det` algorithm from the libsodium [XChaCha20-SIV](https://github.com/jedisct1/libsodium-xchacha20-siv) encryption function.
 
-```
+```sql
 -[ RECORD 1 ]-----------+---------------------------------------------------------------------------------------------------------
 crypto_aead_det_encrypt | \\x099baa820250d7375ed141f8f1936af384bc229f3de1010a6eff6ffdaf3998baffbae75b5cd83d1c469407ff2d3764a428b742
 ```
@@ -98,7 +98,7 @@ from convert_from(pgsodium.crypto_aead_det_decrypt (
 
 Which recovers the original “plaintext” message:
 
-```
+```sql
 -[ RECORD 1 ]+--------------------
 convert_from | this is the message
 ```
