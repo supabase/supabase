@@ -1,7 +1,6 @@
 import Link from 'next/link'
 import { Alert, Button, CodeBlock, GlassPanel, markdownComponents, Tabs } from 'ui'
 import StepHikeCompact from '~/components/StepHikeCompact'
-
 // Common components
 import Admonition from './Admonition'
 import ButtonCard from './ButtonCard'
@@ -30,6 +29,28 @@ import CliGlobalFlagsHandler from '~/components/reference/enrichments/cli/CliGlo
 
 import Options from '~/components/Options'
 import Param from '~/components/Params'
+
+import {
+  IconMenuJavascript,
+  IconMenuHome,
+  IconMenuGettingStarted,
+  IconMenuDatabase,
+  IconMenuServerlessApis,
+  IconMenuAuth,
+  IconMenuEdgeFunctions,
+  IconMenuRealtime,
+  IconMenuStorage,
+  IconMenuPlatform,
+  IconMenuResources,
+  IconMenuSelfHosting,
+  IconMenuIntegrations,
+  IconMenuFlutter,
+  IconMenuPython,
+  IconMenuCsharp,
+  IconMenuSwift,
+  IconMenuApi,
+  IconMenuCli,
+} from './Navigation/NavigationMenu/HomeMenuIcons'
 
 const components = {
   ...markdownComponents,
@@ -73,6 +94,25 @@ const components = {
   CliGlobalFlagsHandler: () => <CliGlobalFlagsHandler />,
   Options,
   Param,
+  IconMenuJavascript,
+  IconMenuHome,
+  IconMenuGettingStarted,
+  IconMenuDatabase,
+  IconMenuServerlessApis,
+  IconMenuAuth,
+  IconMenuEdgeFunctions,
+  IconMenuRealtime,
+  IconMenuStorage,
+  IconMenuPlatform,
+  IconMenuResources,
+  IconMenuSelfHosting,
+  IconMenuIntegrations,
+  IconMenuFlutter,
+  IconMenuPython,
+  IconMenuCsharp,
+  IconMenuSwift,
+  IconMenuApi,
+  IconMenuCli,
 }
 
 export default components
