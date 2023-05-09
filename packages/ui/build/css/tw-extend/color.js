@@ -1,7 +1,7 @@
 module.exports = {
 "theme-variables-brand": {
   cssVariable: "var(--theme-variables-brand)",
-  value: "hsl(153.10000000000002, 50.3%, 33.9%)"
+  value: "hsl(153.10000000000002, 60.2%, 52.7%)"
 },
 "theme-variables-background": {
   cssVariable: "var(--theme-variables-background)",
@@ -14,6 +14,14 @@ module.exports = {
 "theme-variables-background-body-alt": {
   cssVariable: "var(--theme-variables-background-body-alt)",
   value: "hsl(0, 0%, 8.6%)"
+},
+"theme-variables-warning": {
+  cssVariable: "var(--theme-variables-warning)",
+  value: "hsl(26.899999999999977, 93.8%, 56.1%)"
+},
+"theme-variables-success": {
+  cssVariable: "var(--theme-variables-success)",
+  value: "hsl(140.3, 100%, 69.2%)"
 },
 "theme-variables-text-body": {
   cssVariable: "var(--theme-variables-text-body)",
@@ -38,6 +46,38 @@ module.exports = {
 "backgroundColor-control": {
   cssVariable: "var(--background-color-control)",
   value: "hsl(91.8 0% 10.4%)"
+},
+"backgroundColor-success-100": {
+  cssVariable: "var(--background-color-success-100)",
+  value: "hsl(139 38.9% 50.1%)"
+},
+"backgroundColor-success-200": {
+  cssVariable: "var(--background-color-success-200)",
+  value: "hsl(137 33.6% 37.7%)"
+},
+"backgroundColor-success-300": {
+  cssVariable: "var(--background-color-success-300)",
+  value: "hsl(133 17.8% 17%)"
+},
+"backgroundColor-success-DEFAULT": {
+  cssVariable: "var(--background-color-success-default)",
+  value: "hsl(140.3, 100%, 69.2%)"
+},
+"backgroundColor-warning-100": {
+  cssVariable: "var(--background-color-warning-100)",
+  value: "hsl(26.2 64.9% 41.4%)"
+},
+"backgroundColor-warning-200": {
+  cssVariable: "var(--background-color-warning-200)",
+  value: "hsl(25.7 57.5% 31.7%)"
+},
+"backgroundColor-warning-300": {
+  cssVariable: "var(--background-color-warning-300)",
+  value: "hsl(24.5 32.6% 15.4%)"
+},
+"backgroundColor-warning-DEFAULT": {
+  cssVariable: "var(--background-color-warning-default)",
+  value: "hsl(26.899999999999977, 93.8%, 56.1%)"
 },
 "borderColor-DEFAULT": {
   cssVariable: "var(--border-color-default)",

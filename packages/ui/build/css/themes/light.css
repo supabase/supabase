@@ -1,6 +1,6 @@
 /**
  * Do not edit directly
- * Generated on Mon, 08 May 2023 17:33:20 GMT
+ * Generated on Mon, 08 May 2023 19:36:22 GMT
  */
 
 .light {
@@ -8,18 +8,30 @@
   --utility-mix-negative: 0deg 0% 100%;
   --utility-mix-positive: 0deg 0% 0%;
   --darken-percentage: 0.2;
-  --lighten-hardest: 0.65;
-  --lighten-harder: 0.5;
-  --lighten-hard: 0.3;
-  --lighten-soft: 0.035;
-  --lighten-default: 0.1;
+  --shading-hardest-xll: 0.85;
+  --shading-hardest-xl: 0.75;
+  --shading-hardest: 0.65;
+  --shading-harder: 0.5;
+  --shading-hard: 0.3;
+  --shading-soft: 0.035;
+  --shading-default: 0.1;
   --text-override-lighten-strength: 5;
   --theme-variables-text-body: 195deg 7.1% 11%; /* og color is colors.Slate.Dark.2 */
+  --theme-variables-success: 140.3deg 100% 69.2%;
+  --theme-variables-warning: 26.9deg 93.8% 56.1%;
   --theme-variables-background-body-alt: 0deg 0% 100%; /*  og color is colors.Gray.Dark.1 */
   --theme-variables-background-body: 210deg 16.7% 97.6%; /* og color is colors.Slate.Light.2 */
   --theme-variables-background: 210deg 33.3% 98.8%; /* og color is  colors.Slate.Light.1 */
-  --theme-variables-brand: 153.1deg 50.3% 33.9%;
+  --theme-variables-brand: 153.1deg 60.2% 52.7%;
   --text-color-body-default: var(--theme-variables-text-body);
+  --background-color-warning-default: var(--theme-variables-warning);
+  --background-color-warning-300: 23.5deg 100% 94.4%;
+  --background-color-warning-200: 24.6deg 100% 80.1%;
+  --background-color-warning-100: 25.2deg 100% 71.2%;
+  --background-color-success-default: var(--theme-variables-success);
+  --background-color-success-300: 131deg 100% 96.4%;
+  --background-color-success-200: 133deg 100% 87.2%;
+  --background-color-success-100: 135deg 100% 81.1%;
   --background-color-body-alt: var(--theme-variables-background-body-alt);
   --background-color-body: var(--theme-variables-background-body); /* Background color used for the main page body. */
   --background-color-default: var(--theme-variables-background); /* Default background color for any container. */

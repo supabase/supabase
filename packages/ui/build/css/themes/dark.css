@@ -1,24 +1,36 @@
 /**
  * Do not edit directly
- * Generated on Mon, 08 May 2023 17:33:20 GMT
+ * Generated on Mon, 08 May 2023 19:36:22 GMT
  */
 
 .dark {
   --utility-mix-negative: 0deg 0% 0%;
   --utility-mix-positive: 0deg 0% 100%;
   --darken-percentage: 0.2;
-  --lighten-hardest: 0.65;
-  --lighten-harder: 0.5;
-  --lighten-hard: 0.3;
-  --lighten-soft: 0.05;
-  --lighten-default: 0.1;
+  --shading-hardest-xll: 0.85;
+  --shading-hardest-xl: 0.75;
+  --shading-hardest: 0.65;
+  --shading-harder: 0.5;
+  --shading-hard: 0.3;
+  --shading-soft: 0.05;
+  --shading-default: 0.1;
   --text-override-lighten-strength: 0;
   --theme-variables-text-body: 0deg 0% 92.9%; /* og color is colors.Gray.Dark.12 */
+  --theme-variables-success: 140.3deg 100% 69.2%;
+  --theme-variables-warning: 26.9deg 93.8% 56.1%;
   --theme-variables-background-body-alt: 0deg 0% 8.6%; /*  og color is colors.Gray.Dark.1 */
   --theme-variables-background-body: 0deg 0% 11%; /* og color is colors.Gray.Dark.2 */
   --theme-variables-background: 0deg 0% 13.7%; /* og color is colors.Gray.Dark.3 */
-  --theme-variables-brand: 153.1deg 50.3% 33.9%;
+  --theme-variables-brand: 153.1deg 60.2% 52.7%;
   --text-color-body-default: var(--theme-variables-text-body);
+  --background-color-warning-default: var(--theme-variables-warning);
+  --background-color-warning-300: 24.5deg 32.6% 15.4%;
+  --background-color-warning-200: 25.7deg 57.5% 31.7%;
+  --background-color-warning-100: 26.2deg 64.9% 41.4%;
+  --background-color-success-default: var(--theme-variables-success);
+  --background-color-success-300: 133deg 17.8% 17%;
+  --background-color-success-200: 137deg 33.6% 37.7%;
+  --background-color-success-100: 139deg 38.9% 50.1%;
   --background-color-body-alt: var(--theme-variables-background-body-alt);
   --background-color-body: var(--theme-variables-background-body); /* Background color used for the main page body. */
   --background-color-default: var(--theme-variables-background); /* Default background color for any container. */
