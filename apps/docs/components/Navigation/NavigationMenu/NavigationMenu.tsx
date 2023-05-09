@@ -1,39 +1,9 @@
 import { useRouter } from 'next/router'
 import { memo, useEffect } from 'react'
 import { menuState, useMenuLevelId } from '~/hooks/useMenuState'
+import NavigationMenuHome from './HomeMenu'
 import NavigationMenuGuideList from './NavigationMenuGuideList'
 import NavigationMenuRefList from './NavigationMenuRefList'
-import NavigationMenuHome from './HomeMenu'
-import { Json } from '~/types'
-import { ICommonBase } from '~/components/reference/Reference.types'
-
-// Import dynamically to code split / reduce app bundle size
-const specImports = {
-  specJsV1: async () => (await import('~/../../spec/supabase_js_v1.yml')).default,
-  specJsV2: async () => (await import('~/../../spec/supabase_js_v2.yml')).default,
-  specDartV0: async () => (await import('~/../../spec/supabase_dart_v0.yml')).default,
-  specDartV1: async () => (await import('~/../../spec/supabase_dart_v1.yml')).default,
-  specPythonV2: async () => (await import('~/../../spec/supabase_py_v2.yml')).default,
-  specCSharpV0: async () => (await import('~/../../spec/supabase_csharp_v0.yml')).default,
-  specSwiftV0: async () => (await import('~/../../spec/supabase_swift_v0.yml')).default,
-}
-
-const commonSectionImports = {
-  apiCommonSections: async () => (await import('~/../../spec/common-api-sections.json')).default,
-  cliCommonSections: async () => (await import('~/../../spec/common-cli-sections.json')).default,
-  libCommonSections: async () =>
-    (await import('~/../../spec/common-client-libs-sections.json')).default,
-  analyticsServerCommonSections: async () =>
-    (await import('~/../../spec/common-self-hosting-analytics-sections.json')).default,
-  authServerCommonSections: async () =>
-    (await import('~/../../spec/common-self-hosting-auth-sections.json')).default,
-  functionsServerCommonSections: async () =>
-    (await import('~/../../spec/common-self-hosting-functions-sections.json')).default,
-  realtimeServerCommonSections: async () =>
-    (await import('~/../../spec/common-self-hosting-realtime-sections.json')).default,
-  storageServerCommonSections: async () =>
-    (await import('~/../../spec/common-self-hosting-storage-sections.json')).default,
-}
 
 interface BaseMenu {
   id: string
@@ -51,8 +21,8 @@ interface GuideMenu extends BaseMenu {
 
 interface ReferenceMenu extends BaseMenu {
   type: 'reference'
-  commonSectionImport: () => Promise<ICommonBase[]>
-  specImport?: () => Promise<Json>
+  commonSectionsFile: string
+  specFile?: string
 }
 
 type Menu = HomeMenu | GuideMenu | ReferenceMenu
@@ -127,92 +97,92 @@ const menus: Menu[] = [
   {
     id: 'reference_javascript_v1',
     path: '/reference/javascript/v1',
-    commonSectionImport: commonSectionImports.libCommonSections,
-    specImport: specImports.specJsV1,
+    commonSectionsFile: 'common-client-libs-sections.json',
+    specFile: 'supabase_js_v1.yml',
     type: 'reference',
   },
   {
     id: 'reference_javascript_v2',
     path: '/reference/javascript',
-    commonSectionImport: commonSectionImports.libCommonSections,
-    specImport: specImports.specJsV2,
+    commonSectionsFile: 'common-client-libs-sections.json',
+    specFile: 'supabase_js_v2.yml',
     type: 'reference',
   },
   {
     id: 'reference_dart_v0',
     path: '/reference/dart/v0',
-    commonSectionImport: commonSectionImports.libCommonSections,
-    specImport: specImports.specDartV0,
+    commonSectionsFile: 'common-client-libs-sections.json',
+    specFile: 'supabase_dart_v0.yml',
     type: 'reference',
   },
   {
     id: 'reference_dart_v1',
     path: '/reference/dart',
-    commonSectionImport: commonSectionImports.libCommonSections,
-    specImport: specImports.specDartV1,
+    commonSectionsFile: 'common-client-libs-sections.json',
+    specFile: 'supabase_dart_v1.yml',
     type: 'reference',
   },
   {
     id: 'reference_csharp_v0',
     path: '/reference/csharp',
-    commonSectionImport: commonSectionImports.libCommonSections,
-    specImport: specImports.specCSharpV0,
+    commonSectionsFile: 'common-client-libs-sections.json',
+    specFile: 'supabase_csharp_v0.yml',
     type: 'reference',
   },
   {
     id: 'reference_python_v2',
     path: '/reference/python',
-    commonSectionImport: commonSectionImports.libCommonSections,
-    specImport: specImports.specPythonV2,
+    commonSectionsFile: 'common-client-libs-sections.json',
+    specFile: 'supabase_py_v2.yml',
     type: 'reference',
   },
   {
     id: 'reference_swift_v0',
     path: '/reference/swift',
-    commonSectionImport: commonSectionImports.libCommonSections,
-    specImport: specImports.specSwiftV0,
+    commonSectionsFile: 'common-client-libs-sections.json',
+    specFile: 'supabase_swift_v0.yml',
     type: 'reference',
   },
   {
     id: 'reference_cli',
     path: '/reference/cli',
-    commonSectionImport: commonSectionImports.cliCommonSections,
+    commonSectionsFile: 'common-cli-sections.json',
     type: 'reference',
   },
   {
     id: 'reference_api',
     path: '/reference/api',
-    commonSectionImport: commonSectionImports.apiCommonSections,
+    commonSectionsFile: 'common-api-sections.json',
     type: 'reference',
   },
   {
     id: 'reference_self_hosting_auth',
     path: '/reference/self-hosting-auth',
-    commonSectionImport: commonSectionImports.authServerCommonSections,
+    commonSectionsFile: 'common-self-hosting-auth-sections.json',
     type: 'reference',
   },
   {
     id: 'reference_self_hosting_storage',
     path: '/reference/self-hosting-storage',
-    commonSectionImport: commonSectionImports.storageServerCommonSections,
+    commonSectionsFile: 'common-self-hosting-storage-sections.json',
     type: 'reference',
   },
   {
     id: 'reference_self_hosting_realtime',
     path: '/reference/self-hosting-realtime',
-    commonSectionImport: commonSectionImports.realtimeServerCommonSections,
+    commonSectionsFile: 'common-self-hosting-realtime-sections.json',
     type: 'reference',
   },
   {
     id: 'reference_self_hosting_analytics',
     path: '/reference/self-hosting-analytics',
-    commonSectionImport: commonSectionImports.analyticsServerCommonSections,
+    commonSectionsFile: 'common-self-hosting-analytics-sections.json',
     type: 'reference',
   },
   {
     id: 'reference_self_hosting_functions',
     path: '/reference/self-hosting-functions',
-    commonSectionImport: commonSectionImports.functionsServerCommonSections,
+    commonSectionsFile: 'common-self-hosting-functions-sections.json',
     type: 'reference',
   },
 ]
@@ -242,8 +212,8 @@ function getMenuElement(menu: Menu) {
         <NavigationMenuRefList
           id={menu.id}
           basePath={menu.path}
-          commonSectionsImport={menu.commonSectionImport}
-          specImport={menu.specImport}
+          commonSectionsFile={menu.commonSectionsFile}
+          specFile={menu.specFile}
         />
       )
     default:

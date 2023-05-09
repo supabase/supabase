@@ -1,51 +1,29 @@
-import { Json } from '~/types'
+import { useCommonSections, useSpec } from './NavigationMenu.utils'
 import NavigationMenuRefListItems from './NavigationMenuRefListItems'
 
-import React, { useEffect, useState } from 'react'
-import { ICommonBase, ICommonItem } from '~/components/reference/Reference.types'
+import React from 'react'
 
 interface NavigationMenuRefListProps {
   id: string
   basePath: string
-  commonSectionsImport: () => Promise<ICommonBase[]>
-  specImport?: () => Promise<Json>
+  commonSectionsFile: string
+  specFile?: string
 }
 
 const NavigationMenuRefList = ({
   id,
   basePath,
-  commonSectionsImport,
-  specImport,
+  commonSectionsFile,
+  specFile,
 }: NavigationMenuRefListProps) => {
-  const [commonSections, setCommonSections] = useState<ICommonItem[]>()
-  const [spec, setSpec] = useState<Json>()
-
-  // Dynamic imports allow for code splitting which
-  // dramatically reduces app bundle size
-  useEffect(() => {
-    async function fetchCommonSections() {
-      const commonSections = await commonSectionsImport()
-      setCommonSections(commonSections as ICommonItem[])
-    }
-    fetchCommonSections()
-  }, [commonSectionsImport])
-
-  useEffect(() => {
-    if (!specImport) {
-      return
-    }
-    async function fetchSpec() {
-      const spec = await specImport()
-      setSpec(spec)
-    }
-    fetchSpec()
-  }, [specImport])
+  const commonSections = useCommonSections(commonSectionsFile)
+  const spec = useSpec(specFile)
 
   if (!commonSections) {
     return null
   }
 
-  if (specImport && !spec) {
+  if (specFile && !spec) {
     return null
   }
 
