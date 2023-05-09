@@ -1498,6 +1498,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/oss',
+    destination: '/open-source',
+  },
+  {
+    permanent: true,
     source: '/docs/company/aup',
     destination: '/aup',
   },

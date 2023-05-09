@@ -3,12 +3,12 @@ import { useRouter } from 'next/router'
 import { Octokit } from '@octokit/core'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import maintainers from '../data/maintainers.json'
-import Sponsors from '../components/Sponsors'
+import maintainers from '../../data/maintainers.json'
+import Sponsors from '../../components/Sponsors'
 import Image from 'next/image'
 import { NextSeo } from 'next-seo'
 
-export default function Oss() {
+const OpenSource = () => {
   const octokit = new Octokit()
 
   const [activePill, setActivePill] = useState('All')
@@ -157,3 +157,5 @@ export default function Oss() {
     </>
   )
 }
+
+export default OpenSource
