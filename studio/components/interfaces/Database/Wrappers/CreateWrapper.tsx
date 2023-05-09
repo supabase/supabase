@@ -87,7 +87,6 @@ const CreateWrapper = () => {
   }
 
   const onSubmit = async (values: any, { setSubmitting }: any) => {
-    console.log('values:', newTables)
     const validate = makeValidateRequired(wrapperMeta.server.options)
     const errors: any = validate(values)
 

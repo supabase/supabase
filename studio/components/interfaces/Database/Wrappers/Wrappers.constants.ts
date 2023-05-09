@@ -647,7 +647,7 @@ export const WRAPPERS: WrapperMeta[] = [
           label: 'ClickHouse Connection String',
           required: true,
           encrypted: true,
-          hidden: false,
+          hidden: true,
         },
       ],
     },
