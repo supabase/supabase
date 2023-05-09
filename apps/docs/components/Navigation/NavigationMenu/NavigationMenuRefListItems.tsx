@@ -4,17 +4,16 @@ import { useRouter } from 'next/router'
 import { IconChevronLeft, IconChevronUp } from 'ui'
 import * as NavItems from './NavigationMenu.constants'
 
-import { useTheme } from 'common/Providers'
 import Image from 'next/image'
 
 import RevVersionDropdown from '~/components/RefVersionDropdown'
 import { useMenuActiveRefId } from '~/hooks/useMenuState'
 
 import React, { Fragment } from 'react'
-import { ICommonItem, ICommonSection } from '~/components/reference/Reference.types'
-import { deepFilterSections } from './NavigationMenu.utils'
 import { cn } from 'ui/src/utils/cn'
+import { ICommonItem, ICommonSection } from '~/components/reference/Reference.types'
 import HomeMenuIconPicker from './HomeMenuIconPicker'
+import { deepFilterSections } from './NavigationMenu.utils'
 
 const HeaderLink = React.memo(function HeaderLink(props: any) {
   return (
@@ -51,7 +50,7 @@ const FunctionLink = React.memo(function FunctionLink({
   const active = activeAccordionItem === id
 
   return (
-    <li className="function-link-item">
+    <li className="function-link-item leading-5">
       <a
         href={url}
         /**
@@ -63,11 +62,11 @@ const FunctionLink = React.memo(function FunctionLink({
           history.pushState({}, '', url)
           document.getElementById(slug)?.scrollIntoView()
         }}
-        className={[
-          'cursor-pointer transition text-sm hover:text-brand-900 flex gap-3',
+        className={cn(
+          'cursor-pointer transition text-sm hover:text-scale-1200 gap-3 relative',
           isParent ? 'flex justify-between' : 'leading-3',
-          active ? 'text-brand-900' : 'text-scale-1000',
-        ].join(' ')}
+          active ? 'text-brand-900' : 'text-scale-1000'
+        )}
       >
         {icon && <Image width={16} height={16} alt={icon} src={`${router.basePath}${icon}`} />}
         {title}
@@ -98,7 +97,14 @@ const RenderLink = React.memo(function RenderLink({ section, basePath }: RenderL
 
   if (!('items' in section)) {
     return (
-      <FunctionLink title={section.title} id={section.id} slug={section.slug} basePath={basePath} />
+      <FunctionLink
+        title={section.title}
+        id={section.id}
+        slug={section.slug}
+        basePath={basePath}
+        isParent={false}
+        isSubItem
+      />
     )
   }
 
@@ -107,26 +113,33 @@ const RenderLink = React.memo(function RenderLink({ section, basePath }: RenderL
     section.items.some((item) => item.id === activeAccordionItem)
 
   return (
-    <>
-      <FunctionLink title={section.title} id={section.id} slug={section.slug} basePath={basePath} />
-      <Accordion.Root collapsible type="single" value={active ? section.id : ''}>
-        <Accordion.Item value={section.id}>
-          <Accordion.Content className="transition data-open:animate-slide-down data-closed:animate-slide-up ml-2">
-            {section.items.map((item) => {
-              return (
-                <FunctionLink
-                  key={item.id}
-                  title={item.title}
-                  id={item.id}
-                  slug={item.slug}
-                  basePath={basePath}
-                />
-              )
-            })}
-          </Accordion.Content>
-        </Accordion.Item>
-      </Accordion.Root>
-    </>
+    <Accordion.Root collapsible type="single" value={active ? section.id : ''}>
+      <Accordion.Item value={section.id}>
+        <FunctionLink
+          title={section.title}
+          id={section.id}
+          slug={section.slug}
+          basePath={basePath}
+          isParent
+          isSubItem
+        />
+        <Accordion.Content className="transition data-open:animate-slide-down data-closed:animate-slide-up border-l border-scale-600 pl-3 ml-1 data-open:mt-2 grid gap-2.5">
+          {section.items.map((item) => {
+            return (
+              <FunctionLink
+                key={item.id}
+                title={item.title}
+                id={item.id}
+                slug={item.slug}
+                basePath={basePath}
+                isParent={false}
+                isSubItem={false}
+              />
+            )
+          })}
+        </Accordion.Content>
+      </Accordion.Item>
+    </Accordion.Root>
   )
 })
 
@@ -184,7 +197,7 @@ const NavigationMenuRefListItems = ({
         <HeaderLink title={menu.title} url={menu.url} id={id} />
         <RevVersionDropdown />
       </div>
-      <ul className="function-link-list flex flex-col gap-1">
+      <ul className="function-link-list flex flex-col gap-2">
         {filteredSections.map((section) => {
           return (
             <Fragment key={section.title}>
