@@ -1,11 +1,6 @@
+import { useEffect, useState } from 'react'
 import { ICommonItem } from '~/components/reference/Reference.types'
-
-// check if the link is allowed to be displayed
-export function isFuncNotInLibraryOrVersion(id, type, allowedKeys) {
-  if (id && allowedKeys && !allowedKeys.includes(id) && type !== 'markdown') {
-    return true
-  }
-}
+import { Json } from '~/types'
 
 /**
  * Recursively filter common sections and their sub items based on
@@ -31,4 +26,59 @@ export function deepFilterSections<T extends ICommonItem>(
       }
       return section
     })
+}
+
+/**
+ * Imports common sections file dynamically.
+ *
+ * Dynamic imports allow for code splitting which
+ * dramatically reduces app bundle size.
+ *
+ * See https://webpack.js.org/api/module-methods/#dynamic-expressions-in-import
+ */
+export function useCommonSections(commonSectionsFile: string) {
+  const [commonSections, setCommonSections] = useState<ICommonItem[]>()
+
+  useEffect(() => {
+    async function fetchCommonSections() {
+      const commonSections = await import(
+        /* webpackInclude: /common-.*\.json$/ */
+        /* webpackMode: "lazy" */
+        `~/../../spec/${commonSectionsFile}`
+      )
+      setCommonSections(commonSections.default)
+    }
+    fetchCommonSections()
+  }, [commonSectionsFile])
+
+  return commonSections
+}
+
+/**
+ * Imports spec file dynamically.
+ *
+ * Dynamic imports allow for code splitting which
+ * dramatically reduces app bundle size.
+ *
+ * See https://webpack.js.org/api/module-methods/#dynamic-expressions-in-import
+ */
+export function useSpec(specFile?: string) {
+  const [spec, setSpec] = useState<Json>()
+
+  useEffect(() => {
+    if (!specFile) {
+      return
+    }
+    async function fetchSpec() {
+      const spec = await import(
+        /* webpackInclude: /supabase_.*\.ya?ml$/ */
+        /* webpackMode: "lazy" */
+        `~/../../spec/${specFile}`
+      )
+      setSpec(spec.default)
+    }
+    fetchSpec()
+  }, [specFile])
+
+  return spec
 }
