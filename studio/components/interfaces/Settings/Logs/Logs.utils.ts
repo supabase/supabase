@@ -389,6 +389,7 @@ export const fillTimeseries = (
   })
 
   const diff = maxDate.diff(minDate, truncation as dayjs.UnitType)
+  console.log({diff})
   for (let i = 0; i <= diff; i++) {
     const dateToMaybeAdd = minDate.add(i, truncation as dayjs.ManipulateType)
 
@@ -429,5 +430,6 @@ export const getTimestampTruncation = (datetime: string): 'second' | 'minute' | 
     2: 'hour' as const,
     3: 'day' as const,
   }[zeroCount]!
+  console.log({truncation})
   return truncation
 }
