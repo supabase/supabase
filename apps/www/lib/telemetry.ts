@@ -1,25 +1,29 @@
-import { post } from 'lib/common/fetch'
-import { API_URL, IS_PLATFORM } from 'lib/constants'
-import { User } from 'types'
+import { post } from '~/lib/fetchWrapper'
+import { API_URL, IS_PROD, IS_PREVIEW } from 'lib/constants'
 import { BrowserTabTracker } from 'browser-session-tabs'
 import { NextRouter } from 'next/router'
+
+export interface GoogleAnalyticsEvent {
+  category: string
+  action: string
+  label: string
+  value?: string
+}
 
 export interface GoogleAnalyticsProps {
   screenResolution?: string
   language: string
 }
 
+// This event is the same as in studio/lib/telemetry.tx
+// but uses different ENV variables for www
+
 const sendEvent = (
-  event: {
-    category: string
-    action: string
-    label: string
-    value?: string
-  },
+  event: GoogleAnalyticsEvent,
   gaProps: GoogleAnalyticsProps,
   router: NextRouter
 ) => {
-  if (!IS_PLATFORM) return
+  if (!IS_PROD && !IS_PREVIEW) return
 
   const { category, action, label, value } = event
 
@@ -39,24 +43,6 @@ const sendEvent = (
   })
 }
 
-/**
- * TODO: GA4 doesn't have identify method.
- * We may or may not need gaClientId here. Confirm later
- */
-const sendIdentify = (user: User, gaProps?: GoogleAnalyticsProps) => {
-  if (!IS_PLATFORM) return
-
-  return post(`${API_URL}/telemetry/identify`, {
-    user,
-    ga: {
-      screen_resolution: gaProps?.screenResolution,
-      language: gaProps?.language,
-      session_id: BrowserTabTracker.sessionId,
-    },
-  })
-}
-
 export default {
   sendEvent,
-  sendIdentify,
 }

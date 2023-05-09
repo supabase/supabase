@@ -56,6 +56,7 @@
     "@supabase/supabase-js": "^2.13.0",
     "algoliasearch": "^4.14.2",
     "babel": "^6.23.0",
+    "browser-session-tabs": "^3.0.0",
     "clsx": "^1.2.1",
     "common": "*",
     "config": "*",
