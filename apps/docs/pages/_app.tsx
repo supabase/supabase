@@ -90,12 +90,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
       <Favicons />
       <AuthContainer>
         <ThemeProvider>
-          <CommandMenuProvider
-            site="docs"
-            MarkdownHandler={(props) => (
-              <ReactMarkdown remarkPlugins={[remarkGfm]} components={components} {...props} />
-            )}
-          >
+          <CommandMenuProvider site="docs">
             <SiteLayout>
               <Component {...pageProps} />
             </SiteLayout>
