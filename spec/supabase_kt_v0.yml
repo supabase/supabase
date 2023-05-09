@@ -35,6 +35,7 @@ functions:
           ) {
               install(GoTrue)
               install(Postgrest)
+              //install other modules
           }
           ```
       - id: configure-gotrue
@@ -110,6 +111,10 @@ functions:
           `propertyConversionMethod` - The method to use to convert the property names to the column names when applying filters & using the update method. Default: `PropertyConversionMethod.CAMEL_CASE_TO_SNAKE_CASE`
           
           `defaultSchema` - The default schema to use for database requests. Default: `public`
+          
+          `customUrl` - Custom url for the Postgrest Api. Can be safely ignored when using supabase. Default: `null`
+          
+          `jwtToken` - Plugin specific JWT Token. Can be ignored when using the GoTrue plugin. Default: `null`
       - id: configure-storage
         name: Configure Storage module
         code: |
@@ -133,6 +138,10 @@ functions:
           `resumable.retryTimeout` - the timeout for retrying resumable uploads when uploading a chunk fails. Default: `5.seconds`
           
           `resumable.onlyUpdateStateAfterChunk` - whether the upload state should only be updated after a chunk was uploaded successfully or also when the chunk is currently being uploaded. Default: `false`
+          
+          `customUrl` - Custom url for the Storage Api. Can be safely ignored when using supabase. Default: `null`
+          
+          `jwtToken` - Plugin specific JWT Token. Can be ignored when using the GoTrue plugin. Default: `null`
       - id: configure-realtime
         name: Configure Realtime module
         code: |
@@ -156,6 +165,10 @@ functions:
           `secure` - Whether to use wss or ws. Defaults to [SupabaseClient.useHTTPS] when null
           
           `websocketConfig` - Custom ktor websocket config
+          
+          `customUrl` - Custom url for the Realtime Websocket. Can be safely ignored when using supabase. Default: `null`
+          
+          `jwtToken` - Plugin specific JWT Token. Can be ignored when using the GoTrue plugin. Default: `null`
       - id: configure-functions
         name: Configure Functions plugin
         code: |
@@ -169,6 +182,10 @@ functions:
               }
           }
           ```
+        description: |
+          `customUrl` - Custom url for the Functions Api. Can be safely ignored when using supabase. Default: `null`
+          
+          `jwtToken` - Plugin specific JWT Token. Can be ignored when using the GoTrue plugin. Default: `null`   
       - id: configure-graphql
         name: Configure GraphQL plugin
         code: |
@@ -186,6 +203,10 @@ functions:
           ```
         description: |
           `apolloConfiguration` - Custom configuration for the ApolloClient
+          
+          `customUrl` - Custom url for the GraphQL Api. Can be safely ignored when using supabase. Default: `null`
+          
+          `jwtToken` - Plugin specific JWT Token. Can be ignored when using the GoTrue plugin. Default: `null`
 
   - id: select
     title: 'Fetch data: select()'
@@ -433,7 +454,8 @@ functions:
           let toUpsert = User(username = "supabot")
           client.postgrest["users"].insert(toUpsert, upsert = true, onConflict = "username")                          
           ```
-      - name: Return the exact number of rows
+      - id: upsert-return-row-count
+        name: Return the exact number of rows
         isSpotlight: true
         code: |
           ```kotlin
