@@ -26,10 +26,21 @@ const RefSectionHandler = (props: RefSectionHandlerProps) => {
   // When user lands on a url like http://supabase.com/docs/reference/javascript/sign-up
   // find the #sign-up element and scroll to that
   useEffect(() => {
-    if (document && slug !== 'start') {
-      document.querySelector(`#${slug}`) && document.querySelector(`#${slug}`).scrollIntoView()
+    document.getElementById(slug)?.scrollIntoView()
+  }, [slug])
+
+  useEffect(() => {
+    function handler(e: PopStateEvent) {
+      const [slug] = window.location.pathname.split('/').slice(-1)
+      document.getElementById(slug)?.scrollIntoView()
     }
-  })
+
+    window.addEventListener('popstate', handler)
+
+    return () => {
+      window.removeEventListener('popstate', handler)
+    }
+  }, [])
 
   function getPageTitle() {
     switch (props.type) {
