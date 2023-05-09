@@ -57,20 +57,30 @@ const FunctionLink = React.memo(function FunctionLink({
   const router = useRouter()
   const activeAccordionItem = useMenuActiveRefId()
 
+  const url = `${router.basePath}${basePath}/${slug}`
   const active = activeAccordionItem === id
+
   return (
     <li className="function-link-item">
-      <Link href={`${basePath}/${slug}`} passHref>
-        <a
-          className={[
-            'cursor-pointer transition text-sm hover:text-brand-900 flex gap-3',
-            active ? 'text-brand-900' : 'text-scale-1000',
-          ].join(' ')}
-        >
-          {icon && <Image width={16} height={16} alt={icon} src={`${router.basePath}${icon}`} />}
-          {title}
-        </a>
-      </Link>
+      <a
+        href={url}
+        /**
+         * We don't actually want to navigate or re-render anything
+         * since ref links are all sub-sections on the same page
+         */
+        onClick={(e) => {
+          e.preventDefault()
+          history.pushState({}, '', url)
+          document.getElementById(slug)?.scrollIntoView()
+        }}
+        className={[
+          'cursor-pointer transition text-sm hover:text-brand-900 flex gap-3',
+          active ? 'text-brand-900' : 'text-scale-1000',
+        ].join(' ')}
+      >
+        {icon && <Image width={16} height={16} alt={icon} src={`${router.basePath}${icon}`} />}
+        {title}
+      </a>
     </li>
   )
 })
