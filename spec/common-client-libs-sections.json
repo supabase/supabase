@@ -559,6 +559,14 @@
         "type": "function"
       },
       {
+          "id": "exchange-code-for-session",
+          "title": "Exchange an auth code for a session",
+          "slug": "auth-exchangecodeforsession",
+          "product": "auth",
+          "type": "function"
+
+      },
+      {
         "id": "mfa-enroll",
         "title": "Enroll a factor",
         "slug": "auth-mfa-enroll",
