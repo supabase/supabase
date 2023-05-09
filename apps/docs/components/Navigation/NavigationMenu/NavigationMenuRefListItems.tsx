@@ -89,7 +89,9 @@ const RenderLink = React.memo(function RenderLink({ section, basePath }: RenderL
     )
   }
 
-  let active = section.items.some((item) => item.id === activeAccordionItem)
+  let active =
+    section.id === activeAccordionItem ||
+    section.items.some((item) => item.id === activeAccordionItem)
 
   return (
     <>
