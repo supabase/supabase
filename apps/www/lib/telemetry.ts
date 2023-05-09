@@ -1,16 +1,15 @@
 import { post } from '~/lib/fetchWrapper'
 import { API_URL, IS_PROD, IS_PREVIEW } from 'lib/constants'
-import { BrowserTabTracker } from 'browser-session-tabs'
 import { NextRouter } from 'next/router'
 
-export interface GoogleAnalyticsEvent {
+export interface TelemetryEvent {
   category: string
   action: string
   label: string
   value?: string
 }
 
-export interface GoogleAnalyticsProps {
+export interface TelemetryProps {
   screenResolution?: string
   language: string
 }
@@ -18,11 +17,7 @@ export interface GoogleAnalyticsProps {
 // This event is the same as in studio/lib/telemetry.tx
 // but uses different ENV variables for www
 
-const sendEvent = (
-  event: GoogleAnalyticsEvent,
-  gaProps: GoogleAnalyticsProps,
-  router: NextRouter
-) => {
+const sendEvent = (event: TelemetryEvent, gaProps: TelemetryProps, router: NextRouter) => {
   if (!IS_PROD && !IS_PREVIEW) return
 
   const { category, action, label, value } = event
@@ -38,7 +33,6 @@ const sendEvent = (
     ga: {
       screen_resolution: gaProps?.screenResolution,
       language: gaProps?.language,
-      session_id: BrowserTabTracker.sessionId,
     },
   })
 }

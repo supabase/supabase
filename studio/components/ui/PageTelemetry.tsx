@@ -1,5 +1,4 @@
-import { BrowserTabTracker } from 'browser-session-tabs'
-import { useGoogleAnalyticsProps } from 'common'
+import { useTelemetryProps } from 'common'
 import { post } from 'lib/common/fetch'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { observer } from 'mobx-react-lite'
@@ -26,7 +25,7 @@ function sanitizePageViewRoute(_route?: string) {
 
 const PageTelemetry: FC = ({ children }) => {
   const router = useRouter()
-  const googleAnalyticsProps = useGoogleAnalyticsProps()
+  const telemetryProps = useTelemetryProps()
 
   useEffect(() => {
     function handleRouteChange(url: string) {
@@ -72,9 +71,8 @@ const PageTelemetry: FC = ({ children }) => {
         title: document.title,
         route,
         ga: {
-          screen_resolution: googleAnalyticsProps?.screenResolution,
-          language: googleAnalyticsProps?.language,
-          session_id: BrowserTabTracker.sessionId,
+          screen_resolution: telemetryProps?.screenResolution,
+          language: telemetryProps?.language,
         },
       })
     }
