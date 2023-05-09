@@ -25,7 +25,7 @@ const IconPanel = ({
 }: Props) => {
   const { isDarkMode } = useTheme()
 
-  const IconContainer: React.FC = (props) => {
+  const IconContainer: React.FC = (props) => { 
     return (
       <div
         className={[
