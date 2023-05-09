@@ -52,6 +52,46 @@ functions:
               }
           }
           ```
+        description: |
+          **Common:**
+          
+          `alwaysAutoRefresh` - whether the GoTrue plugin should always auto refresh expired sessions automatically. Default: `true`
+          
+          `autoLoadFromStorage` - whether the GoTrue plugin should automatically load the session from the session manager. Default: `true`
+          
+          `flowType` - Which authentication flow to use. Currently available: FlowType.PKCE and FlowType.IMPLICIT. Default: `FlowType.IMPLICIT`
+          
+          `codeVerifierCache` - Interface for saving and loading codes for the PKCE authentication flow. Default: `SettingsCodeVerifierCache`
+          
+          `customUrl` - Custom url for the GoTrue Api. Can be safely ignored when using supabase. Default: `null`
+          
+          `jwtToken` - Plugin specific JWT Token. Can be ignored when using the GoTrue plugin. Default: `null`
+          
+          `retryDelay` - Duration after which the GoTrue plugin should retry a failed session refresh. Default: `10.seconds`
+          
+          `sessionManager` - Interface for saving and loading the user session. Default: `SettingsSessionManager`
+          
+          **Android & IOS:**
+          
+          `scheme` - The scheme for the redirect url, when using deep linking. Default: `supabase`
+          
+          `host` - The host for the redirect url, when using deep linking. Default: `login`
+          
+          **Android:** 
+          
+          `enableLifecycleCallbacks` - Whether to stop auto-refresh on focus loss, and resume it on focus again. Default: `true`
+          
+          **Desktop:**
+          
+          `httpPort`: The port the web server is running on, when logging in with OAuth. Default: `0` (random port).
+          
+          `timeout`: The timeout for the web server, when logging in with OAuth. Default: `1.minutes`.
+          
+          `htmlTitle`: The title of the redirect page, when logging in with OAuth. Default: `"Supabase Auth"`.
+          
+          `htmlText`: The text of the redirect page, when logging in with OAuth. Default: `"Logged in. You may continue in your app."`.
+          
+          `htmlIconUrl`: The icon of the redirect page, when logging in with OAuth. Default: `"https://supabase.com/brand-assets/supabase-logo-icon.png"`.
       - id: configure-postgrest
         name: Configure Postgrest module
         code: |
@@ -65,7 +105,87 @@ functions:
                   propertyConversionMethod = PropertyConversionMethod.SERIAL_NAME // default: PropertyConversionMethod.CAMEL_CASE_TO_SNAKE_CASE
               }
           }
-          ```  
+          ```
+        description: |
+          `propertyConversionMethod` - The method to use to convert the property names to the column names when applying filters & using the update method. Default: `PropertyConversionMethod.CAMEL_CASE_TO_SNAKE_CASE`
+          
+          `defaultSchema` - The default schema to use for database requests. Default: `public`
+      - id: configure-storage
+        name: Configure Storage module
+        code: |
+          ```kotlin
+          val client = createSupabaseClient(
+              supabaseUrl = "https://xyzcompany.supabase.co", 
+              supabaseKey = "public-anon-key"
+          ) {
+              install(Storage) {
+                  transferTimeout = 90.seconds //default: 120 seconds
+              }
+          }
+          ```
+        description: |
+          `transferTimeout` - the timeout for uploading and downloading files. Default: `120.seconds`
+          
+          `resumable.cache` - Interface for storing resumable upload urls. Default: `ResumableCache.Disk`
+          
+          `resumable.defaultChunkSize` - The default chunk size for resumable uploads. Supabase currently only supports a chunk size of 6MB, so be careful when changing this value. Default: `6MB`
+          
+          `resumable.retryTimeout` - the timeout for retrying resumable uploads when uploading a chunk fails. Default: `5.seconds`
+          
+          `resumable.onlyUpdateStateAfterChunk` - whether the upload state should only be updated after a chunk was uploaded successfully or also when the chunk is currently being uploaded. Default: `false`
+      - id: configure-realtime
+        name: Configure Realtime module
+        code: |
+          ```kotlin
+          val client = createSupabaseClient(
+              supabaseUrl = "https://xyzcompany.supabase.co", 
+              supabaseKey = "public-anon-key"
+          ) {
+              install(Realtime) {
+                  reconnectDelay = 5.seconds //Default: 7 seconds
+              }
+          }
+          ```
+        description: |
+          `reconnectDelay` - The delay between reconnect attempts. Default: `7 seconds`
+          
+          `heartbeatInterval` - The interval between heartbeat messages. Default: `15 seconds`
+          
+          `disconnectOnSessionLoss` - Whether to disconnect from the websocket when the session is lost. Default: `true`
+          
+          `secure` - Whether to use wss or ws. Defaults to [SupabaseClient.useHTTPS] when null
+          
+          `websocketConfig` - Custom ktor websocket config
+      - id: configure-functions
+        name: Configure Functions plugin
+        code: |
+          ```kotlin
+          val client = createSupabaseClient(
+              supabaseUrl = "https://xyzcompany.supabase.co", 
+              supabaseKey = "public-anon-key"
+          ) {
+              install(Functions) {
+                  //no custom settings
+              }
+          }
+          ```
+      - id: configure-graphql
+        name: Configure GraphQL plugin
+        code: |
+          ```kotlin
+          val client = createSupabaseClient(
+              supabaseUrl = "https://xyzcompany.supabase.co", 
+              supabaseKey = "public-anon-key"
+          ) {
+              install(GraphQL) {
+                  apolloConfiguration {
+                    //custom configuration
+                  }
+              }
+          }
+          ```
+        description: |
+          `apolloConfiguration` - Custom configuration for the ApolloClient
 
   - id: select
     title: 'Fetch data: select()'
