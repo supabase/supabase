@@ -7,8 +7,6 @@ import Meta from '~/components/Favicons'
 import '../styles/index.css'
 import { post } from '~/lib/fetchWrapper'
 import { AuthProvider, ThemeProvider, useTelemetryProps } from 'common'
-import { BrowserTabTracker } from 'browser-session-tabs'
-import { v4 as uuidv4 } from 'uuid'
 import Head from 'next/head'
 
 export default function MyApp({ Component, pageProps }: AppProps) {
@@ -23,18 +21,9 @@ export default function MyApp({ Component, pageProps }: AppProps) {
       ga: {
         screen_resolution: telemetryProps?.screenResolution,
         language: telemetryProps?.language,
-        session_id: BrowserTabTracker.sessionId,
       },
     })
   }
-
-  useEffect(() => {
-    // Generate browser session id for anon tracking
-    BrowserTabTracker.initialize({
-      storageKey: 'supabase.browser.session',
-      sessionIdGenerator: () => uuidv4(),
-    })
-  }, [])
 
   useEffect(() => {
     function handleRouteChange(url: string) {

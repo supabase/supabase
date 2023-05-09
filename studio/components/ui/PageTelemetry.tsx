@@ -1,4 +1,3 @@
-import { BrowserTabTracker } from 'browser-session-tabs'
 import { useTelemetryProps } from 'common'
 import { post } from 'lib/common/fetch'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
@@ -74,7 +73,6 @@ const PageTelemetry: FC = ({ children }) => {
         ga: {
           screen_resolution: telemetryProps?.screenResolution,
           language: telemetryProps?.language,
-          session_id: BrowserTabTracker.sessionId,
         },
       })
     }

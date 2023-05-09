@@ -1,6 +1,5 @@
 import { post } from '~/lib/fetchWrapper'
 import { API_URL, IS_PROD, IS_PREVIEW } from 'lib/constants'
-import { BrowserTabTracker } from 'browser-session-tabs'
 import { NextRouter } from 'next/router'
 
 export interface TelemetryEvent {
@@ -34,7 +33,6 @@ const sendEvent = (event: TelemetryEvent, gaProps: TelemetryProps, router: NextR
     ga: {
       screen_resolution: gaProps?.screenResolution,
       language: gaProps?.language,
-      session_id: BrowserTabTracker.sessionId,
     },
   })
 }
