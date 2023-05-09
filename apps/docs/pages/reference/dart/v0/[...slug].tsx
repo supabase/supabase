@@ -6,15 +6,16 @@ import handleRefGetStaticPaths from '~/lib/mdx/handleRefStaticPaths'
 import handleRefStaticProps from '~/lib/mdx/handleRefStaticProps'
 
 const sections = flattenSections(clientLibsCommonSections)
+const libraryPath = '/dart/v0'
 
 export default function JSReference(props) {
   return <RefSectionHandler sections={sections} spec={spec} pageProps={props} type="client-lib" />
 }
 
 export async function getStaticProps() {
-  return handleRefStaticProps(sections, '/dart/v0')
+  return handleRefStaticProps(sections, libraryPath)
 }
 
-export function getStaticPaths() {
-  return handleRefGetStaticPaths()
+export async function getStaticPaths() {
+  return handleRefGetStaticPaths(sections, libraryPath)
 }
