@@ -71,7 +71,7 @@ functions:
     title: 'Fetch data: select()'
     notes: |
       Perform a SELECT query on the table or view.
-      - When calling a `decode` method, you have to provide a [serializable class]() as the type parameter.
+      - When calling a `decode` method, you have to provide a [serializable class](/docs/reference/kotlin/installing#add-kotlinx-serialization-required-for-postgrest-and-realtime-serialization) as the type parameter.
       - You can provide a `Columns` object to select specific columns.
       - You can provide a [filter]() block to filter the results
     examples:
@@ -167,7 +167,7 @@ functions:
     title: 'Create data: insert()'
     $ref: '@supabase/postgrest-js."lib/PostgrestQueryBuilder".PostgrestQueryBuilder.insert'
     notes: |
-      - When calling an `insert` method, you have to provide a [serializable value]().
+      - When calling an `insert` method, you have to provide a [serializable value](/docs/reference/kotlin/installing#add-kotlinx-serialization-required-for-postgrest-and-realtime-serialization).
       - By default, every time you run `insert()`, the client library will make a `select` to return the full record.
       This is convenient, but it can also cause problems if your policies are not configured to allow the `select` operation.
       If you are using Row Level Security and you are encountering problems, try setting the `returning` param to `Returning.MINIMAL`.
@@ -204,7 +204,7 @@ functions:
     title: 'Modify data: update()'
     notes: |
       - `update()` should always be combined with a [filter] block to avoid updating all records.
-      - When calling a `decode` method, you have to provide a [serializable class]() as the type parameter.
+      - When calling a `decode` method, you have to provide a [serializable class](/docs/reference/kotlin/installing#add-kotlinx-serialization-required-for-postgrest-and-realtime-serialization) as the type parameter.
     examples:
       - id: updating-your-data
         name: Updating your data
@@ -361,7 +361,7 @@ functions:
       That's a fancy way of saying that you can put some logic into your database then call it from anywhere.
       It's especially useful when the logic rarely changes - like password resets and updates.
       
-      - When calling specifying parameters, you have to provide a [serializable value]().
+      - When calling specifying parameters, you have to provide a [serializable value](/docs/reference/kotlin/installing#add-kotlinx-serialization-required-for-postgrest-and-realtime-serialization).
     examples:
       - id: call-a-stored-procedure
         name: Call a stored procedure
@@ -1899,9 +1899,12 @@ functions:
         - If **Confirm email** is enabled, the return value is null, but the session is not.
         - If **Confirm email** is disabled, the return value is the user but the session is null.
       - When the user confirms their email address, they are redirected to the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url) by default. You can modify your `SITE_URL` or add additional redirect URLs in [your project](https://app.supabase.com/project/_/auth/url-configuration).
+      - supabase-kt has default platform implementations: [deep links](https://developer.android.com/training/app-links/deep-linking) on Android, [url schemes](https://developer.apple.com/documentation/xcode/defining-a-custom-url-scheme-for-your-app) on IOS and the website on JS
+        - To enable deeplinking/url scheme support on Android/IOS set the `host` and the `scheme` in the GoTrue Config and call `client.handleDeeplinks(intent)` (Android) and `client.handleDeeplinks(url)` (IOS) on startup
+        - On Desktop, you can currently only verify a sign up through the token. To send the token, rather than a redirect url, you have to change `{{ .ConfirmationURL }}` in your sign up email to `{{ .Token }}`
       - If signUpWith() is called for an existing confirmed user:
-          - If **Confirm email** is enabled in [your project](https://app.supabase.com/project/_/auth/providers), an obfuscated/fake user object is returned.
-          - If **Confirm email** is disabled, the error message, `User already registered` is returned.
+        - If **Confirm email** is enabled in [your project](https://app.supabase.com/project/_/auth/providers), an obfuscated/fake user object is returned.
+        - If **Confirm email** is disabled, the error message, `User already registered` is returned.
     examples:
       - id: sign-up
         name: Sign up with email
@@ -1974,6 +1977,22 @@ functions:
               password = "example-password"
           }
           ```  
+      - id: sign-in-with-id-token
+        name: Sign in with id token
+        isSpotlight: false
+        code: |
+          ```kotlin
+          client.gotrue.loginWith(IDToken) {
+              idToken = "token"
+              clientId = "oauth client id"
+              provider = Google //Or Apple
+              //optional:
+              nonce = "nonce"
+              data = buildJsonObject {
+                  //...
+              }
+          }
+          ```      
   - id: sign-in-with-otp
     title: 'sendOtpTo()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signInWithOtp'
@@ -1985,6 +2004,9 @@ functions:
       - If you're using phone, you can configure whether you want the user to receive a OTP.
       - The magic link's destination URL is determined by the [`SITE_URL`](/docs/reference/auth/config#site_url).
       - See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
+      - supabase-kt has default platform implementations: [deep links](https://developer.android.com/training/app-links/deep-linking) on Android, [url schemes](https://developer.apple.com/documentation/xcode/defining-a-custom-url-scheme-for-your-app) on IOS and the website on JS
+        - To enable deeplinking/url scheme support on Android/IOS set the `host` and the `scheme` in the GoTrue Config and call `client.handleDeeplinks(intent)` (Android) and `client.handleDeeplinks(url)` (IOS) on startup
+        - On Desktop, you can currently only verify a sign up through the token. To send the token, rather than a redirect url, you have to change `{{ .ConfirmationURL }}` in your sign up email to `{{ .Token }}`
       - Magic links and OTPs share the same implementation. To send users a one-time code instead of a magic link, [modify the magic link email template](https://app.supabase.com/project/_/auth/templates) to include `{{ .Token }}` instead of `{{ .ConfirmationURL }}`.
     examples:
       - id: sign-in-with-email
@@ -2058,6 +2080,42 @@ functions:
               scopes.add("email")
           }
           ```
+  - id: sign-in-with-sso
+    title: 'signInWithSSO()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.signInWithSSO'
+    notes: |
+      - Before you can call this method you need to [establish a connection](/docs/guides/auth/sso/auth-sso-saml#managing-saml-20-connections) to an identity provider. Use the [CLI commands](/docs/reference/cli/supabase-sso) to do this.
+      - If you've associated an email domain to the identity provider, you can use the `SSO.withDomain()` function in the `loginWith` method to start a sign-in flow.
+      - In case you need to use a different way to start the authentication flow with an identity provider, you can use the `SSO.withProviderId` function. For example:
+          - Mapping specific user email addresses with an identity provider.
+          - Using different hints to identity the identity provider to be used by the user, like a company-specific page, IP address or other tracking information.
+      - supabase-kt has default platform implementations: HTTP Callback Server on Desktop, [deep links](https://developer.android.com/training/app-links/deep-linking) on Android, [url schemes](https://developer.apple.com/documentation/xcode/defining-a-custom-url-scheme-for-your-app) on IOS and the website on JS
+          - To enable deeplinking/url scheme support on Android/IOS set the `host` and the `scheme` in the GoTrue Config and call `client.handleDeeplinks(intent)` (Android) and `client.handleDeeplinks(url)` (IOS) on startup
+    examples:
+      - id: sign-in-with-domain
+        name: Sign in with email domain
+        isSpotlight: true
+        code: |
+          ```kotlin
+            // You can extract the user's email domain and use it to trigger the
+            // authentication flow with the correct identity provider.
+
+            client.gotrue.loginWith(SSO.withDomain("company.com"))
+            
+            //the url was opened automatically, if you don't want that, provide a custom redirect url
+          ```
+      - id: sign-in-with-provider-uuid
+        name: Sign in with provider UUID
+        isSpotlight: true
+        code: |
+          ```kotlin
+            // Useful when you need to map a user's sign in request according
+            // to different rules that can't use email domains.
+
+            client.gotrue.loginWith(SSO.withProvider("21648a9d-8d5a-4555-a9d1-d6375dc14e92"))
+            
+            //the url was opened automatically, if you don't want that, provide a custom redirect url
+          ```        
   - id: sign-out
     title: 'logout()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signOut'
@@ -2208,6 +2266,452 @@ functions:
               }
           }
           ```
+  - id: reset-password-for-email
+    title: 'Send a password reset request'
+    notes: |
+      - The password reset flow consist of 2 broad steps: (i) Allow the user to login via the password reset link; (ii) Update the user's password.
+      - The `sendRecoveryEmail()` only sends a password reset link to the user's email.
+      To update the user's password, see [`modifyUser()`](/docs/reference/kotlin/auth-updateuser).
+      - When the user clicks the reset link in the email they are redirected back to your application.
+      You can configure the URL that the user is redirected to with the `redirectUrl` parameter.
+      See [redirect URLs and wildcards](/docs/guides/auth#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
+      - After the user has been redirected successfully, prompt them for a new password and call `modifyUser()`:
+      ```kotlin
+      client.gotrue.modifyUser(Email) {
+          password = "1234567"
+      }
+      ```
+    examples:
+      - id: send-password-reset-email
+        name: Send password reset email
+        isSpotlight: true
+        code: |
+          ```kotlin
+          client.gotrue.sendRecoveryEmail(email = "example@email.com")
+          ```
+  - id: mfa-enroll
+    title: 'Enroll a factor'
+    $ref: '@supabase/gotrue-js.GoTrueMFAApi.enroll'
+    notes: |
+      - Currently, `totp` is the only supported `factorType`. The returned `id` should be used to create a challenge.
+      - To create a challenge, see [`mfa.createChallenge()`](/docs/reference/kotlin/auth-mfa-challenge).
+      - To verify a challenge, see [`mfa.verifyChallenge()`](/docs/reference/kotlin/auth-mfa-verify).
+      - To create and verify a challenge in a single step, see [`mfa.createChallengeAndVerify()`](/docs/reference/kotlin/auth-mfa-challengeandverify).
+    examples:
+      - id: enroll-totp-factor
+        name: Enroll a time-based, one-time password (TOTP) factor
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val factor = client.gotrue.mfa.enroll(factorType = FactorType.TOTP)
+
+          // Use the id to create a challenge.
+          // The challenge can be verified by entering the code generated from the authenticator app.
+          // The code will be generated upon scanning the qr_code or entering the secret into the authenticator app.
+          val (id, type, qrCode) = factor.data //qrCode is a svg as a string
+          val (factorId, factorType, _) = factor
+          ```
+      - id: get-local-verified-factors
+        name: Check the local user for verified factors
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val verifiedFactors = client.gotrue.mfa.verifiedFactors
+          ```  
+      - id: retrieve-verified-factors
+        name: Retrieve verified factors
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val verifiedFactors = client.gotrue.mfa.retrieveFactorsForCurrentUser()
+          ```       
+  - id: mfa-challenge
+    title: 'mfa.challenge()'
+    $ref: '@supabase/gotrue-js.GoTrueMFAApi.challenge'
+    notes: |
+      - An [enrolled factor](/docs/reference/kotlin/auth-mfa-enroll) is required before creating a challenge.
+      - To verify a challenge, see [`mfa.verifyChallenge()`](/docs/reference/kotlin/auth-mfa-verify).
+    examples:
+      - id: create-mfa-challenge
+        name: Create a challenge for a factor
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val challenge = client.gotrue.mfa.createChallenge(factorId = "34e770dd-9ff9-416c-87fa-43b31d7ef225")
+          ```
+  - id: mfa-verify
+    title: 'mfa.verify()'
+    $ref: '@supabase/gotrue-js.GoTrueMFAApi.verify'
+    notes: |
+      - To verify a challenge, please [create a challenge](/docs/reference/kotlin/auth-mfa-challenge) first.
+    examples:
+      - id: verify-challenge
+        name: Verify a challenge for a factor
+        isSpotlight: true
+        code: |
+          ```kotlin
+          client.gotrue.mfa.verifyChallenge(
+              factorId = "34e770dd-9ff9-416c-87fa-43b31d7ef225",
+              challengeId = "4034ae6f-a8ce-4fb5-8ee5-69a5863a7c15",
+              code = "123456",
+              saveSession = true // this is set to true by default, but you can set it to false if you want to handle the session yourself
+          )
+          ```
+  - id: mfa-challenge-and-verify
+    title: 'mfa.challengeAndVerify()'
+    $ref: '@supabase/gotrue-js.GoTrueMFAApi.challengeAndVerify'
+    notes: |
+      - An [enrolled factor](/docs/reference/kotlin/auth-mfa-enroll) is required before invoking `createChallengeAndVerify()`.
+      - Executes [`mfa.createChallenge()`](/docs/reference/kotlin/auth-mfa-challenge) and [`mfa.verifyChallenge()`](/docs/reference/kotlin/auth-mfa-verify) in a single step.
+    examples:
+      - id: challenge-and-verify
+        name: Create and verify a challenge for a factor
+        isSpotlight: true
+        code: |
+          ```kotlin
+          client.gotrue.mfa.createChallengeAndVerify(
+              factorId = "34e770dd-9ff9-416c-87fa-43b31d7ef225",
+              code = "123456",
+              saveSession = true // this is set to true by default, but you can set it to false if you want to handle the session yourself
+          )
+          ```
+  - id: mfa-unenroll
+    title: 'mfa.unenroll()'
+    $ref: '@supabase/gotrue-js.GoTrueMFAApi.unenroll'
+    examples:
+      - id: unenroll-a-factor
+        name: Unenroll a factor
+        isSpotlight: true
+        code: |
+          ```kotlin
+          client.gotrue.mfa.unenroll(factorId = "34e770dd-9ff9-416c-87fa-43b31d7ef225")
+          ```
+  - id: mfa-get-authenticator-assurance-level
+    title: 'mfa.getAuthenticatorAssuranceLevel()'
+    $ref: '@supabase/gotrue-js.GoTrueMFAApi.getAuthenticatorAssuranceLevel'
+    notes: |
+      - Authenticator Assurance Level (AAL) is the measure of the strength of an authentication mechanism.
+      - In Supabase, having an AAL of `aal1` refers to having the 1st factor of authentication such as an email and password or OAuth sign-in while `aal2` refers to the 2nd factor of authentication such as a time-based, one-time-password (TOTP).
+      - If the user has a verified factor, the `next` field will return `AuthenticatorAssuranceLevel.AAL2`, else, it will return `AuthenticatorAssuranceLevel.AAL1`.
+    examples:
+      - id: get-aal
+        name: Get the AAL details of the current session
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val (current, next) = client.gotrue.mfa.getAuthenticatorAssuranceLevel()
+          ```    
+      - id: aal-enabled
+        name: Check whether the user has atleast one verified factor
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val enabled = client.gotrue.mfa.isMfaEnabled
+          //flow variant, automatically emitting new values on session changes
+          val enabledFlow = client.gotrue.mfa.isMfaEnabledFlow
+          ``` 
+      - id: aal-enabled-for-current-session
+        name: Check whether the user is logged in using AAL2
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val loggedInUsingMfa = client.gotrue.mfa.loggedInUsingMfa
+          //flow variant, automatically emitting new values on session changes
+          val loggedInUsingMfaFlow = client.gotrue.mfa.loggedInUsingMfaFlow
+          ```   
+  - id: admin-api
+    title: 'Overview'
+    notes: |
+      - Any method under the `client.gotrue.admin` namespace requires a `service_role` key.
+      - These methods are considered admin methods and should be called on a trusted server. Never expose your `service_role` key in the browser.
+    examples:
+      - id: create-auth-admin-client
+        name: Create server-side auth client
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val client = createSupabaseClient(
+              supabaseUrl = "https://id.supabase.co",
+              supabaseKey = "service_role"
+          ) {
+              install(GoTrue) {
+                  autoLoadFromStorage = false
+                  alwaysAutoRefresh = false
+              }
+          }
+
+          // Access auth admin api
+          val adminGoTrueClient = client.gotrue.admin
+          ```
+
+  - id: get-user-by-id
+    title: 'getUserById()'
+    $ref: '@supabase/gotrue-js.GoTrueAdminApi.getUserById'
+    notes: |
+      - Fetches the user object from the database based on the user's id.
+      - The `retrieveUserById()` method requires the user's id which maps to the `auth.users.id` column.
+    examples:
+      - id: fetch-the-user-object-using-the-access-token-jwt
+        name: Fetch the user object using the access_token jwt
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val user = client.gotrue.admin.retrieveUserById(uid = "f2a0b0a0-6b1a-4b7a-8f1a-4b7a6b1a8f1a")
+          ```
+
+  - id: list-users
+    title: 'listUsers()'
+    $ref: '@supabase/gotrue-js.GoTrueAdminApi.listUsers'
+    notes: |
+      - Defaults to return 50 users per page.
+    examples:
+      - id: get-a-full-list-of-users
+        name: Get a page of users
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val users = client.gotrue.admin.retrieveUsers()
+          ```
+      - id: get-paginated-list-of-users
+        name: Paginated list of users
+        isSpotlight: false
+        code: |
+          ```kotlin
+          val users = client.gotrue.admin.retrieveUsers(
+              page = 1,
+              perPage = 100
+          )
+          ```
+  - id: create-user
+    title: 'createUser()'
+    $ref: '@supabase/gotrue-js.GoTrueAdminApi.createUser'
+    notes: |
+      - To confirm the user's email address or phone number, set `autoConfirm` to true. Both arguments default to false.
+    examples:
+      - id: create-a-new-user-with-email-custom-user-metadata
+        name: Create user with email
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val userWithEmail = client.gotrue.admin.createUserWithEmail {
+              email = "example@email.com"
+              password = "secretpassword"
+              userMetadata {
+                  put("name", "John")
+              }
+          }
+          ```
+      - id: create-a-new-user-with-phone-custom-user-metadata
+        name: Create user with phone
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val userWithPhone = client.gotrue.admin.createUserWithPhone {
+              phoneNumber = "+49123456789"
+              password = "secretpassword"
+              userMetadata {
+                  put("name", "John")
+              }
+          }
+          ```    
+      - id: auto-confirm-the-users-email
+        name: Auto-confirm the user's email
+        code: |
+          ```kotlin
+          val userWithEmail = client.gotrue.admin.createUserWithEmail {
+              email = "example@email.com"
+              password = "secretpassword"
+              autoConfirm = true
+          }
+          ```
+      - id: auto-confirm-the-users-phone-number
+        name: Auto-confirm the user's phone number
+        code: |
+          ```kotlin
+          val userWithPhone = client.gotrue.admin.createUserWithPhone {
+              phoneNumber = "+49123456789"
+              password = "secretpassword"
+              autoConfirm = true
+          }
+          ```
+  - id: delete-user
+    title: 'deleteUser()'
+    $ref: '@supabase/gotrue-js.GoTrueAdminApi.deleteUser'
+    notes: |
+      - The `deleteUser()` method requires the user's ID, which maps to the `auth.users.id` column.
+    examples:
+      - id: removes-a-user
+        name: Removes a user
+        isSpotlight: true
+        code: |
+          ```kotlin
+          client.gotrue.admin.deleteUser(uid = "uid")
+          ```
+
+  - id: invite-user-by-email
+    title: 'inviteUserByEmail()'
+    $ref: '@supabase/gotrue-js.GoTrueAdminApi.inviteUserByEmail'
+    notes: |
+      - Sends an invite link to the user's email address.
+    examples:
+      - id: invite-a-user
+        name: Invite a user
+        isSpotlight: true
+        code: |
+          ```kotlin
+          client.gotrue.admin.inviteUserByEmail(
+              email = "example@email.com",
+              //optional:
+              redirectTo = "https://example.com/redirect",
+              data = buildJsonObject {
+                  put("custom", "value")
+              }
+          )
+          ```
+
+  - id: generate-link
+    title: 'generateLink()'
+    $ref: '@supabase/gotrue-js.GoTrueAdminApi.generateLink'
+    examples:
+      - id: generate-a-signup-link
+        name: Generate a signup link
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val (url, user) = client.gotrue.admin.generateLinkFor(LinkType.Signup) {
+              email = "example@email.com"
+              password = "secretpassword"
+          }
+          ```
+      - id: generate-an-invite-link
+        name: Generate an invite link
+        isSpotlight: false
+        code: |
+          ```kotlin
+          val (url, user) = client.gotrue.admin.generateLinkFor(LinkType.Invite) {
+              email = "example@email.com"
+          }
+          ```
+      - id: generate-a-magic-link
+        name: Generate a magic link
+        isSpotlight: false
+        code: |
+          ```kotlin
+          val (url, user) = client.gotrue.admin.generateLinkFor(LinkType.MagicLink) {
+              email = "example@email.com"
+          }
+          ```
+      - id: generate-a-recovery-link
+        name: Generate a recovery link
+        isSpotlight: false
+        code: |
+          ```kotlin
+          val (url, user) = client.gotrue.admin.generateLinkFor(LinkType.Recovery) {
+              email = "example@email.com"
+          }
+          ```
+      - id: generate-links-to-change-current-email-address
+        name: Generate links to change current email address
+        isSpotlight: false
+        code: |
+          ```kotlin
+          // generate an email change link to be sent to the current email address
+          val (url, user) = client.gotrue.admin.generateLinkFor(LinkType.EmailChangeCurrent) {
+              email = "example@email.com"
+              newEmail = "newEmail@email.com"
+          }
+
+          // generate an email change link to be sent to the new email address
+          val (url, user) = client.gotrue.admin.generateLinkFor(LinkType.EmailChangeNew) {
+              email = "example@email.com"
+              newEmail = "newEmail@email.com"
+          }
+          ```
+
+  - id: update-user-by-id
+    title: 'updateUserById()'
+    $ref: '@supabase/gotrue-js.GoTrueAdminApi.updateUserById'
+    examples:
+      - id: updates-a-users-email
+        name: Updates a user's email
+        isSpotlight: false
+        code: |
+          ```kotlin
+          client.gotrue.admin.updateUserById(uid = "id") {
+              email = "example@email.com"
+          }
+          ```
+      - id: updates-a-users-password
+        name: Updates a user's password
+        isSpotlight: false
+        code: |
+          ```js
+          client.gotrue.admin.updateUserById(uid = "id") {
+              password = "password"
+          }
+          ```
+      - id: updates-a-users-metadata
+        name: Updates a user's metadata
+        isSpotlight: true
+        code: |
+          ```kotlin
+          client.gotrue.admin.updateUserById(uid = "id") {
+              userMetadata = buildJsonObject { 
+                  put("key", "value")
+              }
+          }
+          ```
+      - id: updates-a-users-app-metadata
+        name: Updates a user's app_metadata
+        isSpotlight: false
+        code: |
+          ```kotlin
+          client.gotrue.admin.updateUserById(uid = "id") {
+              appMetadata = buildJsonObject { 
+                  put("key", "value")
+              }
+          }
+          ```
+      - id: confirms-a-users-email-address
+        name: Confirms a user's email address
+        isSpotlight: false
+        code: |
+          ```kotlin
+          client.gotrue.admin.updateUserById(uid = "id") {
+              emailConfirm = true
+          }
+          ```
+      - id: confirms-a-users-phone-number
+        name: Confirms a user's phone number
+        isSpotlight: false
+        code: |
+          ```kotlin
+          client.gotrue.admin.updateUserById(uid = "id") {
+              phoneConfirm = true
+          }
+          ```
+  - id: mfa-list-factors
+    title: 'mfa.listFactors()'
+    $ref: '@supabase/gotrue-js.GoTrueAdminMFAApi.listFactors'
+    examples:
+      - id: list-factors
+        name: List all factors for a user
+        isSpotlight: true
+        code: |
+          ```kotlin
+          const factors = client.gotrue.admin.retrieveFactors(uid = "id")
+          ```
+  - id: mfa-delete-factor
+    title: 'mfa.deleteFactor()'
+    $ref: '@supabase/gotrue-js.GoTrueAdminMFAApi.deleteFactor'
+    examples:
+      - id: delete-factor
+        name: Delete a factor for a user
+        isSpotlight: true
+        code: |
+          ```kotlin
+          client.gotrue.admin.deleteFactor(uid = "id", factorId = "factor_id")
+          ```                       
   - id: invoke
     title: 'invoke()'
     description: |
