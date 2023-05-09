@@ -234,9 +234,9 @@ function getMenuElement(menu: Menu) {
   const menuType = menu.type
   switch (menuType) {
     case 'home':
-      return <NavigationMenuHome active />
+      return <NavigationMenuHome />
     case 'guide':
-      return <NavigationMenuGuideList id={menu.id} active />
+      return <NavigationMenuGuideList id={menu.id} />
     case 'reference':
       return (
         <NavigationMenuRefList
