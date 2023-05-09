@@ -140,21 +140,12 @@ const home = [
   ],
 ]
 
-const NavigationMenuHome = ({ active }) => {
+const NavigationMenuHome = () => {
   const router = useRouter()
   const { isDarkMode } = useTheme()
 
-  if (!active) {
-    return null
-  }
-
   return (
-    <div
-      className={[
-        'transition-all duration-150 ease-out',
-        active ? 'opacity-100 ml-0 delay-150' : 'opacity-0 -ml-8 invisible absolute',
-      ].join(' ')}
-    >
+    <div className="transition-all duration-150 ease-out opacity-100 ml-0 delay-150">
       <ul className="relative w-full flex flex-col gap-4">
         {home.map((section, sectionIndex) => {
           return (
