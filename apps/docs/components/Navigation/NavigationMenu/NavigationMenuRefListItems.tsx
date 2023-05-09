@@ -1,7 +1,7 @@
 import * as Accordion from '@radix-ui/react-accordion'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { IconChevronLeft } from 'ui'
+import { IconChevronLeft, IconChevronUp } from 'ui'
 import * as NavItems from './NavigationMenu.constants'
 
 import { useTheme } from 'common/Providers'
@@ -13,24 +13,10 @@ import { useMenuActiveRefId } from '~/hooks/useMenuState'
 import React, { Fragment } from 'react'
 import { ICommonItem, ICommonSection } from '~/components/reference/Reference.types'
 import { deepFilterSections } from './NavigationMenu.utils'
-
-const HeaderImage = React.memo(function HeaderImage(props: any) {
-  const router = useRouter()
-  const { isDarkMode } = useTheme()
-
-  return (
-    <Image
-      alt={props.icon}
-      width={15}
-      height={15}
-      src={`${router.basePath}` + `/img/icons/menu/${props.icon}${isDarkMode ? '' : '-light'}.svg`}
-    />
-  )
-})
+import { cn } from 'ui/src/utils/cn'
+import HomeMenuIconPicker from './HomeMenuIconPicker'
 
 const HeaderLink = React.memo(function HeaderLink(props: any) {
-  const router = useRouter()
-
   return (
     <span className={['text-base text-brand-1200 ', !props.title && 'capitalize'].join(' ')}>
       {props.title ?? props.id}
@@ -45,6 +31,8 @@ interface FunctionLinkProps {
   icon?: string
   basePath: string
   slug: string
+  isParent?: boolean
+  isSubItem?: boolean
 }
 
 const FunctionLink = React.memo(function FunctionLink({
@@ -53,6 +41,8 @@ const FunctionLink = React.memo(function FunctionLink({
   icon,
   basePath,
   slug,
+  isParent = false,
+  isSubItem = false,
 }: FunctionLinkProps) {
   const router = useRouter()
   const activeAccordionItem = useMenuActiveRefId()
@@ -75,11 +65,24 @@ const FunctionLink = React.memo(function FunctionLink({
         }}
         className={[
           'cursor-pointer transition text-sm hover:text-brand-900 flex gap-3',
+          isParent ? 'flex justify-between' : 'leading-3',
           active ? 'text-brand-900' : 'text-scale-1000',
         ].join(' ')}
       >
         {icon && <Image width={16} height={16} alt={icon} src={`${router.basePath}${icon}`} />}
         {title}
+        {active && !isSubItem && (
+          <div
+            aria-hidden="true"
+            className="absolute -left-[13px] top-0 bottom-0 w-[1px] bg-brand-1000"
+          ></div>
+        )}
+        {isParent && (
+          <IconChevronUp
+            width={16}
+            className="data-open-parent:rotate-0 data-closed-parent:rotate-90 transition"
+          />
+        )}
       </a>
     </li>
   )
@@ -177,7 +180,7 @@ const NavigationMenuRefListItems = ({
         </a>
       </Link>
       <div className="flex items-center gap-3 my-3">
-        <HeaderImage icon={menu.icon} />
+        <HomeMenuIconPicker icon={menu.icon} width={21} height={21} />
         <HeaderLink title={menu.title} url={menu.url} id={id} />
         <RevVersionDropdown />
       </div>
