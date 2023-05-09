@@ -88,12 +88,12 @@ test.each([
     tableName: undefined,
     tableLog: logDataFixture({
       event_message: "some event_message",
-      metadata: {
-        msg: 'some metadata_msg',
-        path: '/auth-path',
-        level: 'info',
-        status: 300,
-      }
+      level: "info",
+      path: '/auth-path',
+      msg: 'some metadata_msg',
+      level: 'info',
+      status: 300,
+      metadata: undefined
     }),
     selectionLog: logDataFixture({
       event_message: "some event_message",
