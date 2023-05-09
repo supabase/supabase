@@ -54,7 +54,7 @@ function getEdgeFunctionUrl() {
   if (isPlatform) {
     const [schemeAndProjectId, domain, tld] = supabaseUrl.split('.')
     return `${schemeAndProjectId}.functions.${domain}.${tld}`
-  } else {
+  } else { 
     return `${supabaseUrl}/functions/v1`
   }
 }
@@ -468,7 +468,7 @@ const AiCommand = () => {
       <div className="absolute bottom-0 w-full bg-scale-200 py-3">
         {messages.length > 0 && !hasError && <AiWarning className="mb-3 mx-3" />}
         <Input
-          className="bg-scale-100 rounded mx-3"
+          className="bg-scale-100 rounded mx-3 [&_input]:pr-32 md:[&_input]:pr-40"
           inputRef={inputRef}
           autoFocus
           placeholder={
@@ -483,7 +483,7 @@ const AiCommand = () => {
                     search ? 'opacity-100' : 'opacity-0'
                   }`}
                 >
-                  <span className="text-scale-1100">Submit message</span>
+                  <button className="text-scale-1100">Submit message</button>
                   <div className="hidden text-scale-1100 md:flex items-center justify-center h-6 w-6 rounded bg-scale-500">
                     <IconCornerDownLeft size={12} strokeWidth={1.5} />
                   </div>
@@ -512,6 +512,7 @@ const AiCommand = () => {
             }
           }}
         />
+
       </div>
     </div>
   )

@@ -16,7 +16,7 @@ const SearchButton = ({
       type="button"
       ref={searchButtonRef}
       onClick={() => setIsOpen(true)}
-      className={className}
+      className={className} 
       {...props}
     >
       {children}
