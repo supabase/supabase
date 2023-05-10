@@ -2556,6 +2556,8 @@ functions:
   - id: mfa-unenroll
     title: 'mfa.unenroll()'
     $ref: '@supabase/gotrue-js.GoTrueMFAApi.unenroll'
+    notes: |
+      - Unenroll removes a MFA factor. A user has to have an `AAL2` authentication level in order to unenroll a verified factor.
     examples:
       - id: unenroll-a-factor
         name: Unenroll a factor
@@ -2750,6 +2752,8 @@ functions:
   - id: generate-link
     title: 'generateLink()'
     $ref: '@supabase/gotrue-js.GoTrueAdminApi.generateLink'
+    notes: |
+      - Generates email links and OTPs to be sent via a custom email provider.
     examples:
       - id: generate-a-signup-link
         name: Generate a signup link
@@ -2809,6 +2813,8 @@ functions:
   - id: update-user-by-id
     title: 'updateUserById()'
     $ref: '@supabase/gotrue-js.GoTrueAdminApi.updateUserById'
+    notes: |
+      - Updates the user data.
     examples:
       - id: updates-a-users-email
         name: Updates a user's email
@@ -2870,6 +2876,8 @@ functions:
           ```
   - id: mfa-list-factors
     title: 'mfa.listFactors()'
+    notes: |
+      - Lists all factors associated to a user.
     $ref: '@supabase/gotrue-js.GoTrueAdminMFAApi.listFactors'
     examples:
       - id: list-factors
@@ -2882,6 +2890,8 @@ functions:
   - id: mfa-delete-factor
     title: 'mfa.deleteFactor()'
     $ref: '@supabase/gotrue-js.GoTrueAdminMFAApi.deleteFactor'
+    notes: |
+      - Deletes a factor on a user. This will log the user out of all active sessions if the deleted factor was verified.
     examples:
       - id: delete-factor
         name: Delete a factor for a user
