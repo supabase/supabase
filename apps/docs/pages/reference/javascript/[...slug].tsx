@@ -1,4 +1,3 @@
-import { inspect } from 'util'
 import clientLibsCommonSections from '~/../../spec/common-client-libs-sections.json'
 import typeSpec from '~/../../spec/enrichments/tsdoc_v2/combined.json'
 import spec from '~/../../spec/supabase_js_v2.yml' assert { type: 'yml' }
@@ -27,5 +26,5 @@ export async function getStaticProps() {
 }
 
 export async function getStaticPaths() {
-  return handleRefGetStaticPaths(sections, libraryPath)
+  return handleRefGetStaticPaths(sections)
 }
