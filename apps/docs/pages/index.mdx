@@ -1,6 +1,15 @@
 import HomeLayout from '~/layouts/HomeLayout'
 import Link from 'next/link'
-import { GlassPanel, IconPanel, Button, IconChevronRight, TextLink } from 'ui'
+import {
+  Button,
+  GlassPanel,
+  IconBackground,
+  IconChevronRight,
+  IconPanel,
+  IconPlay,
+  TextLink,
+} from 'ui'
+import HomeMenuIconPicker from '~/components/Navigation/NavigationMenu/HomeMenuIconPicker'
 
 export const meta = {
   title: 'Supabase Documentation',
@@ -9,7 +18,7 @@ export const meta = {
   subtitle: 'Supabase Developer Documentation and API Reference',
 }
 
-<div className="flex flex-col gap-12 mb-12">
+<div className="flex flex-col mb-12">
 
 <div>
   <div className="max-w-xl">
@@ -37,10 +46,18 @@ export const meta = {
   <div className="flex flex-col lg:grid grid-cols-12 gap-6 mt-12 py-12 border-b">
 
     <div className="col-span-4 flex flex-col gap-1 [&_h2]:m-0">
+
       ## Migrate to Supabase
+
       <p className="text-scale-1100 text-sm p-0 m-0">
         Bring your existing data, auth and storage to Supabase following our migration guides.
       </p>
+
+      <TextLink
+        label="Explore more resources"
+        url="/docs/guides/resources"
+        className="no-underline text-brand-900 text-sm"
+      />
     </div>
 
     <div className="grid col-span-8 grid-cols-12 gap-6 not-prose">
@@ -67,34 +84,92 @@ export const meta = {
 
 <div>
 
-  <div className="max-w-xl">
+  <div className="flex flex-col lg:grid grid-cols-12 gap-6 py-12 border-b">
 
-    ### Reference Documentation
+    <div className="col-span-4 flex flex-col gap-1 [&_h2]:m-0 [&_h3]:m-0">
+
+      <div className="md:max-w-xs 2xl:max-w-none">
+        <div className="flex items-center gap-3 mb-3">
+          <IconBackground>
+            <HomeMenuIconPicker icon="self-hosting" width={18} height={18} />
+          </IconBackground>
+          ### Self-Hosting
+        </div>
+        <p className="text-scale-1100 text-sm">
+          Get started with self-hosting Supabase.
+        </p>
+        <TextLink
+          label="More on Self-Hosting"
+          url="/docs/guides/self-hosting"
+          className="no-underline text-brand-900 text-sm"
+        />
+      </div>
+
+    </div>
+
+    <div className="grid col-span-8 grid-cols-12 gap-6 not-prose">
+      <div className="col-span-full lg:col-span-8 grid grid-cols-12 gap-6">
+        {selfHostingOptions.map((product) => {
+          return (
+            <Link
+              href={`${product.href}`}
+              key={product.title}
+              passHref
+            >
+              <a className={product.span ?? 'col-span-6'}>
+                <IconPanel {...product} icon={<HomeMenuIconPicker icon={product.icon} width={18} height={18} />} background={true} showIconBg={true} showLink={true} showLink={false}>
+                  {product.description}
+                </IconPanel>
+              </a>
+            </Link>
+          )
+        })}
+      </div>
+    </div>
+
+  </div>
+  
+  <div className="flex flex-col lg:grid grid-cols-12 gap-6 py-12">
+
+    <div className="col-span-4 flex flex-col gap-1 [&_h2]:m-0 [&_h3]:m-0">
+
+      <div className="md:max-w-xs 2xl:max-w-none">
+        <div className="flex items-center gap-3 mb-3">
+          <IconBackground>
+            <HomeMenuIconPicker icon="reference-cli" width={18} height={18} />
+          </IconBackground>
+          ### Official Client Libraries
+        </div>
+        {/* <p className="text-scale-1100 text-sm">
+          Some short description about using Official Client Libraries across all of these products we listed here.
+        </p> */}
+      </div>
+
+    </div>
+
+    <div className="grid col-span-8 grid-cols-12 gap-6 not-prose">
+      <div className="col-span-full lg:col-span-8 grid grid-cols-12 gap-6">
+        {clientLibraries.map((product) => {
+          return (
+            <Link
+              href={`${product.href}`}
+              key={product.title}
+              passHref
+            >
+              <a className={product.span ?? 'col-span-6'}>
+                <IconPanel {...product} icon={<HomeMenuIconPicker icon={product.icon} width={18} height={18} />} background={true} showIconBg={true} showLink={true} showLink={false}>
+                  {product.description}
+                </IconPanel>
+              </a>
+            </Link>
+          )
+        })}
+      </div>
+    </div>
 
   </div>
 
-  <div className="grid grid-cols-12 gap-6 not-prose">
-    {apis.map((product) => {
-      return (
-        <Link
-          href={`/${product.href}`}
-          key={product.title}
-          passHref
-        >
-          <a className={product.span ?? 'col-span-12 lg:col-span-4'}>
-            <GlassPanel {...product} background={false}>
-              {product.description}
-            </GlassPanel>
-          </a>
-        </Link>
-      )
-
-})}
-
-  </div>
 </div>
-
-{/* end of container */}
 
 </div>
 
@@ -148,136 +223,67 @@ export const migrationGuides = [
     title: 'Firebase Auth',
     icon: '/docs/img/icons/firebase-icon',
     href: '/guides/resources/migrating-to-supabase/firebase-auth',
-    // description: 'Move your auth users from a Firebase project to a Supabase project.',
   },
   {
     title: 'Firestore Data',
     icon: '/docs/img/icons/firebase-icon',
     href: '/guides/resources/migrating-to-supabase/firestore-data',
-    // description: 'Migrate the contents of a Firestore collection to a single PostgreSQL table.',
   },
   {
     title: 'Firebase Storage',
     icon: '/docs/img/icons/firebase-icon',
     href: '/guides/resources/migrating-to-supabase/firebase-storage',
-    // description: 'Convert your Firebase Storage files to Supabase Storage.',
   },
   {
     title: 'Heroku',
     icon: '/docs/img/icons/heroku-icon',
     href: '/guides/resources/migrating-to-supabase/heroku',
-    // description: 'Migrate your Heroku Postgres database to Supabase.',
   },
   {
     title: 'Render',
     icon: '/docs/img/icons/render-icon',
     href: '/guides/resources/migrating-to-supabase/render',
-    // description: 'Migrate your Render Postgres database to Supabase.',
   },
   {
     title: 'Amazon RDS',
     icon: '/docs/img/icons/aws-rds-icon',
     href: '/guides/resources/migrating-to-supabase/amazon-rds',
-    // description: 'Migrate your Amazon RDS database to Supabase.',
   },
 ]
 
-export const apis = [
+export const selfHostingOptions = [
   {
-    title: 'JavaScript Client Library',
-    icon: '/docs/img/icons/menu/reference-javascript',
-    hasLightIcon: true,
-    href: 'reference/javascript/introduction',
-    description: 'Official client libraries for JavaScript and TypeScript.',
-    span: 'col-span-12 md:col-span-6',
+    title: 'Auth',
+    icon: 'auth',
+    href: '/docs/reference/self-hosting-auth/introduction',
   },
   {
-    title: 'Flutter Client Library',
-    icon: '/docs/img/icons/menu/reference-dart',
-    hasLightIcon: true,
-    href: 'reference/dart/introduction',
-    description: 'Official client libraries for Flutter and Dart.',
-    span: 'col-span-12 md:col-span-6',
+    title: 'Realtime',
+    icon: 'realtime',
+    href: '/docs/reference/self-hosting-realtime/introduction',
   },
   {
-    title: 'Management API',
-    icon: '/docs/img/icons/menu/reference-api',
-    hasLightIcon: true,
-    href: 'reference/api/introduction',
-    description: 'Manage your Supabase projects and organizations programmatically.',
-    span: 'col-span-12 md:col-span-6',
+    title: 'Storage',
+    icon: 'storage',
+    href: '/docs/reference/self-hosting-storage/introduction',
   },
   {
-    title: 'Supabase CLI',
-    icon: '/docs/img/icons/menu/reference-api',
-    hasLightIcon: true,
-    href: 'reference/cli/introduction',
-    description:
-      'Use the CLI to develop your project locally, manage database migrations, and deploy to the Supabase Platform or self-host.',
-    span: 'col-span-12 md:col-span-6',
-  },
-  {
-    title: 'Self-Hosting Auth',
-    icon: '/docs/img/icons/menu/reference-auth',
-    hasLightIcon: true,
-    href: 'reference/self-hosting-auth/introduction',
-    description: 'Self-host your own Auth server.',
-  },
-  {
-    title: 'Self-Hosting Storage',
-    icon: '/docs/img/icons/menu/reference-storage',
-    hasLightIcon: true,
-    href: 'reference/self-hosting-storage/introduction',
-    description: 'Self-host your own Storage server.',
-  },
-  {
-    title: 'Self-Hosting Realtime',
-    icon: '/docs/img/icons/menu/reference-realtime',
-    hasLightIcon: true,
-    href: 'reference/self-hosting-realtime/introduction',
-    description: 'Self-host your own Realtime server.',
-  },
-  {
-    title: 'Self-Hosting Analytics',
-    icon: '/docs/img/icons/menu/reference-analytics',
-    hasLightIcon: true,
-    href: 'reference/self-hosting-analytics/introduction',
-    description: 'Self-host your own Analytics server.',
+    title: 'Analytics',
+    icon: 'analytics',
+    href: '/docs/reference/self-hosting-analytics/introduction',
   },
 ]
 
-export const platform = [
+export const clientLibraries = [
   {
-    // header: '/docs/img/cards/sample-card-header-3.svg',
-    title: 'Platform Guides',
-    icon: '/docs/img/icons/menu/platform',
-    hasLightIcon: true,
-    href: 'guides/platform',
-    description:
-      'Learn more about the tools and services powering the Supabase Platform, available add-ons, and how to customize the platform for your needs.',
+    title: 'Javascript',
+    icon: 'reference-javascript',
+    href: '/docs/reference/javascript/initializing',
   },
   {
-    // header: '/docs/img/cards/sample-card-header-2.svg',
-    title: 'Resources',
-    icon: '/docs/img/icons/menu/resources',
-    hasLightIcon: true,
-    href: 'guides/resources',
-    description: 'View examples, curated content from the community, migration guides, and more.',
-  },
-  {
-    title: 'Self-Hosting Supabase',
-    icon: '/docs/img/icons/menu/platform',
-    hasLightIcon: true,
-    href: 'guides/self-hosting',
-    description: 'Learn how to self-host Supabase and deploy to your own infrastructure.',
-  },
-  {
-    // header: '/docs/img/cards/sample-card-header-2.svg',
-    title: 'Integrations',
-    icon: '/docs/img/icons/menu/integrations',
-    hasLightIcon: true,
-    href: 'guides/integrations',
-    description: 'Explore a variety of integrations from Supabase partners.',
+    title: 'Flutter',
+    icon: 'reference-dart',
+    href: '/docs/reference/dart/initializing',
   },
 ]
 

@@ -1,13 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { IconPanel, IconPlay } from 'ui'
+import { IconBackground, IconPanel, IconPlay } from 'ui'
 import { useBreakpoint } from 'common'
-
-const IconBackground: React.FC = (props) => (
-  <div className="shrink-0 bg-green-600 w-8 h-8 flex items-center justify-center rounded">
-    {props.children}
-  </div>
-)
 
 const HomePageCover = (props) => {
   const isXs = useBreakpoint(639)
