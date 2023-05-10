@@ -155,6 +155,14 @@
         }
       },
       {
+        "title": "Single Sign-On (SAML 2.0)",
+        "tiers": {
+          "free": false,
+          "pro": "50 free, then $0.015 per MAU",
+          "enterprise": "Contact Us"
+        }
+      },
+      {
         "title": "Advanced security features",
         "tiers": {
           "free": false,
@@ -209,7 +217,7 @@
         }
       },
       {
-        "title": "Asset transformations",
+        "title": "Image Transformations",
         "tooltips": {
           "main": "Distinct count of all images that were transformed in the billing period, ignoring any transformations."
         },

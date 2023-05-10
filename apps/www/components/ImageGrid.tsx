@@ -1,7 +1,7 @@
-import { useRouter } from 'next/router'
 import Image from 'next/image'
-
 import Link from 'next/link'
+import { motion } from 'framer-motion'
+
 interface iImages {
   name: string
   image: string
@@ -19,6 +19,7 @@ interface iImageGrid {
   lgCols?: colSizes
   padding?: paddingSizes
   className?: string
+  animated?: boolean
 }
 
 const ImageGrid = ({
@@ -28,6 +29,7 @@ const ImageGrid = ({
   lgCols = 8,
   padding = 8,
   className,
+  animated = false,
 }: iImageGrid) => {
   const smBreakpoint = {
     3: 'grid-cols-3',
@@ -70,7 +72,7 @@ const ImageGrid = ({
           if (x.link) {
             return (
               <Link href={link}>
-                <div className="scale-100 transform cursor-pointer duration-100 ease-in-out hover:z-50 hover:scale-105 hover:shadow-sm">
+                <div className="scale-100 transform cursor-pointer duration-100 ease-in-out hover:shadow-sm">
                   {children}
                 </div>
               </Link>
@@ -80,9 +82,22 @@ const ImageGrid = ({
           }
         }
 
+        const MaybeAnimatedDiv = ({ children, ...rest }: any) =>
+          animated ? (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0, transition: { delay: i / 10 } }}
+              {...rest}
+            >
+              {children}
+            </motion.div>
+          ) : (
+            <div {...rest}>{children}</div>
+          )
+
         return (
           <Container link={x.link} key={i}>
-            <div
+            <MaybeAnimatedDiv
               key={`${x.name}-${i}`}
               className={`
                   dark:bg-scale-400 col-span-1 flex items-center 
@@ -106,7 +121,7 @@ const ImageGrid = ({
                   "
                 />
               </div>
-            </div>
+            </MaybeAnimatedDiv>
           </Container>
         )
       })}

@@ -326,32 +326,7 @@ And then we can share this instance across our application with Outlet Context.
 
 Since authentication happens client-side, we need to tell Remix to re-call all active loaders when the user signs in or out.
 
-Remix does this automatically when an action completes. Let's create an empty action.
-
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="js"
->
-
-<TabPanel id="js" label="JavaScript">
-
-```jsx title=app/routes/handle-supabase-auth.jsx
-export const action = () => null
-```
-
-</TabPanel>
-
-<TabPanel id="ts" label="TypeScript">
-
-```tsx title=app/routes/handle-supabase-auth.tsx
-export const action = () => null
-```
-
-</TabPanel>
-
-</Tabs>
+Remix provides a hook `useRevalidator` that can be used to revalidate all loaders on the current route.
 
 Now to determine when to submit a post request to this action, we need to compare the server and client state for the user's access token.
 
@@ -434,7 +409,7 @@ export const loader = async ({ request }: LoaderArgs) => {
 
 </Tabs>
 
-And then use a `fetcher` to simulate submitting a form to our action, inside the `onAuthStateChange` hook.
+And then use the revalidator, inside the `onAuthStateChange` hook.
 
 <Tabs
   scrollable
@@ -447,7 +422,7 @@ And then use a `fetcher` to simulate submitting a form to our action, inside the
 
 ```jsx title=app/root.jsx
 const { env, session } = useLoaderData()
-const fetcher = useFetcher()
+const { revalidate } = useRevalidator()
 
 const [supabase] = useState(() =>
   createBrowserClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY)
@@ -461,11 +436,7 @@ useEffect(() => {
   } = supabase.auth.onAuthStateChange((event, session) => {
     if (session?.access_token !== serverAccessToken) {
       // server and client are out of sync.
-      // Remix recalls active loaders after actions complete
-      fetcher.submit(null, {
-        method: 'post',
-        action: '/handle-supabase-auth',
-      })
+      revalidate()
     }
   })
 
@@ -481,7 +452,7 @@ useEffect(() => {
 
 ```tsx title=app/root.tsx
 const { env, session } = useLoaderData<typeof loader>()
-const fetcher = useFetcher()
+const { revalidate } = useRevalidator()
 
 const [supabase] = useState(() =>
   createBrowserClient<Database>(env.SUPABASE_URL, env.SUPABASE_ANON_KEY)
@@ -493,13 +464,9 @@ useEffect(() => {
   const {
     data: { subscription },
   } = supabase.auth.onAuthStateChange((event, session) => {
-    if (session?.access_token !== serverAccessToken) {
+    if (event !== "INITIAL_SESSION" && session?.access_token !== serverAccessToken) {
       // server and client are out of sync.
-      // Remix recalls active loaders after actions complete
-      fetcher.submit(null, {
-        method: 'post',
-        action: '/handle-supabase-auth',
-      })
+      revalidate()
     }
   })
 

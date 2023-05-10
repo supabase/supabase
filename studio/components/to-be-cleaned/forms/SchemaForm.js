@@ -21,8 +21,9 @@ const SchemaForm = ({
       onSubmit={onSubmit}
       submitField={() => <></>}
       model={model}
-      children={children}
-    />
+    >
+      {children}
+    </AutoForm>
   )
 }
 export default SchemaForm

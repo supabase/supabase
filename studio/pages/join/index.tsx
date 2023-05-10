@@ -181,7 +181,7 @@ const JoinOrganizationPage = () => {
       </div>
 
       <div
-        className={['border-t border-scale-400', isError ? 'bg-sand-100' : 'bg-transparent'].join(
+        className={['border-t border-scale-400', isError ? 'bg-scale-100' : 'bg-transparent'].join(
           ' '
         )}
       >
@@ -212,14 +212,14 @@ const JoinOrganizationPage = () => {
               </p>
               <div className="flex justify-center gap-3">
                 <Link passHref href={loginRedirectLink}>
-                  <Button as="a" type="default">
-                    Sign in
-                  </Button>
+                  <a>
+                    <Button type="default">Sign in</Button>
+                  </a>
                 </Link>
                 <Link passHref href={loginRedirectLink}>
-                  <Button as="a" type="default">
-                    Create an account
-                  </Button>
+                  <a>
+                    <Button type="default">Create an account</Button>
+                  </a>
                 </Link>
               </div>
             </div>

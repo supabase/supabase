@@ -14,7 +14,7 @@ jobs:
 
     env:
       SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-      PROJECT_ID: ${{ secrets.PROJECT_ID }}
+      PROJECT_ID: ${{ secrets.OG_IMAGE_SUPABASE_PROJECT_ID }}
 
     steps:
       - name: Check out repo

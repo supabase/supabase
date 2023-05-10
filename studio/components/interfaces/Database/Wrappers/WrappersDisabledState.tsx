@@ -5,12 +5,15 @@ import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useParams, useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
+import { useParams } from 'common/hooks'
 import { BASE_PATH } from 'lib/constants'
+import { useTheme } from 'common'
 
 const WrappersDisabledState = () => {
   const { ui, meta } = useStore()
   const { ref } = useParams()
+  const { isDarkMode } = useTheme()
   const wrappersExtension = meta.extensions.byId('wrappers')
   const vaultExtension = meta.extensions.byId('supabase_vault')
   const isNotAvailable = wrappersExtension === undefined || vaultExtension === undefined
@@ -65,7 +68,7 @@ const WrappersDisabledState = () => {
         style={{
           backgroundSize: '45%',
           backgroundPosition: '105% 40%',
-          backgroundImage: ui.isDarkTheme
+          backgroundImage: isDarkMode
             ? `url("${BASE_PATH}/img/wrappers-dark.png")`
             : `url("${BASE_PATH}/img/wrappers-light.png")`,
         }}
@@ -94,7 +97,7 @@ const WrappersDisabledState = () => {
                   <Link
                     href={`/support/new?ref=${ref}&category=sales&subject=Request%20for%20access%20to%20wrappers`}
                   >
-                    <a target="_blank">
+                    <a target="_blank" rel="noreferrer">
                       <Button type="primary">Contact us</Button>
                     </a>
                   </Link>
@@ -102,7 +105,7 @@ const WrappersDisabledState = () => {
               </div>
               <div className="flex items-center space-x-2 my-1 ml-[1px]">
                 <Link href="https://supabase.com/docs/guides/database/wrappers">
-                  <a target="_blank">
+                  <a target="_blank" rel="noreferrer">
                     <Button type="default" icon={<IconExternalLink />}>
                       About Wrappers
                     </Button>
@@ -113,7 +116,7 @@ const WrappersDisabledState = () => {
           ) : (
             <div className="flex items-center space-x-2">
               <Link href="https://supabase.com/docs/guides/database/wrappers">
-                <a target="_blank">
+                <a target="_blank" rel="noreferrer">
                   <Button type="default" icon={<IconExternalLink />}>
                     About Wrappers
                   </Button>
@@ -131,19 +134,21 @@ const WrappersDisabledState = () => {
                   </Button>
                 </Tooltip.Trigger>
                 {!canToggleWrappers && (
-                  <Tooltip.Content side="bottom">
-                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                    <div
-                      className={[
-                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                        'border border-scale-200',
-                      ].join(' ')}
-                    >
-                      <span className="text-xs text-scale-1200">
-                        You need additional permissions to enable Wrappers for this project
-                      </span>
-                    </div>
-                  </Tooltip.Content>
+                  <Tooltip.Portal>
+                    <Tooltip.Content side="bottom">
+                      <Tooltip.Arrow className="radix-tooltip-arrow" />
+                      <div
+                        className={[
+                          'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                          'border border-scale-200',
+                        ].join(' ')}
+                      >
+                        <span className="text-xs text-scale-1200">
+                          You need additional permissions to enable Wrappers for this project
+                        </span>
+                      </div>
+                    </Tooltip.Content>
+                  </Tooltip.Portal>
                 )}
               </Tooltip.Root>
             </div>

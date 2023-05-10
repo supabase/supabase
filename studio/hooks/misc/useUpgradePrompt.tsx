@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useParams } from 'hooks'
+import { useParams } from 'common/hooks'
 import { maybeShowUpgradePrompt } from 'components/interfaces/Settings/Logs'
 import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
 

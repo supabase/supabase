@@ -111,10 +111,5 @@ export async function constructHeaders(requestId: string, optionHeaders?: { [pro
     if (accessToken) headers.Authorization = `Bearer ${accessToken}`
   }
 
-  if (typeof window !== 'undefined') {
-    const gaClientId = window?.localStorage?.getItem('ga_client_id')
-    if (gaClientId && gaClientId !== 'undefined') headers['X-GA-Client-Id'] = gaClientId
-  }
-
   return headers
 }

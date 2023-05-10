@@ -3,11 +3,11 @@
 <path fill-rule="evenodd" clip-rule="evenodd" d="M11.9633 7.62447C11.9574 7.22892 11.4586 7.05917 11.2127 7.36898L7.50057 12.0441C7.06243 12.5959 7.4554 13.4097 8.16 13.4097H11.9945L12.0397 16.4214C12.0456 16.8169 12.5443 16.9867 12.7903 16.6769L16.5024 12.0017C16.9405 11.4499 16.5476 10.6361 15.843 10.6361H11.9831L11.9633 7.62447Z" fill="url(#paint1_linear_214_53007)"/>
 <defs>
 <linearGradient id="paint0_linear_214_53007" x1="12" y1="0.0234375" x2="28.832" y2="29.8425" gradientUnits="userSpaceOnUse">
-<stop stop-color="#3FCF8E"/>
+<stop stopColor="#3FCF8E"/>
 <stop offset="1" stop-color="#375965"/>
 </linearGradient>
 <linearGradient id="paint1_linear_214_53007" x1="12.0015" y1="7.20898" x2="17.6833" y2="20.5567" gradientUnits="userSpaceOnUse">
-<stop stop-color="white"/>
+<stop stopColor="white"/>
 <stop offset="1" stop-color="white" stop-opacity="0"/>
 </linearGradient>
 </defs>

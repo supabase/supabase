@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite'
 
-import { useParams } from 'hooks'
+import { useParams } from 'common/hooks'
 import { NextPageWithLayout } from 'types'
 import Table from 'components/to-be-cleaned/Table'
 import FunctionsLayout from 'components/layouts/FunctionsLayout'

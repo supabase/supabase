@@ -2,9 +2,55 @@ import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
   id: 'functions-local-development',
-  title: 'Local Development',
+  title: 'Developing Functions locally',
   description: 'Run your Edge Functions locally.',
 }
+
+## Setting Up Your Environment
+
+You can follow the [Deno guide](https://deno.com/manual@v1.32.5/getting_started/setup_your_environment) for setting up your development environment with your favorite editor/IDE.
+
+When developing with VS Code inside of an existing application, you can utilize [multi-root workspaces](https://code.visualstudio.com/docs/editor/workspaces#_multiroot-workspaces).
+
+<div className="video-container">
+  <iframe
+    src="https://www.youtube-nocookie.com/embed/lFhU3L8VoSQ"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
+
+For example, see this `edge-functions.code-workspace` configuration for a CRA (create react app) client with Supabase Edge Functions. You can find the complete example on [GitHub](https://github.com/supabase/supabase/tree/master/examples/edge-functions).
+
+```json
+{
+  "folders": [
+    {
+      "name": "project-root",
+      "path": "./"
+    },
+    {
+      "name": "client",
+      "path": "app"
+    },
+    {
+      "name": "supabase-functions",
+      "path": "supabase/functions"
+    }
+  ],
+  "settings": {
+    "files.exclude": {
+      "node_modules/": true,
+      "app/": true,
+      "supabase/functions/": true
+    },
+    "deno.importMap": "./supabase/functions/import_map.json"
+  }
+}
+```
+
+## Running Edge Functions locally
 
 You can run your Edge Function locally using [`supabase functions serve`](/docs/reference/cli/usage#supabase-functions-serve):
 
@@ -15,7 +61,7 @@ supabase functions serve # start the Functions watcher
 
 The `functions serve` command has hot-reloading capabilities. It will watch for any changes to your files and restart the Deno server.
 
-### Invoking Edge Functions locally
+## Invoking Edge Functions locally
 
 While serving your local Edge Function, you can invoke it using curl:
 

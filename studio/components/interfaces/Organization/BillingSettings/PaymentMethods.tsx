@@ -28,6 +28,7 @@ interface Props {
   paymentMethods: any[]
   onDefaultMethodUpdated: (updatedCustomer: any) => void
   onPaymentMethodsDeleted: () => void
+  onPaymentMethodAdded: () => void
 }
 
 const PaymentMethods: FC<Props> = ({
@@ -36,6 +37,7 @@ const PaymentMethods: FC<Props> = ({
   paymentMethods,
   onDefaultMethodUpdated,
   onPaymentMethodsDeleted,
+  onPaymentMethodAdded,
 }) => {
   const { ui } = useStore()
   const orgSlug = ui.selectedOrganization?.slug ?? ''
@@ -97,6 +99,11 @@ const PaymentMethods: FC<Props> = ({
     } finally {
       setIsUpdatingPaymentMethod(false)
     }
+  }
+
+  const onLocalPaymentMethodAdded = () => {
+    setShowAddPaymentMethodModal(false)
+    return onPaymentMethodAdded()
   }
 
   return (
@@ -187,19 +194,21 @@ const PaymentMethods: FC<Props> = ({
                                 <Tooltip.Trigger>
                                   <Button disabled as="span" type="outline" icon={<IconX />} />
                                 </Tooltip.Trigger>
-                                <Tooltip.Content side="bottom">
-                                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                                  <div
-                                    className={[
-                                      'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                                      'w-48 border border-scale-200 text-center', //border
-                                    ].join(' ')}
-                                  >
-                                    <span className="text-xs text-scale-1200">
-                                      Your default payment method cannot be deleted
-                                    </span>
-                                  </div>
-                                </Tooltip.Content>
+                                <Tooltip.Portal>
+                                  <Tooltip.Content side="bottom">
+                                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                                    <div
+                                      className={[
+                                        'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
+                                        'w-48 border border-scale-200 text-center', //border
+                                      ].join(' ')}
+                                    >
+                                      <span className="text-xs text-scale-1200">
+                                        Your default payment method cannot be deleted
+                                      </span>
+                                    </div>
+                                  </Tooltip.Content>
+                                </Tooltip.Portal>
                               </Tooltip.Root>
                             ) : (
                               <Dropdown
@@ -250,6 +259,7 @@ const PaymentMethods: FC<Props> = ({
         visible={showAddPaymentMethodModal}
         returnUrl={`${getURL()}/org/${orgSlug}/billing`}
         onCancel={() => setShowAddPaymentMethodModal(false)}
+        onConfirm={() => onLocalPaymentMethodAdded()}
       />
 
       <Modal

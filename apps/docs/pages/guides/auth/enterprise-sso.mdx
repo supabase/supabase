@@ -1,13 +1,11 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-  title: 'Enterprise SSO',
+  title: 'Enterprise Single Sign-On',
   description: 'Learn about Single Sign-On support in Supabase Auth for enterprise applications',
 }
 
-Supabase Auth supports building enterprise applications that require Single Sign-On (SSO) authentication. At this time only [SSO with SAML 2.0](/guides/auth/sso/auth-sso-saml) is supported in an early beta.
-
-If you are interested in using SAML 2.0 SSO with your Supabase project, please [open a new support ticket](https://app.supabase.com/support/new).
+Supabase Auth supports building enterprise applications that require Single Sign-On (SSO) authentication [with SAML 2.0](/docs/guides/auth/sso/auth-sso-saml).
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

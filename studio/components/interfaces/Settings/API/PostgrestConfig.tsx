@@ -4,7 +4,8 @@ import { observer } from 'mobx-react-lite'
 import { Input, Form, IconAlertCircle, InputNumber } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useStore, useParams } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
+import { useParams } from 'common/hooks'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 import { useProjectPostgrestConfigUpdateMutation } from 'data/config/project-postgrest-config-update-mutation'
 import MultiSelect from 'components/ui/MultiSelect'
@@ -89,6 +90,9 @@ const PostgrestConfig: FC<Props> = ({}) => {
       {({ isSubmitting, handleReset, resetForm, values, initialValues }: any) => {
         const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
 
+        // [Alaister] although this "technically" is breaking the rules of React hooks
+        // it won't error because the hooks are always rendered in the same order
+        // eslint-disable-next-line react-hooks/rules-of-hooks
         useEffect(() => {
           if (config) {
             const values = {

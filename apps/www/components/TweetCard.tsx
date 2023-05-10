@@ -43,9 +43,7 @@ function TweetCard(props: TweetCard) {
         </div>
       </div>
 
-      <p>
-        <p className="text-scale-1100 mt-3 text-base">"{props.quote}"</p>
-      </p>
+      <p className="text-scale-1100 mt-3 text-base">"{props.quote}"</p>
     </div>
   )
 }

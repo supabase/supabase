@@ -18,7 +18,7 @@
   "license": "MIT",
   "devDependencies": {
     "@faker-js/faker": "^6.1.2",
-    "@supabase/supabase-js": "^2.0.0",
+    "@supabase/supabase-js": "^2.13.0",
     "@testdeck/jest": "^0.2.0",
     "@types/jest": "^27.4.0",
     "@types/node": "^17.0.24",

@@ -1,35 +1,36 @@
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
-import { ThemeProvider } from 'common/Providers'
-import { DefaultSeo } from 'next-seo'
-import Head from 'next/head'
+import { AuthProvider, ThemeProvider, useTelemetryProps } from 'common'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { AppPropsWithLayout } from 'types'
+import { CommandMenuProvider } from 'ui'
 import Favicons from '~/components/Favicons'
-import SearchProvider from '~/components/Search/SearchProvider'
 import SiteLayout from '~/layouts/SiteLayout'
-import { IS_PLATFORM, LOCAL_SUPABASE } from '~/lib/constants'
+import { API_URL, IS_PLATFORM, LOCAL_SUPABASE } from '~/lib/constants'
 import { post } from '~/lib/fetchWrappers'
-import '../styles/algolia-search.scss'
 import '../styles/ch.scss'
-import '../styles/docsearch.scss'
 import '../styles/main.scss?v=1.0.0'
 import '../styles/new-docs.scss'
 import '../styles/prism-okaidia.scss'
 
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const router = useRouter()
+  const telemetryProps = useTelemetryProps()
 
   const [supabase] = useState(() =>
     IS_PLATFORM || LOCAL_SUPABASE ? createBrowserSupabaseClient() : undefined
   )
 
-  function telemetry(route: string) {
-    return post(`https://api.supabase.io/platform/telemetry/page`, {
+  function handlePageTelemetry(route: string) {
+    return post(`${API_URL}/telemetry/page`, {
       referrer: document.referrer,
       title: document.title,
       route,
+      ga: {
+        screen_resolution: telemetryProps?.screenResolution,
+        language: telemetryProps?.language,
+      },
     })
   }
 
@@ -38,7 +39,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
       /*
        * handle telemetry
        */
-      telemetry(url)
+      handlePageTelemetry(url)
       /*
        * handle "scroll to top" behaviour on route change
        */
@@ -60,30 +61,39 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
     }
   }, [router.events])
 
+  useEffect(() => {
+    /**
+     * Send page telemetry on first page load
+     */
+    if (router.isReady) {
+      handlePageTelemetry(router.basePath + router.asPath)
+    }
+  }, [router.isReady])
+
   const SITE_TITLE = 'Supabase Documentation'
+
+  const AuthContainer = (props) => {
+    return IS_PLATFORM || LOCAL_SUPABASE ? (
+      <SessionContextProvider supabaseClient={supabase}>
+        <AuthProvider>{props.children}</AuthProvider>
+      </SessionContextProvider>
+    ) : (
+      <AuthProvider>{props.children}</AuthProvider>
+    )
+  }
 
   return (
     <>
       <Favicons />
-      {IS_PLATFORM || LOCAL_SUPABASE ? (
-        <SessionContextProvider supabaseClient={supabase}>
-          <ThemeProvider>
-            <SearchProvider>
-              <SiteLayout>
-                <Component {...pageProps} />
-              </SiteLayout>
-            </SearchProvider>
-          </ThemeProvider>
-        </SessionContextProvider>
-      ) : (
+      <AuthContainer>
         <ThemeProvider>
-          <SearchProvider>
+          <CommandMenuProvider site="docs">
             <SiteLayout>
               <Component {...pageProps} />
             </SiteLayout>
-          </SearchProvider>
+          </CommandMenuProvider>
         </ThemeProvider>
-      )}
+      </AuthContainer>
     </>
   )
 }

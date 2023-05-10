@@ -4,7 +4,8 @@ import React from 'react'
 import { Button, IconDownload, IconExternalLink } from 'ui'
 import { API_ADMIN_URL } from 'lib/constants'
 import { get } from 'lib/common/fetch'
-import { useParams, useStore } from 'hooks'
+import { useStore } from 'hooks'
+import { useParams } from 'common/hooks'
 import CodeSnippet from 'components/to-be-cleaned/Docs/CodeSnippet'
 
 interface Props {
@@ -47,7 +48,7 @@ export default function GeneratingTypes({ selectedLang }: Props) {
       <h2 className="doc-heading flex items-center justify-between">
         <span>Generating types</span>
         <Link href="https://supabase.com/docs/guides/database/api/generating-types">
-          <a target="_blank">
+          <a target="_blank" rel="noreferrer">
             <Button type="default" icon={<IconExternalLink />}>
               Documentation
             </Button>

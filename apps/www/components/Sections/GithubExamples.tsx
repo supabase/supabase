@@ -32,18 +32,22 @@ function GithubExamples() {
           </p>
           <div className="flex items-center justify-center gap-2 py-4">
             <Link href="/docs/guides/auth/overview" passHref>
-              <Button size="small" as="a" type="default" icon={<IconBookOpen size={12} />}>
-                View guides
-              </Button>
+              <a>
+                <Button size="small" type="default" icon={<IconBookOpen size={12} />}>
+                  View guides
+                </Button>
+              </a>
             </Link>
             <Link
               href="https://github.com/supabase/supabase/tree/master/examples"
               as="https://github.com/supabase/supabase/tree/master/examples"
               passHref
             >
-              <Button size="small" as="a" type="default" icon={<IconGitHub size={12} />}>
-                Official GitHub library
-              </Button>
+              <a>
+                <Button size="small" type="default" icon={<IconGitHub size={12} />}>
+                  Official GitHub library
+                </Button>
+              </a>
             </Link>
           </div>
         </div>

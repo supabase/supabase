@@ -1,12 +1,8 @@
-import { GoTrueClient, User } from '@supabase/gotrue-js'
+import { User } from '@supabase/gotrue-js'
+import { gotrueClient } from 'common'
+export { STORAGE_KEY } from 'common'
 
-export const STORAGE_KEY = process.env.NEXT_PUBLIC_STORAGE_KEY || 'supabase.dashboard.auth.token'
-
-export const auth = new GoTrueClient({
-  url: process.env.NEXT_PUBLIC_GOTRUE_URL,
-  storageKey: STORAGE_KEY,
-  detectSessionInUrl: true,
-})
+export const auth = gotrueClient
 
 export const getAuthUser = async (token: String): Promise<any> => {
   try {

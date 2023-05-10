@@ -82,19 +82,21 @@ const PolicyRow: FC<Props> = ({
               />
             </Tooltip.Trigger>
             {!canUpdatePolicies && (
-              <Tooltip.Content side="left">
-                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                <div
-                  className={[
-                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                    'border border-scale-200',
-                  ].join(' ')}
-                >
-                  <span className="text-xs text-scale-1200">
-                    You need additional permissions to edit RLS policies
-                  </span>
-                </div>
-              </Tooltip.Content>
+              <Tooltip.Portal>
+                <Tooltip.Content side="left">
+                  <Tooltip.Arrow className="radix-tooltip-arrow" />
+                  <div
+                    className={[
+                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                      'border border-scale-200',
+                    ].join(' ')}
+                  >
+                    <span className="text-xs text-scale-1200">
+                      You need additional permissions to edit RLS policies
+                    </span>
+                  </div>
+                </Tooltip.Content>
+              </Tooltip.Portal>
             )}
           </Tooltip.Root>
         )}

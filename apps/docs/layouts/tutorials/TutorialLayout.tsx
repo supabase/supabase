@@ -6,7 +6,13 @@ import SideBar from '~/components/Navigation/SideBar'
 import TableOfContents from '~/components/TableOfContents'
 
 interface Props {
-  meta: { title: string; description?: string; hide_table_of_contents?: boolean; video?: string }
+  meta: {
+    title: string
+    description?: string
+    hide_table_of_contents?: boolean
+    video?: string
+    tocVideo?: string
+  }
   children: any
   toc?: any
   menuItems: any
@@ -14,18 +20,7 @@ interface Props {
 }
 
 const Layout: FC<Props> = (props: Props) => {
-  // const contentString = renderToString(props.children)
   const [active, setActive] = useState(false)
-
-  useEffect(() => {
-    const key = localStorage.getItem('supabaseDarkMode')
-    if (!key) {
-      // Default to dark mode if no preference config
-      document.documentElement.className = 'dark'
-    } else {
-      document.documentElement.className = key === 'true' ? 'dark' : ''
-    }
-  }, [])
 
   useEffect(() => {
     setTimeout(function () {

@@ -48,8 +48,8 @@ class _AccountPageState extends State<AccountPage> {
     setState(() {
       _loading = true;
     });
-    final userName = _usernameController.text;
-    final website = _websiteController.text;
+    final userName = _usernameController.text.trim();
+    final website = _websiteController.text.trim();
     final user = supabase.auth.currentUser;
     final updates = {
       'id': user!.id,

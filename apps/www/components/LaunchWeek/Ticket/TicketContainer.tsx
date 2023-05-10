@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { PageState, ConfDataContext, UserData } from './hooks/use-conf-data'
-import Ticket from './ticket'
-import ConfContainer from './conf-container'
+import Ticket from './ActualTicket'
 import Form from './form'
 import { SupabaseClient, Session } from '@supabase/supabase-js'
 
@@ -42,6 +41,8 @@ export default function Conf({
           ticketNumber={userData.ticketNumber}
           sharePage={sharePage}
           golden={userData.golden}
+          bgImageId={userData.bg_image_id}
+          referrals={userData.referrals ?? 0}
         />
       )}
     </ConfDataContext.Provider>

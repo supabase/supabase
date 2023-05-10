@@ -12,7 +12,7 @@ import supabase from '~/lib/supabase'
 import { Partner } from '~/types/partners'
 import Error404 from '../404'
 
-function Partner({ partner }: { partner: Partner }) {
+function PartnerPage({ partner }: { partner: Partner }) {
   if (!partner) return <Error404 />
   return (
     <>
@@ -243,4 +243,4 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   }
 }
 
-export default Partner
+export default PartnerPage

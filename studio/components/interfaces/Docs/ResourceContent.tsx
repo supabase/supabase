@@ -94,7 +94,11 @@ const ResourceContent = ({
                 To read rows in <code>{resourceId}</code>, use the <code>select</code> method.
               </p>
               <p>
-                <a href="https://supabase.com/docs/reference/javascript/select" target="_blank">
+                <a
+                  href="https://supabase.com/docs/reference/javascript/select"
+                  target="_blank"
+                  rel="noreferrer"
+                >
                   Learn more
                 </a>
               </p>
@@ -130,6 +134,7 @@ const ResourceContent = ({
                 <a
                   href="https://supabase.com/docs/reference/javascript/using-filters"
                   target="_blank"
+                  rel="noreferrer"
                 >
                   Learn more
                 </a>
@@ -157,7 +162,11 @@ const ResourceContent = ({
                 <code>insert</code> will also return the replaced values for UPSERT.
               </p>
               <p>
-                <a href="https://supabase.com/docs/reference/javascript/insert" target="_blank">
+                <a
+                  href="https://supabase.com/docs/reference/javascript/insert"
+                  target="_blank"
+                  rel="noreferrer"
+                >
                   Learn more
                 </a>
               </p>
@@ -193,7 +202,11 @@ const ResourceContent = ({
                 <code>update</code> will also return the replaced values for UPDATE.
               </p>
               <p>
-                <a href="https://supabase.com/docs/reference/javascript/update" target="_blank">
+                <a
+                  href="https://supabase.com/docs/reference/javascript/update"
+                  target="_blank"
+                  rel="noreferrer"
+                >
                   Learn more
                 </a>
               </p>
@@ -217,7 +230,11 @@ const ResourceContent = ({
                 default, so remember to specify your filters!
               </p>
               <p>
-                <a href="https://supabase.com/docs/reference/javascript/delete" target="_blank">
+                <a
+                  href="https://supabase.com/docs/reference/javascript/delete"
+                  target="_blank"
+                  rel="noreferrer"
+                >
                   Learn more
                 </a>
               </p>
@@ -231,49 +248,55 @@ const ResourceContent = ({
           </div>
         </>
       )}
-      <>
-        <h3 className="text-scale-1200 mt-4 px-6">Subscribe to changes</h3>
-        <div className="doc-section">
-          <article className="text ">
-            <p>
-              Supabase provides realtime functionality and broadcasts database changes to authorized
-              users depending on Row Level Security (RLS) policies.
-            </p>
-            <p>
-              <a href="https://supabase.com/docs/reference/javascript/subscribe" target="_blank">
-                Learn more
-              </a>
-            </p>
-          </article>
-          <article className="code">
-            <CodeSnippet
-              selectedLang={selectedLang}
-              snippet={Snippets.subscribeAll(resourceMeta.camelCase, resourceId)}
-            />
-            <CodeSnippet
-              selectedLang={selectedLang}
-              snippet={Snippets.subscribeInserts(resourceMeta.camelCase, resourceId)}
-            />
-            <CodeSnippet
-              selectedLang={selectedLang}
-              snippet={Snippets.subscribeUpdates(resourceMeta.camelCase, resourceId)}
-            />
-            <CodeSnippet
-              selectedLang={selectedLang}
-              snippet={Snippets.subscribeDeletes(resourceMeta.camelCase, resourceId)}
-            />
-            <CodeSnippet
-              selectedLang={selectedLang}
-              snippet={Snippets.subscribeEq(
-                resourceMeta.camelCase,
-                resourceId,
-                'column_name',
-                'someValue'
-              )}
-            />
-          </article>
-        </div>
-      </>
+      {(methods.includes('DELETE') || methods.includes('POST') || methods.includes('PATCH')) && (
+        <>
+          <h3 className="text-scale-1200 mt-4 px-6">Subscribe to changes</h3>
+          <div className="doc-section">
+            <article className="text ">
+              <p>
+                Supabase provides realtime functionality and broadcasts database changes to
+                authorized users depending on Row Level Security (RLS) policies.
+              </p>
+              <p>
+                <a
+                  href="https://supabase.com/docs/reference/javascript/subscribe"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Learn more
+                </a>
+              </p>
+            </article>
+            <article className="code">
+              <CodeSnippet
+                selectedLang={selectedLang}
+                snippet={Snippets.subscribeAll(resourceMeta.camelCase, resourceId)}
+              />
+              <CodeSnippet
+                selectedLang={selectedLang}
+                snippet={Snippets.subscribeInserts(resourceMeta.camelCase, resourceId)}
+              />
+              <CodeSnippet
+                selectedLang={selectedLang}
+                snippet={Snippets.subscribeUpdates(resourceMeta.camelCase, resourceId)}
+              />
+              <CodeSnippet
+                selectedLang={selectedLang}
+                snippet={Snippets.subscribeDeletes(resourceMeta.camelCase, resourceId)}
+              />
+              <CodeSnippet
+                selectedLang={selectedLang}
+                snippet={Snippets.subscribeEq(
+                  resourceMeta.camelCase,
+                  resourceId,
+                  'column_name',
+                  'someValue'
+                )}
+              />
+            </article>
+          </div>
+        </>
+      )}
     </>
   )
 }

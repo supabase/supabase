@@ -1,6 +1,6 @@
 import { FC } from 'react'
 import Link from 'next/link'
-import { useParams } from 'hooks'
+import { useParams } from 'common/hooks'
 import CodeSnippet from '../../CodeSnippet'
 import GeneratingTypes from 'components/interfaces/Docs/GeneratingTypes'
 

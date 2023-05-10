@@ -618,7 +618,7 @@ module.exports = [
   {
     permanent: true,
     source: '/_app',
-    destination: 'https://app.supabase.com',
+    destination: 'https://supabase.com/dashboard',
   },
   {
     permanent: true,
@@ -1458,17 +1458,17 @@ module.exports = [
   {
     permanent: true,
     source: '/sign-in',
-    destination: 'https://app.supabase.com/sign-in',
+    destination: 'https://supabase.com/dashboard/sign-in',
   },
   {
     permanent: true,
     source: '/sign-up',
-    destination: 'https://app.supabase.com/sign-up',
+    destination: 'https://supabase.com/dashboard/sign-up',
   },
   {
     permanent: true,
     source: '/forgot-password',
-    destination: 'https://app.supabase.com/forgot-password',
+    destination: 'https://supabase.com/dashboard/forgot-password',
   },
   {
     permanent: true,
@@ -1488,13 +1488,18 @@ module.exports = [
   {
     permanent: true,
     source: '/projects',
-    destination: 'https://app.supabase.com/projects',
+    destination: 'https://supabase.com/dashboard/projects',
   },
   // START docs 2.0, moving pages in to structure
   {
     permanent: true,
     source: '/docs/oss',
     destination: '/oss',
+  },
+  {
+    permanent: true,
+    source: '/oss',
+    destination: '/open-source',
   },
   {
     permanent: true,
@@ -1531,7 +1536,7 @@ module.exports = [
     source: '/docs/guides/auth/passwordless-login/phone-sms-otp-messagebird',
     destination: '/docs/guides/auth/phone-login/messagebird',
   },
-  { permanent: true, source: '/docs/guides/auth', destination: '/docs/guides/auth/overview' },
+  { permanent: true, source: '/docs/guides/auth/overview', destination: '/docs/guides/auth' },
   {
     permanent: true,
     source: '/docs/guides/auth/auth-messagebird',
@@ -1829,16 +1834,6 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/docs/guides/api',
-    destination: '/docs/guides/database/api',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/api/generating-types',
-    destination: '/docs/guides/database/api/generating-types',
-  },
-  {
-    permanent: true,
     source: '/docs/reference/javascript/upgrade-guide',
     destination: '/docs/reference/javascript/v1/upgrade-guide',
   },
@@ -1891,5 +1886,89 @@ module.exports = [
     permanent: true,
     source: '/docs/guides/realtime/postgres-changes',
     destination: '/docs/guides/realtime/extensions/postgres-changes',
+  },
+  // Serverless APIs
+  {
+    permanent: true,
+    source: '/docs/guides/database/api',
+    destination: '/docs/guides/api',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/api/generating-types',
+    destination: '/docs/guides/api/rest/generating-types',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/api/generating-types',
+    destination: '/docs/guides/api/rest/generating-types',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/dashibase',
+    destination: '/docs',
+  },
+  {
+    permanent: true,
+    source: '/docs/support',
+    destination: '/support',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/cli/local-development',
+    destination: '/docs/guides/getting-started/local-development',
+  },
+
+  // old case studies moved to /customers
+
+  {
+    permanent: true,
+    source: '/blog/case-study-monitoro',
+    destination: '/customers',
+  },
+  {
+    permanent: true,
+    source: '/blog/case-study-tayfa',
+    destination: '/customers',
+  },
+  {
+    permanent: true,
+    source: '/blog/case-study-xendit',
+    destination: '/customers/xendit',
+  },
+  {
+    permanent: true,
+    source: '/blog/case-study-roboflow',
+    destination: '/customers',
+  },
+  {
+    permanent: true,
+    source: '/blog/toad-a-link-shortener-with-simple-apis-for-low-coders',
+    destination: '/customers',
+  },
+  {
+    permanent: true,
+    source: '/blog/epsilon3-self-hosting',
+    destination: '/customers/epsilon3',
+  },
+  {
+    permanent: true,
+    source: '/blog/spot-flutter-with-postgres',
+    destination: '/customers',
+  },
+  {
+    permanent: true,
+    source: '/blog/mobbin-supabase-200000-users',
+    destination: '/customers/mobbin',
+  },
+  {
+    permanent: true,
+    source: '/blog/replenysh-time-to-value-in-less-than-24-hours',
+    destination: '/customers/replenysh',
+  },
+  {
+    permanent: true,
+    source: '/blog/how-supabase-accelerates-development-of-all-pull-together',
+    destination: '/customers',
   },
 ]

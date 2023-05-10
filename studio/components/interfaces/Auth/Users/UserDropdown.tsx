@@ -184,19 +184,21 @@ const UserDropdown: FC<Props> = ({ user, canRemoveUser, canRemoveMFAFactors }) =
                  need to double check with KM / anyone familiar with ABAC 
               */}
             {!canRemoveMFAFactors && (
-              <Tooltip.Content side="bottom">
-                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                <div
-                  className={[
-                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                    'border border-scale-200',
-                  ].join(' ')}
-                >
-                  <span className="text-xs text-scale-1200">
-                    You need additional permissions to remove a user's authentication factors.
-                  </span>
-                </div>
-              </Tooltip.Content>
+              <Tooltip.Portal>
+                <Tooltip.Content side="bottom">
+                  <Tooltip.Arrow className="radix-tooltip-arrow" />
+                  <div
+                    className={[
+                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                      'border border-scale-200',
+                    ].join(' ')}
+                  >
+                    <span className="text-xs text-scale-1200">
+                      You need additional permissions to remove a user's authentication factors.
+                    </span>
+                  </div>
+                </Tooltip.Content>
+              </Tooltip.Portal>
             )}
           </Tooltip.Root>
           <Tooltip.Root delayDuration={0}>
@@ -210,19 +212,21 @@ const UserDropdown: FC<Props> = ({ user, canRemoveUser, canRemoveMFAFactors }) =
               </Dropdown.Item>
             </Tooltip.Trigger>
             {!canRemoveUser && (
-              <Tooltip.Content side="bottom">
-                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                <div
-                  className={[
-                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                    'border border-scale-200',
-                  ].join(' ')}
-                >
-                  <span className="text-xs text-scale-1200">
-                    You need additional permissions to delete users
-                  </span>
-                </div>
-              </Tooltip.Content>
+              <Tooltip.Portal>
+                <Tooltip.Content side="bottom">
+                  <Tooltip.Arrow className="radix-tooltip-arrow" />
+                  <div
+                    className={[
+                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                      'border border-scale-200',
+                    ].join(' ')}
+                  >
+                    <span className="text-xs text-scale-1200">
+                      You need additional permissions to delete users
+                    </span>
+                  </div>
+                </Tooltip.Content>
+              </Tooltip.Portal>
             )}
           </Tooltip.Root>
         </>

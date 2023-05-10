@@ -22,3 +22,14 @@ export interface References {
     currentVersion?: string
   }
 }
+
+type MenuItem = {
+  label: string
+  icon?: string
+  href?: string
+  level?: string
+  hasLightIcon?: boolean
+  community?: boolean
+}
+
+export type HomepageMenuItems = MenuItem[][]

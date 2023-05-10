@@ -23,7 +23,8 @@ import userEvent from '@testing-library/user-event'
 import { wait } from '@testing-library/user-event/dist/utils'
 import { logDataFixture } from '../../fixtures'
 import { LogsTableName } from 'components/interfaces/Settings/Logs'
-import { useParams } from 'hooks'
+jest.mock('common/hooks')
+import { useParams } from 'common/hooks'
 
 beforeEach(() => {
   // reset mocks between tests
@@ -346,7 +347,7 @@ test('log event chart hide', async () => {
     return { result: [] }
   })
   render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
-  await screen.findByText(/Logs \/ Time/)
+  await screen.findByText(/No data/)
   const toggle = await screen.findByText(/Chart/)
   userEvent.click(toggle)
   await expect(screen.findByText('Events')).rejects.toThrow()

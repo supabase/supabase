@@ -5,7 +5,8 @@ import { FC } from 'react'
 import { Button, Dropdown, IconMoreHorizontal, IconTrash } from 'ui'
 
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
-import { checkPermissions, useParams, useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
+import { useParams } from 'common/hooks'
 import { Member, Role } from 'types'
 
 import { useOrganizationMemberDeleteMutation } from 'data/organizations/organization-member-delete-mutation'
@@ -133,19 +134,21 @@ const MemberActions: FC<Props> = ({ member, roles }) => {
           <Tooltip.Trigger>
             <Button as="span" type="text" icon={<IconMoreHorizontal />} />
           </Tooltip.Trigger>
-          <Tooltip.Content side="bottom">
-            <Tooltip.Arrow className="radix-tooltip-arrow" />
-            <div
-              className={[
-                'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                'border border-scale-200 ', //border
-              ].join(' ')}
-            >
-              <span className="text-xs text-scale-1200">
-                You need additional permissions to manage this team member
-              </span>
-            </div>
-          </Tooltip.Content>
+          <Tooltip.Portal>
+            <Tooltip.Content side="bottom">
+              <Tooltip.Arrow className="radix-tooltip-arrow" />
+              <div
+                className={[
+                  'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
+                  'border border-scale-200 ', //border
+                ].join(' ')}
+              >
+                <span className="text-xs text-scale-1200">
+                  You need additional permissions to manage this team member
+                </span>
+              </div>
+            </Tooltip.Content>
+          </Tooltip.Portal>
         </Tooltip.Root>
       </div>
     )
