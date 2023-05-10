@@ -6,6 +6,12 @@ import rehypeSlug from 'rehype-slug'
 
 import withTM from 'next-transpile-modules'
 import withYaml from 'next-plugin-yaml'
+import configureBundleAnalyzer from '@next/bundle-analyzer'
+
+const withBundleAnalyzer = configureBundleAnalyzer({
+  enabled: process.env.ANALYZE === 'true',
+})
+
 // import admonitions from 'remark-admonitions'
 
 // import { remarkCodeHike } from '@code-hike/mdx'
@@ -39,7 +45,7 @@ const withMDX = nextMdx({
   },
 })
 
-// /** @type {NextConfig} */
+/** @type {import('next').NextConfig} nextConfig */
 const nextConfig = {
   // Append the default value with md extensions
   pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
@@ -58,6 +64,11 @@ const nextConfig = {
   },
   experimental: {
     mdxRs: true,
+    modularizeImports: {
+      lodash: {
+        transform: 'lodash/{{member}}',
+      },
+    },
   },
   async headers() {
     return [
@@ -92,9 +103,14 @@ const nextConfig = {
   },
 }
 
-// next.config.js
-export default () => {
-  // const plugins = [withMDX]/
-  const plugins = [withTM(['ui', 'common', '@supabase/auth-helpers-nextjs']), withMDX, withYaml]
+const configExport = () => {
+  const plugins = [
+    withTM(['ui', 'common', '@supabase/auth-helpers-nextjs']),
+    withMDX,
+    withYaml,
+    withBundleAnalyzer,
+  ]
   return plugins.reduce((acc, next) => next(acc), nextConfig)
 }
+
+export default configExport
