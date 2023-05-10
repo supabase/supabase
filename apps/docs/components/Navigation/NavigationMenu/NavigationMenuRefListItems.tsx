@@ -4,19 +4,16 @@ import { useRouter } from 'next/router'
 import { IconChevronLeft, IconChevronUp } from 'ui'
 import * as NavItems from './NavigationMenu.constants'
 
-import { find } from 'lodash'
 import Image from 'next/image'
-import { useTheme } from 'common/Providers'
 
 import RevVersionDropdown from '~/components/RefVersionDropdown'
 import { useMenuActiveRefId } from '~/hooks/useMenuState'
-import { RefIdOptions, RefKeyOptions } from './NavigationMenu'
 
 import React, { Fragment } from 'react'
-import { generateAllowedClientLibKeys } from '~/lib/refGenerator/helpers'
-import { isFuncNotInLibraryOrVersion } from './NavigationMenu.utils'
 import { cn } from 'ui/src/utils/cn'
+import { ICommonItem, ICommonSection } from '~/components/reference/Reference.types'
 import HomeMenuIconPicker from './HomeMenuIconPicker'
+import { deepFilterSections } from './NavigationMenu.utils'
 
 const HeaderLink = React.memo(function HeaderLink(props: any) {
   return (
@@ -26,135 +23,121 @@ const HeaderLink = React.memo(function HeaderLink(props: any) {
   )
 })
 
-const FunctionLink = React.memo(function FunctionLink({
-  title,
-  id,
-  icon,
-  library,
-  slug,
-  isParent = false,
-  isSubItem = false,
-}: {
+interface FunctionLinkProps {
   title: string
   name?: string
   id: string
   icon?: string
-  product?: string
-  library: string
+  basePath: string
   slug: string
-  isParent: boolean
-  isSubItem: boolean
-}) {
+  isParent?: boolean
+  isSubItem?: boolean
+}
+
+const FunctionLink = React.memo(function FunctionLink({
+  title,
+  id,
+  icon,
+  basePath,
+  slug,
+  isParent = false,
+  isSubItem = false,
+}: FunctionLinkProps) {
   const router = useRouter()
-  const activeAccordianItem = useMenuActiveRefId()
+  const activeAccordionItem = useMenuActiveRefId()
 
-  // check if we're on a versioned page
-  let version = ''
-  if (router.asPath.includes('v1')) {
-    version = 'v1'
-  }
+  const url = `${router.basePath}${basePath}/${slug}`
+  const active = activeAccordionItem === id
 
-  if (router.asPath.includes('v0')) {
-    version = 'v0'
-  }
-
-  const active = activeAccordianItem === id
   return (
-    <li key={id} className="function-link-item leading-5">
-      <Link href={`/reference/${library}/${version ? version + '/' : ''}${slug}`} passHref>
-        <a
-          className={cn(
-            'cursor-pointer transition text-sm hover:text-scale-1200 gap-3 relative',
-            isParent ? 'flex justify-between' : 'leading-3',
-            active ? 'text-brand-900' : 'text-scale-1000'
-          )}
-        >
-          {icon && <Image width={16} height={16} alt={icon} src={`${router.basePath}${icon}`} />}
-          {title}
-          {active && !isSubItem && (
-            <div
-              aria-hidden="true"
-              className="absolute -left-[13px] top-0 bottom-0 w-[1px] bg-brand-1000"
-            ></div>
-          )}
-          {isParent && (
-            <IconChevronUp
-              width={16}
-              className="data-open-parent:rotate-0 data-closed-parent:rotate-90 transition"
-            />
-          )}
-        </a>
-      </Link>
+    <li className="function-link-item leading-5">
+      <a
+        href={url}
+        /**
+         * We don't actually want to navigate or re-render anything
+         * since ref links are all sub-sections on the same page
+         */
+        onClick={(e) => {
+          e.preventDefault()
+          history.pushState({}, '', url)
+          document.getElementById(slug)?.scrollIntoView()
+        }}
+        className={cn(
+          'cursor-pointer transition text-sm hover:text-scale-1200 gap-3 relative',
+          isParent ? 'flex justify-between' : 'leading-3',
+          active ? 'text-brand-900' : 'text-scale-1000'
+        )}
+      >
+        {icon && <Image width={16} height={16} alt={icon} src={`${router.basePath}${icon}`} />}
+        {title}
+        {active && !isSubItem && (
+          <div
+            aria-hidden="true"
+            className="absolute -left-[13px] top-0 bottom-0 w-[1px] bg-brand-1000"
+          ></div>
+        )}
+        {isParent && (
+          <IconChevronUp
+            width={16}
+            className="data-open-parent:rotate-0 data-closed-parent:rotate-90 transition"
+          />
+        )}
+      </a>
     </li>
   )
 })
 
-const RenderLink = React.memo(function RenderLink(props: any) {
-  const activeAccordianItem = useMenuActiveRefId()
-  let active = false
+export interface RenderLinkProps {
+  section: ICommonSection
+  basePath: string
+}
 
-  const isFilter = props.filterIds?.includes(activeAccordianItem)
-  const isModifier = props.modifierIds?.includes(activeAccordianItem)
-  const isAuthServer = props.authServerIds?.includes(activeAccordianItem)
+const RenderLink = React.memo(function RenderLink({ section, basePath }: RenderLinkProps) {
+  const activeAccordionItem = useMenuActiveRefId()
 
-  if (
-    (isFilter && props.id === 'using-filters') ||
-    (activeAccordianItem === 'using-filters' && props.id === 'using-filters')
-  ) {
-    active = true
-  } else if (
-    (isModifier && props.id === 'using-modifiers') ||
-    (activeAccordianItem === 'using-modifiers' && props.id === 'using-modifiers')
-  ) {
-    active = true
-  } else if (
-    (isAuthServer && props.id === 'admin-api') ||
-    (activeAccordianItem === 'admin-api' && props.id === 'admin-api')
-  ) {
-    active = true
-  } else {
-    active = false
+  if (!('items' in section)) {
+    return (
+      <FunctionLink
+        title={section.title}
+        id={section.id}
+        slug={section.slug}
+        basePath={basePath}
+        isParent={false}
+        isSubItem
+      />
+    )
   }
 
+  let active =
+    section.id === activeAccordionItem ||
+    section.items.some((item) => item.id === activeAccordionItem)
+
   return (
-    <Accordion.Root
-      collapsible
-      key={props.id + '-accordian-root-for-func-' + props.index}
-      type="single"
-      value={active ? props.id : ''}
-    >
-      <Accordion.Item key={props.id + '-accordian-item'} value={props.id}>
+    <Accordion.Root collapsible type="single" value={active ? section.id : ''}>
+      <Accordion.Item value={section.id}>
         <FunctionLink
-          library={props.lib}
-          title={props.title}
-          id={props.id}
-          slug={props.slug}
-          isParent={props.items}
-          isSubItem={true}
+          title={section.title}
+          id={section.id}
+          slug={section.slug}
+          basePath={basePath}
+          isParent
+          isSubItem
         />
-        {props.items && (
-          <Accordion.Content
-            key={props.id + '-sub-items-accordion-container'}
-            className="transition data-open:animate-slide-down data-closed:animate-slide-up border-l border-scale-600 pl-3 ml-1 data-open:mt-2 grid gap-2.5"
-          >
-            {props.items &&
-              props.items
-                .filter((item) => props.allowedKeys.includes(item.id))
-                .map((item) => {
-                  return (
-                    <FunctionLink
-                      key={item.title}
-                      library={props.lib}
-                      title={item.title}
-                      id={item.id}
-                      slug={item.slug}
-                      isParent={false}
-                      isSubItem={false}
-                    />
-                  )
-                })}
-          </Accordion.Content>
-        )}
+        <Accordion.Content className="transition data-open:animate-slide-down data-closed:animate-slide-up border-l border-scale-600 pl-3 ml-1 data-open:mt-2 grid gap-2.5">
+          {section.items.map((item) => {
+            return (
+              <FunctionLink
+                key={item.id}
+                title={item.title}
+                id={item.id}
+                slug={item.slug}
+                basePath={basePath}
+                isParent={false}
+                isSubItem={false}
+              />
+            )
+          })}
+        </Accordion.Content>
       </Accordion.Item>
     </Accordion.Root>
   )
@@ -172,67 +155,25 @@ const Divider = () => {
   return <div className="h-px w-full bg-blackA-300 dark:bg-whiteA-300 my-3"></div>
 }
 
-interface INavigationMenuRefList {
-  id: RefIdOptions
-  lib: RefKeyOptions
-  commonSections: any[] // to do type up
-
-  // the keys of menu items that are allowed to be shown on the side menu
-  // if undefined, we show all the menu items
-  allowedClientKeys?: string[]
+interface NavigationMenuRefListItemsProps {
+  id: string
+  basePath: string
+  commonSections: ICommonItem[]
   spec?: any
 }
 
-const Content: React.FC<INavigationMenuRefList> = ({ id, lib, commonSections, spec }) => {
-  const allowedClientKeys = spec ? generateAllowedClientLibKeys(commonSections, spec) : undefined
-
-  let sections = commonSections
-
-  const allowedKeys = allowedClientKeys
-
-  if (!sections) console.error('no common sections imported')
-
+const NavigationMenuRefListItems = ({
+  id,
+  basePath,
+  commonSections,
+  spec,
+}: NavigationMenuRefListItemsProps) => {
   const menu = NavItems[id]
-  const databaseFunctions = find(sections, { title: 'Database' })
-    ? find(sections, { title: 'Database' }).items
-    : []
 
-  const authFunctions = find(sections, { title: 'Auth' })
-    ? find(sections, { title: 'Auth' }).items
-    : []
-
-  const filterIds =
-    databaseFunctions.length > 0
-      ? find(databaseFunctions, {
-          id: 'using-filters',
-        }) &&
-        find(databaseFunctions, {
-          id: 'using-filters',
-        })
-          .items.filter((x) => allowedKeys.includes(x.id))
-          .map((x) => x.id)
-      : []
-  const modifierIds =
-    databaseFunctions.length > 0
-      ? find(databaseFunctions, {
-          id: 'using-modifiers',
-        }) &&
-        find(databaseFunctions, {
-          id: 'using-modifiers',
-        })
-          .items.filter((x) => allowedKeys.includes(x.id))
-          .map((x) => x.id)
-      : []
-
-  const authServerIds =
-    databaseFunctions.length > 0
-      ? find(authFunctions, {
-          id: 'admin-api',
-        }) &&
-        find(authFunctions, {
-          id: 'admin-api',
-        }).items.map((x) => x.id)
-      : []
+  const specFunctionIds = spec?.functions.map(({ id }) => id)
+  const filteredSections = spec
+    ? deepFilterSections(commonSections, specFunctionIds)
+    : commonSections
 
   return (
     <div className={'w-full flex flex-col gap-0 sticky top-8'}>
@@ -251,61 +192,26 @@ const Content: React.FC<INavigationMenuRefList> = ({ id, lib, commonSections, sp
           <span>Back to Main Menu</span>
         </a>
       </Link>
-
       <div className="flex items-center gap-3 my-3">
         <HomeMenuIconPicker icon={menu.icon} width={21} height={21} />
         <HeaderLink title={menu.title} url={menu.url} id={id} />
         <RevVersionDropdown />
       </div>
-
       <ul className="function-link-list flex flex-col gap-2">
-        {sections.map((fn: any, fnIndex) => {
-          // run allow check
-          if (isFuncNotInLibraryOrVersion(fn.id, fn.type, allowedKeys)) {
-            return <Fragment key={fn.id}></Fragment>
-          }
-
-          // handle subtitles with subitems
-          return fn.id ? (
-            <Fragment key={fn.id}>
-              <RenderLink {...fn} lib={lib} />
-              {fn.items &&
-                fn.items.map((item) => (
-                  <RenderLink
-                    {...item}
-                    library={menu.title}
-                    index={fnIndex}
-                    modifierIds={modifierIds}
-                    filterIds={filterIds}
-                    authServerIds={authServerIds}
-                    lib={lib}
-                    allowedKeys={allowedKeys}
-                  />
-                ))}
-            </Fragment>
-          ) : (
-            <Fragment key={fn.title}>
-              <Divider />
-              <SideMenuTitle title={fn.title} />
-              {fn.items &&
-                fn.items.map((item, i) => {
-                  // run allow check
-                  if (isFuncNotInLibraryOrVersion(item.id, item.type, allowedKeys))
-                    return <Fragment key={item.id + i}></Fragment>
-                  return (
-                    <RenderLink
-                      {...item}
-                      key={item.id + i}
-                      library={menu.title}
-                      index={fnIndex}
-                      modifierIds={modifierIds}
-                      filterIds={filterIds}
-                      authServerIds={authServerIds}
-                      lib={lib}
-                      allowedKeys={allowedKeys}
-                    />
-                  )
-                })}
+        {filteredSections.map((section) => {
+          return (
+            <Fragment key={section.title}>
+              {section.type === 'category' ? (
+                <>
+                  <Divider />
+                  <SideMenuTitle title={section.title} />
+                  {section.items.map((item) => (
+                    <RenderLink key={item.id} section={item} basePath={basePath} />
+                  ))}
+                </>
+              ) : (
+                <RenderLink section={section} basePath={basePath} />
+              )}
             </Fragment>
           )
         })}
@@ -314,4 +220,4 @@ const Content: React.FC<INavigationMenuRefList> = ({ id, lib, commonSections, sp
   )
 }
 
-export default React.memo(Content)
+export default React.memo(NavigationMenuRefListItems)

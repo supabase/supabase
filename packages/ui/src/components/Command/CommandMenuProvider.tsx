@@ -1,6 +1,11 @@
 import { useTheme, UseThemeProps } from 'common'
+import dynamic from 'next/dynamic'
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
-import CommandMenu from './CommandMenu'
+
+// `CommandMenu` is heavy - code split to reduce app bundle size
+const CommandMenu = dynamic(() => import('./CommandMenu'), {
+  loading: () => <p>Loading...</p>,
+})
 
 export interface CommandMenuContextValue {
   isOpen: boolean

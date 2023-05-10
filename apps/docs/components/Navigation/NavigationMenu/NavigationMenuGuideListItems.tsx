@@ -119,7 +119,7 @@ const ContentLink = React.memo(function ContentLink(props: any) {
 
   return (
     <li className="mb-1.5">
-      <Link href={`${props.url}`} passHref>
+      <Link href={props.url} passHref>
         <a
           className={[
             'cursor-pointer transition text-sm',
@@ -180,14 +180,12 @@ const Content = (props) => {
               <div className="flex flex-col gap-2.5">
                 {x.items.map((subItem, subItemIndex) => {
                   return (
-                    <>
-                      <ContentAccordionLink
-                        key={subItem.name}
-                        subItem={subItem}
-                        subItemIndex={subItemIndex}
-                        parent={x}
-                      />
-                    </>
+                    <ContentAccordionLink
+                      key={subItem.name}
+                      subItem={subItem}
+                      subItemIndex={subItemIndex}
+                      parent={x}
+                    />
                   )
                 })}
               </div>
