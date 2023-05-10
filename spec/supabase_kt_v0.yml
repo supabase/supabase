@@ -345,7 +345,7 @@ functions:
     title: 'Modify data: update()'
     notes: |
       - `update()` should always be combined with a [filter] block to avoid updating all records.
-      - When calling a `decode` method, you have to provide a [serializable class](/docs/reference/kotlin/installing#add-kotlinx-serialization-required-for-postgrest-and-realtime-serialization) as the type parameter.
+      - When calling `insert` or `update`, you have to provide a [serializable value](/docs/reference/kotlin/installing#add-kotlinx-serialization-required-for-postgrest-and-realtime-serialization) in the function parameter.      
     examples:
       - id: updating-your-data
         name: Updating your data
@@ -433,6 +433,7 @@ functions:
       - Primary keys should be included in the data payload in order for an update to work correctly.
       - Primary keys  must be natural, not surrogate. There are however, [workarounds](https://github.com/PostgREST/postgrest/issues/1118) for surrogate primary keys.
       - If you need to insert new data and update existing data at the same time, use [Postgres triggers](https://github.com/supabase/postgrest-js/issues/173#issuecomment-825124550).
+      - When calling `insert` or `update`, you have to provide a [serializable value](/docs/reference/kotlin/installing#add-kotlinx-serialization-required-for-postgrest-and-realtime-serialization) in the function parameter.      
     examples:
       - id: upsert-your-data
         name: Upsert your data
@@ -503,7 +504,7 @@ functions:
       That's a fancy way of saying that you can put some logic into your database then call it from anywhere.
       It's especially useful when the logic rarely changes - like password resets and updates.
       
-      - When calling specifying parameters, you have to provide a [serializable value](/docs/reference/kotlin/installing#add-kotlinx-serialization-required-for-postgrest-and-realtime-serialization).
+      - When calling `rpc` with parameters, you have to provide a [serializable value](/docs/reference/kotlin/installing#add-kotlinx-serialization-required-for-postgrest-and-realtime-serialization) in the function parameter.      
     examples:
       - id: call-a-stored-procedure
         name: Call a stored procedure
@@ -2309,12 +2310,21 @@ functions:
       - Should be used only when you require the most current user data. For faster results, `getCurrentSessionOrNull()?.user` is recommended.
     examples:
       - id: get-the-logged-in-user-with-the-current-existing-session
-        name: Get the logged in user with the current existing session
+        name: Get the logged in user with the current session
         isSpotlight: true
         code: |
           ```kotlin
-          val user = client.gotrue.retrieveUserForCurrentSession()
+          val user = client.gotrue.retrieveUserForCurrentSession(updateSession = true)
           ```
+        description: |
+          `updateSession` updates the local session with the new user
+      - id: get-different-user
+        name: Get a user based on their access token
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val user = client.gotrue.retrieveUser("JWT")
+          ```    
   - id: update-user
     title: 'modifyUser()'
     $ref: '@supabase/gotrue-js.GoTrueClient.updateUser'
@@ -2858,35 +2868,53 @@ functions:
     title: 'invoke()'
     description: |
       Invokes a Supabase Function. See the [guide](/docs/guides/functions) for details on writing Functions.
+      - When invoking a function with parameters, you have to provide a [serializable value](/docs/reference/kotlin/installing#add-kotlinx-serialization-required-for-postgrest-and-realtime-serialization) in the function parameter.            
     notes: |
       - Requires an Authorization header.
     examples:
       - id: basic-invocation
-        name: Basic invocation.
+        name: Basic invocation
         isSpotlight: true
         code: |
           ```kotlin
           client.functions.invoke("function_name")
           ```
       - id: basic-invocation-with-body
-        name: Basic invocation with body.
+        name: Basic invocation with body
         isSpotlight: true
         code: |
           ```kotlin
-          client.functions.invoke("function_name", buildJsonObject {
-             put("foo", "bar")
-          })
-          ```
+          client.functions.invoke(
+            function = "function_name",
+            body = buildJsonObject {
+                put("foo", "bar")
+            },
+            headers = Headers.build {
+                append(HttpHeaders.ContentType, "application/json")
+            }
+          )
+          ```    
       - id: reuse-function
         name: Reuse function by saving it to a variable
         isSpotlight: true
         code: |
           ```kotlin
-          val function = client.functions.buildEdgeFunction("function")
+          val function = client.functions.buildEdgeFunction(
+            function = "function", 
+            headers = Headers.build { 
+                /*Default headers*/
+                //when you are sending a body you may want to add this header:
+                append(HttpHeaders.ContentType, "application/json")
+              }
+            )
           //invoke it:
           function()
           //invoke it with a body:
           function(body)
+          //invoke it with custom headers:
+          function(body) {
+              set("Header", "Value")
+          }
           ```    
   - id: subscribe
     description: |
