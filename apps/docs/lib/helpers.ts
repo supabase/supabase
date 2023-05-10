@@ -1,6 +1,4 @@
-// [Joshen] I think this can be done better, as its mostly used to choose what
-
-import { ICommonFunc } from '../components/reference/Reference.types'
+import { ICommonBase, ICommonItem, ICommonSection } from '../components/reference/Reference.types'
 
 // menus to render in the SideBar.js (Ref Nav.constants.ts)
 export function getPageType(asPath: string) {
@@ -36,18 +34,25 @@ export function getPageType(asPath: string) {
   return page
 }
 
-export function flattenSections(sections: ICommonFunc[]) {
-  let a: ICommonFunc[] = []
-  for (let i = 0; i < sections.length; i++) {
-    if (sections[i].id) {
-      // only push a section that has an id
-      // these are reserved for sidebar subtitles
-      a.push(sections[i])
+/**
+ * Flattens common sections recursively by their `items`.
+ *
+ * _Note:_ `sections` type set to `ICommonBase[]` instead of
+ * `ICommonItem[]` until TypeScript supports JSON imports as const:
+ * https://github.com/microsoft/TypeScript/issues/32063
+ */
+export function flattenSections(sections: ICommonBase[]): ICommonSection[] {
+  return sections.reduce<ICommonSection[]>((acc, section: ICommonItem) => {
+    // Flatten sub-items
+    if ('items' in section) {
+      let newSections = acc
+
+      if (section.type !== 'category') {
+        newSections.push(section)
+      }
+
+      return newSections.concat(flattenSections(section.items))
     }
-    if (sections[i].items) {
-      // if there are subitems, loop through
-      a = a.concat(flattenSections(sections[i].items))
-    }
-  }
-  return a
+    return acc.concat(section)
+  }, [])
 }
