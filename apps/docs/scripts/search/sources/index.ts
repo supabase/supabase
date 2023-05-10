@@ -69,11 +69,11 @@ export async function fetchSources() {
   )
 
   const ktLibReferenceSource = new ClientLibReferenceSource(
-      'kt-lib',
-      '/reference/kotlin',
-      { title: 'Kotlin Reference' },
-      '../../spec/supabase_kt_v0.yml',
-      '../../spec/common-client-libs-sections.json'
+    'kt-lib',
+    '/reference/kotlin',
+    { title: 'Kotlin Reference' },
+    '../../spec/supabase_kt_v0.yml',
+    '../../spec/common-client-libs-sections.json'
   )
 
   const cliReferenceSource = new CliReferenceSource(
