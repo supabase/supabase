@@ -12,6 +12,7 @@ interface Props {
     description?: string
     hide_table_of_contents?: boolean
     video?: string
+    tocVideo?: string
     canonical?: string
   }
   children: any
@@ -74,7 +75,7 @@ const Layout: FC<Props> = (props: Props) => {
             'thin-scrollbar overflow-y-auto sticky hidden md:block md:col-span-3 px-2',
           ].join(' ')}
         >
-          <TableOfContents toc={props.toc} video={props.meta.video} />
+          <TableOfContents toc={props.toc} video={props.meta?.video} />
         </div>
       )}
     </>
