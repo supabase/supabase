@@ -3235,6 +3235,7 @@ functions:
         - `buckets` table permissions: none
         - `objects` table permissions: `insert`
       - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Resumable uploads use a `Disk` cache by default to store the upload urls. You can customize that in the GoTrue config by changing the `resumable.cache` property.
     examples:
       - id: upload-file
         name: Upload file
@@ -3265,32 +3266,70 @@ functions:
         code: |
           ```kotlin
           val bucket = client.storage["avatars"]
+          //JVM/Android:
           val upload = bucket.resumable.createOrContinueUpload("icon.png", File("icon.png"))
-          //start or continue uploading
+          //Other platforms:
+          val upload = bucket.resumable.createOrContinueUpload(data = byteArray, source = "this is for continuing previous uploads later", path = "icon.png")
+          val upload = bucket.resumable.createOrContinueUpload( //Probably better to write an extension function
+              channel = { offset -> /* create ByteReadChannel and seek to offset */ },
+              source = "this is for continuing previous uploads later",
+              size = dataSize,
+              path = "icon.png"
+          )                
+          ```   
+      - id: start-resumable-upload
+        name: Start and resumable upload
+        isSpotlight: true    
+        code: |
+          ```kotlin
           upload.startOrResumeUploading()
-      
-          //pause uploading
+          ```
+      - id: pause-resumable-upload
+        name: Pause resumable upload
+        code: |
+          ```kotlin
           upload.pause()
-      
-          //cancel uploading
+          ```
+      - id: cancel-resumable-upload
+        name: Cancel resumable upload
+        code: |
+          ```kotlin
           upload.cancel()
-      
-          //listen to upload status
+          ```    
+        description: |
+          This will also remove the upload url from the cache
+      - id: listen-to-upload-state
+        name: Listen to the resumable upload state
+        code: |
+          ```kotlin
           upload.stateFlow.collect {
               println("Progress: ${it.progress * 100}%")
               println("Paused: ${it.paused}")
               println("Is done: ${it.isDone}")
           }
-          ```   
+          ```    
       - id: continue-previous-upload
         name: Continue previous uploads
         isSpotlight: true
         code: |
           ```kotlin
           val bucket = client.storage["avatars"]
-          bucket.resumable.continuePreviousFileUploads().map { it.await() }.forEach { upload ->
-              upload.startOrResumeUploading()
+          
+          //only on JVM/Android:
+          bucket.resumable.continuePreviousFileUploads()
+              .map { it.await() } //await all uploads. This just makes sure the uploads have an update-to-date url. You can also do this in parallel
+              .forEach { upload ->
+                  upload.startOrResumeUploading()
+              }
+      
+          //on other platforms you may have to continue uploads from the source (Probably better to write an extension function): 
+          bucket.resumable.continuePreviousUploads { source, offset ->
+              //create ByteReadChannel from source and seek to offset
           }
+              .map { it.await() } //await all uploads. This just makes sure the uploads have an update-to-date url. You can also do this in parallel
+              .forEach { upload ->
+                  upload.startOrResumeUploading()
+              }
           ```          
 
   - id: from-update
@@ -3398,6 +3437,12 @@ functions:
               fill()
               quality = 100
           }
+          //or on JVM:
+          bucket.downloadPublicTo("test.png", File("test.png")) {
+              size(100, 100)
+              fill()
+              quality = 100
+          }
           ```  
       - id: download-with-progress
         name: Download file with progress 
@@ -3409,6 +3454,14 @@ functions:
                   is DownloadStatus.ByteData -> println("Downloaded ${it.data.size} bytes")
                   is DownloadStatus.Progress -> println("Downloaded ${it.totalBytesReceived.toFloat() / it.contentLength * 100}%")
                   DownloadStatus.Success -> println("Downloaded successfully")
+              }
+          }
+          //or on JVM:
+          bucket.downloadAuthenticatedToAsFlow("icon.png", File("icon.png")).collect {
+              when(it) {
+                  is DownloadStatus.Progress -> println("Downloaded ${it.totalBytesReceived.toFloat() / it.contentLength * 100}%")
+                  DownloadStatus.Success -> println("Downloaded successfully")
+                  else -> {} //The ByteData status will never occur as we are writing directly to a file
               }
           }
           ```       
