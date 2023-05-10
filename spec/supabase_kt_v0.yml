@@ -2037,6 +2037,7 @@ functions:
     title: 'signUp()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signUp'
     notes: |
+      Creates a new user.
       - By default, the user needs to verify their email address before logging in. To turn this off, disable **Confirm email** in [your project](https://app.supabase.com/project/_/auth/providers).
       - **Confirm email** determines if users need to confirm their email address after signing up.
         - If **Confirm email** is enabled, the return value is null and you will be logged in instead.
@@ -2101,6 +2102,7 @@ functions:
     title: 'loginWith()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signInWithPassword'
     notes: |
+      Logs in an existing user.
       - Requires either an email and password or a phone number and password.
     examples:
       - id: sign-in-with-email-and-password
@@ -2143,6 +2145,7 @@ functions:
     title: 'sendOtpTo()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signInWithOtp'
     notes: |
+      Sends a OTP to the user's email or phone number.
       - Requires either an email or phone number.
       - This method is used for passwordless sign-ins where a OTP is sent to the user's email or phone number.
       - If the user doesn't exist, `sendOtpTo()` will signup the user instead. To restrict this behavior, you can set `createUser` to `false`.
@@ -2278,6 +2281,7 @@ functions:
     title: 'logout()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signOut'
     notes: |
+      Logs out the current user.
       - In order to use the `logout()` method, the user needs to be signed in first.
     examples:
       - id: sign-out
@@ -2290,6 +2294,8 @@ functions:
   - id: verify-otp
     title: 'Verify OTPs'
     $ref: '@supabase/gotrue-js.GoTrueClient.verifyOtp'
+    notes: |
+      Log in a user given a User supplied OTP received via mobile.
     examples:
       - id: verify-email-otp(otp)
         name: Verify an Email OTP
@@ -2319,6 +2325,8 @@ functions:
   - id: get-session
     title: 'Get current session'
     $ref: '@supabase/gotrue-js.GoTrueClient.getSession'
+    notes: |
+      Returns the current session, or `null` if there is none.
     examples:
       - id: get-the-session-data
         name: Get the session data
@@ -2355,6 +2363,7 @@ functions:
     title: 'modifyUser()'
     $ref: '@supabase/gotrue-js.GoTrueClient.updateUser'
     notes: |
+      Modifies the user data.
       - In order to use the `modifyUser()` method, the user needs to be signed in first.
       - By default, email updates sends a confirmation link to both the user's current and new email.
       To only send a confirmation link to the user's new email, disable **Secure email change** in your project's [email auth provider settings](https://app.supabase.com/project/_/auth/providers).
@@ -2391,6 +2400,7 @@ functions:
     title: 'importSession()'
     $ref: '@supabase/gotrue-js.GoTrueClient.setSession'
     notes: |
+      Changes the local session.
       - `importSession()` takes in a UserSession.
       - [Refresh token rotation](/docs/reference/auth/config#refresh_token_rotation_enabled) is enabled by default on all projects to guard against replay attacks.
       - You can configure the [`REFRESH_TOKEN_REUSE_INTERVAL`](https://supabase.com/docs/reference/auth/config#refresh_token_reuse_interval) which provides a short window in which the same refresh token can be used multiple times in the event of concurrency or offline issues.
@@ -2407,7 +2417,9 @@ functions:
     title: 'refreshSession()'
     $ref: '@supabase/gotrue-js.GoTrueClient.refreshSession'
     notes: |
-      - This method will refresh the session whether the current one is expired or not.
+      This method will refresh the session whether the current one is expired or not.
+      
+      - This is done automatically, but can be disabled in the GoTrue config.
     examples:
       - id: refresh-current-session
         name: Refresh current session
@@ -2427,8 +2439,7 @@ functions:
     title: 'sessionStatus'
     $ref: '@supabase/gotrue-js.GoTrueClient.onAuthStateChange'
     notes: |
-      - Types of statuses: `NotAuthenticated`, `LoadingFromStorage`, `NetworkError`, `Authenticated(sesssion)`
-
+      Listen to session changes.
     examples:
       - id: listen-to-auth-changes
         name: Listen to auth changes
@@ -2444,9 +2455,16 @@ functions:
               }
           }
           ```
+        description: |
+          Types of statuses:
+          - `NotAuthenticated`, 
+          - `LoadingFromStorage`, 
+          - `NetworkError`, 
+          - `Authenticated(sesssion)`
   - id: reset-password-for-email
     title: 'Send a password reset request'
     notes: |
+      Sends a password reset request to the given email address.
       - The password reset flow consist of 2 broad steps: (i) Allow the user to login via the password reset link; (ii) Update the user's password.
       - The `sendRecoveryEmail()` only sends a password reset link to the user's email.
       To update the user's password, see [`modifyUser()`](/docs/reference/kotlin/auth-updateuser).
@@ -2471,6 +2489,7 @@ functions:
     title: 'Enroll a factor'
     $ref: '@supabase/gotrue-js.GoTrueMFAApi.enroll'
     notes: |
+      Enrolls a new factor.
       - Currently, `totp` is the only supported `factorType`. The returned `id` should be used to create a challenge.
       - To create a challenge, see [`mfa.createChallenge()`](/docs/reference/kotlin/auth-mfa-challenge).
       - To verify a challenge, see [`mfa.verifyChallenge()`](/docs/reference/kotlin/auth-mfa-verify).
@@ -2507,6 +2526,7 @@ functions:
     title: 'mfa.challenge()'
     $ref: '@supabase/gotrue-js.GoTrueMFAApi.challenge'
     notes: |
+      Creates a challenge for a factor.
       - An [enrolled factor](/docs/reference/kotlin/auth-mfa-enroll) is required before creating a challenge.
       - To verify a challenge, see [`mfa.verifyChallenge()`](/docs/reference/kotlin/auth-mfa-verify).
     examples:
@@ -2521,6 +2541,7 @@ functions:
     title: 'mfa.verify()'
     $ref: '@supabase/gotrue-js.GoTrueMFAApi.verify'
     notes: |
+      Verifies a challenge for a factor.
       - To verify a challenge, please [create a challenge](/docs/reference/kotlin/auth-mfa-challenge) first.
     examples:
       - id: verify-challenge
@@ -2539,6 +2560,7 @@ functions:
     title: 'mfa.challengeAndVerify()'
     $ref: '@supabase/gotrue-js.GoTrueMFAApi.challengeAndVerify'
     notes: |
+        Creates and verifies a challenge for a factor.
       - An [enrolled factor](/docs/reference/kotlin/auth-mfa-enroll) is required before invoking `createChallengeAndVerify()`.
       - Executes [`mfa.createChallenge()`](/docs/reference/kotlin/auth-mfa-challenge) and [`mfa.verifyChallenge()`](/docs/reference/kotlin/auth-mfa-verify) in a single step.
     examples:
@@ -2557,7 +2579,7 @@ functions:
     title: 'mfa.unenroll()'
     $ref: '@supabase/gotrue-js.GoTrueMFAApi.unenroll'
     notes: |
-      - Unenroll removes a MFA factor. A user has to have an `AAL2` authentication level in order to unenroll a verified factor.
+      Unenroll removes a MFA factor. A user has to have an `AAL2` authentication level in order to unenroll a verified factor.
     examples:
       - id: unenroll-a-factor
         name: Unenroll a factor
@@ -2628,7 +2650,7 @@ functions:
     title: 'getUserById()'
     $ref: '@supabase/gotrue-js.GoTrueAdminApi.getUserById'
     notes: |
-      - Fetches the user object from the database based on the user's id.
+      Fetches the user object from the database based on the user's id.
       - The `retrieveUserById()` method requires the user's id which maps to the `auth.users.id` column.
     examples:
       - id: fetch-the-user-object-using-the-access-token-jwt
@@ -2643,6 +2665,7 @@ functions:
     title: 'listUsers()'
     $ref: '@supabase/gotrue-js.GoTrueAdminApi.listUsers'
     notes: |
+      Retrieves a list of users.
       - Defaults to return 50 users per page.
     examples:
       - id: get-a-full-list-of-users
@@ -2666,6 +2689,7 @@ functions:
     title: 'createUser()'
     $ref: '@supabase/gotrue-js.GoTrueAdminApi.createUser'
     notes: |
+      Creates a new user.
       - To confirm the user's email address or phone number, set `autoConfirm` to true. Both arguments default to false.
     examples:
       - id: create-a-new-user-with-email-custom-user-metadata
@@ -2718,6 +2742,7 @@ functions:
     title: 'deleteUser()'
     $ref: '@supabase/gotrue-js.GoTrueAdminApi.deleteUser'
     notes: |
+      Deletes a user from the database.
       - The `deleteUser()` method requires the user's ID, which maps to the `auth.users.id` column.
     examples:
       - id: removes-a-user
@@ -2732,7 +2757,7 @@ functions:
     title: 'inviteUserByEmail()'
     $ref: '@supabase/gotrue-js.GoTrueAdminApi.inviteUserByEmail'
     notes: |
-      - Sends an invite link to the user's email address.
+      Sends an invite link to the user's email address.
     examples:
       - id: invite-a-user
         name: Invite a user
@@ -2753,7 +2778,7 @@ functions:
     title: 'generateLink()'
     $ref: '@supabase/gotrue-js.GoTrueAdminApi.generateLink'
     notes: |
-      - Generates email links and OTPs to be sent via a custom email provider.
+      Generates email links and OTPs to be sent via a custom email provider.
     examples:
       - id: generate-a-signup-link
         name: Generate a signup link
@@ -2814,7 +2839,7 @@ functions:
     title: 'updateUserById()'
     $ref: '@supabase/gotrue-js.GoTrueAdminApi.updateUserById'
     notes: |
-      - Updates the user data.
+      Updates the user data.
     examples:
       - id: updates-a-users-email
         name: Updates a user's email
@@ -2877,7 +2902,7 @@ functions:
   - id: mfa-list-factors
     title: 'mfa.listFactors()'
     notes: |
-      - Lists all factors associated to a user.
+      Lists all factors associated to a user.
     $ref: '@supabase/gotrue-js.GoTrueAdminMFAApi.listFactors'
     examples:
       - id: list-factors
@@ -2891,7 +2916,7 @@ functions:
     title: 'mfa.deleteFactor()'
     $ref: '@supabase/gotrue-js.GoTrueAdminMFAApi.deleteFactor'
     notes: |
-      - Deletes a factor on a user. This will log the user out of all active sessions if the deleted factor was verified.
+      Deletes a factor on a user. This will log the user out of all active sessions if the deleted factor was verified.
     examples:
       - id: delete-factor
         name: Delete a factor for a user
