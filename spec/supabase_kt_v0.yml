@@ -2151,7 +2151,7 @@ functions:
       - The magic link's destination URL is determined by the [`SITE_URL`](/docs/reference/auth/config#site_url).
       - See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
       - [supabase-kt](https://github.com/supabase-community/supabase-kt/) has default platform implementations: 
-        - On JVM, you can currently only verify a sign up through the token. To send the token, rather than a redirect url, you have to change `{{ .ConfirmationURL }}` in your sign up email to `{{ .Token }}`
+        - On JVM, you can currently only verify a OTP through the token. To send the token, rather than a redirect url, you have to change `{{ .ConfirmationURL }}` in your OTP email to `{{ .Token }}`
         - [deep links](https://developer.android.com/training/app-links/deep-linking) (Android), 
         - [url schemes](https://developer.apple.com/documentation/xcode/defining-a-custom-url-scheme-for-your-app) (IOS) 
             - To enable deeplinking/url scheme support on Android/IOS set the `host` and the `scheme` in the GoTrue Config and call `client.handleDeeplinks(intent)` (Android) and `client.handleDeeplinks(url)` (IOS) on startup
@@ -2298,6 +2298,13 @@ functions:
           ```kotlin
           client.gotrue.verifyEmailOtp(type = OtpType.Email.INVITE, email = "example@email.com", token = "token")
           ```
+        description: |
+          Available types are:
+            - `OtpType.Email.MAGIC_LINK`
+            - `OtpType.Email.SIGNUP`
+            - `OtpType.Email.INVITE`
+            - `OtpType.Email.RECOVERY`
+            - `OtpType.Email.EMAIL_CHANGE`
       - id: verify-phone-otp(otp)
         name: Verify an Phone OTP
         isSpotlight: false
@@ -2305,6 +2312,10 @@ functions:
           ```kotlin
           client.gotrue.verifyPhoneOtp(type = OtpType.Phone.SMS, phoneNumber = "+491234567", token = "token")
           ```
+        description: |
+          Available types are:
+            - `OtpType.Phone.SMS`
+            - `OtpType.Phone.PHONE_CHANGE`
   - id: get-session
     title: 'Get current session'
     $ref: '@supabase/gotrue-js.GoTrueClient.getSession'
@@ -2443,11 +2454,11 @@ functions:
       You can configure the URL that the user is redirected to with the `redirectUrl` parameter.
       See [redirect URLs and wildcards](/docs/guides/auth#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
       - After the user has been redirected successfully, prompt them for a new password and call `modifyUser()`:
-      ```kotlin
-      client.gotrue.modifyUser(Email) {
-          password = "1234567"
-      }
-      ```
+        ```kotlin
+        client.gotrue.modifyUser(Email) {
+            password = "1234567"
+        }
+        ```
     examples:
       - id: send-password-reset-email
         name: Send password reset email
@@ -2938,6 +2949,7 @@ functions:
     notes: |
       - Realtime is disabled by default for new Projects for better database performance and security. You can turn it on by [managing replication](/docs/guides/database/api#managing-realtime).
       - If you want to receive the "previous" data for updates and deletes, you will need to set `REPLICA IDENTITY` to `FULL`, like this: `ALTER TABLE your_table REPLICA IDENTITY FULL;`
+      - When using a method with a generic type like `track`, `broadcast` or `broadcastFlow`, you have to provide a [serializable class](/docs/reference/kotlin/installing#add-kotlinx-serialization-required-for-postgrest-and-realtime-serialization) as the type parameter.
     examples:
       - id: connect-to-realtime-client
         name: Connect to Realtime 
