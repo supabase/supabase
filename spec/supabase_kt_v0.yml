@@ -2038,8 +2038,8 @@ functions:
     notes: |
       - By default, the user needs to verify their email address before logging in. To turn this off, disable **Confirm email** in [your project](https://app.supabase.com/project/_/auth/providers).
       - **Confirm email** determines if users need to confirm their email address after signing up.
-        - If **Confirm email** is enabled, the return value is null, but the session is not.
-        - If **Confirm email** is disabled, the return value is the user but the session is null.
+        - If **Confirm email** is enabled, the return value is null and you will be logged in instead.
+        - If **Confirm email** is disabled, the return value is the user and you won't be logged in automatically.
       - When the user confirms their email address, they are redirected to the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url) by default. You can modify your `SITE_URL` or add additional redirect URLs in [your project](https://app.supabase.com/project/_/auth/url-configuration).
       - supabase-kt has default platform implementations: [deep links](https://developer.android.com/training/app-links/deep-linking) on Android, [url schemes](https://developer.apple.com/documentation/xcode/defining-a-custom-url-scheme-for-your-app) on IOS and the website on JS
         - To enable deeplinking/url scheme support on Android/IOS set the `host` and the `scheme` in the GoTrue Config and call `client.handleDeeplinks(intent)` (Android) and `client.handleDeeplinks(url)` (IOS) on startup
