@@ -512,7 +512,6 @@ const AiCommand = () => {
             }
           }}
         />
-
       </div>
     </div>
   )
