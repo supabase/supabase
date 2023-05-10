@@ -12,32 +12,32 @@ const sections = flattenSections(clientLibsCommonSections)
 const libraryPath = '/kotlin/v0'
 
 export default function KotlinReference(props) {
-    const router = useRouter()
-    const slug = router.query.slug[0]
-    const filteredSection = sections.filter((section) => section.id === slug)
+  const router = useRouter()
+  const slug = router.query.slug[0]
+  const filteredSection = sections.filter((section) => section.id === slug)
 
-    const pageTitle = filteredSection[0]?.title
-        ? `${filteredSection[0]?.title} | Supabase`
-        : 'Supabase'
-    return (
-        <>
-            <RefSEO title={pageTitle} />
+  const pageTitle = filteredSection[0]?.title
+    ? `${filteredSection[0]?.title} | Supabase`
+    : 'Supabase'
+  return (
+    <>
+      <RefSEO title={pageTitle} />
 
-            <RefSectionHandler
-                sections={filteredSection}
-                spec={spec}
-                typeSpec={typeSpec}
-                pageProps={props}
-                type="client-lib"
-            />
-        </>
-    )
+      <RefSectionHandler
+        sections={filteredSection}
+        spec={spec}
+        typeSpec={typeSpec}
+        pageProps={props}
+        type="client-lib"
+      />
+    </>
+  )
 }
 
 export async function getStaticProps() {
-    return handleRefStaticProps(sections, libraryPath)
+  return handleRefStaticProps(sections, libraryPath)
 }
 
 export async function getStaticPaths() {
-    return handleRefGetStaticPaths(sections, libraryPath)
+  return handleRefGetStaticPaths(sections)
 }
