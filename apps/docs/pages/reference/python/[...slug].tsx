@@ -7,6 +7,7 @@ import handleRefGetStaticPaths from '~/lib/mdx/handleRefStaticPaths'
 import handleRefStaticProps from '~/lib/mdx/handleRefStaticProps'
 
 const sections = flattenSections(clientLibsCommonSections)
+const libraryPath = '/python'
 
 export default function PyReference(props) {
   return (
@@ -21,9 +22,9 @@ export default function PyReference(props) {
 }
 
 export async function getStaticProps() {
-  return handleRefStaticProps(sections, '/python')
+  return handleRefStaticProps(sections, libraryPath)
 }
 
-export function getStaticPaths() {
-  return handleRefGetStaticPaths()
+export async function getStaticPaths() {
+  return handleRefGetStaticPaths(sections, libraryPath)
 }

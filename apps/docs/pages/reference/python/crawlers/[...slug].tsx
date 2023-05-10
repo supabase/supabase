@@ -9,6 +9,7 @@ import { useRouter } from 'next/router'
 import RefSEO from '~/components/reference/RefSEO'
 
 const sections = flattenSections(clientLibsCommonSections)
+const libraryPath = '/python'
 
 export default function PyReference(props) {
   const router = useRouter()
@@ -35,9 +36,9 @@ export default function PyReference(props) {
 }
 
 export async function getStaticProps() {
-  return handleRefStaticProps(sections, '/python')
+  return handleRefStaticProps(sections, libraryPath)
 }
 
-export function getStaticPaths() {
-  return handleRefGetStaticPaths()
+export async function getStaticPaths() {
+  return handleRefGetStaticPaths(sections, libraryPath)
 }

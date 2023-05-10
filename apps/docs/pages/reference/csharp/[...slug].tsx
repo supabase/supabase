@@ -6,15 +6,16 @@ import handleRefGetStaticPaths from '~/lib/mdx/handleRefStaticPaths'
 import handleRefStaticProps from '~/lib/mdx/handleRefStaticProps'
 
 const sections = flattenSections(clientLibsCommonSections)
+const libraryPath = '/csharp'
 
-export default function JSReference(props) {
+export default function CSharpReference(props) {
   return <RefSectionHandler sections={sections} spec={spec} pageProps={props} type="client-lib" />
 }
 
 export async function getStaticProps() {
-  return handleRefStaticProps(sections, '/csharp')
+  return handleRefStaticProps(sections, libraryPath)
 }
 
-export function getStaticPaths() {
-  return handleRefGetStaticPaths()
+export async function getStaticPaths() {
+  return handleRefGetStaticPaths(sections, libraryPath)
 }
