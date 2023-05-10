@@ -251,7 +251,7 @@ services:
       SUPABASE_ANON_KEY: ${ANON_KEY}
       SUPABASE_SERVICE_ROLE_KEY: ${SERVICE_ROLE_KEY}
       SUPABASE_DB_URL: postgresql://postgres:${POSTGRES_PASSWORD}@{POSTGRES_DB}:${POSTGRES_PORT}/${POSTGRES_DB}"
-      VERIFY_JWT: false
+      VERIFY_JWT: "false"
     ports:
       - ${FUNCTIONS_HTTP_PORT}:9000/tcp
     volumes:

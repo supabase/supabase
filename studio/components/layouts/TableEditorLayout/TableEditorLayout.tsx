@@ -19,6 +19,7 @@ import useTableRowsPrefetchWrapper from './TableEditorLayout.utils'
 
 export interface TableEditorLayoutProps {
   selectedSchema?: string
+  selectedTable?: string
   onSelectSchema: (schema: string) => void
   onAddTable: () => void
   onEditTable: (table: Entity) => void
@@ -28,6 +29,7 @@ export interface TableEditorLayoutProps {
 
 const TableEditorLayout = ({
   selectedSchema,
+  selectedTable,
   onSelectSchema = noop,
   onAddTable = noop,
   onEditTable = noop,
@@ -123,6 +125,7 @@ const TableEditorLayout = ({
   return (
     <ProjectLayout
       product="Table editor"
+      selectedTable={selectedTable}
       productMenu={
         <TableEditorMenu
           selectedSchema={selectedSchema}
