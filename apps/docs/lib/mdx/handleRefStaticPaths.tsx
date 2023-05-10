@@ -1,14 +1,11 @@
 import { ICommonSection } from '~/components/reference/Reference.types'
 
-async function handleRefGetStaticPaths(sections: ICommonSection[], libraryPath: string) {
+async function handleRefGetStaticPaths(sections: ICommonSection[]) {
   return {
     paths: sections.map((section) => {
       return {
         params: {
-          slug: libraryPath
-            .split('/')
-            .filter((dir) => !!dir)
-            .concat(section.slug),
+          slug: [section.slug],
         },
       }
     }),
