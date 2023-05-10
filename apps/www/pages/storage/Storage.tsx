@@ -174,10 +174,7 @@ function StoragePage() {
             content={ApiExamples}
             text={[
               <p key={0}>Built from the ground up for interoperable authentication.</p>,
-              <p key={1}>
-                Fast and easy to implement using our powerful library clients. Asset optimization
-                and image transformation coming soon!
-              </p>,
+              <p key={1}>Fast and easy to implement using our powerful library clients.</p>,
             ]}
             footer={[
               <div className="my-8 grid grid-cols-12 gap-8 lg:gap-0 xl:gap-16" key={0}>
@@ -185,7 +182,7 @@ function StoragePage() {
                   <FeatureColumn
                     icon={<IconWifi />}
                     title="CDN"
-                    text="Serve from the edge to reduce latency."
+                    text="Serve from over 285 cities globally to reduce latency."
                   />
                   <Link href="/docs/guides/storage/cdn" passHref>
                     <a>
@@ -203,8 +200,8 @@ function StoragePage() {
                 <div className="col-span-6 lg:col-span-12 xl:col-span-4">
                   <FeatureColumn
                     icon={<IconShuffle />}
-                    title="Transformations"
-                    text="Resize and compress your media before you serve it."
+                    title="Image Optimizations and Transformations"
+                    text="Resize and compress your media files on the fly."
                   />
                   <Link href="/docs/guides/storage/image-transformations" passHref>
                     <a>
