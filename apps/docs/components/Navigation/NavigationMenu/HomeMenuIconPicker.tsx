@@ -20,6 +20,7 @@ import {
   IconMenuStorage,
   IconMenuSwift,
   IconMenuStatus,
+  IconMenuKotlin,
 } from './HomeMenuIcons'
 
 function getMenuIcon(menuKey: string, width: number = 16, height: number = 16) {
@@ -58,6 +59,8 @@ function getMenuIcon(menuKey: string, width: number = 16, height: number = 16) {
       return <IconMenuCsharp width={width} height={height} />
     case 'reference-swift':
       return <IconMenuSwift width={width} height={height} />
+    case 'reference-kotlin':
+      return <IconMenuKotlin width={width} height={height} />
     case 'reference-api':
       return <IconMenuApi width={width} height={height} />
     case 'reference-cli':

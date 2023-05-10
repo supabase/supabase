@@ -118,6 +118,13 @@ export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
       community: true,
     },
     {
+      label: 'Kotlin',
+      icon: 'reference-kotlin',
+      href: '/reference/kotlin/introduction',
+      level: 'reference_kotlin',
+      community: true,
+    },
+    {
       label: 'Tools reference',
     },
     {

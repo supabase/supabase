@@ -382,6 +382,25 @@ export function IconMenuSwift({ width = 16, height = 16 }: HomeMenuIcon) {
   )
 }
 
+export function IconMenuKotlin({ width = 16, height = 16 }: HomeMenuIcon) {
+  return (
+      <svg
+          viewBox="0 0 16 16"
+          width={width}
+          height={height}
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+            fillRule="evenodd"
+            clipRule="evenodd"
+            d="M16 16H0V0h16L8 8z"
+            fill="currentColor"
+        />
+      </svg>
+  )
+}
+
 export function IconMenuStatus({ width = 16, height = 16 }: HomeMenuIcon) {
   return (
     <svg
