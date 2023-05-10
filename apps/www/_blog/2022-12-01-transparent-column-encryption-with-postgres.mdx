@@ -206,12 +206,10 @@ The new label indicates which column is to be associated with the secret, and th
 Now that you have TCE setup for a table, it's easy to use by simply inserting data into the table, and querying that data by looking at its generated view. The view is named `decrypted_<table_name>` and by default is in the same schema as your table:
 
 ```sql
-INSERT INTO credit_cards (
-	credit_card_number,
-	account_id
-)
-VALUES
-    ('1234-5678-8765-4321', 123);
+insert into credit_cards
+  (credit_card_number, account_id)
+values
+  ('1234-5678-8765-4321', 123);
 ```
 
 Now that you have inserted data, look at the table and notice how the credit card number is encrypted. This is the data that is stored on disk, the encrypted card number, the key id, and the account id, **but the key itself is not stored**. This means if someone gets a backup or dump of your database, they cannot decrypt the credit card number, they do not have the key, only the key ID:
