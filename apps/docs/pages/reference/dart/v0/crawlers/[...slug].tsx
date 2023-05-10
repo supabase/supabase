@@ -39,5 +39,5 @@ export async function getStaticProps() {
 }
 
 export async function getStaticPaths() {
-  return handleRefGetStaticPaths(sections, libraryPath)
+  return handleRefGetStaticPaths(sections)
 }
