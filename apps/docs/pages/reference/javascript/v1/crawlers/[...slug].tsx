@@ -7,7 +7,9 @@ import handleRefGetStaticPaths from '~/lib/mdx/handleRefStaticPaths'
 import handleRefStaticProps from '~/lib/mdx/handleRefStaticProps'
 import { useRouter } from 'next/router'
 import RefSEO from '~/components/reference/RefSEO'
+
 const sections = flattenSections(clientLibsCommonSections)
+const libraryPath = '/javascript/v1'
 
 export default function JSReference(props) {
   const router = useRouter()
@@ -34,9 +36,9 @@ export default function JSReference(props) {
 }
 
 export async function getStaticProps() {
-  return handleRefStaticProps(sections, '/javascript/v1')
+  return handleRefStaticProps(sections, libraryPath)
 }
 
-export function getStaticPaths() {
-  return handleRefGetStaticPaths()
+export async function getStaticPaths() {
+  return handleRefGetStaticPaths(sections, libraryPath)
 }

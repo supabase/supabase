@@ -8,15 +8,16 @@ import handleRefGetStaticPaths from '~/lib/mdx/handleRefStaticPaths'
 import handleRefStaticProps from '~/lib/mdx/handleRefStaticProps'
 
 const sections = flattenSections(cliCommonSections)
+const libraryPath = '/cli'
 
 export default function CliRef(props) {
   return <RefSectionHandler sections={sections} spec={spec} pageProps={props} type="cli" />
 }
 
 export async function getStaticProps() {
-  return handleRefStaticProps(sections, '/cli')
+  return handleRefStaticProps(sections, libraryPath)
 }
 
-export function getStaticPaths() {
-  return handleRefGetStaticPaths()
+export async function getStaticPaths() {
+  return handleRefGetStaticPaths(sections, libraryPath)
 }
