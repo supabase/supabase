@@ -207,6 +207,8 @@ functions:
           `customUrl` - Custom url for the GraphQL API. Can be safely ignored when using Supabase. Default: `null`
           
           `jwtToken` - Plugin specific JWT Token. Can be ignored when using the GoTrue plugin. Default: `null`
+          
+          **You can access the created ApolloClient via `client.graphql.apolloClient`, which automatically adds the required headers depending on your session.**
 
   - id: select
     title: 'Fetch data: select()'
@@ -2560,7 +2562,7 @@ functions:
     title: 'mfa.challengeAndVerify()'
     $ref: '@supabase/gotrue-js.GoTrueMFAApi.challengeAndVerify'
     notes: |
-        Creates and verifies a challenge for a factor.
+      Creates and verifies a challenge for a factor.
       - An [enrolled factor](/docs/reference/kotlin/auth-mfa-enroll) is required before invoking `createChallengeAndVerify()`.
       - Executes [`mfa.createChallenge()`](/docs/reference/kotlin/auth-mfa-challenge) and [`mfa.verifyChallenge()`](/docs/reference/kotlin/auth-mfa-verify) in a single step.
     examples:
