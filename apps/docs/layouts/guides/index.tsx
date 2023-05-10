@@ -1,11 +1,11 @@
 import { MDXProvider } from '@mdx-js/react'
 import { NextSeo } from 'next-seo'
 import Head from 'next/head'
-import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { FC, useEffect, useRef, useState } from 'react'
-import { IconExternalLink, IconPlay, Modal } from 'ui'
+import { IconExternalLink } from 'ui'
+import ExpandableVideo from 'ui/src/components/ExpandableVideo/ExpandableVideo'
 import components from '~/components'
 import { highlightSelectedTocItem } from '~/components/CustomHTMLElements/CustomHTMLElements.utils'
 import FooterHelpCallout, { FooterHelpCalloutType } from '~/components/FooterHelpCallout'
@@ -38,8 +38,6 @@ const Layout: FC<Props> = (props) => {
 
   const { asPath } = useRouter()
   const router = useRouter()
-
-  const [expandVideo, setExpandVideo] = useState(false)
 
   const EDIT_BUTTON_EXCLUDE_LIST = ['/404']
 
@@ -76,22 +74,6 @@ const Layout: FC<Props> = (props) => {
       ogPageType ? `&type=${ogPageType}` : ''
     }&title=${props.meta?.title}&description=${props.meta?.description}`
   )
-
-  useEffect(() => {
-    function onKeyDown(e: KeyboardEvent) {
-      switch (e.key) {
-        case 'Escape':
-          return setExpandVideo(false)
-        default:
-          return
-      }
-    }
-
-    window.addEventListener('keydown', onKeyDown)
-    return () => {
-      window.removeEventListener('keydown', onKeyDown)
-    }
-  }, [])
 
   return (
     <>
@@ -177,65 +159,9 @@ const Layout: FC<Props> = (props) => {
             ].join(' ')}
           >
             <div className="border-l">
-              <Modal
-                visible={expandVideo}
-                hideFooter
-                className={[
-                  '!bg-[#f8f9fa]/95 dark:!bg-[#1c1c1c]/80',
-                  '!border-[#e6e8eb]/90 dark:!border-[#282828]/90',
-                  'transition ease-out',
-                  'mx-auto backdrop-blur-md',
-                  // animateBounce ? 'scale-[101.5%]' : 'scale-100'
-                ].join(' ')}
-                onInteractOutside={(e) => {
-                  // Only hide menu when clicking outside, not focusing outside
-                  // Prevents Firefox dropdown issue that immediately closes menu after opening
-                  if (e.type === 'dismissableLayer.pointerDownOutside') {
-                    setExpandVideo(!expandVideo)
-                  }
-                }}
-                size="xxlarge"
-              >
-                <div className="w-full flex items-center justify-center">
-                  <div className="relative w-full">
-                    <button
-                      onClick={() => setExpandVideo(false)}
-                      className="text-scale-1100 hover:text-scale-1200 absolute -top-8 right-0"
-                    >
-                      <p className="text-xs">Close</p>
-                    </button>
-                    <div className="video-container overflow-hidden rounded-lg">
-                      <iframe
-                        src={`https://www.youtube-nocookie.com/embed/${props.meta.tocVideo}`}
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                      />
-                    </div>
-                  </div>
-                </div>
-              </Modal>
               {props.meta?.tocVideo && !!tocVideoPreview && (
                 <div className="relative mb-6 pl-5">
-                  <div
-                    className="video-container overflow-hidden rounded hover:cursor-pointer"
-                    onClick={() => setExpandVideo(true)}
-                  >
-                    <div
-                      className={`absolute inset-0 z-10 text-whiteA-1200 flex flex-col items-center justify-center gap-3 backdrop-blur-sm
-                                  before:content[''] before:-z-10 before:absolute before:inset-0 before:bg-black before:opacity-30 hover:before:opacity-50 before:transition-opacity
-                                `}
-                    >
-                      <IconPlay strokeWidth={2} size="small" />
-                      <p className="text-sm">Watch video guide</p>
-                    </div>
-                    <Image
-                      src={tocVideoPreview}
-                      alt={''}
-                      layout="fill"
-                      objectFit="cover"
-                      className="absolute inset-0"
-                    />
-                  </div>
+                  <ExpandableVideo imgUrl={tocVideoPreview} videoId={props.meta.tocVideo} />
                 </div>
               )}
               <span className="block font-mono text-xs uppercase text-scale-1200 px-5 mb-6">
