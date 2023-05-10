@@ -22,7 +22,7 @@ const NavigationMenuCliList = ({ currentLevel, setLevel, id }) => {
     icon?: string
   }) => {
     return (
-      <li key={id} className="function-link-item text-scale-1000">
+      <li key={id} className="function-link-item text-scale-1000 leading-3">
         <Link href={`#${id}`} passHref>
           <a className="cursor-pointer transition text-scale-1000 text-sm hover:text-brand-900 flex gap-3">
             {icon && <img className="w-3" src={`${router.basePath}${icon}`} />}
