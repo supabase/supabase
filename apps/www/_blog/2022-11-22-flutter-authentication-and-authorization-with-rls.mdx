@@ -58,7 +58,7 @@ We will also introduce a `create_new_room` function, which is a [database functi
 -- *** Table definitions ***
 
 create table if not exists public.rooms (
-    id uuid not null primary key default uuid_generate_v4(),
+    id uuid not null primary key default gen_random_uuid(),
     created_at timestamp with time zone default timezone('utc' :: text, now()) not null
 );
 comment on table public.rooms is 'Holds chat rooms';

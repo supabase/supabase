@@ -98,9 +98,6 @@ const CommandMenuWrapper = observer(({ children }: PropsWithChildren<{}>) => {
       site="studio"
       projectRef={ref}
       apiKeys={apiKeys}
-      MarkdownHandler={(props) => (
-        <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents} {...props} />
-      )}
       metadata={cmdkMetadata}
       isOptedInToAI={allowCMDKDataOptIn && isOptedInToAI}
       saveGeneratedSQL={onSaveGeneratedSQL}
