@@ -53,6 +53,7 @@
     ]
   },
   {
+    "type": "category",
     "title": "Database",
     "items": [
       {
@@ -294,7 +295,7 @@
       {
         "id": "using-modifiers",
         "isFunc": false,
-        "title": "Using Modifiers",
+        "title": "Using modifiers",
         "slug": "using-modifiers",
         "product": "database",
         "parent": "modifiers",
@@ -377,6 +378,7 @@
     ]
   },
   {
+    "type": "category",
     "title": "Auth",
     "items": [
       {
@@ -698,6 +700,7 @@
     ]
   },
   {
+    "type": "category",
     "title": "Functions",
     "items": [
       {
@@ -710,6 +713,7 @@
     ]
   },
   {
+    "type": "category",
     "title": "Realtime",
     "items": [
       {
@@ -771,6 +775,7 @@
     ]
   },
   {
+    "type": "category",
     "title": "Storage",
     "items": [
       {
@@ -902,6 +907,7 @@
     ]
   },
   {
+    "type": "category",
     "title": "Misc",
     "excludes": [
       "reference_dart_v1",
