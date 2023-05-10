@@ -95,8 +95,8 @@ const levelsData = {
     name: 'Swift Reference v1.0',
   },
   reference_kotlin_v0: {
-      icon: '/docs/img/icons/menu/reference-kotlin',
-      name: 'Kotlin Reference v0.0',
+    icon: '/docs/img/icons/menu/reference-kotlin',
+    name: 'Kotlin Reference v0.0',
   },
   reference_cli: {
     icon: '/docs/img/icons/menu/reference-cli',

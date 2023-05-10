@@ -159,8 +159,7 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                                   .replace('ts', '')
                                   .replace('dart', '')
                                   .replace('c#', '')
-                                  .replace('kotlin', ''))
-                            }
+                                  .replace('kotlin', ''))}
                           </CodeBlock>
 
                           {((tables && tables.length > 0) || sql) && (
