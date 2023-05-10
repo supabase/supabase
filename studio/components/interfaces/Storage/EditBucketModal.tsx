@@ -22,6 +22,7 @@ import {
 import { useStore } from 'hooks'
 import { useParams } from 'common'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
+import { IS_PLATFORM } from 'lib/constants'
 
 export interface EditBucketModalProps {
   visible: boolean
@@ -35,7 +36,7 @@ const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => 
   const storageExplorerStore = useStorageStore()
   const { editBucket } = storageExplorerStore
 
-  const { data } = useProjectStorageConfigQuery({ projectRef: ref })
+  const { data } = useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
   const { value, unit } = convertFromBytes(data?.fileSizeLimit ?? 0)
   const formattedGlobalUploadLimit = `${value} ${unit}`
 
