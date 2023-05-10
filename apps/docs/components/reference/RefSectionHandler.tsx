@@ -21,7 +21,7 @@ interface RefSectionHandlerProps {
 const RefSectionHandler = (props: RefSectionHandlerProps) => {
   const router = useRouter()
 
-  const slug = router.query.slug[0]
+  const slug = router.query?.slug[0]
 
   // When user lands on a url like http://supabase.com/docs/reference/javascript/sign-up
   // find the #sign-up element and scroll to that
