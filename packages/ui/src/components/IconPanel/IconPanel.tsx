@@ -58,7 +58,13 @@ const IconPanel = ({
     <>
       <div className={['relative', 'group'].join(' ')} data-tip={tooltip}>
         <div className={['peer relative', 'flex flex-col', icon ? 'gap-6' : 'gap-2'].join(' ')}>
-          <div className={['flex', children ? 'items-start gap-3' : 'items-center'].join(' ')}>
+          <div
+            className={[
+              'flex',
+              children ? 'items-start' : 'items-center',
+              (title || !hideArrow || showLink) && 'gap-3',
+            ].join(' ')}
+          >
             {typeof icon === 'string' ? (
               <IconContainer>
                 <img
