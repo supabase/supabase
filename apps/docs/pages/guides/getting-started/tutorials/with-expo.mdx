@@ -45,21 +45,21 @@ These variables will be exposed on the browser, and that's completely fine since
 [Row Level Security](/docs/guides/auth#row-level-security) enabled on our Database.
 
 ```ts title=lib/supabase.ts
-import * as SecureStore from "expo-secure-store";
+import 'react-native-url-polyfill/auto'
+import * as SecureStore from 'expo-secure-store'
 import { createClient } from '@supabase/supabase-js'
-
 
 const ExpoSecureStoreAdapter = {
   getItem: (key: string) => {
-    return SecureStore.getItemAsync(key);
+    return SecureStore.getItemAsync(key)
   },
   setItem: (key: string, value: string) => {
-    SecureStore.setItemAsync(key, value);
+    SecureStore.setItemAsync(key, value)
   },
   removeItem: (key: string) => {
-    SecureStore.deleteItemAsync(key);
+    SecureStore.deleteItemAsync(key)
   },
-};
+}
 
 const supabaseUrl = YOUR_REACT_NATIVE_SUPABASE_URL
 const supabaseAnonKey = YOUR_REACT_NATIVE_SUPABASE_ANON_KEY

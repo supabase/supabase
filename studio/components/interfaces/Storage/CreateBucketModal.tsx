@@ -21,6 +21,7 @@ import {
 } from 'components/to-be-cleaned/Storage/StorageSettings/StorageSettings.utils'
 import { useStore } from 'hooks'
 import { useParams } from 'common'
+import { IS_PLATFORM } from 'lib/constants'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useRouter } from 'next/router'
 
@@ -36,7 +37,7 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
   const storageExplorerStore = useStorageStore()
   const { createBucket } = storageExplorerStore
 
-  const { data } = useProjectStorageConfigQuery({ projectRef: ref })
+  const { data } = useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
   const { value, unit } = convertFromBytes(data?.fileSizeLimit ?? 0)
   const formattedGlobalUploadLimit = `${value} ${unit}`
 
@@ -203,17 +204,19 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
                               ))}
                             </Listbox>
                           </div>
-                          <div className="col-span-12">
-                            <p className="text-scale-1000 text-sm">
-                              Note: The{' '}
-                              <Link href={`/project/${ref}/settings/storage`}>
-                                <a className="text-brand-900 opacity-80 hover:opacity-100 transition">
-                                  global upload limit
-                                </a>
-                              </Link>{' '}
-                              takes precedence over this value ({formattedGlobalUploadLimit})
-                            </p>
-                          </div>
+                          {IS_PLATFORM && (
+                            <div className="col-span-12">
+                              <p className="text-scale-1000 text-sm">
+                                Note: The{' '}
+                                <Link href={`/project/${ref}/settings/storage`}>
+                                  <a className="text-brand-900 opacity-80 hover:opacity-100 transition">
+                                    global upload limit
+                                  </a>
+                                </Link>{' '}
+                                takes precedence over this value ({formattedGlobalUploadLimit})
+                              </p>
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>

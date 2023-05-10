@@ -1,4 +1,3 @@
-import React from 'react'
 import type {
   ChatCompletionResponseMessage,
   CreateChatCompletionResponse,
@@ -16,14 +15,23 @@ import {
 
 import { SSE } from 'sse.js'
 
-import { Alert, Button, IconAlertTriangle, IconCornerDownLeft, IconUser, Input } from 'ui'
+import {
+  Button,
+  IconAlertTriangle,
+  IconCornerDownLeft,
+  IconUser,
+  Input,
+  markdownComponents,
+} from 'ui'
 import { AiIcon, AiIconChat } from './Command.icons'
 import { CommandGroup, CommandItem, useAutoInputFocus, useHistoryKeys } from './Command.utils'
 
-import { useCommandMenu } from './CommandMenuProvider'
 import { AiWarning } from './Command.alerts'
+import { useCommandMenu } from './CommandMenuProvider'
 
+import ReactMarkdown from 'react-markdown'
 import { cn } from './../../utils/cn'
+import remarkGfm from 'remark-gfm'
 
 const questions = [
   'How do I get started with Supabase?',
@@ -339,7 +347,7 @@ export function queryAi(messages: Message[], timeout = 0) {
 }
 
 const AiCommand = () => {
-  const { isLoading, setIsLoading, search, setSearch, MarkdownHandler } = useCommandMenu()
+  const { isLoading, setIsLoading, search, setSearch } = useCommandMenu()
 
   const { submit, reset, messages, isResponding, hasError } = useAiChat({
     setIsLoading,
@@ -404,7 +412,9 @@ const AiCommand = () => {
                       {message.status === MessageStatus.Pending ? (
                         <div className="bg-scale-700 h-[21px] w-[13px] mt-1 animate-pulse animate-bounce"></div>
                       ) : (
-                        <MarkdownHandler
+                        <ReactMarkdown
+                          remarkPlugins={[remarkGfm]}
+                          components={markdownComponents}
                           linkTarget="_blank"
                           className="prose dark:prose-dark"
                           transformLinkUri={(href) => {
@@ -419,7 +429,7 @@ const AiCommand = () => {
                           }}
                         >
                           {message.content}
-                        </MarkdownHandler>
+                        </ReactMarkdown>
                       )}
                     </>
                   </div>
