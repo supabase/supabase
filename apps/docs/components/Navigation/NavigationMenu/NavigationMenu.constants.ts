@@ -707,8 +707,8 @@ export const supabase_cli = {
     { name: 'Overview', url: '/guides/cli' },
     { name: 'Managing Environments', url: '/guides/cli/managing-environments' },
     {
-      name: 'Using environment variables in your config',
-      url: '/guides/cli/using-envitonment-variables-in-your-config',
+      name: 'Using environment variables in config.toml',
+      url: '/guides/cli/using-envitonment-variables-in-config',
     },
     {
       name: 'Reference',
