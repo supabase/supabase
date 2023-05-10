@@ -284,6 +284,10 @@ export const cli = {
   items: [
     { name: 'Overview', url: '/guides/cli' },
     { name: 'Managing Environments', url: '/guides/cli/managing-environments' },
+    {
+      name: 'Using environment variables in config.toml',
+      url: '/guides/cli/using-environment-variables-in-config',
+    },
   ],
 }
 
@@ -845,6 +849,10 @@ export const supabase_cli = {
   items: [
     { name: 'Overview', url: '/guides/cli' },
     { name: 'Managing Environments', url: '/guides/cli/managing-environments' },
+    {
+      name: 'Using environment variables in config.toml',
+      url: '/guides/cli/using-environment-variables-in-config',
+    },
     {
       name: 'Reference',
       url: undefined,
