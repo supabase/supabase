@@ -129,7 +129,7 @@ const DocsSearch = () => {
     props: React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>
   ) => (
     <div
-      className=" 
+      className="
         transition
         w-6 h-6
         bg-scale-100
