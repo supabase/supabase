@@ -18,7 +18,7 @@ functions:
   - id: initializing
     title: 'Initializing'
     description: |
-      Independently of which supabase module you are using, you will need to initialize the main client first and install the module.
+      Independently of which Supabase module you are using, you will need to initialize the main client first and install the module.
       
       To create a new client, you can use the `createSupabaseClient` function.
       
@@ -64,7 +64,7 @@ functions:
           
           `codeVerifierCache` - Interface for saving and loading codes for the PKCE authentication flow. Default: `SettingsCodeVerifierCache`
           
-          `customUrl` - Custom url for the GoTrue Api. Can be safely ignored when using supabase. Default: `null`
+          `customUrl` - Custom url for the GoTrue API. Can be safely ignored when using Supabase. Default: `null`
           
           `jwtToken` - Plugin specific JWT Token. Can be ignored when using the GoTrue plugin. Default: `null`
           
@@ -94,7 +94,7 @@ functions:
           
           `htmlIconUrl`: The icon of the redirect page, when logging in with OAuth. Default: `"https://supabase.com/brand-assets/supabase-logo-icon.png"`.
       - id: configure-postgrest
-        name: Configure Postgrest module
+        name: Configure PostgREST module
         code: |
           ```kotlin
           val client = createSupabaseClient(
@@ -112,7 +112,7 @@ functions:
           
           `defaultSchema` - The default schema to use for database requests. Default: `public`
           
-          `customUrl` - Custom url for the Postgrest Api. Can be safely ignored when using supabase. Default: `null`
+          `customUrl` - Custom url for the PostgREST API. Can be safely ignored when using Supabase. Default: `null`
           
           `jwtToken` - Plugin specific JWT Token. Can be ignored when using the GoTrue plugin. Default: `null`
       - id: configure-storage
@@ -124,7 +124,7 @@ functions:
               supabaseKey = "public-anon-key"
           ) {
               install(Storage) {
-                  transferTimeout = 90.seconds //default: 120 seconds
+                  transferTimeout = 90.seconds // Default: 120 seconds
               }
           }
           ```
@@ -139,7 +139,7 @@ functions:
           
           `resumable.onlyUpdateStateAfterChunk` - whether the upload state should only be updated after a chunk was uploaded successfully or also when the chunk is currently being uploaded. Default: `false`
           
-          `customUrl` - Custom url for the Storage Api. Can be safely ignored when using supabase. Default: `null`
+          `customUrl` - Custom url for the Storage API. Can be safely ignored when using Supabase. Default: `null`
           
           `jwtToken` - Plugin specific JWT Token. Can be ignored when using the GoTrue plugin. Default: `null`
       - id: configure-realtime
@@ -151,22 +151,22 @@ functions:
               supabaseKey = "public-anon-key"
           ) {
               install(Realtime) {
-                  reconnectDelay = 5.seconds //Default: 7 seconds
+                  reconnectDelay = 5.seconds // Default: 7 seconds
               }
           }
           ```
         description: |
-          `reconnectDelay` - The delay between reconnect attempts. Default: `7 seconds`
+          `reconnectDelay` - The delay between reconnect attempts. Default: `7.seconds`
           
-          `heartbeatInterval` - The interval between heartbeat messages. Default: `15 seconds`
+          `heartbeatInterval` - The interval between heartbeat messages. Default: `15.seconds`
           
           `disconnectOnSessionLoss` - Whether to disconnect from the websocket when the session is lost. Default: `true`
           
           `secure` - Whether to use wss or ws. Defaults to [SupabaseClient.useHTTPS] when null
           
-          `websocketConfig` - Custom ktor websocket config
+          `websocketConfig` - Custom Ktor websocket config
           
-          `customUrl` - Custom url for the Realtime Websocket. Can be safely ignored when using supabase. Default: `null`
+          `customUrl` - Custom url for the Realtime websocket. Can be safely ignored when using Supabase. Default: `null`
           
           `jwtToken` - Plugin specific JWT Token. Can be ignored when using the GoTrue plugin. Default: `null`
       - id: configure-functions
@@ -183,7 +183,7 @@ functions:
           }
           ```
         description: |
-          `customUrl` - Custom url for the Functions Api. Can be safely ignored when using supabase. Default: `null`
+          `customUrl` - Custom url for the Functions API. Can be safely ignored when using Supabase. Default: `null`
           
           `jwtToken` - Plugin specific JWT Token. Can be ignored when using the GoTrue plugin. Default: `null`   
       - id: configure-graphql
@@ -204,7 +204,7 @@ functions:
         description: |
           `apolloConfiguration` - Custom configuration for the ApolloClient
           
-          `customUrl` - Custom url for the GraphQL Api. Can be safely ignored when using supabase. Default: `null`
+          `customUrl` - Custom url for the GraphQL API. Can be safely ignored when using Supabase. Default: `null`
           
           `jwtToken` - Plugin specific JWT Token. Can be ignored when using the GoTrue plugin. Default: `null`
 
@@ -214,7 +214,7 @@ functions:
       Perform a SELECT query on the table or view.
       - When calling a `decode` method, you have to provide a [serializable class](/docs/reference/kotlin/installing#add-kotlinx-serialization-required-for-postgrest-and-realtime-serialization) as the type parameter.
       - You can provide a `Columns` object to select specific columns.
-      - You can provide a [filter]() block to filter the results
+      - You can provide a [filter](/docs/reference/kotlin/using-filters) block to filter the results
     examples:
       - id: getting-your-data
         name: Getting your data
@@ -344,7 +344,7 @@ functions:
   - id: update
     title: 'Modify data: update()'
     notes: |
-      - `update()` should always be combined with a [filter] block to avoid updating all records.
+      - `update()` should always be combined with a [filter](/docs/reference/kotlin/using-filters) block to avoid updating all records.
       - When calling `insert` or `update`, you have to provide a [serializable value](/docs/reference/kotlin/installing#add-kotlinx-serialization-required-for-postgrest-and-realtime-serialization) in the function parameter.      
     examples:
       - id: updating-your-data
@@ -446,8 +446,8 @@ functions:
       - id: upserting-into-tables-with-constraints
         name: Upserting into tables with constraints
         description: |
-          Running the following will cause supabase to upsert data into the `users` table.
-          If the username 'supabot' already exists, the `onConflict` argument tells supabase to overwrite that row
+          Running the following will cause Supabase to upsert data into the `users` table.
+          If the username 'supabot' already exists, the `onConflict` argument tells Supabase to overwrite that row
           based on the column passed into `onConflict`.
         isSpotlight: true
         code: |
@@ -468,7 +468,7 @@ functions:
     title: 'Delete data: delete()'
     $ref: '@supabase/postgrest-js."lib/PostgrestQueryBuilder".PostgrestQueryBuilder.delete'
     notes: |
-      - `delete()` should always be combined with a [filter]() block to target the item(s) you wish to delete.
+      - `delete()` should always be combined with a [filter](/docs/reference/kotlin/using-filters) block to target the item(s) you wish to delete.
       - If you use `delete()` with filters and you have
         [RLS](/docs/learn/auth-deep-dive/auth-row-level-security) enabled, only
         rows visible through `SELECT` policies are deleted. Note that by default
@@ -2042,9 +2042,12 @@ functions:
         - If **Confirm email** is enabled, the return value is null and you will be logged in instead.
         - If **Confirm email** is disabled, the return value is the user and you won't be logged in automatically.
       - When the user confirms their email address, they are redirected to the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url) by default. You can modify your `SITE_URL` or add additional redirect URLs in [your project](https://app.supabase.com/project/_/auth/url-configuration).
-      - supabase-kt has default platform implementations: [deep links](https://developer.android.com/training/app-links/deep-linking) on Android, [url schemes](https://developer.apple.com/documentation/xcode/defining-a-custom-url-scheme-for-your-app) on IOS and the website on JS
-        - To enable deeplinking/url scheme support on Android/IOS set the `host` and the `scheme` in the GoTrue Config and call `client.handleDeeplinks(intent)` (Android) and `client.handleDeeplinks(url)` (IOS) on startup
-        - On Desktop, you can currently only verify a sign up through the token. To send the token, rather than a redirect url, you have to change `{{ .ConfirmationURL }}` in your sign up email to `{{ .Token }}`
+      - [supabase-kt](https://github.com/supabase-community/supabase-kt/) has default platform implementations: 
+          - On JVM, you can currently only verify a sign up through the token. To send the token, rather than a redirect url, you have to change `{{ .ConfirmationURL }}` in your sign up email to `{{ .Token }}`
+          - [deep links](https://developer.android.com/training/app-links/deep-linking) (Android), 
+          - [url schemes](https://developer.apple.com/documentation/xcode/defining-a-custom-url-scheme-for-your-app) (IOS) 
+              - To enable deeplinking/url scheme support on Android/IOS set the `host` and the `scheme` in the GoTrue Config and call `client.handleDeeplinks(intent)` (Android) and `client.handleDeeplinks(url)` (IOS) on startup
+          - the website origin (JS)
       - If signUpWith() is called for an existing confirmed user:
         - If **Confirm email** is enabled in [your project](https://app.supabase.com/project/_/auth/providers), an obfuscated/fake user object is returned.
         - If **Confirm email** is disabled, the error message, `User already registered` is returned.
@@ -2147,9 +2150,12 @@ functions:
       - If you're using phone, you can configure whether you want the user to receive a OTP.
       - The magic link's destination URL is determined by the [`SITE_URL`](/docs/reference/auth/config#site_url).
       - See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
-      - supabase-kt has default platform implementations: [deep links](https://developer.android.com/training/app-links/deep-linking) on Android, [url schemes](https://developer.apple.com/documentation/xcode/defining-a-custom-url-scheme-for-your-app) on IOS and the website on JS
-        - To enable deeplinking/url scheme support on Android/IOS set the `host` and the `scheme` in the GoTrue Config and call `client.handleDeeplinks(intent)` (Android) and `client.handleDeeplinks(url)` (IOS) on startup
-        - On Desktop, you can currently only verify a sign up through the token. To send the token, rather than a redirect url, you have to change `{{ .ConfirmationURL }}` in your sign up email to `{{ .Token }}`
+      - [supabase-kt](https://github.com/supabase-community/supabase-kt/) has default platform implementations: 
+        - On JVM, you can currently only verify a sign up through the token. To send the token, rather than a redirect url, you have to change `{{ .ConfirmationURL }}` in your sign up email to `{{ .Token }}`
+        - [deep links](https://developer.android.com/training/app-links/deep-linking) (Android), 
+        - [url schemes](https://developer.apple.com/documentation/xcode/defining-a-custom-url-scheme-for-your-app) (IOS) 
+            - To enable deeplinking/url scheme support on Android/IOS set the `host` and the `scheme` in the GoTrue Config and call `client.handleDeeplinks(intent)` (Android) and `client.handleDeeplinks(url)` (IOS) on startup
+        - the website origin (JS)
       - Magic links and OTPs share the same implementation. To send users a one-time code instead of a magic link, [modify the magic link email template](https://app.supabase.com/project/_/auth/templates) to include `{{ .Token }}` instead of `{{ .ConfirmationURL }}`.
     examples:
       - id: sign-in-with-email
@@ -2178,8 +2184,12 @@ functions:
     notes: |
       - This method is used for signing in using a third-party provider.
       - Supabase supports many different [third-party providers](https://supabase.com/docs/guides/auth#providers).
-      - supabase-kt has default platform implementations: HTTP Callback Server on Desktop, [deep links](https://developer.android.com/training/app-links/deep-linking) on Android, [url schemes](https://developer.apple.com/documentation/xcode/defining-a-custom-url-scheme-for-your-app) on IOS and the website on JS
-        - To enable deeplinking/url scheme support on Android/IOS set the `host` and the `scheme` in the GoTrue Config and call `client.handleDeeplinks(intent)` (Android) and `client.handleDeeplinks(url)` (IOS) on startup
+      - [supabase-kt](https://github.com/supabase-community/supabase-kt/) has default platform implementations: 
+          - HTTP Callback Server (JVM), 
+          - [deep links](https://developer.android.com/training/app-links/deep-linking) (Android), 
+          - [url schemes](https://developer.apple.com/documentation/xcode/defining-a-custom-url-scheme-for-your-app) (IOS) 
+              - To enable deeplinking/url scheme support on Android/IOS set the `host` and the `scheme` in the GoTrue Config and call `client.handleDeeplinks(intent)` (Android) and `client.handleDeeplinks(url)` (IOS) on startup
+          - the website origin (JS)
     examples:
       - id: sign-in-using-a-third-party-provider
         name: Sign in using a third-party provider
@@ -2232,8 +2242,13 @@ functions:
       - In case you need to use a different way to start the authentication flow with an identity provider, you can use the `SSO.withProviderId` function. For example:
           - Mapping specific user email addresses with an identity provider.
           - Using different hints to identity the identity provider to be used by the user, like a company-specific page, IP address or other tracking information.
-      - supabase-kt has default platform implementations: HTTP Callback Server on Desktop, [deep links](https://developer.android.com/training/app-links/deep-linking) on Android, [url schemes](https://developer.apple.com/documentation/xcode/defining-a-custom-url-scheme-for-your-app) on IOS and the website on JS
-          - To enable deeplinking/url scheme support on Android/IOS set the `host` and the `scheme` in the GoTrue Config and call `client.handleDeeplinks(intent)` (Android) and `client.handleDeeplinks(url)` (IOS) on startup
+      - [supabase-kt](https://github.com/supabase-community/supabase-kt/) has default platform implementations: 
+          - HTTP Callback Server (JVM), 
+          - [deep links](https://developer.android.com/training/app-links/deep-linking) (Android), 
+          - [url schemes](https://developer.apple.com/documentation/xcode/defining-a-custom-url-scheme-for-your-app) (IOS) 
+              - To enable deeplinking/url scheme support on Android/IOS set the `host` and the `scheme` in the GoTrue Config and call `client.handleDeeplinks(intent)` (Android) and `client.handleDeeplinks(url)` (IOS) on startup
+          - the website origin (JS)
+
     examples:
       - id: sign-in-with-domain
         name: Sign in with email domain
