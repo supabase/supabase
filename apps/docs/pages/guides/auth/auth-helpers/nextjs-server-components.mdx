@@ -142,7 +142,6 @@ export default function SupabaseProvider({ children, session }) {
   const [supabase] = useState(() => createBrowserSupabaseClient())
   const router = useRouter()
 
-
   useEffect(() => {
     const {
       data: { subscription },
@@ -190,7 +189,7 @@ import type { SupabaseClient } from '@supabase/auth-helpers-nextjs'
 import type { Database } from '@/lib/database.types'
 
 type MaybeSession = Session | null
- 
+
 type SupabaseContext = {
   supabase: SupabaseClient<Database>
   session: MaybeSession
@@ -198,8 +197,13 @@ type SupabaseContext = {
 
 const Context = createContext<SupabaseContext | undefined>(undefined)
 
-
-export default function SupabaseProvider({ children, session }: { children: React.ReactNode, session: MaybeSession }) {
+export default function SupabaseProvider({
+  children,
+  session,
+}: {
+  children: React.ReactNode
+  session: MaybeSession
+}) {
   const [supabase] = useState(() => createBrowserSupabaseClient())
   const router = useRouter()
 
@@ -294,7 +298,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <SupabaseListener serverAccessToken={session?.access_token} />
           {children}
         </SupabaseProvider>
-
       </body>
     </html>
   )
