@@ -315,7 +315,7 @@ const NavContainer = memo(function NavContainer() {
 const SiteLayout = ({ children }: PropsWithChildren<{}>) => {
   const router = useRouter()
   const isHomepage = router.asPath === '/'
-  
+
   return (
     <>
       <Head>
