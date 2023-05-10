@@ -922,6 +922,10 @@ export const platform = {
           name: 'HTTP and Project Issues',
           url: '/guides/platform/troubleshooting',
         },
+        {
+          name: 'High CPU Usage',
+          url: '/guides/platform/exhaust-cpu',
+        },
       ],
     },
   ],
