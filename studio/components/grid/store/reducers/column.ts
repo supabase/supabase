@@ -33,6 +33,10 @@ type COLUMN_ACTIONTYPE =
       type: 'UPDATE_COLUMN_IDX'
       payload: { columnKey: string; columnIdx: number }
     }
+  | {
+      type: 'HIDE_COLUMN'
+      payload: { columnKey: string }
+    }
 
 const ColumnReducer = (state: ColumnInitialState, action: COLUMN_ACTIONTYPE) => {
   switch (action.type) {
@@ -99,6 +103,19 @@ const ColumnReducer = (state: ColumnInitialState, action: COLUMN_ACTIONTYPE) => 
         }).sort((a, b) => a.idx - b.idx),
       }
     }
+    case 'HIDE_COLUMN': {
+      const columnIdx = state.gridColumns.findIndex((x) => x.key === action.payload.columnKey)
+      const updated = cloneColumn(state.gridColumns[columnIdx])
+      updated.hidden = !updated.hidden
+
+      return {
+        ...state,
+        gridColumns: update(state.gridColumns, {
+          [columnIdx]: { $set: updated },
+        }),
+      }
+    }
+
     default:
       return state
   }

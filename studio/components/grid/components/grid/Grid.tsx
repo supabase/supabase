@@ -106,6 +106,8 @@ export const Grid = memo(
         }
       }
 
+      const filteredColumns = state.gridColumns.filter((x) => x.name !== 'created')
+
       return (
         <div
           className={containerClass}

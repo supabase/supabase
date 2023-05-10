@@ -15,6 +15,7 @@ export interface SupaColumn {
   readonly isEncrypted?: boolean
   readonly foreignKey?: GridForeignKey
   position: number
+  hidden: boolean
 }
 
 export interface SupaTable {

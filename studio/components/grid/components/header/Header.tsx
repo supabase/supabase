@@ -10,6 +10,9 @@ import {
   IconChevronDown,
   IconFileText,
   IconArrowUp,
+  IconEye,
+  Toggle,
+  Popover,
 } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
@@ -103,14 +106,21 @@ const DefaultHeader = ({
   onAddRow,
   onImportData,
 }: DefaultHeaderProps) => {
-  const canAddNew = onAddRow !== undefined || onAddColumn !== undefined
+  const dispatch = useDispatch()
 
+  const canAddNew = onAddRow !== undefined || onAddColumn !== undefined
+  console.log('table', table)
   // [Joshen] Using this logic to block both column and row creation/update/delete
   const canCreateColumns = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
 
   const [{ filter: filters, sort: sorts }, setParams] = useUrlState({
     arrayKeys: ['sort', 'filter'],
   })
+
+  function onHideColumn(columnKey: string) {
+    dispatch({ type: 'HIDE_COLUMN', payload: { columnKey } })
+    useDispatch
+  }
 
   return (
     <div className="flex items-center gap-4">
@@ -214,6 +224,37 @@ const DefaultHeader = ({
                   Insert
                 </Button>
               </Dropdown>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            {canCreateColumns && (
+              <Popover
+                size="large"
+                align="start"
+                className="sb-grid-filter-popover"
+                overlay={table?.columns.map((column) => (
+                  <div key={column.name} className="flex items-center gap-2 px-2 py-1">
+                    <Toggle
+                      size="tiny"
+                      checked={column.hidden}
+                      onChange={() => onHideColumn(column.name)}
+                    />
+                    <span className="font-bold">{column.format}</span> {column.name}|{' '}
+                    {column.hidden ? 'hidden' : 'visible'}
+                  </div>
+                ))}
+              >
+                <Button
+                  type="text"
+                  icon={
+                    <div className="text-scale-1000">
+                      <IconEye strokeWidth={1.5} />
+                    </div>
+                  }
+                >
+                  Columns
+                </Button>
+              </Popover>
             )}
           </div>
         </>
