@@ -4,10 +4,11 @@ import Link from 'next/link'
 import NavigationMenu from '~/components/Navigation/NavigationMenu/NavigationMenu'
 import TopNavBarRef from '~/components/Navigation/NavigationMenu/TopNavBarRef'
 
-import { memo, useEffect } from 'react'
+import { memo } from 'react'
 import Footer from '~/components/Navigation/Footer'
 import { menuState, useMenuLevelId, useMenuMobileOpen } from '~/hooks/useMenuState'
 import Head from 'next/head'
+import { useRouter } from 'next/router'
 
 const levelsData = {
   home: {
@@ -318,6 +319,9 @@ const NavContainer = memo(function NavContainer() {
 })
 
 const SiteLayout = ({ children }) => {
+  const router = useRouter()
+  const isHomepage = router.asPath === '/'
+
   return (
     <>
       <Head>
@@ -341,7 +345,7 @@ const SiteLayout = ({ children }) => {
                 <MobileHeader />
               </div>
             </div>
-            <div className="grow px-5 max-w-7xl mx-auto py-16">
+            <div className="grow">
               {children}
               <Footer />
             </div>

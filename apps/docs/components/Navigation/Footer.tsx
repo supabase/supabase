@@ -3,12 +3,13 @@ import Link from 'next/link'
 import { Button, IconGitHub, IconTwitter, IconYoutube } from '~/../../packages/ui'
 import footerData from '~/data/footer.json'
 import { useTheme } from 'common/Providers'
+import { LayoutMainContent } from '../../layouts/DefaultLayout'
 
 const Footer = () => {
   const { isDarkMode } = useTheme()
   return (
-    <div>
-      <hr className="border-scale-400  mt-8"></hr>
+    <LayoutMainContent className="pt-0">
+      <hr className="border-scale-400 mt-8"></hr>
       <div className="flex gap-4 items-center mt-6 justify-between">
         <div className="flex flex-col lg:flex-row gap-3 ">
           <Link href="https://supabase.com/">
@@ -61,7 +62,7 @@ const Footer = () => {
           </Button>
         </div>
       </div>
-    </div>
+    </LayoutMainContent>
   )
 }
 
