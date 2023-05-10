@@ -1,4 +1,6 @@
-import { useParams, useStore } from 'hooks'
+import { useParams } from 'common/hooks'
+import { useStore } from 'hooks'
+import { PROJECT_STATUS } from 'lib/constants'
 import { observer } from 'mobx-react-lite'
 import { createContext, PropsWithChildren, useContext, useMemo } from 'react'
 import { Project } from 'types'
@@ -49,4 +51,9 @@ export const ProjectContextFromParamsProvider = ({ children }: PropsWithChildren
   const { ref: projectRef } = useParams()
 
   return <ProjectContextProvider projectRef={projectRef}>{children}</ProjectContextProvider>
+}
+
+export const useIsProjectActive = () => {
+  const { project } = useProjectContext()
+  return project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 }

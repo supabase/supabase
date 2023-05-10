@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render as originalRender } from '@testing-library/react'
 import { RootStore } from 'stores'
 import { StoreProvider } from 'hooks'
+import { TooltipProvider } from '@radix-ui/react-tooltip'
 interface SelectorOptions {
   container?: HTMLElement
 }
@@ -68,7 +69,9 @@ const ReactQueryTestConfig: React.FC = ({ children }) => {
 
   return (
     <StoreProvider rootStore={rootStore}>
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+      <TooltipProvider>
+        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+      </TooltipProvider>
     </StoreProvider>
   )
 }

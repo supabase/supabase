@@ -1,7 +1,7 @@
 import CommandRender from 'components/interfaces/Functions/CommandRender'
 import { useAccessTokensQuery } from 'data/access-tokens/access-tokens-query'
 import { useProjectApiQuery } from 'data/config/project-api-query'
-import { useParams } from 'hooks'
+import { useParams } from 'common/hooks'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { FC, useState } from 'react'
@@ -143,7 +143,7 @@ const TerminalInstructions: FC<Props> = ({ closable = false, removeBorder = fals
               href="https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions"
             >
               <a target="_blank" rel="noreferrer">
-                <Button as="a" type="default" iconRight={<IconCode />}>
+                <Button type="default" iconRight={<IconCode />}>
                   Examples
                 </Button>
               </a>

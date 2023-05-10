@@ -22,7 +22,7 @@ import ShimmerLine from 'components/ui/ShimmerLine'
 import LoadingOpacity from 'components/ui/LoadingOpacity'
 import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
 import UpgradePrompt from './UpgradePrompt'
-import { useParams } from 'hooks'
+import { useParams } from 'common/hooks'
 import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
 
 /**
@@ -191,9 +191,9 @@ export const LogsPreviewer: React.FC<Props> = ({
         }
       >
         <div className={condensedLayout ? 'px-4' : ''}>
-          {showChart && (
+          {!isLoading && showChart && (
             <LogEventChart
-              data={!isLoading && eventChartData ? eventChartData : undefined}
+              data={eventChartData}
               onBarClick={(isoTimestamp) => {
                 handleSearch('event-chart-bar-click', {
                   query: filters.search_query as string,

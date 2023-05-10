@@ -31,13 +31,13 @@ const ClientLibrary: FC<Props> = ({ language, releaseState, officialSupport, doc
         </div>
         <div className="space-x-1">
           {docsUrl && (
-            <a href={docsUrl} target="_blank">
+            <a href={docsUrl} target="_blank" rel="noreferrer">
               <Button icon={<IconBookOpen />} type="default">
                 Docs
               </Button>
             </a>
           )}
-          <a href={gitUrl} target="_blank">
+          <a href={gitUrl} target="_blank" rel="noreferrer">
             <Button icon={<IconGitHub />} type="default">
               See GitHub
             </Button>

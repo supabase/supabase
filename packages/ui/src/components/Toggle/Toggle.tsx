@@ -128,7 +128,7 @@ function Toggle({
         type="button"
         id={id}
         name={name}
-        className={clsx(toggleClasses, disabled && 'opacity-50 cursor-default')}
+        className={clsx(...toggleClasses, disabled && 'opacity-50 cursor-default')}
         onClick={onClick}
         disabled={disabled}
         onBlur={handleBlurEvent}

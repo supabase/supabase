@@ -22,7 +22,7 @@ Let's start building the Vue 3 app from scratch.
 
 ### Initialize a Nuxt 3 app
 
-We can use [`nuxi init`](https://v3.nuxtjs.org/getting-started/quick-start/) to create an app called `nuxt-user-management`:
+We can use [`nuxi init`](https://nuxt.com/docs/getting-started/installation) to create an app called `nuxt-user-management`:
 
 ```bash
 npx nuxi init nuxt-user-management
@@ -192,7 +192,7 @@ async function signOut() {
     </div>
     <div>
       <label for="website">Website</label>
-      <input id="website" type="website" v-model="website" />
+      <input id="website" type="url" v-model="website" />
     </div>
 
     <div>
@@ -414,7 +414,7 @@ async function signOut() {
     </div>
     <div>
       <label for="website">Website</label>
-      <input id="website" type="website" v-model="website" />
+      <input id="website" type="url" v-model="website" />
     </div>
 
     <div>

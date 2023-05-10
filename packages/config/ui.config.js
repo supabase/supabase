@@ -6,7 +6,22 @@ const brandColors = require('./default-colors')
 
 const { default: flattenColorPalette } = require('tailwindcss/lib/util/flattenColorPalette')
 
-// console.log(Object.keys(radixUiColors))
+// exclude these colors from the included set from Radix
+const excludedRadixColors = [
+  'bronze',
+  'brown',
+  'cyan',
+  'grass',
+  'olive',
+  'mauve',
+  'mint',
+  'lime',
+  'plum',
+  'sage',
+  'sand',
+  'sky',
+  'teal',
+]
 
 // generates fixed scales
 // based on the root/light mode version
@@ -26,7 +41,11 @@ function radixColorKeys() {
 
   keys = filterItems(keys, 'Dark')
 
-  // console.log('radixColorKeys', keys)
+  // remove excluded colors
+  keys = keys.filter(
+    (key) => !excludedRadixColors.some((excludeColor) => key.startsWith(excludeColor))
+  )
+
   return keys
 }
 
@@ -41,11 +60,7 @@ function generateColorClasses() {
     // create empty obj for each color
     mappedColors[x] = {}
     // create empty obj for each fixed color
-    if (
-      fixedOptions.some(function (v) {
-        return x.indexOf(v) >= 0
-      })
-    ) {
+    if (fixedOptions.some((v) => x.indexOf(v) >= 0)) {
       mappedColors[`${x}-fixed`] = {}
     }
   })
@@ -55,12 +70,7 @@ function generateColorClasses() {
       const step = index + 1
       mappedColors[x][step * 100] = `var(--colors-${x}${step})`
 
-      if (
-        fixedOptions.some(function (v) {
-          return x.indexOf(v) >= 0
-        })
-      ) {
-        // console.log(x)
+      if (fixedOptions.some((v) => x.indexOf(v) >= 0)) {
         mappedColors[`${x}-fixed`][step * 100] = `var(--colors-fixed-${x}${step})`
       }
     }
@@ -71,13 +81,7 @@ function generateColorClasses() {
 
 const colorClasses = generateColorClasses()
 
-/*
- * generateCssVariables()
- *
- * generate the CSS variables for tailwind to use
- *
- */
-
+// generate the CSS variables for tailwind to use
 function generateCssVariables() {
   // potential options
   // { fixedOptions, brandColors }
@@ -85,7 +89,12 @@ function generateCssVariables() {
   let rootColors = {}
   let darkColors = {}
 
-  const radixArray = Object.values(radixUiColors)
+  const radixArray = Object.entries(radixUiColors)
+    .filter(
+      ([key, value]) => !excludedRadixColors.some((excludeColor) => key.startsWith(excludeColor))
+    )
+    .map(([, value]) => value)
+
   const brandArray = Object.values(brandColors)
 
   function generateColors(colors, index, colorSet) {
@@ -225,6 +234,26 @@ const uiConfig = {
           '0%': { transform: 'translate-x-0', opacity: 1 },
           '100%': { transform: 'translateX(100%)', opacity: 0 },
         },
+        lineLoading: {
+          '0%': {
+            marginLeft: '-10%',
+            width: '80px',
+          },
+          '25%': {
+            width: ' 240px',
+          },
+          '50%': {
+            marginLeft: '100%',
+            width: '80px',
+          },
+          '75%': {
+            width: '240px',
+          },
+          '100%': {
+            marginLeft: '-10%',
+            width: '80px',
+          },
+        },
       },
       animation: {
         'fade-in': 'fadeIn 300ms',
@@ -250,6 +279,8 @@ const uiConfig = {
         'panel-slide-right-out': 'panelSlideRightOut 200ms cubic-bezier(0.87, 0, 0.13, 1)',
         'panel-slide-right-in': 'panelSlideRightIn 250ms cubic-bezier(0.87, 0, 0.13, 1)',
 
+        'line-loading': 'lineLoading 1.8s infinite',
+
         // tailwind class for this is `animate-dropdownFadeIn`
         dropdownFadeIn: 'dropdownFadeIn 0.1s ease-out',
         // tailwind class for this is `animate-dropdownFadeOut`
@@ -267,13 +298,22 @@ const uiConfig = {
     function ({ addUtilities, addVariant }) {
       // addVariant('data-open', '&:[data-state=open]')
       addUtilities({
+        '.line-loading-bg': {
+          background: 'rgb(0, 0, 0)',
+          background:
+            'linear-gradient(90deg,rgba(0, 0, 0, 0) 0%,rgba(255, 255, 255, 0.65) 50%,rgba(0, 0, 0, 0) 100%)',
+        },
+        '.line-loading-bg-light': {
+          background: 'rgb(0, 0, 0)',
+          background:
+            'linear-gradient(90deg,rgba(0, 0, 0, 0) 0%,rgba(33, 33, 33, 0.65) 50%,rgba(0, 0, 0, 0) 100%)',
+        },
         ".dropdown-content[data-state='open']": {
           animation: 'fadeIn 50ms ease-out',
         },
         ".dropdown-content[data-state='closed']": {
           animation: 'fadeOut 50ms ease-in',
         },
-
         "[data-state='open'] .accordion-content-animation": {
           animation: 'slideDown 200ms ease-out',
         },
@@ -348,12 +388,12 @@ const uiConfig = {
             bordershadow: (value) => {
               return {
                 boxShadow: `
-                var(--colors-blackA1) 0px 0px 0px 0px, 
-                var(--colors-blackA1) 0px 0px 0px 0px, 
-                var(--colors-blackA8) 0px 1px 1px 0px, 
-                ${value} 0px 0px 0px 1px, 
-                var(--colors-blackA1) 0px 0px 0px 0px, 
-                var(--colors-blackA1) 0px 0px 0px 0px, 
+                var(--colors-blackA1) 0px 0px 0px 0px,
+                var(--colors-blackA1) 0px 0px 0px 0px,
+                var(--colors-blackA8) 0px 1px 1px 0px,
+                ${value} 0px 0px 0px 1px,
+                var(--colors-blackA1) 0px 0px 0px 0px,
+                var(--colors-blackA1) 0px 0px 0px 0px,
                 rgb(64 68 82 / 8%) 0px 2px 5px 0px;
                 `,
               }

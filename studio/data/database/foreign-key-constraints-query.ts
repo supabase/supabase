@@ -2,7 +2,7 @@ import { UseQueryOptions } from '@tanstack/react-query'
 import { useCallback } from 'react'
 import { ExecuteSqlData, useExecuteSqlPrefetch, useExecuteSqlQuery } from '../sql/execute-sql-query'
 
-type getForeignKeyConstraintsVariables = {
+type GetForeignKeyConstraintsVariables = {
   schema?: string
 }
 
@@ -20,7 +20,7 @@ export type ForeignKeyConstraint = {
   target_columns: string
 }
 
-export const getForeignKeyConstraintsQuery = ({ schema }: getForeignKeyConstraintsVariables) => {
+export const getForeignKeyConstraintsQuery = ({ schema }: GetForeignKeyConstraintsVariables) => {
   const sql = /* SQL */ `
 SELECT 
   con.oid as id, 
@@ -72,7 +72,7 @@ WHERE
   return sql
 }
 
-export type ForeignKeyConstraintsVariables = getForeignKeyConstraintsVariables & {
+export type ForeignKeyConstraintsVariables = GetForeignKeyConstraintsVariables & {
   projectRef?: string
   connectionString?: string
 }

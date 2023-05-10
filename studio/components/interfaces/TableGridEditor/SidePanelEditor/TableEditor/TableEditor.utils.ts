@@ -55,9 +55,12 @@ export const generateTableFieldFromPostgresTable = (
 }
 
 export const formatImportedContentToColumnFields = (importContent: ImportContent) => {
-  const columnFields = importContent.headers.map((header: string) => {
-    const columnType = importContent.columnTypeMap[header]
-    return generateColumnField({ name: header, format: columnType })
-  })
+  const { headers, selectedHeaders, columnTypeMap } = importContent
+  const columnFields = headers
+    .filter((header) => selectedHeaders.includes(header))
+    .map((header) => {
+      const columnType = columnTypeMap[header]
+      return generateColumnField({ name: header, format: columnType })
+    })
   return columnFields
 }

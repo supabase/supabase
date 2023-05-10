@@ -127,7 +127,7 @@ const ForeignRowSelector = ({
             <div className="h-full flex flex-col">
               <div className="flex items-center justify-between my-2 mx-3">
                 <div className="flex items-center">
-                  <RefreshButton table={supaTable} />
+                  <RefreshButton table={supaTable} isRefetching={isRefetching} />
                   <FilterPopover
                     table={supaTable}
                     filters={params.filter ?? []}

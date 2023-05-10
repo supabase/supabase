@@ -9,6 +9,7 @@ export type EntityTypesVariables = {
   search?: string
   limit?: number
   page?: number
+  sort?: 'alphabetical' | 'grouped-alphabetical'
 } & Pick<ExecuteSqlVariables, 'connectionString'>
 
 export type EntityTypesResponse = {
@@ -26,9 +27,13 @@ export async function getEntityTypes(
     search,
     limit = 100,
     page = 0,
+    sort = 'alphabetical',
   }: EntityTypesVariables,
   signal?: AbortSignal
 ) {
+  const innerOrderBy = sort === 'alphabetical' ? `c.relname asc` : `"type_sort" asc, c.relname asc`
+  const outerOrderBy = sort === 'alphabetical' ? `r.name asc` : `r.type_sort asc, r.name asc`
+
   const sql = /* SQL */ `
     with records as (
       select
@@ -36,6 +41,13 @@ export async function getEntityTypes(
         nc.nspname as "schema",
         c.relname as "name",
         c.relkind as "type",
+        case c.relkind
+          when 'r' then 1
+          when 'v' then 2
+          when 'm' then 3
+          when 'f' then 4
+          when 'p' then 5
+        end as "type_sort",
         obj_description(c.oid) as "comment",
         count(*) over() as "count"
       from
@@ -54,7 +66,7 @@ export async function getEntityTypes(
         )
         and nc.nspname = '${schema}'
         ${search ? `and c.relname ilike '%${search}%'` : ''}
-      order by "name" asc
+      order by ${innerOrderBy}
       limit ${limit}
       offset ${page * limit}
     )
@@ -68,7 +80,7 @@ export async function getEntityTypes(
             'type', r.type,
             'comment', r.comment
           )
-          order by r.name asc
+          order by ${outerOrderBy}
         ), '[]'::jsonb),
         'count', coalesce(min(r.count), 0)
       ) "data"
@@ -98,6 +110,7 @@ export const useEntityTypesQuery = <TData = EntityTypesData>(
     schema = 'public',
     search,
     limit = 100,
+    sort,
   }: Omit<EntityTypesVariables, 'page'>,
   {
     enabled = true,
@@ -105,10 +118,10 @@ export const useEntityTypesQuery = <TData = EntityTypesData>(
   }: UseInfiniteQueryOptions<EntityTypesData, EntityTypesError, TData> = {}
 ) =>
   useInfiniteQuery<EntityTypesData, EntityTypesError, TData>(
-    entityTypeKeys.list(projectRef, search),
+    entityTypeKeys.list(projectRef, { schema, search, sort, limit }),
     ({ signal, pageParam }) =>
       getEntityTypes(
-        { projectRef, connectionString, schema, search, limit, page: pageParam },
+        { projectRef, connectionString, schema, search, limit, page: pageParam, sort },
         signal
       ),
     {

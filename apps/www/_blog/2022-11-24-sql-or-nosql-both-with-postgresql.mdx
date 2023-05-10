@@ -136,7 +136,7 @@ Let's see how we can use the power of SQL together with the ease-of-use of NoSQL
 
 ```sql
 CREATE TABLE calendar (
-    id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
     date date,
     user_id uuid NOT NULL,
     weight numeric,

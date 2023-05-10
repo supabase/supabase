@@ -16,7 +16,6 @@ interface RootProps {
   onOpenChange?: RadixPopoverTypes.PopoverProps['onOpenChange']
   open?: boolean
   overlay?: React.ReactNode
-  portalled?: boolean
   showClose?: boolean
   side?: RadixPopoverTypes.PopoverContentProps['side']
   sideOffset?: RadixPopoverTypes.PopoverContentProps['sideOffset']
@@ -37,7 +36,6 @@ function Popover({
   onOpenChange,
   open,
   overlay,
-  portalled,
   side = 'bottom',
   sideOffset = 6,
   style,
@@ -67,24 +65,25 @@ function Popover({
         {children}
       </RadixPopover.Trigger>
 
-      <RadixPopover.Content
-        sideOffset={sideOffset}
-        side={side}
-        align={align}
-        className={classes.join(' ')}
-        style={style}
-        portalled={portalled}
-      >
-        {arrow && (
-          <RadixPopover.Arrow
-            // className={DropdownStyles['sbui-popover__arrow']}
-            offset={10}
-          ></RadixPopover.Arrow>
-        )}
-        {header && <div className={__styles.header}>{header}</div>}
-        {overlay}
-        {footer && <div className={__styles.footer}>{footer}</div>}
-      </RadixPopover.Content>
+      <RadixPopover.Portal>
+        <RadixPopover.Content
+          sideOffset={sideOffset}
+          side={side}
+          align={align}
+          className={classes.join(' ')}
+          style={style}
+        >
+          {arrow && (
+            <RadixPopover.Arrow
+              // className={DropdownStyles['sbui-popover__arrow']}
+              offset={10}
+            ></RadixPopover.Arrow>
+          )}
+          {header && <div className={__styles.header}>{header}</div>}
+          {overlay}
+          {footer && <div className={__styles.footer}>{footer}</div>}
+        </RadixPopover.Content>
+      </RadixPopover.Portal>
     </RadixPopover.Root>
   )
 }

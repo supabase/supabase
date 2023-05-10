@@ -62,13 +62,14 @@ const UpgradePrompt: React.FC<Props> = ({ show, setShowUpgradePrompt }) => {
         </Modal.Content>
         <Modal.Separator />
         <Modal.Content>
-          <div className="flex justify-between">
+          <div className="flex justify-end gap-3">
             <Button type="default" onClick={() => setShowUpgradePrompt(false)}>
               Close
             </Button>
-
-            <Link href={`/project/${ref}/settings/billing/subscription`}>
-              <Button size="tiny">Upgrade</Button>
+            <Link href={`/project/${ref}/settings/billing/subscription`} passHref>
+              <a>
+                <Button size="tiny">Upgrade</Button>
+              </a>
             </Link>
           </div>
         </Modal.Content>

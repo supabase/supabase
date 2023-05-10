@@ -1,54 +1,44 @@
 .visual {
-  position: relative;
   transform: translateZ(0);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  /* background-color: black; */
-  border: 2px solid rgba(0, 0, 0, 0.1);
+  background-image: linear-gradient(154.77deg, #cb88ff 29.4%, #cb88ff 120.47%);
+  box-shadow: 0px 1px 27px #9e44ef10, 0 0 0 1px rgba(121, 89, 134, 0.237),
+    inset 0 0px 0 -2px rgba(0, 0, 0, 0.55);
+  /* border: 1px solid rgba(0, 0, 0, 0.05); */
   border-radius: 16px;
 
-  background-color: rgba(0, 0, 0, 1);
   -webkit-backdrop-filter: blur(2px);
   backdrop-filter: blur(2px);
 
-  /* background: linear-gradient(#fff000, var(--gold-secondary)); */
-  border: 1px solid #1c5f52;
-  animation: blank-svg-shadow 2s ease-in-out infinite alternate;
+  /* border: 1px solid #1c1c1c; */
+  /* animation: 2s ease-in-out infinite alternate; */
 
-  background-image: url('/images/launchweek/regular-ticket-background.png');
   background-repeat: no-repeat;
   background-size: contain;
 }
 
 .visual--gold {
-  /* border: 10px solid;
-  border-image-slice: 1;
-  border-width: 2px;
-  border-radius: 16px; */
-  background-color: linear-gradient(#fff000, #dea513);
-  background-color: #dea513;
+  background: radial-gradient(#fcdf9d, #dbb333);
+}
+
+.visual--gold::before {
+  content: ' ';
+  position: absolute;
+  inset: 0;
+  filter: drop-shadow(0 0 6px #fff) drop-shadow(0 0 6px #d99f0c) drop-shadow(0 0 9px #dbb333);
+  background: radial-gradient(#fcdf9d, #dbb333);
   border: 1px solid rgba(255, 255, 0, 0.629);
-  animation: svg-shadow 2s ease-in-out infinite alternate;
-  background-image: url('/images/launchweek/gold-ticket-background.png');
-  /* filter: drop-shadow(2.45223px 8.5828px 73.5669px #FFBD14);  */
-  /* border-image-source: linear-gradient(to left, var(--gold-secondary), var(--gold-accent)); */
+  animation: opacity-pulse 2s ease-in-out infinite alternate;
 }
 
-@media (max-width: 768px) {
-  .visual {
-    background-size: cover;
-
-    background-image: url('/images/launchweek/2x-regular-ticket-background.jpg');
+@keyframes opacity-pulse {
+  from {
+    opacity: 0.5;
   }
 
-  .visual--gold {
-    background-image: url('/images/launchweek/2x-gold-ticket-background.jpg');
+  to {
+    opacity: 1;
   }
 }
-
-/* .svg-shadow {
-} */
 
 @keyframes svg-shadow {
   from {
@@ -56,35 +46,17 @@
   }
 
   to {
-    filter: drop-shadow(0 0 3px #fff) drop-shadow(0 0 6px #d99f0c) drop-shadow(0 0 9px #d99f0c);
+    filter: drop-shadow(0 0 10px #fff) drop-shadow(0 0 6px #d99f0c) drop-shadow(0 0 9px #d99f0c);
   }
 }
 
 @keyframes blank-svg-shadow {
   from {
-    filter: drop-shadow(0 0 2px #1c5f52) drop-shadow(0 0 4px #1c5f52) drop-shadow(0 0 6px #1c5f52);
+    filter: drop-shadow(0 0 2px #bada55) drop-shadow(0 0 2px #bada55) drop-shadow(0 0 2px #bada55);
   }
 
   to {
-    filter: drop-shadow(0 0 3px #1c5f52) drop-shadow(0 0 6px #1c5f52) drop-shadow(0 0 9px #1c5f52);
-  }
-}
-
-.horizontal-ticket {
-  display: none;
-}
-
-.vertical-ticket {
-  display: flex;
-}
-
-@media (min-width: 768px) {
-  .horizontal-ticket {
-    display: flex;
-  }
-
-  .vertical-ticket {
-    display: none;
+    filter: drop-shadow(0 0 3px #bada55) drop-shadow(0 0 2px #bada55) drop-shadow(0 0 2px #bada55);
   }
 }
 
@@ -94,22 +66,18 @@
   top: 0;
   width: 100%;
   height: 100%;
-  /* padding: 46px 29px;/ */
 }
 
 .logo img {
-  /* margin-top: 64px; */
   margin-top: calc(64px * var(--size));
   margin-left: calc(32px * var(--size));
   margin-left: calc(32px * var(--size));
-  /* width: 272px; */
   width: calc(272px * var(--size));
 }
 
 @media (min-width: 768px) {
   .logo img {
     margin-top: calc(32px * var(--size));
-    /* width: 280px; */
     width: calc(280px * var(--size));
     margin-left: calc(160px * var(--size));
   }
@@ -140,48 +108,10 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  /* padding: calc(46px * var(--size)) calc(29px * var(--size)); */
 }
 
 @media (min-width: 768px) {
   .info {
     bottom: 0;
-    /* padding: 0 calc(160px * var(--size)) calc(44px * var(--size))
-      calc(63px * var(--size)); */
-  }
-}
-
-.ticket-number-wrapper {
-  position: absolute;
-  bottom: 40px;
-  right: 0;
-}
-
-@media (min-width: 768px) {
-  .ticket-number-wrapper {
-    bottom: 0;
-  }
-}
-
-.ticket-number {
-  font-size: calc(40px * var(--size));
-  line-height: 1;
-  width: calc(330px * var(--size));
-  text-align: center;
-  background-clip: text;
-}
-
-.ticket-number-golden {
-  color: var(--gold-primary);
-}
-
-@media (min-width: 768px) {
-  .ticket-number {
-    transform: rotate(90deg) translateY(calc(100px * var(--size)));
-    transform-origin: bottom right;
-  }
-
-  .ticket-number-golden {
-    color: var(--gold-accent);
   }
 }

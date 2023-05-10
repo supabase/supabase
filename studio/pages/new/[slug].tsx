@@ -21,7 +21,8 @@ import {
   PRICING_TIER_FREE_KEY,
   PRICING_TIER_PRODUCT_IDS,
 } from 'lib/constants'
-import { useStore, useFlag, withAuth, checkPermissions, useParams } from 'hooks'
+import { useStore, useFlag, withAuth, checkPermissions } from 'hooks'
+import { useParams } from 'common/hooks'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 
 import { WizardLayoutWithoutAuth } from 'components/layouts'
@@ -111,14 +112,14 @@ const Wizard: NextPageWithLayout = () => {
     }
   }, [])
 
-  useEffect(() => {
-    async function getPaymentMethods(slug: string) {
-      const { data: paymentMethods, error } = await get(`${API_URL}/organizations/${slug}/payments`)
-      if (!error) {
-        setPaymentMethods(paymentMethods)
-      }
+  async function getPaymentMethods(slug: string) {
+    const { data: paymentMethods, error } = await get(`${API_URL}/organizations/${slug}/payments`)
+    if (!error) {
+      setPaymentMethods(paymentMethods)
     }
+  }
 
+  useEffect(() => {
     if (slug) {
       getPaymentMethods(slug as string)
     }
@@ -146,6 +147,12 @@ const Wizard: NextPageWithLayout = () => {
     setDbPricingTierKey(value)
   }
 
+  function onPaymentMethodAdded() {
+    if (slug) {
+      return getPaymentMethods(slug)
+    }
+  }
+
   async function checkPasswordStrength(value: any) {
     const { message, warning, strength } = await passwordStrength(value)
     setPasswordStrengthScore(strength)
@@ -161,13 +168,22 @@ const Wizard: NextPageWithLayout = () => {
     const data: Record<string, any> = {
       cloud_provider: PROVIDERS.AWS.id, // hardcoded for DB instances to be under AWS
       org_id: currentOrg?.id,
-      name: projectName,
+      name: projectName.trim(),
       db_pass: dbPass,
       db_region: dbRegion,
       db_pricing_tier_id: (PRICING_TIER_PRODUCT_IDS as any)[dbTier],
       kps_enabled: kpsEnabled,
     }
     if (postgresVersion) {
+      if (!postgresVersion.match(/1[2-9]\..*/)) {
+        setNewProjectLoading(false)
+        ui.setNotification({
+          category: 'error',
+          message: `Invalid Postgres version, should start with a number between 12-19, a dot and additional characters, i.e. 15.2 or 15.2.0-3`,
+        })
+        return
+      }
+
       data['custom_supabase_internal_requests'] = {
         ami: { search_tags: { 'tag:postgresVersion': postgresVersion } },
       }
@@ -309,6 +325,7 @@ const Wizard: NextPageWithLayout = () => {
                       id="custom-postgres-version"
                       layout="horizontal"
                       label="Postgres Version"
+                      autoComplete="off"
                       descriptionText={
                         <p>
                           Specify a custom version of Postgres (Defaults to the latest)
@@ -393,7 +410,12 @@ const Wizard: NextPageWithLayout = () => {
                   descriptionText={
                     <>
                       Select a plan that suits your needs.&nbsp;
-                      <a className="underline" target="_blank" href="https://supabase.com/pricing">
+                      <a
+                        className="underline"
+                        target="_blank"
+                        rel="noreferrer"
+                        href="https://supabase.com/pricing"
+                      >
                         More details
                       </a>
                       {!isSelectFreeTier && !isEmptyPaymentMethod && (
@@ -427,7 +449,7 @@ const Wizard: NextPageWithLayout = () => {
                 )}
 
                 {!isSelectFreeTier && isEmptyPaymentMethod && (
-                  <EmptyPaymentMethodWarning stripeCustomerId={stripeCustomerId} />
+                  <EmptyPaymentMethodWarning onPaymentMethodAdded={onPaymentMethodAdded} />
                 )}
               </Panel.Content>
             )}

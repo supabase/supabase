@@ -2,11 +2,11 @@ import { NextPage } from 'next'
 import { AppProps } from 'next/app'
 import { ComponentType, ReactElement, ReactNode } from 'react'
 
-export type AppPropsWithLayout = AppProps & {
+export type AppPropsWithLayout = AppProps<{ dehydratedState: any }> & {
   Component: NextPageWithLayout
 }
 
-export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
+export type NextPageWithLayout<P = { dehydratedState: any }, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode
 }
 

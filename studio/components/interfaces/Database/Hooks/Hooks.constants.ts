@@ -1,4 +1,4 @@
-import { BASE_PATH } from 'lib/constants'
+import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 
 export const ENABLED_MODE_OPTIONS = [
   { label: 'Origin', value: 'ORIGIN', description: 'This is the default behaviour' },
@@ -35,17 +35,19 @@ export const HOOK_EVENTS = [
 
 export const AVAILABLE_WEBHOOK_TYPES = [
   {
-    disabled: false,
     value: 'http_request',
     icon: `${BASE_PATH}/img/function-providers/http-request.png`,
     label: 'HTTP Request',
     description: 'Send an HTTP request to any URL.',
   },
-  {
-    disabled: true,
-    value: 'supabase_function',
-    icon: `${BASE_PATH}/img/function-providers/supabase-severless-function.png`,
-    label: 'Supabase Edge Functions',
-    description: 'Choose a Supabase edge function to run.',
-  },
+  ...(IS_PLATFORM
+    ? [
+        {
+          value: 'supabase_function',
+          icon: `${BASE_PATH}/img/function-providers/supabase-severless-function.png`,
+          label: 'Supabase Edge Functions',
+          description: 'Choose a Supabase edge function to run.',
+        },
+      ]
+    : []),
 ]

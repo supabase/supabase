@@ -1,4 +1,11 @@
 export const entityTypeKeys = {
-  list: (projectRef: string | undefined, search?: string) =>
-    ['projects', projectRef, 'entity-types', ...(search ? [{ search }] : [])] as const,
+  list: (
+    projectRef: string | undefined,
+    params?: {
+      schema?: string
+      search?: string
+      sort?: 'alphabetical' | 'grouped-alphabetical'
+      limit?: number
+    }
+  ) => ['projects', projectRef, 'entity-types', ...(params ? [params] : [])] as const,
 }

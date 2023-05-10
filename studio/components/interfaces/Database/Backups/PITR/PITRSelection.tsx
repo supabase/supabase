@@ -192,19 +192,21 @@ const PITRSelection = ({}) => {
                       </Button>
                     </Tooltip.Trigger>
                     {isSelectedOutOfRange && (
-                      <Tooltip.Content side="bottom">
-                        <Tooltip.Arrow className="radix-tooltip-arrow" />
-                        <div
-                          className={[
-                            'bg-scale-100 rounded py-1 px-2 leading-none shadow',
-                            'border-scale-200 border w-48 text-center',
-                          ].join(' ')}
-                        >
-                          <span className="text-scale-1200 text-xs">
-                            Selected date is out of range where backups are available
-                          </span>
-                        </div>
-                      </Tooltip.Content>
+                      <Tooltip.Portal>
+                        <Tooltip.Content side="bottom">
+                          <Tooltip.Arrow className="radix-tooltip-arrow" />
+                          <div
+                            className={[
+                              'bg-scale-100 rounded py-1 px-2 leading-none shadow',
+                              'border-scale-200 border w-48 text-center',
+                            ].join(' ')}
+                          >
+                            <span className="text-scale-1200 text-xs">
+                              Selected date is out of range where backups are available
+                            </span>
+                          </div>
+                        </Tooltip.Content>
+                      </Tooltip.Portal>
                     )}
                   </Tooltip.Root>
                 </div>

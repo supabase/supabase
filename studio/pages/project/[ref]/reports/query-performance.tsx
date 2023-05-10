@@ -1,3 +1,6 @@
+import { useParams } from 'common'
+import ReportHeader from 'components/interfaces/Reports/ReportHeader'
+import ReportPadding from 'components/interfaces/Reports/ReportPadding'
 import { PRESET_CONFIG } from 'components/interfaces/Reports/Reports.constants'
 import { Presets } from 'components/interfaces/Reports/Reports.types'
 import { queriesFactory } from 'components/interfaces/Reports/Reports.utils'
@@ -9,19 +12,19 @@ import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { useFlag } from 'hooks'
 import { observer } from 'mobx-react-lite'
+import Link from 'next/link'
 import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { NextPageWithLayout } from 'types'
 import { Accordion, Button, IconAlertCircle, IconCheckCircle, Tabs } from 'ui'
-import ReportPadding from 'components/interfaces/Reports/ReportPadding'
-import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 
 const QueryPerformanceReport: NextPageWithLayout = () => {
   const { project } = useProjectContext()
   const [showResetgPgStatStatements, setShowResetgPgStatStatements] = useState(false)
   const tableIndexEfficiencyEnabled = useFlag('tableIndexEfficiency')
   const config = PRESET_CONFIG[Presets.QUERY_PERFORMANCE]
-  const hooks = queriesFactory(config.queries)
+  const { ref: projectRef } = useParams()
+  const hooks = queriesFactory(config.queries, projectRef ?? 'default')
   const mostFrequentlyInvoked = hooks.mostFrequentlyInvoked()
   const mostTimeConsuming = hooks.mostTimeConsuming()
   const slowestExecutionTime = hooks.slowestExecutionTime()
@@ -62,13 +65,21 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
   const showIndexWarning =
     indexHitRate && tableHitRate && (indexHitRate <= 0.99 || tableHitRate <= 0.99)
 
-  const HeaderText = `Identify the queries that consume the most time and database resources.
-
-  It relies on the \`pg_stat_statements\` table. Read more about [examining query performance]((https://supabase.com/docs/guides/platform/performance#examining-query-performance)).
-
-  Consider resetting the analysis after optimizing any queries.
-
-`
+  const headerText = (
+    <p className="whitespace-pre-wrap prose text-sm max-w-2xl text-scale-1000">
+      Identify the queries that consume the most time and database resources.
+      {'\n\n'}It relies on the <code>pg_stat_statements</code> table. Read more about{' '}
+      <Link
+        href="https://supabase.com/docs/guides/platform/performance#examining-query-performance"
+        passHref
+      >
+        <a target="_blank" rel="noreferrer">
+          examining query performance
+        </a>
+      </Link>
+      .{'\n\n'}Consider resetting the analysis after optimizing any queries.
+    </p>
+  )
 
   const TimeConsumingHelperText = `This table lists queries ordered by their cumulative total execution time.
 
@@ -84,7 +95,6 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
 
   Look for queries with high or mean execution times. These are often good candidates for optimization.
 `
-
   const panelClassNames = 'text-sm max-w-none flex flex-col gap-8 py-4'
   const helperTextClassNames = 'prose text-sm max-w-2xl text-scale-1000'
 
@@ -156,7 +166,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
         </Accordion>
       )}
 
-      <ReactMarkdown className={helperTextClassNames} children={HeaderText} />
+      {headerText}
 
       <div className="mb-8">
         <Button type="default" onClick={() => setShowResetgPgStatStatements(true)}>
@@ -193,7 +203,9 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
         <Tabs type="underlined" size="medium">
           <Tabs.Panel key={1} id="1" label="Most time consuming">
             <div className={panelClassNames}>
-              <ReactMarkdown className={helperTextClassNames} children={TimeConsumingHelperText} />
+              <ReactMarkdown className={helperTextClassNames}>
+                {TimeConsumingHelperText}
+              </ReactMarkdown>
               <div className="thin-scrollbars max-w-full overflow-scroll">
                 <Table
                   head={
@@ -242,7 +254,9 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
           </Tabs.Panel>
           <Tabs.Panel key={2} id="2" label="Most frequent">
             <div className={panelClassNames}>
-              <ReactMarkdown className={helperTextClassNames} children={MostFrequentHelperText} />
+              <ReactMarkdown className={helperTextClassNames}>
+                {MostFrequentHelperText}
+              </ReactMarkdown>
               <div className="thin-scrollbars max-w-full overflow-scroll">
                 <Table
                   head={
@@ -304,10 +318,9 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
           </Tabs.Panel>
           <Tabs.Panel key={3} id="3" label="Slowest execution time">
             <div className={panelClassNames}>
-              <ReactMarkdown
-                className={helperTextClassNames}
-                children={SlowestExecutionHelperText}
-              />
+              <ReactMarkdown className={helperTextClassNames}>
+                {SlowestExecutionHelperText}
+              </ReactMarkdown>
               <div className="thin-scrollbars max-w-full overflow-scroll">
                 <Table
                   head={

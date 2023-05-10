@@ -1,10 +1,9 @@
-import { FC, useState } from 'react'
-import Router from 'next/router'
+import { useState } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { Listbox, IconLoader, Button, IconPlus, IconAlertCircle, IconCreditCard } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useStore } from 'hooks'
+import { checkPermissions, useFlag, useStore } from 'hooks'
 import { BASE_PATH, PRICING_TIER_PRODUCT_IDS, STRIPE_PRODUCT_IDS } from 'lib/constants'
 import { SubscriptionPreview } from '../Billing.types'
 import { getProductPrice, validateSubscriptionUpdatePayload } from '../Billing.utils'
@@ -14,10 +13,12 @@ import { AddonPrice, SubscriptionAddon } from '../AddOns/AddOns.types'
 import { getPITRDays } from './PaymentSummaryPanel.utils'
 import ConfirmPaymentModal from './ConfirmPaymentModal'
 import { StripeSubscription } from '../Subscription/Subscription.types'
+import { useIsProjectActive } from 'components/layouts/ProjectLayout/ProjectContext'
+import clsx from 'clsx'
 
 // [Joshen] PITR stuff can be undefined for now until we officially launch PITR self serve
 
-interface Props {
+interface PaymentSummaryPanelProps {
   isRefreshingPreview: boolean
   currentSubscription?: StripeSubscription
   subscriptionPreview?: SubscriptionPreview
@@ -57,7 +58,7 @@ interface Props {
 // [Joshen] Eventually if we do support more addons, it'll be better to generalize
 // the selectedComputeSize to an addOns array. But for now, we keep it simple, don't over-engineer too early
 
-const PaymentSummaryPanel: FC<Props> = ({
+const PaymentSummaryPanel = ({
   isRefreshingPreview,
   isSpendCapEnabled,
   currentSubscription,
@@ -78,9 +79,13 @@ const PaymentSummaryPanel: FC<Props> = ({
   onConfirmPayment,
   isSubmitting,
   captcha,
-}) => {
+}: PaymentSummaryPanelProps) => {
   const { ui } = useStore()
+  const isActive = useIsProjectActive()
   const projectRegion = ui.selectedProject?.region
+
+  // [Joshen] Point of refactor: Current plan can just be currentSubscription.tier
+  // Reduce one unnecessary prop
 
   const canUpdatePaymentMethods = checkPermissions(
     PermissionAction.BILLING_WRITE,
@@ -88,11 +93,15 @@ const PaymentSummaryPanel: FC<Props> = ({
   )
 
   const [showConfirmModal, setShowConfirmModal] = useState(false)
+  const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
 
   const selectedPlanCost =
-    selectedPlan.prices.find(
-      (price: AddonPrice) => price.id === selectedPlan.metadata.default_price_id
-    )?.unit_amount ?? 0
+    selectedPlan !== undefined
+      ? selectedPlan.prices.find(
+          (price: AddonPrice) => price.id === selectedPlan.metadata.default_price_id
+        )?.unit_amount ?? 0
+      : currentSubscription?.tier.unit_amount ?? 0
+
   const totalSelectedAddonCost = Object.keys(selectedAddons)
     .map((productName) => {
       const product = (selectedAddons as any)[productName]
@@ -171,7 +180,11 @@ const PaymentSummaryPanel: FC<Props> = ({
   return (
     <>
       <div
-        className="w-full px-6 py-10 space-y-8 overflow-y-auto border-l bg-panel-body-light dark:bg-panel-body-dark lg:px-12"
+        className={clsx(
+          'bg-panel-body-light dark:bg-panel-body-dark overflow-y-auto border-l',
+          'px-6 lg:px-12 py-10 space-y-8',
+          'min-w-[450px] max-w-[450px] 2xl:min-w-[630px] 2xl:max-w-[630px]'
+        )}
         style={{ height: 'calc(100vh - 57px)' }}
       >
         <p>Payment Summary</p>
@@ -372,20 +385,22 @@ const PaymentSummaryPanel: FC<Props> = ({
                   </Button>
                 </Tooltip.Trigger>
                 {!canUpdatePaymentMethods && (
-                  <Tooltip.Content side="bottom">
-                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                    <div
-                      className={[
-                        'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                        'w-48 border border-scale-200 text-center', //border
-                      ].join(' ')}
-                    >
-                      <span className="text-xs text-scale-1200">
-                        You need additional permissions to add new payment methods to this
-                        organization
-                      </span>
-                    </div>
-                  </Tooltip.Content>
+                  <Tooltip.Portal>
+                    <Tooltip.Content side="bottom">
+                      <Tooltip.Arrow className="radix-tooltip-arrow" />
+                      <div
+                        className={[
+                          'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
+                          'w-48 border border-scale-200 text-center', //border
+                        ].join(' ')}
+                      >
+                        <span className="text-xs text-scale-1200">
+                          You need additional permissions to add new payment methods to this
+                          organization
+                        </span>
+                      </div>
+                    </Tooltip.Content>
+                  </Tooltip.Portal>
                 )}
               </Tooltip.Root>
             </div>
@@ -437,6 +452,8 @@ const PaymentSummaryPanel: FC<Props> = ({
                 size="medium"
                 loading={isSubmitting}
                 disabled={
+                  !isActive ||
+                  projectUpdateDisabled ||
                   isSubmitting ||
                   isLoadingPaymentMethods ||
                   !hasChangesToPlan ||
@@ -447,35 +464,31 @@ const PaymentSummaryPanel: FC<Props> = ({
                 Confirm payment
               </Button>
             </Tooltip.Trigger>
-            {!hasChangesToPlan ? (
-              <Tooltip.Content side="bottom">
-                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                <div
-                  className={[
-                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                    'border border-scale-200',
-                  ].join(' ')}
-                >
-                  <span className="text-xs text-scale-1200">
-                    No changes made to your subscription
-                  </span>
-                </div>
-              </Tooltip.Content>
-            ) : !selectedPaymentMethod ? (
-              <Tooltip.Content side="bottom">
-                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                <div
-                  className={[
-                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                    'border border-scale-200',
-                  ].join(' ')}
-                >
-                  <span className="text-xs text-scale-1200">Please select a payment method</span>
-                </div>
-              </Tooltip.Content>
-            ) : (
-              <></>
-            )}
+            {!hasChangesToPlan || !selectedPaymentMethod || !isActive ? (
+              <Tooltip.Portal>
+                <Tooltip.Content side="bottom">
+                  <Tooltip.Arrow className="radix-tooltip-arrow" />
+                  <div
+                    className={[
+                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                      'border border-scale-200',
+                    ].join(' ')}
+                  >
+                    <span className="text-xs text-scale-1200">
+                      {!hasChangesToPlan
+                        ? 'No changes made to your subscription'
+                        : !selectedPaymentMethod
+                        ? 'Please select a payment method'
+                        : !isActive
+                        ? 'Unable to update subscription as project is not active'
+                        : projectUpdateDisabled
+                        ? 'Subscription changes are currently disabled. Our engineers are working on a fix.'
+                        : ''}
+                    </span>
+                  </div>
+                </Tooltip.Content>
+              </Tooltip.Portal>
+            ) : null}
           </Tooltip.Root>
         </div>
       </div>

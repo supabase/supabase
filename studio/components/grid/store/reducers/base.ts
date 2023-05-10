@@ -2,11 +2,9 @@ import { CalculatedColumn } from '@supabase/react-data-grid'
 import { GridProps, SavedState, SupaTable } from '../../types'
 import { REFRESH_PAGE_IMMEDIATELY, TOTAL_ROWS_RESET } from '../../constants'
 import { IRowService, SqlRowService } from '../../services/row'
-import { IMetaService, SqlMetaService } from '../../services/meta'
 
 export interface BaseInitialState {
   table: SupaTable | null
-  metaService: IMetaService | null
   rowService: IRowService | null
   refreshPageFlag: number
   isInitialComplete: boolean
@@ -16,7 +14,6 @@ export interface BaseInitialState {
 
 export const baseInitialState: BaseInitialState = {
   table: null,
-  metaService: null,
   rowService: null,
   refreshPageFlag: 0,
   isInitialComplete: false,
@@ -25,12 +22,6 @@ export const baseInitialState: BaseInitialState = {
 }
 
 export type INIT_ACTIONTYPE =
-  | {
-      type: 'INIT_CLIENT'
-      payload: {
-        onSqlQuery: (query: string) => Promise<{ data?: any; error?: any }>
-      }
-    }
   | {
       type: 'INIT_TABLE'
       payload: {
@@ -56,12 +47,6 @@ type BASE_ACTIONTYPE = INIT_ACTIONTYPE
 
 const BaseReducer = (state: BaseInitialState, action: BASE_ACTIONTYPE) => {
   switch (action.type) {
-    case 'INIT_CLIENT': {
-      return {
-        ...state,
-        metaService: new SqlMetaService(action.payload.onSqlQuery),
-      }
-    }
     case 'INIT_TABLE': {
       return {
         ...state,

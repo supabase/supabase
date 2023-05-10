@@ -21,7 +21,7 @@ const ProjectList: FC<Props> = ({ rewriteHref }) => {
   const { organizations, projects } = app
   const { isLoading: isLoadingProjects } = projects
 
-  const { data: allOverdueInvoices } = useOverdueInvoicesQuery()
+  const { data: allOverdueInvoices } = useOverdueInvoicesQuery({ enabled: IS_PLATFORM })
 
   const isLoadingPermissions = IS_PLATFORM ? (ui?.permissions ?? []).length === 0 : false
 

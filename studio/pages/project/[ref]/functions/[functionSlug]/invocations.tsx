@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react-lite'
 
 import { NextPageWithLayout } from 'types'
-import { useParams } from 'hooks'
+import { useParams } from 'common/hooks'
 import LogsPreviewer from 'components/interfaces/Settings/Logs/LogsPreviewer'
 import FunctionsLayout from 'components/layouts/FunctionsLayout'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'

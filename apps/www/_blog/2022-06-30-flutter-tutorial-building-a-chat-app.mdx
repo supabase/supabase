@@ -109,7 +109,7 @@ create table if not exists public.profiles (
 comment on table public.profiles is 'Holds all of users profile information';
 
 create table if not exists public.messages (
-    id uuid not null primary key default uuid_generate_v4(),
+    id uuid not null primary key default gen_random_uuid(),
     profile_id uuid default auth.uid() references public.profiles(id) on delete cascade not null,
     content varchar(500) not null,
     created_at timestamp with time zone default timezone('utc' :: text, now()) not null

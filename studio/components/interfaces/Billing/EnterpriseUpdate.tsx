@@ -33,6 +33,7 @@ interface Props {
   paymentMethods?: PaymentMethod[]
   currentSubscription: StripeSubscription
   isLoadingPaymentMethods: boolean
+  onPaymentMethodAdded: () => void
 }
 
 const EnterpriseUpdate: FC<Props> = ({
@@ -40,6 +41,7 @@ const EnterpriseUpdate: FC<Props> = ({
   paymentMethods,
   currentSubscription,
   isLoadingPaymentMethods,
+  onPaymentMethodAdded,
 }) => {
   const { app, ui } = useStore()
   const router = useRouter()
@@ -91,6 +93,11 @@ const EnterpriseUpdate: FC<Props> = ({
   const [showAddPaymentMethodModal, setShowAddPaymentMethodModal] = useState(false)
 
   const isChangingComputeSize = currentAddons.computeSize?.id !== selectedAddons.computeSize.id
+
+  const onLocalPaymentMethodAdded = () => {
+    setShowAddPaymentMethodModal(false)
+    return onPaymentMethodAdded()
+  }
 
   useEffect(() => {
     getSubscriptionPreview()
@@ -272,48 +279,47 @@ const EnterpriseUpdate: FC<Props> = ({
             </div>
           </div>
         </div>
-        <div className="w-[34rem]">
-          <PaymentSummaryPanel
-            isSpendCapEnabled={true}
-            isSubmitting={isSubmitting}
-            isRefreshingPreview={isRefreshingPreview}
-            currentSubscription={currentSubscription}
-            subscriptionPreview={subscriptionPreview}
-            // Current subscription configuration based on DB
-            currentPlan={currentSubscription.tier}
-            currentAddons={currentAddons}
-            // Selected subscription configuration based on UI
-            selectedAddons={selectedAddons}
-            paymentMethods={paymentMethods}
-            isLoadingPaymentMethods={isLoadingPaymentMethods}
-            selectedPaymentMethod={selectedPaymentMethodId}
-            onSelectPaymentMethod={setSelectedPaymentMethodId}
-            onSelectAddNewPaymentMethod={() => {
-              setShowAddPaymentMethodModal(true)
-            }}
-            beforeConfirmPayment={beforeConfirmPayment}
-            onConfirmPayment={onConfirmPayment}
-            captcha={
-              <HCaptcha
-                ref={captchaRef}
-                sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
-                size="invisible"
-                onVerify={(token) => {
-                  setCaptchaToken(token)
-                }}
-                onExpire={() => {
-                  setCaptchaToken(null)
-                }}
-              />
-            }
-          />
-        </div>
+        <PaymentSummaryPanel
+          isSpendCapEnabled={true}
+          isSubmitting={isSubmitting}
+          isRefreshingPreview={isRefreshingPreview}
+          currentSubscription={currentSubscription}
+          subscriptionPreview={subscriptionPreview}
+          // Current subscription configuration based on DB
+          currentPlan={currentSubscription.tier}
+          currentAddons={currentAddons}
+          // Selected subscription configuration based on UI
+          selectedAddons={selectedAddons}
+          paymentMethods={paymentMethods}
+          isLoadingPaymentMethods={isLoadingPaymentMethods}
+          selectedPaymentMethod={selectedPaymentMethodId}
+          onSelectPaymentMethod={setSelectedPaymentMethodId}
+          onSelectAddNewPaymentMethod={() => {
+            setShowAddPaymentMethodModal(true)
+          }}
+          beforeConfirmPayment={beforeConfirmPayment}
+          onConfirmPayment={onConfirmPayment}
+          captcha={
+            <HCaptcha
+              ref={captchaRef}
+              sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
+              size="invisible"
+              onVerify={(token) => {
+                setCaptchaToken(token)
+              }}
+              onExpire={() => {
+                setCaptchaToken(null)
+              }}
+            />
+          }
+        />
       </Transition>
 
       <AddNewPaymentMethodModal
         visible={showAddPaymentMethodModal}
         returnUrl={`${getURL()}/project/${projectRef}/settings/billing/update/pro`}
         onCancel={() => setShowAddPaymentMethodModal(false)}
+        onConfirm={() => onLocalPaymentMethodAdded()}
       />
     </>
   )

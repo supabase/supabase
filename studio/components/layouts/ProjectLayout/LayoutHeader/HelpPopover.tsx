@@ -37,9 +37,11 @@ const HelpPopover: FC<Props> = () => {
             </p>
             <div className="space-x-1">
               <Link passHref href={supportUrl}>
-                <Button type="default" icon={<IconMail />} as="a">
-                  Contact Support
-                </Button>
+                <a>
+                  <Button type="default" icon={<IconMail />}>
+                    Contact Support
+                  </Button>
+                </a>
               </Link>
               <Link passHref href="https://supabase.com/docs/">
                 <a target="_blank" rel="noreferrer">
@@ -58,7 +60,7 @@ const HelpPopover: FC<Props> = () => {
             </div>
             <p className="text-sm text-scale-900">
               Expected response time is based on your billing tier. Pro and Pay as You Go plans are
-              prioritised.
+              prioritized.
             </p>
           </div>
           <Popover.Separator />
@@ -79,6 +81,7 @@ const HelpPopover: FC<Props> = () => {
                 <a
                   href="https://discord.supabase.com"
                   target="_blank"
+                  rel="noreferrer"
                   className="dark block cursor-pointer"
                 >
                   <Image
@@ -104,6 +107,7 @@ const HelpPopover: FC<Props> = () => {
                 <a
                   href="https://github.com/supabase/supabase/discussions"
                   target="_blank"
+                  rel="noreferrer"
                   className="block cursor-pointer"
                 >
                   <Image

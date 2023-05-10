@@ -2,7 +2,7 @@ import { PropsWithChildren } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { useStore, withAuth } from 'hooks'
-import ProjectLayout from '../ProjectLayout/ProjectLayout'
+import ProjectLayout from '../'
 import ProductMenu from 'components/ui/ProductMenu'
 import { generateReportsMenu } from './ReportsMenu.utils'
 

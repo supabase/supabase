@@ -32,6 +32,8 @@ export const SelectColumn: CalculatedColumn<any, any> = {
     )
   },
   formatter: (props: FormatterProps<SupaRow>) => {
+    // [Alaister] formatter is actually a valid React component, so we can use hooks here
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     const [isRowSelected, onRowSelectionChange] = useRowSelection()
     return (
       <SelectCellFormatter
@@ -49,6 +51,8 @@ export const SelectColumn: CalculatedColumn<any, any> = {
     )
   },
   groupFormatter: (props: GroupFormatterProps<SupaRow>) => {
+    // [Alaister] groupFormatter is actually a valid React component, so we can use hooks here
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     const [isRowSelected, onRowSelectionChange] = useRowSelection()
     return (
       <SelectCellFormatter

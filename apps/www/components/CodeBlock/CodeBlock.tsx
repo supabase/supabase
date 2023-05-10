@@ -87,6 +87,7 @@ function CodeBlock(props: CodeBlockProps) {
         </div>
       )}
       <div className="relative">
+        {/* @ts-ignore */}
         <SyntaxHighlighter
           language={lang}
           style={monokaiCustomTheme}

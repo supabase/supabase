@@ -110,17 +110,19 @@ const TimeInput: FC<Props> = ({ defaultTime, minimumTime, maximumTime, onChange 
               className="w-full text-sm bg-transparent p-0 text-center outline-none border-none focus:ring-0"
             />
           </Tooltip.Trigger>
-          <Tooltip.Content side="bottom">
-            <Tooltip.Arrow className="radix-tooltip-arrow" />
-            <div
-              className={[
-                'bg-scale-100 rounded py-1 px-2 leading-none shadow',
-                'border-scale-200 border',
-              ].join(' ')}
-            >
-              <span className="text-scale-1200 text-xs">Hours (HH)</span>
-            </div>
-          </Tooltip.Content>
+          <Tooltip.Portal>
+            <Tooltip.Content side="bottom">
+              <Tooltip.Arrow className="radix-tooltip-arrow" />
+              <div
+                className={[
+                  'bg-scale-100 rounded py-1 px-2 leading-none shadow',
+                  'border-scale-200 border',
+                ].join(' ')}
+              >
+                <span className="text-scale-1200 text-xs">Hours (HH)</span>
+              </div>
+            </Tooltip.Content>
+          </Tooltip.Portal>
         </Tooltip.Root>
         <span>:</span>
         <Tooltip.Root delayDuration={0}>
@@ -138,17 +140,19 @@ const TimeInput: FC<Props> = ({ defaultTime, minimumTime, maximumTime, onChange 
               className="w-full text-sm bg-transparent p-0 text-center outline-none border-none focus:ring-0"
             />
           </Tooltip.Trigger>
-          <Tooltip.Content side="bottom">
-            <Tooltip.Arrow className="radix-tooltip-arrow" />
-            <div
-              className={[
-                'bg-scale-100 rounded py-1 px-2 leading-none shadow',
-                'border-scale-200 border',
-              ].join(' ')}
-            >
-              <span className="text-scale-1200 text-xs">Minutes (MM)</span>
-            </div>
-          </Tooltip.Content>
+          <Tooltip.Portal>
+            <Tooltip.Content side="bottom">
+              <Tooltip.Arrow className="radix-tooltip-arrow" />
+              <div
+                className={[
+                  'bg-scale-100 rounded py-1 px-2 leading-none shadow',
+                  'border-scale-200 border',
+                ].join(' ')}
+              >
+                <span className="text-scale-1200 text-xs">Minutes (MM)</span>
+              </div>
+            </Tooltip.Content>
+          </Tooltip.Portal>
         </Tooltip.Root>
         <span>:</span>
         <Tooltip.Root delayDuration={0}>
@@ -166,17 +170,19 @@ const TimeInput: FC<Props> = ({ defaultTime, minimumTime, maximumTime, onChange 
               className="w-full text-sm bg-transparent p-0 text-center outline-none border-none focus:ring-0"
             />
           </Tooltip.Trigger>
-          <Tooltip.Content side="bottom">
-            <Tooltip.Arrow className="radix-tooltip-arrow" />
-            <div
-              className={[
-                'bg-scale-100 rounded py-1 px-2 leading-none shadow',
-                'border-scale-200 border',
-              ].join(' ')}
-            >
-              <span className="text-scale-1200 text-xs">Seconds (SS)</span>
-            </div>
-          </Tooltip.Content>
+          <Tooltip.Portal>
+            <Tooltip.Content side="bottom">
+              <Tooltip.Arrow className="radix-tooltip-arrow" />
+              <div
+                className={[
+                  'bg-scale-100 rounded py-1 px-2 leading-none shadow',
+                  'border-scale-200 border',
+                ].join(' ')}
+              >
+                <span className="text-scale-1200 text-xs">Seconds (SS)</span>
+              </div>
+            </Tooltip.Content>
+          </Tooltip.Portal>
         </Tooltip.Root>
       </div>
       {error && <p className="text-sm text-red-900">{error}</p>}

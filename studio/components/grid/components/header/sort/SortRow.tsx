@@ -17,7 +17,6 @@ export interface SortRowProps {
 
 const SortRow = ({ table, index, columnName, sort, onDelete, onToggle, onDrag }: SortRowProps) => {
   const column = table.columns.find((x) => x.name === columnName)
-  if (!column) return null
 
   const ref = useRef<HTMLDivElement>(null)
 
@@ -94,6 +93,8 @@ const SortRow = ({ table, index, columnName, sort, onDelete, onToggle, onDrag }:
 
   const opacity = isDragging ? 0 : 1
   drag(drop(ref))
+
+  if (!column) return null
 
   return (
     <div

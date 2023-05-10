@@ -68,10 +68,8 @@ const ConnectionPooling: FC<Props> = () => {
     )
   }
 
-  const { project } = poolingConfiguration
-
   // for older projects
-  if (!project.pgbouncer_enabled && project.pool_mode == null)
+  if (!poolingConfiguration.pgbouncer_enabled && poolingConfiguration.pool_mode == null)
     return (
       <Panel
         title={
@@ -85,7 +83,7 @@ const ConnectionPooling: FC<Props> = () => {
         </Panel.Content>
       </Panel>
     )
-  const formModel = project
+  const formModel = poolingConfiguration
   const DB_FIELDS = ['db_host', 'db_name', 'db_port', 'db_user', 'inserted_at']
   const connectionInfo = pluckObjectFields(formModel, DB_FIELDS)
   const BOUNCER_FIELDS = [
@@ -134,19 +132,25 @@ export const PgbouncerConfig: FC<ConfigProps> = observer(
     )
 
     const [updates, setUpdates] = useState<any>({
-      pgbouncer_enabled: bouncerInfo.pgbouncer_enabled,
       pool_mode: bouncerInfo.pool_mode || 'transaction',
       default_pool_size: bouncerInfo.default_pool_size || '',
       ignore_startup_parameters: bouncerInfo.ignore_startup_parameters || '',
+      pgbouncer_enabled: bouncerInfo.pgbouncer_enabled,
     })
 
     const updateConfig = async (updatedConfig: any) => {
       try {
-        const response = await patch(`${API_URL}/props/pooling/${projectRef}/config`, updatedConfig)
+        const response = await patch(`${API_URL}/projects/${projectRef}/config/pgbouncer`, {
+          pgbouncer_enabled: updatedConfig.pgbouncer_enabled,
+          default_pool_size: updatedConfig.default_pool_size,
+          ignore_startup_parameters: updatedConfig.ignore_startup_parameters,
+          pool_mode: updatedConfig.pool_mode,
+          max_client_conn: updatedConfig.max_client_conn,
+        })
         if (response.error) {
           throw response.error
         } else {
-          setUpdates({ ...response.project })
+          setUpdates({ ...response })
           ui.setNotification({ category: 'success', message: 'Successfully saved settings' })
         }
       } catch (error: any) {
@@ -159,11 +163,6 @@ export const PgbouncerConfig: FC<ConfigProps> = observer(
 
     const formSchema = {
       properties: {
-        pgbouncer_enabled: {
-          title: 'Enabled',
-          type: 'boolean',
-          help: 'Activates / deactivates Connection Pooling.',
-        },
         pool_mode: {
           title: 'Pool Mode',
           type: 'string',
@@ -176,16 +175,11 @@ export const PgbouncerConfig: FC<ConfigProps> = observer(
               label: 'Session',
               value: 'session',
             },
-            {
-              label: 'Statement',
-              value: 'statement',
-            },
           ],
         },
         ignore_startup_parameters: {
           title: 'Ignore Startup Parameters',
           type: 'string',
-          readOnly: true,
           help: 'Defaults are either blank or "extra_float_digits"',
         },
       },
@@ -208,16 +202,12 @@ export const PgbouncerConfig: FC<ConfigProps> = observer(
           disabledMessage="You need additional permissions to update connection pooling settings"
         >
           <div className="space-y-6 py-4">
-            <ToggleField name="pgbouncer_enabled" />
-
-            <Divider light />
-
-            {updates.pgbouncer_enabled && (
+            {bouncerInfo.pgbouncer_enabled && (
               <>
                 <AutoField
                   name="pool_mode"
                   showInlineError
-                  errorMessage="You must select one of the three options"
+                  errorMessage="You must select one of the two options"
                 />
                 <div className="!mt-1 flex" style={{ marginLeft: 'calc(33% + 0.5rem)' }}>
                   <p className="text-sm text-scale-900">
@@ -226,6 +216,7 @@ export const PgbouncerConfig: FC<ConfigProps> = observer(
                     <a
                       className="text-green-900"
                       target="_blank"
+                      rel="noreferrer"
                       href="https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pool"
                     >
                       click here

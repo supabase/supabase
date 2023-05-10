@@ -768,10 +768,10 @@ functions:
             - schema: public
               name: countries
               content: |
-                | name                    | id    | 
-                | :-----------------------|------:| 
-                | Afghanistan             | 1     | 
-                | Albania                 | 2     |   
+                | name                    | id    |
+                | :-----------------------|------:|
+                | Afghanistan             | 1     |
+                | Albania                 | 2     |
                 | Algeria                 | 3     |
         response: |
           {
@@ -811,10 +811,10 @@ functions:
             - schema: public
               name: countries
               content: |
-                | name                    | id    | 
-                | :-----------------------|------:| 
-                | Afghanistan             | 1     | 
-                | Albania                 | 2     |   
+                | name                    | id    |
+                | :-----------------------|------:|
+                | Afghanistan             | 1     |
+                | Albania                 | 2     |
                 | Algeria                 | 3     |
         response: |
           {
@@ -873,16 +873,16 @@ functions:
             - schema: public
               name: countries
               content: |
-                | name                    | id    | 
-                | :-----------------------|------:| 
-                | Germany                 | 1     | 
+                | name                    | id    |
+                | :-----------------------|------:|
+                | Germany                 | 1     |
                 | Indonesia               | 2     |
             - schema: public
               name: cities
               content: |
-                | name                    | id    | 
-                | :-----------------------|------:| 
-                | Bali                    | 1     | 
+                | name                    | id    |
+                | :-----------------------|------:|
+                | Bali                    | 1     |
                 | Munich                  | 2     |
         response: |
           {
@@ -4209,7 +4209,7 @@ functions:
 
   - id: Using Modifiers
     description: |
-      Filters work on the row level—they allows you to return rows that
+      Filters work on the row level—they allow you to return rows that
       only match certain conditions without changing the shape of the rows.
       Modifiers are everything that don't fit that definition—allowing you to
       change the format of the response (e.g., returning a CSV string).
@@ -4966,7 +4966,8 @@ functions:
           })
 
           if (error instanceof FunctionsHttpError) {
-            console.log('Function returned an error', error.message)
+            const errorMessage = await error.context.json()
+            console.log('Function returned an error', errorMessage)
           } else if (error instanceof FunctionsRelayError) {
             console.log('Relay error:', error.message)
           } else if (error instanceof FunctionsFetchError) {

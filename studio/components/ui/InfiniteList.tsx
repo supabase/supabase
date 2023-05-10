@@ -82,8 +82,8 @@ function InfiniteList<T>({
               {({ onItemsRendered, ref }) => (
                 <VariableSizeList
                   ref={ref}
-                  height={height}
-                  width={width}
+                  height={height ?? 0}
+                  width={width ?? 0}
                   itemCount={itemCount}
                   itemData={itemData}
                   itemSize={getItemSize}

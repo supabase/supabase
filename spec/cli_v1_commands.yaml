@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 1.42.0
+  version: 1.50.13
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -45,6 +45,253 @@ flags:
     description: path to a Supabase project directory
     default_value: ''
 commands:
+  - id: supabase-sso
+    title: supabase sso
+    summary: Manage SSO authentication for your project
+    description: |-
+      Manage SSO authentication for Supabase projects.
+    tags:
+      - management-api
+    links: []
+    subcommands:
+      - supabase-sso-list
+      - supabase-sso-show
+      - supabase-sso-add
+      - supabase-sso-remove
+      - supabase-sso-update
+      - supabase-sso-info
+    flags:
+      - id: project-ref
+        name: --project-ref <string>
+        description: Project ref of the Supabase project.
+        default_value: ''
+        type: string
+        required: true
+        inherit: true
+      - id: output
+        name: --output [ pretty | json | yaml | toml ]
+        description: Output format of the command, useful when using the CLI in scripts or CI workflows.
+        default_value: pretty
+        type: '[ pretty | json | yaml | toml ]'
+        inherit: true
+        accepted_values:
+          - name: pretty
+            value: pretty
+            type: '[ pretty | json | yaml | toml ]'
+          - name: json
+            value: json
+            type: '[ pretty | json | yaml | toml ]'
+          - name: yaml
+            value: yaml
+            type: '[ pretty | json | yaml | toml ]'
+          - name: toml
+            value: toml
+            type: '[ pretty | json | yaml | toml ]'
+            description: |-
+              Use only with certain commands to output the raw SAML 2.0 Metadata XML stored in your project's authentication configuration.
+  - id: supabase-sso-info
+    title: supabase sso info
+    summary: Show important SAML 2.0 information about your project
+    description: |-
+      Returns all of the important SSO information necessary for your project to be registered with a SAML 2.0 compatible identity provider.
+    tags:
+      - management-api
+    flags: []
+    links: []
+    examples:
+      - id: basic-usage
+        name: Show project information
+        code: |-
+          supabase sso info --project-ref abcdefghijklmnopqrst
+        response: |-
+          Information about your project's SAML 2.0 configuration.
+  - id: supabase-sso-add
+    title: supabase sso add
+    summary: Add a connection to a SSO identity provider
+    description: |-
+      Add and configure a new connection to a SSO identity provider to your Supabase project.
+    tags:
+      - management-api
+    examples:
+      - id: basic-usage
+        name: Add with Metadata URL
+        code: |-
+          supabase sso add \
+            --project-ref abcdefgijklmnopqrst \
+            --type saml \
+            --metadata-url 'https://...' \
+            --domains company.com
+        response: |-
+          Information about the added identity provider. You can use
+          company.com as the domain name on the frontend side to initiate a SSO
+          request to the identity provider.
+      - id: with-xml
+        name: Add with Metadata File
+        code: |-
+          supabase sso add \
+            --project-ref abcdefgijklmnopqrst \
+            --type saml \
+            --metadata-file /path/to/metadata/file.xml \
+            --domains company.com
+        response: |-
+          Information about the added identity provider. You can use
+          company.com as the domain name on the frontend side to initiate a SSO
+          request to the identity provider.
+    flags:
+      - id: type
+        name: --type saml
+        description: |-
+          Type of identity provider being added. Only SAML 2.0 supported at this time.
+        type: string
+        accepted_values:
+          - name: saml
+            type: string
+        required: true
+      - id: metadata-url
+        name: --metadata-url <URL>
+        description: |-
+          A URL (typically HTTPS) that points to a SAML 2.0 Metadata XML document describing the SAML features supported by the identity provider being added.
+          Mutually exclusive with --metadata-file.
+        type: string
+        required: true
+      - id: metadata-file
+        name: --metadata-file <path to file>
+        description: |
+          A path to a file containing a SAML 2.0 Metadata XML document describing the SAML features supported by the identity provider being added. Prefer using --metadata-url if possible.
+
+          Mutually exclusive with --metadata-url.
+        type: string
+        required: true
+      - id: domains
+        name: domains
+        description: |-
+          A comma separated list of email domains to associate with this identity provider. Used to quickly sign users in on the frontend by identifying the correct identity provider based on the email address of the user.
+        type: string
+      - id: attribute-mapping-file
+        name: attribute-mapping-file
+        type: string
+        description: |-
+          A file containing a JSON document describing the attribute mappings attached to this identity provider. User information contained in the SAML assertion will be mapped according to the rules laid out in this document.
+  - id: supabase-sso-remove
+    title: supabase sso remove <provider-id>
+    summary: Remove a connection to a SSO identity provider
+    description: |-
+      Remove a connection to an already added SSO identity provider. Removing the provider will prevent existing users from logging in. Please treat this command with care.
+    tags:
+      - management-api
+    links: []
+    flags: []
+    examples:
+      - id: basic-usage
+        name: Remove a provider
+        code: |-
+          supabase sso remove 6df4d73f-bf21-405f-a084-b11adf19fea5 \
+            --project-ref abcdefghijklmnopqrst
+        response: |-
+          Information about the removed identity provider. It's a good idea to
+          save this in case you need it later on.
+  - id: supabase-sso-update
+    title: supabase sso update <provider-id>
+    summary: Update the configuration of an identity provider
+    description: |-
+      Update the configuration settings of a already added SSO identity provider.
+    tags:
+      - management-api
+    links: []
+    examples:
+      - id: basic-usage
+        name: Replace domains
+        code: |-
+          supabase sso update 6df4d73f-bf21-405f-a084-b11adf19fea5 \
+            --project-ref abcdefghijklmnopqrst \
+            --domains new-company.com,new-company.net
+        response: |-
+          Information about the updated provider.
+      - id: add-domains
+        name: Add an additional domain
+        code: |-
+          supabase sso update 6df4d73f-bf21-405f-a084-b11adf19fea5 \
+            --project-ref abcdefghijklmnopqrst \
+            --add-domains company.net
+        response: |-
+          Information about the updated provider.
+      - id: remove-domains
+        name: Remove a domain
+        code: |-
+          supabase sso update 6df4d73f-bf21-405f-a084-b11adf19fea5 \
+            --project-ref abcdefghijklmnopqrst \
+            --remove-domains company.org
+        response: |-
+          Information about the updated provider.
+    flags:
+      - id: metadata-url
+        name: --metadata-url <URL>
+        description: |-
+          A URL (typically HTTPS) that points to a SAML 2.0 Metadata XML document describing the SAML features supported by the identity provider being added.
+          Mutually exclusive with --metadata-file.
+        type: string
+      - id: metadata-file
+        name: --metadata-file <path to file>
+        description: |
+          A path to a file containing a SAML 2.0 Metadata XML document describing the SAML features supported by the identity provider being added. Prefer using --metadata-url if possible.
+
+          Mutually exclusive with --metadata-url.
+        type: string
+      - id: domains
+        name: domains
+        description: |-
+          A comma separated list of email domains to associate with this identity provider. Used to quickly sign users in on the frontend by identifying the correct identity provider based on the email address of the user. When provided all of the domains already attached to the identity provider will be replaced with this list.
+        type: string
+      - id: add-domains
+        name: add-domains
+        description: |-
+          Associates these additional email domains to the existing set of domains. See --domains for a detailed explanation.
+      - id: remove-domains
+        name: remove-domains
+        description: |-
+          Removes these email domains from the existing set of domains. See --domains for a detailed explanation.
+      - id: attribute-mapping-file
+        name: attribute-mapping-file
+        type: string
+        description: |-
+          A file containing a JSON document describing the attribute mappings attached to this identity provider. User information contained in the SAML assertion will be mapped according to the rules laid out in this document.
+  - id: supabase-sso-list
+    title: supabase sso list
+    summary: Lists all connections to identity providers
+    description: |-
+      List all connections to a SSO identity provider to your Supabase project.
+    tags:
+      - management-api
+    links: []
+    flags: []
+  - id: supabase-sso-show
+    title: supabase sso show <provider-id>
+    summary: Show information about an identity provider.
+    description: |-
+      Provides the information about an established connection to an identity provider. You can use --metadata to obtain the raw SAML 2.0 Metadata XML document stored in your project's configuration.
+    tags:
+      - management-api
+    examples:
+      - id: basic-usage
+        name: Show information
+        code: |-
+          supabase sso show 6df4d73f-bf21-405f-a084-b11adf19fea5 \
+            --project-ref abcdefghijklmnopqrst
+        response: |-
+          Information about the identity provider in pretty output.
+      - id: metadata-output
+        name: Get raw SAML 2.0 Metadata XML
+        code: |-
+          supabase sso show 6df4d73f-bf21-405f-a084-b11adf19fea5 \
+            --project-ref abcdefghijklmnopqrst \
+            --metadata
+        response: |-
+          Raw SAML 2.0 XML assigned to this identity provider. This is the
+          version used in the authentication project, and if using a SAML 2.0
+          Metadata URL it may change depending on the caching information
+          contained within the metadata.
+    links: []
+    flags: []
   - id: supabase-vanity-subdomains
     title: supabase vanity-subdomains
     summary: Manage vanity subdomains for Supabase projects
@@ -158,6 +405,25 @@ commands:
   - id: supabase-test-db
     title: supabase test db
     summary: Tests local database with pgTAP
+    description: |2
+
+      Executes pgTAP tests against the local database.
+
+      Requires the local development stack to be started by running `supabase start`.
+
+      Runs `pg_prove` in a container with unit test files volume mounted from `supabase/tests` directory. The test file can be suffixed by either `.sql` or `.pg` extension.
+
+      Since each test is wrapped in its own transaction, it will be individually rolled back regardless of success or failure.
+    examples:
+      - id: basic-usage
+        name: Basic usage
+        code: supabase test db
+        response: |
+          /tmp/supabase/tests/nested/order_test.pg .. ok
+          /tmp/supabase/tests/pet_test.sql .......... ok
+          All tests successful.
+          Files=2, Tests=2,  6 wallclock secs ( 0.03 usr  0.01 sys +  0.05 cusr  0.02 csys =  0.11 CPU)
+          Result: PASS
     tags: []
     links: []
     usage: supabase test db
@@ -213,7 +479,8 @@ commands:
         response: |
           supabase local development setup is running.
 
-                  API URL: http://localhost:54321
+                   API URL: http://localhost:54321
+               GraphQL URL: http://localhost:54321/graphql/v1
                     DB URL: postgresql://postgres:postgres@localhost:54322/postgres
                 Studio URL: http://localhost:54323
               Inbucket URL: http://localhost:54324
@@ -227,6 +494,7 @@ commands:
           ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0"
           API_URL="http://localhost:54321"
           DB_URL="postgresql://postgres:postgres@localhost:54322/postgres"
+          GRAPHQL_URL="http://localhost:54321/graphql/v1"
           INBUCKET_URL="http://localhost:54324"
           JWT_SECRET="super-secret-jwt-token-with-at-least-32-characters-long"
           SERVICE_ROLE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU"
@@ -238,6 +506,7 @@ commands:
           Stopped services: [supabase_inbucket_cli supabase_rest_cli supabase_studio_cli]
           SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0"
           DB_URL="postgresql://postgres:postgres@localhost:54322/postgres"
+          GRAPHQL_URL="http://localhost:54321/graphql/v1"
           JWT_SECRET="super-secret-jwt-token-with-at-least-32-characters-long"
           SUPABASE_SERVICE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU"
     tags:
@@ -247,25 +516,25 @@ commands:
     subcommands: []
     flags:
       - id: output
-        name: -o, --output <[ env | json | pretty | toml | yaml ]>
+        name: -o, --output <[ env | pretty | json | toml | yaml ]>
         description: Output format of status variables.
         default_value: pretty
         accepted_values:
           - id: env
             name: env
-            type: '[ env | json | pretty | toml | yaml ]'
-          - id: json
-            name: json
-            type: '[ env | json | pretty | toml | yaml ]'
+            type: '[ env | pretty | json | toml | yaml ]'
           - id: pretty
             name: pretty
-            type: '[ env | json | pretty | toml | yaml ]'
+            type: '[ env | pretty | json | toml | yaml ]'
+          - id: json
+            name: json
+            type: '[ env | pretty | json | toml | yaml ]'
           - id: toml
             name: toml
-            type: '[ env | json | pretty | toml | yaml ]'
+            type: '[ env | pretty | json | toml | yaml ]'
           - id: yaml
             name: yaml
-            type: '[ env | json | pretty | toml | yaml ]'
+            type: '[ env | pretty | json | toml | yaml ]'
       - id: override-name
         name: --override-name <strings>
         description: Override specific variable names.
@@ -289,6 +558,7 @@ commands:
         name: Basic usage
         code: supabase start
         response: |
+          Creating custom roles supabase/roles.sql...
           Applying migration 20220810154536_employee.sql...
           Seeding data supabase/seed.sql...
           Started supabase local development setup.
@@ -298,13 +568,11 @@ commands:
         response: |
           Excluding container: supabase/studio:20221214-4eecc99
           Excluding container: darthsim/imgproxy:v3.8.0
-          Seeding data supabase/seed.sql...
           Started supabase local development setup.
       - id: ignore-health-check
         name: Ignore service health checks
         code: supabase start --ignore-health-check
         response: |
-          Seeding data supabase/seed.sql...
           service not healthy: [supabase_storage_cli]
           Started supabase local development setup.
     tags:
@@ -316,7 +584,7 @@ commands:
       - id: exclude
         name: -x, --exclude <strings>
         description: |
-          Names of containers to not start. [gotrue,realtime,storage-api,imgproxy,kong,inbucket,postgrest,pgadmin-schema-diff,migra,postgres-meta,studio,deno-relay]
+          Names of containers to not start. [gotrue,realtime,storage-api,imgproxy,kong,inbucket,postgrest,pgadmin-schema-diff,migra,postgres-meta,studio,edge-runtime,logflare,vector]
         default_value: '[]'
       - id: ignore-health-check
         name: --ignore-health-check
@@ -511,6 +779,9 @@ commands:
             type: string
           - id: us-west-1
             name: us-west-1
+            type: string
+          - id: us-west-2
+            name: us-west-2
             type: string
   - id: supabase-orgs
     title: supabase orgs
@@ -842,19 +1113,19 @@ commands:
         name: Basic usage
         code: supabase link --project-ref ********************
         response: |
-          Enter your database password: ********
+          Enter your database password (or leave blank to skip): ********
           Finished supabase link.
       - id: without-password
         name: Link without database password
         code: supabase link --project-ref ******************** <<< ""
         response: |
-          Enter your database password:
+          Enter your database password (or leave blank to skip):
           Finished supabase link.
       - id: using-alternate-dns
         name: Link using DNS-over-HTTPS resolver
         code: supabase link --project-ref ******************** --dns-resolver https
         response: |
-          Enter your database password:
+          Enter your database password (or leave blank to skip):
           Finished supabase link.
     tags:
       - local-dev
@@ -1182,6 +1453,25 @@ commands:
   - id: supabase-db-reset
     title: supabase db reset
     summary: Resets the local database to current migrations
+    description: |2
+
+      Resets the local database to a clean state.
+
+      Requires the local development stack to be started by running `supabase start`.
+
+      Recreates the local Postgres container and applies all local migrations found in `supabase/migrations` directory. If test data is defined in `supabase/seed.sql`, it will be seeded after the migrations are run. Any other data or schema changes made during local development will be discarded.
+
+      Note that since Postgres roles are cluster level entities, those changes will persist between resets. In order to reset custom roles, you need to restart the local development stack.
+    examples:
+      - id: basic-usage
+        name: Basic usage
+        code: supabase db reset
+        response: |
+          Resetting database...
+          Initializing schema...
+          Applying migration 20220810154537_create_employees_table.sql...
+          Seeding data supabase/seed.sql...
+          Finished supabase db reset on branch main.
     tags: []
     links: []
     usage: supabase db reset
@@ -1222,6 +1512,37 @@ commands:
   - id: supabase-db-push
     title: supabase db push
     summary: Push new migrations to the remote database
+    description: |2
+
+      Pushes all local migrations to a remote database.
+
+      Requires your local project to be linked to a remote database by running `supabase link`. For self-hosted databases, you can pass in the connection parameters using `--db-url` flag.
+
+      The first time this command is run, a migration history table will be created under `supabase_migrations.schema_migrations`. After successfully applying a migration, a new row will be inserted into the migration history table with timestamp as its unique id. Subsequent pushes will skip migrations that have already been applied.
+
+      If you need to mutate the migration history table, such as deleting existing entries or inserting new entries without actually running the migration, use the `migration repair` command.
+
+      Use the `--dry-run` flag to view the list of changes before applying.
+    examples:
+      - id: basic-usage
+        name: Basic usage
+        code: supabase db push
+        response: |
+          Linked project is up to date.
+      - id: self-hosted
+        name: Self hosted
+        code: supabase db push --db-url "postgres://user:pass@localhost:5432/postgres"
+        response: |
+          Pushing migration 20230410135622_create_employees_table.sql...
+          Finished supabase db push.
+      - id: dry-run
+        name: Dry run
+        code: supabase db push --dry-run
+        response: |
+          DRY RUN: migrations will *not* be pushed to the database.
+          Would push migration 20230410135622_create_employees_table.sql...
+          Would push migration 20230425064254_my_table.sql...
+          Finished supabase db push.
     tags: []
     links: []
     usage: supabase db push [flags]
@@ -1243,6 +1564,40 @@ commands:
   - id: supabase-db-lint
     title: supabase db lint
     summary: Checks local database for typing error
+    description: |2
+
+      Lints local database for schema errors.
+
+      Requires the local development stack to be running when linting against the local database. To lint against a remote or self-hosted database, specify the `--linked` or `--db-url` flag respectively.
+
+      Runs `plpgsql_check` extension in the local Postgres container to check for errors in all schemas. The default lint level is `warning` and can be raised to error via the `--level` flag.
+
+      To lint against specific schemas only, pass in the `--schema` flag.
+    examples:
+      - id: basic-usage
+        name: Basic usage
+        code: supabase db lint
+        response: |
+          Linting schema: public
+
+          No schema errors found
+      - id: schema-warnings
+        name: Warnings for a specific schema
+        code: supabase db lint --level warning --schema storage
+        response: |
+          Linting schema: storage
+          [
+            {
+              "function": "storage.search",
+              "issues": [
+                {
+                  "level": "warning",
+                  "message": "unused variable \"_bucketid\"",
+                  "sqlState": "00000"
+                }
+              ]
+            }
+          ]
     tags: []
     links: []
     usage: supabase db lint [flags]
@@ -1270,6 +1625,34 @@ commands:
   - id: supabase-db-dump
     title: supabase db dump
     summary: Dumps data or schemas from the remote database
+    description: |2
+
+      Dumps contents from a remote database.
+
+      Requires your local project to be linked to a remote database by running `supabase link`. For self-hosted databases, you can pass in the connection parameters using `--db-url` flag.
+
+      Runs `pg_dump` in a container with additional flags to exclude Supabase managed schemas. The ignored schemas include auth, stroage, and those created by extensions.
+
+      The default dump does not contain any data or custom roles. To dump those contents explicitly, specify either the `--data-only` and `--role-only` flag.
+    examples:
+      - id: basic-usage
+        name: Basic usage
+        code: supabase db dump -f supabase/schema.sql
+        response: |
+          Dumping schemas from remote database...
+          Dumped schema to supabase/schema.sql.
+      - id: role-only
+        name: Role only
+        code: supabase db dump -f supabase/roles.sql --role-only
+        response: |
+          Dumping roles from remote database...
+          Dumped schema to supabase/roles.sql.
+      - id: data-only
+        name: Data only
+        code: supabase db dump -f supabase/seed.sql --data-only
+        response: |
+          Dumping data from remote database...
+          Dumped schema to supabase/seed.sql.
     tags: []
     links: []
     usage: supabase db dump [flags]
@@ -1298,6 +1681,54 @@ commands:
   - id: supabase-db-diff
     title: supabase db diff
     summary: Diffs the local database for schema changes
+    description: |2
+
+      Diffs schema changes made to the local or remote database.
+
+      Requires the local development stack to be running when diffing against the local database. To diff against a remote or self-hosted database, specify the `--linked` or `--db-url` flag respectively.
+
+      Runs [djrobstep/migra](https://github.com/djrobstep/migra) in a container to compare schema differences between the target database and a shadow database. The shadow database is created by applying migrations in local `supabase/migrations` directory in a separate container. Output is written to stdout by default. For convenience, you can also save the schema diff as a new migration file by passing in `-f` flag.
+
+      By default, all schemas in the target database are diffed. Use the `--schema public,extensions` flag to restrict diffing to a subset of schemas.
+
+      While the diff command is able to capture most schema changes, there are cases where it is known to fail. Currently, this could happen if you schema contains:
+
+      - Changes to publication
+      - Changes to storage buckets
+      - Views with `security_invoker` attributes
+    examples:
+      - id: basic-usage
+        name: Basic usage
+        code: supabase db diff -f my_table
+        response: |
+          Connecting to local database...
+          Creating shadow database...
+          Applying migration 20230425064254_remote_commit.sql...
+          Diffing schemas: auth,extensions,public,storage
+          Finished supabase db diff on branch main.
+
+          No schema changes found
+      - id: linked-project
+        name: Against linked project
+        code: supabase db diff -f my_table --linked
+        response: |
+          Connecting to local database...
+          Creating shadow database...
+          Diffing schemas: auth,extensions,public,storage
+          Finished supabase db diff on branch main.
+
+          WARNING: The diff tool is not foolproof, so you may need to manually rearrange and modify the generated migration.
+          Run supabase db reset to verify that the new migration does not generate errors.
+      - id: specific-schema
+        name: For a specific schema
+        code: supabase db diff -f my_table --schema auth
+        response: |
+          Connecting to local database...
+          Creating shadow database...
+          Diffing schemas: auth
+          Finished supabase db diff on branch main.
+
+          No schema changes found
     tags: []
     links: []
     usage: supabase db diff [flags]
@@ -1355,7 +1786,7 @@ commands:
 
       To load completions in your current shell session:
 
-          source <(supabase completion zsh); compdef _supabase supabase
+          source <(supabase completion zsh)
 
       To load completions for every new session, execute once:
 

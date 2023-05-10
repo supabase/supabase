@@ -1,6 +1,4 @@
-import React from 'react'
 import { Button } from '../Button'
-import Typography from '../Typography'
 import { Divider } from './'
 
 export default {
@@ -10,17 +8,11 @@ export default {
 
 export const Default = (args: any) => <Divider {...args} />
 
-export const withCenterText = (args: any) => (
-  <Divider {...args}>Hello world</Divider>
-)
+export const withCenterText = (args: any) => <Divider {...args}>Hello world</Divider>
 
-export const withLeftText = (args: any) => (
-  <Divider {...args}>Hello world</Divider>
-)
+export const withLeftText = (args: any) => <Divider {...args}>Hello world</Divider>
 
-export const withRightText = (args: any) => (
-  <Divider {...args}>Hello world</Divider>
-)
+export const withRightText = (args: any) => <Divider {...args}>Hello world</Divider>
 
 export const lighterColor = (args: any) => <Divider {...args} />
 
@@ -32,7 +24,7 @@ export const vertical = (args: any) => (
       <Divider {...args} />
       <Button>Button two</Button>
       <Divider {...args} />
-      <Typography.Text>Some text</Typography.Text>
+      <span>Some text</span>
       <Divider {...args} />
       <Button>Button three</Button>
     </div>

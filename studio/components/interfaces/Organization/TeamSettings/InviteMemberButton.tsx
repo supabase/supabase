@@ -2,10 +2,11 @@ import { isNil } from 'lodash'
 import { useEffect, useState } from 'react'
 import { object, string } from 'yup'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Button, Form, IconMail, Input, Modal, Select } from 'ui'
+import { Button, Form, IconMail, Input, Listbox, Modal } from 'ui'
 
 import { Member, Role } from 'types'
-import { checkPermissions, useParams, useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
+import { useParams } from 'common/hooks'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useOrganizationMemberInviteCreateMutation } from 'data/organizations/organization-member-invite-create-mutation'
 
@@ -101,19 +102,21 @@ const InviteMemberButton = ({
           </Button>
         </Tooltip.Trigger>
         {!canInviteMembers && (
-          <Tooltip.Content side="bottom">
-            <Tooltip.Arrow className="radix-tooltip-arrow" />
-            <div
-              className={[
-                'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                'border border-scale-200',
-              ].join(' ')}
-            >
-              <span className="text-xs text-scale-1200">
-                You need additional permissions to invite a member to this organization
-              </span>
-            </div>
-          </Tooltip.Content>
+          <Tooltip.Portal>
+            <Tooltip.Content side="bottom">
+              <Tooltip.Arrow className="radix-tooltip-arrow" />
+              <div
+                className={[
+                  'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                  'border border-scale-200',
+                ].join(' ')}
+              >
+                <span className="text-xs text-scale-1200">
+                  You need additional permissions to invite a member to this organization
+                </span>
+              </div>
+            </Tooltip.Content>
+          </Tooltip.Portal>
         )}
       </Tooltip.Root>
       <Modal
@@ -127,8 +130,11 @@ const InviteMemberButton = ({
       >
         <Form validationSchema={schema} initialValues={initialValues} onSubmit={onInviteMember}>
           {({ values, isSubmitting, resetForm }: any) => {
-            // Catches 'roles' when its available and then adds a default value for role select
+            // [Alaister] although this "technically" is breaking the rules of React hooks
+            // it won't error because the hooks are always rendered in the same order
+            // eslint-disable-next-line react-hooks/rules-of-hooks
             useEffect(() => {
+              // Catches 'roles' when its available and then adds a default value for role select
               if (roles) {
                 resetForm({
                   values: {
@@ -153,7 +159,7 @@ const InviteMemberButton = ({
                     <div className="space-y-4">
                       <div className="space-y-2">
                         {roles && (
-                          <Select
+                          <Listbox
                             id="role"
                             name="role"
                             label="Member role"
@@ -164,11 +170,11 @@ const InviteMemberButton = ({
                             }
                           >
                             {roles.map((role: any) => (
-                              <Select.Option key={role.id} value={role.id}>
+                              <Listbox.Option key={role.id} value={role.id} label={role.name}>
                                 {role.name}
-                              </Select.Option>
+                              </Listbox.Option>
                             ))}
-                          </Select>
+                          </Listbox>
                         )}
                       </div>
 

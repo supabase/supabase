@@ -106,7 +106,7 @@ const AccountLayout: FC<Props> = ({ children, title, breadcrumbs }) => {
           key: 'ext-guides',
           icon: `${router.basePath}/img/book-open.svg`,
           label: 'API Reference',
-          href: 'https://supabase.com/docs/guides/database/api',
+          href: 'https://supabase.com/docs/guides/api',
           isExternal: true,
         },
       ],
@@ -134,7 +134,6 @@ const AccountLayout: FC<Props> = ({ children, title, breadcrumbs }) => {
       <Head>
         <title>{title ? `${title} | Supabase` : 'Supabase'}</title>
         <meta name="description" content="Supabase Studio" />
-        <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className="flex h-full">
         <main

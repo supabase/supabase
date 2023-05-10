@@ -1,4 +1,4 @@
-import { Button, IconGrid, IconLayers, IconMenu } from '@supabase/ui'
+import { Button, IconGrid, IconLayers, IconMenu } from 'ui'
 import ApiExamples from 'data/products/realtime/api-examples'
 import AppExamples from 'data/products/realtime/app-examples'
 import Solutions from 'data/Solutions.json'
@@ -145,9 +145,9 @@ function RealtimePage() {
               </p>
               <div className="not-prose mt-3">
                 <Link passHref href="/docs/guides/realtime/postgres-changes">
-                  <Button as="a" type="default">
-                    View docs
-                  </Button>
+                  <a>
+                    <Button type="default">View docs</Button>
+                  </a>
                 </Link>
               </div>
             </div>
@@ -163,9 +163,9 @@ function RealtimePage() {
               <p>Store and synchronize online user state consistently across clients.</p>
               <div className="not-prose mt-3">
                 <Link passHref href="/docs/guides/realtime/presence">
-                  <Button as="a" type="default">
-                    View docs
-                  </Button>
+                  <a>
+                    <Button type="default">View docs</Button>
+                  </a>
                 </Link>
               </div>
             </div>
@@ -181,9 +181,9 @@ function RealtimePage() {
               <p>Send any data to any client subscribed to the same Channel.</p>
               <div className="not-prose mt-3">
                 <Link passHref href="/docs/guides/realtime/broadcast">
-                  <Button as="a" type="default">
-                    View docs
-                  </Button>
+                  <a>
+                    <Button type="default">View docs</Button>
+                  </a>
                 </Link>
               </div>
             </div>

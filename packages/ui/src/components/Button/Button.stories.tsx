@@ -1,48 +1,25 @@
-// import React, { useRef, useState } from 'react'
-// import defaultTheme from '../../theme/defaultTheme'
-// import { ThemeProvider } from './../ThemeProvider'
-// import customThemeExample from '../../lib/theme/customThemeExample'
-
-import { useRef, useState } from 'react'
-import { Button, IconPackage, IconChevronRight } from './../../index'
+import { Button } from './'
+import { IconPackage } from './../Icon/icons/IconPackage'
+import { IconChevronRight } from './../Icon/icons/IconChevronRight'
 
 export default {
   title: 'General/Button',
   component: Button,
 }
 
-export const Default = (args: any) => <Button {...args}>Button text</Button>
+export const Neutral = (args: any) => <Button {...args}>Button text</Button>
+export const Success = (args: any) => <Button {...args}>Button text</Button>
+
 export const withStyles = (args: any) => <Button {...args}>Button text</Button>
 export const withIcon = (args: any) => <Button {...args}>Button text</Button>
-export const withIconRight = (args: any) => (
-  <Button {...args}>Button text</Button>
-)
+export const withIconRight = (args: any) => <Button {...args}>Button text</Button>
 export const withBlock = (args: any) => <Button {...args}>Button text</Button>
 export const withOnlyIcon = (args: any) => <Button {...args} />
 export const withOnlyLoading = (args: any) => <Button {...args} />
 export const withLoadingCentered = (args: any) => (
   <Button {...args}>Loading icon is centered</Button>
 )
-export const withRef = () => {
-  const buttonRef = useRef(null)
-  const [msg, setMsg] = useState('Click button to console.log Ref')
 
-  function onClick() {
-    const message = `button:${buttonRef?.current}  `
-    setMsg(message)
-    // console.log(message)
-  }
-
-  return (
-    <>
-      <Button ref={buttonRef} onClick={onClick}>
-        Button with forwardRef
-      </Button>
-
-      <p style={{ color: '#666666' }}>{msg}</p>
-    </>
-  )
-}
 export const allButtons = (args: any) => (
   <>
     <div className="flex flex-col space-y-4">
@@ -211,9 +188,7 @@ export const allButtons = (args: any) => (
   </>
 )
 
-export const withCustomTag = (args: any) => (
-  <Button {...args}>Button text</Button>
-)
+export const withCustomTag = (args: any) => <Button {...args}>Button text</Button>
 
 const icon = <IconPackage />
 
