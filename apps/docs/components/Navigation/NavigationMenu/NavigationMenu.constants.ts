@@ -297,6 +297,10 @@ export const cli = {
   items: [
     { name: 'Overview', url: '/guides/cli' },
     { name: 'Managing Environments', url: '/guides/cli/managing-environments' },
+    {
+      name: 'Using environment variables in config.toml',
+      url: '/guides/cli/using-environment-variables-in-config',
+    },
   ],
 }
 
@@ -859,6 +863,10 @@ export const supabase_cli = {
     { name: 'Overview', url: '/guides/cli' },
     { name: 'Managing Environments', url: '/guides/cli/managing-environments' },
     {
+      name: 'Using environment variables in config.toml',
+      url: '/guides/cli/using-environment-variables-in-config',
+    },
+    {
       name: 'Reference',
       url: undefined,
       items: [
@@ -935,6 +943,10 @@ export const platform = {
         {
           name: 'HTTP and Project Issues',
           url: '/guides/platform/troubleshooting',
+        },
+        {
+          name: 'High CPU Usage',
+          url: '/guides/platform/exhaust-cpu',
         },
       ],
     },
