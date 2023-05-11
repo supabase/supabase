@@ -22,7 +22,6 @@ import {
   formatSortURLParams,
 } from './SupabaseGrid.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { toJS } from 'mobx'
 
 /** Supabase Grid: React component to render database table */
 
@@ -73,7 +72,6 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>((props
     onEditForeignKeyColumnValue,
     onImportData,
   } = props
-  console.log('the props', props)
   const dispatch = useDispatch()
   const state = useTrackedState()
 
@@ -141,8 +139,6 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>((props
   }, [JSON.stringify(sorts)])
 
   useEffect(() => {
-    console.log('state', toJS(state))
-    console.log('useffect running?')
     if (state.isInitialComplete && storageRef && state.table) {
       saveStorageDebounced(state, storageRef, sort as string[], filter as string[])
     }
