@@ -111,6 +111,7 @@ const BillingUpdateEnterprise: NextPageWithLayout = () => {
       currentSubscription={subscription}
       isLoadingPaymentMethods={isLoadingPaymentMethods}
       paymentMethods={paymentMethods || []}
+      onPaymentMethodAdded={() => getPaymentMethods()}
     />
   )
 }

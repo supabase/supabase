@@ -1,12 +1,52 @@
-import { Button, Badge, IconArrowRight } from 'ui'
-import SectionHeader from 'components/UI/SectionHeader'
+import { Badge } from 'ui'
 import Solutions from 'data/Solutions.json'
-import Link from 'next/link'
+import Telemetry from '~/lib/telemetry'
+import gaEvents from '~/lib/gaEvents'
 import SectionContainer from '../Layouts/SectionContainer'
 import ProductIcon from '../ProductIcon'
 import TextLink from '../TextLink'
+import { useTelemetryProps } from 'common/hooks/useTelemetryProps'
+import { useRouter } from 'next/router'
 
 const Features = () => {
+  const router = useRouter()
+  const telemetryProps = useTelemetryProps()
+
+  const sendTelemetryEvent = async (product: any) => {
+    switch (product) {
+      case 'Database':
+        return await Telemetry.sendEvent(
+          gaEvents['www_hp_subhero_products_database'],
+          telemetryProps,
+          router
+        )
+      case 'Authentication':
+        return await Telemetry.sendEvent(
+          gaEvents['www_hp_subhero_products_auth'],
+          telemetryProps,
+          router
+        )
+      case 'Storage':
+        return await Telemetry.sendEvent(
+          gaEvents['www_hp_subhero_products_storage'],
+          telemetryProps,
+          router
+        )
+      case 'Edge Functions':
+        return await Telemetry.sendEvent(
+          gaEvents['www_hp_subhero_products_edgeFunctions'],
+          telemetryProps,
+          router
+        )
+      case 'Realtime':
+        return await Telemetry.sendEvent(
+          gaEvents['www_hp_subhero_products_realtime'],
+          telemetryProps,
+          router
+        )
+    }
+  }
+
   const IconSections = Object.values(Solutions).map((solution: any) => {
     const { name, description, icon, label, url } = solution
     if (solution.name === 'Realtime') return null
@@ -24,7 +64,13 @@ const Features = () => {
             <Badge dot>{label}</Badge>
           </div>
         )}
-        {url && <TextLink label={label ? 'Get notified' : 'Learn more'} url={url} />}
+        {url && (
+          <TextLink
+            label={label ? 'Get notified' : 'Learn more'}
+            url={url}
+            onClick={() => sendTelemetryEvent(name)}
+          />
+        )}
       </div>
     )
   })

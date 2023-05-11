@@ -27,5 +27,10 @@ const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(400).json({ error: { message: error.message } })
   }
 
+  // change the domain name to the SUPABASE_PUBLIC_URL since SUPABASE_URL is not accessible from the client
+  const signedUrl = new URL(data.signedUrl)
+  signedUrl.host = new URL(process.env.SUPABASE_PUBLIC_URL!).host
+  data.signedUrl = signedUrl.href
+
   return res.status(200).json(data)
 }

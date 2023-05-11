@@ -1,16 +1,13 @@
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
-import { AuthProvider, ThemeProvider } from 'common'
+import { AuthProvider, ThemeProvider, useTelemetryProps } from 'common'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import ReactMarkdown from 'react-markdown'
-import remarkGfm from 'remark-gfm'
 import { AppPropsWithLayout } from 'types'
 import { CommandMenuProvider } from 'ui'
-import components from '~/components'
 import Favicons from '~/components/Favicons'
 import SiteLayout from '~/layouts/SiteLayout'
-import { IS_PLATFORM, LOCAL_SUPABASE } from '~/lib/constants'
+import { API_URL, IS_PLATFORM, LOCAL_SUPABASE } from '~/lib/constants'
 import { post } from '~/lib/fetchWrappers'
 import '../styles/ch.scss'
 import '../styles/main.scss?v=1.0.0'
@@ -19,16 +16,21 @@ import '../styles/prism-okaidia.scss'
 
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const router = useRouter()
+  const telemetryProps = useTelemetryProps()
 
   const [supabase] = useState(() =>
     IS_PLATFORM || LOCAL_SUPABASE ? createBrowserSupabaseClient() : undefined
   )
 
   function handlePageTelemetry(route: string) {
-    return post(`https://api.supabase.io/platform/telemetry/page`, {
+    return post(`${API_URL}/telemetry/page`, {
       referrer: document.referrer,
       title: document.title,
       route,
+      ga: {
+        screen_resolution: telemetryProps?.screenResolution,
+        language: telemetryProps?.language,
+      },
     })
   }
 
@@ -64,7 +66,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
      * Send page telemetry on first page load
      */
     if (router.isReady) {
-      handlePageTelemetry(router.asPath)
+      handlePageTelemetry(router.basePath + router.asPath)
     }
   }, [router.isReady])
 
@@ -85,12 +87,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
       <Favicons />
       <AuthContainer>
         <ThemeProvider>
-          <CommandMenuProvider
-            site="docs"
-            MarkdownHandler={(props) => (
-              <ReactMarkdown remarkPlugins={[remarkGfm]} components={components} {...props} />
-            )}
-          >
+          <CommandMenuProvider site="docs">
             <SiteLayout>
               <Component {...pageProps} />
             </SiteLayout>

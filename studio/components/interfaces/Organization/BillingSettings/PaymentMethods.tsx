@@ -28,6 +28,7 @@ interface Props {
   paymentMethods: any[]
   onDefaultMethodUpdated: (updatedCustomer: any) => void
   onPaymentMethodsDeleted: () => void
+  onPaymentMethodAdded: () => void
 }
 
 const PaymentMethods: FC<Props> = ({
@@ -36,6 +37,7 @@ const PaymentMethods: FC<Props> = ({
   paymentMethods,
   onDefaultMethodUpdated,
   onPaymentMethodsDeleted,
+  onPaymentMethodAdded,
 }) => {
   const { ui } = useStore()
   const orgSlug = ui.selectedOrganization?.slug ?? ''
@@ -97,6 +99,11 @@ const PaymentMethods: FC<Props> = ({
     } finally {
       setIsUpdatingPaymentMethod(false)
     }
+  }
+
+  const onLocalPaymentMethodAdded = () => {
+    setShowAddPaymentMethodModal(false)
+    return onPaymentMethodAdded()
   }
 
   return (
@@ -252,6 +259,7 @@ const PaymentMethods: FC<Props> = ({
         visible={showAddPaymentMethodModal}
         returnUrl={`${getURL()}/org/${orgSlug}/billing`}
         onCancel={() => setShowAddPaymentMethodModal(false)}
+        onConfirm={() => onLocalPaymentMethodAdded()}
       />
 
       <Modal

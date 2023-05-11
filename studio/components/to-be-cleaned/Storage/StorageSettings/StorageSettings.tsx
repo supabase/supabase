@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { Button, Form, IconClock, Input, Listbox } from 'ui'
 
 import { checkPermissions, useStore } from 'hooks'
+import { IS_PLATFORM } from 'lib/constants'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useProjectStorageConfigUpdateUpdateMutation } from 'data/config/project-storage-config-update-mutation'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
@@ -15,7 +15,7 @@ export type StorageSettingsProps = {
 }
 
 const StorageSettings = ({ projectRef }: StorageSettingsProps) => {
-  const { data, error } = useProjectStorageConfigQuery({ projectRef })
+  const { data, error } = useProjectStorageConfigQuery({ projectRef }, { enabled: IS_PLATFORM })
 
   if (error || data?.error) {
     return (
