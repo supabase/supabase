@@ -109,7 +109,6 @@ const DefaultHeader = ({
   const dispatch = useDispatch()
 
   const canAddNew = onAddRow !== undefined || onAddColumn !== undefined
-  console.log('table', table)
   // [Joshen] Using this logic to block both column and row creation/update/delete
   const canCreateColumns = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
 
@@ -119,7 +118,6 @@ const DefaultHeader = ({
 
   function onHideColumn(columnKey: string) {
     dispatch({ type: 'HIDE_COLUMN', payload: { columnKey } })
-    useDispatch
   }
 
   return (

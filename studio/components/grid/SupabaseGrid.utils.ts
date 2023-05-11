@@ -73,11 +73,9 @@ export async function initTable(
   sort?: string[], // Comes directly from URL param
   filter?: string[] // Comes directly from URL param
 ): Promise<{ savedState: { sorts?: string[]; filters?: string[] } }> {
-  console.log('init table runs now')
   const savedState = props.storageRef
     ? onLoadStorage(props.storageRef, props.table.name, props.table.schema)
     : undefined
-  console.log('savedState:', savedState)
   // Check for saved state on initial load and also, load sort and filters via URL param only if given
   // Otherwise load from local storage to resume user session
   if (
@@ -185,7 +183,6 @@ export function onLoadStorage(storageRef: string, tableName: string, schema?: st
   const json = JSON.parse(jsonStr)
   console.log('more json', json)
   const tableKey = !schema || schema == 'public' ? tableName : `${schema}.${tableName}`
-  console.log('json', json[tableKey])
   return json[tableKey]
 }
 
@@ -215,7 +212,6 @@ function saveStorage(
   } else {
     savedJson = { [tableKey]: config }
   }
-  console.log('savedJson', savedJson)
   localStorage.setItem(storageKey, JSON.stringify(savedJson))
 }
 
