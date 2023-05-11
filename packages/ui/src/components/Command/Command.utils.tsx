@@ -241,7 +241,7 @@ export const CommandItem = React.forwardRef<CommandPrimitiveItemElement, Command
       {...props}
     >
       <div className="w-full flex flex-row justify-between items-center">
-        <div className="flex flex-row items-center">{children}</div>
+        <div className="flex flex-row flex-grow items-center">{children}</div>
         {badge}
       </div>
     </CommandPrimitive.Item>
