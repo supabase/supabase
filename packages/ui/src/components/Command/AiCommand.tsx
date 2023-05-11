@@ -54,7 +54,7 @@ function getEdgeFunctionUrl() {
   if (isPlatform) {
     const [schemeAndProjectId, domain, tld] = supabaseUrl.split('.')
     return `${schemeAndProjectId}.functions.${domain}.${tld}`
-  } else { 
+  } else {
     return `${supabaseUrl}/functions/v1`
   }
 }
