@@ -48,7 +48,11 @@ const Hero = () => {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Link href="https://app.supabase.com" as="https://app.supabase.com" passHref>
+                      <Link
+                        href="https://supabase.com/dashboard"
+                        as="https://supabase.com/dashboard"
+                        passHref
+                      >
                         <a onClick={() => sendTelemetryEvent(gaEvents['www_hp_hero_startProject'])}>
                           <Button size="small" className="text-white">
                             Start your project
