@@ -8,7 +8,6 @@ import Head from 'next/head'
 import { PropsWithChildren, memo } from 'react'
 import Footer from '~/components/Navigation/Footer'
 import { menuState, useMenuLevelId, useMenuMobileOpen } from '~/hooks/useMenuState'
-import { useRouter } from 'next/router'
 
 const levelsData = {
   home: {
@@ -313,9 +312,6 @@ const NavContainer = memo(function NavContainer() {
 })
 
 const SiteLayout = ({ children }: PropsWithChildren<{}>) => {
-  const router = useRouter()
-  const isHomepage = router.asPath === '/'
-
   return (
     <>
       <Head>
