@@ -424,9 +424,7 @@ And then use the revalidator, inside the `onAuthStateChange` hook.
 const { env, session } = useLoaderData()
 const { revalidate } = useRevalidator()
 
-const [supabase] = useState(() =>
-  createBrowserClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY)
-)
+const [supabase] = useState(() => createBrowserClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY))
 
 const serverAccessToken = session?.access_token
 
@@ -464,7 +462,7 @@ useEffect(() => {
   const {
     data: { subscription },
   } = supabase.auth.onAuthStateChange((event, session) => {
-    if (event !== "INITIAL_SESSION" && session?.access_token !== serverAccessToken) {
+    if (event !== 'INITIAL_SESSION' && session?.access_token !== serverAccessToken) {
       // server and client are out of sync.
       revalidate()
     }

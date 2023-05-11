@@ -34,7 +34,8 @@
       "reference_dart_v1",
       "reference_python_v2",
       "reference_csharp_v0",
-      "reference_swift_v0"
+      "reference_swift_v0",
+      "reference_kotlin_v0"
     ]
   },
   {
@@ -47,10 +48,12 @@
       "reference_dart_v1",
       "reference_python_v2",
       "reference_csharp_v0",
-      "reference_swift_v0"
+      "reference_swift_v0",
+      "reference_kotlin_v0"
     ]
   },
   {
+    "type": "category",
     "title": "Database",
     "items": [
       {
@@ -292,7 +295,7 @@
       {
         "id": "using-modifiers",
         "isFunc": false,
-        "title": "Using Modifiers",
+        "title": "Using modifiers",
         "slug": "using-modifiers",
         "product": "database",
         "parent": "modifiers",
@@ -375,6 +378,7 @@
     ]
   },
   {
+    "type": "category",
     "title": "Auth",
     "items": [
       {
@@ -552,19 +556,11 @@
         "type": "function"
       },
       {
-        "id": "reset-password-for-email",
-        "title": "Send a password reset request",
-        "slug": "auth-resetpasswordforemail",
+        "id": "exchange-code-for-session",
+        "title": "Exchange an auth code for a session",
+        "slug": "auth-exchangecodeforsession",
         "product": "auth",
         "type": "function"
-      },
-      {
-          "id": "exchange-code-for-session",
-          "title": "Exchange an auth code for a session",
-          "slug": "auth-exchangecodeforsession",
-          "product": "auth",
-          "type": "function"
-
       },
       {
         "id": "mfa-enroll",
@@ -696,6 +692,7 @@
     ]
   },
   {
+    "type": "category",
     "title": "Functions",
     "items": [
       {
@@ -708,6 +705,7 @@
     ]
   },
   {
+    "type": "category",
     "title": "Realtime",
     "items": [
       {
@@ -769,6 +767,7 @@
     ]
   },
   {
+    "type": "category",
     "title": "Storage",
     "items": [
       {
@@ -900,13 +899,15 @@
     ]
   },
   {
+    "type": "category",
     "title": "Misc",
     "excludes": [
       "reference_dart_v1",
       "reference_dart_v0",
       "reference_python_v2",
       "reference_csharp_v0",
-      "reference_swift_v0"
+      "reference_swift_v0",
+      "reference_kotlin_v0"
     ],
     "items": [
       {
