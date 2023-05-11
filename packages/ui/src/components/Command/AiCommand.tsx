@@ -483,7 +483,7 @@ const AiCommand = () => {
                     search ? 'opacity-100' : 'opacity-0'
                   }`}
                 >
-                  <button className="text-scale-1100">Submit message</button>
+                  <span className="text-scale-1100">Submit message</span>
                   <div className="hidden text-scale-1100 md:flex items-center justify-center h-6 w-6 rounded bg-scale-500">
                     <IconCornerDownLeft size={12} strokeWidth={1.5} />
                   </div>
