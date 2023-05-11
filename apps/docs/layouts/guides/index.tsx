@@ -169,7 +169,7 @@ const Layout: FC<Props> = (props) => {
             </div>
           )}
         </div>
-        <FooterHelpCallout footerHelpType={props.meta?.footerHelpType} title={props.meta?.title} />
+        {/* <FooterHelpCallout footerHelpType={props.meta?.footerHelpType} title={props.meta?.title} /> */}
       </LayoutMainContent>
     </>
   )
