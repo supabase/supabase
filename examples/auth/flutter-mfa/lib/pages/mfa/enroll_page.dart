@@ -122,7 +122,7 @@ class _MFAEnrollPageState extends State<MFAEnrollPage> {
                         .showSnackBar(SnackBar(content: Text(error.message)));
                   } catch (error) {
                     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                        content: Text('Unexpected error occured')));
+                        content: Text('Unexpected error occurred')));
                   }
                 },
               ),

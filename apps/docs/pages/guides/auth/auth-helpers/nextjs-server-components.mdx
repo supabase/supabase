@@ -138,7 +138,7 @@ import { useRouter } from 'next/navigation'
 
 const Context = createContext(undefined)
 
-export default function SupabaseProvider({ children }) {
+export default function SupabaseProvider({ children, session }) {
   const [supabase] = useState(() => createBrowserSupabaseClient())
   const router = useRouter()
 
@@ -155,7 +155,7 @@ export default function SupabaseProvider({ children }) {
   }, [router, supabase])
 
   return (
-    <Context.Provider value={{ supabase }}>
+    <Context.Provider value={{ supabase, session }}>
       <>{children}</>
     </Context.Provider>
   )
@@ -188,13 +188,22 @@ import { useRouter } from 'next/navigation'
 import type { SupabaseClient } from '@supabase/auth-helpers-nextjs'
 import type { Database } from '@/lib/database.types'
 
+type MaybeSession = Session | null
+
 type SupabaseContext = {
   supabase: SupabaseClient<Database>
+  session: MaybeSession
 }
 
 const Context = createContext<SupabaseContext | undefined>(undefined)
 
-export default function SupabaseProvider({ children }: { children: React.ReactNode }) {
+export default function SupabaseProvider({
+  children,
+  session,
+}: {
+  children: React.ReactNode
+  session: MaybeSession
+}) {
   const [supabase] = useState(() => createBrowserSupabaseClient())
   const router = useRouter()
 
@@ -211,7 +220,7 @@ export default function SupabaseProvider({ children }: { children: React.ReactNo
   }, [router, supabase])
 
   return (
-    <Context.Provider value={{ supabase }}>
+    <Context.Provider value={{ supabase, session }}>
       <>{children}</>
     </Context.Provider>
   )
@@ -256,7 +265,10 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
-        <SupabaseProvider>{children}</SupabaseProvider>
+        <SupabaseProvider session={session}>
+          <SupabaseListener serverAccessToken={session?.access_token} />
+          {children}
+        </SupabaseProvider>
       </body>
     </html>
   )
@@ -282,7 +294,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body>
-        <SupabaseProvider>{children}</SupabaseProvider>
+        <SupabaseProvider session={session}>
+          <SupabaseListener serverAccessToken={session?.access_token} />
+          {children}
+        </SupabaseProvider>
       </body>
     </html>
   )
