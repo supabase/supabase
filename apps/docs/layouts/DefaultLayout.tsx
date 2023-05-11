@@ -12,6 +12,7 @@ interface Props {
     description?: string
     hide_table_of_contents?: boolean
     video?: string
+    tocVideo?: string
     canonical?: string
   }
   children: any

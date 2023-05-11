@@ -144,6 +144,13 @@ const menus: Menu[] = [
     type: 'reference',
   },
   {
+    id: 'reference_kotlin_v0',
+    path: '/reference/kotlin',
+    commonSectionsFile: 'common-client-libs-sections.json',
+    specFile: 'supabase_kt_v0.yml',
+    type: 'reference',
+  },
+  {
     id: 'reference_cli',
     path: '/reference/cli',
     commonSectionsFile: 'common-cli-sections.json',

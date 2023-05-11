@@ -118,6 +118,13 @@ export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
       community: true,
     },
     {
+      label: 'Kotlin',
+      icon: 'reference-kotlin',
+      href: '/reference/kotlin/introduction',
+      level: 'reference_kotlin',
+      community: true,
+    },
+    {
       label: 'Tools reference',
     },
     {
@@ -166,6 +173,12 @@ export const REFERENCES: References = {
     library: 'supabase-swift',
     versions: ['v0'],
     icon: '/docs/img/libraries/swift-icon.svg',
+  },
+  kotlin: {
+    name: 'Kotlin',
+    library: 'supabase-kt',
+    versions: ['v0'],
+    icon: '/docs/img/libraries/kotlin-icon.svg',
   },
   cli: {
     name: 'CLI',
@@ -284,6 +297,10 @@ export const cli = {
   items: [
     { name: 'Overview', url: '/guides/cli' },
     { name: 'Managing Environments', url: '/guides/cli/managing-environments' },
+    {
+      name: 'Using environment variables in config.toml',
+      url: '/guides/cli/using-environment-variables-in-config',
+    },
   ],
 }
 
@@ -846,6 +863,10 @@ export const supabase_cli = {
     { name: 'Overview', url: '/guides/cli' },
     { name: 'Managing Environments', url: '/guides/cli/managing-environments' },
     {
+      name: 'Using environment variables in config.toml',
+      url: '/guides/cli/using-environment-variables-in-config',
+    },
+    {
       name: 'Reference',
       url: undefined,
       items: [
@@ -922,6 +943,10 @@ export const platform = {
         {
           name: 'HTTP and Project Issues',
           url: '/guides/platform/troubleshooting',
+        },
+        {
+          name: 'High CPU Usage',
+          url: '/guides/platform/exhaust-cpu',
         },
       ],
     },
@@ -1128,6 +1153,13 @@ export const reference = {
           items: [],
           icon: '/img/icons/menu/reference-swift',
         },
+        {
+          name: 'supabase-kt',
+          url: '/reference/kotlin/start',
+          level: 'reference_kotlin',
+          items: [],
+          icon: '/img/icons/menu/reference-kotlin',
+        },
         // {
         //   name: 'supabase-python',
         //   url: '/reference/python/start',
@@ -1201,6 +1233,13 @@ export const reference_swift_v0 = {
   icon: 'reference-swift',
   title: 'swift',
   url: 'guides/reference/swift',
+  parent: '/reference',
+}
+
+export const reference_kotlin_v0 = {
+  icon: 'reference-kotlin',
+  title: 'kotlin',
+  url: 'guides/reference/kotlin',
   parent: '/reference',
 }
 
@@ -1324,6 +1363,13 @@ export const references = [
         description: 'something about the reference',
         icon: '/docs/img/icons/swift-icon.svg',
         url: '/reference/swift/start',
+      },
+      {
+        label: 'supabase-kt',
+        versions: ['v0'],
+        description: 'something about the reference',
+        icon: '/docs/img/icons/kotlin-icon.svg',
+        url: '/reference/kotlin/start',
       },
     ],
   },

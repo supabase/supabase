@@ -48,6 +48,7 @@ import {
   IconMenuPython,
   IconMenuCsharp,
   IconMenuSwift,
+  IconMenuKotlin,
   IconMenuApi,
   IconMenuCli,
 } from './Navigation/NavigationMenu/HomeMenuIcons'
@@ -110,6 +111,7 @@ const components = {
   IconMenuFlutter,
   IconMenuPython,
   IconMenuCsharp,
+  IconMenuKotlin,
   IconMenuSwift,
   IconMenuApi,
   IconMenuCli,
