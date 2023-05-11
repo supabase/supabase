@@ -15,10 +15,10 @@ import useHash from '~/hooks/useHash'
 interface Props {
   meta: {
     title: string
-    description?: string
+    description?: string // used in meta tags
     hide_table_of_contents?: boolean
     breadcrumb?: string
-    subtitle?: string
+    subtitle?: string // used on the page under the H1
     footerHelpType?: FooterHelpCalloutType
     video?: string
     tocVideo?: string
@@ -127,7 +127,7 @@ const Layout: FC<Props> = (props) => {
             {props.meta.subtitle && (
               <h2 className="mt-3 text-xl text-scale-1100">{props.meta.subtitle}</h2>
             )}
-            <div className="max-w-xs w-32 h-[1px] bg-gradient-to-r from-brand-800 to-brand-900 my-8"></div>
+            <div className="w-full h-[1px] bg-scale-500 my-8"></div>
             <MDXProvider components={components}>{props.children}</MDXProvider>
 
             {EDIT_BUTTON_EXCLUDE_LIST.includes(router.route) ? (
