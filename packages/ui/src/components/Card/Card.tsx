@@ -66,4 +66,4 @@ function Meta({ title, description, style, className }: MetaProps) {
 }
 
 Card.Meta = Meta
-export default Card 
+export default Card
