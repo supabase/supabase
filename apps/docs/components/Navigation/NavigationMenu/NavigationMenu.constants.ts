@@ -916,6 +916,11 @@ export const platform = {
       items: [{ name: 'Spend cap', url: '/guides/platform/spend-cap' }],
     },
     {
+      name: 'Support',
+      url: undefined,
+      items: [{ name: 'Support Policy', url: '/guides/platform/support-policy' }],
+    },
+    {
       name: 'Single sign-on',
       url: undefined,
       items: [
