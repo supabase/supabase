@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { FC, useEffect, useRef, useState } from 'react'
 import { IconExternalLink } from 'ui'
+import ExpandableVideo from 'ui/src/components/ExpandableVideo/ExpandableVideo'
 import components from '~/components'
 import { highlightSelectedTocItem } from '~/components/CustomHTMLElements/CustomHTMLElements.utils'
 import FooterHelpCallout, { FooterHelpCalloutType } from '~/components/FooterHelpCallout'
@@ -21,6 +22,7 @@ interface Props {
     subtitle?: string
     footerHelpType?: FooterHelpCalloutType
     video?: string
+    tocVideo?: string
     canonical?: string
   }
   children: any
@@ -36,7 +38,6 @@ const Layout: FC<Props> = (props) => {
   const [tocList, setTocList] = useState([])
 
   const { asPath } = useRouter()
-
   const router = useRouter()
 
   const EDIT_BUTTON_EXCLUDE_LIST = ['/404']
@@ -64,6 +65,7 @@ const Layout: FC<Props> = (props) => {
   }, [])
 
   const hasTableOfContents = tocList.length > 0
+  const tocVideoPreview = `http://img.youtube.com/vi/${props.meta.tocVideo}/0.jpg`
 
   // page type, ie, Auth, Database, Storage etc
   const ogPageType = asPath.split('/')[2]
