@@ -38,6 +38,7 @@ export * from './src/components/SidePanel'
 export * from './src/components/Dropdown'
 export * from './src/components/ContextMenu'
 export * from './src/components/Popover'
+export * from './src/components/ExpandableVideo'
 
 // UTILITIES
 

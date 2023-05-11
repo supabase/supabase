@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { FC, useEffect, useRef, useState } from 'react'
 import { IconExternalLink } from 'ui'
+import ExpandableVideo from 'ui/src/components/ExpandableVideo/ExpandableVideo'
 import components from '~/components'
 import { highlightSelectedTocItem } from '~/components/CustomHTMLElements/CustomHTMLElements.utils'
 import FooterHelpCallout, { FooterHelpCalloutType } from '~/components/FooterHelpCallout'
@@ -14,12 +15,13 @@ import useHash from '~/hooks/useHash'
 interface Props {
   meta: {
     title: string
-    description?: string
+    description?: string // used in meta tags
     hide_table_of_contents?: boolean
     breadcrumb?: string
-    subtitle?: string
+    subtitle?: string // used on the page under the H1
     footerHelpType?: FooterHelpCalloutType
     video?: string
+    tocVideo?: string
     canonical?: string
   }
   children: any
@@ -35,7 +37,6 @@ const Layout: FC<Props> = (props) => {
   const [tocList, setTocList] = useState([])
 
   const { asPath } = useRouter()
-
   const router = useRouter()
 
   const EDIT_BUTTON_EXCLUDE_LIST = ['/404']
@@ -63,6 +64,7 @@ const Layout: FC<Props> = (props) => {
   }, [])
 
   const hasTableOfContents = tocList.length > 0
+  const tocVideoPreview = `http://img.youtube.com/vi/${props.meta.tocVideo}/0.jpg`
 
   // page type, ie, Auth, Database, Storage etc
   const ogPageType = asPath.split('/')[2]
@@ -125,7 +127,7 @@ const Layout: FC<Props> = (props) => {
             {props.meta.subtitle && (
               <h2 className="mt-3 text-xl text-scale-1100">{props.meta.subtitle}</h2>
             )}
-            <div className="max-w-xs w-32 h-[1px] bg-gradient-to-r from-brand-800 to-brand-900 my-8"></div>
+            <div className="w-full h-[1px] bg-scale-500 my-8"></div>
             <MDXProvider components={components}>{props.children}</MDXProvider>
 
             {EDIT_BUTTON_EXCLUDE_LIST.includes(router.route) ? (
@@ -157,6 +159,11 @@ const Layout: FC<Props> = (props) => {
             ].join(' ')}
           >
             <div className="border-l">
+              {props.meta?.tocVideo && !!tocVideoPreview && (
+                <div className="relative mb-6 pl-5">
+                  <ExpandableVideo imgUrl={tocVideoPreview} videoId={props.meta.tocVideo} />
+                </div>
+              )}
               <span className="block font-mono text-xs uppercase text-scale-1200 px-5 mb-6">
                 On this page
               </span>

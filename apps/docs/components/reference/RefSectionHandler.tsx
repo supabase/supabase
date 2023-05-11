@@ -9,10 +9,10 @@ import RefSubLayout from '~/layouts/ref/RefSubLayout'
 import ApiOperationSection from './ApiOperationSection'
 import CliCommandSection from './CLICommandSection'
 import OldVersionAlert from './OldVersionAlert'
-import { IAPISpec, ICommonFunc, IRefStaticDoc, ISpec, TypeSpec } from './Reference.types'
+import { IAPISpec, ICommonSection, IRefStaticDoc, ISpec, TypeSpec } from './Reference.types'
 
 interface RefSectionHandlerProps {
-  sections: ICommonFunc[]
+  sections: ICommonSection[]
   spec?: ISpec | IAPISpec
   typeSpec?: TypeSpec
   pageProps: { docs: IRefStaticDoc[] }
@@ -28,10 +28,21 @@ const RefSectionHandler = (props: RefSectionHandlerProps) => {
   // When user lands on a url like http://supabase.com/docs/reference/javascript/sign-up
   // find the #sign-up element and scroll to that
   useEffect(() => {
-    if (document && slug !== 'start') {
-      document.querySelector(`#${slug}`) && document.querySelector(`#${slug}`).scrollIntoView()
+    document.getElementById(slug)?.scrollIntoView()
+  }, [slug])
+
+  useEffect(() => {
+    function handler(e: PopStateEvent) {
+      const [slug] = window.location.pathname.split('/').slice(-1)
+      document.getElementById(slug)?.scrollIntoView()
     }
-  })
+
+    window.addEventListener('popstate', handler)
+
+    return () => {
+      window.removeEventListener('popstate', handler)
+    }
+  }, [])
 
   function getPageTitle() {
     switch (props.type) {
@@ -62,46 +73,48 @@ const RefSectionHandler = (props: RefSectionHandlerProps) => {
       </Head>
       {props.isOldVersion && <OldVersionAlert />}
       <RefSubLayout>
-        {props.sections.map((x, i) => {
-          switch (x.type) {
+        {props.sections.map((section, i) => {
+          const sectionType = section.type
+          switch (sectionType) {
             case 'markdown':
-              const markdownData = props.pageProps.docs.find((doc) => doc.id === x.id)
+              const markdownData = props.pageProps.docs.find((doc) => doc.id === section.id)
 
-              return <RefEducationSection key={x.id + i} item={x} markdownContent={markdownData} />
-              break
+              return (
+                <RefEducationSection
+                  key={section.id + i}
+                  item={section}
+                  markdownContent={markdownData}
+                />
+              )
             case 'function':
               return (
                 <RefFunctionSection
-                  key={x.id + i}
-                  funcData={x}
-                  commonFuncData={x}
+                  key={section.id + i}
+                  funcData={section}
+                  commonFuncData={section}
                   spec={props.spec}
                   typeSpec={props.typeSpec}
                 />
               )
             case 'cli-command':
-              return <CliCommandSection key={x.id + i} funcData={x} commonFuncData={x} />
-              break
+              return (
+                <CliCommandSection
+                  key={section.id + i}
+                  funcData={section}
+                  commonFuncData={section}
+                />
+              )
             case 'operation':
               return (
                 <ApiOperationSection
-                  key={x.id + i}
-                  funcData={x}
-                  commonFuncData={x}
+                  key={section.id + i}
+                  funcData={section}
+                  commonFuncData={section}
                   spec={props.spec}
                 />
               )
             default:
-              return (
-                <RefFunctionSection
-                  key={x.id + i}
-                  funcData={x}
-                  commonFuncData={x}
-                  spec={props.spec}
-                  typeSpec={props.typeSpec}
-                />
-              )
-              break
+              throw new Error(`Unknown common section type '${sectionType}'`)
           }
         })}
       </RefSubLayout>
