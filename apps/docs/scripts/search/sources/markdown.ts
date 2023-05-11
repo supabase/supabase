@@ -97,20 +97,20 @@ export function splitTreeBy(tree: Root, predicate: (node: Content) => boolean) {
 }
 
 /**
- * Wrapped slug generator that also accounts for
- * custom anchors in the format:
+ * Parses a markdown heading which can optionally
+ * contain a custom anchor in the format:
  *
  * ```markdown
  * ### My Heading [#my-custom-anchor]
  * ```
  */
-export function generateSlug(slugger: GithubSlugger, heading: string) {
-  const match = heading.match(/\[#(.*)\]/)
+export function parseHeading(heading: string): { heading: string; customAnchor?: string } {
+  const match = heading.match(/(.*) *\[#(.*)\]/)
   if (match) {
-    const [, customAnchor] = match
-    return slugger.slug(customAnchor)
+    const [, heading, customAnchor] = match
+    return { heading, customAnchor }
   }
-  return slugger.slug(heading)
+  return { heading }
 }
 
 /**
@@ -157,12 +157,20 @@ export function processMdxForSearch(content: string): ProcessedMdx {
 
   const sections = sectionTrees.map((tree) => {
     const [firstNode] = tree.children
+    const content = toMarkdown(tree)
 
-    const heading = firstNode.type === 'heading' ? toString(firstNode) : undefined
-    const slug = heading ? generateSlug(slugger, heading) : undefined
+    const rawHeading: string = firstNode.type === 'heading' ? toString(firstNode) : undefined
+
+    if (!rawHeading) {
+      return { content }
+    }
+
+    const { heading, customAnchor } = parseHeading(rawHeading)
+
+    const slug = slugger.slug(customAnchor ?? heading)
 
     return {
-      content: toMarkdown(tree),
+      content,
       heading,
       slug,
     }
