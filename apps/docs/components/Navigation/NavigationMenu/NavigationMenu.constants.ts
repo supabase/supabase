@@ -391,6 +391,11 @@ export const SocialLoginItems = [
     icon: '/docs/img/icons/zoom-icon',
     url: '/guides/auth/social-login/auth-zoom',
   },
+  {
+    name: 'Kakao',
+    icon: '/docs/img/icons/kakao-icon',
+    url: '/guides/auth/social-login/auth-kakao',
+  },
 ]
 
 export const PhoneLoginsItems = [
