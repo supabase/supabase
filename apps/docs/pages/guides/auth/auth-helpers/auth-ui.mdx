@@ -94,7 +94,7 @@ The Auth component is currently shipped with the following views:
 - Update password
 - Forgotten password
 
-We are planning on adding more views in the future.  Follow along on that [repo](https://github.com/supabase/auth-ui).
+We are planning on adding more views in the future. Follow along on that [repo](https://github.com/supabase/auth-ui).
 
 ## Customization
 
@@ -202,10 +202,7 @@ See the list of [tokens within a theme](https://github.com/supabase/auth-ui/blob
 import { createClient } from '@supabase/supabase-js'
 import { Auth } from '@supabase/auth-ui-react'
 
-const supabase = createClient(
-  '<INSERT PROJECT URL>',
-  '<INSERT PROJECT ANON API KEY>'
-)
+const supabase = createClient('<INSERT PROJECT URL>', '<INSERT PROJECT ANON API KEY>')
 
 const customTheme = {
   default: {
@@ -239,7 +236,7 @@ const App = () => (
   <Auth
     supabaseClient={supabase}
     theme="default" // can also be "dark" or "evenDarker"
-    appearance={{ theme: customTheme}}
+    appearance={{ theme: customTheme }}
   />
 )
 ```

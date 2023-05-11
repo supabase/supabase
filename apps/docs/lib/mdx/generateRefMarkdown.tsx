@@ -2,12 +2,9 @@ import fs from 'fs'
 
 import matter from 'gray-matter'
 import { serialize } from 'next-mdx-remote/serialize'
+import { ICommonMarkdown } from '~/components/reference/Reference.types'
 
-// import { remarkCodeHike } from '@code-hike/mdx'
-// import codeHikeTheme from '~/codeHikeTheme.js'
-// import theme from 'shiki/themes/solarized-dark.json'
-
-async function generateRefMarkdown(sections, slug) {
+async function generateRefMarkdown(sections: ICommonMarkdown[], slug: string) {
   let markdownContent = []
   /**
    * Read all the markdown files that might have
@@ -16,10 +13,8 @@ async function generateRefMarkdown(sections, slug) {
    *  - important notes regarding implementation
    */
   await Promise.all(
-    sections.map(async (x, i) => {
-      if (!x.id) return null
-
-      const pathName = `docs/ref${slug}/${x.id}.mdx`
+    sections.map(async (section) => {
+      const pathName = `docs/ref${slug}/${section.id}.mdx`
 
       function checkFileExists(x) {
         if (fs.existsSync(x)) {
@@ -37,8 +32,8 @@ async function generateRefMarkdown(sections, slug) {
       const { data, content } = matter(fileContents)
 
       markdownContent.push({
-        id: x.id,
-        title: x.title,
+        id: section.id,
+        title: section.title,
         meta: data,
         // introPage: introPages.includes(x),
         content: content

@@ -3,11 +3,8 @@ import { SessionContextProvider } from '@supabase/auth-helpers-react'
 import { AuthProvider, ThemeProvider, useTelemetryProps } from 'common'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import ReactMarkdown from 'react-markdown'
-import remarkGfm from 'remark-gfm'
 import { AppPropsWithLayout } from 'types'
 import { CommandMenuProvider } from 'ui'
-import components from '~/components'
 import Favicons from '~/components/Favicons'
 import SiteLayout from '~/layouts/SiteLayout'
 import { API_URL, IS_PLATFORM, LOCAL_SUPABASE } from '~/lib/constants'
@@ -90,12 +87,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
       <Favicons />
       <AuthContainer>
         <ThemeProvider>
-          <CommandMenuProvider
-            site="docs"
-            MarkdownHandler={(props) => (
-              <ReactMarkdown remarkPlugins={[remarkGfm]} components={components} {...props} />
-            )}
-          >
+          <CommandMenuProvider site="docs">
             <SiteLayout>
               <Component {...pageProps} />
             </SiteLayout>
