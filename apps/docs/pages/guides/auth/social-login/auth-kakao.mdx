@@ -15,6 +15,7 @@ Kakao OAuth consists of six broad steps:
 - Create and configure your app in the [Kakao Developer Portal](https://developers.kakao.com).
 - Obtaining a `REST API key` - this will serve as the `client_id`.
 - Generating the `client_secret` using the `Client secret code`.
+- Additional configurations on Kakao Developers Portal.
 - Add your `client id` and `client secret` keys to your [Supabase Project](https://app.supabase.com).
 - Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js).
 
@@ -54,6 +55,12 @@ This will serve as the `client_id` when you make API calls to authenticate the u
 - Click on the `Kakao Login` switch to enable Kakao Login.
 - Click on `generate code` at the bottom to generate the `Client secret code` -- this will serve as a `client_secret` for your supabase project.
 - Make sure you enabled `Client sercet code` by selecting `enable` from the `Activation state` section.
+
+## Additional configurations on Kakao Developers Portal
+- Make sure the Kakao Login is enabled in the `Kakao Login` tab.
+- Set following scopes under the "Consent Items": account_email, profile_image, profile_nickname
+
+![Consent items needs to be set.](/docs/img/guides/auth-kakao/kakao-developers-consent-items-set.png)
 
 ## Add your OAuth credentials to Supabase
 
