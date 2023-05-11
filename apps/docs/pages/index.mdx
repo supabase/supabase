@@ -20,58 +20,121 @@ export const meta = {
 
 <div className="flex flex-col">
 
-<div>
-  <div className="max-w-xl">
-    ## Products
-  </div>
-
-  <div className="grid grid-cols-12 gap-6 not-prose">
-    {products.map((product) => {
-      return (
-        <Link
-          href={`${product.href}`}
-          key={product.title}
-          passHref
-        >
-          <a className={product.span ?? 'col-span-12 md:col-span-4'}>
-            <GlassPanel {...product} background={true} showIconBg={true} showLink={true}>
-              {product.description}
-            </GlassPanel>
-          </a>
-        </Link>
-      )
-    })}
-  </div>
-  
-  <div className="flex flex-col lg:grid grid-cols-12 gap-6 mt-12 py-12 border-b">
-
-    <div className="col-span-4 flex flex-col gap-1 [&_h2]:m-0">
-
-      ## Migrate to Supabase
-
-      <p className="text-scale-1100 text-sm p-0 m-0">
-        Bring your existing data, auth and storage to Supabase following our migration guides.
-      </p>
-
-      <TextLink
-        label="Explore more resources"
-        url="/docs/guides/resources"
-        className="no-underline text-brand-900 text-sm"
-      />
+  <div>
+    <div className="max-w-xl">
+      ## Products
     </div>
 
-    <div className="grid col-span-8 grid-cols-12 gap-6 not-prose">
-      {migrationGuides.map((product) => {
+    <div className="grid grid-cols-12 gap-6 not-prose [&_svg]:text-brand-1100 [&_svg]dark:text-brand-900">
+      {products.map((product) => {
+        return (
+          <Link href={product.href} key={product.title} passHref>
+            <a className={product.span ?? 'col-span-12 md:col-span-4'}>
+              <GlassPanel {...product} icon={<HomeMenuIconPicker icon={product.icon} width={18} height={18} />} background={true} showIconBg={true} showLink={false}>
+                {product.description}
+              </GlassPanel>
+            </a>
+          </Link>
+        )
+      })}
+    </div>
+
+    <div className="flex flex-col lg:grid grid-cols-12 gap-6 py-12 border-b">
+
+      <div className="col-span-4 flex flex-col gap-1 [&_h2]:m-0 [&_h3]:m-0">
+
+        <div className="md:max-w-xs 2xl:max-w-none">
+          <div className="flex items-center gap-3 mb-3 text-brand-1100 dark:text-brand-900">
+            {/* <IconBackground>
+              <HomeMenuIconPicker icon="reference-cli" width={18} height={18} />
+            </IconBackground> */}
+            ## Client Libraries
+          </div>
+        </div>
+
+      </div>
+
+      <div className="grid col-span-8 grid-cols-12 gap-6 not-prose">
+        {clientLibraries.map((product) => {
+          return (
+            <Link href={product.href} key={product.title} passHref>
+              <a className={product.span ?? 'col-span-6 md:col-span-4'}>
+                <IconPanel
+                  {...product}
+                  icon={<HomeMenuIconPicker icon={product.icon} width={18} height={18} />}
+                  background={true}
+                  showIconBg={true}
+                  showLink={false}
+                >
+                  {product.description}
+                </IconPanel>
+              </a>
+            </Link>
+          )
+        })}
+      </div>
+
+    </div>
+
+    <div className="flex flex-col lg:grid grid-cols-12 gap-6 py-12 border-b">
+
+      <div className="col-span-4 flex flex-col gap-1 [&_h2]:m-0">
+
+        ## Migrate to Supabase
+
+        <p className="text-scale-1100 text-sm p-0 m-0">
+          Bring your existing data, auth and storage to Supabase following our migration guides.
+        </p>
+
+        <TextLink
+          label="Explore more resources"
+          url="/docs/guides/resources"
+          className="no-underline text-brand-900 text-sm"
+        />
+      </div>
+
+      <div className="grid col-span-8 grid-cols-12 gap-6 not-prose">
+        {migrationGuides.map((product) => {
+          return (
+            <Link
+              href={product.href}
+              key={product.title}
+              passHref
+            >
+              <a className={product.span ?? 'col-span-6 md:col-span-4'}>
+                <IconPanel {...product} background={true} showIconBg={true} showLink={false}>
+                  {product.description}
+                </IconPanel>
+              </a>
+            </Link>
+          )
+        })}
+      </div>
+
+    </div>
+
+  </div>
+
+  <div className="flex flex-col gap-6 py-12 border-b">
+
+    <div className="col-span-4 flex flex-col gap-1 [&_h2]:m-0 [&_h3]:m-0">
+
+      ### Additional resources
+
+    </div>
+
+    <div className="grid grid-cols-12 gap-6 not-prose">
+      {additionalResources.map((product) => {
         return (
           <Link
-            href={`${product.href}`}
+            href={product.href}
             key={product.title}
             passHref
           >
-            <a className={product.span ?? 'col-span-6 md:col-span-4'}>
-              <IconPanel {...product} background={true} showIconBg={true} showLink={true} showLink={false}>
+            <a className={product.span ?? 'col-span-12 md:col-span-6 lg:col-span-3'}>
+              <GlassPanel {...product} icon={<HomeMenuIconPicker icon={product.icon} width={18} height={18} />} background={false}>
                 {product.description}
-              </IconPanel>
+              </GlassPanel>
             </a>
           </Link>
         )
@@ -80,11 +143,7 @@ export const meta = {
 
   </div>
 
-</div>
-
-<div>
-
-  <div className="flex flex-col lg:grid grid-cols-12 gap-6 py-12 border-b">
+  <div className="flex flex-col lg:grid grid-cols-12 gap-6 py-12">
 
     <div className="col-span-4 flex flex-col gap-1 [&_h2]:m-0 [&_h3]:m-0">
 
@@ -112,12 +171,12 @@ export const meta = {
         {selfHostingOptions.map((product) => {
           return (
             <Link
-              href={`${product.href}`}
+              href={product.href}
               key={product.title}
               passHref
             >
               <a className={product.span ?? 'col-span-6'}>
-                <IconPanel {...product} icon={<HomeMenuIconPicker icon={product.icon} width={18} height={18} />} background={true} showIconBg={true} showLink={true} showLink={false}>
+                <IconPanel {...product} icon={<HomeMenuIconPicker icon={product.icon} width={18} height={18} />} background={true} showIconBg={true} showLink={false}>
                   {product.description}
                 </IconPanel>
               </a>
@@ -128,55 +187,13 @@ export const meta = {
     </div>
 
   </div>
-  
-  <div className="flex flex-col lg:grid grid-cols-12 gap-6 py-12">
-
-    <div className="col-span-4 flex flex-col gap-1 [&_h2]:m-0 [&_h3]:m-0">
-
-      <div className="md:max-w-xs 2xl:max-w-none">
-        <div className="flex items-center gap-3 mb-3 text-brand-1100 dark:text-brand-900">
-          <IconBackground>
-            <HomeMenuIconPicker icon="reference-cli" width={18} height={18} />
-          </IconBackground>
-          ### Official Client Libraries
-        </div>
-        {/* <p className="text-scale-1100 text-sm">
-          Some short description about using Official Client Libraries across all of these products we listed here.
-        </p> */}
-      </div>
-
-    </div>
-
-    <div className="grid col-span-8 grid-cols-12 gap-6 not-prose">
-      <div className="col-span-full lg:col-span-8 grid grid-cols-12 gap-6">
-        {clientLibraries.map((product) => {
-          return (
-            <Link
-              href={`${product.href}`}
-              key={product.title}
-              passHref
-            >
-              <a className={product.span ?? 'col-span-6'}>
-                <IconPanel {...product} icon={<HomeMenuIconPicker icon={product.icon} width={18} height={18} />} background={true} showIconBg={true} showLink={true} showLink={false}>
-                  {product.description}
-                </IconPanel>
-              </a>
-            </Link>
-          )
-        })}
-      </div>
-    </div>
-
-  </div>
-
-</div>
 
 </div>
 
 export const products = [
   {
     title: 'Database',
-    icon: '/docs/img/icons/menu/database',
+    icon: 'database',
     hasLightIcon: true,
     href: '/guides/database',
     description:
@@ -185,16 +202,16 @@ export const products = [
   },
   {
     title: 'Auth',
-    icon: '/docs/img/icons/menu/auth',
+    icon: 'auth',
     hasLightIcon: true,
-    href: '/guides/auth/overview',
+    href: '/guides/auth',
     description:
       'Add and manage email and password, passwordless, OAuth, and mobile logins to your project through a suite of identity providers and APIs.',
     span: 'col-span-12 md:col-span-6',
   },
   {
     title: 'Storage',
-    icon: '/docs/img/icons/menu/storage',
+    icon: 'storage',
     hasLightIcon: true,
     href: '/guides/storage',
     description:
@@ -202,7 +219,7 @@ export const products = [
   },
   {
     title: 'Realtime',
-    icon: '/docs/img/icons/menu/realtime',
+    icon: 'realtime',
     hasLightIcon: true,
     href: '/guides/realtime',
     description:
@@ -210,7 +227,7 @@ export const products = [
   },
   {
     title: 'Edge Functions',
-    icon: '/docs/img/icons/menu/functions',
+    icon: 'functions',
     hasLightIcon: true,
     href: '/guides/functions',
     description:
@@ -255,22 +272,22 @@ export const selfHostingOptions = [
   {
     title: 'Auth',
     icon: 'auth',
-    href: '/docs/reference/self-hosting-auth/introduction',
+    href: 'reference/self-hosting-auth/introduction',
   },
   {
     title: 'Realtime',
     icon: 'realtime',
-    href: '/docs/reference/self-hosting-realtime/introduction',
+    href: 'reference/self-hosting-realtime/introduction',
   },
   {
     title: 'Storage',
     icon: 'storage',
-    href: '/docs/reference/self-hosting-storage/introduction',
+    href: 'reference/self-hosting-storage/introduction',
   },
   {
     title: 'Analytics',
     icon: 'analytics',
-    href: '/docs/reference/self-hosting-analytics/introduction',
+    href: 'reference/self-hosting-analytics/introduction',
   },
 ]
 
@@ -278,12 +295,54 @@ export const clientLibraries = [
   {
     title: 'Javascript',
     icon: 'reference-javascript',
-    href: '/docs/reference/javascript/initializing',
+    href: 'reference/javascript/introduction',
   },
   {
     title: 'Flutter',
     icon: 'reference-dart',
-    href: '/docs/reference/dart/initializing',
+    href: 'reference/dart/introduction',
+  },
+  {
+    title: 'Python',
+    icon: 'reference-python',
+    href: 'reference/python/introduction',
+  },
+  {
+    title: 'C#',
+    icon: 'reference-csharp',
+    href: 'reference/csharp/introduction',
+  },
+  {
+    title: 'Swift',
+    icon: 'reference-swift',
+    href: 'reference/swift/introduction',
+  },
+]
+
+export const additionalResources = [
+  {
+    title: 'Management API',
+    description: 'Manage your Supabase projects and organizations.',
+    icon: 'reference-api',
+    href: 'reference/api/introduction',
+  },
+  {
+    title: 'Supabase CLI',
+    description: 'Use the CLI to develop, manage and deploy your projects.',
+    icon: 'reference-cli',
+    href: 'reference/cli/introduction',
+  },
+  {
+    title: 'Platform Guides',
+    description: 'Learn more about the tools and services powering Supabase.',
+    icon: 'platform',
+    href: 'guides/platform',
+  },
+  {
+    title: 'Integrations',
+    description: 'Explore a variety of integrations from Supabase partners.',
+    icon: 'integrations',
+    href: 'guides/integrations',
   },
 ]
 

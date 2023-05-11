@@ -5,7 +5,7 @@ import { LayoutMainContent } from '../../layouts/DefaultLayout'
 
 const Footer = () => (
   <LayoutMainContent className="pt-0">
-    <div className="mt-8">
+    <div className="mt-16">
       <ul className="flex flex-col gap-2">
         {primaryLinks.map(({ url, featherIcon: Icon, icon, text, ctaLabel }) => (
           <li key={url} className="flex items-center gap-1 text-xs text-scale-900">

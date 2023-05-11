@@ -102,7 +102,14 @@ const IconPanel = ({
         bg-scale-200 dark:bg-whiteA-300 opacity-0 peer-hover:opacity-100"
         ></div>
       </div>
-      {tooltip && <ReactTooltip effect={'solid'} className="!py-2 !px-4" />}
+      {tooltip && (
+        <ReactTooltip
+          effect="solid"
+          backgroundColor="var(--colors-scale1)"
+          textColor="var(--colors-scale11)"
+          className="!py-2 !px-4"
+        />
+      )}
     </>
   )
 }
