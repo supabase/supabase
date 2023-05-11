@@ -97,6 +97,23 @@ export function splitTreeBy(tree: Root, predicate: (node: Content) => boolean) {
 }
 
 /**
+ * Wrapped slug generator that also accounts for
+ * custom anchors in the format:
+ *
+ * ```markdown
+ * ### My Heading [#my-custom-anchor]
+ * ```
+ */
+export function generateSlug(slugger: GithubSlugger, heading: string) {
+  const match = heading.match(/\[#(.*)\]/)
+  if (match) {
+    const [, customAnchor] = match
+    return slugger.slug(customAnchor)
+  }
+  return slugger.slug(heading)
+}
+
+/**
  * Processes MDX content for search indexing.
  * It extracts metadata, strips it of all JSX,
  * and splits it into sub-sections based on criteria.
@@ -142,7 +159,7 @@ export function processMdxForSearch(content: string): ProcessedMdx {
     const [firstNode] = tree.children
 
     const heading = firstNode.type === 'heading' ? toString(firstNode) : undefined
-    const slug = heading ? slugger.slug(heading) : undefined
+    const slug = heading ? generateSlug(slugger, heading) : undefined
 
     return {
       content: toMarkdown(tree),
