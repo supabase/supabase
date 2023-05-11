@@ -1,4 +1,4 @@
-export const LOCAL_STORAGE_KEYS_ALLOWLIST = ['graphiql:theme', 'theme']
+export const LOCAL_STORAGE_KEYS_ALLOWLIST = ['graphiql:theme', 'theme', 'supabaseDarkMode']
 
 export function clearLocalStorage() {
   for (const key in localStorage) {
