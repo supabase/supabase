@@ -17,8 +17,8 @@ const HomePageCover = (props) => {
         p-5 md:p-8
         "
     >
-      <div className="col-span-full flex flex-col md:flex-row 2xl:flex-col justify-between gap-1 md:gap-6">
-        <div className="md:max-w-xs 2xl:max-w-none">
+      <div className="col-span-full flex flex-col md:flex-row xl:flex-col justify-between gap-1 md:gap-6">
+        <div className="md:max-w-xs xl:max-w-none">
           <div className="flex items-center gap-3 mb-3">
             <IconBackground>
               <IconPlay className="text-brand-900 w-4" />
@@ -106,8 +106,8 @@ const HomePageCover = (props) => {
   )
 
   return (
-    <div className="w-full bg-scale-100 border-b prose dark:prose-dar max-w-none mb-16 md:mb-12 2xl:mb-0">
-      <div className="max-w-7xl px-5 mx-auto py-8 sm:py-16 flex flex-col 2xl:flex-row justify-between gap-12">
+    <div className="w-full bg-scale-100 border-b prose dark:prose-dar max-w-none mb-16 md:mb-12 xl:mb-0">
+      <div className="max-w-7xl px-5 mx-auto py-8 sm:pb-16 xl:pt-16 flex flex-col xl:flex-row justify-between gap-12 sm:gap-4 xl:gap-12">
         <div className="flex flex-col sm:flex-row gap-2 sm:gap-8 items-start sm:items-center w-full max-w-xl">
           <Image
             src="/docs/img/icons/supabase-docs2.svg"
@@ -115,14 +115,14 @@ const HomePageCover = (props) => {
             height={isXs ? '80' : '300'}
           />
           <div className="flex flex-col">
-            <h1 className="m-0 mb-3 text-3xl sm:text-4xl">{props.meta?.title}</h1>
-            <p className="m-0 text-scale-1100 text-lg">
+            <h1 className="m-0 mb-3 text-2xl sm:text-3xl">{props.meta?.title}</h1>
+            <p className="m-0 text-scale-1100">
               Learn how to get up and running with Supabase through tutorials, APIs and platform
               resources.
             </p>
           </div>
         </div>
-        <div className="w-full 2xl:max-w-sm -mb-40">
+        <div className="w-full xl:max-w-[365px] -mb-40">
           <GettingStarted />
         </div>
       </div>
