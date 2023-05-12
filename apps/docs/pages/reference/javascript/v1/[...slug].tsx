@@ -1,4 +1,3 @@
-import { inspect } from 'util'
 import clientLibsCommonSections from '~/../../spec/common-client-libs-sections.json'
 import typeSpec from '~/../../spec/enrichments/tsdoc_v1/combined.json'
 import spec from '~/../../spec/supabase_js_v1.yml' assert { type: 'yml' }
@@ -18,6 +17,7 @@ export default function JSReference(props) {
       typeSpec={typeSpec}
       pageProps={props}
       type="client-lib"
+      isOldVersion
     />
   )
 }

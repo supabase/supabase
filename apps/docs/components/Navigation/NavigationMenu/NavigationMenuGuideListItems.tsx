@@ -54,7 +54,7 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
     <>
       {props.subItemIndex === 0 && (
         <>
-          <div className="h-px w-full bg-green-500 my-3"></div>
+          <div className="h-px w-full bg-scale-500 my-3"></div>
           <span className="font-mono text-xs uppercase text-scale-1200 font-medium tracking-wider">
             {props.parent.name}
           </span>
