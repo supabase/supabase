@@ -23,20 +23,6 @@ export function IconMenuHome({ width = 16, height = 16 }: HomeMenuIcon) {
 
 export function IconMenuApi({ width = 16, height = 16 }: HomeMenuIcon) {
   return (
-    // <svg
-    //   viewBox="0 0 16 16"
-    //   width={width}
-    //   height={height}
-    //   fill="none"
-    //   xmlns="http://www.w3.org/2000/svg"
-    // >
-    //   <path
-    //     d="M2.923 10.927A5.833 5.833 0 0 1 2.14 8m2.877-5.046A5.833 5.833 0 0 1 8 2.14m5.13 3.025c.465.84.73 1.807.73 2.835m-2.883 5.049A5.832 5.832 0 0 1 8 13.859m6.172-10.027a2 2 0 1 1-4 0 2 2 0 0 1 4 0ZM5.81 12.148a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm8.362 0a2 2 0 1 1-4 0 2 2 0 0 1 4 0ZM5.81 3.832a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z"
-    //     stroke="currentColor"
-    //     strokeMiterlimit="10"
-    //     strokeLinejoin="bevel"
-    //   />
-    // </svg>
     <svg
       width={width}
       height={height}
