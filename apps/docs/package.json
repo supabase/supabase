@@ -61,6 +61,7 @@
     "clsx": "^1.2.1",
     "common": "*",
     "config": "*",
+    "framer-motion": "^6.5.1",
     "github-slugger": "^2.0.0",
     "gray-matter": "^4.0.3",
     "isbot": "^3.6.5",
