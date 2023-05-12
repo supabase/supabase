@@ -64,7 +64,6 @@ const Layout: FC<Props> = (props: Props) => {
         <div className={['relative transition-all ease-out', 'duration-150 '].join(' ')}>
           <article className="prose dark:prose-dar max-w-none">
             <h1>{props.meta.title}</h1>
-            {/* <div className="max-w-xs w-32 h-[1px] bg-gradient-to-r from-brand-800 to-brand-900 my-16"></div> */}
             <MDXProvider components={components} children={props.children} />
           </article>
         </div>
