@@ -8,6 +8,7 @@ import RefFunctionSection from '~/components/reference/RefFunctionSection'
 import RefSubLayout from '~/layouts/ref/RefSubLayout'
 import ApiOperationSection from './ApiOperationSection'
 import CliCommandSection from './CLICommandSection'
+import OldVersionAlert from './OldVersionAlert'
 import { IAPISpec, ICommonSection, IRefStaticDoc, ISpec, TypeSpec } from './Reference.types'
 
 interface RefSectionHandlerProps {
@@ -16,12 +17,13 @@ interface RefSectionHandlerProps {
   typeSpec?: TypeSpec
   pageProps: { docs: IRefStaticDoc[] }
   type: 'client-lib' | 'cli' | 'api'
+  isOldVersion?: boolean
 }
 
 const RefSectionHandler = (props: RefSectionHandlerProps) => {
   const router = useRouter()
 
-  const slug = router.query.slug[0]
+  const [slug] = router.query.slug
 
   // When user lands on a url like http://supabase.com/docs/reference/javascript/sign-up
   // find the #sign-up element and scroll to that
@@ -30,7 +32,7 @@ const RefSectionHandler = (props: RefSectionHandlerProps) => {
   }, [slug])
 
   useEffect(() => {
-    function handler(e: PopStateEvent) {
+    function handler() {
       const [slug] = window.location.pathname.split('/').slice(-1)
       document.getElementById(slug)?.scrollIntoView()
     }
@@ -69,6 +71,7 @@ const RefSectionHandler = (props: RefSectionHandlerProps) => {
         />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
+      {props.isOldVersion && <OldVersionAlert sections={props.sections} />}
       <RefSubLayout>
         {props.sections.map((section, i) => {
           const sectionType = section.type
