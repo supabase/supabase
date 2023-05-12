@@ -5,6 +5,8 @@ import { useRouter } from 'next/router'
 import { FC } from 'react'
 import components from '~/components'
 import TableOfContents from '~/components/TableOfContents'
+import HomePageCover from '../components/HomePageCover'
+import { LayoutMainContent } from './DefaultLayout'
 
 interface Props {
   meta: {
@@ -12,7 +14,6 @@ interface Props {
     description?: string
     hide_table_of_contents?: boolean
     video?: string
-    tocVideo?: string
     canonical?: string
   }
   children: any
@@ -20,7 +21,7 @@ interface Props {
   menuItems: any
 }
 
-const Layout: FC<Props> = (props: Props) => {
+const HomeLayout: FC<Props> = (props: Props) => {
   const { asPath } = useRouter()
 
   const hasTableOfContents =
@@ -60,10 +61,10 @@ const Layout: FC<Props> = (props: Props) => {
           },
         }}
       />
+      <HomePageCover meta={props.meta} />
       <LayoutMainContent>
         <div className={['relative transition-all ease-out', 'duration-150 '].join(' ')}>
           <article className="prose dark:prose-dar max-w-none">
-            <h1>{props.meta.title}</h1>
             <MDXProvider components={components} children={props.children} />
           </article>
         </div>
@@ -82,8 +83,4 @@ const Layout: FC<Props> = (props: Props) => {
   )
 }
 
-export const LayoutMainContent: FC<{ className?: string }> = ({ className, children }) => (
-  <div className={['max-w-7xl px-5 mx-auto py-16', className].join(' ')}>{children}</div>
-)
-
-export default Layout
+export default HomeLayout
