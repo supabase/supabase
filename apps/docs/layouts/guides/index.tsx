@@ -8,9 +8,9 @@ import { IconExternalLink } from 'ui'
 import components from '~/components'
 import { highlightSelectedTocItem } from '~/components/CustomHTMLElements/CustomHTMLElements.utils'
 import { FooterHelpCalloutType } from '~/components/FooterHelpCallout'
+import GuidesTableOfContents from '~/components/GuidesTableOfContents'
 import useHash from '~/hooks/useHash'
 import { LayoutMainContent } from '../DefaultLayout'
-import GuidesTableOfContents from '../../components/GuidesTableOfContents'
 import ExpandableVideo from 'ui/src/components/ExpandableVideo/ExpandableVideo'
 
 interface Props {
