@@ -147,7 +147,7 @@ const Content = (props) => {
   const { menu, id } = props
 
   return (
-    <ul className={['relative w-full flex flex-col gap-0'].join(' ')}>
+    <ul className={['relative w-full flex flex-col gap-0 pb-5'].join(' ')}>
       <Link href={`${menu.parent ?? '/'}`} passHref>
         <a
           className={[
