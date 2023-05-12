@@ -8,8 +8,10 @@ import { IconExternalLink } from 'ui'
 import components from '~/components'
 import { highlightSelectedTocItem } from '~/components/CustomHTMLElements/CustomHTMLElements.utils'
 import { FooterHelpCalloutType } from '~/components/FooterHelpCallout'
+import GuidesTableOfContents from '~/components/GuidesTableOfContents'
 import useHash from '~/hooks/useHash'
 import { LayoutMainContent } from '../DefaultLayout'
+import ExpandableVideo from 'ui/src/components/ExpandableVideo/ExpandableVideo'
 
 interface Props {
   meta: {
@@ -151,45 +153,24 @@ const Layout: FC<Props> = (props) => {
           {!props.hideToc && hasTableOfContents && !props.meta?.hide_table_of_contents && (
             <div
               className={[
-                'relative',
-                !props.hideToc ? 'col-span-12 md:col-span-9' : 'col-span-12',
+                'col-span-3',
+                'border-scale-400 dark:bg-scale-200 table-of-contents-height',
+                'thin-scrollbar overflow-y-auto sticky hidden md:block md:col-span-3 px-2',
                 'transition-all ease-out',
                 'duration-100',
               ].join(' ')}
             >
-              {props.meta.breadcrumb && (
-                <p className="text-brand-900 tracking-wider mb-3">{props.meta.breadcrumb}</p>
-              )}
-              <article
-                ref={articleRef}
-                className={`${
-                  props.meta?.hide_table_of_contents || !hasTableOfContents ? '' : ''
-                } prose dark:prose-dark max-w-none`}
-              >
-                <h1 className="mb-0">{props.meta.title}</h1>
-                {props.meta.subtitle && (
-                  <h2 className="mt-3 text-xl text-scale-1100">{props.meta.subtitle}</h2>
-                )}
-                <div className="max-w-xs w-32 h-[1px] bg-gradient-to-r from-brand-800 to-brand-900 my-8"></div>
-                <MDXProvider components={components}>{props.children}</MDXProvider>
-
-                {EDIT_BUTTON_EXCLUDE_LIST.includes(router.route) ? (
-                  <></>
-                ) : (
-                  <div className="mt-16 not-prose">
-                    <div>
-                      <Link
-                        href={`https://github.com/supabase/supabase/edit/master/apps/docs/pages${router.asPath}.mdx`}
-                        passHref
-                      >
-                        <a className="text-sm transition flex items-center gap-1 text-scale-1000 hover:text-scale-1200">
-                          Edit this page on GitHub <IconExternalLink size={14} strokeWidth={1.5} />
-                        </a>
-                      </Link>
-                    </div>
+              <div className="border-l">
+                {props.meta?.tocVideo && !!tocVideoPreview && (
+                  <div className="relative mb-6 pl-5">
+                    <ExpandableVideo imgUrl={tocVideoPreview} videoId={props.meta.tocVideo} />
                   </div>
                 )}
-              </article>
+                <span className="block font-mono text-xs uppercase text-scale-1200 px-5 mb-6">
+                  On this page
+                </span>
+                <GuidesTableOfContents list={tocList} />
+              </div>
             </div>
           )}
         </div>
