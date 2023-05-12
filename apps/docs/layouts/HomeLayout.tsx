@@ -22,7 +22,7 @@ interface Props {
 }
 
 const HomeLayout: FC<Props> = (props: Props) => {
-  const { asPath, basePath } = useRouter()
+  const { asPath } = useRouter()
 
   const hasTableOfContents =
     props.toc !== undefined &&
