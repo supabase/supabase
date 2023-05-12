@@ -29,7 +29,7 @@ const HomePageCover = (props) => {
             Discover how to set up a database to an app making queries in just a few minutes.
           </p>
         </div>
-        <div className="flex flex-wrap md:grid md:grid-cols-4 gap-3 sm:gap-3">
+        <div className="flex flex-wrap md:grid md:grid-cols-4 gap-2 sm:gap-3">
           <Link href={`/guides/getting-started/quickstarts/reactjs`} passHref>
             <a className="no-underline">
               <IconPanel
