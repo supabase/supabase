@@ -62,7 +62,6 @@ const Layout: FC<Props> = (props: Props) => {
       />
       <LayoutMainContent>
         <div className={['relative transition-all ease-out', 'duration-150 '].join(' ')}>
-          {/* <p className="text-brand-900 tracking-wider">Tutorials</p> */}
           <article className="prose dark:prose-dar max-w-none">
             <h1>{props.meta.title}</h1>
             {/* <div className="max-w-xs w-32 h-[1px] bg-gradient-to-r from-brand-800 to-brand-900 my-16"></div> */}
