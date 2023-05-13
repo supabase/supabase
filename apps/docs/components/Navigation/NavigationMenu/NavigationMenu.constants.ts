@@ -211,6 +211,7 @@ export const gettingstarted = {
         { name: 'SvelteKit', url: '/guides/getting-started/quickstarts/sveltekit' },
         { name: 'SolidJS', url: '/guides/getting-started/quickstarts/solidjs' },
         { name: 'Vue', url: '/guides/getting-started/quickstarts/vue' },
+        { name: 'Angular', url: '/guides/getting-started/quickstarts/angular' },
       ],
     },
     {
