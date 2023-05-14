@@ -2642,6 +2642,7 @@ functions:
                   autoLoadFromStorage = false
                   alwaysAutoRefresh = false
               }
+              // install other plugins (these will have use the service role key)
           }
           client.gotrue.importAuthToken("service_role")
 
