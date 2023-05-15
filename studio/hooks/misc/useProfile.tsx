@@ -25,7 +25,7 @@ function useProfile() {
   const { isLoading, ...result } = useProfileQuery({
     onError(err) {
       // if the user does not yet exist, create a profile for them
-      if (typeof err === 'object' && err !== null && 'code' in err && err.code === 404) {
+      if (typeof err === 'object' && err !== null && 'code' in err && (err as any).code === 404) {
         createProfile()
       }
     },
