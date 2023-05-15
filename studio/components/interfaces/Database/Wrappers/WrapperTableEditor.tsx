@@ -108,50 +108,27 @@ export default WrapperTableEditor
 
 const Option = ({ option }: { option: TableOption }) => {
   if (option.type === 'select') {
-    // NOTE(alaister): We have this annoying workaround because Listbox
-    // doesn't support conditional rendering inside of it
-
-    return option.required ? (
-      <Listbox
-        key={option.name}
-        id={option.name}
-        name={option.name}
-        label={option.label}
-        defaultValue={option.defaultValue ?? ''}
-      >
-        {option.options.map((subOption) => (
-          <Listbox.Option
-            key={subOption.value}
-            id={option.name + subOption.value}
-            value={subOption.value}
-            label={subOption.label}
-          >
-            {subOption.label}
-          </Listbox.Option>
-        ))}
-      </Listbox>
-    ) : (
-      <Listbox
-        key={option.name}
-        id={option.name}
-        name={option.name}
-        label={option.label}
-        defaultValue={option.defaultValue ?? ''}
-      >
-        <Listbox.Option key="empty" value="" label="---">
-          ---
-        </Listbox.Option>
-
-        {option.options.map((subOption) => (
-          <Listbox.Option
-            key={subOption.value}
-            id={option.name + subOption.value}
-            value={subOption.value}
-            label={subOption.label}
-          >
-            {subOption.label}
-          </Listbox.Option>
-        ))}
+    return (
+      <Listbox>
+        {[
+          ...(!option.required
+            ? [
+                <Listbox.Option key="empty" value="" label="---">
+                  ---
+                </Listbox.Option>,
+              ]
+            : []),
+          ...option.options.map((subOption) => (
+            <Listbox.Option
+              key={subOption.value}
+              id={option.name + subOption.value}
+              value={subOption.value}
+              label={subOption.label}
+            >
+              {subOption.label}
+            </Listbox.Option>
+          )),
+        ]}
       </Listbox>
     )
   }
