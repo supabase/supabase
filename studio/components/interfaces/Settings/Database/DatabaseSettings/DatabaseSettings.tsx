@@ -105,14 +105,15 @@ const DatabaseSettings: FC<any> = ({ projectRef }) => {
   const DB_FIELDS = ['db_host', 'db_name', 'db_port', 'db_user', 'inserted_at']
   const connectionInfo = pluckObjectFields(project, DB_FIELDS)
 
-  const handleCopy = (labelValue?: string) => Telemetry.sendEvent(
-    {
-      category: 'settings',
-      action: 'copy_connection_string',
-      label: labelValue ? labelValue:''
-    },
-    ui.googleAnalyticsProps
-  )
+  const handleCopy = (labelValue?: string) =>
+    Telemetry.sendEvent(
+      {
+        category: 'settings',
+        action: 'copy_connection_string',
+        label: labelValue ? labelValue : '',
+      },
+      ui.googleAnalyticsProps
+    )
   const uriConnString =
     `postgresql://${connectionInfo.db_user}:[YOUR-PASSWORD]@` +
     `${connectionInfo.db_host}:${connectionInfo.db_port.toString()}` +
@@ -208,15 +209,39 @@ const DatabaseSettings: FC<any> = ({ projectRef }) => {
           <Panel.Content>
             <Tabs type="underlined" size="small">
               <Tabs.Panel id="psql" label="PSQL">
-                <Input copy readOnly disabled value={psqlConnString} />
+                <Input
+                  copy
+                  readOnly
+                  disabled
+                  value={psqlConnString}
+                  onCopy={() => {
+                    handleCopy('PSQL')
+                  }}
+                />
               </Tabs.Panel>
 
               <Tabs.Panel id="uri" label="URI">
-                <Input copy readOnly disabled value={uriConnString} />
+                <Input
+                  copy
+                  readOnly
+                  disabled
+                  value={uriConnString}
+                  onCopy={() => {
+                    handleCopy('URI')
+                  }}
+                />
               </Tabs.Panel>
 
               <Tabs.Panel id="golang" label="Golang">
-                <Input copy readOnly disabled value={golangConnString} />
+                <Input
+                  copy
+                  readOnly
+                  disabled
+                  value={golangConnString}
+                  onCopy={() => {
+                    handleCopy('Golang')
+                  }}
+                />
               </Tabs.Panel>
 
               <Tabs.Panel id="jdbc" label="JDBC">
@@ -230,6 +255,9 @@ const DatabaseSettings: FC<any> = ({ projectRef }) => {
                     }:${connectionInfo.db_port.toString()}` +
                     `/${connectionInfo.db_name}?user=${connectionInfo.db_user}&password=[YOUR-PASSWORD]`
                   }
+                  onCopy={() => {
+                    handleCopy('JDBC')
+                  }}
                 />
               </Tabs.Panel>
 
@@ -243,15 +271,34 @@ const DatabaseSettings: FC<any> = ({ projectRef }) => {
                     `Server=${connectionInfo.db_host};Port=${connectionInfo.db_port.toString()};` +
                     `Database=${connectionInfo.db_name}`
                   }
+                  onCopy={() => {
+                    handleCopy('.NET')
+                  }}
                 />
               </Tabs.Panel>
 
               <Tabs.Panel id="nodejs" label="Nodejs">
-                <Input copy readOnly disabled value={uriConnString} />
+                <Input
+                  copy
+                  readOnly
+                  disabled
+                  value={uriConnString}
+                  onCopy={() => {
+                    handleCopy('Nodejs')
+                  }}
+                />
               </Tabs.Panel>
 
               <Tabs.Panel id="php" label="PHP">
-                <Input copy readOnly disabled value={golangConnString} />
+                <Input
+                  copy
+                  readOnly
+                  disabled
+                  value={golangConnString}
+                  onCopy={() => {
+                    handleCopy('PHP')
+                  }}
+                />
               </Tabs.Panel>
 
               <Tabs.Panel id="python" label="Python">
@@ -264,6 +311,9 @@ const DatabaseSettings: FC<any> = ({ projectRef }) => {
                     ` host=${connectionInfo.db_host} port=${connectionInfo.db_port.toString()}` +
                     ` database=${connectionInfo.db_name}`
                   }
+                  onCopy={() => {
+                    handleCopy('Python')
+                  }}
                 />
               </Tabs.Panel>
             </Tabs>
