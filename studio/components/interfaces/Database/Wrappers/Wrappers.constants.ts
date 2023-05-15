@@ -612,7 +612,7 @@ export const WRAPPERS: WrapperMeta[] = [
             name: 'has_header',
             label: 'Has Header',
             editable: true,
-            required: false,
+            required: true,
             type: 'select',
             defaultValue: 'true',
             options: [
