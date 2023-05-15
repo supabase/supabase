@@ -120,7 +120,7 @@ from
     'https://webhook.site/223c8a43-725b-4cbd-b1fe-d0da73353a6b', -- webhook URL
     '{"hello": "world"}', -- payload
     'application/json'
-  )
+  );
 ```
 
 #### Scheduling the job
@@ -176,6 +176,7 @@ select * from cron.job_run_details;
 
 To stop a running cron job, you can run:
 
+{/* prettier-ignore */}
 ```sql
 select cron.unschedule('webhook-every-minute'); -- pass the name of the cron job
 ```

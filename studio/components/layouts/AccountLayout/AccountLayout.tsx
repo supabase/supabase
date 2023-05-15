@@ -3,12 +3,11 @@ import { FC, ReactNode } from 'react'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 
-import { auth, STORAGE_KEY } from 'lib/gotrue'
+import { useSignOut } from 'lib/auth'
 import { useStore, withAuth, useFlag } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import WithSidebar from './WithSidebar'
 import { SidebarSection } from './AccountLayout.types'
-import { useQueryClient } from '@tanstack/react-query'
 
 interface Props {
   title: string
@@ -22,16 +21,15 @@ interface Props {
 const AccountLayout: FC<Props> = ({ children, title, breadcrumbs }) => {
   const router = useRouter()
   const { app, ui } = useStore()
-  const queryClient = useQueryClient()
 
   const ongoingIncident = useFlag('ongoingIncident')
   const maxHeight = ongoingIncident ? 'calc(100vh - 44px)' : '100vh'
 
+  const signOut = useSignOut()
   const onClickLogout = async () => {
-    await auth.signOut()
-    localStorage.removeItem(STORAGE_KEY)
+    await signOut()
+
     await router.push('/sign-in')
-    await queryClient.resetQueries()
   }
 
   const organizationsLinks = app.organizations
