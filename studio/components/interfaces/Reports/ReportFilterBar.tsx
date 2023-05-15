@@ -12,7 +12,7 @@ import {
   IconBox,
   IconCode,
   IconDatabase,
-  IconZapOff,
+  IconZap,
 } from 'ui'
 import DatePickers from '../Settings/Logs/Logs.DatePickers'
 import { REPORTS_DATEPICKER_HELPERS } from './Reports.constants'
@@ -59,7 +59,7 @@ const PRODUCT_FILTERS = [
     filterValue: '/realtime',
     label: 'Realtime',
     description: 'Realtime connection requests',
-    icon: IconZapOff,
+    icon: IconZap,
   },
   // TODO: support functions once union parsing is fixed
   // {
