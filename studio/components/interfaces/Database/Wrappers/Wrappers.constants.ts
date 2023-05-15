@@ -564,14 +564,14 @@ export const WRAPPERS: WrapperMeta[] = [
           label: 'Access Key ID',
           required: true,
           encrypted: true,
-          hidden: false,
+          hidden: true,
         },
         {
           name: 'vault_secret_access_key',
           label: 'Access Key Secret',
           required: true,
           encrypted: true,
-          hidden: false,
+          hidden: true,
         },
         {
           name: 'aws_region',
