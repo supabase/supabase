@@ -12,7 +12,11 @@ Encrypted Columns for Tables
 
 ## Transparent Column Encryption (TCE)
 
-Our recent [blog post](/blog/transparent-column-encryption-with-postgres) describes TCE in-depth. TCE is one of the safest ways to encrypt your data so that it doesn't leak into logs and backups, as well as providing your users with row-level authenticated encryption. TCE is the foundational feature of the Vault, but you can use it on your own tables if you choose to if the Vault isn't sufficient for your needs, for example if you have multiple tables that you wish to have encrypted columns. Any Postgres value that can be cast to `text` or `bytea` can use TCE to encrypt the data that is stored to disk.
+TCE provides a safe way to encrypt your data so that it doesn't leak into logs and backups. It can also provide row-level authenticated encryption.
+
+TCE is the primary building block of [Vault](/docs/guides/database/vault), Supabase's Postgres secrets manager. Vault is a built-in table with an integrated UI intended to act as a secure global secrets management for you project. However if you need more fine-grain control over your encrypted data, such as encrypting columns in your own tables, you can use TCE directly. Any Postgres value that can be cast to `text` or `bytea` can be encrypted using TCE.
+
+See the [blog post](/blog/transparent-column-encryption-with-postgres) for an in-depth discussion on TCE.
 
 ### Encrypting columns
 
