@@ -68,7 +68,7 @@ Using the vault is as simple as `INSERT`ing data into the
 `vault.secret` table.
 
 ```sql
-postgres=> INSERT INTO vault.secrets (secret) VALUES ('s3kre3t_k3y') RETURNING *;
+postgres=> insert into vault.secrets (secret) values ('s3kre3t_k3y') returning *;
 -[ RECORD 1 ]-------------------------------------------------------------
 id          | d91596b8-1047-446c-b9c0-66d98af6d001
 name        |
