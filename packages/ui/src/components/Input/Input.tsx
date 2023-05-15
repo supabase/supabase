@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
+import { mergeRefs } from "react-merge-refs";
 import { IconCopy } from '../Icon/icons/IconCopy'
 import { Button } from '../Button'
 
@@ -14,6 +15,7 @@ import { useFormContext } from '../Form/FormContext'
 
 export interface Props extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
   copy?: boolean
+  onCopy?: (value: string) => void
   defaultValue?: string | number
   descriptionText?: string | React.ReactNode | undefined
   disabled?: boolean
@@ -52,6 +54,7 @@ function Input({
   layout,
   onChange,
   onBlur,
+  onCopy,
   placeholder,
   type = 'text',
   value = undefined,
@@ -65,6 +68,7 @@ function Input({
 }: Props) {
   const [copyLabel, setCopyLabel] = useState('Copy')
   const [hidden, setHidden] = useState(true)
+  const localRef = useRef<HTMLInputElement>(null)
 
   const __styles = styleHandler('input')
 
@@ -100,7 +104,7 @@ function Input({
   //   error = touched && touched[id] ? error : undefined
   // }, [errors, touched])
 
-  function onCopy(value: any) {
+  function _onCopy(value: any) {
     navigator.clipboard.writeText(value)?.then(
       function () {
         /* clipboard successfully set */
@@ -108,6 +112,7 @@ function Input({
         setTimeout(function () {
           setCopyLabel('Copy')
         }, 3000)
+        onCopy?.(value)
       },
       function () {
         /* clipboard write failed */
@@ -115,6 +120,20 @@ function Input({
       }
     )
   }
+
+  useEffect(() => {
+    function onCopyEvent(event) {
+      const selection = document.getSelection();
+      
+      onCopy(selection.toString())
+    }
+
+    localRef?.current?.addEventListener("copy", onCopyEvent);
+
+    return () => {
+      localRef?.current?.removeEventListener("copy", onCopyEvent);
+    }
+  }, [])
 
   function onReveal() {
     setHidden(false)
@@ -153,7 +172,7 @@ function Input({
           onChange={onInputChange}
           onBlur={handleBlurEvent}
           placeholder={placeholder}
-          ref={inputRef}
+          ref={mergeRefs([inputRef, localRef])}
           type={type}
           value={reveal && hidden ? HIDDEN_PLACEHOLDER : value}
           className={inputClasses.join(' ')}
@@ -164,7 +183,7 @@ function Input({
           <div className={__styles.actions_container}>
             {error && <InputErrorIcon size={size} />}
             {copy && !(reveal && hidden) ? (
-              <Button size="tiny" type="default" icon={<IconCopy />} onClick={() => onCopy(value)}>
+              <Button size="tiny" type="default" icon={<IconCopy />} onClick={() => _onCopy(value)}>
                 {copyLabel}
               </Button>
             ) : null}
@@ -197,6 +216,7 @@ export interface TextAreaProps
   borderless?: boolean
   validation?: (x: any) => void
   copy?: boolean
+  onCopy?: (value: string) => void
   actions?: React.ReactNode
 }
 
@@ -224,13 +244,14 @@ function TextArea({
   borderless = false,
   validation,
   copy = false,
+  onCopy,
   actions,
   ...props
 }: TextAreaProps) {
   const [charLength, setCharLength] = useState(0)
   const [copyLabel, setCopyLabel] = useState('Copy')
 
-  function onCopy(value: any) {
+  function _onCopy(value: any) {
     navigator.clipboard.writeText(value).then(
       function () {
         /* clipboard successfully set */
@@ -238,6 +259,7 @@ function TextArea({
         setTimeout(function () {
           setCopyLabel('Copy')
         }, 3000)
+        onCopy?.(value)
       },
       function () {
         /* clipboard write failed */
@@ -323,7 +345,7 @@ function TextArea({
                 <Button
                   size="tiny"
                   type="default"
-                  onClick={() => onCopy(value)}
+                  onClick={() => _onCopy(value)}
                   icon={<IconCopy />}
                 >
                   {copyLabel}
