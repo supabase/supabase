@@ -1,5 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react'
-import { mergeRefs } from "react-merge-refs";
+import React, { useEffect, useState } from 'react'
 import { IconCopy } from '../Icon/icons/IconCopy'
 import { Button } from '../Button'
 
@@ -13,9 +12,10 @@ import { HIDDEN_PLACEHOLDER } from './../../lib/constants'
 import styleHandler from '../../lib/theme/styleHandler'
 import { useFormContext } from '../Form/FormContext'
 
-export interface Props extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
+export interface Props
+  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size' | 'onCopy'> {
   copy?: boolean
-  onCopy?: (value: string) => void
+  onCopy?: () => void
   defaultValue?: string | number
   descriptionText?: string | React.ReactNode | undefined
   disabled?: boolean
@@ -68,7 +68,6 @@ function Input({
 }: Props) {
   const [copyLabel, setCopyLabel] = useState('Copy')
   const [hidden, setHidden] = useState(true)
-  const localRef = useRef<HTMLInputElement>(null)
 
   const __styles = styleHandler('input')
 
@@ -112,7 +111,7 @@ function Input({
         setTimeout(function () {
           setCopyLabel('Copy')
         }, 3000)
-        onCopy?.(value)
+        onCopy?.()
       },
       function () {
         /* clipboard write failed */
@@ -120,20 +119,6 @@ function Input({
       }
     )
   }
-
-  useEffect(() => {
-    function onCopyEvent(event) {
-      const selection = document.getSelection();
-      
-      onCopy(selection.toString())
-    }
-
-    localRef?.current?.addEventListener("copy", onCopyEvent);
-
-    return () => {
-      localRef?.current?.removeEventListener("copy", onCopyEvent);
-    }
-  }, [])
 
   function onReveal() {
     setHidden(false)
@@ -172,7 +157,7 @@ function Input({
           onChange={onInputChange}
           onBlur={handleBlurEvent}
           placeholder={placeholder}
-          ref={mergeRefs([inputRef, localRef])}
+          ref={inputRef}
           type={type}
           value={reveal && hidden ? HIDDEN_PLACEHOLDER : value}
           className={inputClasses.join(' ')}
@@ -201,7 +186,7 @@ function Input({
 }
 
 export interface TextAreaProps
-  extends Omit<React.InputHTMLAttributes<HTMLTextAreaElement>, 'size'> {
+  extends Omit<React.InputHTMLAttributes<HTMLTextAreaElement>, 'size' | 'onCopy'> {
   descriptionText?: string
   error?: string
   icon?: any
@@ -216,7 +201,7 @@ export interface TextAreaProps
   borderless?: boolean
   validation?: (x: any) => void
   copy?: boolean
-  onCopy?: (value: string) => void
+  onCopy?: () => void
   actions?: React.ReactNode
 }
 
@@ -259,7 +244,7 @@ function TextArea({
         setTimeout(function () {
           setCopyLabel('Copy')
         }, 3000)
-        onCopy?.(value)
+        onCopy?.()
       },
       function () {
         /* clipboard write failed */
