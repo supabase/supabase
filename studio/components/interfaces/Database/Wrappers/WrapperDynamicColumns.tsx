@@ -12,6 +12,7 @@ export type SimpleColumn = {
 export type WrapperDynamicColumnsProps = {
   initialColumns?: Pick<SimpleColumn, 'name' | 'type'>[]
   onChange?: (columns: SimpleColumn[]) => void
+  errors?: any
 }
 
 const DEFAULT_INITIAL_COLUMNS: WrapperDynamicColumnsProps['initialColumns'] = [
@@ -47,6 +48,7 @@ type Action =
 const WrapperDynamicColumns = ({
   initialColumns = DEFAULT_INITIAL_COLUMNS,
   onChange,
+  errors = {},
 }: WrapperDynamicColumnsProps) => {
   const [state, dispatch] = useReducer(
     (state: State, action: Action) => {
@@ -112,32 +114,38 @@ const WrapperDynamicColumns = ({
   return (
     <div className="w-full flex flex-col gap-4">
       <div className="flex flex-col gap-4">
-        {columns.map((column) => (
-          <div key={column.id} className="flex items-center gap-2">
-            <Input
-              className="flex-1 [&_label]:!p-0"
-              layout="vertical"
-              label="Name"
-              value={column.name}
-              onChange={(e) => onUpdateValue(column.id, 'name', e.target.value)}
-            />
-
-            <div className="flex-1">
-              <ColumnType
-                value={column.type}
-                enumTypes={[]}
-                onOptionSelect={(value) => onUpdateValue(column.id, 'type', value)}
+        {columns.map((column, idx) => (
+          <div key={column.id} className="flex flex-col">
+            <div className="flex items-center gap-2">
+              <Input
+                className="flex-1 [&_label]:!p-0"
                 layout="vertical"
-                className="[&_label]:!p-0"
+                label="Name"
+                value={column.name}
+                onChange={(e) => onUpdateValue(column.id, 'name', e.target.value)}
+              />
+
+              <div className="flex-1">
+                <ColumnType
+                  value={column.type}
+                  enumTypes={[]}
+                  onOptionSelect={(value) => onUpdateValue(column.id, 'type', value)}
+                  layout="vertical"
+                  className="[&_label]:!p-0"
+                />
+              </div>
+
+              <Button
+                onClick={() => onRemoveColumn(column.id)}
+                icon={<IconX size={14} strokeWidth={1.5} />}
+                type="outline"
+                className="self-end -translate-y-1 !px-2 !py-2"
               />
             </div>
 
-            <Button
-              onClick={() => onRemoveColumn(column.id)}
-              icon={<IconX size={14} strokeWidth={1.5} />}
-              type="outline"
-              className="self-end -translate-y-1 !px-2 !py-2"
-            />
+            {errors[`columns.${idx}`] && (
+              <span className="text-red-900 text-sm mt-2">{errors[`columns.${idx}`]}</span>
+            )}
           </div>
         ))}
       </div>
