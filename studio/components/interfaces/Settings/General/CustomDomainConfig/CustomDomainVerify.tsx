@@ -126,58 +126,65 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
           </Alert>
         )}
 
-        <div className="space-y-2">
-          <div className="flex gap-4">
-            <div className="w-[50px]">
-              <p className="text-scale-1100 text-sm">Type</p>
-            </div>
-            <div className="text-sm grid gap-2 md:grid md:grid-cols-12 md:gap-x-4 input-mono flex-1">
-              <div className="flex flex-row space-x-2 justify-between col-span-12">
-                <label className="block text-scale-1100 text-sm break-all">Name</label>
+        {customDomain.ssl.status === 'validation_timed_out' ? (
+          <Alert withIcon variant="warning" title="Validation timed out">
+            Please click "Verify" again to retry the validation of the records
+          </Alert>
+        ) : (
+          <div className="space-y-2">
+            <div className="flex gap-4">
+              <div className="w-[50px]">
+                <p className="text-scale-1100 text-sm">Type</p>
+              </div>
+              <div className="text-sm grid gap-2 md:grid md:grid-cols-12 md:gap-x-4 input-mono flex-1">
+                <div className="flex flex-row space-x-2 justify-between col-span-12">
+                  <label className="block text-scale-1100 text-sm break-all">Name</label>
+                </div>
+              </div>
+              <div className="text-sm grid gap-2 md:grid md:grid-cols-12 md:gap-x-4 input-mono flex-1">
+                <div className="flex flex-row space-x-2 justify-between col-span-12">
+                  <label className="block text-scale-1100 text-sm break-all">Content</label>
+                </div>
               </div>
             </div>
-            <div className="text-sm grid gap-2 md:grid md:grid-cols-12 md:gap-x-4 input-mono flex-1">
-              <div className="flex flex-row space-x-2 justify-between col-span-12">
-                <label className="block text-scale-1100 text-sm break-all">Content</label>
+
+            {customDomain.verification_errors?.includes(
+              'custom hostname does not CNAME to this zone.'
+            ) && (
+              <DNSRecord
+                type="CNAME"
+                name={customDomain.hostname}
+                value={settings?.autoApiService.endpoint ?? 'Loading...'}
+              />
+            )}
+
+            {customDomain.ownership_verification && (
+              <DNSRecord
+                type={customDomain.ownership_verification.type}
+                name={customDomain.ownership_verification.name}
+                value={customDomain.ownership_verification.value}
+              />
+            )}
+
+            {customDomain.ssl.status === 'pending_validation' && (
+              <DNSRecord
+                type="TXT"
+                name={customDomain.ssl.txt_name ?? 'Loading...'}
+                value={customDomain.ssl.txt_value ?? 'Loading...'}
+              />
+            )}
+
+            {customDomain.ssl.status === 'pending_deployment' && (
+              <div className="flex items-center justify-center space-x-2 py-8">
+                <IconAlertCircle size={16} strokeWidth={1.5} />
+                <p className="text-sm text-scale-1100">
+                  SSL certificate is being deployed. Please wait a few minutes and try again.
+                </p>
               </div>
-            </div>
+            )}
           </div>
+        )}
 
-          {customDomain.verification_errors?.includes(
-            'custom hostname does not CNAME to this zone.'
-          ) && (
-            <DNSRecord
-              type="CNAME"
-              name={customDomain.hostname}
-              value={settings?.autoApiService.endpoint ?? 'Loading...'}
-            />
-          )}
-
-          {customDomain.ownership_verification && (
-            <DNSRecord
-              type={customDomain.ownership_verification.type}
-              name={customDomain.ownership_verification.name}
-              value={customDomain.ownership_verification.value}
-            />
-          )}
-
-          {customDomain.ssl.status === 'pending_validation' && (
-            <DNSRecord
-              type="TXT"
-              name={customDomain.ssl.txt_name ?? 'Loading...'}
-              value={customDomain.ssl.txt_value ?? 'Loading...'}
-            />
-          )}
-
-          {customDomain.ssl.status === 'pending_deployment' && (
-            <div className="flex items-center justify-center space-x-2 py-8">
-              <IconAlertCircle size={16} strokeWidth={1.5} />
-              <p className="text-sm text-scale-1100">
-                SSL certificate is being deployed. Please wait a few minutes and try again.
-              </p>
-            </div>
-          )}
-        </div>
         <div className="!mt-4">
           <p className="text-sm text-scale-1000">
             One of the records requires you to replace the CNAME record set up in the first step
@@ -195,7 +202,7 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
       <Panel.Content>
         <div className="flex items-center justify-between">
           <Link href="https://supabase.com/docs/guides/platform/custom-domains">
-            <a target="_blank">
+            <a target="_blank" rel="noreferrer">
               <Button type="default" icon={<IconExternalLink />}>
                 Documentation
               </Button>

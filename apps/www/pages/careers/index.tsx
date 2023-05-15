@@ -111,7 +111,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
               Explore remote possibilities and join our team to help us achieve it.
             </p>
             <a href="#positions">
-              <Button className="text-white xl:text-sm">Open positions</Button>
+              <Button className="text-white xl:text-sm mt-4">Open positions</Button>
             </a>
           </div>
 

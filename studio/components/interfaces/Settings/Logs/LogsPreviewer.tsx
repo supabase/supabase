@@ -191,9 +191,9 @@ export const LogsPreviewer: React.FC<Props> = ({
         }
       >
         <div className={condensedLayout ? 'px-4' : ''}>
-          {showChart && (
+          {!isLoading && showChart && (
             <LogEventChart
-              data={!isLoading && eventChartData ? eventChartData : undefined}
+              data={eventChartData}
               onBarClick={(isoTimestamp) => {
                 handleSearch('event-chart-bar-click', {
                   query: filters.search_query as string,

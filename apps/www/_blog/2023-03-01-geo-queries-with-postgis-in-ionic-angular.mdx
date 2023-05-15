@@ -105,9 +105,13 @@ For our tests, I also added some dummy data. Feel free to use mine or use coordi
 ```sql
 -- add some dummy data
 insert into public.stores
-(name, description, location)
+  (name, description, location)
 values
-  ('The Galaxies.dev Shop', 'Galaxies.dev - your favourite place to learn', st_point(7.6005702, 51.8807174)),
+  (
+    'The Galaxies.dev Shop',
+    'Galaxies.dev - your favourite place to learn',
+    st_point(7.6005702, 51.8807174)
+  ),
   ('The Local Dev', 'Local people, always best', st_point(7.614454, 51.876565)),
   ('City Store', 'Get the supplies a dev needs', st_point(7.642581, 51.945606)),
   ('MEGA Store', 'Everything you need', st_point(13.404315, 52.511640));
@@ -188,9 +192,9 @@ Within the new project we need to add our Supabase credentials and a key for the
 export const environment = {
   production: false,
   mapsKey: 'YOUR-GOOGLE-MAPS-KEY',
-  supabaseUrl: "YOUR-URL",
-  supabaseKey: "YOUR-ANON-KEY",
-};
+  supabaseUrl: 'YOUR-URL',
+  supabaseKey: 'YOUR-ANON-KEY',
+}
 ```
 
 You can find those values in your Supabase project by clicking on the **Settings** icon and then navigating to **API** where it shows your **Project API keys**.
@@ -211,6 +215,7 @@ To use the Capacitor plugin we also need to update the permissions of our native
 ```
 
 Additionally, we need to add our Maps Key to the **android/app/src/main/AndroidManifest.xml**:
+
 ```xml
 <meta-data android:name="com.google.android.geo.API_KEY" android:value="YOUR_API_KEY_HERE"/>
 ```
@@ -223,46 +228,42 @@ Finally also add the required permissions for Android in the **android/app/src/m
 <uses-feature android:name="android.hardware.location.gps" />
 ```
 
-You can also find more information about using [Capacitor maps with Ionic in my Ionic Academy](https://ionicacademy.com/capacitor-google-maps-plugin/
-)!
+You can also find more information about using [Capacitor maps with Ionic in my Ionic Academy](https://ionicacademy.com/capacitor-google-maps-plugin/)!
 
 ### Finding Nearby Places with Database Functions
 
 Now the fun begins, and we can start by adding a function to our **src/app/services/stores.service.ts** that calls the database function (Remote Procedure Call) that we defined in the beginning:
 
 ```ts
-import { Injectable } from '@angular/core';
-import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
-import { SupabaseClient, User, createClient } from '@supabase/supabase-js';
-import { environment } from 'src/environments/environment';
+import { Injectable } from '@angular/core'
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser'
+import { SupabaseClient, User, createClient } from '@supabase/supabase-js'
+import { environment } from 'src/environments/environment'
 
 export interface StoreEntry {
-  lat?: number;
-  long?: number;
-  name: string;
-  description: string;
-  image?: File;
+  lat?: number
+  long?: number
+  name: string
+  description: string
+  image?: File
 }
 export interface StoreResult {
-  id: number;
-  lat: number;
-  long: number;
-  name: string;
-  description: string;
-  image?: SafeUrl;
-  dist_meters?: number;
+  id: number
+  lat: number
+  long: number
+  name: string
+  description: string
+  image?: SafeUrl
+  dist_meters?: number
 }
 @Injectable({
   providedIn: 'root',
 })
 export class StoresService {
-  private supabase: SupabaseClient;
+  private supabase: SupabaseClient
 
   constructor(private sanitizer: DomSanitizer) {
-    this.supabase = createClient(
-      environment.supabaseUrl,
-      environment.supabaseKey
-    );
+    this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey)
   }
 
   // Get all places with calculated distance
@@ -270,8 +271,8 @@ export class StoresService {
     const { data, error } = await this.supabase.rpc('nearby_stores', {
       lat,
       long,
-    });
-    return data;
+    })
+    return data
   }
 }
 ```
@@ -281,13 +282,13 @@ This should return a nice list of `StoreResult` items that we can render in a li
 For that, let's display a modal from our **src/app/home/home.page.ts**:
 
 ```ts
-import { Component } from '@angular/core';
-import { ModalController } from '@ionic/angular';
-import { NearbyPage } from '../nearby/nearby.page';
+import { Component } from '@angular/core'
+import { ModalController } from '@ionic/angular'
+import { NearbyPage } from '../nearby/nearby.page'
 
 export interface StoreMarker {
-  markerId: string;
-  storeId: number;
+  markerId: string
+  storeId: number
 }
 
 @Component({
@@ -296,15 +297,13 @@ export interface StoreMarker {
   styleUrls: ['home.page.scss'],
 })
 export class HomePage {
-  constructor(
-    private modalCtrl: ModalController
-  ) {}
+  constructor(private modalCtrl: ModalController) {}
 
   async showNearby() {
     const modal = await this.modalCtrl.create({
       component: NearbyPage,
-    });
-    modal.present();
+    })
+    modal.present()
   }
 }
 ```
@@ -324,9 +323,7 @@ We also need a button to present that modal, so change the **src/app/home/home.p
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-
-</ion-content>
+<ion-content> </ion-content>
 ```
 
 Now we are able to use the `getNearbyStores` from our service on that modal page, and we also load the current user location using Capacitor.
@@ -336,10 +333,10 @@ Once we got the user coordinates, we pass them to our function and PostGIS will 
 Go ahead and change the **src/app/nearby/nearby.page.ts** to this now:
 
 ```ts
-import { Component, OnInit } from '@angular/core';
-import { Geolocation } from '@capacitor/geolocation';
-import { StoresService, StoreResult } from '../services/stores.service';
-import { LoadingController, ModalController } from '@ionic/angular';
+import { Component, OnInit } from '@angular/core'
+import { Geolocation } from '@capacitor/geolocation'
+import { StoresService, StoreResult } from '../services/stores.service'
+import { LoadingController, ModalController } from '@ionic/angular'
 
 @Component({
   selector: 'app-nearby',
@@ -347,7 +344,7 @@ import { LoadingController, ModalController } from '@ionic/angular';
   styleUrls: ['./nearby.page.scss'],
 })
 export class NearbyPage implements OnInit {
-  stores: StoreResult[] = [];
+  stores: StoreResult[] = []
 
   constructor(
     private storesService: StoresService,
@@ -359,18 +356,18 @@ export class NearbyPage implements OnInit {
     // Show loading while getting data from Supabase
     const loading = await this.loadingCtrl.create({
       message: 'Loading nearby places...',
-    });
-    loading.present();
+    })
+    loading.present()
 
-    const coordinates = await Geolocation.getCurrentPosition();
+    const coordinates = await Geolocation.getCurrentPosition()
 
     if (coordinates) {
       // Get nearby places sorted by distance using PostGIS
       this.stores = await this.storesService.getNearbyStores(
         coordinates.coords.latitude,
         coordinates.coords.longitude
-      );
-      loading.dismiss();
+      )
+      loading.dismiss()
     }
   }
 }
@@ -397,9 +394,7 @@ At this point, you can already log the values, but we can also quickly display t
         {{ store.name }}
         <p>{{store.description }}</p>
       </ion-label>
-      <ion-note slot="end"
-        >{{store.dist_meters!/1000 | number:'1.0-2' }} km</ion-note
-      >
+      <ion-note slot="end">{{store.dist_meters!/1000 | number:'1.0-2' }} km</ion-note>
     </ion-item>
   </ion-list>
 </ion-content>
@@ -433,7 +428,7 @@ To add data to Supabase we create a new function in our **src/app/services/store
       })
       .select()
       .single();
-  
+
     if (data && info.image) {
       // Upload the image to Supabase
       const foo = await this.supabase.storage
@@ -486,9 +481,9 @@ Back in this new modal, we will define an empty `StoreEntry` object and then con
 Because we defined the rest of the functionality in our service, we can simply update the **src/app/store/store.page.ts** to:
 
 ```ts
-import { Component, OnInit } from '@angular/core';
-import { ModalController } from '@ionic/angular';
-import { StoreEntry, StoresService } from '../services/stores.service';
+import { Component, OnInit } from '@angular/core'
+import { ModalController } from '@ionic/angular'
+import { StoreEntry, StoresService } from '../services/stores.service'
 
 @Component({
   selector: 'app-store',
@@ -502,22 +497,19 @@ export class StorePage implements OnInit {
     image: undefined,
     lat: undefined,
     long: undefined,
-  };
+  }
 
-  constructor(
-    public modalCtrl: ModalController,
-    private storesService: StoresService
-  ) {}
+  constructor(public modalCtrl: ModalController, private storesService: StoresService) {}
 
   ngOnInit() {}
 
   imageSelected(ev: any) {
-    this.store.image = ev.detail.event.target.files[0];
+    this.store.image = ev.detail.event.target.files[0]
   }
 
   async addStore() {
-    this.storesService.addStore(this.store);
-    this.modalCtrl.dismiss();
+    this.storesService.addStore(this.store)
+    this.modalCtrl.dismiss()
   }
 }
 ```
@@ -550,18 +542,8 @@ The view is not really special and simply holds a bunch of input fields that are
     placeholder="Some about text"
     [(ngModel)]="store.description"
   />
-  <ion-input
-    type="number"
-    label="Latitude"
-    label-placement="stacked"
-    [(ngModel)]="store.lat"
-  />
-  <ion-input
-    type="number"
-    label="Longitude"
-    label-placement="stacked"
-    [(ngModel)]="store.long"
-  />
+  <ion-input type="number" label="Latitude" label-placement="stacked" [(ngModel)]="store.lat" />
+  <ion-input type="number" label="Longitude" label-placement="stacked" [(ngModel)]="store.long" />
   <ion-input
     label="Select store image"
     (ionChange)="imageSelected($event)"
@@ -595,14 +577,14 @@ But if you've come this far, I'm sure you can do it!
 Get started by adding the `CUSTOM_ELEMENTS_SCHEMA` to the **src/app/home/home.module.ts** which is required to use Capacitor native maps:
 
 ```ts
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { IonicModule } from '@ionic/angular';
-import { FormsModule } from '@angular/forms';
-import { HomePage } from './home.page';
+import { NgModule } from '@angular/core'
+import { CommonModule } from '@angular/common'
+import { IonicModule } from '@ionic/angular'
+import { FormsModule } from '@angular/forms'
+import { HomePage } from './home.page'
 
-import { HomePageRoutingModule } from './home-routing.module';
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { HomePageRoutingModule } from './home-routing.module'
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core'
 
 @NgModule({
   imports: [CommonModule, FormsModule, IonicModule, HomePageRoutingModule],
@@ -617,19 +599,19 @@ In our **src/app/home/home.page.ts** we can now create the map by passing in a r
 Update the page with our first step that adds some new variables:
 
 ```ts
-import { Component, ElementRef, ViewChild } from '@angular/core';
-import { GoogleMap } from '@capacitor/google-maps';
-import { LatLngBounds } from '@capacitor/google-maps/dist/typings/definitions';
-import { ModalController } from '@ionic/angular';
-import { BehaviorSubject } from 'rxjs';
-import { environment } from 'src/environments/environment';
-import { NearbyPage } from '../nearby/nearby.page';
-import { StoreResult, StoresService } from '../services/stores.service';
-import { StorePage } from '../store/store.page';
+import { Component, ElementRef, ViewChild } from '@angular/core'
+import { GoogleMap } from '@capacitor/google-maps'
+import { LatLngBounds } from '@capacitor/google-maps/dist/typings/definitions'
+import { ModalController } from '@ionic/angular'
+import { BehaviorSubject } from 'rxjs'
+import { environment } from 'src/environments/environment'
+import { NearbyPage } from '../nearby/nearby.page'
+import { StoreResult, StoresService } from '../services/stores.service'
+import { StorePage } from '../store/store.page'
 
 export interface StoreMarker {
-  markerId: string;
-  storeId: number;
+  markerId: string
+  storeId: number
 }
 
 @Component({
@@ -638,22 +620,19 @@ export interface StoreMarker {
   styleUrls: ['home.page.scss'],
 })
 export class HomePage {
-  @ViewChild('map') mapRef!: ElementRef<HTMLElement>;
-  map!: GoogleMap;
-  mapBounds = new BehaviorSubject<LatLngBounds | null>(null);
-  activeMarkers: StoreMarker[] = [];
-  selectedMarker: StoreMarker | null = null;
-  selectedStore: StoreResult | null = null;
+  @ViewChild('map') mapRef!: ElementRef<HTMLElement>
+  map!: GoogleMap
+  mapBounds = new BehaviorSubject<LatLngBounds | null>(null)
+  activeMarkers: StoreMarker[] = []
+  selectedMarker: StoreMarker | null = null
+  selectedStore: StoreResult | null = null
 
-  constructor(
-    private storesService: StoresService,
-    private modalCtrl: ModalController
-  ) {}
+  constructor(private storesService: StoresService, private modalCtrl: ModalController) {}
 
   ionViewDidEnter() {
-    this.createMap();
+    this.createMap()
   }
-  
+
   async createMap() {
     this.map = await GoogleMap.create({
       forceCreate: true, // Prevent issues with live reload
@@ -667,22 +646,22 @@ export class HomePage {
         },
         zoom: 7,
       },
-    });
-    this.map.enableCurrentLocation(true);
+    })
+    this.map.enableCurrentLocation(true)
   }
 
   async showNearby() {
     const modal = await this.modalCtrl.create({
       component: NearbyPage,
-    });
-    modal.present();
+    })
+    modal.present()
   }
 
   async addStore() {
     const modal = await this.modalCtrl.create({
       component: StorePage,
-    });
-    modal.present();
+    })
+    modal.present()
   }
 }
 ```
@@ -1054,4 +1033,3 @@ Until next time and happy coding with Supabase!
 - [Authentication in Ionic Angular with Supabase](https://supabase.com/blog/authentication-in-ionic-angular)
 - [Building a Realtime Trello Board with Supabase and Angular](https://supabase.com/blog/building-a-realtime-trello-board-with-supabase-and-angular)
 - [Build a User Management App with Ionic Angular](https://supabase.com/docs/guides/getting-started/tutorials/with-ionic-angular)
-

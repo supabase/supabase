@@ -1,0 +1,62 @@
+name: Generate Embeddings for Search
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - '.github/workflows/search.yml'
+      - 'supabase/migrations/**'
+      - 'apps/docs/**'
+      - 'spec/**'
+  workflow_dispatch:
+    inputs:
+      refresh:
+        description: 'Refresh all pages'
+        required: false
+        type: boolean
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      OPENAI_KEY: ${{ secrets.OPENAI_KEY }}
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      PROJECT_ID: ${{ secrets.SEARCH_SUPABASE_PROJECT_ID }}
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SEARCH_SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SEARCH_SUPABASE_SERVICE_ROLE_KEY }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SEARCH_SUPABASE_DB_PASSWORD }}
+      SEARCH_GITHUB_APP_ID: ${{ secrets.SEARCH_GITHUB_APP_ID }}
+      SEARCH_GITHUB_APP_INSTALLATION_ID: ${{ secrets.SEARCH_GITHUB_APP_INSTALLATION_ID }}
+      SEARCH_GITHUB_APP_PRIVATE_KEY: ${{ secrets.SEARCH_GITHUB_APP_PRIVATE_KEY }}
+
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v3
+
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Download dependencies
+        run: npm ci
+
+      - name: Link Supabase project
+        run: npx supabase link --project-ref $PROJECT_ID
+
+      - name: Run migrations
+        run: npx supabase db push
+
+      - name: Update embeddings
+        working-directory: ./apps/docs
+        if: ${{ !inputs.refresh }}
+        run: npm run embeddings
+
+      - name: Refresh embeddings
+        working-directory: ./apps/docs
+        if: ${{ inputs.refresh }}
+        run: npm run embeddings:refresh

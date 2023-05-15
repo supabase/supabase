@@ -51,7 +51,7 @@ const Success: FC<Props> = ({ sentCategory = '' }) => {
                   key="search"
                   href={`https://github.com/supabase/supabase/discussions?discussions_q=${searchValue}`}
                 >
-                  <a target="_blank">
+                  <a target="_blank" rel="noreferrer">
                     <Button
                       className="mr-1"
                       type="default"

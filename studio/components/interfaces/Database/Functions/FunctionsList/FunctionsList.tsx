@@ -63,7 +63,6 @@ const FunctionsList: FC<Props> = ({
             disabled={!canCreateFunctions}
             disabledMessage="You need additional permissions to create functions"
           >
-            <AlphaPreview />
             <p className="text-sm text-scale-1100">
               PostgreSQL functions, also known as stored procedures, is a set of SQL and procedural
               commands such as declarations, assignments, loops, flow-of-control, etc.
