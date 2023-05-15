@@ -20,7 +20,7 @@ See the [blog post](/blog/transparent-column-encryption-with-postgres) for an in
 
 ### Encrypting columns
 
-In the “New Column” flow on the Dashboard, you can select that a `text` or `bytea` column is encrypted, and select an existing key id or create a new one. This is functionally identical to the Vault above, but you can apply it to any of your existing tables. In a sense the Vault is a pre-created table and UI for you to get started quickly storing secrets, and to be a centralized point for “global” secrets management, but your not stuck with just that, you can encrypt multiple columns in multiple tables, how you want to store your secret data can be entirely up to you.
+When creating a new column in the Dashboard, you can choose to encrypt a `text` or `bytea` column. You will choose which key you would like to encrypt it with by selecting an existing key ID or creating a new one.
 
 ![Encrypting columns](/docs/img/guides/database/vault-encrypting-columns.png)
 
