@@ -89,12 +89,11 @@ create extension vector;
 Next let's create a table to store our documents and their embeddings:
 
 ```sql
-create table
-  documents (
-    id bigserial primary key,
-    content text,
-    embedding vector (1536)
-  );
+create table documents (
+  id bigserial primary key,
+  content text,
+  embedding vector(1536)
+);
 ```
 
 `pgvector` introduces a new data type called `vector`. In the code above, we create a column named `embedding` with the `vector` data type. The size of the vector defines how many dimensions the vector holds. OpenAI's `text-embedding-ada-002` model outputs 1536 dimensions, so we will use that for our vector size.
