@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
-import { Button, Badge, Announcement, AnnouncementCountdown, IconStar, IconChevronDown } from 'ui'
+import { Button, Badge, IconStar, IconChevronDown } from 'ui'
 import FlyOut from '~/components/UI/FlyOut'
 import Transition from 'lib/Transition'
 
@@ -197,9 +197,8 @@ const Nav = () => {
 
   return (
     <>
-      <Announcement>
-        <AnnouncementCountdown />
-      </Announcement>
+      {/* <Announcement>
+      </Announcement> */}
       <div className="sticky top-0 z-40 transform" style={{ transform: 'translate3d(0,0,999px)' }}>
         <div
           className={[
