@@ -95,9 +95,9 @@ export const meta = {
           const { data } = await supabase.from("countries").select();
           return data;
         }
-      
+
         function App() {
-          const [countries] = createResource(getCountries);         
+          const [countries] = createResource(getCountries);
 
           return (
             <ul>
