@@ -18,7 +18,7 @@ Vault is a Postgres extension and accompanying Supabase UI that makes it safe an
 
 Practically speaking, the Vault is a table of Secrets and Encryption Keys that are stored using [Authenticated Encryption](https://en.wikipedia.org/wiki/Authenticated_encryption) on disk, but available in decrypted form through a Postgres view so that the secrets can be used by applications from SQL. Because the secrets are stored encrypted and authenticated, any backups or replication streams also preserve this encryption in a way that can't be forged.
 
-We've created a dashboard UI for the Vault that makes storing secrets easy. Click a button and type in your secret, optionally create a new key that is referenced by id (or use the existing default), and submit. Your secret is now stored on disk encrypted using the specified key id.
+Supabase provides a dashboard UI for the Vault that makes storing secrets easy. Click a button, type in your secret,  and save. Optionally create your own keys you can use to encrypt your secret. Your secret will then be stored on disk encrypted using the specified key.
 
 <video width="99%" muted playsInline controls="true">
   <source
