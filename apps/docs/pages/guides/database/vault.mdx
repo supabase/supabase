@@ -115,7 +115,7 @@ updated_at  | 2022-12-14 02:34:23.85159+00
 
 ## Querying Data from the Vault
 
-If you look in the `vault.secrets` table, you will see that your data is stored encrypted. To decrypt the data, there is an automatically created view `vault.decrypted_secrets`.  This view will decrypt secret data on the fly:
+If you look in the `vault.secrets` table, you will see that your data is stored encrypted. To decrypt the data, there is an automatically created view `vault.decrypted_secrets`. This view will decrypt secret data on the fly:
 
 ```sql
 postgres=> select * from vault.decrypted_secrets order by created_at desc limit 3;
