@@ -156,6 +156,7 @@ function Input({
           name={name}
           onChange={onInputChange}
           onBlur={handleBlurEvent}
+          onCopy={onCopy}
           placeholder={placeholder}
           ref={inputRef}
           type={type}
@@ -315,6 +316,7 @@ function TextArea({
           placeholder={placeholder}
           onChange={onInputChange}
           onBlur={handleBlurEvent}
+          onCopy={onCopy}
           value={value}
           className={classes.join(' ')}
           maxLength={limit}
