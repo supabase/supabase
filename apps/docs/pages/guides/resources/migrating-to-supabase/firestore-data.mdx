@@ -89,7 +89,7 @@ And split it into two files (one table for users and one table for items):
   - `smallserial` Creates a key using `(id SMALLSERIAL PRIMARY KEY)` (autoincrementing 2-byte integer).
   - `serial` Creates a key using `(id SERIAL PRIMARY KEY)` (autoincrementing 4-byte integer).
   - `bigserial` Creates a key using `(id BIGSERIAL PRIMARY KEY)` (autoincrementing 8-byte integer).
-  - `uuid` Creates a key using `(id UUID PRIMARY KEY DEFAULT uuid_generate_v4())` (randomly generated UUID).
+  - `uuid` Creates a key using `(id UUID PRIMARY KEY DEFAULT gen_random_uuid())` (randomly generated UUID).
   - `firestore_id` Creates a key using `(id TEXT PRIMARY KEY)` (uses existing `firestore_id` random text as key).
 - `[<primary_key_name>]` (optional) Name of primary key. Defaults to "id".
 

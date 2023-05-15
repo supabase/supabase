@@ -143,7 +143,7 @@ const CreateWrapper = () => {
           <h3 className="mb-2 text-xl text-scale-1200">Create a {wrapperMeta?.label} Wrapper</h3>
           <div className="flex items-center space-x-2">
             <Link href="https://supabase.github.io/wrappers/stripe/">
-              <a target="_blank">
+              <a target="_blank" rel="noreferrer">
                 <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
                   Documentation
                 </Button>

@@ -1,11 +1,11 @@
 import { Filters, LogData, LogsEndpointParams, LogsTableName, SQL_FILTER_TEMPLATES } from '.'
 import dayjs, { Dayjs } from 'dayjs'
-import { get } from 'lodash'
+import { get, isEqual } from 'lodash'
 import { StripeSubscription } from 'components/interfaces/Billing'
 import { useMonaco } from '@monaco-editor/react'
 import logConstants from 'shared-data/logConstants'
 import BackwardIterator from 'components/ui/CodeEditor/Providers/BackwardIterator'
-import { uniqBy } from 'lodash'
+import uniqBy from 'lodash/uniqBy'
 import { useEffect } from 'react'
 
 /**
@@ -228,13 +228,22 @@ export const genChartQuery = (
 ) => {
   const [startOffset, trunc] = calcChartStart(params)
   const where = _genWhereStatement(table, filters)
+
+  let joins = 'cross join unnest(t.metadata) as metadata'
+  if (table === LogsTableName.EDGE) {
+    joins += ' \n  cross join unnest(metadata.request) as request'
+    joins += ' \n  cross join unnest(metadata.response) as response'
+  } else if (table === LogsTableName.POSTGRES) {
+    joins += ' \n  cross join unnest(metadata.parsed) as parsed'
+  }
+
   return `
 SELECT
   timestamp_trunc(t.timestamp, ${trunc}) as timestamp,
   count(t.timestamp) as count
 FROM
   ${table} t
-  cross join unnest(t.metadata) as metadata
+  ${joins}
   ${
     where
       ? where + ` and t.timestamp > '${startOffset.toISOString()}'`
@@ -348,4 +357,65 @@ export const useEditorHints = () => {
       }
     }
   }, [monaco])
+}
+
+/**
+ * Assumes that all timestamps are in ISO-8601 UTC timezone.
+ *
+ * min/max are the datetime strings that extend beyond the given timeseries data.
+ */
+export const fillTimeseries = (
+  timeseriesData: any[],
+  timestampKey: string,
+  valueKey: string,
+  defaultValue: number,
+  min?: string,
+  max?: string
+) => {
+  if (timeseriesData.length <= 1 && !(min || max)) return timeseriesData
+  const dates: unknown[] = timeseriesData.map((datum) => dayjs.utc(datum[timestampKey]))
+
+  const maxDate = max ? dayjs.utc(max) : dayjs.utc(Math.max.apply(null, dates as number[]))
+  const minDate = min ? dayjs.utc(min) : dayjs.utc(Math.min.apply(null, dates as number[]))
+
+  const truncationSample = timeseriesData.length > 0 ? timeseriesData[0][timestampKey] : min || max
+  const truncation = getTimestampTruncation(truncationSample)
+
+  const newData = timeseriesData.map((datum) => {
+    const iso = dayjs.utc(datum[timestampKey]).toISOString()
+    datum[timestampKey] = iso
+    return datum
+  })
+
+  const diff = maxDate.diff(minDate, truncation as dayjs.UnitType)
+  for (let i = 0; i <= diff; i++) {
+    const dateToMaybeAdd = minDate.add(i, truncation as dayjs.ManipulateType)
+    if (!dates.find((d) => isEqual(d, dateToMaybeAdd))) {
+      newData.push({
+        [timestampKey]: dateToMaybeAdd.toISOString(),
+        [valueKey]: defaultValue,
+      })
+    }
+  }
+
+  return newData
+}
+
+export const getTimestampTruncation = (datetime: string): 'second' | 'minute' | 'hour' | 'day' => {
+  const values = ['second', 'minute', 'hour', 'day'].map((key) =>
+    dayjs(datetime).get(key as dayjs.UnitType)
+  )
+  const zeroCount = values.reduce((acc, value) => {
+    if (value === 0) {
+      acc += 1
+    }
+    return acc
+  }, 0)
+  const truncation = {
+    0: 'second' as const,
+    1: 'minute' as const,
+    2: 'hour' as const,
+    3: 'day' as const,
+  }[zeroCount]!
+  return truncation
 }

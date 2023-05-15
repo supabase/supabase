@@ -282,7 +282,7 @@ const GenerateSQL = () => {
         )}
         <Input
           inputRef={inputRef}
-          className="bg-scale-100 rounded mx-3 mb-4"
+          className="bg-scale-100 rounded mx-3 mb-4 [&_input]:pr-32 md:[&_input]:pr-40"
           autoFocus
           placeholder={
             isLoading || isResponding

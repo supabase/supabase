@@ -73,7 +73,9 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
         href="https://supabase.com/docs/guides/platform/performance#examining-query-performance"
         passHref
       >
-        <a target="_blank">examining query performance</a>
+        <a target="_blank" rel="noreferrer">
+          examining query performance
+        </a>
       </Link>
       .{'\n\n'}Consider resetting the analysis after optimizing any queries.
     </p>

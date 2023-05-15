@@ -47,10 +47,16 @@ const ConfirmDeleteModal: FC<Props> = ({
       onCancel={onSelectCancel}
       customFooter={
         <div className="flex items-center gap-2">
-          <Button type="default" onClick={onSelectCancel}>
+          <Button type="default" disabled={deleting} onClick={onSelectCancel}>
             Cancel
           </Button>
-          <Button type="primary" danger loading={deleting} onClick={onConfirmDelete}>
+          <Button
+            type="primary"
+            danger
+            disabled={deleting}
+            loading={deleting}
+            onClick={onConfirmDelete}
+          >
             {deleting ? 'Deleting' : 'Delete'}
           </Button>
         </div>

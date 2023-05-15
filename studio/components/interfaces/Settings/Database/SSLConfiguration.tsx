@@ -102,7 +102,7 @@ const SSLConfiguration = () => {
                       >
                         Please try updating again, or contact{' '}
                         <Link href="/support/new">
-                          <a target="_blank" className="underline">
+                          <a target="_blank" rel="noreferrer" className="underline">
                             support
                           </a>
                         </Link>{' '}
