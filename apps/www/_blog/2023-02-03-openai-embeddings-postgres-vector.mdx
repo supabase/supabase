@@ -11,9 +11,9 @@ date: '2023-02-06'
 toc_depth: 3
 ---
 
-A new PostgreSQL extension is now available in Supabase: [`pgvector`]([https://github.com/pgvector/pgvector](https://supabase.com/docs/guides/getting-started/openai/vector-search)), an open-source vector similarity search.
+A new PostgreSQL extension is now available in Supabase: [`pgvector`](<[https://github.com/pgvector/pgvector](https://supabase.com/docs/guides/getting-started/openai/vector-search)>), an open-source vector similarity search.
 
-The exponential progress of AI functionality over the past year has inspired many new real world applications. One specific challenge has been the ability to store and query _embeddings_ at scale. 
+The exponential progress of AI functionality over the past year has inspired many new real world applications. One specific challenge has been the ability to store and query _embeddings_ at scale.
 In this post we'll explain what embeddings are, why we might want to use them, and how we can store and query them in PostgreSQL using `pgvector`.
 
 ## What are embeddings?
@@ -88,11 +88,12 @@ create extension vector;
 Next let's create a table to store our documents and their embeddings:
 
 ```sql
-create table documents (
-  id bigserial primary key,
-  content text,
-  embedding vector (1536)
-);
+create table
+  documents (
+    id bigserial primary key,
+    content text,
+    embedding vector (1536)
+  );
 ```
 
 `pgvector` introduces a new data type called `vector`. In the code above, we create a column named `embedding` with the `vector` data type. The size of the vector defines how many dimensions the vector holds. OpenAI's `text-embedding-ada-002` model outputs 1536 dimensions, so we will use that for our vector size.
@@ -147,9 +148,9 @@ Once your table starts to grow with embeddings, you will likely want to add an i
 Each distance operator requires a different type of index. We expect to order by cosine distance, so we need `vector_cosine_ops` index. A good starting number of lists is 4 \* sqrt(table_rows):
 
 ```sql
-create index on documents 
-using ivfflat (embedding vector_cosine_ops)
-with (lists = 100);
+create index on documents using ivfflat (embedding vector_cosine_ops)
+with
+  (lists = 100);
 ```
 
 You can read more about indexing on `pgvector`'s GitHub page [here](https://github.com/pgvector/pgvector#indexing).
