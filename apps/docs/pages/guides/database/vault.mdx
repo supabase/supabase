@@ -32,7 +32,7 @@ We've created a dashboard UI for the Vault that makes storing secrets easy. Clic
 There are two main parts to the Vault UI, Secrets and Encryption Keys:
 
 - **Secrets:** Use the Vault to store Secrets - everything from Environment Variables to API Keys. You can use these Secrets anywhere in your database: Postgres [Functions](/docs/guides/database/functions), Triggers, and [Webhooks](/docs/guides/database/webhooks). From a SQL perspective, accessing secrets is as easy as querying a table (or in this case, a view). The underlying secrets tables will be stored in encrypted form.
-- **Encryption Keys:** encryption keys are used to encrypt data inside your database. Fun fact: the Secrets you store in the Vault are encrypted with an Encryption Key which we set up by default and is not accessible to SQL or stored in your database alongside the same data it is used to encrypt. You can create different Encryption Keys for different purposes, for example: one for encrypting user-data, and another for application-data.
+- **Encryption Keys:** These are keys used to encrypt data inside your database. You can create different Encryption Keys for different purposes, for example: one for encrypting user-data, and another for application-data. Each key is encrypted itself using a root encryption key that lives outside of the database. See **[Encryption key location](#encryption-key-location)** for more details.
 
 ## Deep Dive on How The Vault works
 
