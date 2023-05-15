@@ -177,6 +177,7 @@ const TableForm = ({
     ...table.options,
     { name: 'table_name', required: true },
     { name: 'columns', required: true },
+    ...(table.availableColumns ? [] : [{ name: 'columns.name', required: true }]),
   ])
 
   return (
@@ -270,6 +271,7 @@ const TableForm = ({
                     onChange={(columns) => {
                       setFieldValue('columns', columns)
                     }}
+                    errors={errors}
                   />
                 )}
               </div>
