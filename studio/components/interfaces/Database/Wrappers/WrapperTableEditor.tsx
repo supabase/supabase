@@ -67,7 +67,7 @@ const WrapperTableEditor = ({
       }
     >
       <SidePanel.Content>
-        <div className="mt-4 space-y-6">
+        <div className="my-4 space-y-6">
           <Listbox
             size="small"
             label="Select a target the table will point to"
