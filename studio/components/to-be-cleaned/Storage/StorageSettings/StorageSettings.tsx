@@ -44,7 +44,7 @@ const StorageConfig = ({ config, projectRef }: any) => {
   const [selectedUnit, setSelectedUnit] = useState(unit)
   let initialValues = { fileSizeLimit: value, unformattedFileSizeLimit: fileSizeLimit }
 
-  const canUpdateStorageSettings = checkPermissions(PermissionAction.UPDATE, 'projects')
+  const canUpdateStorageSettings = checkPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
 
   const formattedMaxSizeBytes = `${new Intl.NumberFormat('en-US').format(
     STORAGE_FILE_SIZE_LIMIT_MAX_BYTES
