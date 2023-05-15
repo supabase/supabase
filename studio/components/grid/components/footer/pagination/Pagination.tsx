@@ -46,11 +46,26 @@ const Pagination = ({ isLoading: isLoadingRows = false }: PaginationProps) => {
       table,
       filters,
     },
-    { keepPreviousData: true }
+    {
+      keepPreviousData: true,
+      onSuccess(data) {
+        dispatch({
+          type: 'SET_ROWS_COUNT',
+          payload: data.count,
+        })
+      },
+    }
   )
 
   const maxPages = Math.ceil((data?.count ?? 0) / state.rowsPerPage)
   const totalPages = (data?.count ?? 0) > 0 ? maxPages : 1
+
+  useEffect(() => {
+    if (page && page > totalPages) {
+      setPage(totalPages)
+      dispatch({ type: 'SET_PAGE', payload: totalPages })
+    }
+  }, [page, totalPages])
 
   // [Joshen] Oddly without this, state.selectedRows will be stale
   useEffect(() => {}, [state.selectedRows])

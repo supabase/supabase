@@ -14,11 +14,12 @@ interface Props {
   visible: boolean
   returnUrl: string
   onCancel: () => void
+  onConfirm: () => void
 }
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
-const AddNewPaymentMethodModal: FC<Props> = ({ visible, returnUrl, onCancel }) => {
+const AddNewPaymentMethodModal: FC<Props> = ({ visible, returnUrl, onCancel, onConfirm }) => {
   const { ui } = useStore()
   const [intent, setIntent] = useState<any>()
 
@@ -87,6 +88,11 @@ const AddNewPaymentMethodModal: FC<Props> = ({ visible, returnUrl, onCancel }) =
     return onCancel()
   }
 
+  const onLocalConfirm = () => {
+    setIntent(undefined)
+    return onConfirm()
+  }
+
   return (
     // We cant display the hCaptcha in the modal, as the modal auto-closes when clicking the captcha
     // So we only show the modal if the captcha has been executed successfully (intent loaded)
@@ -114,7 +120,11 @@ const AddNewPaymentMethodModal: FC<Props> = ({ visible, returnUrl, onCancel }) =
       >
         <div className="py-4 space-y-4">
           <Elements stripe={stripePromise} options={options}>
-            <AddPaymentMethodForm returnUrl={returnUrl} onCancel={onLocalCancel} />
+            <AddPaymentMethodForm
+              returnUrl={returnUrl}
+              onCancel={onLocalCancel}
+              onConfirm={onLocalConfirm}
+            />
           </Elements>
         </div>
       </Modal>

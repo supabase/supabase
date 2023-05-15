@@ -24,7 +24,9 @@ Daily Backups and PITR are mutually exclusive. If your project opts into using P
 All Pro and Enterprise tier Supabase projects are backed up automatically on a daily basis. In terms of Recovery Point Objective (RPO), Daily Backups would be suitable for projects willing to lose up to 24 hours worth of data if disaster hits at the most inopportune time. If a lower RPO is required, enabling Point-in-Time Recovery should be considered.
 
 <Admonition type="note">
-  For security purposes, passwords for custom roles are not stored in daily backups, and will not be found in downloadable files. As such, if you are restoring from a daily backup and are using custom roles, you will need to set their passwords once more following a completed restoration.
+  For security purposes, passwords for custom roles are not stored in daily backups, and will not be
+  found in downloadable files. As such, if you are restoring from a daily backup and are using
+  custom roles, you will need to set their passwords once more following a completed restoration.
 </Admonition>
 
 ### Backup Process [#daily-backups-process]

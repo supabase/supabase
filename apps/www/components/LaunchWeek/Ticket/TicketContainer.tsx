@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { PageState, ConfDataContext, UserData } from './hooks/use-conf-data'
 import Ticket from './ActualTicket'
 import Form from './form'
@@ -21,10 +21,6 @@ export default function Conf({
 }: Props) {
   const [userData, setUserData] = useState<UserData>(defaultUserData)
   const [pageState, setPageState] = useState<PageState>(defaultPageState)
-
-  useEffect(() => {
-    localStorage.setItem('isGolden', !!userData?.golden ? 'true' : 'false')
-  }, [userData])
 
   return (
     <ConfDataContext.Provider

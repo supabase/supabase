@@ -99,7 +99,7 @@ service_role key: eyJh......
 
 ```
 
-You can use the [supabase stop](/docs/reference/cli/usage#supabase-stop) command at any time to stop all services.
+You can use the [`supabase stop`](/docs/reference/cli/usage#supabase-stop) command at any time to stop all services and reset your local database. Use `supabase stop --backup` to stop all services without resetting your local database.
 
 ## Access your project's services
 
@@ -463,6 +463,7 @@ The local development environment is not as feature-complete as the Supabase Pla
 
 - The Functions interface is coming soon.
 - You cannot update your project settings in the Dashboard. This must be done using the CLI.
+- The CLI version determines the local version of Studio used, so make sure you keep your local [Supabase CLI up to date](https://github.com/supabase/cli#getting-started). We're constantly adding new features and bug fixes.
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
