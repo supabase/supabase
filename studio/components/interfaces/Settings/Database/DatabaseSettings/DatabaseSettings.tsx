@@ -3,12 +3,15 @@ import { Input, Tabs } from 'ui'
 import { pluckObjectFields } from 'lib/helpers'
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 
+import { useStore } from 'hooks'
+import Telemetry from 'lib/telemetry'
 import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import ResetDbPassword from './ResetDbPassword'
 
 const DatabaseSettings: FC<any> = ({ projectRef }) => {
   const { data, isLoading, isError } = useProjectSettingsQuery({ projectRef })
+  const { ui } = useStore()
 
   if (isError) {
     return (
@@ -102,6 +105,14 @@ const DatabaseSettings: FC<any> = ({ projectRef }) => {
   const DB_FIELDS = ['db_host', 'db_name', 'db_port', 'db_user', 'inserted_at']
   const connectionInfo = pluckObjectFields(project, DB_FIELDS)
 
+  const handleCopy = (labelValue?: string) => Telemetry.sendEvent(
+    {
+      category: 'settings',
+      action: 'copy_connection_string',
+      label: labelValue ? labelValue:''
+    },
+    ui.googleAnalyticsProps
+  )
   const uriConnString =
     `postgresql://${connectionInfo.db_user}:[YOUR-PASSWORD]@` +
     `${connectionInfo.db_host}:${connectionInfo.db_port.toString()}` +
@@ -136,6 +147,9 @@ const DatabaseSettings: FC<any> = ({ projectRef }) => {
               disabled
               value={connectionInfo.db_host}
               label="Host"
+              onCopy={() => {
+                handleCopy('Host')
+              }}
             />
 
             <Input
