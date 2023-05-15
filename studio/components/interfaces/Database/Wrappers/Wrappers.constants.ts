@@ -586,7 +586,7 @@ export const WRAPPERS: WrapperMeta[] = [
     tables: [
       {
         label: 'S3 File',
-        description: 'Map to a file in S3',
+        description: 'Map to a file in S3 (CSV or JSON only)',
         options: [
           {
             name: 'uri',
