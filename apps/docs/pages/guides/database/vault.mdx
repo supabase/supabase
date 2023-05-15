@@ -60,7 +60,7 @@ Another important feature of pgsodium is that the encryption keys are never stor
 
 This is an important safety precaution - there is little value in storing the encryption key in the database itself as this would be like locking your front door but leaving the key in the lock! Storing the key outside the database fixes this issue.
 
-You might be wondering, ok then where are the keys stored? Supabase creates and manages the root keys from which all key ids are derived in our internal customer backend systems. We keep this key safe and separate from your data, and provide an alternate dashboard endpoint for accessing the key if you want to decrypt your data outside of Supabase.
+Where are the keys stored? Supabase creates and manages the root keys (from which all key IDs are derived) in our secured backend systems. We keep this root key safe and separate from your data. You remain in control of your keys - a separate API endpoint is available that you can use to access the key if you want to decrypt your data outside of Supabase.
 
 ## Using the Vault
 
