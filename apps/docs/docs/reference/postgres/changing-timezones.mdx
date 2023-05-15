@@ -1,15 +1,11 @@
 ---
 id: changing-timezones
-title: "Changing Timezones"
+title: 'Changing Timezones'
 slug: changing-timezones
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/postgres.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabsPanel from '@theme/TabsPanel';
-
 Data types.
-
 
 <Tabs
   defaultActiveId="sql"
@@ -19,37 +15,21 @@ Data types.
 <TabsPanel id="sql" label="sql">
 
 ```sql
-alter database postgres 
+alter database postgres
 set timezone to 'America/New_York';
 ```
-
 
 </TabsPanel>
 
 </Tabs>
 
-
-
-
-
 ## Notes
 
 - View a full list of timezones on [Wikipedia](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
 
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### Change timezone
-
-
 
 <Tabs
   defaultActiveId="sql"
@@ -59,10 +39,9 @@ set timezone to 'America/New_York';
 <TabsPanel id="sql" label="sql">
 
 ```sql
-alter database postgres 
+alter database postgres
 set timezone to 'America/New_York';
 ```
-
 
 </TabsPanel>
 
@@ -77,7 +56,6 @@ Get a full list of timezones supported by your database. This will return the fo
 - `utc_offset`: Offset from UTC (positive means east of Greenwich)
 - `is_dst`: True if currently observing daylight savings
 
-
 <Tabs
   defaultActiveId="sql"
   groupId="reference/postgres"
@@ -87,10 +65,9 @@ Get a full list of timezones supported by your database. This will return the fo
 
 ```sql
 select name, abbrev, utc_offset, is_dst
-from pg_timezone_names() 
+from pg_timezone_names()
 order by name;
 ```
-
 
 </TabsPanel>
 
@@ -108,11 +85,10 @@ Use `ilike` (case insensitive search) to find specific timezones.
 <TabsPanel id="sql" label="sql">
 
 ```sql
-select * 
-from pg_timezone_names() 
+select *
+from pg_timezone_names()
 where name ilike '%york%';
 ```
-
 
 </TabsPanel>
 
