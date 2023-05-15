@@ -4,17 +4,22 @@ import { TIER_QUERY_LIMITS } from '.'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useFlag } from 'hooks'
+import { StripeSubscription } from 'components/interfaces/Billing'
+import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 
 interface Props {
   show: boolean
   setShowUpgradePrompt: (value: boolean) => void
+  subscription: StripeSubscription | undefined
 }
 
-const UpgradePrompt: React.FC<Props> = ({ show, setShowUpgradePrompt }) => {
+const UpgradePrompt: React.FC<Props> = ({ show, setShowUpgradePrompt, subscription }) => {
   const router = useRouter()
   const { ref } = router.query
 
-  const teamTierEnabled = useFlag('teamTier')
+  // Team tier is enabled when the flag is turned on OR the user is already on the team tier (manually assigned by us)
+  const userIsOnTeamTier = subscription?.tier?.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.TEAM
+  const teamTierEnabled = useFlag('teamTier') || userIsOnTeamTier
 
   return (
     <Modal
