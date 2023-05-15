@@ -3,7 +3,7 @@ import { useRouter } from 'next/router'
 import { useTelemetryProps } from 'common'
 import { useProfileCreateMutation } from 'data/profile/profile-create-mutation'
 import { useProfileQuery } from 'data/profile/profile-query'
-import telemetry from 'lib/telemetry'
+import Telemetry from 'lib/telemetry'
 
 /**
  * Fetches the user's profile, creating one if it does not exist
@@ -14,7 +14,7 @@ function useProfile() {
 
   const { mutate: createProfile, isLoading: isCreating } = useProfileCreateMutation({
     onSuccess() {
-      telemetry.sendEvent(
+      Telemetry.sendEvent(
         { category: 'conversion', action: 'sign_up', label: '' },
         telemetryProps,
         router
