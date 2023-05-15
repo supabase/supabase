@@ -4,6 +4,7 @@
   "main": "./index.tsx",
   "types": "./index.tsx",
   "license": "MIT",
+  "sideEffects": false,
   "scripts": {
     "build-storybook": "build-storybook",
     "build:icons": "node --experimental-modules internals/populate-icons.js",
