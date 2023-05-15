@@ -15,7 +15,7 @@ export function getQueryClient() {
               typeof error === 'object' &&
               error !== null &&
               'code' in error &&
-              error.code === 404
+              (error as any).code === 404
             ) {
               return false
             }
