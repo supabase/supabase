@@ -5,9 +5,16 @@
       <link>https://supabase.com/blog</link>
       <description>Latest Postgres news from Oliver Rice at Supabase</description>
       <language>en</language>
-      <lastBuildDate>Thu, 16 Feb 2023 23:11:00 +0000</lastBuildDate>
+      <lastBuildDate>Thu, 20 Apr 2023 22:10:00 +0000</lastBuildDate>
       <atom:link href="https://supabase.com/planetpg-oli_rice-rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/whats-new-in-pg-graphql-v1-2</guid>
+  <title>What's New in pg_graphql v1.2</title>
+  <link>https://supabase.com/blog/whats-new-in-pg-graphql-v1-2</link>
+  <description>New Features in the v1.2 release of pg_graphql</description>
+  <pubDate>Thu, 20 Apr 2023 22:10:00 +0000</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/type-constraints-in-65-lines-of-sql</guid>
   <title>Type Constraints in 65 lines of SQL</title>
   <link>https://supabase.com/blog/type-constraints-in-65-lines-of-sql</link>
