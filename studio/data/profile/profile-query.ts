@@ -4,6 +4,8 @@ import { API_URL } from 'lib/constants'
 import { useCallback } from 'react'
 import { profileKeys } from './keys'
 import Telemetry from 'lib/telemetry'
+import { useRouter } from 'next/router'
+import { useTelemetryProps } from 'common'
 
 export type Profile = {
   id: number
@@ -25,18 +27,19 @@ export type ProfileResponse = Profile
  * This will also need to send a sign_up event
  */
 async function createProfile() {
+  const router = useRouter()
+  const telemetryProps = useTelemetryProps()
+
   const response = await post(`${API_URL}/profile`, {})
   if (response.error) {
     throw response.error
   }
 
+  // send conversion event
   Telemetry.sendEvent(
     { category: 'conversion', action: 'sign_up', label: '' },
-    {
-      screenResolution:
-        typeof window !== 'undefined' ? `${window.innerWidth}x${window.innerHeight}` : undefined,
-      language: 'en-US',
-    }
+    telemetryProps,
+    router
   )
 
   return response
