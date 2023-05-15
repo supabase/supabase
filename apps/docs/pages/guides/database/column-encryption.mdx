@@ -262,6 +262,7 @@ nonce                        | \x300a14aa721184ff7cf0f6bf088da267
 
 Notice how there is a new column called `decrypted_secret`. This column is not stored in database or on disk at all, it is generated “on-the-fly” as you select from the view. Database dumps do not contain this information, only the view itself, and most importantly, **raw decryption keys are never stored**.
 
+- [Supabase Vault](/docs/guides/database/vault)
 - Read more about Supabase Vault in the [blog post](https://supabase.com/blog/vault-now-in-beta)
 - [Supabase Vault on GitHub](https://github.com/supabase/vault)
 
