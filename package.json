@@ -59,8 +59,5 @@
     "functions",
     "database",
     "auth"
-  ],
-  "dependencies": {
-    "react-merge-refs": "^2.0.2"
-  }
+  ]
 }
