@@ -28,7 +28,7 @@ Once you've created an encrypted column, you can insert data into the table like
 
 ![Encrypted data](/docs/img/guides/database/vault-encrypted-data.png)
 
-Decrypted data can be accessed by a special view that is automatically created whenever you create an encrypted column on a table. This view decrypts the data row-by-row as you access it. By default this view is called `decrypted_<your-table-name>`, so in the example provided, the decryption view for the `profiles` table is `decrypted_profiles`. In addition to the existing `emails` column, there is a new column in the view called `decrypted_emails` that contains the decrypted email value. It's that simple!
+Decrypted data is accessed using a special view that is automatically created after adding an encrypted column to a table. This view decrypts the data row-by-row as you access it. By default, this view is called `decrypted_<your-table-name>`. In the example below, the decryption view for the `profiles` table is called `decrypted_profiles`. Notice there is a new column in the view called `decrypted_emails` that contains the decrypted email value.
 
 ![Decrypted data](/docs/img/guides/database/vault-decrypted-data.png)
 
