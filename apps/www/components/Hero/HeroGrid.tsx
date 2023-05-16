@@ -39,6 +39,7 @@ const HeroGrid = () => {
             y2={y}
             stroke={svgGridOptions.color}
             strokeWidth={svgGridOptions.strokeWidth}
+            shapeRendering="crispEdges"
           />
         )
       })}
@@ -54,6 +55,7 @@ const HeroGrid = () => {
               y2="0"
               stroke={svgGridOptions.color}
               strokeWidth={svgGridOptions.strokeWidth}
+              shapeRendering="crispEdges"
             />
             {isSm
               ? i === 9 && (
@@ -65,6 +67,7 @@ const HeroGrid = () => {
                     stroke="url(#electric-pulse)"
                     strokeLinecap="round"
                     strokeWidth={4}
+                    shapeRendering="crispEdges"
                   />
                 )
               : i === 25 && (
@@ -76,6 +79,7 @@ const HeroGrid = () => {
                     stroke="url(#electric-pulse)"
                     strokeLinecap="round"
                     strokeWidth={4}
+                    shapeRendering="crispEdges"
                   />
                 )}
             {isSm
@@ -88,6 +92,7 @@ const HeroGrid = () => {
                     stroke="url(#electric-pulse-2)"
                     strokeLinecap="round"
                     strokeWidth={4}
+                    shapeRendering="crispEdges"
                   />
                 )
               : i === 33 && (
@@ -99,6 +104,7 @@ const HeroGrid = () => {
                     stroke="url(#electric-pulse-2)"
                     strokeLinecap="round"
                     strokeWidth={4}
+                    shapeRendering="crispEdges"
                   />
                 )}
           </>

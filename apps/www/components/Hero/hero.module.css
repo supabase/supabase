@@ -17,6 +17,7 @@
   inset: 0;
   margin: 0 auto;
   animation: animate-grid 30s linear infinite;
+  will-change: transform;
 }
 
 .gradient {
