@@ -120,7 +120,7 @@ const HeroGrid = () => {
     >
       <div
         style={{
-          transform: 'rotateX(86deg)',
+          transform: 'rotateX(85deg)',
           position: 'absolute',
           top: 0,
           bottom: 0,
