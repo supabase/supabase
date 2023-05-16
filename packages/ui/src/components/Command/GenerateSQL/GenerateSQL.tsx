@@ -74,6 +74,9 @@ const GenerateSQL = () => {
     if (search) handleSubmit(search)
   }, [])
 
+  // Detect an IME composition (so that we can ignore Enter keypress)
+  const [isImeComposing, setIsImeComposing] = useState(false)
+
   const formatAnswer = (answer: string) => {
     try {
       return format(answer, {
@@ -210,7 +213,9 @@ const GenerateSQL = () => {
                           onKeyDown={(e) => {
                             switch (e.key) {
                               case 'Enter':
-                                if (!search || isLoading || isResponding) return
+                                if (!search || isLoading || isResponding || isImeComposing) {
+                                  return
+                                }
                                 return handleSubmit(query)
                               default:
                                 return
@@ -311,10 +316,14 @@ const GenerateSQL = () => {
               setSearch(e.target.value)
             }
           }}
+          onCompositionStart={() => setIsImeComposing(true)}
+          onCompositionEnd={() => setIsImeComposing(false)}
           onKeyDown={(e) => {
             switch (e.key) {
               case 'Enter':
-                if (!search || isLoading || isResponding) return
+                if (!search || isLoading || isResponding || isImeComposing) {
+                  return
+                }
                 return handleSubmit(search)
               default:
                 return

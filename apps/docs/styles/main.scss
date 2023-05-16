@@ -80,6 +80,10 @@ article h1 {
   @apply text-scale-900 text-xs;
 }
 
+.prose :where(p):not(:where([class~='not-prose'] *)) {
+  white-space: pre-line;
+}
+
 code[class*='language-'],
 pre[class*='language-'] {
   text-shadow: none !important;

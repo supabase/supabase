@@ -2636,13 +2636,15 @@ functions:
           ```kotlin
           val client = createSupabaseClient(
               supabaseUrl = "https://id.supabase.co",
-              supabaseKey = "service_role"
+              supabaseKey = "supabaseKey"
           ) {
               install(GoTrue) {
                   autoLoadFromStorage = false
                   alwaysAutoRefresh = false
               }
+              // install other plugins (these will use the service role key)
           }
+          client.gotrue.importAuthToken("service_role")
 
           // Access auth admin api
           val adminGoTrueClient = client.gotrue.admin
