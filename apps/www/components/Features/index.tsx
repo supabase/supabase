@@ -76,22 +76,8 @@ const Features = () => {
           }
           onClick={() => sendTelemetryEvent(name)}
           image={
-            // <motion.div className="absolute inset-0 z-0" variants={opacityVariant}>
-            //   <Image
-            //     src={
-            //       isDarkMode
-            //         ? '/images/index/database-dark.jpg'
-            //         : '/images/index/database-light.jpg'
-            //     }
-            //     alt="Supabase Postgres Database, hover image with glow"
-            //     layout="fill"
-            //     objectPosition={isSm ? 'bottom' : '50% 50%'}
-            //     objectFit={isSm ? 'contain' : 'cover'}
-            //     quality={100}
-            //   />
-            // </motion.div>
             <motion.div className="absolute inset-0 z-0" variants={opacityVariant}>
-              <DatabaseVisual />
+              <DatabaseVisual isDarkMode={isDarkMode} />
             </motion.div>
           }
           classname="col-span-full md:col-span-3"
