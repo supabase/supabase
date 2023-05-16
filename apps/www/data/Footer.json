@@ -82,7 +82,7 @@
       },
       {
         "text": "Open Source",
-        "url": "/oss"
+        "url": "/open-source"
       },
       {
         "text": "SupaSquad",
@@ -128,6 +128,10 @@
       {
         "text": "Acceptable Use Policy",
         "url": "/aup"
+      },
+      {
+        "text": "Support Policy",
+        "url": "/support-policy"
       },
       {
         "text": "Service Level Agreement",
