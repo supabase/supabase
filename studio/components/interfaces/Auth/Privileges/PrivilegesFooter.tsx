@@ -14,7 +14,7 @@ function PrivilegesFooter(props: Props) {
 
   return (
     <Portal className="portal--save-changes">
-      <div className="fixed left-1/2 -translate-x-1/2 mb-4 bottom-0 bg-gray-400 text-white p-3 shadow-lg rounded-md">
+      <div className="fixed left-1/2 -translate-x-1/2 mb-4 bottom-0 bg-gray-400 p-3 shadow-lg rounded-md">
         <div className="container mx-auto flex gap-16 justify-between items-center">
           <div className="text-sm">You have unsaved changes</div>
           <div className="flex gap-2 items-center">
