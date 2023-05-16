@@ -14,7 +14,7 @@ const HeroGrid = () => {
     color: isDarkMode ? '#00c6d4' : '#01876c',
     boxWidth: width ? width * 7 : 7500,
     boxHeight: width ? width * 5 : 6000,
-    xLines: isSm ? 20 : 50,
+    xLines: isSm ? 20 : 49,
     yLines: isSm ? 65 : 130,
     strokeWidth: 1,
   }
