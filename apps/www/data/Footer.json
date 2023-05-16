@@ -27,8 +27,8 @@
         "url": "/pricing"
       },
       {
-        "text": "Beta",
-        "url": "/beta"
+        "text": "Launch Week 7",
+        "url": "/launch-week"
       }
     ]
   },
@@ -82,7 +82,7 @@
       },
       {
         "text": "Open Source",
-        "url": "/oss"
+        "url": "/open-source"
       },
       {
         "text": "SupaSquad",
@@ -106,6 +106,10 @@
         "url": "/blog"
       },
       {
+        "text": "Customer Stories",
+        "url": "/customers"
+      },
+      {
         "text": "Careers",
         "url": "/careers"
       },
@@ -124,6 +128,10 @@
       {
         "text": "Acceptable Use Policy",
         "url": "/aup"
+      },
+      {
+        "text": "Support Policy",
+        "url": "/support-policy"
       },
       {
         "text": "Service Level Agreement",

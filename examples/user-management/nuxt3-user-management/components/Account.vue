@@ -11,7 +11,7 @@
         </div>
         <div>
             <label for="website">Website</label>
-            <input id="website" type="website" v-model="website" />
+            <input id="website" type="url" v-model="website" />
         </div>
 
         <div>
@@ -74,10 +74,11 @@ async function updateProfile() {
     }
 }
 
+const supabaseAuth = useSupabaseAuthClient()
 async function signOut() {
     try {
         loading.value = true
-        let { error } = await supabase.auth.signOut()
+        let { error } = await supabaseAuth.auth.signOut()
         if (error) throw error
     } catch (error) {
         alert(error.message)

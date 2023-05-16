@@ -15,9 +15,7 @@ While Postgres natively runs SQL, it can also run other "procedural languages".
 
 It can be used for database functions, triggers, queries and more.
 
-## Usage
-
-### Enable the extension
+## Enable the extension
 
 <Tabs
   scrollable
@@ -50,7 +48,7 @@ Procedural languages are automatically installed within `pg_catalog`, so you don
 </TabPanel>
 </Tabs>
 
-### Create `plv8` functions
+## Create `plv8` functions
 
 Functions written in `plv8` are written just like any other PostgreSQL functions, only
 with the `language` identifier set to `plv8`.
@@ -135,6 +133,8 @@ returns setof messages as $$
 
     return json_result;
 $$ language plv8;
+
+select * from get_messages();
 ```
 
 ## Resources

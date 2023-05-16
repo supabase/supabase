@@ -1,0 +1,105 @@
+[
+  {
+    "id": "introduction",
+    "title": "Introduction",
+    "slug": "introduction",
+    "summary": "Introduction",
+    "type": "markdown"
+  },
+  {
+    "type": "category",
+    "title": "Management API",
+    "items": [
+      {
+        "id": "list-endpoints",
+        "slug": "list-endpoints",
+        "title": "List endpoints",
+        "type": "operation"
+      },
+      {
+        "id": "create-endpoint",
+        "slug": "create-endpoint",
+        "title": "Create endpoint",
+        "type": "operation"
+      },
+      {
+        "id": "delete-endpoint",
+        "slug": "delete-endpoint",
+        "title": "Delete endpoint",
+        "type": "operation"
+      },
+      {
+        "id": "fetch-endpoint",
+        "slug": "fetch-endpoint",
+        "title": "Fetch endpoint",
+        "type": "operation"
+      },
+      {
+        "id": "update-endpoint",
+        "slug": "update-endpoint",
+        "title": "Update endpoint",
+        "type": "operation"
+      },
+      {
+        "id": "list-sources",
+        "slug": "list-sources",
+        "title": "List sources",
+        "type": "operation"
+      },
+      {
+        "id": "create-source",
+        "slug": "create-source",
+        "title": "Create source",
+        "type": "operation"
+      },
+      {
+        "id": "delete-source",
+        "slug": "delete-source",
+        "title": "Delete source",
+        "type": "operation"
+      },
+      {
+        "id": "fetch-source",
+        "slug": "fetch-source",
+        "title": "Fetch source",
+        "type": "operation"
+      },
+      {
+        "id": "update-source",
+        "slug": "update-source",
+        "title": "Update source",
+        "type": "operation"
+      },
+      {
+        "id": "list-teams",
+        "slug": "list-teams",
+        "title": "List teams",
+        "type": "operation"
+      },
+      {
+        "id": "create-team",
+        "slug": "create-team",
+        "title": "Create team",
+        "type": "operation"
+      },
+      {
+        "id": "delete-team",
+        "slug": "delete-team",
+        "title": "Delete team",
+        "type": "operation"
+      },
+      {
+        "id": "fetch-team",
+        "slug": "fetch-team",
+        "title": "Fetch team",
+        "type": "operation"
+      },
+      {
+        "id": "update-team",
+        "slug": "update-team",
+        "title": "Update team",
+        "type": "operation"
+      }
+    ]
+  }
+]

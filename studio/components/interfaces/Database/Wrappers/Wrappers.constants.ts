@@ -1,16 +1,16 @@
-import { Wrapper } from './Wrappers.types'
+import { BASE_PATH } from 'lib/constants'
+import { WrapperMeta } from './Wrappers.types'
 
-export const WRAPPERS: Wrapper[] = [
+export const WRAPPERS: WrapperMeta[] = [
   {
     name: 'stripe_wrapper',
     handlerName: 'stripe_fdw_handler',
     validatorName: 'stripe_fdw_validator',
-    icon: '/img/icons/stripe-icon.svg',
+    icon: `${BASE_PATH}/img/icons/stripe-icon.svg`,
     extensionName: 'StripeFdw',
     label: 'Stripe',
     docsUrl: 'https://supabase.com/docs/guides/database/wrappers/stripe',
     server: {
-      name: 'stripe_server',
       options: [
         {
           name: 'api_key_id',
@@ -205,13 +205,13 @@ export const WRAPPERS: Wrapper[] = [
             editable: false,
             required: true,
           },
-          {
-            name: 'rowid_column',
-            label: 'Row ID Column',
-            defaultValue: 'id',
-            editable: true,
-            required: true,
-          },
+          // {
+          //   name: 'rowid_column',
+          //   label: 'Row ID Column',
+          //   defaultValue: 'id',
+          //   editable: true,
+          //   required: true,
+          // },
         ],
       },
       {
@@ -350,13 +350,13 @@ export const WRAPPERS: Wrapper[] = [
             editable: false,
             required: true,
           },
-          {
-            name: 'rowid_column',
-            label: 'Row ID Column',
-            defaultValue: 'id',
-            editable: true,
-            required: true,
-          },
+          // {
+          //   name: 'rowid_column',
+          //   label: 'Row ID Column',
+          //   defaultValue: 'id',
+          //   editable: true,
+          //   required: true,
+          // },
         ],
       },
       {
@@ -395,13 +395,13 @@ export const WRAPPERS: Wrapper[] = [
             editable: false,
             required: true,
           },
-          {
-            name: 'rowid_column',
-            label: 'Row ID Column',
-            defaultValue: 'id',
-            editable: true,
-            required: true,
-          },
+          // {
+          //   name: 'rowid_column',
+          //   label: 'Row ID Column',
+          //   defaultValue: 'id',
+          //   editable: true,
+          //   required: true,
+          // },
         ],
       },
     ],
@@ -410,12 +410,11 @@ export const WRAPPERS: Wrapper[] = [
     name: 'firebase_wrapper',
     handlerName: 'firebase_fdw_handler',
     validatorName: 'firebase_fdw_validator',
-    icon: '/img/icons/firebase-icon.svg',
+    icon: `${BASE_PATH}/img/icons/firebase-icon.svg`,
     extensionName: 'FirebaseFdw',
     label: 'Firebase',
     docsUrl: 'https://supabase.com/docs/guides/database/wrappers/firebase',
     server: {
-      name: 'firebase_server',
       options: [
         {
           name: 'project_id',

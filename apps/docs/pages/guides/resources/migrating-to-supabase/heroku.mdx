@@ -5,6 +5,7 @@ export const meta = {
   title: 'Migrate from Heroku to Supabase',
   description: 'Migrate your Heroku Postgres database to Supabase.',
   sidebar_label: 'Heroku',
+  video: 'https://www.youtube.com/v/xsRhPMphtZ4',
 }
 
 Supabase is one of the best [free alternatives to Heroku Postgres](https://supabase.com/alternatives/supabase-vs-heroku-postgres). This guide shows how to migrate your Heroku Postgres database to Supabase. This migration requires the [pg_dump](https://www.postgresql.org/docs/current/app-pgdump.html) and [psql](https://www.postgresql.org/docs/current/app-psql.html) CLI tools, which are installed automatically as part of the complete PostgreSQL installation package.
@@ -65,6 +66,13 @@ psql -h $SUPABASE_HOST -U postgres -f heroku_dump.sql
 - To exclude a table: `--exclude-table=PATTERN`.
 
 Run `pg_dump --help` for a full list of options.
+
+<Admonition type="caution">
+
+- If you plan on migrating a database larger than 6 GB, we recommend [contacting support](https://app.supabase.com/support/new) to ensure that you'll have the proper disk size pre-provisioned. You can read more about how the disk is managed on Supabase on the [Database usage](/docs/guides/platform/database-size#disk-management).
+- We also recommend upgrading to at least a [Large instance](/docs/guides/platform/compute-add-ons) for the migration (you can downgrade later) to avoid running out of IO-Budget.
+
+</Admonition>
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

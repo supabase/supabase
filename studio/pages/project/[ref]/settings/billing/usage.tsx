@@ -1,26 +1,44 @@
 import dayjs from 'dayjs'
 import { observer } from 'mobx-react-lite'
-import { FC, useEffect, useState } from 'react'
-import { IconArrowRight, Loading } from 'ui'
+import { useEffect, useState } from 'react'
+import { IconArrowRight, Loading, Toggle } from 'ui'
 
-import { Project, NextPageWithLayout } from 'types'
-import { useProjectSubscription, useStore } from 'hooks'
+import { NextPageWithLayout } from 'types'
+import { useStore, useFlag } from 'hooks'
+import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
 import { STRIPE_PRODUCT_IDS, TIME_PERIODS_REPORTS, TIME_PERIODS_BILLING } from 'lib/constants'
 import { SettingsLayout } from 'components/layouts'
 import LoadingUI from 'components/ui/Loading'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import { PAYGUsage } from 'components/interfaces/Billing'
-import ProjectUsage from 'components/interfaces/Settings/ProjectUsageBars/ProjectUsageBars'
+import ProjectUsageBars from 'components/interfaces/Settings/ProjectUsageBars/ProjectUsageBars'
+import Usage from 'components/interfaces/BillingV2/Usage/Usage'
 
 const ProjectBillingUsage: NextPageWithLayout = () => {
-  const { ui } = useStore()
-  const project = ui.selectedProject
+  const enableUsageV2 = useFlag('usagev2')
+  const [showNewUsageUI, setShowNewUsageUI] = useState(enableUsageV2)
 
   return (
-    <div className="content h-full w-full overflow-y-auto">
-      <div className="mx-auto w-full">
-        <Settings project={project} />
-      </div>
+    <div className="relative">
+      {enableUsageV2 && (
+        <div className="absolute top-[1.9rem] right-16 flex items-center space-x-3">
+          <Toggle
+            size="tiny"
+            checked={showNewUsageUI}
+            onChange={() => setShowNewUsageUI(!showNewUsageUI)}
+          />
+          <p className="text-xs text-scale-1100 -translate-y-[1px]">Preview new interface</p>
+        </div>
+      )}
+      {enableUsageV2 && showNewUsageUI ? (
+        <Usage />
+      ) : (
+        <div className="w-full h-full overflow-y-auto content">
+          <div className="w-full mx-auto">
+            <Settings />
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -31,18 +49,15 @@ ProjectBillingUsage.getLayout = (page) => (
 
 export default observer(ProjectBillingUsage)
 
-interface SettingsProps {
-  project?: Project
-}
-
-const Settings: FC<SettingsProps> = ({ project }) => {
+const Settings = () => {
   const { ui } = useStore()
+  const project = ui.selectedProject
 
   const {
-    subscription,
+    data: subscription,
     isLoading: loading,
     error,
-  } = useProjectSubscription(ui.selectedProject?.ref)
+  } = useProjectSubscriptionQuery({ projectRef: ui.selectedProject?.ref })
 
   const [dateRange, setDateRange] = useState<any>()
   const isPayg = subscription?.tier?.prod_id === STRIPE_PRODUCT_IDS.PAYG
@@ -51,7 +66,7 @@ const Settings: FC<SettingsProps> = ({ project }) => {
     if (error) {
       ui.setNotification({
         category: 'error',
-        message: `Failed to get project subscription: ${error?.message ?? 'unknown'}`,
+        message: `Failed to get project subscription: ${(error as any)?.message ?? 'unknown'}`,
       })
     }
   }, [error])
@@ -61,18 +76,18 @@ const Settings: FC<SettingsProps> = ({ project }) => {
   }
 
   return (
-    <div className="container max-w-4xl space-y-8 p-4">
+    <div className="container max-w-4xl p-4 space-y-8">
       {loading ? (
         <Loading active={loading}>
-          <div className="mb-8 w-full overflow-hidden rounded border border-panel-border-light dark:border-panel-border-dark">
-            <div className="flex items-center justify-center bg-panel-body-light px-6 py-6 dark:bg-panel-body-dark">
+          <div className="w-full mb-8 overflow-hidden border rounded border-panel-border-light dark:border-panel-border-dark">
+            <div className="flex items-center justify-center px-6 py-6 bg-panel-body-light dark:bg-panel-body-dark">
               <p>Loading usage breakdown</p>
             </div>
           </div>
         </Loading>
       ) : isPayg ? (
         <div>
-          <div className="mb-4 flex items-center space-x-3">
+          <div className="flex items-center mb-4 space-x-3">
             <DateRangePicker
               onChange={setDateRange}
               value={TIME_PERIODS_BILLING[0].key}
@@ -97,7 +112,7 @@ const Settings: FC<SettingsProps> = ({ project }) => {
           {dateRange && <PAYGUsage dateRange={dateRange} />}
         </div>
       ) : (
-        <ProjectUsage projectRef={project?.ref} />
+        <ProjectUsageBars projectRef={project?.ref} />
       )}
     </div>
   )

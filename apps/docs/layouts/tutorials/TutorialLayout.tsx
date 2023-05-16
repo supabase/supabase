@@ -6,7 +6,13 @@ import SideBar from '~/components/Navigation/SideBar'
 import TableOfContents from '~/components/TableOfContents'
 
 interface Props {
-  meta: { title: string; description?: string; hide_table_of_contents?: boolean; video?: string }
+  meta: {
+    title: string
+    description?: string
+    hide_table_of_contents?: boolean
+    video?: string
+    tocVideo?: string
+  }
   children: any
   toc?: any
   menuItems: any
@@ -14,18 +20,7 @@ interface Props {
 }
 
 const Layout: FC<Props> = (props: Props) => {
-  // const contentString = renderToString(props.children)
   const [active, setActive] = useState(false)
-
-  useEffect(() => {
-    const key = localStorage.getItem('supabaseDarkMode')
-    if (!key) {
-      // Default to dark mode if no preference config
-      document.documentElement.className = 'dark'
-    } else {
-      document.documentElement.className = key === 'true' ? 'dark' : ''
-    }
-  }, [])
 
   useEffect(() => {
     setTimeout(function () {
@@ -50,7 +45,7 @@ const Layout: FC<Props> = (props: Props) => {
       <Head>
         <title>{props.meta?.title} | Supabase</title>
         <meta name="description" content={props.meta?.description} />
-        <meta content="width=device-width, initial-scale=1" name="viewport" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="icon" href="/docs/favicon.ico" />
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content={props.meta?.title} />

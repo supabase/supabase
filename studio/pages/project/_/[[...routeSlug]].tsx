@@ -5,6 +5,7 @@ import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 
 import { withAuth } from 'hooks'
+import { BASE_PATH } from 'lib/constants'
 import ProjectList from 'components/interfaces/Home/ProjectList'
 
 interface Props {}
@@ -16,7 +17,7 @@ const Header: FC<Props> = () => {
         <Link href="/projects">
           <a>
             <img
-              src="/img/supabase-logo.svg"
+              src={`${BASE_PATH}/img/supabase-logo.svg`}
               alt="Supabase"
               className="dark:border-dark rounded border p-1 hover:border-white"
               style={{ height: 24 }}
@@ -55,7 +56,7 @@ const GenericProjectPage: NextPage = () => {
     <>
       <Header />
       <div className="flex flex-col mx-auto w-full max-w-5xl">
-        <h3 className="mt-8 text-2xl">Select a project to continue</h3>
+        <h1 className="mt-8 text-2xl">Select a project to continue</h1>
         <div
           className="flex-grow py-6 space-y-8 overflow-y-auto"
           style={{ maxHeight: 'calc(100vh - 49px - 64px)' }}

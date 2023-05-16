@@ -1,5 +1,6 @@
 import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
 import { get } from 'lib/common/fetch'
+import { API_ADMIN_URL } from 'lib/constants'
 import { useCallback } from 'react'
 import { customDomainKeys } from './keys'
 
@@ -26,7 +27,7 @@ type Ssl = {
   id: string
   type: string
   method: string
-  status: string
+  status: 'pending_validation' | 'pending_deployment' | 'validation_timed_out'
   txt_name?: string
   txt_value?: string
   settings: Settings
@@ -37,6 +38,9 @@ type Ssl = {
     status: string
     txt_name: string
     txt_value: string
+  }[]
+  validation_errors?: {
+    message: string
   }[]
 }
 
@@ -72,12 +76,9 @@ export async function getCustomDomains(
     throw new Error('projectRef is required')
   }
 
-  const response = (await get(
-    `${process.env.NEXT_PUBLIC_API_ADMIN_URL}/projects/${projectRef}/custom-hostname`,
-    {
-      signal,
-    }
-  )) as {
+  const response = (await get(`${API_ADMIN_URL}/projects/${projectRef}/custom-hostname`, {
+    signal,
+  })) as {
     data: {
       errors: any[]
       result: CustomDomainResponse

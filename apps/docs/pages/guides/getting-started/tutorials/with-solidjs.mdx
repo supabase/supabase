@@ -1,19 +1,18 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-  id: 'with-solidjs',
-  title: 'Quickstart: SolidJS',
+  title: 'Build a User Management App with SolidJS',
   description: 'Learn how to use Supabase in your SolidJS App.',
-  sidebar_label: 'SolidJS',
 }
 
 <QuickstartIntro />
 
 ![Supabase User Management example](/docs/img/user-management-demo.png)
 
-### GitHub
-
-Should you get stuck while working through the guide, refer to [this repo](https://github.com/supabase/supabase/tree/master/examples/user-management/solid-user-management).
+<Admonition type="note">
+  If you get stuck while working through this guide, refer to the [full example on
+  GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/solid-user-management).
+</Admonition>
 
 <ProjectSetup />
 
@@ -123,13 +122,13 @@ After a user is signed in we can allow them to edit their profile details and ma
 
 Let's create a new component for that called `Account.tsx`.
 
-```jsx title=src/Account.tsx
+```tsx title=src/Account.tsx
 import { AuthSession } from '@supabase/supabase-js'
 import { Component, createEffect, createSignal } from 'solid-js'
 import { supabase } from './supabaseClient'
 
 interface Props {
-  session: AuthSession;
+  session: AuthSession
 }
 
 const Account: Component<Props> = ({ session }) => {
@@ -415,12 +414,11 @@ return (
 )
 ```
 
-## Next steps
+### Storage management
+
+<StorageManagement />
 
 At this stage you have a fully functional application!
-
-- Got a question? [Ask here](https://github.com/supabase/supabase/discussions).
-- Sign in: [app.supabase.com](https://app.supabase.com)
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

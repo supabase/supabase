@@ -1,4 +1,4 @@
-import { inferColumnType } from 'components/interfaces/TableGridEditor/SidePanelEditor/TableEditor/SpreadsheetImport/SpreadsheetImport.utils'
+import { inferColumnType } from 'components/interfaces/TableGridEditor/SidePanelEditor/SpreadsheetImport/SpreadsheetImport.utils'
 
 describe('SpreadsheedImport.utils: inferColumnType', () => {
   test('should default column type to text if no rows to infer from', () => {

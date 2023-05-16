@@ -112,19 +112,21 @@ const InputWithSuggestions: FC<Props> = ({
                     icon={<IconList strokeWidth={1.5} />}
                   />
                 </Tooltip.Trigger>
-                <Tooltip.Content side="bottom">
-                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                  <div
-                    className={[
-                      'bg-scale-100 rounded py-1 px-2 leading-none shadow',
-                      'border-scale-200 border',
-                    ].join(' ')}
-                  >
-                    <span className="text-scale-1200 text-xs">
-                      {suggestionsTooltip || 'Suggestions'}
-                    </span>
-                  </div>
-                </Tooltip.Content>
+                <Tooltip.Portal>
+                  <Tooltip.Content side="bottom">
+                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                    <div
+                      className={[
+                        'bg-scale-100 rounded py-1 px-2 leading-none shadow',
+                        'border-scale-200 border',
+                      ].join(' ')}
+                    >
+                      <span className="text-scale-1200 text-xs">
+                        {suggestionsTooltip || 'Suggestions'}
+                      </span>
+                    </div>
+                  </Tooltip.Content>
+                </Tooltip.Portal>
               </Tooltip.Root>
             </Dropdown>
           )

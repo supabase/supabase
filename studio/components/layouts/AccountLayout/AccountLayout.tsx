@@ -3,9 +3,9 @@ import { FC, ReactNode } from 'react'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 
-import { auth, STORAGE_KEY } from 'lib/gotrue'
+import { useSignOut } from 'lib/auth'
 import { useStore, withAuth, useFlag } from 'hooks'
-import { API_URL, IS_PLATFORM } from 'lib/constants'
+import { IS_PLATFORM } from 'lib/constants'
 import WithSidebar from './WithSidebar'
 import { SidebarSection } from './AccountLayout.types'
 
@@ -25,10 +25,11 @@ const AccountLayout: FC<Props> = ({ children, title, breadcrumbs }) => {
   const ongoingIncident = useFlag('ongoingIncident')
   const maxHeight = ongoingIncident ? 'calc(100vh - 44px)' : '100vh'
 
+  const signOut = useSignOut()
   const onClickLogout = async () => {
-    await auth.signOut()
-    localStorage.removeItem(STORAGE_KEY)
-    window.location.href = '/sign-in'
+    await signOut()
+
+    await router.push('/sign-in')
   }
 
   const organizationsLinks = app.organizations
@@ -37,7 +38,7 @@ const AccountLayout: FC<Props> = ({ children, title, breadcrumbs }) => {
       isActive:
         router.pathname.startsWith('/org/') && ui.selectedOrganization?.slug === organization.slug,
       label: organization.name,
-      href: `/org/${organization.slug}/settings`,
+      href: `/org/${organization.slug}/general`,
       key: organization.slug,
     }))
     .sort((a, b) => a.label.localeCompare(b.label))
@@ -72,14 +73,14 @@ const AccountLayout: FC<Props> = ({ children, title, breadcrumbs }) => {
             links: [
               {
                 isActive: router.pathname === `/account/me`,
-                icon: '/img/user.svg',
+                icon: `${router.basePath}/img/user.svg`,
                 label: 'Preferences',
                 href: `/account/me`,
                 key: `/account/me`,
               },
               {
                 isActive: router.pathname === `/account/tokens`,
-                icon: '/img/user.svg',
+                icon: `${router.basePath}/img/user.svg`,
                 label: 'Access Tokens',
                 href: `/account/tokens`,
                 key: `/account/tokens`,
@@ -94,14 +95,14 @@ const AccountLayout: FC<Props> = ({ children, title, breadcrumbs }) => {
       links: [
         {
           key: 'ext-guides',
-          icon: '/img/book.svg',
+          icon: `${router.basePath}/img/book.svg`,
           label: 'Guides',
           href: 'https://supabase.com/docs',
           isExternal: true,
         },
         {
           key: 'ext-guides',
-          icon: '/img/book-open.svg',
+          icon: `${router.basePath}/img/book-open.svg`,
           label: 'API Reference',
           href: 'https://supabase.com/docs/guides/api',
           isExternal: true,
@@ -131,7 +132,6 @@ const AccountLayout: FC<Props> = ({ children, title, breadcrumbs }) => {
       <Head>
         <title>{title ? `${title} | Supabase` : 'Supabase'}</title>
         <meta name="description" content="Supabase Studio" />
-        <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className="flex h-full">
         <main

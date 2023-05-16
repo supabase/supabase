@@ -14,6 +14,7 @@ import DefaultLayout from '~/components/Layouts/Default'
 import { Tabs } from 'ui'
 import PostTypes from '~/types/post'
 import BlogListItem from '~/components/Blog/BlogListItem'
+import { useParams } from '~/hooks/useParams'
 
 export async function getStaticProps() {
   const allPostsData = getSortedPosts('_blog', undefined, undefined, '** BLOG PAGE **')
@@ -24,6 +25,22 @@ export async function getStaticProps() {
   // rss feed is added via <Head> component in render return
   fs.writeFileSync('./public/rss.xml', rss)
 
+  // generate a series of rss feeds for each author (for PlanetPG)
+  const planetPgPosts = allPostsData.filter((post: any) => post.tags.includes('planetpg'))
+  const planetPgAuthors = planetPgPosts.map((post: any) => post.author.split(','))
+  const uniquePlanetPgAuthors = new Set([].concat(...planetPgAuthors))
+
+  uniquePlanetPgAuthors.forEach((author) => {
+    const authorPosts = planetPgPosts.filter((post: any) => post.author.includes(author))
+    if (authorPosts.length > 0) {
+      const authorRss = generateRss(authorPosts, author)
+      fs.writeFileSync(`./public/planetpg-${author}-rss.xml`, authorRss)
+    }
+  })
+
+  // Append 'all' category here
+  categories.unshift('all')
+
   return {
     props: {
       blogs: allPostsData,
@@ -33,6 +50,7 @@ export async function getStaticProps() {
 }
 
 function Blog(props: any) {
+  const tag = useParams()?.tag
   const [category, setCategory] = useState('all')
   const [blogs, setBlogs] = useState(props.blogs)
 
@@ -43,6 +61,13 @@ function Blog(props: any) {
     // not inluding the first blog post
     const shiftedBlogs = [...props.blogs]
     shiftedBlogs.shift()
+
+    if (category === 'all') {
+      router.replace('/blog', undefined, { shallow: true, scroll: false })
+    } else {
+      router.query.tag = category
+      router.replace(router, undefined, { shallow: true, scroll: false })
+    }
 
     setBlogs(
       category === 'all'
@@ -55,11 +80,11 @@ function Blog(props: any) {
   }, [category])
 
   useEffect(() => {
-    return props.categories.unshift('all')
-  }, [])
+    if (router.isReady && tag && tag !== 'all') {
+      setCategory(tag)
+    }
+  }, [tag, router.isReady])
 
-  // append 'all' category
-  // const categories = props.categories.push('all')
   const meta_title = 'Supabase Blog: Open Source Firebase alternative Blog'
   const meta_description = 'Get all your Supabase News on the Supabase blog.'
 
@@ -87,6 +112,7 @@ function Blog(props: any) {
         ]}
       />
       <DefaultLayout>
+        <h1 className="sr-only">Supabase blog</h1>
         <div className="overflow-hidden py-12">
           <div className="container mx-auto mt-16 px-8 sm:px-16 xl:px-20">
             <div className="mx-auto ">
@@ -102,9 +128,15 @@ function Blog(props: any) {
             <div className="mx-auto ">
               <div className="grid grid-cols-12">
                 <div className="col-span-12 lg:col-span-12">
-                  <Tabs scrollable size="medium" onChange={setCategory} defaultActiveId={'all'}>
-                    {props.categories.map((categoryId: string) => (
-                      <Tabs.Panel id={categoryId} key={categoryId} label={categoryId} />
+                  <Tabs
+                    scrollable
+                    size="medium"
+                    onChange={setCategory}
+                    defaultActiveId={'all'}
+                    activeId={category}
+                  >
+                    {props.categories.map((tag: string) => (
+                      <Tabs.Panel id={tag} key={tag} label={tag} />
                     ))}
                   </Tabs>
                 </div>
@@ -152,6 +184,7 @@ function FeaturedThumb(blog: PostTypes) {
               src={`/images/blog/` + (blog.thumb ? blog.thumb : blog.image)}
               layout="fill"
               objectFit="cover"
+              alt="blog thumbnail"
             />
           </div>
           <div className="flex flex-col space-y-2">

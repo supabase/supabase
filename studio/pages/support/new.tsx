@@ -5,7 +5,9 @@ import { observer } from 'mobx-react-lite'
 import { Button, IconLoader } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 
-import { withAuth, useFlag, usePlatformStatus } from 'hooks'
+import { withAuth, useFlag } from 'hooks'
+import { BASE_PATH } from 'lib/constants'
+import { usePlatformStatusQuery } from 'data/platform/platform-status-query'
 import Success from 'components/interfaces/Support/Success'
 import SupportForm from 'components/interfaces/Support/SupportForm'
 
@@ -15,7 +17,8 @@ const SupportPage = () => {
   const ongoingIncident = useFlag('ongoingIncident')
   const maxHeight = ongoingIncident ? 'calc(100vh - 44px)' : '100vh'
 
-  const { isHealthy, isLoading } = usePlatformStatus()
+  const { data, isLoading } = usePlatformStatusQuery()
+  const isHealthy = data?.isHealthy
 
   return (
     <div
@@ -26,14 +29,14 @@ const SupportPage = () => {
         <div className="space-y-12 py-8">
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-3">
-              <SVG src={`/img/supabase-logo.svg`} className="h-4 w-4" />
-              <h4 className="m-0 text-lg">Supabase support</h4>
+              <SVG src={`${BASE_PATH}/img/supabase-logo.svg`} className="h-4 w-4" />
+              <h1 className="m-0 text-lg">Supabase support</h1>
             </div>
             <div className="flex items-center space-x-3">
               <Tooltip.Root delayDuration={0}>
                 <Tooltip.Trigger>
                   <Link href="https://status.supabase.com/">
-                    <a target="_blank">
+                    <a target="_blank" rel="noreferrer">
                       <Button
                         type="default"
                         icon={
@@ -55,17 +58,19 @@ const SupportPage = () => {
                     </a>
                   </Link>
                 </Tooltip.Trigger>
-                <Tooltip.Content side="bottom">
-                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                  <div
-                    className={[
-                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                      'border border-scale-200',
-                    ].join(' ')}
-                  >
-                    <span className="text-xs text-scale-1200">Check Supabase status page</span>
-                  </div>
-                </Tooltip.Content>
+                <Tooltip.Portal>
+                  <Tooltip.Content side="bottom">
+                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                    <div
+                      className={[
+                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                        'border border-scale-200',
+                      ].join(' ')}
+                    >
+                      <span className="text-xs text-scale-1200">Check Supabase status page</span>
+                    </div>
+                  </Tooltip.Content>
+                </Tooltip.Portal>
               </Tooltip.Root>
             </div>
           </div>

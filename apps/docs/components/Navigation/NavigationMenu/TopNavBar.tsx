@@ -1,13 +1,19 @@
+import { useTheme } from 'common/Providers'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { FC, useEffect, useState } from 'react'
-import { Button, IconCommand, IconMenu, IconMoon, IconSearch, IconSun, Input, Listbox } from 'ui'
-import { SearchButton } from '~/components/DocSearch'
-import { REFERENCES } from '~/components/Navigation/Navigation.constants'
-import { useTheme } from 'common/Providers'
-
-import { getPageType } from '~/lib/helpers'
+import {
+  Button,
+  IconCommand,
+  IconMenu,
+  IconMoon,
+  IconSearch,
+  IconSun,
+  Listbox,
+  SearchButton,
+} from 'ui'
+import { REFERENCES } from './NavigationMenu.constants'
 
 const TopNavBar: FC = () => {
   const { isDarkMode, toggleTheme } = useTheme()
@@ -25,24 +31,9 @@ const TopNavBar: FC = () => {
     ? pathSegments[pathSegments.indexOf(library) + 1]
     : versions[0]
 
-  const pageType = getPageType(asPath)
-
   useEffect(() => {
     setMounted(true)
   }, [isDarkMode])
-
-  const pageLinks = [
-    { text: 'Guides', key: 'docs', link: '/' },
-    { text: 'Reference', key: 'reference', link: '/reference' },
-  ]
-
-  const toggleDarkMode = () => {
-    localStorage.setItem('supabaseDarkMode', (!isDarkMode).toString())
-    toggleTheme()
-
-    const key = localStorage.getItem('supabaseDarkMode')
-    document.documentElement.className = key === 'true' ? 'dark' : ''
-  }
 
   const onSelectVersion = (version: string) => {
     // [Joshen] Ideally we use <Link> but this works for now
@@ -65,7 +56,7 @@ const TopNavBar: FC = () => {
   }
 
   return (
-    <nav className="h-[60px] border-b px-4 backdrop-blur backdrop-filter bg-white-1200 dark:bg-blackA-300">
+    <nav className="h-[60px] border-b px-4 backdrop-blur backdrop-filter bg-white-1200 bg-scale-200/90">
       <div className="max-w-[1400px] grid grid-cols-12 mx-auto gap-4 px-5 h-full">
         <div className="col-span-3 flex items-center">
           <button className="mr-4 block stroke-2 lg:hidden" onClick={toggleMobileMenu}>
@@ -147,7 +138,7 @@ const TopNavBar: FC = () => {
           </Button>
           <ul className="flex items-center">
             <li className="px-4">
-              <div className="cursor-pointer" onClick={toggleDarkMode}>
+              <div className="cursor-pointer" onClick={() => toggleTheme()}>
                 {isDarkMode ? (
                   <IconMoon
                     size={16}

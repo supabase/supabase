@@ -8,17 +8,17 @@ import { gen_v3 } from '~/lib/refGenerator/helpers'
 
 // @ts-ignore
 const generatedSpec = gen_v3(specFile, 'wat', { apiUrl: 'apiv0' })
-
 const sections = flattenSections(apiCommonSections)
+const libraryPath = '/api'
 
 export default function Config(props) {
   return <RefSectionHandler sections={sections} spec={generatedSpec} pageProps={props} type="api" />
 }
 
-export async function getStaticProps({ params }: { params: { slug: string[] } }) {
-  return handleRefStaticProps(sections, params, '/api', '/api')
+export async function getStaticProps() {
+  return handleRefStaticProps(sections, libraryPath)
 }
 
-export function getStaticPaths() {
-  return handleRefGetStaticPaths()
+export async function getStaticPaths() {
+  return handleRefGetStaticPaths(sections)
 }

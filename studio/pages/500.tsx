@@ -5,17 +5,16 @@ import Image from 'next/image'
 import { Button } from 'ui'
 import { observer } from 'mobx-react-lite'
 
-import { useStore } from 'hooks'
-import { auth, STORAGE_KEY } from 'lib/gotrue'
+import { useSignOut } from 'lib/auth'
+import { useTheme } from 'common'
 
 const Error500: NextPage = () => {
   const router = useRouter()
-  const { ui } = useStore()
-  const { theme } = ui
+  const { isDarkMode } = useTheme()
 
+  const signOut = useSignOut()
   const onClickLogout = async () => {
-    await auth.signOut()
-    localStorage.removeItem(STORAGE_KEY)
+    await signOut()
     await router.push('/sign-in')
     router.reload()
   }
@@ -26,14 +25,20 @@ const Error500: NextPage = () => {
         <nav className="relative flex items-center justify-between sm:h-10">
           <div className="flex flex-shrink-0 flex-grow items-center lg:flex-grow-0">
             <div className="flex w-full items-center justify-between md:w-auto">
-              <a href="/projects">
-                <Image
-                  src={theme == 'dark' ? '/img/supabase-dark.svg' : '/img/supabase-light.svg'}
-                  alt=""
-                  height={24}
-                  width={120}
-                />
-              </a>
+              <Link href="/projects">
+                <a>
+                  <Image
+                    src={
+                      isDarkMode
+                        ? `${router.basePath}/img/supabase-dark.svg`
+                        : `${router.basePath}/img/supabase-light.svg`
+                    }
+                    alt=""
+                    height={24}
+                    width={120}
+                  />
+                </a>
+              </Link>
             </div>
           </div>
         </nav>

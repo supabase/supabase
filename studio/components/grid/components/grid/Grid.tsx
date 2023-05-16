@@ -6,6 +6,9 @@ import { GridProps, SupaRow } from '../../types'
 import { useDispatch, useTrackedState } from '../../store'
 import RowRenderer from './RowRenderer'
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
+import { ForeignRowSelectorProps } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/ForeignRowSelector/ForeignRowSelector'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 
 function rowKeyGetter(row: SupaRow) {
   return row?.idx ?? -1
@@ -13,21 +16,32 @@ function rowKeyGetter(row: SupaRow) {
 
 interface IGrid extends GridProps {
   rows: any[]
+  updateRow: (previousRow: any, updatedData: any) => void
+  onEditForeignKeyColumnValue: (args: {
+    foreignKey: NonNullable<ForeignRowSelectorProps['foreignKey']>
+    row: any
+    column: any
+  }) => void
 }
 
 // [Joshen] Just for visibility this is causing some hook errors in the browser
 export const Grid = memo(
   forwardRef<DataGridHandle, IGrid>(
     (
-      { width, height, containerClass, gridClass, rowClass, rows },
+      {
+        width,
+        height,
+        containerClass,
+        gridClass,
+        rowClass,
+        rows,
+        updateRow,
+        onEditForeignKeyColumnValue,
+      },
       ref: React.Ref<DataGridHandle> | undefined
     ) => {
       const dispatch = useDispatch()
       const state = useTrackedState()
-
-      // workaround to force state tracking on state.gridColumns
-      const columnHeaders = state.gridColumns.map((x) => `${x.key}_${x.frozen}`)
-      const { gridColumns, onError: onErrorFunc } = state
 
       function onColumnResize(index: number, width: number) {
         updateColumnResizeDebounced(index, width, dispatch)
@@ -41,18 +55,7 @@ export const Grid = memo(
         )
 
         if (changedColumn) {
-          const { error } = state.rowService!.update(
-            rowData,
-            originRowData,
-            changedColumn,
-            (payload) => {
-              dispatch({
-                type: 'EDIT_ROW',
-                payload,
-              })
-            }
-          )
-          if (error && onErrorFunc) onErrorFunc(error)
+          updateRow(originRowData, { [changedColumn]: rowData[changedColumn] })
         }
       }
 
@@ -70,20 +73,37 @@ export const Grid = memo(
         })
       }
 
-      if (!columnHeaders || columnHeaders.length == 0) {
-        return (
-          <div
-            className="sb-grid-grid--loading"
-            style={{ width: width || '100%', height: height || '50vh' }}
-          >
-            <div className="sb-grid-grid--loading__inner flex items-center gap-2">
-              <div className="animate-spin text-scale-900">
-                <IconLoader />
-              </div>
-              <div className="text-sm text-scale-1100">Loading...</div>
-            </div>
-          </div>
+      const table = state.table
+
+      const { project } = useProjectContext()
+      const { data } = useForeignKeyConstraintsQuery({
+        projectRef: project?.ref,
+        connectionString: project?.connectionString,
+        schema: table?.schema ?? undefined,
+      })
+
+      function getColumnForeignKey(columnName: string) {
+        const { targetTableSchema, targetTableName, targetColumnName } =
+          table?.columns.find((x) => x.name == columnName)?.foreignKey ?? {}
+
+        return data?.find(
+          (key) =>
+            key.target_schema == targetTableSchema &&
+            key.target_table == targetTableName &&
+            key.target_columns == targetColumnName
         )
+      }
+
+      function onRowDoubleClick(row: any, column: any) {
+        const foreignKey = getColumnForeignKey(column.name)
+
+        if (foreignKey) {
+          onEditForeignKeyColumnValue({
+            foreignKey,
+            row,
+            column,
+          })
+        }
       }
 
       return (
@@ -93,7 +113,7 @@ export const Grid = memo(
         >
           <DataGrid
             ref={ref}
-            columns={gridColumns}
+            columns={state.gridColumns}
             rows={rows ?? []}
             rowRenderer={RowRenderer}
             rowKeyGetter={rowKeyGetter}
@@ -102,6 +122,7 @@ export const Grid = memo(
             onRowsChange={onRowsChange}
             onSelectedCellChange={onSelectedCellChange}
             onSelectedRowsChange={onSelectedRowsChange}
+            onRowDoubleClick={onRowDoubleClick}
             className={gridClass}
             rowClass={rowClass}
             style={{ height: '100%' }}

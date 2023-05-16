@@ -1,17 +1,17 @@
 import Link from 'next/link'
-import { FC, useEffect, useState } from 'react'
-import { isUndefined, isEmpty } from 'lodash'
+import { useEffect, useState } from 'react'
+import { isEmpty, noop } from 'lodash'
 import { Dictionary } from 'components/grid'
 import { Checkbox, SidePanel, Input, Button, IconExternalLink, Toggle } from 'ui'
-import {
+import type {
   PostgresColumn,
   PostgresExtension,
-  PostgresRelationship,
   PostgresTable,
   PostgresType,
 } from '@supabase/postgres-meta'
 
-import { useFlag, useParams, useStore } from 'hooks'
+import { useFlag, useStore } from 'hooks'
+import { useParams } from 'common/hooks'
 import ActionBar from '../ActionBar'
 import HeaderTitle from './HeaderTitle'
 import ColumnType from './ColumnType'
@@ -27,19 +27,26 @@ import {
   generateUpdateColumnPayload,
 } from './ColumnEditor.utils'
 import { TEXT_TYPES } from '../SidePanelEditor.constants'
-import { ColumnField, CreateColumnPayload, UpdateColumnPayload } from '../SidePanelEditor.types'
+import {
+  ColumnField,
+  CreateColumnPayload,
+  ExtendedPostgresRelationship,
+  UpdateColumnPayload,
+} from '../SidePanelEditor.types'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms'
 import { EncryptionKeySelector } from 'components/interfaces/Settings/Vault'
 
-interface Props {
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
+
+export interface ColumnEditorProps {
   column?: PostgresColumn
   selectedTable: PostgresTable
-  tables: PostgresTable[]
   visible: boolean
   closePanel: () => void
   saveChanges: (
     payload: CreateColumnPayload | UpdateColumnPayload,
-    foreignKey: Partial<PostgresRelationship> | undefined,
+    foreignKey: ExtendedPostgresRelationship | undefined,
     isNewRecord: boolean,
     configuration: {
       columnId: string | undefined
@@ -52,42 +59,51 @@ interface Props {
   updateEditorDirty: () => void
 }
 
-const ColumnEditor: FC<Props> = ({
+const ColumnEditor = ({
   column,
   selectedTable,
-  tables = [],
   visible = false,
-  closePanel = () => {},
-  saveChanges = () => {},
-  updateEditorDirty = () => {},
-}) => {
+  closePanel = noop,
+  saveChanges = noop,
+  updateEditorDirty = noop,
+}: ColumnEditorProps) => {
   const { ref } = useParams()
   const { meta, vault } = useStore()
+  const { project } = useProjectContext()
   const isTCEEnabled = useFlag('transparentColumnEncryption')
 
-  const isNewRecord = isUndefined(column)
-  const originalForeignKey = column ? getColumnForeignKey(column, selectedTable) : undefined
+  const [errors, setErrors] = useState<Dictionary<any>>({})
+  const [columnFields, setColumnFields] = useState<ColumnField>()
+  const [isEditingRelation, setIsEditingRelation] = useState<boolean>(false)
+
+  const { data } = useForeignKeyConstraintsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    schema: selectedTable?.schema,
+  })
+  const foreignKeyMeta = data || []
 
   const keys = vault.listKeys()
   const enumTypes = meta.types.list(
     (type: PostgresType) => !meta.excludedSchemas.includes(type.schema)
   )
 
-  const [errors, setErrors] = useState<Dictionary<any>>({})
-  const [columnFields, setColumnFields] = useState<ColumnField>()
-  const [isEditingRelation, setIsEditingRelation] = useState<boolean>(false)
-
   const [pgsodiumExtension] = meta.extensions.list(
     (ext: PostgresExtension) => ext.name.toLowerCase() === 'pgsodium'
   )
   const isPgSodiumInstalled = pgsodiumExtension?.installed_version !== null
+
+  const isNewRecord = column === undefined
+  const originalForeignKey = column
+    ? getColumnForeignKey(column, selectedTable, foreignKeyMeta)
+    : undefined
 
   useEffect(() => {
     if (visible) {
       setErrors({})
       const columnFields = isNewRecord
         ? { ...generateColumnField(), keyId: keys.length > 0 ? keys[0].id : 'create-new' }
-        : generateColumnFieldFromPostgresColumn(column!, selectedTable)
+        : generateColumnFieldFromPostgresColumn(column!, selectedTable, foreignKeyMeta)
       setColumnFields(columnFields)
     }
   }, [visible])
@@ -111,23 +127,27 @@ const ColumnEditor: FC<Props> = ({
     setErrors(updatedErrors)
   }
 
-  const saveColumnForeignKey = (
-    foreignKeyConfiguration: { table: PostgresTable; column: PostgresColumn } | undefined
-  ) => {
+  const saveColumnForeignKey = (foreignKeyConfiguration?: {
+    table: PostgresTable
+    column: PostgresColumn
+    deletionAction: string
+  }) => {
     onUpdateField({
-      foreignKey: !isUndefined(foreignKeyConfiguration)
-        ? {
-            id: 0,
-            constraint_name: '',
-            source_schema: selectedTable.schema,
-            source_table_name: selectedTable.name,
-            source_column_name: columnFields?.name || column?.name || '',
-            target_table_schema: foreignKeyConfiguration.table.schema,
-            target_table_name: foreignKeyConfiguration.table.name,
-            target_column_name: foreignKeyConfiguration.column.name,
-          }
-        : undefined,
-      ...(!isUndefined(foreignKeyConfiguration) && {
+      foreignKey:
+        foreignKeyConfiguration !== undefined
+          ? {
+              id: 0,
+              constraint_name: '',
+              source_schema: selectedTable.schema,
+              source_table_name: selectedTable.name,
+              source_column_name: columnFields?.name || column?.name || '',
+              target_table_schema: foreignKeyConfiguration.table.schema,
+              target_table_name: foreignKeyConfiguration.table.name,
+              target_column_name: foreignKeyConfiguration.column.name,
+              deletion_action: foreignKeyConfiguration.deletionAction,
+            }
+          : undefined,
+      ...(foreignKeyConfiguration !== undefined && {
         format: foreignKeyConfiguration.column.format,
         defaultValue: null,
       }),
@@ -178,12 +198,6 @@ const ColumnEditor: FC<Props> = ({
           applyFunction={(resolve: () => void) => onSaveChanges(resolve)}
         />
       }
-      onInteractOutside={(event) => {
-        const isToast = (event.target as Element)?.closest('#toast')
-        if (isToast) {
-          event.preventDefault()
-        }
-      }}
     >
       <FormSection header={<FormSectionLabel className="lg:!col-span-4">General</FormSectionLabel>}>
         <FormSectionContent loading={false} className="lg:!col-span-8">
@@ -191,7 +205,7 @@ const ColumnEditor: FC<Props> = ({
             label="Name"
             type="text"
             descriptionText="Recommended to use lowercase and use an underscore to separate words e.g. column_name"
-            placeholder='column_name'
+            placeholder="column_name"
             error={errors.name}
             value={columnFields?.name ?? ''}
             onChange={(event: any) => onUpdateField({ name: event.target.value })}
@@ -218,39 +232,47 @@ const ColumnEditor: FC<Props> = ({
               originalForeignKey={originalForeignKey}
               onSelectEditRelation={() => setIsEditingRelation(true)}
               onSelectRemoveRelation={() => onUpdateField({ foreignKey: undefined })}
+              onSelectCancelRemoveRelation={() => onUpdateField({ foreignKey: originalForeignKey })}
             />
           </div>
         </FormSectionContent>
       </FormSection>
       <SidePanel.Separator />
       <FormSection
-        header={<FormSectionLabel className="lg:!col-span-4">Data Type</FormSectionLabel>}
-      >
-        <FormSectionContent loading={false} className="lg:!col-span-8">
-          <ColumnType
-            value={columnFields?.format ?? ''}
-            layout="vertical"
-            enumTypes={enumTypes}
-            error={errors.format}
-            disabled={!isUndefined(columnFields?.foreignKey)}
+        header={
+          <FormSectionLabel
+            className="lg:!col-span-4"
             description={
               <Link href="https://supabase.com/docs/guides/database/tables#data-types">
                 <a target="_blank" rel="noreferrer">
                   <Button
                     as="span"
-                    type="text"
-                    size="small"
-                    className="text-scale-1000 hover:text-scale-1200"
+                    type="default"
+                    size="tiny"
+                    // className="text-scale-1000 hover:text-scale-1200"
                     icon={<IconExternalLink size={14} strokeWidth={2} />}
                   >
-                    Learn more about data types
+                    About data types
                   </Button>
                 </a>
               </Link>
             }
+          >
+            Data Type
+          </FormSectionLabel>
+        }
+      >
+        <FormSectionContent loading={false} className="lg:!col-span-8">
+          <ColumnType
+            showRecommendation
+            value={columnFields?.format ?? ''}
+            layout="vertical"
+            enumTypes={enumTypes}
+            error={errors.format}
+            disabled={columnFields?.foreignKey !== undefined}
             onOptionSelect={(format: string) => onUpdateField({ format, defaultValue: null })}
           />
-          {isUndefined(columnFields.foreignKey) && (
+          {columnFields.foreignKey === undefined && (
             <div className="space-y-4">
               {columnFields.format.includes('int') && (
                 <div className="w-full">
@@ -291,7 +313,7 @@ const ColumnEditor: FC<Props> = ({
       </FormSection>
       <SidePanel.Separator />
       <FormSection
-        header={<FormSectionLabel className="lg:!col-span-4">Configuration</FormSectionLabel>}
+        header={<FormSectionLabel className="lg:!col-span-4">Constraints</FormSectionLabel>}
       >
         <FormSectionContent loading={false} className="lg:!col-span-8">
           <Toggle
@@ -311,6 +333,15 @@ const ColumnEditor: FC<Props> = ({
             descriptionText="Enforce values in the column to be unique across rows"
             checked={columnFields.isUnique}
             onChange={() => onUpdateField({ isUnique: !columnFields.isUnique })}
+          />
+          <Input
+            label="CHECK Constraint"
+            labelOptional="Optional"
+            placeholder={`e.g length(${columnFields?.name || 'column_name'}) < 500`}
+            type="text"
+            value={columnFields?.check ?? ''}
+            onChange={(event: any) => onUpdateField({ check: event.target.value })}
+            className="[&_input]:font-mono"
           />
         </FormSectionContent>
       </FormSection>
@@ -368,7 +399,6 @@ const ColumnEditor: FC<Props> = ({
       )}
 
       <ForeignKeySelector
-        tables={tables}
         column={columnFields}
         visible={isEditingRelation}
         closePanel={() => setIsEditingRelation(false)}

@@ -4,6 +4,10 @@ import * as React from 'react'
 
 export * from './src/providers'
 
+// Markdown components
+
+export * from './src/lib/Markdown'
+
 // // GENERAL
 
 export * from './src/components/Button'
@@ -11,7 +15,7 @@ export * from './src/components/Icon'
 export * from './src/components/Icon/IconContext'
 export * from './src/components/GlassPanel'
 export * from './src/components/IconPanel'
-// export * from './src/components/Image'
+export * from './src/components/Icon/IconBackground'
 
 // DISPLAYS
 
@@ -21,11 +25,12 @@ export * from './src/components/Tabs'
 export * from './src/components/Alert'
 export * from './src/components/Accordion'
 export * from './src/components/Collapsible'
-// export * from './src/components/Breadcrumb'
+export * from './src/components/CodeBlock'
 
 // NAV
 
 export * from './src/components/Menu'
+export * from './src/components/TextLink'
 
 // OVERLAYS
 
@@ -34,14 +39,13 @@ export * from './src/components/SidePanel'
 export * from './src/components/Dropdown'
 export * from './src/components/ContextMenu'
 export * from './src/components/Popover'
-// export * from './src/components/Toast'
+export * from './src/components/ExpandableVideo'
 
 // UTILITIES
 
 export * from './src/components/Space'
 export * from './src/components/Loading'
 export * from './src/components/Divider'
-// export * from './src/components/ThemeProvider'
 
 // DATA ENTRY
 
@@ -54,6 +58,14 @@ export * from './src/components/Radio'
 export * from './src/components/Toggle'
 export * from './src/components/Upload'
 export * from './src/components/Form'
+
+// CMD+K
+export * from './src/components/Command'
+
+// layout
+
+// banners
+export * from './src/layout/banners'
 
 // config
 
@@ -68,7 +80,6 @@ export * from './src/components/Form'
 // export * from './src/components/Auth'
 
 // ICONS
-
 // export icons
 export * from './src/components/Icon/icons/IconActivity'
 export * from './src/components/Icon/icons/IconAirplay'
@@ -305,6 +316,7 @@ export * from './src/components/Icon/icons/IconSun'
 export * from './src/components/Icon/icons/IconSunrise'
 export * from './src/components/Icon/icons/IconSunset'
 export * from './src/components/Icon/icons/IconTablet'
+export * from './src/components/Icon/icons/IconTable'
 export * from './src/components/Icon/icons/IconTag'
 export * from './src/components/Icon/icons/IconTarget'
 export * from './src/components/Icon/icons/IconTerminal'

@@ -81,9 +81,9 @@ const DeleteProjectButton: FC<Props> = ({ type = 'danger' }) => {
     if (!isFree) {
       const feedbackRes = await post(`${API_URL}/feedback/downgrade`, {
         projectRef,
-	reasons: selectedReasons.reduce((a, b) => `${a}- ${b}\n`, ''),
-	additionalFeedback: cancellationMessage,
-	exitAction: 'delete',
+        reasons: selectedReasons.reduce((a, b) => `${a}- ${b}\n`, ''),
+        additionalFeedback: cancellationMessage,
+        exitAction: 'delete',
       })
       if (feedbackRes.error) throw feedbackRes.error
     }
@@ -98,19 +98,21 @@ const DeleteProjectButton: FC<Props> = ({ type = 'danger' }) => {
           </Button>
         </Tooltip.Trigger>
         {!canDeleteProject && (
-          <Tooltip.Content side="bottom">
-            <Tooltip.Arrow className="radix-tooltip-arrow" />
-            <div
-              className={[
-                'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                'border border-scale-200 ', //border
-              ].join(' ')}
-            >
-              <span className="text-xs text-scale-1200">
-                You need additional permissions to delete this project
-              </span>
-            </div>
-          </Tooltip.Content>
+          <Tooltip.Portal>
+            <Tooltip.Content side="bottom">
+              <Tooltip.Arrow className="radix-tooltip-arrow" />
+              <div
+                className={[
+                  'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
+                  'border border-scale-200 ', //border
+                ].join(' ')}
+              >
+                <span className="text-xs text-scale-1200">
+                  You need additional permissions to delete this project
+                </span>
+              </div>
+            </Tooltip.Content>
+          </Tooltip.Portal>
         )}
       </Tooltip.Root>
       <TextConfirmModal

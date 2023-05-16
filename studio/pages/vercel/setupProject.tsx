@@ -317,7 +317,7 @@ const CreateProject = observer(() => {
                   addOnBefore={({ active, selected }: any) => (
                     <img
                       className="w-5 rounded-sm"
-                      src={`/img/regions/${Object.keys(REGIONS)[i]}.svg`}
+                      src={`${router.basePath}/img/regions/${Object.keys(REGIONS)[i]}.svg`}
                     />
                   )}
                 >

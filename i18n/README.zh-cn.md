@@ -12,9 +12,9 @@
 - [x] Postgres 数据库托管。[文档](https://supabase.com/docs/guides/database)
 - [x] 身份验证和授权。[文档](https://supabase.com/docs/guides/auth)
 - [x] 自动生成的 API。
-  - [x] REST。[文档](https://supabase.com/docs/guides/api#rest-api)
-  - [x] 实时订阅。[文档](https://supabase.com/docs/guides/api#realtime-api)
-  - [x] GraphQL（测试版）。[文档](https://supabase.com/docs/guides/api#graphql-api)
+  - [x] REST。[文档](https://supabase.com/docs/guides/database/api#rest-api)
+  - [x] 实时订阅。[文档](https://supabase.com/docs/guides/database/api#realtime-api)
+  - [x] GraphQL（测试版）。[文档](https://supabase.com/docs/guides/database/api#graphql-api)
 - [x] 函数。
   - [x] 数据库函数。[文档](https://supabase.com/docs/guides/database/functions)
   - [x] 边缘函数。[文档](https://supabase.com/docs/guides/functions)
@@ -141,11 +141,11 @@ Supabase 是一个[托管平台](https://app.supabase.com)。你可以注册并�
   </tr>
   <tr>
     <td>Kotlin</td>
-    <td>-</td>
-    <td><a href="https://github.com/supabase-community/postgrest-kt" target="_blank" rel="noopener noreferrer">postgrest-kt</a></td>
-    <td><a href="https://github.com/supabase-community/gotrue-kt" target="_blank" rel="noopener noreferrer">gotrue-kt</a></td>
-    <td>-</td>
-    <td>-</td>
+    <td><a href="https://github.com/supabase-community/supabase-kt" target="_blank" rel="noopener noreferrer">supabase-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Postgrest" target="_blank" rel="noopener noreferrer">postgrest-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/GoTrue" target="_blank" rel="noopener noreferrer">gotrue-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Realtime" target="_blank" rel="noopener noreferrer">realtime-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Storage" target="_blank" rel="noopener noreferrer">storage-kt</a></td>
   </tr>
   <tr>
     <td>Python</td>

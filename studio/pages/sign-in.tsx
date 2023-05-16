@@ -1,6 +1,5 @@
 import Link from 'next/link'
 
-import { useFlag } from 'hooks'
 import { NextPageWithLayout } from 'types'
 import SignInForm from 'components/interfaces/SignIn/SignInForm'
 import SignInWithGitHub from 'components/interfaces/SignIn/SignInWithGitHub'
@@ -9,15 +8,28 @@ import { SignInLayout } from 'components/layouts'
 import { useEffect } from 'react'
 import { IS_PLATFORM } from 'lib/constants'
 import { useRouter } from 'next/router'
+import { auth } from 'lib/gotrue'
 
 const SignInPage: NextPageWithLayout = () => {
-  const showSsoLogin = useFlag('mfaSso')
-
   const router = useRouter()
   useEffect(() => {
     // if the dashboard is running locally, redirect straight to the projects page
     if (!IS_PLATFORM) {
       router.replace('/projects')
+      return
+    }
+
+    const {
+      data: { subscription },
+    } = auth.onAuthStateChange((event) => {
+      if (event === 'SIGNED_IN') {
+        // if user has signed in on another tab, take them to the home page
+        router.replace('/projects')
+      }
+    })
+
+    return () => {
+      subscription.unsubscribe()
     }
   }, [])
 
@@ -25,7 +37,7 @@ const SignInPage: NextPageWithLayout = () => {
     <>
       <div className="flex flex-col gap-5">
         <SignInWithGitHub />
-        {showSsoLogin && <SignInWithSSO />}
+        <SignInWithSSO />
 
         <div className="relative">
           <div className="absolute inset-0 flex items-center">

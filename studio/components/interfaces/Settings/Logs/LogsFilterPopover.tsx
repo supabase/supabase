@@ -77,7 +77,6 @@ const LogsFilterPopover: React.FC<Props> = ({
           )}
         </Form>
       }
-      portalled
       showClose
       side="bottom"
     >

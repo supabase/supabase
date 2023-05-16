@@ -1,25 +1,10 @@
-import { IconChevronRight } from '~/../../packages/ui'
-// @ts-expect-error
+import ReactMarkdown from 'react-markdown'
+import { CodeBlock, IconChevronRight, Tabs } from 'ui'
 import spec from '~/../../spec/cli_v1_commands.yaml' assert { type: 'yml' }
-import CodeBlock from '~/components/CodeBlock/CodeBlock'
 import Options from '~/components/Options'
 import Param from '~/components/Params'
 import RefSubLayout from '~/layouts/ref/RefSubLayout'
-
-interface ICommonFunc {
-  id: string
-  title: string
-  slug: string
-  product: string
-  libs: string
-  items: ICommonFunc[]
-}
-
-interface IRefFunctionSection {
-  funcData: any
-  commonFuncData: ICommonFunc
-  spec: any
-}
+import RefDetailCollapse from './RefDetailCollapse'
 
 export type Flag = {
   id: string
@@ -28,6 +13,8 @@ export type Flag = {
   default_value: string
   accepted_values: AcceptedValue[]
   required?: boolean
+  /** Whether subcommands inherit this flag. */
+  inherit?: boolean
 }
 
 export type AcceptedValue = {
@@ -37,20 +24,37 @@ export type AcceptedValue = {
   description?: string
 }
 
+export type Example = {
+  id: string
+  name: string
+  code: string
+  response: string
+  description?: string
+}
+
 export type Command = {
   id: string
   title: string
   description: string
   flags?: Flag[]
   summary: string
-  tags?: []
-  links?: []
-  subcommands?: []
+  tags?: string[]
+  links?: string[]
+  subcommands?: string[]
   usage?: string
+  examples?: Example[]
 }
 
 const CliCommandSection = (props) => {
   const command = spec.commands.find((x: any) => x.id === props.funcData.id)
+  const parentCommand = spec.commands.find(
+    (x: any) => x.subcommands && x.subcommands.find((y: any) => y === props.funcData.id)
+  )
+
+  const commandFlags = [
+    ...(parentCommand?.flags?.filter((x: any) => x.inherit) || []),
+    ...command.flags,
+  ]
 
   return (
     <RefSubLayout.Section
@@ -70,18 +74,18 @@ const CliCommandSection = (props) => {
                 ' mb-16',
               ].join(' ')}
             >
-              <p className="capitalize mb-4 scroll-mt-16 mt-0 text-scale-1100 text-base">
-                {command.summary}
-              </p>
+              {command.description ? (
+                <div className="prose">
+                  <ReactMarkdown>{command.description}</ReactMarkdown>
+                </div>
+              ) : (
+                <p className="capitalize mb-4 scroll-mt-16 mt-0 text-scale-1100 text-base">
+                  {command.summary}
+                </p>
+              )}
             </header>
 
-            {/* {command.usage && (
-                        <CodeBlock language="bash" className="relative">
-                          {command.usage}
-                        </CodeBlock>
-                      )} */}
-
-            {command.subcommands.length > 0 && (
+            {command.subcommands?.length > 0 && (
               <div className="mb-3">
                 <h3 className="text-lg text-scale-1200 mb-3">Available Commands</h3>
                 <ul>
@@ -101,11 +105,11 @@ const CliCommandSection = (props) => {
                 </ul>
               </div>
             )}
-            {command.flags.length > 0 && (
+            {commandFlags.length > 0 && (
               <>
                 <h3 className="text-lg text-scale-1200 mb-3">Flags</h3>
                 <ul className="">
-                  {command.flags.map((flag: Flag) => (
+                  {commandFlags.map((flag: Flag) => (
                     <>
                       <li className="mt-0">
                         <Param {...flag} isOptional={!flag.required}>
@@ -126,13 +130,82 @@ const CliCommandSection = (props) => {
           </div>
         </div>
       </RefSubLayout.Details>
-      <RefSubLayout.Examples>
-        {command.usage && (
-          <CodeBlock language="bash" className="relative">
-            {command.usage}
-          </CodeBlock>
-        )}
-      </RefSubLayout.Examples>
+      {(command.examples || command.usage) && (
+        <RefSubLayout.Examples>
+          <div className="overflow-hidden w-full">
+            <Tabs
+              defaultActiveId={`${command.id}-basic-usage`}
+              size="tiny"
+              type="rounded-pills"
+              scrollable
+            >
+              {command.examples ? (
+                command.examples.map((example) => {
+                  const exampleId = `${command.id}-${example.id}`
+                  return (
+                    <Tabs.Panel
+                      id={exampleId}
+                      key={exampleId}
+                      label={example.name}
+                      className="flex flex-col gap-3"
+                    >
+                      <CodeBlock
+                        className="useless-code-block-class"
+                        language="bash"
+                        hideLineNumbers={true}
+                      >
+                        {example.code}
+                      </CodeBlock>
+
+                      <RefDetailCollapse
+                        id={`${exampleId}-response`}
+                        label="Response"
+                        defaultOpen={false}
+                      >
+                        <CodeBlock
+                          className="useless-code-block-class rounded !rounded-tl-none !rounded-tr-none border border-scale-500"
+                          language="bash"
+                          hideLineNumbers={true}
+                        >
+                          {example.response}
+                        </CodeBlock>
+                      </RefDetailCollapse>
+
+                      {example.description && (
+                        <RefDetailCollapse
+                          id={`${exampleId}-notes`}
+                          label="Notes"
+                          defaultOpen={false}
+                        >
+                          <div className="bg-scale-300 border border-scale-500 rounded !rounded-tl-none !rounded-tr-none prose max-w-none px-5 py-2">
+                            <ReactMarkdown className="text-sm">{example.description}</ReactMarkdown>
+                          </div>
+                        </RefDetailCollapse>
+                      )}
+                    </Tabs.Panel>
+                  )
+                })
+              ) : (
+                // TODO: remove this block once all commands have examples
+                <Tabs.Panel
+                  id={`${command.id}-basic-usage`}
+                  key={`${command.id}-basic-usage`}
+                  label="Basic usage"
+                  className="flex flex-col gap-3"
+                >
+                  <CodeBlock
+                    className="useless-code-block-class"
+                    language="bash"
+                    hideLineNumbers={true}
+                  >
+                    {command.usage}
+                  </CodeBlock>
+                </Tabs.Panel>
+              )}
+            </Tabs>
+          </div>
+        </RefSubLayout.Examples>
+      )}
     </RefSubLayout.Section>
   )
 }

@@ -2,7 +2,8 @@ import { FC } from 'react'
 import Link from 'next/link'
 import { Badge, Button, IconExternalLink, Radio } from 'ui'
 
-import { useFlag, useParams } from 'hooks'
+import { useFlag } from 'hooks'
+import { useParams } from 'common/hooks'
 import { getProductPrice } from '../Billing.utils'
 import DisabledWarningDueToIncident from 'components/ui/DisabledWarningDueToIncident'
 import { SubscriptionAddon } from './AddOns.types'
@@ -36,7 +37,7 @@ const ComputeSizeSelection: FC<Props> = ({
           </p>
         </div>
         <Link href="https://supabase.com/docs/guides/platform/compute-add-ons">
-          <a target="_blank">
+          <a target="_blank" rel="noreferrer">
             <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
               About compute add-ons
             </Button>
@@ -89,13 +90,13 @@ const ComputeSizeSelection: FC<Props> = ({
                   </div>
                 }
                 // @ts-ignore
-                description={
-                  <div>
-                    <p>{option.metadata.features}</p>
+                description={option.metadata.features}
+                value={option.id}
+                optionalLabel={
+                  <div className="w-[6rem] flex items-center justify-end">
+                    ${defaultPrice.unit_amount / 100} / month
                   </div>
                 }
-                value={option.id}
-                optionalLabel={<div>${defaultPrice.unit_amount / 100} / month</div>}
                 checked={selectedComputeSize?.id === option.id}
                 onChange={() => onSelectOption(option)}
               />

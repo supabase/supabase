@@ -6,13 +6,14 @@ import { useStore } from 'hooks'
 interface Props {
   returnUrl: string
   onCancel: () => void
+  onConfirm: () => void
 }
 
 // Stripe docs recommend to use the new SetupIntent flow over
 // manually creating and attaching payment methods via the API
 // Small UX annoyance here, that the page will be refreshed
 
-const AddPaymentMethodForm: FC<Props> = ({ returnUrl, onCancel }) => {
+const AddPaymentMethodForm: FC<Props> = ({ returnUrl, onCancel, onConfirm }) => {
   const { ui } = useStore()
   const stripe = useStripe()
   const elements = useElements()
@@ -36,6 +37,7 @@ const AddPaymentMethodForm: FC<Props> = ({ returnUrl, onCancel }) => {
 
     const { error } = await stripe.confirmSetup({
       elements,
+      redirect: 'if_required',
       confirmParams: { return_url: returnUrl },
     })
 
@@ -45,6 +47,9 @@ const AddPaymentMethodForm: FC<Props> = ({ returnUrl, onCancel }) => {
         category: 'error',
         message: error?.message ?? ' Failed to save card details',
       })
+    } else {
+      setIsSaving(false)
+      onConfirm()
     }
 
     if (document !== undefined) {
@@ -64,10 +69,10 @@ const AddPaymentMethodForm: FC<Props> = ({ returnUrl, onCancel }) => {
       <Modal.Separator />
       <Modal.Content>
         <div className="flex items-center space-x-2 pt-2">
-          <Button block htmlType="submit" type="primary" loading={isSaving}>
+          <Button block htmlType="submit" type="primary" loading={isSaving} disabled={isSaving}>
             Save
           </Button>
-          <Button htmlType="button" type="default" onClick={onCancel} block>
+          <Button htmlType="button" type="default" onClick={onCancel} block disabled={isSaving}>
             Cancel
           </Button>
         </div>

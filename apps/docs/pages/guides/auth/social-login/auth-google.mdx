@@ -83,6 +83,24 @@ async function signInWithGoogle() {
 }
 ```
 
+Google OAuth2.0 doesn't return the `provider_refresh_token` by default. If you need the `provider_refresh_token` returned, you will need to add additional query parameters:
+
+```js
+async function signInWithGoogle() {
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      queryParams: {
+        access_type: 'offline',
+        prompt: 'consent',
+      },
+    },
+  })
+}
+```
+
+You can view the full list of query parameters and their descriptions [here](https://developers.google.com/identity/protocols/oauth2/web-server#creatingclient).
+
 When your user signs out, call [signOut()](/docs/reference/javascript/auth-signout) to remove them from the browser session and any objects from localStorage:
 
 ```js

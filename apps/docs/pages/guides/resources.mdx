@@ -3,10 +3,8 @@ import Link from 'next/link'
 import { GlassPanel, IconPanel, Button, IconChevronRight } from 'ui'
 
 export const meta = {
-  id: 'resources',
   title: 'Resources',
   description: 'Resources for getting started building with Supabase.',
-  sidebar_label: 'Overview',
 }
 
 <div className="flex flex-col gap-12 my-12">
@@ -64,15 +62,30 @@ export const meta = {
 
 </div>
 
-<div className="grid gap-16 md:grid-cols-2">
+<div>
+  <div className="max-w-xl mb-6">
 
-  <div>
+### Postgres Resources
 
-    ### Supabase CLI
+  </div>
 
-    Develop your project locally, manage your Supabase projects, handle database migrations, CI/CD workflows, and generate types from your database schema, all from the comfort of your Terminal.
+  <div className="grid grid-cols-12 gap-6 not-prose">
+    {postgres.map((resource) => {
+      return (
+        <Link
+          href={`${resource.href}`}
+          key={resource.title}
+          passHref
+        >
+          <a className={'col-span-12 md:col-span-4'}>
+            <GlassPanel {...resource} background={false} showIconBg={true}>
+              {resource.description}
+            </GlassPanel>
+          </a>
+        </Link>
+      )
 
-[Learn more](/docs/guides/resources/supabase-cli)
+})}
 
   </div>
 
@@ -83,13 +96,12 @@ export const meta = {
 </div>
 
 export const resources = [
-  // removing until the examples page is reworked
-  // {
-  //   title: 'Examples',
-  //   hasLightIcon: true,
-  //   href: '/guides/resources/examples',
-  //   description: 'Official GitHub examples, curated content from the community, and more.',
-  // },
+  {
+    title: 'Examples',
+    hasLightIcon: true,
+    href: '/guides/resources/examples',
+    description: 'Official GitHub examples, curated content from the community, and more.',
+  },
   {
     title: 'Glossary',
     hasLightIcon: true,
@@ -122,6 +134,51 @@ export const migrationGuides = [
     icon: '/docs/img/icons/heroku-icon',
     href: '/guides/resources/migrating-to-supabase/heroku',
     description: 'Migrate your Heroku Postgres database to Supabase.',
+  },
+  {
+    title: 'Render',
+    icon: '/docs/img/icons/render-icon',
+    href: '/guides/resources/migrating-to-supabase/render',
+    description: 'Migrate your Render Postgres database to Supabase.',
+  },
+  {
+    title: 'Amazon RDS',
+    icon: '/docs/img/icons/aws-rds-icon',
+    href: '/guides/resources/migrating-to-supabase/amazon-rds',
+    description: 'Migrate your Amazon RDS database to Supabase.',
+  },
+]
+
+export const postgres = [
+  {
+    title: 'Managing Indexes',
+    hasLightIcon: true,
+    href: '/guides/database/postgres/indexes',
+    description: 'Improve query performance using various index types in Postgres.',
+  },
+  {
+    title: 'Cascade Deletes',
+    hasLightIcon: true,
+    href: '/guides/database/postgres/cascade-deletes',
+    description: 'Understand the types of foreign key constraint deletes.',
+  },
+  {
+    title: 'Drop all tables in schema',
+    hasLightIcon: true,
+    href: '/guides/database/postgres/dropping-all-tables-in-schema',
+    description: 'Delete all tables in a given schema.',
+  },
+  {
+    title: 'Select first row per group',
+    hasLightIcon: true,
+    href: '/guides/database/postgres/first-row-in-group',
+    description: 'Retrieve the first row in each distinct group.',
+  },
+  {
+    title: 'Print PostgreSQL version',
+    hasLightIcon: true,
+    href: '/guides/database/postgres/which-version-of-postgres',
+    description: 'Find out which version of Postgres you are running.',
   },
 ]
 

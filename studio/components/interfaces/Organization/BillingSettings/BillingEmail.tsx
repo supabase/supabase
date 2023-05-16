@@ -1,21 +1,20 @@
-import { useContext, useEffect } from 'react'
+import { useEffect } from 'react'
 import { Form, Input } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useStore, checkPermissions } from 'hooks'
+import { useParams } from 'common/hooks'
 import { API_URL } from 'lib/constants'
 import { patch } from 'lib/common/fetch'
-
 import { FormActions, FormPanel, FormSection, FormSectionContent } from 'components/ui/Forms'
 
-import { PageContext } from 'pages/org/[slug]/settings'
-
 const BillingEmail = () => {
-  const { ui } = useStore()
-  const PageState: any = useContext(PageContext)
+  const { app, ui } = useStore()
+  const { slug } = useParams()
+  const { name, billing_email } = ui.selectedOrganization ?? {}
 
   const formId = 'org-billing-email'
   const initialValues = {
-    billing_email: PageState.organization?.billing_email ?? '',
+    billing_email: billing_email ?? '',
   }
 
   const canUpdateOrganization = checkPermissions(PermissionAction.UPDATE, 'organizations')
@@ -30,9 +29,9 @@ const BillingEmail = () => {
     }
 
     setSubmitting(true)
-    const response = await patch(`${API_URL}/organizations/${PageState.organization.slug}`, {
+    const response = await patch(`${API_URL}/organizations/${slug}`, {
       ...values,
-      name: PageState.organization.name,
+      name,
     })
     if (response.error) {
       ui.setNotification({
@@ -46,7 +45,7 @@ const BillingEmail = () => {
         initialValues: { billing_email },
       })
 
-      PageState.onOrgUpdated(response)
+      app.onOrgUpdated(response)
       ui.setNotification({
         category: 'success',
         message: 'Successfully saved settings',
@@ -65,10 +64,13 @@ const BillingEmail = () => {
           {({ isSubmitting, handleReset, values, initialValues, resetForm }: any) => {
             const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
 
+            // [Alaister] although this "technically" is breaking the rules of React hooks
+            // it won't error because the hooks are always rendered in the same order
+            // eslint-disable-next-line react-hooks/rules-of-hooks
             useEffect(() => {
-              const values = { billing_email: PageState.organization?.billing_email ?? '' }
+              const values = { billing_email: billing_email ?? '' }
               resetForm({ values, initialValues: values })
-            }, [PageState.organization.slug])
+            }, [slug])
 
             return (
               <FormPanel

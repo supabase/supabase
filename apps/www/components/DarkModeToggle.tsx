@@ -1,16 +1,8 @@
-import { useTheme } from '~/components/Providers'
+import { useTheme } from 'common/Providers'
 import { IconSun, IconMoon } from 'ui'
 
 function DarkModeToggle() {
   const { isDarkMode, toggleTheme } = useTheme()
-
-  const toggleDarkMode = () => {
-    localStorage.setItem('supabaseDarkMode', (!isDarkMode).toString())
-    toggleTheme()
-
-    const key = localStorage.getItem('supabaseDarkMode')
-    document.documentElement.className = key === 'true' ? 'dark' : ''
-  }
 
   return (
     <div className="flex items-center">
@@ -24,7 +16,7 @@ function DarkModeToggle() {
                   isDarkMode ? 'bg-scale-500' : 'bg-scale-900'
                 } mx-5
               `}
-        onClick={() => toggleDarkMode()}
+        onClick={() => toggleTheme()}
       >
         <span className="sr-only">Toggle Themes</span>
         <span

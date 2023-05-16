@@ -4,9 +4,19 @@ export const meta = {
   id: 'full-text-search',
   title: 'Full Text Search',
   description: 'How to use full text search in PostgreSQL.',
+  video: 'https://www.youtube.com/v/b-mgca_2Oe4',
 }
 
 Postgres has built-in functions to handle `Full Text Search` queries. This is like a "search engine" within Postgres.
+
+<div className="video-container">
+  <iframe
+    src="https://www.youtube-nocookie.com/embed/b-mgca_2Oe4"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
 
 ## Preparation
 
@@ -39,13 +49,26 @@ create table books (
   description text
 );
 
-insert into books (title, author, description)
+insert into books
+  (title, author, description)
 values
-  ('The Poky Little Puppy','Janette Sebring Lowrey','Puppy is slower than other, bigger animals.'),
-  ('The Tale of Peter Rabbit','Beatrix Potter','Rabbit eats some vegetables.'),
-  ('Tootle','Gertrude Crampton','Little toy train has big dreams.'),
-  ('Green Eggs and Ham','Dr. Seuss','Sam has changing food preferences and eats unusually colored food.'),
-  ('Harry Potter and the Goblet of Fire','J.K. Rowling','Fourth year of school starts, big drama ensues.');
+  (
+    'The Poky Little Puppy',
+    'Janette Sebring Lowrey',
+    'Puppy is slower than other, bigger animals.'
+  ),
+  ('The Tale of Peter Rabbit', 'Beatrix Potter', 'Rabbit eats some vegetables.'),
+  ('Tootle', 'Gertrude Crampton', 'Little toy train has big dreams.'),
+  (
+    'Green Eggs and Ham',
+    'Dr. Seuss',
+    'Sam has changing food preferences and eats unusually colored food.'
+  ),
+  (
+    'Harry Potter and the Goblet of Fire',
+    'J.K. Rowling',
+    'Fourth year of school starts, big drama ensues.'
+  );
 ```
 
 </TabPanel>
@@ -60,8 +83,7 @@ The functions we'll cover in this guide are:
 Converts your data into searchable "tokens". `to_tsvector()` stands for "to text search vector". For example:
 
 ```sql
-select to_tsvector('green eggs and ham')
-
+select to_tsvector('green eggs and ham');
 -- Returns 'egg':2 'green':1 'ham':4
 ```
 
@@ -108,8 +130,7 @@ const { data, error } = await supabase.from('books').select().eq('title', 'Harry
 final result = await client
   .from('books')
   .select()
-  .eq('title', 'Harry')
-  .execute();
+  .eq('title', 'Harry');
 ```
 
 </TabPanel>
@@ -146,8 +167,7 @@ const { data, error } = await supabase.from('books').select().textSearch('title'
 final result = await client
   .from('books')
   .select()
-  .textSearch('title', "'Harry'")
-  .execute();
+  .textSearch('title', "'Harry'");
 ```
 
 </TabPanel>
@@ -191,8 +211,7 @@ const { data, error } = await supabase.from('books').select().textSearch('descri
 final result = await client
   .from('books')
   .select()
-  .textSearch('description', "'big'")
-  .execute();
+  .textSearch('description', "'big'");
 ```
 
 </TabPanel>
@@ -207,6 +226,8 @@ final result = await client
 </Tabs>
 
 ### Search multiple columns
+
+Right now there is no direct way to use JavaScript or Dart to search through multiple columns but you can do it by creating [computed columns](https://postgrest.org/en/stable/api.html#computed-virtual-columns) on the database.
 
 To find all `books` where `description` or `title` contain the word `little`:
 
@@ -226,6 +247,38 @@ from
 where
   to_tsvector(description || ' ' || title) -- concat columns, but be sure to include a space to separate them!
   @@ to_tsquery('little');
+```
+
+</TabPanel>
+<TabPanel id="js" label="JavaScript">
+
+```sql
+create function title_description(books) returns text as $$
+  select $1.title || ' ' || $1.description;
+$$ language sql immutable;
+```
+
+```js
+const { data, error } = await supabase
+  .from('books')
+  .select()
+  .textSearch('title_description', `little`)
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```sql
+create function title_description(books) returns text as $$
+  select $1.title || ' ' || $1.description;
+$$ language sql immutable;
+```
+
+```dart
+final result = await client
+  .from('books')
+  .select()
+  .textSearch('title_description', "little")
 ```
 
 </TabPanel>
@@ -278,8 +331,7 @@ const { data, error } = await supabase
 final result = await client
   .from('books')
   .select()
-  .textSearch('description', "'little' & 'big'")
-  .execute();
+  .textSearch('description', "'little' & 'big'");
 ```
 
 </TabPanel>
@@ -331,8 +383,7 @@ const { data, error } = await supabase
 final result = await client
   .from('books')
   .select()
-  .textSearch('description', "'little' | 'big'")
-  .execute();
+  .textSearch('description', "'little' | 'big'");
 ```
 
 </TabPanel>
@@ -430,8 +481,7 @@ const { data, error } = await supabase.from('books').select().textSearch('fts', 
 final result = await client
   .from('books')
   .select()
-  .textSearch('fts', "'little' & 'big'")
-  .execute();
+  .textSearch('fts', "'little' & 'big'");
 ```
 
 </TabPanel>
@@ -488,8 +538,7 @@ const { data, error } = await supabase
 final result = await client
   .from('books')
   .select()
-  .textSearch('description', "'big' <-> 'dreams'")
-  .execute();
+  .textSearch('description', "'big' <-> 'dreams'");
 ```
 
 </TabPanel>
@@ -531,8 +580,7 @@ const { data, error } = await supabase
 final result = await client
   .from('books')
   .select()
-  .textSearch('description', "'year' <2> 'school'")
-  .execute();
+  .textSearch('description', "'year' <2> 'school'");
 ```
 
 </TabPanel>
@@ -577,8 +625,7 @@ const { data, error } = await supabase
 final result = await client
   .from('books')
   .select()
-  .textSearch('description', "'big' & !'little'")
-  .execute();
+  .textSearch('description', "'big' & !'little'");
 ```
 
 </TabPanel>

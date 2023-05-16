@@ -8,6 +8,7 @@ export interface Organization {
   billing_email: string
   is_owner?: boolean
   stripe_customer_id?: string
+  opt_in_tags: string[]
 }
 
 export interface ProjectBase {
@@ -41,7 +42,7 @@ export interface Project extends ProjectBase {
 
 export interface User {
   id: number
-  mobile: string
+  mobile: string | null
   primary_email: string
   username: string
   first_name: string

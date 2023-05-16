@@ -8,6 +8,7 @@ tags:
   - Next.js
 date: '2022-11-17'
 toc_depth: 3
+video: https://www.youtube.com/v/QH0P5xZt5wY
 ---
 
 The biggest announcement from Next.js Conf 2022 was the [release of Next.js 13](https://nextjs.org/blog/next-13), which introduces a collection of improvements, most exciting of which is Server Components. The combination of Server Components and Suspense allow for a more streamlined, reimagined way to fetch and cache data in Next.js applications. This provides excellent DX improvements — such as async components — and aligns the Next framework even closer with the future of React.
@@ -57,7 +58,7 @@ Once your instance is up and running, head over to the [SQL Editor](https://app.
 
 ```sql
 create table if not exists posts (
-  id uuid default uuid_generate_v4() primary key,
+  id uuid default gen_random_uuid() primary key,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,
   title text,
   content text

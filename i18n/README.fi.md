@@ -12,9 +12,9 @@
 - [x] Isännöity Postgres-tietokanta [Docs](https://supabase.com/docs/guides/database)
 - [x] Autentikointi ja valtuutus [Docs](https://supabase.com/docs/guides/auth)
 - [x] Automaattisesti luodut rajapinnat
-  - [x] REST [Docs](https://supabase.com/docs/guides/api#rest-api)
-  - [x] Reaaliaikaiset tilaukset [Docs](https://supabase.com/docs/guides/api#realtime-api)
-  - [x] GraphQL (Beta) [Docs](https://supabase.com/docs/guides/api#graphql-api)
+  - [x] REST [Docs](https://supabase.com/docs/guides/database/api#rest-api)
+  - [x] Reaaliaikaiset tilaukset [Docs](https://supabase.com/docs/guides/database/api#realtime-api)
+  - [x] GraphQL (Beta) [Docs](https://supabase.com/docs/guides/database/api#graphql-api)
 - [x] Funktiot
   - [x] Tietokantatoiminnot [Docs](https://supabase.com/docs/guides/database/functions)
   - [x] Reunatoiminnot [Docs](https://supabase.com/docs/guides/functions)
@@ -27,7 +27,7 @@
 
 Katso täydelliset dokumentaatiot osoitteesta [supabase.com/docs](https://supabase.com/docs)
 
-Katso ohjeet osallistumiseen vierailemalla [Aloitus](./DEVELOPERS.md)
+Katso ohjeet osallistumiseen vierailemalla [Aloitus](../DEVELOPERS.md)
 
 ## Yhteisö ja tuki
 
@@ -147,12 +147,12 @@ Lähestymistapamme asiakaskirjastoissa on modulaarinen. Jokainen alikirjasto on 
   </tr>
   <tr>
     <td>Kotlin</td>
-    <td>-</td>
-    <td><a href="https://github.com/supabase-community/postgrest-kt" target="_blank" rel="noopener noreferrer">postgrest-kt</a></td>
-    <td><a href="https://github.com/supabase-community/gotrue-kt" target="_blank" rel="noopener noreferrer">gotrue-kt</a></td>
-    <td>-</td>
-    <td>-</td>
-    <td>-</td>
+    <td><a href="https://github.com/supabase-community/supabase-kt" target="_blank" rel="noopener noreferrer">supabase-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Postgrest" target="_blank" rel="noopener noreferrer">postgrest-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/GoTrue" target="_blank" rel="noopener noreferrer">gotrue-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Realtime" target="_blank" rel="noopener noreferrer">realtime-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Storage" target="_blank" rel="noopener noreferrer">storage-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Functions" target="_blank" rel="noopener noreferrer">functions-kt</a></td>
   </tr>
   <tr>
     <td>Python</td>

@@ -1,19 +1,26 @@
+import { useQueryClient } from '@tanstack/react-query'
 import { useState, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import { isUndefined } from 'lodash'
-import { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
+import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 import { Modal } from 'ui'
 
 import { useStore } from 'hooks'
+import { sqlKeys } from 'data/sql/keys'
 
 import { DatabaseLayout } from 'components/layouts'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { TableList, ColumnList } from 'components/interfaces/Database'
 import { SidePanelEditor } from 'components/interfaces/TableGridEditor'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { NextPageWithLayout } from 'types'
 
 const DatabaseTables: NextPageWithLayout = () => {
   const { meta, ui } = useStore()
+
+  const { project } = useProjectContext()
+
+  const queryClient = useQueryClient()
 
   const [isDeleting, setIsDeleting] = useState<boolean>(false)
   const [selectedSchema, setSelectedSchema] = useState('public')
@@ -108,6 +115,21 @@ const DatabaseTables: NextPageWithLayout = () => {
           category: 'success',
           message: `Successfully removed ${selectedColumnToDelete.name}.`,
         })
+
+        queryClient.invalidateQueries(sqlKeys.query(project?.ref, ['foreign-key-constraints']))
+        await Promise.all([
+          meta.tables.loadById(selectedColumnToDelete!.table_id),
+          queryClient.invalidateQueries(
+            sqlKeys.query(project?.ref, [selectedTable!.schema, selectedTable!.name])
+          ),
+          queryClient.invalidateQueries(
+            sqlKeys.query(project?.ref, [
+              'table-definition',
+              selectedTable!.schema,
+              selectedTable!.name,
+            ])
+          ),
+        ])
       }
     } catch (error: any) {
       ui.setNotification({
@@ -148,34 +170,32 @@ const DatabaseTables: NextPageWithLayout = () => {
         header={
           <span className="break-words">{`Confirm deletion of table "${selectedTableToDelete?.name}"`}</span>
         }
-        children={
-          <Modal.Content>
-            <p className="py-4 text-sm text-scale-1100">
-              Are you sure you want to delete the selected table? This action cannot be undone.
-            </p>
-          </Modal.Content>
-        }
         buttonLabel="Delete"
         buttonLoadingLabel="Deleting"
         onSelectCancel={() => setIsDeleting(false)}
         onSelectConfirm={onConfirmDeleteTable}
-      />
+      >
+        <Modal.Content>
+          <p className="py-4 text-sm text-scale-1100">
+            Are you sure you want to delete the selected table? This action cannot be undone.
+          </p>
+        </Modal.Content>
+      </ConfirmationModal>
       <ConfirmationModal
         danger
         visible={isDeleting && !isUndefined(selectedColumnToDelete)}
         header={`Confirm deletion of column "${selectedColumnToDelete?.name}"`}
-        children={
-          <Modal.Content>
-            <p className="py-4 text-sm text-scale-1100">
-              Are you sure you want to delete the selected column? This action cannot be undone.
-            </p>
-          </Modal.Content>
-        }
         buttonLabel="Delete"
         buttonLoadingLabel="Deleting"
         onSelectCancel={() => setIsDeleting(false)}
         onSelectConfirm={onConfirmDeleteColumn}
-      />
+      >
+        <Modal.Content>
+          <p className="py-4 text-sm text-scale-1100">
+            Are you sure you want to delete the selected column? This action cannot be undone.
+          </p>
+        </Modal.Content>
+      </ConfirmationModal>
       <SidePanelEditor
         sidePanelKey={sidePanelKey}
         selectedSchema={selectedSchema}

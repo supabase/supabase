@@ -187,3 +187,27 @@ commands:
   - id: supabase-completion-bash
     title: supabase completion bash
     product: 'completion'
+
+  - id: supabase-sso
+    title: supabase sso
+    product: 'auth'
+
+  - id: supabase-sso-add
+    title: supabase sso add
+    product: 'auth'
+
+  - id: supabase-sso-remove
+    title: supabase sso remove
+    product: 'auth'
+
+  - id: supabase-sso-update
+    title: supabase sso update
+    product: 'auth'
+
+  - id: supabase-sso-list
+    title: supabase sso list
+    product: 'auth'
+
+  - id: supabase-sso-show
+    title: supabase sso show
+    product: 'auth'

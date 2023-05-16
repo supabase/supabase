@@ -1,5 +1,6 @@
 import { useTheme } from 'common/Providers'
 import * as React from 'react'
+import Image from 'next/image'
 
 interface Props {
   title: string
@@ -8,11 +9,10 @@ interface Props {
   children?: React.ReactNode
   header?: string
   background?: boolean
-  img?: string
+  logo?: string
+  logoInverse?: string
   hasLightIcon?: boolean
-
   showLink?: boolean
-
   showIconBg?: boolean
 }
 
@@ -23,12 +23,15 @@ const GlassPanel = ({
   children,
   header,
   background = true,
-  img,
+  logo,
+  logoInverse,
   hasLightIcon,
   showLink = false,
   showIconBg = false,
 }: Props) => {
   const { isDarkMode } = useTheme()
+  const showLogoInverse = logoInverse && isDarkMode
+  const showLogo = !showLogoInverse && logo
 
   const IconBackground: React.FC = (props) => (
     <div
@@ -38,6 +41,20 @@ const GlassPanel = ({
       ].join(' ')}
     >
       {props.children}
+    </div>
+  )
+
+  const LogoComponent = ({ logoImage, className }: { logoImage: string; className?: string }) => (
+    <div className="relative box-content p-8 pb-0">
+      <div className="relative h-[33px] w-auto max-w-[145px]">
+        <Image
+          src={logoImage}
+          layout="fill"
+          objectFit="contain"
+          objectPosition="left"
+          className={className}
+        />
+      </div>
     </div>
   )
 
@@ -57,6 +74,9 @@ const GlassPanel = ({
         'transition',
       ].join(' ')}
     >
+      {showLogoInverse && <LogoComponent logoImage={logoInverse} className="opacity-50" />}
+      {showLogo && <LogoComponent logoImage={logo} className="opacity-75" />}
+
       {header && (
         <img
           src={`${header}`}
@@ -65,12 +85,9 @@ const GlassPanel = ({
             "
         />
       )}
-      <img
-        src={`/docs/img/gradient-bg.png`}
-        className="transition-all absolute left-0 -top-64 w-[258px]
-            duration-700 ease-out
-            group-hover:w-[320px]
-            "
+      <div
+        className="absolute left-0 top-0 w-[250px] h-[150px] transform scale-100 opacity-50 group-hover:scale-150 group-hover:opacity-100 transition-all duration-700 ease-out"
+        style={{ background: `radial-gradient(100% 100% at 0% 0%, #3EACCF18, transparent)` }}
       />
       <div
         className={[

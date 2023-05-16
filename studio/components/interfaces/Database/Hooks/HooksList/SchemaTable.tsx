@@ -20,28 +20,28 @@ const SchemaTable: FC<Props> = ({
   return (
     <div key={schema} className="">
       <div className="sticky top-0 backdrop-blur backdrop-filter">
-        <div className="flex items-baseline space-x-1 py-2 px-6">
+        <div className="flex items-baseline space-x-1 py-2">
           <h5 className="text-scale-1000">schema</h5>
           <h4>{schema}</h4>
         </div>
       </div>
       <Table
-        className="table-fixed px-6"
+        className="table-fixed"
         head={
           <>
-            <Table.th key="name" className="space-x-4">
-              Name
+            <Table.th key="name" className="w-[20%]">
+              <p className="translate-x-[36px]">Name</p>
             </Table.th>
-            <Table.th key="table" className="hidden lg:table-cell">
+            <Table.th key="table" className="w-[15%] hidden lg:table-cell">
               Table
             </Table.th>
-            <Table.th key="events" className="hidden xl:table-cell">
+            <Table.th key="events" className="w-[24%] hidden xl:table-cell">
               Events
             </Table.th>
             <Table.th key="webhook" className="hidden xl:table-cell">
               Webhook
             </Table.th>
-            <Table.th key="buttons" className="w-1/6"></Table.th>
+            <Table.th key="buttons" className="w-[5%]"></Table.th>
           </>
         }
         body={

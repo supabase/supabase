@@ -1,7 +1,12 @@
 import { Filters, LogData, LogsEndpointParams, LogsTableName, SQL_FILTER_TEMPLATES } from '.'
 import dayjs, { Dayjs } from 'dayjs'
-import { get } from 'lodash'
+import { get, isEqual } from 'lodash'
 import { StripeSubscription } from 'components/interfaces/Billing'
+import { useMonaco } from '@monaco-editor/react'
+import logConstants from 'shared-data/logConstants'
+import BackwardIterator from 'components/ui/CodeEditor/Providers/BackwardIterator'
+import uniqBy from 'lodash/uniqBy'
+import { useEffect } from 'react'
 
 /**
  * Convert a micro timestamp from number/string to iso timestamp
@@ -173,16 +178,22 @@ export const genSingleLogQuery = (table: LogsTableName, id: string) =>
  */
 export const maybeShowUpgradePrompt = (
   from: string | null | undefined,
-  tierKey?: StripeSubscription['tier']["key"]
+  tierKey?: StripeSubscription['tier']['key']
 ) => {
   const day = Math.abs(dayjs().diff(dayjs(from), 'day'))
 
-  return (day > 1 && tierKey === 'FREE') || (day > 7 && tierKey === 'PRO') || day > 90 && tierKey === 'ENTERPRISE'
+  return (
+    (day > 1 && tierKey === 'FREE') ||
+    (day > 7 && tierKey === 'PRO') ||
+    (day > 28 && tierKey === 'TEAM') ||
+    (day > 90 && tierKey === 'ENTERPRISE')
+  )
 }
 
 export const genCountQuery = (table: LogsTableName, filters: Filters): string => {
   const where = _genWhereStatement(table, filters)
-  return `SELECT count(*) as count FROM ${table} ${where}`}
+  return `SELECT count(*) as count FROM ${table} ${where}`
+}
 
 /** calculates how much the chart start datetime should be offset given the current datetime filter params */
 export const calcChartStart = (params: Partial<LogsEndpointParams>): [Dayjs, string] => {
@@ -217,17 +228,27 @@ export const genChartQuery = (
 ) => {
   const [startOffset, trunc] = calcChartStart(params)
   const where = _genWhereStatement(table, filters)
+
+  let joins = 'cross join unnest(t.metadata) as metadata'
+  if (table === LogsTableName.EDGE) {
+    joins += ' \n  cross join unnest(metadata.request) as request'
+    joins += ' \n  cross join unnest(metadata.response) as response'
+  } else if (table === LogsTableName.POSTGRES) {
+    joins += ' \n  cross join unnest(metadata.parsed) as parsed'
+  }
+
   return `
 SELECT
   timestamp_trunc(t.timestamp, ${trunc}) as timestamp,
   count(t.timestamp) as count
 FROM
   ${table} t
-  cross join unnest(t.metadata) as metadata
-  ${where
+  ${joins}
+  ${
+    where
       ? where + ` and t.timestamp > '${startOffset.toISOString()}'`
       : `where t.timestamp > '${startOffset.toISOString()}'`
-    }
+  }
 GROUP BY
 timestamp
 ORDER BY
@@ -256,4 +277,145 @@ export const ensureNoTimestampConflict = (
   } else {
     return [nextStart, nextEnd]
   }
+}
+
+/**
+ * Adds SQL code hints to logs explorer code editor
+ */
+export const useEditorHints = () => {
+  const monaco = useMonaco()
+
+  useEffect(() => {
+    if (monaco) {
+      const competionProvider = {
+        triggerCharacters: ['`', ' ', '.'],
+        provideCompletionItems: function (model: any, position: any, context: any) {
+          let iterator = new BackwardIterator(model, position.column - 2, position.lineNumber - 1)
+          if (iterator.isNextDQuote()) return { suggestions: [] }
+          let suggestions: { label: string; kind: any; insertText: string }[] = []
+
+          let schemasInUse = logConstants.schemas.filter((schema) =>
+            iterator._text.includes(schema.reference)
+          )
+          if (schemasInUse.length === 0) {
+            schemasInUse = logConstants.schemas
+          }
+
+          if (iterator.isNextPeriod()) {
+            // should be nested key reference, suggest all tail endings of available fields
+            const fields = schemasInUse.flatMap((schema) => schema.fields)
+            const trailingKeys = fields.flatMap((field) => {
+              const [_head, ...rest] = field.path.split('.')
+              return rest
+            })
+
+            const trailingToAdd = trailingKeys.map((key) => ({
+              label: key,
+              kind: monaco.languages.CompletionItemKind.Property,
+              insertText: key,
+            }))
+            suggestions = suggestions.concat(trailingToAdd)
+          }
+
+          if (context.triggerCharacter === '`' || context.triggerCharacter === ' ') {
+            // should be reference or start of key
+            const referencesToAdd = logConstants.schemas.map((schema) => ({
+              label: schema.reference,
+              kind: monaco.languages.CompletionItemKind.Class,
+              insertText: schema.reference,
+            }))
+
+            const fields = schemasInUse.flatMap((schema) => schema.fields)
+            const leadingKeys = fields.flatMap((field) => {
+              const splitPath = field.path.split('.')
+
+              return splitPath.slice(0, -1)
+            })
+
+            const leadingToAdd = leadingKeys.map((key) => ({
+              label: key,
+              kind: monaco.languages.CompletionItemKind.Property,
+              insertText: key,
+            }))
+            suggestions = suggestions.concat(leadingToAdd)
+            suggestions = suggestions.concat(referencesToAdd)
+          }
+          return {
+            suggestions: uniqBy(suggestions, 'label'),
+          }
+        },
+      } as any
+
+      // register completion item provider for pgsql
+      const completeProvider = monaco.languages.registerCompletionItemProvider(
+        'pgsql',
+        competionProvider
+      )
+
+      return () => {
+        completeProvider.dispose()
+      }
+    }
+  }, [monaco])
+}
+
+/**
+ * Assumes that all timestamps are in ISO-8601 UTC timezone.
+ *
+ * min/max are the datetime strings that extend beyond the given timeseries data.
+ */
+export const fillTimeseries = (
+  timeseriesData: any[],
+  timestampKey: string,
+  valueKey: string,
+  defaultValue: number,
+  min?: string,
+  max?: string
+) => {
+  if (timeseriesData.length <= 1 && !(min || max)) return timeseriesData
+  const dates: unknown[] = timeseriesData.map((datum) => dayjs.utc(datum[timestampKey]))
+
+  const maxDate = max ? dayjs.utc(max) : dayjs.utc(Math.max.apply(null, dates as number[]))
+  const minDate = min ? dayjs.utc(min) : dayjs.utc(Math.min.apply(null, dates as number[]))
+
+  const truncationSample = timeseriesData.length > 0 ? timeseriesData[0][timestampKey] : min || max
+  const truncation = getTimestampTruncation(truncationSample)
+
+  const newData = timeseriesData.map((datum) => {
+    const iso = dayjs.utc(datum[timestampKey]).toISOString()
+    datum[timestampKey] = iso
+    return datum
+  })
+
+  const diff = maxDate.diff(minDate, truncation as dayjs.UnitType)
+  for (let i = 0; i <= diff; i++) {
+    const dateToMaybeAdd = minDate.add(i, truncation as dayjs.ManipulateType)
+    if (!dates.find((d) => isEqual(d, dateToMaybeAdd))) {
+      newData.push({
+        [timestampKey]: dateToMaybeAdd.toISOString(),
+        [valueKey]: defaultValue,
+      })
+    }
+  }
+
+  return newData
+}
+
+export const getTimestampTruncation = (datetime: string): 'second' | 'minute' | 'hour' | 'day' => {
+  const values = ['second', 'minute', 'hour', 'day'].map((key) =>
+    dayjs(datetime).get(key as dayjs.UnitType)
+  )
+  const zeroCount = values.reduce((acc, value) => {
+    if (value === 0) {
+      acc += 1
+    }
+    return acc
+  }, 0)
+  const truncation = {
+    0: 'second' as const,
+    1: 'minute' as const,
+    2: 'hour' as const,
+    3: 'day' as const,
+  }[zeroCount]!
+  return truncation
 }

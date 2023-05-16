@@ -63,6 +63,8 @@ The schedule uses the standard cron syntax, in which \* means "run every time pe
  * * * * *
 ```
 
+You can use [crontab.guru](https://crontab.guru/) to help validate your cron schedules.
+
 ## Examples
 
 ### Delete data every week
@@ -71,8 +73,8 @@ Delete old data on Saturday at 3:30am (GMT):
 
 ```sql
 select cron.schedule (
-    'webhook-every-minute', -- name of the cron job
-    '* * * * *', -- every minute
+    'saturday-cleanup', -- name of the cron job
+    '30 3 * * 6', -- Saturday at 3:30am (GMT)
     $$ delete from events where event_time < now() - interval '1 week' $$
 );
 ```
@@ -82,7 +84,27 @@ select cron.schedule (
 Vacuum every day at 3:00am (GMT)
 
 ```sql
-SELECT cron.schedule('nightly-vacuum', '0 3 * * *', 'VACUUM');
+select cron.schedule('nightly-vacuum', '0 3 * * *', 'VACUUM');
+```
+
+### Invoke Supabase Edge Function every minute
+
+Make a POST request to a Supabase Edge Function every minute. Note: this requires the [`pg_net` extension](/docs/guides/database/extensions/pgnet) to be enabled.
+
+```sql
+select
+  cron.schedule(
+    'invoke-function-every-minute',
+    '* * * * *', -- every minute
+    $$
+    select
+      net.http_post(
+          url:='https://project-ref.functions.supabase.co/function-name',
+          headers:='{"Content-Type": "application/json", "Authorization": "Bearer YOUR_ANON_KEY"}'::jsonb,
+          body:=concat('{"time": "', now(), '"}')::jsonb
+      ) as request_id;
+    $$
+  );
 ```
 
 ### Unschedule a job
@@ -90,7 +112,7 @@ SELECT cron.schedule('nightly-vacuum', '0 3 * * *', 'VACUUM');
 Unschedules a job called `'nightly-vacuum'`
 
 ```sql
-SELECT cron.unschedule('nightly-vacuum');
+select cron.unschedule('nightly-vacuum');
 ```
 
 ## Resources

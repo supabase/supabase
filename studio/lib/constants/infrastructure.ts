@@ -30,6 +30,7 @@ export const PRICING_TIER_PRODUCT_IDS = {
   FREE: 'tier_free',
   PRO: 'tier_pro',
   PAYG: 'tier_payg',
+  TEAM: 'tier_team',
   ENTERPRISE: 'tier_enterprise',
 }
 
@@ -106,12 +107,14 @@ export const PROJECT_STATUS = {
   REMOVED: 'REMOVED',
   RESTORING: 'RESTORING',
   RESTORATION_FAILED: 'RESTORATION_FAILED',
+  UPGRADING: 'UPGRADING',
 }
 
 export const STRIPE_PRODUCT_IDS: { [x: string]: string } = {
   FREE: process?.env?.NEXT_PUBLIC_STRIPE_FREE_TIER_ID || 'prod_Ip4vqwv3EJ7Mi0',
   PRO: process?.env?.NEXT_PUBLIC_STRIPE_PRO_TIER_ID || 'prod_IsRLOp58Z7V4XN',
   PAYG: process?.env?.NEXT_PUBLIC_STRIPE_PAYG_TIER_ID || 'prod_JlTbw91xcM6NY4',
+  TEAM: process?.env?.NEXT_PUBLIC_STRIPE_TEAM_TIER_ID || 'prod_MeUrsWN6pj0oXM',
 }
 
 export const DEFAULT_MINIMUM_PASSWORD_STRENGTH = 4

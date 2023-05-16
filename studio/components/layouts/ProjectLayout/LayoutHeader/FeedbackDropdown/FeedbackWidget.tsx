@@ -1,14 +1,14 @@
 import Link from 'next/link'
-import { useState, useEffect, useRef, FC } from 'react'
+import { useState, useEffect, useRef, FC, ChangeEvent } from 'react'
 import { useRouter } from 'next/router'
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { toPng } from 'html-to-image'
-import { Button, Input, Popover, IconCamera, IconX } from 'ui'
+import { Button, Input, Popover, IconCamera, IconX, IconImage, Dropdown, IconUpload } from 'ui'
 
 import { useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { convertB64toBlob, uploadAttachment } from './FeedbackDropdown.utils'
+import { timeout } from 'lib/helpers'
 
 interface Props {
   onClose: () => void
@@ -30,6 +30,7 @@ const FeedbackWidget: FC<Props> = ({
 
   const { ui } = useStore()
   const inputRef = useRef<any>(null)
+  const uploadButtonRef = useRef()
 
   const [isSending, setSending] = useState(false)
   const [isSavingScreenshot, setIsSavingScreenshot] = useState(false)
@@ -42,7 +43,7 @@ const FeedbackWidget: FC<Props> = ({
     setFeedback(e.target.value)
   }
 
-  const captureScreenshot = () => {
+  const captureScreenshot = async () => {
     setIsSavingScreenshot(true)
 
     function filter(node: HTMLElement) {
@@ -52,6 +53,8 @@ const FeedbackWidget: FC<Props> = ({
       return true
     }
 
+    // Give time for dropdown to close
+    await timeout(100)
     toPng(document.body, { filter })
       .then((dataUrl: any) => setScreenshot(dataUrl))
       .catch((error: any) => {
@@ -65,6 +68,18 @@ const FeedbackWidget: FC<Props> = ({
       .finally(() => {
         setIsSavingScreenshot(false)
       })
+  }
+
+  const onFilesUpload = async (event: ChangeEvent<HTMLInputElement>) => {
+    event.persist()
+    const [file] = event.target.files || (event as any).dataTransfer.items
+
+    const reader = new FileReader()
+    reader.onload = function (event) {
+      setScreenshot(event.target?.result as string)
+    }
+    reader.readAsDataURL(file)
+    event.target.value = ''
   }
 
   const sendFeedback = async () => {
@@ -97,7 +112,7 @@ const FeedbackWidget: FC<Props> = ({
   }
 
   return (
-    <div id="feedback-widget">
+    <div id="feedback-widget" className="text-area-text-sm">
       <Input.TextArea
         className="w-80 p-3"
         size="small"
@@ -138,33 +153,46 @@ const FeedbackWidget: FC<Props> = ({
                 </div>
               </div>
             ) : (
-              <Tooltip.Root delayDuration={0}>
-                <Tooltip.Trigger>
-                  <Button
-                    as="span"
-                    type="default"
-                    disabled={isSavingScreenshot}
-                    loading={isSavingScreenshot}
-                    className="px-2 py-1.5"
+              <Dropdown
+                className="feedback-dropdown"
+                size="small"
+                overlay={[
+                  <Dropdown.Item
+                    key="upload-screenshot"
+                    icon={<IconUpload size={14} />}
+                    onClick={() => {
+                      if (uploadButtonRef.current) (uploadButtonRef.current as any).click()
+                    }}
+                  >
+                    Upload screenshot
+                  </Dropdown.Item>,
+                  <Dropdown.Item
+                    key="capture-screenshot"
                     icon={<IconCamera size={14} />}
                     onClick={() => captureScreenshot()}
-                  />
-                </Tooltip.Trigger>
-                <Tooltip.Content side="bottom">
-                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                  <div
-                    className={[
-                      'bg-scale-100 rounded py-1 px-2 leading-none shadow', // background
-                      'w-[130px] text-center border-scale-200 border', //border
-                    ].join(' ')}
                   >
-                    <span className="text-scale-1200 text-xs">
-                      Capture screenshot of current view
-                    </span>
-                  </div>
-                </Tooltip.Content>
-              </Tooltip.Root>
+                    Capture screenshot
+                  </Dropdown.Item>,
+                ]}
+              >
+                <Button
+                  as="span"
+                  type="default"
+                  disabled={isSavingScreenshot}
+                  loading={isSavingScreenshot}
+                  className="px-2 py-1.5"
+                  icon={<IconImage size={14} />}
+                />
+              </Dropdown>
             )}
+            <input
+              type="file"
+              // @ts-ignore
+              ref={uploadButtonRef}
+              className="hidden"
+              accept="image/png"
+              onChange={onFilesUpload}
+            />
             <Button disabled={isSending} loading={isSending} onClick={sendFeedback}>
               Send feedback
             </Button>
@@ -180,7 +208,7 @@ const FeedbackWidget: FC<Props> = ({
             </a>
           </Link>{' '}
           or{' '}
-          <a href="https://supabase.com/docs" target="_blank">
+          <a href="https://supabase.com/docs" target="_blank" rel="noreferrer">
             <span className="cursor-pointer text-brand-900 transition-colors hover:text-brand-1200">
               browse our docs
             </span>

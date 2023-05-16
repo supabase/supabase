@@ -1,36 +1,48 @@
-import { DefaultSeo } from 'next-seo'
+import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
+import { SessionContextProvider } from '@supabase/auth-helpers-react'
+import { AuthProvider, ThemeProvider, useTelemetryProps } from 'common'
 import { useRouter } from 'next/router'
-import { useEffect } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { AppPropsWithLayout } from 'types'
-import { SearchProvider } from '~/components/DocSearch'
+import { CommandMenuProvider } from 'ui'
 import Favicons from '~/components/Favicons'
-import { ThemeProvider } from 'common/Providers'
 import SiteLayout from '~/layouts/SiteLayout'
-import '../styles/algolia-search.scss'
+import { API_URL, IS_PLATFORM, LOCAL_SUPABASE } from '~/lib/constants'
+import { post } from '~/lib/fetchWrappers'
 import '../styles/ch.scss'
-import '../styles/docsearch.scss'
 import '../styles/main.scss?v=1.0.0'
 import '../styles/new-docs.scss'
 import '../styles/prism-okaidia.scss'
-import { post } from '~/lib/fetchWrappers'
 
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const router = useRouter()
+  const telemetryProps = useTelemetryProps()
 
-  function telemetry(route: string) {
-    return post(`https://api.supabase.io/platform/telemetry/page`, {
-      referrer: document.referrer,
-      title: document.title,
-      route,
-    })
-  }
+  const [supabase] = useState(() =>
+    IS_PLATFORM || LOCAL_SUPABASE ? createBrowserSupabaseClient() : undefined
+  )
+
+  const handlePageTelemetry = useCallback(
+    (route: string) => {
+      return post(`${API_URL}/telemetry/page`, {
+        referrer: document.referrer,
+        title: document.title,
+        route,
+        ga: {
+          screen_resolution: telemetryProps?.screenResolution,
+          language: telemetryProps?.language,
+        },
+      })
+    },
+    [telemetryProps]
+  )
 
   useEffect(() => {
     function handleRouteChange(url: string) {
       /*
        * handle telemetry
        */
-      telemetry(url)
+      handlePageTelemetry(url)
       /*
        * handle "scroll to top" behaviour on route change
        */
@@ -50,44 +62,60 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
     return () => {
       router.events.off('routeChangeComplete', handleRouteChange)
     }
-  }, [router.events])
+  }, [router, handlePageTelemetry])
+
+  useEffect(() => {
+    /**
+     * Send page telemetry on first page load
+     */
+    if (router.isReady) {
+      handlePageTelemetry(router.basePath + router.asPath)
+    }
+  }, [router, handlePageTelemetry])
+
+  /**
+   * Reference docs use `history.pushState()` to jump to
+   * sub-sections without causing a re-render.
+   *
+   * We need to the below handler to manually force a re-render
+   * when navigating away from, then back to reference docs
+   */
+  useEffect(() => {
+    function handler() {
+      router.replace(window.location.href)
+    }
+
+    window.addEventListener('popstate', handler)
+
+    return () => {
+      window.removeEventListener('popstate', handler)
+    }
+  }, [router])
 
   const SITE_TITLE = 'Supabase Documentation'
-  const SITE_DESCRIPTION = 'The open source Firebase alternative.'
-  const { basePath } = useRouter()
+
+  const AuthContainer = (props) => {
+    return IS_PLATFORM || LOCAL_SUPABASE ? (
+      <SessionContextProvider supabaseClient={supabase}>
+        <AuthProvider>{props.children}</AuthProvider>
+      </SessionContextProvider>
+    ) : (
+      <AuthProvider>{props.children}</AuthProvider>
+    )
+  }
 
   return (
     <>
       <Favicons />
-      <DefaultSeo
-        title={SITE_TITLE}
-        description={SITE_DESCRIPTION}
-        openGraph={{
-          type: 'website',
-          url: 'https://supabase.com/docs',
-          site_name: SITE_TITLE,
-          images: [
-            {
-              url: `https://supabase.com${basePath}/img/supabase-og-image.png`,
-              width: 800,
-              height: 600,
-              alt: 'Supabase Og Image',
-            },
-          ],
-        }}
-        twitter={{
-          handle: '@supabase',
-          site: '@supabase',
-          cardType: 'summary_large_image',
-        }}
-      />
-      <ThemeProvider>
-        <SearchProvider>
-          <SiteLayout>
-            <Component {...pageProps} />
-          </SiteLayout>
-        </SearchProvider>
-      </ThemeProvider>
+      <AuthContainer>
+        <ThemeProvider>
+          <CommandMenuProvider site="docs">
+            <SiteLayout>
+              <Component {...pageProps} />
+            </SiteLayout>
+          </CommandMenuProvider>
+        </ThemeProvider>
+      </AuthContainer>
     </>
   )
 }

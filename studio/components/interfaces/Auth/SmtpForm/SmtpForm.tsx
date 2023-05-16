@@ -13,7 +13,7 @@ import {
   FormSectionLabel,
 } from 'components/ui/Forms'
 import { useStore, checkPermissions } from 'hooks'
-import { domainRegex } from './../Auth.constants'
+import { urlRegex } from './../Auth.constants'
 import { defaultDisabledSmtpFormValues } from './SmtpForm.constants'
 import { generateFormValues, isSmtpEnabled } from './SmtpForm.utils'
 
@@ -55,7 +55,7 @@ const SmtpForm = () => {
       },
       then: (schema) =>
         schema
-          .matches(domainRegex, 'Must be a valid URL or IP address')
+          .matches(urlRegex, 'Must be a valid URL or IP address')
           .required('Host URL is required.'),
       otherwise: (schema) => schema,
     }),
@@ -125,6 +125,9 @@ const SmtpForm = () => {
         const isValidSmtpConfig = isSmtpEnabled(values)
         const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
 
+        // [Alaister] although this "technically" is breaking the rules of React hooks
+        // it won't error because the hooks are always rendered in the same order
+        // eslint-disable-next-line react-hooks/rules-of-hooks
         useEffect(() => {
           if (isLoaded) {
             const formValues = generateFormValues(config)

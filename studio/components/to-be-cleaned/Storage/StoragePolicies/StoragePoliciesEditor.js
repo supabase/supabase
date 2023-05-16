@@ -37,6 +37,7 @@ const PolicyAllowedOperations = ({ allowedOperations = [], onToggleOperation = (
           <a
             href="https://supabase.com/docs/reference/javascript/storage-from-list"
             target="_blank"
+            rel="noreferrer"
             className="underline"
           >
             client library

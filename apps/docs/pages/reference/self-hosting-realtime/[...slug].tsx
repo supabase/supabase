@@ -4,18 +4,18 @@ import RefSectionHandler from '~/components/reference/RefSectionHandler'
 import { flattenSections } from '~/lib/helpers'
 import handleRefGetStaticPaths from '~/lib/mdx/handleRefStaticPaths'
 import handleRefStaticProps from '~/lib/mdx/handleRefStaticProps'
-import { gen_v3 } from '~/lib/refGenerator/helpers'
 
 const sections = flattenSections(selfHostingRealtimeCommonSections)
+const libraryPath = '/self-hosting-realtime'
 
-export default function JSReference(props) {
-  return <RefSectionHandler sections={sections} pageProps={props} />
+export default function SelfHostRealtimeReference(props) {
+  return <RefSectionHandler sections={sections} pageProps={props} type="api" />
 }
 
-export async function getStaticProps({ params }: { params: { slug: string[] } }) {
-  return handleRefStaticProps(sections, params, '/self-hosting-realtime', '/self-hosting-realtime')
+export async function getStaticProps() {
+  return handleRefStaticProps(sections, libraryPath)
 }
 
-export function getStaticPaths() {
-  return handleRefGetStaticPaths()
+export async function getStaticPaths() {
+  return handleRefGetStaticPaths(sections)
 }

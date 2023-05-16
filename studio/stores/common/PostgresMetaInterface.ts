@@ -15,6 +15,7 @@ export interface IPostgresMetaInterface<T> {
   isInitialized: boolean
 
   load: () => void
+  loadBySchema: (schema: string) => Promise<T[] | { error: ResponseError }>
   create: (payload: any) => Promise<T | { error: ResponseError }>
   update: (id: number | string, updates: any) => Promise<T | { error: ResponseError }>
   del: (id: number | string, cascade?: boolean) => Promise<boolean | { error: ResponseError }>
@@ -46,6 +47,7 @@ export default class PostgresMetaInterface<T> implements IPostgresMetaInterface<
   state = this.STATES.INITIAL
   data: { [key in DataKeys]: T } = {}
   headers: any = {}
+  isInitialized: boolean = false
 
   constructor(
     rootStore: IRootStore,
@@ -67,6 +69,7 @@ export default class PostgresMetaInterface<T> implements IPostgresMetaInterface<
       count: computed,
       hasError: computed,
       isLoading: computed,
+      isInitialized: observable,
       load: action,
       create: action,
       update: action,
@@ -89,10 +92,6 @@ export default class PostgresMetaInterface<T> implements IPostgresMetaInterface<
     return this.state === this.STATES.INITIAL || this.state === this.STATES.LOADING
   }
 
-  get isInitialized() {
-    return this.state === this.STATES.LOADED || this.state === this.STATES.ERROR
-  }
-
   async fetchData() {
     const headers = { 'Content-Type': 'application/json', ...this.headers }
     const response = await get<T[]>(this.url, { headers })
@@ -113,12 +112,49 @@ export default class PostgresMetaInterface<T> implements IPostgresMetaInterface<
       console.error('Load error message', e.message)
       this.setError(e)
       this.setState(ERROR)
+    } finally {
+      if (!this.isInitialized) this.isInitialized = true
+    }
+  }
+
+  // [Joshen] Only used for tables and views for now
+  async loadBySchema(schema: string) {
+    let { LOADING, ERROR, LOADED } = this.STATES
+    try {
+      this.setError(null)
+      this.setState(LOADING)
+
+      const url = this.url.includes('?')
+        ? `${this.url}&included_schemas=${schema}`
+        : `${this.url}?included_schemas=${schema}`
+      const response = await get(url, { headers: this.headers })
+      if (response.error) throw response.error
+
+      const data = response as T[]
+      const formattedData = keyBy(data, this.identifier)
+
+      // Purge existing data that belongs to given schema, otherwise
+      // stale data will persist
+      const purgedData = Object.keys(this.data)
+        .map((identifier: any) => this.data[identifier])
+        .filter((item: any) => item.schema !== schema)
+      const formattedPurgedData = keyBy(purgedData, this.identifier)
+
+      this.data = { ...formattedPurgedData, ...formattedData } as any
+      this.setState(LOADED)
+
+      return data
+    } catch (error: any) {
+      console.error('Error in loadBySchema:', error.message)
+      this.setError(error)
+      this.setState(ERROR)
+      return { error }
     }
   }
 
   initialDataArray(value: T[]) {
     if (this.state === this.STATES.INITIAL) {
-      this.data = keyBy(value, this.identifier)
+      this.data = keyBy(value, this.identifier) as any
       this.state = this.STATES.LOADED
     }
   }
@@ -128,7 +164,7 @@ export default class PostgresMetaInterface<T> implements IPostgresMetaInterface<
   }
 
   setDataArray(value: T[]) {
-    this.data = keyBy(value, this.identifier)
+    this.data = keyBy(value, this.identifier) as any
   }
 
   setError(value: any) {
@@ -172,10 +208,9 @@ export default class PostgresMetaInterface<T> implements IPostgresMetaInterface<
     }
   }
 
-  async update(id: number | string, updates: any) {
+  async update(id: number | string, payload: any) {
     try {
       const headers = { 'Content-Type': 'application/json', ...this.headers }
-      let payload = { ...updates, id }
       const url = `${this.url}?id=${id}`
       const response = await patch<T>(url, payload, { headers })
       if (response.error) throw response.error

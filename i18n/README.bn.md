@@ -12,9 +12,9 @@
 - [x] হোস্ট করা পোস্টগ্রেস ডাটাবেস. [ডক্স](https://supabase.com/docs/guides/database)
 - [x] অথেনটিকেশন এবং অথরাইজড . [ডক্স](https://supabase.com/docs/guides/auth)
 - [x] স্বয়ংক্রিয়ভাবে তৈরি এপিআই.
-  - [x] রেস্ট. [ডক্স](https://supabase.com/docs/guides/api#rest-api)
-  - [x] রিয়েলটাইম সাবস্ক্রিপশন. [ডক্স](https://supabase.com/docs/guides/api#realtime-api)
-  - [x] গ্রাফকিউএল (বেটা). [ডক্স](https://supabase.com/docs/guides/api#graphql-api)
+  - [x] রেস্ট. [ডক্স](https://supabase.com/docs/guides/database/api#rest-api)
+  - [x] রিয়েলটাইম সাবস্ক্রিপশন. [ডক্স](https://supabase.com/docs/guides/database/api#realtime-api)
+  - [x] গ্রাফকিউএল (বেটা). [ডক্স](https://supabase.com/docs/guides/database/api#graphql-api)
 - [x] ফাংশনস.
   - [x] ডাটাবেস ফাংশনস. [ডক্স](https://supabase.com/docs/guides/database/functions)
   - [x] এজ ফাংশনস. [ডক্স](https://supabase.com/docs/guides/functions)
@@ -141,11 +141,12 @@ Supabase হল ওপেন সোর্স টুলের সংমিশ্�
   </tr>
   <tr>
     <td>কোটলিন</td>
-    <td>-</td>
-    <td><a href="https://github.com/supabase-community/postgrest-kt" target="_blank" rel="noopener noreferrer">postgrest-kt</a></td>
-    <td><a href="https://github.com/supabase-community/gotrue-kt" target="_blank" rel="noopener noreferrer">গোট্রু-kt</a></td>
-    <td>-</td>
-    <td>-</td>
+    <td>Kotlin</td>
+    <td><a href="https://github.com/supabase-community/supabase-kt" target="_blank" rel="noopener noreferrer">supabase-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Postgrest" target="_blank" rel="noopener noreferrer">postgrest-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/GoTrue" target="_blank" rel="noopener noreferrer">gotrue-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Realtime" target="_blank" rel="noopener noreferrer">realtime-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Storage" target="_blank" rel="noopener noreferrer">storage-kt</a></td>
   </tr>
   <tr>
     <td>পাইথন</td>

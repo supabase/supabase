@@ -1,32 +1,32 @@
 [
   {
     "type": "Announcement",
-    "title": "Supabase Launch Week 6",
+    "title": "Flutter Hackathon",
+    "description": "Build Flutter apps and win limited edition swag.",
+    "imgUrl": "/images/blog/flutter-hackathon/thumbnail.jpg",
+    "logoUrl": "/images/blog/flutter-hackathon/thumbnail.jpg",
+    "organization": "Supabase",
+    "url": "/blog/flutter-hackathon",
+    "postMeta": {
+      "name": "Tyler",
+      "publishDate": "May 12, 2023",
+      "readLength": 3
+    },
+    "ctaText": "See how to join"
+  },
+  {
+    "type": "Announcement",
+    "title": "Supabase Launch Week 7",
     "description": "One new feature (or more) every day during a week.",
-    "imgUrl": "/images/launchweek/launch-week-6.jpg",
-    "logoUrl": "/images/launchweek/launch-week-6.jpg",
+    "imgUrl": "/images/launchweek/seven/launch-week-7.jpg",
+    "logoUrl": "/images/launchweek/seven/launch-week-7.jpg",
     "organization": "Supabase",
     "url": "/launch-week",
     "postMeta": {
       "name": "Paul Copplestone",
-      "publishDate": "Dec 12, 2022",
+      "publishDate": "Apr 03, 2023",
       "readLength": 5
     },
     "ctaText": "Learn more"
-  },
-  {
-    "type": "Announcement",
-    "title": "The Supabase Content Storm",
-    "description": "We worked with dozens of content creators from around the world to create Supabase-related content and publish everything on the same day!",
-    "imgUrl": "/images/blog/2022-12-06-content-storm/content-storm.jpg",
-    "logoUrl": "/images/blog/2022-12-06-content-storm/content-storm.jpg",
-    "organization": "Supabase",
-    "url": "/blog/the-supabase-content-storm",
-    "postMeta": {
-      "name": "Ramiro",
-      "publishDate": "Dec 06, 2022",
-      "readLength": 4
-    },
-    "ctaText": "See the full list"
   }
 ]

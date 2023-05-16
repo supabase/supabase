@@ -1,6 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import apiWrapper from 'lib/api/apiWrapper'
-import { Member } from 'types'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
@@ -27,6 +26,7 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
       total_paid_projects: 0,
       total_free_projects: 0,
       total_pro_projects: 0,
+      total_team_projects: 0,
       total_payg_projects: 0,
     },
   }

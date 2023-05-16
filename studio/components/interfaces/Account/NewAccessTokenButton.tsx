@@ -1,63 +1,96 @@
-import { FC, useState } from 'react'
-import { Input, Button, Modal, Form, Alert } from 'ui'
+import { useState } from 'react'
+import { Input, Button, Modal, Form, Alert, IconChevronDown, Dropdown, IconExternalLink } from 'ui'
 import { useStore } from 'hooks'
-import { post } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
-import { NewAccessToken, useAccessTokens } from 'hooks/queries/useAccessTokens'
+import { useAccessTokenCreateMutation } from 'data/access-tokens/access-tokens-create-mutation'
 import { observer } from 'mobx-react-lite'
+import Link from 'next/link'
 
-const NewAccessTokenButton = observer(() => {
+export interface NewAccessTokenButtonProps {
+  onCreateToken: (token: any) => void
+}
+
+const NewAccessTokenButton = observer(({ onCreateToken }: NewAccessTokenButtonProps) => {
   const { ui } = useStore()
-  const { mutateNewToken } = useAccessTokens()
   const [isOpen, setIsOpen] = useState(false)
-  const [newToken, setNewToken] = useState<NewAccessToken | undefined>(undefined)
+  const [tokenScope, setTokenScope] = useState<'V0' | undefined>(undefined)
 
   const validate = (values: any) => {
     const errors: any = {}
-    if (!values.tokenName) {
-      errors.tokenName = 'Please enter a name for the token'
-    }
+    if (!values.tokenName) errors.tokenName = 'Please enter a name for the token'
     return errors
   }
 
+  const { mutateAsync: createAccessToken } = useAccessTokenCreateMutation()
+
   async function onFormSubmit(values: any, { setSubmitting }: any) {
     setSubmitting(true)
-    const response = await post(`${API_URL}/profile/access-tokens`, { name: values.tokenName })
-    if (response.error) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to create token: ${response.error.message}`,
-      })
-      setSubmitting(false)
-    } else {
-      mutateNewToken(response)
-      setNewToken(response)
 
+    try {
+      const response = await createAccessToken({ name: values.tokenName, scope: tokenScope })
+      onCreateToken(response)
       setSubmitting(false)
       setIsOpen(false)
+    } catch (error: any) {
+      ui.setNotification({
+        category: 'error',
+        message: `Failed to create token: ${error.message}`,
+      })
+      setSubmitting(false)
     }
   }
 
   return (
     <>
-      <Button
-        onClick={() => {
-          setNewToken(undefined)
-          setIsOpen(!isOpen)
-        }}
-      >
-        Generate new token
-      </Button>
-      {newToken && <NewTokenItem data={newToken} />}
+      <div className="container max-w-7xl">
+        <div className="flex justify-between">
+          <div className="flex items-center">
+            <Button
+              className="rounded-r-none px-3"
+              onClick={() => {
+                setTokenScope(undefined)
+                setIsOpen(true)
+              }}
+            >
+              Generate new token
+            </Button>
+            <Dropdown
+              align="end"
+              side="bottom"
+              overlay={[
+                <Dropdown.Item
+                  key="experimental-token"
+                  onClick={() => {
+                    setTokenScope('V0')
+                    setIsOpen(true)
+                  }}
+                >
+                  <div className="space-y-1">
+                    <p className="block text-scale-1200">Generate token for experimental API</p>
+                  </div>
+                </Dropdown.Item>,
+              ]}
+            >
+              <Button
+                type="primary"
+                className="rounded-l-none px-[4px] py-[5px]"
+                icon={<IconChevronDown />}
+              />
+            </Dropdown>
+          </div>
+        </div>
+      </div>
+
       <Modal
         closable
         hideFooter
-        size="small"
+        size="medium"
         visible={isOpen}
         onCancel={() => setIsOpen(!isOpen)}
         header={
           <div className="flex items-baseline gap-2">
-            <h5 className="text-sm text-scale-1200">Generate New Token</h5>
+            <h5 className="text-sm text-scale-1200">
+              {tokenScope === 'V0' ? 'Generate token for experimental API' : 'Generate New Token'}
+            </h5>
           </div>
         }
       >
@@ -68,20 +101,48 @@ const NewAccessTokenButton = observer(() => {
           validate={validate}
         >
           {({ isSubmitting }: { isSubmitting: boolean }) => (
-            <div className="space-y-4 py-3">
+            <div className="py-3 space-y-4">
+              {tokenScope === 'V0' && (
+                <Modal.Content>
+                  <Alert
+                    withIcon
+                    variant="warning"
+                    title="The experimental API provides additional endpoints which allows you to manage your organizations and projects."
+                  >
+                    <p>
+                      These include deleting organizations and projects which cannot be undone. As
+                      such, be very careful when using this API.
+                    </p>
+                    <div className="mt-4">
+                      <Link href="https://api.supabase.com/api/v0">
+                        <a target="_blank" rel="noreferrer">
+                          <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                            Experimental API documentation
+                          </Button>
+                        </a>
+                      </Link>
+                    </div>
+                  </Alert>
+                </Modal.Content>
+              )}
               <Modal.Content>
                 <Input
                   id="tokenName"
                   label="Name"
-                  placeholder="Type in the token name"
+                  placeholder="Provide a name for your token"
                   className="w-full"
                 />
               </Modal.Content>
               <Modal.Separator />
               <Modal.Content>
-                <Button htmlType="submit" loading={isSubmitting} size="small" block danger>
-                  Generate Token
-                </Button>
+                <div className="flex items-center space-x-2 justify-end">
+                  <Button type="default" disabled={isSubmitting} onClick={() => setIsOpen(false)}>
+                    Cancel
+                  </Button>
+                  <Button htmlType="submit" loading={isSubmitting} disabled={isSubmitting}>
+                    Generate token
+                  </Button>
+                </div>
               </Modal.Content>
             </div>
           )}
@@ -92,28 +153,3 @@ const NewAccessTokenButton = observer(() => {
 })
 
 export default NewAccessTokenButton
-
-interface NewTokenItemProps {
-  data: NewAccessToken
-}
-
-const NewTokenItem: FC<NewTokenItemProps> = observer(({ data }) => {
-  return (
-    <Alert withIcon variant="success" title="Successfully generated a new token!">
-      <div className="w-full space-y-2">
-        <p className="text-sm">
-          Do copy this access token and store it in a secure place - you will not be able to see it
-          again.
-        </p>
-        <Input
-          copy
-          readOnly
-          size="small"
-          className="input-mono max-w-xl"
-          value={data.token}
-          onChange={() => {}}
-        />
-      </div>
-    </Alert>
-  )
-})

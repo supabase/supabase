@@ -1,6 +1,5 @@
 import RefSubLayout from '~/layouts/ref/RefSubLayout'
 
-// @ts-expect-error
 import spec from '~/../../spec/cli_v1_commands.yaml' assert { type: 'yaml' }
 import Param from '~/components/Params'
 import Options from '~/components/Options'
@@ -15,6 +14,7 @@ const CliGlobalFlagsHandler = () => {
             return (
               <Param
                 {...flag}
+                id={`${spec.id}-${flag.id}`}
                 isOptional={flag.required === undefined ? true : !flag.required}
               ></Param>
             )

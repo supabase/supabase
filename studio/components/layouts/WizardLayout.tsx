@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { IconChevronRight } from 'ui'
 import { withAuth, useFlag } from 'hooks'
 import { observer } from 'mobx-react-lite'
+import { BASE_PATH } from 'lib/constants'
 
 const WizardLayout: FC<any> = ({ organization, project, children }) => {
   const ongoingIncident = useFlag('ongoingIncident')
@@ -35,7 +36,7 @@ const Header: FC<any> = ({ organization, project }) => {
               <Link href="/projects">
                 <a>
                   <img
-                    src="/img/supabase-logo.svg"
+                    src={`${BASE_PATH}/img/supabase-logo.svg`}
                     alt="Supabase"
                     className="rounded border p-1 hover:border-white dark:border-dark"
                     style={{ height: 24 }}

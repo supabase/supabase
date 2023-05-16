@@ -47,7 +47,7 @@ const NewProjectPanel: FC<Props> = ({}) => {
                       type="default"
                       icon={
                         <SVG
-                          src="/img/table-editor.svg"
+                          src={`${router.basePath}/img/table-editor.svg`}
                           style={{ width: `${14}px`, height: `${14}px` }}
                           preProcessor={(code) =>
                             code.replace(/svg/, 'svg class="m-auto text-color-inherit"')
@@ -65,7 +65,7 @@ const NewProjectPanel: FC<Props> = ({}) => {
                       type="default"
                       icon={
                         <SVG
-                          src="/img/sql-editor.svg"
+                          src={`${router.basePath}/img/sql-editor.svg`}
                           style={{ width: `${14}px`, height: `${14}px` }}
                           preProcessor={(code) =>
                             code.replace(/svg/, 'svg class="m-auto text-color-inherit"')
@@ -212,7 +212,7 @@ const NewProjectPanel: FC<Props> = ({}) => {
                   </div>
                   <div className="flex md:min-h-[50px] xl:min-h-[75px]">
                     <p className="text-sm text-scale-1000">
-                      Listen to your to PostgreSQL database in realtime via websockets.
+                      Listen to your PostgreSQL database in realtime via websockets.
                     </p>
                   </div>
                   <div className="flex items-center space-x-2">
@@ -257,7 +257,7 @@ const NewProjectPanel: FC<Props> = ({}) => {
                 <Button type="default">View API settings</Button>
               </a>
             </Link>
-            <Link href="https://supabase.com/docs/guides/api">
+            <Link href="https://supabase.com/docs/guides/database/api">
               <a target="_blank" rel="noreferrer">
                 <Button className="translate-y-[1px]" type="default" icon={<IconExternalLink />}>
                   About APIs

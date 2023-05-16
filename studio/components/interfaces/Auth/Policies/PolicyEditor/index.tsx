@@ -6,7 +6,7 @@ import PolicyDefinition from './PolicyDefinition'
 import PolicyAllowedOperation from './PolicyAllowedOperation'
 import PolicyRoles from './PolicyRoles'
 import PolicyEditorFooter from './PolicyEditorFooter'
-import { PostgresRole } from '@supabase/postgres-meta'
+import type { PostgresRole } from '@supabase/postgres-meta'
 
 // Exposed for StoragePoliciesEditor.js
 export { PolicyName, PolicyRoles }
@@ -37,7 +37,7 @@ const PolicyEditor: FC<Props> = ({
 
   return (
     <div className="">
-      <div className="max-h-[600px] space-y-8 overflow-y-auto py-8">
+      <div className="space-y-8 py-8">
         <Modal.Content>
           <PolicyName
             name={policyFormFields.name}

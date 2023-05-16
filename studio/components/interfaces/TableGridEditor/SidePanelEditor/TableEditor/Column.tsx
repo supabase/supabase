@@ -1,13 +1,25 @@
 import { FC } from 'react'
-import { isUndefined } from 'lodash'
-import { Checkbox, Input, IconX, IconMenu, Popover, IconLink, IconSettings, Button } from 'ui'
-import { PostgresType } from '@supabase/postgres-meta'
+import * as Tooltip from '@radix-ui/react-tooltip'
+import {
+  Checkbox,
+  Input,
+  IconX,
+  IconMenu,
+  Popover,
+  IconLink,
+  IconSettings,
+  Button,
+  IconArrowRight,
+} from 'ui'
+import type { PostgresType } from '@supabase/postgres-meta'
 
 import { ColumnField } from '../SidePanelEditor.types'
 import ColumnType from '../ColumnEditor/ColumnType'
 import InputWithSuggestions from '../ColumnEditor/InputWithSuggestions'
 import { Suggestion } from '../ColumnEditor/ColumnEditor.types'
 import { typeExpressionSuggestions } from '../ColumnEditor/ColumnEditor.constants'
+import { FOREIGN_KEY_DELETION_ACTION } from 'data/database/database-query-constants'
+import { getForeignKeyDeletionAction } from '../ColumnEditor/ColumnEditor.utils'
 
 /**
  * [Joshen] For context:
@@ -50,12 +62,12 @@ const Column: FC<Props> = ({
 }) => {
   const suggestions: Suggestion[] = typeExpressionSuggestions?.[column.format] ?? []
 
-  let settingsCount = 0
-
-  column.isNullable ? (settingsCount += 1) : null
-  column.isIdentity ? (settingsCount += 1) : null
-  column.isUnique ? (settingsCount += 1) : null
-  column.isArray ? (settingsCount += 1) : null
+  const settingsCount = [
+    column.isNullable ? 1 : 0,
+    column.isIdentity ? 1 : 0,
+    column.isUnique ? 1 : 0,
+    column.isArray ? 1 : 0,
+  ].reduce((a, b) => a + b, 0)
 
   return (
     <div className="flex w-full items-center">
@@ -79,14 +91,54 @@ const Column: FC<Props> = ({
           />
         </div>
       </div>
-      <div className="w-[5%]  pl-0.5">
-        <Button
-          type={!isUndefined(column.foreignKey) ? 'secondary' : 'default'}
-          onClick={() => onEditRelation(column)}
-          className="px-1 py-2"
-        >
-          <IconLink size={14} strokeWidth={!isUndefined(column.foreignKey) ? 2 : 1} />
-        </Button>
+      <div className="w-[5%] mr-2.5">
+        <Tooltip.Root delayDuration={0}>
+          <Tooltip.Trigger>
+            <Button
+              type={column.foreignKey !== undefined ? 'secondary' : 'default'}
+              onClick={() => onEditRelation(column)}
+              className="px-1 py-2"
+            >
+              <IconLink size={14} strokeWidth={column.foreignKey !== undefined ? 2 : 1} />
+            </Button>
+          </Tooltip.Trigger>
+          <Tooltip.Portal>
+            <Tooltip.Content side="bottom">
+              <Tooltip.Arrow className="radix-tooltip-arrow" />
+              <div
+                className={[
+                  'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
+                  'border border-scale-200 ', //border
+                ].join(' ')}
+              >
+                {column.foreignKey === undefined ? (
+                  <span className="text-xs text-scale-1200">Edit foreign key relation</span>
+                ) : (
+                  <div>
+                    <p className="text-xs text-scale-1100">Foreign key relation:</p>
+                    <div className="flex items-center space-x-1">
+                      <p className="text-xs text-scale-1200">
+                        {column.foreignKey.source_schema}.{column.foreignKey.source_table_name}.
+                        {column.foreignKey.source_column_name}
+                      </p>
+                      <IconArrowRight size="tiny" strokeWidth={1.5} />
+                      <p className="text-xs text-scale-1200">
+                        {column.foreignKey.target_table_schema}.
+                        {column.foreignKey.target_table_name}.{column.foreignKey.target_column_name}
+                      </p>
+                    </div>
+                    {column.foreignKey.deletion_action !==
+                      FOREIGN_KEY_DELETION_ACTION.NO_ACTION && (
+                      <p className="text-xs text-scale-1200 mt-1">
+                        On delete: {getForeignKeyDeletionAction(column.foreignKey.deletion_action)}
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
+            </Tooltip.Content>
+          </Tooltip.Portal>
+        </Tooltip.Root>
       </div>
       <div className="w-[25%]">
         <div className="w-[95%]">
@@ -96,7 +148,7 @@ const Column: FC<Props> = ({
             size="small"
             showLabel={false}
             className="table-editor-column-type lg:gap-0 "
-            disabled={!isUndefined(column.foreignKey)}
+            disabled={column.foreignKey !== undefined}
             onOptionSelect={(format: string) => {
               onUpdateColumn({ format, defaultValue: null })
             }}
@@ -104,11 +156,11 @@ const Column: FC<Props> = ({
         </div>
       </div>
       <div className={`${isNewRecord ? 'w-[25%]' : 'w-[30%]'}`}>
-        <div className="w-[90%]">
+        <div className="w-[95%]">
           <InputWithSuggestions
             placeholder={
               typeof column.defaultValue === 'string' && column.defaultValue.length === 0
-                ? 'Empty string'
+                ? 'EMPTY'
                 : 'NULL'
             }
             size="small"
@@ -141,6 +193,7 @@ const Column: FC<Props> = ({
             <Popover
               size="xlarge"
               className="pointer-events-auto"
+              align="end"
               header={
                 <div className="flex items-center justify-center">
                   <h5 className="text-sm text-scale-1200">Extra options</h5>
@@ -161,7 +214,7 @@ const Column: FC<Props> = ({
                     </>
                   )}
 
-                  {isNewRecord && (
+                  {column.isNewColumn && (
                     <>
                       <Checkbox
                         label="Is Unique"

@@ -1,15 +1,13 @@
-import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { IconAlertCircle, Tabs } from 'ui'
+import { Tabs } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { NextPageWithLayout } from 'types'
-import { useStore, checkPermissions, useFlag } from 'hooks'
+import { useStore, checkPermissions } from 'hooks'
 import { DatabaseLayout } from 'components/layouts'
 import Loading from 'components/ui/Loading'
 import NoPermission from 'components/ui/NoPermission'
-import InformationBox from 'components/ui/InformationBox'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { PITRNotice, PITRSelection } from 'components/interfaces/Database/Backups/PITR'
 import BackupsError from 'components/interfaces/Database/Backups/BackupsError'
@@ -55,43 +53,24 @@ const PITR = () => {
   const tier = ui.selectedProject?.subscription_tier
   const isEnabled = configuration.walg_enabled
 
-  const isPITRSelfServeEnabled = useFlag('pitrSelfServe')
   const canReadPhysicalBackups = checkPermissions(PermissionAction.READ, 'physical_backups')
   if (!canReadPhysicalBackups) return <NoPermission resourceText="view PITR backups" />
 
   if (isLoading) return <Loading />
   if (error) return <BackupsError />
-  if (!isEnabled)
-    return isPITRSelfServeEnabled ? (
+  if (!isEnabled) {
+    return (
       <UpgradeToPro
         projectRef={ref}
         primaryText="Point in time recovery is a Pro plan add-on."
         secondaryText={
           tier === PRICING_TIER_PRODUCT_IDS.FREE
-            ? 'Please upgrade to the Pro plan with the PITR add-on selected to enable point in time recovery for your project.'
+            ? 'Upgrade to the Pro plan with the PITR add-on selected to enable point in time recovery for your project.'
             : 'Please enable the add-on to enable point in time recovery for your project.'
         }
       />
-    ) : (
-      <InformationBox
-        hideCollapse
-        defaultVisibility
-        title={
-          <div>
-            <p>
-              Point in time backups is an Enterprise feature. Reach out to us{' '}
-              <Link
-                href={`/support/new?ref=${ref}&category=sales&subject=Interest%20in%20enabling%20PITR%20for%20my%20project`}
-              >
-                <a className="text-brand-900">here</a>
-              </Link>{' '}
-              if you're interested!
-            </p>
-          </div>
-        }
-        icon={<IconAlertCircle size={18} strokeWidth={2} />}
-      />
     )
+  }
 
   return (
     <>

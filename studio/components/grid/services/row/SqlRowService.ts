@@ -7,6 +7,9 @@ import { useDispatch } from 'components/grid/store'
 
 export class SqlRowService implements IRowService {
   protected query = new Query()
+  // [Alaister]: This store is going to be removed in the near future
+  // and I really don't want to fix this "hook inside class" craziness 🤯
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   protected dispatch = useDispatch()
 
   constructor(

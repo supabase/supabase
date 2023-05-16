@@ -18,10 +18,10 @@
 <ellipse cx="130.95" cy="172.177" rx="107.969" ry="131.311" transform="rotate(-61.8798 130.95 172.177)" stroke="#FFDF72" stroke-width="0.5" stroke-linecap="round"/>
 <ellipse cx="136.996" cy="162.661" rx="122.268" ry="151.988" transform="rotate(-61.8798 136.996 162.661)" stroke="#FFDF72" stroke-width="0.5" stroke-linecap="round"/>
 <ellipse cx="140.488" cy="156.129" rx="133.57" ry="163.629" transform="rotate(-61.8798 140.488 156.129)" stroke="#FFDF72" stroke-width="0.5" stroke-linecap="round"/>
-<ellipse cx="143.399" cy="148.888" rx="146.147" ry="177.743" transform="rotate(-61.8798 143.399 148.888)" stroke="#FFDF72" stroke-linecap="round" stroke-dasharray="0.2 2"/>
-<ellipse cx="143.398" cy="148.889" rx="157.084" ry="191.045" transform="rotate(-61.8798 143.398 148.889)" stroke="#FFDF72" stroke-linecap="round" stroke-dasharray="0.2 2"/>
-<ellipse cx="144.068" cy="146.636" rx="171.225" ry="208.244" transform="rotate(-61.8798 144.068 146.636)" stroke="#FFDF72" stroke-linecap="round" stroke-dasharray="0.2 2"/>
-<ellipse cx="144.064" cy="146.636" rx="181.765" ry="221.062" transform="rotate(-61.8798 144.064 146.636)" stroke="#FFDF72" stroke-linecap="round" stroke-dasharray="0.2 2"/>
+<ellipse cx="143.399" cy="148.888" rx="146.147" ry="177.743" transform="rotate(-61.8798 143.399 148.888)" stroke="#FFDF72" stroke-linecap="round" strokeDasharray="0.2 2"/>
+<ellipse cx="143.398" cy="148.889" rx="157.084" ry="191.045" transform="rotate(-61.8798 143.398 148.889)" stroke="#FFDF72" stroke-linecap="round" strokeDasharray="0.2 2"/>
+<ellipse cx="144.068" cy="146.636" rx="171.225" ry="208.244" transform="rotate(-61.8798 144.068 146.636)" stroke="#FFDF72" stroke-linecap="round" strokeDasharray="0.2 2"/>
+<ellipse cx="144.064" cy="146.636" rx="181.765" ry="221.062" transform="rotate(-61.8798 144.064 146.636)" stroke="#FFDF72" stroke-linecap="round" strokeDasharray="0.2 2"/>
 <mask id="mask1_660_34464" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="-70" y="-59" width="433" height="405">
 <path d="M242.575 -16.8122C308.202 18.2551 499.682 265.335 193.697 345.533C187.474 296.498 141.078 274.246 120.307 275.46C106.058 276.292 90.6408 273.057 76.1901 265.335C54.8846 253.949 40.5208 235.395 35.7836 216.11C32.6242 203.249 14.1795 151.358 -69.7906 148.741C-69.7913 -143.039 176.94 -51.8711 242.575 -16.8122Z" fill="#ADEFF3"/>
 </mask>
@@ -59,11 +59,11 @@
 <feGaussianBlur stdDeviation="67.4384" result="effect1_foregroundBlur_660_34464"/>
 </filter>
 <linearGradient id="paint0_linear_660_34464" x1="118.076" y1="120.152" x2="32.5429" y2="275.113" gradientUnits="userSpaceOnUse">
-<stop stop-color="#FFC700"/>
+<stop stopColor="#FFC700"/>
 <stop offset="1" stop-color="#FFEBB9"/>
 </linearGradient>
 <linearGradient id="paint1_linear_660_34464" x1="148.98" y1="54.9662" x2="17.0834" y2="274.049" gradientUnits="userSpaceOnUse">
-<stop stop-color="#FFE600"/>
+<stop stopColor="#FFE600"/>
 <stop offset="1" stop-color="#FFE49F"/>
 </linearGradient>
 </defs>

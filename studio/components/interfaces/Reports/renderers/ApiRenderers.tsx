@@ -1,266 +1,217 @@
-import { Button, IconChevronRight } from 'ui'
-import { jsonSyntaxHighlight } from 'components/interfaces/Settings/Logs/LogsFormatters'
-import { BarChart } from 'components/to-be-cleaned/Charts/ChartRenderer'
+import { ReportWidgetProps, ReportWidgetRendererProps } from '../ReportWidget'
+import BarChart from 'components/ui/Charts/BarChart'
 import Table from 'components/to-be-cleaned/Table'
-import { USAGE_COLORS } from 'components/ui/Charts/Charts.constants'
-import StackedAreaChart from 'components/ui/Charts/StackedAreaChart'
-import { useState } from 'react'
-import { DATETIME_FORMAT } from '../Reports.constants'
-import { PathsDatum, StatusCodesDatum } from '../Reports.types'
+import {
+  jsonSyntaxHighlight,
+  TextFormatter,
+} from 'components/interfaces/Settings/Logs/LogsFormatters'
+import { Button, Collapsible, IconChevronRight } from 'ui'
 import { queryParamsToObject } from '../Reports.utils'
-import { ReportWidgetProps } from '../ReportWidget'
+import { Fragment } from 'react'
+import useFillTimeseriesSorted from 'hooks/analytics/useFillTimeseriesSorted'
 
-export const renderUserAgents = (
+export const TotalRequestsChartRenderer = (
   props: ReportWidgetProps<{
-    user_agent: string
-    request_source: string
+    timestamp: string
     count: number
   }>
 ) => {
+  const total = props.data.reduce((acc, datum) => {
+    return acc + datum.count
+  }, 0)
+  const data = useFillTimeseriesSorted(
+    props.data,
+    'timestamp',
+    'count',
+    0,
+    props.params?.iso_timestamp_start,
+    props.params?.iso_timestamp_end
+  )
   return (
-    <Table
-      containerClassName="max-h-72 w-full overflow-y-auto"
-      className="relative rounded border border-scale-600"
-      head={
-        <>
-          <Table.th className="sticky top-0 z-10">User Agents</Table.th>
-          <Table.th className="sticky top-0 z-10">Request Source</Table.th>
-          <Table.th className="sticky top-0 z-10">Count</Table.th>
-        </>
-      }
-      body={
-        <>
-          {props.data.map((row, index) => {
-            return (
-              <Table.tr key={index}>
-                <Table.td className="max-w-sm lg:max-w-lg" style={{ padding: '0.3rem' }}>
-                  {row.user_agent ? (
-                    row.user_agent
-                  ) : (
-                    <span className="text-scale-1000">No user agent</span>
-                  )}
-                </Table.td>
-                <Table.td>{row.request_source}</Table.td>
-                <Table.td style={{ padding: '0.5rem' }} className="align-top text-xs">
-                  {row.count}
-                </Table.td>
-              </Table.tr>
-            )
-          })}
-        </>
-      }
+    <BarChart
+      size="small"
+      minimalHeader
+      highlightedValue={total}
+      className="w-full"
+      data={data}
+      yAxisKey="count"
+      xAxisKey="timestamp"
+      displayDateInUtc
     />
   )
 }
 
-export const renderBotScores = (
-  props: ReportWidgetProps<{
-    ip: string
-    country: string
-    user_agent: string
+export const TopApiRoutesRenderer = (
+  props: ReportWidgetRendererProps<{
+    method: string
+    // shown for error table but not all requests table
+    status_code?: number
     path: string
-    bot_score: number
-    bot_verified: boolean
+    search: string
+    count: number
+    // used for response speed table only
+    avg?: number
+  }>
+) => {
+  if (props.data.length === 0) return null
+  const headerClasses = '!text-xs !py-2 p-0 font-bold !bg-scale-400'
+  const cellClasses = '!text-xs !py-2'
+  return (
+    <Table
+      head={
+        <>
+          <Table.th className={headerClasses}>Request</Table.th>
+          <Table.th className={headerClasses + ' text-right'}>Count</Table.th>
+          {props.data[0].avg !== undefined && (
+            <Table.th className={headerClasses + ' text-right'}>Avg</Table.th>
+          )}
+        </>
+      }
+      body={
+        <>
+          {props.data.map((datum) => (
+            <Fragment key={datum.path + (datum.search || '')}>
+              <Table.tr className="p-0">
+                <Table.td className={[cellClasses].join(' ')}>
+                  <RouteTdContent {...datum} />
+                </Table.td>
+                <Table.td className={[cellClasses, 'text-right align-top'].join(' ')}>
+                  {datum.count}
+                </Table.td>
+                {props.data[0].avg !== undefined && (
+                  <Table.td className={[cellClasses, 'text-right align-top'].join(' ')}>
+                    {Number(datum.avg).toFixed(2)}ms
+                  </Table.td>
+                )}
+              </Table.tr>
+            </Fragment>
+          ))}
+        </>
+      }
+    />
+  )
+}
+
+export const ErrorCountsChartRenderer = (
+  props: ReportWidgetProps<{
+    timestamp: string
     count: number
   }>
 ) => {
+  const total = props.data.reduce((acc, datum) => {
+    return acc + datum.count
+  }, 0)
+
+  const data = useFillTimeseriesSorted(
+    props.data,
+    'timestamp',
+    'count',
+    0,
+    props.params?.iso_timestamp_start,
+    props.params?.iso_timestamp_end
+  )
+
   return (
-    <Table
-      containerClassName="max-h-72 w-full overflow-y-auto"
-      className="relative rounded border border-scale-600"
-      head={
-        <>
-          <Table.th className="sticky top-0 z-10">IP (Country)</Table.th>
-          <Table.th className="sticky top-0 z-10">Request Path</Table.th>
-          <Table.th className="sticky top-0 z-10">User Agent</Table.th>
-          <Table.th className="sticky top-0 z-10">Bot Score</Table.th>
-          <Table.th className="sticky top-0 z-10">Is Verified Bot</Table.th>
-          <Table.th className="sticky top-0 z-10">Count</Table.th>
-        </>
-      }
-      body={
-        <>
-          {props.data.map((row, index) => {
-            return (
-              <Table.tr key={index}>
-                <Table.td className="max-w-sm lg:max-w-lg" style={{ padding: '0.3rem' }}>
-                  {row.ip} ({row.country})
-                </Table.td>
-                <Table.td>{row.path}</Table.td>
-                <Table.td className="max-w-xs truncate">{row.user_agent}</Table.td>
-                <Table.td>{row.bot_score}</Table.td>
-                <Table.td>{row.bot_verified ? 'Yes' : 'No'}</Table.td>
-                <Table.td style={{ padding: '0.5rem' }} className="align-top text-xs">
-                  {row.count}
-                </Table.td>
-              </Table.tr>
-            )
-          })}
-        </>
-      }
+    <BarChart
+      size="small"
+      minimalHeader
+      className="w-full"
+      highlightedValue={total}
+      data={data}
+      yAxisKey="count"
+      xAxisKey="timestamp"
+      displayDateInUtc
     />
   )
 }
 
-export const renderStatusCodesChart = (props: ReportWidgetProps<StatusCodesDatum>) => (
-  <StackedAreaChart
-    dateFormat={DATETIME_FORMAT}
-    data={props.data}
-    stackKey="status_code"
-    xAxisKey="timestamp"
-    yAxisKey="count"
-    isLoading={false}
-    xAxisFormatAsDate
-    size="large"
-    styleMap={{
-      200: { stroke: USAGE_COLORS['200'], fill: USAGE_COLORS['200'] },
-      201: { stroke: USAGE_COLORS['201'], fill: USAGE_COLORS['201'] },
-      400: { stroke: USAGE_COLORS['400'], fill: USAGE_COLORS['400'] },
-      401: { stroke: USAGE_COLORS['401'], fill: USAGE_COLORS['401'] },
-      404: { stroke: USAGE_COLORS['404'], fill: USAGE_COLORS['404'] },
-      500: { stroke: USAGE_COLORS['500'], fill: USAGE_COLORS['500'] },
-    }}
-  />
-)
-export const renderErrorRateChart = (props: ReportWidgetProps) => {
-  return (
-    <div className="flex w-full flex-col">
-      <BarChart
-        data={props.data}
-        attribute="count"
-        label=""
-        minimalHeader
-        customDateFormat={DATETIME_FORMAT}
-        noDataMessage={'No errors yet'}
-      />
-    </div>
-  )
-}
-
-export const renderRequestsPathsTable = (props: ReportWidgetProps<PathsDatum>) => {
-  const transformedData = props.data.map((data: PathsDatum) => ({
-    ...data,
-    p99_time: data.quantiles[98],
+export const ResponseSpeedChartRenderer = (
+  props: ReportWidgetProps<{
+    timestamp: string
+    avg: number
+  }>
+) => {
+  const transformedData = props.data.map((datum) => ({
+    timestamp: datum.timestamp,
+    avg: datum.avg,
   }))
-  const requestPathsSums = transformedData.map((v) => v.sum) as number[]
-  const requestPathsSumMax = Math.max(...requestPathsSums)
-  const requestPathsSumMin = Math.min(...requestPathsSums)
-  const requestPathsAvgs = transformedData.map((v) => v.avg_origin_time) as number[]
-  const requestPathsAvgMax = Math.max(...requestPathsAvgs)
-  const requestPathsAvgMin = Math.min(...requestPathsAvgs)
-  const requestPathsP99s = transformedData.map((v) => v.p99_time) as number[]
-  const requestPathsP99Max = Math.max(...requestPathsP99s)
-  const requestPathsP99Min = Math.min(...requestPathsP99s)
 
-  const renderNumericCellWithColorScale = (value: number, percentage: number) => (
-    <Table.td
-      style={{
-        padding: '0.5rem',
-      }}
-      className={`${
-        percentage >= 80
-          ? 'bg-orange-600'
-          : percentage > 60
-          ? 'bg-orange-500'
-          : percentage > 40
-          ? 'bg-yellow-500'
-          : percentage > 20
-          ? 'bg-yellow-400'
-          : percentage > 10
-          ? 'bg-yellow-200'
-          : 'bg-green-100'
-      } align-top text-xs`}
-    >
-      <span className="text-scale-1100">{Number(value).toFixed(1)}</span>
-    </Table.td>
+  const data = useFillTimeseriesSorted(
+    transformedData,
+    'timestamp',
+    'avg',
+    0,
+    props.params?.iso_timestamp_start,
+    props.params?.iso_timestamp_end
   )
-  return (
-    <Table
-      containerClassName="max-h-72 w-full overflow-y-auto"
-      className="relative rounded border border-scale-600"
-      head={
-        <>
-          <Table.th className="sticky top-0 z-10">Path</Table.th>
-          <Table.th className="sticky top-0 z-10">Count</Table.th>
-          <Table.th className="sticky top-0 z-10">Avg. Time (ms)</Table.th>
-          <Table.th className="sticky top-0 z-10">p99 Time (ms)</Table.th>
-          <Table.th className="sticky top-0 z-10">Total Query Time</Table.th>
-        </>
-      }
-      body={
-        <>
-          {transformedData.map((row, index) => {
-            const [show, setShow] = useState(false)
 
-            const totalQueryTimePercentage =
-              ((row.sum - requestPathsSumMin) / requestPathsSumMax) * 100
-            const avgTimePercentage =
-              ((row.avg_origin_time - requestPathsAvgMin) / requestPathsAvgMax) * 100
-            const p99TimePercentage =
-              ((row.p99_time - requestPathsP99Min) / requestPathsP99Max) * 100
-            return (
-              <>
-                <Table.tr key={index}>
-                  <Table.td className="max-w-sm lg:max-w-lg" style={{ padding: '0.3rem' }}>
-                    <Button
-                      onClick={() => setShow(!show)}
-                      type="text"
-                      className="flex w-full justify-start space-x-1 text-scale-1200"
-                      icon={
-                        <span className={`transition ${show ? 'rotate-90' : 'rotate-0'}`}>
-                          <IconChevronRight size="tiny" />
-                        </span>
-                      }
-                    >
-                      <div className="overflow-x-none flex items-center space-x-2">
-                        <p className="font-mono text-xs text-scale-1200">{row.method}</p>
-                        <p className="max-w-xs truncate font-mono text-xs text-scale-1200 ">
-                          {row.path}
-                          <span className="text-scale-1000">{row.query_params}</span>
-                        </p>
-                      </div>
-                    </Button>
-                  </Table.td>
-                  <Table.td style={{ padding: '0.5rem' }} className="align-top text-xs">
-                    {row.count}
-                  </Table.td>
-                  {renderNumericCellWithColorScale(row.avg_origin_time, avgTimePercentage)}
-                  {renderNumericCellWithColorScale(row.p99_time, p99TimePercentage)}
-                  <Table.td className="py-1 align-top">
-                    <div
-                      className={`mt-1 h-2 w-full rounded bg-green-1100`}
-                      style={{
-                        width: `${totalQueryTimePercentage}%`,
-                      }}
-                    />
-                  </Table.td>
-                </Table.tr>
-                <Table.tr className="transition-all duration-500">
-                  <Table.td
-                    colSpan={4}
-                    className={`overflow-none w-full ${
-                      show ? 'h-auto opacity-100' : 'table-cell !h-0 !p-0 opacity-0'
-                    }`}
-                  >
-                    <pre
-                      className={`syntax-highlight max-w-lg overflow-auto rounded bg-scale-300 p-2 text-xs  ${
-                        show ? '' : 'h-0 !p-0'
-                      }`}
-                    >
-                      <div
-                        className="text-wrap"
-                        dangerouslySetInnerHTML={{
-                          __html: jsonSyntaxHighlight(queryParamsToObject(row.query_params)),
-                        }}
-                      />
-                    </pre>
-                  </Table.td>
-                </Table.tr>
-              </>
-            )
-          })}
-        </>
-      }
+  const lastAvg = props.data[props.data.length - 1]?.avg
+  return (
+    <BarChart
+      size="small"
+      highlightedValue={lastAvg}
+      format="ms"
+      minimalHeader
+      className="w-full"
+      data={data}
+      yAxisKey="avg"
+      xAxisKey="timestamp"
+      displayDateInUtc
     />
   )
 }
+
+interface RouteTdContentProps {
+  method: string
+  status_code?: number
+  path: string
+  search: string
+}
+const RouteTdContent = (datum: RouteTdContentProps) => (
+  <Collapsible>
+    <Collapsible.Trigger asChild>
+      <div className="flex gap-2">
+        <Button as="span" type="text" className=" !py-0 !p-1" title="Show more route details">
+          <IconChevronRight
+            size={14}
+            className="transition data-open-parent:rotate-90 data-closed-parent:rotate-0"
+          />
+        </Button>
+        <TextFormatter className="w-10 h-4 text-center rounded bg-scale-500" value={datum.method} />
+        {datum.status_code && (
+          <TextFormatter
+            className={`w-10 h-4 text-center rounded ${
+              datum.status_code >= 400
+                ? 'bg-orange-500'
+                : datum.status_code >= 300
+                ? 'bg-yellow-500'
+                : 'bg-green-500'
+            }`}
+            value={String(datum.status_code)}
+          />
+        )}
+        <div className=" truncate max-w-sm lg:max-w-lg">
+          <TextFormatter className="text-scale-1100" value={datum.path} />
+          <TextFormatter
+            className="max-w-sm text-scale-900 truncate "
+            value={decodeURIComponent(datum.search || '')}
+          />
+        </div>
+      </div>
+    </Collapsible.Trigger>
+    <Collapsible.Content className="pt-2">
+      {datum.search ? (
+        <pre className={`syntax-highlight overflow-auto rounded bg-scale-300 p-2 !text-xs`}>
+          <div
+            className="text-wrap"
+            dangerouslySetInnerHTML={{
+              __html: jsonSyntaxHighlight(queryParamsToObject(datum.search)),
+            }}
+          />
+        </pre>
+      ) : (
+        <p className="text-xs text-scale-900">No query parameters in this request</p>
+      )}
+    </Collapsible.Content>
+  </Collapsible>
+)

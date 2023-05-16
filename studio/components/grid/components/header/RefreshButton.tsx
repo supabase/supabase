@@ -1,20 +1,21 @@
-import { FC, useState, useEffect } from 'react'
-import { Button, IconRefreshCw, IconCheck } from 'ui'
+import { useQueryClient } from '@tanstack/react-query'
+import { SupaTable } from 'components/grid/types'
+import { sqlKeys } from 'data/sql/keys'
+import { useParams } from 'common/hooks'
+import { useEffect, useState } from 'react'
+import { Button, IconCheck, IconRefreshCw } from 'ui'
 import { SupabaseGridQueue } from '../../constants'
-import { Filter, Sort } from 'components/grid/types'
-import { useDispatch, useTrackedState } from 'components/grid/store'
-import { fetchCount, fetchPage } from 'components/grid/utils'
 
-interface Props {
-  sorts: Sort[]
-  filters: Filter[]
+export type RefreshButtonProps = {
+  table: SupaTable
+  isRefetching: boolean
 }
 
-const RefreshButton: FC<Props> = ({ sorts, filters }) => {
-  const state = useTrackedState()
-  const dispatch = useDispatch()
+const RefreshButton = ({ table, isRefetching }: RefreshButtonProps) => {
+  const { ref } = useParams()
+  const queryClient = useQueryClient()
 
-  const [loading, setLoading] = useState(false)
+  const queryKey = sqlKeys.query(ref, [table.schema, table.name])
   const [status, setStatus] = useState<string>()
 
   useEffect(() => {
@@ -40,10 +41,7 @@ const RefreshButton: FC<Props> = ({ sorts, filters }) => {
   }, [])
 
   async function onClick() {
-    setLoading(true)
-    await fetchCount(state, dispatch, filters)
-    await fetchPage(state, dispatch, sorts, filters)
-    setLoading(false)
+    await queryClient.invalidateQueries(queryKey)
   }
 
   return (
@@ -61,7 +59,7 @@ const RefreshButton: FC<Props> = ({ sorts, filters }) => {
       onClick={() => {
         if (!status) onClick()
       }}
-      loading={loading || status === 'saving'}
+      loading={isRefetching || status === 'saving'}
     >
       {!status ? 'Refresh' : status === 'saved' ? 'Changes saved' : 'Saving changes'}
     </Button>
