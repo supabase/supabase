@@ -44,7 +44,7 @@ export const AuthProvider = ({ children }: PropsWithChildren<{}>) => {
     } = gotrueClient.onAuthStateChange((event) => {
       if (event === 'SIGNED_IN') {
         Telemetry.sendEvent(
-          { category: 'conversion', action: 'sign_in', label: '' },
+          { category: 'account', action: 'sign_in', label: '' },
           telemetryProps,
           router
         )
