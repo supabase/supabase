@@ -52,7 +52,7 @@ const FrontendFrameworks = ({ className }: { className?: string }) => {
               <a key={framework.name} className="m-0" data-tip={framework.name}>
                 <Image
                   key={framework.name}
-                  className="opacity-80 hover:opacity-100"
+                  className="opacity-100 hover:opacity-80 transition-opacity"
                   src={framework.icon}
                   alt={framework.name}
                   width={40}
