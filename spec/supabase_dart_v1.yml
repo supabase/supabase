@@ -1129,6 +1129,17 @@ functions:
                 fileOptions: const FileOptions(cacheControl: '3600', upsert: false),
               );
           ```
+      - id: upload-file-on-web
+        name: Upload file on web
+        code: |
+          ```dart
+          final avatarFile = chosenFile.bytes;
+          final String path = await supabase.storage.from('avatars').uploadBinary(
+                'public/avatar1.png',
+                avatarFile,
+                fileOptions: const FileOptions(cacheControl: '3600', upsert: false),
+              );
+          ```
 
   - id: from-update
     description: |
