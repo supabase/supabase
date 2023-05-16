@@ -4,7 +4,7 @@ import styles from './hero.module.css'
 
 const HeroGrid = dynamic(() => import('./HeroGrid'))
 
-const HeroBackground = ({ showGrid }: any) => (
+const HeroBackground = () => (
   <>
     <div
       className={[
@@ -22,7 +22,7 @@ const HeroBackground = ({ showGrid }: any) => (
     >
       <div className={['w-full h-full opacity-30 dark:opacity-60', styles['gradient']].join(' ')} />
       <div className="absolute bottom-0 z-[-2] w-full h-full bg-gradient-to-t from-scale-100 to-transparent" />
-      {showGrid && <HeroGrid />}
+      <HeroGrid />
     </div>
   </>
 )
