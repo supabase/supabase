@@ -208,7 +208,7 @@ function DatabaseVisual({ isDarkMode }: { isDarkMode: boolean }) {
               height="99.2224"
               rx="10"
               fill="url(#paint15_linear_2_842)"
-              fill-opacity="0.8"
+              fill-opacity="1"
               shape-rendering="crispEdges"
             />
             <g filter="url(#filter2_d_2_842)">
