@@ -79,6 +79,139 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
 And one optional step is to update the CSS file `styles/globals.css` to make the app look nice.
 You can find the full contents of this file [here](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/nextjs-ts-user-management/styles/globals.css).
 
+### Supabase provider
+
+Create a Supabase context provider to make it easier to access the Supabase client inside of client side code.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+>
+<TabPanel id="js" label="JavaScript">
+
+Create a `SupabaseProvider` component in `app/supabase-provider.jsx` and populate it with the following content:
+
+```jsx title=app/supabase-provider.jsx
+"use client";
+
+import { createContext, useContext, useEffect, useState } from "react";
+import { createBrowserSupabaseClient } from "@supabase/auth-helpers-nextjs";
+import { useRouter } from "next/navigation";
+
+const Context = createContext(undefined);
+
+export default function SupabaseProvider({
+  children,
+  session,
+}) {
+  const [supabase] = useState(() => createBrowserSupabaseClient());
+  const router = useRouter();
+
+  useEffect(() => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_, _session) => {
+      if (_session?.access_token !== session?.access_token) {
+        router.refresh();
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [router, supabase, session]);
+
+  return (
+    <Context.Provider value={{ supabase, session }}>
+      <>{children}</>
+    </Context.Provider>
+  );
+}
+
+export const useSupabase = () => {
+  let context = useContext(Context);
+
+  if (context === undefined) {
+    throw new Error("useSupabase must be used inside SupabaseProvider");
+  }
+
+  return context;
+};
+
+```
+
+</TabPanel>
+<TabPanel id="ts" label="TypeScript">
+
+Create a `SupabaseProvider` component in `app/supabase-provider.tsx` and populate it with the following content:
+
+```tsx title=app/supabase-provider.tsx
+"use client";
+
+import { createContext, useContext, useEffect, useState } from "react";
+import {
+  Session,
+  SupabaseClient,
+  createBrowserSupabaseClient,
+} from "@supabase/auth-helpers-nextjs";
+import { useRouter } from "next/navigation";
+
+type MaybeSession = Session | null;
+
+type SupabaseContext = {
+  supabase: SupabaseClient;
+  session: MaybeSession;
+};
+
+const Context = createContext<SupabaseContext | undefined>(undefined);
+
+export default function SupabaseProvider({
+  children,
+  session,
+}: {
+  children: React.ReactNode;
+  session: MaybeSession;
+}) {
+  const [supabase] = useState(() => createBrowserSupabaseClient());
+  const router = useRouter();
+
+  useEffect(() => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_, _session) => {
+      if (_session?.access_token !== session?.access_token) {
+        router.refresh();
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [router, supabase, session]);
+
+  return (
+    <Context.Provider value={{ supabase, session }}>
+      <>{children}</>
+    </Context.Provider>
+  );
+}
+
+export const useSupabase = () => {
+  let context = useContext(Context);
+
+  if (context === undefined) {
+    throw new Error("useSupabase must be used inside SupabaseProvider");
+  }
+
+  return context;
+};
+```
+
+</TabPanel>
+</Tabs>
+
 ### Set up a Login component
 
 #### Supabase Auth Helpers
@@ -87,10 +220,10 @@ Next.js is a highly versatile framework offering pre-rendering at build time (SS
 
 It can be challenging to authenticate your users in all these different environments, that's why we've created the [Supabase Auth Helpers](/docs/guides/auth/auth-helpers/nextjs) to make user management and data fetching within Next.js as easy as possible.
 
-Install the auth helpers for React and Next.js
+Install the auth helpers for Next.js
 
 ```bash
-npm install @supabase/auth-helpers-react @supabase/auth-helpers-nextjs
+npm install @supabase/auth-helpers-nextjs
 ```
 
 <Tabs
@@ -101,53 +234,81 @@ npm install @supabase/auth-helpers-react @supabase/auth-helpers-nextjs
 >
 <TabPanel id="js" label="JavaScript">
 
-Wrap your `pages/_app.js` component with the `SessionContextProvider` component:
+Wrap your `app/layout.js` component with the `SupabaseProvider` component:
 
-```jsx title=pages/_app.js
-import '../styles/globals.css'
-import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
-import { SessionContextProvider } from '@supabase/auth-helpers-react'
-import { useState } from 'react'
+```jsx title=app/layout.js
+import "./globals.css";
+import { createServerComponentSupabaseClient } from "@supabase/auth-helpers-nextjs";
+import SupabaseProvider from "./supabase-provider";
+import { cookies } from "next/headers";
 
-function MyApp({ Component, pageProps }) {
-  const [supabase] = useState(() => createBrowserSupabaseClient())
+export const metadata = {
+  title: "Create Next App",
+  description: "Generated by create next app",
+};
+
+export default async function RootLayout({
+  children,
+}) {
+  const supabase = createServerComponentSupabaseClient({
+    cookies,
+  });
+
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
 
   return (
-    <SessionContextProvider supabaseClient={supabase} initialSession={pageProps.initialSession}>
-      <Component {...pageProps} />
-    </SessionContextProvider>
-  )
+    <html lang="en">
+      <body>
+        <SupabaseProvider session={session}>{children}</SupabaseProvider>
+      </body>
+    </html>
+  );
 }
-export default MyApp
 ```
 
 </TabPanel>
 <TabPanel id="ts" label="TypeScript">
 
-Wrap your `pages/_app.tsx` component with the `SessionContextProvider` component:
+Wrap your `app/layout.tsx` component with the `SupabaseProvider` component:
 
-```jsx lines=2,8 title=pages/_app.tsx
-import '../styles/globals.css'
-import { useState } from 'react'
-import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
-import { SessionContextProvider, Session } from '@supabase/auth-helpers-react'
-import { AppProps } from 'next/app'
+```jsx title=app/layout.tsx
+import "./globals.css";
+import { createServerComponentSupabaseClient } from "@supabase/auth-helpers-nextjs";
+import SupabaseProvider from "./supabase-provider";
+import { cookies } from "next/headers";
 
-function MyApp({
-  Component,
-  pageProps,
-}: AppProps<{
-  initialSession: Session,
-}>) {
-  const [supabase] = useState(() => createBrowserSupabaseClient())
+export const metadata = {
+  title: "Create Next App",
+  description: "Generated by create next app",
+};
+
+export default async function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const supabase = createServerComponentSupabaseClient({
+    cookies,
+  });
+
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
 
   return (
-    <SessionContextProvider supabaseClient={supabase} initialSession={pageProps.initialSession}>
-      <Component {...pageProps} />
-    </SessionContextProvider>
-  )
+    <html lang="en">
+      <body>
+        <SupabaseProvider session={session}>
+          <div className="container" style={{ padding: "50px 0 100px 0" }}>
+            {children}
+          </div>
+        </SupabaseProvider>
+      </body>
+    </html>
+  );
 }
-export default MyApp
 ```
 
 See the [Auth Helpers docs](/docs/guides/auth/auth-helpers/nextjs#usage-with-typescript) for more details on usage with TypeScript.
@@ -162,32 +323,58 @@ We can use the [Supabase Auth UI](/docs/guides/auth/auth-helpers/auth-ui) a pre-
 Install the Supabase Auth UI for React
 
 ```bash
-npm install @supabase/auth-ui-react
+npm install @supabase/auth-ui-react @supabase/auth-ui-shared
 ```
 
-Add the `Auth` component to your home page
+Create a `AuthForm` client side component with the `Auth` component imported in it
 
-```jsx title=pages/index.js
-import { Auth } from '@supabase/auth-ui-react'
-import { ThemeSupa } from '@supabase/auth-ui-shared'
-import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
+```jsx title=app/authform.jsx
+// app/authform.jsx
+"use client";
+import { Auth } from "@supabase/auth-ui-react";
+import { ThemeSupa } from "@supabase/auth-ui-shared";
+import { useSupabase } from "./supabase-provider";
 
-const Home = () => {
-  const session = useSession()
-  const supabase = useSupabaseClient()
+export default function AuthForm() {
+  const { supabase } = useSupabase();
 
   return (
-    <div className="container" style={{ padding: '50px 0 100px 0' }}>
-      {!session ? (
-        <Auth supabaseClient={supabase} appearance={{ theme: ThemeSupa }} theme="dark" />
-      ) : (
-        <p>Account page will go here.</p>
-      )}
-    </div>
-  )
+    <Auth
+      supabaseClient={supabase}
+      view="magic_link"
+      appearance={{ theme: ThemeSupa }}
+      theme="dark"
+      showLinks={false}
+      providers={[]}
+      redirectTo="http://localhost:3000/auth/callback"
+    />
+  );
 }
+```
 
-export default Home
+Add the `AuthForm` component to your home page
+
+```jsx title=app/page.js
+// app/page.jsx
+import AuthForm from "./authform";
+
+export default async function Home() {
+  return (
+    <div className="row">
+      <div className="col-6">
+        <h1 className="header">Supabase Auth + Storage</h1>
+        <p className="">
+          Experience our Auth and Storage through a simple profile management
+          example. Create a user profile and upload an avatar image. Fast,
+          simple, secure.
+        </p>
+      </div>
+      <div className="col-6 auth-widget">
+        <AuthForm />
+      </div>
+    </div>
+  );
+}
 ```
 
 ### Account page
