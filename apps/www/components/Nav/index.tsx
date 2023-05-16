@@ -2,11 +2,7 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
-<<<<<<< HEAD
 import { Button, Badge, IconStar, IconChevronDown } from 'ui'
-=======
-import { Button, Badge, Announcement, IconStar, IconChevronDown } from 'ui'
->>>>>>> c73d8f313 (chore: remove announcement banner)
 import FlyOut from '~/components/UI/FlyOut'
 import Transition from 'lib/Transition'
 
