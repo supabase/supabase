@@ -9,6 +9,7 @@ import { motion } from 'framer-motion'
 import BackedBy from '../BackedBy'
 import { useBreakpoint, useTheme } from 'common'
 import FeatureCard from './FeatureCard'
+import DatabaseVisual from './DatabaseVisual'
 
 const opacityVariant = {
   default: { opacity: 1, filter: 'grayscale(1)', transition: { duration: 0.1 } },
@@ -75,19 +76,22 @@ const Features = () => {
           }
           onClick={() => sendTelemetryEvent(name)}
           image={
+            // <motion.div className="absolute inset-0 z-0" variants={opacityVariant}>
+            //   <Image
+            //     src={
+            //       isDarkMode
+            //         ? '/images/index/database-dark.jpg'
+            //         : '/images/index/database-light.jpg'
+            //     }
+            //     alt="Supabase Postgres Database, hover image with glow"
+            //     layout="fill"
+            //     objectPosition={isSm ? 'bottom' : '50% 50%'}
+            //     objectFit={isSm ? 'contain' : 'cover'}
+            //     quality={100}
+            //   />
+            // </motion.div>
             <motion.div className="absolute inset-0 z-0" variants={opacityVariant}>
-              <Image
-                src={
-                  isDarkMode
-                    ? '/images/index/database-dark.jpg'
-                    : '/images/index/database-light.jpg'
-                }
-                alt="Supabase Postgres Database, hover image with glow"
-                layout="fill"
-                objectPosition={isSm ? 'bottom' : '50% 50%'}
-                objectFit={isSm ? 'contain' : 'cover'}
-                quality={100}
-              />
+              <DatabaseVisual />
             </motion.div>
           }
           classname="col-span-full md:col-span-3"
