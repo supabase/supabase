@@ -19,6 +19,13 @@ const HeroGrid = () => {
     strokeWidth: 1,
   }
 
+  const pulseAnimation = {
+    x2: [svgGridOptions.boxWidth / 2, 0, svgGridOptions.boxWidth / 2],
+    x1: [svgGridOptions.boxWidth / 2, 0, svgGridOptions.boxWidth / 2],
+    y1: [svgGridOptions.boxHeight, svgGridOptions.boxHeight / 3, 0],
+    y2: [svgGridOptions.boxHeight, svgGridOptions.boxHeight / 2, 0],
+  }
+
   const GridSVG = () => (
     <svg
       preserveAspectRatio="none"
@@ -28,130 +35,81 @@ const HeroGrid = () => {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      {[...new Array(svgGridOptions.yLines)].map((_: any, i: number) => {
-        const y = (svgGridOptions.boxWidth * i) / svgGridOptions.yLines
-        return (
+      {[...new Array(svgGridOptions.xLines)].map((_: any, i: number) => {
+        const x = (svgGridOptions.boxHeight * i) / svgGridOptions.xLines
+
+        const AnimatedLine = ({ name }: { name: string }) => (
           <line
-            key={`y-${i}`}
-            x1={svgGridOptions.boxHeight}
-            y1={y}
-            x2="0"
-            y2={y}
-            stroke={svgGridOptions.color}
-            strokeWidth={svgGridOptions.strokeWidth}
+            x1={x}
+            y1={svgGridOptions.boxWidth}
+            x2={x}
+            y2="0"
+            stroke={`url(#${name})`}
+            strokeLinecap="round"
+            strokeWidth={isSm ? 3 : 6}
             shapeRendering="crispEdges"
           />
         )
-      })}
-      {[...new Array(svgGridOptions.xLines)].map((_: any, i: number) => {
-        const x = (svgGridOptions.boxHeight * i) / svgGridOptions.xLines
-        return (
-          <>
-            <line
-              key={`x-${i}`}
-              x1={x}
-              y1={svgGridOptions.boxWidth}
-              x2={x}
-              y2="0"
-              stroke={svgGridOptions.color}
-              strokeWidth={svgGridOptions.strokeWidth}
-              shapeRendering="crispEdges"
-            />
-            {isSm
-              ? i === 9 && (
-                  <line
-                    x1={x}
-                    y1={svgGridOptions.boxWidth}
-                    x2={x}
-                    y2="0"
-                    stroke="url(#electric-pulse)"
-                    strokeLinecap="round"
-                    strokeWidth={4}
-                    shapeRendering="crispEdges"
-                  />
-                )
-              : i === 25 && (
-                  <line
-                    x1={x}
-                    y1={svgGridOptions.boxWidth}
-                    x2={x}
-                    y2="0"
-                    stroke="url(#electric-pulse)"
-                    strokeLinecap="round"
-                    strokeWidth={4}
-                    shapeRendering="crispEdges"
-                  />
-                )}
-            {isSm
-              ? i === 14 && (
-                  <line
-                    x1={x}
-                    y1={svgGridOptions.boxWidth}
-                    x2={x}
-                    y2="0"
-                    stroke="url(#electric-pulse-2)"
-                    strokeLinecap="round"
-                    strokeWidth={4}
-                    shapeRendering="crispEdges"
-                  />
-                )
-              : i === 33 && (
-                  <line
-                    x1={x}
-                    y1={svgGridOptions.boxWidth}
-                    x2={x}
-                    y2="0"
-                    stroke="url(#electric-pulse-2)"
-                    strokeLinecap="round"
-                    strokeWidth={4}
-                    shapeRendering="crispEdges"
-                  />
-                )}
-          </>
-        )
+
+        const getMobileLines: () => string = () => {
+          switch (i) {
+            case 9:
+              return 'electric-pulse'
+            case 14:
+              return 'electric-pulse-2'
+            case 17:
+              return 'electric-pulse-3'
+            case 12:
+              return 'electric-pulse-4'
+            default:
+              return ''
+          }
+        }
+        const getDesktopLines: () => string = () => {
+          switch (i) {
+            case 25:
+              return 'electric-pulse'
+            case 33:
+              return 'electric-pulse-2'
+            case 22:
+              return 'electric-pulse-3'
+            case 30:
+              return 'electric-pulse-4'
+            case 36:
+              return 'electric-pulse-5'
+            default:
+              return ''
+          }
+        }
+
+        return <AnimatedLine name={isSm ? getMobileLines() : getDesktopLines()} />
       })}
       <defs>
-        <motion.linearGradient
-          animate={{
-            x2: [svgGridOptions.boxWidth / 2, 0, svgGridOptions.boxWidth / 2],
-            x1: [svgGridOptions.boxWidth / 2, 0, svgGridOptions.boxWidth / 2],
-            y1: [svgGridOptions.boxHeight, svgGridOptions.boxHeight / 3, 0],
-            y2: [svgGridOptions.boxHeight, svgGridOptions.boxHeight / 2, 0],
-          }}
-          transition={{
-            duration: isSm ? 4 : 5,
-            repeat: Infinity,
-            ease: 'linear',
-          }}
-          id="electric-pulse"
-          gradientUnits="userSpaceOnUse"
-        >
-          <stop stopColor={svgGridOptions.color} stopOpacity="0" />
-          <stop stopColor={svgGridOptions.color} stopOpacity="0.8" />
-          <stop offset="1" stopColor="#3E9BCF" stopOpacity="0" />
-        </motion.linearGradient>
-        <motion.linearGradient
-          animate={{
-            x2: [svgGridOptions.boxWidth / 2, 0, svgGridOptions.boxWidth / 2],
-            x1: [svgGridOptions.boxWidth / 2, 0, svgGridOptions.boxWidth / 2],
-            y1: [svgGridOptions.boxHeight, svgGridOptions.boxHeight / 3, 0],
-            y2: [svgGridOptions.boxHeight, svgGridOptions.boxHeight / 2, 0],
-          }}
-          transition={{
-            duration: isSm ? 4 : 5,
-            repeat: Infinity,
-            ease: 'linear',
-            delay: 2,
-          }}
-          id="electric-pulse-2"
-          gradientUnits="userSpaceOnUse"
-        >
-          <stop stopColor={svgGridOptions.color} stopOpacity="0" />
-          <stop stopColor={svgGridOptions.color} stopOpacity="0.8" />
-          <stop offset="1" stopColor="#3E9BCF" stopOpacity="0" />
-        </motion.linearGradient>
+        <MotionLinearGradient name="electric-pulse" delay={0} />
+        <MotionLinearGradient name="electric-pulse-2" delay={2} />
+        <MotionLinearGradient name="electric-pulse-3" delay={4} />
+        <MotionLinearGradient name="electric-pulse-4" delay={5} />
+        <MotionLinearGradient name="electric-pulse-5" delay={6} />
       </defs>
     </svg>
+  )
+
+  const MotionLinearGradient = ({ name, delay }: { name: string; delay: number }) => (
+    <motion.linearGradient
+      animate={pulseAnimation}
+      transition={{
+        duration: isSm ? 4 : 5,
+        repeat: Infinity,
+        ease: 'linear',
+        delay: delay,
+      }}
+      id={name}
+      gradientUnits="userSpaceOnUse"
+    >
+      <stop stopColor={svgGridOptions.color} stopOpacity="0" />
+      <stop stopColor={svgGridOptions.color} stopOpacity="1" />
+      <stop offset="1" stopColor="#3E9BCF" stopOpacity="0" />
+    </motion.linearGradient>
   )
 
   return (
@@ -162,7 +120,7 @@ const HeroGrid = () => {
     >
       <div
         style={{
-          transform: 'rotateX(85deg)',
+          transform: 'rotateX(86deg)',
           position: 'absolute',
           top: 0,
           bottom: 0,
