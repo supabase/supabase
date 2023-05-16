@@ -111,6 +111,8 @@ const SideBarContent = observer(() => {
                 <Dropdown
                   align="end"
                   side="bottom"
+                  sideOffset={3}
+                  className="max-w-[210px]"
                   overlay={[
                     <Dropdown.Item
                       key="new-ai-query"
