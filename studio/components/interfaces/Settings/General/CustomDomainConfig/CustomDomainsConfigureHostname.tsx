@@ -57,6 +57,7 @@ const CustomDomainsConfigureHostname = () => {
       })
     } catch (error: any) {
       ui.setNotification({
+        error,
         category: 'error',
         message: error.message,
       })

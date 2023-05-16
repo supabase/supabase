@@ -212,7 +212,7 @@ const NewProjectPanel: FC<Props> = ({}) => {
                   </div>
                   <div className="flex md:min-h-[50px] xl:min-h-[75px]">
                     <p className="text-sm text-scale-1000">
-                      Listen to your to PostgreSQL database in realtime via websockets.
+                      Listen to your PostgreSQL database in realtime via websockets.
                     </p>
                   </div>
                   <div className="flex items-center space-x-2">

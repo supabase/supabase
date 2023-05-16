@@ -5020,7 +5020,7 @@
                   "kindString": "Call signature",
                   "flags": {},
                   "comment": {
-                    "shortText": "Creates a signed upload URL.\nSigned upload URLs can be used to upload files to the bucket without further authentication.\nThey are valid for one minute."
+                    "shortText": "Creates a signed upload URL.\nSigned upload URLs can be used to upload files to the bucket without further authentication.\nThey are valid for 2 hours."
                   },
                   "parameters": [
                     {

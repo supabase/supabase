@@ -33,7 +33,7 @@ const ProjectUsage: FC<Props> = ({}) => {
 
   const selectedInterval = CHART_INTERVALS.find((i) => i.key === interval) || CHART_INTERVALS[1]
   const startDate = dayjs()
-    .subtract(selectedInterval.startValue, selectedInterval.startUnit)
+    .subtract(selectedInterval.startValue, selectedInterval.startUnit as dayjs.ManipulateType)
     .format(DATE_FORMAT)
   const endDate = dayjs().format(DATE_FORMAT)
   const charts = data?.data

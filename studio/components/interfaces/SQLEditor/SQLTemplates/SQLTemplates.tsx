@@ -8,7 +8,7 @@ import { useProfileQuery } from 'data/profile/profile-query'
 import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.constants'
 import SQLCard from './SQLCard'
 import { createSqlSnippetSkeleton } from '../SQLEditor.utils'
-import { useParams } from 'common'
+import { useTelemetryProps, useParams } from 'common'
 import { useRouter } from 'next/router'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
@@ -21,6 +21,7 @@ const SQLTemplates = observer(() => {
   const { data: profile } = useProfileQuery()
   const [sql, quickStart] = partition(SQL_TEMPLATES, { type: 'template' })
 
+  const telemetryProps = useTelemetryProps()
   const snap = useSqlEditorStateSnapshot()
   const canCreateSQLSnippet = checkPermissions(PermissionAction.CREATE, 'user_content', {
     resource: { type: 'sql', owner_id: profile?.id },
@@ -77,7 +78,8 @@ const SQLTemplates = observer(() => {
                     action: 'script_clicked',
                     label: x.title,
                   },
-                  ui.googleAnalyticsProps
+                  telemetryProps,
+                  router
                 )
               }}
             />
@@ -111,7 +113,8 @@ const SQLTemplates = observer(() => {
                     action: 'quickstart_clicked',
                     label: x.title,
                   },
-                  ui.googleAnalyticsProps
+                  telemetryProps,
+                  router
                 )
               }}
             />

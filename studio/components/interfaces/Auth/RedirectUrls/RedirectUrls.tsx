@@ -141,7 +141,7 @@ const RedirectUrls = () => {
                 <div className="px-5">
                   <p className="text-sm text-scale-1100">
                     This will add a URL to a list of allowed URLs that can interact with your
-                    Authenticaton services for this project.
+                    Authentication services for this project.
                   </p>
                 </div>
                 <div className="border-overlay-border border-t" />

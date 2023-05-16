@@ -198,10 +198,6 @@ const ColumnEditor = ({
           applyFunction={(resolve: () => void) => onSaveChanges(resolve)}
         />
       }
-      onInteractOutside={(event) => {
-        const isToast = (event.target as Element)?.closest('#toast')
-        if (isToast) event.preventDefault()
-      }}
     >
       <FormSection header={<FormSectionLabel className="lg:!col-span-4">General</FormSectionLabel>}>
         <FormSectionContent loading={false} className="lg:!col-span-8">

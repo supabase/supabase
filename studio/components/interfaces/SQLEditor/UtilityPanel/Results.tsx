@@ -75,14 +75,6 @@ const Results = ({ id, rows }: { id: string; rows: readonly any[] }) => {
     )
   }
 
-  if (rows.length <= 0) {
-    return (
-      <div className="bg-table-header-light dark:bg-table-header-dark">
-        <p className="m-0 border-0 px-6 py-4 font-mono text-sm">Success. No rows returned</p>
-      </div>
-    )
-  }
-
   return (
     <>
       <DataGrid

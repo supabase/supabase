@@ -66,9 +66,11 @@ Use your browser's developer tools to find the WebSocket initiation request and 
 
 </Admonition>
 
-## Payload Limits
+## Postgres Changes Payload Limit
 
-Realtime has a message byte size limit of 1 megabyte.
+Realtime Postgres Changes has a change payload size limit of 1 mebibyte (MiB).
+
+When this limit is reached, the `new` and `old` record payloads only include the fields with a value size of less than or equal to 64 bytes.
 
 ## Presence Limits
 
