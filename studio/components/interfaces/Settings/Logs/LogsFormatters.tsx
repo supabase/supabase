@@ -235,9 +235,16 @@ export const TimestampLocalFormatter = ({
   className?: string
   value: string | number
 }) => {
+  return <span className={`text-xs ${className}`}>{timestampLocalFormatter(value)}</span>
+}
+
+/**
+ * Formats a string to local timestamp display
+ * Accepts unix microsecond or iso timestamp
+ */
+export const timestampLocalFormatter = (value: string | number) => {
   const timestamp = isUnixMicro(value) ? unixMicroToIsoTimestamp(value) : value
-  const formattedTimestamp = dayjs(timestamp).format('DD MMM, HH:mm:ss')
-  return <span className={`text-xs ${className}`}>{formattedTimestamp}</span>
+  return dayjs(timestamp).format('DD MMM  HH:mm:ss')
 }
 
 /*

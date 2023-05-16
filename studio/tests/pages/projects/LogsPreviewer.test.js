@@ -347,7 +347,7 @@ test('log event chart hide', async () => {
     return { result: [] }
   })
   render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
-  await screen.findByText(/Logs \/ Time/)
+  await screen.findByText(/No data/)
   const toggle = await screen.findByText(/Chart/)
   userEvent.click(toggle)
   await expect(screen.findByText('Events')).rejects.toThrow()

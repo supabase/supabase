@@ -3,7 +3,7 @@ import { Button, IconLoader } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 
 import { useFlag } from 'hooks'
-import { STRIPE_PRODUCT_IDS } from 'lib/constants'
+import { PRICING_TIER_PRODUCT_IDS, STRIPE_PRODUCT_IDS } from 'lib/constants'
 import { StripeProduct } from 'components/interfaces/Billing'
 import { useIsProjectActive } from 'components/layouts/ProjectLayout/ProjectContext'
 
@@ -14,8 +14,10 @@ interface PlanCTAButtonProps {
 }
 
 const PlanCTAButton = ({ plan, currentPlan, onSelectPlan }: PlanCTAButtonProps) => {
-  const isActive = useIsProjectActive()
+  const isProjectActive = useIsProjectActive()
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
+
+  const isTeamTier = currentPlan?.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.TEAM
 
   const getButtonType = (plan: any, currentPlan: any) => {
     if (['Free tier'].includes(plan.name)) {
@@ -85,7 +87,8 @@ const PlanCTAButton = ({ plan, currentPlan, onSelectPlan }: PlanCTAButtonProps) 
   const type = getButtonType(plan, currentPlan)
   const ctaText = getButtonText(plan, currentPlan)
   const disabled =
-    (!isActive && plan.name !== 'Enterprise') ||
+    (!isProjectActive && plan.name !== 'Enterprise') ||
+    (isTeamTier && plan.name !== 'Enterprise' && plan.name !== 'Team tier') ||
     (plan.id === STRIPE_PRODUCT_IDS.FREE && currentPlan.prod_id === STRIPE_PRODUCT_IDS.FREE)
 
   if (plan.name === 'Enterprise') {
@@ -113,7 +116,7 @@ const PlanCTAButton = ({ plan, currentPlan, onSelectPlan }: PlanCTAButtonProps) 
             {ctaText}
           </Button>
         </Tooltip.Trigger>
-        {(projectUpdateDisabled || !isActive) && (
+        {((disabled && isTeamTier) || projectUpdateDisabled || !isProjectActive) && (
           <Tooltip.Portal>
             <Tooltip.Portal>
               <Tooltip.Content side="bottom">
@@ -127,8 +130,10 @@ const PlanCTAButton = ({ plan, currentPlan, onSelectPlan }: PlanCTAButtonProps) 
                   <span className="text-xs text-scale-1200 text-center">
                     {projectUpdateDisabled
                       ? 'Subscription changes are currently disabled, our engineers are working on a fix'
-                      : !isActive
+                      : !isProjectActive
                       ? 'Unable to update subscription as project is not active'
+                      : isTeamTier
+                      ? "Unable to update subscription from Team tier. Please reach out to us via support if you'd like to change your plan"
                       : ''}
                   </span>
                 </div>

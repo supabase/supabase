@@ -1,4 +1,153 @@
-import { References } from '../Navigation.types'
+import { References, HomepageMenuItems } from '../Navigation.types'
+
+export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
+  [
+    {
+      label: 'Home',
+      icon: 'home',
+      href: '/',
+      level: 'home',
+    },
+    {
+      label: 'Getting Started',
+      icon: 'getting-started',
+      href: '/guides/getting-started',
+      level: 'gettingstarted',
+    },
+  ],
+  [
+    {
+      label: 'Database',
+      icon: 'database',
+      href: '/guides/database',
+      level: 'database',
+    },
+    {
+      label: 'Serverless APIs',
+      icon: 'serverless-apis',
+      href: '/guides/api',
+      level: 'api',
+    },
+    {
+      label: 'Auth',
+      icon: 'auth',
+      href: '/guides/auth',
+      level: 'auth',
+    },
+    {
+      label: 'Edge Functions',
+      icon: 'edge-functions',
+      href: '/guides/functions',
+      level: 'functions',
+    },
+    {
+      label: 'Realtime',
+      icon: 'realtime',
+      href: '/guides/realtime',
+      level: 'realtime',
+    },
+    {
+      label: 'Storage',
+      icon: 'storage',
+      href: '/guides/storage',
+      level: 'storage',
+    },
+  ],
+  [
+    {
+      label: 'Platform',
+      icon: 'platform',
+      href: '/guides/platform',
+      level: 'platform',
+    },
+    {
+      label: 'Resources',
+      icon: 'resources',
+      href: '/guides/resources',
+      level: 'resources',
+    },
+    {
+      label: 'Self-Hosting',
+      icon: 'self-hosting',
+      href: '/guides/self-hosting',
+      level: 'self_hosting',
+    },
+    {
+      label: 'Integrations',
+      icon: 'integrations',
+      hasLightIcon: true,
+      href: '/guides/integrations',
+      level: 'integrations',
+    },
+  ],
+  [
+    {
+      label: 'Client Library Reference',
+    },
+    {
+      label: 'JavaScript',
+      icon: 'reference-javascript',
+      href: '/reference/javascript/introduction',
+      level: 'reference_javascript',
+    },
+    {
+      label: 'Flutter',
+      icon: 'reference-dart',
+      href: '/reference/dart/introduction',
+      level: 'reference_dart',
+    },
+    {
+      label: 'Python',
+      icon: 'reference-python',
+      href: '/reference/python/introduction',
+      level: 'reference_python',
+      community: true,
+    },
+    {
+      label: 'C#',
+      icon: 'reference-csharp',
+      href: '/reference/csharp/introduction',
+      level: 'reference_csharp',
+      community: true,
+    },
+    {
+      label: 'Swift',
+      icon: 'reference-swift',
+      href: '/reference/swift/introduction',
+      level: 'reference_swift',
+      community: true,
+    },
+    {
+      label: 'Kotlin',
+      icon: 'reference-kotlin',
+      href: '/reference/kotlin/introduction',
+      level: 'reference_kotlin',
+      community: true,
+    },
+    {
+      label: 'Tools reference',
+    },
+    {
+      label: 'Management API',
+      icon: 'reference-api',
+      href: '/reference/api/introduction',
+      level: 'reference_javascript',
+    },
+    {
+      label: 'Supabase CLI',
+      icon: 'reference-cli',
+      href: '/guides/cli',
+      level: 'reference_javascript',
+    },
+  ],
+  [
+    {
+      label: 'Status',
+      icon: 'status',
+      href: 'https://status.supabase.com/',
+    },
+  ],
+]
 
 export const REFERENCES: References = {
   javascript: {
@@ -22,8 +171,14 @@ export const REFERENCES: References = {
   swift: {
     name: 'Swift',
     library: 'supabase-swift',
-    versions: ['v1'],
+    versions: ['v0'],
     icon: '/docs/img/libraries/swift-icon.svg',
+  },
+  kotlin: {
+    name: 'Kotlin',
+    library: 'supabase-kt',
+    versions: ['v0'],
+    icon: '/docs/img/libraries/kotlin-icon.svg',
   },
   cli: {
     name: 'CLI',
@@ -45,7 +200,7 @@ export const gettingstarted = {
   items: [
     { name: 'Features', url: '/guides/getting-started/features' },
     { name: 'Architecture', url: '/guides/getting-started/architecture' },
-    // { name: 'Local Development', url: '/guides/cli/local-development' }, // Disabling this until we actually move the doc into this section
+    { name: 'Local Development', url: '/guides/getting-started/local-development' },
     {
       name: 'Framework Quickstarts',
       items: [
@@ -141,8 +296,11 @@ export const cli = {
   title: 'CLI',
   items: [
     { name: 'Overview', url: '/guides/cli' },
-    { name: 'Local Development', url: '/guides/cli/local-development' },
     { name: 'Managing Environments', url: '/guides/cli/managing-environments' },
+    {
+      name: 'Using environment variables in config.toml',
+      url: '/guides/cli/using-environment-variables-in-config',
+    },
   ],
 }
 
@@ -296,6 +454,7 @@ export const auth = {
             },
           ],
         },
+        { name: 'Password Reset', url: '/guides/auth/auth-password-reset' },
         { name: 'Email Templates', url: '/guides/auth/auth-email-templates' },
       ],
     },
@@ -473,6 +632,10 @@ export const database = {
           url: '/guides/database/postgres/indexes',
         },
         {
+          name: 'Cascade Deletes',
+          url: '/guides/database/postgres/cascade-deletes',
+        },
+        {
           name: 'Drop All Tables in Schema',
           url: '/guides/database/postgres/dropping-all-tables-in-schema',
         },
@@ -500,7 +663,7 @@ export const database = {
 }
 
 export const api = {
-  icon: 'reference',
+  icon: 'serverless-apis',
   title: 'Serverless APIs',
   url: '/guides/api',
   items: [
@@ -538,7 +701,7 @@ export const api = {
 }
 
 export const functions = {
-  icon: 'functions',
+  icon: 'edge-functions',
   title: 'Edge Functions',
   url: '/guides/functions',
   items: [
@@ -578,7 +741,17 @@ export const functions = {
           name: 'Connecting directly to Postgres',
           url: '/guides/functions/connect-to-postgres',
         },
+      ],
+    },
+    {
+      name: 'Third-Party Tools',
+      url: undefined,
+      items: [
         { name: 'Dart Edge on Supabase', url: '/guides/functions/dart-edge' },
+        { name: 'Browserless.io', url: '/guides/functions/examples/screenshots' },
+        { name: 'OpenAI API', url: '/guides/functions/examples/openai' },
+        { name: 'Upstash Redis', url: '/guides/functions/examples/upstash-redis' },
+        { name: 'Type-Safe SQL with Kysely', url: '/guides/functions/kysely-postgres' },
       ],
     },
     {
@@ -688,8 +861,11 @@ export const supabase_cli = {
   url: '/guides/cli',
   items: [
     { name: 'Overview', url: '/guides/cli' },
-    { name: 'Local Development', url: '/guides/cli/local-development' },
     { name: 'Managing Environments', url: '/guides/cli/managing-environments' },
+    {
+      name: 'Using environment variables in config.toml',
+      url: '/guides/cli/using-environment-variables-in-config',
+    },
     {
       name: 'Reference',
       url: undefined,
@@ -768,6 +944,10 @@ export const platform = {
           name: 'HTTP and Project Issues',
           url: '/guides/platform/troubleshooting',
         },
+        {
+          name: 'High CPU Usage',
+          url: '/guides/platform/exhaust-cpu',
+        },
       ],
     },
   ],
@@ -816,7 +996,7 @@ export const resources = {
 
 export const self_hosting = {
   title: 'Self-Hosting',
-  icon: 'resources',
+  icon: 'self-hosting',
   url: '/guides/self-hosting',
   items: [
     { name: 'Overview', url: '/guides/self-hosting' },
@@ -973,6 +1153,13 @@ export const reference = {
           items: [],
           icon: '/img/icons/menu/reference-swift',
         },
+        {
+          name: 'supabase-kt',
+          url: '/reference/kotlin/start',
+          level: 'reference_kotlin',
+          items: [],
+          icon: '/img/icons/menu/reference-kotlin',
+        },
         // {
         //   name: 'supabase-python',
         //   url: '/reference/python/start',
@@ -1042,10 +1229,17 @@ export const reference_python_v2 = {
   parent: '/reference',
 }
 
-export const reference_swift_v1 = {
+export const reference_swift_v0 = {
   icon: 'reference-swift',
   title: 'swift',
   url: 'guides/reference/swift',
+  parent: '/reference',
+}
+
+export const reference_kotlin_v0 = {
+  icon: 'reference-kotlin',
+  title: 'kotlin',
+  url: 'guides/reference/kotlin',
   parent: '/reference',
 }
 
@@ -1165,10 +1359,17 @@ export const references = [
       },
       {
         label: 'supabase-swift',
-        versions: ['v1'],
+        versions: ['v0'],
         description: 'something about the reference',
         icon: '/docs/img/icons/swift-icon.svg',
         url: '/reference/swift/start',
+      },
+      {
+        label: 'supabase-kt',
+        versions: ['v0'],
+        description: 'something about the reference',
+        icon: '/docs/img/icons/kotlin-icon.svg',
+        url: '/reference/kotlin/start',
       },
     ],
   },

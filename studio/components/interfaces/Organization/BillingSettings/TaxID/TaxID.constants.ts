@@ -8,6 +8,7 @@ export interface TaxId {
   code: string
   country: string
   placeholder: string
+  vatPrefix?: string
 }
 
 export interface StripeTaxId {
@@ -30,6 +31,7 @@ export const TAX_IDS: TaxId[] = [
     code: 'eu_vat',
     country: 'Austria',
     placeholder: 'ATU12345678',
+    vatPrefix: 'ATU',
   },
   {
     name: 'AU ABN',
@@ -48,12 +50,14 @@ export const TAX_IDS: TaxId[] = [
     code: 'eu_vat',
     country: 'Belgium',
     placeholder: 'BE0123456789',
+    vatPrefix: 'BE',
   },
   {
     name: 'BG VAT',
     code: 'eu_vat',
     country: 'Bulgaria',
     placeholder: 'BG0123456789',
+    vatPrefix: 'BG',
   },
   {
     name: 'BR CNPJ',
@@ -108,6 +112,7 @@ export const TAX_IDS: TaxId[] = [
     code: 'ch_vat',
     country: 'Switzerland',
     placeholder: 'CHE-123.456.789 MWST',
+    vatPrefix: 'CHE',
   },
   {
     name: 'CL TIN',
@@ -120,30 +125,35 @@ export const TAX_IDS: TaxId[] = [
     code: 'eu_vat',
     country: 'Cyprus',
     placeholder: 'CY12345678Z',
+    vatPrefix: 'CY',
   },
   {
     name: 'CZ VAT',
     code: 'eu_vat',
     country: 'Czech Republic',
     placeholder: 'CZ1234567890',
+    vatPrefix: 'CZ',
   },
   {
     name: 'DE VAT',
     code: 'eu_vat',
     country: 'Germany',
     placeholder: 'DE123456789',
+    vatPrefix: 'DE',
   },
   {
     name: 'DK VAT',
     code: 'eu_vat',
     country: 'Denmark',
     placeholder: 'DK12345678',
+    vatPrefix: 'DK',
   },
   {
     name: 'EE VAT',
     code: 'eu_vat',
     country: 'Estonia',
     placeholder: 'EE123456789',
+    vatPrefix: 'EE',
   },
   {
     name: 'ES CIF',
@@ -155,25 +165,29 @@ export const TAX_IDS: TaxId[] = [
     name: 'ES VAT',
     code: 'eu_vat',
     country: 'Spain',
-    placeholder: 'ESA1234567Z',
+    placeholder: 'ESX1234567Z',
+    vatPrefix: 'ES',
   },
   {
     name: 'FI VAT',
     code: 'eu_vat',
     country: 'Finland',
     placeholder: 'FI12345678',
+    vatPrefix: 'FI',
   },
   {
     name: 'FR VAT',
     code: 'eu_vat',
     country: 'France',
     placeholder: 'FRAB123456789',
+    vatPrefix: 'FR',
   },
   {
     name: 'GB VAT',
     code: 'eu_vat',
     country: 'United Kingdom',
     placeholder: 'GB123456789',
+    vatPrefix: 'GB',
   },
   {
     name: 'GE VAT',
@@ -186,6 +200,7 @@ export const TAX_IDS: TaxId[] = [
     code: 'eu_vat',
     country: 'Greece',
     placeholder: 'EL123456789',
+    vatPrefix: 'EL',
   },
   {
     name: 'HK BR',
@@ -198,12 +213,14 @@ export const TAX_IDS: TaxId[] = [
     code: 'eu_vat',
     country: 'Croatia',
     placeholder: 'HR12345678912',
+    vatPrefix: 'HR',
   },
   {
     name: 'HU VAT',
     code: 'eu_vat',
     country: 'Hungary',
     placeholder: 'HU12345678912',
+    vatPrefix: 'HU',
   },
   {
     name: 'ID NPWP',
@@ -216,6 +233,7 @@ export const TAX_IDS: TaxId[] = [
     code: 'eu_vat',
     country: 'Ireland',
     placeholder: 'IE1234567AB',
+    vatPrefix: 'IE',
   },
   {
     name: 'IL VAT',
@@ -240,6 +258,7 @@ export const TAX_IDS: TaxId[] = [
     code: 'eu_vat',
     country: 'Italy',
     placeholder: 'IT12345678912',
+    vatPrefix: 'IT',
   },
   {
     name: 'JP CN',
@@ -270,24 +289,28 @@ export const TAX_IDS: TaxId[] = [
     code: 'eu_vat',
     country: 'Lithuania',
     placeholder: 'LT123456789123',
+    vatPrefix: 'LT',
   },
   {
     name: 'LU VAT',
     code: 'eu_vat',
     country: 'Luxembourg',
     placeholder: 'LU12345678',
+    vatPrefix: 'LU',
   },
   {
     name: 'LV VAT',
     code: 'eu_vat',
     country: 'Latvia',
     placeholder: 'LV12345678912',
+    vatPrefix: 'LV',
   },
   {
     name: 'MT VAT',
     code: 'eu_vat',
     country: 'Malta',
     placeholder: 'MT12345678',
+    vatPrefix: 'MT',
   },
   {
     name: 'MX RFC',
@@ -318,6 +341,7 @@ export const TAX_IDS: TaxId[] = [
     code: 'eu_vat',
     country: 'Netherlands',
     placeholder: 'NL123456789B12',
+    vatPrefix: 'NL',
   },
   {
     name: 'NO VAT',
@@ -336,18 +360,21 @@ export const TAX_IDS: TaxId[] = [
     code: 'eu_vat',
     country: 'Poland',
     placeholder: 'PL1234567890',
+    vatPrefix: 'PL',
   },
   {
     name: 'PT VAT',
     code: 'eu_vat',
     country: 'Portugal',
     placeholder: 'PT123456789',
+    vatPrefix: 'PT',
   },
   {
     name: 'RO VAT',
     code: 'eu_vat',
     country: 'Romania',
     placeholder: 'RO1234567891',
+    vatPrefix: 'RO',
   },
   {
     name: 'RU INN',
@@ -372,6 +399,7 @@ export const TAX_IDS: TaxId[] = [
     code: 'eu_vat',
     country: 'Sweden',
     placeholder: 'SE123456789123',
+    vatPrefix: 'SE',
   },
   {
     name: 'SG GST',
@@ -390,12 +418,14 @@ export const TAX_IDS: TaxId[] = [
     code: 'eu_vat',
     country: 'Slovenia',
     placeholder: 'SI12345678',
+    vatPrefix: 'SI',
   },
   {
     name: 'SK VAT',
     code: 'eu_vat',
     country: 'Slovakia',
     placeholder: 'SK1234567891',
+    vatPrefix: 'SK',
   },
   {
     name: 'TH VAT',
@@ -426,6 +456,7 @@ export const TAX_IDS: TaxId[] = [
     code: 'eu_vat',
     country: 'United Kingdom (Northern Ireland)',
     placeholder: 'XI123456789',
+    vatPrefix: 'XI',
   },
   {
     name: 'ZA VAT',
