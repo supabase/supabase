@@ -383,7 +383,7 @@ const AiCommand = () => {
   }, [])
 
   // Detect an IME composition (so that we can ignore Enter keypress)
-  const [isComposing, setIsComposing] = useState(false)
+  const [isImeComposing, setIsImeComposing] = useState(false)
 
   return (
     <div onClick={(e) => e.stopPropagation()}>
@@ -509,19 +509,15 @@ const AiCommand = () => {
               setSearch(e.target.value)
             }
           }}
-          onCompositionStart={() => setIsComposing(true)}
-          onCompositionEnd={() => setIsComposing(false)}
+          onCompositionStart={() => setIsImeComposing(true)}
+          onCompositionEnd={() => setIsImeComposing(false)}
           onKeyDown={(e) => {
             switch (e.key) {
               case 'Enter':
-                if (!search) {
+                if (!search || isLoading || isResponding || isImeComposing) {
                   return
                 }
-                if (isLoading || isResponding || isComposing) {
-                  return
-                }
-                handleSubmit(search)
-                return
+                return handleSubmit(search)
               default:
                 return
             }
