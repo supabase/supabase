@@ -16,17 +16,17 @@
   },
   {
     "type": "Announcement",
-    "title": "The Supabase Content Storm",
-    "description": "We worked with dozens of content creators from around the world to create Supabase-related content and publish everything on the same day!",
-    "imgUrl": "/images/blog/2022-12-06-content-storm/content-storm.jpg",
-    "logoUrl": "/images/blog/2022-12-06-content-storm/content-storm.jpg",
+    "title": "Flutter Hackathon",
+    "description": "Build Flutter apps and win limited edition swag.",
+    "imgUrl": "/images/blog/flutter-hackathon/thumbnail.jpg",
+    "logoUrl": "/images/blog/flutter-hackathon/thumbnail.jpg",
     "organization": "Supabase",
-    "url": "/blog/the-supabase-content-storm",
+    "url": "/blog/flutter-hackathon",
     "postMeta": {
-      "name": "Ramiro",
-      "publishDate": "Dec 06, 2022",
-      "readLength": 4
+      "name": "Tyler",
+      "publishDate": "May 12, 2023",
+      "readLength": 3
     },
-    "ctaText": "See the full list"
+    "ctaText": "See how to join"
   }
 ]
