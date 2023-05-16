@@ -123,7 +123,7 @@ class CreateTriggerStore implements ICreateTriggerStore {
   meta = null
   tables = []
   triggerFunctions = []
-  isEdited = false
+  isDirty = false
 
   constructor() {
     makeAutoObservable(this)
@@ -163,8 +163,8 @@ class CreateTriggerStore implements ICreateTriggerStore {
     this.loading = value
   }
 
-  setIsEdited = (value: boolean) => {
-    this.isEdited = value
+  setisDirty = (value: boolean) => {
+    this.isDirty = value
   }
 
   setTables = (value: Dictionary<any>[]) => {
@@ -177,7 +177,7 @@ class CreateTriggerStore implements ICreateTriggerStore {
   }
 
   onFormChange = ({ key, value }: { key: string; value: any }) => {
-    this.isEdited = true
+    this.isDirty = true
     if (has(this.formState, key)) {
       const temp = (this.formState as any)[key]
       // @ts-ignore
@@ -282,7 +282,7 @@ const CreateTrigger: FC<CreateTriggerProps> = ({ trigger, visible, setVisible })
   }, [])
 
   useEffect(() => {
-    _localState.setIsEdited(false)
+    _localState.setisDirty(false)
     if (trigger) {
       _localState.formState.reset(trigger)
     } else {
@@ -331,8 +331,8 @@ const CreateTrigger: FC<CreateTriggerProps> = ({ trigger, visible, setVisible })
 
   const hasPublicTables = _localState.tables.length >= 1
 
-  const onClosePanel = () => {
-    _localState.isEdited ? setIsClosingPanel(true) : setVisible(!visible)
+  const isClosingSidePanel = () => {
+    _localState.isDirty ? setIsClosingPanel(true) : setVisible(!visible)
   }
 
   return (
@@ -340,7 +340,7 @@ const CreateTrigger: FC<CreateTriggerProps> = ({ trigger, visible, setVisible })
       <SidePanel
         size="large"
         visible={visible}
-        onCancel={onClosePanel}
+        onCancel={isClosingSidePanel}
         header={_localState.title}
         hideFooter={!hasPublicTables}
         className={
