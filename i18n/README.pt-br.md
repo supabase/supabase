@@ -1,24 +1,24 @@
 <p align="center">
-<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/packages/common/assets/images/supabase-logo-wordmark--light.svg#gh-light-mode-only">
-<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/packages/common/assets/images/supabase-logo-wordmark--dark.svg#gh-dark-mode-only">
+<img src="https://user-images.githubusercontent.com/8291514/213727234-cda046d6-28c6-491a-b284-b86c5cede25d.png#gh-light-mode-only">
+<img src="https://user-images.githubusercontent.com/8291514/213727225-56186826-bee8-43b5-9b15-86e839d89393.png#gh-dark-mode-only">
 </p>
 
 ---
 
 # Supabase
 
-[Supabase](https://supabase.com) é uma alternativa de código aberto Firebase. Estamos construindo as características do Firebase usando ferramentas de código aberto de nível empresarial.
+[Supabase](https://supabase.com) é uma alternativa ao Firebase de código aberto. Estamos construindo as características do Firebase usando ferramentas de código aberto de nível empresarial.
 
-- [x] Banco de dados hospedado de Postgres. [Docs](https://supabase.com/docs/guides/database)
-- [x] Autenticação e Autorização. [Docs](https://supabase.com/docs/guides/auth)
+- [x] Banco de dados Postgres hospedado. [Documentação](https://supabase.com/docs/guides/database)
+- [x] Autenticação e Autorização. [Documentação](https://supabase.com/docs/guides/auth)
 - [x] APIs auto-geradas.
-  - [x] REST. [Docs](https://supabase.com/docs/guides/database/api#rest-api)
-  - [x] Assinaturas em tempo real. [Docs](https://supabase.com/docs/guides/database/api#realtime-api)
-  - [x] GraphQL (Beta). [Docs](https://supabase.com/docs/guides/database/api#graphql-api)
+  - [x] REST. [Documentação](https://supabase.com/docs/guides/database/api#rest-api)
+  - [x] GraphQL. [Documentação](https://supabase.com/docs/guides/database/api#graphql-api)
+  - [x] Assinaturas em tempo real. [Documentação](https://supabase.com/docs/guides/database/api#realtime-api)
 - [x] Funções.
-  - [x] Funções do Banco de Dados [Docs]https://supabase.com/docs/guides/database/functions)
-  - [x] Funções de borda [Docs](https://supabase.com/docs/guides/functions)
-- [x] Armazenamento de arquivos. [Docs](https://supabase.com/docs/guides/storage)
+  - [x] Funções do Banco de Dados [Documentação]https://supabase.com/docs/guides/database/functions)
+  - [x] Funções de borda (Edge) [Documentação](https://supabase.com/docs/guides/functions)
+- [x] Armazenamento de arquivos. [Documentação](https://supabase.com/docs/guides/storage)
 - [x] Painel de controle
 
 ![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
@@ -55,14 +55,14 @@ Supabase é uma combinação de ferramentas de código aberto. Nós estamos cons
 
 **Arquitetura atual**
 
-Supabase é uma [plataforma hospedada](https://app.supabase.com). Você pode se cadastrar e começar a usar Supabase sem instalar nada. Nós ainda estamos criando a experiência de trabalho local - esse é o nosso foco principal, junto com a estabilidade da plataforma.
-Voce tambem pode [auto-hospedar](https://supabase.com/docs/guides/hosting/overview) e [develop locally](https://supabase.com/docs/guides/local-development).
+Supabase é uma [plataforma hospedada](https://app.supabase.com). Você pode se cadastrar e começar a usar Supabase sem instalar nada. Voce tambem pode [auto-hospedagem](https://supabase.com/docs/guides/hosting/overview) e [desenvolvimento local](https://supabase.com/docs/guides/local-development).
 
-![Arquitetura](https://user-images.githubusercontent.com/70828596/187547862-ffa9d058-0c3a-4851-a3e7-92ccfca4b596.png)
+![Arquitetura](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
 
 - [PostgreSQL](https://www.postgresql.org/) é um banco objeto-relational com mais de 30 anos de desenvolvimento ativo que conquistou uma forte reputação por ser confiável, robusto e de ótimo desempenho.
 - [Tempo real](https://github.com/supabase/realtime) é um servidor Elixir que permite ouvir as inserções, atualizações e remoções (_inserts_, _updates_ e _deletes_) do PostgreSQL usando _websockets_. Supabase ouve as funcionalidades de replicação nativas do Postgres, converte os bytes de replicação em JSON, e propaga o JSON usando websockets.
 - [PostgREST](http://postgrest.org/) é um servidor web que converte sua base de dados PostgreSQL diretamente em uma API RESTful.
+- [pg_graphql](http://github.com/supabase/pg_graphql/) uma extensão PostgreSQL que expõe uma API GraphQL.
 - [Armazenamento](https://github.com/supabase/storage-api) oferece uma interface RESTful para gerenciar arquivos armazenados em um S3, usando Postgres para gerenciar as permissões.
 - [postgres-meta](https://github.com/supabase/postgres-meta) é uma API RESTful para gerenciar seu Postgres, permitindo você carregar tabelas, adicionar permissões, executar consultas e etc.
 - [GoTrue](https://github.com/netlify/gotrue) é uma API baseada em SWT para gerenciar usuários e distribuir tokens SWT.
@@ -153,15 +153,6 @@ Nossa biblioteca de cliente é modular. Cada sub-biblioteca é uma implementaç�
     <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Realtime" target="_blank" rel="noopener noreferrer">realtime-kt</a></td>
     <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Storage" target="_blank" rel="noopener noreferrer">storage-kt</a></td>
     <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Functions" target="_blank" rel="noopener noreferrer">functions-kt</a></td>
-  </tr>
-  <tr>
-    <td>PHP</td>
-    <td>-</td>
-    <td><a href="https://github.com/supabase-community/postgrest-php" target="_blank" rel="noopener noreferrer">postgrest-php</a></td>
-    <td><a href="https://github.com/supabase-community/gotrue-php" target="_blank" rel="noopener noreferrer">gotrue-php</a></td>
-    <td>-</td>
-    <td><a href="https://github.com/supabase-community/storage-php" target="_blank" rel="noopener noreferrer">storage-php</a></td>
-    <td>-</td>
   </tr>
   <tr>
     <td>Python</td>
