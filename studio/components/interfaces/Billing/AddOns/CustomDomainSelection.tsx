@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { FC } from 'react'
+import { FC, useEffect } from 'react'
 import { Badge, Button, Radio } from 'ui'
 
 import { useFlag } from 'hooks'
@@ -24,8 +24,16 @@ const CustomDomainSelection: FC<Props> = ({
   const { ref } = useParams()
   const addonUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
 
+  useEffect(() => {
+    const hash = window.location.hash
+    if (hash.length > 0) {
+      window.location.hash = ''
+      window.location.hash = hash
+    }
+  })
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" id="custom-domain-addon">
       <div>
         <div className="flex items-center space-x-2">
           <h4 className="text-lg">Custom Domains</h4>

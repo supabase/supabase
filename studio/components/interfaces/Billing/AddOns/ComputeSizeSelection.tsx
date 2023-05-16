@@ -1,4 +1,4 @@
-import { FC } from 'react'
+import { FC, useEffect } from 'react'
 import Link from 'next/link'
 import { Badge, Button, IconExternalLink, Radio } from 'ui'
 
@@ -24,8 +24,16 @@ const ComputeSizeSelection: FC<Props> = ({
   const { ref } = useParams()
   const addonUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
 
+  useEffect(() => {
+    const hash = window.location.hash
+    if (hash.length > 0) {
+      window.location.hash = ''
+      window.location.hash = hash
+    }
+  })
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" id="compute-addon">
       <div className="flex items-center justify-between">
         <div>
           <div className="flex items-center space-x-2">
