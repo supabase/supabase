@@ -15,7 +15,7 @@ export * from './src/components/Icon'
 export * from './src/components/Icon/IconContext'
 export * from './src/components/GlassPanel'
 export * from './src/components/IconPanel'
-// export * from './src/components/Image'
+export * from './src/components/Icon/IconBackground'
 
 // DISPLAYS
 
@@ -30,6 +30,7 @@ export * from './src/components/CodeBlock'
 // NAV
 
 export * from './src/components/Menu'
+export * from './src/components/TextLink'
 
 // OVERLAYS
 

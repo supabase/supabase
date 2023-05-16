@@ -1,3 +1,6 @@
+import { useQueryClient } from '@tanstack/react-query'
+import { PropsWithChildren, useCallback, useEffect } from 'react'
+
 import {
   AuthContext as AuthContextInternal,
   AuthProvider as AuthProviderInternal,
@@ -6,9 +9,9 @@ import {
 } from 'common'
 import { useProfileQuery } from 'data/profile/profile-query'
 import { useStore } from 'hooks'
-import { PropsWithChildren, useEffect } from 'react'
-import { GOTRUE_ERRORS, IS_PLATFORM } from './constants'
 import Telemetry from 'lib/telemetry'
+import { GOTRUE_ERRORS, IS_PLATFORM } from './constants'
+import { clearLocalStorage } from './local-storage'
 
 export const AuthContext = AuthContextInternal
 
@@ -53,3 +56,15 @@ export const AuthProvider = ({ children }: PropsWithChildren<{}>) => {
 }
 
 export { useAuth, useIsLoggedIn, useSession, useUser } from 'common'
+
+export function useSignOut() {
+  const queryClient = useQueryClient()
+
+  return useCallback(async () => {
+    const result = await gotrueClient.signOut()
+    clearLocalStorage()
+    await queryClient.resetQueries()
+
+    return result
+  }, [])
+}
