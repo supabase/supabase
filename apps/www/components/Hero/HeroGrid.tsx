@@ -11,7 +11,7 @@ const HeroGrid = () => {
   const isSm = useBreakpoint(640)
 
   const svgGridOptions = {
-    color: isDarkMode ? '#00c6d4' : '#005359',
+    color: isDarkMode ? '#00c6d4' : '#01876c',
     boxWidth: width ? width * 7 : 7500,
     boxHeight: width ? width * 5 : 6000,
     xLines: isSm ? 20 : 50,
@@ -154,12 +154,6 @@ const HeroGrid = () => {
         'relative -z-10 ![perspective:1200px] sm:![perspective:1200px] md:![perspective:1200px] lg:![perspective:1200px]',
       ].join(' ')}
     >
-      <div
-        className="z-[100] absolute inset-0"
-        style={{
-          background: 'linear-gradient(to top, rgba(0,0,0,0) 0px, #000000 50%)',
-        }}
-      />
       <div
         style={{
           transform: 'rotateX(85deg)',

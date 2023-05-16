@@ -25,22 +25,10 @@
   pointer-events: none;
   inset: 0px;
   z-index: -3;
-  opacity: 0.6;
   filter: blur(140px);
   transform: translateZ(0px);
   background: radial-gradient(ellipse 50% 60% at 50% 70%, #3ecf8e, transparent),
     radial-gradient(ellipse 70% 80% at 50% 50%, #1d7a50, transparent);
-}
-
-.shape-gradient {
-  position: absolute;
-  user-select: none;
-  pointer-events: none;
-  z-index: 1;
-  opacity: 0.3;
-  height: 700px;
-  filter: blur(40px);
-  background: radial-gradient(ellipse 50% 50% at 50% 50%, #3ecf8e20, transparent);
 }
 
 @media (min-width: 1024px) {

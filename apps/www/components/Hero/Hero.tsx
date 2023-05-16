@@ -18,7 +18,7 @@ const Hero = () => {
 
   return (
     <div className="relative">
-      <SectionContainer className="pt-12 md:py-16 lg:py-20">
+      <SectionContainer className="py-12 md:py-16 lg:py-20">
         <div className="relative">
           <div className="mx-auto">
             <div className="mx-auto max-w-2xl lg:col-span-6 lg:flex lg:items-center justify-center text-center">
@@ -31,9 +31,9 @@ const Hero = () => {
                         xl:text-7xl
                         "
                   >
-                    <span className="block">Build in a weekend.</span>
+                    <span className="block">Build in a weekend</span>
                     <span className="text-transparent bg-clip-text bg-gradient-to-br from-[#3ECF8E] via-[#3ECF8E] to-[#3E9BCF] block md:ml-0">
-                      Scale to millions.
+                      Scale to millions
                     </span>
                   </h1>
                   <p className="pt-2 text-scale-1200 !mb-0 mt-1.5 text-sm sm:mt-5 sm:text-base lg:text-lg">
