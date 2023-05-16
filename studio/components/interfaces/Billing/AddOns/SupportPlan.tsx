@@ -1,4 +1,4 @@
-import { FC } from 'react'
+import { FC, useEffect } from 'react'
 import Link from 'next/link'
 import { Button } from 'ui'
 import { useParams } from 'common/hooks'
@@ -9,8 +9,17 @@ interface Props {
 
 const SupportPlan: FC<Props> = ({ currentOption }) => {
   const { ref } = useParams()
+
+  useEffect(() => {
+    const hash = window.location.hash
+    if (hash.length > 0) {
+      window.location.hash = ''
+      window.location.hash = hash
+    }
+  })
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" id="support-addon">
       <div>
         <div className="flex items-center space-x-2">
           <h4 className="text-lg">Support Plan</h4>
