@@ -6,19 +6,22 @@
 	export let data
 	export let form
 
-	let { session, supabase, profile } = data
+	$: ({ session, supabase, profile } = data)
 
 	let profileForm: any
 	let loading = false
-	let fullName: string = profile?.full_name ?? ''
-	let username: string = profile?.username ?? ''
-	let website: string = profile?.website ?? ''
-	let avatarUrl: string = profile?.avatar_url ?? ''
+	let fullName: string = profile?.full_name
+	let username: string = profile?.username
+	let website: string = profile?.website
+	let avatarUrl: string = profile?.avatar_url
+
+	$: console.log({ session })
 
 	const handleSubmit: SubmitFunction = () => {
 		loading = true
-		return async () => {
+		return async ({ update }) => {
 			loading = false
+			update()
 		}
 	}
 
@@ -49,12 +52,12 @@
 		/>
 		<div>
 			<label for="email">Email</label>
-			<input id="email" type="text" value={session?.user.email} disabled />
+			<input name="email" id="email" type="text" value={session?.user.email} disabled />
 		</div>
 
 		<div>
 			<label for="fullName">Full Name</label>
-			<input id="fullName" name="fullName" type="text" value={form?.fullName ?? fullName} />
+			<input id="fullName" name="fullName" type="text" value={fullName} />
 		</div>
 
 		<div>
