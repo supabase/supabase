@@ -22,7 +22,7 @@ You are also responsible for ensuring that tables with sensitive data has the ri
 
 ”Crash” is used liberally here. It refers to any situation where your application is unable to work as desired because of DB issues. It could be because the DB is unable to support the number of connections being attempted, or because its performance is unacceptably low because of CPU or memory constraints.
 
-You are responsible of provisioning enough compute to run the workload that your application requires. You are also responsible for employing methods to manage the workload: adding indexes, adding filters on large queries, caching strategies, materialized views, etc.
+You are responsible of provisioning enough compute to run the workload that your application requires. The Supabase Dashboard provides [observability tooling](https://app.supabase.com/project/_/reports/database) to help with this. You are also responsible for employing methods to manage the workload: adding indexes, adding filters on large queries, caching strategies, materialized views, and optimizing your database queries.
 
 ## You decide your own workflow
 
