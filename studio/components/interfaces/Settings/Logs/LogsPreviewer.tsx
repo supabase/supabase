@@ -231,7 +231,11 @@ export const LogsPreviewer: React.FC<Props> = ({
               Load older
             </Button>
             <div className="flex flex-row justify-end mt-2">
-              <UpgradePrompt show={showUpgradePrompt} setShowUpgradePrompt={setShowUpgradePrompt} />
+              <UpgradePrompt
+                show={showUpgradePrompt}
+                setShowUpgradePrompt={setShowUpgradePrompt}
+                subscription={subscription}
+              />
             </div>
           </div>
         )}
