@@ -1,9 +1,10 @@
 import { FC } from 'react'
+import { useRouter } from 'next/router'
 import { Input, Tabs } from 'ui'
 import { pluckObjectFields } from 'lib/helpers'
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 
-import { useStore } from 'hooks'
+import { useTelemetryProps } from 'common'
 import Telemetry from 'lib/telemetry'
 import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
@@ -11,7 +12,8 @@ import ResetDbPassword from './ResetDbPassword'
 
 const DatabaseSettings: FC<any> = ({ projectRef }) => {
   const { data, isLoading, isError } = useProjectSettingsQuery({ projectRef })
-  const { ui } = useStore()
+  const router = useRouter()
+  const telemetryProps = useTelemetryProps()
 
   if (isError) {
     return (
@@ -112,7 +114,8 @@ const DatabaseSettings: FC<any> = ({ projectRef }) => {
         action: 'copy_connection_string',
         label: labelValue ? labelValue : '',
       },
-      ui.googleAnalyticsProps
+      telemetryProps,
+      router
     )
   const uriConnString =
     `postgresql://${connectionInfo.db_user}:[YOUR-PASSWORD]@` +
