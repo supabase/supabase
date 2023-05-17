@@ -122,7 +122,7 @@ function AuthPage() {
               </div>
               <h4 className="h4">All the social providers</h4>
               <p className="p text-base">
-                Enable social logins with the click of a button. Google, Facebook, GitHub, Azure,
+                Enable social logins with the click of a button. Google, Facebook, GitHub, Microsoft,
                 Gitlab, Twitter, Discord, and many more.
               </p>
             </div>
@@ -174,7 +174,7 @@ function AuthPage() {
                   <FeatureColumn
                     icon={<IconBriefcase />}
                     title="Enterprise logins"
-                    text="Support for SAML, Azure. More enterprise providers and SSO coming soon."
+                    text="Support for SAML, Microsoft. More enterprise providers and SSO coming soon."
                   />
                 </div>
                 <div className="col-span-12 sm:col-span-6 lg:col-span-12 xl:col-span-4">

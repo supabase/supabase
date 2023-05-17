@@ -1574,6 +1574,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/auth/social-login/auth-azure',
+    destination: '/docs/guides/auth/social-login/auth-microsoft',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/auth/auth-twitter',
     destination: '/docs/guides/auth/social-login/auth-twitter',
   },
