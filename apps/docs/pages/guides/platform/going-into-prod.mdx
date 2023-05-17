@@ -2,7 +2,7 @@ import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
   id: 'going-into-prod',
-  title: 'Production Readiness',
+  title: 'Going into Production',
   description: 'Things to do before making your app publicly available',
 }
 
@@ -84,6 +84,17 @@ After developing your project and deciding it's Production Ready, you should run
 
 - When working with enterprise systems, email scanners may scan and make a `GET` request to the reset password link or sign up link in your email. Since links in Supabase Auth are single use, a user who opens an email post-scan to click on a link will receive an error. To get around this problem,
   consider altering the email template to replace the original magic link with a link to a domain you control. The domain can present the user with a "Sign-in" button which redirect the user to the original magic link URL when clicked.
+
+### Restricted Access Levels for Team Members
+
+As your team grows, consider the different [access levels](/docs/guides/platform/access-control) that your team requires.
+
+- Free and Pro: Supabase provides access controls within the Dashboard for Developers and Administrators.
+- Teams and Enterprise: these tiers include advanced access controls, such as read-only Dashboard roles.
+
+For a more secure setup, consider running your workload across several organizations. It's a common pattern to have a Production organization which is restricted to only those team members who are qualified to have direct access to production databases.
+
+One other small tip: the [PGAudit](/docs/guides/database/extensions/pgaudit) extension tracks changes to your database. You can use it to track schema changes.
 
 ## Next steps
 
