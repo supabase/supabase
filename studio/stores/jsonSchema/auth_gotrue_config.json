@@ -10,7 +10,7 @@
     "EXTERNAL_EMAIL_ENABLED",
     "EXTERNAL_PHONE_ENABLED",
     "EXTERNAL_APPLE_ENABLED",
-    "EXTERNAL_AZURE_ENABLED",
+    "EXTERNAL_MICROSOFT_ENABLED",
     "EXTERNAL_BITBUCKET_ENABLED",
     "EXTERNAL_DISCORD_ENABLED",
     "EXTERNAL_FACEBOOK_ENABLED",
@@ -103,21 +103,21 @@
       "title": "Apple secret",
       "type": "string"
     },
-    "EXTERNAL_AZURE_ENABLED": {
-      "title": "Azure enabled",
+    "EXTERNAL_MICROSOFT_ENABLED": {
+      "title": "Microsoft enabled",
       "type": "boolean"
     },
-    "EXTERNAL_AZURE_CLIENT_ID": {
-      "title": "Azure client ID",
+    "EXTERNAL_MICROSOFT_CLIENT_ID": {
+      "title": "Microsoft client ID",
       "type": "string"
     },
-    "EXTERNAL_AZURE_SECRET": {
-      "title": "Azure secret",
+    "EXTERNAL_MICROSOFT_SECRET": {
+      "title": "Microsoft secret",
       "type": "string",
       "help": "Enter the data from Value, not the Secret ID."
     },
-    "EXTERNAL_AZURE_URL": {
-      "title": "Azure tenant URL",
+    "EXTERNAL_MICROSOFT_URL": {
+      "title": "Microsoft tenant URL",
       "type": "string"
     },
     "EXTERNAL_BITBUCKET_ENABLED": {

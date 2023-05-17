@@ -378,47 +378,47 @@ The secret key is a JWT token that must be generated.
   },
 }
 
-const EXTERNAL_PROVIDER_AZURE = {
+const EXTERNAL_PROVIDER_MICROSOFT = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
-  title: 'Azure',
+  title: 'Mircosoft',
   properties: {
-    EXTERNAL_AZURE_ENABLED: {
-      title: 'Azure enabled',
+    EXTERNAL_MICROSOFT_ENABLED: {
+      title: 'Mircosoft enabled',
       type: 'boolean',
     },
-    EXTERNAL_AZURE_CLIENT_ID: {
+    EXTERNAL_MICROSOFT_CLIENT_ID: {
       // [TODO] Change docs
       title: 'Application (client) ID',
       type: 'string',
     },
-    EXTERNAL_AZURE_SECRET: {
+    EXTERNAL_MICROSOFT_SECRET: {
       // [TODO] Change docs
       title: 'Secret Value',
-      description: `Enter the data from Value, not the Secret ID. [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-azure#obtain-a-secret-id)`,
+      description: `Enter the data from Value, not the Secret ID. [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-mircosoft#obtain-a-secret-id)`,
       type: 'string',
       isSecret: true,
     },
-    EXTERNAL_AZURE_URL: {
+    EXTERNAL_MICROSOFT_URL: {
       // [TODO] Change docs
-      title: 'Azure Tenant URL',
+      title: 'Mircosoft Tenant URL',
       descriptionOptional: 'Optional',
       type: 'string',
     },
   },
   validationSchema: object().shape({
-    EXTERNAL_AZURE_ENABLED: boolean().required(),
-    EXTERNAL_AZURE_CLIENT_ID: string().when('EXTERNAL_AZURE_ENABLED', {
+    EXTERNAL_MICROSOFT_ENABLED: boolean().required(),
+    EXTERNAL_MICROSOFT_CLIENT_ID: string().when('EXTERNAL_MICROSOFT_ENABLED', {
       is: true,
       then: (schema) => schema.required('Application (client) ID is required'),
       otherwise: (schema) => schema,
     }),
-    EXTERNAL_AZURE_SECRET: string().when('EXTERNAL_AZURE_ENABLED', {
+    EXTERNAL_MICROSOFT_SECRET: string().when('EXTERNAL_MICROSOFT_ENABLED', {
       is: true,
       then: (schema) => schema.required('Secret ID is required'),
       otherwise: (schema) => schema,
     }),
-    EXTERNAL_AZURE_URL: string().matches(urlRegex, 'Must be a valid URL').optional(),
+    EXTERNAL_MICROSOFT_URL: string().matches(urlRegex, 'Must be a valid URL').optional(),
   }),
   misc: {
     iconKey: 'microsoft-icon',
@@ -1056,7 +1056,7 @@ export const PROVIDERS_SCHEMAS = [
   PROVIDER_PHONE,
   PROVIDER_SAML,
   EXTERNAL_PROVIDER_APPLE,
-  EXTERNAL_PROVIDER_AZURE,
+  EXTERNAL_PROVIDER_MICROSOFT,
   EXTERNAL_PROVIDER_BITBUCKET,
   EXTERNAL_PROVIDER_DISCORD,
   EXTERNAL_PROVIDER_FACEBOOK,

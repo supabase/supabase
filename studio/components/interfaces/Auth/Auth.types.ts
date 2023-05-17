@@ -13,10 +13,10 @@ export interface AuthConfig {
   EXTERNAL_APPLE_CLIENT_ID: string | null
   EXTERNAL_APPLE_SECRET: string | null
 
-  EXTERNAL_AZURE_ENABLED: boolean
-  EXTERNAL_AZURE_URL: string | null
-  EXTERNAL_AZURE_CLIENT_ID: string | null
-  EXTERNAL_AZURE_SECRET: string | null
+  EXTERNAL_MICROSOFT_ENABLED: boolean
+  EXTERNAL_MICROSOFT_URL: string | null
+  EXTERNAL_MICROSOFT_CLIENT_ID: string | null
+  EXTERNAL_MICROSOFT_SECRET: string | null
 
   EXTERNAL_BITBUCKET_ENABLED: boolean
   EXTERNAL_BITBUCKET_CLIENT_ID: string | null
