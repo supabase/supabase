@@ -37,7 +37,7 @@ const BarChart: React.FC<BarChartProps> = ({
   const { Container } = useChartSize(size)
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
 
-  if (data.length === 0) return <ChartNoData className={className} />
+  if (data.length === 0) return <ChartNoData size={size} className={className} />
 
   const day = (value: number | string) => (displayDateInUtc ? dayjs(value).utc() : dayjs(value))
   const resolvedHighlightedLabel =
@@ -48,7 +48,7 @@ const BarChart: React.FC<BarChartProps> = ({
     highlightedLabel
 
   const resolvedHighlightedValue =
-    (focusDataIndex !== null ? data[focusDataIndex]?.[yAxisKey] : highlightedValue) 
+    focusDataIndex !== null ? data[focusDataIndex]?.[yAxisKey] : highlightedValue
 
   return (
     <div className={['flex flex-col gap-3', className].join(' ')}>

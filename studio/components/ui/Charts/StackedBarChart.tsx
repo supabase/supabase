@@ -43,7 +43,7 @@ const StackedBarChart: React.FC<Props> = ({
     variant,
   })
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
-  if (!data || data.length === 0) return <NoDataPlaceholder />
+  if (!data || data.length === 0) return <NoDataPlaceholder size={size} />
   return (
     <div className="w-full">
       {!hideHeader && (

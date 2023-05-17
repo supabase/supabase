@@ -1,3 +1,4 @@
+// @ts-check
 import nextMdx from '@next/mdx'
 import remarkGfm from 'remark-gfm'
 import rehypeSlug from 'rehype-slug'
@@ -64,7 +65,8 @@ const nextConfig = {
     ],
   },
   experimental: {
-    mdxRs: true,
+    // TODO: @next/mdx ^13.0.2 only supports experimental mdxRs flag. next ^13.0.2 will stop warning about this being unsupported.
+    // mdxRs: true,
     modularizeImports: {
       lodash: {
         transform: 'lodash/{{member}}',

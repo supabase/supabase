@@ -30,4 +30,7 @@ export const analyticsKeys = {
       'infra-monitoring',
       { attribute, startDate, endDate, interval },
     ] as const,
+  usageApiCounts: (projectRef: string | undefined, interval: string | undefined) =>
+    ['projects', projectRef, 'usage.api-counts', interval] as const,
 }
+

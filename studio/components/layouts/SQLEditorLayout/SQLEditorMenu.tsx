@@ -181,12 +181,10 @@ const SideBarContent = observer(() => {
                 <div className="editor-product-menu">
                   <Menu.Group title="Favorites" />
                   <div className="space-y-1">
-                    {favouriteTabs
-                      .sort((a, b) => a.name?.localeCompare(b.name)) // first alphabetical
-                      .map((tabInfo) => {
-                        const { id } = tabInfo || {}
-                        return <QueryItem key={id} tabInfo={tabInfo} />
-                      })}
+                    {favouriteTabs.map((tabInfo) => {
+                      const { id } = tabInfo || {}
+                      return <QueryItem key={id} tabInfo={tabInfo} />
+                    })}
                   </div>
                 </div>
               )}
@@ -194,12 +192,10 @@ const SideBarContent = observer(() => {
                 <div className="editor-product-menu">
                   <Menu.Group title="SQL snippets" />
                   <div className="space-y-1 pb-8">
-                    {queryTabs
-                      .sort((a, b) => a.name?.localeCompare(b.name)) // first alphabetical
-                      .map((tabInfo) => {
-                        const { id } = tabInfo || {}
-                        return <QueryItem key={id} tabInfo={tabInfo} />
-                      })}
+                    {queryTabs.map((tabInfo) => {
+                      const { id } = tabInfo || {}
+                      return <QueryItem key={id} tabInfo={tabInfo} />
+                    })}
                   </div>
                 </div>
               )}
