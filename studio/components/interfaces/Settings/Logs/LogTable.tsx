@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo, useCallback } from 'react'
 import { Alert, Button, IconEye, IconEyeOff } from 'ui'
 import DataGrid, { Row, RowRendererProps } from '@supabase/react-data-grid'
 
@@ -163,11 +163,12 @@ const LogTable = ({
     }
   }, [stringData])
 
-  const RowRenderer = useMemo(() => {
-    return (props: RowRendererProps<any>) => (
+  const RowRenderer = useCallback(
+    (props: RowRendererProps<any>) => (
       <Row {...props} isRowSelected={false} selectedCellIdx={undefined} />
-    )
-  }, [])
+    ),
+    []
+  )
 
   const LogsExplorerTableHeader = () => (
     <div className="flex w-full items-center justify-between rounded-tl rounded-tr border-t border-l border-r bg-scale-100 px-5 py-2 dark:bg-scale-300">
