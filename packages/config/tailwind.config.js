@@ -213,8 +213,6 @@ module.exports = ui({
       }),
       screens: {
         xs: '480px',
-        '3xl': '1600px',
-        '4xl': '2000px',
       },
       fontFamily: {
         sans: ['custom-font', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'],

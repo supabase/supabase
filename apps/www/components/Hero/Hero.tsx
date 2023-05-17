@@ -43,7 +43,7 @@ const Hero = () => {
                       Scale to millions
                     </span>
                   </h1>
-                  <p className="pt-2 text-scale-1200 !mb-0 mt-1.5 text-sm sm:mt-5 sm:text-base lg:text-xl">
+                  <p className="pt-2 text-scale-1200 !mb-0 mt-1.5 text-sm sm:mt-5 sm:text-base lg:text-lg">
                     Supabase is an open source Firebase alternative for building secure and
                     performant Postgres backends with minimal configuration.
                   </p>
