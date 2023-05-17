@@ -60,8 +60,8 @@ const HeroFrameworks = ({ className }: { className?: string }) => {
                   className="opacity-100 hover:opacity-80 transition-opacity"
                   src={framework.icon}
                   alt={framework.name}
-                  width={40}
-                  height={40}
+                  width={45}
+                  height={45}
                 />
               </a>
             </Link>
