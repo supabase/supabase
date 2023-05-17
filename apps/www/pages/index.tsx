@@ -8,6 +8,7 @@ import Hero from '~/components/Hero/Hero'
 import 'swiper/swiper.min.css'
 
 const Features = dynamic(() => import('~/components/Features/index'))
+const BackedBy = dynamic(() => import('~/components/BackedBy'))
 const BuiltExamples = dynamic(() => import('components/BuiltWithSupabase/index'))
 const MadeForDevelopers = dynamic(() => import('components/MadeForDevelopers/index'))
 const AdminAccess = dynamic(() => import('components/AdminAccess/index'))
@@ -22,6 +23,7 @@ const Index = ({ customerStories }: Props) => {
     <Layout>
       <Hero />
       <Features />
+      <BackedBy className="pt-8 sm:pb-18 pb-16 md:pb-24 lg:pb-24" />
       <TwitterSocialSection />
       <BuiltExamples />
       <MadeForDevelopers />

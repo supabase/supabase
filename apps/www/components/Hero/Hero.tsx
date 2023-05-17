@@ -63,7 +63,7 @@ const Hero = () => {
           </div>
         </div>
       </SectionContainer>
-      <div className="w-1/2 container mx-auto h-px bg-gradient-to-r from-transparent via-scale-800 to-transparent" />
+      <div className="w-1/2 container mx-auto h-px bg-gradient-to-r from-transparent via-scale-600 to-transparent" />
     </div>
   )
 }
