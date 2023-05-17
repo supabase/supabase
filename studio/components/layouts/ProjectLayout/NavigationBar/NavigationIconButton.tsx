@@ -37,7 +37,7 @@ const NavigationIconButton: FC<Props> = ({ route, isActive = false }) => {
 
           <div
             className={[
-              'bg-scale-100 shadow-lg shadow-scale-500 dark:shadow-scale-300	py-1.5 px-3 rounded leading-none', // background
+              'bg-scale-100 shadow-lg shadow-scale-700 dark:shadow-scale-300	py-1.5 px-3 rounded leading-none', // background
               'border border-scale-500 ', //border
             ].join(' ')}
           >
