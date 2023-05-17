@@ -1,38 +1,7 @@
-.hero-container {
-  z-index: -6;
-  transition: perspective 3s ease 0s;
-}
-
 .hero-text {
   opacity: 0;
   transform: translate3d(0, 10px, 0);
   animation: animateText 1s cubic-bezier(0.25, 0.25, 0, 1) 0.1s both;
-}
-
-.hero-grid-lines {
-  position: absolute;
-  width: 120vw;
-  height: 120vh;
-  min-height: 800px;
-  transform: translateY(20%);
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  inset: 0;
-  margin: 0 auto;
-}
-
-.gradient {
-  position: absolute;
-  user-select: none;
-  pointer-events: none;
-  inset: 0px;
-  z-index: -3;
-  filter: blur(140px);
-  transform: translateZ(0px);
-  background: radial-gradient(ellipse 50% 60% at 50% 70%, #3ecf8e, transparent),
-    radial-gradient(ellipse 70% 80% at 50% 50%, #1d7a50, transparent);
 }
 
 @keyframes animateText {

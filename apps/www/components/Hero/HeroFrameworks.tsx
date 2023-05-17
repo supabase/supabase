@@ -46,7 +46,7 @@ const frameworks = [
   },
 ]
 
-const FrontendFrameworks = ({ className }: { className?: string }) => {
+const HeroFrameworks = ({ className }: { className?: string }) => {
   return (
     <div className={['flex text-center flex-col items-center', className].join(' ')}>
       <small className="small !text-scale-1100">Works seamlessly with 20+ frameworks</small>
@@ -79,4 +79,4 @@ const FrontendFrameworks = ({ className }: { className?: string }) => {
   )
 }
 
-export default FrontendFrameworks
+export default HeroFrameworks
