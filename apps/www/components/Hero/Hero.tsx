@@ -36,14 +36,14 @@ const Hero = () => {
                         xl:text-7xl
                         "
                   >
-                    <span className="block text-[#F4FFFA00] bg-clip-text bg-gradient-to-b from-scale-1200 to-scale-1100">
+                    <span className="block text-[#F4FFFA00] bg-clip-text bg-gradient-to-b from-scale-1200 to-scale-1200 dark:to-scale-1100">
                       Build in a weekend
                     </span>
-                    <span className="text-transparent bg-clip-text bg-gradient-to-br from-[#3ECF8E] via-[#3ECF8E] to-[#3E9BCF] block md:ml-0">
+                    <span className="text-transparent bg-clip-text bg-gradient-to-br from-[#3ECF8E] via-[#3ECF8E] to-[#3ecfb2] block md:ml-0">
                       Scale to millions
                     </span>
                   </h1>
-                  <p className="pt-2 text-scale-1200 !mb-0 mt-1.5 text-sm sm:mt-5 sm:text-base lg:text-lg">
+                  <p className="pt-2 text-scale-1200 !mb-0 mt-1.5 text-sm sm:mt-5 sm:text-base lg:text-xl">
                     Supabase is an open source Firebase alternative for building secure and
                     performant Postgres backends with minimal configuration.
                   </p>
@@ -51,14 +51,14 @@ const Hero = () => {
                 <div className="flex items-center gap-2">
                   <Link href="https://app.supabase.com" as="https://app.supabase.com" passHref>
                     <a onClick={() => sendTelemetryEvent(gaEvents['www_hp_hero_startProject'])}>
-                      <Button size="small" className="text-white">
+                      <Button size="large" className="text-white">
                         Start your project
                       </Button>
                     </a>
                   </Link>
                   <Link href="/docs" as="/docs" passHref>
                     <a onClick={() => sendTelemetryEvent(gaEvents['www_hp_hero_documentation'])}>
-                      <Button size="small" type="default" icon={<IconBookOpen />}>
+                      <Button size="large" type="default" icon={<IconBookOpen />}>
                         Documentation
                       </Button>
                     </a>
@@ -70,7 +70,7 @@ const Hero = () => {
           </div>
         </div>
       </SectionContainer>
-      <HeroBackground />
+      {/* <HeroBackground /> */}
     </div>
   )
 }

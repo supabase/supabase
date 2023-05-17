@@ -18,9 +18,9 @@ const ShinyBox = ({
     const { x: elX, y: elY, width, height } = outerElement.getBoundingClientRect()
     x = event.clientX - elX
     y = event.clientY - elY
-    const isActive = x > -15 && x < width + 15 && y > -15 && y < height + 15
+    const isActive = x > -0 && x < width + 0 && y > -0 && y < height + 0
     const activeGlow = isActive
-      ? `radial-gradient(65rem circle at ${x}px ${y}px, var(--colors-brand8), transparent), `
+      ? `radial-gradient(65rem circle at ${x}px ${y}px, var(--colors-brand9), transparent), `
       : ''
     outerElement.style.background = isActive ? `var(--colors-brand9)` : `var(--colors-scale3)`
     outerElement.style.backgroundImage = `
