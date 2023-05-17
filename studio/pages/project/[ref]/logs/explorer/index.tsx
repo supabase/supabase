@@ -43,7 +43,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   const [warnings, setWarnings] = useState<LogsWarning[]>([])
   const { data: subscription } = useProjectSubscriptionQuery({ projectRef })
   const tier = subscription?.tier
-  const [{ params, logData, error, isLoading }, { changeQuery, runQuery, setParams }] =
+  const { params, logData, error, isLoading, changeQuery, runQuery, setParams } =
     useLogsQuery(projectRef as string, {
       iso_timestamp_start: its ? (its as string) : undefined,
       iso_timestamp_end: ite ? (ite as string) : undefined,
