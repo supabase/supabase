@@ -16,15 +16,15 @@ In this post we'll walk you through a new addition to the Cloudflare Workers das
 
 ## How To Enable Supabase Integration in Cloudflare Workers
 
-Start of by heading to the Cloudflare Dashboard, go to the Workers & Pages tab and hit 'Create Application' followed by 'Create Worker'.
+Start by heading to the [Cloudflare Dashboard](https://dash.cloudflare.com), go to the Workers & Pages tab and hit 'Create Application' followed by 'Create Worker'.
 
 ![Cloudflare Dashboard 2](/images/blog/cloudflare-integration/2.png)
 
 Deploy the Hello World example Worker. Once it's deployed hit 'Configure Worker'.
 
-On the configuration page select the Settings tab, followed by the Integrations option.
-
 ![Cloudflare Dashboard 3](/images/blog/cloudflare-integration/3.png)
+
+On the configuration page select the Settings tab, followed by the Integrations option.
 
 You should now see the database integration options. On the Supabase card, click 'Add Integration'
 
@@ -98,4 +98,4 @@ values
   ('Lilliput');
 ```
 
-Remember that you don't need to use supabase-js to connect to your Supabase database, you can connect "directly" to the underlying Postgres database using the connection string (every Supabase database comes pre-installed with a connection pooler), or you can try Cloudflare's new [TCP socket method of connecting to Postgres](https://blog.cloudflare.com/workers-tcp-socket-api-connect-databases/) directly from Cloudflare Workers.
+Remember that you don't need to use supabase-js to connect to your Supabase database, you can connect "directly" to the underlying Postgres database using the connection string (every Supabase database comes pre-installed with a [connection pooler](https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pool)), or you can try Cloudflare's new [TCP socket method of connecting to Postgres](https://blog.cloudflare.com/workers-tcp-socket-api-connect-databases/) directly from Cloudflare Workers.
