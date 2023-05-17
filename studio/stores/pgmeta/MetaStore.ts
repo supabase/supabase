@@ -178,6 +178,7 @@ export default class MetaStore implements IMetaStore {
     'pgsodium',
     'pgsodium_masks',
     'pgbouncer',
+    'pgtle',
     'realtime',
     'storage',
     'supabase_functions',
