@@ -117,7 +117,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
         <BreadcrumbsView defaultValue={breadcrumbs} />
       </div>
       {IS_PLATFORM && showCmdkHelper && (
-        <SearchButton className="w-full max-w-md">
+        <SearchButton className="lg:w-full max-w-sm lg:max-w-md">
           <div
             className="
               flex
