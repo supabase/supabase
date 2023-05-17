@@ -321,7 +321,7 @@ export const SocialLoginItems = [
     url: '/guides/auth/social-login/auth-apple',
   },
   {
-    name: 'Azure',
+    name: 'Azure (Microsoft)',
     icon: '/docs/img/icons/microsoft-icon',
     url: '/guides/auth/social-login/auth-azure',
   },
