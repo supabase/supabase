@@ -69,7 +69,7 @@ const FrontendFrameworks = ({ className }: { className?: string }) => {
           <ReactTooltip
             effect={'solid'}
             place="bottom"
-            backgroundColor="#161616"
+            backgroundColor="#2e2e2e"
             textColor="white"
             className="!py-2 !px-4"
           />
