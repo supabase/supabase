@@ -84,7 +84,7 @@ const StackedBarChart: React.FC<Props> = ({
             dataKey={xAxisKey}
             interval={data.length - 2}
             angle={0}
-            tick={{ fontSize: '0px' }}
+            tick={false}
             axisLine={{ stroke: CHART_COLORS.AXIS }}
             tickLine={{ stroke: CHART_COLORS.AXIS }}
           />
