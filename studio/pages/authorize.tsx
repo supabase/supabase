@@ -177,7 +177,7 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
               <div
                 className="w-8 h-8 md:w-10 md:h-10 bg-center bg-no-repeat bg-cover flex items-center justify-center"
                 style={{
-                  backgroundImage: requester?.icon !== null ? `url('${requester?.icon}')` : 'none',
+                  backgroundImage: requester.icon !== null ? `url('${requester?.icon}')` : 'none',
                 }}
               >
                 {requester?.icon === null && (
