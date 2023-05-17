@@ -35,7 +35,7 @@ const LogSelection: FC<LogSelectionProps> = ({
   queryType,
   params = {},
 }) => {
-  const [{ logData: fullLog, isLoading }] = useSingleLog(
+  const { logData: fullLog, isLoading } = useSingleLog(
     projectRef,
     queryType,
     params,

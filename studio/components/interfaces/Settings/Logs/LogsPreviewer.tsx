@@ -57,10 +57,20 @@ export const LogsPreviewer: React.FC<Props> = ({
 
   const table = !tableName ? LOGS_TABLES[queryType] : tableName
 
-  const [
-    { error, logData, params, newCount, filters, isLoading, eventChartData, isLoadingOlder },
-    { loadOlder, setFilters, refresh, setParams },
-  ] = useLogsPreview(projectRef as string, table, filterOverride)
+  const {
+    error,
+    logData,
+    params,
+    newCount,
+    filters,
+    isLoading,
+    eventChartData,
+    isLoadingOlder,
+    loadOlder,
+    setFilters,
+    refresh,
+    setParams,
+  } = useLogsPreview(projectRef as string, table, filterOverride)
 
   const { showUpgradePrompt, setShowUpgradePrompt } = useUpgradePrompt(
     params.iso_timestamp_start as string
