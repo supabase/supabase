@@ -182,6 +182,7 @@ export default class MetaStore implements IMetaStore {
     'realtime',
     'storage',
     'supabase_functions',
+    'supabase_migrations',
     'vault',
     'graphql',
     'graphql_public',
