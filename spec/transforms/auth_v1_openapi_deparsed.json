@@ -1253,9 +1253,9 @@
                       "type": "boolean",
                       "x-go-name": "Apple"
                     },
-                    "azure": {
+                    "microsoft": {
                       "type": "boolean",
-                      "x-go-name": "Azure"
+                      "x-go-name": "Microsoft"
                     },
                     "bitbucket": {
                       "type": "boolean",
@@ -3171,9 +3171,9 @@
           "type": "boolean",
           "x-go-name": "Apple"
         },
-        "azure": {
+        "microsoft": {
           "type": "boolean",
-          "x-go-name": "Azure"
+          "x-go-name": "Microsoft"
         },
         "bitbucket": {
           "type": "boolean",
@@ -3286,9 +3286,9 @@
               "type": "boolean",
               "x-go-name": "Apple"
             },
-            "azure": {
+            "microsoft": {
               "type": "boolean",
-              "x-go-name": "Azure"
+              "x-go-name": "Microsoft"
             },
             "bitbucket": {
               "type": "boolean",
@@ -4028,9 +4028,9 @@
                 "type": "boolean",
                 "x-go-name": "Apple"
               },
-              "azure": {
+              "microsoft": {
                 "type": "boolean",
-                "x-go-name": "Azure"
+                "x-go-name": "Microsoft"
               },
               "bitbucket": {
                 "type": "boolean",

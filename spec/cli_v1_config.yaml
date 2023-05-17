@@ -267,7 +267,7 @@ parameters:
       Use an external OAuth provider. The full list of providers are:
 
       - `apple`
-      - `azure`
+      - `microsoft`
       - `bitbucket`
       - `discord`
       - `facebook`

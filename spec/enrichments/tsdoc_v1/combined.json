@@ -6410,7 +6410,7 @@
                               },
                               {
                                 "type": "literal",
-                                "value": "azure"
+                                "value": "microsoft"
                               },
                               {
                                 "type": "literal",
@@ -12405,7 +12405,7 @@
                               },
                               {
                                 "type": "literal",
-                                "value": "azure"
+                                "value": "microsoft"
                               },
                               {
                                 "type": "literal",
@@ -18105,7 +18105,7 @@
               },
               {
                 "type": "literal",
-                "value": "azure"
+                "value": "microsoft"
               },
               {
                 "type": "literal",
