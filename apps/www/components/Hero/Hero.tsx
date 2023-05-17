@@ -5,7 +5,7 @@ import { useTelemetryProps } from 'common/hooks/useTelemetryProps'
 import gaEvents from '~/lib/gaEvents'
 import { Button, IconBookOpen } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import HeroBackground from './HeroBackground'
+// import HeroBackground from './HeroBackground'
 import FrontendFrameworks from './FrontendFrameworks'
 import styles from './hero.module.css'
 
@@ -29,13 +29,7 @@ const Hero = () => {
                 ].join(' ')}
               >
                 <div>
-                  <h1
-                    className="
-                        text-scale-1200
-                        text-3xl sm:text-5xl sm:leading-none lg:text-6xl
-                        xl:text-7xl
-                        "
-                  >
+                  <h1 className="text-scale-1200 text-4xl sm:text-5xl sm:leading-none lg:text-7xl">
                     <span className="block text-[#F4FFFA00] bg-clip-text bg-gradient-to-b from-scale-1200 to-scale-1200 dark:to-scale-1100">
                       Build in a weekend
                     </span>
@@ -43,7 +37,7 @@ const Hero = () => {
                       Scale to millions
                     </span>
                   </h1>
-                  <p className="pt-2 text-scale-1200 !mb-0 mt-1.5 text-sm sm:mt-5 sm:text-base lg:text-lg">
+                  <p className="pt-2 text-scale-1200 my-3 text-sm sm:mt-5 lg:mb-0 sm:text-base lg:text-lg">
                     Supabase is an open source Firebase alternative for building secure and
                     performant Postgres backends with minimal configuration.
                   </p>
@@ -51,14 +45,14 @@ const Hero = () => {
                 <div className="flex items-center gap-2">
                   <Link href="https://app.supabase.com" as="https://app.supabase.com" passHref>
                     <a onClick={() => sendTelemetryEvent(gaEvents['www_hp_hero_startProject'])}>
-                      <Button size="large" className="text-white">
+                      <Button size="medium" className="text-white">
                         Start your project
                       </Button>
                     </a>
                   </Link>
                   <Link href="/docs" as="/docs" passHref>
                     <a onClick={() => sendTelemetryEvent(gaEvents['www_hp_hero_documentation'])}>
-                      <Button size="large" type="default" icon={<IconBookOpen />}>
+                      <Button size="medium" type="default" icon={<IconBookOpen />}>
                         Documentation
                       </Button>
                     </a>
