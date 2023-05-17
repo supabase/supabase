@@ -5,8 +5,7 @@ import { useTelemetryProps } from 'common/hooks/useTelemetryProps'
 import gaEvents from '~/lib/gaEvents'
 import { Button, IconBookOpen } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-// import HeroBackground from './HeroBackground'
-import FrontendFrameworks from './FrontendFrameworks'
+import HeroFrameworks from './HeroFrameworks'
 import styles from './hero.module.css'
 
 const Hero = () => {
@@ -58,13 +57,13 @@ const Hero = () => {
                     </a>
                   </Link>
                 </div>
-                <FrontendFrameworks className="mt-4 lg:mt-6" />
+                <HeroFrameworks className="mt-4 lg:mt-6" />
               </div>
             </div>
           </div>
         </div>
       </SectionContainer>
-      {/* <HeroBackground /> */}
+      <div className="w-1/2 container mx-auto h-px bg-gradient-to-r from-transparent via-scale-800 to-transparent" />
     </div>
   )
 }
