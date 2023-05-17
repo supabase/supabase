@@ -1,0 +1,50 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  id: 'maturity-model',
+  title: 'Maturity Model',
+  description: 'Growing with your application.',
+}
+
+Supabase is great for building something very fast _and_ for scaling up. Keep in mind however, that as your application and team grows, the practices you use for managing an application in production should not be the same as the practices you used for prototyping.
+
+## Prototyping
+
+When you are prototyping, the Dashboard we provide is a great way to build your application. We still strongly recommend using [Migrations](/docs/guides/getting-started/local-development#database-migrations) to manage your database changes.
+
+## Collaborating
+
+As soon as you start collaborating with team members, all changes should be in version control. At this point we strongly recommend moving away from using the Dashboard for making database changes. Use Migrations to manage your database, and check them into your codebase to track every change.
+
+Resources:
+
+- [Database migrations](/docs/guides/getting-started/local-development#database-migrations)
+- [PGAudit for Postgres](/docs/guides/database/extensions/pgaudit)
+
+## In Production
+
+Once your application is live, you should never change your database using the Dashboard. Read the [Production Checklist](docs/guides/platform/going-into-prod) and make sure that your organization is aware of the [Shared Responsibilities](/docs/guides/platform/shared-responsibility-model) between your organizaiton and Supabase. Supabase provides various [access levels](https://supabase.com/docs/guides/platform/access-control) for the Dashboard. You should [design a secure workflow](https://supabase.com/docs/guides/platform/shared-responsibility-model#you-decide-your-own-workflow) for managing your database.
+
+We strongly recommend running [multiple environments](/docs/guides/cli/managing-environments) as part of your development workflow (`local` -> `staging` -> `prod`).
+
+Resources:
+
+- [Database migrations](/docs/guides/getting-started/local-development#database-migrations)
+- [PGAudit for Postgres](/docs/guides/database/extensions/pgaudit)
+- [Managing environments](/docs/guides/cli/managing-environments)
+- [Access Control](/docs/guides/platform/access-control)
+
+Resources:
+
+- [Database migrations](/docs/guides/getting-started/local-development#database-migrations)
+- [PGAudit for Postgres](/docs/guides/getting-started/local-development#database-migrations)
+
+## Enterprise
+
+For a more secure setup, consider running your workload across several organizations. It's a common pattern to have a Production organization which is restricted to only those team members who are qualified to have direct access to production databases.
+
+Reach out to [growth@supabase.com](mailto:growth@supabase.com) if you need help designing a secure development workflow for your organization.
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page
