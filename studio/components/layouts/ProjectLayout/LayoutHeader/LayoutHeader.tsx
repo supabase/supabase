@@ -1,8 +1,7 @@
 import Link from 'next/link'
 import { observer } from 'mobx-react-lite'
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { useParams } from 'common'
-import { Badge, Button, IconCommand, IconSearch, useCommandMenu } from 'ui'
+import { Badge, IconCommand, IconSearch, SearchButton, useCommandMenu } from 'ui'
 
 import { detectOS } from 'lib/helpers'
 import { IS_PLATFORM, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
@@ -117,39 +116,38 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
         {/* Additional breadcrumbs are supplied */}
         <BreadcrumbsView defaultValue={breadcrumbs} />
       </div>
+      {IS_PLATFORM && showCmdkHelper && (
+        <SearchButton className="w-full max-w-md">
+          <div
+            className="
+              flex
+              group
+              items-center
+              justify-between
+              bg-scaleA-200
+              border
+              transition
+              hover:border-scale-600
+              hover:bg-scaleA-300
+              border-scale-500 pl-3 pr-1.5 w-full h-[32px] rounded"
+          >
+            <div className="flex items-center space-x-2">
+              <IconSearch className="text-scale-1100" size={18} strokeWidth={2} />
+              <p className="text-scale-1100 text-sm group-hover:text-scale-1200 transition">
+                Search...
+              </p>
+            </div>
+            <div className="flex items-center space-x-1">
+              <div className="text-scale-1200 md:flex items-center justify-center h-5 w-10 border rounded bg-scale-500 border-scale-700 gap-1">
+                <IconCommand size={12} strokeWidth={1.5} />
+                <span className="text-[12px]">K</span>
+              </div>
+            </div>
+          </div>
+        </SearchButton>
+      )}
       <div className="flex items-center space-x-2">
         {customHeaderComponents && customHeaderComponents}
-        {IS_PLATFORM && showCmdkHelper && (
-          <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger>
-              <div className="flex">
-                <Button
-                  type="default"
-                  icon={<IconSearch size={16} strokeWidth={1.5} className="text-scale-1200" />}
-                  onClick={() => setIsOpen(true)}
-                />
-              </div>
-            </Tooltip.Trigger>
-            <Tooltip.Portal>
-              <Tooltip.Content side="bottom">
-                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                <div
-                  className={[
-                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                    'border border-scale-200 flex items-center space-x-1',
-                  ].join(' ')}
-                >
-                  {os === 'macos' ? (
-                    <IconCommand size={11.5} strokeWidth={1.5} className="text-scale-1200" />
-                  ) : (
-                    <p className="text-xs">CTRL</p>
-                  )}
-                  <p className="text-xs">K</p>
-                </div>
-              </Tooltip.Content>
-            </Tooltip.Portal>
-          </Tooltip.Root>
-        )}
         {IS_PLATFORM && <HelpPopover />}
         {IS_PLATFORM && <FeedbackDropdown />}
         {IS_PLATFORM && <NotificationsPopover />}
