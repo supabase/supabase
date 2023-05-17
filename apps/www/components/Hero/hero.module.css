@@ -8,8 +8,7 @@
   width: 120vw;
   height: 120vh;
   min-height: 800px;
-  margin-left: 0%;
-  transform: translateY(0);
+  transform: translateY(20%);
   overflow: hidden;
   display: flex;
   align-items: center;

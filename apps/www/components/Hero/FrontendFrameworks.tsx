@@ -48,7 +48,7 @@ const FrontendFrameworks = ({ className }: { className?: string }) => {
       <div className="w-full sm:max-w-lg mt-4 md:mt-3 lg:ml-0">
         <div className="flex flex-wrap items-center justify-center gap-2 sm:flex-nowrap">
           {frameworks.map((framework) => (
-            <Link href={framework.docs}>
+            <Link href={framework.docs} key={framework.name}>
               <a key={framework.name} className="m-0" data-tip={framework.name}>
                 <Image
                   key={framework.name}
