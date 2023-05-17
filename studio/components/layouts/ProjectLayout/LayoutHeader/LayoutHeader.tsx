@@ -1,9 +1,8 @@
 import Link from 'next/link'
 import { observer } from 'mobx-react-lite'
 import { useParams } from 'common'
-import { Badge, IconCommand, IconSearch, SearchButton, useCommandMenu } from 'ui'
+import { Badge } from 'ui'
 
-import { detectOS } from 'lib/helpers'
 import { IS_PLATFORM, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import { useFlag, useStore } from 'hooks'
 import BreadcrumbsView from './BreadcrumbsView'
@@ -20,10 +19,6 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder = true }: any) => {
   const { ui } = useStore()
   const { selectedOrganization, selectedProject } = ui
-
-  const os = detectOS()
-  const { setIsOpen } = useCommandMenu()
-  const showCmdkHelper = useFlag('dashboardCmdk')
 
   const { ref: projectRef } = useParams()
   const { project } = useProjectContext()
@@ -116,36 +111,6 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
         {/* Additional breadcrumbs are supplied */}
         <BreadcrumbsView defaultValue={breadcrumbs} />
       </div>
-      {IS_PLATFORM && showCmdkHelper && (
-        <SearchButton className="lg:w-full max-w-sm lg:max-w-md">
-          <div
-            className="
-              flex
-              group
-              items-center
-              justify-between
-              bg-scaleA-200
-              border
-              transition
-              hover:border-scale-600
-              hover:bg-scaleA-300
-              border-scale-500 pl-3 pr-1.5 w-full h-[32px] rounded"
-          >
-            <div className="flex items-center space-x-2">
-              <IconSearch className="text-scale-1100" size={18} strokeWidth={2} />
-              <p className="text-scale-1100 text-sm group-hover:text-scale-1200 transition">
-                Search...
-              </p>
-            </div>
-            <div className="flex items-center space-x-1">
-              <div className="text-scale-1200 md:flex items-center justify-center h-5 w-10 border rounded bg-scale-500 border-scale-700 gap-1">
-                <IconCommand size={12} strokeWidth={1.5} />
-                <span className="text-[12px]">K</span>
-              </div>
-            </div>
-          </div>
-        </SearchButton>
-      )}
       <div className="flex items-center space-x-2">
         {customHeaderComponents && customHeaderComponents}
         {IS_PLATFORM && <HelpPopover />}
