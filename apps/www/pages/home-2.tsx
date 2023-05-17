@@ -7,7 +7,7 @@ import Hero from '~/components/Hero/Hero'
 // Import Swiper styles if swiper used on page
 import 'swiper/swiper.min.css'
 
-const Features = dynamic(() => import('components/Features/index'))
+const FeaturesOld = dynamic(() => import('components/Features/FeaturesOld'))
 const BuiltExamples = dynamic(() => import('components/BuiltWithSupabase/index'))
 const MadeForDevelopers = dynamic(() => import('components/MadeForDevelopers/index'))
 const AdminAccess = dynamic(() => import('components/AdminAccess/index'))
@@ -21,7 +21,7 @@ const Index = ({ customerStories }: Props) => {
   return (
     <Layout>
       <Hero />
-      <Features />
+      <FeaturesOld />
       <TwitterSocialSection />
       <BuiltExamples />
       <MadeForDevelopers />
