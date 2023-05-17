@@ -63,6 +63,7 @@ const Features = () => {
 
   return (
     <SectionContainer className="space-y-8 max-w-7xl mt-0 lg:mt-0 !pt-0">
+      <h3 className="h3 text-center">Build faster and focus on your products</h3>
       <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-4 lg:gap-6 md:grid-cols-6">
         <FeatureCard
           url={Solutions['database'].url}
