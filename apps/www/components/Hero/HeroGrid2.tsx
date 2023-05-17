@@ -5,19 +5,23 @@ import { motion } from 'framer-motion'
 import styles from './hero.module.css'
 import { useWindowSize } from 'react-use'
 
-const HeroGrid = () => {
+const HeroGrid2 = () => {
   const { isDarkMode } = useTheme()
   const { width } = useWindowSize()
   const isSm = useBreakpoint(640)
+
+  if (!width) return null
 
   const svgGridOptions = {
     color: isDarkMode ? '#00c6d4' : '#01876c',
     boxWidth: width ? width * 7 : 7500,
     boxHeight: width ? width * 5 : 6000,
-    xLines: isSm ? 20 : 49,
-    yLines: isSm ? 65 : 130,
+    xLines: isSm ? 19 : 49,
+    yLines: isSm ? 65 : 60,
     strokeWidth: 1,
   }
+
+  console.log('svgGridOptions', svgGridOptions)
 
   const pulseAnimation = {
     x2: [svgGridOptions.boxWidth / 2, 0, svgGridOptions.boxWidth / 2],
@@ -31,10 +35,25 @@ const HeroGrid = () => {
       preserveAspectRatio="none"
       width="100%"
       height="100%"
-      viewBox={`0 0 ${svgGridOptions.boxWidth} ${svgGridOptions.boxHeight}`}
+      viewBox={`0 0 ${svgGridOptions.boxWidth ?? 600} ${svgGridOptions.boxHeight ?? 300}`}
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
+      {[...new Array(svgGridOptions.yLines)].map((_: any, i: number) => {
+        const y = (svgGridOptions.boxWidth * i) / svgGridOptions.yLines
+        return (
+          <line
+            key={`y-${i}`}
+            x1={svgGridOptions.boxHeight}
+            y1={y}
+            x2="0"
+            y2={y}
+            stroke={svgGridOptions.color}
+            strokeWidth={svgGridOptions.strokeWidth}
+            shapeRendering="crispEdges"
+          />
+        )
+      })}
       {[...new Array(svgGridOptions.xLines)].map((_: any, i: number) => {
         const x = (svgGridOptions.boxHeight * i) / svgGridOptions.xLines
 
@@ -82,7 +101,21 @@ const HeroGrid = () => {
           }
         }
 
-        return <AnimatedLine name={isSm ? getMobileLines() : getDesktopLines()} />
+        return (
+          <>
+            <line
+              key={`x-${i}`}
+              x1={x}
+              y1={svgGridOptions.boxWidth}
+              x2={x}
+              y2="0"
+              stroke={svgGridOptions.color}
+              strokeWidth={svgGridOptions.strokeWidth}
+              shapeRendering="crispEdges"
+            />
+            <AnimatedLine name={isSm ? getMobileLines() : getDesktopLines()} />
+          </>
+        )
       })}
       <defs>
         <MotionLinearGradient name="electric-pulse" delay={0} />
@@ -115,12 +148,12 @@ const HeroGrid = () => {
   return (
     <div
       className={[
-        'relative -z-10 ![perspective:800px] sm:![perspective:800px] md:![perspective:800px] lg:![perspective:800px]',
+        'relative -z-10 ![perspective:1500px] sm:![perspective:1500px] md:![perspective:1500px] lg:![perspective:1500px]',
       ].join(' ')}
     >
       <div
         style={{
-          transform: 'rotateX(85deg)',
+          transform: 'rotateX(75deg)',
           position: 'absolute',
           top: 0,
           bottom: 0,
@@ -136,4 +169,4 @@ const HeroGrid = () => {
   )
 }
 
-export default HeroGrid
+export default HeroGrid2
