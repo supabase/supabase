@@ -30,6 +30,11 @@ const frameworks = [
     docs: '/docs/guides/getting-started/quickstarts/sveltekit',
   },
   {
+    name: 'Python',
+    icon: '/images/logos/languages/python-icon.svg',
+    docs: '/docs/reference/python/introduction',
+  },
+  {
     name: 'Expo',
     icon: '/images/logos/frameworks/expo.svg',
     docs: '/docs/guides/getting-started/tutorials/with-expo',
@@ -44,7 +49,7 @@ const frameworks = [
 const FrontendFrameworks = ({ className }: { className?: string }) => {
   return (
     <div className={['flex text-center flex-col items-center', className].join(' ')}>
-      <small className="small !text-scale-1100">Works seamlessly with +20 frameworks</small>
+      <small className="small !text-scale-1100">Works seamlessly with</small>
       <div className="w-full sm:max-w-lg mt-4 md:mt-3 lg:ml-0">
         <div className="flex flex-wrap items-center justify-center gap-2 sm:flex-nowrap">
           {frameworks.map((framework) => (
