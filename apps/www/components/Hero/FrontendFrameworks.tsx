@@ -34,11 +34,11 @@ const frameworks = [
     icon: '/images/logos/languages/python-icon.svg',
     docs: '/docs/reference/python/introduction',
   },
-  {
-    name: 'Expo',
-    icon: '/images/logos/frameworks/expo.svg',
-    docs: '/docs/guides/getting-started/tutorials/with-expo',
-  },
+  // {
+  //   name: 'Expo',
+  //   icon: '/images/logos/frameworks/expo.svg',
+  //   docs: '/docs/guides/getting-started/tutorials/with-expo',
+  // },
   {
     name: 'Vue',
     icon: '/images/logos/frameworks/vue.svg',
