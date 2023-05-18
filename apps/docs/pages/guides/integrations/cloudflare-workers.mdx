@@ -1,40 +1,37 @@
----
-title: Cloudflare Integrates with Supabase
-description: Using Supabase from your Cloudflare Workers just got even easier.
-author: ant_wilson
-image: 2023-05-09-beta-update-april/monthly-update-april-2023.jpg
-thumb: 2023-05-09-beta-update-april/monthly-update-april-2023.jpg
-tags:
-  - release-notes
-date: '2023-05-18'
-toc_depth: 3
----
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  id: 'cloudflare-workers',
+  title: 'Cloudflare Workers',
+  description:
+    "Using Supabase from your Cloudflare Workers just got even easier.",
+}
 
 Using Supabase in Cloudflare Workers has always been a great way to interact with your data from the edge. Supabase-js communicates with your Supabase Postgres instance via HTTP using PostgREST, so you never need to worry about running out of database connections.
 
-In this post we'll walk you through a new addition to the Cloudflare Workers dashboard - the ability to authenticate directly with your Supabase account, and automatically inject your Supabase environment variables into your Worker code.
+In this guide we'll walk you through a new addition to the Cloudflare Workers dashboard - the ability to authenticate directly with your Supabase account, and automatically inject your Supabase environment variables into your Worker code.
 
 ## How To Enable Supabase Integration in Cloudflare Workers
 
 Start by heading to the [Cloudflare Dashboard](https://dash.cloudflare.com), go to the Workers & Pages tab and hit 'Create Application' followed by 'Create Worker'.
 
-![Cloudflare Dashboard 2](/images/blog/cloudflare-integration/2.png)
+![Cloudflare Dashboard 2](/docs/img/guides/integrations/cloudflare-integration/2.png)
 
 Deploy the Hello World example Worker. Once it's deployed hit 'Configure Worker'.
 
-![Cloudflare Dashboard 3](/images/blog/cloudflare-integration/3.png)
+![Cloudflare Dashboard 3](/docs/img/guides/integrations/cloudflare-integration/3.png)
 
 On the configuration page select the Settings tab, followed by the Integrations option.
 
 You should now see the database integration options. On the Supabase card, click 'Add Integration'
 
-![Cloudflare Dashboard 4](/images/blog/cloudflare-integration/4.png)
+![Cloudflare Dashboard 4](/docs/img/guides/integrations/cloudflare-integration/4.png)
 
 After reviewing and accepting the terms, you will be shown the option to connect and a Supabase popup should appear.
 
 Follow the flow by selecting your Supabase Org and the Project you wish to connect to. If you don't have any projects yet, head over to the [Supabase Dashboard](https://app.supabase.com) to create one.
 
-![Cloudflare Dashboard 5](/images/blog/cloudflare-integration/5.png)
+![Cloudflare Dashboard 5](/docs/img/guides/integrations/cloudflare-integration/5.png)
 
 Once it's connected you will be given the option to select which Supabase Key you want to pull into the Worker context.
 
@@ -42,9 +39,11 @@ The `Anon` key here is one that always adhires to the Database's RLS policies (r
 
 The `Service Role` is typically ok to use in backend contexts, such as Cloudflare Workers, but note that this key **bypasses your Row Level Security policies**, and has the ablity to read, write, and delete any data in your database.
 
-![Cloudflare Dashboard 6](/images/blog/cloudflare-integration/6.png)
+![Cloudflare Dashboard 6](/docs/img/guides/integrations/cloudflare-integration/6.png)
 
 Once this is done the `SUPABASE_KEY` and `SUPABASE_URL` environment variables will now be available from your Cloudflare Worker code.
+
+![Cloudflare Dashboard 7](/docs/img/guides/integrations/cloudflare-integration/7.png)
 
 You can now install the supabase-js client in your Worker:
 
