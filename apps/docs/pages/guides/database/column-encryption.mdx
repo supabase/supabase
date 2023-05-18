@@ -62,9 +62,9 @@ This key can now be used with pgsodium encryption functions by its UUID (`eaa20d
 
 ```sql
 select * from pgsodium.crypto_aead_det_encrypt (
-    'this is the message',  -- a message to encrypt
-    'this is associated data',  -- some authenticated associated data
-    'eaa20d8c-c77c-4985-9f73-2a5f5d1f1e6d'::uuid -- key ID
+  'this is the message',  -- a message to encrypt
+  'this is associated data',  -- some authenticated associated data
+  'eaa20d8c-c77c-4985-9f73-2a5f5d1f1e6d'::uuid -- key ID
 );
 ```
 
@@ -80,9 +80,9 @@ Now to decrypt the ciphertext, pass it to the decryption function _with the same
 ```sql
 select *
 from convert_from(pgsodium.crypto_aead_det_decrypt (
-    '\\x099baa820250d7375ed141f8f1936af384bc229f3de1010a6eff6ffdaf3998baffbae75b5cd83d1c469407ff2d3764a428b742',
-    'this is associated data',
-    'eaa20d8c-c77c-4985-9f73-2a5f5d1f1e6d'::uuid
+  '\\x099baa820250d7375ed141f8f1936af384bc229f3de1010a6eff6ffdaf3998baffbae75b5cd83d1c469407ff2d3764a428b742',
+  'this is associated data',
+  'eaa20d8c-c77c-4985-9f73-2a5f5d1f1e6d'::uuid
 ), 'utf8');
 ```
 
@@ -121,14 +121,14 @@ Let's see a simple example of using `SECURITY LABEL` to encrypt a column using *
 For the simplest case, a column can be encrypted with one Key ID which must be of the type `aead-det` (as created above):
 
 ```sql
-CREATE TABLE secrets (
-    id bigserial primary key,
-    secret_number text
+create table secrets (
+  id bigserial primary key,
+  secret_number text
 );
 
-SECURITY LABEL FOR pgsodium
-    ON COLUMN secrets.secret_number
-    IS 'ENCRYPT WITH KEY ID e348034b-3f07-4878-aad6-000511d12826';
+security label for pgsodium
+ on column secrets.secret_number
+ is 'ENCRYPT WITH KEY ID e348034b-3f07-4878-aad6-000511d12826';
 ```
 
 The advantage of this approach is simplicity - the user creates one key and labels a column with it. The cryptographic algorithm for this approach uses a _nonceless_ encryption algorithm called `crypto_aead_det_xchacha20()`. This algorithm is written by the author of libsodium and can be found [here](https://github.com/jedisct1/libsodium-xchacha20-siv).
@@ -140,15 +140,15 @@ Using one key for an entire column means that whoever can decrypt one row can de
 A more fine grained approach would be storing one Key ID per row:
 
 ```sql
-CREATE TABLE secrets (
-    id bigserial primary key,
-    secret text,
-    key_id uuid not null DEFAULT 'e348034b-3f07-4878-aad6-000511d12826'::uuid
+create table secrets (
+  id bigserial primary key,
+  secret text,
+  key_id uuid not null default 'e348034b-3f07-4878-aad6-000511d12826'::uuid
 );
 
-SECURITY LABEL FOR pgsodium
-    ON COLUMN secrets.secret
-    IS 'ENCRYPT WITH KEY COLUMN key_id';
+security label for pgsodium
+  on column secrets.secret
+  is 'ENCRYPT WITH KEY COLUMN key_id';
 ```
 
 This approach ensures that a key for one user doesn't necessarily decrypt any others. While rows can share key IDs, they don't necessarily have to (unlike the first example above where one key id was used for the entire column). It also acts as a natural partition that can work in conjunction with Row Level Security to share distinct keys between owners.
@@ -164,16 +164,16 @@ Nonces are some extra cryptographic context that is used in many cryptographic a
 Duplicate ciphertexts cannot be used to “attack the key”, it can only reveal the duplication. However, duplication is still information. In our examples so far, an attacker might be able to use this information to determine that two accounts share the same secret. While not technically breaking the encryption, this still leaks information to an attacker.
 
 ```sql
-CREATE TABLE secrets (
-    id bigserial primary key,
-    secret text,
-    key_id uuid not null DEFAULT 'e348034b-3f07-4878-aad6-000511d12826'::uuid,
-    nonce bytea default pgsodium.crypto_aead_det_noncegen()
+create table secrets (
+  id bigserial primary key,
+  secret text,
+  key_id uuid not null default 'e348034b-3f07-4878-aad6-000511d12826'::uuid,
+  nonce bytea default pgsodium.crypto_aead_det_noncegen()
 );
 
-SECURITY LABEL FOR pgsodium
-    ON COLUMN secrets.secret
-    IS 'ENCRYPT WITH KEY COLUMN key_id NONCE nonce';
+security label for pgsodium
+  on column secrets.secret
+  is 'ENCRYPT WITH KEY COLUMN key_id NONCE nonce';
 ```
 
 This is the most secure form of TCE - there is a unique key ID and a unique nonce per row.
@@ -189,17 +189,17 @@ In our secret example, we might associate a "`secret`" with an "`account_id`". B
 Like above, this is done simply by extending the security label with the associated data column:
 
 ```sql
-CREATE TABLE secrets (
-    id bigserial primary key,
-    secret text,
-    account_id integer,
-    key_id uuid not null DEFAULT 'e348034b-3f07-4878-aad6-000511d12826'::uuid,
-    nonce bytea default pgsodium.crypto_aead_det_noncegen()
+create table secrets (
+  id bigserial primary key,
+  secret text,
+  account_id integer,
+  key_id uuid not null default 'e348034b-3f07-4878-aad6-000511d12826'::uuid,
+  nonce bytea default pgsodium.crypto_aead_det_noncegen()
 );
 
-SECURITY LABEL FOR pgsodium
-    ON COLUMN secrets.secret
-    IS 'ENCRYPT WITH KEY COLUMN key_id ASSOCIATED (account_id) NONCE nonce';
+security label for pgsodium
+  on column secrets.secret
+  is 'ENCRYPT WITH KEY COLUMN key_id ASSOCIATED (account_id) NONCE nonce';
 ```
 
 The new label indicates which column is to be associated with the secret, and that's it! Your `account_id` and secret are now protected under the same authentication signature as the secret itself.
@@ -209,12 +209,10 @@ The new label indicates which column is to be associated with the secret, and th
 Now that you have TCE setup for a table, it's easy to use by simply inserting data into the table, and querying that data by looking at its generated view. The view is named `decrypted_<table_name>` and by default is in the same schema as your table:
 
 ```sql
-INSERT INTO secrets (
-    secret,
-    account_id
-)
-VALUES
-    ('1234-5678-8765-4321', 123);
+insert into secrets
+  (secret, account_id)
+values
+  ('1234-5678-8765-4321', 123);
 ```
 
 Now that you have inserted data, look at the table and notice how the secret is encrypted. This is the data that is stored on disk, the encrypted card number, the key id, and the account id, **but the key itself is not stored**. This means if someone gets a backup or dump of your database, they cannot decrypt the secret, they do not have the key, only the key ID:
