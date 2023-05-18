@@ -1,7 +1,6 @@
 import { useParams } from 'common'
-import { useContentUpdateMutation } from 'data/content/content-update-mutation'
 import { useStore } from 'hooks'
-import { sqlEditorState } from 'state/sql-editor'
+import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { Button, Form, Input, Modal } from 'ui'
 
 export interface RenameQueryModalProps {
@@ -14,13 +13,7 @@ export interface RenameQueryModalProps {
 const RenameQueryModal = ({ snippet, visible, onCancel, onComplete }: RenameQueryModalProps) => {
   const { ui } = useStore()
   const { ref } = useParams()
-  const { mutateAsync: updateContent } = useContentUpdateMutation({
-    onSuccess(data) {
-      if (data.content.id) {
-        sqlEditorState.snippets[data.content.id].snippet.name = data.content.name
-      }
-    },
-  })
+  const snap = useSqlEditorStateSnapshot()
 
   const { id, name, description } = snippet
 
@@ -36,7 +29,7 @@ const RenameQueryModal = ({ snippet, visible, onCancel, onComplete }: RenameQuer
 
     setSubmitting(true)
     try {
-      await updateContent({ projectRef: ref, id, content: values })
+      snap.renameSnippet(id, values.name, values.description)
       if (onComplete) onComplete()
       return Promise.resolve()
     } catch (error: any) {
