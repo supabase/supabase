@@ -6,6 +6,7 @@ import { ParsedUrlQuery } from 'querystring'
 
 import { useStore } from 'hooks'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
+import query from 'pages/api/pg-meta/[ref]/query'
 
 // [Fran] the idea is to let users change projects without losing the current page,
 // but at the same time we need to redirect correctly between urls that might be
@@ -15,9 +16,16 @@ import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 // highest common route with just projectRef in the router queries.
 
 const sanitizeRoute = (route: string, routerQueries: ParsedUrlQuery) => {
-  let queryArray = Object.entries(routerQueries)
+  const queryArray = Object.entries(routerQueries)
+
   if (queryArray.length > 1) {
-    return route.split('/').slice(0, 4).join('/')
+    // account for query string, if exists (example: /logs/explorer?q=select...)
+    const hasQueryString = queryArray.filter(([key]) => key === 'q').length > 0
+
+    return route
+      .split('/')
+      .slice(0, hasQueryString ? 5 : 4)
+      .join('/')
   } else {
     return route
   }
@@ -28,7 +36,6 @@ const ProjectDropdown = () => {
   const selectedOrganizationProjects = app.projects.list()
   const selectedOrganizationSlug = ui.selectedOrganization?.slug
   const selectedProject: any = ui.selectedProject
-
   const router = useRouter()
   const sanitizedRoute = sanitizeRoute(router.route, router.query)
 
@@ -48,7 +55,15 @@ const ProjectDropdown = () => {
                 passHref
               >
                 <a className="block">
-                  <Dropdown.Item>{x.name}</Dropdown.Item>
+                  <Dropdown.Item
+                    className={
+                      selectedProject.name === x.name
+                        ? 'font-bold bg-slate-400 dark:bg-slate-500'
+                        : ''
+                    }
+                  >
+                    {x.name}
+                  </Dropdown.Item>
                 </a>
               </Link>
             ))}
