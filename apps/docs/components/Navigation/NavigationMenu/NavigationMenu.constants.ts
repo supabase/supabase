@@ -939,7 +939,11 @@ export const platform = {
           name: 'Shared Responsibility Model',
           url: '/guides/platform/shared-responsibility-model',
         },
-        { name: 'Going into Production', url: '/guides/platform/going-into-prod' },
+        {
+          name: 'Maturity Model',
+          url: '/guides/platform/maturity-model',
+        },
+        { name: 'Production Checklist', url: '/guides/platform/going-into-prod' },
       ],
     },
     {
