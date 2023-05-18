@@ -1,5 +1,6 @@
-import { FC, useEffect } from 'react'
 import Link from 'next/link'
+import { FC, useEffect } from 'react'
+import { useRouter } from 'next/router'
 import { Badge, Button, IconExternalLink, Radio } from 'ui'
 
 import { useFlag } from 'hooks'
@@ -22,22 +23,26 @@ const ComputeSizeSelection: FC<Props> = ({
   onSelectOption,
 }) => {
   const { ref } = useParams()
-  const addonUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
-
+  const { asPath } = useRouter()
   useEffect(() => {
-    const hash = window.location.hash
-    if (hash.length > 0) {
+    const hash = asPath.split('#')[1]
+    console.log('hash', hash)
+    if (hash !== undefined) {
       window.location.hash = ''
       window.location.hash = hash
     }
-  })
-
+  }, [asPath])
+  const addonUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
   return (
-    <div className="space-y-4" id="compute-addon">
+    <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
           <div className="flex items-center space-x-2">
-            <h4 className="text-lg">Compute add-ons</h4>
+            <h4 id="compute-addon" className="text-lg">
+              <Link href="#compute-addon" prefetch={false}>
+                <a>Compute add-ons</a>
+              </Link>
+            </h4>
             <Badge color="green">Optional</Badge>
           </div>
           <p className="text-sm text-scale-1100">

@@ -1,5 +1,6 @@
-import { FC, useEffect } from 'react'
 import Link from 'next/link'
+import { FC, useEffect } from 'react'
+import { useRouter } from 'next/router'
 import { Button } from 'ui'
 import { useParams } from 'common/hooks'
 
@@ -9,20 +10,23 @@ interface Props {
 
 const SupportPlan: FC<Props> = ({ currentOption }) => {
   const { ref } = useParams()
-
+  const { asPath } = useRouter()
   useEffect(() => {
-    const hash = window.location.hash
-    if (hash.length > 0) {
+    const hash = asPath.split('#')[1]
+    if (hash !== undefined) {
       window.location.hash = ''
       window.location.hash = hash
     }
-  })
-
+  }, [asPath])
   return (
-    <div className="space-y-4" id="support-addon">
+    <div className="space-y-4">
       <div>
         <div className="flex items-center space-x-2">
-          <h4 className="text-lg">Support Plan</h4>
+          <h4 id="support-addon" className="text-lg">
+            <Link href="#support-addon" prefetch={false}>
+              <a>Support Plan</a>
+            </Link>
+          </h4>
         </div>
         <p className="text-sm text-scale-1100">Designated support with guaranteed response times</p>
       </div>
