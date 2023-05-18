@@ -119,7 +119,7 @@ const Nav = () => {
     >
       <button
         className={[
-          'text-scale-900 focus:ring-brand-900 dark:bg-scale-100 dark:hover:bg-scale-300 inline-flex items-center justify-center rounded-md bg-gray-50 p-2 hover:bg-white focus:outline-none focus:ring-2 focus:ring-inset',
+          'text-scale-900 focus:ring-brand-900 dark:bg-scale-200 dark:hover:bg-scale-300 inline-flex items-center justify-center rounded-md bg-gray-50 p-2 hover:bg-white focus:outline-none focus:ring-2 focus:ring-inset',
           showLaunchWeekNavMode && '!bg-transparent border border-[#be9eea]',
         ].join(' ')}
         aria-expanded="false"
@@ -202,7 +202,7 @@ const Nav = () => {
       <div className="sticky top-0 z-40 transform" style={{ transform: 'translate3d(0,0,999px)' }}>
         <div
           className={[
-            'absolute inset-0 h-full w-full opacity-80 bg-scale-100',
+            'absolute inset-0 h-full w-full opacity-80 bg-scale-200',
             !showLaunchWeekNavMode && '!opacity-100 transition-opacity',
             showLaunchWeekNavMode && '!bg-transparent transition-all',
           ].join(' ')}
