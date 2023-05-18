@@ -6,7 +6,6 @@ import { ParsedUrlQuery } from 'querystring'
 
 import { useStore } from 'hooks'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
-import query from 'pages/api/pg-meta/[ref]/query'
 
 // [Fran] the idea is to let users change projects without losing the current page,
 // but at the same time we need to redirect correctly between urls that might be
