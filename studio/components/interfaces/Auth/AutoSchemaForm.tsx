@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { boolean, number, object, string } from 'yup'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Button, Form, Input, IconEye, IconEyeOff, InputNumber, Toggle } from 'ui'
+import { Button, Form, Input, IconEye, IconEyeOff, InputNumber, Toggle, Radio } from 'ui'
 
 import { useStore, checkPermissions } from 'hooks'
 import {
@@ -150,6 +150,22 @@ const AutoSchemaForm = observer(() => {
                     disabled={!canUpdateConfig}
                   />
                   {values.SECURITY_CAPTCHA_ENABLED && (
+                    <>
+                    <Radio.Group
+                      type="cards"
+                      label="Group of radios"
+                      labelOptional="Optional label"
+                      descriptionText="You can also show label hint text here"
+                    >
+                      <Radio
+                        label="First Radio"
+                        description="The value of this Radio is controlled by a react state"
+                      />
+                      <Radio
+                        label="Second Radio"
+                        description="The value of this Radio is controlled by a react state"
+                      />
+                    </Radio.Group>
                     <Input
                       id="SECURITY_CAPTCHA_SECRET"
                       type={hidden ? 'password' : 'text'}
@@ -164,26 +180,27 @@ const AutoSchemaForm = observer(() => {
                         />
                       }
                     />
+                    </>
                   )}
-                  <Toggle
-                    id="REFRESH_TOKEN_ROTATION_ENABLED"
-                    size="small"
-                    label="Enable automatic reuse detection"
-                    layout="flex"
-                    descriptionText="Prevent replay attacks from compromised refresh tokens."
-                    disabled={!canUpdateConfig}
-                  />
-                  {values.REFRESH_TOKEN_ROTATION_ENABLED && (
-                    <InputNumber
-                      id="SECURITY_REFRESH_TOKEN_REUSE_INTERVAL"
-                      size="small"
-                      min={0}
-                      label="Reuse interval"
-                      descriptionText="Time interval where the same refresh token can be used to request for an access token."
-                      actions={<span className="mr-3 text-scale-900">seconds</span>}
-                      disabled={!canUpdateConfig}
-                    />
-                  )}
+          <Toggle
+            id="REFRESH_TOKEN_ROTATION_ENABLED"
+            size="small"
+            label="Enable automatic reuse detection"
+            layout="flex"
+            descriptionText="Prevent replay attacks from compromised refresh tokens."
+            disabled={!canUpdateConfig}
+          />
+          {values.REFRESH_TOKEN_ROTATION_ENABLED && (
+            <InputNumber
+              id="SECURITY_REFRESH_TOKEN_REUSE_INTERVAL"
+              size="small"
+              min={0}
+              label="Reuse interval"
+              descriptionText="Time interval where the same refresh token can be used to request for an access token."
+              actions={<span className="mr-3 text-scale-900">seconds</span>}
+              disabled={!canUpdateConfig}
+            />
+          )}
                 </FormSectionContent>
               </FormSection>
               <FormSection
