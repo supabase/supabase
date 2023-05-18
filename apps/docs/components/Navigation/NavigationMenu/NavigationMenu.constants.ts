@@ -1088,6 +1088,7 @@ export const integrations = {
       name: 'Developer Tools',
       url: undefined,
       items: [
+        { name: 'Cloudflare Workers', url: '/guides/integrations/cloudflare-workers' },
         { name: 'Estuary', url: '/guides/integrations/estuary' },
         { name: 'OpenAI', url: '/guides/functions/examples/openai' },
         { name: 'pgMustard', url: '/guides/integrations/pgmustard' },
