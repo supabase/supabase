@@ -1,10 +1,10 @@
-"use client";
-import { Auth } from "@supabase/auth-ui-react";
-import { ThemeSupa } from "@supabase/auth-ui-shared";
-import { useSupabase } from "./supabase-provider";
+'use client'
+import { Auth } from '@supabase/auth-ui-react'
+import { ThemeSupa } from '@supabase/auth-ui-shared'
+import { useSupabase } from './supabase-provider'
 
 export default function AuthForm() {
-  const { supabase } = useSupabase();
+  const { supabase } = useSupabase()
 
   return (
     <Auth
@@ -16,5 +16,5 @@ export default function AuthForm() {
       providers={[]}
       redirectTo="http://localhost:3000/auth/callback"
     />
-  );
+  )
 }
