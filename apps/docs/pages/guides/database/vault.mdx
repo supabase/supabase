@@ -18,7 +18,7 @@ From a product perspective, Supabase groups a number of related features under t
 
 Under the hood, the Vault is a table of Secrets and Encryption Keys that are stored using [Authenticated Encryption](https://en.wikipedia.org/wiki/Authenticated_encryption) on disk. They are then available in decrypted form through a Postgres view so that the secrets can be used by applications from SQL. Because the secrets are stored on disk encrypted and authenticated, any backups or replication streams also preserve this encryption in a way that can't be decrypted or forged.
 
-Supabase provides a dashboard UI for the Vault that makes storing secrets easy. Click a button, type in your secret,  and save. Optionally create your own keys you can use to encrypt your secret. Your secret will then be stored on disk encrypted using the specified key.
+Supabase provides a dashboard UI for the Vault that makes storing secrets easy. Click a button, type in your secret, and save. Optionally create your own keys you can use to encrypt your secret. Your secret will then be stored on disk encrypted using the specified key.
 
 <video width="99%" muted playsInline controls="true">
   <source
@@ -49,14 +49,16 @@ There are two main parts to the Vault UI, Secrets and Encryption Keys:
 As we mentioned, the Vault uses pgsodium's Transparent Column Encryption (TCE) to store secrets in an authenticated encrypted form. There are some details around that you may be curious about, what does authenticated mean, and where are encryption keys store? This section explains those details.
 
 ### Authenticated Encryption with Associated Data
+
 The first important feature of TCE is that it uses an [Authenticated Encryption with Associated Data](<https://en.wikipedia.org/wiki/Authenticated_encryption#Authenticated_encryption_with_associated_data_(AEAD)>) encryption algorithm (based on libsodium).
 
 ### Encryption key location
-**Authenticated Encryption** means that in addition to the data being encrypted, it is also signed so that it cannot be forged. You can guarantee that the data was encrypted by someone you trust, which you wouldn't get with encryption alone. The decryption function verifies that the signature is valid *before decrypting the value*.
+
+**Authenticated Encryption** means that in addition to the data being encrypted, it is also signed so that it cannot be forged. You can guarantee that the data was encrypted by someone you trust, which you wouldn't get with encryption alone. The decryption function verifies that the signature is valid _before decrypting the value_.
 
 **Associated Data** means that you can include any other columns from the same row as part of the signature computation. This doesn't encrypt those other columns - rather it ensures that your encrypted value is only associated with columns from that row. If an attacker were to copy an encrypted value from another row to the current one, the signature would be rejected (assuming you used a unique column in the associated data).
 
-Another important feature of pgsodium is that the encryption keys are never stored in the database alongside the encrypted data. Instead, only a **Key ID** is stored, which is a reference to the key that is only accessible outside of SQL. Even if an attacker can capture a dump of your entire database, they will see only encrypted data and key IDs, *never the raw key itself*.
+Another important feature of pgsodium is that the encryption keys are never stored in the database alongside the encrypted data. Instead, only a **Key ID** is stored, which is a reference to the key that is only accessible outside of SQL. Even if an attacker can capture a dump of your entire database, they will see only encrypted data and key IDs, _never the raw key itself_.
 
 This is an important safety precaution - there is little value in storing the encryption key in the database itself as this would be like locking your front door but leaving the key in the lock! Storing the key outside the database fixes this issue.
 
@@ -151,7 +153,7 @@ created_at       | 2022-12-14 02:29:21.3625+00
 updated_at       | 2022-12-14 02:29:21.3625+00
 ```
 
-Notice how this view has a `decrypted_secret` column that contains the decrypted secrets.  Views are not stored on disk, they are only run at query time, so the secret remains encrypted on disk, and in any backup dumps or replication streams.
+Notice how this view has a `decrypted_secret` column that contains the decrypted secrets. Views are not stored on disk, they are only run at query time, so the secret remains encrypted on disk, and in any backup dumps or replication streams.
 
 You should ensure that you protect access to this view with the appropriate SQL privilege settings at all times, as anyone that has access to the view has access to decrypted secrets.
 
@@ -180,9 +182,9 @@ updated_at       | 2022-12-14 02:51:13.938396+00
 
 ## Internal Details
 
-To encrypt data, you need a *key id*.  You can use the default key id created automatically for every project, or create your own key ids Using the `pgsodium.create_key()` function.  Key ids are used to internally derive the encryption key used to encrypt secrets in the vault.  Vault users typically do not have access to the key itself, only the key id.
+To encrypt data, you need a _key id_. You can use the default key id created automatically for every project, or create your own key ids Using the `pgsodium.create_key()` function. Key ids are used to internally derive the encryption key used to encrypt secrets in the vault. Vault users typically do not have access to the key itself, only the key id.
 
-Both `vault.create_secret()` and `vault.update_secret()` take an optional fourth `new_key_id` argument.  This argument can be used to store a different key id for the secret instead of the default value.
+Both `vault.create_secret()` and `vault.update_secret()` take an optional fourth `new_key_id` argument. This argument can be used to store a different key id for the secret instead of the default value.
 
 ```sql
 postgres=> select vault.create_secret('another_s3kre3t_key', 'another_unique_name',
@@ -191,16 +193,16 @@ postgres=> select vault.create_secret('another_s3kre3t_key', 'another_unique_nam
 create_secret | cec9e005-a44d-4b19-86e1-febf3cd40619
 ```
 
-Which roles should have access to the `vault.secrets` table should be carefully considered.  There are two ways to grant access, the first is that the `postgres` user can explicitly grant access to the vault table itself.
+Which roles should have access to the `vault.secrets` table should be carefully considered. There are two ways to grant access, the first is that the `postgres` user can explicitly grant access to the vault table itself.
 
 ## Turning off Statement Logging
 
-When you insert secrets into the vault table with an INSERT statement, those statements get logged by default into the Supabase logs.  Since this would mean your secrets are stored unencrypted in the logs, you should turn off statement logging while using the Vault.
+When you insert secrets into the vault table with an INSERT statement, those statements get logged by default into the Supabase logs. Since this would mean your secrets are stored unencrypted in the logs, you should turn off statement logging while using the Vault.
 
-While turning off statement logging does hinder you if you're used to looking at the logs to debug your application, it provides a much higher level of security by ensuring that your data does not leak out of the database and into the logs.  This is especially critical with encrypted column data, because the statement logs will contain the *unencrypted* secrets.  If you *must* store that data encrypted, then you *must* turn off statement logging.
+While turning off statement logging does hinder you if you're used to looking at the logs to debug your application, it provides a much higher level of security by ensuring that your data does not leak out of the database and into the logs. This is especially critical with encrypted column data, because the statement logs will contain the _unencrypted_ secrets. If you _must_ store that data encrypted, then you _must_ turn off statement logging.
 
 ```sql
-ALTER SYSTEM SET statement_log = 'none';
+alter system set statement_log = 'none';
 ```
 
 And then restart your project from the dashboard to enable that change.
