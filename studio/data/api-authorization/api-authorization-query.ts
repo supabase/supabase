@@ -11,6 +11,7 @@ export type ApiAuthorizationVariables = {
 export type ApiAuthorizationResponse = {
   name: string
   website: string
+  icon: string | null
   domain: string
   expires_at: string
   approved_at: string | null
