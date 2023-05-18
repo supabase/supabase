@@ -1,4 +1,4 @@
-import React, { forwardRef, useRef, useImperativeHandle } from 'react'
+import React, { forwardRef } from 'react'
 import { IconContext } from './../Icon/IconContext'
 import { IconLoader } from './../Icon/icons/IconLoader'
 
@@ -15,19 +15,9 @@ interface ButtonBaseProps {
   loading?: boolean
   loadingCentered?: boolean
   shadow?: boolean
-  size?: 'tiny' | 'small' | 'medium' | 'large' | 'xlarge'
+  size?: ButtonSize
   style?: React.CSSProperties
-  type?:
-    | 'primary'
-    | 'default'
-    | 'secondary'
-    | 'alternative'
-    | 'outline'
-    | 'dashed'
-    | 'link'
-    | 'text'
-    | 'danger'
-    | 'warning'
+  type?: ButtonType
   danger?: boolean
   htmlType?: 'button' | 'submit' | 'reset'
   ref?: any
@@ -56,12 +46,20 @@ type PropsOf<T extends keyof JSX.IntrinsicElements> = JSX.LibraryManagedAttribut
   React.ComponentPropsWithoutRef<T>
 >
 
-interface RefHandle {
-  // container: () => HTMLElement | null
-  button: () => HTMLButtonElement | null
-}
+export type ButtonSize = 'tiny' | 'small' | 'medium' | 'large' | 'xlarge'
+export type ButtonType =
+  | 'primary'
+  | 'default'
+  | 'secondary'
+  | 'alternative'
+  | 'outline'
+  | 'dashed'
+  | 'link'
+  | 'text'
+  | 'danger'
+  | 'warning'
 
-export const Button = forwardRef<RefHandle, ButtonProps>(
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   (
     {
       block,
@@ -89,16 +87,6 @@ export const Button = forwardRef<RefHandle, ButtonProps>(
     }: ButtonProps,
     ref
   ) => {
-    // button ref
-    // const containerRef = useRef<HTMLElement>(null)
-    const buttonRef = useRef<HTMLButtonElement>(null)
-
-    useImperativeHandle(ref, () => ({
-      button: () => {
-        return buttonRef.current
-      },
-    }))
-
     let __styles = styleHandler('button')
 
     // styles
@@ -164,7 +152,7 @@ export const Button = forwardRef<RefHandle, ButtonProps>(
         // <span ref={containerRef} className={containerClasses.join(' ')}>
         <button
           {...props}
-          ref={buttonRef}
+          ref={ref}
           className={classes.join(' ')}
           disabled={loading || (disabled && true)}
           onClick={onClick}

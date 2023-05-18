@@ -1,6 +1,6 @@
 import { FC, useEffect, useState } from 'react'
 import { isEqual } from 'lodash'
-import { Input, Button, IconPlus, Select, IconX } from 'ui'
+import { Input, Button, IconPlus, IconX, Listbox } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { checkPermissions, useFlag, useStore } from 'hooks'
@@ -193,19 +193,24 @@ const TaxID: FC<Props> = ({ loading, taxIds, onTaxIdsUpdated }) => {
                     const selectedTaxId = TAX_IDS.find((option) => option.name === taxId.name)
                     return (
                       <div key={`tax-id-${idx}`} className="flex items-center space-x-2">
-                        <Select
+                        <Listbox
                           value={selectedTaxId?.name}
-                          onChange={(e: any) => onUpdateTaxId(taxId.id, 'name', e.target.value)}
+                          onChange={(e: any) => onUpdateTaxId(taxId.id, 'name', e)}
                           disabled={!canUpdateTaxIds}
+                          className="w-[200px]"
                         >
                           {TAX_IDS.sort((a, b) => a.country.localeCompare(b.country)).map(
                             (option) => (
-                              <Select.Option key={option.name} value={option.name}>
+                              <Listbox.Option
+                                key={option.name}
+                                value={option.name}
+                                label={option.name}
+                              >
                                 {option.country} - {option.name}
-                              </Select.Option>
+                              </Listbox.Option>
                             )
                           )}
-                        </Select>
+                        </Listbox>
                         <Input
                           value={taxId.value}
                           placeholder={selectedTaxId?.placeholder ?? ''}

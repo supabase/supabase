@@ -56,7 +56,7 @@ const TopNavBarRef: FC = () => {
   }
 
   return (
-    <nav className="h-[60px] border-b backdrop-blur backdrop-filter bg-white-1200 dark:bg-blackA-300">
+    <nav className="h-[60px] border-b backdrop-blur backdrop-filter bg-white-1200 dark:bg-scale-200/90">
       <div className="px-5 max-w-7xl mx-auto flex gap-3 justify-between items-center h-full">
         <div className={['lg:hidden'].join(' ')}>
           <Link href="/">

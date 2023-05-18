@@ -658,12 +658,12 @@ export const getDefaultHelper = (helpers: DatetimeHelper[]) =>
   helpers.find((helper) => helper.default) || helpers[0]
 
 export const TIER_QUERY_LIMITS: {
-  [x: string]: { text: string; value: 1 | 7 | 90; unit: 'day'; promptUpgrade: boolean }
+  [x: string]: { text: string; value: 1 | 7 | 28 | 90; unit: 'day'; promptUpgrade: boolean }
 } = {
   FREE: { text: '1 day', value: 1, unit: 'day', promptUpgrade: true },
   PRO: { text: '7 days', value: 7, unit: 'day', promptUpgrade: true },
-  PAYG: { text: '90 days', value: 90, unit: 'day', promptUpgrade: false },
-  TEAM: { text: '90 days', value: 90, unit: 'day', promptUpgrade: false },
+  PAYG: { text: '7 days', value: 7, unit: 'day', promptUpgrade: true },
+  TEAM: { text: '28 days', value: 28, unit: 'day', promptUpgrade: true },
   ENTERPRISE: { text: '90 days', value: 90, unit: 'day', promptUpgrade: false },
 }
 

@@ -122,13 +122,13 @@ After a user is signed in we can allow them to edit their profile details and ma
 
 Let's create a new component for that called `Account.tsx`.
 
-```jsx title=src/Account.tsx
+```tsx title=src/Account.tsx
 import { AuthSession } from '@supabase/supabase-js'
 import { Component, createEffect, createSignal } from 'solid-js'
 import { supabase } from './supabaseClient'
 
 interface Props {
-  session: AuthSession;
+  session: AuthSession
 }
 
 const Account: Component<Props> = ({ session }) => {

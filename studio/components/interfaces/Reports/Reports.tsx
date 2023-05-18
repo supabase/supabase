@@ -17,11 +17,11 @@ import {
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { checkPermissions } from 'hooks'
+import useProfile from 'hooks/misc/useProfile'
 import { useParams } from 'common/hooks'
 import { uuidv4 } from 'lib/helpers'
 import { METRIC_CATEGORIES, METRICS, TIME_PERIODS_REPORTS } from 'lib/constants'
 import { useProjectContentStore } from 'stores/projectContentStore'
-import { useProfileQuery } from 'data/profile/profile-query'
 import Loading from 'components/ui/Loading'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import NoPermission from 'components/ui/NoPermission'
@@ -33,7 +33,7 @@ const DEFAULT_CHART_ROW_COUNT = 4
 
 const Reports = () => {
   const { id, ref } = useParams()
-  const { data: profile } = useProfileQuery()
+  const { data: profile } = useProfile()
 
   const [report, setReport] = useState<any>()
 

@@ -9,13 +9,8 @@ export const meta = {
 Auth UI is a pre-built React component for authenticating users.
 It supports custom themes and extensible styles to match your brand and aesthetic.
 
-<video width="99%" muted playsInline controls="true">
-  <source
-    src="https://supabase.com/images/blog/lw5-one-more/auth-ui-demo.mp4"
-    type="video/mp4"
-    muted
-    playsInline
-  />
+<video width="99%" muted playsInline controls={true}>
+  <source src="https://supabase.com/images/blog/lw5-one-more/auth-ui-demo.mp4" type="video/mp4" />
 </video>
 
 ## Set up Auth UI
@@ -94,7 +89,7 @@ The Auth component is currently shipped with the following views:
 - Update password
 - Forgotten password
 
-We are planning on adding more views in the future.  Follow along on that [repo](https://github.com/supabase/auth-ui).
+We are planning on adding more views in the future. Follow along on that [repo](https://github.com/supabase/auth-ui).
 
 ## Customization
 
@@ -202,10 +197,7 @@ See the list of [tokens within a theme](https://github.com/supabase/auth-ui/blob
 import { createClient } from '@supabase/supabase-js'
 import { Auth } from '@supabase/auth-ui-react'
 
-const supabase = createClient(
-  '<INSERT PROJECT URL>',
-  '<INSERT PROJECT ANON API KEY>'
-)
+const supabase = createClient('<INSERT PROJECT URL>', '<INSERT PROJECT ANON API KEY>')
 
 const customTheme = {
   default: {
@@ -239,7 +231,7 @@ const App = () => (
   <Auth
     supabaseClient={supabase}
     theme="default" // can also be "dark" or "evenDarker"
-    appearance={{ theme: customTheme}}
+    appearance={{ theme: customTheme }}
   />
 )
 ```

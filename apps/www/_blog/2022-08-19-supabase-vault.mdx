@@ -147,11 +147,12 @@ Now you can encrypt table secrets with this new key by inserting its ID explicit
 ```sql
 insert into vault.secrets
   (secret, associated, key_id)
-values (
-  'apikey_XaYrurzcquqhEdBjzfTzfwAZqpd',
-  'This is some different associated data.',
-  'f9f176eb-7069-4743-9403-582c04354ffc'
-)
+values
+  (
+    'apikey_XaYrurzcquqhEdBjzfTzfwAZqpd',
+    'This is some different associated data.',
+    'f9f176eb-7069-4743-9403-582c04354ffc'
+  )
 returning *;
 ```
 
