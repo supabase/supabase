@@ -98,3 +98,11 @@ values
 ```
 
 Remember that you don't need to use supabase-js to connect to your Supabase database, you can connect "directly" to the underlying Postgres database using the connection string (every Supabase database comes pre-installed with a [connection pooler](https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pool)), or you can try Cloudflare's new [TCP socket method of connecting to Postgres](https://blog.cloudflare.com/workers-tcp-socket-api-connect-databases/) directly from Cloudflare Workers.
+
+- [Cloudflare Integration Docs](https://developers.cloudflare.com/workers/learning/integrations/databases/#supabase).
+- [Cloudflare Dashboard](dash.cloudflare.com/).
+- [Cloudflare Integration Announcement](https://blog.cloudflare.com/announcing-database-integrations/).
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page
