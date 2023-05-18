@@ -36,8 +36,8 @@ If you are transferring ownership of your organization to someone else, you will
 
 The table below shows the corresponding permissions for each available role you can assign a team member in the Dashboard.
 
-| Permissions              | Owner                   | Administrator           | Developer               |
-| ------------------------ | ----------------------- | ----------------------- | ----------------------- |
+| Permissions              | Owner                   | Administrator           | Developer               | Read only [^2]          |
+| ------------------------ | ----------------------- | ----------------------- | ----------------------- | ----------------------- |
 | **Organization**         |
 | Change organization name | <IconCheck size={14} /> |                         |                         |
 | Delete organization      | <IconCheck size={14} /> |                         |                         |
@@ -70,12 +70,16 @@ The table below shows the corresponding permissions for each available role you 
 | Pause a project          | <IconCheck size={14} /> | <IconCheck size={14} /> |                         |
 | Resume a project         | <IconCheck size={14} /> | <IconCheck size={14} /> |                         |
 | Restart a project        | <IconCheck size={14} /> | <IconCheck size={14} /> | <IconCheck size={14} /> |
+| Manage tables            | <IconCheck size={14} /> | <IconCheck size={14} /> | <IconCheck size={14} /> |
+| View Data                | <IconCheck size={14} /> | <IconCheck size={14} /> | <IconCheck size={14} /> | <IconCheck size={14} /> |
 
 [^1]:
     Invites sent from a SSO account can only be accepted by another SSO account
     coming from the same identity provider. This is a security measure that
     prevents accidental invites to accounts not managed by your company's
     enterprise systems.
+
+[^2]: Available on the Teams and Enterprise Tiers.
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
