@@ -125,6 +125,7 @@ function ImageCarousel(props: ImageCarouselProps) {
                           style={{ top: 0, left: 0 }}
                           frameBorder="0"
                           allow="autoplay; modestbranding; encrypted-media"
+                          loading="lazy"
                         />
                       </div>
                     )}

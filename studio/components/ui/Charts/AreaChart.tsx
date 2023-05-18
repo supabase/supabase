@@ -41,7 +41,7 @@ const AreaChart: React.FC<AreaChartProps> = ({
   const { Container } = useChartSize(size)
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
 
-  if (data.length === 0) return <ChartNoData className={className} />
+  if (data.length === 0) return <ChartNoData size={size} className={className} />
 
   const day = (value: number | string) => (displayDateInUtc ? dayjs(value).utc() : dayjs(value))
   const resolvedHighlightedLabel =
@@ -97,7 +97,7 @@ const AreaChart: React.FC<AreaChartProps> = ({
             interval={data.length - 2}
             angle={0}
             // hide the tick
-            tick={{ fontSize: '0px' }}
+            tick={false}
             // color the axis
             axisLine={{ stroke: CHART_COLORS.AXIS }}
             tickLine={{ stroke: CHART_COLORS.AXIS }}
@@ -113,7 +113,7 @@ const AreaChart: React.FC<AreaChartProps> = ({
         </RechartAreaChart>
       </Container>
       {data && (
-        <div className="text-scale-900 -mt-5 flex items-center justify-between text-xs">
+        <div className="text-scale-900 -mt-2 flex items-center justify-between text-xs">
           <span>{dayjs(data[0][xAxisKey]).format(customDateFormat)}</span>
           <span>{dayjs(data[data?.length - 1]?.[xAxisKey]).format(customDateFormat)}</span>
         </div>

@@ -19,10 +19,10 @@ import { CLIENT_LIBRARIES } from 'common/constants'
 
 import { Project } from 'types'
 import { useStore, useFlag } from 'hooks'
+import useProfile from 'hooks/misc/useProfile'
 import { post, get } from 'lib/common/fetch'
 import { detectBrowser } from 'lib/helpers'
 import { API_URL, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
-import { useProfileQuery } from 'data/profile/profile-query'
 
 import Divider from 'components/ui/Divider'
 import Connecting from 'components/ui/Loading'
@@ -76,7 +76,7 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
     }
   }, [uploadedFiles])
 
-  const { data: profile } = useProfileQuery()
+  const { data: profile } = useProfile()
   const respondToEmail = profile?.primary_email ?? 'your email'
 
   if (!isInitialized) {

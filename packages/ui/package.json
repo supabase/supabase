@@ -4,10 +4,12 @@
   "main": "./index.tsx",
   "types": "./index.tsx",
   "license": "MIT",
+  "sideEffects": false,
   "scripts": {
+    "build-storybook": "build-storybook",
     "build:icons": "node --experimental-modules internals/populate-icons.js",
     "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook"
+    "test": "jest"
   },
   "dependencies": {
     "@headlessui/react": "^1.0.0",
@@ -47,6 +49,7 @@
   },
   "devDependencies": {
     "@storybook/react": "^6.5.16",
+    "@testing-library/jest-dom": "^5.16.5",
     "@types/common-tags": "^1.8.1",
     "@types/react": "^17.0.37",
     "@types/react-copy-to-clipboard": "^5.0.4",

@@ -1,5 +1,6 @@
 import Link from 'next/link'
-import { FC } from 'react'
+import { FC, useEffect } from 'react'
+import { useRouter } from 'next/router'
 import { Badge, IconAlertCircle, Radio, Button } from 'ui'
 
 import { useFlag, useStore } from 'hooks'
@@ -32,12 +33,23 @@ const PITRDurationSelection: FC<Props> = ({
   // Only projects of version greater than supabase-postgrest-14.1.0.44 can use PITR
   const sufficientPgVersion = getSemanticVersion(ui.selectedProject?.dbVersion ?? '') >= 141044
   const isDisabledForRegion = ['ap-northeast-2'].includes(projectRegion)
-
+  const { asPath } = useRouter()
+  useEffect(() => {
+    const hash = asPath.split('#')[1]
+    if (hash !== undefined) {
+      window.location.hash = ''
+      window.location.hash = hash
+    }
+  }, [asPath])
   return (
     <div className="space-y-4">
       <div>
         <div className="flex items-center space-x-2">
-          <h4 className="text-lg">Point in time recovery (PITR)</h4>
+          <h4 id="pitr-addon" className="text-lg">
+            <Link href="#pitr-addon" prefetch={false}>
+              <a>Point in time recovery (PITR)</a>
+            </Link>
+          </h4>
           <Badge color="green">Optional</Badge>
         </div>
         <p className="text-sm text-scale-1100">

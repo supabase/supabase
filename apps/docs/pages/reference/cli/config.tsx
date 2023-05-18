@@ -1,4 +1,3 @@
-// @ts-expect-error
 import specFile from '~/../../spec/cli_v1_config.yaml' assert { type: 'yml' }
 import { Parameter } from '~/lib/refGenerator/refTypes'
 import ReactMarkdown from 'react-markdown'
@@ -26,7 +25,7 @@ export default function Config() {
       <Head>
         <title>Supabase CLI config</title>
       </Head>
-      <div className="grid grid-cols-12 relative gap-4">
+      <div className="grid grid-cols-12 relative gap-4 px-5 max-w-7xl mx-auto py-16">
         <div className="relative col-span-12 md:col-span-9 transition-all ease-out duration-100">
           <div className="w-full prose">
             <h1 className="">CLI configuration</h1>

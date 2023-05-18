@@ -1,16 +1,13 @@
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
-import { AuthProvider, ThemeProvider } from 'common'
+import { AuthProvider, ThemeProvider, useTelemetryProps } from 'common'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
-import ReactMarkdown from 'react-markdown'
-import remarkGfm from 'remark-gfm'
+import { useCallback, useEffect, useState } from 'react'
 import { AppPropsWithLayout } from 'types'
 import { CommandMenuProvider } from 'ui'
-import components from '~/components'
 import Favicons from '~/components/Favicons'
 import SiteLayout from '~/layouts/SiteLayout'
-import { IS_PLATFORM, LOCAL_SUPABASE } from '~/lib/constants'
+import { API_URL, IS_PLATFORM, LOCAL_SUPABASE } from '~/lib/constants'
 import { post } from '~/lib/fetchWrappers'
 import '../styles/ch.scss'
 import '../styles/main.scss?v=1.0.0'
@@ -19,18 +16,26 @@ import '../styles/prism-okaidia.scss'
 
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const router = useRouter()
+  const telemetryProps = useTelemetryProps()
 
   const [supabase] = useState(() =>
     IS_PLATFORM || LOCAL_SUPABASE ? createBrowserSupabaseClient() : undefined
   )
 
-  function handlePageTelemetry(route: string) {
-    return post(`https://api.supabase.io/platform/telemetry/page`, {
-      referrer: document.referrer,
-      title: document.title,
-      route,
-    })
-  }
+  const handlePageTelemetry = useCallback(
+    (route: string) => {
+      return post(`${API_URL}/telemetry/page`, {
+        referrer: document.referrer,
+        title: document.title,
+        route,
+        ga: {
+          screen_resolution: telemetryProps?.screenResolution,
+          language: telemetryProps?.language,
+        },
+      })
+    },
+    [telemetryProps]
+  )
 
   useEffect(() => {
     function handleRouteChange(url: string) {
@@ -57,7 +62,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
     return () => {
       router.events.off('routeChangeComplete', handleRouteChange)
     }
-  }, [router.events])
+  }, [router, handlePageTelemetry])
 
   useEffect(() => {
     /**
@@ -66,7 +71,26 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
     if (router.isReady) {
       handlePageTelemetry(router.basePath + router.asPath)
     }
-  }, [router.isReady])
+  }, [router, handlePageTelemetry])
+
+  /**
+   * Reference docs use `history.pushState()` to jump to
+   * sub-sections without causing a re-render.
+   *
+   * We need to the below handler to manually force a re-render
+   * when navigating away from, then back to reference docs
+   */
+  useEffect(() => {
+    function handler() {
+      router.replace(window.location.href)
+    }
+
+    window.addEventListener('popstate', handler)
+
+    return () => {
+      window.removeEventListener('popstate', handler)
+    }
+  }, [router])
 
   const SITE_TITLE = 'Supabase Documentation'
 
@@ -85,12 +109,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
       <Favicons />
       <AuthContainer>
         <ThemeProvider>
-          <CommandMenuProvider
-            site="docs"
-            MarkdownHandler={(props) => (
-              <ReactMarkdown remarkPlugins={[remarkGfm]} components={components} {...props} />
-            )}
-          >
+          <CommandMenuProvider site="docs">
             <SiteLayout>
               <Component {...pageProps} />
             </SiteLayout>
