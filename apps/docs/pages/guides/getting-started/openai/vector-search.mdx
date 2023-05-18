@@ -471,7 +471,7 @@ All of this is glued together in a [Vercel Edge Function](https://vercel.com/doc
 
 In a last step, we need to process the event stream from the OpenAI API and print the answer to the user. The full code for this can be found on [GitHub](https://github.com/supabase-community/nextjs-openai-doc-search/blob/main/components/SearchDialog.tsx).
 
-```tsx
+```ts
 const handleConfirm = React.useCallback(
   async (query: string) => {
     setAnswer(undefined)
