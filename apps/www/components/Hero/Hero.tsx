@@ -42,20 +42,25 @@ const Hero = () => {
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Link href="https://app.supabase.com" as="https://app.supabase.com" passHref>
-                    <a onClick={() => sendTelemetryEvent(gaEvents['www_hp_hero_startProject'])}>
-                      <Button size="medium" className="text-white">
-                        Start your project
-                      </Button>
-                    </a>
-                  </Link>
-                  <Link href="/docs" as="/docs" passHref>
-                    <a onClick={() => sendTelemetryEvent(gaEvents['www_hp_hero_documentation'])}>
-                      <Button size="medium" type="default" icon={<IconBookOpen />}>
-                        Documentation
-                      </Button>
-                    </a>
-                  </Link>
+                  <Button
+                    as="a"
+                    href="https://app.supabase.com"
+                    size="medium"
+                    className="text-white"
+                    onClick={() => sendTelemetryEvent(gaEvents['www_hp_hero_startProject'])}
+                  >
+                    Start your project
+                  </Button>
+                  <Button
+                    as="a"
+                    href="/docs"
+                    size="medium"
+                    type="default"
+                    icon={<IconBookOpen />}
+                    onClick={() => sendTelemetryEvent(gaEvents['www_hp_hero_documentation'])}
+                  >
+                    Documentation
+                  </Button>
                 </div>
                 <HeroFrameworks className="mt-4 lg:mt-6" />
               </div>
