@@ -21,7 +21,7 @@ Explore a variety of integrations from Supabase partners. Need a different integ
             <GlassPanel
               title={integration.name}
               background={false}
-              icon={<Image height={40} width={40} className="rounded" src={`/docs/img/integrations/logos/${integration.name.toLowerCase()}_logo.png`}/>}
+              icon={<Image height={40} width={40} className="rounded" src={`/docs/img/integrations/logos/${integration.name.toLowerCase().replace(/ /g,"_")}_logo.png`}/>}
             >
               {integration.description}
 
