@@ -16,8 +16,6 @@ TCE provides a safe way to encrypt your data so that it doesn't leak into logs a
 
 TCE is the primary building block of [Vault](/docs/guides/database/vault), Supabase's Postgres secrets manager. Vault is a built-in table with an integrated UI intended to act as a secure global secrets management for you project. However if you need more fine-grain control over your encrypted data, such as encrypting columns in your own tables, you can use TCE directly. Any Postgres value that can be cast to `text` or `bytea` can be encrypted using TCE.
 
-See the [blog post](/blog/transparent-column-encryption-with-postgres) for an in-depth discussion on TCE.
-
 ### Encrypting columns
 
 When creating a new column in the Dashboard, you can choose to encrypt a `text` or `bytea` column. You will choose which key you would like to encrypt it with by selecting an existing key ID or creating a new one.
