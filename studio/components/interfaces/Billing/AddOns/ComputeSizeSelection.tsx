@@ -26,7 +26,6 @@ const ComputeSizeSelection: FC<Props> = ({
   const { asPath } = useRouter()
   useEffect(() => {
     const hash = asPath.split('#')[1]
-    console.log('hash', hash)
     if (hash !== undefined) {
       window.location.hash = ''
       window.location.hash = hash
