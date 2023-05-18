@@ -287,7 +287,6 @@ export default DocsSearch
 
 export function formatPageUrl(page: PageResult) {
   const docsUrl = getDocsUrl()
-  console.log('docsUrl:', docsUrl)
   switch (page.type) {
     case PageType.Markdown:
     case PageType.Reference:
