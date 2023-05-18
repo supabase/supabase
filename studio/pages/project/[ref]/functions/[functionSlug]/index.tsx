@@ -17,15 +17,17 @@ import AreaChart from 'components/ui/Charts/AreaChart'
 import { isUnixMicro, unixMicroToIsoTimestamp } from 'components/interfaces/Settings/Logs'
 import meanBy from 'lodash/meanBy'
 import sumBy from 'lodash/sumBy'
+import useFillTimeseriesSorted from 'hooks/analytics/useFillTimeseriesSorted'
 
 const CHART_INTERVALS: ChartIntervals[] = [
   {
     key: '5min',
     label: '5 min',
-    startValue: 1,
-    startUnit: 'hour',
+    startValue: 5,
+    startUnit: 'minute',
+    format: 'MMM D, h:mm:ssa',
   },
-  { key: '15min', label: '15 min', startValue: 15, startUnit: 'min' },
+  { key: '15min', label: '15 min', startValue: 15, startUnit: 'minute' },
   { key: '1hr', label: '1 hour', startValue: 1, startUnit: 'hour' },
   { key: '1day', label: '1 day', startValue: 1, startUnit: 'day' },
   { key: '7day', label: '7 days', startValue: 7, startUnit: 'day' },
@@ -45,7 +47,7 @@ const PageLayout: NextPageWithLayout = () => {
     interval: selectedInterval.key,
   })
   const isChartLoading = !data?.result && !error ? true : false
-  const chartData = useMemo(() => {
+  const normalizedData = useMemo(() => {
     return (data?.result || []).map((d: any) => ({
       ...d,
       timestamp: isUnixMicro(d.timestamp) ? unixMicroToIsoTimestamp(d.timestamp) : d.timestamp,
@@ -56,6 +58,16 @@ const PageLayout: NextPageWithLayout = () => {
     selectedInterval.startValue,
     selectedInterval.startUnit as dayjs.ManipulateType
   )
+
+  const chartData = useFillTimeseriesSorted(
+    normalizedData,
+    'timestamp',
+    ['avg_execution_time', 'count'],
+    0,
+    startDate.toISOString(),
+    dayjs().toISOString()
+  )
+
   const canReadFunction = checkPermissions(PermissionAction.FUNCTIONS_READ, functionSlug as string)
   if (!canReadFunction) {
     return <NoPermission isFullPage resourceText="access this edge function" />
@@ -103,6 +115,7 @@ const PageLayout: NextPageWithLayout = () => {
               <AreaChart
                 className="w-full"
                 xAxisKey="timestamp"
+                customDateFormat={selectedInterval.format}
                 yAxisKey="avg_execution_time"
                 data={props.data}
                 format="ms"
@@ -121,6 +134,7 @@ const PageLayout: NextPageWithLayout = () => {
                 yAxisKey="count"
                 data={props.data}
                 highlightedValue={sumBy(props.data, 'count')}
+                customDateFormat={selectedInterval.format}
                 onBarClick={(v) => {
                   router.push(
                     `/project/${projectRef}/functions/${functionSlug}/invocations?its=${startDate.toISOString()}&ite=${

@@ -137,14 +137,12 @@ const Layout: FC<Props> = (props) => {
               ) : (
                 <div className="mt-16 not-prose">
                   <div>
-                    <Link
+                    <a
                       href={`https://github.com/supabase/supabase/edit/master/apps/docs/pages${router.asPath}.mdx`}
-                      passHref
+                      className="text-sm transition flex items-center gap-1 text-scale-1000 hover:text-scale-1200"
                     >
-                      <a className="text-sm transition flex items-center gap-1 text-scale-1000 hover:text-scale-1200">
-                        Edit this page on GitHub <IconExternalLink size={14} strokeWidth={1.5} />
-                      </a>
-                    </Link>
+                      Edit this page on GitHub <IconExternalLink size={14} strokeWidth={1.5} />
+                    </a>
                   </div>
                 </div>
               )}
