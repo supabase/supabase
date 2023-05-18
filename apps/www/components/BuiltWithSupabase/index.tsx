@@ -17,7 +17,7 @@ const BuiltExamples = () => {
         <div className="flex justify-center gap-2 py-4">
           <Link href="/docs/guides/examples" as="/docs/guides/examples" passHref>
             <a>
-              <Button type="default" icon={null} size="small" className="h-full">
+              <Button type="default" size="small" className="h-full">
                 View all examples
               </Button>
             </a>

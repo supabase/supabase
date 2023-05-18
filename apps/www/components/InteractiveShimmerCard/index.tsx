@@ -1,6 +1,6 @@
 import React, { PropsWithChildren, useEffect, useRef } from 'react'
 
-const ShinyBox = ({
+const InteractiveShimmerCard = ({
   outerClassName,
   innerClassName,
   children,
@@ -61,4 +61,4 @@ const ShinyBox = ({
   )
 }
 
-export default ShinyBox
+export default InteractiveShimmerCard
