@@ -379,8 +379,9 @@ export const fillTimeseries = (
   const maxDate = max ? dayjs.utc(max) : dayjs.utc(Math.max.apply(null, dates as number[]))
   const minDate = min ? dayjs.utc(min) : dayjs.utc(Math.min.apply(null, dates as number[]))
 
-  const truncationSample = timeseriesData.length > 0 ? timeseriesData[0][timestampKey] : min || max
-  const truncation = getTimestampTruncation(truncationSample)
+  // const truncationSample = timeseriesData.length > 0 ? timeseriesData[0][timestampKey] : min || max
+  const truncationSamples = timeseriesData.length > 0 ? dates : [minDate, maxDate]
+  const truncation = getTimestampTruncation(truncationSamples as Dayjs[])
 
   const newData = timeseriesData.map((datum) => {
     const iso = dayjs.utc(datum[timestampKey]).toISOString()
@@ -413,10 +414,30 @@ export const fillTimeseries = (
   return newData
 }
 
-export const getTimestampTruncation = (datetime: string): 'second' | 'minute' | 'hour' | 'day' => {
-  const values = ['second', 'minute', 'hour', 'day'].map((key) =>
-    dayjs(datetime).get(key as dayjs.UnitType)
+export const getTimestampTruncation = (samples: Dayjs[]): 'second' | 'minute' | 'hour' | 'day' => {
+  const truncationCounts = samples.reduce(
+    (acc, sample) => {
+      const truncation = _getTruncation(sample)
+      acc[truncation] += 1
+
+      return acc
+    },
+    {
+      second: 0,
+      minute: 0,
+      hour: 0,
+      day: 0,
+    }
   )
+
+  const mostLikelyTruncation = (
+    Object.keys(truncationCounts) as (keyof typeof truncationCounts)[]
+  ).reduce((a, b) => (truncationCounts[a] > truncationCounts[b] ? a : b))
+  return mostLikelyTruncation
+}
+
+const _getTruncation = (date: Dayjs) => {
+  const values = ['second', 'minute', 'hour', 'day'].map((key) => date.get(key as dayjs.UnitType))
   const zeroCount = values.reduce((acc, value) => {
     if (value === 0) {
       acc += 1
