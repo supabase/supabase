@@ -26,6 +26,7 @@ const DatabaseLayout: FC<Props> = ({ title, children }) => {
   const vaultExtension = meta.extensions.byId('supabase_vault')
   const isVaultEnabled = vaultExtension !== undefined && vaultExtension.installed_version !== null
   const foreignDataWrappersEnabled = useFlag('foreignDataWrappers')
+  const pgNetExtensionExists = meta.extensions.byId('pg_net') !== undefined
 
   const [loaded, setLoaded] = useState<boolean>(isInitialized)
 
@@ -73,7 +74,7 @@ const DatabaseLayout: FC<Props> = ({ title, children }) => {
       isLoading={!loaded}
       product="Database"
       productMenu={
-        <ProductMenu page={page} menu={generateDatabaseMenu(project, foreignDataWrappersEnabled)} />
+        <ProductMenu page={page} menu={generateDatabaseMenu(project, foreignDataWrappersEnabled, pgNetExtensionExists)} />
       }
     >
       <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">
