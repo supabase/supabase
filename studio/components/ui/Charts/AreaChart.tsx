@@ -97,7 +97,7 @@ const AreaChart: React.FC<AreaChartProps> = ({
             interval={data.length - 2}
             angle={0}
             // hide the tick
-            tick={{ fontSize: '0px' }}
+            tick={false}
             // color the axis
             axisLine={{ stroke: CHART_COLORS.AXIS }}
             tickLine={{ stroke: CHART_COLORS.AXIS }}
