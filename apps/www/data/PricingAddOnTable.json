@@ -24,12 +24,12 @@
           {
             "key": "directConnections",
             "title": "Connections: Direct",
-            "value": "10"
+            "value": "60"
           },
           {
             "key": "poolerConnections",
             "title": "Connections: Pooler",
-            "value": "50"
+            "value": "200"
           }
         ]
       },
@@ -49,12 +49,12 @@
           {
             "key": "directConnections",
             "title": "Connections: Direct (recommended)",
-            "value": "30"
+            "value": "90"
           },
           {
             "key": "poolerConnections",
             "title": "Connections: Pooler (recommended)",
-            "value": "75"
+            "value": "200"
           }
         ]
       },
@@ -74,12 +74,12 @@
           {
             "key": "directConnections",
             "title": "Connections: Direct (recommended)",
-            "value": "50"
+            "value": "120"
           },
           {
             "key": "poolerConnections",
             "title": "Connections: Pooler (recommended)",
-            "value": "150"
+            "value": "200"
           }
         ]
       },
@@ -99,7 +99,7 @@
           {
             "key": "directConnections",
             "title": "Connections: Direct (recommended)",
-            "value": "100"
+            "value": "160"
           },
           {
             "key": "poolerConnections",
@@ -124,12 +124,12 @@
           {
             "key": "directConnections",
             "title": "Connections: Direct (recommended)",
-            "value": "200"
+            "value": "240"
           },
           {
             "key": "poolerConnections",
             "title": "Connections: Pooler (recommended)",
-            "value": "600"
+            "value": "700"
           }
         ]
       },
@@ -149,12 +149,12 @@
           {
             "key": "directConnections",
             "title": "Connections: Direct (recommended)",
-            "value": "350"
+            "value": "380"
           },
           {
             "key": "poolerConnections",
             "title": "Connections: Pooler (recommended)",
-            "value": "1200"
+            "value": "1500"
           }
         ]
       },
@@ -174,12 +174,12 @@
           {
             "key": "directConnections",
             "title": "Connections: Direct (recommended)",
-            "value": "420"
+            "value": "480"
           },
           {
             "key": "poolerConnections",
             "title": "Connections: Pooler (recommended)",
-            "value": "2800"
+            "value": "3000"
           }
         ]
       },
@@ -199,12 +199,12 @@
           {
             "key": "directConnections",
             "title": "Connections: Direct (recommended)",
-            "value": "450"
+            "value": "490"
           },
           {
             "key": "poolerConnections",
             "title": "Connections: Pooler (recommended)",
-            "value": "5600"
+            "value": "6000"
           }
         ]
       },
@@ -228,12 +228,12 @@
           {
             "key": "directConnections",
             "title": "Connections: Direct (recommended)",
-            "value": "480"
+            "value": "500"
           },
           {
             "key": "poolerConnections",
             "title": "Connections: Pooler (recommended)",
-            "value": "8600"
+            "value": "9000"
           }
         ]
       },
@@ -262,7 +262,7 @@
           {
             "key": "poolerConnections",
             "title": "Connections: Pooler (recommended)",
-            "value": "11,600"
+            "value": "12,000"
           }
         ]
       }

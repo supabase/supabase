@@ -141,55 +141,53 @@ const useApiReport = () => {
 
   useEffect(() => {
     // update sql for each query
-    if (totalRequests[1].changeQuery) {
-      totalRequests[1].changeQuery(PRESET_CONFIG.api.queries.totalRequests.sql(filters))
+    if (totalRequests.changeQuery) {
+      totalRequests.changeQuery(PRESET_CONFIG.api.queries.totalRequests.sql(filters))
     }
-    if (topRoutes[1].changeQuery) {
-      topRoutes[1].changeQuery(PRESET_CONFIG.api.queries.topRoutes.sql(filters))
+    if (topRoutes.changeQuery) {
+      topRoutes.changeQuery(PRESET_CONFIG.api.queries.topRoutes.sql(filters))
     }
-    if (errorCounts[1].changeQuery) {
-      errorCounts[1].changeQuery(PRESET_CONFIG.api.queries.errorCounts.sql(filters))
-    }
-
-    if (topErrorRoutes[1].changeQuery) {
-      topErrorRoutes[1].changeQuery(PRESET_CONFIG.api.queries.topErrorRoutes.sql(filters))
-    }
-    if (responseSpeed[1].changeQuery) {
-      responseSpeed[1].changeQuery(PRESET_CONFIG.api.queries.responseSpeed.sql(filters))
+    if (errorCounts.changeQuery) {
+      errorCounts.changeQuery(PRESET_CONFIG.api.queries.errorCounts.sql(filters))
     }
 
-    if (topSlowRoutes[1].changeQuery) {
-      topSlowRoutes[1].changeQuery(PRESET_CONFIG.api.queries.topSlowRoutes.sql(filters))
+    if (topErrorRoutes.changeQuery) {
+      topErrorRoutes.changeQuery(PRESET_CONFIG.api.queries.topErrorRoutes.sql(filters))
+    }
+    if (responseSpeed.changeQuery) {
+      responseSpeed.changeQuery(PRESET_CONFIG.api.queries.responseSpeed.sql(filters))
+    }
+
+    if (topSlowRoutes.changeQuery) {
+      topSlowRoutes.changeQuery(PRESET_CONFIG.api.queries.topSlowRoutes.sql(filters))
     }
   }, [JSON.stringify(filters)])
 
   const handleRefresh = async () => {
-    activeHooks.forEach(([_hookData, hookHandler]) => {
-      hookHandler.runQuery()
-    })
+    activeHooks.forEach(hook => hook.runQuery())
   }
   const handleSetParams = (params: Partial<LogsEndpointParams>) => {
-    activeHooks.forEach(([_hookData, hookHandler]) => {
-      hookHandler.setParams?.((prev: LogsEndpointParams) => ({ ...prev, ...params }))
+    activeHooks.forEach(hook => {
+      hook.setParams?.((prev: LogsEndpointParams) => ({ ...prev, ...params }))
     })
   }
-  const isLoading = activeHooks.some(([hookData]) => hookData.isLoading)
+  const isLoading = activeHooks.some(hook => hook.isLoading)
   return {
     data: {
-      totalRequests: totalRequests[0].logData,
-      errorCounts: errorCounts[0].logData,
-      responseSpeed: responseSpeed[0].logData,
-      topRoutes: topRoutes[0].logData,
-      topErrorRoutes: topErrorRoutes[0].logData,
-      topSlowRoutes: topSlowRoutes[0].logData,
+      totalRequests: totalRequests.logData,
+      errorCounts: errorCounts.logData,
+      responseSpeed: responseSpeed.logData,
+      topRoutes: topRoutes.logData,
+      topErrorRoutes: topErrorRoutes.logData,
+      topSlowRoutes: topSlowRoutes.logData,
     },
     params: {
-      totalRequests: totalRequests[0].params,
-      errorCounts: errorCounts[0].params,
-      responseSpeed: responseSpeed[0].params,
-      topRoutes: topRoutes[0].params,
-      topErrorRoutes: topErrorRoutes[0].params,
-      topSlowRoutes: topSlowRoutes[0].params,
+      totalRequests: totalRequests.params,
+      errorCounts: errorCounts.params,
+      responseSpeed: responseSpeed.params,
+      topRoutes: topRoutes.params,
+      topErrorRoutes: topErrorRoutes.params,
+      topSlowRoutes: topSlowRoutes.params,
     },
     mergeParams: handleSetParams,
     filters,

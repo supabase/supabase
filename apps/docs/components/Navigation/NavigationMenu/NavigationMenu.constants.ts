@@ -932,9 +932,19 @@ export const platform = {
       ],
     },
     {
-      name: 'Go-live Checklist',
+      name: 'Production Readiness',
       url: undefined,
-      items: [{ name: 'Production Readiness', url: '/guides/platform/going-into-prod' }],
+      items: [
+        {
+          name: 'Shared Responsibility Model',
+          url: '/guides/platform/shared-responsibility-model',
+        },
+        {
+          name: 'Maturity Model',
+          url: '/guides/platform/maturity-model',
+        },
+        { name: 'Production Checklist', url: '/guides/platform/going-into-prod' },
+      ],
     },
     {
       name: 'Troubleshooting',
