@@ -252,6 +252,8 @@ Modify `layout.jsx` to wrap the application with the `<SupabaseProvider>` compon
 import { createServerComponentSupabaseClient } from '@supabase/auth-helpers-nextjs'
 import { headers, cookies } from 'next/headers'
 import './globals.css'
+import { createServerComponentSupabaseClient } from '@supabase/auth-helpers-nextjs'
+import { headers, cookies } from 'next/headers'
 import SupabaseProvider from './supabase-provider'
 
 export const metadata = {
@@ -260,10 +262,7 @@ export const metadata = {
 }
 
 export default async function RootLayout({ children }) {
-  const supabase = createServerComponentSupabaseClient({
-    headers,
-    cookies,
-  })
+  const supabase = createServerComponentClient({ headers, cookies })
 
   const {
     data: { session },
@@ -289,6 +288,8 @@ Modify `layout.tsx` to wrap the application with the `<SupabaseProvider>` compon
 import { createServerComponentSupabaseClient } from '@supabase/auth-helpers-nextjs'
 import { headers, cookies } from 'next/headers'
 import './globals.css'
+import { createServerComponentSupabaseClient } from '@supabase/auth-helpers-nextjs'
+import { headers, cookies } from 'next/headers'
 import SupabaseProvider from './supabase-provider'
 
 export const metadata = {
@@ -297,10 +298,7 @@ export const metadata = {
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const supabase = createServerComponentSupabaseClient({
-    headers,
-    cookies,
-  })
+  const supabase = createServerComponentSupabaseClient({ headers, cookies })
 
   const {
     data: { session },
