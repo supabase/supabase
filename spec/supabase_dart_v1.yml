@@ -939,7 +939,7 @@ functions:
           supabase.from('countries')
             .stream(primaryKey: ['id'])
             .eq('id', 120)
-            .order('name', { ascending: true })
+            .order('name')
             .limit(10);
           ```
       - id: with-in-filter
@@ -949,7 +949,7 @@ functions:
           supabase.from('countries')
             .stream(primaryKey: ['id'])
             .inFilter('id', [1, 2, 3])
-            .order('name', { ascending: true })
+            .order('name')
             .limit(10);
           ```
       - id: using-stream-with-stream-builder
