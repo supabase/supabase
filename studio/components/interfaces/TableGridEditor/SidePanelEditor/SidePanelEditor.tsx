@@ -591,15 +591,14 @@ const SidePanelEditor = ({
           setIsEdited(false)
           closePanel()
         }}
-        children={
-          <Modal.Content>
-            <p className="py-4 text-sm text-scale-1100">
-              There are unsaved changes. Are you sure you want to close the panel? Your changes will
-              be lost.
-            </p>
-          </Modal.Content>
-        }
-      />
+      >
+        <Modal.Content>
+          <p className="py-4 text-sm text-scale-1100">
+            There are unsaved changes. Are you sure you want to close the panel? Your changes will
+            be lost.
+          </p>
+        </Modal.Content>
+      </ConfirmationModal>
     </>
   )
 }

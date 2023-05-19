@@ -1,7 +1,7 @@
 import { FC, ReactNode, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
-import { useStore, withAuth } from 'hooks'
+import { useFlag, useStore, withAuth } from 'hooks'
 import { generateSettingsMenu } from './SettingsMenu.utils'
 
 import ProjectLayout from '../'
@@ -24,7 +24,8 @@ const SettingsLayout: FC<Props> = ({ title, children }) => {
     ? router.pathname.split('/')[5]
     : router.pathname.split('/')[4]
 
-  const menuRoutes = generateSettingsMenu(projectRef, projectBaseInfo)
+  const isVaultEnabled = useFlag('vaultExtension')
+  const menuRoutes = generateSettingsMenu(projectRef, projectBaseInfo, isVaultEnabled)
 
   useEffect(() => {
     if (ui.selectedProject?.ref) {

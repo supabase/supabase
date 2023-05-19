@@ -131,7 +131,7 @@ const LogsQueryPanel = ({
                 <Button type="default" onClick={onClear}>
                   Clear query
                 </Button>
-                {IS_PLATFORM &&  onSave && (
+                {IS_PLATFORM && onSave && (
                   <Tooltip.Root delayDuration={0}>
                     <Tooltip.Trigger>
                       <Button

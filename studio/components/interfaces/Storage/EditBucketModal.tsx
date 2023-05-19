@@ -22,6 +22,7 @@ import {
 import { useStore } from 'hooks'
 import { useParams } from 'common'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
+import { IS_PLATFORM } from 'lib/constants'
 
 export interface EditBucketModalProps {
   visible: boolean
@@ -35,7 +36,7 @@ const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => 
   const storageExplorerStore = useStorageStore()
   const { editBucket } = storageExplorerStore
 
-  const { data } = useProjectStorageConfigQuery({ projectRef: ref })
+  const { data } = useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
   const { value, unit } = convertFromBytes(data?.fileSizeLimit ?? 0)
   const formattedGlobalUploadLimit = `${value} ${unit}`
 
@@ -105,6 +106,9 @@ const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => 
           isSubmitting: boolean
           resetForm: any
         }) => {
+          // [Alaister] although this "technically" is breaking the rules of React hooks
+          // it won't error because the hooks are always rendered in the same order
+          // eslint-disable-next-line react-hooks/rules-of-hooks
           useEffect(() => {
             if (visible && bucket !== undefined) {
               const { value: fileSizeLimit } = convertFromBytes(bucket.file_size_limit ?? 0)
@@ -223,17 +227,19 @@ const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => 
                               ))}
                             </Listbox>
                           </div>
-                          <div className="col-span-12">
-                            <p className="text-scale-1000 text-sm">
-                              Note: The{' '}
-                              <Link href={`/project/${ref}/settings/storage`}>
-                                <a className="text-brand-900 opacity-80 hover:opacity-100 transition">
-                                  global upload limit
-                                </a>
-                              </Link>{' '}
-                              takes precedence over this value ({formattedGlobalUploadLimit})
-                            </p>
-                          </div>
+                          {IS_PLATFORM && (
+                            <div className="col-span-12">
+                              <p className="text-scale-1000 text-sm">
+                                Note: The{' '}
+                                <Link href={`/project/${ref}/settings/storage`}>
+                                  <a className="text-brand-900 opacity-80 hover:opacity-100 transition">
+                                    global upload limit
+                                  </a>
+                                </Link>{' '}
+                                takes precedence over this value ({formattedGlobalUploadLimit})
+                              </p>
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>

@@ -86,7 +86,6 @@ export default function SchemaFormPanel({
           formRef={(ref) => (formRef = ref)}
           schema={schema}
           model={model}
-          children={children}
           onSubmit={async (args) => {
             onSubmit(args)
               .then(() => {
@@ -95,7 +94,9 @@ export default function SchemaFormPanel({
               })
               .catch(() => setSubmitButtonLoading(false))
           }}
-        />
+        >
+          {children}
+        </SchemaForm>
       </div>
     </section>
   )

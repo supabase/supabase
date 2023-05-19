@@ -1,13 +1,31 @@
-import { useStore } from 'hooks'
+import { useTelemetryProps } from 'common'
 import { post } from 'lib/common/fetch'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { FC, useEffect } from 'react'
 
+function sanitizePageViewRoute(_route?: string) {
+  // remove all fragments
+  const noFragments = _route?.split('#')[0]
+  // remove sensitive params
+  const paramsSplits = noFragments?.split('?')
+  const hasParams = paramsSplits && paramsSplits?.length > 1
+
+  if (hasParams) {
+    const urlParams = new URLSearchParams(paramsSplits[1])
+    const sensitiveKeys = [...urlParams.keys()].filter((x) => x.includes('token'))
+    const sensitiveParams = ['code', ...sensitiveKeys]
+    sensitiveParams.forEach((name) => urlParams.delete(name))
+    return `${paramsSplits[0]}?${urlParams?.toString()}`
+  }
+
+  return noFragments
+}
+
 const PageTelemetry: FC = ({ children }) => {
   const router = useRouter()
-  const { ui } = useStore()
+  const telemetryProps = useTelemetryProps()
 
   useEffect(() => {
     function handleRouteChange(url: string) {
@@ -19,20 +37,27 @@ const PageTelemetry: FC = ({ children }) => {
     return () => {
       router.events.off('routeChangeComplete', handleRouteChange)
     }
-  }, [router.events])
+  }, [router])
 
   useEffect(() => {
-    /**
-     * Send page telemetry on first page load
-     * if the route is not ready. Don't need to send it will be picked up by router.event above
-     */
+    // Send page telemetry on first page load
+    // Waiting for router ready before sending page_view
+    // if not the path will be dynamic route instead of the browser url
     if (router.isReady) {
       handlePageTelemetry(router.asPath)
     }
-  }, [])
+  }, [router.isReady])
 
-  const handlePageTelemetry = async (route?: string) => {
+  /**
+   * send page_view event
+   *
+   * @param route: the browser url
+   * */
+  const handlePageTelemetry = async (_route?: string) => {
     if (IS_PLATFORM) {
+      // filter out sensitive query params
+      const route = sanitizePageViewRoute(_route)
+
       /**
        * Get referrer from browser
        */
@@ -40,17 +65,14 @@ const PageTelemetry: FC = ({ children }) => {
 
       /**
        * Send page telemetry
-       *
-       * TODO: document.title is lagging behind routeChangeComplete
-       * that means the page title is the previous one instead of the new page title
        */
       post(`${API_URL}/telemetry/page`, {
         referrer: referrer,
         title: document.title,
         route,
         ga: {
-          screen_resolution: ui.googleAnalyticsProps?.screenResolution,
-          language: ui.googleAnalyticsProps?.language,
+          screen_resolution: telemetryProps?.screenResolution,
+          language: telemetryProps?.language,
         },
       })
     }

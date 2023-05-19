@@ -1,4 +1,4 @@
-import { Menu, Item, ItemParams, PredicateParams } from 'react-contexify'
+import { Menu, Item, ItemParams, PredicateParams, Separator } from 'react-contexify'
 import { IconTrash, IconClipboard, IconEdit } from 'ui'
 import { useDispatch, useTrackedState } from '../../store'
 import { formatClipboardValue, copyToClipboard } from '../../utils'
@@ -84,11 +84,7 @@ const RowContextMenu = ({ table, rows }: RowContextMenuProps) => {
 
   return (
     <>
-      <Menu
-        id={ROW_CONTEXT_MENU_ID}
-        animation={false}
-        className="!bg-scale-300 border border-scale-500"
-      >
+      <Menu id={ROW_CONTEXT_MENU_ID} animation={false}>
         <Item onClick={onCopyCellContent}>
           <IconClipboard size="tiny" />
           <span className="ml-2 text-xs">Copy cell content</span>
@@ -97,6 +93,7 @@ const RowContextMenu = ({ table, rows }: RowContextMenuProps) => {
           <IconEdit size="tiny" />
           <span className="ml-2 text-xs">Edit row</span>
         </Item>
+        <Separator />
         <Item onClick={onDeleteRow} hidden={isItemHidden} data="delete">
           <IconTrash size="tiny" stroke="red" />
           <span className="ml-2 text-xs">Delete row</span>

@@ -154,7 +154,10 @@ const EntityListItem = ({
               >
                 Duplicate Table
               </Dropdown.Item>,
-              <Link href={`/project/${projectRef}/auth/policies?search=${entity.id}`}>
+              <Link
+                key="view-policies"
+                href={`/project/${projectRef}/auth/policies?search=${entity.id}`}
+              >
                 <a>
                   <Dropdown.Item key="delete-table" icon={<IconLock size="tiny" />}>
                     View Policies

@@ -78,13 +78,9 @@ With nothing but the raw data in your database, we can actually do some _basic_ 
 
 ```sql
 select
-	*
-from
-	movies
-where
-  title like '%Avengers%'
-	or
-	overview like '%Avengers%';
+  *
+from movies
+where title like '%Avengers%' or overview like '%Avengers%';
 ```
 
 The `LIKE` [operator](https://www.postgresql.org/docs/current/functions-matching.html#FUNCTIONS-LIKE) as used in the query above will match _only_ the term "Avengers", but it will match it in any part of a given row's `title` or `overview`.

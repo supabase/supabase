@@ -1,5 +1,5 @@
 .react-contexify {
-  @apply dark:bg-gray-700;
+  @apply dark:bg-scale-300 border border-scale-500;
   .react-contexify__item {
     .react-contexify__item__content {
       @apply dark:text-white text-sm;
