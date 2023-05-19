@@ -4,7 +4,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import Telemetry from 'lib/telemetry'
 import { checkPermissions, useStore } from 'hooks'
-import { useProfileQuery } from 'data/profile/profile-query'
+import useProfile from 'hooks/misc/useProfile'
 import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.constants'
 import SQLCard from './SQLCard'
 import { createSqlSnippetSkeleton } from '../SQLEditor.utils'
@@ -18,7 +18,7 @@ const SQLTemplates = observer(() => {
   const { ui } = useStore()
   const { ref } = useParams()
   const router = useRouter()
-  const { data: profile } = useProfileQuery()
+  const { data: profile } = useProfile()
   const [sql, quickStart] = partition(SQL_TEMPLATES, { type: 'template' })
 
   const telemetryProps = useTelemetryProps()

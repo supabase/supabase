@@ -7,20 +7,6 @@ export enum Presets {
   QUERY_PERFORMANCE = 'query_performance',
 }
 
-export interface QueryDataBase {
-  isLoading: boolean
-  error: string
-}
-export interface DbQueryData<T = any> extends QueryDataBase {
-  data: T[]
-  params: BaseReportParams
-  logData?: never
-}
-export interface DbQueryHandler {
-  runQuery: () => void
-  setParams?: never
-  changeQuery?: never
-}
 export type MetaQueryResponse = any & { error: ResponseError }
 
 export type BaseReportParams = typeof DEFAULT_QUERY_PARAMS & { sql?: string } & unknown
