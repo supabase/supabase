@@ -11,7 +11,7 @@
   <guid>https://supabase.com/blog/building-chatgpt-plugins-template</guid>
   <title>Building ChatGPT Plugins with Supabase Edge Runtime</title>
   <link>https://supabase.com/blog/building-chatgpt-plugins-template</link>
-  <description>undefined</description>
+  <description>We're releasing a ChatGPT plugin template written in TypeScript and running on Deno!</description>
   <pubDate>Sun, 14 May 2023 22:10:00 +0000</pubDate>
 </item>
 <item>
@@ -60,7 +60,7 @@
   <guid>https://supabase.com/blog/supabase-studio-2.0</guid>
   <title>Supabase Studio 2.0: help when you need it most</title>
   <link>https://supabase.com/blog/supabase-studio-2.0</link>
-  <description>undefined</description>
+  <description>Supabase Studio now comes with ChatGPT, and GraphiQL built in, Cascade Deletes, and Foreign Key Selectors, and much more.</description>
   <pubDate>Thu, 13 Apr 2023 22:10:00 +0000</pubDate>
 </item>
 <item>
@@ -74,42 +74,42 @@
   <guid>https://supabase.com/blog/pg-tle</guid>
   <title>Trusted Language Extensions for Postgres</title>
   <link>https://supabase.com/blog/pg-tle</link>
-  <description>undefined</description>
+  <description>We're collaborating with AWS to bring Trusted Language Extensions to Postgres.</description>
   <pubDate>Thu, 13 Apr 2023 22:10:00 +0000</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/launch-week-7-community-highlights</guid>
   <title>Launch Week 7 Community Highlights</title>
   <link>https://supabase.com/blog/launch-week-7-community-highlights</link>
-  <description>undefined</description>
+  <description>We're honored to work with, sponsor, and support incredible people and tools. Here is a highlight of the last 3 months.</description>
   <pubDate>Thu, 13 Apr 2023 22:10:00 +0000</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-auth-sso-pkce</guid>
   <title>Supabase Auth: SSO,  Mobile, and Server-side support</title>
   <link>https://supabase.com/blog/supabase-auth-sso-pkce</link>
-  <description>undefined</description>
+  <description>Supacharging Supabase Auth with Sign in with Apple on iOS, Single-Sign-On support with SAML 2.0, and PKCE for server-side rendering and mobile auth.</description>
   <pubDate>Wed, 12 Apr 2023 22:10:00 +0000</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/storage-v3-resumable-uploads</guid>
   <title>Supabase Storage v3: Resumable Uploads with support for 50GB files</title>
   <link>https://supabase.com/blog/storage-v3-resumable-uploads</link>
-  <description>undefined</description>
+  <description>Storage V3 with lots of new features including resumable uploads, more image transformationsm a Next.js image loader and more.</description>
   <pubDate>Tue, 11 Apr 2023 22:10:00 +0000</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/edge-runtime-self-hosted-deno-functions</guid>
   <title>Supabase Edge Runtime: Self-hosted Deno Functions</title>
   <link>https://supabase.com/blog/edge-runtime-self-hosted-deno-functions</link>
-  <description>undefined</description>
+  <description>We are open-sourcing Supabase Edge Runtime allowing you to host your Edge Functions anywhere.</description>
   <pubDate>Mon, 10 Apr 2023 22:10:00 +0000</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-logs-self-hosted</guid>
   <title>Supabase Logs: open source logging server</title>
   <link>https://supabase.com/blog/supabase-logs-self-hosted</link>
-  <description>undefined</description>
+  <description>We're releasing Supabase Logs for both self-hosted users and CLI development.</description>
   <pubDate>Sun, 09 Apr 2023 22:10:00 +0000</pubDate>
 </item>
 <item>
