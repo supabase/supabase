@@ -208,6 +208,7 @@ export const gettingstarted = {
         { name: 'NextJS', url: '/guides/getting-started/quickstarts/nextjs' },
         { name: 'RedwoodJS', url: '/guides/getting-started/quickstarts/redwoodjs' },
         { name: 'Flutter', url: '/guides/getting-started/quickstarts/flutter' },
+        { name: 'Kotlin', url: '/guides/getting-started/quickstarts/kotlin' },
         { name: 'SvelteKit', url: '/guides/getting-started/quickstarts/sveltekit' },
         { name: 'SolidJS', url: '/guides/getting-started/quickstarts/solidjs' },
         { name: 'Vue', url: '/guides/getting-started/quickstarts/vue' },
@@ -265,7 +266,10 @@ export const gettingstarted = {
           name: 'Expo',
           url: '/guides/getting-started/tutorials/with-expo',
         },
-
+        {
+          name: 'Kotlin',
+          url: '/guides/getting-started/tutorials/with-kotlin',
+        },
         {
           name: 'Ionic React',
           url: '/guides/getting-started/tutorials/with-ionic-react',

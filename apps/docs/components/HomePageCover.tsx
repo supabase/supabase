@@ -66,6 +66,16 @@ const HomePageCover = (props) => {
                 iconSize={iconSize}
                 hideArrow
                 tooltip="Flutter"
+                icon="/docs/img/icons/kotlin-icon"
+              />
+            </a>
+          </Link>
+          <Link href={`/guides/getting-started/quickstarts/kotlin`} passHref>
+            <a className="no-underline">
+              <IconPanel
+                iconSize={iconSize}
+                hideArrow
+                tooltip="Kotlin"
                 icon="/docs/img/icons/flutter-icon"
               />
             </a>

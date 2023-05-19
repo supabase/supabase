@@ -1,0 +1,131 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+import StepHikeCompact from '~/components/StepHikeCompact'
+
+export const meta = {
+  title: 'Use Supabase with Kotlin',
+  subtitle:
+    'Learn how to create a Supabase project, add some sample data to your database, and query the data from a Kotlin app.',
+  breadcrumb: 'Framework Quickstarts',
+}
+
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={1}>
+    <StepHikeCompact.Details title="Set up a Supabase project with sample data">
+
+    [Create a new project](https://app.supabase.com) in the Supabase Dashboard.
+
+    After your project is ready, create a table in your Supabase database using the [SQL Editor](https://app.supabase.com/project/_/sql) in the Dashboard. Use the following SQL statement to create a `countries` table with some sample data.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+     ```sql SQL_EDITOR
+      -- Create the table
+      CREATE TABLE countries (
+      id SERIAL PRIMARY KEY,
+      name VARCHAR(255) NOT NULL
+      );
+      -- Insert some sample data into the table
+      INSERT INTO countries (name) VALUES ('United States');
+      INSERT INTO countries (name) VALUES ('Canada');
+      INSERT INTO countries (name) VALUES ('Mexico');
+      ````
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={2}>
+
+    <StepHikeCompact.Details title="Create a Flutter app">
+
+    ...
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```bash Terminal
+      ...
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={3}>
+
+    <StepHikeCompact.Details title="Install the Supabase client library">
+
+      ...
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```kotlin
+      ...
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={4}>
+
+    <StepHikeCompact.Details title="Initialize the Supabase client">
+
+      ...
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```kotlin MainActivity.kt
+      ...
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={5}>
+
+    <StepHikeCompact.Details title="Query data from the app">
+
+      ...
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```kotlin MainActivity.kt
+      ...
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={6}>
+    <StepHikeCompact.Details title="Start the app">
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```bash Terminal
+      ...
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+</StepHikeCompact>
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} hideToc={true} />
+
+export default Page

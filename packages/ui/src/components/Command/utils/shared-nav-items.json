@@ -209,6 +209,10 @@
       "url": "https://supabase.com/docs/guides/getting-started/quickstarts/flutter"
     },
     {
+      "label": "Kotlin",
+      "url": "https://supabase.com/docs/guides/getting-started/quickstarts/kotlin"
+    },
+    {
       "label": "SvelteKit",
       "url": "https://supabase.com/docs/guides/getting-started/quickstarts/sveltekit"
     },
