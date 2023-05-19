@@ -5,7 +5,7 @@
 
 ---
 
-# Supabas
+# Supabase
 
 [Supabase] (https://supabase.com) är ett alternativ till Firebase med öppen källkod. Vi bygger upp Firebase-funktionerna med hjälp av verktyg för öppen källkod i företagsklass.
 
@@ -45,7 +45,7 @@ För att se hur man bidrar, besök [Getting Started](./DEVELOPERS.md)
 
 Vi befinner oss för närvarande i Public Beta. Bevaka "releases" i denna repo för att få information om större uppdateringar.
 
-<kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="Titta på denna repo"/></kbd>
+<kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="Watch this repo"/></kbd>
 
 ---
 
@@ -64,9 +64,9 @@ Du kan också [självhosta](https://supabase.com/docs/guides/hosting/overview) o
 - [Realtime](https://github.com/supabase/realtime) är en Elixir-server som låter dig lyssna på PostgreSQL-insättningar, uppdateringar och borttagningar med hjälp av websockets. Realtime söker Postgres inbyggda replikeringsfunktionalitet efter databasändringar, omvandlar ändringarna till JSON och sänder sedan JSON via websockets till auktoriserade klienter.
 - [PostgREST] (http://postgrest.org/) är en webbserver som omvandlar din PostgreSQL-databas direkt till ett RESTful API
 - [pg_graphql](http://github.com/supabase/pg_graphql/) är ett PostgreSQL-tillägg som exponerar ett GraphQL API
-- [Storage](https://github.com/supabase/storage-api) tillhandahåller ett RESTful-gränssnitt för hantering av filer som lagras i S3, med Postgres för att hantera behörigheter.
+- [Storage](https://github.com/supabase/storage-api) tillhandahåller ett RESTful-gränssnitt för hantering av filer som lagras i S3, där Postgres används för att hantera behörigheter.
 - [postgres-meta](https://github.com/supabase/postgres-meta) är ett RESTful API för hantering av Postgres, så att du kan hämta tabeller, lägga till roller, köra frågor osv.
-- [GoTrue](https://github.com/netlify/gotrue) är ett SWT-baserat API för hantering av användare och utfärdande av SWT-token.
+- [GoTrue](https://github.com/netlify/gotrue) är ett SWT-baserat API för hantering av användare och utfärdande av SWT-tokens.
 - [Kong](https://github.com/Kong/kong) är en molnbaserad API-gateway.
 
 #### Klientbibliotek
@@ -76,7 +76,7 @@ Vårt tillvägagångssätt för klientbibliotek är modulärt. Varje delbibliote
 <table style="table-layout:fixed; white-space: nowrap;">
   <tr>
     <th>Språk</th>
-    <th>Client</th>
+    <th>Klient</th>
     <th colspan="5">Feature-Clients (ingår i Supabase-klienten)</th>
   </tr>
   <tr>
@@ -84,12 +84,12 @@ Vårt tillvägagångssätt för klientbibliotek är modulärt. Varje delbibliote
     <th>Supabase</th>
     <th><a href="https://github.com/postgrest/postgrest" target="_blank" rel="noopener noreferrer">PostgREST</a></th>
     <th><a href="https://github.com/supabase/gotrue" target="_blank" rel="noopener noreferrer">GoTrue</a></th>
-    <th><a href="https://github.com/supabase/realtime" target="_blank" rel="noopener noreferrer">Realtime</a></th>
-    <th><a href="https://github.com/supabase/storage-api" target="_blank" rel="noopener noreferrer">Storage</a></th>
+    <th><a href="https://github.com/supabase/realtime" target="_blank" rel="noopener noreferrer">Realtid</a></th>
+    <th><a href="https://github.com/supabase/storage-api" target="_blank" rel="noopener noreferrer">Lagring</a></th>
     <th>Funktioner</th>
   </tr>
-  <!-- MALL FÖR NY RAD -->
-  <!-- START RÄCK
+  <!-- TEMPLATE FOR NEW ROW -->
+  <!-- START ROW
   <tr>
     <td>lang</td>
     <td><a href="https://github.com/supabase-community/supabase-lang" target="_blank" rel="noopener noreferrer">supabase-lang</a></td>
@@ -98,10 +98,10 @@ Vårt tillvägagångssätt för klientbibliotek är modulärt. Varje delbibliote
     <td><a href="https://github.com/supabase-community/realtime-lang" target="_blank" rel="noopener noreferrer">realtime-lang</a></td>
     <td><a href="https://github.com/supabase-community/storage-lang" target="_blank" rel="noopener noreferrer">storage-lang</a></td>
   </tr>
-  SLUTAR RADEN -->
-  <th colspan="7">⚡️ Official ⚡️</th>
+  END ROW -->
+  <th colspan="7">⚡️ Officiell ⚡️</th>
   <tr>
-    <td>JavaScript (TypeScript)</td>
+    <td><keep>Java</keep>Skript (TypeScript)</td>
     <td><a href="https://github.com/supabase/supabase-js" target="_blank" rel="noopener noreferrer">supabase-js</a></td>
     <td><a href="https://github.com/supabase/postgrest-js" target="_blank" rel="noopener noreferrer">postgrest-js</a></td>
     <td><a href="https://github.com/supabase/gotrue-js" target="_blank" rel="noopener noreferrer">gotrue-js</a></td>
@@ -110,15 +110,15 @@ Vårt tillvägagångssätt för klientbibliotek är modulärt. Varje delbibliote
     <td><a href="https://github.com/supabase/functions-js" target="_blank" rel="noopener noreferrer">funktioner-js</a></td>
   </tr>
     <tr>
-    <td>Flutter</td>
+    <td><keep>Flutter</keep></td>
     <td><a href="https://github.com/supabase/supabase-flutter" target="_blank" rel="noopener noreferrer">supabase-flutter</a></td>
     <td><a href="https://github.com/supabase/postgrest-dart" target="_blank" rel="noopener noreferrer">postgrest-dart</a></td>
     <td><a href="https://github.com/supabase/gotrue-dart" target="_blank" rel="noopener noreferrer">gotrue-dart</a></td>
     <td><a href="https://github.com/supabase/realtime-dart" target="_blank" rel="noopener noreferrer">realtime-dart</a></td>
-    <td><a href="https://github.com/supabase/storage-dart" target="_blank" rel="noopener noreferrer">storage-dart</a></td>
+    <td><a href="https://github.com/supabase/storage-dart" target="_blank" rel="noopener noreferrer">lagring-dart</a></td>
     <td><a href="https://github.com/supabase/functions-dart" target="_blank" rel="noopener noreferrer">funktioner-dart</a></td>
   </tr>
-  <th colspan="7">💚 Community 💚</th>
+  <th colspan="7">💚 Gemenskapen 💚</th>
   <tr>
     <td>C#</td>
     <td><a href="https://github.com/supabase-community/supabase-csharp" target="_blank" rel="noopener noreferrer">supabase-csharp</a></td>
@@ -129,7 +129,7 @@ Vårt tillvägagångssätt för klientbibliotek är modulärt. Varje delbibliote
     <td><a href="https://github.com/supabase-community/functions-csharp" target="_blank" rel="noopener noreferrer">funktioner-csharp</a></td>
   </tr>
   <tr>
-    <td>Gå</td>
+    <td>Go</td>
     <td>-</td>
     <td><a href="https://github.com/supabase-community/postgrest-go" target="_blank" rel="noopener noreferrer">postgrest-go</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-go" target="_blank" rel="noopener noreferrer">gotrue-go</a></td>
@@ -138,12 +138,12 @@ Vårt tillvägagångssätt för klientbibliotek är modulärt. Varje delbibliote
     <td><a href="https://github.com/supabase-community/functions-go" target="_blank" rel="noopener noreferrer">funktioner-go</a></td>
   </tr>
   <tr>
-    <td>Java</td>
+    <td><keep>Java</keep></td>
     <td>-</td>
     <td>-</td>
     <td><a href="https://github.com/supabase-community/gotrue-java" target="_blank" rel="noopener noreferrer">gotrue-java</a></td>
     <td>-</td>
-    <td><a href="https://github.com/supabase-community/storage-java" target="_blank" rel="noopener noreferrer">storage-java</a></td>
+    <td><a href="https://github.com/supabase-community/storage-java" target="_blank" rel="noopener noreferrer">lagring-java</a></td>
     <td>-</td>
   </tr>
   <tr>
@@ -156,16 +156,16 @@ Vårt tillvägagångssätt för klientbibliotek är modulärt. Varje delbibliote
     <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Functions" target="_blank" rel="noopener noreferrer">funktioner-kt</a></td>
   </tr>
   <tr>
-    <td>Python</td>
+    <td><keep>Python</keep></td>
     <td><a href="https://github.com/supabase-community/supabase-py" target="_blank" rel="noopener noreferrer">supabase-py</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-py" target="_blank" rel="noopener noreferrer">postgrest-py</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-py" target="_blank" rel="noopener noreferrer">gotrue-py</a></td>
     <td><a href="https://github.com/supabase-community/realtime-py" target="_blank" rel="noopener noreferrer">realtime-py</a></td>
     <td><a href="https://github.com/supabase-community/storage-py" target="_blank" rel="noopener noreferrer">storage-py</a></td>
-    <td><a href="https://github.com/supabase-community/functions-py" target="_blank" rel="noopener noreferrer">funktioner-py</a></td>
+    <td><a href="https://github.com/supabase-community/functions-py" target="_blank" rel="noopener noreferrer">functions-py</a></td>
   </tr>
   <tr>
-    <td>Ruby</td>
+    <td><keep>Ruby</keep></td>
     <td><a href="https://github.com/supabase-community/supabase-rb" target="_blank" rel="noopener noreferrer">supabase-rb</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-rb" target="_blank" rel="noopener noreferrer">postgrest-rb</a></td>
     <td>-</td>
@@ -174,7 +174,7 @@ Vårt tillvägagångssätt för klientbibliotek är modulärt. Varje delbibliote
     <td>-</td>
   </tr>
   <tr>
-    <td>Rust</td>
+    <td><keep>Rust</keep></td>
     <td>-</td>
     <td><a href="https://github.com/supabase-community/postgrest-rs" target="_blank" rel="noopener noreferrer">postgrest-rs</a></td>
     <td>-</td>
@@ -183,16 +183,16 @@ Vårt tillvägagångssätt för klientbibliotek är modulärt. Varje delbibliote
     <td>-</td>
   </tr>
   <tr>
-    <td>Swift</td>
+    <td><keep>Swift</keep></td>
     <td><a href="https://github.com/supabase-community/supabase-swift" target="_blank" rel="noopener noreferrer">supabase-swift</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-swift" target="_blank" rel="noopener noreferrer">postgrest-swift</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-swift" target="_blank" rel="noopener noreferrer">gotrue-swift</a></td>
-    <td><a href="https://github.com/supabase-community/realtime-swift" target="_blank" rel="noopener noreferrer">realtime-swift</a></td>
-    <td><a href="https://github.com/supabase-community/storage-swift" target="_blank" rel="noopener noreferrer">lagringssvift</a></td>
+    <td><a href="https://github.com/supabase-community/realtime-swift" target="_blank" rel="noopener noreferrer">realtidsskift</a></td>
+    <td><a href="https://github.com/supabase-community/storage-swift" target="_blank" rel="noopener noreferrer">lagringsskiftet</a></td>
     <td><a href="https://github.com/supabase-community/functions-swift" target="_blank" rel="noopener noreferrer">funktioner-swift</a></td>
   </tr>
   <tr>
-    <td>Godot Engine (GDScript)</td>
+    <td>Godot-motor (GDScript)</td>
     <td><a href="https://github.com/supabase-community/godot-engine.supabase" target="_blank" rel="noopener noreferrer">supabase-gdscript</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-gdscript" target="_blank" rel="noopener noreferrer">postgrest-gdscript</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-gdscript" target="_blank" rel="noopener noreferrer">gotrue-gdscript</a></td>
@@ -202,13 +202,13 @@ Vårt tillvägagångssätt för klientbibliotek är modulärt. Varje delbibliote
   </tr>
 </table>
 
-<!--- Ta bort den här listan om du översätter till ett annat språk, det är svårt att hålla den uppdaterad i flera filer-->
-<!--- Behåll endast länken till listan över översättningsfiler-->
+<!--- Remove this list if you're translating to another language, it's hard to keep updated across multiple files-->
+<!--- Keep only the link to the list of translation files-->
 
 ## Översättningar
 
 - [Arabiska | العربية](/i18n/README.ar.md)
-- [Albanska / Shqip](/i18n/README.sq.md)
+- [albanska / Shqip](/i18n/README.sq.md)
 - [Bangla / বাংলা](/i18n/README.bn.md)
 - [Bulgariska / Български](/i18n/README.bg.md)
 - [Katalanska / Català](/i18n/README.ca.md)
@@ -245,7 +245,7 @@ Vårt tillvägagångssätt för klientbibliotek är modulärt. Varje delbibliote
 - [Turkiska / Türkçe](/i18n/README.tr.md)
 - [Ukrainska / Українська](/i18n/README.uk.md)
 - [Vietnamesiska / Tiếng Việt](/i18n/README.vi-vn.md)
-- [Förteckning över översättningar](/i18n/languages.md) <!--- Behåll endast detta -->
+- [Förteckning över översättningar](/i18n/languages.md) <!--- Keep only this -->
 
 ---
 

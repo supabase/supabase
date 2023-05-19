@@ -5,7 +5,7 @@
 
 ---
 
-# Supabase
+# 슈퍼베이스
 
 [Supabase](https://supabase.com)는 파이어베이스의 오픈소스 대안입니다. 엔터프라이즈급 오픈 소스 도구를 사용하여 Firebase의 기능을 구축하고 있습니다.
 
@@ -45,7 +45,7 @@
 
 현재 공개 베타 버전입니다. 주요 업데이트에 대한 알림을 받으려면 이 리포지토리의 "릴리즈"를 살펴보세요.
 
-<kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="이 리포지토리 보기"/></kbd>
+<kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="Watch this repo"/></kbd>
 
 ---
 
@@ -60,7 +60,7 @@ Supabase는 [호스팅 플랫폼](https://app.supabase.com)입니다. 가입만 
 
 아키텍처](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
 
-- [PostgreSQL](https://www.postgresql.org/)은 30년 이상 활발하게 개발되어 안정성, 기능 견고성 및 성능에 대한 높은 명성을 얻고 있는 객체 관계형 데이터베이스 시스템입니다.
+- [PostgreSQL](https://www.postgresql.org/)은 30년 이상 활발하게 개발되어 안정성, 기능 견고성 및 성능에 대한 높은 평판을 얻고 있는 객체 관계형 데이터베이스 시스템입니다.
 - [Realtime](https://github.com/supabase/realtime)은 웹소켓을 사용하여 PostgreSQL 삽입, 업데이트, 삭제를 수신할 수 있는 Elixir 서버입니다. Realtime은 데이터베이스 변경 사항에 대해 Postgres의 기본 제공 복제 기능을 폴링하고, 변경 사항을 JSON으로 변환한 다음, 웹 소켓을 통해 승인된 클라이언트에 JSON을 브로드캐스트합니다.
 - [PostgREST](http://postgrest.org/)는 PostgreSQL 데이터베이스를 RESTful API로 직접 전환하는 웹 서버입니다
 - [pg_graphql](http://github.com/supabase/pg_graphql/)은 GraphQL API를 노출하는 PostgreSQL 확장입니다
@@ -73,11 +73,11 @@ Supabase는 [호스팅 플랫폼](https://app.supabase.com)입니다. 가입만 
 
 클라이언트 라이브러리에 대한 접근 방식은 모듈식입니다. 각 하위 라이브러리는 단일 외부 시스템을 위한 독립형 구현입니다. 이는 기존 도구를 지원하는 방식 중 하나입니다.
 
-<table style="table-layout:고정; 공백: nowrap;">
+<table style="table-layout:fixed; white-space: nowrap;">
   <tr>
     <th>언어</th>
     <th>클라이언트</th>
-    <th colspan="5">기능-클라이언트(Supabase 클라이언트에 번들로 제공)</th>
+    <th colspan="5">기능 클라이언트(Supabase 클라이언트에 번들로 제공)</th>
   </tr>
   <tr>
     <th></th>
@@ -85,11 +85,11 @@ Supabase는 [호스팅 플랫폼](https://app.supabase.com)입니다. 가입만 
     <th><a href="https://github.com/postgrest/postgrest" target="_blank" rel="noopener noreferrer">PostgREST</a></th>
     <th><a href="https://github.com/supabase/gotrue" target="_blank" rel="noopener noreferrer">GoTrue</a></th>
     <th><a href="https://github.com/supabase/realtime" target="_blank" rel="noopener noreferrer">실시간</a></th>
-    <th><a href="https://github.com/supabase/storage-api" target="_blank" rel="noopener noreferrer">저장</a></th>
+    <th><a href="https://github.com/supabase/storage-api" target="_blank" rel="noopener noreferrer">스토리지</a></th>
     <th>기능</th>
   </tr>
-  <!-- 새 행 템플릿 -->
-  <!-- 행 시작
+  <!-- TEMPLATE FOR NEW ROW -->
+  <!-- START ROW
   <tr>
     <td>lang</td>
     <td><a href="https://github.com/supabase-community/supabase-lang" target="_blank" rel="noopener noreferrer">supabase-lang</a></td>
@@ -101,7 +101,7 @@ Supabase는 [호스팅 플랫폼](https://app.supabase.com)입니다. 가입만 
   END ROW -->
   <th colspan="7">⚡️ 공식 ⚡️</th>
   <tr>
-    <td>자바스크립트(타입스크립트)</td>
+    <td><keep>Java</keep>스크립트(타입스크립트)</td>
     <td><a href="https://github.com/supabase/supabase-js" target="_blank" rel="noopener noreferrer">supabase-js</a></td>
     <td><a href="https://github.com/supabase/postgrest-js" target="_blank" rel="noopener noreferrer">postgrest-js</a></td>
     <td><a href="https://github.com/supabase/gotrue-js" target="_blank" rel="noopener noreferrer">gotrue-js</a></td>
@@ -110,13 +110,13 @@ Supabase는 [호스팅 플랫폼](https://app.supabase.com)입니다. 가입만 
     <td><a href="https://github.com/supabase/functions-js" target="_blank" rel="noopener noreferrer">functions-js</a></td>
   </tr>
     <tr>
-    <td>Flutter</td>
+    <td><keep>Flutter</keep></td>
     <td><a href="https://github.com/supabase/supabase-flutter" target="_blank" rel="noopener noreferrer">supabase-flutter</a></td>
     <td><a href="https://github.com/supabase/postgrest-dart" target="_blank" rel="noopener noreferrer">postgrest-dart</a></td>
     <td><a href="https://github.com/supabase/gotrue-dart" target="_blank" rel="noopener noreferrer">gotrue-dart</a></td>
-    <td><a href="https://github.com/supabase/realtime-dart" target="_blank" rel="noopener noreferrer">real-time-dart</a></td>
+    <td><a href="https://github.com/supabase/realtime-dart" target="_blank" rel="noopener noreferrer">realtime-dart</a></td>
     <td><a href="https://github.com/supabase/storage-dart" target="_blank" rel="noopener noreferrer">storage-dart</a></td>
-    <td><a href="https://github.com/supabase/functions-dart" target="_blank" rel="noopener noreferrer">functions-dart</a></td>
+    <td><a href="https://github.com/supabase/functions-dart" target="_blank" rel="noopener noreferrer">함수 다트</a></td>
   </tr>
   <th colspan="7">💚 커뮤니티 💚</th>
   <tr>
@@ -134,11 +134,11 @@ Supabase는 [호스팅 플랫폼](https://app.supabase.com)입니다. 가입만 
     <td><a href="https://github.com/supabase-community/postgrest-go" target="_blank" rel="noopener noreferrer">postgrest-go</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-go" target="_blank" rel="noopener noreferrer">gotrue-go</a></td>
     <td>-</td>
-    <td><a href="https://github.com/supabase-community/storage-go" target="_blank" rel="noopener noreferrer">storage-go</a></td>
+    <td><a href="https://github.com/supabase-community/storage-go" target="_blank" rel="noopener noreferrer">스토리지 이동</a></td>
     <td><a href="https://github.com/supabase-community/functions-go" target="_blank" rel="noopener noreferrer">functions-go</a></td>
   </tr>
   <tr>
-    <td>Java</td>
+    <td><keep>Java</keep></td>
     <td>-</td>
     <td>-</td>
     <td><a href="https://github.com/supabase-community/gotrue-java" target="_blank" rel="noopener noreferrer">gotrue-java</a></td>
@@ -156,7 +156,7 @@ Supabase는 [호스팅 플랫폼](https://app.supabase.com)입니다. 가입만 
     <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Functions" target="_blank" rel="noopener noreferrer">functions-kt</a></td>
   </tr>
   <tr>
-    <td>Python</td>
+    <td><keep>Python</keep></td>
     <td><a href="https://github.com/supabase-community/supabase-py" target="_blank" rel="noopener noreferrer">supabase-py</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-py" target="_blank" rel="noopener noreferrer">postgrest-py</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-py" target="_blank" rel="noopener noreferrer">gotrue-py</a></td>
@@ -165,7 +165,7 @@ Supabase는 [호스팅 플랫폼](https://app.supabase.com)입니다. 가입만 
     <td><a href="https://github.com/supabase-community/functions-py" target="_blank" rel="noopener noreferrer">functions-py</a></td>
   </tr>
   <tr>
-    <td>Ruby</td>
+    <td><keep>Ruby</keep></td>
     <td><a href="https://github.com/supabase-community/supabase-rb" target="_blank" rel="noopener noreferrer">supabase-rb</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-rb" target="_blank" rel="noopener noreferrer">postgrest-rb</a></td>
     <td>-</td>
@@ -174,7 +174,7 @@ Supabase는 [호스팅 플랫폼](https://app.supabase.com)입니다. 가입만 
     <td>-</td>
   </tr>
   <tr>
-    <td>Rust</td>
+    <td><keep>Rust</keep></td>
     <td>-</td>
     <td><a href="https://github.com/supabase-community/postgrest-rs" target="_blank" rel="noopener noreferrer">postgrest-rs</a></td>
     <td>-</td>
@@ -183,13 +183,13 @@ Supabase는 [호스팅 플랫폼](https://app.supabase.com)입니다. 가입만 
     <td>-</td>
   </tr>
   <tr>
-    <td>스위프트</td>
+    <td><keep>Swift</keep></td>
     <td><a href="https://github.com/supabase-community/supabase-swift" target="_blank" rel="noopener noreferrer">supabase-swift</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-swift" target="_blank" rel="noopener noreferrer">postgrest-swift</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-swift" target="_blank" rel="noopener noreferrer">gotrue-swift</a></td>
-    <td><a href="https://github.com/supabase-community/realtime-swift" target="_blank" rel="noopener noreferrer">realtime-swift</a></td>
+    <td><a href="https://github.com/supabase-community/realtime-swift" target="_blank" rel="noopener noreferrer">real-time-swift</a></td>
     <td><a href="https://github.com/supabase-community/storage-swift" target="_blank" rel="noopener noreferrer">storage-swift</a></td>
-    <td><a href="https://github.com/supabase-community/functions-swift" target="_blank" rel="noopener noreferrer">functions-swift</a></td>
+    <td><a href="https://github.com/supabase-community/functions-swift" target="_blank" rel="noopener noreferrer">함수-스위프트</a></td>
   </tr>
   <tr>
     <td>고닷 엔진(GDScript)</td>
@@ -202,8 +202,8 @@ Supabase는 [호스팅 플랫폼](https://app.supabase.com)입니다. 가입만 
   </tr>
 </table>
 
-<!--- 다른 언어로 번역하는 경우 이 목록을 제거하세요. 여러 파일에서 계속 업데이트하기 어렵습니다-->
-<!--- 번역 파일 목록에 대한 링크만 유지 -->
+<!--- Remove this list if you're translating to another language, it's hard to keep updated across multiple files-->
+<!--- Keep only the link to the list of translation files-->
 
 ## 번역
 
@@ -245,7 +245,7 @@ Supabase는 [호스팅 플랫폼](https://app.supabase.com)입니다. 가입만 
 - [터키어 / Türkçe](/i18n/README.tr.md)
 - [우크라이나어 / Українська](/i18n/README.uk.md)
 - [베트남어 / Tiếng Việt](/i18n/README.vi-vn.md)
-- [번역 목록](/i18n/languages.md) <!--- 이것만 보관 -->
+- [번역 목록](/i18n/languages.md) <!--- Keep only this -->
 
 ---
 
