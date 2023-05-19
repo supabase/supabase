@@ -49,6 +49,16 @@ export interface PageResult {
   sections: PageSection[]
 }
 
+const getDocsUrl = () => {
+  if (!process.env.NEXT_PUBLIC_SITE_URL || !process.env.NEXT_PUBLIC_LOCAL_SUPABASE) {
+    return 'https://supabase.com/docs'
+  }
+
+  const isLocal =
+    process.env.NEXT_PUBLIC_SITE_URL.includes('localhost') || process.env.NEXT_PUBLIC_LOCAL_SUPABASE
+  return isLocal ? 'http://localhost:3001/docs' : 'https://supabase.com/docs'
+}
+
 const DocsSearch = () => {
   const [results, setResults] = useState<PageResult[]>()
   const [hasSearchError, setHasSearchError] = useState(false)
@@ -276,10 +286,11 @@ const DocsSearch = () => {
 export default DocsSearch
 
 export function formatPageUrl(page: PageResult) {
+  const docsUrl = getDocsUrl()
   switch (page.type) {
     case PageType.Markdown:
     case PageType.Reference:
-      return `/docs/${page.path}`
+      return `${docsUrl}${page.path}`
     case PageType.GithubDiscussion:
       return page.path
     default:
