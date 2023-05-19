@@ -66,7 +66,7 @@ A Supabase egy [hosztolt platform](https://app.supabase.com). Regisztrálhat és
 - [pg_graphql](http://github.com/supabase/pg_graphql/) egy PostgreSQL kiterjesztés, amely GraphQL API-t tesz elérhetővé
 - [Storage](https://github.com/supabase/storage-api) egy RESTful felületet biztosít az S3-ban tárolt fájlok kezeléséhez, a Postgres segítségével a jogosultságok kezeléséhez.
 - [postgres-meta](https://github.com/supabase/postgres-meta) egy RESTful API a Postgres kezeléséhez, amely lehetővé teszi a táblák lekérdezését, szerepek hozzáadását, lekérdezések futtatását stb.
-- a [GoTrue](https://github.com/netlify/gotrue) egy SWT alapú API a felhasználók kezelésére és SWT tokenek kiadására.
+- [GoTrue](https://github.com/netlify/gotrue) egy SWT alapú API a felhasználók kezelésére és SWT tokenek kiadására.
 - a [Kong](https://github.com/Kong/kong) egy felhő-natív API átjáró.
 
 #### Ügyfélkönyvtárak
@@ -76,19 +76,19 @@ Az ügyfélkönyvtárakra vonatkozó megközelítésünk moduláris. Minden egye
 <table style="table-layout:fixed; white-space: nowrap;">
   <tr>
     <th>Nyelv</th>
-    <th>Kliens</th>
-    <th colspan="5">Feature-Clients (Supabase kliensben csomagolva)</th>
+    <th>Ügyfél</th>
+    <th colspan="5">Feature-kliensek (a Supabase klienssel együtt)</th>
   </tr>
   <tr>
     <th></th>
     <th>Supabase</th>
     <th><a href="https://github.com/postgrest/postgrest" target="_blank" rel="noopener noreferrer">PostgREST</a></th>
     <th><a href="https://github.com/supabase/gotrue" target="_blank" rel="noopener noreferrer">GoTrue</a></th>
-    <th><a href="https://github.com/supabase/realtime" target="_blank" rel="noopener noreferrer">Realtime</a></th>
+    <th><a href="https://github.com/supabase/realtime" target="_blank" rel="noopener noreferrer">Valós idejű</a></th>
     <th><a href="https://github.com/supabase/storage-api" target="_blank" rel="noopener noreferrer">Tárolás</a></th>
     <th>Funkciók</th>
   </tr>
-  <!-- SABLON AZ ÚJ SORHOZ -->
+  <!-- TEMPLATE FOR NEW ROW -->
   <!-- START ROW
   <tr>
     <td>lang</td>
@@ -98,25 +98,25 @@ Az ügyfélkönyvtárakra vonatkozó megközelítésünk moduláris. Minden egye
     <td><a href="https://github.com/supabase-community/realtime-lang" target="_blank" rel="noopener noreferrer">realtime-lang</a></td>
     <td><a href="https://github.com/supabase-community/storage-lang" target="_blank" rel="noopener noreferrer">storage-lang</a></td>
   </tr>
-  SOR VÉGE -->
+  END ROW -->
   <th colspan="7">⚡️ Hivatalos ⚡️</th>
   <tr>
-    <td>JavaScript (TypeScript)</td>
+    <td><keep>Java</keep>Szkript (TypeScript)</td>
     <td><a href="https://github.com/supabase/supabase-js" target="_blank" rel="noopener noreferrer">supabase-js</a></td>
     <td><a href="https://github.com/supabase/postgrest-js" target="_blank" rel="noopener noreferrer">postgrest-js</a></td>
     <td><a href="https://github.com/supabase/gotrue-js" target="_blank" rel="noopener noreferrer">gotrue-js</a></td>
     <td><a href="https://github.com/supabase/realtime-js" target="_blank" rel="noopener noreferrer">realtime-js</a></td>
     <td><a href="https://github.com/supabase/storage-js" target="_blank" rel="noopener noreferrer">storage-js</a></td>
-    <td><a href="https://github.com/supabase/functions-js" target="_blank" rel="noopener noreferrer">funkciók-js</a></td>
+    <td><a href="https://github.com/supabase/functions-js" target="_blank" rel="noopener noreferrer">functions-js</a></td>
   </tr>
     <tr>
-    <td>Flutter</td>
+    <td><keep>Flutter</keep></td>
     <td><a href="https://github.com/supabase/supabase-flutter" target="_blank" rel="noopener noreferrer">supabase-flutter</a></td>
     <td><a href="https://github.com/supabase/postgrest-dart" target="_blank" rel="noopener noreferrer">postgrest-dart</a></td>
     <td><a href="https://github.com/supabase/gotrue-dart" target="_blank" rel="noopener noreferrer">gotrue-dart</a></td>
     <td><a href="https://github.com/supabase/realtime-dart" target="_blank" rel="noopener noreferrer">realtime-dart</a></td>
     <td><a href="https://github.com/supabase/storage-dart" target="_blank" rel="noopener noreferrer">storage-dart</a></td>
-    <td><a href="https://github.com/supabase/functions-dart" target="_blank" rel="noopener noreferrer">funkciók-dart</a></td>
+    <td><a href="https://github.com/supabase/functions-dart" target="_blank" rel="noopener noreferrer">functions-dart</a></td>
   </tr>
   <th colspan="7">💚 Közösség 💚</th>
   <tr>
@@ -126,7 +126,7 @@ Az ügyfélkönyvtárakra vonatkozó megközelítésünk moduláris. Minden egye
     <td><a href="https://github.com/supabase-community/gotrue-csharp" target="_blank" rel="noopener noreferrer">gotrue-csharp</a></td>
     <td><a href="https://github.com/supabase-community/realtime-csharp" target="_blank" rel="noopener noreferrer">realtime-csharp</a></td>
     <td><a href="https://github.com/supabase-community/storage-csharp" target="_blank" rel="noopener noreferrer">storage-csharp</a></td>
-    <td><a href="https://github.com/supabase-community/functions-csharp" target="_blank" rel="noopener noreferrer">funkciók-csharp</a></td>
+    <td><a href="https://github.com/supabase-community/functions-csharp" target="_blank" rel="noopener noreferrer">functions-csharp</a></td>
   </tr>
   <tr>
     <td>Go</td>
@@ -135,10 +135,10 @@ Az ügyfélkönyvtárakra vonatkozó megközelítésünk moduláris. Minden egye
     <td><a href="https://github.com/supabase-community/gotrue-go" target="_blank" rel="noopener noreferrer">gotrue-go</a></td>
     <td>-</td>
     <td><a href="https://github.com/supabase-community/storage-go" target="_blank" rel="noopener noreferrer">storage-go</a></td>
-    <td><a href="https://github.com/supabase-community/functions-go" target="_blank" rel="noopener noreferrer">funkciók-go</a></td>
+    <td><a href="https://github.com/supabase-community/functions-go" target="_blank" rel="noopener noreferrer">functions-go</a></td>
   </tr>
   <tr>
-    <td>Java</td>
+    <td><keep>Java</keep></td>
     <td>-</td>
     <td>-</td>
     <td><a href="https://github.com/supabase-community/gotrue-java" target="_blank" rel="noopener noreferrer">gotrue-java</a></td>
@@ -152,20 +152,20 @@ Az ügyfélkönyvtárakra vonatkozó megközelítésünk moduláris. Minden egye
     <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Postgrest" target="_blank" rel="noopener noreferrer">postgrest-kt</a></td>
     <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/GoTrue" target="_blank" rel="noopener noreferrer">gotrue-kt</a></td>
     <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Realtime" target="_blank" rel="noopener noreferrer">realtime-kt</a></td>
-    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Storage" target="_blank" rel="noopener noreferrer">tárolás-kt</a></td>
-    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Functions" target="_blank" rel="noopener noreferrer">funkciók-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Storage" target="_blank" rel="noopener noreferrer">storage-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Functions" target="_blank" rel="noopener noreferrer">functions-kt</a></td>
   </tr>
   <tr>
-    <td>Python</td>
+    <td><keep>Python</keep></td>
     <td><a href="https://github.com/supabase-community/supabase-py" target="_blank" rel="noopener noreferrer">supabase-py</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-py" target="_blank" rel="noopener noreferrer">postgrest-py</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-py" target="_blank" rel="noopener noreferrer">gotrue-py</a></td>
     <td><a href="https://github.com/supabase-community/realtime-py" target="_blank" rel="noopener noreferrer">realtime-py</a></td>
     <td><a href="https://github.com/supabase-community/storage-py" target="_blank" rel="noopener noreferrer">storage-py</a></td>
-    <td><a href="https://github.com/supabase-community/functions-py" target="_blank" rel="noopener noreferrer">funkciók-py</a></td>
+    <td><a href="https://github.com/supabase-community/functions-py" target="_blank" rel="noopener noreferrer">functions-py</a></td>
   </tr>
   <tr>
-    <td>Ruby</td>
+    <td><keep>Ruby</keep></td>
     <td><a href="https://github.com/supabase-community/supabase-rb" target="_blank" rel="noopener noreferrer">supabase-rb</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-rb" target="_blank" rel="noopener noreferrer">postgrest-rb</a></td>
     <td>-</td>
@@ -174,7 +174,7 @@ Az ügyfélkönyvtárakra vonatkozó megközelítésünk moduláris. Minden egye
     <td>-</td>
   </tr>
   <tr>
-    <td>Rust</td>
+    <td><keep>Rust</keep></td>
     <td>-</td>
     <td><a href="https://github.com/supabase-community/postgrest-rs" target="_blank" rel="noopener noreferrer">postgrest-rs</a></td>
     <td>-</td>
@@ -183,16 +183,16 @@ Az ügyfélkönyvtárakra vonatkozó megközelítésünk moduláris. Minden egye
     <td>-</td>
   </tr>
   <tr>
-    <td>Swift</td>
+    <td><keep>Swift</keep></td>
     <td><a href="https://github.com/supabase-community/supabase-swift" target="_blank" rel="noopener noreferrer">supabase-swift</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-swift" target="_blank" rel="noopener noreferrer">postgrest-swift</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-swift" target="_blank" rel="noopener noreferrer">gotrue-swift</a></td>
     <td><a href="https://github.com/supabase-community/realtime-swift" target="_blank" rel="noopener noreferrer">realtime-swift</a></td>
     <td><a href="https://github.com/supabase-community/storage-swift" target="_blank" rel="noopener noreferrer">storage-swift</a></td>
-    <td><a href="https://github.com/supabase-community/functions-swift" target="_blank" rel="noopener noreferrer">funkciók-swift</a></td>
+    <td><a href="https://github.com/supabase-community/functions-swift" target="_blank" rel="noopener noreferrer">functions-swift</a></td>
   </tr>
   <tr>
-    <td>Godot Engine (GDScript)</td>
+    <td>Godot motor (GDScript)</td>
     <td><a href="https://github.com/supabase-community/godot-engine.supabase" target="_blank" rel="noopener noreferrer">supabase-gdscript</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-gdscript" target="_blank" rel="noopener noreferrer">postgrest-gdscript</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-gdscript" target="_blank" rel="noopener noreferrer">gotrue-gdscript</a></td>
@@ -202,8 +202,8 @@ Az ügyfélkönyvtárakra vonatkozó megközelítésünk moduláris. Minden egye
   </tr>
 </table>
 
-<!--- Távolítsa el ezt a listát, ha más nyelvre fordít, nehéz több fájlban is naprakészen tartani-->
-<!--- Csak a fordítási fájlok listájának linkjét tartsd meg-->
+<!--- Remove this list if you're translating to another language, it's hard to keep updated across multiple files-->
+<!--- Keep only the link to the list of translation files-->
 
 ## Fordítások
 
@@ -237,7 +237,7 @@ Az ügyfélkönyvtárakra vonatkozó megközelítésünk moduláris. Minden egye
 - [Orosz / Pусский](/i18n/README.ru.md)
 - [Szerb / Srpski](/i18n/README.sr.md)
 - [Sinhala / සිංහල](/i18n/README.si.md)
-- [Spanyol / Español](/i18n/README.es.md)
+- [Spanish / Español](/i18n/README.es.md)
 - [Egyszerűsített kínai / 简体中文](/i18n/README.zh-cn.md)
 - [Svéd / Svenska](/i18n/README.sv.md)
 - [Thai / ไทย](/i18n/README.th.md)
@@ -245,7 +245,7 @@ Az ügyfélkönyvtárakra vonatkozó megközelítésünk moduláris. Minden egye
 - [Török / Türkçe](/i18n/README.tr.md)
 - [Ukrán / Українська](/i18n/README.uk.md)
 - [Vietnámi / Tiếng Việt](/i18n/README.vi-vn.md)
-- [Fordítások listája](/i18n/languages.md) <!--- Csak ezt tartsd meg -->
+- [Fordítások listája](/i18n/languages.md) <!--- Keep only this -->
 
 ---
 

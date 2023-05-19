@@ -9,11 +9,11 @@
 
 [Supabase](https://supabase.com) is een open source Firebase alternatief. We bouwen de functies van Firebase met behulp van enterprise-grade open source tools.
 
-- [Gehoste Postgres Database. [Docs](https://supabase.com/docs/guides/database)
-- [Authenticatie en Autorisatie. [Docs](https://supabase.com/docs/guides/auth)
+- [x]Gehoste Postgres Database. [Docs](https://supabase.com/docs/guides/database)
+- [x] Authenticatie en Autorisatie. [Docs](https://supabase.com/docs/guides/auth)
 - [x] Automatisch gegenereerde API's.
-  - [REST. [Docs](https://supabase.com/docs/guides/database/api#rest-api)
-  - [GraphQL. [Docs](https://supabase.com/docs/guides/database/api#graphql-api)
+  - REST. [Docs](https://supabase.com/docs/guides/database/api#rest-api)
+  - GraphQL. [Docs](https://supabase.com/docs/guides/database/api#graphql-api)
   - [x] Realtime abonnementen. [Docs](https://supabase.com/docs/guides/database/api#realtime-api)
 - [x] Functies.
   - [x] Database functies. [Docs](https://supabase.com/docs/guides/database/functions)
@@ -45,7 +45,7 @@ Om te zien hoe u kunt bijdragen, bezoek [Aan de slag](./DEVELOPERS.md)
 
 We zijn momenteel in Openbare Beta. Bekijk "releases" van deze repo om op de hoogte te blijven van belangrijke updates.
 
-<kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="Bekijk deze repo"/></kbd>
+<kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="Watch this repo"/></kbd>
 
 ---
 
@@ -88,8 +88,8 @@ Onze aanpak voor client libraries is modulair. Elke sub-bibliotheek is een op zi
     <th><a href="https://github.com/supabase/storage-api" target="_blank" rel="noopener noreferrer">Opslag</a></th>
     <th>Functies</th>
   </tr>
-  <!-- SJABLOON VOOR NIEUWE RIJ -->
-  <!-- START RIJ
+  <!-- TEMPLATE FOR NEW ROW -->
+  <!-- START ROW
   <tr>
     <td>lang</td>
     <td><a href="https://github.com/supabase-community/supabase-lang" target="_blank" rel="noopener noreferrer">supabase-lang</a></td>
@@ -98,19 +98,19 @@ Onze aanpak voor client libraries is modulair. Elke sub-bibliotheek is een op zi
     <td><a href="https://github.com/supabase-community/realtime-lang" target="_blank" rel="noopener noreferrer">realtime-lang</a></td>
     <td><a href="https://github.com/supabase-community/storage-lang" target="_blank" rel="noopener noreferrer">storage-lang</a></td>
   </tr>
-  EINDRIJ -->
-  <th colspan="7">⚡️ Official ⚡️</th>
+  END ROW -->
+  <th colspan="7">⚡️ Officieel ⚡️</th>
   <tr>
-    <td>JavaScript (TypeScript)</td>
+    <td><keep>Java</keep>Script (TypeScript)</td>
     <td><a href="https://github.com/supabase/supabase-js" target="_blank" rel="noopener noreferrer">supabase-js</a></td>
     <td><a href="https://github.com/supabase/postgrest-js" target="_blank" rel="noopener noreferrer">postgrest-js</a></td>
     <td><a href="https://github.com/supabase/gotrue-js" target="_blank" rel="noopener noreferrer">gotrue-js</a></td>
     <td><a href="https://github.com/supabase/realtime-js" target="_blank" rel="noopener noreferrer">realtime-js</a></td>
-    <td><a href="https://github.com/supabase/storage-js" target="_blank" rel="noopener noreferrer">storage-js</a></td>
-    <td><a href="https://github.com/supabase/functions-js" target="_blank" rel="noopener noreferrer">functions-js</a></td>
+    <td><a href="https://github.com/supabase/storage-js" target="_blank" rel="noopener noreferrer">opslag-js</a></td>
+    <td><a href="https://github.com/supabase/functions-js" target="_blank" rel="noopener noreferrer">functies-js</a></td>
   </tr>
     <tr>
-    <td>Flutter</td>
+    <td><keep>Flutter</keep></td>
     <td><a href="https://github.com/supabase/supabase-flutter" target="_blank" rel="noopener noreferrer">supabase-flutter</a></td>
     <td><a href="https://github.com/supabase/postgrest-dart" target="_blank" rel="noopener noreferrer">postgrest-dart</a></td>
     <td><a href="https://github.com/supabase/gotrue-dart" target="_blank" rel="noopener noreferrer">gotrue-dart</a></td>
@@ -118,32 +118,32 @@ Onze aanpak voor client libraries is modulair. Elke sub-bibliotheek is een op zi
     <td><a href="https://github.com/supabase/storage-dart" target="_blank" rel="noopener noreferrer">opslag-dart</a></td>
     <td><a href="https://github.com/supabase/functions-dart" target="_blank" rel="noopener noreferrer">functies-dart</a></td>
   </tr>
-  <th colspan="7">💚 Gemeenschap 💚</th>
+  <th colspan="7">gemeenschap</th>
   <tr>
     <td>C#</td>
     <td><a href="https://github.com/supabase-community/supabase-csharp" target="_blank" rel="noopener noreferrer">supabase-csharp</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-csharp" target="_blank" rel="noopener noreferrer">postgrest-csharp</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-csharp" target="_blank" rel="noopener noreferrer">gotrue-csharp</a></td>
     <td><a href="https://github.com/supabase-community/realtime-csharp" target="_blank" rel="noopener noreferrer">realtime-csharp</a></td>
-    <td><a href="https://github.com/supabase-community/storage-csharp" target="_blank" rel="noopener noreferrer">storage-csharp</a></td>
+    <td><a href="https://github.com/supabase-community/storage-csharp" target="_blank" rel="noopener noreferrer">opslag-csharp</a></td>
     <td><a href="https://github.com/supabase-community/functions-csharp" target="_blank" rel="noopener noreferrer">functies-csharp</a></td>
   </tr>
   <tr>
-    <td>Ga</td>
+    <td>Go</td>
     <td>-</td>
     <td><a href="https://github.com/supabase-community/postgrest-go" target="_blank" rel="noopener noreferrer">postgrest-go</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-go" target="_blank" rel="noopener noreferrer">gotrue-go</a></td>
     <td>-</td>
-    <td><a href="https://github.com/supabase-community/storage-go" target="_blank" rel="noopener noreferrer">storage-go</a></td>
-    <td><a href="https://github.com/supabase-community/functions-go" target="_blank" rel="noopener noreferrer">functions-go</a></td>
+    <td><a href="https://github.com/supabase-community/storage-go" target="_blank" rel="noopener noreferrer">opslag-go</a></td>
+    <td><a href="https://github.com/supabase-community/functions-go" target="_blank" rel="noopener noreferrer">functies-go</a></td>
   </tr>
   <tr>
-    <td>Java</td>
+    <td><keep>Java</keep></td>
     <td>-</td>
     <td>-</td>
     <td><a href="https://github.com/supabase-community/gotrue-java" target="_blank" rel="noopener noreferrer">gotrue-java</a></td>
     <td>-</td>
-    <td><a href="https://github.com/supabase-community/storage-java" target="_blank" rel="noopener noreferrer">storage-java</a></td>
+    <td><a href="https://github.com/supabase-community/storage-java" target="_blank" rel="noopener noreferrer">opslag-java</a></td>
     <td>-</td>
   </tr>
   <tr>
@@ -155,17 +155,17 @@ Onze aanpak voor client libraries is modulair. Elke sub-bibliotheek is een op zi
     <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Storage" target="_blank" rel="noopener noreferrer">opslag-kt</a></td>
     <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Functions" target="_blank" rel="noopener noreferrer">functies-kt</a></td>
   </tr>
-  <tr>Terras
-    <td>Python</td>
+  <tr>
+    <td><keep>Python</keep></td>
     <td><a href="https://github.com/supabase-community/supabase-py" target="_blank" rel="noopener noreferrer">supabase-py</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-py" target="_blank" rel="noopener noreferrer">postgrest-py</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-py" target="_blank" rel="noopener noreferrer">gotrue-py</a></td>
     <td><a href="https://github.com/supabase-community/realtime-py" target="_blank" rel="noopener noreferrer">realtime-py</a></td>
-    <td><a href="https://github.com/supabase-community/storage-py" target="_blank" rel="noopener noreferrer">storage-py</a></td>
+    <td><a href="https://github.com/supabase-community/storage-py" target="_blank" rel="noopener noreferrer">opslag-py</a></td>
     <td><a href="https://github.com/supabase-community/functions-py" target="_blank" rel="noopener noreferrer">functies-py</a></td>
   </tr>
   <tr>
-    <td>Ruby</td>
+    <td><keep>Ruby</keep></td>
     <td><a href="https://github.com/supabase-community/supabase-rb" target="_blank" rel="noopener noreferrer">supabase-rb</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-rb" target="_blank" rel="noopener noreferrer">postgrest-rb</a></td>
     <td>-</td>
@@ -174,7 +174,7 @@ Onze aanpak voor client libraries is modulair. Elke sub-bibliotheek is een op zi
     <td>-</td>
   </tr>
   <tr>
-    <td>Roest</td>
+    <td><keep>Rust</keep></td>
     <td>-</td>
     <td><a href="https://github.com/supabase-community/postgrest-rs" target="_blank" rel="noopener noreferrer">postgrest-rs</a></td>
     <td>-</td>
@@ -183,13 +183,13 @@ Onze aanpak voor client libraries is modulair. Elke sub-bibliotheek is een op zi
     <td>-</td>
   </tr>
   <tr>
-    <td>Swift</td>
+    <td><keep>Swift</keep></td>
     <td><a href="https://github.com/supabase-community/supabase-swift" target="_blank" rel="noopener noreferrer">supabase-swift</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-swift" target="_blank" rel="noopener noreferrer">postgrest-swift</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-swift" target="_blank" rel="noopener noreferrer">gotrue-swift</a></td>
     <td><a href="https://github.com/supabase-community/realtime-swift" target="_blank" rel="noopener noreferrer">realtime-swift</a></td>
-    <td><a href="https://github.com/supabase-community/storage-swift" target="_blank" rel="noopener noreferrer">storage-swift</a></td>
-    <td><a href="https://github.com/supabase-community/functions-swift" target="_blank" rel="noopener noreferrer">functions-swift</a></td>
+    <td><a href="https://github.com/supabase-community/storage-swift" target="_blank" rel="noopener noreferrer">opslag</a></td>
+    <td><a href="https://github.com/supabase-community/functions-swift" target="_blank" rel="noopener noreferrer">functies-swift</a></td>
   </tr>
   <tr>
     <td>Godot Engine (GDScript)</td>
@@ -197,13 +197,13 @@ Onze aanpak voor client libraries is modulair. Elke sub-bibliotheek is een op zi
     <td><a href="https://github.com/supabase-community/postgrest-gdscript" target="_blank" rel="noopener noreferrer">postgrest-gdscript</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-gdscript" target="_blank" rel="noopener noreferrer">gotrue-gdscript</a></td>
     <td><a href="https://github.com/supabase-community/realtime-gdscript" target="_blank" rel="noopener noreferrer">realtime-gdscript</a></td>
-    <td><a href="https://github.com/supabase-community/storage-gdscript" target="_blank" rel="noopener noreferrer">storage-gdscript</a></td>
-    <td><a href="https://github.com/supabase-community/functions-gdscript" target="_blank" rel="noopener noreferrer">functions-gdscript</a></td>
+    <td><a href="https://github.com/supabase-community/storage-gdscript" target="_blank" rel="noopener noreferrer">opslag-gdscript</a></td>
+    <td><a href="https://github.com/supabase-community/functions-gdscript" target="_blank" rel="noopener noreferrer">functies-gdscript</a></td>
   </tr>
 </table>
 
-<!--- Verwijder deze lijst als u naar een andere taal vertaalt, het is moeilijk om deze lijst in meerdere bestanden bij te houden-->
-<!--- Bewaar alleen de link naar de lijst met vertaalbestanden-->
+<!--- Remove this list if you're translating to another language, it's hard to keep updated across multiple files-->
+<!--- Keep only the link to the list of translation files-->
 
 ## Vertalingen
 
@@ -245,7 +245,7 @@ Onze aanpak voor client libraries is modulair. Elke sub-bibliotheek is een op zi
 - [Turks / Türkçe](/i18n/README.tr.md)
 - [Oekraïens / Українська](/i18n/README.uk.md)
 - [Vietnamees / Tiếng Việt](/i18n/README.vi-vn.md)
-- [Lijst van vertalingen](/i18n/languages.md) <!--- Alleen dit bewaren -->
+- [Lijst van vertalingen](/i18n/talen.md) <!--- Keep only this -->
 
 ---
 

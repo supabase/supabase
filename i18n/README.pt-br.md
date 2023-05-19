@@ -7,9 +7,9 @@
 
 # Supabase
 
-o [Supabase] (https://supabase.com) é uma alternativa de código aberto ao Firebase. Estamos desenvolvendo os recursos do Firebase usando ferramentas de código aberto de nível empresarial.
+[Supabase] (https://supabase.com) é uma alternativa de código aberto ao Firebase. Estamos desenvolvendo os recursos do Firebase usando ferramentas de código aberto de nível empresarial.
 
-- [Banco de dados Postgres hospedado. [Docs](https://supabase.com/docs/guides/database)
+- [x] [Banco de dados Postgres hospedado. [Docs](https://supabase.com/docs/guides/database)
 - [x] Autenticação e autorização. [Docs](https://supabase.com/docs/guides/auth)
 - [x] APIs geradas automaticamente.
   - [x] REST. [Docs](https://supabase.com/docs/guides/database/api#rest-api)
@@ -43,19 +43,19 @@ Para ver como contribuir, visite [Getting Started](./DEVELOPERS.md)
 - [x] Beta público: Estável o suficiente para a maioria dos casos de uso não corporativos
 - [ ] Público: Disponibilidade geral [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
 
-No momento, estamos em Beta Público. Acompanhe os "lançamentos" deste repositório para ser notificado sobre as principais atualizações.
+No momento, estamos em Beta Pública. Acompanhe os "lançamentos" deste repositório para ser notificado sobre as principais atualizações.
 
-<kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="Assista a este repositório"/></kbd>
+<kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="Watch this repo"/></kbd>
 
 ---
 
 ## Como funciona
 
-O Supabase é uma combinação de ferramentas de código aberto. Estamos desenvolvendo os recursos do Firebase usando produtos de código aberto de nível empresarial. Se as ferramentas e as comunidades existirem, com uma licença aberta MIT, Apache 2 ou equivalente, usaremos e daremos suporte a essa ferramenta. Se a ferramenta não existir, nós mesmos a criaremos e abriremos o código-fonte. O Supabase não é um mapeamento 1 para 1 do Firebase. Nosso objetivo é oferecer aos desenvolvedores uma experiência semelhante à do Firebase usando ferramentas de código aberto.
+Supabase é uma combinação de ferramentas de código aberto. Estamos desenvolvendo os recursos do Firebase usando produtos de código aberto de nível empresarial. Se as ferramentas e as comunidades existirem, com uma licença aberta MIT, Apache 2 ou equivalente, usaremos e daremos suporte a essa ferramenta. Se a ferramenta não existir, nós mesmos a criaremos e abriremos o código-fonte. Supabase não é um mapeamento 1 para 1 do Firebase. Nosso objetivo é oferecer aos desenvolvedores uma experiência semelhante à do Firebase usando ferramentas de código aberto.
 
-**Arquitetura
+**Arquitetura**
 
-O Supabase é uma [plataforma hospedada] (https://app.supabase.com). Você pode se registrar e começar a usar o Supabase sem instalar nada.
+Supabase é uma [plataforma hospedada] (https://app.supabase.com). Você pode se registrar e começar a usar o Supabase sem instalar nada.
 Você também pode [auto-hospedar] (https://supabase.com/docs/guides/hosting/overview) e [desenvolver localmente] (https://supabase.com/docs/guides/local-development).
 
 ![Arquitetura](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
@@ -75,21 +75,21 @@ Nossa abordagem para bibliotecas de clientes é modular. Cada sub-biblioteca é 
 
 <table style="table-layout:fixed; white-space: nowrap;">
   <tr>
-    <th>Idioma</th>
+    <th>Linguagem</th>
     <th>Cliente</th>
-    <th colspan="5">Feature-Clients (empacotado no cliente Supabase)</th>
+    <th colspan="5">Feature-Clients (incluídos no cliente Supabase)</th>
   </tr>
   <tr>
     <th></th>
     <th>Supabase</th>
     <th><a href="https://github.com/postgrest/postgrest" target="_blank" rel="noopener noreferrer">PostgREST</a></th>
     <th><a href="https://github.com/supabase/gotrue" target="_blank" rel="noopener noreferrer">GoTrue</a></th>
-    <th><a href="https://github.com/supabase/realtime" target="_blank" rel="noopener noreferrer">Realtime</a></th>
-    <th><a href="https://github.com/supabase/storage-api" target="_blank" rel="noopener noreferrer">Storage</a></th>
+    <th><a href="https://github.com/supabase/realtime" target="_blank" rel="noopener noreferrer">Tempo real</a></th>
+    <th><a href="https://github.com/supabase/storage-api" target="_blank" rel="noopener noreferrer">Armazenamento</a></th>
     <th>Funções</th>
   </tr>
-  <!-- MODELO PARA NOVA LINHA -->
-  <!-- LINHA INICIAL
+  <!-- TEMPLATE FOR NEW ROW -->
+  <!-- START ROW
   <tr>
     <td>lang</td>
     <td><a href="https://github.com/supabase-community/supabase-lang" target="_blank" rel="noopener noreferrer">supabase-lang</a></td>
@@ -98,10 +98,10 @@ Nossa abordagem para bibliotecas de clientes é modular. Cada sub-biblioteca é 
     <td><a href="https://github.com/supabase-community/realtime-lang" target="_blank" rel="noopener noreferrer">realtime-lang</a></td>
     <td><a href="https://github.com/supabase-community/storage-lang" target="_blank" rel="noopener noreferrer">storage-lang</a></td>
   </tr>
-  LINHA FINAL -->
-  <th colspan="7">⚡️ Official ⚡️</th>
+  END ROW -->
+  <th colspan="7">⚡️ Oficial ⚡️</th>
   <tr>
-    <td>JavaScript (TypeScript)</td>
+    <td><keep>Java</keep>Script (TypeScript)</td>
     <td><a href="https://github.com/supabase/supabase-js" target="_blank" rel="noopener noreferrer">supabase-js</a></td>
     <td><a href="https://github.com/supabase/postgrest-js" target="_blank" rel="noopener noreferrer">postgrest-js</a></td>
     <td><a href="https://github.com/supabase/gotrue-js" target="_blank" rel="noopener noreferrer">gotrue-js</a></td>
@@ -110,7 +110,7 @@ Nossa abordagem para bibliotecas de clientes é modular. Cada sub-biblioteca é 
     <td><a href="https://github.com/supabase/functions-js" target="_blank" rel="noopener noreferrer">functions-js</a></td>
   </tr>
     <tr>
-    <td>Flutter</td>
+    <td><keep>Flutter</keep></td>
     <td><a href="https://github.com/supabase/supabase-flutter" target="_blank" rel="noopener noreferrer">supabase-flutter</a></td>
     <td><a href="https://github.com/supabase/postgrest-dart" target="_blank" rel="noopener noreferrer">postgrest-dart</a></td>
     <td><a href="https://github.com/supabase/gotrue-dart" target="_blank" rel="noopener noreferrer">gotrue-dart</a></td>
@@ -129,21 +129,21 @@ Nossa abordagem para bibliotecas de clientes é modular. Cada sub-biblioteca é 
     <td><a href="https://github.com/supabase-community/functions-csharp" target="_blank" rel="noopener noreferrer">functions-csharp</a></td>
   </tr>
   <tr>
-    <td>Go</td>
+    <td>Ir</td>
     <td>-</td>
     <td><a href="https://github.com/supabase-community/postgrest-go" target="_blank" rel="noopener noreferrer">postgrest-go</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-go" target="_blank" rel="noopener noreferrer">gotrue-go</a></td>
     <td>-</td>
     <td><a href="https://github.com/supabase-community/storage-go" target="_blank" rel="noopener noreferrer">storage-go</a></td>
-    <td><a href="https://github.com/supabase-community/functions-go" target="_blank" rel="noopener noreferrer">functions-go</a></td>
+    <td><a href="https://github.com/supabase-community/functions-go" target="_blank" rel="noopener noreferrer">funções - ir</a></td>
   </tr>
   <tr>
-    <td>Java</td>
+    <td><keep>Java</keep></td>
     <td>-</td>
     <td>-</td>
     <td><a href="https://github.com/supabase-community/gotrue-java" target="_blank" rel="noopener noreferrer">gotrue-java</a></td>
     <td>-</td>
-    <td><a href="https://github.com/supabase-community/storage-java" target="_blank" rel="noopener noreferrer">storage-java</a></td>
+    <td><a href="https://github.com/supabase-community/storage-java" target="_blank" rel="noopener noreferrer">armazenamento-java</a></td>
     <td>-</td>
   </tr>
   <tr>
@@ -153,10 +153,10 @@ Nossa abordagem para bibliotecas de clientes é modular. Cada sub-biblioteca é 
     <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/GoTrue" target="_blank" rel="noopener noreferrer">gotrue-kt</a></td>
     <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Realtime" target="_blank" rel="noopener noreferrer">realtime-kt</a></td>
     <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Storage" target="_blank" rel="noopener noreferrer">storage-kt</a></td>
-    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Functions" target="_blank" rel="noopener noreferrer">functions-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Functions" target="_blank" rel="noopener noreferrer">funções-kt</a></td>
   </tr>
   <tr>
-    <td>Python</td>
+    <td><keep>Python</keep></td>
     <td><a href="https://github.com/supabase-community/supabase-py" target="_blank" rel="noopener noreferrer">supabase-py</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-py" target="_blank" rel="noopener noreferrer">postgrest-py</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-py" target="_blank" rel="noopener noreferrer">gotrue-py</a></td>
@@ -165,7 +165,7 @@ Nossa abordagem para bibliotecas de clientes é modular. Cada sub-biblioteca é 
     <td><a href="https://github.com/supabase-community/functions-py" target="_blank" rel="noopener noreferrer">functions-py</a></td>
   </tr>
   <tr>
-    <td>Ruby</td>
+    <td><keep>Ruby</keep></td>
     <td><a href="https://github.com/supabase-community/supabase-rb" target="_blank" rel="noopener noreferrer">supabase-rb</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-rb" target="_blank" rel="noopener noreferrer">postgrest-rb</a></td>
     <td>-</td>
@@ -174,7 +174,7 @@ Nossa abordagem para bibliotecas de clientes é modular. Cada sub-biblioteca é 
     <td>-</td>
   </tr>
   <tr>
-    <td>Ferrugem</td>
+    <td><keep>Rust</keep></td>
     <td>-</td>
     <td><a href="https://github.com/supabase-community/postgrest-rs" target="_blank" rel="noopener noreferrer">postgrest-rs</a></td>
     <td>-</td>
@@ -183,16 +183,16 @@ Nossa abordagem para bibliotecas de clientes é modular. Cada sub-biblioteca é 
     <td>-</td>
   </tr>
   <tr>
-    <td>Swift</td>
+    <td><keep>Swift</keep></td>
     <td><a href="https://github.com/supabase-community/supabase-swift" target="_blank" rel="noopener noreferrer">supabase-swift</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-swift" target="_blank" rel="noopener noreferrer">postgrest-swift</a></td>
-    <td><a href="https://github.com/supabase-community/gotrue-swift" target="_blank" rel="noopener noreferrer">gotrue-swift</a></td>
-    <td><a href="https://github.com/supabase-community/realtime-swift" target="_blank" rel="noopener noreferrer">realtime-swift</a></td>
+    <td><a href="https://github.com/supabase-community/gotrue-swift" target="_blank" rel="noopener noreferrer">getrue-swift</a></td>
+    <td><a href="https://github.com/supabase-community/realtime-swift" target="_blank" rel="noopener noreferrer">mudança de tempo real</a></td>
     <td><a href="https://github.com/supabase-community/storage-swift" target="_blank" rel="noopener noreferrer">storage-swift</a></td>
-    <td><a href="https://github.com/supabase-community/functions-swift" target="_blank" rel="noopener noreferrer">functions-swift</a></td>
+    <td><a href="https://github.com/supabase-community/functions-swift" target="_blank" rel="noopener noreferrer">funções-swift</a></td>
   </tr>
   <tr>
-    <td>Motor Godot (GDScript)</td>
+    <td>Mecanismo Godot (GDScript)</td>
     <td><a href="https://github.com/supabase-community/godot-engine.supabase" target="_blank" rel="noopener noreferrer">supabase-gdscript</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-gdscript" target="_blank" rel="noopener noreferrer">postgrest-gdscript</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-gdscript" target="_blank" rel="noopener noreferrer">gotrue-gdscript</a></td>
@@ -202,8 +202,8 @@ Nossa abordagem para bibliotecas de clientes é modular. Cada sub-biblioteca é 
   </tr>
 </table>
 
-<!--- Remova esta lista se estiver traduzindo para outro idioma, pois é difícil mantê-la atualizada em vários arquivos-->
-<!--- Mantenha apenas o link para a lista de arquivos de tradução-->
+<!--- Remove this list if you're translating to another language, it's hard to keep updated across multiple files-->
+<!--- Keep only the link to the list of translation files-->
 
 ## Traduções
 
@@ -212,7 +212,7 @@ Nossa abordagem para bibliotecas de clientes é modular. Cada sub-biblioteca é 
 - [Bangla / বাংলা](/i18n/README.bn.md)
 - [Búlgaro / Български](/i18n/README.bg.md)
 - [Catalan / Català](/i18n/README.ca.md)
-- [Danish / Dansk](/i18n/README.da.md)
+- [Dinamarquês / Dansk](/i18n/README.da.md)
 - [Holandês / Nederlands](/i18n/README.nl.md)
 - [Inglês](https://github.com/supabase/supabase)
 - [Finlandês / Suomalainen](/i18n/README.fi.md)
@@ -222,7 +222,7 @@ Nossa abordagem para bibliotecas de clientes é modular. Cada sub-biblioteca é 
 - [Hebraico / עברית](/i18n/README.he.md)
 - [Hindi / हिंदी](/i18n/README.hi.md)
 - [Húngaro / Magyar](/i18n/README.hu.md)
-- [Nepali / नेपाली](/i18n/README.ne.md)
+- [Nepalês / नेपाली](/i18n/README.ne.md)
 - [Indonésio / Bahasa Indonesia](/i18n/README.id.md)
 - [Italiano / Italiano](/i18n/README.it.md)
 - [Japonês / 日本語](/i18n/README.jp.md)
@@ -245,7 +245,7 @@ Nossa abordagem para bibliotecas de clientes é modular. Cada sub-biblioteca é 
 - [Turco / Türkçe](/i18n/README.tr.md)
 - [Ucraniano / Українська](/i18n/README.uk.md)
 - [Vietnamita / Tiếng Việt](/i18n/README.vi-vn.md)
-- [Lista de traduções](/i18n/languages.md) <!--- Mantenha apenas isso -->
+- [Lista de traduções](/i18n/languages.md) <!--- Keep only this -->
 
 ---
 

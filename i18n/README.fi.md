@@ -61,7 +61,7 @@ Voit myös [itse isännöidä](https://supabase.com/docs/guides/hosting/overview
 ![Arkkitehtuuri](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
 
 - [PostgreSQL](https://www.postgresql.org/) on oliorelationaalinen tietokantajärjestelmä, jota on kehitetty aktiivisesti yli 30 vuoden ajan ja joka on saavuttanut vahvan maineen luotettavuutensa, ominaisuuksien kestävyytensä ja suorituskykynsä ansiosta.
-- [Realtime](https://github.com/supabase/realtime) on Elixir-palvelin, jonka avulla voit kuunnella PostgreSQL:n lisäyksiä, päivityksiä ja poistoja websockettien avulla. Realtime kyselee Postgresin sisäänrakennettua replikointitoimintoa tietokannan muutosten varalta, muuntaa muutokset JSONiksi ja lähettää sitten JSONin websockettien kautta valtuutetuille asiakkaille.
+- [Realtime](https://github.com/supabase/realtime) on Elixir-palvelin, jonka avulla voit kuunnella PostgreSQL:n lisäyksiä, päivityksiä ja poistoja websockettien avulla. Realtime kysyy Postgresin sisäänrakennettua replikointitoimintoa tietokannan muutoksista, muuntaa muutokset JSONiksi ja lähettää sitten JSONin websocketin kautta valtuutetuille asiakkaille.
 - [PostgREST](http://postgrest.org/) on web-palvelin, joka muuttaa PostgreSQL-tietokannan suoraan RESTful API:ksi
 - [pg_graphql](http://github.com/supabase/pg_graphql/) PostgreSQL-laajennus, joka paljastaa GraphQL API:n
 - [Storage](https://github.com/supabase/storage-api) tarjoaa RESTful-rajapinnan S3:een tallennettujen tiedostojen hallintaan, jossa käytetään Postgresiä oikeuksien hallintaan.
@@ -76,20 +76,20 @@ Lähestymistapamme asiakaskirjastoihin on modulaarinen. Jokainen osakirjasto on 
 <table style="table-layout:fixed; white-space: nowrap;">
   <tr>
     <th>Kieli</th>
-    <th>Client</th>
-    <th colspan="5">Feature-Clients (niputettu Supabase-asiakasohjelmaan)</th>
+    <th>Asiakas</th>
+    <th colspan="5">Feature-Clients (niputettu Supabase-asiakkaaseen)</th>
   </tr>
   <tr>
     <th></th>
     <th>Supabase</th>
     <th><a href="https://github.com/postgrest/postgrest" target="_blank" rel="noopener noreferrer">PostgREST</a></th>
     <th><a href="https://github.com/supabase/gotrue" target="_blank" rel="noopener noreferrer">GoTrue</a></th>
-    <th><a href="https://github.com/supabase/realtime" target="_blank" rel="noopener noreferrer">Realtime</a></th>
-    <th><a href="https://github.com/supabase/storage-api" target="_blank" rel="noopener noreferrer">Varasto</a></th>
+    <th><a href="https://github.com/supabase/realtime" target="_blank" rel="noopener noreferrer">Reaaliaikainen</a></th>
+    <th><a href="https://github.com/supabase/storage-api" target="_blank" rel="noopener noreferrer">Varastointi</a></th>
     <th>Toiminnot</th>
   </tr>
-  <!-- MALLI UUDELLE RIVILLE -->
-  <!-- ALOITA RIVI
+  <!-- TEMPLATE FOR NEW ROW -->
+  <!-- START ROW
   <tr>
     <td>lang</td>
     <td><a href="https://github.com/supabase-community/supabase-lang" target="_blank" rel="noopener noreferrer">supabase-lang</a></td>
@@ -98,10 +98,10 @@ Lähestymistapamme asiakaskirjastoihin on modulaarinen. Jokainen osakirjasto on 
     <td><a href="https://github.com/supabase-community/realtime-lang" target="_blank" rel="noopener noreferrer">realtime-lang</a></td>
     <td><a href="https://github.com/supabase-community/storage-lang" target="_blank" rel="noopener noreferrer">storage-lang</a></td>
   </tr>
-  LOPPURIVI -->
+  END ROW -->
   <th colspan="7">⚡️ Virallinen ⚡️</th>
   <tr>
-    <td>JavaScript (TypeScript)</td>
+    <td><keep>Java</keep>Skripti (TypeScript)</td>
     <td><a href="https://github.com/supabase/supabase-js" target="_blank" rel="noopener noreferrer">supabase-js</a></td>
     <td><a href="https://github.com/supabase/postgrest-js" target="_blank" rel="noopener noreferrer">postgrest-js</a></td>
     <td><a href="https://github.com/supabase/gotrue-js" target="_blank" rel="noopener noreferrer">gotrue-js</a></td>
@@ -110,15 +110,15 @@ Lähestymistapamme asiakaskirjastoihin on modulaarinen. Jokainen osakirjasto on 
     <td><a href="https://github.com/supabase/functions-js" target="_blank" rel="noopener noreferrer">functions-js</a></td>
   </tr>
     <tr>
-    <td>Flutter</td>
+    <td><keep>Flutter</keep></td>
     <td><a href="https://github.com/supabase/supabase-flutter" target="_blank" rel="noopener noreferrer">supabase-flutter</a></td>
     <td><a href="https://github.com/supabase/postgrest-dart" target="_blank" rel="noopener noreferrer">postgrest-dart</a></td>
-    <td><a href="https://github.com/supabase/gotrue-dart" target="_blank" rel="noopener noreferrer">gotrue-tikka</a></td>
+    <td><a href="https://github.com/supabase/gotrue-dart" target="_blank" rel="noopener noreferrer">gotrue-dart</a></td>
     <td><a href="https://github.com/supabase/realtime-dart" target="_blank" rel="noopener noreferrer">realtime-dart</a></td>
-    <td><a href="https://github.com/supabase/storage-dart" target="_blank" rel="noopener noreferrer">varasto-tikka</a></td>
+    <td><a href="https://github.com/supabase/storage-dart" target="_blank" rel="noopener noreferrer">storage-dart</a></td>
     <td><a href="https://github.com/supabase/functions-dart" target="_blank" rel="noopener noreferrer">functions-dart</a></td>
   </tr>
-  <th colspan="7">💚 Yhteisö 💚</th>
+  <th colspan="7">💚 yhteisö 💚</th>
   <tr>
     <td>C#</td>
     <td><a href="https://github.com/supabase-community/supabase-csharp" target="_blank" rel="noopener noreferrer">supabase-csharp</a></td>
@@ -138,7 +138,7 @@ Lähestymistapamme asiakaskirjastoihin on modulaarinen. Jokainen osakirjasto on 
     <td><a href="https://github.com/supabase-community/functions-go" target="_blank" rel="noopener noreferrer">functions-go</a></td>
   </tr>
   <tr>
-    <td>Java</td>
+    <td><keep>Java</keep></td>
     <td>-</td>
     <td>-</td>
     <td><a href="https://github.com/supabase-community/gotrue-java" target="_blank" rel="noopener noreferrer">gotrue-java</a></td>
@@ -152,11 +152,11 @@ Lähestymistapamme asiakaskirjastoihin on modulaarinen. Jokainen osakirjasto on 
     <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Postgrest" target="_blank" rel="noopener noreferrer">postgrest-kt</a></td>
     <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/GoTrue" target="_blank" rel="noopener noreferrer">gotrue-kt</a></td>
     <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Realtime" target="_blank" rel="noopener noreferrer">realtime-kt</a></td>
-    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Storage" target="_blank" rel="noopener noreferrer">varasto-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Storage" target="_blank" rel="noopener noreferrer">storage-kt</a></td>
     <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Functions" target="_blank" rel="noopener noreferrer">functions-kt</a></td>
   </tr>
   <tr>
-    <td>Python</td>
+    <td><keep>Python</keep></td>
     <td><a href="https://github.com/supabase-community/supabase-py" target="_blank" rel="noopener noreferrer">supabase-py</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-py" target="_blank" rel="noopener noreferrer">postgrest-py</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-py" target="_blank" rel="noopener noreferrer">gotrue-py</a></td>
@@ -165,7 +165,7 @@ Lähestymistapamme asiakaskirjastoihin on modulaarinen. Jokainen osakirjasto on 
     <td><a href="https://github.com/supabase-community/functions-py" target="_blank" rel="noopener noreferrer">functions-py</a></td>
   </tr>
   <tr>
-    <td>Ruby</td>
+    <td><keep>Ruby</keep></td>
     <td><a href="https://github.com/supabase-community/supabase-rb" target="_blank" rel="noopener noreferrer">supabase-rb</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-rb" target="_blank" rel="noopener noreferrer">postgrest-rb</a></td>
     <td>-</td>
@@ -174,7 +174,7 @@ Lähestymistapamme asiakaskirjastoihin on modulaarinen. Jokainen osakirjasto on 
     <td>-</td>
   </tr>
   <tr>
-    <td>Rust</td>
+    <td><keep>Rust</keep></td>
     <td>-</td>
     <td><a href="https://github.com/supabase-community/postgrest-rs" target="_blank" rel="noopener noreferrer">postgrest-rs</a></td>
     <td>-</td>
@@ -183,7 +183,7 @@ Lähestymistapamme asiakaskirjastoihin on modulaarinen. Jokainen osakirjasto on 
     <td>-</td>
   </tr>
   <tr>
-    <td>Swift</td>
+    <td><keep>Swift</keep></td>
     <td><a href="https://github.com/supabase-community/supabase-swift" target="_blank" rel="noopener noreferrer">supabase-swift</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-swift" target="_blank" rel="noopener noreferrer">postgrest-swift</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-swift" target="_blank" rel="noopener noreferrer">gotrue-swift</a></td>
@@ -202,8 +202,8 @@ Lähestymistapamme asiakaskirjastoihin on modulaarinen. Jokainen osakirjasto on 
   </tr>
 </table>
 
-<!--- Poista tämä lista, jos käännät toiselle kielelle, sitä on vaikea pitää ajan tasalla useissa tiedostoissa-->
-<!--- Pidä vain linkki käännöstiedostojen luetteloon-->
+<!--- Remove this list if you're translating to another language, it's hard to keep updated across multiple files-->
+<!--- Keep only the link to the list of translation files-->
 
 ## Käännökset
 
@@ -245,7 +245,7 @@ Lähestymistapamme asiakaskirjastoihin on modulaarinen. Jokainen osakirjasto on 
 - [Turkin kieli / Türkçe](/i18n/README.tr.md)
 - [Ukrainaksi / Українська](/i18n/README.uk.md)
 - [Vietnamin kieli / Tiếng Việt](/i18n/README.vi-vn.md)
-- [Luettelo käännöksistä](/i18n/languages.md) <!--- Pidä vain tämä -->
+- [Luettelo käännöksistä](/i18n/languages.md) <!--- Keep only this -->
 
 ---
 

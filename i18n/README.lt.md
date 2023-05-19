@@ -36,7 +36,7 @@ Norėdami sužinoti, kaip prisidėti, apsilankykite [Getting Started](./DEVELOPE
 - [Pagalba el. paštu](https://supabase.com/docs/support#business-support). Geriausiai tinka: problemoms, susijusioms su jūsų duomenų baze ar infrastruktūra, spręsti.
 - [Discord](https://discord.supabase.com). Geriausiai tinka: dalytis savo programomis ir bendrauti su bendruomene.
 
-## Būklė
+## Statusas
 
 - [x] Alfa: Bandome "Supabase" su uždaru klientų rinkiniu
 - [x] Viešoji Alfa versija: [app.supabase.com] (https://app.supabase.com). Tačiau neskubėkite su mumis, yra keletas trūkumų
@@ -45,7 +45,7 @@ Norėdami sužinoti, kaip prisidėti, apsilankykite [Getting Started](./DEVELOPE
 
 Šiuo metu esame viešojoje beta versijoje. Stebėkite šios repozitorijos "releases", kad gautumėte pranešimus apie svarbius atnaujinimus.
 
-<kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="Stebėti šią repą"/></kbd>
+<kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="Watch this repo"/></kbd>
 
 ---
 
@@ -62,7 +62,7 @@ Taip pat galite [savarankiškai talpinti](https://supabase.com/docs/guides/hosti
 
 - [PostgreSQL](https://www.postgresql.org/) - tai objektinė-reliacinė duomenų bazių sistema, aktyviai plėtojama daugiau kaip 30 metų, todėl ji pelnė gerą reputaciją dėl patikimumo, funkcijų tvirtumo ir našumo.
 - [Realtime](https://github.com/supabase/realtime) - tai "Elixir" serveris, leidžiantis klausytis "PostgreSQL" įterpimų, atnaujinimų ir ištrynimų naudojant žiniatinklio lizdus. "Realtime" apklausia "Postgres" integruotą replikavimo funkciją dėl duomenų bazės pakeitimų, konvertuoja pakeitimus į JSON ir transliuoja JSON per žiniatinklio lizdus įgaliotiems klientams.
-- [PostgREST](http://postgrest.org/) - tai žiniatinklio serveris, kuris jūsų "PostgreSQL" duomenų bazę paverčia tiesiogine REST sąsajos su vartotoju (API) versija
+- [PostgREST](http://postgrest.org/) - tai žiniatinklio serveris, kuris paverčia jūsų "PostgreSQL" duomenų bazę tiesiogiai į RESTful API
 - [pg_graphql](http://github.com/supabase/pg_graphql/) - "PostgreSQL" plėtinys, kuris atveria GraphQL API
 - [Storage](https://github.com/supabase/storage-api) - tai REST sąsaja, skirta S3 saugomiems failams valdyti, naudojant "Postgres" leidimams valdyti.
 - [postgres-meta](https://github.com/supabase/postgres-meta) - tai RESTful API, skirta "Postgres" valdymui, leidžianti gauti lenteles, pridėti vaidmenis, vykdyti užklausas ir t. t.
@@ -77,19 +77,19 @@ Mūsų požiūris į klientų bibliotekas yra modulinis. Kiekviena dalinė bibli
   <tr>
     <th>Kalba</th>
     <th>Klientas</th>
-    <th colspan="5">Feature-Clients (pridedama prie "Supabase" kliento)</th>
+    <th colspan="5">Funkcijų klientai (įtraukti į "Supabase" klientą)</th>
   </tr>
   <tr>
     <th></th>
     <th>Supabase</th>
     <th><a href="https://github.com/postgrest/postgrest" target="_blank" rel="noopener noreferrer">PostgREST</a></th>
     <th><a href="https://github.com/supabase/gotrue" target="_blank" rel="noopener noreferrer">GoTrue</a></th>
-    <th><a href="https://github.com/supabase/realtime" target="_blank" rel="noopener noreferrer">Realtime</a></th>
-    <th><a href="https://github.com/supabase/storage-api" target="_blank" rel="noopener noreferrer">Storage</a></th>
+    <th><a href="https://github.com/supabase/realtime" target="_blank" rel="noopener noreferrer">Realaus laiko</a></th>
+    <th><a href="https://github.com/supabase/storage-api" target="_blank" rel="noopener noreferrer">Saugykla</a></th>
     <th>Funkcijos</th>
   </tr>
-  <!-- NAUJOS EILUTĖS ŠABLONAS -->
-  <!-- PRADĖTI EILUTĘ
+  <!-- TEMPLATE FOR NEW ROW -->
+  <!-- START ROW
   <tr>
     <td>lang</td>
     <td><a href="https://github.com/supabase-community/supabase-lang" target="_blank" rel="noopener noreferrer">supabase-lang</a></td>
@@ -98,10 +98,10 @@ Mūsų požiūris į klientų bibliotekas yra modulinis. Kiekviena dalinė bibli
     <td><a href="https://github.com/supabase-community/realtime-lang" target="_blank" rel="noopener noreferrer">realtime-lang</a></td>
     <td><a href="https://github.com/supabase-community/storage-lang" target="_blank" rel="noopener noreferrer">storage-lang</a></td>
   </tr>
-  EILUTĖS PABAIGA -->
+  END ROW -->
   <th colspan="7">⚡️ Oficialus ⚡️</th>
   <tr>
-    <td>JavaScript (TypeScript)</td>
+    <td><keep>Java</keep>Skriptas (TypeScript)</td>
     <td><a href="https://github.com/supabase/supabase-js" target="_blank" rel="noopener noreferrer">supabase-js</a></td>
     <td><a href="https://github.com/supabase/postgrest-js" target="_blank" rel="noopener noreferrer">postgrest-js</a></td>
     <td><a href="https://github.com/supabase/gotrue-js" target="_blank" rel="noopener noreferrer">gotrue-js</a></td>
@@ -110,7 +110,7 @@ Mūsų požiūris į klientų bibliotekas yra modulinis. Kiekviena dalinė bibli
     <td><a href="https://github.com/supabase/functions-js" target="_blank" rel="noopener noreferrer">functions-js</a></td>
   </tr>
     <tr>
-    <td>Flutter</td>
+    <td><keep>Flutter</keep></td>
     <td><a href="https://github.com/supabase/supabase-flutter" target="_blank" rel="noopener noreferrer">supabase-flutter</a></td>
     <td><a href="https://github.com/supabase/postgrest-dart" target="_blank" rel="noopener noreferrer">postgrest-dart</a></td>
     <td><a href="https://github.com/supabase/gotrue-dart" target="_blank" rel="noopener noreferrer">gotrue-dart</a></td>
@@ -129,7 +129,7 @@ Mūsų požiūris į klientų bibliotekas yra modulinis. Kiekviena dalinė bibli
     <td><a href="https://github.com/supabase-community/functions-csharp" target="_blank" rel="noopener noreferrer">functions-csharp</a></td>
   </tr>
   <tr>
-    <td>Eiti</td>
+    <td>Go</td>
     <td>-</td>
     <td><a href="https://github.com/supabase-community/postgrest-go" target="_blank" rel="noopener noreferrer">postgrest-go</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-go" target="_blank" rel="noopener noreferrer">gotrue-go</a></td>
@@ -138,7 +138,7 @@ Mūsų požiūris į klientų bibliotekas yra modulinis. Kiekviena dalinė bibli
     <td><a href="https://github.com/supabase-community/functions-go" target="_blank" rel="noopener noreferrer">functions-go</a></td>
   </tr>
   <tr>
-    <td>Java</td>
+    <td><keep>Java</keep></td>
     <td>-</td>
     <td>-</td>
     <td><a href="https://github.com/supabase-community/gotrue-java" target="_blank" rel="noopener noreferrer">gotrue-java</a></td>
@@ -153,10 +153,10 @@ Mūsų požiūris į klientų bibliotekas yra modulinis. Kiekviena dalinė bibli
     <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/GoTrue" target="_blank" rel="noopener noreferrer">gotrue-kt</a></td>
     <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Realtime" target="_blank" rel="noopener noreferrer">realtime-kt</a></td>
     <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Storage" target="_blank" rel="noopener noreferrer">storage-kt</a></td>
-    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Functions" target="_blank" rel="noopener noreferrer">funkcijos-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Functions" target="_blank" rel="noopener noreferrer">functions-kt</a></td>
   </tr>
   <tr>
-    <td>Python</td>
+    <td><keep>Python</keep></td>
     <td><a href="https://github.com/supabase-community/supabase-py" target="_blank" rel="noopener noreferrer">supabase-py</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-py" target="_blank" rel="noopener noreferrer">postgrest-py</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-py" target="_blank" rel="noopener noreferrer">gotrue-py</a></td>
@@ -165,7 +165,7 @@ Mūsų požiūris į klientų bibliotekas yra modulinis. Kiekviena dalinė bibli
     <td><a href="https://github.com/supabase-community/functions-py" target="_blank" rel="noopener noreferrer">functions-py</a></td>
   </tr>
   <tr>
-    <td>Ruby</td>
+    <td><keep>Ruby</keep></td>
     <td><a href="https://github.com/supabase-community/supabase-rb" target="_blank" rel="noopener noreferrer">supabase-rb</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-rb" target="_blank" rel="noopener noreferrer">postgrest-rb</a></td>
     <td>-</td>
@@ -174,7 +174,7 @@ Mūsų požiūris į klientų bibliotekas yra modulinis. Kiekviena dalinė bibli
     <td>-</td>
   </tr>
   <tr>
-    <td>Rust</td>
+    <td><keep>Rust</keep></td>
     <td>-</td>
     <td><a href="https://github.com/supabase-community/postgrest-rs" target="_blank" rel="noopener noreferrer">postgrest-rs</a></td>
     <td>-</td>
@@ -183,13 +183,13 @@ Mūsų požiūris į klientų bibliotekas yra modulinis. Kiekviena dalinė bibli
     <td>-</td>
   </tr>
   <tr>
-    <td>Swift</td>
+    <td><keep>Swift</keep></td>
     <td><a href="https://github.com/supabase-community/supabase-swift" target="_blank" rel="noopener noreferrer">supabase-swift</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-swift" target="_blank" rel="noopener noreferrer">postgrest-swift</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-swift" target="_blank" rel="noopener noreferrer">gotrue-swift</a></td>
     <td><a href="https://github.com/supabase-community/realtime-swift" target="_blank" rel="noopener noreferrer">realtime-swift</a></td>
     <td><a href="https://github.com/supabase-community/storage-swift" target="_blank" rel="noopener noreferrer">storage-swift</a></td>
-    <td><a href="https://github.com/supabase-community/functions-swift" target="_blank" rel="noopener noreferrer">funkcijos-swift</a></td>
+    <td><a href="https://github.com/supabase-community/functions-swift" target="_blank" rel="noopener noreferrer">functions-swift</a></td>
   </tr>
   <tr>
     <td>Godot variklis (GDScript)</td>
@@ -202,8 +202,8 @@ Mūsų požiūris į klientų bibliotekas yra modulinis. Kiekviena dalinė bibli
   </tr>
 </table>
 
-<!--- Pašalinkite šį sąrašą, jei verčiate į kitą kalbą, jį sunku atnaujinti keliuose failuose-->
-<!--- Palikite tik nuorodą į vertimo failų sąrašą-->
+<!--- Remove this list if you're translating to another language, it's hard to keep updated across multiple files-->
+<!--- Keep only the link to the list of translation files-->
 
 ## Vertimai
 
@@ -232,7 +232,7 @@ Mūsų požiūris į klientų bibliotekas yra modulinis. Kiekviena dalinė bibli
 - [Persų kalba / فارسی](/i18n/README.fa.md)
 - [lenkų kalba](/i18n/README.pl.md)
 - [Portuguese / Português](/i18n/README.pt.md)
-- [Portugalų kalba (Brazilijos) / Português Brasileiro](/i18n/README.pt-br.md)
+- [Portugalų (brazilų) / Português Brasileiro](/i18n/README.pt-br.md)
 - [Rumuniškai / Română](/i18n/README.ro.md)
 - [Rusų kalba / Pусский](/i18n/README.ru.md)
 - [Serbian / Srpski](/i18n/README.sr.md)
@@ -245,7 +245,7 @@ Mūsų požiūris į klientų bibliotekas yra modulinis. Kiekviena dalinė bibli
 - [Turkų kalba](/i18n/README.tr.md)
 - [Ukrainiečių kalba / Українська](/i18n/README.uk.md)
 - [Vietnamiečių kalba / Tiếng Việt](/i18n/README.vi-vn.md)
-- [Vertimų sąrašas](/i18n/languages.md) <!--- Palikite tik tai -->
+- [Vertimų sąrašas](/i18n/languages.md) <!--- Keep only this -->
 
 ---
 

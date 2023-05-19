@@ -61,7 +61,7 @@ Supabase е [хоствана платформа](https://app.supabase.com). М�
 ![Архитектура](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
 
 - [PostgreSQL](https://www.postgresql.org/) е обектно-релационна система за бази данни с над 30-годишна активна разработка, която ѝ е спечелила силна репутация за надеждност, устойчивост на функциите и производителност.
-- [Realtime](https://github.com/supabase/realtime) е сървър на Elixir, който ви позволява да слушате PostgreSQL за вмъквания, актуализации и изтривания, използвайки websockets. Realtime се допитва до вградената функция за репликация на Postgres за промени в базата данни, преобразува промените в JSON, след което излъчва JSON през уебсокети до оторизирани клиенти.
+- [Realtime](https://github.com/supabase/realtime) е сървър на Elixir, който ви позволява да слушате PostgreSQL вмъквания, актуализации и изтривания, използвайки websockets. Realtime се допитва до вградената функция за репликация на Postgres за промени в базата данни, преобразува промените в JSON, след което излъчва JSON през уебсокети до оторизирани клиенти.
 - [PostgREST](http://postgrest.org/) е уеб сървър, който превръща вашата база данни PostgreSQL директно в RESTful API
 - [pg_graphql](http://github.com/supabase/pg_graphql/) е разширение на PostgreSQL, което разкрива GraphQL API
 - [Storage](https://github.com/supabase/storage-api) предоставя RESTful интерфейс за управление на файлове, съхранявани в S3, като използва Postgres за управление на разрешенията.
@@ -77,19 +77,19 @@ Supabase е [хоствана платформа](https://app.supabase.com). М�
   <tr>
     <th>Език</th>
     <th>Клиент</th>
-    <th colspan="5">Клиенти за функции (в пакет с клиента Supabase)</th>
+    <th colspan="5">Функционални клиенти (в комплект с клиента на Supabase)</th>
   </tr>
   <tr>
     <th></th>
-    <th>База данни Supabase</th>
+    <th>Supabase</th>
     <th><a href="https://github.com/postgrest/postgrest" target="_blank" rel="noopener noreferrer">PostgREST</a></th>
     <th><a href="https://github.com/supabase/gotrue" target="_blank" rel="noopener noreferrer">GoTrue</a></th>
-    <th><a href="https://github.com/supabase/realtime" target="_blank" rel="noopener noreferrer">Realtime</a></th>
-    <th><a href="https://github.com/supabase/storage-api" target="_blank" rel="noopener noreferrer">Складиране</a></th>
+    <th><a href="https://github.com/supabase/realtime" target="_blank" rel="noopener noreferrer">В реално време</a></th>
+    <th><a href="https://github.com/supabase/storage-api" target="_blank" rel="noopener noreferrer">Съхранение</a></th>
     <th>Функции</th>
   </tr>
-  <!-- ШАБЛОН ЗА НОВ РЕД -->
-  <!-- НАЧАЛО НА РЕДА
+  <!-- TEMPLATE FOR NEW ROW -->
+  <!-- START ROW
   <tr>
     <td>lang</td>
     <td><a href="https://github.com/supabase-community/supabase-lang" target="_blank" rel="noopener noreferrer">supabase-lang</a></td>
@@ -98,10 +98,10 @@ Supabase е [хоствана платформа](https://app.supabase.com). М�
     <td><a href="https://github.com/supabase-community/realtime-lang" target="_blank" rel="noopener noreferrer">realtime-lang</a></td>
     <td><a href="https://github.com/supabase-community/storage-lang" target="_blank" rel="noopener noreferrer">storage-lang</a></td>
   </tr>
-  КРАЙ НА РЕДА -->
+  END ROW -->
   <th colspan="7">⚡️ Официален ⚡️</th>
   <tr>
-    <td>JavaScript (TypeScript)</td>
+    <td><keep>Java</keep>Скрипт (TypeScript)</td>
     <td><a href="https://github.com/supabase/supabase-js" target="_blank" rel="noopener noreferrer">supabase-js</a></td>
     <td><a href="https://github.com/supabase/postgrest-js" target="_blank" rel="noopener noreferrer">postgrest-js</a></td>
     <td><a href="https://github.com/supabase/gotrue-js" target="_blank" rel="noopener noreferrer">gotrue-js</a></td>
@@ -110,7 +110,7 @@ Supabase е [хоствана платформа](https://app.supabase.com). М�
     <td><a href="https://github.com/supabase/functions-js" target="_blank" rel="noopener noreferrer">functions-js</a></td>
   </tr>
     <tr>
-    <td>Flutter</td>
+    <td><keep>Flutter</keep></td>
     <td><a href="https://github.com/supabase/supabase-flutter" target="_blank" rel="noopener noreferrer">supabase-flutter</a></td>
     <td><a href="https://github.com/supabase/postgrest-dart" target="_blank" rel="noopener noreferrer">postgrest-dart</a></td>
     <td><a href="https://github.com/supabase/gotrue-dart" target="_blank" rel="noopener noreferrer">gotrue-dart</a></td>
@@ -129,16 +129,16 @@ Supabase е [хоствана платформа](https://app.supabase.com). М�
     <td><a href="https://github.com/supabase-community/functions-csharp" target="_blank" rel="noopener noreferrer">functions-csharp</a></td>
   </tr>
   <tr>
-    <td>Излез</td>
+    <td>Go</td>
     <td>-</td>
     <td><a href="https://github.com/supabase-community/postgrest-go" target="_blank" rel="noopener noreferrer">postgrest-go</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-go" target="_blank" rel="noopener noreferrer">gotrue-go</a></td>
     <td>-</td>
     <td><a href="https://github.com/supabase-community/storage-go" target="_blank" rel="noopener noreferrer">storage-go</a></td>
-    <td><a href="https://github.com/supabase-community/functions-go" target="_blank" rel="noopener noreferrer">функции-go</a></td>
+    <td><a href="https://github.com/supabase-community/functions-go" target="_blank" rel="noopener noreferrer">functions-go</a></td>
   </tr>
   <tr>
-    <td>Java</td>
+    <td><keep>Java</keep></td>
     <td>-</td>
     <td>-</td>
     <td><a href="https://github.com/supabase-community/gotrue-java" target="_blank" rel="noopener noreferrer">gotrue-java</a></td>
@@ -147,16 +147,16 @@ Supabase е [хоствана платформа](https://app.supabase.com). М�
     <td>-</td>
   </tr>
   <tr>
-    <td>Котлин</td>
+    <td>Kotlin</td>
     <td><a href="https://github.com/supabase-community/supabase-kt" target="_blank" rel="noopener noreferrer">supabase-kt</a></td>
     <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Postgrest" target="_blank" rel="noopener noreferrer">postgrest-kt</a></td>
     <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/GoTrue" target="_blank" rel="noopener noreferrer">gotrue-kt</a></td>
     <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Realtime" target="_blank" rel="noopener noreferrer">realtime-kt</a></td>
     <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Storage" target="_blank" rel="noopener noreferrer">storage-kt</a></td>
-    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Functions" target="_blank" rel="noopener noreferrer">функции-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Functions" target="_blank" rel="noopener noreferrer">functions-kt</a></td>
   </tr>
   <tr>
-    <td>Python</td>
+    <td><keep>Python</keep></td>
     <td><a href="https://github.com/supabase-community/supabase-py" target="_blank" rel="noopener noreferrer">supabase-py</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-py" target="_blank" rel="noopener noreferrer">postgrest-py</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-py" target="_blank" rel="noopener noreferrer">gotrue-py</a></td>
@@ -165,7 +165,7 @@ Supabase е [хоствана платформа](https://app.supabase.com). М�
     <td><a href="https://github.com/supabase-community/functions-py" target="_blank" rel="noopener noreferrer">functions-py</a></td>
   </tr>
   <tr>
-    <td>Ruby</td>
+    <td><keep>Ruby</keep></td>
     <td><a href="https://github.com/supabase-community/supabase-rb" target="_blank" rel="noopener noreferrer">supabase-rb</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-rb" target="_blank" rel="noopener noreferrer">postgrest-rb</a></td>
     <td>-</td>
@@ -174,7 +174,7 @@ Supabase е [хоствана платформа](https://app.supabase.com). М�
     <td>-</td>
   </tr>
   <tr>
-    <td>Ръжда</td>
+    <td><keep>Rust</keep></td>
     <td>-</td>
     <td><a href="https://github.com/supabase-community/postgrest-rs" target="_blank" rel="noopener noreferrer">postgrest-rs</a></td>
     <td>-</td>
@@ -183,13 +183,13 @@ Supabase е [хоствана платформа](https://app.supabase.com). М�
     <td>-</td>
   </tr>
   <tr>
-    <td>Swift</td>
+    <td><keep>Swift</keep></td>
     <td><a href="https://github.com/supabase-community/supabase-swift" target="_blank" rel="noopener noreferrer">supabase-swift</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-swift" target="_blank" rel="noopener noreferrer">postgrest-swift</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-swift" target="_blank" rel="noopener noreferrer">gotrue-swift</a></td>
     <td><a href="https://github.com/supabase-community/realtime-swift" target="_blank" rel="noopener noreferrer">realtime-swift</a></td>
     <td><a href="https://github.com/supabase-community/storage-swift" target="_blank" rel="noopener noreferrer">storage-swift</a></td>
-    <td><a href="https://github.com/supabase-community/functions-swift" target="_blank" rel="noopener noreferrer">функции-swift</a></td>
+    <td><a href="https://github.com/supabase-community/functions-swift" target="_blank" rel="noopener noreferrer">functions-swift</a></td>
   </tr>
   <tr>
     <td>Двигател на Godot (GDScript)</td>
@@ -202,8 +202,8 @@ Supabase е [хоствана платформа](https://app.supabase.com). М�
   </tr>
 </table>
 
-<!--- Премахнете този списък, ако превеждате на друг език, трудно е да се актуализира в няколко файла-->
-<!--- Запазете само връзката към списъка с файловете за превод-->
+<!--- Remove this list if you're translating to another language, it's hard to keep updated across multiple files-->
+<!--- Keep only the link to the list of translation files-->
 
 ## Преводи
 
@@ -245,7 +245,7 @@ Supabase е [хоствана платформа](https://app.supabase.com). М�
 - [Турски език / Türkçe](/i18n/README.tr.md)
 - [Украински / Українська](/i18n/README.uk.md)
 - [Виетнамски / Tiếng Việt](/i18n/README.vi-vn.md)
-- [Списък на преводите](/i18n/languages.md) <!--- Запазете само това -->
+- [Списък на преводите](/i18n/languages.md) <!--- Keep only this -->
 
 ---
 

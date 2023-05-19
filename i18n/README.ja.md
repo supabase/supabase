@@ -5,7 +5,7 @@
 
 ---
 
-# スーパーベース
+# Supabase
 
 [Supabase](https://supabase.com) は、オープンソースのFirebaseの代替品です。エンタープライズグレードのオープンソースツールを使って、Firebaseの機能を構築しています。
 
@@ -31,8 +31,8 @@
 
 ## コミュニティとサポート
 
-- [コミュニティ・フォーラム](https://github.com/supabase/supabase/discussions)。最適な場所：ビルドに関するヘルプ、データベースのベストプラクティスに関する議論。
-- [GitHub Issues](https://github.com/supabase/supabase/issues).Supabaseを使用していて遭遇したバグやエラーに対処する。
+- [コミュニティ・フォーラム](https://github.com/supabase/supabase/discussions)。最適な場所：構築に関するヘルプ、データベースのベストプラクティスに関する議論。
+- [GitHub Issues](https://github.com/supabase/supabase/issues).Supabaseを使用していて遭遇したバグやエラーに最適です。
 - [メールサポート](https://supabase.com/docs/support#business-support).あなたのデータベースやインフラに関する問題。
 - [Discord】(https://discord.supabase.com).アプリケーションを共有したり、コミュニティと交流するのに適しています。
 
@@ -45,11 +45,11 @@
 
 現在、パブリックベータ版です。メジャーアップデートの通知を受けるには、このレポの "releases" を見てください。
 
-<kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="このレポを見る"/></kbd>。
+<kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="Watch this repo"/></kbd>
 
 ---
 
-## 仕組み
+## How it works
 
 Supabaseは、オープンソースツールの組み合わせです。私たちは、エンタープライズグレードのオープンソース製品を使ってFirebaseの機能を構築しています。ツールやコミュニティが存在し、MIT、Apache 2、または同等のオープンライセンスがあれば、そのツールを使用しサポートします。ツールが存在しない場合は、私たち自身で構築し、オープンソース化します。Supabaseは、Firebaseの1対1マッピングではありません。私たちの目的は、オープンソースツールを使ってFirebaseのような開発者体験を開発者に提供することです。
 
@@ -73,141 +73,141 @@ Supabaseは[hosted platform](https://app.supabase.com)です。サインアッ�
 
 クライアントライブラリのアプローチはモジュール化されています。各サブライブラリは、1つの外部システムに対するスタンドアロンな実装です。これは、私たちが既存のツールをサポートする方法の1つです。
 
-<table style="table-layout:fixed; white-space: nowrap;">（テーブルレイアウト：固定）。
+<table style="table-layout:fixed; white-space: nowrap;">
   <tr>
-    <th>言語</th></th
-    <th>クライアント</th></th
-    <th colspan="5">Feature-Clients (Supabaseクライアントにバンドル)</th></th>。
+    <th>言語</th>
+    <th>クライアント</th>
+    <th colspan="5">フィーチャークライアント（Supabaseクライアントにバンドルされています）</th>
   </tr>
-  
+  <tr>
     <th></th>
-    <th>スーパーベース</th></td
-    <th><a href="https://github.com/postgrest/postgrest" target="_blank" rel="noopener noreferrer">PostgREST</a></th>。
-    <th><a href="https://github.com/supabase/gotrue" target="_blank" rel="noopener noreferrer">GoTrue</a></th></th>。
-    <th><a href="https://github.com/supabase/realtime" target="_blank" rel="noopener noreferrer">リアルタイム</a></th></th>。
-    <th><a href="https://github.com/supabase/storage-api" target="_blank" rel="noopener noreferrer">ストレージ</a></th></th>。
-    <th>ファンクション</th></th
+    <th>Supabase</th>
+    <th><a href="https://github.com/postgrest/postgrest" target="_blank" rel="noopener noreferrer">PostgREST</a></th>
+    <th><a href="https://github.com/supabase/gotrue" target="_blank" rel="noopener noreferrer">GoTrue</a></th>
+    <th><a href="https://github.com/supabase/realtime" target="_blank" rel="noopener noreferrer">リアルタイム</a></th>
+    <th><a href="https://github.com/supabase/storage-api" target="_blank" rel="noopener noreferrer">ストレージ</a></th>
+    <th>ファンクション</th>
   </tr>
-  <!-- 新しい行のテンプレート -->
+  <!-- TEMPLATE FOR NEW ROW -->
   <!-- START ROW
-  
+  <tr>
     <td>lang</td>
     <td><a href="https://github.com/supabase-community/supabase-lang" target="_blank" rel="noopener noreferrer">supabase-lang</a></td>
-    <td><a href="https://github.com/supabase-community/postgrest-lang" target="_blank" rel="noopener noreferrer">postgrest-lang</a></td></td>。
-    <td><a href="https://github.com/supabase-community/gotrue-lang" target="_blank" rel="noopener noreferrer">gotrue-lang</a></td></td>。
+    <td><a href="https://github.com/supabase-community/postgrest-lang" target="_blank" rel="noopener noreferrer">postgrest-lang</a></td>
+    <td><a href="https://github.com/supabase-community/gotrue-lang" target="_blank" rel="noopener noreferrer">gotrue-lang</a></td>
     <td><a href="https://github.com/supabase-community/realtime-lang" target="_blank" rel="noopener noreferrer">realtime-lang</a></td>
-    <td><a href="https://github.com/supabase-community/storage-lang" target="_blank" rel="noopener noreferrer">ストレージ関連</a></td></a></td>。
+    <td><a href="https://github.com/supabase-community/storage-lang" target="_blank" rel="noopener noreferrer">storage-lang</a></td>
   </tr>
-  行を終了します。
+  END ROW -->
   <th colspan="7">⚡️ 公式 ⚡️</th>
-  
-    <td>JavaScript（TypeScript）</td>。
+  <tr>
+    <td><keep>Java</keep>スクリプト(TypeScript)</td>
     <td><a href="https://github.com/supabase/supabase-js" target="_blank" rel="noopener noreferrer">supabase-js</a></td>
-    <td><a href="https://github.com/supabase/postgrest-js" target="_blank" rel="noopener noreferrer">postgrest-js</a></td>。
-    <td><a href="https://github.com/supabase/gotrue-js" target="_blank" rel="noopener noreferrer">gotrue-js</a></td>。
+    <td><a href="https://github.com/supabase/postgrest-js" target="_blank" rel="noopener noreferrer">postgrest-js</a></td>
+    <td><a href="https://github.com/supabase/gotrue-js" target="_blank" rel="noopener noreferrer">gotrue-js（ゴトル-js</a></td>
     <td><a href="https://github.com/supabase/realtime-js" target="_blank" rel="noopener noreferrer">realtime-js</a></td>
-    <td><a href="https://github.com/supabase/storage-js" target="_blank" rel="noopener noreferrer">storage-js</a></td>。
-    <td><a href="https://github.com/supabase/functions-js" target="_blank" rel="noopener noreferrer">functions-js</a></td>。
-  </td> </tr> </table
-    
-    <td>フラッター</td
-    <td><a href="https://github.com/supabase/supabase-flutter" target="_blank" rel="noopener noreferrer">supabase-flutter</a></td>
-    <td><a href="https://github.com/supabase/postgrest-dart" target="_blank" rel="noopener noreferrer">postgrest-dart</a></td>
-    <td><a href="https://github.com/supabase/gotrue-dart" target="_blank" rel="noopener noreferrer">ゴトルエダーツ</a></td></td
-    <td><a href="https://github.com/supabase/realtime-dart" target="_blank" rel="noopener noreferrer">realtime-dart</a></td>
-    <td><a href="https://github.com/supabase/storage-dart" target="_blank" rel="noopener noreferrer">storage-dart</a></td>
-    <td><a href="https://github.com/supabase/functions-dart" target="_blank" rel="noopener noreferrer">functions-dart</a></td> <td><a href="https://github.com/supabase/functions-dart" target="_blank" rel="noopener noreferrer">functions-dart</a></td>
-  </td> </tr> <td
-  <th colspan="7">💚コミュニティ💚</th></td
-  
-    <td>C#</td>
-    <td><a href="https://github.com/supabase-community/supabase-csharp" target="_blank" rel="noopener noreferrer">supabase-charp</a></td>
-    <td><a href="https://github.com/supabase-community/postgrest-csharp" target="_blank" rel="noopener noreferrer">postgrest-csharp</a></td></td>。
-    <td><a href="https://github.com/supabase-community/gotrue-csharp" target="_blank" rel="noopener noreferrer">ゴトクシャープ</a></td></td
-    <td><a href="https://github.com/supabase-community/realtime-csharp" target="_blank" rel="noopener noreferrer">realtime-csharp</a></td>
-    <td><a href="https://github.com/supabase-community/storage-csharp" target="_blank" rel="noopener noreferrer">ストレージ-シャープ</a></td>。
-    <td><a href="https://github.com/supabase-community/functions-csharp" target="_blank" rel="noopener noreferrer">functions-csharp</a></td> <td><a href="https://github.com/supabase-community/functions-csharp" target="_blank" rel="noopener noreferrer">functions-csharp</a></td>
-  </td> </tr> </table
-  </td> </tr> <td>Go
-    <td>ゴー</td></td></td></td></td></td></td
-    <td>-</td> <td>-</td>
-    <td><a href="https://github.com/supabase-community/postgrest-go" target="_blank" rel="noopener noreferrer">postgrest-go</a></td>
-    <td><a href="https://github.com/supabase-community/gotrue-go" target="_blank" rel="noopener noreferrer">ゴットル号</a></td></td
-    <td>-</td>
-    <td><a href="https://github.com/supabase-community/storage-go" target="_blank" rel="noopener noreferrer">ストレージ-go</a></td></td
-    <td><a href="https://github.com/supabase-community/functions-go" target="_blank" rel="noopener noreferrer">functions-go</a></td> <td><a href="https://github.com/supabase-community/functions-go" target="_blank" rel="noopener noreferrer">functions-go</a></td>
-  </td> </tr> </table
-  
-    <td>Java</td>の場合
-    <td>-</td> <td>-</td>
-    <td>-</td> <td>-</td> <td>-</td
-    <td><a href="https://github.com/supabase-community/gotrue-java" target="_blank" rel="noopener noreferrer">gotrue-java</a></td>.
-    <td>-</td>
-    <td><a href="https://github.com/supabase-community/storage-java" target="_blank" rel="noopener noreferrer">storage-java</a></td>。
-    <td>-</td> <td>-</td> <td>-</td
-  </td> </tr> </table
-  
-    <td>Kotlin(コトリン)</td></td
-    <td><a href="https://github.com/supabase-community/supabase-kt" target="_blank" rel="noopener noreferrer">supabase-kt</a></td>
-    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Postgrest" target="_blank" rel="noopener noreferrer">postgrest-kt</a></td></td>。
-    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/GoTrue" target="_blank" rel="noopener noreferrer">ゴトルエ-kt</a></td>。
-    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Realtime" target="_blank" rel="noopener noreferrer">realtime-kt</a></td> <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Realtime" target="_blank" rel="noopener noreferrer">realtime-kt</a></td>
-    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Storage" target="_blank" rel="noopener noreferrer">ストレージ-kt</a></td></td>。
-    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Functions" target="_blank" rel="noopener noreferrer">functions-kt</a></td>
-  </td> </tr> </table
-  </tr> <td>Python
-    <td>Python</td>（パイソン）</td>。
-    <td><a href="https://github.com/supabase-community/supabase-py" target="_blank" rel="noopener noreferrer">supabase-py</a></td>
-    <td><a href="https://github.com/supabase-community/postgrest-py" target="_blank" rel="noopener noreferrer">postgrest-py</a></td>。
-    <td><a href="https://github.com/supabase-community/gotrue-py" target="_blank" rel="noopener noreferrer">gotrue-py</a></td>。
-    <td><a href="https://github.com/supabase-community/realtime-py" target="_blank" rel="noopener noreferrer">リアルタイムのパイ</a></td>。
-    <td><a href="https://github.com/supabase-community/storage-py" target="_blank" rel="noopener noreferrer">storage-py</a></td>。
-    <td><a href="https://github.com/supabase-community/functions-py" target="_blank" rel="noopener noreferrer">functions-py</a></td>。
+    <td><a href="https://github.com/supabase/storage-js" target="_blank" rel="noopener noreferrer">storage-js</a></td>
+    <td><a href="https://github.com/supabase/functions-js" target="_blank" rel="noopener noreferrer">ファンクション-JS</a></td>
   </tr>
-  </td> </tr> <td>Ruby
-    <td>Ruby</td>（ルビー）</td
+    <tr>
+    <td><keep>Flutter</keep></td>
+    <td><a href="https://github.com/supabase/supabase-flutter" target="_blank" rel="noopener noreferrer">スーパーベース・フラッター</a></td>
+    <td><a href="https://github.com/supabase/postgrest-dart" target="_blank" rel="noopener noreferrer">ポストグレストダート</a></td>
+    <td><a href="https://github.com/supabase/gotrue-dart" target="_blank" rel="noopener noreferrer">gotrue-dart（ゴトルードアート</a></td>
+    <td><a href="https://github.com/supabase/realtime-dart" target="_blank" rel="noopener noreferrer">リアルタイムダート</a></td>
+    <td><a href="https://github.com/supabase/storage-dart" target="_blank" rel="noopener noreferrer">ストレージダート</a></td>
+    <td><a href="https://github.com/supabase/functions-dart" target="_blank" rel="noopener noreferrer">ファンクションダート</a></td>
+  </tr>
+  <th colspan="7">💚コミュニティ💚</th>
+  <tr>
+    <td>C#</td>
+    <td><a href="https://github.com/supabase-community/supabase-csharp" target="_blank" rel="noopener noreferrer">スーパーベース・シャープ</a></td>
+    <td><a href="https://github.com/supabase-community/postgrest-csharp" target="_blank" rel="noopener noreferrer">ポストグレスト-シャープ</a></td>
+    <td><a href="https://github.com/supabase-community/gotrue-csharp" target="_blank" rel="noopener noreferrer">ゴトル-csharp</a></td>
+    <td><a href="https://github.com/supabase-community/realtime-csharp" target="_blank" rel="noopener noreferrer">リアルタイムシャープ</a></td>
+    <td><a href="https://github.com/supabase-community/storage-csharp" target="_blank" rel="noopener noreferrer">ストレージ-シャープ</a></td>
+    <td><a href="https://github.com/supabase-community/functions-csharp" target="_blank" rel="noopener noreferrer">ファンクション-シャープ</a></td>
+  </tr>
+  <tr>
+    <td>Go</td>
+    <td>-</td>
+    <td><a href="https://github.com/supabase-community/postgrest-go" target="_blank" rel="noopener noreferrer">ポストグレスト号</a></td>
+    <td><a href="https://github.com/supabase-community/gotrue-go" target="_blank" rel="noopener noreferrer">ゴトルーゴー</a></td>
+    <td>-</td>
+    <td><a href="https://github.com/supabase-community/storage-go" target="_blank" rel="noopener noreferrer">ストレージ-go</a></td>
+    <td><a href="https://github.com/supabase-community/functions-go" target="_blank" rel="noopener noreferrer">ファンクション-go</a></td>
+  </tr>
+  <tr>
+    <td><keep>Java</keep></td>
+    <td>-</td>
+    <td>-</td>
+    <td><a href="https://github.com/supabase-community/gotrue-java" target="_blank" rel="noopener noreferrer">GOTRUE-JAVA</a></td>
+    <td>-</td>
+    <td><a href="https://github.com/supabase-community/storage-java" target="_blank" rel="noopener noreferrer">ストレージ-java</a></td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td>コトリン</td>
+    <td><a href="https://github.com/supabase-community/supabase-kt" target="_blank" rel="noopener noreferrer">supabase-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Postgrest" target="_blank" rel="noopener noreferrer">postgrest-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/GoTrue" target="_blank" rel="noopener noreferrer">gotrue-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Realtime" target="_blank" rel="noopener noreferrer">リアルタイムクロック</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Storage" target="_blank" rel="noopener noreferrer">ストレージ-KT</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Functions" target="_blank" rel="noopener noreferrer">ファンクション-KT</a></td>
+  </tr>
+  <tr>
+    <td><keep>Python</keep></td>
+    <td><a href="https://github.com/supabase-community/supabase-py" target="_blank" rel="noopener noreferrer">supabase-py</a></td>
+    <td><a href="https://github.com/supabase-community/postgrest-py" target="_blank" rel="noopener noreferrer">postgrest-py</a></td>
+    <td><a href="https://github.com/supabase-community/gotrue-py" target="_blank" rel="noopener noreferrer">gotrue-py</a></td>
+    <td><a href="https://github.com/supabase-community/realtime-py" target="_blank" rel="noopener noreferrer">realtime-py</a></td>
+    <td><a href="https://github.com/supabase-community/storage-py" target="_blank" rel="noopener noreferrer">ストレージ-py</a></td>
+    <td><a href="https://github.com/supabase-community/functions-py" target="_blank" rel="noopener noreferrer">関数-py</a></td>
+  </tr>
+  <tr>
+    <td><keep>Ruby</keep></td>
     <td><a href="https://github.com/supabase-community/supabase-rb" target="_blank" rel="noopener noreferrer">supabase-rb</a></td>
-    <td><a href="https://github.com/supabase-community/postgrest-rb" target="_blank" rel="noopener noreferrer">postgrest-rb</a></td>。
-    <td>-</td> <td>-</td> <td>-</td
-    <td>-</td> <td>-</td> <td>-</td> <td>-</td
-    <td>-</td> <td>-</td> <td>-</td> <td>-</td
-    <td>-</td> <td>-</td> <td>-</td> <td>-</td
-  </td> </tr><tr
-  
-    <td>ラスト</td
-    <td>-</td> </tr> <td>-</td
-    <td><a href="https://github.com/supabase-community/postgrest-rs" target="_blank" rel="noopener noreferrer">postgrest-rs</a></td>
-    <td>-</td> <td>-</td> <td>-</td
-    <td>-</td> <td>-</td> <td>-</td> <td>-</td
-    <td>-</td> <td>-</td> <td>-</td> <td>-</td
-    <td>-</td> <td>-</td> <td>-</td> <td>-</td
-  </td> </tr><tr
-  
-    <td>スウィフト</td></td
-    <td><a href="https://github.com/supabase-community/supabase-swift" target="_blank" rel="noopener noreferrer">supabase-swift</a></td>
-    <td><a href="https://github.com/supabase-community/postgrest-swift" target="_blank" rel="noopener noreferrer">postgrest-swift</a></td>。
-    <td><a href="https://github.com/supabase-community/gotrue-swift" target="_blank" rel="noopener noreferrer">ゴットルースイフト</a></td></td
-    <td><a href="https://github.com/supabase-community/realtime-swift" target="_blank" rel="noopener noreferrer">リアルタイムシフト</a></td></td
-    <td><a href="https://github.com/supabase-community/storage-swift" target="_blank" rel="noopener noreferrer">storage-swift</a></td>。
-    <td><a href="https://github.com/supabase-community/functions-swift" target="_blank" rel="noopener noreferrer">functions-swift</a></td>。
-  </td> </tr> </table
-  
-    <td>Godotエンジン（GDScript）</td
+    <td><a href="https://github.com/supabase-community/postgrest-rb" target="_blank" rel="noopener noreferrer">postgrest-rb</a></td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td><keep>Rust</keep></td>
+    <td>-</td>
+    <td><a href="https://github.com/supabase-community/postgrest-rs" target="_blank" rel="noopener noreferrer">ポストグレスターズ</a></td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td><keep>Swift</keep></td>
+    <td><a href="https://github.com/supabase-community/supabase-swift" target="_blank" rel="noopener noreferrer">スーパーベーススウィフト</a></td>
+    <td><a href="https://github.com/supabase-community/postgrest-swift" target="_blank" rel="noopener noreferrer">ポストグレストスウィフト</a></td>
+    <td><a href="https://github.com/supabase-community/gotrue-swift" target="_blank" rel="noopener noreferrer">gotrue-swift（ゴトルースイフト</a></td>
+    <td><a href="https://github.com/supabase-community/realtime-swift" target="_blank" rel="noopener noreferrer">リアルタイムシフト</a></td>
+    <td><a href="https://github.com/supabase-community/storage-swift" target="_blank" rel="noopener noreferrer">ストレージ-swift</a></td>
+    <td><a href="https://github.com/supabase-community/functions-swift" target="_blank" rel="noopener noreferrer">ファンクションスウィフト</a></td>
+  </tr>
+  <tr>
+    <td>Godotエンジン(GDScript)</td>
     <td><a href="https://github.com/supabase-community/godot-engine.supabase" target="_blank" rel="noopener noreferrer">supabase-gdscript</a></td>
-    <td><a href="https://github.com/supabase-community/postgrest-gdscript" target="_blank" rel="noopener noreferrer">postgrest-gdscript</a></td></td>。
-    <td><a href="https://github.com/supabase-community/gotrue-gdscript" target="_blank" rel="noopener noreferrer">gotrue-gdscript</a></td>。
-    <td><a href="https://github.com/supabase-community/realtime-gdscript" target="_blank" rel="noopener noreferrer">realtime-gdscript</a></td>
-    <td><a href="https://github.com/supabase-community/storage-gdscript" target="_blank" rel="noopener noreferrer">storage-gdscript</a></td></td>。
-    <td><a href="https://github.com/supabase-community/functions-gdscript" target="_blank" rel="noopener noreferrer">functions-gdscript</a></td>。
-  </td> </tr>
-</td> </tr> </table
+    <td><a href="https://github.com/supabase-community/postgrest-gdscript" target="_blank" rel="noopener noreferrer">postgrest-gdscript（ポストグレスト・ジーズスクリプト</a></td>
+    <td><a href="https://github.com/supabase-community/gotrue-gdscript" target="_blank" rel="noopener noreferrer">gotrue-gdscript（ゴトルエ・ジーズスクリプト</a></td>
+    <td><a href="https://github.com/supabase-community/realtime-gdscript" target="_blank" rel="noopener noreferrer">リアルタイムのGDScript</a></td>
+    <td><a href="https://github.com/supabase-community/storage-gdscript" target="_blank" rel="noopener noreferrer">ストレージ-gdscript</a></td>
+    <td><a href="https://github.com/supabase-community/functions-gdscript" target="_blank" rel="noopener noreferrer">ファンクション-gdscript</a></td>
+  </tr>
+</table>
 
-<!--- 他の言語に翻訳する場合は、このリストを削除してください、複数のファイルで更新し続けるのは大変です-->。
-<!--- 翻訳ファイルのリストへのリンクだけは残しておく-->。
+<!--- Remove this list if you're translating to another language, it's hard to keep updated across multiple files-->
+<!--- Keep only the link to the list of translation files-->
 
 ## 翻訳
 
-- [アラビア語 | العربية](/i18n/README.ar.md)
+- [アラビア語｜العربية](/i18n/README.ar.md)
 - [アルバニア語｜Shqip](/i18n/README.sq.md)
 - [バングラ / বাংলা](/i18n/README.bn.md)
 - [ブルガリア語 / Български](/i18n/README.bg.md)
@@ -245,7 +245,7 @@ Supabaseは[hosted platform](https://app.supabase.com)です。サインアッ�
 - [トルコ語 / Türkçe](/i18n/README.tr.md)
 - [ウクライナ語/Українська](/i18n/README.uk.md)
 - [ベトナム語 / Tiếng Việt](/i18n/README.vi-vn.md)
-- [翻訳一覧](/i18n/languages.md) <!--- これだけは残しておいてください -->。
+- [翻訳一覧](/i18n/languages.md)<!--- Keep only this -->
 
 ---
 

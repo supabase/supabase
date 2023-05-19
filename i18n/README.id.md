@@ -39,19 +39,19 @@ Untuk melihat bagaimana cara berkontribusi, kunjungi [Memulai](./DEVELOPERS.md)
 ## Status
 
 - [x] Alpha: Kami sedang menguji Supabase dengan sekumpulan pelanggan tertutup
-- [x] Alpha Publik: Siapa pun dapat mendaftar di [app.supabase.com](https://app.supabase.com). Tapi tenang saja, ada beberapa hal yang masih belum sempurna
+- [x] Alpha Publik: Siapa pun dapat mendaftar di [app.supabase.com](https://app.supabase.com). Tapi jangan khawatir, ada beberapa hal yang perlu diperhatikan
 - [x] Public Beta: Cukup stabil untuk sebagian besar kasus penggunaan non-perusahaan
 - [Publik: Ketersediaan Umum [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
 
 Saat ini kami berada dalam versi Beta Publik. Tonton "rilis" repo ini untuk mendapatkan pemberitahuan tentang pembaruan utama.
 
-<kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="Tonton repo ini"/></kbd>
+<kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="Watch this repo"/></kbd>
 
 ---
 
 ## Bagaimana cara kerjanya
 
-Supabase adalah kombinasi dari alat sumber terbuka. Kami membangun fitur-fitur Firebase menggunakan produk open source kelas enterprise. Jika alat dan komunitasnya ada, dengan lisensi MIT, Apache 2, atau lisensi terbuka yang setara, kami akan menggunakan dan mendukung alat tersebut. Jika alat tersebut tidak ada, kami akan membangun dan mengembangkannya sendiri. Supabase bukanlah pemetaan 1-ke-1 dari Firebase. Tujuan kami adalah untuk memberikan pengalaman pengembang seperti Firebase dengan menggunakan alat sumber terbuka.
+Supabase adalah kombinasi dari alat sumber terbuka. Kami membangun fitur-fitur Firebase menggunakan produk open source kelas enterprise. Jika alat dan komunitasnya ada, dengan lisensi MIT, Apache 2, atau lisensi terbuka yang setara, kami akan menggunakan dan mendukung alat tersebut. Jika alat tersebut tidak ada, kami akan membangun dan membuat sumber terbuka sendiri. Supabase bukanlah pemetaan 1-ke-1 dari Firebase. Tujuan kami adalah untuk memberikan pengalaman pengembang seperti Firebase dengan menggunakan alat sumber terbuka.
 
 **Arsitektur**
 
@@ -62,11 +62,11 @@ Anda juga bisa [menghosting sendiri](https://supabase.com/docs/guides/hosting/ov
 
 - [PostgreSQL](https://www.postgresql.org/) adalah sistem basis data relasional objek dengan lebih dari 30 tahun pengembangan aktif yang telah membuatnya memiliki reputasi yang kuat dalam hal keandalan, ketangguhan fitur, dan kinerja.
 - [Realtime] (https://github.com/supabase/realtime) adalah server Elixir yang memungkinkan Anda untuk mendengarkan penyisipan, pembaruan, dan penghapusan PostgreSQL menggunakan websocket. Realtime melakukan polling terhadap fungsionalitas replikasi bawaan Postgres untuk perubahan database, mengkonversi perubahan ke JSON, kemudian menyiarkan JSON melalui websockets ke klien yang berwenang.
-- [PostgREST] (http://postgrest.org/) adalah server web yang mengubah database PostgreSQL Anda secara langsung menjadi RESTful API
-- [pg_graphql](http://github.com/supabase/pg_graphql/) ekstensi PostgreSQL yang mengekspos API GraphQL
+- [PostgREST] (http://postgrest.org/) adalah server web yang mengubah basis data PostgreSQL Anda secara langsung menjadi RESTful API
+- [pg_graphql] (http://github.com/supabase/pg_graphql/) ekstensi PostgreSQL yang mengekspos API GraphQL
 - [Storage](https://github.com/supabase/storage-api) menyediakan antarmuka RESTful untuk mengelola File yang disimpan di S3, menggunakan Postgres untuk mengelola izin.
-- [postgres-meta](https://github.com/supabase/postgres-meta) adalah API RESTful untuk mengelola Postgres Anda, memungkinkan Anda untuk mengambil tabel, menambahkan peran, dan menjalankan kueri, dll.
-- [GoTrue] (https://github.com/netlify/gotrue) adalah API berbasis SWT untuk mengelola pengguna dan mengeluarkan token SWT.
+- [postgres-meta](https://github.com/supabase/postgres-meta) adalah API RESTful untuk mengelola Postgres Anda, yang memungkinkan Anda untuk mengambil tabel, menambahkan peran, dan menjalankan kueri, dll.
+- [GoTrue] (https://github.com/netlify/gotrue) adalah API berbasis SWT untuk mengelola pengguna dan menerbitkan token SWT.
 - [Kong] (https://github.com/Kong/kong) adalah gateway API asli cloud.
 
 #### Perpustakaan klien
@@ -77,73 +77,73 @@ Pendekatan kami untuk pustaka klien bersifat modular. Setiap sub-pustaka adalah 
   <tr>
     <th>Bahasa</th>
     <th>Klien</th>
-    <th colspan="5">Fitur-Klien (dibundel dalam klien Supabase)</th>
+    <th colspan="5">Klien-Fitur (dibundel dalam klien Supabase)</th>
   </tr>
   <tr>
     <th></th>
     <th>Supabase</th>
     <th><a href="https://github.com/postgrest/postgrest" target="_blank" rel="noopener noreferrer">PostgREST</a></th>
     <th><a href="https://github.com/supabase/gotrue" target="_blank" rel="noopener noreferrer">GoTrue</a></th>
-    <th><a href="https://github.com/supabase/realtime" target="_blank" rel="noopener noreferrer">Waktu Nyata</a></th>
+    <th><a href="https://github.com/supabase/realtime" target="_blank" rel="noopener noreferrer">Realtime</a></th>
     <th><a href="https://github.com/supabase/storage-api" target="_blank" rel="noopener noreferrer">Penyimpanan</a></th>
     <th>Fungsi</th>
   </tr>
-  <!-- TEMPLATE UNTUK BARIS BARU -->
-  <!-- BARIS AWAL
+  <!-- TEMPLATE FOR NEW ROW -->
+  <!-- START ROW
   <tr>
-    <td>bahasa</td>
+    <td>lang</td>
     <td><a href="https://github.com/supabase-community/supabase-lang" target="_blank" rel="noopener noreferrer">supabase-lang</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-lang" target="_blank" rel="noopener noreferrer">postgrest-lang</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-lang" target="_blank" rel="noopener noreferrer">gotrue-lang</a></td>
-    <td><a href="https://github.com/supabase-community/realtime-lang" target="_blank" rel="noopener noreferrer">real-time-lang</a></td>
+    <td><a href="https://github.com/supabase-community/realtime-lang" target="_blank" rel="noopener noreferrer">realtime-lang</a></td>
     <td><a href="https://github.com/supabase-community/storage-lang" target="_blank" rel="noopener noreferrer">storage-lang</a></td>
   </tr>
-  AKHIR BARIS -->
+  END ROW -->
   <th colspan="7">⚡️ Resmi ⚡️</th>
   <tr>
-    <td>JavaScript (TypeScript)</td>
+    <td><keep>Java</keep>Naskah (TypeScript)</td>
     <td><a href="https://github.com/supabase/supabase-js" target="_blank" rel="noopener noreferrer">supabase-js</a></td>
     <td><a href="https://github.com/supabase/postgrest-js" target="_blank" rel="noopener noreferrer">postgrest-js</a></td>
     <td><a href="https://github.com/supabase/gotrue-js" target="_blank" rel="noopener noreferrer">gotrue-js</a></td>
     <td><a href="https://github.com/supabase/realtime-js" target="_blank" rel="noopener noreferrer">realtime-js</a></td>
-    <td><a href="https://github.com/supabase/storage-js" target="_blank" rel="noopener noreferrer">storage-js</a></td>
+    <td><a href="https://github.com/supabase/storage-js" target="_blank" rel="noopener noreferrer">penyimpanan-js</a></td>
     <td><a href="https://github.com/supabase/functions-js" target="_blank" rel="noopener noreferrer">functions-js</a></td>
   </tr>
     <tr>
-    <td>Kibaran</td>
+    <td><keep>Flutter</keep></td>
     <td><a href="https://github.com/supabase/supabase-flutter" target="_blank" rel="noopener noreferrer">supabase-flutter</a></td>
     <td><a href="https://github.com/supabase/postgrest-dart" target="_blank" rel="noopener noreferrer">postgrest-dart</a></td>
     <td><a href="https://github.com/supabase/gotrue-dart" target="_blank" rel="noopener noreferrer">gotrue-dart</a></td>
-    <td><a href="https://github.com/supabase/realtime-dart" target="_blank" rel="noopener noreferrer">real-time-dart</a></td>
+    <td><a href="https://github.com/supabase/realtime-dart" target="_blank" rel="noopener noreferrer">realtime-dart</a></td>
     <td><a href="https://github.com/supabase/storage-dart" target="_blank" rel="noopener noreferrer">storage-dart</a></td>
     <td><a href="https://github.com/supabase/functions-dart" target="_blank" rel="noopener noreferrer">fungsi-dart</a></td>
   </tr>
   <th colspan="7">💚 Komunitas 💚</th>
   <tr>
-    <td>C#</td> <td>C#</td>
+    <td>C#</td>
     <td><a href="https://github.com/supabase-community/supabase-csharp" target="_blank" rel="noopener noreferrer">supabase-csharp</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-csharp" target="_blank" rel="noopener noreferrer">postgrest-csharp</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-csharp" target="_blank" rel="noopener noreferrer">gotrue-csharp</a></td>
-    <td><a href="https://github.com/supabase-community/realtime-csharp" target="_blank" rel="noopener noreferrer">real-time-csharp</a></td>
+    <td><a href="https://github.com/supabase-community/realtime-csharp" target="_blank" rel="noopener noreferrer">realtime-csharp</a></td>
     <td><a href="https://github.com/supabase-community/storage-csharp" target="_blank" rel="noopener noreferrer">storage-csharp</a></td>
-    <td><a href="https://github.com/supabase-community/functions-csharp" target="_blank" rel="noopener noreferrer">fungsi-csharp</a></td>
+    <td><a href="https://github.com/supabase-community/functions-csharp" target="_blank" rel="noopener noreferrer">functions-csharp</a></td>
   </tr>
   <tr>
     <td>Pergi</td>
     <td>-</td>
     <td><a href="https://github.com/supabase-community/postgrest-go" target="_blank" rel="noopener noreferrer">postgrest-go</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-go" target="_blank" rel="noopener noreferrer">gotrue-go</a></td>
-    <td>-</td
-    <td><a href="https://github.com/supabase-community/storage-go" target="_blank" rel="noopener noreferrer">penyimpanan-go</a></td>
-    <td><a href="https://github.com/supabase-community/functions-go" target="_blank" rel="noopener noreferrer">fungsi-go</a></td>
+    <td>-</td>
+    <td><a href="https://github.com/supabase-community/storage-go" target="_blank" rel="noopener noreferrer">penyimpanan-pergi</a></td>
+    <td><a href="https://github.com/supabase-community/functions-go" target="_blank" rel="noopener noreferrer">fungsi-pergi</a></td>
   </tr>
   <tr>
-    <td>Jawa</td>
+    <td><keep>Java</keep></td>
     <td>-</td>
     <td>-</td>
-    <td><a href="https://github.com/supabase-community/gotrue-java" target="_blank" rel="noopener noreferrer">jawa-tulen</a></td>
-    <td>-</td
-    <td><a href="https://github.com/supabase-community/storage-java" target="_blank" rel="noopener noreferrer">storage-java</a></td>
+    <td><a href="https://github.com/supabase-community/gotrue-java" target="_blank" rel="noopener noreferrer">gotrue-java</a></td>
+    <td>-</td>
+    <td><a href="https://github.com/supabase-community/storage-java" target="_blank" rel="noopener noreferrer">penyimpanan-jawa</a></td>
     <td>-</td>
   </tr>
   <tr>
@@ -151,30 +151,30 @@ Pendekatan kami untuk pustaka klien bersifat modular. Setiap sub-pustaka adalah 
     <td><a href="https://github.com/supabase-community/supabase-kt" target="_blank" rel="noopener noreferrer">supabase-kt</a></td>
     <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Postgrest" target="_blank" rel="noopener noreferrer">postgrest-kt</a></td>
     <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/GoTrue" target="_blank" rel="noopener noreferrer">gotrue-kt</a></td>
-    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Realtime" target="_blank" rel="noopener noreferrer">real-time-kt</a></td>
-    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Storage" target="_blank" rel="noopener noreferrer">storage-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Realtime" target="_blank" rel="noopener noreferrer">realtime-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Storage" target="_blank" rel="noopener noreferrer">penyimpanan-kt</a></td>
     <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Functions" target="_blank" rel="noopener noreferrer">fungsi-kt</a></td>
   </tr>
   <tr>
-    <td>Python</td>
+    <td><keep>Python</keep></td>
     <td><a href="https://github.com/supabase-community/supabase-py" target="_blank" rel="noopener noreferrer">supabase-py</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-py" target="_blank" rel="noopener noreferrer">postgrest-py</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-py" target="_blank" rel="noopener noreferrer">gotrue-py</a></td>
-    <td><a href="https://github.com/supabase-community/realtime-py" target="_blank" rel="noopener noreferrer">real-time-py</a></td>
+    <td><a href="https://github.com/supabase-community/realtime-py" target="_blank" rel="noopener noreferrer">realtime-py</a></td>
     <td><a href="https://github.com/supabase-community/storage-py" target="_blank" rel="noopener noreferrer">storage-py</a></td>
     <td><a href="https://github.com/supabase-community/functions-py" target="_blank" rel="noopener noreferrer">functions-py</a></td>
   </tr>
   <tr>
-    <td>Ruby</td>
+    <td><keep>Ruby</keep></td>
     <td><a href="https://github.com/supabase-community/supabase-rb" target="_blank" rel="noopener noreferrer">supabase-rb</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-rb" target="_blank" rel="noopener noreferrer">postgrest-rb</a></td>
     <td>-</td>
     <td>-</td>
     <td>-</td>
-    <td>-</td> <td>-</td> <td>-</td> <td>-</td> <td
+    <td>-</td>
   </tr>
   <tr>
-    <td>Karat</td>
+    <td><keep>Rust</keep></td>
     <td>-</td>
     <td><a href="https://github.com/supabase-community/postgrest-rs" target="_blank" rel="noopener noreferrer">postgrest-rs</a></td>
     <td>-</td>
@@ -183,31 +183,31 @@ Pendekatan kami untuk pustaka klien bersifat modular. Setiap sub-pustaka adalah 
     <td>-</td>
   </tr>
   <tr>
-    <td>Cepat</td>
+    <td><keep>Swift</keep></td>
     <td><a href="https://github.com/supabase-community/supabase-swift" target="_blank" rel="noopener noreferrer">supabase-swift</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-swift" target="_blank" rel="noopener noreferrer">postgrest-swift</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-swift" target="_blank" rel="noopener noreferrer">gotrue-swift</a></td>
-    <td><a href="https://github.com/supabase-community/realtime-swift" target="_blank" rel="noopener noreferrer">real-time-swift</a></td>
-    <td><a href="https://github.com/supabase-community/storage-swift" target="_blank" rel="noopener noreferrer">storage-swift</a></td>
-    <td><a href="https://github.com/supabase-community/functions-swift" target="_blank" rel="noopener noreferrer">fungsi-swift</a></td>
+    <td><a href="https://github.com/supabase-community/realtime-swift" target="_blank" rel="noopener noreferrer">realtime-swift</a></td>
+    <td><a href="https://github.com/supabase-community/storage-swift" target="_blank" rel="noopener noreferrer">penyimpanan-cepat</a></td>
+    <td><a href="https://github.com/supabase-community/functions-swift" target="_blank" rel="noopener noreferrer">fungsi-fungsi-cepat</a></td>
   </tr>
   <tr>
-    <td>Godot Engine (GDScript)</td>
+    <td>Mesin Godot (GDScript)</td>
     <td><a href="https://github.com/supabase-community/godot-engine.supabase" target="_blank" rel="noopener noreferrer">supabase-gdscript</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-gdscript" target="_blank" rel="noopener noreferrer">postgrest-gdscript</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-gdscript" target="_blank" rel="noopener noreferrer">gotrue-gdscript</a></td>
     <td><a href="https://github.com/supabase-community/realtime-gdscript" target="_blank" rel="noopener noreferrer">realtime-gdscript</a></td>
-    <td><a href="https://github.com/supabase-community/storage-gdscript" target="_blank" rel="noopener noreferrer">storage-gdscript</a></td>
-    <td><a href="https://github.com/supabase-community/functions-gdscript" target="_blank" rel="noopener noreferrer">fungsi-gdscript</a></td>
+    <td><a href="https://github.com/supabase-community/storage-gdscript" target="_blank" rel="noopener noreferrer">penyimpanan-gdscript</a></td>
+    <td><a href="https://github.com/supabase-community/functions-gdscript" target="_blank" rel="noopener noreferrer">functions-gdscript</a></td>
   </tr>
-</tabel> </table>
+</table>
 
-<!--- Hapus daftar ini jika Anda menerjemahkan ke bahasa lain, karena akan sulit untuk terus memperbaruinya di beberapa file-->
-<!--- Simpan hanya tautan ke daftar berkas terjemahan-->
+<!--- Remove this list if you're translating to another language, it's hard to keep updated across multiple files-->
+<!--- Keep only the link to the list of translation files-->
 
 ## Terjemahan
 
-- [Bahasa Arab | Bahasa Arab](/i18n/README.ar.md)
+- [Bahasa Arab | العربية](/i18n/README.ar.md)
 - [Bahasa Albania / Shqip](/i18n/README.sq.md)
 - [Bangla / বাংলা](/i18n/README.bn.md)
 - [Bahasa Bulgaria / Български](/i18n/README.bg.md)
@@ -245,7 +245,7 @@ Pendekatan kami untuk pustaka klien bersifat modular. Setiap sub-pustaka adalah 
 - [Bahasa Turki / Türkçe](/i18n/README.tr.md)
 - [Bahasa Ukraina / Українська](/i18n/README.uk.md)
 - [Bahasa Vietnam / Tiếng Việt](/i18n/README.vi-vn.md)
-- [Daftar terjemahan](/i18n/languages.md) <!--- Simpan hanya yang ini -->
+- [Daftar terjemahan](/i18n/languages.md) <!--- Keep only this -->
 
 ---
 
