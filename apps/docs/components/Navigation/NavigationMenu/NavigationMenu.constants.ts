@@ -909,6 +909,7 @@ export const platform = {
         { name: 'Network Restrictions', url: '/guides/platform/network-restrictions' },
         { name: 'Performance Tuning', url: '/guides/platform/performance' },
         { name: 'Permissions', url: '/guides/platform/permissions' },
+        { name: 'Project Upgrades', url: '/guides/platform/project-upgrades' },
         { name: 'SSL Enforcement', url: '/guides/platform/ssl-enforcement' },
       ],
     },

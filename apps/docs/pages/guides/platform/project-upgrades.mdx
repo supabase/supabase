@@ -1,0 +1,50 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  id: 'project-upgrades',
+  title: 'Project Upgrades',
+  description: 'Upgrading your Supabase project to the latest platform version.',
+}
+
+Supabase projects use the latest software versions of our platform when they're created. Supabase upgrades all projects hosted on our platform with new software builds, if the builds do not involve breaking changes, and if they can be rolled out with minimal disruption. For upgrades involving breaking changes, or requiring extended downtime, projects can be upgraded on-demand through the Supabase dashboard.
+
+## Upgrading a Supabase project
+
+TODO (darora): instructions here
+
+## Planning your upgrade
+
+### Misc considerations
+
+- Replication slots will need to be recreated?
+- ??
+
+### Estimating downtime requirements
+
+Postgres version upgrades, especially when they involve major version upgrades, can require extended maintenance windows. They also tend to grow as a function of the database size. 
+Furthermore, after the upgrade has been completed, you'll also want to ensure that your client applications and services are not running into any issues or errors, which should also be budgeted for as part of the maintenance window.
+
+As a rule of thumb, we recommend allocating an hour's maintenance window for upgrades for small (< 10GB) databases. For databases in the range of 10-100GB, we recommend between two to three hours. For larger databases, we recommend trying out the upgrade in a staging environment, with representative data (both in shape and size) to arrive at a more accurate estimate.
+
+The actual upgrade process (and associated database downtime) tends to be significantly shorter than the recommended maintenance window durations, as the durations allow for QC, remediation in case something unforeseen happens, etc etc etc
+
+## Breaking Changes
+
+TODO (darora): do we have a better changelog somewhere?
+
+### Supabase Postgres 15.1.0.XX
+
+- Postgrest 11 <link to breaking changes, brief description>
+
+### Supabase Postgrest 15.____
+
+- Postgres 15 <link to breaking changes, brief description>
+- Postgrest 10 <link to breaking changes, description, remediation steps>
+
+### Supabase Postgres 14
+
+- Postgres 14 <...>
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page
