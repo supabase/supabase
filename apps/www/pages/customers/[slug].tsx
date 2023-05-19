@@ -62,8 +62,9 @@ function CaseStudyPage(props: any) {
   const { basePath } = useRouter()
 
   const meta = {
-    title: `${props.blog.name} | Supabase Customer Stories`,
-    description: props.blog.description,
+    title:
+      props.blog.meta_title ?? props.blog.title ?? `${props.blog.name} | Supabase Customer Stories`,
+    description: props.blog.meta_description ?? props.blog.description,
     image: props.blog.og_image ?? `${basePath}/images/customers/og/customer-stories.jpg`,
     url: `https://supabase.io/customers/${props.blog.slug}`,
   }
