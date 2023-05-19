@@ -20,6 +20,7 @@ const AutoSchemaForm = observer(() => {
 
   const formId = 'auth-config-general-form'
   const [hidden, setHidden] = useState(true)
+  const [captchaProvider, setCaptchaProvider] = useState('hcaptcha')
   const canUpdateConfig = checkPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
   const INITIAL_VALUES = {
@@ -46,17 +47,24 @@ const AutoSchemaForm = observer(() => {
     SECURITY_CAPTCHA_ENABLED: boolean().required(),
     SECURITY_CAPTCHA_SECRET: string().when('SECURITY_CAPTCHA_ENABLED', {
       is: true,
-      then: string().required('Must have a hCaptcha secret'),
+      then: string().required('Must have a Captcha secret'),
     }),
+    SECURITY_CAPTCHA_PROVIDER: string().when('SECURITY_CAPTCHA_ENABLED', {
+      is: true,
+      then: string().oneOf(['hcaptcha', 'turnstile']).required('captcha provider must be either hcaptcha or turnstile')
+   }),
     MAX_ENROLLED_FACTORS: number()
       .min(0, 'Must be be a value more than 0')
       .max(30, 'Must be a value less than 30'),
   })
+  const onCaptchaProviderChange = (event) => {
+     setCaptchaProvider(event.target.value)
+  }
 
   const onSubmit = async (values: any, { setSubmitting, resetForm }: any) => {
     const payload = { ...values }
     payload.DISABLE_SIGNUP = !values.DISABLE_SIGNUP
-    payload.SECURITY_CAPTCHA_PROVIDER = 'hcaptcha'
+    payload.SECURITY_CAPTCHA_PROVIDER = captchaProvider
 
     setSubmitting(true)
     const { error } = await authConfig.update(payload)
@@ -144,7 +152,7 @@ const AutoSchemaForm = observer(() => {
                   <Toggle
                     id="SECURITY_CAPTCHA_ENABLED"
                     size="small"
-                    label="Enable hCaptcha protection"
+                    label="Enable Captcha protection"
                     layout="flex"
                     descriptionText="Protect authentication endpoints from abuse."
                     disabled={!canUpdateConfig}
@@ -152,19 +160,20 @@ const AutoSchemaForm = observer(() => {
                   {values.SECURITY_CAPTCHA_ENABLED && (
                     <>
                     <Radio.Group
-                      type="cards"
-                      label="Group of radios"
-                      labelOptional="Optional label"
-                      descriptionText="You can also show label hint text here"
+                        name="Captcha Providers"
+                        label="Captcha Providers"
+                        onChange={onCaptchaProviderChange}
                     >
-                      <Radio
-                        label="First Radio"
-                        description="The value of this Radio is controlled by a react state"
-                      />
-                      <Radio
-                        label="Second Radio"
-                        description="The value of this Radio is controlled by a react state"
-                      />
+                        <Radio
+                            label="hCaptcha"
+                            value="hcaptcha"
+                            checked={captchaProvider === 'hcaptcha'}
+                        />
+                        <Radio
+                            label="Turnstile (Cloudflare)"
+                            value="turnstile"
+                            checked={captchaProvider === 'turnstile'}
+                        />
                     </Radio.Group>
                     <Input
                       id="SECURITY_CAPTCHA_SECRET"
