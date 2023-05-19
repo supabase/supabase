@@ -912,9 +912,17 @@ functions:
     notes: |
       - `stream()` will emit the initial data as well as any further change on the database as `Stream` of `List<Map<String, dynamic>>` by combining Postgrest and Realtime.
       - Takes a list of primary key columns as its argument.
+      - The following filters are available
+        - `.eq('column', value)` listens to rows where the column equals the value
+        - `.neq('column', value)` listens to rows where the column does not equal the value
+        - `.gt('column', value)` listens to rows where the column is greater than the value
+        - `.gte('column', value)` listens to rows where the column is greater than or equal to the value
+        - `.lt('column', value)` listens to rows where the column is less than the value
+        - `.lte('column', value)` listens to rows where the column is less than or equal to the value
+        - `.inFilter('column', [val1, val2, val3])` listens to rows where the column is one of the values
     examples:
-      - id: listen-to-a-specific-table
-        name: Listen to a specific table
+      - id: listen-to-table
+        name: Listen to a table
         isSpotlight: true
         code: |
           ```dart
@@ -924,42 +932,25 @@ functions:
             // Do something awesome with the data
           });
           ```
-      - id: listening-to-a-specific-rows-within-a-table
-        name: Listening to a specific rows within a table
-        description: |
-          You can listen to individual rows using the format `{table}:{col}=eq.{val}` - where `{col}` is the column name, and `{val}` is the value which you want to match.
-          This syntax is the as how you can filter data in Realtime
+      - id: with-filter-order-limit
+        name: With filter, order and limit
         code: |
           ```dart
           supabase.from('countries')
             .stream(primaryKey: ['id'])
-            .eq('id', '120')
-            .listen((List<Map<String, dynamic>> data) {
-            // Do something awesome with the data
-          });
+            .eq('id', 120)
+            .order('name')
+            .limit(10);
           ```
-      - id: with-order
-        name: With `order()`
+      - id: with-in-filter
+        name: With an IN filter
         code: |
           ```dart
           supabase.from('countries')
             .stream(primaryKey: ['id'])
-            .order('name', { ascending: true })
-            .listen((List<Map<String, dynamic>> data) {
-            // Do something awesome with the data
-          });
-          ```
-      - id: with-limit
-        name: With `limit()`
-        code: |
-          ```dart
-          supabase.from('countries')
-            .stream(primaryKey: ['id'])
-            .order('name', { ascending: true })
-            .limit(10)
-            .listen((List<Map<String, dynamic>> data) {
-            // Do something awesome with the data
-          });
+            .inFilter('id', [1, 2, 3])
+            .order('name')
+            .limit(10);
           ```
       - id: using-stream-with-stream-builder
         name: Using `stream()` with `StreamBuilder`
