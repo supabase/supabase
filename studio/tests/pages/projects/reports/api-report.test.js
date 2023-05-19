@@ -3,8 +3,12 @@ import { render } from '../../../helpers'
 import { waitFor, screen } from '@testing-library/react'
 import { ApiReport } from 'pages/project/[ref]/reports/api-overview'
 import userEvent from '@testing-library/user-event'
+import * as useFillTimeseriesSortedModule from 'hooks/analytics/useFillTimeseriesSorted'
 
 beforeEach(() => {
+  // This hook can result in a huge amount of data being loaded into memory (array of 130k+ objects)
+  jest.spyOn(useFillTimeseriesSortedModule, 'default').mockReturnValue([])
+
   // reset mocks between tests
   get.mockReset()
   get.mockImplementation(async (_url) => [{ result: [] }])
@@ -29,8 +33,12 @@ test('refresh button', async () => {
 
 test('append - api request routes', async () => {
   get.mockImplementation(async (url) => {
-    if (decodeURIComponent(url).includes("request.path")) {
-      return { result: [{ path: 'mypath', method: 'GET', status_code: 200, search: 'some-query', count: 22 }] }
+    if (decodeURIComponent(url).includes('request.path')) {
+      return {
+        result: [
+          { path: 'mypath', method: 'GET', status_code: 200, search: 'some-query', count: 22 },
+        ],
+      }
     }
     return { result: [{ timestamp: new Date().toISOString(), count: 123 }] }
   })
@@ -43,12 +51,15 @@ test('append - api request routes', async () => {
   await screen.findAllByText(/22/)
 })
 
-
 test('append - error routes', async () => {
   get.mockImplementation(async (url) => {
     const uri = decodeURIComponent(url)
-    if (uri.includes("400")) {
-      return { result: [{ path: 'mypath', method: 'GET', status_code: 200, search: 'some-query', count: 22 }] }
+    if (uri.includes('400')) {
+      return {
+        result: [
+          { path: 'mypath', method: 'GET', status_code: 200, search: 'some-query', count: 22 },
+        ],
+      }
     }
     return { result: [{ timestamp: new Date().toISOString(), count: 123 }] }
   })
@@ -61,12 +72,22 @@ test('append - error routes', async () => {
   await screen.findAllByText(/22/)
 })
 
-
 test('append - error routes', async () => {
   get.mockImplementation(async (url) => {
     const uri = decodeURIComponent(url)
-    if (uri.includes("avg") && uri.includes("request.path")) {
-      return { result: [{ path: 'mypath', method: 'GET', status_code: 200, avg: 534, search: 'some-query', count: 22 }] }
+    if (uri.includes('avg') && uri.includes('request.path')) {
+      return {
+        result: [
+          {
+            path: 'mypath',
+            method: 'GET',
+            status_code: 200,
+            avg: 534,
+            search: 'some-query',
+            count: 22,
+          },
+        ],
+      }
     }
     return { result: [{ timestamp: new Date().toISOString(), count: 123 }] }
   })
@@ -79,8 +100,6 @@ test('append - error routes', async () => {
   await screen.findAllByText(/22/)
   await screen.findAllByText(/534\.00ms/)
 })
-
-
 
 // test('expandable error routes', async () => {
 //   get.mockImplementation(async (url) => {
