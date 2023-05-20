@@ -3,7 +3,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 
 import { Button, ButtonProps } from './Button'
-import { Fragment } from 'react'
+
 import { IconAirplay } from '../Icon/icons/IconAirplay'
 
 const meta: Meta<typeof Button> = {
@@ -16,11 +16,6 @@ const meta: Meta<typeof Button> = {
 }
 
 export default meta
-
-// export default {
-//   title: 'General/Button',
-//   component: Button,
-// }
 
 type Story = StoryObj<typeof Button>
 
