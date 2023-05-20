@@ -3,7 +3,7 @@
 //   return randomNumber.toString()
 // }
 
-export default function generateUID() {
+export function generateUID() {
   // I generate the UID from two parts here
   // to ensure the random number provide enough bits.
   var firstPart = (Math.random() * 46656) | 0

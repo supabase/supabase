@@ -3,7 +3,7 @@ import { createContext } from 'react'
 
 import defaultTheme from '../../lib/theme/defaultTheme'
 
-import { mergeDeep } from '../../utils/mergeDeep'
+import { mergeDeep } from '../../lib/utils/mergeDeep'
 // import useDarkMode from './utils/useDarkMode'
 
 interface ThemeContextInterface {
