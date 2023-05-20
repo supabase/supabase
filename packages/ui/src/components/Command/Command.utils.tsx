@@ -1,7 +1,7 @@
 import { Command as CommandPrimitive } from 'cmdk-supabase'
 import * as React from 'react'
 
-import { cn } from './../../utils/cn'
+import { cn } from '../../lib/utils/cn'
 
 import { DetailedHTMLProps, HTMLAttributes, KeyboardEventHandler } from 'react'
 import { Modal } from '../Modal'
