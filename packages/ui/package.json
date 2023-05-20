@@ -76,6 +76,7 @@
     "storybook": "^7.0.5",
     "storybook-dark-mode": "^3.0.0",
     "style-dictionary": "^3.7.1",
+    "tsconfig-paths-webpack-plugin": "^4.0.1",
     "typescript": "4.3.4"
   }
 }
