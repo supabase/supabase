@@ -176,10 +176,13 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
             <div className="rounded-md border border-scale-600 p-2.5 flex items-center">
               <div
                 className="w-8 h-8 md:w-10 md:h-10 bg-center bg-no-repeat bg-cover flex items-center justify-center"
-                // [Joshen] For when we support icons
-                // style={{ backgroundImage: `url('${requester?.icon}')` }}
+                style={{
+                  backgroundImage: requester.icon !== null ? `url('${requester?.icon}')` : 'none',
+                }}
               >
-                <p className="text-scale-1000 text-lg">{requester?.name[0]}</p>
+                {requester?.icon === null && (
+                  <p className="text-scale-1000 text-lg">{requester?.name[0]}</p>
+                )}
               </div>
             </div>
           </div>

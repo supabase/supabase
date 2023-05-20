@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useParams } from 'common'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
@@ -21,14 +21,26 @@ const QueryItem = ({ tabInfo }: QueryItemProps) => {
   const { ref, id: activeId } = useParams()
   const { id, name } = tabInfo || {}
   const isActive = id === activeId
+  const activeItemRef = useRef<HTMLElement | null>(null)
+
+  useEffect(() => {
+    // scroll to active item
+    if (isActive && activeItemRef.current) {
+      // race condition hack
+      setTimeout(() => {
+        activeItemRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+      }, 0)
+    }
+  })
 
   return (
     <div
       key={id}
       className={clsx(
         'flex items-center justify-between rounded-md group',
-        isActive && 'text-scale-1200 bg-scale-300'
+        isActive && 'text-scale-1200 bg-scale-400 dark:bg-scale-300 -active'
       )}
+      ref={isActive ? (activeItemRef as React.RefObject<HTMLDivElement>) : null}
     >
       <Link href={`/project/${ref}/sql/${id}`}>
         <a className="py-1 px-3 w-full">
@@ -127,14 +139,12 @@ const QueryItemActions = observer(({ tabInfo }: { tabInfo: SqlSnippet }) => {
       ) : (
         <Button as="span" type="text" style={{ padding: '3px' }} />
       )}
-
       <RenameQueryModal
         snippet={tabInfo}
         visible={renameModalOpen}
         onCancel={onCloseRenameModal}
         onComplete={onCloseRenameModal}
       />
-
       <ConfirmationModal
         header="Confirm to delete"
         buttonLabel="Delete query"

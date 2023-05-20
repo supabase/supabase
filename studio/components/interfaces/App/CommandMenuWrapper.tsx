@@ -8,9 +8,9 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { uuidv4 } from 'lib/helpers'
 import { checkPermissions, useFlag, useStore } from 'hooks'
+import useProfile from 'hooks/misc/useProfile'
 import { createSqlSnippetSkeleton } from '../SQLEditor/SQLEditor.utils'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { useProfileQuery } from 'data/profile/profile-query'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { codeBlock } from 'common-tags'
@@ -25,7 +25,7 @@ const CommandMenuWrapper = observer(({ children }: PropsWithChildren<{}>) => {
   const allowCMDKDataOptIn = useFlag('dashboardCmdkDataOptIn')
   const isOptedInToAI = opt_in_tags?.includes('AI_SQL_GENERATOR_OPT_IN') ?? false
 
-  const { data: profile } = useProfileQuery()
+  const { data: profile } = useProfile()
   const { data: settings } = useProjectApiQuery({ projectRef: ref })
   const canCreateSQLSnippet = checkPermissions(PermissionAction.CREATE, 'user_content', {
     resource: { type: 'sql', owner_id: profile?.id },
@@ -98,9 +98,6 @@ const CommandMenuWrapper = observer(({ children }: PropsWithChildren<{}>) => {
       site="studio"
       projectRef={ref}
       apiKeys={apiKeys}
-      MarkdownHandler={(props) => (
-        <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents} {...props} />
-      )}
       metadata={cmdkMetadata}
       isOptedInToAI={allowCMDKDataOptIn && isOptedInToAI}
       saveGeneratedSQL={onSaveGeneratedSQL}

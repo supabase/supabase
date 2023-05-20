@@ -15,8 +15,8 @@ import {
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { checkPermissions, useFlag, useStore } from 'hooks'
+import useProfile from 'hooks/misc/useProfile'
 import { IS_PLATFORM } from 'lib/constants'
-import { useProfileQuery } from 'data/profile/profile-query'
 import { uuidv4 } from 'lib/helpers'
 
 import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
@@ -33,7 +33,7 @@ const SideBarContent = observer(() => {
   const { ui } = useStore()
   const { ref, id } = useParams()
   const router = useRouter()
-  const { data: profile } = useProfileQuery()
+  const { data: profile } = useProfile()
   const [filterString, setFilterString] = useState('')
   const { setPages, setIsOpen } = useCommandMenu()
   const showCmdkHelper = useFlag('dashboardCmdk')
@@ -61,7 +61,6 @@ const SideBarContent = observer(() => {
     filterString.length === 0
       ? queries
       : queries.filter((tab) => tab.name.toLowerCase().includes(filterString.toLowerCase()))
-
   const canCreateSQLSnippet = checkPermissions(PermissionAction.CREATE, 'user_content', {
     resource: { type: 'sql', owner_id: profile?.id },
     subject: { id: profile?.id },
@@ -112,6 +111,8 @@ const SideBarContent = observer(() => {
                 <Dropdown
                   align="end"
                   side="bottom"
+                  sideOffset={3}
+                  className="max-w-[210px]"
                   overlay={[
                     <Dropdown.Item
                       key="new-ai-query"
@@ -190,7 +191,7 @@ const SideBarContent = observer(() => {
               {queryTabs.length >= 1 && (
                 <div className="editor-product-menu">
                   <Menu.Group title="SQL snippets" />
-                  <div className="space-y-1">
+                  <div className="space-y-1 pb-8">
                     {queryTabs.map((tabInfo) => {
                       const { id } = tabInfo || {}
                       return <QueryItem key={id} tabInfo={tabInfo} />
