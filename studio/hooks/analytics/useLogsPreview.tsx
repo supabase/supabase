@@ -15,14 +15,14 @@ import {
   LogsTableName,
   PREVIEWER_DATEPICKER_HELPERS,
 } from 'components/interfaces/Settings/Logs'
-import { Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from 'react'
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react'
 import { API_URL } from 'lib/constants'
 import { get } from 'lib/common/fetch'
 import dayjs from 'dayjs'
 import useFillTimeseriesSorted from './useFillTimeseriesSorted'
 import useTimeseriesUnixToIso from './useTimeseriesUnixToIso'
 
-interface Data {
+interface LogsPreviewHook {
   logData: LogData[]
   error: string | Object | null
   newCount: number
@@ -32,8 +32,6 @@ interface Data {
   params: LogsEndpointParams
   oldestTimestamp?: string
   eventChartData: EventChartData[]
-}
-interface Handlers {
   loadOlder: () => void
   refresh: () => void
   setFilters: (filters: Filters | ((previous: Filters) => Filters)) => void
@@ -43,7 +41,7 @@ function useLogsPreview(
   projectRef: string,
   table: LogsTableName,
   filterOverride?: Filters
-): [Data, Handlers] {
+): LogsPreviewHook {
   const defaultHelper = getDefaultHelper(PREVIEWER_DATEPICKER_HELPERS)
   const [latestRefresh, setLatestRefresh] = useState<string>(new Date().toISOString())
 
@@ -168,7 +166,7 @@ function useLogsPreview(
 
   const oldestTimestamp = logData[logData.length - 1]?.timestamp
 
-  const handleSetFilters: Handlers['setFilters'] = (newFilters) => {
+  const handleSetFilters: LogsPreviewHook['setFilters'] = (newFilters) => {
     if (typeof newFilters === 'function') {
       setFilters((prev) => {
         const resolved = newFilters(prev)
@@ -189,29 +187,25 @@ function useLogsPreview(
     'timestamp',
     'count',
     0,
-    params.iso_timestamp_start ,
+    params.iso_timestamp_start,
     // default to current time if not set
     params.iso_timestamp_end || new Date().toISOString()
   )
 
-  return [
-    {
-      newCount,
-      logData,
-      isLoading: isLoading || isRefetching,
-      isLoadingOlder: isFetchingNextPage,
-      error,
-      filters,
-      params,
-      oldestTimestamp: oldestTimestamp ? String(oldestTimestamp) : undefined,
-      eventChartData,
-    },
-    {
-      setFilters: handleSetFilters,
-      refresh,
-      loadOlder: () => fetchNextPage(),
-      setParams,
-    },
-  ]
+  return {
+    newCount,
+    logData,
+    isLoading: isLoading || isRefetching,
+    isLoadingOlder: isFetchingNextPage,
+    error,
+    filters,
+    params,
+    oldestTimestamp: oldestTimestamp ? String(oldestTimestamp) : undefined,
+    eventChartData,
+    setFilters: handleSetFilters,
+    refresh,
+    loadOlder: () => fetchNextPage(),
+    setParams,
+  }
 }
 export default useLogsPreview

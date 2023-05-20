@@ -8,14 +8,12 @@ import { Dispatch, SetStateAction, useState } from 'react'
 import { LogsEndpointParams, Logs, LogData } from 'components/interfaces/Settings/Logs/Logs.types'
 import { API_URL } from 'lib/constants'
 import { get } from 'lib/common/fetch'
-export interface LogsQueryData {
+export interface LogsQueryHook {
   params: LogsEndpointParams
   isLoading: boolean
   logData: LogData[]
   data?: never
   error: string | Object | null
-}
-export interface LogsQueryHandlers {
   changeQuery: (newQuery?: string) => void
   runQuery: () => void
   setParams: Dispatch<SetStateAction<LogsEndpointParams>>
@@ -24,7 +22,7 @@ export interface LogsQueryHandlers {
 const useLogsQuery = (
   projectRef: string,
   initialParams: Partial<LogsEndpointParams> = {}
-): [LogsQueryData, LogsQueryHandlers] => {
+): LogsQueryHook => {
   const defaultHelper = getDefaultHelper(EXPLORER_DATEPICKER_HELPERS)
   const [params, setParams] = useState<LogsEndpointParams>({
     sql: initialParams?.sql || '',
@@ -67,14 +65,14 @@ const useLogsQuery = (
     setParams((prev) => ({ ...prev, sql: newQuery }))
   }
 
-  return [
-    {
-      params,
-      isLoading: (enabled && isLoading) || isRefetching,
-      logData: data?.result ? data?.result : [],
-      error,
-    },
-    { changeQuery, runQuery: () => refetch(), setParams },
-  ]
+  return {
+    params,
+    isLoading: (enabled && isLoading) || isRefetching,
+    logData: data?.result ? data?.result : [],
+    error,
+    changeQuery,
+    runQuery: () => refetch(),
+    setParams,
+  }
 }
 export default useLogsQuery

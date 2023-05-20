@@ -4,6 +4,7 @@
   "main": "./index.tsx",
   "types": "./index.tsx",
   "license": "MIT",
+  "sideEffects": false,
   "scripts": {
     "build:icons": "node --experimental-modules internals/populate-icons.js",
     "build-tokens": "node internals/tokens/build-tokens.js",
@@ -11,7 +12,8 @@
     "cleanse-css-for-tailwind": "node internals/tokens/cleanse-css-for-tailwind.js",
     "generate-styles": "npm run copy-tokens && npm run build-tokens && npm run cleanse-css-for-tailwind",
     "build-storybook": "storybook build",
-    "storybook": "storybook dev -p 6006"
+    "storybook": "storybook dev -p 6006",
+    "test": "jest"
   },
   "dependencies": {
     "@headlessui/react": "^1.0.0",
@@ -61,6 +63,7 @@
     "@storybook/react": "^7.0.5",
     "@storybook/react-webpack5": "^7.0.5",
     "@tokens-studio/sd-transforms": "^0.8.5",
+    "@testing-library/jest-dom": "^5.16.5",
     "@types/common-tags": "^1.8.1",
     "@types/react": "^17.0.37",
     "@types/react-copy-to-clipboard": "^5.0.4",
