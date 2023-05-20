@@ -79,6 +79,7 @@ Our approach for client libraries is modular. Each sub-library is a standalone i
     <th>Client</th>
     <th colspan="5">Feature-Clients (bundled in Supabase client)</th>
   </tr>
+  <!-- notranslate -->
   <tr>
     <th></th>
     <th>Supabase</th>
@@ -99,7 +100,9 @@ Our approach for client libraries is modular. Each sub-library is a standalone i
     <td><a href="https://github.com/supabase-community/storage-lang" target="_blank" rel="noopener noreferrer">storage-lang</a></td>
   </tr>
   END ROW -->
+  <!-- /notranslate -->
   <th colspan="7">⚡️ Official ⚡️</th>
+  <!-- notranslate -->
   <tr>
     <td>JavaScript (TypeScript)</td>
     <td><a href="https://github.com/supabase/supabase-js" target="_blank" rel="noopener noreferrer">supabase-js</a></td>
@@ -118,7 +121,9 @@ Our approach for client libraries is modular. Each sub-library is a standalone i
     <td><a href="https://github.com/supabase/storage-dart" target="_blank" rel="noopener noreferrer">storage-dart</a></td>
     <td><a href="https://github.com/supabase/functions-dart" target="_blank" rel="noopener noreferrer">functions-dart</a></td>
   </tr>
+  <!-- /notranslate -->
   <th colspan="7">💚 Community 💚</th>
+  <!-- notranslate -->
   <tr>
     <td>C#</td>
     <td><a href="https://github.com/supabase-community/supabase-csharp" target="_blank" rel="noopener noreferrer">supabase-csharp</a></td>
@@ -200,6 +205,7 @@ Our approach for client libraries is modular. Each sub-library is a standalone i
     <td><a href="https://github.com/supabase-community/storage-gdscript" target="_blank" rel="noopener noreferrer">storage-gdscript</a></td>
     <td><a href="https://github.com/supabase-community/functions-gdscript" target="_blank" rel="noopener noreferrer">functions-gdscript</a></td>
   </tr>
+  <!-- /notranslate -->
 </table>
 
 <!--- Remove this list if you're translating to another language, it's hard to keep updated across multiple files-->
