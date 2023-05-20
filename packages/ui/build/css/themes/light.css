@@ -1,6 +1,6 @@
 /**
  * Do not edit directly
- * Generated on Tue, 09 May 2023 15:35:29 GMT
+ * Generated on Sat, 20 May 2023 09:00:49 GMT
  */
 
 .light {
@@ -22,7 +22,7 @@
   --theme-variables-warning: 26.9deg 93.8% 56.1%;
   --theme-variables-background-body-alt: 0deg 0% 100%; /*  og color is colors.Gray.Dark.1 */
   --theme-variables-background-body: 210deg 16.7% 97.6%; /* og color is colors.Slate.Light.2 */
-  --theme-variables-background: 210deg 33.3% 98.8%; /* og color is  colors.Slate.Light.1 */
+  --theme-variables-background: 0deg 0% 98.4%; /* og color is  colors.Slate.Light.1 */
   --theme-variables-brand: 153.1deg 60.2% 52.7%;
   --text-color-disabled-default: 195deg 7.1% 5.5%;
   --text-color-danger-default: var(--theme-variables-danger);
@@ -48,11 +48,11 @@
   --text-color-body-lightest: 195deg 1% 65.6%;
   --text-color-body-lighter: 195deg 1% 51.8%;
   --text-color-body-light: 195deg 1.9% 34.3%;
-  --border-color-selection: 210deg 0.4% 46.1%;
+  --border-color-selection: 91.8deg 0% 45.9%;
   --border-color-body-alt: 91.8deg 0% 96%;
   --border-color-body: 210deg 6.1% 93.7%;
-  --border-color-default: 210deg 7.5% 94.9%; /* Default border color */
-  --background-color-control: 210deg 33.3% 99.2%;
-  --background-color-selection: 210deg 7.5% 94.9%;
-  --border-color-control: 210deg 4.1% 91.2%;
+  --border-color-default: 91.8deg 0% 94.5%; /* Default border color */
+  --background-color-control: 91.8deg 0% 98.9%;
+  --background-color-selection: 91.8deg 0% 94.5%;
+  --border-color-control: 91.8deg 0% 90.8%;
 }

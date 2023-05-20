@@ -103,7 +103,7 @@ const buttonVariantsNew = cva(
             shadow-sm`,
       },
       block: {
-        default: 'w-full flex items-center justify-center',
+        true: 'w-full flex items-center justify-center',
       },
       size: {
         ...sizes,
@@ -149,10 +149,10 @@ export interface ButtonProps
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ asChild = false, ...props }, ref) => {
+  ({ asChild = false, size = 'small', type = 'primary', ...props }, ref) => {
     const Comp = asChild ? Slot : 'button'
 
-    const { className, type, disabled, size, loading, icon, iconLeft, iconRight } = props
+    const { className, disabled, loading, icon, iconLeft, iconRight } = props
 
     const showIcon = loading || icon
 
@@ -188,9 +188,5 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 )
 
 Button.displayName = 'Button'
-
-function Test() {
-  return <Button as={'input'}></Button>
-}
 
 export { Button, buttonVariantsNew }
