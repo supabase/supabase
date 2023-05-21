@@ -12,6 +12,8 @@ const config: any = {
     '../src/components/Collapsible/Collapsible.stories.tsx',
     // '../src/components/ContextMenu/ContextMenu.stories.tsx',
     '../src/components/Dropdown/Dropdown.stories.tsx',
+
+    '../src/components/shadcn/form/Form.stories.tsx',
   ],
   addons: [
     'storybook-dark-mode',
