@@ -294,7 +294,7 @@ Policies are a tool. In the case of "serverless/Jamstack" setups, they are espec
 
 That said, if you want to use another authorization method for your applications that's also fine. Supabase is "just Postgres", so if your application works with Postgres, then it also works with Supabase.
 
-If you plan to use this approach ake sure to enable RLS for your tables. Then use the `service_role` key (for our client libraries) or the `postgres` role - both of these can bypass RLS. You don't need to create any policies with this approach, simply enabling RLS is sufficient:
+If you plan to use this approach make sure to enable RLS for your tables. Then use the `service_role` key (for our client libraries) or the `postgres` role - both of these can bypass RLS. You don't need to create any policies with this approach, simply enabling RLS is sufficient:
 
 ```sql
 create table profiles (
