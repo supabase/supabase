@@ -1,7 +1,7 @@
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin')
-import type { StorybookConfig } from '@storybook/your-framework'
+// import type { StorybookConfig } from '@storybook/your-framework'
 
-const config: StorybookConfig = {
+const config: any = {
   //   // stories: [
   //   //   '../src/components/**/*.stories.mdx',
   //   //   '../src/components/**/*.stories.@(js|jsx|ts|tsx)',
@@ -11,6 +11,7 @@ const config: StorybookConfig = {
   stories: [
     '../src/components/Accordion/Accordion.stories.tsx',
     '../src/components/Alert/Alert.stories.tsx',
+    '../src/components/Badge/Badge.stories.tsx',
     // '../src/components/Avatar/Avatar.stories.tsx',
     '../src/components/Button/Button.stories.tsx',
     // '../src/components/Checkbox/Checkbox.stories.tsx',
