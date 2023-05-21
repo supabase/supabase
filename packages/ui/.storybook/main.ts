@@ -9,7 +9,7 @@ const config: StorybookConfig = {
   //   // TODO: Temporally Import one by one story and fix build issue.
   //   // After all stories are cleaned, revert to wildcard import.
   stories: [
-    // '../src/components/Accordion/Accordion.stories.tsx',
+    '../src/components/Accordion/Accordion.stories.tsx',
     // '../src/components/Alert/Alert.stories.tsx',
     // '../src/components/Avatar/Avatar.stories.tsx',
     '../src/components/Button/Button.stories.tsx',

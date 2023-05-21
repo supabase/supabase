@@ -1,199 +1,79 @@
-import React from 'react'
+// Button.stories.ts|tsx
 
-import Accordion, { AccordionProps } from './Accordion'
+import type { Meta, StoryObj } from '@storybook/react'
+
+import { Accordion, AccordionItem } from './Accordion'
 import { Badge } from '../Badge'
 
-export default {
-  title: 'Displays/Accordion',
+const meta: Meta<typeof Accordion> = {
+  /* 👇 The title prop is optional.
+   * See https://storybook.js.org/docs/react/configure/overview#configure-story-loading
+   * to learn how to generate automatic titles
+   */
+  title: 'General/Accordion',
   component: Accordion,
 }
 
-export const OneItem = (args: AccordionProps) => (
-  <Accordion {...args} justified={false}>
-    <Accordion.Item
-      header={
-        <>
-          <span className="text-scale-900 group-hover:text-scale-1200">
-            Title of the thing
-          </span>
-          <Badge>Test badge</Badge>
-        </>
-      }
-      id="first"
-    >
-      <span className="text-scale-900">
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur
-        amet labore.
-      </span>
-    </Accordion.Item>
-  </Accordion>
-)
+export default meta
 
-export const MultipleItems = (args: AccordionProps) => (
-  <Accordion {...args} openBehaviour="multiple">
-    <Accordion.Item
-      header={
-        <span className="text-scale-900 group-hover:text-scale-1200">
-          Title of the thing
-        </span>
-      }
-      id={'1'}
-    >
-      <span className="text-scale-900">
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur
-        amet labore.
-      </span>
-    </Accordion.Item>
-    <Accordion.Item
-      header={
-        <span className="text-scale-900 group-hover:text-scale-1200">
-          Title of the thing
-        </span>
-      }
-      id={'2'}
-    >
-      <span className="text-scale-900">
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur
-        amet labore.
-      </span>
-    </Accordion.Item>
-    <Accordion.Item
-      header={
-        <span className="text-scale-900 group-hover:text-scale-1200">
-          Title of the thing
-        </span>
-      }
-      id={'3'}
-    >
-      <span className="text-scale-900">
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur
-        amet labore.
-      </span>
-    </Accordion.Item>
-    <Accordion.Item
-      header={
-        <span className="text-scale-900 group-hover:text-scale-1200">
-          Title of the thing
-        </span>
-      }
-      id={'4'}
-    >
-      <span className="text-scale-900">
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur
-        amet labore.
-      </span>
-    </Accordion.Item>
-  </Accordion>
-)
+type Story = StoryObj<typeof Accordion>
 
-export const Bordered = (args: AccordionProps) => (
-  <Accordion {...args}>
-    <Accordion.Item
-      header={
-        <span className="text-scale-900 group-hover:text-scale-1200">
-          Title of the thing
-        </span>
-      }
-      id={'1'}
-    >
-      <span className="text-scale-900">
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur
-        amet labore.
-      </span>
-    </Accordion.Item>
-    <Accordion.Item
-      header={
-        <span className="text-scale-900 group-hover:text-scale-1200">
-          Title of the thing
-        </span>
-      }
-      id={'2'}
-    >
-      <span className="text-scale-900">
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur
-        amet labore.
-      </span>
-    </Accordion.Item>
-    <Accordion.Item
-      header={
-        <span className="text-scale-900 group-hover:text-scale-1200">
-          Title of the thing
-        </span>
-      }
-      id={'3'}
-    >
-      <span className="text-scale-900">
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur
-        amet labore.
-      </span>
-    </Accordion.Item>
-    <Accordion.Item
-      header={
-        <span className="text-scale-900 group-hover:text-scale-1200">
-          Title of the thing
-        </span>
-      }
-      id={'4'}
-    >
-      <span className="text-scale-900">
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur
-        amet labore.
-      </span>
-    </Accordion.Item>
-  </Accordion>
-)
+/*
+ *👇 Render functions are a framework specific feature to allow you control on how the component renders.
+ * See https://storybook.js.org/docs/react/api/csf
+ * to learn how to use render functions.
+ */
 
-Bordered.args = {
-  type: 'bordered',
+export const Default = {
+  args: {
+    type: 'default',
+  },
+  render: ({ children, type }: any) => (
+    <Accordion type={type} openBehaviour="single" collapsible className="w-full">
+      <Accordion.Item value="item-1">
+        <Accordion.Trigger>
+          <span className="text-scale-900 group-hover:text-scale-1200">Title of the thing</span>
+        </Accordion.Trigger>
+        <Accordion.Content>Yes. It adheres to the WAI-ARIA design pattern.</Accordion.Content>
+      </Accordion.Item>
+      <Accordion.Item value="item-2">
+        <Accordion.Trigger>Is it styled?</Accordion.Trigger>
+        <Accordion.Content>
+          Yes. It comes with default styles that matches the other components' aesthetic.
+        </Accordion.Content>
+      </Accordion.Item>
+      <Accordion.Item value="item-3">
+        <Accordion.Trigger>Is it animated?</Accordion.Trigger>
+        <Accordion.Content>
+          Yes. It's animated by default, but you can disable it if you prefer.
+        </Accordion.Content>
+      </Accordion.Item>
+    </Accordion>
+  ),
 }
 
-export const LeftAlignedChevron = (args: AccordionProps) => (
-  <Accordion {...args} justified={false} chevronAlign="left">
-    <Accordion.Item
-      header={
-        <>
-          <span className="text-scale-900 group-hover:text-scale-1200">
-            First item
-          </span>
-          <Badge>Test badge</Badge>
-        </>
-      }
-      id="first"
-    >
-      <span className="text-scale-900">
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur
-        amet labore.
-      </span>
-    </Accordion.Item>
-    <Accordion.Item
-      header={
-        <>
-          <span className="text-scale-900 group-hover:text-scale-1200">
-            Second item
-          </span>
-        </>
-      }
-      id="second"
-    >
-      <span className="text-scale-900">
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur
-        amet labore.
-      </span>
-    </Accordion.Item>
-  </Accordion>
-)
-
-// export const withDefaultActive = Multiple.bind({})
-// withDefaultActive.args = {
-//   defaultActiveId: [1],
-// }
-
-// export const withIconLeft = Multiple.bind({})
-// withIconLeft.args = {
-//   iconPosition: 'left',
-// }
-
-// export const withCustomIcon = Multiple.bind({})
-// withCustomIcon.args = {
-//   icon: <IconArrowUp />,
-// }
+export const Bordered = {
+  args: {
+    type: 'bordered',
+  },
+  render: ({ children, type }: any) => (
+    <Accordion type={type} openBehaviour="single" collapsible className="w-full">
+      <Accordion.Item value="item-1">
+        <Accordion.Trigger>Is it accessible?</Accordion.Trigger>
+        <Accordion.Content>Yes. It adheres to the WAI-ARIA design pattern.</Accordion.Content>
+      </Accordion.Item>
+      <Accordion.Item value="item-2">
+        <Accordion.Trigger>Is it styled?</Accordion.Trigger>
+        <Accordion.Content>
+          Yes. It comes with default styles that matches the other components' aesthetic.
+        </Accordion.Content>
+      </Accordion.Item>
+      <Accordion.Item value="item-3">
+        <Accordion.Trigger>Is it animated?</Accordion.Trigger>
+        <Accordion.Content>
+          Yes. It's animated by default, but you can disable it if you prefer.
+        </Accordion.Content>
+      </Accordion.Item>
+    </Accordion>
+  ),
+}
