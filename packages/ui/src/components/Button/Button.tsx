@@ -8,8 +8,8 @@ import { IconLoader } from './../Icon/icons/IconLoader'
 import { cn } from '@ui/lib/utils'
 import { sizes } from '@ui/lib/commonCva'
 
-export type ButtonVariantProps = VariantProps<typeof buttonVariantsNew>
-const buttonVariantsNew = cva(
+export type ButtonVariantProps = VariantProps<typeof buttonVariants>
+const buttonVariants = cva(
   `relative 
   cursor-pointer 
   inline-flex 
@@ -176,7 +176,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
     return (
       <Comp
-        className={cn(buttonVariantsNew({ type, size, disabled, className }))}
+        className={cn(buttonVariants({ type, size, disabled }), className)}
         ref={ref}
         type={props.htmlType}
         {...props}
@@ -189,4 +189,4 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
 Button.displayName = 'Button'
 
-export { Button, buttonVariantsNew }
+export { Button, buttonVariants }
