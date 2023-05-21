@@ -1,84 +1,145 @@
-import React, { useState } from 'react'
-import { IconAlertTriangle } from '../Icon/icons/IconAlertTriangle'
+import * as React from 'react'
+import { VariantProps, cva } from 'class-variance-authority'
+import { cn } from '@ui/lib/utils'
+import { AlertCircle, AlertOctagon, AlertTriangle, Check, Info } from 'lucide-react'
 
-import { IconInfo } from '../Icon/icons/IconInfo'
-import { IconX } from '../Icon/icons/IconX'
+export type AlertRootVariantsProps = VariantProps<typeof alertRootVariants>
+const alertRootVariants = cva(
+  `relative w-full 
+  rounded-lg border 
+  py-4 px-6
+  [&>svg]:absolute [&>svg]:text-foreground [&>svg]:left-4 [&>svg]:top-4 [&>svg+div]:translate-y-[-3px] [&:has(svg)]:pl-11`,
+  {
+    variants: {
+      variant: {
+        danger: `bg-red-200 dark:bg-red-100 text-red-1200 border-red-700 [&>svg]:text-red-1200`,
+        warning: `bg-amber-200 dark:bg-amber-100 border-amber-700 [&>svg]:text-amber-1200`,
+        info: `bg-scale-400 border-scale-500 dark:bg-scale-100 dark:border-scale-300 [&>svg]:text-scale-1200`,
+        success: `bg-brand-300 dark:bg-brand-100 border-brand-700 [&>svg]:text-brand-900`,
+        neutral: `bg-scale-300 dark:bg-scale-300 border-scale-500 [&>svg]:text-scale-900`,
+      },
+    },
+    defaultVariants: {
+      variant: 'info',
+    },
+  }
+)
 
-import styleHandler from '../../lib/theme/styleHandler'
-import { IconAlertOctagon } from '../Icon/icons/IconAlertOctagon'
-import { IconCheckCircle } from '../Icon/icons/IconCheckCircle'
+const alertTitleVariants = cva('mb-1 font-medium leading-none tracking-tight', {
+  variants: {
+    variant: {
+      danger: `text-red-1200`,
+      warning: `text-amber-1200`,
+      info: `text-scale-1200`,
+      success: `text-brand-1200`,
+      neutral: `text-scale-1200`,
+    },
+    defaultVariants: {
+      variant: 'info',
+    },
+  },
+})
 
-export interface AlertProps {
-  variant?: 'success' | 'danger' | 'warning' | 'info' | 'neutral'
-  className?: string
-  title: string | React.ReactNode
-  withIcon?: boolean
-  closable?: boolean
-  children?: React.ReactNode
-  icon?: React.ReactNode
-  actions?: React.ReactNode
+const alertDescriptionVariants = cva('text-sm [&_p]:leading-relaxed', {
+  variants: {
+    variant: {
+      danger: 'text-red-1100',
+      warning: 'text-amber-1100',
+      info: 'text-scale-1100',
+      success: 'text-brand-1100',
+      neutral: 'text-scale-1100',
+    },
+    defaultVariants: {
+      variant: 'info',
+    },
+  },
+})
+
+interface ContextValue {
+  variant: AlertRootVariantsProps['variant']
 }
 
-const icons: Record<'success' | 'danger' | 'warning' | 'info' | 'neutral', React.ReactElement> = {
-  danger: <IconAlertOctagon strokeWidth={1.5} size={18} />,
-  success: <IconCheckCircle strokeWidth={1.5} size={18} />,
-  warning: <IconAlertTriangle strokeWidth={1.5} size={18} />,
-  info: <IconInfo strokeWidth={1.5} size={18} />,
+const AlertContext = React.createContext<ContextValue>({
+  variant: undefined,
+})
+
+// Define the Alert component
+interface AlertProps
+  extends React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof alertRootVariants> {
+  withIcon: boolean
+}
+
+interface AlertComponent
+  extends React.ForwardRefExoticComponent<AlertProps & React.RefAttributes<HTMLDivElement>> {
+  Title: typeof AlertTitle
+  Description: typeof AlertDescription
+}
+
+type AlertIconVariant = Exclude<AlertRootVariantsProps['variant'], null | undefined>
+const icons: Record<AlertIconVariant, React.ReactElement> = {
+  danger: <AlertOctagon strokeWidth={1.5} size={18} />,
+  success: <Check strokeWidth={1.5} size={18} />,
+  warning: <AlertTriangle strokeWidth={1.5} size={18} />,
+  info: <Info strokeWidth={1.5} size={18} />,
   neutral: <></>,
 }
 
-function Alert({
-  variant = 'neutral',
-  className,
-  title,
-  withIcon,
-  closable,
-  children,
-  icon,
-  actions,
-}: AlertProps) {
-  let __styles = styleHandler('alert')
+const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
+  ({ className, withIcon, variant = 'info', children, ...props }, ref) => {
+    const contextValue = {
+      variant,
+    }
 
-  const [visible, setVisible] = useState(true)
+    return (
+      <div
+        ref={ref}
+        role="alert"
+        className={cn(alertRootVariants({ variant }), className)}
+        {...props}
+        children={
+          <AlertContext.Provider value={{ ...contextValue }}>
+            {withIcon && icons[variant as AlertIconVariant]}
+            {children}
+          </AlertContext.Provider>
+        }
+      />
+    )
+  }
+) as AlertComponent
 
-  let containerClasses = [__styles.base]
-  containerClasses.push(__styles.variant[variant].base)
+Alert.displayName = 'Alert'
 
-  if (className) containerClasses.push(className)
+// Define the AlertTitle component as a subcomponent of Alert
+interface AlertTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {}
 
-  let descriptionClasses = [__styles.description, __styles.variant[variant].description]
-  let closeButtonClasses = [__styles.close]
+const AlertTitle = React.forwardRef<HTMLHeadingElement, AlertTitleProps>(
+  ({ className, ...props }, ref) => {
+    const { variant } = React.useContext(AlertContext)
+    console.log('variant', variant)
+    return <h5 ref={ref} className={cn(alertTitleVariants({ variant }), className)} {...props} />
+  }
+)
 
-  return (
-    <>
-      {visible && (
-        <div className={containerClasses.join(' ')}>
-          {withIcon ? (
-            <div className={__styles.variant[variant].icon}>{withIcon && icons[variant]}</div>
-          ) : null}
-          {icon && icon}
-          <div className="flex flex-1 items-center justify-between">
-            <div>
-              <h3 className={[__styles.variant[variant].header, __styles.header].join(' ')}>
-                {title}
-              </h3>
-              <div className={descriptionClasses.join(' ')}>{children}</div>
-            </div>
-            {actions}
-          </div>
-          {closable && (
-            <button
-              aria-label="Close alert"
-              onClick={() => setVisible(false)}
-              className={closeButtonClasses.join(' ')}
-            >
-              <IconX strokeWidth={2} size={16} />
-            </button>
-          )}
-        </div>
-      )}
-    </>
-  )
-}
+AlertTitle.displayName = 'AlertTitle'
 
-export default Alert
+// Define the AlertDescription component as a subcomponent of Alert
+interface AlertDescriptionProps extends React.HTMLAttributes<HTMLParagraphElement> {}
+
+const AlertDescription = React.forwardRef<HTMLParagraphElement, AlertDescriptionProps>(
+  ({ className, ...props }, ref) => {
+    const { variant } = React.useContext(AlertContext)
+    return (
+      <div ref={ref} className={cn(alertDescriptionVariants({ variant }), className)} {...props} />
+    )
+  }
+)
+
+AlertDescription.displayName = 'AlertDescription'
+
+// Attach the subcomponents to the Alert component
+Alert.Title = AlertTitle
+Alert.Description = AlertDescription
+
+// Export the Alert component
+export { Alert }

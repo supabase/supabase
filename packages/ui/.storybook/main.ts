@@ -10,7 +10,7 @@ const config: StorybookConfig = {
   //   // After all stories are cleaned, revert to wildcard import.
   stories: [
     '../src/components/Accordion/Accordion.stories.tsx',
-    // '../src/components/Alert/Alert.stories.tsx',
+    '../src/components/Alert/Alert.stories.tsx',
     // '../src/components/Avatar/Avatar.stories.tsx',
     '../src/components/Button/Button.stories.tsx',
     // '../src/components/Checkbox/Checkbox.stories.tsx',

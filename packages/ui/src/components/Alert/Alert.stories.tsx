@@ -1,135 +1,92 @@
-import React from 'react'
+// Button.stories.ts|tsx
 
-import Alert, { AlertProps } from './Alert'
+import type { Meta, StoryObj } from '@storybook/react'
 
-export default {
-  title: 'Displays/Alerts',
+import { Alert, AlertProps } from './Alert'
+
+import { IconAirplay } from '../Icon/icons/IconAirplay'
+import { Terminal } from 'lucide-react'
+
+const meta: Meta<typeof Alert> = {
+  /* 👇 The title prop is optional.
+   * See https://storybook.js.org/docs/react/configure/overview#configure-story-loading
+   * to learn how to generate automatic titles
+   */
+  title: 'General/Alert',
   component: Alert,
 }
 
-export const Neutral = (args: AlertProps) => (
-  <Alert {...args}>
-    Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur amet labore.
-  </Alert>
-)
+export default meta
 
-export const Success = (args: AlertProps) => (
-  <Alert {...args}>
-    Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur amet labore.
-  </Alert>
-)
+type Story = StoryObj<typeof Alert>
 
-export const SuccessWithIcon = (args: AlertProps) => (
-  <Alert {...args}>
-    Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur amet labore.
-  </Alert>
-)
+/*
+ *👇 Render functions are a framework specific feature to allow you control on how the component renders.
+ * See https://storybook.js.org/docs/react/api/csf
+ * to learn how to use render functions.
+ */
 
-export const Danger = (args: AlertProps) => (
-  <Alert {...args}>
-    Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur amet labore.
-  </Alert>
-)
-
-export const DangerWithIcon = (args: AlertProps) => (
-  <Alert {...args}>
-    Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur amet labore.
-  </Alert>
-)
-
-export const Info = (args: AlertProps) => (
-  <Alert {...args}>
-    Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur amet labore.
-  </Alert>
-)
-
-export const InfoWithIcon = (args: AlertProps) => (
-  <Alert {...args}>
-    Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur amet labore.
-  </Alert>
-)
-
-export const Warning = (args: AlertProps) => (
-  <Alert {...args}>
-    Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur amet labore.
-  </Alert>
-)
-
-export const WarningWithIcon = (args: AlertProps) => (
-  <Alert {...args}>
-    Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur amet labore.
-  </Alert>
-)
-
-export const Closable = (args: AlertProps) => (
-  <Alert {...args}>
-    Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur amet labore.
-  </Alert>
-)
-
-export const WithAction = (args: AlertProps) => (
-  <Alert {...args}>
-    Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur amet labore.
-  </Alert>
-)
-
-Neutral.args = {
-  title: 'Success alert with icon',
-  withIcon: true,
+export const Info = {
+  args: {
+    variant: 'info',
+    withIcon: true,
+  },
+  render: ({ withIcon, variant }: AlertProps) => (
+    <Alert variant={variant} withIcon={withIcon}>
+      <Alert.Title>Info Alert</Alert.Title>
+      <Alert.Description>This is an informative message for your application.</Alert.Description>
+    </Alert>
+  ),
 }
 
-Success.args = {
-  title: 'Success alert',
-  variant: 'success',
+export const Danger = {
+  args: {
+    variant: 'danger',
+    withIcon: true,
+  },
+  render: ({ withIcon, variant }: AlertProps) => (
+    <Alert variant={variant} withIcon={withIcon}>
+      <Alert.Title>Danger Alert</Alert.Title>
+      <Alert.Description>This is a dangerous warning for your application.</Alert.Description>
+    </Alert>
+  ),
 }
 
-SuccessWithIcon.args = {
-  title: 'Success alert with icon',
-  variant: 'success',
-  withIcon: true,
+export const Warning = {
+  args: {
+    variant: 'warning',
+    withIcon: true,
+  },
+  render: ({ withIcon, variant }: AlertProps) => (
+    <Alert variant={variant} withIcon={withIcon}>
+      <Alert.Title>Warning Alert</Alert.Title>
+      <Alert.Description>This is a warning message for your application.</Alert.Description>
+    </Alert>
+  ),
 }
 
-Danger.args = {
-  title: 'Danger alert',
-  variant: 'danger',
+export const Success = {
+  args: {
+    variant: 'success',
+    withIcon: true,
+  },
+  render: ({ withIcon, variant }: AlertProps) => (
+    <Alert variant={variant} withIcon={withIcon}>
+      <Alert.Title>Success Alert</Alert.Title>
+      <Alert.Description>This is a successful notification for your application.</Alert.Description>
+    </Alert>
+  ),
 }
 
-DangerWithIcon.args = {
-  title: 'Danger alert with icon',
-  variant: 'danger',
-  withIcon: true,
-}
-
-Info.args = {
-  title: 'Info alert',
-  variant: 'info',
-}
-
-InfoWithIcon.args = {
-  title: 'Info alert with icon',
-  variant: 'info',
-  withIcon: true,
-}
-
-Warning.args = {
-  title: 'Warning alert',
-  variant: 'warning',
-}
-
-WarningWithIcon.args = {
-  title: 'Warning alert with icon',
-  variant: 'warning',
-  withIcon: true,
-}
-
-Closable.args = {
-  title: 'Closable alert',
-  closable: true,
-}
-
-WithAction.args = {
-  title: 'Alert with action',
-  variant: 'warning',
-  withIcon: true,
-  actions: <div>Hello</div>,
+export const Neutral = {
+  args: {
+    variant: 'neutral',
+    withIcon: true,
+  },
+  render: ({ withIcon, variant }: AlertProps) => (
+    <Alert variant={variant} withIcon={withIcon}>
+      <Alert.Title>Neutral Alert</Alert.Title>
+      <Alert.Description>This is a neutral message for your application.</Alert.Description>
+    </Alert>
+  ),
 }
