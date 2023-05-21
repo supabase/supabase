@@ -2,28 +2,18 @@ const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin')
 // import type { StorybookConfig } from '@storybook/your-framework'
 
 const config: any = {
-  //   // stories: [
-  //   //   '../src/components/**/*.stories.mdx',
-  //   //   '../src/components/**/*.stories.@(js|jsx|ts|tsx)',
-  //   // ],
-  //   // TODO: Temporally Import one by one story and fix build issue.
-  //   // After all stories are cleaned, revert to wildcard import.
   stories: [
     '../src/components/Accordion/Accordion.stories.tsx',
     '../src/components/Alert/Alert.stories.tsx',
     '../src/components/Badge/Badge.stories.tsx',
     // '../src/components/Avatar/Avatar.stories.tsx',
     '../src/components/Button/Button.stories.tsx',
-    // '../src/components/Checkbox/Checkbox.stories.tsx',
-    // '../src/components/Collapsible/Collapsible.stories.tsx',
+    '../src/components/Checkbox/Checkbox.stories.tsx',
+    '../src/components/Collapsible/Collapsible.stories.tsx',
     // '../src/components/ContextMenu/ContextMenu.stories.tsx',
-    // '../src/components/Dropdown/Dropdown.stories.tsx',
+    '../src/components/Dropdown/Dropdown.stories.tsx',
   ],
   addons: [
-    // '@storybook/addon-links',
-    // '@storybook/addon-essentials',
-    // '@storybook/addon-interactions',
-    // '@storybook/addon-actions',
     'storybook-dark-mode',
     {
       name: '@storybook/addon-styling',
@@ -35,7 +25,6 @@ const config: any = {
     },
     '@storybook/addon-mdx-gfm',
   ],
-
   docs: {
     autodocs: true,
   },
