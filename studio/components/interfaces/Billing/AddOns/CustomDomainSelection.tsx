@@ -1,6 +1,5 @@
 import Link from 'next/link'
-import { FC, useEffect } from 'react'
-import { useRouter } from 'next/router'
+import { FC } from 'react'
 import { Badge, Button, Radio } from 'ui'
 
 import { useFlag } from 'hooks'
@@ -24,14 +23,6 @@ const CustomDomainSelection: FC<Props> = ({
 }) => {
   const { ref } = useParams()
   const addonUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
-  const { asPath } = useRouter()
-  useEffect(() => {
-    const hash = asPath.split('#')[1]
-    if (hash !== undefined) {
-      window.location.hash = ''
-      window.location.hash = hash
-    }
-  }, [asPath])
   return (
     <div className="space-y-4">
       <div>

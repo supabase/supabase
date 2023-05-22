@@ -1,6 +1,5 @@
 import Link from 'next/link'
-import { FC, useEffect } from 'react'
-import { useRouter } from 'next/router'
+import { FC } from 'react'
 import { Badge, Button, IconExternalLink, Radio } from 'ui'
 
 import { useFlag } from 'hooks'
@@ -23,14 +22,6 @@ const ComputeSizeSelection: FC<Props> = ({
   onSelectOption,
 }) => {
   const { ref } = useParams()
-  const { asPath } = useRouter()
-  useEffect(() => {
-    const hash = asPath.split('#')[1]
-    if (hash !== undefined) {
-      window.location.hash = ''
-      window.location.hash = hash
-    }
-  }, [asPath])
   const addonUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
   return (
     <div className="space-y-4">

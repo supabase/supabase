@@ -1,6 +1,5 @@
 import Link from 'next/link'
-import { FC, useEffect } from 'react'
-import { useRouter } from 'next/router'
+import { FC } from 'react'
 import { Button } from 'ui'
 import { useParams } from 'common/hooks'
 
@@ -10,14 +9,6 @@ interface Props {
 
 const SupportPlan: FC<Props> = ({ currentOption }) => {
   const { ref } = useParams()
-  const { asPath } = useRouter()
-  useEffect(() => {
-    const hash = asPath.split('#')[1]
-    if (hash !== undefined) {
-      window.location.hash = ''
-      window.location.hash = hash
-    }
-  }, [asPath])
   return (
     <div className="space-y-4">
       <div>

@@ -133,6 +133,16 @@ const ProUpgrade: FC<Props> = ({
     getSubscriptionPreview()
   }, [selectedComputeSize, selectedPITRDuration, selectedCustomDomainOption, isSpendCapEnabled])
 
+  // this is used to navigate to addon hash anchors on first load, allows us to directly link subscription addons
+  useEffect(() => {
+    if (router.isReady) {
+      const hash = router.asPath.split('#')[1]
+      if (hash !== undefined) {
+        router.replace({ hash }, null, { shallow: true })
+      }
+    }
+  }, [router.asPath])
+
   const getSubscriptionPreview = async () => {
     if (!selectedTier) return
 
