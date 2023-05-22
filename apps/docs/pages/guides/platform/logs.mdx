@@ -112,7 +112,7 @@ To _permanently_ set a logging configuration (beyond a single session), execute 
 alter role postgres set pgaudit.log to 'function, write, ddl';
 ```
 
-It is advised to adjust the scope of the logs to only relevant statements to aid in your debugging, as having too wide of a scope would result in a lot of noise in your Postgres logs.
+To help with debugging, we recommend adjusting the log scope to only relevant statements as having too wide of a scope would result in a lot of noise in your Postgres logs.
 
 Note that in the above example, the role is set to `postgres`. To log user-traffic flowing through the [HTTP APIs](../../guides/database/api#rest-api-overview) powered by PostgREST, set your configuration values for the roles `anon` and `authenticated`. For traffic using the `service_role` key, set the configuration values for the role `service_role`.
 
