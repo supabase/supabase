@@ -751,6 +751,7 @@ export const functions: NavMenuConstant = {
       items: [
         { name: 'Dart Edge on Supabase', url: '/guides/functions/dart-edge' },
         { name: 'Browserless.io', url: '/guides/functions/examples/screenshots' },
+        { name: 'Hugging Face', url: '/guides/functions/examples/huggingface-image-captioning' },
         { name: 'OpenAI API', url: '/guides/functions/examples/openai' },
         { name: 'Upstash Redis', url: '/guides/functions/examples/upstash-redis' },
         { name: 'Type-Safe SQL with Kysely', url: '/guides/functions/kysely-postgres' },
