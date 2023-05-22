@@ -20,7 +20,7 @@ Make sure you have the latest version of the [Supabase CLI installed](https://su
 
 ```bash
 supabase start
-supabase functions serve --no-verify-jwt --env-file supabase/.env.local
+supabase functions serve --env-file supabase/.env.local
 ```
 
 Navigate to http://localhost:54321/functions/v1/upstash-redis-ratelimit.
@@ -28,6 +28,6 @@ Navigate to http://localhost:54321/functions/v1/upstash-redis-ratelimit.
 ## Deploy
 
 ```bash
-supabase functions deploy upstash-redis-ratelimit --no-verify-jwt
+supabase functions deploy upstash-redis-ratelimit
 supabase secrets set --env-file supabase/.env.local
 ```
