@@ -138,7 +138,7 @@ const ProUpgrade: FC<Props> = ({
     if (router.isReady) {
       const hash = router.asPath.split('#')[1]
       if (hash !== undefined) {
-        router.replace({ hash }, null, { shallow: true })
+        router.replace({ hash })
       }
     }
   }, [router.asPath])
