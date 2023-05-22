@@ -68,20 +68,41 @@ export const generateSettingsMenu = (
     ...(IS_PLATFORM
       ? [
           {
+            title: 'Addons',
+            items: [
+              {
+                name: 'Compute',
+                key: 'compute-addon',
+                url: isProjectBuilding
+                  ? buildingUrl
+                  : `/project/${ref}/settings/billing/update/pro#compute-addon`,
+                items: [],
+              },
+              {
+                name: 'PITR',
+                key: 'pitr-addon',
+                url: isProjectBuilding
+                  ? buildingUrl
+                  : `/project/${ref}/settings/billing/update/pro#pitr-addon`,
+                items: [],
+              },
+            ],
+          },
+          {
             title: 'Billing',
             items: [
+              {
+                name: 'Usage',
+                key: 'usage',
+                url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/billing/usage`,
+                items: [],
+              },
               {
                 name: 'Subscription',
                 key: 'subscription',
                 url: isProjectBuilding
                   ? buildingUrl
                   : `/project/${ref}/settings/billing/subscription`,
-                items: [],
-              },
-              {
-                name: 'Usage',
-                key: 'usage',
-                url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/billing/usage`,
                 items: [],
               },
               {
