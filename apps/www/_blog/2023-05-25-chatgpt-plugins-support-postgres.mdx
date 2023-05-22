@@ -24,7 +24,7 @@ ChatGPT recently released [Plugins](https://openai.com/blog/chatgpt-plugins) whi
 
 A [Retrieval Plugin](https://github.com/openai/chatgpt-retrieval-plugin) is a Python project designed to inject external data into the ChatGPT. It allows ChatGPT to dynamically pull relevant information into conversations from your data sources. This could be PDF documents, Confluence, or Notion knowledge bases.
 
-A retrieval plugin does a few things: 
+A retrieval plugin does a few things:
 
 1. Turn documents into smaller chunks.
 2. Converts chunks into embeddings using OpenAI's `text-embedding-ada-002` model.
@@ -62,25 +62,25 @@ When you create the retrieval store inside your database, a stored function is i
 
 ```sql
 create or replace function match_page_sections(
-	in_embedding vector(1536), 
-	in_match_count int default 3, 
-	in_document_id text default '%%', 
-	in_source_id text default '%%', 
-	in_source text default '%%', 
-	in_author text default '%%', 
-	in_start_date timestamptz default '-infinity', 
+	in_embedding vector(1536),
+	in_match_count int default 3,
+	in_document_id text default '%%',
+	in_source_id text default '%%',
+	in_source text default '%%',
+	in_author text default '%%',
+	in_start_date timestamptz default '-infinity',
 	in_end_date timestamptz default 'infinity'
 )
 returns table (
-	id text, 
-	source text, 
-	source_id text, 
-	document_id text, 
-	url text, 
-	created_at timestamptz, 
-	author text, 
-	content text, 
-	embedding vector(1536), 
+	id text,
+	source text,
+	source_id text,
+	document_id text,
+	url text,
+	created_at timestamptz,
+	author text,
+	content text,
+	embedding vector(1536),
 	similarity float
 )
 language plpgsql
@@ -100,18 +100,18 @@ select
 	documents.content,
 	documents.embedding,
 	(documents.embedding <#> in_embedding) * -1 as similarity
-from 
+from
 	documents
-where 
-	in_start_date <= documents.created_at and 
+where
+	in_start_date <= documents.created_at and
   documents.created_at <= in_end_date and
   (documents.source_id like in_source_id or documents.source_id is null) and
   (documents.source like in_source or documents.source is null) and
   (documents.author like in_author or documents.author is null) and
   (documents.document_id like in_document_id or documents.document_id is null)
-order by 
+order by
 	documents.embedding <#> in_embedding
-limit 
+limit
 	in_match_count;
 end;
 $$;
@@ -173,7 +173,7 @@ export PG_HOST=<postgres_host_url>
 export PG_PASSWORD=<postgres_password>
 ```
 
-### Step 4:  Run Postgres Locally
+### Step 4: Run Postgres Locally
 
 To start quicker you may use Supabase CLI to spin everything up locally as it already includes pgvector from the start. Install `supabase-cli`, go to the `examples/providers` folder in the repo and run:
 
@@ -219,14 +219,14 @@ curl -X POST -F \\"file=@./postgresql-15-US.pdf\\" <http://localhost:3333/upsert
 The plugin will split your data and documents into smaller chunks automatically. You can view the chunks using the Supabase dashboard or any other SQL client you prefer. For the whole Postgres Documentation I got 7,904 records in my documents table, which is not a lot, but we can try to add index for `embedding` column to speed things up by a little. To do so, you should run the following SQL command:
 
 ```sql
-create index on documents 
-using ivfflat (embedding vector_ip_ops) 
+create index on documents
+using ivfflat (embedding vector_ip_ops)
 with (lists = 10);
 ```
 
-This will create an index for the inner product distance function. Important to note that it is an approximate index. It will change the logic from performing the exact nearest neighbor search to the approximate nearest neighbor search. 
+This will create an index for the inner product distance function. Important to note that it is an approximate index. It will change the logic from performing the exact nearest neighbor search to the approximate nearest neighbor search.
 
-We are using `lists = 10`, because as a general guideline, you should start looking for optimal lists constant value with the formula: `rows / 1000` when you have less than 1 million records in your table. 
+We are using `lists = 10`, because as a general guideline, you should start looking for optimal lists constant value with the formula: `rows / 1000` when you have less than 1 million records in your table.
 
 Now, it is time to add our plugin to ChatGPT.
 
@@ -235,7 +235,9 @@ Now, it is time to add our plugin to ChatGPT.
 To integrate our plugin with ChatGPT, register it in the ChatGPT dashboard. Assuming you have access to ChatGPT Plugins and plugin development, select the Plugins model in a new chat, then choose "Plugin store" and "Develop your own plugin." Enter `localhost:3333` into the domain input, and your plugin is now part of ChatGPT.
 
 ![ChatGPT Change Model](/images/blog/2023-05-25-chatgpt-plugins-support-postgres/chatgpt-change-model.png)
+
 ![ChatGPT Plugin Store](/images/blog/2023-05-25-chatgpt-plugins-support-postgres/chatgpt-plugin-store.png)
+
 ![ChatGPT Local Plugin](/images/blog/2023-05-25-chatgpt-plugins-support-postgres/chatgpt-local-plugin.png)
 
 You can now ask questions about Postgres and receive answers derived from the documentation!
@@ -243,6 +245,7 @@ You can now ask questions about Postgres and receive answers derived from the do
 Let's try it out: ask ChatGPT to find out when to use `check` and when to use `using`. You will be able to see what queries were sent to our plugin and what it responded to.
 
 ![Ask ChatGPT](/images/blog/2023-05-25-chatgpt-plugins-support-postgres/ask-chatgpt.png)
+
 ![ChatGPT Query](/images/blog/2023-05-25-chatgpt-plugins-support-postgres/chatgpt-query.png)
 
 And after ChatGPT receives a response from the plugin it will answer your question with the data from the documentation.
@@ -251,7 +254,7 @@ And after ChatGPT receives a response from the plugin it will answer your questi
 
 ## Wrap up
 
-It's easy to bring any context into the datastore and utilize it with ChatGPT. Simply export your knowledge base from platforms like Notion or Confluence, upload it to the datastore, and you're good to go. You can also use any other datastore provider you prefer. 
+It's easy to bring any context into the datastore and utilize it with ChatGPT. Simply export your knowledge base from platforms like Notion or Confluence, upload it to the datastore, and you're good to go. You can also use any other datastore provider you prefer.
 
 And the good news is that you’re not limited by using it with ChatGPT, you can embed it in your website or documentation, and build a Slack bot or telegram bot to answer questions about your company or product. For that, you will only need to add a single call to OpenAI API to create a summary of data retrieved from the Plugin. You can find some inspiration on how to do that in our blog post about building [Supabase Clippy assistant](https://supabase.com/blog/chatgpt-supabase-docs).
 
