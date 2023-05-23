@@ -465,6 +465,82 @@ functions:
             data: { hello: 'world' }
           })
           ```
+      - id: update-password-with-reauthentication
+        name: Update the user's password with a nonce
+        description: If "Secure password change" is enabled, updating the user's password would require a nonce. The nonce is sent to the user's email or phone number.
+        isSpotlight: true
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.updateUser({
+            password: 'new password',
+            nonce: '123456'
+          })
+          ```
+  - id: send-password-reauthentication
+    title: 'reauthenticate()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.reauthenticate'
+    notes: |
+      - This method is used together with `updateUser()` when a user's password needs to be updated.
+      - This method will send a nonce to the user's email. If the user doesn't have a confirmed email address, the method will send the nonce to the user's confirmed phone number instead.
+    examples:
+      - id: send-reauthentication-nonce
+        name: Send reauthentication nonce
+        description: Sends a reauthentication nonce to the user's email or phone number.
+        isSpotlight: true
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.reauthenticate()
+          ```
+  - id: resend-email-or-phone-otps
+    title: 'resend()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.resend'
+    notes: |
+      - Resends a signup confirmation, email change or phone change email to the user.
+      - Passwordless sign-ins can be resent by calling the `signInWithOtp()` method again.
+      - Password recovery emails can be resent by calling the `resetPassswordForEmail()` method again.
+      - This method will only resend an email or phone OTP to the user if there was an initial signup, email change or phone change request being made.
+    examples:
+      - id: resend-email-signup-confirmation
+        name: Resend an email signup confirmation
+        description: Resends the email signup confirmation to the user
+        isSpotlight: true
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.resend({
+            type: 'signup',
+            email: 'email@example.com'
+          })
+          ```
+      - id: resend-phone-signup-confirmation
+        name: Resend a phone signup confirmation
+        description: Resends the phone signup confirmation email to the user
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.resend({
+            type: 'sms',
+            phone: '1234567890'
+          })
+          ```
+      - id: resend-email-change-email
+        name: Resend email change email
+        description: Resends the email change email to the user
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.resend({
+            type: 'email_change',
+            email: 'email@example.com'
+          })
+          ```
+      - id: resend-phone-change
+        name: Resend phone change OTP
+        description: Resends the phone change OTP to the user
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.resend({
+            type: 'phone_change',
+            phone: '1234567890'
+          })
+          ```
   - id: set-session
     title: 'setSession()'
     $ref: '@supabase/gotrue-js.GoTrueClient.setSession'
