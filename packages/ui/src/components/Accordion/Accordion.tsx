@@ -26,10 +26,13 @@ const AccordionContext = createContext<ContextValue>({
 export interface AccordionProps {
   children?: React.ReactNode
   className?: string
-
+  defaultActiveId?: (string | number)[]
+  icon?: React.ReactNode
+  iconPosition?: Align
   onChange?: (item: string | string[]) => void
   openBehaviour: 'single' | 'multiple'
   type?: Type
+  size?: Size
   defaultValue?: string | string[] | undefined
   justified?: Boolean
   chevronAlign?: Align
@@ -71,6 +74,8 @@ function Accordion({
 
   return (
     <>
+      {/* // 	
+      @ts-expect-error */}
       <RadixAccordion.Root
         type={openBehaviour}
         onValueChange={handleOnChange}
