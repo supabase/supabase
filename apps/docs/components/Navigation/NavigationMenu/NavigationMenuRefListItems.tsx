@@ -1,14 +1,18 @@
 import * as Accordion from '@radix-ui/react-accordion'
-import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import React, { Fragment } from 'react'
 import { IconChevronLeft, IconChevronUp, cn } from 'ui'
-import RevVersionDropdown from '~/components/RefVersionDropdown'
-import { ICommonItem, ICommonSection } from '~/components/reference/Reference.types'
-import { useMenuActiveRefId } from '~/hooks/useMenuState'
-import HomeMenuIconPicker from './HomeMenuIconPicker'
 import * as NavItems from './NavigationMenu.constants'
+
+import Image from 'next/image'
+
+import RevVersionDropdown from '~/components/RefVersionDropdown'
+import { useMenuActiveRefId } from '~/hooks/useMenuState'
+
+import React, { Fragment } from 'react'
+
+import { ICommonItem, ICommonSection } from '~/components/reference/Reference.types'
+import HomeMenuIconPicker from './HomeMenuIconPicker'
 import { deepFilterSections } from './NavigationMenu.utils'
 
 const HeaderLink = React.memo(function HeaderLink(props: any) {
