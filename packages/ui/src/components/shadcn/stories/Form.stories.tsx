@@ -3,7 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IdProvider } from '@radix-ui/react-id'
 import type { Meta, StoryObj } from '@storybook/react'
-import { Button } from './../button'
+import { Button } from '../button'
 import { cn } from '@ui/lib/utils'
 import { format } from 'date-fns'
 import { CalendarIcon } from 'lucide-react'
@@ -21,8 +21,8 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from './../form'
-import { Input } from './../input'
+} from '../form'
+import { Input } from '../input'
 
 const meta: Meta<typeof Form> = {
   /* 👇 The title prop is optional.
