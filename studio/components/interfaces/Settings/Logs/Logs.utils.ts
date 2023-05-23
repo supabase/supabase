@@ -437,7 +437,7 @@ export const getTimestampTruncation = (samples: Dayjs[]): 'second' | 'minute' | 
 }
 
 const _getTruncation = (date: Dayjs) => {
-  const values = ['second', 'minute', 'hour', 'day'].map((key) => date.get(key as dayjs.UnitType))
+  const values = ['second', 'minute', 'hour'].map((key) => date.get(key as dayjs.UnitType))
   const zeroCount = values.reduce((acc, value) => {
     if (value === 0) {
       acc += 1
@@ -449,7 +449,6 @@ const _getTruncation = (date: Dayjs) => {
     1: 'minute' as const,
     2: 'hour' as const,
     3: 'day' as const,
-    4: 'day' as const,
   }[zeroCount]!
   return truncation
 }
