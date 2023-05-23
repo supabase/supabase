@@ -1,1 +1,1 @@
-export * from './Button'
+export * from '../shadcn/updated/Button/Button'

@@ -1,6 +1,6 @@
 import React from 'react'
 import { render, screen, fireEvent } from '@testing-library/react'
-import { Button, ButtonSize, ButtonType } from './Button'
+import { Button, ButtonSize, ButtonType } from '../shadcn/updated/Button/Button'
 import defaultTheme from '../../lib/theme/defaultTheme'
 import Link from 'next/link'
 
