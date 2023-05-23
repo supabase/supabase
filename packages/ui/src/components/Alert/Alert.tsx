@@ -27,7 +27,7 @@ const icons: Record<'success' | 'danger' | 'warning' | 'info' | 'neutral', React
   neutral: <></>,
 }
 
-function Alert({
+export function Alert({
   variant = 'neutral',
   className,
   title,
@@ -80,5 +80,3 @@ function Alert({
     </>
   )
 }
-
-export default Alert
