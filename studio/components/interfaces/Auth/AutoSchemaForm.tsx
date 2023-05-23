@@ -20,7 +20,6 @@ const AutoSchemaForm = observer(() => {
 
   const formId = 'auth-config-general-form'
   const [hidden, setHidden] = useState(true)
-  const [captchaProvider, setCaptchaProvider] = useState('hcaptcha')
   const canUpdateConfig = checkPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
   const INITIAL_VALUES = {
@@ -52,20 +51,18 @@ const AutoSchemaForm = observer(() => {
     }),
     SECURITY_CAPTCHA_PROVIDER: string().when('SECURITY_CAPTCHA_ENABLED', {
       is: true,
-      then: string().oneOf(['hcaptcha', 'turnstile']).required('captcha provider must be either hcaptcha or turnstile')
-   }),
+      then: string()
+        .oneOf(['hcaptcha', 'turnstile'])
+        .required('Captcha provider must be either hcaptcha or turnstile'),
+    }),
     MAX_ENROLLED_FACTORS: number()
       .min(0, 'Must be be a value more than 0')
       .max(30, 'Must be a value less than 30'),
   })
-  const onCaptchaProviderChange = (event) => {
-     setCaptchaProvider(event.target.value)
-  }
 
   const onSubmit = async (values: any, { setSubmitting, resetForm }: any) => {
     const payload = { ...values }
     payload.DISABLE_SIGNUP = !values.DISABLE_SIGNUP
-    payload.SECURITY_CAPTCHA_PROVIDER = captchaProvider
 
     setSubmitting(true)
     const { error } = await authConfig.update(payload)
@@ -79,7 +76,7 @@ const AutoSchemaForm = observer(() => {
     } else {
       ui.setNotification({
         category: 'error',
-        message: `Failed to update settings`,
+        message: `Failed to update settings:  ${error?.message}`,
       })
     }
 
@@ -160,58 +157,57 @@ const AutoSchemaForm = observer(() => {
                   />
                   {values.SECURITY_CAPTCHA_ENABLED && (
                     <>
-                    <Radio.Group
+                      <Radio.Group
                         id="SECURITY_CAPTCHA_PROVIDER"
-                        name="Captcha Providers"
+                        name="SECURITY_CAPTCHA_PROVIDER"
                         label="Captcha Providers"
-                        onChange={onCaptchaProviderChange}
-                    >
+                      >
                         <Radio
-                            label="hCaptcha"
-                            value="hcaptcha"
-                            checked={captchaProvider === 'hcaptcha'}
+                          label="hCaptcha"
+                          value="hcaptcha"
+                          checked={values.SECURITY_CAPTCHA_PROVIDER === 'hcaptcha'}
                         />
                         <Radio
-                            label="Turnstile (Cloudflare)"
-                            value="turnstile"
-                            checked={captchaProvider === 'turnstile'}
+                          label="Turnstile (Cloudflare)"
+                          value="turnstile"
+                          checked={values.SECURITY_CAPTCHA_PROVIDER === 'turnstile'}
                         />
-                    </Radio.Group>
-                    <Input
-                      id="SECURITY_CAPTCHA_SECRET"
-                      type={hidden ? 'password' : 'text'}
-                      size="small"
-                      label="hCaptcha secret"
-                      disabled={!canUpdateConfig}
-                      actions={
-                        <Button
-                          icon={hidden ? <IconEye /> : <IconEyeOff />}
-                          type="default"
-                          onClick={() => setHidden(!hidden)}
-                        />
-                      }
-                    />
+                      </Radio.Group>
+                      <Input
+                        id="SECURITY_CAPTCHA_SECRET"
+                        type={hidden ? 'password' : 'text'}
+                        size="small"
+                        label="hCaptcha secret"
+                        disabled={!canUpdateConfig}
+                        actions={
+                          <Button
+                            icon={hidden ? <IconEye /> : <IconEyeOff />}
+                            type="default"
+                            onClick={() => setHidden(!hidden)}
+                          />
+                        }
+                      />
                     </>
                   )}
-          <Toggle
-            id="REFRESH_TOKEN_ROTATION_ENABLED"
-            size="small"
-            label="Enable automatic reuse detection"
-            layout="flex"
-            descriptionText="Prevent replay attacks from compromised refresh tokens."
-            disabled={!canUpdateConfig}
-          />
-          {values.REFRESH_TOKEN_ROTATION_ENABLED && (
-            <InputNumber
-              id="SECURITY_REFRESH_TOKEN_REUSE_INTERVAL"
-              size="small"
-              min={0}
-              label="Reuse interval"
-              descriptionText="Time interval where the same refresh token can be used to request for an access token."
-              actions={<span className="mr-3 text-scale-900">seconds</span>}
-              disabled={!canUpdateConfig}
-            />
-          )}
+                  <Toggle
+                    id="REFRESH_TOKEN_ROTATION_ENABLED"
+                    size="small"
+                    label="Enable automatic reuse detection"
+                    layout="flex"
+                    descriptionText="Prevent replay attacks from compromised refresh tokens."
+                    disabled={!canUpdateConfig}
+                  />
+                  {values.REFRESH_TOKEN_ROTATION_ENABLED && (
+                    <InputNumber
+                      id="SECURITY_REFRESH_TOKEN_REUSE_INTERVAL"
+                      size="small"
+                      min={0}
+                      label="Reuse interval"
+                      descriptionText="Time interval where the same refresh token can be used to request for an access token."
+                      actions={<span className="mr-3 text-scale-900">seconds</span>}
+                      disabled={!canUpdateConfig}
+                    />
+                  )}
                 </FormSectionContent>
               </FormSection>
               <FormSection
