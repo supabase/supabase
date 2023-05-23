@@ -160,6 +160,7 @@ const AutoSchemaForm = observer(() => {
                   {values.SECURITY_CAPTCHA_ENABLED && (
                     <>
                     <Radio.Group
+                        id="SECURITY_CAPTCHA_PROVIDER"
                         name="Captcha Providers"
                         label="Captcha Providers"
                         onChange={onCaptchaProviderChange}
