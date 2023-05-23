@@ -112,7 +112,28 @@ To _permanently_ set a logging configuration (beyond a single session), execute 
 alter role postgres set pgaudit.log to 'function, write, ddl';
 ```
 
-For user-traffic flowing through the [HTTP APIs](../../guides/database/api#rest-api-overview) powered by PostgREST, set your configuration values for the roles `anon` and `authenticated`. For traffic using the `service_role` key, set the configuration values for the role `service_role`.
+To help with debugging, we recommend adjusting the log scope to only relevant statements as having too wide of a scope would result in a lot of noise in your Postgres logs.
+
+Note that in the above example, the role is set to `postgres`. To log user-traffic flowing through the [HTTP APIs](../../guides/database/api#rest-api-overview) powered by PostgREST, set your configuration values for the roles `anon` and `authenticated`. For traffic using the `service_role` key, set the configuration values for the role `service_role`.
+
+```sql
+-- for API-related logs
+alter role anon set pgaudit.log to 'write';
+alter role authenticated set pgaudit.log to 'write';
+
+-- for service role logs
+alter role service_role set pgaudit.log to 'write';
+```
+
+By default, the log level will be set to `log`. To view other levels, run the following:
+
+```sql
+-- adjust log level
+alter role postgres set pgaudit.log_level to 'info';
+alter role postgres set pgaudit.log_level to 'debug5';
+```
+
+Note that as per the pgAudit [log_level documentation](https://github.com/pgaudit/pgaudit/blob/master/README.md#pgauditlog_level), `error`, `fatal`, and `panic` are not allowed.
 
 To reset system-wide settings, execute the following, then perform a fast reboot:
 

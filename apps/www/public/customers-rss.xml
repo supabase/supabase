@@ -9,9 +9,9 @@
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
   <guid>https://supabase.com/customers/mendableai</guid>
-  <title>Mendable.ai switches from Pinecone to Supabase for PostgreSQL vector embeddings.</title>
+  <title>Mendable switches from Pinecone to Supabase for PostgreSQL vector embeddings.</title>
   <link>https://supabase.com/customers/mendableai</link>
-  <description>How Mendable.ai boosts efficiency and accuracy of chat powered search for documentation using Supabase with pg_vector.</description>
+  <description>How Mendable boosts efficiency and accuracy of chat powered search for documentation using Supabase with pgvector.</description>
   <pubDate>Thu, 04 May 2023 22:10:00 +0000</pubDate>
 </item>
 <item>

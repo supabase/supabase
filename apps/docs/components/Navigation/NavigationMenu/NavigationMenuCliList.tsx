@@ -48,7 +48,7 @@ const NavigationMenuCliList = ({ currentLevel, setLevel, id }) => {
   }
 
   const Divider = () => {
-    return <div className="h-px w-full bg-green-500 my-3"></div>
+    return <div className="h-px w-full bg-scale-500 my-3"></div>
   }
 
   const MenuSections = [

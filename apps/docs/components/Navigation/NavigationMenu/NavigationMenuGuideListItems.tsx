@@ -46,7 +46,7 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
     if (activeItem && activeItemRef.current) {
       // this is a hack, but seems a common one on Stackoverflow
       setTimeout(() => {
-        activeItemRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+        activeItemRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
       }, 0)
     }
   })
@@ -54,7 +54,7 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
     <>
       {props.subItemIndex === 0 && (
         <>
-          <div className="h-px w-full bg-green-500 my-3"></div>
+          <div className="h-px w-full bg-scale-500 my-3"></div>
           <span className="font-mono text-xs uppercase text-scale-1200 font-medium tracking-wider">
             {props.parent.name}
           </span>
@@ -147,7 +147,7 @@ const Content = (props) => {
   const { menu, id } = props
 
   return (
-    <ul className={['relative w-full flex flex-col gap-0'].join(' ')}>
+    <ul className={['relative w-full flex flex-col gap-0 pb-5'].join(' ')}>
       <Link href={`${menu.parent ?? '/'}`} passHref>
         <a
           className={[
