@@ -1,7 +1,7 @@
-import * as React from 'react'
-import { VariantProps, cva } from 'class-variance-authority'
 import { cn } from '@ui/lib/utils'
-import { AlertCircle, AlertOctagon, AlertTriangle, Check, Info } from 'lucide-react'
+import { VariantProps, cva } from 'class-variance-authority'
+import { AlertOctagon, AlertTriangle, Check, Info } from 'lucide-react'
+import * as React from 'react'
 
 export type AlertRootVariantsProps = VariantProps<typeof alertRootVariants>
 const alertRootVariants = cva(
