@@ -178,6 +178,7 @@ themeFiles.map(function (filePath, i) {
   const buildTailwindFiles = filePath.includes('root') // i === 0
   const fileName = fileNameCleaner(filePath)
   const rootTheme = filePath.includes('root')
+  console.log('here', filePath ?? 'no file path', rootTheme)
   const SD = StyleDictionary.extend(
     getStyleDictionaryConfig(
       // determine wether to include the root theme properties with each theme
@@ -185,7 +186,7 @@ themeFiles.map(function (filePath, i) {
       rootTheme ? 'dark' : fileName,
       'themes',
       buildTailwindFiles,
-      false
+      fileName === 'light' ? true : false
     )
   )
   SD.buildAllPlatforms()
