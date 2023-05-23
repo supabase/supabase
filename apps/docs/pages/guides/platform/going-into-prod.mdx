@@ -2,7 +2,7 @@ import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
   id: 'going-into-prod',
-  title: 'Production Readiness',
+  title: 'Production Checklist',
   description: 'Things to do before making your app publicly available',
 }
 
@@ -35,6 +35,7 @@ After developing your project and deciding it's Production Ready, you should run
   - Tools like [k6](https://k6.io/) can simulate traffic from many different users.
 - Upgrade your database if you require more resources. If you need anything beyond what is listed, contact enterprise@supabase.io.
 - If you are expecting a surge in traffic (for a big launch) [contact support](https://app.supabase.com/support/new) with more details about your launch. We'll keep an eye on your project.
+- If you expect your database size to be > 4 GB, [enable](https://app.supabase.com/project/_/settings/billing/update) the Point in Time Recovery (PITR) addon. Daily backups can take up resources from your database when the backup is in progress. PITR is more resource efficient, since only the changes to the database are backed up.
 
 ## Availability
 
@@ -47,6 +48,7 @@ After developing your project and deciding it's Production Ready, you should run
 - Database backups are not available for download on the free tier.
   - You can set up your own backup systems using tools like [pg_dump](https://www.postgresqltutorial.com/postgresql-backup-database/) or [wal-g](https://github.com/wal-g/wal-g).
   - Nightly backups for Pro tier projects are available on the Supabase dashboard for up to 7 days.
+  - Point in Time Recovery (PITR) allows a project to be backed up at much shorter intervals. This provides users an option to restore to any chosen point of up to seconds in granularity. In terms of Recovery Point Objective (RPO), Daily Backups would be suitable for projects willing to lose up to 24 hours worth of data. If a lower RPO is required, enable PITR.
 - Upgrading to the Supabase Pro Tier will give you [access to our support team](https://app.supabase.com/support/new).
 
 ## Rate Limiting, Resource Allocation, & Abuse Prevention

@@ -1,4 +1,4 @@
-import { References, HomepageMenuItems } from '../Navigation.types'
+import type { HomepageMenuItems, NavMenuConstant, References } from '../Navigation.types'
 
 export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
   [
@@ -194,7 +194,7 @@ export const REFERENCES: References = {
   },
 }
 
-export const gettingstarted = {
+export const gettingstarted: NavMenuConstant = {
   icon: 'getting-started',
   title: 'Getting Started',
   items: [
@@ -321,7 +321,7 @@ export const SocialLoginItems = [
     url: '/guides/auth/social-login/auth-apple',
   },
   {
-    name: 'Azure',
+    name: 'Azure (Microsoft)',
     icon: '/docs/img/icons/microsoft-icon',
     url: '/guides/auth/social-login/auth-azure',
   },
@@ -507,7 +507,7 @@ export const auth = {
   ],
 }
 
-export const database = {
+export const database: NavMenuConstant = {
   icon: 'database',
   title: 'Database',
   url: '/guides/database',
@@ -518,6 +518,8 @@ export const database = {
     { name: 'Database Webhooks', url: '/guides/database/webhooks' },
     { name: 'Full Text Search', url: '/guides/database/full-text-search' },
     { name: 'Database Testing', url: '/guides/database/testing' },
+    { name: 'Managing Secrets with Vault', url: '/guides/database/vault' },
+    { name: 'Column Encryption', url: '/guides/database/column-encryption' },
     {
       name: 'Extensions',
       url: undefined,
@@ -662,7 +664,7 @@ export const database = {
   ],
 }
 
-export const api = {
+export const api: NavMenuConstant = {
   icon: 'serverless-apis',
   title: 'Serverless APIs',
   url: '/guides/api',
@@ -700,7 +702,7 @@ export const api = {
   ],
 }
 
-export const functions = {
+export const functions: NavMenuConstant = {
   icon: 'edge-functions',
   title: 'Edge Functions',
   url: '/guides/functions',
@@ -778,7 +780,7 @@ export const functions = {
   ],
 }
 
-export const realtime = {
+export const realtime: NavMenuConstant = {
   icon: 'realtime',
   title: 'Realtime',
   url: '/guides/realtime',
@@ -841,7 +843,7 @@ export const realtime = {
   ],
 }
 
-export const storage = {
+export const storage: NavMenuConstant = {
   icon: 'storage',
   title: 'Storage',
   url: '/guides/storage',
@@ -855,7 +857,7 @@ export const storage = {
   ],
 }
 
-export const supabase_cli = {
+export const supabase_cli: NavMenuConstant = {
   icon: 'reference-cli',
   title: 'Supabase CLI',
   url: '/guides/cli',
@@ -877,7 +879,7 @@ export const supabase_cli = {
   ],
 }
 
-export const platform = {
+export const platform: NavMenuConstant = {
   icon: 'platform',
   title: 'Platform',
   url: '/guides/platform',
@@ -932,9 +934,19 @@ export const platform = {
       ],
     },
     {
-      name: 'Go-live Checklist',
+      name: 'Production Readiness',
       url: undefined,
-      items: [{ name: 'Production Readiness', url: '/guides/platform/going-into-prod' }],
+      items: [
+        {
+          name: 'Shared Responsibility Model',
+          url: '/guides/platform/shared-responsibility-model',
+        },
+        {
+          name: 'Maturity Model',
+          url: '/guides/platform/maturity-model',
+        },
+        { name: 'Production Checklist', url: '/guides/platform/going-into-prod' },
+      ],
     },
     {
       name: 'Troubleshooting',
@@ -953,7 +965,7 @@ export const platform = {
   ],
 }
 
-export const resources = {
+export const resources: NavMenuConstant = {
   icon: 'resources',
   title: 'Resources',
   url: '/guides/resources',
@@ -994,7 +1006,7 @@ export const resources = {
   ],
 }
 
-export const self_hosting = {
+export const self_hosting: NavMenuConstant = {
   title: 'Self-Hosting',
   icon: 'self-hosting',
   url: '/guides/self-hosting',
@@ -1051,7 +1063,7 @@ export const migrate = {
   ],
 }
 
-export const integrations = {
+export const integrations: NavMenuConstant = {
   icon: 'integrations',
   title: 'Integrations',
   url: '/guides/integrations',
@@ -1082,6 +1094,7 @@ export const integrations = {
       name: 'Developer Tools',
       url: undefined,
       items: [
+        { name: 'Cloudflare Workers', url: '/guides/integrations/cloudflare-workers' },
         { name: 'Estuary', url: '/guides/integrations/estuary' },
         { name: 'OpenAI', url: '/guides/functions/examples/openai' },
         { name: 'pgMustard', url: '/guides/integrations/pgmustard' },

@@ -8,7 +8,7 @@ import { detectOS } from 'lib/helpers'
 export type UtilityActionsProps = {
   id: string
   isExecuting?: boolean
-  executeQuery?: (overrideSql?: string) => void
+  executeQuery: () => void
 }
 
 const UtilityActions = ({ id, isExecuting = false, executeQuery }: UtilityActionsProps) => {
@@ -20,7 +20,7 @@ const UtilityActions = ({ id, isExecuting = false, executeQuery }: UtilityAction
       {IS_PLATFORM && <FavoriteButton id={id} />}
       <SizeToggleButton id={id} />
       <Button
-        onClick={() => executeQuery?.()}
+        onClick={() => executeQuery()}
         disabled={isExecuting}
         loading={isExecuting}
         type="default"
