@@ -1,1 +1,1 @@
-export { default as Alert } from '../shadcn/updated/Alert/Alert'
+export * from './Alert'
