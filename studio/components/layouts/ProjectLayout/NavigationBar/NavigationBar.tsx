@@ -37,7 +37,7 @@ const NavigationBar: FC<Props> = ({}) => {
       style={{ height: ongoingIncident ? 'calc(100vh - 44px)' : '100vh' }}
       className={[
         'flex w-14 flex-col justify-between overflow-y-hidden p-2',
-        'border-r bg-sidebar-light dark:border-dark dark:bg-sidebar-dark',
+        'border-r bg-body border-scale-500',
       ].join(' ')}
     >
       <ul className="flex flex-col space-y-2">

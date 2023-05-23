@@ -1181,7 +1181,6 @@ export default {
     // root:
     trigger: `
       flex
-
       border-none
       rounded
       bg-transparent p-0
@@ -1201,8 +1200,8 @@ export default {
     `,
     content: `
       z-40
-      bg-scale-100 dark:bg-scale-300
-      border border-scale-300 dark:border-scale-500
+      bg
+      border
       rounded
       shadow-lg
       py-1.5
@@ -1226,26 +1225,25 @@ export default {
     item: `
       group
       relative
-      text-xs
-      text-scale-1100
+      text-sm
+      text-body-light
       px-4 py-1.5 flex items-center space-x-2
       cursor-pointer
-      focus:bg-scale-300 dark:focus:bg-scale-500
-      focus:text-scale-1200
+      focus:bg-selection
+      focus:text-body
       border-none
       focus:outline-none
     `,
     disabled: `opacity-50 cursor-default`,
     label: `
-      text-scale-900
+      text-body-lighter
       px-4 flex items-center space-x-2 py-1.5
       text-xs
     `,
     separator: `
       w-full
-      h-px
       my-2
-      bg-scale-300 dark:bg-scale-500
+      border-t-[1px]
     `,
     misc: `
       px-4 py-1.5
