@@ -542,6 +542,20 @@
         "type": "function"
       },
       {
+        "id": "send-password-reauthentication",
+        "title": "Send a password reauthentication nonce",
+        "slug": "auth-reauthentication",
+        "product": "auth",
+        "type": "function"
+      },
+      {
+        "id": "resend-email-or-phone-otps",
+        "title": "Resend an OTP",
+        "slug": "auth-resend",
+        "product": "auth",
+        "type": "function"
+      },
+      {
         "id": "set-session",
         "title": "Set the session data",
         "slug": "auth-setsession",
