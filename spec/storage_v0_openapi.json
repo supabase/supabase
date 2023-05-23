@@ -555,6 +555,7 @@
                   "description": "Successful response",
                   "type": "object",
                   "properties": {
+                    "Id": { "type": "string" },
                     "Key": { "type": "string", "examples": ["avatars/folder/cat.png"] }
                   },
                   "required": ["Key"]
@@ -607,6 +608,7 @@
                   "description": "Successful response",
                   "type": "object",
                   "properties": {
+                    "Id": { "type": "string" },
                     "Key": { "type": "string", "examples": ["avatars/folder/cat.png"] }
                   },
                   "required": ["Key"]
