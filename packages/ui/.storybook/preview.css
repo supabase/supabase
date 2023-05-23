@@ -89,7 +89,11 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    /* @apply bg-background text-foreground;
+    font-feature-settings: 'rlig' 1, 'calt' 1; */
+
+    @apply bg-body text-body;
+    font-family: 'Circular std';
     font-feature-settings: 'rlig' 1, 'calt' 1;
   }
 }
@@ -98,6 +102,6 @@
 .light,
 .light .docs-story,
 .dark .docs-story {
-  @apply bg-background text-foreground;
-  font-family: 'Circular std';
+  /* @apply bg-background text;
+  font-family: 'Circular std'; */
 }
