@@ -1,234 +1,137 @@
-import * as AccordionPrimitive from '@radix-ui/react-accordion'
-import { cn } from '@ui/lib/utils'
-import { VariantProps, cva, cx } from 'class-variance-authority'
-import { ChevronDown } from 'lucide-react'
 import React, { createContext, useContext, useState } from 'react'
 
-export type AccordionRootVariantsProps = VariantProps<typeof accordionRootVariants>
-const accordionRootVariants = cva('flex flex-col', {
-  variants: {
-    type: {
-      default: 'space-y-3',
-      bordered: '-space-y-px',
-    },
-    defaultVariants: {
-      type: 'default',
-    },
-  },
-})
+import styleHandler from '../../lib/theme/styleHandler'
 
-export type AccordionItemVariantsProps = VariantProps<typeof accordionItemVariants>
-const accordionItemVariants = cva(
-  'group first:rounded-tl-md first:rounded-tr-md last:rounded-bl-md last:rounded-br-md',
-  {
-    variants: {
-      type: {
-        default: 'overflow-hidden',
-        bordered: 'border border-scale-700',
-      },
-      justified: {
-        true: 'justify-between',
-        false: '',
-      },
-    },
-  }
-)
+import * as RadixAccordion from '@radix-ui/react-accordion'
+import { IconChevronDown } from '../Icon/icons/IconChevronDown'
+import { IconChevronUp } from '../Icon/icons/IconChevronUp'
 
-const accordionTriggerVariants = cva(
-  `flex flex-row items-center w-full text-left cursor-pointer focus-visible:ring-1 focus-visible:z-10 ring-scale-1100
-    justify-between transition-all hover:underline [&[data-state=open]>svg]:rotate-180`,
-  {
-    variants: {
-      type: {
-        default: 'gap-3',
-        bordered: `
-          px-6 py-4
-          font-medium text-base bg-transparent 
-          transition-colors hover:bg-scale-200 
-          overflow-hidden 
-          group-first:rounded-tl-md group-first:rounded-tr-md 
-          group-last:rounded-bl-md group-last:rounded-br-md`,
-      },
-    },
-  }
-)
-
-const accordionContentVariants = cva('pb-4 pt-0', {
-  variants: {
-    type: {
-      default: '',
-      bordered: 'px-6',
-    },
-  },
-})
-
-type Type = AccordionRootVariantsProps['type']
-type Align = 'left' | 'right' | undefined
+type Type = 'default' | 'bordered'
+type Size = 'tiny' | 'small' | 'medium' | 'large' | 'xlarge'
+type Align = 'left' | 'right'
 
 interface ContextValue {
-  chevronAlign: Align
-  justified: boolean
+  bordered?: boolean
   type: Type
-  defaultValue: AccordionPrimitive.AccordionImplSingleProps['defaultValue']
+  justified: Boolean
+  chevronAlign: Align
 }
-
-interface AdditionalProps {
-  openBehaviour: 'single' | 'multiple'
-  variant?: Type
-  // Add other additional props here
-  onChange?: (item: string | string[]) => void
-  type?: Type
-  justified?: AccordionItemVariantsProps['justified']
-  chevronAlign?: Align
-}
-
-interface AccordionComponent
-  extends React.ForwardRefExoticComponent<
-    ExtendedAccordionProps & React.RefAttributes<HTMLDivElement>
-  > {
-  Item: typeof AccordionItem
-  Content: typeof AccordionContent
-  Trigger: typeof AccordionTrigger
-}
-
-export interface AccordionSingleProps extends AccordionPrimitive.AccordionImplSingleProps {
-  openBehaviour: 'single'
-  value?: string
-  // Add other props specific to single accordion
-}
-
-export interface AccordionMultipleProps extends AccordionPrimitive.AccordionImplMultipleProps {
-  openBehaviour: 'multiple'
-  value?: string[]
-  // Add other props specific to multiple accordion
-}
-
-type ExtendedAccordionProps = (AccordionSingleProps | AccordionMultipleProps) & AdditionalProps
 
 const AccordionContext = createContext<ContextValue>({
   chevronAlign: 'left',
-  justified: false, // Set the default value to false
-  type: undefined,
-  defaultValue: undefined,
+  justified: true,
+  type: 'default',
 })
 
-const Accordion: AccordionComponent = React.forwardRef(
-  ({ openBehaviour, type, chevronAlign, justified, defaultValue, ...props }, ref) => {
-    function handleOnChange(e: string | string[]) {
-      if (props.onChange) props.onChange(e)
-    }
+export interface AccordionProps {
+  children?: React.ReactNode
+  className?: string
 
-    const contextValue = {
-      chevronAlign,
-      justified: justified || false, // Provide a default value of false
-      type: type || 'default', // Provide a default value for the type
-      defaultValue: Array.isArray(defaultValue) ? defaultValue.join('') : defaultValue, // Convert array to string
-    }
+  onChange?: (item: string | string[]) => void
+  openBehaviour: 'single' | 'multiple'
+  type?: Type
+  defaultValue?: string | string[] | undefined
+  justified?: Boolean
+  chevronAlign?: Align
+}
 
-    if (openBehaviour === 'single') {
-      const { value, children, className, ...singleProps } = props as AccordionSingleProps
-      return (
-        <AccordionPrimitive.Root
-          ref={ref}
-          type="single"
-          onValueChange={handleOnChange}
-          value={value}
-          defaultValue={defaultValue}
-          className={cn(accordionRootVariants({ type }), className)}
-          children={
-            <AccordionContext.Provider value={{ ...contextValue }}>
-              {children}
-            </AccordionContext.Provider>
-          }
-          {...singleProps}
-        />
-      )
-    } else {
-      const { value, children, className, ...multipleProps } = props as AccordionMultipleProps
-      return (
-        <AccordionPrimitive.Root
-          ref={ref}
-          type="multiple"
-          onValueChange={handleOnChange}
-          value={value}
-          className={cn(accordionRootVariants({ type }), className)}
-          children={
-            <AccordionContext.Provider value={{ ...contextValue }}>
-              <div>{props.children}</div>
-            </AccordionContext.Provider>
-          }
-          {...multipleProps}
-        />
-      )
-    }
+function Accordion({
+  children,
+  className,
+  onChange,
+  openBehaviour = 'multiple',
+  type = 'default',
+  defaultValue = undefined,
+  justified = false,
+  chevronAlign = 'left',
+}: AccordionProps) {
+  const __styles = styleHandler('accordion')
+
+  let containerClasses = [__styles.variants[type].base]
+
+  if (className) {
+    containerClasses.push(className)
   }
-) as AccordionComponent
 
-export interface ItemAdditionalProps
-  extends React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Item> {}
+  const contextValue = {
+    chevronAlign,
+    justified,
+    type,
+    defaultValue,
+  }
 
-export const AccordionItem = React.forwardRef<
-  React.ElementRef<typeof AccordionPrimitive.Item>,
-  React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Item>
->(({ className, ...props }, ref) => {
-  const [open, setOpen] = useState(false)
-
-  let { type, justified } = useContext(AccordionContext)
+  function handleOnChange(e: string | string[]) {
+    if (onChange) onChange(e)
+    const value = e == typeof String ? e.split(' ') : e
+    // setCurrentItems(e)
+    // console.log('about to change state')
+    // currentItems = e
+    // console.log('currentItems', currentItems)
+  }
 
   return (
-    <AccordionPrimitive.Item
-      ref={ref}
-      className={cn(accordionItemVariants({ type, justified }), className)}
+    <>
+      <RadixAccordion.Root
+        type={openBehaviour}
+        onValueChange={handleOnChange}
+        defaultValue={defaultValue}
+        className={containerClasses.join(' ')}
+        children={
+          <AccordionContext.Provider value={{ ...contextValue }}>
+            <div>{children}</div>
+          </AccordionContext.Provider>
+        }
+      ></RadixAccordion.Root>
+    </>
+  )
+}
+
+interface ItemProps {
+  children?: React.ReactNode
+  className?: string
+  header: React.ReactNode
+  id: string
+  icon?: React.ReactNode
+  disabled?: boolean
+}
+
+export function Item({ children, className, header, id, disabled }: ItemProps) {
+  const __styles = styleHandler('accordion')
+  const [open, setOpen] = useState(false)
+
+  const { type, justified, chevronAlign } = useContext(AccordionContext)
+
+  let triggerClasses = [__styles.variants[type].trigger]
+  if (justified) triggerClasses.push(__styles.justified)
+  if (className) triggerClasses.push(className)
+
+  let chevronClasses = [__styles.chevron.base, __styles.chevron.align[chevronAlign]]
+
+  if (open && !disabled) {
+    chevronClasses.unshift('!rotate-180')
+  }
+
+  return (
+    <RadixAccordion.Item
+      value={id}
+      className={__styles.variants[type].container}
+      disabled={disabled}
       onClick={() => {
         setOpen(!open)
       }}
-      {...props}
-    />
-  )
-})
-AccordionItem.displayName = AccordionPrimitive.Item.displayName
-
-export const AccordionTrigger = React.forwardRef<
-  React.ElementRef<typeof AccordionPrimitive.Trigger>,
-  React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Trigger>
->(({ className, children, ...props }, ref) => {
-  const { type } = useContext(AccordionContext)
-  return (
-    <AccordionPrimitive.Header className="flex">
-      <AccordionPrimitive.Trigger
-        ref={ref}
-        className={cn(accordionTriggerVariants({ type }), className)}
-        {...props}
-      >
-        {children}
-        <ChevronDown className="h-4 w-4 transition-transform duration-200" />
-      </AccordionPrimitive.Trigger>
-    </AccordionPrimitive.Header>
-  )
-})
-AccordionTrigger.displayName = AccordionPrimitive.Trigger.displayName
-
-export const AccordionContent = React.forwardRef<
-  React.ElementRef<typeof AccordionPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Content>
->(({ className, children, ...props }, ref) => {
-  const { type } = useContext(AccordionContext)
-  return (
-    <AccordionPrimitive.Content
-      ref={ref}
-      className={cn(
-        'overflow-hidden text-sm transition-all data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down',
-        className
-      )}
-      {...props}
     >
-      <div className={cx(accordionContentVariants({ type }))}>{children}</div>
-    </AccordionPrimitive.Content>
+      <RadixAccordion.Trigger className={triggerClasses.join(' ')}>
+        {header}
+        {!disabled && (
+          <IconChevronDown aria-hidden className={chevronClasses.join(' ')} strokeWidth={2} />
+        )}
+      </RadixAccordion.Trigger>
+      <RadixAccordion.Content className={__styles.variants[type].content}>
+        <div className={__styles.variants[type].panel}>{children}</div>
+      </RadixAccordion.Content>
+    </RadixAccordion.Item>
   )
-})
-AccordionContent.displayName = AccordionPrimitive.Content.displayName
+}
 
-Accordion.Item = AccordionItem
-Accordion.Content = AccordionContent
-Accordion.Trigger = AccordionTrigger
-export { Accordion }
+Accordion.Item = Item
+export default Accordion
