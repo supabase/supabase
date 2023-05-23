@@ -1,5 +1,8 @@
 import Link from 'next/link'
 import supabase from '../../utils/supabase'
+import dynamic from 'next/dynamic'
+
+const DynamicSyntaxHighlighter = dynamic(() => import('react-syntax-highlighter'))
 
 export default async function Posts() {
   const { data: posts } = await supabase.from('posts').select('id, title')
@@ -9,8 +12,10 @@ export default async function Posts() {
   }
 
   return posts.map((post) => (
-    <p key={post.id}>
-      <Link href={`/static/${post.id}`}>{post.title}</Link>
-    </p>
+    <DynamicSyntaxHighlighter language="javascript">
+      <p key={post.id}>
+        <Link href={`/static/${post.id}`}>{post.title}</Link>
+      </p>
+    </DynamicSyntaxHighlighter>
   ))
 }
