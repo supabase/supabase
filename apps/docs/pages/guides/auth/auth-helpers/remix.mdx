@@ -441,7 +441,7 @@ useEffect(() => {
   return () => {
     subscription.unsubscribe()
   }
-}, [serverAccessToken, supabase, fetcher])
+}, [serverAccessToken, supabase, revalidate])
 ```
 
 </TabPanel>
@@ -471,7 +471,7 @@ useEffect(() => {
   return () => {
     subscription.unsubscribe()
   }
-}, [serverAccessToken, supabase, fetcher])
+}, [serverAccessToken, supabase, revalidate])
 ```
 
 </TabPanel>
