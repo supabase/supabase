@@ -126,6 +126,7 @@ function CodeBlock(props: CodeBlockProps) {
                   )
                 }
                 onClick={() => handleCopy()}
+                aria-label="Copy"
               >
                 {/* {copied ? 'Copied' : 'Copy'} */}
               </Button>

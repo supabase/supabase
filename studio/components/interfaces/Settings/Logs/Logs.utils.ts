@@ -150,6 +150,13 @@ export const genDefaultQuery = (table: LogsTableName, filters: Filters) => {
   limit 100
     `
 
+    case 'auth_logs':
+      return `select id, ${table}.timestamp, event_message, metadata.level, metadata.status, metadata.path, metadata.msg as msg, metadata.error from ${table}
+  cross join unnest(metadata) as metadata
+  ${where}
+  limit 100
+    `
+
     case 'function_edge_logs':
       return `select id, ${table}.timestamp, event_message, response.status_code, request.method, m.function_id, m.execution_time_ms, m.deployment_id, m.version from ${table}
   cross join unnest(metadata) as m
