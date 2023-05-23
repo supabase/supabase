@@ -25,7 +25,7 @@
 }
 
 body {
-  @apply bg-scale-200 dark:bg-[#1c1c1c] #{!important};
+  @apply bg-scale-200;
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

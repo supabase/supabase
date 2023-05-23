@@ -1,3 +1,6 @@
+import '../../packages/ui/build/css/themes/light.css'
+import '../../packages/ui/build/css/themes/dark.css'
+
 import 'styles/main.scss'
 import 'styles/editor.scss'
 import 'styles/ui.scss'
@@ -119,6 +122,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
     },
     [supabase]
   )
+  //
 
   return (
     <QueryClientProvider client={queryClient}>
