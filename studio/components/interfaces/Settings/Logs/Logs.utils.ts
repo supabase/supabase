@@ -449,6 +449,7 @@ const _getTruncation = (date: Dayjs) => {
     1: 'minute' as const,
     2: 'hour' as const,
     3: 'day' as const,
+    4: 'day' as const,
   }[zeroCount]!
   return truncation
 }
