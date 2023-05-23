@@ -89,4 +89,5 @@ module.exports = config({
       },
     },
   },
+  plugins: [require('tailwindcss-animate')],
 })
