@@ -1,10 +1,11 @@
 import { useTheme } from 'common/Providers'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { Fragment } from 'react'
-import { Badge, cn } from 'ui'
-import HomeMenuIconPicker from './HomeMenuIconPicker'
+import { Badge, cn } from '~/../../packages/ui'
 import { HOMEPAGE_MENU_ITEMS } from './NavigationMenu.constants'
+import HomeMenuIconPicker from './HomeMenuIconPicker'
 
 const NavigationMenuHome = () => {
   const router = useRouter()
