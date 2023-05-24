@@ -54,7 +54,6 @@ const PageLayout: NextPageWithLayout = () => {
     }))
   }, [data?.result])
 
-  console.log(data)
 
   const [startDate, endDate]: [Dayjs, Dayjs] = useMemo(() => {
     const start = dayjs()
