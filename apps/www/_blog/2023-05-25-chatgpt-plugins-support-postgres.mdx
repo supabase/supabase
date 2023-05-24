@@ -5,11 +5,11 @@ tags:
   - AI
   - tutorial
   - postgres
-date: '2023-05-24'
+date: '2023-05-25'
 toc_depth: 2
 author: egor_romanov,paul_copplestone
-image: 2023-05-24-chatgpt-plugins-support-postgres/chatgpt-plugins-support-postgres.jpeg
-thumb: 2023-05-24-chatgpt-plugins-support-postgres/chatgpt-plugins-support-postgres.jpeg
+image: 2023-05-25-chatgpt-plugins-support-postgres/chatgpt-plugins-support-postgres.jpeg
+thumb: 2023-05-25-chatgpt-plugins-support-postgres/chatgpt-plugins-support-postgres.jpeg
 ---
 
 One of the challenges that ChatGPT faces is being able to answer questions from a private dataset. We can solve this with “retrieval plugins”, which allow ChatGPT to access information from a database.
@@ -132,13 +132,13 @@ This will require several steps:
 <img
   className="dark:hidden !m-0"
   alt="diagram reference"
-  src="/images/blog/2023-05-24-chatgpt-plugins-support-postgres/chatgpt-plugin-scheme--light.svg"
+  src="/images/blog/2023-05-25-chatgpt-plugins-support-postgres/chatgpt-plugin-scheme--light.svg"
 />
 
 <img
   className="hidden dark:block !m-0"
   alt="diagram reference"
-  src="/images/blog/2023-05-24-chatgpt-plugins-support-postgres/chatgpt-plugin-scheme--dark.svg"
+  src="/images/blog/2023-05-25-chatgpt-plugins-support-postgres/chatgpt-plugin-scheme--dark.svg"
 />
 
 ### Step 1: Fork the ChatGPT Retrieval Plugin repository
@@ -189,7 +189,7 @@ Using `supabase-cli` is not required and you can use any other docker image or h
 
 To create embeddings Plugin uses OpenAI API and `text-embedding-ada-002` model. Each time we add some data to our datastore, or try to query relevant information from it, embedding will be created either for inserted data chunk, or for the query itself. To make it work we need to export `OPENAI_API_KEY`. If you already have an account in OpenAI, you just need to go to [User Settings - API keys](https://platform.openai.com/account/api-keys) and Create new secret key.
 
-![OpenAI Secret Keys](/images/blog/2023-05-24-chatgpt-plugins-support-postgres/openai-secret-keys.png)
+![OpenAI Secret Keys](/images/blog/2023-05-25-chatgpt-plugins-support-postgres/openai-secret-keys.png)
 
 ### Step 6: Run the plugin!
 
@@ -234,23 +234,23 @@ Now, it is time to add our plugin to ChatGPT.
 
 To integrate our plugin with ChatGPT, register it in the ChatGPT dashboard. Assuming you have access to ChatGPT Plugins and plugin development, select the Plugins model in a new chat, then choose "Plugin store" and "Develop your own plugin." Enter `localhost:3333` into the domain input, and your plugin is now part of ChatGPT.
 
-![ChatGPT Change Model](/images/blog/2023-05-24-chatgpt-plugins-support-postgres/chatgpt-change-model.png)
+![ChatGPT Change Model](/images/blog/2023-05-25-chatgpt-plugins-support-postgres/chatgpt-change-model.png)
 
-![ChatGPT Plugin Store](/images/blog/2023-05-24-chatgpt-plugins-support-postgres/chatgpt-plugin-store.png)
+![ChatGPT Plugin Store](/images/blog/2023-05-25-chatgpt-plugins-support-postgres/chatgpt-plugin-store.png)
 
-![ChatGPT Local Plugin](/images/blog/2023-05-24-chatgpt-plugins-support-postgres/chatgpt-local-plugin.png)
+![ChatGPT Local Plugin](/images/blog/2023-05-25-chatgpt-plugins-support-postgres/chatgpt-local-plugin.png)
 
 You can now ask questions about Postgres and receive answers derived from the documentation!
 
 Let's try it out: ask ChatGPT to find out when to use `check` and when to use `using`. You will be able to see what queries were sent to our plugin and what it responded to.
 
-![Ask ChatGPT](/images/blog/2023-05-24-chatgpt-plugins-support-postgres/ask-chatgpt.png)
+![Ask ChatGPT](/images/blog/2023-05-25-chatgpt-plugins-support-postgres/ask-chatgpt.png)
 
-![ChatGPT Query](/images/blog/2023-05-24-chatgpt-plugins-support-postgres/chatgpt-query.png)
+![ChatGPT Query](/images/blog/2023-05-25-chatgpt-plugins-support-postgres/chatgpt-query.png)
 
 And after ChatGPT receives a response from the plugin it will answer your question with the data from the documentation.
 
-![ChatGPT Reply](/images/blog/2023-05-24-chatgpt-plugins-support-postgres/chatgpt-reply.png)
+![ChatGPT Reply](/images/blog/2023-05-25-chatgpt-plugins-support-postgres/chatgpt-reply.png)
 
 ## Wrap up
 
