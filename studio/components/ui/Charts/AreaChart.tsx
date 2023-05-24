@@ -47,7 +47,7 @@ const AreaChart: React.FC<AreaChartProps> = ({
   const resolvedHighlightedLabel =
     (focusDataIndex !== null &&
       data &&
-      data[focusDataIndex] &&
+      data[focusDataIndex] !== undefined &&
       day(data[focusDataIndex][xAxisKey]).format(customDateFormat)) ||
     highlightedLabel
 
