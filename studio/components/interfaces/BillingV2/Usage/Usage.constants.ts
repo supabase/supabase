@@ -7,6 +7,7 @@ export const USAGE_STATUS = {
 }
 
 export interface CategoryAttribute {
+  anchor: string
   key: string // Property from project usage
   attribute: string // For querying against stats-daily / infra-monitoring
   name: string
@@ -28,6 +29,7 @@ export const USAGE_CATEGORIES: {
     description: 'Usage statistics related to your Postgres server',
     attributes: [
       {
+        anchor: 'cpu',
         key: 'cpu_usage',
         attribute: 'cpu_usage',
         name: 'CPU',
@@ -36,6 +38,7 @@ export const USAGE_CATEGORIES: {
         chartDescription: 'The data shown here is refreshed over a period of 24 hours.',
       },
       {
+        anchor: 'ram',
         key: 'ram_usage',
         attribute: 'ram_usage',
         name: 'Memory',
@@ -44,6 +47,7 @@ export const USAGE_CATEGORIES: {
         chartDescription: 'The data shown here is refreshed over a period of 24 hours.',
       },
       {
+        anchor: 'disk_io_budget',
         key: 'disk_io_budget',
         attribute: 'disk_io_budget',
         name: 'Disk IO bandwidth',
@@ -62,6 +66,7 @@ export const USAGE_CATEGORIES: {
     description: 'Amount of data transmitted over network connections',
     attributes: [
       {
+        anchor: 'dbEgress',
         key: 'db_egress',
         attribute: 'total_egress_modified',
         name: 'Database egress',
@@ -71,6 +76,7 @@ export const USAGE_CATEGORIES: {
           'Billing is based on the total sum of egress in GB throughout your billing period. The data shown here is refreshed over a period of 24 hours.',
       },
       {
+        anchor: 'storageEgress',
         key: 'storage_egress',
         attribute: 'total_storage_egress',
         name: 'Storage egress',
@@ -88,6 +94,7 @@ export const USAGE_CATEGORIES: {
     description: 'Amount of resources your project is consuming',
     attributes: [
       {
+        anchor: 'dbSize',
         key: 'db_size',
         attribute: 'total_db_size_bytes',
         name: 'Database size',
@@ -98,6 +105,7 @@ export const USAGE_CATEGORIES: {
           'Billing is based on the average daily database size in GB throughout the billing period. The data shown here is refreshed over a period of 24 hours.',
       },
       {
+        anchor: 'storageSize',
         key: 'storage_size',
         attribute: 'total_storage_size_bytes',
         name: 'Storage size',
@@ -107,6 +115,7 @@ export const USAGE_CATEGORIES: {
           'Billing is based on the average size in GB throughout your billing period. The data shown here is refreshed over a period of 24 hours.',
       },
       {
+        anchor: 'funcCount',
         key: 'func_count',
         attribute: 'total_func_count',
         name: 'Edge function count',
@@ -123,6 +132,7 @@ export const USAGE_CATEGORIES: {
     description: 'Usage statistics that reflect the activity of your project',
     attributes: [
       {
+        anchor: 'mau',
         key: 'monthly_active_users',
         attribute: 'total_auth_billing_period_mau',
         name: 'Monthly active users',
@@ -133,6 +143,7 @@ export const USAGE_CATEGORIES: {
           'The data shown here is refreshed over a period of 24 hours and resets at the beginning of every billing period.',
       },
       {
+        anchor: 'mauSso',
         key: 'monthly_active_sso_users',
         attribute: 'total_auth_billing_period_sso_mau',
         name: 'Monthly active single sign-on users',
@@ -143,6 +154,7 @@ export const USAGE_CATEGORIES: {
           'The data shown here is refreshed over a period of 24 hours and resets at the beginning of every billing period.',
       },
       {
+        anchor:'storageImageTransformations',
         key: 'storage_image_render_count',
         attribute: 'total_storage_image_render_count',
         name: 'Storage image transformations',
@@ -152,6 +164,7 @@ export const USAGE_CATEGORIES: {
         chartDescription: 'The data shown here is refreshed over a period of 24 hours.',
       },
       {
+        anchor:'functionInvocations',
         key: 'func_invocations',
         attribute: 'total_func_invocations',
         name: 'Edge function invocations',
@@ -162,6 +175,7 @@ export const USAGE_CATEGORIES: {
           'Billing is based on the sum of all invocations throughout your billing period. The data shown here is refreshed over a period of 24 hours.',
       },
       {
+        anchor:'realtimeMessageCount',
         key: 'realtime_message_count',
         attribute: 'total_realtime_message_count',
         name: 'Realtime message count',
@@ -171,6 +185,7 @@ export const USAGE_CATEGORIES: {
           'Billing is based on the total amount of messages throughout your billing period. The data shown here is refreshed over a period of 24 hours.',
       },
       {
+        anchor: 'realtimePeakConnection',
         key: 'realtime_peak_connection',
         attribute: 'total_realtime_peak_connection',
         name: 'Realtime peak connections',

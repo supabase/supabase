@@ -80,7 +80,7 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [553, 545, 548, 543, 541, 544, 546, 547, 542]
+                          "children": [545, 548, 543, 553, 541, 544, 546, 547, 542]
                         },
                         {
                           "title": "Methods",
@@ -151,26 +151,6 @@
               }
             }
           ]
-        },
-        {
-          "id": 553,
-          "name": "allowEmpty",
-          "kind": 1024,
-          "kindString": "Property",
-          "flags": {
-            "isProtected": true
-          },
-          "sources": [
-            {
-              "fileName": "src/PostgrestBuilder.ts",
-              "line": 16,
-              "character": 12
-            }
-          ],
-          "type": {
-            "type": "intrinsic",
-            "name": "boolean"
-          }
         },
         {
           "id": 545,
@@ -313,6 +293,26 @@
             "qualifiedName": "Record",
             "package": "typescript",
             "name": "Record"
+          }
+        },
+        {
+          "id": 553,
+          "name": "isMaybeSingle",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isProtected": true
+          },
+          "sources": [
+            {
+              "fileName": "src/PostgrestBuilder.ts",
+              "line": 16,
+              "character": 12
+            }
+          ],
+          "type": {
+            "type": "intrinsic",
+            "name": "boolean"
           }
         },
         {
@@ -734,7 +734,7 @@
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [553, 545, 548, 543, 541, 544, 546, 547, 542]
+          "children": [545, 548, 543, 553, 541, 544, 546, 547, 542]
         },
         {
           "title": "Methods",
@@ -2106,26 +2106,6 @@
                           ]
                         },
                         {
-                          "id": 553,
-                          "name": "allowEmpty",
-                          "kind": 1024,
-                          "kindString": "Property",
-                          "flags": {
-                            "isProtected": true
-                          },
-                          "sources": [
-                            {
-                              "fileName": "src/PostgrestBuilder.ts",
-                              "line": 16,
-                              "character": 12
-                            }
-                          ],
-                          "type": {
-                            "type": "intrinsic",
-                            "name": "boolean"
-                          }
-                        },
-                        {
                           "id": 545,
                           "name": "body",
                           "kind": 1024,
@@ -2266,6 +2246,26 @@
                             "qualifiedName": "Record",
                             "package": "typescript",
                             "name": "Record"
+                          }
+                        },
+                        {
+                          "id": 553,
+                          "name": "isMaybeSingle",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isProtected": true
+                          },
+                          "sources": [
+                            {
+                              "fileName": "src/PostgrestBuilder.ts",
+                              "line": 16,
+                              "character": 12
+                            }
+                          ],
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "boolean"
                           }
                         },
                         {
@@ -2687,7 +2687,7 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [553, 545, 548, 543, 541, 544, 546, 547, 542]
+                          "children": [545, 548, 543, 553, 541, 544, 546, 547, 542]
                         },
                         {
                           "title": "Methods",
@@ -2777,31 +2777,6 @@
             "type": "reference",
             "id": 438,
             "name": "default.constructor"
-          }
-        },
-        {
-          "id": 419,
-          "name": "allowEmpty",
-          "kind": 1024,
-          "kindString": "Property",
-          "flags": {
-            "isProtected": true
-          },
-          "sources": [
-            {
-              "fileName": "src/PostgrestBuilder.ts",
-              "line": 16,
-              "character": 12
-            }
-          ],
-          "type": {
-            "type": "intrinsic",
-            "name": "boolean"
-          },
-          "inheritedFrom": {
-            "type": "reference",
-            "id": 518,
-            "name": "default.allowEmpty"
           }
         },
         {
@@ -2960,6 +2935,31 @@
             "type": "reference",
             "id": 508,
             "name": "default.headers"
+          }
+        },
+        {
+          "id": 419,
+          "name": "isMaybeSingle",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isProtected": true
+          },
+          "sources": [
+            {
+              "fileName": "src/PostgrestBuilder.ts",
+              "line": 16,
+              "character": 12
+            }
+          ],
+          "type": {
+            "type": "intrinsic",
+            "name": "boolean"
+          },
+          "inheritedFrom": {
+            "type": "reference",
+            "id": 518,
+            "name": "default.isMaybeSingle"
           }
         },
         {
@@ -3640,7 +3640,7 @@
           "sources": [
             {
               "fileName": "src/PostgrestTransformBuilder.ts",
-              "line": 160,
+              "line": 166,
               "character": 2
             }
           ],
@@ -3853,7 +3853,7 @@
           "sources": [
             {
               "fileName": "src/PostgrestTransformBuilder.ts",
-              "line": 194,
+              "line": 200,
               "character": 2
             }
           ],
@@ -3901,7 +3901,7 @@
                           "sources": [
                             {
                               "fileName": "src/PostgrestTransformBuilder.ts",
-                              "line": 202,
+                              "line": 208,
                               "character": 4
                             }
                           ],
@@ -3924,7 +3924,7 @@
                           "sources": [
                             {
                               "fileName": "src/PostgrestTransformBuilder.ts",
-                              "line": 205,
+                              "line": 211,
                               "character": 4
                             }
                           ],
@@ -3947,7 +3947,7 @@
                           "sources": [
                             {
                               "fileName": "src/PostgrestTransformBuilder.ts",
-                              "line": 207,
+                              "line": 213,
                               "character": 4
                             }
                           ],
@@ -3979,7 +3979,7 @@
                           "sources": [
                             {
                               "fileName": "src/PostgrestTransformBuilder.ts",
-                              "line": 204,
+                              "line": 210,
                               "character": 4
                             }
                           ],
@@ -4002,7 +4002,7 @@
                           "sources": [
                             {
                               "fileName": "src/PostgrestTransformBuilder.ts",
-                              "line": 203,
+                              "line": 209,
                               "character": 4
                             }
                           ],
@@ -4025,7 +4025,7 @@
                           "sources": [
                             {
                               "fileName": "src/PostgrestTransformBuilder.ts",
-                              "line": 206,
+                              "line": 212,
                               "character": 4
                             }
                           ],
@@ -4389,7 +4389,7 @@
           "sources": [
             {
               "fileName": "src/PostgrestTransformBuilder.ts",
-              "line": 168,
+              "line": 174,
               "character": 2
             }
           ],
@@ -8759,7 +8759,7 @@
           "sources": [
             {
               "fileName": "src/PostgrestTransformBuilder.ts",
-              "line": 246,
+              "line": 252,
               "character": 2
             }
           ],
@@ -8829,7 +8829,7 @@
           "sources": [
             {
               "fileName": "src/PostgrestTransformBuilder.ts",
-              "line": 232,
+              "line": 238,
               "character": 2
             }
           ],
@@ -9735,7 +9735,7 @@
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [419, 411, 414, 409, 407, 410, 412, 413, 408]
+          "children": [411, 414, 409, 419, 407, 410, 412, 413, 408]
         },
         {
           "title": "Methods",
@@ -11438,26 +11438,6 @@
                           ]
                         },
                         {
-                          "id": 553,
-                          "name": "allowEmpty",
-                          "kind": 1024,
-                          "kindString": "Property",
-                          "flags": {
-                            "isProtected": true
-                          },
-                          "sources": [
-                            {
-                              "fileName": "src/PostgrestBuilder.ts",
-                              "line": 16,
-                              "character": 12
-                            }
-                          ],
-                          "type": {
-                            "type": "intrinsic",
-                            "name": "boolean"
-                          }
-                        },
-                        {
                           "id": 545,
                           "name": "body",
                           "kind": 1024,
@@ -11598,6 +11578,26 @@
                             "qualifiedName": "Record",
                             "package": "typescript",
                             "name": "Record"
+                          }
+                        },
+                        {
+                          "id": 553,
+                          "name": "isMaybeSingle",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isProtected": true
+                          },
+                          "sources": [
+                            {
+                              "fileName": "src/PostgrestBuilder.ts",
+                              "line": 16,
+                              "character": 12
+                            }
+                          ],
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "boolean"
                           }
                         },
                         {
@@ -12019,7 +12019,7 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [553, 545, 548, 543, 541, 544, 546, 547, 542]
+                          "children": [545, 548, 543, 553, 541, 544, 546, 547, 542]
                         },
                         {
                           "title": "Methods",
@@ -12109,31 +12109,6 @@
             "type": "reference",
             "id": 537,
             "name": "default.constructor"
-          }
-        },
-        {
-          "id": 518,
-          "name": "allowEmpty",
-          "kind": 1024,
-          "kindString": "Property",
-          "flags": {
-            "isProtected": true
-          },
-          "sources": [
-            {
-              "fileName": "src/PostgrestBuilder.ts",
-              "line": 16,
-              "character": 12
-            }
-          ],
-          "type": {
-            "type": "intrinsic",
-            "name": "boolean"
-          },
-          "inheritedFrom": {
-            "type": "reference",
-            "id": 553,
-            "name": "default.allowEmpty"
           }
         },
         {
@@ -12292,6 +12267,31 @@
             "type": "reference",
             "id": 543,
             "name": "default.headers"
+          }
+        },
+        {
+          "id": 518,
+          "name": "isMaybeSingle",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isProtected": true
+          },
+          "sources": [
+            {
+              "fileName": "src/PostgrestBuilder.ts",
+              "line": 16,
+              "character": 12
+            }
+          ],
+          "type": {
+            "type": "intrinsic",
+            "name": "boolean"
+          },
+          "inheritedFrom": {
+            "type": "reference",
+            "id": 553,
+            "name": "default.isMaybeSingle"
           }
         },
         {
@@ -12522,7 +12522,7 @@
           "sources": [
             {
               "fileName": "src/PostgrestTransformBuilder.ts",
-              "line": 160,
+              "line": 166,
               "character": 2
             }
           ],
@@ -12559,7 +12559,7 @@
           "sources": [
             {
               "fileName": "src/PostgrestTransformBuilder.ts",
-              "line": 194,
+              "line": 200,
               "character": 2
             }
           ],
@@ -12607,7 +12607,7 @@
                           "sources": [
                             {
                               "fileName": "src/PostgrestTransformBuilder.ts",
-                              "line": 202,
+                              "line": 208,
                               "character": 4
                             }
                           ],
@@ -12630,7 +12630,7 @@
                           "sources": [
                             {
                               "fileName": "src/PostgrestTransformBuilder.ts",
-                              "line": 205,
+                              "line": 211,
                               "character": 4
                             }
                           ],
@@ -12653,7 +12653,7 @@
                           "sources": [
                             {
                               "fileName": "src/PostgrestTransformBuilder.ts",
-                              "line": 207,
+                              "line": 213,
                               "character": 4
                             }
                           ],
@@ -12685,7 +12685,7 @@
                           "sources": [
                             {
                               "fileName": "src/PostgrestTransformBuilder.ts",
-                              "line": 204,
+                              "line": 210,
                               "character": 4
                             }
                           ],
@@ -12708,7 +12708,7 @@
                           "sources": [
                             {
                               "fileName": "src/PostgrestTransformBuilder.ts",
-                              "line": 203,
+                              "line": 209,
                               "character": 4
                             }
                           ],
@@ -12731,7 +12731,7 @@
                           "sources": [
                             {
                               "fileName": "src/PostgrestTransformBuilder.ts",
-                              "line": 206,
+                              "line": 212,
                               "character": 4
                             }
                           ],
@@ -12807,7 +12807,7 @@
           "sources": [
             {
               "fileName": "src/PostgrestTransformBuilder.ts",
-              "line": 168,
+              "line": 174,
               "character": 2
             }
           ],
@@ -13513,7 +13513,7 @@
           "sources": [
             {
               "fileName": "src/PostgrestTransformBuilder.ts",
-              "line": 246,
+              "line": 252,
               "character": 2
             }
           ],
@@ -13573,7 +13573,7 @@
           "sources": [
             {
               "fileName": "src/PostgrestTransformBuilder.ts",
-              "line": 232,
+              "line": 238,
               "character": 2
             }
           ],
@@ -14114,7 +14114,7 @@
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [518, 510, 513, 508, 506, 509, 511, 512, 507]
+          "children": [510, 513, 508, 518, 506, 509, 511, 512, 507]
         },
         {
           "title": "Methods",
