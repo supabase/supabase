@@ -64,7 +64,6 @@ const PageLayout: NextPageWithLayout = () => {
     const end = dayjs().startOf(selectedInterval.startUnit as dayjs.ManipulateType)
     return [start, end]
   }, [selectedInterval])
-  console.log(startDate.toISOString(), endDate.toISOString())
   const chartData = useFillTimeseriesSorted(
     normalizedData,
     'timestamp',
