@@ -73,26 +73,17 @@ const GridHeaderActions: FC<Props> = ({
         </Tooltip.Root>
       )}
 
-      <Link href={`/project/${projectRef}/auth/policies?search=${table.id}`}>
+      {table.rls_enabled && <Link href={`/project/${projectRef}/auth/policies?search=${table.id}`}>
         <a>
           <Button
-            type={table.rls_enabled ? 'link' : 'warning'}
-            icon={
-              table.rls_enabled ? (
-                <IconLock strokeWidth={2} size={14} />
-              ) : (
-                <IconAlertCircle strokeWidth={2} size={14} />
-              )
-            }
+            type="link"
+            icon={<IconLock strokeWidth={2} size={14} />}
           >
-            {!table.rls_enabled
-              ? 'RLS is not enabled'
-              : `${policies.length == 0 ? 'No' : policies.length} active RLS polic${
-                  policies.length > 1 || policies.length == 0 ? 'ies' : 'y'
-                }`}
+            {`${policies.length == 0 ? 'No' : policies.length} active RLS polic${policies.length > 1 || policies.length == 0 ? 'ies' : 'y'
+              }`}
           </Button>
         </a>
-      </Link>
+      </Link>}
       <div className="mt-[1px]">
         <RenderAPIPreviewToggle />
       </div>
