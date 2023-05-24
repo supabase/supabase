@@ -100,6 +100,16 @@ const HomePageCover = (props) => {
               />
             </a>
           </Link>
+          <Link href={`/guides/getting-started/quickstarts/angular`} passHref>
+            <a className="no-underline">
+              <IconPanel
+                iconSize={iconSize}
+                hideArrow
+                tooltip="Angular"
+                icon="/docs/img/icons/angular-icon"
+              />
+            </a>
+          </Link>
         </div>
       </div>
     </div>

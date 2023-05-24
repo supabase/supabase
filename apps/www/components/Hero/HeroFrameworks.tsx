@@ -20,6 +20,12 @@ const frameworks = [
     gaEvent: 'www_hp_hero_frameworks_react',
   },
   {
+    name: 'Angular',
+    icon: '/images/logos/frameworks/angular.svg',
+    docs: '/docs/guides/getting-started/quickstarts/angular',
+    gaEvent: 'www_hp_hero_frameworks_angular',
+  },
+  {
     name: 'Nuxt',
     icon: '/images/logos/frameworks/nuxtjs.svg',
     docs: '/docs/guides/getting-started/quickstarts/nuxtjs',
