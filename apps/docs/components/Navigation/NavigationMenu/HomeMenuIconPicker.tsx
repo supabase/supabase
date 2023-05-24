@@ -41,6 +41,8 @@ function getMenuIcon(menuKey: string, width: number = 16, height: number = 16) {
       return <IconMenuRealtime width={width} height={height} />
     case 'storage':
       return <IconMenuStorage width={width} height={height} />
+    case 'ai':
+      return <IconMenuStorage width={width} height={height} />
     case 'platform':
       return <IconMenuPlatform width={width} height={height} />
     case 'resources':
