@@ -52,6 +52,12 @@ export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
       href: '/guides/storage',
       level: 'storage',
     },
+    {
+      label: 'AI & Vectors',
+      icon: 'ai',
+      href: '/guides/ai',
+      level: 'ai',
+    },
   ],
   [
     {
@@ -855,6 +861,46 @@ export const storage: NavMenuConstant = {
     { name: 'Access Control', url: '/guides/storage/access-control' },
     { name: 'CDN', url: '/guides/storage/cdn' },
     { name: 'Image Transformations', url: '/guides/storage/image-transformations' },
+  ],
+}
+
+export const ai: NavMenuConstant = {
+  icon: 'ai',
+  title: 'AI & Vectors',
+  url: '/guides/ai',
+  items: [
+    { name: 'Overview', url: '/guides/ai' },
+    { name: 'Concepts', url: '/guides/ai/concepts' },
+    {
+      name: 'Quickstarts',
+      url: undefined,
+      items: [{ name: 'Vecs for data scientists', url: '/guides/ai/vecs-for-data-scientists' }],
+    },
+    {
+      name: 'Guides',
+      url: undefined,
+      items: [{ name: 'Creating collections', url: '/guides/ai/creating-collections' }],
+    },
+    {
+      name: 'Examples',
+      url: undefined,
+      items: [
+        {
+          name: 'Hugging Face inference with Edge Functions',
+          url: '/guides/ai/hugging-face-inference-edge-functions',
+        },
+      ],
+    },
+    {
+      name: 'Third-Party Tools',
+      url: undefined,
+      items: [
+        {
+          name: 'LangChain',
+          url: '/guides/ai/langchain',
+        },
+      ],
+    },
   ],
 }
 
