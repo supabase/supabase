@@ -38,5 +38,13 @@
     "description_short": "",
     "label": "",
     "url": "/realtime"
+  },
+  "vector": {
+    "name": "Vector",
+    "icon": "M13 10V3L4 14h7v7l9-11h-7z",
+    "description": "todo",
+    "description_short": "",
+    "label": "",
+    "url": "/vector"
   }
 }

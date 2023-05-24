@@ -34,7 +34,7 @@ export function TicketBrickWallSlider({ users, reverse, speed = 10000 }: Props) 
 
   return (
     <div ref={ref} className="relative h-auto w-full m-0 overflow-hidden mb-2.5">
-      <div className="flex ticket-brick-swiper">
+      <div className="flex swiper-transition-linear">
         <Swiper
           onSwiper={(swiper) => setSwiperInstance(swiper)}
           centeredSlides={true}
