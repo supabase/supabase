@@ -17,7 +17,7 @@ const HomePageCover = (props) => {
         p-5 md:p-8
         "
     >
-      <div className="col-span-full flex flex-col md:flex-row xl:flex-col justify-between gap-1 md:gap-6">
+      <div className="col-span-full flex flex-col md:flex-row xl:flex-col justify-between gap-1 md:gap-3">
         <div className="md:max-w-xs xl:max-w-none">
           <div className="flex items-center gap-3 mb-3">
             <IconBackground>
@@ -29,7 +29,7 @@ const HomePageCover = (props) => {
             Discover how to set up a database to an app making queries in just a few minutes.
           </p>
         </div>
-        <div className="flex flex-wrap md:grid md:grid-cols-4 gap-2 sm:gap-3">
+        <div className="flex flex-wrap md:grid md:grid-cols-4 2xl:grid-cols-7 gap-2 sm:gap-3">
           <Link href={`/guides/getting-started/quickstarts/reactjs`} passHref>
             <a className="no-underline">
               <IconPanel
@@ -118,7 +118,7 @@ const HomePageCover = (props) => {
             </p>
           </div>
         </div>
-        <div className="w-full xl:max-w-[365px] -mb-40">
+        <div className="w-full xl:max-w-[365px] 2xl:max-w-[608px] -mb-40">
           <GettingStarted />
         </div>
       </div>
