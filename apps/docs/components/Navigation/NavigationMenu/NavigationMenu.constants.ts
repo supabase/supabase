@@ -870,7 +870,10 @@ export const ai: NavMenuConstant = {
     {
       name: 'Guides',
       url: undefined,
-      items: [{ name: 'Creating collections', url: '/guides/ai/creating-collections' }],
+      items: [
+        { name: 'Creating collections', url: '/guides/ai/creating-collections' },
+        { name: 'Managing indexes', url: '/guides/ai/managing-indexes' },
+      ],
     },
     {
       name: 'Examples',
