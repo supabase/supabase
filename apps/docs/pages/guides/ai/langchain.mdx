@@ -7,13 +7,97 @@ export const meta = {
   sidebar_label: 'Langchain',
 }
 
-This guide shows ...
+[LangChain](langchain.com) is a popular framework for working with AI, Vectors, and embeddings. Langchain supports using Supabase as a [vector store](https://js.langchain.com/docs/modules/indexes/vector_stores/integrations/supabase), using the `pgvector` extension.
 
-## TBD
+## Initializing your database
 
-## See also
+Prepare you database with the relevant tables:
 
-- TBD
+```sql
+-- Enable the pgvector extension to work with embedding vectors
+create extension vector;
+
+-- Create a table to store your documents
+create table documents (
+  id bigserial primary key,
+  content text, -- corresponds to Document.pageContent
+  metadata jsonb, -- corresponds to Document.metadata
+  embedding vector(1536) -- 1536 works for OpenAI embeddings, change if needed
+);
+
+-- Create a function to search for documents
+create function match_documents (
+  query_embedding vector(1536),
+  match_count int,
+  filter jsonb DEFAULT '{}'
+) returns table (
+  id bigint,
+  content text,
+  metadata jsonb,
+  similarity float
+)
+language plpgsql
+as $$
+#variable_conflict use_column
+begin
+  return query
+  select
+    id,
+    content,
+    metadata,
+    1 - (documents.embedding <=> query_embedding) as similarity
+  from documents
+  where metadata @> filter
+  order by documents.embedding <=> query_embedding
+  limit match_count;
+end;
+$$;
+```
+
+## Usage
+
+You can now search your documents using any Node.js application. This is intended to be run on a secure server route.
+
+```js
+import { SupabaseVectorStore } from 'langchain/vectorstores/supabase'
+import { OpenAIEmbeddings } from 'langchain/embeddings/openai'
+import { createClient } from '@supabase/supabase-js'
+
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+if (!supabaseKey) throw new Error(`Expected SUPABASE_SERVICE_ROLE_KEY`)
+
+const url = process.env.SUPABASE_URL
+if (!url) throw new Error(`Expected env var SUPABASE_URL`)
+
+export const run = async () => {
+  const client = createClient(url, supabaseKey)
+
+  const vectorStore = await SupabaseVectorStore.fromTexts(
+    ['Hello world', 'Bye bye', "What's this?"],
+    [{ id: 2 }, { id: 1 }, { id: 3 }],
+    new OpenAIEmbeddings(),
+    {
+      client,
+      tableName: 'documents',
+      queryName: 'match_documents',
+    }
+  )
+
+  const resultOne = await vectorStore.similaritySearch('Hello world', 1)
+
+  console.log(resultOne)
+}
+```
+
+## Hybrid search
+
+Langchain supports the concept of a hybrid search, which combines Similarity Search with Full Text Search. Read the official docs to get started: [Supabase Hybrid Search](https://js.langchain.com/docs/modules/indexes/retrievers/supabase-hybrid).
+
+## Resources
+
+- Official [Langchain site](https://langchain.com/).
+- Official [Langchain docs](https://js.langchain.com/docs/modules/indexes/vector_stores/integrations/supabase).
+- Supabase [Hybrid Search](https://js.langchain.com/docs/modules/indexes/retrievers/supabase-hybrid).
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
