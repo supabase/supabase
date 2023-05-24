@@ -286,15 +286,6 @@ export const gettingstarted: NavMenuConstant = {
         },
       ],
     },
-    {
-      name: 'AI & ML',
-      items: [
-        {
-          name: 'Vector Search with OpenAI',
-          url: '/guides/getting-started/openai/vector-search',
-        },
-      ],
-    },
   ],
 }
 
@@ -885,6 +876,10 @@ export const ai: NavMenuConstant = {
       name: 'Examples',
       url: undefined,
       items: [
+        {
+          name: 'Docs search with OpenAI',
+          url: '/guides/ai/examples/docs-search',
+        },
         {
           name: 'Hugging Face inference with Edge Functions',
           url: '/guides/ai/hugging-face-inference-edge-functions',

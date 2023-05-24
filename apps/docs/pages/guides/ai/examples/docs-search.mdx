@@ -2,7 +2,7 @@ import Layout from '~/layouts/DefaultGuideLayout'
 import StepHikeCompact from '~/components/StepHikeCompact'
 
 export const meta = {
-  title: 'OpenAI Embeddings & Vector Search',
+  title: 'Docs search using OpenAI',
   subtitle:
     'Learn how to build a ChatGPT-style doc search powered by Next.js, OpenAI, and Supabase.',
   breadcrumb: 'OpenAI',
@@ -10,24 +10,20 @@ export const meta = {
   tocVideo: 'xmfNUCjszh4',
 }
 
-In this tutorial we'll look at how you can build a custom ChatGPT-like search experience for your own knowledge base. See our [Supabase Clippy](https://supabase.com/blog/chatgpt-supabase-docs) blog post for an example of how this will look.
+In this tutorial we'll look at how you can build a custom ChatGPT-like search experience for your own knowledge base. You will:
+
+1. Convert your markdown into embeddings using OpenAI.
+2. Store you embeddings in Postgres using pgvector.
+3. Deploy a function for answering your users' questions.
+
+You can read our [Supabase Clippy](https://supabase.com/blog/chatgpt-supabase-docs) blog post for a full example.
 
 We assume that you have a Next.js project with a collection of `.mdx` files nested inside your `pages` directory. We will start developing locally with the Supabase CLI and then push our local database changes to our hosted Supabase project.
 
-## Video Guide
-
-<div class="video-container">
-  <iframe
-    src="https://www.youtube-nocookie.com/embed/xmfNUCjszh4"
-    frameBorder="1"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-    allowFullScreen
-  ></iframe>
-</div>
-
 <Admonition type="note">
-  You can find the [full example on
-  GitHub](https://github.com/supabase-community/nextjs-openai-doc-search).
+
+You can find the [full Next.js example on GitHub](https://github.com/supabase-community/nextjs-openai-doc-search).
+
 </Admonition>
 
 ## Create a project
@@ -553,5 +549,5 @@ Want to learn more about the awesome tech that is powering this?
   ></iframe>
 </div>
 
-export const Page = ({ children }) => <Layout meta={meta} children={children} hideToc={true} />
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
 export default Page
