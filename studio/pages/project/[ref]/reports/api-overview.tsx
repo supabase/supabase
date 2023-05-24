@@ -13,7 +13,7 @@ import {
   ErrorCountsChartRenderer,
   ResponseSpeedChartRenderer,
   TopApiRoutesRenderer,
-  networkTrafficRenderer,
+  NetworkTrafficRenderer,
 } from 'components/interfaces/Reports/renderers/ApiRenderers'
 import { useState, useEffect } from 'react'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
@@ -96,7 +96,7 @@ export const ApiReport: NextPageWithLayout = () => {
         title="Network Traffic"
         tooltip="Ingress and egress of requests and responses respectively"
         data={report.data.networkTraffic || []}
-        renderer={networkTrafficRenderer}
+        renderer={NetworkTrafficRenderer}
       />
     </ReportPadding>
   )
