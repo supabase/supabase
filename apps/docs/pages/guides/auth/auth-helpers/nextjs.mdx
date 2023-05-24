@@ -519,7 +519,7 @@ export default function Home() {
 </TabPanel>
 </Tabs>
 
-> check out [this repo](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs/app/page.tsx) for more examples, including realtime subscriptions.
+> check out [this repo](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs) for more examples, including [realtime subscriptions](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs/app/realtime-posts.tsx).
 
 ### Server Component
 
@@ -568,7 +568,7 @@ export default async function ServerComponent() {
 </TabPanel>
 </Tabs>
 
-> check out [this repo](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs/app/page.tsx) for more examples, including redirecting unauthenticated users - protected pages.
+> check out [this repo](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs) for more examples, including redirecting unauthenticated users - [protected pages](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs/app/[id]/page.tsx).
 
 ### Server Action
 
@@ -698,7 +698,8 @@ See [refreshing session example](/docs/guides/auth/auth-helpers/nextjs#refresh-s
 
 - [Full App Router repo](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs)
 - [Realtime](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs/app/realtime-posts.tsx)
-- [Protected Routes](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs/app/page.tsx)
+- [Protected Routes](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs/app/[id]/page.tsx)
+- [Conditional Rendering in Client Components with SSR](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs/app/login-form.tsx)
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
