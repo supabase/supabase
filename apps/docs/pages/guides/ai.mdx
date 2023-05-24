@@ -4,20 +4,51 @@ export const meta = {
   id: 'ai',
   title: 'AI & Vectors',
   description: 'Use Supabase to store and search embedding vectors.',
+  subtitle: 'Use Supabase to store and search embedding vectors.',
   sidebar_label: 'Overview',
-  video: 'https://www.youtube.com/v/J9mTPY8rIXE',
 }
 
-Supabase AI & Vectors makes it simple to store and search embeding vectors.
+Supabase provides a number of tools to get started with Vectors and Embeddings. These tools include:
 
-## TBD
+- An embedding store using the popular [pgvector](https://github.com/pgvector/pgvector/)
+- A Python Library for managing collections called [Vecs](https://supabase.github.io/vecs)
 
-TBD
+## Examples
 
-## See also
+Check out all of the AI [templates and examples](https://github.com/supabase/supabase/tree/master/examples/ai) in our GitHub repository.
 
-- TBD
+<div className="grid md:grid-cols-12 gap-4 not-prose">
+  {examples.map((x) => (
+    <div className="col-span-4" key={x.href}>
+      <Link href={x.href} passHref>
+        <a>
+          <GlassPanel icon={'/docs/img/icons/github-icon'} hasLightIcon={true} title={x.name}>
+            {x.description}
+          </GlassPanel>
+        </a>
+      </Link>
+    </div>
+  ))}
+</div>
 
-export const Page = ({ children }) => <Layout meta={meta} children={children} />
+export const examples = [
+  {
+    name: 'With supabase-js',
+    description: 'Use the Supabase client inside your Edge Function.',
+    href: '/guides/functions/auth',
+  },
+  {
+    name: 'Type-Safe SQL with Kysely',
+    description: 'Combining Kysely with Deno Postgres',
+    href: '/guides/functions/kysely-postgres',
+  },
+  {
+    name: 'With CORS headers',
+    description: 'Send CORS headers for invoking from the browser.',
+    href: '/guides/functions/cors',
+  },
+]
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} hideToc={true} />
 
 export default Page
