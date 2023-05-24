@@ -874,7 +874,7 @@ export const ai: NavMenuConstant = {
     {
       name: 'Quickstarts',
       url: undefined,
-      items: [{ name: 'Vecs for data scientists', url: '/guides/ai/vecs-for-data-scientists' }],
+      items: [{ name: 'Vecs for Data Scientists', url: '/guides/ai/vecs-for-data-scientists' }],
     },
     {
       name: 'Guides',
