@@ -11,7 +11,7 @@ import { Fragment } from 'react'
 import useFillTimeseriesSorted from 'hooks/analytics/useFillTimeseriesSorted'
 import sumBy from 'lodash/sumBy'
 
-export const networkTrafficRenderer = (
+export const NetworkTrafficRenderer = (
   props: ReportWidgetProps<{
     timestamp: string
     ingress: number
