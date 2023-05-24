@@ -28,8 +28,12 @@ const Bandwidth = ({ projectRef }: BandwidthProps) => {
   const { data: usage } = useProjectUsageQuery({ projectRef })
   const { data: subscription } = useProjectSubscriptionQuery({ projectRef })
   const { current_period_start, current_period_end } = subscription?.billing ?? {}
-  const startDate = new Date((current_period_start ?? 0) * 1000).toISOString()
-  const endDate = new Date((current_period_end ?? 0) * 1000).toISOString()
+  const startDate =
+    current_period_start !== undefined
+      ? new Date(current_period_start * 1000).toISOString()
+      : undefined
+  const endDate =
+    current_period_end !== undefined ? new Date(current_period_end * 1000).toISOString() : undefined
   const categoryMeta = USAGE_CATEGORIES.find((category) => category.key === 'bandwidth')
 
   const upgradeUrl = getUpgradeUrl(projectRef, subscription)
@@ -96,98 +100,104 @@ const Bandwidth = ({ projectRef }: BandwidthProps) => {
             : undefined
 
         return (
-          <SectionContent key={attribute.key} section={attribute} lastKnownValue={lastKnownValue}>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  <p className="text-sm">{attribute.name} quota usage</p>
-                  {usageRatio >= 1 ? (
-                    <div className="flex items-center space-x-2 min-w-[115px]">
-                      <IconAlertTriangle size={14} strokeWidth={2} className={exceededLimitStyle} />
-                      <p className={`text-sm ${exceededLimitStyle}`}>Exceeded limit</p>
-                    </div>
-                  ) : usageRatio >= USAGE_APPROACHING_THRESHOLD ? (
-                    <div className="flex items-center space-x-2 min-w-[115px]">
-                      <IconAlertTriangle size={14} strokeWidth={2} className="text-amber-900" />
-                      <p className="text-sm text-amber-900">Approaching limit</p>
-                    </div>
-                  ) : null}
-                </div>
-                {isFreeTier && (
-                  <Link href={upgradeUrl}>
-                    <a>
-                      <Button type="default" size="tiny">
-                        Upgrade project
-                      </Button>
-                    </a>
-                  </Link>
-                )}
-              </div>
-              {usageMeta?.limit > 0 && (
-                <SparkBar
-                  type="horizontal"
-                  barClass={clsx(
-                    usageRatio >= 1
-                      ? 'bg-red-900'
-                      : usageRatio >= USAGE_APPROACHING_THRESHOLD
-                      ? 'bg-amber-900'
-                      : 'bg-scale-1100'
+          <div id={attribute.anchor} key={attribute.key}>
+            <SectionContent section={attribute} lastKnownValue={lastKnownValue}>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-4">
+                    <p className="text-sm">{attribute.name} quota usage</p>
+                    {usageRatio >= 1 ? (
+                      <div className="flex items-center space-x-2 min-w-[115px]">
+                        <IconAlertTriangle
+                          size={14}
+                          strokeWidth={2}
+                          className={exceededLimitStyle}
+                        />
+                        <p className={`text-sm ${exceededLimitStyle}`}>Exceeded limit</p>
+                      </div>
+                    ) : usageRatio >= USAGE_APPROACHING_THRESHOLD ? (
+                      <div className="flex items-center space-x-2 min-w-[115px]">
+                        <IconAlertTriangle size={14} strokeWidth={2} className="text-amber-900" />
+                        <p className="text-sm text-amber-900">Approaching limit</p>
+                      </div>
+                    ) : null}
+                  </div>
+                  {isFreeTier && (
+                    <Link href={upgradeUrl}>
+                      <a>
+                        <Button type="default" size="tiny">
+                          Upgrade project
+                        </Button>
+                      </a>
+                    </Link>
                   )}
-                  value={usageMeta?.usage ?? 0}
-                  max={usageMeta?.limit ?? 0}
-                />
-              )}
-              <div>
-                <div className="flex items-center justify-between border-b py-1">
-                  <p className="text-xs text-scale-1000">
-                    Included in {subscription?.tier.name.toLowerCase()}
-                  </p>
-                  <p className="text-xs">
-                    {usageMeta?.limit === 0 ? 'Unlimited' : formatBytes(usageMeta?.limit ?? 0)}
-                  </p>
-                </div>
-                <div className="flex items-center justify-between py-1">
-                  <p className="text-xs text-scale-1000">Used</p>
-                  <p className="text-xs">{formatBytes(usageMeta?.usage ?? 0)}</p>
                 </div>
                 {usageMeta?.limit > 0 && (
-                  <div className="flex items-center justify-between border-t py-1">
-                    <p className="text-xs text-scale-1000">Extra volume used this month</p>
+                  <SparkBar
+                    type="horizontal"
+                    barClass={clsx(
+                      usageRatio >= 1
+                        ? 'bg-red-900'
+                        : usageRatio >= USAGE_APPROACHING_THRESHOLD
+                        ? 'bg-amber-900'
+                        : 'bg-scale-1100'
+                    )}
+                    value={usageMeta?.usage ?? 0}
+                    max={usageMeta?.limit ?? 0}
+                  />
+                )}
+                <div>
+                  <div className="flex items-center justify-between border-b py-1">
+                    <p className="text-xs text-scale-1000">
+                      Included in {subscription?.tier.name.toLowerCase()}
+                    </p>
                     <p className="text-xs">
-                      {usageExcess < 0 ? formatBytes(0) : formatBytes(usageExcess)}
+                      {usageMeta?.limit === 0 ? 'Unlimited' : formatBytes(usageMeta?.limit ?? 0)}
                     </p>
                   </div>
-                )}
+                  <div className="flex items-center justify-between py-1">
+                    <p className="text-xs text-scale-1000">Used</p>
+                    <p className="text-xs">{formatBytes(usageMeta?.usage ?? 0)}</p>
+                  </div>
+                  {usageMeta?.limit > 0 && (
+                    <div className="flex items-center justify-between border-t py-1">
+                      <p className="text-xs text-scale-1000">Extra volume used this month</p>
+                      <p className="text-xs">
+                        {usageExcess < 0 ? formatBytes(0) : formatBytes(usageExcess)}
+                      </p>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-            <div className="space-y-1">
-              <p>{attribute.name} over time</p>
-              {attribute.chartDescription.split('\n').map((paragraph, idx) => (
-                <p key={`para-${idx}`} className="text-sm text-scale-1000">
-                  {paragraph}
-                </p>
-              ))}
-            </div>
-            {chartMeta[attribute.key]?.isLoading ? (
-              <div className="space-y-2">
-                <ShimmeringLoader />
-                <ShimmeringLoader className="w-3/4" />
-                <ShimmeringLoader className="w-1/2" />
+              <div className="space-y-1">
+                <p>{attribute.name} over time</p>
+                {attribute.chartDescription.split('\n').map((paragraph, idx) => (
+                  <p key={`para-${idx}`} className="text-sm text-scale-1000">
+                    {paragraph}
+                  </p>
+                ))}
               </div>
-            ) : (
-              <UsageBarChart
-                hasQuota={usageMeta?.limit > 0}
-                name={attribute.name}
-                unit={attribute.unit}
-                attribute={attribute.attribute}
-                data={chartData}
-                yLimit={usageMeta?.limit ?? 0}
-                yLeftMargin={chartMeta[attribute.key].margin}
-                yFormatter={(value) => formatBytes(value, 1, 'GB').replace(/\s/g, '')}
-                quotaWarningType={isFreeTier || isProTier ? 'danger' : 'warning'}
-              />
-            )}
-          </SectionContent>
+              {chartMeta[attribute.key]?.isLoading ? (
+                <div className="space-y-2">
+                  <ShimmeringLoader />
+                  <ShimmeringLoader className="w-3/4" />
+                  <ShimmeringLoader className="w-1/2" />
+                </div>
+              ) : (
+                <UsageBarChart
+                  hasQuota={usageMeta?.limit > 0}
+                  name={attribute.name}
+                  unit={attribute.unit}
+                  attribute={attribute.attribute}
+                  data={chartData}
+                  yLimit={usageMeta?.limit ?? 0}
+                  yLeftMargin={chartMeta[attribute.key].margin}
+                  yFormatter={(value) => formatBytes(value, 1, 'GB').replace(/\s/g, '')}
+                  quotaWarningType={isFreeTier || isProTier ? 'danger' : 'warning'}
+                />
+              )}
+            </SectionContent>
+          </div>
         )
       })}
     </>
