@@ -1,0 +1,200 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+import StepHikeCompact from '~/components/StepHikeCompact'
+
+export const meta = {
+  title: 'Use Supabase with Angular',
+  subtitle:
+    'Learn how to create a Supabase project, add some sample data to your database, and query the data from an Angular app.',
+  breadcrumb: 'Framework Quickstarts',
+}
+
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={1}>
+    <StepHikeCompact.Details title="Set up a Supabase project with sample data">
+
+    [Create a new project](https://app.supabase.com) in the Supabase Dashboard.
+
+    After your project is ready, create a table in your Supabase database using the [SQL Editor](https://app.supabase.com/project/_/sql) in the Dashboard. Use the following SQL statement to create a `countries` table with some sample data.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+     ```sql SQL_EDITOR
+      -- Create the table
+      CREATE TABLE countries (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255) NOT NULL
+      );
+      -- Insert some sample data into the table
+      INSERT INTO countries (name) VALUES ('United States');
+      INSERT INTO countries (name) VALUES ('Canada');
+      INSERT INTO countries (name) VALUES ('Mexico');
+      ````
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={2}>
+
+    <StepHikeCompact.Details title="Create an Angular app">
+
+    Create an Angular app using the `ng new` command.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```bash Terminal
+      ng new my-app
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={3}>
+    <StepHikeCompact.Details title="Install the Supabase client library">
+
+    The fastest way to get started is to use the `supabase-js` client library which provides a convenient interface for working with Supabase from an Angular app.
+
+    Navigate to the Angular app and install `supabase-js`.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```bash Terminal
+      cd my-app && npm install @supabase/supabase-js
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={4}>
+    <StepHikeCompact.Details title="Create the Supabase client">
+
+    In the `src/app` directory of your Angular app, create a file called `supabaseClient.ts` and add the following code to initialize the Supabase client with your [project URL and public API (anon) key](https://app.supabase.com/project/_/settings/api).
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```js lib/supabaseClient.js
+        import { createClient } from '@supabase/supabase-js'
+
+        // Replace 'project' and 'your-anon-key' with your actual Supabase project and key
+        export const supabase = createClient('https://<project>.supabase.co', '<your-anon-key>')
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+
+  <StepHikeCompact.Step step={5}>
+    <StepHikeCompact.Details title="Create a new component">
+
+    Create a new component, lets call it CountryListComponent, using the `ng generate component` command.
+
+    </StepHikeCompact.Details>
+    <StepHikeCompact.Code>
+
+
+      ```bash Terminal
+      ng generate component country-list
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={6}>
+    <StepHikeCompact.Details title="Query data from the app">
+
+    In `country-list/country-list.component.ts`, add a `getCountries` function to fetch the data and display the query result to the page..
+
+
+    </StepHikeCompact.Details>
+    <StepHikeCompact.Code>
+
+
+      ```ts src/App.jsx
+    import { Component, OnInit } from '@angular/core';
+    import { supabase } from '../supabase';
+
+    @Component({
+        selector: 'app-country-list',
+        template: `
+            <h2>Country List</h2>
+            <ul>
+             <li *ngFor="let country of countries">{{ country.name }}</li>
+             </ul>
+            `,
+    })
+    export class CountryListComponent implements OnInit {
+        countries: any[];
+
+        async ngOnInit() {
+            await this.getCountries();
+        }
+
+        async getCountries() {
+            const { data, error } = await supabase
+            .from('countries')
+            .select('name');
+
+            if (error) {
+            console.error(error);
+            } else {
+             this.countries = data;
+            }
+        }
+    }
+
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={7}>
+    <StepHikeCompact.Details title="Add the CountryListComponent ">
+
+    Open the `app.component.html` file and add the following line to include the `CountryListComponent`:
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```ts src/app/app.component.html
+        <app-country-list></app-country-list>
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={8}>
+    <StepHikeCompact.Details title="Build and run your Angular application:">
+
+    Start the app, go to http://localhost:4200 in a browser, and open the browser console and you should see the list of countries.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```bash Terminal
+      ng serve
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+</StepHikeCompact>
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} hideToc={true} />
+
+export default Page
