@@ -75,8 +75,8 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
           timestamp ASC`,
       },
       topRoutes: {
-        queryType: "logs",
-        sql: (filters)=> `
+        queryType: 'logs',
+        sql: (filters) => `
         select
           request.path as path,
           request.method as method,
@@ -95,7 +95,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
           count desc
         limit
         3
-        `
+        `,
       },
       errorCounts: {
         queryType: 'logs',
@@ -118,8 +118,8 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
         `,
       },
       topErrorRoutes: {
-        queryType: "logs",
-        sql: (filters)=> `
+        queryType: 'logs',
+        sql: (filters) => `
         select
           request.path as path,
           request.method as method,
@@ -140,7 +140,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
           count desc
         limit
         3
-        `
+        `,
       },
       responseSpeed: {
         queryType: 'logs',
@@ -162,8 +162,8 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
       `,
       },
       topSlowRoutes: {
-        queryType: "logs",
-        sql: (filters)=> `
+        queryType: 'logs',
+        sql: (filters) => `
         select
           request.path as path,
           request.method as method,
@@ -183,7 +183,44 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
           avg desc
         limit
         3
-        `
+        `,
+      },
+      networkTraffic: {
+        queryType: 'logs',
+        sql: (filters) => `
+        select
+          cast(timestamp_trunc(t.timestamp, hour) as datetime) as timestamp,
+          coalesce(
+            safe_divide(
+              sum(
+                cast(coalesce(headers.content_length, "0") as int64)
+              ),
+              1000000
+            ),
+            0
+          ) as ingress_mb,
+          coalesce(
+            safe_divide(
+              sum(
+                cast(coalesce(resp_headers.content_length, "0") as int64)
+              ),
+              1000000
+            ),
+            0
+          ) as egress_mb,
+        FROM
+          edge_logs t
+          cross join unnest(metadata) as m
+          cross join unnest(m.response) as response
+          cross join unnest(m.request) as request
+          cross join unnest(request.headers) as headers
+          cross join unnest(response.headers) as resp_headers
+          ${generateRexepWhere(filters)}
+        GROUP BY
+          timestamp
+        ORDER BY
+          timestamp ASC
+        `,
       },
     },
   },
