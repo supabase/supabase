@@ -52,7 +52,7 @@ const AreaChart: React.FC<AreaChartProps> = ({
     highlightedLabel
 
   const resolvedHighlightedValue =
-    (focusDataIndex !== null ? data[focusDataIndex]?.[yAxisKey] : null) || highlightedValue
+    focusDataIndex !== null ? data[focusDataIndex]?.[yAxisKey] : highlightedValue
 
   return (
     <div className={['flex flex-col gap-3', className].join(' ')}>
