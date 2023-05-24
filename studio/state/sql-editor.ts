@@ -107,7 +107,7 @@ export const sqlEditorState = proxy({
   },
   collapseUtilityPanel: (id: string) => {
     if (sqlEditorState.snippets[id]) {
-      sqlEditorState.snippets[id].splitSizes = [100, 0]
+      sqlEditorState.snippets[id].splitSizes = [88, 12]
     }
   },
   restoreUtilityPanel: (id: string) => {
