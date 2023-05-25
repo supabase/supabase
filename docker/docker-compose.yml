@@ -247,7 +247,7 @@ services:
     restart: unless-stopped
     environment:
       JWT_SECRET: ${JWT_SECRET}
-      SUPABASE_URL: http://kong:8000"
+      SUPABASE_URL: http://kong:8000
       SUPABASE_ANON_KEY: ${ANON_KEY}
       SUPABASE_SERVICE_ROLE_KEY: ${SERVICE_ROLE_KEY}
       SUPABASE_DB_URL: postgresql://postgres:${POSTGRES_PASSWORD}@{POSTGRES_DB}:${POSTGRES_PORT}/${POSTGRES_DB}"

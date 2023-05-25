@@ -1,5 +1,5 @@
 import { PropsWithChildren } from 'react'
-import { Badge, Button, IconExternalLink } from 'ui'
+import { Badge, IconExternalLink } from 'ui'
 import { CategoryAttribute } from './Usage.constants'
 import Link from 'next/link'
 
@@ -21,7 +21,7 @@ const SectionContent = ({
     <div className="border-b">
       <div className="1xl:px-28 mx-auto flex flex-col gap-10 px-5 lg:px-16 2xl:px-32 py-16">
         <div className="grid grid-cols-12 gap-6">
-          <div className="col-span-12 md:col-span-5">
+          <div className="col-span-12 lg:col-span-5">
             <div className="sticky top-16 space-y-6">
               <div className="space-y-1">
                 <div className="flex items-center space-x-2">
@@ -41,7 +41,7 @@ const SectionContent = ({
                     <a target="_blank" rel="noreferrer">
                       <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
                         <p className="text-sm">Documentation</p>
-                        <IconExternalLink size={16} strokeWidth={2} />
+                        <IconExternalLink size={16} strokeWidth={1.5} />
                       </div>
                     </a>
                   </Link>
@@ -52,7 +52,7 @@ const SectionContent = ({
               )}
             </div>
           </div>
-          <div className="col-span-12 md:col-span-7 space-y-6">{children}</div>
+          <div className="col-span-12 lg:col-span-7 space-y-6">{children}</div>
         </div>
       </div>
     </div>

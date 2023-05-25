@@ -154,7 +154,7 @@ const StorageExplorer = observer(({ bucket }) => {
     <div
       ref={storageExplorerRef}
       className="
-        bg-bg-primary-light dark:bg-bg-primary-dark
+        bg-scale-200
         border-panel-border-light dark:border-panel-border-dark flex
         h-full w-full flex-col rounded-md border"
     >

@@ -2040,11 +2040,11 @@ functions:
     $ref: '@supabase/gotrue-js.GoTrueClient.signUp'
     notes: |
       Creates a new user.
-      - By default, the user needs to verify their email address before logging in. To turn this off, disable **Confirm email** in [your project](https://app.supabase.com/project/_/auth/providers).
+      - By default, the user needs to verify their email address before logging in. To turn this off, disable **Confirm email** in [your project](https://supabase.com/dashboard/project/_/auth/providers).
       - **Confirm email** determines if users need to confirm their email address after signing up.
         - If **Confirm email** is enabled, the return value is null and you will be logged in instead.
         - If **Confirm email** is disabled, the return value is the user and you won't be logged in automatically.
-      - When the user confirms their email address, they are redirected to the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url) by default. You can modify your `SITE_URL` or add additional redirect URLs in [your project](https://app.supabase.com/project/_/auth/url-configuration).
+      - When the user confirms their email address, they are redirected to the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url) by default. You can modify your `SITE_URL` or add additional redirect URLs in [your project](https://supabase.com/dashboard/project/_/auth/url-configuration).
       - [supabase-kt](https://github.com/supabase-community/supabase-kt/) has default platform implementations: 
           - On JVM, you can currently only verify a sign up through the token. To send the token, rather than a redirect url, you have to change `{{ .ConfirmationURL }}` in your sign up email to `{{ .Token }}`
           - [deep links](https://developer.android.com/training/app-links/deep-linking) (Android), 
@@ -2052,7 +2052,7 @@ functions:
               - To enable deeplinking/url scheme support on Android/IOS set the `host` and the `scheme` in the GoTrue Config and call `client.handleDeeplinks(intent)` (Android) and `client.handleDeeplinks(url)` (IOS) on startup
           - the website origin (JS)
       - If signUpWith() is called for an existing confirmed user:
-        - If **Confirm email** is enabled in [your project](https://app.supabase.com/project/_/auth/providers), an obfuscated/fake user object is returned.
+        - If **Confirm email** is enabled in [your project](https://supabase.com/dashboard/project/_/auth/providers), an obfuscated/fake user object is returned.
         - If **Confirm email** is disabled, the error message, `User already registered` is returned.
     examples:
       - id: sign-up-phone
@@ -2161,7 +2161,7 @@ functions:
         - [url schemes](https://developer.apple.com/documentation/xcode/defining-a-custom-url-scheme-for-your-app) (IOS) 
             - To enable deeplinking/url scheme support on Android/IOS set the `host` and the `scheme` in the GoTrue Config and call `client.handleDeeplinks(intent)` (Android) and `client.handleDeeplinks(url)` (IOS) on startup
         - the website origin (JS)
-      - Magic links and OTPs share the same implementation. To send users a one-time code instead of a magic link, [modify the magic link email template](https://app.supabase.com/project/_/auth/templates) to include `{{ .Token }}` instead of `{{ .ConfirmationURL }}`.
+      - Magic links and OTPs share the same implementation. To send users a one-time code instead of a magic link, [modify the magic link email template](https://supabase.com/dashboard/project/_/auth/templates) to include `{{ .Token }}` instead of `{{ .ConfirmationURL }}`.
     examples:
       - id: sign-in-with-email
         name: Sign in with email
@@ -2368,7 +2368,7 @@ functions:
       Modifies the user data.
       - In order to use the `modifyUser()` method, the user needs to be signed in first.
       - By default, email updates sends a confirmation link to both the user's current and new email.
-      To only send a confirmation link to the user's new email, disable **Secure email change** in your project's [email auth provider settings](https://app.supabase.com/project/_/auth/providers).
+      To only send a confirmation link to the user's new email, disable **Secure email change** in your project's [email auth provider settings](https://supabase.com/dashboard/project/_/auth/providers).
     examples:
       - id: update-the-email-for-an-authenticated-user
         name: Update the email for an authenticated user
