@@ -217,7 +217,7 @@
         }
       },
       {
-        "title": "Asset transformations",
+        "title": "Image Transformations",
         "tooltips": {
           "main": "Distinct count of all images that were transformed in the billing period, ignoring any transformations."
         },

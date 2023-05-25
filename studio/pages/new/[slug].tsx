@@ -112,14 +112,14 @@ const Wizard: NextPageWithLayout = () => {
     }
   }, [])
 
-  useEffect(() => {
-    async function getPaymentMethods(slug: string) {
-      const { data: paymentMethods, error } = await get(`${API_URL}/organizations/${slug}/payments`)
-      if (!error) {
-        setPaymentMethods(paymentMethods)
-      }
+  async function getPaymentMethods(slug: string) {
+    const { data: paymentMethods, error } = await get(`${API_URL}/organizations/${slug}/payments`)
+    if (!error) {
+      setPaymentMethods(paymentMethods)
     }
+  }
 
+  useEffect(() => {
     if (slug) {
       getPaymentMethods(slug as string)
     }
@@ -147,6 +147,12 @@ const Wizard: NextPageWithLayout = () => {
     setDbPricingTierKey(value)
   }
 
+  function onPaymentMethodAdded() {
+    if (slug) {
+      return getPaymentMethods(slug)
+    }
+  }
+
   async function checkPasswordStrength(value: any) {
     const { message, warning, strength } = await passwordStrength(value)
     setPasswordStrengthScore(strength)
@@ -162,7 +168,7 @@ const Wizard: NextPageWithLayout = () => {
     const data: Record<string, any> = {
       cloud_provider: PROVIDERS.AWS.id, // hardcoded for DB instances to be under AWS
       org_id: currentOrg?.id,
-      name: projectName,
+      name: projectName.trim(),
       db_pass: dbPass,
       db_region: dbRegion,
       db_pricing_tier_id: (PRICING_TIER_PRODUCT_IDS as any)[dbTier],
@@ -443,7 +449,7 @@ const Wizard: NextPageWithLayout = () => {
                 )}
 
                 {!isSelectFreeTier && isEmptyPaymentMethod && (
-                  <EmptyPaymentMethodWarning stripeCustomerId={stripeCustomerId} />
+                  <EmptyPaymentMethodWarning onPaymentMethodAdded={onPaymentMethodAdded} />
                 )}
               </Panel.Content>
             )}

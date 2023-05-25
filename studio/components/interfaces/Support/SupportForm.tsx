@@ -19,6 +19,7 @@ import { CLIENT_LIBRARIES } from 'common/constants'
 
 import { Project } from 'types'
 import { useStore, useFlag } from 'hooks'
+import useProfile from 'hooks/misc/useProfile'
 import { post, get } from 'lib/common/fetch'
 import { detectBrowser } from 'lib/helpers'
 import { API_URL, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
@@ -74,6 +75,9 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
       objectUrls.forEach((url: any) => URL.revokeObjectURL(url))
     }
   }, [uploadedFiles])
+
+  const { data: profile } = useProfile()
+  const respondToEmail = profile?.primary_email ?? 'your email'
 
   if (!isInitialized) {
     return (
@@ -576,6 +580,11 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
                       </div>
                     </div>
                     <div className="px-6">
+                      <div className="flex justify-end">
+                        <p className="block text-sm text-scale-1000 mt-0 mb-2">
+                          We will contact you at {respondToEmail}.
+                        </p>
+                      </div>
                       <div className="flex justify-end">
                         <Button
                           htmlType="submit"

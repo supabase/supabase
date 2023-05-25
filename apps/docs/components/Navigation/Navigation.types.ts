@@ -9,8 +9,8 @@ export interface NavMenuGroup {
 
 export interface NavMenuSection {
   name: string
-  url?: string
-  items: NavMenuSection[]
+  url?: `/${string}`
+  items: Partial<NavMenuSection>[]
 }
 
 export interface References {
@@ -22,3 +22,21 @@ export interface References {
     currentVersion?: string
   }
 }
+
+type MenuItem = {
+  label: string
+  icon?: string
+  href?: `/${string}` | `https://${string}`
+  level?: string
+  hasLightIcon?: boolean
+  community?: boolean
+}
+
+export type HomepageMenuItems = MenuItem[][]
+
+export type NavMenuConstant = Readonly<{
+  title: string
+  icon: string
+  url?: `/${string}`
+  items: ReadonlyArray<Partial<NavMenuSection>>
+}>

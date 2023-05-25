@@ -123,6 +123,8 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                         ? 'dart'
                         : example?.code?.startsWith('```c#')
                         ? 'csharp'
+                        : example?.code?.startsWith('```kotlin')
+                        ? 'kotlin'
                         : 'js'
                       //                     `
                       // import { createClient } from '@supabase/supabase-js'
@@ -156,7 +158,8 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                                   .replace('js', '')
                                   .replace('ts', '')
                                   .replace('dart', '')
-                                  .replace('c#', ''))}
+                                  .replace('c#', '')
+                                  .replace('kotlin', ''))}
                           </CodeBlock>
 
                           {((tables && tables.length > 0) || sql) && (

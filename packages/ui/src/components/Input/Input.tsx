@@ -12,8 +12,10 @@ import { HIDDEN_PLACEHOLDER } from './../../lib/constants'
 import styleHandler from '../../lib/theme/styleHandler'
 import { useFormContext } from '../Form/FormContext'
 
-export interface Props extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
+export interface Props
+  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size' | 'onCopy'> {
   copy?: boolean
+  onCopy?: () => void
   defaultValue?: string | number
   descriptionText?: string | React.ReactNode | undefined
   disabled?: boolean
@@ -52,6 +54,7 @@ function Input({
   layout,
   onChange,
   onBlur,
+  onCopy,
   placeholder,
   type = 'text',
   value = undefined,
@@ -100,7 +103,7 @@ function Input({
   //   error = touched && touched[id] ? error : undefined
   // }, [errors, touched])
 
-  function onCopy(value: any) {
+  function _onCopy(value: any) {
     navigator.clipboard.writeText(value)?.then(
       function () {
         /* clipboard successfully set */
@@ -108,6 +111,7 @@ function Input({
         setTimeout(function () {
           setCopyLabel('Copy')
         }, 3000)
+        onCopy?.()
       },
       function () {
         /* clipboard write failed */
@@ -152,6 +156,7 @@ function Input({
           name={name}
           onChange={onInputChange}
           onBlur={handleBlurEvent}
+          onCopy={onCopy}
           placeholder={placeholder}
           ref={inputRef}
           type={type}
@@ -164,7 +169,7 @@ function Input({
           <div className={__styles.actions_container}>
             {error && <InputErrorIcon size={size} />}
             {copy && !(reveal && hidden) ? (
-              <Button size="tiny" type="default" icon={<IconCopy />} onClick={() => onCopy(value)}>
+              <Button size="tiny" type="default" icon={<IconCopy />} onClick={() => _onCopy(value)}>
                 {copyLabel}
               </Button>
             ) : null}
@@ -182,7 +187,7 @@ function Input({
 }
 
 export interface TextAreaProps
-  extends Omit<React.InputHTMLAttributes<HTMLTextAreaElement>, 'size'> {
+  extends Omit<React.InputHTMLAttributes<HTMLTextAreaElement>, 'size' | 'onCopy'> {
   descriptionText?: string
   error?: string
   icon?: any
@@ -197,6 +202,7 @@ export interface TextAreaProps
   borderless?: boolean
   validation?: (x: any) => void
   copy?: boolean
+  onCopy?: () => void
   actions?: React.ReactNode
 }
 
@@ -224,13 +230,14 @@ function TextArea({
   borderless = false,
   validation,
   copy = false,
+  onCopy,
   actions,
   ...props
 }: TextAreaProps) {
   const [charLength, setCharLength] = useState(0)
   const [copyLabel, setCopyLabel] = useState('Copy')
 
-  function onCopy(value: any) {
+  function _onCopy(value: any) {
     navigator.clipboard.writeText(value).then(
       function () {
         /* clipboard successfully set */
@@ -238,6 +245,7 @@ function TextArea({
         setTimeout(function () {
           setCopyLabel('Copy')
         }, 3000)
+        onCopy?.()
       },
       function () {
         /* clipboard write failed */
@@ -308,6 +316,7 @@ function TextArea({
           placeholder={placeholder}
           onChange={onInputChange}
           onBlur={handleBlurEvent}
+          onCopy={onCopy}
           value={value}
           className={classes.join(' ')}
           maxLength={limit}
@@ -323,7 +332,7 @@ function TextArea({
                 <Button
                   size="tiny"
                   type="default"
-                  onClick={() => onCopy(value)}
+                  onClick={() => _onCopy(value)}
                   icon={<IconCopy />}
                 >
                   {copyLabel}

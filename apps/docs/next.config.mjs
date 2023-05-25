@@ -1,3 +1,4 @@
+// @ts-check
 import nextMdx from '@next/mdx'
 import remarkGfm from 'remark-gfm'
 import rehypeSlug from 'rehype-slug'
@@ -6,6 +7,12 @@ import rehypeSlug from 'rehype-slug'
 
 import withTM from 'next-transpile-modules'
 import withYaml from 'next-plugin-yaml'
+import configureBundleAnalyzer from '@next/bundle-analyzer'
+
+const withBundleAnalyzer = configureBundleAnalyzer({
+  enabled: process.env.ANALYZE === 'true',
+})
+
 // import admonitions from 'remark-admonitions'
 
 // import { remarkCodeHike } from '@code-hike/mdx'
@@ -39,7 +46,7 @@ const withMDX = nextMdx({
   },
 })
 
-// /** @type {NextConfig} */
+/** @type {import('next').NextConfig} nextConfig */
 const nextConfig = {
   // Append the default value with md extensions
   pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
@@ -54,10 +61,18 @@ const nextConfig = {
       'user-images.githubusercontent.com',
       'raw.githubusercontent.com',
       'weweb-changelog.ghost.io',
+      'img.youtube.com',
+      'archbee-image-uploads.s3.amazonaws.com'
     ],
   },
   experimental: {
-    mdxRs: true,
+    // TODO: @next/mdx ^13.0.2 only supports experimental mdxRs flag. next ^13.0.2 will stop warning about this being unsupported.
+    // mdxRs: true,
+    modularizeImports: {
+      lodash: {
+        transform: 'lodash/{{member}}',
+      },
+    },
   },
   async headers() {
     return [
@@ -92,9 +107,14 @@ const nextConfig = {
   },
 }
 
-// next.config.js
-export default () => {
-  // const plugins = [withMDX]/
-  const plugins = [withTM(['ui', 'common', '@supabase/auth-helpers-nextjs']), withMDX, withYaml]
+const configExport = () => {
+  const plugins = [
+    withTM(['ui', 'common', '@supabase/auth-helpers-nextjs']),
+    withMDX,
+    withYaml,
+    withBundleAnalyzer,
+  ]
   return plugins.reduce((acc, next) => next(acc), nextConfig)
 }
+
+export default configExport

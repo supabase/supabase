@@ -22,7 +22,7 @@ export const getResourcesExceededLimits = (usages: any) => {
       .filter((resourceName) => usages[resourceName] !== null)
       .map((resourceName) => {
         const resource = usages[resourceName]
-        if (resource.usage / resource.limit >= 1) return resourceName
+        if (resource.limit > 0 && (resource.usage / resource.limit) > 1) return resourceName
       })
   )
 }

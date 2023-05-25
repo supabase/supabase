@@ -4,10 +4,10 @@ import { Button, Input, IconSearch } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 
 import { useStore } from 'hooks'
+import useProfile from 'hooks/misc/useProfile'
 import { useParams } from 'common/hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { useProfileQuery } from 'data/profile/profile-query'
 import InviteMemberButton from './InviteMemberButton'
 import MembersView from './MembersView'
 import { getRolesManagementPermissions, hasMultipleOwners } from './TeamSettings.utils'
@@ -19,7 +19,7 @@ const TeamSettings = () => {
   const { ui } = useStore()
   const { slug } = useParams()
 
-  const { data: profile } = useProfileQuery()
+  const { data: profile } = useProfile()
   const isOwner = ui.selectedOrganization?.is_owner
 
   const { data: detailData } = useOrganizationDetailQuery({ slug })

@@ -57,10 +57,20 @@ export const LogsPreviewer: React.FC<Props> = ({
 
   const table = !tableName ? LOGS_TABLES[queryType] : tableName
 
-  const [
-    { error, logData, params, newCount, filters, isLoading, eventChartData, isLoadingOlder },
-    { loadOlder, setFilters, refresh, setParams },
-  ] = useLogsPreview(projectRef as string, table, filterOverride)
+  const {
+    error,
+    logData,
+    params,
+    newCount,
+    filters,
+    isLoading,
+    eventChartData,
+    isLoadingOlder,
+    loadOlder,
+    setFilters,
+    refresh,
+    setParams,
+  } = useLogsPreview(projectRef as string, table, filterOverride)
 
   const { showUpgradePrompt, setShowUpgradePrompt } = useUpgradePrompt(
     params.iso_timestamp_start as string
@@ -191,9 +201,9 @@ export const LogsPreviewer: React.FC<Props> = ({
         }
       >
         <div className={condensedLayout ? 'px-4' : ''}>
-          {showChart && (
+          {!isLoading && showChart && (
             <LogEventChart
-              data={!isLoading && eventChartData ? eventChartData : undefined}
+              data={eventChartData}
               onBarClick={(isoTimestamp) => {
                 handleSearch('event-chart-bar-click', {
                   query: filters.search_query as string,
@@ -231,7 +241,11 @@ export const LogsPreviewer: React.FC<Props> = ({
               Load older
             </Button>
             <div className="flex flex-row justify-end mt-2">
-              <UpgradePrompt show={showUpgradePrompt} setShowUpgradePrompt={setShowUpgradePrompt} />
+              <UpgradePrompt
+                show={showUpgradePrompt}
+                setShowUpgradePrompt={setShowUpgradePrompt}
+                subscription={subscription}
+              />
             </div>
           </div>
         )}
