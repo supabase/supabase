@@ -28,7 +28,7 @@ For small workloads it's typical to store your data in a single database. You ca
 
 ## Enterprise workloads
 
-At this stage you should move the collections into their own projects, and start querying them directly wherever possible. You can still access them through foreign data wrappers.
+At this stage you should distribute the collections into their own projects, and start querying them directly wherever possible. You can still access them through foreign data wrappers.
 
 - Project1
   - `vecs`
@@ -36,8 +36,6 @@ At this stage you should move the collections into their own projects, and start
 - Project2
   - `vecs`
     - `collection_two`
-- Project3
-  - `vecs`
     - `collection_three`
 - Main project
   - `public`
