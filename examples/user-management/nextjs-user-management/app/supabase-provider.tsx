@@ -8,7 +8,7 @@ import { Database } from './database.types'
 type MaybeSession = Session | null
 
 type SupabaseContext = {
-  supabase: SupabaseClient
+  supabase: SupabaseClient<any, string>
   session: MaybeSession
 }
 
@@ -21,7 +21,7 @@ export default function SupabaseProvider({
   children: React.ReactNode
   session: MaybeSession
 }) {
-  const [supabase] = useState(() => createClientComponentClient<Database>())
+  const supabase = createClientComponentClient<Database>()
   const router = useRouter()
 
   useEffect(() => {
@@ -45,12 +45,27 @@ export default function SupabaseProvider({
   )
 }
 
-export const useSupabase = () => {
+export const useSupabase = <
+  Database = any,
+  SchemaName extends string & keyof Database = 'public' extends keyof Database
+    ? 'public'
+    : string & keyof Database
+>() => {
   let context = useContext(Context)
 
   if (context === undefined) {
     throw new Error('useSupabase must be used inside SupabaseProvider')
   }
 
-  return context
+  return context.supabase as SupabaseClient<Database, SchemaName>
+}
+
+export const useSession = () => {
+  let context = useContext(Context)
+
+  if (context === undefined) {
+    throw new Error('useSession must be used inside SupabaseProvider')
+  }
+
+  return context.session
 }
