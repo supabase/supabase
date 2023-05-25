@@ -38,7 +38,7 @@ You can choose your preferred vector database provider from a list of [supported
 We've implemented two vector provider options: one for Postgres and one for Supabase. The main differences are:
 
 - The Postgres version uses the `psycopg2` python library to directly connect to the database.
-- The Supabase version interacts with the database via PostgREST. This is helpful if you want to use Row Level Security or if you are planning to use the data in the Retrieval store beyond ChatGPT.
+- The Supabase version interacts with the database via PostgREST. This is helpful if you want to use [Row Level Security](https://supabase.com/docs/guides/auth/row-level-security) or if you are planning to use the data in the Retrieval store beyond ChatGPT.
 
 The Postgres implementation is great to start with because there are now a [large number of providers](https://github.com/pgvector/pgvector/issues/54) supporting pgvector.
 
@@ -155,7 +155,7 @@ poetry install
 
 ### Step 3: Create a Supabase project
 
-Create a Supabase project and database by following the instructions [here](https://supabase.com/docs/guides/platform). Export the environment variables required for the retrieval plugin to work:
+Create a {Supabase project](https://supabase.com/dashboard) and database by following the instructions [here](https://supabase.com/docs/guides/platform). Export the environment variables required for the retrieval plugin to work:
 
 ```bash
 export OPENAI_API_KEY=<open_ai_api_key>
