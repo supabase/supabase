@@ -862,6 +862,7 @@ export const ai: NavMenuConstant = {
   items: [
     { name: 'Overview', url: '/guides/ai' },
     { name: 'Concepts', url: '/guides/ai/concepts' },
+    { name: 'Structured & Unstructured', url: '/guides/ai/structured-unstructured-embeddings' },
     {
       name: 'Quickstarts',
       url: undefined,
@@ -873,6 +874,7 @@ export const ai: NavMenuConstant = {
       items: [
         { name: 'Creating collections', url: '/guides/ai/creating-collections' },
         { name: 'Managing indexes', url: '/guides/ai/managing-indexes' },
+        { name: 'Engineering for scale', url: '/guides/ai/engineering-for-scale' },
       ],
     },
     {

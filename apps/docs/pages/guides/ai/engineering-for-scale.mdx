@@ -1,0 +1,96 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  id: 'ai-engineering-for-scale',
+  title: 'Engineering for Scale',
+  description: 'Building an enterprise-grade vector architecture',
+  subtitle: 'Building an enterprise-grade vector architecture.',
+  sidebar_label: 'Engineering for Scale',
+}
+
+Because content sources for vectors can be extremely large, as you grow you should run your Vector workloads across several independent databases (sometimes called "pods"). This allows each collection to scale independently.
+
+- [ ] TODO: PMC - add diagram
+
+## Small workloads
+
+For small workloads it's typical to store your data in a single database. You can expose collections to your application with [views](/docs/guides/database/tables#views):
+
+- Main Project
+  - `vecs` (schema)
+    - `collection_one`
+    - `collection_two`
+    - `collection_three`
+  - `public` (schema)
+    - `collection_one` (view)
+    - `collection_two` (view)
+    - `collection_three` (view)
+
+## Enterprise workloads
+
+At this stage you should move the collections into their own projects, and start querying them directly wherever possible. You can still access them through foreign data wrappers.
+
+- Project1
+  - `vecs`
+    - `collection_one`
+- Project2
+  - `vecs`
+    - `collection_two`
+- Project3
+  - `vecs`
+    - `collection_three`
+- Main project
+  - `public`
+    - `collection_one` (foreign table)
+    - `collection_two` (foreign table)
+    - `collection_three` (foreign table)
+
+## Choosing a database size
+
+We can estimate the size you require either by the dimensionality of embeddings you require, or by the number of queries you expect to run. This is guidance only, and so you should monitor your database closely to manage any growth that you expect.
+
+### By dimensionality
+
+| `Compute Add-on` | `Dimensions` | `Estimated max vectors` |
+| ---------------- | ------------ | ----------------------- |
+| None             | 512          | TBD                     |
+|                  | 768          | TBD                     |
+|                  | 1024         | TBD                     |
+| Small            | 512          | TBD                     |
+|                  | 768          | TBD                     |
+|                  | 1024         | TBD                     |
+| Medium           | 512          | TBD                     |
+|                  | 768          | TBD                     |
+|                  | 1024         | TBD                     |
+| Large            | 512          | TBD                     |
+|                  | 768          | TBD                     |
+|                  | 1024         | TBD                     |
+| XL               | 512          | TBD                     |
+|                  | 768          | TBD                     |
+|                  | 1024         | TBD                     |
+| 2XL              | 512          | TBD                     |
+|                  | 768          | TBD                     |
+|                  | 1024         | TBD                     |
+| 4XL              | 512          | TBD                     |
+|                  | 768          | TBD                     |
+|                  | 1024         | TBD                     |
+| 8XL              | 512          | TBD                     |
+|                  | 768          | TBD                     |
+|                  | 1024         | TBD                     |
+| 8XL              | 512          | TBD                     |
+|                  | 768          | TBD                     |
+|                  | 1024         | TBD                     |
+| 12XL             | 512          | TBD                     |
+|                  | 768          | TBD                     |
+|                  | 1024         | TBD                     |
+| 16XL             | 512          | TBD                     |
+|                  | 768          | TBD                     |
+|                  | 1024         | TBD                     |
+
+### By queries per second
+
+- [ ] TODO
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page
