@@ -33,7 +33,7 @@ export const DEFAULT_QUERY_PARAMS = {
   iso_timestamp_end: REPORTS_DATEPICKER_HELPERS[0].calcTo(),
 }
 
-const generateRexepWhere = (filters: ReportFilterItem[], prepend = true) => {
+const generateRegexpWhere = (filters: ReportFilterItem[], prepend = true) => {
   if (filters.length === 0) return ''
   const conditions = filters
     .map((filter) => {
@@ -68,7 +68,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
           cross join unnest(m.response) as response
           cross join unnest(m.request) as request
           cross join unnest(request.headers) as headers
-          ${generateRexepWhere(filters)}
+          ${generateRegexpWhere(filters)}
         GROUP BY
           timestamp
         ORDER BY
@@ -88,7 +88,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
           cross join unnest(m.response) as response
           cross join unnest(m.request) as request
           cross join unnest(request.headers) as headers
-          ${generateRexepWhere(filters)}
+          ${generateRegexpWhere(filters)}
         group by
           request.path, request.method, request.search, response.status_code
         order by
@@ -110,7 +110,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
           cross join unnest(request.headers) as headers
         WHERE
           response.status_code >= 400
-        ${generateRexepWhere(filters, false)}
+        ${generateRegexpWhere(filters, false)}
         GROUP BY
           timestamp
         ORDER BY
@@ -133,7 +133,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
           cross join unnest(request.headers) as headers
         where
           response.status_code >= 400
-        ${generateRexepWhere(filters, false)}
+        ${generateRegexpWhere(filters, false)}
         group by
           request.path, request.method, request.search, response.status_code
         order by
@@ -154,7 +154,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
           cross join unnest(m.response) as response
           cross join unnest(m.request) as request
           cross join unnest(request.headers) as headers
-          ${generateRexepWhere(filters)}
+          ${generateRegexpWhere(filters)}
         GROUP BY
           timestamp
         ORDER BY
@@ -176,7 +176,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
           cross join unnest(m.response) as response
           cross join unnest(m.request) as request
           cross join unnest(request.headers) as headers
-        ${generateRexepWhere(filters)}
+        ${generateRegexpWhere(filters)}
         group by
           request.path, request.method, request.search, response.status_code
         order by
