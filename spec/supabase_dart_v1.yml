@@ -912,7 +912,7 @@ functions:
     notes: |
       - Realtime is disabled by default for new tables. You can turn it on by [managing replication](/docs/guides/realtime/extensions/postgres-changes#replication-setup).
       - `stream()` will emit the initial data as well as any further change on the database as `Stream<List<Map<String, dynamic>>>` by combining Postgrest and Realtime.
-      - Takes a list of primary key columns as its argument to be used to update and deleting the proper record internally.
+      - Takes a list of primary key columns as its argument to be used to updating and deleting the proper record internally.
       - The following filters are available
         - `.eq('column', value)` listens to rows where the column equals the value
         - `.neq('column', value)` listens to rows where the column does not equal the value
