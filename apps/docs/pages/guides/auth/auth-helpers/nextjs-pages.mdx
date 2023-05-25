@@ -556,7 +556,7 @@ export default ProtectedRoute
 As an alternative to protecting individual pages you can use a [Next.js Middleware](https://nextjs.org/docs/middleware) to protect the entire directory or those that match the config object. In the following example, all requests to `/middleware-protected/*` will check whether a user is signed in, if successful the request will be forwarded to the destination route, otherwise the user will be redirected:
 
 ```ts title=middleware.ts
-import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
+import { createMiddlewareSupabaseClient } from '@supabase/auth-helpers-nextjs'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
@@ -564,7 +564,7 @@ export async function middleware(req: NextRequest) {
   // We need to create a response and hand it to the supabase client to be able to modify the response headers.
   const res = NextResponse.next()
   // Create authenticated Supabase Client.
-  const supabase = createMiddlewareClient({ req, res })
+  const supabase = createMiddlewareSupabaseClient({ req, res })
   // Check if we have a session
   const {
     data: { session },
@@ -745,7 +745,7 @@ export const config = {
 <TabPanel id="after" label="After">
 
 ```tsx title=middleware.ts
-import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
+import { createMiddlewareSupabaseClient } from '@supabase/auth-helpers-nextjs'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
@@ -753,7 +753,7 @@ export async function middleware(req: NextRequest) {
   // We need to create a response and hand it to the supabase client to be able to modify the response headers.
   const res = NextResponse.next()
   // Create authenticated Supabase Client.
-  const supabase = createMiddlewareClient({ req, res })
+  const supabase = createMiddlewareSupabaseClient({ req, res })
   // Check if we have a session
   const {
     data: { session },
