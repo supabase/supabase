@@ -889,6 +889,10 @@ export const ai: NavMenuConstant = {
           name: 'Hugging Face inference with Edge Functions',
           url: '/guides/functions/examples/huggingface-image-captioning',
         },
+        {
+          name: 'OpenAI completions with Edge Functions',
+          url: '/guides/functions/examples/openai',
+        },
       ],
     },
     {
