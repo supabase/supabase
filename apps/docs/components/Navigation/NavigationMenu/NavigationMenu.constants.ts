@@ -1116,6 +1116,7 @@ export const integrations: NavMenuConstant = {
         { name: 'Directus', url: '/guides/integrations/directus' },
         { name: 'Draftbit', url: '/guides/integrations/draftbit' },
         { name: 'FlutterFlow', url: '/guides/integrations/flutterflow' },
+        { name: 'Forest Admin', url: '/guides/integrations/forestadmin' },
         { name: 'Plasmic', url: '/guides/integrations/plasmic' },
         { name: 'ILLA', url: '/guides/integrations/illa' },
       ],
