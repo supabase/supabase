@@ -1,4 +1,4 @@
-import dayjs from 'dayjs'
+import dayjs, { Dayjs } from 'dayjs'
 import { useMemo, useState } from 'react'
 import { useRouter } from 'next/router'
 import { Button } from 'ui'
@@ -27,10 +27,10 @@ const CHART_INTERVALS: ChartIntervals[] = [
     startUnit: 'minute',
     format: 'MMM D, h:mm:ssa',
   },
-  { key: '15min', label: '15 min', startValue: 15, startUnit: 'minute' },
-  { key: '1hr', label: '1 hour', startValue: 1, startUnit: 'hour' },
-  { key: '1day', label: '1 day', startValue: 1, startUnit: 'day' },
-  { key: '7day', label: '7 days', startValue: 7, startUnit: 'day' },
+  { key: '15min', label: '15 min', startValue: 15, startUnit: 'minute', format: 'MMM D, h:mma' },
+  { key: '1hr', label: '1 hour', startValue: 1, startUnit: 'hour', format: 'MMM D, h:mma' },
+  { key: '1day', label: '1 day', startValue: 1, startUnit: 'hour', format: 'MMM D, h:mma' },
+  { key: '7day', label: '7 days', startValue: 7, startUnit: 'day', format: 'MMM D' },
 ]
 
 const PageLayout: NextPageWithLayout = () => {
@@ -54,18 +54,22 @@ const PageLayout: NextPageWithLayout = () => {
     }))
   }, [data?.result])
 
-  const startDate = dayjs().subtract(
-    selectedInterval.startValue,
-    selectedInterval.startUnit as dayjs.ManipulateType
-  )
 
+  const [startDate, endDate]: [Dayjs, Dayjs] = useMemo(() => {
+    const start = dayjs()
+      .subtract(selectedInterval.startValue, selectedInterval.startUnit as dayjs.ManipulateType)
+      .startOf(selectedInterval.startUnit as dayjs.ManipulateType)
+
+    const end = dayjs().startOf(selectedInterval.startUnit as dayjs.ManipulateType)
+    return [start, end]
+  }, [selectedInterval])
   const chartData = useFillTimeseriesSorted(
     normalizedData,
     'timestamp',
     ['avg_execution_time', 'count'],
     0,
     startDate.toISOString(),
-    dayjs().toISOString()
+    endDate.toISOString()
   )
 
   const canReadFunction = checkPermissions(PermissionAction.FUNCTIONS_READ, functionSlug as string)
@@ -111,17 +115,24 @@ const PageLayout: NextPageWithLayout = () => {
             tooltip="Average execution time of function invocations"
             data={chartData}
             isLoading={isChartLoading}
-            renderer={(props) => (
-              <AreaChart
-                className="w-full"
-                xAxisKey="timestamp"
-                customDateFormat={selectedInterval.format}
-                yAxisKey="avg_execution_time"
-                data={props.data}
-                format="ms"
-                highlightedValue={meanBy(props.data, 'avg_execution_time')}
-              />
-            )}
+            renderer={(props) => {
+              const latest = normalizedData[normalizedData.length - 1]
+              let highlightedValue
+              if (latest) {
+                highlightedValue = latest['avg_execution_time']
+              }
+              return (
+                <AreaChart
+                  className="w-full"
+                  xAxisKey="timestamp"
+                  customDateFormat={selectedInterval.format}
+                  yAxisKey="avg_execution_time"
+                  data={props.data}
+                  format="ms"
+                  highlightedValue={highlightedValue}
+                />
+              )
+            }}
           />
           <ReportWidget
             title="Invocations"
