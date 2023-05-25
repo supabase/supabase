@@ -10,6 +10,7 @@ import { extractTsDocNode, generateParameters } from '~/lib/refGenerator/helpers
 import RefDetailCollapse from '~/components/reference/RefDetailCollapse'
 import { Fragment } from 'react'
 import { IRefFunctionSection } from './Reference.types'
+import components from '~/components'
 
 const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
   const item = props.spec.functions.find((x: any) => x.id === props.funcData.id)
@@ -38,16 +39,16 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
             <header className={['prose'].join(' ')}>
               {shortText && <ReactMarkdown className="text-sm">{shortText}</ReactMarkdown>}
             </header>
-
             {item.description && (
               <div className="prose">
                 <ReactMarkdown className="text-sm">{item.description}</ReactMarkdown>
               </div>
             )}
-
             {item.notes && (
               <div className="prose">
-                <ReactMarkdown className="text-sm">{item.notes}</ReactMarkdown>
+                <ReactMarkdown className="text-sm" components={components}>
+                  {item.notes}
+                </ReactMarkdown>
               </div>
             )}
             {/* // parameters */}
