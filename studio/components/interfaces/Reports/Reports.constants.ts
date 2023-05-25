@@ -215,7 +215,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
           cross join unnest(m.request) as request
           cross join unnest(request.headers) as headers
           cross join unnest(response.headers) as resp_headers
-          ${generateRexepWhere(filters)}
+          ${generateRegexpWhere(filters)}
         GROUP BY
           timestamp
         ORDER BY
