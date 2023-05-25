@@ -27,7 +27,7 @@ const ProductHeaderCentered = (props: Types) => (
               )}
             </div>
           ) : null}
-          <h1 className="h1" key={`h1`}>
+          <h1 className="h1 tracking-[-1px]" key={`h1`}>
             {props.h1}
           </h1>
         </div>

@@ -90,6 +90,10 @@ h6:not(.overwrite) {
   @apply text-[#F4FFFA00] bg-clip-text bg-gradient-to-b from-scale-1200 to-scale-1200 dark:to-scale-1100;
 }
 
+.heading-gradient-brand {
+  @apply text-[#3ECF8E00] bg-clip-text bg-gradient-to-b from-brand-1000 to-brand-900 dark:to-brand-900;
+}
+
 .toc-animate {
   @apply !translate-x-1 !text-brand-900;
 }

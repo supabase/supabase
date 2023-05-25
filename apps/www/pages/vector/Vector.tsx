@@ -6,12 +6,13 @@ import { useRouter } from 'next/router'
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
+import CommunitySlider from '~/components/Sections/CommunitySlider'
 import APISection from '~/components/Sections/APISection'
 import ProductHeaderCentered from '~/components/Sections/ProductHeaderCentered'
 import VectorStyles from './vector.module.css'
+import FeaturesSection from '~/components/Sections/FeaturesSection'
 
 import 'swiper/swiper.min.css'
-import CommunitySlider from '../../components/Sections/CommunitySlider'
 
 const Cursor = ({ className = '', color = 'none' }) => {
   return (
@@ -195,6 +196,8 @@ function VectorPage() {
             </div>
           </div>
         </SectionContainer>
+
+        <FeaturesSection />
 
         {/* <SectionContainer>
           <APISection
