@@ -207,10 +207,7 @@ import { useRouter } from 'next/navigation'
 
 const Context = createContext(undefined)
 
-export default function SupabaseProvider({
-  children,
-  session,
-}) {
+export default function SupabaseProvider({ children, session }) {
   const [supabase] = useState(() => createClientComponentClient())
   const router = useRouter()
 
@@ -254,7 +251,6 @@ export const useSession = () => {
 
   return context.session
 }
-
 ```
 
 </TabPanel>
@@ -446,13 +442,13 @@ Create an `AuthForm` client side component with the `Auth` component rendered wi
 
 ```jsx title=app/authform.jsx
 // app/authform.[j|t]sx
-"use client";
-import { Auth } from "@supabase/auth-ui-react";
-import { ThemeSupa } from "@supabase/auth-ui-shared";
-import { useSupabase } from "./supabase-provider";
+'use client'
+import { Auth } from '@supabase/auth-ui-react'
+import { ThemeSupa } from '@supabase/auth-ui-shared'
+import { useSupabase } from './supabase-provider'
 
 export default function AuthForm() {
-  const supabase = useSupabase();
+  const supabase = useSupabase()
 
   return (
     <Auth
@@ -464,7 +460,7 @@ export default function AuthForm() {
       providers={[]}
       redirectTo="http://localhost:3000/auth/callback"
     />
-  );
+  )
 }
 ```
 
@@ -472,7 +468,7 @@ Add the `AuthForm` component to your home page
 
 ```jsx title=app/page.js
 // app/page.[j|t]sx
-import AuthForm from "./authform";
+import AuthForm from './authform'
 
 export default async function Home() {
   return (
@@ -480,22 +476,22 @@ export default async function Home() {
       <div className="col-6">
         <h1 className="header">Supabase Auth + Storage</h1>
         <p className="">
-          Experience our Auth and Storage through a simple profile management
-          example. Create a user profile and upload an avatar image. Fast,
-          simple, secure.
+          Experience our Auth and Storage through a simple profile management example. Create a user
+          profile and upload an avatar image. Fast, simple, secure.
         </p>
       </div>
       <div className="col-6 auth-widget">
         <AuthForm />
       </div>
     </div>
-  );
+  )
 }
 ```
 
 As we are employing Proof Key for Code Exchange (PKCE) in our authentication flow, it is necessary to create a route handler responsible for exchanging the code for a session.
 
 In the following code snippet, we perform the following steps:
+
 - Retrieve the code sent back from the Supabase Auth server using the `code` query parameter.
 - Exchange this code for a session, which we store in our chosen storage mechanism (in this case, cookies).
 - Finally, we redirect the user to the `account` page.
@@ -912,10 +908,10 @@ Create a account page for the `AccountForm` component we just created
 
 ```jsx title=app/account/page.jsx
 // app/account/page.jsx
-import AccountForm from "./accountform";
+import AccountForm from './accountform'
 
 export default function Account() {
-  return <AccountForm />;
+  return <AccountForm />
 }
 ```
 
@@ -924,10 +920,10 @@ export default function Account() {
 
 ```tsx title=app/account/page.tsx
 // app/account/page.tsx
-import AccountForm from "./accountform";
+import AccountForm from './accountform'
 
 export default function Account() {
-  return <AccountForm />;
+  return <AccountForm />
 }
 ```
 
@@ -967,12 +963,7 @@ import React, { useEffect, useState } from 'react'
 import { Database } from '../database.types'
 import { useSupabase } from '../supabase-provider'
 
-export default function Avatar({
-  uid,
-  url,
-  size,
-  onUpload,
-}) {
+export default function Avatar({ uid, url, size, onUpload }) {
   const supabase = useSupabase()
   const [avatarUrl, setAvatarUrl] = useState(null)
   const [uploading, setUploading] = useState(false)
