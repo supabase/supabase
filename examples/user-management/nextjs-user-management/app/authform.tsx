@@ -4,7 +4,7 @@ import { ThemeSupa } from '@supabase/auth-ui-shared'
 import { useSupabase } from './supabase-provider'
 
 export default function AuthForm() {
-  const { supabase } = useSupabase()
+  const supabase = useSupabase()
 
   return (
     <Auth
