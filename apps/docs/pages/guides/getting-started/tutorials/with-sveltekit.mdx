@@ -63,41 +63,33 @@ Add the code below to your `src/hooks.server.ts` to initialize the client on the
 
 ```ts title=src/hooks.server.ts
 // src/hooks.server.ts
-import {
-  PUBLIC_SUPABASE_URL,
-  PUBLIC_SUPABASE_ANON_KEY
-} from '$env/static/public';
-import { createSupabaseServerClient } from '@supabase/auth-helpers-sveltekit';
-import type { Handle } from '@sveltejs/kit';
+import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public'
+import { createSupabaseServerClient } from '@supabase/auth-helpers-sveltekit'
+import type { Handle } from '@sveltejs/kit'
 
 export const handle: Handle = async ({ event, resolve }) => {
   event.locals.supabase = createSupabaseServerClient({
     supabaseUrl: PUBLIC_SUPABASE_URL,
     supabaseKey: PUBLIC_SUPABASE_ANON_KEY,
-    event
-  });
+    event,
+  })
 
   /**
    * A convenience helper so we can just call await getSession() instead const { data: { session } } = await supabase.auth.getSession()
    */
   event.locals.getSession = async () => {
     const {
-      data: { session }
-    } = await event.locals.supabase.auth.getSession();
-    return session;
-  };
+      data: { session },
+    } = await event.locals.supabase.auth.getSession()
+    return session
+  }
 
   return resolve(event, {
-    /**
-     * There´s an issue with `filterSerializedResponseHeaders` not working when using `sequence`
-     *
-     * https://github.com/sveltejs/kit/issues/8061
-     */
     filterSerializedResponseHeaders(name) {
-      return name === 'content-range';
-    }
-  });
-};
+      return name === 'content-range'
+    },
+  })
+}
 ```
 
 If you are using TypeScript the compiler might complain about `event.locals.supabase` and `event.locals.getSession`, this can be fixed by updating your `src/app.d.ts` with the content below:
@@ -105,16 +97,16 @@ If you are using TypeScript the compiler might complain about `event.locals.supa
 ```ts title=src/app.d.ts
 // src/app.d.ts
 
-import { SupabaseClient, Session } from '@supabase/supabase-js';
+import { SupabaseClient, Session } from '@supabase/supabase-js'
 
 declare global {
   namespace App {
     interface Locals {
-      supabase: SupabaseClient;
-      getSession(): Promise<Session | null>;
+      supabase: SupabaseClient
+      getSession(): Promise<Session | null>
     }
     interface PageData {
-      session: Session | null;
+      session: Session | null
     }
     // interface Error {}
     // interface Platform {}
@@ -126,13 +118,13 @@ Create a new `src/routes/+layout.server.ts` file to handle the session on the se
 
 ```ts title=src/routes/+layout.server.ts
 // src/routes/+layout.server.ts
-import type { LayoutServerLoad } from './$types';
+import type { LayoutServerLoad } from './$types'
 
 export const load: LayoutServerLoad = async ({ locals: { getSession } }) => {
   return {
-    session: await getSession()
-  };
-};
+    session: await getSession(),
+  }
+}
 ```
 
 > Start your dev server (`npm run dev`) in order to generate the `./$types` files we are referencing in our project.
@@ -141,30 +133,27 @@ Create a new `src/routes/+layout.ts` file to handle the session and the supabase
 
 ```ts title=src/routes/+layout.ts
 // src/routes/+layout.ts
-import { invalidate } from '$app/navigation';
-import {
-  PUBLIC_SUPABASE_ANON_KEY,
-  PUBLIC_SUPABASE_URL
-} from '$env/static/public';
-import { createSupabaseLoadClient } from '@supabase/auth-helpers-sveltekit';
-import type { LayoutLoad } from './$types';
+import { invalidate } from '$app/navigation'
+import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public'
+import { createSupabaseLoadClient } from '@supabase/auth-helpers-sveltekit'
+import type { LayoutLoad } from './$types'
 
 export const load: LayoutLoad = async ({ fetch, data, depends }) => {
-  depends('supabase:auth');
+  depends('supabase:auth')
 
   const supabase = createSupabaseLoadClient({
     supabaseUrl: PUBLIC_SUPABASE_URL,
     supabaseKey: PUBLIC_SUPABASE_ANON_KEY,
     event: { fetch },
-    serverSession: data.session
-  });
+    serverSession: data.session,
+  })
 
   const {
-    data: { session }
-  } = await supabase.auth.getSession();
+    data: { session },
+  } = await supabase.auth.getSession()
 
-  return { supabase, session };
-};
+  return { supabase, session }
+}
 ```
 
 Update your `src/routes/+layout.svelte`:
@@ -173,23 +162,22 @@ Update your `src/routes/+layout.svelte`:
 <!-- src/routes/+layout.svelte -->
 <script lang="ts">
 	import '../styles.css';
-	import { invalidate } from '$app/navigation'
-	import { onMount } from 'svelte'
-	import type { LayoutData } from './$types'
+	import { invalidate } from '$app/navigation';
+	import { onMount } from 'svelte';
 
-	export let data: LayoutData
+	export let data;
 
-	$: ({ supabase, session } = data)
+	$: ({ supabase, session } = data);
 
 	onMount(() => {
 		const { data } = supabase.auth.onAuthStateChange((event, _session) => {
 			if (_session?.expires_at !== session?.expires_at) {
-				invalidate('supabase:auth')
+				invalidate('supabase:auth');
 			}
-		})
+		});
 
-		return () => data.subscription.unsubscribe()
-	})
+		return () => data.subscription.unsubscribe();
+	});
 </script>
 
 <svelte:head>
@@ -220,9 +208,8 @@ Add the `Auth` component to your home page
 <script lang="ts">
 	import { Auth } from '@supabase/auth-ui-svelte';
 	import { ThemeSupa } from '@supabase/auth-ui-shared';
-	import type { PageData } from './$types';
 
-	export let data: PageData;
+	export let data;
 </script>
 
 <svelte:head>
@@ -244,25 +231,26 @@ Add the `Auth` component to your home page
 
 Create a `src/routes/+page.server.ts` file that will return our website url to be used in our `redirectTo` above.
 
-> This is necessary because the current Supabase auth flow uses implicit grant which returns the tokens as part of the url fragment (#).  
-The redirect to a non server protected page will make sure that the client captures the url fragment as we cannot read these on the server
-and send it over to the server. This all happens behind the scenes and isn't something you will need to do manually.
+> This is necessary because the current Supabase auth flow uses implicit grant which returns the tokens as part of the url fragment (#).
+
+> The redirect to a non server protected page will make sure that the client captures the url fragment as we cannot read these on the server
+> and send it over to the server. This all happens behind the scenes and isn't something you will need to do manually.
 
 ```ts
 // src/routes/+page.server.ts
-import { redirect } from '@sveltejs/kit';
-import type { PageServerLoad } from './$types';
+import { redirect } from '@sveltejs/kit'
+import type { PageServerLoad } from './$types'
 
 export const load: PageServerLoad = async ({ url, locals: { getSession } }) => {
-	const session = await getSession();
+  const session = await getSession()
 
-    // if the user is already logged in return them to the account page
-	if (session) {
-		throw redirect(303, '/account');
-	}
+  // if the user is already logged in return them to the account page
+  if (session) {
+    throw redirect(303, '/account')
+  }
 
-	return { url: url.origin };
-};
+  return { url: url.origin }
+}
 ```
 
 ### Loading page
@@ -277,9 +265,8 @@ This page is used for waiting while your client-side code inside of `src/routes/
 	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
-	import type { PageData } from './$types';
 
-	export let data: PageData;
+	export let data;
 	$: {
 		const redirectTo = $page.url.searchParams.get('redirect');
 
@@ -305,26 +292,33 @@ Create a new `src/routes/account/+page.svelte` file with the content below.
 ```svelte title=src/routes/account/+page.svelte
 <!-- src/routes/account/+page.svelte -->
 <script lang="ts">
-	import { enhance } from '$app/forms';
-	import type { ActionData, PageData } from './$types';
+	import { enhance, type SubmitFunction } from '$app/forms';
 
-	export let data: PageData;
-	export let form: ActionData;
+	export let data;
+	export let form;
 
-	let { session, profile } = data;
+	let { session, supabase, profile } = data;
 
-  let profileForm: any;
+  	let profileForm: any;
 	let loading = false;
-	let fullName: string | null = profile?.full_name;
-	let username: string | null = profile?.username;
-	let website: string | null = profile?.website;
-	let avatarUrl: string | null = profile?.avatar_url;
+	let fullName: string = profile?.full_name ?? '';
+	let username: string = profile?.username ?? '';
+	let website: string = profile?.website ?? '';
+	let avatarUrl: string = profile?.avatar_url ?? '';
 
-	function handleSubmit() {
+	const handleSubmit: SubmitFunction = () => {
 		loading = true;
 		return async () => {
 			loading = false;
-		};
+		}
+	}
+
+	const handleSignOut: SubmitFunction = () => {
+		loading = true;
+		return async ({ update }) => {
+			loading = false;
+			update();
+		}
 	}
 </script>
 
@@ -366,7 +360,7 @@ Create a new `src/routes/account/+page.svelte` file with the content below.
 		</div>
 	</form>
 
-	<form method="post" action="?/signout" use:enhance={handleSubmit}>
+	<form method="post" action="?/signout" use:enhance={handleSignOut}>
 		<div>
 			<button class="button block" disabled={loading}>Sign Out</button>
 		</div>
@@ -378,68 +372,68 @@ Now create the associated `src/routes/account/+page.server.ts` file that will ha
 and handle all our form actions through the `actions` object.
 
 ```ts
-import { fail, redirect } from '@sveltejs/kit';
-import type { Actions, PageServerLoad } from './$types';
+import { fail, redirect } from '@sveltejs/kit'
+import type { Actions, PageServerLoad } from './$types'
 
 export const load = (async ({ locals: { supabase, getSession } }) => {
-	const session = await getSession();
+  const session = await getSession()
 
-	if (!session) {
-		throw redirect(303, '/');
-	}
+  if (!session) {
+    throw redirect(303, '/')
+  }
 
-	const { data: profile } = await supabase
-		.from('profiles')
-		.select(`username, full_name, website, avatar_url`)
-		.eq('id', session.user.id)
-		.single();
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select(`username, full_name, website, avatar_url`)
+    .eq('id', session.user.id)
+    .single()
 
-	return { session, profile };
-}) satisfies PageServerLoad;
+  return { session, profile }
+}) satisfies PageServerLoad
 
 export const actions = {
-	update: async ({ request, locals: { supabase, getSession } }) => {
-		const formData = await request.formData();
-		const fullName = formData.get('fullName') as string;
-		const username = formData.get('username') as string;
-		const website = formData.get('website') as string;
-		const avatarUrl = formData.get('avatarUrl') as string;
+  update: async ({ request, locals: { supabase, getSession } }) => {
+    const formData = await request.formData()
+    const fullName = formData.get('fullName') as string
+    const username = formData.get('username') as string
+    const website = formData.get('website') as string
+    const avatarUrl = formData.get('avatarUrl') as string
 
-		const session = await getSession();
+    const session = await getSession()
 
-		const { error } = await supabase.from('profiles').upsert({
-			id: session?.user.id,
-			full_name: fullName,
-			username,
-			website,
-			avatar_url: avatarUrl,
-			updated_at: new Date()
-		});
+    const { error } = await supabase.from('profiles').upsert({
+      id: session?.user.id,
+      full_name: fullName,
+      username,
+      website,
+      avatar_url: avatarUrl,
+      updated_at: new Date(),
+    })
 
-		if (error) {
-			return fail(500, {
-				fullName,
-				username,
-				website,
-				avatarUrl
-			});
-		}
+    if (error) {
+      return fail(500, {
+        fullName,
+        username,
+        website,
+        avatarUrl,
+      })
+    }
 
-		return {
-			fullName,
-			username,
-			website,
-			avatarUrl
-		};
-	},
-	signout: async ({ locals: { supabase, getSession } }) => {
-		const session = await getSession();
-		if (session) {
-			await supabase.auth.signOut();
-			throw redirect(303, '/');
-		}
-	}
-} satisfies Actions;
+    return {
+      fullName,
+      username,
+      website,
+      avatarUrl,
+    }
+  },
+  signout: async ({ locals: { supabase, getSession } }) => {
+    const session = await getSession()
+    if (session) {
+      await supabase.auth.signOut()
+      throw redirect(303, '/')
+    }
+  },
+} satisfies Actions
 ```
 
 ### Launch!

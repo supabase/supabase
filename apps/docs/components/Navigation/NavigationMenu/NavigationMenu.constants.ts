@@ -1,4 +1,153 @@
-import { References } from '../Navigation.types'
+import type { HomepageMenuItems, NavMenuConstant, References } from '../Navigation.types'
+
+export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
+  [
+    {
+      label: 'Home',
+      icon: 'home',
+      href: '/',
+      level: 'home',
+    },
+    {
+      label: 'Getting Started',
+      icon: 'getting-started',
+      href: '/guides/getting-started',
+      level: 'gettingstarted',
+    },
+  ],
+  [
+    {
+      label: 'Database',
+      icon: 'database',
+      href: '/guides/database',
+      level: 'database',
+    },
+    {
+      label: 'Serverless APIs',
+      icon: 'serverless-apis',
+      href: '/guides/api',
+      level: 'api',
+    },
+    {
+      label: 'Auth',
+      icon: 'auth',
+      href: '/guides/auth',
+      level: 'auth',
+    },
+    {
+      label: 'Edge Functions',
+      icon: 'edge-functions',
+      href: '/guides/functions',
+      level: 'functions',
+    },
+    {
+      label: 'Realtime',
+      icon: 'realtime',
+      href: '/guides/realtime',
+      level: 'realtime',
+    },
+    {
+      label: 'Storage',
+      icon: 'storage',
+      href: '/guides/storage',
+      level: 'storage',
+    },
+  ],
+  [
+    {
+      label: 'Platform',
+      icon: 'platform',
+      href: '/guides/platform',
+      level: 'platform',
+    },
+    {
+      label: 'Resources',
+      icon: 'resources',
+      href: '/guides/resources',
+      level: 'resources',
+    },
+    {
+      label: 'Self-Hosting',
+      icon: 'self-hosting',
+      href: '/guides/self-hosting',
+      level: 'self_hosting',
+    },
+    {
+      label: 'Integrations',
+      icon: 'integrations',
+      hasLightIcon: true,
+      href: '/guides/integrations',
+      level: 'integrations',
+    },
+  ],
+  [
+    {
+      label: 'Client Library Reference',
+    },
+    {
+      label: 'JavaScript',
+      icon: 'reference-javascript',
+      href: '/reference/javascript/introduction',
+      level: 'reference_javascript',
+    },
+    {
+      label: 'Flutter',
+      icon: 'reference-dart',
+      href: '/reference/dart/introduction',
+      level: 'reference_dart',
+    },
+    {
+      label: 'Python',
+      icon: 'reference-python',
+      href: '/reference/python/introduction',
+      level: 'reference_python',
+      community: true,
+    },
+    {
+      label: 'C#',
+      icon: 'reference-csharp',
+      href: '/reference/csharp/introduction',
+      level: 'reference_csharp',
+      community: true,
+    },
+    {
+      label: 'Swift',
+      icon: 'reference-swift',
+      href: '/reference/swift/introduction',
+      level: 'reference_swift',
+      community: true,
+    },
+    {
+      label: 'Kotlin',
+      icon: 'reference-kotlin',
+      href: '/reference/kotlin/introduction',
+      level: 'reference_kotlin',
+      community: true,
+    },
+    {
+      label: 'Tools reference',
+    },
+    {
+      label: 'Management API',
+      icon: 'reference-api',
+      href: '/reference/api/introduction',
+      level: 'reference_javascript',
+    },
+    {
+      label: 'Supabase CLI',
+      icon: 'reference-cli',
+      href: '/guides/cli',
+      level: 'reference_javascript',
+    },
+  ],
+  [
+    {
+      label: 'Status',
+      icon: 'status',
+      href: 'https://status.supabase.com/',
+    },
+  ],
+]
 
 export const REFERENCES: References = {
   javascript: {
@@ -22,8 +171,14 @@ export const REFERENCES: References = {
   swift: {
     name: 'Swift',
     library: 'supabase-swift',
-    versions: ['v1'],
+    versions: ['v0'],
     icon: '/docs/img/libraries/swift-icon.svg',
+  },
+  kotlin: {
+    name: 'Kotlin',
+    library: 'supabase-kt',
+    versions: ['v0'],
+    icon: '/docs/img/libraries/kotlin-icon.svg',
   },
   cli: {
     name: 'CLI',
@@ -39,7 +194,7 @@ export const REFERENCES: References = {
   },
 }
 
-export const gettingstarted = {
+export const gettingstarted: NavMenuConstant = {
   icon: 'getting-started',
   title: 'Getting Started',
   items: [
@@ -142,6 +297,10 @@ export const cli = {
   items: [
     { name: 'Overview', url: '/guides/cli' },
     { name: 'Managing Environments', url: '/guides/cli/managing-environments' },
+    {
+      name: 'Using environment variables in config.toml',
+      url: '/guides/cli/using-environment-variables-in-config',
+    },
   ],
 }
 
@@ -162,7 +321,7 @@ export const SocialLoginItems = [
     url: '/guides/auth/social-login/auth-apple',
   },
   {
-    name: 'Azure',
+    name: 'Azure (Microsoft)',
     icon: '/docs/img/icons/microsoft-icon',
     url: '/guides/auth/social-login/auth-azure',
   },
@@ -295,6 +454,7 @@ export const auth = {
             },
           ],
         },
+        { name: 'Password Reset', url: '/guides/auth/auth-password-reset' },
         { name: 'Email Templates', url: '/guides/auth/auth-email-templates' },
       ],
     },
@@ -315,10 +475,9 @@ export const auth = {
       items: [
         { name: 'Overview', url: '/guides/auth/auth-helpers' },
         { name: 'Auth UI', url: '/guides/auth/auth-helpers/auth-ui' },
-        { name: 'Next.js (pages)', url: '/guides/auth/auth-helpers/nextjs' },
         {
-          name: 'Next.js (app)',
-          url: '/guides/auth/auth-helpers/nextjs-server-components',
+          name: 'Next.js',
+          url: '/guides/auth/auth-helpers/nextjs',
         },
         { name: 'Remix', url: '/guides/auth/auth-helpers/remix' },
         { name: 'SvelteKit', url: '/guides/auth/auth-helpers/sveltekit' },
@@ -347,7 +506,7 @@ export const auth = {
   ],
 }
 
-export const database = {
+export const database: NavMenuConstant = {
   icon: 'database',
   title: 'Database',
   url: '/guides/database',
@@ -358,6 +517,8 @@ export const database = {
     { name: 'Database Webhooks', url: '/guides/database/webhooks' },
     { name: 'Full Text Search', url: '/guides/database/full-text-search' },
     { name: 'Database Testing', url: '/guides/database/testing' },
+    { name: 'Managing Secrets with Vault', url: '/guides/database/vault' },
+    { name: 'Column Encryption', url: '/guides/database/column-encryption' },
     {
       name: 'Extensions',
       url: undefined,
@@ -472,6 +633,10 @@ export const database = {
           url: '/guides/database/postgres/indexes',
         },
         {
+          name: 'Cascade Deletes',
+          url: '/guides/database/postgres/cascade-deletes',
+        },
+        {
           name: 'Drop All Tables in Schema',
           url: '/guides/database/postgres/dropping-all-tables-in-schema',
         },
@@ -498,8 +663,8 @@ export const database = {
   ],
 }
 
-export const api = {
-  icon: 'reference',
+export const api: NavMenuConstant = {
+  icon: 'serverless-apis',
   title: 'Serverless APIs',
   url: '/guides/api',
   items: [
@@ -536,8 +701,8 @@ export const api = {
   ],
 }
 
-export const functions = {
-  icon: 'functions',
+export const functions: NavMenuConstant = {
+  icon: 'edge-functions',
   title: 'Edge Functions',
   url: '/guides/functions',
   items: [
@@ -585,8 +750,10 @@ export const functions = {
       items: [
         { name: 'Dart Edge on Supabase', url: '/guides/functions/dart-edge' },
         { name: 'Browserless.io', url: '/guides/functions/examples/screenshots' },
+        { name: 'Hugging Face', url: '/guides/functions/examples/huggingface-image-captioning' },
         { name: 'OpenAI API', url: '/guides/functions/examples/openai' },
         { name: 'Upstash Redis', url: '/guides/functions/examples/upstash-redis' },
+        { name: 'Type-Safe SQL with Kysely', url: '/guides/functions/kysely-postgres' },
       ],
     },
     {
@@ -613,7 +780,7 @@ export const functions = {
   ],
 }
 
-export const realtime = {
+export const realtime: NavMenuConstant = {
   icon: 'realtime',
   title: 'Realtime',
   url: '/guides/realtime',
@@ -676,7 +843,7 @@ export const realtime = {
   ],
 }
 
-export const storage = {
+export const storage: NavMenuConstant = {
   icon: 'storage',
   title: 'Storage',
   url: '/guides/storage',
@@ -690,13 +857,17 @@ export const storage = {
   ],
 }
 
-export const supabase_cli = {
+export const supabase_cli: NavMenuConstant = {
   icon: 'reference-cli',
   title: 'Supabase CLI',
   url: '/guides/cli',
   items: [
     { name: 'Overview', url: '/guides/cli' },
     { name: 'Managing Environments', url: '/guides/cli/managing-environments' },
+    {
+      name: 'Using environment variables in config.toml',
+      url: '/guides/cli/using-environment-variables-in-config',
+    },
     {
       name: 'Reference',
       url: undefined,
@@ -708,7 +879,7 @@ export const supabase_cli = {
   ],
 }
 
-export const platform = {
+export const platform: NavMenuConstant = {
   icon: 'platform',
   title: 'Platform',
   url: '/guides/platform',
@@ -763,9 +934,19 @@ export const platform = {
       ],
     },
     {
-      name: 'Go-live Checklist',
+      name: 'Production Readiness',
       url: undefined,
-      items: [{ name: 'Production Readiness', url: '/guides/platform/going-into-prod' }],
+      items: [
+        {
+          name: 'Shared Responsibility Model',
+          url: '/guides/platform/shared-responsibility-model',
+        },
+        {
+          name: 'Maturity Model',
+          url: '/guides/platform/maturity-model',
+        },
+        { name: 'Production Checklist', url: '/guides/platform/going-into-prod' },
+      ],
     },
     {
       name: 'Troubleshooting',
@@ -775,12 +956,16 @@ export const platform = {
           name: 'HTTP and Project Issues',
           url: '/guides/platform/troubleshooting',
         },
+        {
+          name: 'High CPU Usage',
+          url: '/guides/platform/exhaust-cpu',
+        },
       ],
     },
   ],
 }
 
-export const resources = {
+export const resources: NavMenuConstant = {
   icon: 'resources',
   title: 'Resources',
   url: '/guides/resources',
@@ -821,9 +1006,9 @@ export const resources = {
   ],
 }
 
-export const self_hosting = {
+export const self_hosting: NavMenuConstant = {
   title: 'Self-Hosting',
-  icon: 'resources',
+  icon: 'self-hosting',
   url: '/guides/self-hosting',
   items: [
     { name: 'Overview', url: '/guides/self-hosting' },
@@ -878,7 +1063,7 @@ export const migrate = {
   ],
 }
 
-export const integrations = {
+export const integrations: NavMenuConstant = {
   icon: 'integrations',
   title: 'Integrations',
   url: '/guides/integrations',
@@ -909,6 +1094,7 @@ export const integrations = {
       name: 'Developer Tools',
       url: undefined,
       items: [
+        { name: 'Cloudflare Workers', url: '/guides/integrations/cloudflare-workers' },
         { name: 'Estuary', url: '/guides/integrations/estuary' },
         { name: 'OpenAI', url: '/guides/functions/examples/openai' },
         { name: 'pgMustard', url: '/guides/integrations/pgmustard' },
@@ -980,6 +1166,13 @@ export const reference = {
           items: [],
           icon: '/img/icons/menu/reference-swift',
         },
+        {
+          name: 'supabase-kt',
+          url: '/reference/kotlin/start',
+          level: 'reference_kotlin',
+          items: [],
+          icon: '/img/icons/menu/reference-kotlin',
+        },
         // {
         //   name: 'supabase-python',
         //   url: '/reference/python/start',
@@ -1049,10 +1242,17 @@ export const reference_python_v2 = {
   parent: '/reference',
 }
 
-export const reference_swift_v1 = {
+export const reference_swift_v0 = {
   icon: 'reference-swift',
   title: 'swift',
   url: 'guides/reference/swift',
+  parent: '/reference',
+}
+
+export const reference_kotlin_v0 = {
+  icon: 'reference-kotlin',
+  title: 'kotlin',
+  url: 'guides/reference/kotlin',
   parent: '/reference',
 }
 
@@ -1172,10 +1372,17 @@ export const references = [
       },
       {
         label: 'supabase-swift',
-        versions: ['v1'],
+        versions: ['v0'],
         description: 'something about the reference',
         icon: '/docs/img/icons/swift-icon.svg',
         url: '/reference/swift/start',
+      },
+      {
+        label: 'supabase-kt',
+        versions: ['v0'],
+        description: 'something about the reference',
+        icon: '/docs/img/icons/kotlin-icon.svg',
+        url: '/reference/kotlin/start',
       },
     ],
   },

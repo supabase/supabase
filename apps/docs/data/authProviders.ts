@@ -10,7 +10,7 @@ const authProviders = [
     authType: 'social',
   },
   {
-    name: 'Azure',
+    name: 'Azure (Microsoft)',
     logo: '/docs/img/icons/microsoft-icon',
     href: '/guides/auth/social-login/auth-azure',
     official: false,

@@ -57,7 +57,7 @@ export const meta = {
 <div className="grid lg:grid-cols-12 gap-6 not-prose">
   {quickstarts.map((item) => {
     return (
-      <Link href={`/${item.href}`} key={item.title} passHref>
+      <Link href={`${item.href}`} key={item.title} passHref>
         <a className={'col-span-4'}>
           <GlassPanel title={item.title} span="col-span-6" background={false} icon={item.icon}>
             {item.description}
@@ -73,7 +73,7 @@ export const meta = {
 <div className="grid lg:grid-cols-12 gap-6 not-prose">
   {webapps.map((item) => {
     return (
-      <Link href={`/${item.href}`} key={item.title} passHref>
+      <Link href={`${item.href}`} key={item.title} passHref>
         <a className={'col-span-4'}>
           <GlassPanel title={item.title} span="col-span-6" background={false} icon={item.icon}>
             {item.description}
@@ -89,7 +89,7 @@ export const meta = {
 <div className="grid lg:grid-cols-12 gap-6 not-prose">
   {mobile.map((item) => {
     return (
-      <Link href={`/${item.href}`} key={item.title} passHref>
+      <Link href={`${item.href}`} key={item.title} passHref>
         <a className={'col-span-4'}>
           <GlassPanel title={item.title} span="col-span-6" background={false} icon={item.icon}>
             {item.description}

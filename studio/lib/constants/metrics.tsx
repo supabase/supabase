@@ -217,7 +217,7 @@ export const METRICS = [
   },
   {
     key: 'total_storage_image_render_count',
-    label: 'Storage Images Transformed',
+    label: 'Storage Image Transformations',
     provider: 'daily-stats',
     category: METRIC_CATEGORIES.API_STORAGE,
   },

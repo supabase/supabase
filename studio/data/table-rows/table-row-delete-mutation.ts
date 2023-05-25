@@ -16,12 +16,9 @@ export function getTableRowDeleteSql({
   rows,
 }: Pick<TableRowDeleteVariables, 'table' | 'rows'>) {
   const { primaryKeys, error } = getPrimaryKeys({ table })
-  if (error) {
-    throw error
-  }
+  if (error) throw error
 
   let queryChains = new Query().from(table.name, table.schema ?? undefined).delete()
-
   primaryKeys!.forEach((key) => {
     const primaryKeyValues = rows.map((x) => x[key])
     queryChains = queryChains.filter(key, 'in', primaryKeyValues)

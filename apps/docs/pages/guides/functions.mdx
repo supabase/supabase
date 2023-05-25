@@ -4,6 +4,7 @@ export const meta = {
   id: 'functions',
   title: 'Edge Functions',
   description: 'Globally distributed TypeScript functions.',
+  subtitle: 'Globally distributed TypeScript functions.',
   sidebar_label: 'Overview',
   hide_table_of_contents: true,
 }
@@ -44,6 +45,12 @@ export const examples = [
     name: 'With supabase-js',
     description: 'Use the Supabase client inside your Edge Function.',
     href: '/guides/functions/auth',
+  },
+  {
+    name: 'Type-Safe SQL with Kysely',
+    description:
+      'Combining Kysely with Deno Postgres gives you a convenient developer experience for interacting directly with your Postgres database.',
+    href: '/guides/functions/kysely-postgres',
   },
   {
     name: 'With CORS headers',
@@ -105,6 +112,11 @@ export const examples = [
     name: 'Oak Server Middleware',
     description: `Request Routing with Oak server middleware.`,
     href: 'https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/oak-server',
+  },
+  {
+    name: 'Hugging Face',
+    description: `Access 100,000+ Machine Learning models.`,
+    href: '/guides/functions/examples/huggingface-image-captioning',
   },
   {
     name: 'OpenAI',
