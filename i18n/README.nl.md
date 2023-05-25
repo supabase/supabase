@@ -12,8 +12,8 @@
 - [x]Gehoste Postgres Database. [Docs](https://supabase.com/docs/guides/database)
 - [x] Authenticatie en Autorisatie. [Docs](https://supabase.com/docs/guides/auth)
 - [x] Automatisch gegenereerde API's.
-  - REST. [Docs](https://supabase.com/docs/guides/database/api#rest-api)
-  - GraphQL. [Docs](https://supabase.com/docs/guides/database/api#graphql-api)
+  - [x] REST. [Docs](https://supabase.com/docs/guides/database/api#rest-api)
+  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/database/api#graphql-api)
   - [x] Realtime abonnementen. [Docs](https://supabase.com/docs/guides/database/api#realtime-api)
 - [x] Functies.
   - [x] Database functies. [Docs](https://supabase.com/docs/guides/database/functions)

@@ -9,7 +9,7 @@
 
 [Supabase](https://supabase.com) è un'alternativa open source a Firebase. Stiamo costruendo le funzionalità di Firebase utilizzando strumenti open source di livello enterprise.
 
-- [Database Postgres ospitato. [Documenti](https://supabase.com/docs/guides/database)
+- Database Postgres ospitato. [Documenti](https://supabase.com/docs/guides/database)
 - [x] Autenticazione e autorizzazione. [Documenti](https://supabase.com/docs/guides/auth)
 - [x] API generate automaticamente.
   - [x] REST. [Documenti](https://supabase.com/docs/guides/database/api#rest-api)

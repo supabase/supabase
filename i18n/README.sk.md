@@ -9,7 +9,7 @@
 
 [Supabase](https://supabase.com) je open source alternatíva Firebase. Funkcie Firebase budujeme pomocou open source nástrojov podnikovej triedy.
 
-- hostovaná databáza Postgres [x]. [Dokumenty](https://supabase.com/docs/guides/database)
+- [x] hostovaná databáza Postgres. [Dokumenty](https://supabase.com/docs/guides/database)
 - [x] Autentifikácia a autorizácia. [Dokumenty](https://supabase.com/docs/guides/auth)
 - [x] Automaticky generované rozhrania API.
   - [x] REST. [Dokumenty](https://supabase.com/docs/guides/database/api#rest-api)
