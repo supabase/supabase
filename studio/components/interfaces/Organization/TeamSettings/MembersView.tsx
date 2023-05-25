@@ -154,7 +154,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                         <div className="flex items-center space-x-4">
                           <div>
                             {x.invited_id ? (
-                              <span className="flex p-2 border-2 rounded-full border-border-secondary-light dark:border-border-secondary-dark">
+                              <span className="flex p-2 border-2 rounded-full border-scale-700">
                                 <IconUser size={20} strokeWidth={2} />
                               </span>
                             ) : isEmailUser ? (
