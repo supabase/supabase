@@ -109,7 +109,13 @@ export default WrapperTableEditor
 const Option = ({ option }: { option: TableOption }) => {
   if (option.type === 'select') {
     return (
-      <Listbox>
+      <Listbox
+        key={option.name}
+        id={option.name}
+        name={option.name}
+        label={option.label}
+        defaultValue={option.defaultValue ?? ''}
+      >
         {[
           ...(!option.required
             ? [
