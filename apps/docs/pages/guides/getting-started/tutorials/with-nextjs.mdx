@@ -79,9 +79,113 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
 And one optional step is to update the CSS file `styles/globals.css` to make the app look nice.
 You can find the full contents of this file [here](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/nextjs-ts-user-management/styles/globals.css).
 
+### Supabase Auth Helpers
+
+Next.js is a highly versatile framework offering pre-rendering at build time (SSG), server-side rendering at request time (SSR), API routes, and middleware edge-functions.
+
+It can be challenging to authenticate your users in all these different environments, that's why we've created the [Supabase Auth Helpers](/docs/guides/auth/auth-helpers/nextjs) to make user management and data fetching within Next.js as easy as possible.
+
+Install the auth helpers for Next.js
+
+```bash
+npm install @supabase/auth-helpers-nextjs
+```
+
+### NextJS Middleware
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+>
+<TabPanel id="js" label="JavaScript">
+
+Create a `middleware.js` file and include the following content to:
+
+- Verify if there is an authenticated Supabase user
+- Validate if the user is authenticated and currently on the sign-in page, redirecting them to the `account` page
+- Verify if the user is not authenticated and currently on the account page, redirecting them to the `sign-in` page.
+
+```tsx title=middleware.js
+// middleware.js
+import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
+import { NextResponse } from 'next/server'
+
+export async function middleware(req) {
+  const res = NextResponse.next()
+  const supabase = createMiddlewareClient({ req, res })
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  // if user is signed in and the current path is / redirect the user to /account
+  if (user && req.nextUrl.pathname === '/') {
+    return NextResponse.redirect(new URL('/account', req.url))
+  }
+
+  // if user is not signed in and the current path is not / redirect the user to /
+  if (!user && req.nextUrl.pathname !== '/') {
+    return NextResponse.redirect(new URL('/', req.url))
+  }
+
+  return res
+}
+
+export const config = {
+  matcher: ['/', '/account'],
+}
+```
+
+</TabPanel>
+<TabPanel id="ts" label="TypeScript">
+
+Create a `middleware.ts` file and include the following content to:
+
+- Verify if there is an authenticated Supabase user
+- Validate if the user is authenticated and currently on the sign-in page, redirecting them to the `account` page
+- Verify if the user is not authenticated and currently on the account page, redirecting them to the `sign-in` page.
+
+```tsx title=middleware.ts
+// middleware.ts
+import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
+import { NextResponse } from 'next/server'
+
+import type { NextRequest } from 'next/server'
+
+export async function middleware(req: NextRequest) {
+  const res = NextResponse.next()
+  const supabase = createMiddlewareClient({ req, res })
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  // if user is signed in and the current path is / redirect the user to /account
+  if (user && req.nextUrl.pathname === '/') {
+    return NextResponse.redirect(new URL('/account', req.url))
+  }
+
+  // if user is not signed in and the current path is not / redirect the user to /
+  if (!user && req.nextUrl.pathname !== '/') {
+    return NextResponse.redirect(new URL('/', req.url))
+  }
+
+  return res
+}
+
+export const config = {
+  matcher: ['/', '/account'],
+}
+```
+
+</TabPanel>
+</Tabs>
+
 ### Supabase provider
 
-Create a Supabase context provider to make it easier to access the Supabase client inside of client side code.
+Create a Supabase context provider that simplifies access to the Supabase client within client-side code.
 
 <Tabs
   scrollable
@@ -94,51 +198,62 @@ Create a Supabase context provider to make it easier to access the Supabase clie
 Create a `SupabaseProvider` component in `app/supabase-provider.jsx` and populate it with the following content:
 
 ```jsx title=app/supabase-provider.jsx
-"use client";
+// app/supabase-provider.jsx
+'use client'
 
-import { createContext, useContext, useEffect, useState } from "react";
-import { createBrowserSupabaseClient } from "@supabase/auth-helpers-nextjs";
-import { useRouter } from "next/navigation";
+import { createContext, useContext, useEffect, useState } from 'react'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { useRouter } from 'next/navigation'
 
-const Context = createContext(undefined);
+const Context = createContext(undefined)
 
 export default function SupabaseProvider({
   children,
   session,
 }) {
-  const [supabase] = useState(() => createBrowserSupabaseClient());
-  const router = useRouter();
+  const [supabase] = useState(() => createClientComponentClient())
+  const router = useRouter()
 
   useEffect(() => {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_, _session) => {
       if (_session?.access_token !== session?.access_token) {
-        router.refresh();
+        router.refresh()
       }
-    });
+    })
 
     return () => {
-      subscription.unsubscribe();
-    };
-  }, [router, supabase, session]);
+      subscription.unsubscribe()
+    }
+  }, [router, supabase, session])
 
   return (
     <Context.Provider value={{ supabase, session }}>
       <>{children}</>
     </Context.Provider>
-  );
+  )
 }
 
 export const useSupabase = () => {
-  let context = useContext(Context);
+  let context = useContext(Context)
 
   if (context === undefined) {
-    throw new Error("useSupabase must be used inside SupabaseProvider");
+    throw new Error('useSupabase must be used inside SupabaseProvider')
   }
 
-  return context;
-};
+  return context.supabase
+}
+
+export const useSession = () => {
+  let context = useContext(Context)
+
+  if (context === undefined) {
+    throw new Error('useSession must be used inside SupabaseProvider')
+  }
+
+  return context.session
+}
 
 ```
 
@@ -148,83 +263,82 @@ export const useSupabase = () => {
 Create a `SupabaseProvider` component in `app/supabase-provider.tsx` and populate it with the following content:
 
 ```tsx title=app/supabase-provider.tsx
-"use client";
+// app/supabase-provider.tsx
+'use client'
 
-import { createContext, useContext, useEffect, useState } from "react";
-import {
-  Session,
-  SupabaseClient,
-  createBrowserSupabaseClient,
-} from "@supabase/auth-helpers-nextjs";
-import { useRouter } from "next/navigation";
+import { createContext, useContext, useEffect, useState } from 'react'
+import { Session, SupabaseClient, createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { useRouter } from 'next/navigation'
+import { Database } from './database.types'
 
-type MaybeSession = Session | null;
+type MaybeSession = Session | null
 
 type SupabaseContext = {
-  supabase: SupabaseClient;
-  session: MaybeSession;
-};
+  supabase: SupabaseClient
+  session: MaybeSession
+}
 
-const Context = createContext<SupabaseContext | undefined>(undefined);
+const Context = createContext<SupabaseContext | undefined>(undefined)
 
 export default function SupabaseProvider({
   children,
   session,
 }: {
-  children: React.ReactNode;
-  session: MaybeSession;
+  children: React.ReactNode
+  session: MaybeSession
 }) {
-  const [supabase] = useState(() => createBrowserSupabaseClient());
-  const router = useRouter();
+  const [supabase] = useState(() => createClientComponentClient<Database>())
+  const router = useRouter()
 
   useEffect(() => {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_, _session) => {
       if (_session?.access_token !== session?.access_token) {
-        router.refresh();
+        router.refresh()
       }
-    });
+    })
 
     return () => {
-      subscription.unsubscribe();
-    };
-  }, [router, supabase, session]);
+      subscription.unsubscribe()
+    }
+  }, [router, supabase, session])
 
   return (
     <Context.Provider value={{ supabase, session }}>
       <>{children}</>
     </Context.Provider>
-  );
+  )
 }
 
-export const useSupabase = () => {
-  let context = useContext(Context);
+export const useSupabase = <
+  Database = any,
+  SchemaName extends string & keyof Database = 'public' extends keyof Database
+    ? 'public'
+    : string & keyof Database
+>() => {
+  let context = useContext(Context)
 
   if (context === undefined) {
-    throw new Error("useSupabase must be used inside SupabaseProvider");
+    throw new Error('useSupabase must be used inside SupabaseProvider')
   }
 
-  return context;
-};
+  return context.supabase as SupabaseClient<Database, SchemaName>
+}
+
+export const useSession = () => {
+  let context = useContext(Context)
+
+  if (context === undefined) {
+    throw new Error('useSession must be used inside SupabaseProvider')
+  }
+
+  return context.session
+}
 ```
 
 </TabPanel>
 </Tabs>
-
-### Set up a Login component
-
-#### Supabase Auth Helpers
-
-Next.js is a highly versatile framework offering pre-rendering at build time (SSG), server-side rendering at request time (SSR), API routes, and middleware edge-functions.
-
-It can be challenging to authenticate your users in all these different environments, that's why we've created the [Supabase Auth Helpers](/docs/guides/auth/auth-helpers/nextjs) to make user management and data fetching within Next.js as easy as possible.
-
-Install the auth helpers for Next.js
-
-```bash
-npm install @supabase/auth-helpers-nextjs
-```
 
 <Tabs
   scrollable
@@ -236,35 +350,38 @@ npm install @supabase/auth-helpers-nextjs
 
 Wrap your `app/layout.js` component with the `SupabaseProvider` component:
 
-```jsx title=app/layout.js
-import "./globals.css";
-import { createServerComponentSupabaseClient } from "@supabase/auth-helpers-nextjs";
-import SupabaseProvider from "./supabase-provider";
-import { cookies } from "next/headers";
+```jsx title=app/layout.jsx
+// app/layout.jsx
+import './globals.css'
+import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
+import SupabaseProvider from './supabase-provider'
+import { cookies } from 'next/headers'
 
 export const metadata = {
-  title: "Create Next App",
-  description: "Generated by create next app",
-};
+  title: 'User Management',
+  description: 'Generated by create next app',
+}
 
-export default async function RootLayout({
-  children,
-}) {
-  const supabase = createServerComponentSupabaseClient({
+export default async function RootLayout({ children }) {
+  const supabase = createServerComponentClient({
     cookies,
-  });
+  })
 
   const {
     data: { session },
-  } = await supabase.auth.getSession();
+  } = await supabase.auth.getSession()
 
   return (
     <html lang="en">
       <body>
-        <SupabaseProvider session={session}>{children}</SupabaseProvider>
+        <SupabaseProvider session={session}>
+          <div className="container" style={{ padding: '50px 0 100px 0' }}>
+            {children}
+          </div>
+        </SupabaseProvider>
       </body>
     </html>
-  );
+  )
 }
 ```
 
@@ -274,40 +391,37 @@ export default async function RootLayout({
 Wrap your `app/layout.tsx` component with the `SupabaseProvider` component:
 
 ```jsx title=app/layout.tsx
-import "./globals.css";
-import { createServerComponentSupabaseClient } from "@supabase/auth-helpers-nextjs";
-import SupabaseProvider from "./supabase-provider";
-import { cookies } from "next/headers";
+// app/layout.tsx
+import './globals.css'
+import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
+import SupabaseProvider from './supabase-provider'
+import { cookies } from 'next/headers'
 
 export const metadata = {
-  title: "Create Next App",
-  description: "Generated by create next app",
-};
+  title: 'User Management',
+  description: 'Generated by create next app',
+}
 
-export default async function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const supabase = createServerComponentSupabaseClient({
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const supabase = createServerComponentClient({
     cookies,
-  });
+  })
 
   const {
     data: { session },
-  } = await supabase.auth.getSession();
+  } = await supabase.auth.getSession()
 
   return (
     <html lang="en">
       <body>
         <SupabaseProvider session={session}>
-          <div className="container" style={{ padding: "50px 0 100px 0" }}>
+          <div className="container" style={{ padding: '50px 0 100px 0' }}>
             {children}
           </div>
         </SupabaseProvider>
       </body>
     </html>
-  );
+  )
 }
 ```
 
@@ -315,6 +429,8 @@ See the [Auth Helpers docs](/docs/guides/auth/auth-helpers/nextjs#usage-with-typ
 
 </TabPanel>
 </Tabs>
+
+### Set up a Login component
 
 #### Supabase Auth UI
 
@@ -326,17 +442,17 @@ Install the Supabase Auth UI for React
 npm install @supabase/auth-ui-react @supabase/auth-ui-shared
 ```
 
-Create a `AuthForm` client side component with the `Auth` component imported in it
+Create an `AuthForm` client side component with the `Auth` component rendered within it:
 
 ```jsx title=app/authform.jsx
-// app/authform.jsx
+// app/authform.[j|t]sx
 "use client";
 import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { useSupabase } from "./supabase-provider";
 
 export default function AuthForm() {
-  const { supabase } = useSupabase();
+  const supabase = useSupabase();
 
   return (
     <Auth
@@ -355,7 +471,7 @@ export default function AuthForm() {
 Add the `AuthForm` component to your home page
 
 ```jsx title=app/page.js
-// app/page.jsx
+// app/page.[j|t]sx
 import AuthForm from "./authform";
 
 export default async function Home() {
@@ -377,9 +493,12 @@ export default async function Home() {
 }
 ```
 
-### Account page
+As we are employing Proof Key for Code Exchange (PKCE) in our authentication flow, it is necessary to create a route handler responsible for exchanging the code for a session.
 
-After a user is signed in we can allow them to edit their profile details and manage their account.
+In the following code snippet, we perform the following steps:
+- Retrieve the code sent back from the Supabase Auth server using the `code` query parameter.
+- Exchange this code for a session, which we store in our chosen storage mechanism (in this case, cookies).
+- Finally, we redirect the user to the `account` page.
 
 <Tabs
   scrollable
@@ -389,32 +508,154 @@ After a user is signed in we can allow them to edit their profile details and ma
 >
 <TabPanel id="js" label="JavaScript">
 
-Let's create a new component for that called `Account.js` within a `components` folder.
+```js title=app/auth/callback/route.js
+// app/auth/callback/route.js
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
+import { cookies } from 'next/headers'
+import { NextResponse } from 'next/server'
 
-```tsx title=components/Account.js
-import { useState, useEffect } from 'react'
-import { useUser, useSupabaseClient } from '@supabase/auth-helpers-react'
+export async function GET(req) {
+  const supabase = createRouteHandlerClient({ cookies })
+  const { searchParams } = new URL(req.url)
+  const code = searchParams.get('code')
 
-export default function Account({ session }) {
-  const supabase = useSupabaseClient()
-  const user = useUser()
+  if (code) {
+    await supabase.auth.exchangeCodeForSession(code)
+  }
+
+  return NextResponse.redirect(new URL('/account', req.url))
+}
+```
+
+</TabPanel>
+<TabPanel id="ts" label="TypeScript">
+
+```ts title=app/auth/callback/route.ts
+// app/auth/callback/route.ts
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
+import { cookies } from 'next/headers'
+import { NextRequest, NextResponse } from 'next/server'
+
+export async function GET(req: NextRequest) {
+  const supabase = createRouteHandlerClient({ cookies })
+  const { searchParams } = new URL(req.url)
+  const code = searchParams.get('code')
+
+  if (code) {
+    await supabase.auth.exchangeCodeForSession(code)
+  }
+
+  return NextResponse.redirect(new URL('/account', req.url))
+}
+```
+
+</TabPanel>
+</Tabs>
+
+### Sign out
+
+Let's create an route handler to handle the signout from the server side.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+>
+<TabPanel id="js" label="JavaScript">
+
+```js title=app/auth/signout/route.js
+// app/auth/signout/route.js
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
+import { cookies } from 'next/headers'
+import { NextResponse } from 'next/server'
+
+export async function POST(req) {
+  const supabase = createRouteHandlerClient({ cookies })
+
+  // Check if we have a session
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+
+  if (session) {
+    await supabase.auth.signOut()
+  }
+
+  return NextResponse.redirect(new URL('/', req.url), {
+    status: 302,
+  })
+}
+```
+
+</TabPanel>
+<TabPanel id="ts" label="TypeScript">
+
+```ts title=app/auth/signout/route.ts
+// app/auth/signout/route.ts
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
+import { cookies } from 'next/headers'
+import { type NextRequest, NextResponse } from 'next/server'
+
+export async function POST(req: NextRequest) {
+  const supabase = createRouteHandlerClient({ cookies })
+
+  // Check if we have a session
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+
+  if (session) {
+    await supabase.auth.signOut()
+  }
+
+  return NextResponse.redirect(new URL('/', req.url), {
+    status: 302,
+  })
+}
+```
+
+</TabPanel>
+</Tabs>
+
+### Account page
+
+After a user is signed in we can allow them to edit their profile details and manage their account.
+
+Let's create a new component for that called `AccountForm` within the `app/account` folder.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+>
+<TabPanel id="js" label="JavaScript">
+
+```jsx title=app/account/accountform.jsx
+// app/account/accountform.jsx
+'use client'
+import { useSession, useSupabase } from '../supabase-provider'
+import { useCallback, useEffect, useState } from 'react'
+
+export default function AccountForm() {
+  const supabase = useSupabase()
+  const session = useSession()
   const [loading, setLoading] = useState(true)
+  const [fullname, setFullname] = useState(null)
   const [username, setUsername] = useState(null)
   const [website, setWebsite] = useState(null)
   const [avatar_url, setAvatarUrl] = useState(null)
+  const user = session?.user
 
-  useEffect(() => {
-    getProfile()
-  }, [session])
-
-  async function getProfile() {
+  const getProfile = useCallback(async () => {
     try {
       setLoading(true)
 
       let { data, error, status } = await supabase
         .from('profiles')
-        .select(`username, website, avatar_url`)
-        .eq('id', user.id)
+        .select(`full_name, username, website, avatar_url`)
+        .eq('id', user?.id)
         .single()
 
       if (error && status !== 406) {
@@ -422,36 +663,42 @@ export default function Account({ session }) {
       }
 
       if (data) {
+        setFullname(data.full_name)
         setUsername(data.username)
         setWebsite(data.website)
         setAvatarUrl(data.avatar_url)
       }
     } catch (error) {
       alert('Error loading user data!')
-      console.log(error)
     } finally {
       setLoading(false)
     }
-  }
+  }, [user, supabase])
 
-  async function updateProfile({ username, website, avatar_url }) {
+  useEffect(() => {
+    getProfile()
+  }, [user, getProfile])
+
+  async function updateProfile({
+    username,
+    website,
+    avatar_url,
+  }) {
     try {
       setLoading(true)
 
-      const updates = {
-        id: user.id,
+      let { error } = await supabase.from('profiles').upsert({
+        id: user?.id as string,
+        full_name: fullname,
         username,
         website,
         avatar_url,
         updated_at: new Date().toISOString(),
-      }
-
-      let { error } = await supabase.from('profiles').upsert(updates)
+      })
       if (error) throw error
       alert('Profile updated!')
     } catch (error) {
       alert('Error updating the data!')
-      console.log(error)
     } finally {
       setLoading(false)
     }
@@ -461,7 +708,16 @@ export default function Account({ session }) {
     <div className="form-widget">
       <div>
         <label htmlFor="email">Email</label>
-        <input id="email" type="text" value={session.user.email} disabled />
+        <input id="email" type="text" value={session?.user.email} disabled />
+      </div>
+      <div>
+        <label htmlFor="fullName">Full Name</label>
+        <input
+          id="fullName"
+          type="text"
+          value={fullname || ''}
+          onChange={(e) => setFullname(e.target.value)}
+        />
       </div>
       <div>
         <label htmlFor="username">Username</label>
@@ -485,7 +741,7 @@ export default function Account({ session }) {
       <div>
         <button
           className="button primary block"
-          onClick={() => updateProfile({ username, website, avatar_url })}
+          onClick={() => updateProfile({ fullname, username, website, avatar_url })}
           disabled={loading}
         >
           {loading ? 'Loading ...' : 'Update'}
@@ -493,9 +749,11 @@ export default function Account({ session }) {
       </div>
 
       <div>
-        <button className="button block" onClick={() => supabase.auth.signOut()}>
-          Sign Out
-        </button>
+        <form action="/auth/signout" method="post">
+          <button className="button block" type="submit">
+            Sign out
+          </button>
+        </form>
       </div>
     </div>
   )
@@ -505,37 +763,31 @@ export default function Account({ session }) {
 </TabPanel>
 <TabPanel id="ts" label="TypeScript">
 
-Let's create a new component for that called `Account.tsx` within a `components` folder.
+```tsx title=app/account/accountform.tsx
+// app/account/accountform.tsx
+'use client'
+import { useSession, useSupabase } from '../supabase-provider'
+import { useCallback, useEffect, useState } from 'react'
+import { Database } from '../database.types'
 
-First, [generate type definitions from your database using the Supabase CLI](https://supabase.com/docs/guides/database/api/generating-types) to `../utils/database.types`.
-
-```tsx title=components/Account.tsx
-import { useState, useEffect } from 'react'
-import { useUser, useSupabaseClient, Session } from '@supabase/auth-helpers-react'
-import { Database } from '../utils/database.types'
-type Profiles = Database['public']['Tables']['profiles']['Row']
-
-export default function Account({ session }: { session: Session }) {
-  const supabase = useSupabaseClient<Database>()
-  const user = useUser()
+export default function AccountForm() {
+  const supabase = useSupabase<Database>()
+  const session = useSession()
   const [loading, setLoading] = useState(true)
-  const [username, setUsername] = useState<Profiles['username']>(null)
-  const [website, setWebsite] = useState<Profiles['website']>(null)
-  const [avatar_url, setAvatarUrl] = useState<Profiles['avatar_url']>(null)
+  const [fullname, setFullname] = useState<string | null>(null)
+  const [username, setUsername] = useState<string | null>(null)
+  const [website, setWebsite] = useState<string | null>(null)
+  const [avatar_url, setAvatarUrl] = useState<string | null>(null)
+  const user = session?.user
 
-  useEffect(() => {
-    getProfile()
-  }, [session])
-
-  async function getProfile() {
+  const getProfile = useCallback(async () => {
     try {
       setLoading(true)
-      if (!user) throw new Error('No user')
 
       let { data, error, status } = await supabase
         .from('profiles')
-        .select(`username, website, avatar_url`)
-        .eq('id', user.id)
+        .select(`full_name, username, website, avatar_url`)
+        .eq('id', user?.id)
         .single()
 
       if (error && status !== 406) {
@@ -543,45 +795,47 @@ export default function Account({ session }: { session: Session }) {
       }
 
       if (data) {
+        setFullname(data.full_name)
         setUsername(data.username)
         setWebsite(data.website)
         setAvatarUrl(data.avatar_url)
       }
     } catch (error) {
       alert('Error loading user data!')
-      console.log(error)
     } finally {
       setLoading(false)
     }
-  }
+  }, [user, supabase])
+
+  useEffect(() => {
+    getProfile()
+  }, [user, getProfile])
 
   async function updateProfile({
     username,
     website,
     avatar_url,
   }: {
-    username: Profiles['username']
-    website: Profiles['website']
-    avatar_url: Profiles['avatar_url']
+    username: string | null
+    fullname: string | null
+    website: string | null
+    avatar_url: string | null
   }) {
     try {
       setLoading(true)
-      if (!user) throw new Error('No user')
 
-      const updates = {
-        id: user.id,
+      let { error } = await supabase.from('profiles').upsert({
+        id: user?.id as string,
+        full_name: fullname,
         username,
         website,
         avatar_url,
         updated_at: new Date().toISOString(),
-      }
-
-      let { error } = await supabase.from('profiles').upsert(updates)
+      })
       if (error) throw error
       alert('Profile updated!')
     } catch (error) {
       alert('Error updating the data!')
-      console.log(error)
     } finally {
       setLoading(false)
     }
@@ -591,7 +845,16 @@ export default function Account({ session }: { session: Session }) {
     <div className="form-widget">
       <div>
         <label htmlFor="email">Email</label>
-        <input id="email" type="text" value={session.user.email} disabled />
+        <input id="email" type="text" value={session?.user.email} disabled />
+      </div>
+      <div>
+        <label htmlFor="fullName">Full Name</label>
+        <input
+          id="fullName"
+          type="text"
+          value={fullname || ''}
+          onChange={(e) => setFullname(e.target.value)}
+        />
       </div>
       <div>
         <label htmlFor="username">Username</label>
@@ -615,7 +878,7 @@ export default function Account({ session }: { session: Session }) {
       <div>
         <button
           className="button primary block"
-          onClick={() => updateProfile({ username, website, avatar_url })}
+          onClick={() => updateProfile({ fullname, username, website, avatar_url })}
           disabled={loading}
         >
           {loading ? 'Loading ...' : 'Update'}
@@ -623,9 +886,11 @@ export default function Account({ session }: { session: Session }) {
       </div>
 
       <div>
-        <button className="button block" onClick={() => supabase.auth.signOut()}>
-          Sign Out
-        </button>
+        <form action="/auth/signout" method="post">
+          <button className="button block" type="submit">
+            Sign out
+          </button>
+        </form>
       </div>
     </div>
   )
@@ -635,35 +900,43 @@ export default function Account({ session }: { session: Session }) {
 </TabPanel>
 </Tabs>
 
-### Launch!
+Create a account page for the `AccountForm` component we just created
 
-Now that we have all the components in place, let's update `pages/index.js`:
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+>
+<TabPanel id="js" label="JavaScript">
 
-```jsx lines=3,14 title=pages/index.js
-import { Auth } from '@supabase/auth-ui-react'
-import { ThemeSupa } from '@supabase/auth-ui-shared'
-import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
-import Account from '../components/Account'
+```jsx title=app/account/page.jsx
+// app/account/page.jsx
+import AccountForm from "./accountform";
 
-const Home = () => {
-  const session = useSession()
-  const supabase = useSupabaseClient()
-
-  return (
-    <div className="container" style={{ padding: '50px 0 100px 0' }}>
-      {!session ? (
-        <Auth supabaseClient={supabase} appearance={{ theme: ThemeSupa }} theme="dark" />
-      ) : (
-        <Account session={session} />
-      )}
-    </div>
-  )
+export default function Account() {
+  return <AccountForm />;
 }
-
-export default Home
 ```
 
-Once that's done, run this in a terminal window:
+</TabPanel>
+<TabPanel id="ts" label="TypeScript">
+
+```tsx title=app/account/page.tsx
+// app/account/page.tsx
+import AccountForm from "./accountform";
+
+export default function Account() {
+  return <AccountForm />;
+}
+```
+
+</TabPanel>
+</Tabs>
+
+### Launch!
+
+Now that we have all the pages, route handlers and components in place, let's run this in a terminal window:
 
 ```bash
 npm run dev
@@ -688,31 +961,46 @@ Let's create an avatar widget for the user so that they can upload a profile pho
 >
 <TabPanel id="js" label="JavaScript">
 
-```jsx title=components/Avatar.js
+```jsx title=app/account/avatar.jsx
+'use client'
 import React, { useEffect, useState } from 'react'
-import { useSupabaseClient } from '@supabase/auth-helpers-react'
+import { Database } from '../database.types'
+import { useSupabase } from '../supabase-provider'
 
-export default function Avatar({ uid, url, size, onUpload }) {
-  const supabase = useSupabaseClient()
+export default function Avatar({
+  uid,
+  url,
+  size,
+  onUpload,
+}) {
+  const supabase = useSupabase()
   const [avatarUrl, setAvatarUrl] = useState(null)
   const [uploading, setUploading] = useState(false)
+  const [blobUrlCache, setBlobUrlCache] = useState({})
 
   useEffect(() => {
-    if (url) downloadImage(url)
-  }, [url])
+    async function downloadImage(path) {
+      try {
+        if (blobUrlCache[path]) {
+          setAvatarUrl(blobUrlCache[path])
+          return
+        }
 
-  async function downloadImage(path) {
-    try {
-      const { data, error } = await supabase.storage.from('avatars').download(path)
-      if (error) {
-        throw error
+        const { data, error } = await supabase.storage.from('avatars').download(path)
+        if (error) {
+          throw error
+        }
+
+        const url = URL.createObjectURL(data)
+        setAvatarUrl(url)
+        setBlobUrlCache((prevCache) => ({ ...prevCache, [path]: url }))
+      } catch (error) {
+        console.log('Error downloading image: ', error)
       }
-      const url = URL.createObjectURL(data)
-      setAvatarUrl(url)
-    } catch (error) {
-      console.log('Error downloading image: ', error)
     }
-  }
+
+    if (url) downloadImage(url)
+  }, [url, supabase.storage, blobUrlCache])
 
   const uploadAvatar = async (event) => {
     try {
@@ -780,10 +1068,11 @@ export default function Avatar({ uid, url, size, onUpload }) {
 </TabPanel>
 <TabPanel id="ts" label="TypeScript">
 
-```tsx title=components/Avatar.tsx
+```tsx title=app/account/avatar.tsx
+'use client'
 import React, { useEffect, useState } from 'react'
-import { useSupabaseClient } from '@supabase/auth-helpers-react'
-import { Database } from '../utils/database.types'
+import { Database } from '../database.types'
+import { useSupabase } from '../supabase-provider'
 type Profiles = Database['public']['Tables']['profiles']['Row']
 
 export default function Avatar({
@@ -797,26 +1086,34 @@ export default function Avatar({
   size: number
   onUpload: (url: string) => void
 }) {
-  const supabase = useSupabaseClient<Database>()
+  const supabase = useSupabase()
   const [avatarUrl, setAvatarUrl] = useState<Profiles['avatar_url']>(null)
   const [uploading, setUploading] = useState(false)
+  const [blobUrlCache, setBlobUrlCache] = useState<Record<string, string>>({})
 
   useEffect(() => {
-    if (url) downloadImage(url)
-  }, [url])
+    async function downloadImage(path: string) {
+      try {
+        if (blobUrlCache[path]) {
+          setAvatarUrl(blobUrlCache[path])
+          return
+        }
 
-  async function downloadImage(path: string) {
-    try {
-      const { data, error } = await supabase.storage.from('avatars').download(path)
-      if (error) {
-        throw error
+        const { data, error } = await supabase.storage.from('avatars').download(path)
+        if (error) {
+          throw error
+        }
+
+        const url = URL.createObjectURL(data)
+        setAvatarUrl(url)
+        setBlobUrlCache((prevCache) => ({ ...prevCache, [path]: url }))
+      } catch (error) {
+        console.log('Error downloading image: ', error)
       }
-      const url = URL.createObjectURL(data)
-      setAvatarUrl(url)
-    } catch (error) {
-      console.log('Error downloading image: ', error)
     }
-  }
+
+    if (url) downloadImage(url)
+  }, [url, supabase.storage, blobUrlCache])
 
   const uploadAvatar: React.ChangeEventHandler<HTMLInputElement> = async (event) => {
     try {
@@ -886,11 +1183,12 @@ export default function Avatar({
 
 ### Add the new widget
 
-And then we can add the widget to the Account page:
+And then we can add the widget to the `AccountForm` component:
 
-```jsx title=components/Account.js
+```jsx title=app/account/accountform.js
+// app/account/accountform.[j|t]sx
 // Import the new component
-import Avatar from './Avatar'
+import Avatar from './avatar'
 
 // ...
 
