@@ -1972,6 +1972,7 @@ module.exports = [
     destination: '/customers',
   },
   {
+    permanent: true,
     source: '/blog/how-supabase-accelerates-development-of-all-pull-together',
     destination: '/customers',
   },
