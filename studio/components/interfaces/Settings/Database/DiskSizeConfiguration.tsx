@@ -53,7 +53,7 @@ const DiskSizeConfiguration: FC<any> = ({ disabled = false }) => {
         await app.projects.fetchDetail(ref, (project) => meta.setProjectDetails(project))
         ui.setNotification({
           category: 'success',
-          message: `Succesfully updated disk size to ${values['new-disk-size']} GB`,
+          message: `Successfully updated disk size to ${values['new-disk-size']} GB`,
         })
         setShowResetDbPass(false)
       }
