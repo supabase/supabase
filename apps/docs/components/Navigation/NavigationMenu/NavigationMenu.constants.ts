@@ -747,6 +747,8 @@ export const functions: NavMenuConstant = {
       items: [
         { name: 'Dart Edge on Supabase', url: '/guides/functions/dart-edge' },
         { name: 'Browserless.io', url: '/guides/functions/examples/screenshots' },
+        { name: 'Hugging Face', url: '/guides/ai/examples/huggingface-image-captioning' },
+        { name: 'OpenAI API', url: '/guides/ai/examples/openai' },
         { name: 'Upstash Redis', url: '/guides/functions/examples/upstash-redis' },
         { name: 'Type-Safe SQL with Kysely', url: '/guides/functions/kysely-postgres' },
       ],
@@ -755,7 +757,7 @@ export const functions: NavMenuConstant = {
       name: 'Examples',
       url: '/guides/functions/examples',
       items: [
-        { name: 'Generating OpenAI GPT3 completions', url: '/guides/functions/examples/openai' },
+        { name: 'Generating OpenAI GPT3 completions', url: '/guides/ai/examples/openai' },
         { name: 'Generating OG images ', url: '/guides/functions/examples/og-image' },
         {
           name: 'CAPTCHA support with Cloudflare Turnstile',
@@ -1152,7 +1154,7 @@ export const integrations: NavMenuConstant = {
       items: [
         { name: 'Cloudflare Workers', url: '/guides/integrations/cloudflare-workers' },
         { name: 'Estuary', url: '/guides/integrations/estuary' },
-        { name: 'OpenAI', url: '/guides/functions/examples/openai' },
+        { name: 'OpenAI', url: '/guides/ai/examples/openai' },
         { name: 'pgMustard', url: '/guides/integrations/pgmustard' },
         { name: 'Prisma', url: '/guides/integrations/prisma' },
         { name: 'Sequin', url: '/guides/integrations/sequin' },
