@@ -12,11 +12,12 @@ import ProductHeaderCentered from '~/components/Sections/ProductHeaderCentered'
 import VectorStyles from './vector.module.css'
 import FeaturesSection from '~/components/Sections/FeaturesSection'
 import HighlightCards from '~/components/Sections/HighlightCards'
+import UseCasesSection from '~/components/Sections/UseCasesSection'
+import CenteredTitleImage from '~/components/Sections/CenteredTitleImage'
+import TimedTabs from '~/components/Sections/TimedTabs'
 import { pageData } from '~/data/products/vector/page'
 
 import 'swiper/swiper.min.css'
-import UseCasesSection from '../../components/Sections/UseCasesSection'
-import CenteredTitleImage from '../../components/Sections/CenteredTitleImage'
 
 const Cursor = ({ className = '', color = 'none' }) => {
   return (
@@ -145,6 +146,8 @@ function VectorPage() {
         <CenteredTitleImage {...pageData.integrations} />
 
         <UseCasesSection {...pageData.useCasesSection} />
+
+        <TimedTabs {...pageData.APIsection} />
 
         <FeaturesSection {...pageData.featuresSection} />
 

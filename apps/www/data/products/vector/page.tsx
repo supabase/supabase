@@ -1,3 +1,4 @@
+import { CodeBlock } from 'ui'
 import IntegrationsSVG from '../../../components/products/vector/IntegrationsSVG'
 
 export const pageData = {
@@ -10,24 +11,28 @@ export const pageData = {
   ],
   highlights: [
     {
-      title: 'Postgres pgvector',
-      paragraph: 'Unleash the power of vector embeddings with Postgres pgvector.',
-      image: 'asdfadsf',
+      title: 'PostgreSQL + pgvector',
+      paragraph:
+        'Every Supabase project is a dedicated Postgres instance. Use pgvector to store, query, and index your vector embeddings at scale.',
+      image: '',
     },
     {
       title: 'Connect with OpenAI',
-      paragraph: 'Seamlessly integrate with Open AI for advanced AI capabilities.',
-      image: 'asdfadsf',
+      paragraph:
+        'Easily connect to any LLM or embeddings API, including Hugging Face, SageMaker and more.',
+      image: '',
     },
     {
-      title: 'SOC 2 Type 2 compliant',
-      paragraph: 'asdfadsf',
-      image: 'asdfadsf',
+      title: 'Secure and Scalable',
+      paragraph:
+        'Supabase is SOC2 type 2 compliant, and comes with an advanced permissions system.',
+      image: '',
     },
     {
-      title: 'Hosted or Self-Hosted',
-      paragraph: 'Choose the deployment option that suits your needs.',
-      image: 'asdfadsf',
+      title: 'Deploy Globally',
+      paragraph:
+        'Choose from 12 Fully Managed datacenters or, or Self-Host on your own cloud or servers.',
+      image: '',
     },
   ],
   integrations: {
@@ -68,6 +73,67 @@ export const pageData = {
         img: 'in-app-chat.svg',
         title: 'Recommendations',
         description: 'Discover related content: articles, videos, restaurants, and more.',
+      },
+    ],
+  },
+  APIsection: {
+    title: (
+      <>
+        <span className="heading-gradient">Simple yet</span>
+        <br />
+        <span className="heading-gradient-brand">powerful APIs</span>
+      </>
+    ),
+    paragraph:
+      'Easy-to-use client libraries for managing and querying vector stores in PostgreSQL.',
+    tabs: [
+      {
+        label: 'Store',
+        code: `
+docs = vx.create_collection(name="docs", dimension=3)
+
+# add records to the collection
+docs.upsert(
+  vectors=[
+    (
+      "vec0",           # the vector's identifier
+      [0.1, 0.2, 0.3],  # the vector. list or np.array
+      {"year": 1973}    # associated  metadata
+    ),
+    (
+      "vec1",
+      [0.7, 0.8, 0.9],
+      {"year": 2012}
+    )
+  ]
+)
+        `,
+      },
+      {
+        label: 'Search',
+        code: `
+# index the collection to be queried by cosine distance
+docs.create_index(measure=vecs.IndexMeasure.cosine_distance)
+
+# Available options for query measure are:
+#
+# vecs.IndexMeasure.cosine_distance
+# vecs.IndexMeasure.l2_distance
+# vecs.IndexMeasure.max_inner_product
+
+# or use the default (cosine_distance)
+docs.create_index()
+      `,
+      },
+      {
+        label: 'Query',
+        code: `
+# Query vectors with optional Metadata Filtering
+docs.query(
+    query_vector=[0.4,0.5,0.6],
+    filters={"year": {"$eq": 2012}}, # metadata filters
+)
+      `,
       },
     ],
   },
