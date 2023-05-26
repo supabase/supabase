@@ -10366,7 +10366,7 @@
                                           },
                                           {
                                             "type": "literal",
-                                            "value": "phone"
+                                            "value": "phone_change"
                                           }
                                         ]
                                       }
@@ -24307,7 +24307,7 @@
                           },
                           {
                             "type": "literal",
-                            "value": "phone"
+                            "value": "phone_change"
                           }
                         ]
                       }

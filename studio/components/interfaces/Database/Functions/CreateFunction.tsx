@@ -407,7 +407,7 @@ const CreateFunction: FC<CreateFunctionProps> = ({ func, visible, setVisible }) 
                 <SidePanel.Separator />
                 <SidePanel.Content>
                   <Panel>
-                    <div className={`space-y-8 rounded bg-bg-alt-light py-4 dark:bg-bg-alt-dark`}>
+                    <div className={`space-y-8 rounded bg-scale-200 py-4`}>
                       <div className={`px-6`}>
                         <Toggle
                           onChange={() => _localState.toggleAdvancedVisible()}

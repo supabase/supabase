@@ -207,7 +207,7 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
                   {sharedItems.tools.map((item) => {
                     const itemUrl = (
                       projectRef ? item.url.replace('_', projectRef) : item.url
-                    ).split('https://app.supabase.com')[1]
+                    ).split('https://supabase.com/dashboard')[1]
 
                     return (
                       <CommandItem

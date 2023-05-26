@@ -10,7 +10,7 @@ import { makeRandomString } from 'lib/helpers'
 import ProjectCard from './ProjectCard'
 import ShimmeringCard from './ShimmeringCard'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useOverdueInvoicesQuery } from 'data/invoices/invoices-query'
+import { useOverdueInvoicesQuery } from 'data/invoices/invoices-overdue-query'
 
 interface Props {
   rewriteHref?: (projectRef: string) => string
