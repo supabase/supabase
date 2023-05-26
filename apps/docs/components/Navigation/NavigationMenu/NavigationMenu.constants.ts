@@ -871,7 +871,7 @@ export const ai: NavMenuConstant = {
       name: 'Guides',
       url: undefined,
       items: [
-        { name: 'Creating collections', url: '/guides/ai/creating-collections' },
+        { name: 'Managing collections', url: '/guides/ai/managing-collections' },
         { name: 'Managing indexes', url: '/guides/ai/managing-indexes' },
         { name: 'Engineering for scale', url: '/guides/ai/engineering-for-scale' },
       ],
