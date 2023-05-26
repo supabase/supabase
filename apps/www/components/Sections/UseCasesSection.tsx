@@ -15,10 +15,10 @@ interface Props {
 
 const UseCasesSection = ({ title, paragraph, useCases }: Props) => {
   return (
-    <SectionContainer className="flex flex-col gap-8">
-      <div className="flex flex-col gap-4 items-center justify-center">
+    <SectionContainer className="flex flex-col gap-12">
+      <div className="flex flex-col text-center gap-4 items-center justify-center">
         <h2 className="heading-gradient text-2xl sm:text-3xl xl:text-4xl font-medium">{title}</h2>
-        <p className="p mx-auto text-center lg:w-1/2">{paragraph}</p>
+        <p className="mx-auto text-scale-900 lg:w-1/2">{paragraph}</p>
       </div>
       <div className="grid gap-10 grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
         {useCases.map((example) => {
@@ -36,8 +36,8 @@ const UseCasesSection = ({ title, paragraph, useCases }: Props) => {
                   alt={example.title}
                 />
                 <div className="prose">
-                  <h4 className="">{example.title}</h4>
-                  <p className="text-sm">{example.description}</p>
+                  <h4 className="text-lg">{example.title}</h4>
+                  <p className="text-sm text-scale-900">{example.description}</p>
                 </div>
               </div>
             </>

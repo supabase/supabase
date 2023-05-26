@@ -23,7 +23,7 @@ const FeaturesSection = ({ title, paragraph, features }: Props) => {
           <h2 className="text-2xl sm:text-3xl xl:text-4xl max-w-[280px] sm:max-w-xs xl:max-w-[360px] tracking-[-1px]">
             {title}
           </h2>
-          <p className="p">{paragraph}</p>
+          <p className="text-scale-900 mb-4">{paragraph}</p>
           <Link href="">
             <a className="">
               <Button type="default" size="small">
@@ -56,7 +56,9 @@ const FeaturesSection = ({ title, paragraph, features }: Props) => {
                 </div>
                 <div className="text-sm lg:text-base">
                   <h2 className="text-base">{feature.title}</h2>
-                  <ReactMarkdown className="prose pt-1 text-sm">{feature.text}</ReactMarkdown>
+                  <ReactMarkdown className="prose pt-1 text-sm text-scale-900">
+                    {feature.text}
+                  </ReactMarkdown>
                 </div>
               </div>
             )

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, ReactNode } from 'react'
-import { motion, useAnimation, AnimatePresence } from 'framer-motion'
+import { motion, useAnimation } from 'framer-motion'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import Link from 'next/link'
 import { Button } from 'ui'
@@ -42,18 +42,18 @@ interface Tab {
 }
 
 interface Props {
-  title: string
+  title: string | ReactNode
   paragraph: string
   tabs: Tab[]
   intervalDuration?: number
   updateFrequency?: number
 }
 
-const TimedTabs = ({
+const TimedTabsSection = ({
   title,
   paragraph,
   tabs,
-  intervalDuration = 15,
+  intervalDuration = 25,
   updateFrequency = 10,
 }: Props) => {
   const [activeTab, setActiveTab] = useState(0)
@@ -120,10 +120,10 @@ const TimedTabs = ({
     <SectionContainer className="flex flex-col gap-8">
       <div className="flex flex-col lg:flex-row gap-8 xl:gap-10 justify-between">
         <div className="w-full lg:w-1/2 gap-2 flex flex-col">
-          <h2 className="text-2xl sm:text-3xl xl:text-4xl max-w-[280px] sm:max-w-xs xl:max-w-[360px] tracking-[-1px]">
+          <h2 className="text-3xl xl:text-4xl max-w-[280px] sm:max-w-xs xl:max-w-[360px] tracking-[-1px]">
             {title}
           </h2>
-          <p className="p max-w-sm">{paragraph}</p>
+          <p className="text-scale-900 mb-4 max-w-sm">{paragraph}</p>
           <Link href="">
             <a className="">
               <Button type="default" size="small">
@@ -146,7 +146,7 @@ const TimedTabs = ({
           >
             {tabs.map((tab, i) => (
               <SwiperSlide key={i}>
-                <CodeBlock key={i} lang="py" size="medium">
+                <CodeBlock key={i} lang="py" size="large" background="#1A1A1A">
                   {tab.code}
                 </CodeBlock>
               </SwiperSlide>
@@ -170,4 +170,4 @@ const TimedTabs = ({
   )
 }
 
-export default TimedTabs
+export default TimedTabsSection

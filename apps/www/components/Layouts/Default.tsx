@@ -5,17 +5,18 @@ import Footer from 'components/Footer/index'
 type Props = {
   hideHeader?: boolean
   hideFooter?: boolean
+  className?: string
   children: React.ReactNode
 }
 
 const DefaultLayout = (props: Props) => {
-  const { hideHeader = false, hideFooter = false, children } = props
+  const { hideHeader = false, hideFooter = false, className = '', children } = props
 
   return (
     <>
       {!hideHeader && <Nav />}
       <div className="min-h-screen">
-        <main>{children}</main>
+        <main className={className}>{children}</main>
       </div>
       {!hideFooter && <Footer />}
     </>
