@@ -16,7 +16,7 @@ const HighlightCards = ({ highlights }: { highlights: Highlight[] }) => {
           <InteractiveShimmerCard innerClassName="flex flex-col p-8 !bg-scale-200">
             <div className="w-full aspect-square mb-4">image</div>
             <h3 className="text-lg text-scale-1200 font-medium mb-2">{highlight.title}</h3>
-            <p>{highlight.paragraph}</p>
+            <p className="text-scale-900">{highlight.paragraph}</p>
           </InteractiveShimmerCard>
         ))}
       </div>
