@@ -83,13 +83,14 @@ const embeddingResponse = await openai.createEmbedding({
   model: 'text-embedding-ada-002',
   input: body,
 })
-const [responseData] = embeddingResponse.data.data.
+
+const [{ embedding }] = embeddingResponse.data.data
 
 // Store the vector in Postgres
 const { data, error } = await supabase.from('posts').insert({
   title,
   body,
-  embedding: responseData.embedding,
+  embedding,
 })
 ```
 
