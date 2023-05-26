@@ -19,7 +19,7 @@ const sanitizeRoute = (route: string, routerQueries: ParsedUrlQuery) => {
 
   if (queryArray.length > 1) {
     // account for query string, if exists (example: /logs/explorer?q=select...)
-    const hasQueryString = queryArray.filter(([key]) => key === 'q').length > 0
+    const hasQueryString = queryArray.some(([key]) => key === 'q')
 
     return route
       .split('/')
