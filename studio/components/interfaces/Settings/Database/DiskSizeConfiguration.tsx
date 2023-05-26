@@ -4,33 +4,26 @@ import { useParams } from 'common/hooks'
 import { FormHeader } from 'components/ui/Forms'
 import Panel from 'components/ui/Panel'
 import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
+import { useProjectUsageUpdateMutation } from 'data/usage/project-usage-mutation'
 import { useProjectUsageQuery } from 'data/usage/project-usage-query'
 import { checkPermissions, useStore } from 'hooks'
-import { post } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
 import Link from 'next/link'
 import { FC, useEffect, useState } from 'react'
 import { Alert, Button, Form, InputNumber, Modal } from 'ui'
 import { number, object } from 'yup'
 
 const DiskSizeConfiguration: FC<any> = ({ disabled = false }) => {
-  const { ui, app, meta } = useStore()
-  const { ref } = useParams()
+  const { ui } = useStore()
+  const { ref: projectRef } = useParams()
 
   const canUpdateDiskSizeConfig = checkPermissions(PermissionAction.UPDATE, 'projects')
 
   const [showResetDbPass, setShowResetDbPass] = useState<boolean>(false)
   const [isUpdatingDiskSize, setIsUpdatingDiskSize] = useState<boolean>(false)
 
-  const {
-    data: projectUsage,
-    error: projectUsageError,
-    isLoading: projectUsageLoading,
-  } = useProjectUsageQuery({ projectRef: ref })
-
-  const { data: projectSubscriptionData } = useProjectSubscriptionQuery({ projectRef: ref })
-
-  console.log('projectSubscriptionData', projectSubscriptionData)
+  const { data: projectUsage } = useProjectUsageQuery({ projectRef })
+  const { data: projectSubscriptionData } = useProjectSubscriptionQuery({ projectRef })
+  const { mutateAsync: updateProjectUsage } = useProjectUsageUpdateMutation()
 
   useEffect(() => {
     if (showResetDbPass) {
@@ -39,26 +32,18 @@ const DiskSizeConfiguration: FC<any> = ({ disabled = false }) => {
   }, [showResetDbPass])
 
   const confirmResetDbPass = async (values: { [prop: string]: any }) => {
-    if (!ref) return
+    const volumeSize = values['new-disk-size']
+    if (!projectRef) return
 
     try {
       setIsUpdatingDiskSize(true)
-      const res = await post(`${API_URL}/projects/${ref}/resize`, {
-        volume_size_gb: values['new-disk-size'],
+      await updateProjectUsage({ projectRef, volumeSize })
+      ui.setNotification({
+        category: 'success',
+        message: `Successfully updated disk size to ${values['new-disk-size']} GB`,
       })
-
-      if (res.error) {
-        throw res.error
-      } else {
-        await app.projects.fetchDetail(ref, (project) => meta.setProjectDetails(project))
-        ui.setNotification({
-          category: 'success',
-          message: `Succesfully updated disk size to ${values['new-disk-size']} GB`,
-        })
-        setShowResetDbPass(false)
-      }
-
       setIsUpdatingDiskSize(false)
+      setShowResetDbPass(false)
     } catch (error: any) {
       ui.setNotification({ category: 'error', message: error.message })
       setIsUpdatingDiskSize(false)
@@ -100,7 +85,8 @@ const DiskSizeConfiguration: FC<any> = ({ disabled = false }) => {
                     </span>
                   )}
                   <p className="text-sm opacity-50">
-                    Supabase uses network-attached storage to balance performance with scalability.
+                    Supabase employs auto-scaling storage and allows for manual disk size <br />{' '}
+                    adjustments when necessary
                   </p>
                 </div>
                 <div className="flex items-end justify-end">
@@ -136,19 +122,33 @@ const DiskSizeConfiguration: FC<any> = ({ disabled = false }) => {
               </div>
             </Panel.Content>
           </Panel>
-          <Alert withIcon variant="info" title={'Importing a lot of data'}>
-            If you intend to import a lot of data into your database which requires multiple disk
-            expansions then reach out to our team. For example, uploading more than 1.5x the current
-            size of your database storage will put your database into read-only mode.
+          <Alert withIcon variant="info" title={'Importing a lot of data?'}>
+            <p className=" max-w-2xl">
+              We auto-scale your disk as you need more storage, but can only do this every 6 hours.
+              If you upload more than 1.5x the current size of your storage, your database will go
+              into read-only mode. If you know how big your database is going to be, you can
+              manually increase the size here.
+            </p>
+
+            <p className="mt-4">
+              Read more about{' '}
+              <a
+                className="underline"
+                href="https://supabase.com/docs/guides/platform/database-size#disk-management"
+              >
+                disk management
+              </a>
+              .
+            </p>
           </Alert>
         </div>
       ) : (
         <Alert
           withIcon
           variant="info"
-          title={'DB disk size config not available for free tier project'}
+          title={'Disk size configuration is not available for projects on the Free tier'}
           actions={
-            <Link href={`/project/${ref}/settings/billing/subscription`}>
+            <Link href={`/project/${projectRef}/settings/billing/subscription`}>
               <Button type="default">Upgrade subscription</Button>
             </Link>
           }
