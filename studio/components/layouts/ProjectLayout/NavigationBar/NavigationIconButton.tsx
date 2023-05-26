@@ -32,12 +32,13 @@ const NavigationIconButton: FC<Props> = ({ route, isActive = false }) => {
         </ConditionalWrap>
       </Tooltip.Trigger>
       <Tooltip.Portal>
-        <Tooltip.Content side="right">
+        <Tooltip.Content side="right" sideOffset={5}>
           <Tooltip.Arrow className="radix-tooltip-arrow" />
+
           <div
             className={[
-              'bg-scale-100 shadow py-1 px-2 rounded leading-none', // background
-              'border border-scale-200 ', //border
+              'bg-scale-100 shadow-lg shadow-scale-700 dark:shadow-scale-300	py-1.5 px-3 rounded leading-none', // background
+              'border border-scale-500 ', //border
             ].join(' ')}
           >
             <span className="text-scale-1200 text-xs">{route.label}</span>

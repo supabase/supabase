@@ -472,10 +472,9 @@ export const auth = {
       items: [
         { name: 'Overview', url: '/guides/auth/auth-helpers' },
         { name: 'Auth UI', url: '/guides/auth/auth-helpers/auth-ui' },
-        { name: 'Next.js (pages)', url: '/guides/auth/auth-helpers/nextjs' },
         {
-          name: 'Next.js (app)',
-          url: '/guides/auth/auth-helpers/nextjs-server-components',
+          name: 'Next.js',
+          url: '/guides/auth/auth-helpers/nextjs',
         },
         { name: 'Remix', url: '/guides/auth/auth-helpers/remix' },
         { name: 'SvelteKit', url: '/guides/auth/auth-helpers/sveltekit' },
@@ -1175,6 +1174,7 @@ export const integrations: NavMenuConstant = {
         { name: 'Directus', url: '/guides/integrations/directus' },
         { name: 'Draftbit', url: '/guides/integrations/draftbit' },
         { name: 'FlutterFlow', url: '/guides/integrations/flutterflow' },
+        { name: 'Forest Admin', url: '/guides/integrations/forestadmin' },
         { name: 'Plasmic', url: '/guides/integrations/plasmic' },
         { name: 'ILLA', url: '/guides/integrations/illa' },
       ],

@@ -57,7 +57,7 @@ functions:
                 {
                   AutoRefreshToken = true,
                   AutoConnectRealtime = true,
-                  SessionHandler = new SupabaseSessionHandler()
+                  // SessionHandler = new SupabaseSessionHandler() <-- This must be implemented by the developer
                 };
 
                 // Note the creation as a singleton.
@@ -311,22 +311,22 @@ functions:
         isSpotlight: true
         code: |
           ```c#
-          supabase.Auth.StateChanged += (sender, ev) =>
-            {
-                switch (ev.State)
-                {
-                    case AuthState.SignedIn:
-                        break;
-                    case AuthState.SignedOut:
-                        break;
-                    case AuthState.UserUpdated:
-                        break;
-                    case AuthState.PasswordRecovery:
-                        break;
-                    case AuthState.TokenRefreshed:
-                        break;
-                }
-            };
+          supabase.Auth.AddStateChangedListener((sender, changed) =>
+          {
+              switch (changed)
+              {
+                  case AuthState.SignedIn:
+                      break;
+                  case AuthState.SignedOut:
+                      break;
+                  case AuthState.UserUpdated:
+                      break;
+                  case AuthState.PasswordRecovery:
+                      break;
+                  case AuthState.TokenRefreshed:
+                      break;
+              }
+          });
           ```
   - id: auth-reset-password-for-email
     title: 'ResetPasswordForEmail()'
@@ -713,11 +713,10 @@ functions:
 
           var channel = supabase.Realtime.Channel("any");
           var broadcast = channel.Register<CursorBroadcast>();
-
-          broadcast.OnBroadcast += (sender, _) =>
+          broadcast.AddBroadcastEventHandler((sender, baseBroadcast) =>
           {
-            var data = broadcast.Current();
-          };
+              var response = broadcast.Current();
+          });
 
           await channel.Subscribe();
 
@@ -741,11 +740,11 @@ functions:
             var channel = supabase.Realtime.Channel("any");
             var presenceKey = Guid.NewGuid().ToString();
             var presence = channel.Register<UserPresence>(presenceKey);
-
-            presence.OnSync += (sender, _) =>
+            presence.AddPresenceEventHandler(EventType.Sync, (sender, type) =>
             {
-              var state = presence.CurrentState;
-            };
+                Debug.WriteLine($"The Event Type: {type}");
+                var state = presence.CurrentState;
+            });
 
             await channel.Subscribe();
 
@@ -757,9 +756,9 @@ functions:
         isSpotlight: true
         code: |
           ```c#
-          await supabase.From<City>().On(ChannelEventType.All, (sender, args) =>
+          await supabase.From<City>().On(ListenType.All, (sender, change) =>
           {
-              Debug.WriteLine(args.Response.Payload.Data);
+              Debug.WriteLine(change.Payload.Data);
           });
           ```
       - id: listen-to-all-database-changes
@@ -768,10 +767,13 @@ functions:
           ```c#
           var channel = supabase.Realtime.Channel("realtime", "public", "*");
 
-          channel.OnPostgresChanges += (sender, args) =>
+          channel.AddPostgresChangeHandler(ListenType.All, (sender, change) =>
           {
-              Debug.WriteLine(args.Response.Payload.Data);
-          };
+              // The event type
+              Debug.WriteLine(change.Event);
+              // The changed record
+              Debug.WriteLine(change.Payload);
+          });
 
           await channel.Subscribe();
           ```
@@ -779,9 +781,9 @@ functions:
         name: Listening to inserts
         code: |
           ```c#
-          await supabase.From<City>().On(ChannelEventType.Insert, (sender, args) =>
+          await supabase.From<City>().On(ListenType.Inserts, (sender, change) =>
           {
-              Debug.WriteLine(args.Response.Payload.Data);
+              Debug.WriteLine(change.Payload.Data);
           });
           ```
       - id: listening-to-updates
@@ -795,9 +797,9 @@ functions:
           ```
         code: |
           ```c#
-          await supabase.From<City>().On(ChannelEventType.Update, (sender, args) =>
+          await supabase.From<City>().On(ListenType.Updates, (sender, change) =>
           {
-              Debug.WriteLine(args.Response.Payload.Data);
+              Debug.WriteLine(change.Payload.Data);
           });
           ```
       - id: listening-to-deletes
@@ -811,9 +813,9 @@ functions:
           ```
         code: |
           ```c#
-          await supabase.From<City>().On(ChannelEventType.Delete, (sender, args) =>
+          await supabase.From<City>().On(ListenType.Deletes, (sender, change) =>
           {
-              Debug.WriteLine(args.Response.Payload.Data);
+              Debug.WriteLine(change.Payload.Data);
           });
           ```
       - id: listening-to-row-level-changes
@@ -823,10 +825,13 @@ functions:
           ```c#
           var channel = supabase.Realtime.Channel("realtime", "public", "countries", "id", "id=eq.200");
 
-          channel.OnMessage += (sender, args) =>
+          channel.AddPostgresChangeHandler(ListenType.All, (sender, change) =>
           {
-              Debug.WriteLine(args.Response.Payload);
-          };
+              // The event type
+              Debug.WriteLine(change.Event);
+              // The changed record
+              Debug.WriteLine(change.Payload);
+          });
 
           await channel.Subscribe();
           ```
@@ -843,7 +848,7 @@ functions:
         isSpotlight: true
         code: |
           ```c#
-          var channel = await supabase.From<City>().On(ChannelEventType.All, (sender, args) => { });
+          var channel = await supabase.From<City>().On(ChannelEventType.All, (sender, change) => { });
           channel.Unsubscribe();
 
           // OR

@@ -1972,6 +1972,15 @@ module.exports = [
     destination: '/customers',
   },
   {
+    source: '/blog/how-supabase-accelerates-development-of-all-pull-together',
+    destination: '/customers',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-helpers/nextjs-server-components',
+    destination: '/docs/guides/auth/auth-helpers/nextjs',
+  },
+  {
     permanent: true,
     source: '/docs/guides/getting-started/openai/vector-search',
     destination: '/docs/guides/ai/examples/docs-search',
