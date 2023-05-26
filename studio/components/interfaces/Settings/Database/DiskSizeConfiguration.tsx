@@ -53,7 +53,7 @@ const DiskSizeConfiguration: FC<any> = ({ disabled = false }) => {
         await app.projects.fetchDetail(ref, (project) => meta.setProjectDetails(project))
         ui.setNotification({
           category: 'success',
-          message: `Succesfully updated disk size to values['new-disk-size'] GB`,
+          message: `Succesfully updated disk size to ${values['new-disk-size']} GB`,
         })
         setShowResetDbPass(false)
       }
@@ -66,6 +66,8 @@ const DiskSizeConfiguration: FC<any> = ({ disabled = false }) => {
   }
 
   const currentDiskSize = projectUsage?.disk_volume_size_gb ?? 0
+  // to do, update with max_disk_volume_size_gb
+  const maxDiskSize = 200
 
   const INITIAL_VALUES = {
     'new-disk-size': currentDiskSize,
@@ -76,7 +78,7 @@ const DiskSizeConfiguration: FC<any> = ({ disabled = false }) => {
       .required('Please enter a GB amount you want to resize the disk up to.')
       .moreThan(Number(currentDiskSize ?? 0), `Must be more than ${currentDiskSize} GB`)
       // to do, update with max_disk_volume_size_gb
-      .lessThan(200, 'Must be no more than 200 GB'),
+      .lessThan(Number(maxDiskSize), 'Must be no more than 200 GB'),
   })
 
   return (
@@ -90,7 +92,7 @@ const DiskSizeConfiguration: FC<any> = ({ disabled = false }) => {
                 <div className="col-span-2 space-y-1">
                   {projectUsage?.disk_volume_size_gb && (
                     <span className="text-scale-1100 flex gap-2 items-baseline">
-                      <span className="text-scale-1200">Current disk Size:</span>
+                      <span className="text-scale-1200">Current Disk Storage Size:</span>
                       <span className="text-scale-1200 text-xl">
                         {currentDiskSize}
                         <span className="text-scale-1200 text-sm">GB</span>
@@ -152,14 +154,14 @@ const DiskSizeConfiguration: FC<any> = ({ disabled = false }) => {
           }
         >
           <div>
-            If you are intending to use more than 8GB of disk space, then you will need to upgrade
+            If you are intending to use more than 500MB of disk space, then you will need to upgrade
             to at least the Pro tier.
           </div>
         </Alert>
       )}
 
       <Modal
-        header={<h5 className="text-sm text-scale-1200">Increase disk size</h5>}
+        header={<h5 className="text-sm text-scale-1200">Increase Disk Storage Size</h5>}
         size="small"
         visible={showResetDbPass}
         loading={isUpdatingDiskSize}
@@ -172,31 +174,44 @@ const DiskSizeConfiguration: FC<any> = ({ disabled = false }) => {
           validationSchema={diskSizeValidationSchema}
           onSubmit={confirmResetDbPass}
         >
-          {({ isSubmitting }: { isSubmitting: boolean }) => (
-            <>
-              <Modal.Content>
-                <div className="w-full space-y-8 py-8">
-                  <InputNumber
-                    id="new-disk-size"
-                    label="New disk size"
-                    labelOptional="GB"
-                    required
-                  />
-                </div>
-              </Modal.Content>
-              <Modal.Separator />
-              <Modal.Content>
-                <div className="flex space-x-2 justify-between pb-2">
-                  <Button type="default" onClick={() => setShowResetDbPass(false)}>
-                    Cancel
-                  </Button>
-                  <Button htmlType="submit" type="primary" loading={isSubmitting}>
-                    Update disk size
-                  </Button>
-                </div>
-              </Modal.Content>
-            </>
-          )}
+          {({ isSubmitting }: { isSubmitting: boolean }) =>
+            currentDiskSize >= maxDiskSize ? (
+              <>
+                <Alert
+                  withIcon
+                  variant="warning"
+                  title={'Maximum manual disk size increase reached'}
+                >
+                  You cannot manually expand the disk size any more than {maxDiskSize} GB. If you
+                  need more than this, contact us to learn more about the Enterprise plan.
+                </Alert>
+              </>
+            ) : (
+              <>
+                <Modal.Content>
+                  <div className="w-full space-y-8 py-8">
+                    <InputNumber
+                      id="new-disk-size"
+                      label="New disk size"
+                      labelOptional="GB"
+                      required
+                    />
+                  </div>
+                </Modal.Content>
+                <Modal.Separator />
+                <Modal.Content>
+                  <div className="flex space-x-2 justify-between pb-2">
+                    <Button type="default" onClick={() => setShowResetDbPass(false)}>
+                      Cancel
+                    </Button>
+                    <Button htmlType="submit" type="primary" loading={isSubmitting}>
+                      Update disk size
+                    </Button>
+                  </div>
+                </Modal.Content>
+              </>
+            )
+          }
         </Form>
       </Modal>
     </div>
