@@ -907,6 +907,10 @@ export const ai: NavMenuConstant = {
           name: 'LangChain',
           url: '/guides/ai/langchain',
         },
+        {
+          name: 'Hugging Face',
+          url: '/guides/ai/hugging-face',
+        },
       ],
     },
   ],
