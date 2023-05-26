@@ -1,0 +1,63 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  id: 'column-level-security',
+  title: 'Column Level Security',
+  description: 'Secure your data using Postgres Column Level Security.',
+}
+
+Sometimes you want to restrict access to specific columns in your database.
+For example, let's assume you have a `posts` table with the following columns:
+- `id`
+- `user_id`
+- `title`
+- `content`
+- `created_at`
+- `updated_at`
+
+It's fairly easy to restrict updates to the user who created it using [RLS](/docs/guides/auth#row-level-security), with the following policy:
+
+```sql
+create a policy "Allow update for owners"
+  on posts for update
+  using (auth.uid() = user_id);
+```
+
+However, this gives the post owner full access to update the row, including:
+- `id`
+- `user_id`
+- `created_at` and `updated_at` (which should be set automatically)
+
+To restrict access to these columns, you can use [Privileges](https://www.postgresql.org/docs/current/ddl-priv.html).
+
+There are two types of privileges in PostgreSQL:
+1. **table-level**: Grants the privilege on all columns in the table.
+2. **column-level** Grants the privilege on a specific column in the table.
+
+You can have both types of privileges on the same table. If you have both, and you revoke the column-level privilege, the table-level privilege will still be in effect.
+
+By default, our table will have a table-level `UPDATE` privilege, which means that the `authenticated` role can update all the columns in the table.
+
+```sql
+revoke update on table public.posts from authenticated;
+grant update (title, content) on table public.posts to authenticated;
+```
+
+In the above example, we are revoking the table-level `UPDATE` privilege from the `authenticated` role and granting a column-level `UPDATE` privilege on the `title` and `content` columns.
+
+Now, let's say we want to restrict access to updating the `title` column as well:
+
+```sql
+revoke update (title) on table public.posts from authenticated;
+```
+
+This time, we are revoking the column-level `UPDATE` privilege of the `title` column from the `authenticated` role. We didn't need to revoke the table-level `UPDATE` privilege because it's already revoked.
+
+
+## GUI
+Maintaining all the privileges without a tool would be a nightmare and error-prone.
+Luckily, you can view and edit the privileges in the [Supabase Studio](https://app.supabase.com/project/_/auth/privileges).
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page
