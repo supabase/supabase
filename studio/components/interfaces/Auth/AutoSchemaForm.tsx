@@ -177,7 +177,7 @@ const AutoSchemaForm = observer(() => {
                         id="SECURITY_CAPTCHA_SECRET"
                         type={hidden ? 'password' : 'text'}
                         size="small"
-                        label="hCaptcha secret"
+                        label="Captcha secret"
                         disabled={!canUpdateConfig}
                         actions={
                           <Button
