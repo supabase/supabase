@@ -866,7 +866,7 @@ export const ai: NavMenuConstant = {
     {
       name: 'Quickstarts',
       url: undefined,
-      items: [{ name: 'Vecs for Data Scientists', url: '/guides/ai/vecs-for-data-scientists' }],
+      items: [{ name: 'Python client', url: '/guides/ai/vecs-python-client' }],
     },
     {
       name: 'Guides',
@@ -882,12 +882,16 @@ export const ai: NavMenuConstant = {
       url: undefined,
       items: [
         {
-          name: 'Docs search with OpenAI',
-          url: '/guides/ai/examples/docs-search',
+          name: 'Headless Vector Search',
+          url: '/guides/ai/examples/headless-vector-search',
         },
         {
           name: 'Hugging Face inference with Edge Functions',
           url: '/guides/ai/hugging-face-inference-edge-functions',
+        },
+        {
+          name: 'Vector search with OpenAI and Next.js',
+          url: '/guides/ai/examples/nextjs-vector-search',
         },
       ],
     },

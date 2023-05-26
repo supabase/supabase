@@ -1,0 +1,24 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+import StepHikeCompact from '~/components/StepHikeCompact'
+
+export const meta = {
+  title: 'Headless Vector Search',
+  subtitle: 'A toolkit to perform vector similarity search on your knowledge base embeddings.',
+  breadcrumb: 'AI Examples',
+}
+
+Provides a vector/similarity search for any documentation site or knowledge base. It's headless, so that you can integrate it into your existing website.
+
+This toolkit consists of 2 parts:
+
+- The [Headless Vector Search](https://github.com/supabase/headless-vector-search) template which you can deploy in your own organization.
+- A [GitHub Action](https://github.com/supabase/embeddings-generator) which will ingest your markdown files, convert them to embeddings, and store them in your database.
+
+## Tech stack
+
+- Supabase: Database & Edge Functions.
+- OpenAI: Embeddings and completions.
+- GitHub Actions: for ingesting your markdown docs.
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+export default Page

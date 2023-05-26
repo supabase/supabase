@@ -7,9 +7,9 @@ export const meta = {
   sidebar_label: 'Structured and Unstructured embeddings',
 }
 
-Most vector stores treat embeddings like NoSQL, unstructured data. Supabase is flexible enough to fit either a structured or an unstructured approach. Compare these code snippets -
+Most vector stores treat embeddings like NoSQL, unstructured data. Supabase is flexible enough to fit either a structured or an unstructured approach. Compare these code snippets:
 
-Structured (SQL):
+**Structured (SQL)**
 
 ```sql
 create table (
@@ -20,7 +20,7 @@ create table (
 );
 ```
 
-Unstructured (Python):
+**Unstructured (Python)**
 
 ```py
 import vecs
@@ -28,11 +28,11 @@ import vecs
 docs = vx.create_collection(name="docs", dimension=1536)
 ```
 
-Both of these create a table where you can store your embeddings and some metadata.
-
 ## Choosing the right model
 
-- Structured embeddings are typically co-located with some content that's already stored in your database.
+Both approaches create a table where you can store your embeddings and some metadata. You should choose the best approach for your use-case.
+
+- Structured embeddings are typically co-located with some content that is already stored in your database.
 - Unstructured embeddings are typically defined at runtime, better-suited for a large body of external content.
 
 Both approaches are fine, and the one you should choose depends on your use-case.
