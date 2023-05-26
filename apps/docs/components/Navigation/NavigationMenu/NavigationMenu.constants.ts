@@ -747,8 +747,6 @@ export const functions: NavMenuConstant = {
       items: [
         { name: 'Dart Edge on Supabase', url: '/guides/functions/dart-edge' },
         { name: 'Browserless.io', url: '/guides/functions/examples/screenshots' },
-        { name: 'Hugging Face', url: '/guides/functions/examples/huggingface-image-captioning' },
-        { name: 'OpenAI API', url: '/guides/functions/examples/openai' },
         { name: 'Upstash Redis', url: '/guides/functions/examples/upstash-redis' },
         { name: 'Type-Safe SQL with Kysely', url: '/guides/functions/kysely-postgres' },
       ],
@@ -886,11 +884,11 @@ export const ai: NavMenuConstant = {
         },
         {
           name: 'Hugging Face inference with Edge Functions',
-          url: '/guides/functions/examples/huggingface-image-captioning',
+          url: '/guides/ai/examples/huggingface-image-captioning',
         },
         {
           name: 'OpenAI completions with Edge Functions',
-          url: '/guides/functions/examples/openai',
+          url: '/guides/ai/examples/openai',
         },
         {
           name: 'Vector search with OpenAI and Next.js',
