@@ -1971,4 +1971,14 @@ module.exports = [
     source: '/blog/how-supabase-accelerates-development-of-all-pull-together',
     destination: '/customers',
   },
+  {
+    permanent: true,
+    source: '/blog/how-supabase-accelerates-development-of-all-pull-together',
+    destination: '/customers',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-helpers/nextjs-server-components',
+    destination: '/docs/guides/auth/auth-helpers/nextjs',
+  },
 ]

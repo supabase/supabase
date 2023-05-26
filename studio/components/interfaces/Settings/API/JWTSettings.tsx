@@ -132,7 +132,7 @@ const JWTSettings: FC<Props> = ({}) => {
                 layout="horizontal"
               />
               <div className="space-y-3">
-                <div className="p-3 px-6 border rounded-md shadow-sm bg-bg-alt-light dark:border-dark dark:bg-bg-alt-dark">
+                <div className="p-3 px-6 border rounded-md shadow-sm bg-scale-200 dark:border-dark dark:bg-scale-200">
                   {isUpdatingJwtSecret ? (
                     <div className="flex items-center space-x-2">
                       <IconLoader className="animate-spin" size={14} />
