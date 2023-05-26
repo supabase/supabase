@@ -8,11 +8,9 @@ export const meta = {
   sidebar_label: 'Engineering for Scale',
 }
 
-Because content sources for vectors can be extremely large, as you grow you should run your Vector workloads across several independent databases (sometimes called "pods"). This allows each collection to scale independently.
+Content sources for vectors can be extremely large. As you grow you should run your Vector workloads across several secondary databases (sometimes called "pods"), which allows each collection to scale independently.
 
-- [ ] TODO: PMC - add diagram
-
-## Small workloads
+## Simple workloads
 
 For small workloads it's typical to store your data in a single database. You can expose collections to your application with [views](/docs/guides/database/tables#views):
 
