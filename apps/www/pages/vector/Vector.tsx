@@ -15,6 +15,8 @@ import HighlightCards from '~/components/Sections/HighlightCards'
 import { pageData } from '~/data/products/vector/page'
 
 import 'swiper/swiper.min.css'
+import UseCasesSection from '../../components/Sections/UseCasesSection'
+import CenteredTitleImage from '../../components/Sections/CenteredTitleImage'
 
 const Cursor = ({ className = '', color = 'none' }) => {
   return (
@@ -140,68 +142,11 @@ function VectorPage() {
 
         <HighlightCards highlights={pageData.highlights} />
 
-        <SectionContainer>
-          <div className="grid grid-cols-12">
-            <div className="prose col-span-12 mb-10 lg:col-span-3 lg:mb-0">
-              <div className="p mb-4">
-                <img
-                  src="/images/vector/icons/database-changes.svg"
-                  alt="realtime broadcast"
-                  className="-mb-4 w-9"
-                />
-              </div>
-              <h3>Database changes</h3>
-              <p>
-                Listen to changes in the Database inserts, updates, and deletes and other changes.
-              </p>
-              <div className="not-prose mt-3">
-                <Link passHref href="/docs/guides/vector/postgres-changes">
-                  <a>
-                    <Button type="default">View docs</Button>
-                  </a>
-                </Link>
-              </div>
-            </div>
-            <div className="prose col-span-12 mb-10 lg:col-span-3 lg:col-start-5 lg:mb-0">
-              <div className="p mb-4">
-                <img
-                  src="/images/vector/icons/presence.svg"
-                  alt="realtime broadcast"
-                  className="-mb-4 w-9"
-                />
-              </div>
-              <h3>Presence</h3>
-              <p>Store and synchronize online user state consistently across clients.</p>
-              <div className="not-prose mt-3">
-                <Link passHref href="/docs/guides/vector/presence">
-                  <a>
-                    <Button type="default">View docs</Button>
-                  </a>
-                </Link>
-              </div>
-            </div>
-            <div className="prose col-span-12 lg:col-span-3 lg:col-start-9">
-              <div className="p mb-4">
-                <img
-                  src="/images/vector/icons/broadcast.svg"
-                  alt="realtime broadcast"
-                  className="-mb-4 w-9"
-                />
-              </div>
-              <h3>Broadcast</h3>
-              <p>Send any data to any client subscribed to the same Channel.</p>
-              <div className="not-prose mt-3">
-                <Link passHref href="/docs/guides/vector/broadcast">
-                  <a>
-                    <Button type="default">View docs</Button>
-                  </a>
-                </Link>
-              </div>
-            </div>
-          </div>
-        </SectionContainer>
+        <CenteredTitleImage {...pageData.integrations} />
 
-        <FeaturesSection />
+        <UseCasesSection {...pageData.useCasesSection} />
+
+        <FeaturesSection {...pageData.featuresSection} />
 
         <CommunitySlider />
 
