@@ -6,6 +6,28 @@ export const pageData = {
       component: '',
     },
   ],
+  highlights: [
+    {
+      title: 'Postgres pgvector',
+      paragraph: 'Unleash the power of vector embeddings with Postgres pgvector.',
+      image: 'asdfadsf',
+    },
+    {
+      title: 'Connect with OpenAI',
+      paragraph: 'Seamlessly integrate with Open AI for advanced AI capabilities.',
+      image: 'asdfadsf',
+    },
+    {
+      title: 'SOC 2 Type 2 compliant',
+      paragraph: 'asdfadsf',
+      image: 'asdfadsf',
+    },
+    {
+      title: 'Hosted or Self-Hosted',
+      paragraph: 'Choose the deployment option that suits your needs.',
+      image: 'asdfadsf',
+    },
+  ],
   features: [
     {
       icon: 'M2.22628 8.76631C2.07453 6.92839 2.70175 5.03824 4.10791 3.63208C6.64632 1.09367 10.7619 1.09367 13.3003 3.63208C15.8387 6.17049 15.8387 10.2861 13.3003 12.8245C10.7619 15.3629 6.64632 15.3629 4.10791 12.8245C3.50852 12.2251 3.05066 11.5377 2.73434 10.804M0.516543 7.55176L2.23116 9.26638L3.94578 7.55176M5.95088 4.97787L11.3675 4.97787L11.3675 7.1379L5.95088 7.1379L5.95088 4.97787ZM6.2096 7.13777L11.0825 7.13777L11.0825 9.2978L6.2096 9.2978L6.2096 7.13777ZM5.95114 9.29726L11.3678 9.29726L11.3678 11.4573H5.95114V9.29726Z',

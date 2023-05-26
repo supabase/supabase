@@ -11,6 +11,8 @@ import APISection from '~/components/Sections/APISection'
 import ProductHeaderCentered from '~/components/Sections/ProductHeaderCentered'
 import VectorStyles from './vector.module.css'
 import FeaturesSection from '~/components/Sections/FeaturesSection'
+import HighlightCards from '~/components/Sections/HighlightCards'
+import { pageData } from '~/data/products/vector/page'
 
 import 'swiper/swiper.min.css'
 
@@ -136,6 +138,8 @@ function VectorPage() {
           documentation_url={'/docs/guides/vector/broadcast'}
         />
 
+        <HighlightCards highlights={pageData.highlights} />
+
         <SectionContainer>
           <div className="grid grid-cols-12">
             <div className="prose col-span-12 mb-10 lg:col-span-3 lg:mb-0">
@@ -199,24 +203,6 @@ function VectorPage() {
 
         <FeaturesSection />
 
-        {/* <SectionContainer>
-          <APISection
-            title="Simple and convenient APIs"
-            // @ts-ignore
-            content={ApiExamples}
-            size="large"
-            text={[
-              <p key={0}>
-                <p className="text-base lg:text-lg">
-                  APIs that you can understand. With powerful libraries that work on client and
-                  server-side applications.
-                </p>
-              </p>,
-            ]}
-            // [TODO] Point to the correct docs URL
-            documentation_link={'/docs/guides/vector/broadcast'}
-          />
-        </SectionContainer> */}
         <CommunitySlider />
 
         <CTABanner />
