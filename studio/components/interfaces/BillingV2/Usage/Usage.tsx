@@ -13,13 +13,14 @@ import SizeAndCounts from './SizeAndCounts'
 import { USAGE_CATEGORIES, USAGE_STATUS } from './Usage.constants'
 import { getUsageStatus } from './Usage.utils'
 import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
+import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 
 const Usage = () => {
   const { ref } = useParams()
 
   // [Joshen] Using a state here for now as in the future, we'd have this usage page support showing
   // stats for different projects. So we'll pass the selected ref as a prop into the individual components
-  const [selectedProjectRef, setSelectedProjectRef] = useState<string>(ref as string)
+  const [selectedProjectRef] = useState<string>(ref as string)
 
   const infrastructureRef = useRef<HTMLDivElement>(null)
   const bandwidthRef = useRef<HTMLDivElement>(null)
@@ -53,6 +54,10 @@ const Usage = () => {
 
   const billingCycleStart = dayjs.unix(subscription?.billing?.current_period_start ?? 0).utc()
   const billingCycleEnd = dayjs.unix(subscription?.billing?.current_period_end ?? 0).utc()
+
+  const subscriptionTierId = subscription?.tier?.supabase_prod_id
+  const usageBillingEnabled =
+    subscriptionTierId === PRICING_TIER_PRODUCT_IDS.FREE || PRICING_TIER_PRODUCT_IDS.PRO
 
   const scrollTo = (id: 'infra' | 'bandwidth' | 'sizeCount' | 'activity') => {
     switch (id) {
@@ -104,7 +109,8 @@ const Usage = () => {
                     Project is on {subscription.tier.name}
                   </p>
                   <p className="text-sm text-scale-1000">
-                    {billingCycleStart.format('DD MMM YY')} - {billingCycleEnd.format('DD MMM YY')}
+                    {billingCycleStart.format('DD MMM YYYY')} -{' '}
+                    {billingCycleEnd.format('DD MMM YYYY')}
                   </p>
                 </div>
               ) : null}
@@ -140,7 +146,7 @@ const Usage = () => {
                   onClick={() => scrollTo(category.key)}
                   className="flex items-center opacity-50 space-x-2 py-3 hover:opacity-100 transition cursor-pointer"
                 >
-                  {status === USAGE_STATUS.NORMAL ? (
+                  {status === USAGE_STATUS.NORMAL || usageBillingEnabled ? (
                     <IconCheckCircle size={15} strokeWidth={2} className="text-scale-1100" />
                   ) : status === USAGE_STATUS.APPROACHING ? (
                     <IconAlertCircle size={15} strokeWidth={2} className="text-amber-900" />
@@ -155,8 +161,8 @@ const Usage = () => {
         </div>
       </div>
 
-      {/* 
-        [Joshen] Could potentially run a map here based on USAGE_CATEGORIES, rather than defining each section 
+      {/*
+        [Joshen] Could potentially run a map here based on USAGE_CATEGORIES, rather than defining each section
         but thinking it's gonna "cover up" too much details and make it harder to add attribute specific components
         e.g for database size, we also need to show disk volume size. Not to mention that are little nuances across
         each attribute RE formatting (bytes vs locale string)

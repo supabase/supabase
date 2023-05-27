@@ -17,7 +17,7 @@ import { Button, IconAlertTriangle } from 'ui'
 import SectionContent from './SectionContent'
 import SectionHeader from './SectionHeader'
 import { USAGE_CATEGORIES } from './Usage.constants'
-import { getUpgradeUrl } from './Usage.utils'
+import { ChartYFormatterCompactNumber, getUpgradeUrl } from './Usage.utils'
 import UsageBarChart from './UsageBarChart'
 
 export interface BandwidthProps {
@@ -32,14 +32,21 @@ const Bandwidth = ({ projectRef }: BandwidthProps) => {
     current_period_start !== undefined
       ? new Date(current_period_start * 1000).toISOString()
       : undefined
-  const endDate =
+  let endDate =
     current_period_end !== undefined ? new Date(current_period_end * 1000).toISOString() : undefined
+  // If end date is in future, set end date to now
+  if (endDate && dayjs(endDate).isAfter(dayjs())) {
+    // LF seems to have an issue with the milliseconds, causes infinite loading sometimes
+    endDate = new Date().toISOString().slice(0, -5) + 'Z'
+  }
+
   const categoryMeta = USAGE_CATEGORIES.find((category) => category.key === 'bandwidth')
 
   const upgradeUrl = getUpgradeUrl(projectRef, subscription)
   const isFreeTier = subscription?.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.FREE
   const isProTier = subscription?.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.PRO
-  const exceededLimitStyle = isFreeTier || isProTier ? 'text-red-900' : 'text-amber-900'
+  const usageBasedBilling = !isFreeTier && !isProTier
+  const exceededLimitStyle = !usageBasedBilling ? 'text-red-900' : 'text-amber-900'
 
   const { data: dbEgressData, isLoading: isLoadingDbEgressData } = useDailyStatsQuery({
     projectRef,
@@ -88,25 +95,14 @@ const Bandwidth = ({ projectRef }: BandwidthProps) => {
 
         const chartData = chartMeta[attribute.key]?.data ?? []
 
-        // [Joshen] Ideally this should come from the API imo, foresee some discrepancies
-        const lastZeroValue = chartData.find(
-          (x: any) => x.loopId > 0 && x[attribute.attribute] === 0
-        )
-        const lastKnownValue =
-          lastZeroValue !== undefined && !chartMeta[attribute.key]?.hasNoData
-            ? dayjs(lastZeroValue.period_start)
-                .subtract(1, 'day')
-                .format('DD MMM YYYY, HH:mma (ZZ)')
-            : undefined
-
         return (
           <div id={attribute.anchor} key={attribute.key}>
-            <SectionContent section={attribute} lastKnownValue={lastKnownValue}>
+            <SectionContent section={attribute}>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
                     <p className="text-sm">{attribute.name} quota usage</p>
-                    {usageRatio >= 1 ? (
+                    {!usageBasedBilling && usageRatio >= 1 ? (
                       <div className="flex items-center space-x-2 min-w-[115px]">
                         <IconAlertTriangle
                           size={14}
@@ -115,14 +111,14 @@ const Bandwidth = ({ projectRef }: BandwidthProps) => {
                         />
                         <p className={`text-sm ${exceededLimitStyle}`}>Exceeded limit</p>
                       </div>
-                    ) : usageRatio >= USAGE_APPROACHING_THRESHOLD ? (
+                    ) : !usageBasedBilling && usageRatio >= USAGE_APPROACHING_THRESHOLD ? (
                       <div className="flex items-center space-x-2 min-w-[115px]">
                         <IconAlertTriangle size={14} strokeWidth={2} className="text-amber-900" />
                         <p className="text-sm text-amber-900">Approaching limit</p>
                       </div>
                     ) : null}
                   </div>
-                  {isFreeTier && (
+                  {!usageBasedBilling && usageRatio >= USAGE_APPROACHING_THRESHOLD && (
                     <Link href={upgradeUrl}>
                       <a>
                         <Button type="default" size="tiny">
@@ -137,13 +133,15 @@ const Bandwidth = ({ projectRef }: BandwidthProps) => {
                     type="horizontal"
                     barClass={clsx(
                       usageRatio >= 1
-                        ? 'bg-red-900'
+                        ? usageBasedBilling
+                          ? 'bg-amber-900'
+                          : 'bg-red-900'
                         : usageRatio >= USAGE_APPROACHING_THRESHOLD
                         ? 'bg-amber-900'
                         : 'bg-scale-1100'
                     )}
                     value={usageMeta?.usage ?? 0}
-                    max={usageMeta?.limit ?? 0}
+                    max={usageMeta?.limit || 1}
                   />
                 )}
                 <div>
@@ -192,7 +190,7 @@ const Bandwidth = ({ projectRef }: BandwidthProps) => {
                   data={chartData}
                   yLimit={usageMeta?.limit ?? 0}
                   yLeftMargin={chartMeta[attribute.key].margin}
-                  yFormatter={(value) => formatBytes(value, 1, 'GB').replace(/\s/g, '')}
+                  yFormatter={value => ChartYFormatterCompactNumber(value, attribute.unit)}
                   quotaWarningType={isFreeTier || isProTier ? 'danger' : 'warning'}
                 />
               )}
