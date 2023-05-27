@@ -60,7 +60,7 @@ functions:
 
           `autoLoadFromStorage` - whether the GoTrue plugin should automatically load the session from the session manager. Default: `true`
 
-	    `autoSaveToStorage` - whether the GoTrue plugin should automatically save the session to the session manager. Default: `true`	
+          `autoSaveToStorage` - whether the GoTrue plugin should automatically save the session to the session manager. Default: `true`	
 
           `flowType` - Which authentication flow to use. Currently available: FlowType.PKCE and FlowType.IMPLICIT. Default: `FlowType.IMPLICIT`
 
