@@ -11,7 +11,6 @@ export * from './src/lib/Markdown'
 // // GENERAL
 
 export * from './src/components/Button'
-export * from './src/components/Icon'
 export * from './src/components/Icon/IconContext'
 export * from './src/components/GlassPanel'
 export * from './src/components/IconPanel'
