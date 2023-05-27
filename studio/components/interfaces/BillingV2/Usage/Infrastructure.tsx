@@ -11,6 +11,7 @@ import SectionHeader from './SectionHeader'
 import { COMPUTE_INSTANCE_SPECS, USAGE_CATEGORIES } from './Usage.constants'
 import { getUpgradeUrl } from './Usage.utils'
 import UsageBarChart from './UsageBarChart'
+import Panel from 'components/ui/Panel'
 
 export interface InfrastructureProps {
   projectRef: string
@@ -25,8 +26,15 @@ const Infrastructure = ({ projectRef }: InfrastructureProps) => {
     current_period_start !== undefined
       ? new Date(current_period_start * 1000).toISOString()
       : undefined
-  const endDate =
+  let endDate =
     current_period_end !== undefined ? new Date(current_period_end * 1000).toISOString() : undefined
+
+  // If end date is in future, set end date to now
+  if (endDate && dayjs(endDate).isAfter(dayjs())) {
+    // LF seems to have an issue with the milliseconds, causes infinite loading sometimes
+    endDate = new Date().toISOString().slice(0, -5) + 'Z'
+  }
+
   const categoryMeta = USAGE_CATEGORIES.find((category) => category.key === 'infra')
 
   const upgradeUrl = getUpgradeUrl(projectRef, subscription)
@@ -37,28 +45,43 @@ const Infrastructure = ({ projectRef }: InfrastructureProps) => {
   const currentComputeInstanceSpecs =
     COMPUTE_INSTANCE_SPECS[currentComputeInstance?.supabase_prod_id ?? 'addon_instance_micro']
 
+  // Switch to hourly interval, if the timeframe is <48 hours
+  let interval: '1d' | '1h' = '1d'
+  let dateFormat = 'DD MMM'
+  if (startDate && endDate) {
+    const diffInHours = dayjs(endDate).diff(startDate, 'hours')
+
+    if (diffInHours <= 48) {
+      interval = '1h'
+      dateFormat = 'HH a'
+    }
+  }
+
   const { data: cpuUsageData, isLoading: isLoadingCpuUsageData } = useInfraMonitoringQuery({
     projectRef,
     attribute: 'cpu_usage',
-    interval: '1d',
+    interval,
     startDate,
     endDate,
+    dateFormat,
   })
 
   const { data: memoryUsageData, isLoading: isLoadingMemoryUsageData } = useInfraMonitoringQuery({
     projectRef,
     attribute: 'ram_usage',
-    interval: '1d',
+    interval,
     startDate,
     endDate,
+    dateFormat,
   })
 
   const { data: ioBudgetData, isLoading: isLoadingIoBudgetData } = useInfraMonitoringQuery({
     projectRef,
     attribute: 'disk_io_budget',
-    interval: '1d',
+    interval,
     startDate,
     endDate,
+    dateFormat,
   })
 
   const currentDayIoBudget = Number(
@@ -90,20 +113,9 @@ const Infrastructure = ({ projectRef }: InfrastructureProps) => {
       {categoryMeta.attributes.map((attribute) => {
         const chartData = chartMeta[attribute.key]?.data ?? []
 
-        // [Joshen] Ideally this should come from the API imo, foresee some discrepancies
-        const lastZeroValue = chartData.find(
-          (x: any) => x.loopId > 0 && x[attribute.attribute] === 0
-        )
-        const lastKnownValue =
-          lastZeroValue !== undefined
-            ? dayjs(lastZeroValue.period_start)
-                .subtract(1, 'day')
-                .format('DD MMM YYYY, HH:mma (ZZ)')
-            : undefined
-
         return (
           <div id={attribute.anchor} key={attribute.key}>
-            <SectionContent section={attribute} lastKnownValue={lastKnownValue}>
+            <SectionContent section={attribute}>
               {attribute.key === 'disk_io_budget' && (
                 <>
                   {currentDayIoBudget <= 0 ? (
@@ -172,17 +184,27 @@ const Infrastructure = ({ projectRef }: InfrastructureProps) => {
                 </>
               )}
               <div className="space-y-1">
-                {attribute.key === 'disk_io_budget' ? (
-                  <p>IO Budget remaining each day</p>
-                ) : (
-                  <p>
-                    Max{' '}
-                    <span className={attribute.key === 'ram_usage' ? 'lowercase' : ''}>
-                      {attribute.name}
-                    </span>{' '}
-                    usage each day
-                  </p>
-                )}
+                <div className="flex flex-row justify-between">
+                  {attribute.key === 'disk_io_budget' ? (
+                    <p>IO Budget remaining</p>
+                  ) : (
+                    <p>
+                      Max{' '}
+                      <span className={attribute.key === 'ram_usage' ? 'lowercase' : ''}>
+                        {attribute.name}
+                      </span>{' '}
+                      usage
+                    </p>
+                  )}
+                  <Link href={`/project/${projectRef}/settings/billing/subscription`}>
+                    <a>
+                      <Button type="default" size="tiny">
+                        Upgrade compute
+                      </Button>
+                    </a>
+                  </Link>
+                </div>
+
                 {attribute.chartDescription.split('\n').map((paragraph, idx) => (
                   <p key={`para-${idx}`} className="text-sm text-scale-1000">
                     {paragraph}
@@ -195,7 +217,7 @@ const Infrastructure = ({ projectRef }: InfrastructureProps) => {
                   <ShimmeringLoader className="w-3/4" />
                   <ShimmeringLoader className="w-1/2" />
                 </div>
-              ) : (
+              ) : chartData.length ? (
                 <UsageBarChart
                   name={attribute.name}
                   unit={attribute.unit}
@@ -204,6 +226,17 @@ const Infrastructure = ({ projectRef }: InfrastructureProps) => {
                   yFormatter={(value) => `${value}%`}
                   yLimit={100}
                 />
+              ) : (
+                <Panel>
+                  <Panel.Content>
+                    <div className="flex flex-col items-center justify-center space-y-2">
+                      <p>No data</p>
+                      <p className="text-sm text-scale-1000">
+                        There is no data in the timeframe available
+                      </p>
+                    </div>
+                  </Panel.Content>
+                </Panel>
               )}
             </SectionContent>
           </div>
