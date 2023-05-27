@@ -330,7 +330,7 @@ const Nav = () => {
                   <>
                     <Button
                       as="a"
-                      href="https://app.supabase.com/"
+                      href="https://supabase.com/dashboard"
                       type="default"
                       className="hidden lg:block"
                     >
@@ -338,7 +338,7 @@ const Nav = () => {
                     </Button>
                     <Button
                       as="a"
-                      href="https://app.supabase.com/"
+                      href="https://supabase.com/dashboard"
                       className="hidden text-white lg:block"
                     >
                       Start your project
@@ -395,7 +395,7 @@ const Nav = () => {
               {/* </div> */}
               <div className="mt-6 mb-12">
                 <div className="pt-2 pb-4 space-y-1">
-                  <Link href="https://app.supabase.com/">
+                  <Link href="https://supabase.com/dashboard">
                     <a className="block pl-3 pr-4 text-base font-medium text-scale-900 dark:text-white">
                       Sign in
                     </a>

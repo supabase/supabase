@@ -18,12 +18,6 @@ If you have an inexperienced member on your team, then you probably shouldn’t 
 
 You are also responsible for ensuring that tables with sensitive data have the right level of access. You are also responsible for managing your database secrets and API keys, storing them safely in an encrypted store.
 
-## You can crash your database
-
-”Crash” is used liberally here. It refers to any situation where your application is unable to work as desired because of DB issues. It could be because the DB is unable to support the number of connections being attempted, or because its performance is unacceptably low because of CPU or memory constraints.
-
-You are responsible of provisioning enough compute to run the workload that your application requires. The Supabase Dashboard provides [observability tooling](https://app.supabase.com/project/_/reports/database) to help with this. You are also responsible for employing methods to manage the workload: adding indexes, adding filters on large queries, caching strategies, materialized views, and optimizing your database queries.
-
 ## You decide your own workflow
 
 There are _many_ ways to work with Supabase.
@@ -43,6 +37,14 @@ If you don’t want to implement logic inside your database, that is 100% fine. 
 ## You choose your level of comfort with Postgres
 
 Our goal at Supabase is to make _all_ of Postgres easy to use. That doesn’t mean you have to use all of it. If you’re a Postgres veteran, you’ll probably love the tools that we offer. If you’ve never used Postgres before, then start smaller and grow into it. If you just want to treat Postgres like a simple table-store, that’s perfectly fine.
+
+## You are in control of your database
+
+Supabase places very few guard-rails around your database. That gives you a lot of control, but it also means you can break things. ”Break” is used liberally here. It refers to any situation that affects your application because of the way you're using the database.
+
+You are responsible for using best-practices to optimize and manage your database: adding indexes, adding filters on large queries, using caching strategies, optimizing your database queries, and managing connections to the database.
+
+You are responsible of provisioning enough compute to run the workload that your application requires. The Supabase Dashboard provides [observability tooling](https://app.supabase.com/project/_/reports/database) to help with this.
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

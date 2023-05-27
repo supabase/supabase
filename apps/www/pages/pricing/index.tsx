@@ -56,7 +56,7 @@ export default function IndexPage() {
       name: 'Free',
       nameBadge: '',
       costUnit: 'per month per project',
-      href: 'https://app.supabase.com/new/new-project',
+      href: 'https://supabase.com/dashboard/new/new-project',
       priceLabel: 'Starting from',
       priceMonthly: 0,
       warning: 'Limit of 2 free projects',
@@ -82,7 +82,7 @@ export default function IndexPage() {
       name: 'Pro',
       nameBadge: '',
       costUnit: 'per month per project',
-      href: 'https://app.supabase.com/new/new-project',
+      href: 'https://supabase.com/dashboard/new/new-project',
       from: true,
       priceLabel: 'Starting from',
       warning: '+ usage',
@@ -201,7 +201,7 @@ export default function IndexPage() {
           <p className="p">{priceDescription}</p>
         </div>
         <p className="p">{description}</p>
-        <Link href="https://app.supabase.com" passHref>
+        <Link href="https://supabase.com/dashboard" passHref>
           <a>
             <Button size="medium" block>
               Get started
@@ -849,7 +849,10 @@ export default function IndexPage() {
                     </th>
 
                     <td className="px-6 pt-5">
-                      <Link href="https://app.supabase.com" as="https://app.supabase.com">
+                      <Link
+                        href="https://supabase.com/dashboard"
+                        as="https://supabase.com/dashboard"
+                      >
                         <a>
                           <Button size="tiny" type="primary" block>
                             Get started
@@ -859,7 +862,10 @@ export default function IndexPage() {
                     </td>
 
                     <td className="px-6 pt-5">
-                      <Link href="https://app.supabase.com" as="https://app.supabase.com">
+                      <Link
+                        href="https://supabase.com/dashboard"
+                        as="https://supabase.com/dashboard"
+                      >
                         <a>
                           <Button size="tiny" type="primary" block>
                             Get started
@@ -916,7 +922,7 @@ export default function IndexPage() {
                 Can&apos;t find the answer to your question, you can{' '}
                 <a
                   target="_blank"
-                  href="https://app.supabase.com/support/new"
+                  href="https://supabase.com/dashboard/support/new"
                   className="transition text-brand-900 hover:text-brand-1000"
                 >
                   open a support ticket
@@ -927,7 +933,7 @@ export default function IndexPage() {
                 For enterprise enquries,{' '}
                 <a
                   target="_blank"
-                  href="https://app.supabase.com/support/new"
+                  href="https://supabase.com/dashboard/support/new"
                   className="transition text-brand-900 hover:text-brand-1000"
                 >
                   you can contact the team here

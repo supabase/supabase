@@ -128,7 +128,7 @@ const TopNavBar: FC = () => {
           <Button
             type="outline"
             as="a"
-            href="https://app.supabase.com"
+            href="https://supabase.com/dashboard"
             className="text-scale-1100 text-sm"
             target="_blank"
             rel="noreferrer noopener"

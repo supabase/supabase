@@ -43,7 +43,7 @@ const ProductHeader = (props: Types) => (
             })}
         </div>
         <div className="flex flex-row md:flex-row md:items-center">
-          <Link href="https://app.supabase.com/" as="https://app.supabase.com/">
+          <Link href="https://supabase.com/dashboard" as="https://supabase.com/dashboard">
             <a>
               <Button size="medium" className="text-white">
                 Start a project

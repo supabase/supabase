@@ -117,7 +117,7 @@ const TopNavBarRef: FC = () => {
           <Button
             type="text"
             as="a"
-            href="https://app.supabase.com"
+            href="https://supabase.com/dashboard"
             target="_blank"
             rel="noreferrer noopener"
           >
