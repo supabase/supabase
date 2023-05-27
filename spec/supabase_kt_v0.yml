@@ -3282,6 +3282,19 @@ functions:
           //...
           channel.leave()
           ```
+  - id: remove-all-channels
+    title: removeAllChannels()
+    $ref: '@supabase/supabase-js.index.SupabaseClient.removeAllChannels'
+    notes: |
+      - Removing channels is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes. Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
+    examples:
+      - id: remove-all-channels
+        name: Remove all channels
+        isSpotlight: true
+        code: |
+          ```js
+          client.realtime.removeAllChannels()
+          ```
   - id: list-buckets
     title: listBuckets()
     $ref: '@supabase/storage-js.packages/StorageBucketApi.default.listBuckets'
@@ -3531,7 +3544,22 @@ functions:
           val bucket = client.storage["avatars"]
           bucket.move("icon1.png", "icon2.png")
           ```
-
+  - id: from-copy
+    title: from.copy()
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.copy'
+    notes: |
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `insert` and `select`
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+    examples:
+      - id: copy-file
+        name: Copy file
+        isSpotlight: true
+        code: |
+          ```kotlin
+          client.storage["test"].copy(from = "avatar.png", to = "avatar2.png")
+          ```
   - id: from-create-signed-url
     title: from.createSignedUrl()
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.createSignedUrl'
