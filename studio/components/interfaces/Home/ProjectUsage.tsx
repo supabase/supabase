@@ -210,7 +210,7 @@ const PanelHeader = (props: any) => {
           (props.href ? 'cursor-pointer hover:text-gray-1200 hover:opacity-100' : '')
         }
       >
-        <p>{props.icon}</p>
+        <div>{props.icon}</div>
         <span className="flex items-center space-x-1">
           <h4 className="mb-0 text-lg">{props.title}</h4>
         </span>
