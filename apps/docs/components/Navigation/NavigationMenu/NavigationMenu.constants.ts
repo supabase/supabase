@@ -894,6 +894,10 @@ export const ai: NavMenuConstant = {
           url: '/guides/ai/examples/openai',
         },
         {
+          name: 'Building ChatGPT Plugins',
+          url: '/guides/ai/examples/building-chatgpt-plugins',
+        },
+        {
           name: 'ChatGPT for your own knowledge base',
           url: '/guides/ai/examples/nextjs-vector-search',
         },
