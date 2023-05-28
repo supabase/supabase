@@ -13,6 +13,15 @@ Supabase provides a number of tools to get started with Vectors and Embeddings. 
 - An embedding store using the popular [pgvector](https://github.com/pgvector/pgvector/)
 - A Python Library for managing unstructured collections called [Vecs](https://supabase.github.io/vecs/api)
 
+## Features
+
+Supabase provides a full toolkit for developing AI applications.
+
+- A vector store and embeddings support using pgvector.
+- A Python client for managing unstructured embeddings.
+- Database migrations for managing structured embeddings.
+- Integrations with all popular AI providers, such as OpenAI, Hugging Face, LangChain, and more.
+
 ## Examples
 
 Check out all of the AI [templates and examples](https://github.com/supabase/supabase/tree/master/examples/ai) in our GitHub repository.
@@ -33,12 +42,6 @@ Check out all of the AI [templates and examples](https://github.com/supabase/sup
 
 export const examples = [
   {
-    name: 'ChatGPT for your own knowledge base',
-    description:
-      'Learn how to build a ChatGPT-style doc search powered by Next.js, OpenAI, and Supabase.',
-    href: '/guides/ai/examples/nextjs-vector-search',
-  },
-  {
     name: 'Headless Vector Search',
     description: 'A toolkit to perform vector similarity search on your knowledge base embeddings.',
     href: '/guides/ai/examples/headless-vector-search',
@@ -53,6 +56,35 @@ export const examples = [
     description:
       'Use the Hugging Face Inference API to make calls to 100,000+ Machine Learning models from Supabase Edge Functions.',
     href: '/guides/ai/examples/huggingface-image-captioning',
+  },
+]
+
+## Case studies
+
+<div className="grid md:grid-cols-12 gap-4 not-prose">
+  {customers.map((x) => (
+    <div className="col-span-4" key={x.href}>
+      <Link href={x.href} passHref>
+        <a>
+          <GlassPanel title={x.name}>{x.description}</GlassPanel>
+        </a>
+      </Link>
+    </div>
+  ))}
+</div>
+
+export const customers = [
+  {
+    name: 'Mendable switches from Pinecone to Supabase for PostgreSQL vector embeddings',
+    description:
+      'How Mendable boosts efficiency and accuracy of chat powered search for documentation using Supabase with pgvector',
+    href: 'https://supabase.com/customers/mendableai',
+  },
+  {
+    name: 'Markprompt: GDPR-Compliant AI Chatbots for Docs and Websites',
+    description:
+      "AI-powered chatbot platform, Markprompt, empowers developers to deliver efficient and GDPR-compliant prompt experiences on top of their content, by leveraging Supabase's secure and privacy-focused database and authentication solutions",
+    href: 'https://supabase.com/customers/markprompt',
   },
 ]
 
