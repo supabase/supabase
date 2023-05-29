@@ -861,7 +861,10 @@ export const ai: NavMenuConstant = {
   items: [
     { name: 'Overview', url: '/guides/ai' },
     { name: 'Concepts', url: '/guides/ai/concepts' },
-    { name: 'Structured & Unstructured', url: '/guides/ai/structured-unstructured-embeddings' },
+    {
+      name: 'Structured & unstructured embeddings',
+      url: '/guides/ai/structured-unstructured-embeddings',
+    },
     {
       name: 'Quickstarts',
       url: undefined,
@@ -882,11 +885,11 @@ export const ai: NavMenuConstant = {
       url: undefined,
       items: [
         {
-          name: 'Headless Vector Search',
-          url: '/guides/ai/examples/headless-vector-search',
+          name: 'OpenAI completions using Edge Functions',
+          url: '/guides/ai/examples/openai',
         },
         {
-          name: 'Image Search with OpenAI CLIP',
+          name: 'Image search with OpenAI CLIP',
           url: '/guides/ai/examples/image-search-openai-clip',
         },
         {
@@ -894,15 +897,15 @@ export const ai: NavMenuConstant = {
           url: '/guides/ai/examples/huggingface-image-captioning',
         },
         {
-          name: 'OpenAI completions using Edge Functions',
-          url: '/guides/ai/examples/openai',
-        },
-        {
           name: 'Building ChatGPT Plugins',
           url: '/guides/ai/examples/building-chatgpt-plugins',
         },
         {
-          name: 'Vector search with Next.js and OpenAI',
+          name: 'Adding generative Q&A to your documentation',
+          url: '/guides/ai/examples/headless-vector-search',
+        },
+        {
+          name: 'Adding generative Q&A to your Next.js site',
           url: '/guides/ai/examples/nextjs-vector-search',
         },
       ],

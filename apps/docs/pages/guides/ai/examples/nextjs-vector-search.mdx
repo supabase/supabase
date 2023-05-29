@@ -10,7 +10,7 @@ export const meta = {
   tocVideo: 'xmfNUCjszh4',
 }
 
-In this tutorial we'll build a custom ChatGPT-like search experience for your own knowledge base using Next.js. You will:
+While our [Headless Vector search](/docs/guides/ai/examples/headless-vector-search) provides a toolkit for generative Q&A, in this tutorial we'll go more in-depth, build a custom ChatGPT-like search experience from the ground-up using Next.js. You will:
 
 1. Convert your markdown into embeddings using OpenAI.
 2. Store you embeddings in Postgres using pgvector.
@@ -18,13 +18,7 @@ In this tutorial we'll build a custom ChatGPT-like search experience for your ow
 
 You can read our [Supabase Clippy](https://supabase.com/blog/chatgpt-supabase-docs) blog post for a full example.
 
-We assume that you have a Next.js project with a collection of `.mdx` files nested inside your `pages` directory. We will start developing locally with the Supabase CLI and then push our local database changes to our hosted Supabase project.
-
-<Admonition type="note">
-
-You can find the [full Next.js example on GitHub](https://github.com/supabase-community/nextjs-openai-doc-search).
-
-</Admonition>
+We assume that you have a Next.js project with a collection of `.mdx` files nested inside your `pages` directory. We will start developing locally with the Supabase CLI and then push our local database changes to our hosted Supabase project. You can find the [full Next.js example on GitHub](https://github.com/supabase-community/nextjs-openai-doc-search).
 
 ## Create a project
 
