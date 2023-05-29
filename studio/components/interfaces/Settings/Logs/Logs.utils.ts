@@ -397,6 +397,11 @@ export const fillTimeseries = (
   })
 
   const diff = maxDate.diff(minDate, truncation as dayjs.UnitType)
+  if (diff > 10000) {
+    throw new Error(
+      'Data error, filling timeseries dynamically with more than 10k data points degrades performance.'
+    )
+  }
   for (let i = 0; i <= diff; i++) {
     const dateToMaybeAdd = minDate.add(i, truncation as dayjs.ManipulateType)
 
