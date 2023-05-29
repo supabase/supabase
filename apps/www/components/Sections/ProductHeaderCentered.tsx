@@ -2,6 +2,7 @@ import { Button, IconBookOpen, IconPlayCircle } from 'ui'
 import Link from 'next/link'
 import ProductIcon from '../ProductIcon'
 import Image from 'next/image'
+import styles from '~/styles/animations.module.css'
 
 interface Types {
   h1: string | React.ReactNode
@@ -50,11 +51,11 @@ const ProductHeaderCentered = (props: Types) => (
               )}
             </div>
           ) : null}
+        </div>
+        <div className={[styles['appear-from-bottom']].join(' ')}>
           <h1 className="h1 text-3xl md:text-4xl tracking-[-1px]" key={`h1`}>
             {props.h1}
           </h1>
-        </div>
-        <div>
           <p className="p !text-scale-1000">{props.subheader}</p>
         </div>
         <div className="flex flex-row md:flex-row pt-8 md:items-center">
