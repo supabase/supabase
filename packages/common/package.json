@@ -11,7 +11,7 @@
     "react-use": "^17.4.0"
   },
   "devDependencies": {
-    "@types/react": "^17.0.37",
+    "@types/react": "17.0.39",
     "@types/react-dom": "^17.0.11",
     "config": "*",
     "tsconfig": "*",
