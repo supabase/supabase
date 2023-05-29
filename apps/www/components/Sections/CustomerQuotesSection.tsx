@@ -1,19 +1,10 @@
-import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
-import { useRouter } from 'next/router'
 import Link from 'next/link'
-import { useWindowSize } from 'react-use'
-
-import TweetCard from '~/components/TweetCard'
-import { Swiper, SwiperSlide } from 'swiper/react'
-import SwiperCore, { Autoplay } from 'swiper'
-
-import SectionContainer from '../Layouts/SectionContainer'
+import { useRouter } from 'next/router'
 import { useBreakpoint } from 'common'
-import { ArrowTopRightSvg } from '../LaunchWeek/Releases/LW7/components'
-import { IconArrowLeft, IconArrowUpRight } from 'ui'
+import { IconArrowUpRight } from 'ui'
 
-SwiperCore.use([Autoplay])
+import SectionContainer from '~/components/Layouts/SectionContainer'
 
 interface CardInterface {
   type?: string
@@ -34,28 +25,8 @@ interface Props {
 }
 
 const CustomerQuotesSection = (props: Props) => {
-  const ref = useRef<any>(null)
   const isSm = useBreakpoint(768)
   const { basePath } = useRouter()
-  const [swiperInstance, setSwiperInstance] = useState<SwiperCore | any | null>(null)
-  const { width } = useWindowSize()
-
-  useEffect(() => {
-    // trigger autoplay if viewport resize
-    if (swiperInstance) swiperInstance?.autoplay?.start()
-  }, [width])
-
-  useEffect(() => {
-    if (!ref.current || !swiperInstance?.autoplay) return
-
-    ref.current?.addEventListener('mouseover', () => swiperInstance?.autoplay?.stop())
-    ref.current?.addEventListener('mouseleave', () => swiperInstance?.autoplay?.start())
-
-    return () => {
-      ref.current?.removeEventListener('mouseover', () => swiperInstance?.autoplay?.stop())
-      ref.current?.removeEventListener('mouseleave', () => swiperInstance?.autoplay?.start())
-    }
-  }, [ref.current, swiperInstance?.autoplay])
 
   const Card = (card: CardInterface) => (
     <div className="dark:bg-scale-300 hover:border-scale-600 hover:dark:border-scale-700 border-scale-300 dark:border-scale-400 rounded-2xl border bg-white p-6 drop-shadow-sm flex flex-col justify-between">
@@ -104,10 +75,7 @@ const CustomerQuotesSection = (props: Props) => {
             community of users
           </h3>
         </div>
-        <div
-          ref={ref}
-          className="relative mx-auto grid grid-cols-1 lg:grid-cols-3 gap-4 xl:gap-8 pt-16 pb-0"
-        >
+        <div className="relative mx-auto grid grid-cols-1 lg:grid-cols-3 gap-4 xl:gap-8 pt-16 pb-0">
           {props.customers.map((customer) => (
             <Link href={`${basePath}${customer.url}`}>
               <a className="h-full flex">
