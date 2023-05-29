@@ -82,6 +82,7 @@ const ComputeInstanceSidePanel = () => {
         message: `Successfully updated compute instance to ${selectedCompute?.name}. Your project is currently being restarted to update its instance`,
       })
       app.onProjectStatusUpdated(projectId, PROJECT_STATUS.RESTORING)
+      onClose()
       router.push(`/project/${projectRef}`)
     } catch (error: any) {
       ui.setNotification({
