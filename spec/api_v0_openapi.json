@@ -101,6 +101,126 @@
         "security": [{ "bearer": [] }]
       }
     },
+    "/v1/oauth/authorize": {
+      "get": {
+        "operationId": "authorize",
+        "parameters": [
+          { "name": "client_id", "required": true, "in": "query", "schema": { "type": "string" } },
+          {
+            "name": "response_type",
+            "required": true,
+            "in": "query",
+            "schema": { "enum": ["code", "token", "id_token token"], "type": "string" }
+          },
+          {
+            "name": "redirect_uri",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          { "name": "scope", "required": true, "in": "query", "schema": { "type": "string" } },
+          { "name": "state", "required": false, "in": "query", "schema": { "type": "string" } },
+          {
+            "name": "response_mode",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "code_challenge",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "code_challenge_method",
+            "required": false,
+            "in": "query",
+            "schema": { "enum": ["plain", "sha256"], "type": "string" }
+          }
+        ],
+        "responses": { "200": { "description": "" } },
+        "tags": ["oauth (beta)"]
+      }
+    },
+    "/v1/oauth/token": {
+      "post": {
+        "operationId": "token",
+        "parameters": [
+          {
+            "name": "grant_type",
+            "required": true,
+            "in": "query",
+            "schema": { "enum": ["authorization_code", "refresh_token"], "type": "string" }
+          },
+          { "name": "client_id", "required": true, "in": "query", "schema": { "type": "string" } },
+          {
+            "name": "client_secret",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          { "name": "code", "required": false, "in": "query", "schema": { "type": "string" } },
+          {
+            "name": "code_verifier",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "redirect_uri",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "refresh_token",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": { "201": { "description": "" } },
+        "tags": ["oauth (beta)"]
+      }
+    },
+    "/v1/oauth/authorizations/{id}": {
+      "get": {
+        "operationId": "getAuthorizationRequest",
+        "parameters": [
+          { "name": "id", "required": true, "in": "path", "schema": { "type": "string" } }
+        ],
+        "responses": { "200": { "description": "" } },
+        "tags": ["oauth (beta)"],
+        "security": [{ "bearer": [] }]
+      },
+      "post": {
+        "operationId": "approveAuthorizationRequest",
+        "parameters": [
+          { "name": "id", "required": true, "in": "path", "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AuthorizationsApproveBody" }
+            }
+          }
+        },
+        "responses": { "201": { "description": "" } },
+        "tags": ["oauth (beta)"],
+        "security": [{ "bearer": [] }]
+      },
+      "delete": {
+        "operationId": "declineAuthorizationRequest",
+        "parameters": [
+          { "name": "id", "required": true, "in": "path", "schema": { "type": "string" } }
+        ],
+        "responses": { "200": { "description": "" } },
+        "tags": ["oauth (beta)"],
+        "security": [{ "bearer": [] }]
+      }
+    },
     "/v1/projects/{ref}/functions": {
       "post": {
         "operationId": "createFunction",
@@ -132,6 +252,18 @@
             "required": false,
             "in": "query",
             "schema": { "type": "boolean" }
+          },
+          {
+            "name": "entrypoint_path",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "import_map_path",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
           }
         ],
         "requestBody": {
@@ -261,6 +393,18 @@
             "required": false,
             "in": "query",
             "schema": { "type": "boolean" }
+          },
+          {
+            "name": "entrypoint_path",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "import_map_path",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
           }
         ],
         "requestBody": {
@@ -342,6 +486,36 @@
         },
         "tags": ["functions"],
         "security": [{ "apiKeyHeader": [], "apiKeyParam": [] }, { "bearer": [] }]
+      }
+    },
+    "/v1/projects/{ref}/api-keys": {
+      "get": {
+        "operationId": "getProjectApiKeys",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/ApiKeyResponse" }
+                }
+              }
+            }
+          },
+          "403": { "description": "" }
+        },
+        "tags": ["projects"],
+        "security": [{ "bearer": [] }]
       }
     },
     "/v1/projects/{ref}/custom-hostname": {
@@ -615,7 +789,7 @@
     },
     "/v1/projects/{ref}/pgsodium": {
       "get": {
-        "operationId": "getConfig",
+        "operationId": "getPgsodiumConfig",
         "summary": "Gets project's pgsodium config",
         "parameters": [
           {
@@ -642,7 +816,7 @@
         "security": [{ "bearer": [] }]
       },
       "put": {
-        "operationId": "updateConfig",
+        "operationId": "updatePgsodiumConfig",
         "summary": "Updates project's pgsodium config. Updating the root_key can cause all data encrypted with the older key to become inaccessible.",
         "parameters": [
           {
@@ -695,7 +869,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/PostgrestConfigResponse" }
+                "schema": { "$ref": "#/components/schemas/PostgrestConfigWithJWTSecretResponse" }
               }
             }
           },
@@ -1252,6 +1426,69 @@
         "security": [{ "bearer": [] }, { "bearer": [] }]
       }
     },
+    "/v1/projects/{ref}/config/database/pgbouncer": {
+      "get": {
+        "operationId": "getPgbouncerConfig",
+        "summary": "Gets project's pgbouncer config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ProjectPgBouncerConfig" }
+              }
+            }
+          },
+          "500": { "description": "Failed to retrieve project's pgbouncer config" }
+        },
+        "tags": ["projects config"],
+        "security": [{ "bearer": [] }, { "bearer": [] }]
+      },
+      "patch": {
+        "operationId": "updatePgbouncerConfig",
+        "summary": "Updates project's pgbouncer config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdatePgbouncerConfigBody" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UpdatePoolingConfigResponse" }
+              }
+            }
+          },
+          "403": { "description": "" },
+          "500": { "description": "Failed to update project's pgbouncer config" }
+        },
+        "tags": ["projects config"],
+        "security": [{ "bearer": [] }, { "bearer": [] }]
+      }
+    },
     "/v1/projects/{ref}/config/auth/sso/providers": {
       "post": {
         "operationId": "createProviderForProject",
@@ -1500,6 +1737,11 @@
         "properties": { "name": { "type": "string" } },
         "required": ["name"]
       },
+      "AuthorizationsApproveBody": {
+        "type": "object",
+        "properties": { "organization_id": { "type": "string" } },
+        "required": ["organization_id"]
+      },
       "CreateFunctionBody": {
         "type": "object",
         "properties": {
@@ -1521,7 +1763,9 @@
           "created_at": { "type": "number" },
           "updated_at": { "type": "number" },
           "verify_jwt": { "type": "boolean" },
-          "import_map": { "type": "boolean" }
+          "import_map": { "type": "boolean" },
+          "entrypoint_path": { "type": "string" },
+          "import_map_path": { "type": "string" }
         },
         "required": ["id", "slug", "name", "status", "version", "created_at", "updated_at"]
       },
@@ -1536,7 +1780,9 @@
           "created_at": { "type": "number" },
           "updated_at": { "type": "number" },
           "verify_jwt": { "type": "boolean" },
-          "import_map": { "type": "boolean" }
+          "import_map": { "type": "boolean" },
+          "entrypoint_path": { "type": "string" },
+          "import_map_path": { "type": "string" }
         },
         "required": ["id", "slug", "name", "status", "version", "created_at", "updated_at"]
       },
@@ -1547,6 +1793,11 @@
           "body": { "type": "string" },
           "verify_jwt": { "type": "boolean" }
         }
+      },
+      "ApiKeyResponse": {
+        "type": "object",
+        "properties": { "name": { "type": "string" }, "api_key": { "type": "string" } },
+        "required": ["name", "api_key"]
       },
       "UpdateCustomHostnameResponse": {
         "type": "object",
@@ -1608,12 +1859,13 @@
         "properties": { "root_key": { "type": "string" } },
         "required": ["root_key"]
       },
-      "PostgrestConfigResponse": {
+      "PostgrestConfigWithJWTSecretResponse": {
         "type": "object",
         "properties": {
           "max_rows": { "type": "integer" },
           "db_schema": { "type": "string" },
-          "db_extra_search_path": { "type": "string" }
+          "db_extra_search_path": { "type": "string" },
+          "jwt_secret": { "type": "string" }
         },
         "required": ["max_rows", "db_schema", "db_extra_search_path"]
       },
@@ -1624,6 +1876,15 @@
           "db_extra_search_path": { "type": "string" },
           "db_schema": { "type": "string" }
         }
+      },
+      "PostgrestConfigResponse": {
+        "type": "object",
+        "properties": {
+          "max_rows": { "type": "integer" },
+          "db_schema": { "type": "string" },
+          "db_extra_search_path": { "type": "string" }
+        },
+        "required": ["max_rows", "db_schema", "db_extra_search_path"]
       },
       "SecretResponse": {
         "type": "object",
@@ -1832,12 +2093,101 @@
           "session_replication_role"
         ]
       },
+      "ProjectPgBouncerConfig": {
+        "type": "object",
+        "properties": {
+          "db_dns_name": { "type": "string" },
+          "db_host": { "type": "string" },
+          "db_name": { "type": "string" },
+          "db_port": { "type": "number" },
+          "db_ssl": { "type": "boolean" },
+          "db_user": { "type": "string" },
+          "default_pool_size": { "type": "number" },
+          "ignore_startup_parameters": { "type": "string" },
+          "inserted_at": { "type": "string" },
+          "pgbouncer_enabled": { "type": "boolean" },
+          "pgbouncer_status": {
+            "enum": ["COMING_DOWN", "COMING_UP", "DISABLED", "ENABLED", "RELOADING"],
+            "type": "string"
+          },
+          "pool_mode": { "enum": ["transaction", "session", "statement"], "type": "string" },
+          "max_client_conn": { "type": "number", "nullable": true }
+        },
+        "required": [
+          "db_dns_name",
+          "db_host",
+          "db_name",
+          "db_port",
+          "db_ssl",
+          "db_user",
+          "default_pool_size",
+          "ignore_startup_parameters",
+          "inserted_at",
+          "pgbouncer_enabled",
+          "pgbouncer_status",
+          "pool_mode"
+        ]
+      },
+      "UpdatePgbouncerConfigBody": {
+        "type": "object",
+        "properties": {
+          "default_pool_size": { "type": "integer", "minimum": 0, "maximum": 65535 },
+          "max_client_conn": {
+            "type": "integer",
+            "nullable": true,
+            "minimum": 0,
+            "maximum": 18000
+          },
+          "ignore_startup_parameters": { "type": "string" },
+          "pgbouncer_enabled": { "type": "boolean" },
+          "pool_mode": { "enum": ["transaction", "session", "statement"], "type": "string" }
+        },
+        "required": [
+          "default_pool_size",
+          "ignore_startup_parameters",
+          "pgbouncer_enabled",
+          "pool_mode"
+        ]
+      },
+      "UpdatePoolingConfigResponse": {
+        "type": "object",
+        "properties": {
+          "default_pool_size": { "type": "integer", "minimum": 0, "maximum": 65535 },
+          "max_client_conn": {
+            "type": "integer",
+            "nullable": true,
+            "minimum": 0,
+            "maximum": 18000
+          },
+          "ignore_startup_parameters": { "type": "string" },
+          "pgbouncer_enabled": { "type": "boolean" },
+          "pool_mode": { "enum": ["transaction", "session", "statement"], "type": "string" },
+          "pgbouncer_status": {
+            "enum": ["COMING_DOWN", "COMING_UP", "DISABLED", "ENABLED", "RELOADING"],
+            "type": "string"
+          }
+        },
+        "required": [
+          "default_pool_size",
+          "ignore_startup_parameters",
+          "pgbouncer_enabled",
+          "pool_mode",
+          "pgbouncer_status"
+        ]
+      },
       "AttributeValue": {
         "type": "object",
         "properties": {
+          "default": {
+            "oneOf": [
+              { "type": "object" },
+              { "type": "number" },
+              { "type": "string" },
+              { "type": "boolean" }
+            ]
+          },
           "name": { "type": "string" },
-          "names": { "type": "array", "items": { "type": "string" } },
-          "default": { "type": "object" }
+          "names": { "type": "array", "items": { "type": "string" } }
         }
       },
       "AttributeMapping": {

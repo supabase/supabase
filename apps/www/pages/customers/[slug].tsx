@@ -98,7 +98,7 @@ function CaseStudyPage(props: any) {
           "
         >
           <div className="grid grid-cols-12 gap-4">
-            <div className="col-span-12 mb-2 lg:col-span-2">
+            <div className="col-span-12 mb-2 xl:col-span-2">
               {/* Back button */}
               <p>
                 <a
@@ -113,7 +113,7 @@ function CaseStudyPage(props: any) {
 
             <div
               className="col-span-12 lg:col-span-8
-          
+
           "
             >
               <div className="">
@@ -146,8 +146,8 @@ function CaseStudyPage(props: any) {
                               objectPosition="left"
                               className="
                       bg-no-repeat
-                      
-                      dark:brightness-200 
+
+                      dark:brightness-200
                       dark:contrast-0
                       dark:filter
                     "

@@ -1,3 +1,11 @@
+import '../../../packages/ui/build/css/themes/light.css'
+import '../../../packages/ui/build/css/themes/dark.css'
+
+import '../styles/ch.scss'
+import '../styles/main.scss?v=1.0.0'
+import '../styles/new-docs.scss'
+import '../styles/prism-okaidia.scss'
+
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
 import { AuthProvider, ThemeProvider, useTelemetryProps } from 'common'
@@ -9,10 +17,6 @@ import Favicons from '~/components/Favicons'
 import SiteLayout from '~/layouts/SiteLayout'
 import { API_URL, IS_PLATFORM, LOCAL_SUPABASE } from '~/lib/constants'
 import { post } from '~/lib/fetchWrappers'
-import '../styles/ch.scss'
-import '../styles/main.scss?v=1.0.0'
-import '../styles/new-docs.scss'
-import '../styles/prism-okaidia.scss'
 
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const router = useRouter()
