@@ -21,6 +21,7 @@ import {
   IconMenuSwift,
   IconMenuStatus,
   IconMenuKotlin,
+  IconMenuAI,
 } from './HomeMenuIcons'
 
 function getMenuIcon(menuKey: string, width: number = 16, height: number = 16) {
@@ -42,7 +43,7 @@ function getMenuIcon(menuKey: string, width: number = 16, height: number = 16) {
     case 'storage':
       return <IconMenuStorage width={width} height={height} />
     case 'ai':
-      return <IconMenuStorage width={width} height={height} />
+      return <IconMenuAI width={width} height={height} />
     case 'platform':
       return <IconMenuPlatform width={width} height={height} />
     case 'resources':
