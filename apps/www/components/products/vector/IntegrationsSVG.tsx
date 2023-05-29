@@ -3,8 +3,8 @@ import React from 'react'
 const IntegrationsSVG = () => {
   return (
     <svg
-      width="812"
-      height="363"
+      width="100%"
+      height="auto"
       viewBox="0 0 812 363"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"

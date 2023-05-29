@@ -22,7 +22,13 @@ const ProductHeaderCentered = (props: Types) => (
     <div className="flex flex-col text-center items-center">
       {props.image && typeof props.image === 'string' ? (
         <div className="relative w-full max-w-[830px] mx-auto z-0 aspect-[2.3/1] -mb-8 md:-mb-12 lg:-mb-16">
-          <Image src={props.image} layout="fill" objectFit="contain" objectPosition="top" />
+          <Image
+            src={props.image}
+            priority
+            layout="fill"
+            objectFit="contain"
+            objectPosition="top"
+          />
         </div>
       ) : (
         <div className="col-span-12 mt-8 lg:col-span-7 lg:mt-0 xl:col-span-6 xl:col-start-7">
