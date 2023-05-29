@@ -2,7 +2,7 @@ import React, { useState, useEffect, ReactNode } from 'react'
 import { motion, useAnimation } from 'framer-motion'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import Link from 'next/link'
-import { Button } from 'ui'
+import { Button, IconArrowUpRight } from 'ui'
 import CodeBlock from '../CodeBlock/CodeBlock'
 import { Swiper, SwiperSlide } from 'swiper/react'
 
@@ -118,7 +118,7 @@ const TimedTabsSection = ({
           {cta && (
             <Link href={cta.link}>
               <a className="">
-                <Button type="default" size="tiny">
+                <Button type="default" size="small" icon={<IconArrowUpRight />}>
                   {cta.label ?? 'Explore more'}
                 </Button>
               </a>

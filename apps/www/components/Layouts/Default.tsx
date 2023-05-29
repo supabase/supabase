@@ -6,11 +6,18 @@ type Props = {
   hideHeader?: boolean
   hideFooter?: boolean
   className?: string
+  footerClassName?: string
   children: React.ReactNode
 }
 
 const DefaultLayout = (props: Props) => {
-  const { hideHeader = false, hideFooter = false, className = '', children } = props
+  const {
+    hideHeader = false,
+    hideFooter = false,
+    className = '',
+    footerClassName = '',
+    children,
+  } = props
 
   return (
     <>
@@ -18,7 +25,7 @@ const DefaultLayout = (props: Props) => {
       <div className="min-h-screen">
         <main className={className}>{children}</main>
       </div>
-      {!hideFooter && <Footer />}
+      {!hideFooter && <Footer className={footerClassName} />}
     </>
   )
 }

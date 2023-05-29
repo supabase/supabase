@@ -47,7 +47,7 @@ const FeaturesSection = ({ title, paragraph, features }: Props) => {
                     >
                       <path
                         d={feature.icon}
-                        stroke="white"
+                        stroke="var(--colors-scale12)"
                         strokeMiterlimit="10"
                         strokeLinejoin="bevel"
                       />
