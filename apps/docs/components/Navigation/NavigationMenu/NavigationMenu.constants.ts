@@ -894,7 +894,7 @@ export const ai: NavMenuConstant = {
           url: '/guides/ai/examples/huggingface-image-captioning',
         },
         {
-          name: 'Streaming OpenAI completions using Edge Functions',
+          name: 'OpenAI completions using Edge Functions',
           url: '/guides/ai/examples/openai',
         },
         {
