@@ -150,9 +150,9 @@ export const formatNotificationText = (
     return (
       <>
         <p className="text-sm">{notification.data.message}</p>{' '}
-        {buttons.map((button) => {
+        {buttons.map((button, index) => {
           return (
-            <a href={button.url} target="_blank">
+            <a href={button.url} key={index} target="_blank">
               <Button
                 as="span"
                 type="default"
