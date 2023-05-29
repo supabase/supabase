@@ -82,8 +82,7 @@ const Wizard: NextPageWithLayout = () => {
     projectName !== '' &&
     passwordStrengthScore >= DEFAULT_MINIMUM_PASSWORD_STRENGTH &&
     dbRegion !== '' &&
-    dbPricingTierKey !== '' &&
-    (isSelectFreeTier || (!isSelectFreeTier && !isEmptyPaymentMethod))
+    dbPricingTierKey !== ''
 
   const delayedCheckPasswordStrength = useRef(
     debounce((value) => checkPasswordStrength(value), 300)
