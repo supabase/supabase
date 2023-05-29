@@ -181,7 +181,7 @@ const SizeAndCounts = ({ projectRef }: SizeAndCountsProps) => {
                   </div>
                   {usageMeta.limit > 0 && (
                     <div className="flex items-center justify-between border-t py-1">
-                      <p className="text-xs text-scale-1000">Extra volume used this month</p>
+                      <p className="text-xs text-scale-1000">Overage this month</p>
                       <p className="text-xs">
                         {usageExcess < 0
                           ? attribute.unit === 'bytes'
