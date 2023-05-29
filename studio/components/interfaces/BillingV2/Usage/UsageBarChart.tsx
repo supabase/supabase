@@ -58,7 +58,7 @@ const UsageBarChart = ({
           <CartesianGrid vertical={false} strokeDasharray="3 3" className="stroke-scale-800" />
           <XAxis dataKey="periodStartFormatted" />
           <YAxis
-            width={28}
+            width={40}
             axisLine={false}
             tickLine={{ stroke: 'none' }}
             domain={yDomain}

@@ -12,7 +12,10 @@ export interface CategoryAttribute {
   attribute: string // For querying against stats-daily / infra-monitoring
   name: string
   unit: 'bytes' | 'absolute' | 'percentage'
-  docsUrl?: string
+  links?: {
+    name: string
+    url: string
+  }[]
   description: string
   chartDescription: string
 }
@@ -35,7 +38,14 @@ export const USAGE_CATEGORIES: {
         name: 'CPU',
         unit: 'percentage',
         description: 'CPU usage of your server',
-        chartDescription: 'The data shown here is refreshed over a period of 24 hours.',
+        chartDescription: '',
+        links: [
+          {
+            name: 'Compute Add-Ons',
+            url: 'https://supabase.com/docs/guides/platform/compute-add-ons',
+          },
+          { name: 'High CPU Usage', url: 'https://supabase.com/docs/guides/platform/exhaust-cpu' },
+        ],
       },
       {
         anchor: 'ram',
@@ -44,7 +54,13 @@ export const USAGE_CATEGORIES: {
         name: 'Memory',
         unit: 'percentage',
         description: 'Memory usage of your server',
-        chartDescription: 'The data shown here is refreshed over a period of 24 hours.',
+        chartDescription: '',
+        links: [
+          {
+            name: 'Compute Add-Ons',
+            url: 'https://supabase.com/docs/guides/platform/compute-add-ons',
+          },
+        ],
       },
       {
         anchor: 'disk_io_budget',
@@ -52,11 +68,15 @@ export const USAGE_CATEGORIES: {
         attribute: 'disk_io_budget',
         name: 'Disk IO bandwidth',
         unit: 'percentage',
-        docsUrl: 'https://supabase.com/docs/guides/platform/compute-add-ons#disk-io-bandwidth',
+        links: [
+          {
+            name: 'Documentation',
+            url: 'https://supabase.com/docs/guides/platform/compute-add-ons#disk-io-bandwidth',
+          },
+        ],
         description:
           'SSD Disks are attached to your servers and the disk performance of your workload is determined by the Disk IO bandwidth of this connection.',
-        chartDescription:
-          'The amount of remaining bandwidth resets at the beginning of each day, and the data shown here is refreshed over a period of 24 hours.',
+        chartDescription: '',
       },
     ],
   },
@@ -82,7 +102,7 @@ export const USAGE_CATEGORIES: {
         name: 'Storage egress',
         unit: 'bytes',
         description:
-          'Contains any outgoing traffic (egress) from your storage buckets (only download operations are counted). We currently do not differentiate between no-cache and cache hits.',
+          'All requests to download/view your storage items go through our CDN.\nWe sum up all outgoing traffic (egress) for storage related requests through our CDN.\nWe do not differentiate between cache and no cache hits.',
         chartDescription:
           'Billing is based on the total amount of egress in GB throughout your billing period. The data shown here is refreshed over a period of 24 hours.',
       },
@@ -100,7 +120,12 @@ export const USAGE_CATEGORIES: {
         name: 'Database size',
         unit: 'bytes',
         description: "Size of your project's database",
-        docsUrl: 'https://supabase.com/docs/guides/platform/database-usage',
+        links: [
+          {
+            name: 'Documentation',
+            url: 'https://supabase.com/docs/guides/platform/database-size',
+          },
+        ],
         chartDescription:
           'Billing is based on the average daily database size in GB throughout the billing period. The data shown here is refreshed over a period of 24 hours.',
       },
@@ -154,17 +179,17 @@ export const USAGE_CATEGORIES: {
           'The data shown here is refreshed over a period of 24 hours and resets at the beginning of every billing period.',
       },
       {
-        anchor:'storageImageTransformations',
+        anchor: 'storageImageTransformations',
         key: 'storage_image_render_count',
         attribute: 'total_storage_image_render_count',
         name: 'Storage image transformations',
         unit: 'absolute',
         description:
-          'We distinctly count all images that were transformed in the billing period, ignoring any transformations.\nIf you transform one image with different transformations, it only counts as one. We only count the unique (origin) images being transformed.',
+          'We distinctly count all images that were transformed in the billing period, ignoring any transformations.\nIf you transform one image with different transformations, it only counts as one.\nWe only count the unique (origin) images being transformed.',
         chartDescription: 'The data shown here is refreshed over a period of 24 hours.',
       },
       {
-        anchor:'functionInvocations',
+        anchor: 'functionInvocations',
         key: 'func_invocations',
         attribute: 'total_func_invocations',
         name: 'Edge function invocations',
@@ -175,7 +200,7 @@ export const USAGE_CATEGORIES: {
           'Billing is based on the sum of all invocations throughout your billing period. The data shown here is refreshed over a period of 24 hours.',
       },
       {
-        anchor:'realtimeMessageCount',
+        anchor: 'realtimeMessageCount',
         key: 'realtime_message_count',
         attribute: 'total_realtime_message_count',
         name: 'Realtime message count',
