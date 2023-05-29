@@ -29,7 +29,7 @@ const CustomerQuotesSection = (props: Props) => {
   const { basePath } = useRouter()
 
   const Card = (card: CardInterface) => (
-    <div className="dark:bg-scale-300 hover:border-scale-600 hover:dark:border-scale-700 border-scale-300 dark:border-scale-400 rounded-2xl border bg-white p-6 drop-shadow-sm flex flex-col justify-between">
+    <div className="bg-scale-100 dark:bg-scale-200 hover:border-scale-600 hover:dark:border-scale-700 border-scale-300 dark:border-scale-400 rounded-2xl border p-6 drop-shadow-sm flex flex-col justify-between">
       <div className="flex flex-col gap-4">
         <div className="h-24 w-full flex items-center justify-center pb-3">
           <div className="relative w-full flex items-center justify-center h-10">
@@ -59,12 +59,13 @@ const CustomerQuotesSection = (props: Props) => {
   )
 
   return (
-    <div className="py-16 sm:py-18 md:py-24 bg-scale-100">
+    <div className="py-16 sm:py-18 md:py-24 bg-scale-400 dark:bg-transparent">
       <div className="relative h-[300px] w-screen mx-auto md:w-full -mb-32 z-0">
         <Image
-          src="/images/product/vector/community/vector-community.svg"
+          src="/images/product/vector/community/vector-graphics-dark.svg"
           alt="vector graphic"
           layout="fill"
+          objectPosition={isSm ? '49%' : '51%'}
           objectFit={isSm ? 'cover' : 'contain'}
         />
       </div>
@@ -86,7 +87,7 @@ const CustomerQuotesSection = (props: Props) => {
           <div className="w-full h-full flex flex-col justify-stretch gap-4 xl:gap-8">
             {props.secondaryLinks.map((link) => (
               <Link href={`${basePath}${link.url}`}>
-                <a className="w-full h-auto lg:h-full dark:bg-scale-300 hover:border-scale-600 hover:dark:border-scale-700 border-scale-300 dark:border-scale-400 rounded-2xl border bg-white p-6 drop-shadow-sm flex flex-col justify-center items-center py-16">
+                <a className="w-full h-auto lg:h-full bg-scale-100 dark:bg-scale-200 hover:border-scale-600 hover:dark:border-scale-700 border-scale-300 dark:border-scale-400 rounded-2xl border p-6 drop-shadow-sm flex flex-col justify-center items-center py-16">
                   <div className="relative w-full flex items-center justify-center h-10 pb-3">
                     <Image
                       src={link.image!}

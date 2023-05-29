@@ -1,8 +1,13 @@
 import React from 'react'
-import SectionContainer from '../Layouts/SectionContainer'
-import MagnifiedProducts from '../MagnifiedProducts'
+import SectionContainer from '~/components/Layouts/SectionContainer'
+import MagnifiedProducts from '~/components/MagnifiedProducts'
+import { PRODUCT_SHORTNAMES } from '~/lib/constants'
 
-interface Props {}
+export type Products = PRODUCT_SHORTNAMES
+
+interface Props {
+  currentProduct?: Products
+}
 
 function ProductsCta(props: Props) {
   return (
@@ -18,7 +23,7 @@ function ProductsCta(props: Props) {
         </p>
       </div>
       <div className="w-full py-12 md:h-[200px] flex items-center justify-center text-center">
-        <MagnifiedProducts />
+        <MagnifiedProducts currentProduct={props.currentProduct} />
       </div>
     </SectionContainer>
   )

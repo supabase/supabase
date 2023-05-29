@@ -11,8 +11,10 @@ import {
 } from 'framer-motion'
 import { useBreakpoint } from 'common'
 import { DEFAULT_TRANSITION } from '~/lib/animations'
+import { Products } from './Sections/ProductsCta'
+import { PRODUCT_NAMES, PRODUCT_SHORTNAMES } from '../lib/constants'
 
-function MagnifiedProducts() {
+function MagnifiedProducts({ currentProduct }: { currentProduct?: Products }) {
   let mouseX = useMotionValue(Infinity)
 
   return (
@@ -22,13 +24,29 @@ function MagnifiedProducts() {
       className="mx-auto w-full max-w-md grid grid-cols-3 md:flex items-center justify-center gap-y-8 md:gap-4 px-4"
     >
       {Object.entries(products).map(([key, product], i) => (
-        <AppIcon mouseX={mouseX} product={product} index={i} key={key} />
+        <Product
+          mouseX={mouseX}
+          product={product}
+          isCurrentProduct={product.shortname === currentProduct}
+          index={i}
+          key={key}
+        />
       ))}
     </motion.div>
   )
 }
 
-function AppIcon({ mouseX, product, index }: { mouseX: MotionValue; product: any; index: number }) {
+function Product({
+  mouseX,
+  product,
+  index,
+  isCurrentProduct,
+}: {
+  mouseX: MotionValue
+  product: any
+  index: number
+  isCurrentProduct: boolean
+}) {
   let ref = useRef<HTMLDivElement>(null)
   const isInView = useInView(ref, { margin: '20%', once: true })
   const isMobile = useBreakpoint(768)
@@ -46,13 +64,16 @@ function AppIcon({ mouseX, product, index }: { mouseX: MotionValue; product: any
   const xDelta = 120
   const animate = {
     x: index > 2 ? (index - 2) * xDelta - xDelta / 2 : index * -xDelta - xDelta / 2,
-    transition: { ...DEFAULT_TRANSITION, delay: 0.2 },
+    transition: { ...DEFAULT_TRANSITION, delay: 0.5 },
   }
 
   return (
     <motion.div
       ref={ref}
-      className="relative md:absolute mx-auto w-[150px] bg-transparent group"
+      className={[
+        'relative md:absolute mx-auto w-[150px] bg-transparent group',
+        isCurrentProduct ? 'z-10' : 'z-0',
+      ].join(' ')}
       initial={initial}
       animate={!isMobile && isInView ? animate : initial}
     >
@@ -81,7 +102,8 @@ function AppIcon({ mouseX, product, index }: { mouseX: MotionValue; product: any
 
 const products = {
   database: {
-    name: 'Database',
+    shortname: PRODUCT_SHORTNAMES.DATABASE,
+    name: PRODUCT_NAMES.DATABASE,
     icon: '/images/product/database/database-v2.png',
     description:
       "Every project is a full Postgres database, the world's most trusted relational database.",
@@ -90,7 +112,8 @@ const products = {
     url: '/database',
   },
   authentication: {
-    name: 'Authentication',
+    shortname: PRODUCT_SHORTNAMES.AUTH,
+    name: PRODUCT_NAMES.AUTH,
     icon: '/images/product/auth/auth-v2.png',
     description: 'Add user sign ups and logins, securing your data with Row Level Security.',
     description_short: '',
@@ -98,7 +121,8 @@ const products = {
     url: '/auth',
   },
   storage: {
-    name: 'Storage',
+    shortname: PRODUCT_SHORTNAMES.STORAGE,
+    name: PRODUCT_NAMES.STORAGE,
     icon: '/images/product/storage/storage-v2.png',
     description: 'Store, organize, and serve large files. Any media, including videos and images.',
     description_short: '',
@@ -106,7 +130,8 @@ const products = {
     url: '/storage',
   },
   'edge-functions': {
-    name: 'Edge Functions',
+    shortname: PRODUCT_SHORTNAMES.FUNCTIONS,
+    name: PRODUCT_NAMES.FUNCTIONS,
     icon: '/images/product/functions/functions-v2.png',
     description: 'Write custom code without deploying or scaling servers.',
     description_short: '',
@@ -114,7 +139,8 @@ const products = {
     url: '/edge-functions',
   },
   realtime: {
-    name: 'Realtime',
+    shortname: PRODUCT_SHORTNAMES.REALTIME,
+    name: PRODUCT_NAMES.REALTIME,
     icon: '/images/product/realtime/realtime-v2.png',
     description:
       'Create multiplayer experiences by sharing, broadcasting, and listening to changes from other clients or the Database.',
@@ -123,7 +149,8 @@ const products = {
     url: '/realtime',
   },
   vector: {
-    name: 'Vector',
+    shortname: PRODUCT_SHORTNAMES.VECTOR,
+    name: PRODUCT_NAMES.VECTOR,
     icon: '/images/product/vector/vector-v2.png',
     description: 'Integrate your favorite ML-models to store, index and search vector embeddings.',
     description_short: '',
