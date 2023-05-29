@@ -35,10 +35,20 @@ const Activity = ({ projectRef }: ActivityProps) => {
       : undefined
   let endDate =
     current_period_end !== undefined ? new Date(current_period_end * 1000).toISOString() : undefined
-  // If end date is in future, set end date to now
+
+  // If end date is in future, set end date to yesterday/now
   if (endDate && dayjs(endDate).isAfter(dayjs())) {
+    const yesterday = dayjs(new Date()).subtract(1, 'day')
+
+    /**
+     * Currently, daily-stats data is only available a day later, so we'll use yesterday as end date, as otherwise the current day would just show up with "0" values
+     *
+     * We are actively working on removing this restriction on the data-eng/LF side and can remove this workaround once that's done
+     */
+    let newEndDate = yesterday.isAfter(dayjs(startDate)) ? yesterday : new Date()
+
     // LF seems to have an issue with the milliseconds, causes infinite loading sometimes
-    endDate = new Date().toISOString().slice(0, -5) + 'Z'
+    endDate = newEndDate.toISOString().slice(0, -5) + 'Z'
   }
 
   const categoryMeta = USAGE_CATEGORIES.find((category) => category.key === 'activity')
@@ -232,7 +242,7 @@ const Activity = ({ projectRef }: ActivityProps) => {
                       </div>
                       {usageMeta.limit > 0 && (
                         <div className="flex items-center justify-between border-t py-1">
-                          <p className="text-xs text-scale-1000">Extra volume used this month</p>
+                          <p className="text-xs text-scale-1000">Overage this month</p>
                           <p className="text-xs">
                             {((usageMeta?.limit ?? 0) === -1 || usageExcess < 0
                               ? 0
@@ -266,7 +276,7 @@ const Activity = ({ projectRef }: ActivityProps) => {
                       data={chartData}
                       yLimit={usageMeta?.limit ?? 0}
                       yLeftMargin={chartMeta[attribute.key].margin}
-                      yFormatter={value => ChartYFormatterCompactNumber(value, attribute.unit)}
+                      yFormatter={(value) => ChartYFormatterCompactNumber(value, attribute.unit)}
                       quotaWarningType={isFreeTier || isProTier ? 'danger' : 'warning'}
                     />
                   )}
