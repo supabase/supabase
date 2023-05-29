@@ -149,7 +149,7 @@ const TimedTabsSection = ({
             slidesPerView={1}
             speed={300}
             allowTouchMove={false}
-            autoHeight={true}
+            // autoHeight={true}
           >
             {tabs.map((tab, i) => (
               <SwiperSlide key={i}>

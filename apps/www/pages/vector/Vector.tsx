@@ -1,6 +1,5 @@
 import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/router'
-import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
 import CommunitySlider from '~/components/Sections/CommunitySlider'
 import ProductHeaderCentered from '~/components/Sections/ProductHeaderCentered'
@@ -10,6 +9,7 @@ import UseCasesSection from '~/components/Sections/UseCasesSection'
 import CenteredTitleImage from '~/components/Sections/CenteredTitleImage'
 import TimedTabsSection from '~/components/Sections/TimedTabsSection'
 import ProductsCta from '~/components/Sections/ProductsCta'
+import EnterpriseCta from '~/components/Sections/EnterpriseCta'
 
 import { pageData } from '~/data/products/vector/page'
 
@@ -46,9 +46,11 @@ function VectorPage() {
         <UseCasesSection {...pageData.useCasesSection} />
         <FeaturesSection {...pageData.featuresSection} />
         <CommunitySlider />
-        <ProductsCta />
-
-        <CTABanner />
+        <EnterpriseCta />
+        <div className="bg-scale-200">
+          <div className="w-full h-[1px] bg-gradient-to-r from-scale-100 via-scale-500 dark:via-scale-600 to-scale-100" />
+          <ProductsCta />
+        </div>
       </DefaultLayout>
     </>
   )
