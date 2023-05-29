@@ -39,7 +39,7 @@ function VectorPage() {
           ],
         }}
       />
-      <DefaultLayout className="!bg-scale-400 dark:!bg-scale-100">
+      <DefaultLayout className="!bg-scale-300 dark:!bg-scale-100">
         <ProductHeaderCentered {...pageData.heroSection} />
         <HighlightCards {...pageData.highlightsSection} />
         <CenteredTitleImage {...pageData.integrations} />

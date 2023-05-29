@@ -61,13 +61,13 @@ const InteractiveShimmerCard = ({
     <div
       ref={outerRef}
       className={[
-        'relative rounded-xl bg-slate-400 from-slate-800 to-slate-800 p-px transition-all shadow-md',
+        'relative rounded-xl bg-scale-400 from-scale-800 to-scale-800 p-px transition-all shadow-md',
         outerClassName,
       ].join(' ')}
     >
       <div
         className={[
-          'relative h-full rounded-xl bg-scale-300 overflow-hidden transition-all text-slate-1100',
+          'relative h-full rounded-xl bg-scale-200 dark:bg-scale-300 overflow-hidden transition-all text-scale-1100',
           innerClassName,
         ].join(' ')}
       >
