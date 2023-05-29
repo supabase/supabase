@@ -30,7 +30,7 @@ function AppIcon({ mouseX, product }: { mouseX: MotionValue; product: any }) {
     return val - bounds.x - bounds.width / 2
   })
 
-  let widthSync = useTransform(distance, [-150, 0, 150], [50, 80, 50])
+  let widthSync = useTransform(distance, [-150, 0, 150], [75, 130, 75])
   let width = useSpring(widthSync, { mass: 0.1, stiffness: 150, damping: 12 })
 
   return (
@@ -43,7 +43,7 @@ function AppIcon({ mouseX, product }: { mouseX: MotionValue; product: any }) {
           >
             <Image src={product.icon} layout="fill" objectFit="contain" />
           </motion.div>
-          <div className="text-brand-900 flex justify-center relative md:absolute md:bottom-0 md:opacity-0 md:group-hover:opacity-100 transition-opacity md:translate-y-8 md:-left-20 md:md:-right-20 font-mono uppercase text-center text-xs mt-2">
+          <div className="text-brand-900 flex justify-center relative opacity-70 md:absolute md:bottom-0 md:opacity-0 group-hover:opacity-100 transition-opacity md:translate-y-8 md:-left-20 md:md:-right-20 font-mono uppercase text-center text-xs mt-2">
             <span>{product.name}</span>
           </div>
         </a>
