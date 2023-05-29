@@ -83,11 +83,10 @@
     "next-mdx-toc": "^0.1.3",
     "next-plugin-yaml": "^1.0.1",
     "next-seo": "^5.14.1",
-    "next-transpile-modules": "^9.0.0",
     "openai": "^3.1.0",
-    "react": "17.0.2",
+    "react": "^17.0.2",
     "react-copy-to-clipboard": "^5.0.2",
-    "react-dom": "17.0.2",
+    "react-dom": "^17.0.2",
     "react-intersection-observer": "^9.4.0",
     "react-markdown": "^8.0.3",
     "react-syntax-highlighter": "^15.3.1",
@@ -113,13 +112,13 @@
     "eslint": "8.9.0",
     "globby": "^12.0.2",
     "minimist": "^1.2.6",
-    "next-transpile-modules": "9.0.0",
+    "next-transpile-modules": "^9.0.0",
     "npm-run-all": "^4.1.5",
     "openapi-types": "^12.0.2",
     "sass": "^1.55.0",
     "ts-node": "^10.9.1",
     "tsconfig": "*",
     "tsx": "^3.12.2",
-    "typescript": "^4.5.3"
+    "typescript": "^5.0.4"
   }
 }

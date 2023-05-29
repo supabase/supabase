@@ -56,7 +56,7 @@
     "remark-html": "^15.0.1",
     "swiper": "^6.5.0",
     "swr": "^0.5.4",
-    "typescript": "^4.0.3",
+    "typescript": "^5.0.4",
     "ui": "*",
     "use-debounce": "^7.0.1",
     "uuid": "^8.3.2",
