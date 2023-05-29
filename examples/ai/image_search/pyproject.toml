@@ -13,8 +13,8 @@ vecs = "^0.2.4"
 matplotlib = "^3.7.1"
 
 [tool.poetry.scripts]
-start = "image_search.main:start"
 seed = "image_search.main:seed"
+search = "image_search.main:search"
 
 [build-system]
 requires = ["poetry-core"]
