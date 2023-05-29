@@ -3,7 +3,6 @@ import React, { ReactNode } from 'react'
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
 import { Button } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import { pageData } from '~/data/products/vector/pageData'
 
 interface Props {
   title: string | ReactNode
