@@ -1,4 +1,3 @@
-import Solutions from 'data/Solutions.json'
 import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/router'
 import CTABanner from '~/components/CTABanner'
@@ -10,6 +9,7 @@ import HighlightCards from '~/components/Sections/HighlightCards'
 import UseCasesSection from '~/components/Sections/UseCasesSection'
 import CenteredTitleImage from '~/components/Sections/CenteredTitleImage'
 import TimedTabsSection from '~/components/Sections/TimedTabsSection'
+
 import { pageData } from '~/data/products/vector/page'
 
 import 'swiper/swiper.min.css'
@@ -38,22 +38,7 @@ function VectorPage() {
         }}
       />
       <DefaultLayout className="bg-scale-100">
-        <ProductHeaderCentered
-          icon={Solutions['vector']?.icon}
-          title={Solutions['vector']?.name}
-          h1={[
-            <span key={'vector-h1'}>
-              The open source Vector Database <br className="hidden md:block" />
-              for AI applications
-            </span>,
-          ]}
-          subheader={[
-            'Integrate your favorite ML-models to easily store, index and search vector embeddings for any AI use case.',
-          ]}
-          image={[]}
-          documentation_url={'/docs/guides/vector/broadcast'}
-        />
-
+        <ProductHeaderCentered {...pageData.heroSection} />
         <HighlightCards {...pageData.highlightsSection} />
         <CenteredTitleImage {...pageData.integrations} />
         <TimedTabsSection {...pageData.APIsection} />

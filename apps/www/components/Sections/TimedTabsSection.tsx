@@ -44,6 +44,10 @@ interface Tab {
 interface Props {
   title: string | ReactNode
   paragraph: string
+  cta?: {
+    label?: string
+    link: string
+  }
   tabs: Tab[]
   intervalDuration?: number
   updateFrequency?: number
@@ -52,6 +56,7 @@ interface Props {
 const TimedTabsSection = ({
   title,
   paragraph,
+  cta,
   tabs,
   intervalDuration = 25,
   updateFrequency = 10,
@@ -124,13 +129,15 @@ const TimedTabsSection = ({
             {title}
           </h2>
           <p className="text-scale-900 mb-4 max-w-sm">{paragraph}</p>
-          <Link href="">
-            <a className="">
-              <Button type="default" size="small">
-                Explore documentation
-              </Button>
-            </a>
-          </Link>
+          {cta && (
+            <Link href={cta.link}>
+              <a className="">
+                <Button type="default" size="tiny">
+                  {cta.label ?? 'Explore more'}
+                </Button>
+              </a>
+            </Link>
+          )}
         </div>
         <div className="w-full lg:w-1/2 min-h-[300px]">
           <Swiper

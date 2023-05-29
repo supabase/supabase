@@ -1,20 +1,38 @@
-import { CodeBlock } from 'ui'
-import IntegrationsSVG from '../../../components/products/vector/IntegrationsSVG'
+import Link from 'next/link'
+import IntegrationsSVG from '~/components/products/vector/IntegrationsSVG'
 
 export const pageData = {
   metaTitle: '',
   metaDescription: '',
-  sections: [
-    {
-      component: '',
+  heroSection: {
+    title: 'Supabase Vector',
+    h1: (
+      <span key={'vector-h1'}>
+        The open source Vector Database <br />
+        for AI applications
+      </span>
+    ),
+    subheader: (
+      <>
+        Integrate Supabase Vector database with your favorite ML-models{' '}
+        <br className="hidden md:block" />
+        to easily store, access and scale vector embeddings for any AI use case.
+      </>
+    ),
+    image: '/images/product/vector/vector-hero.svg',
+    cta: {
+      label: 'Start for free',
+      link: '/docs/guides/ai',
     },
-  ],
+    video: 'asdf',
+  },
   highlightsSection: {
     highlights: [
       {
         title: 'PostgreSQL + pgvector',
         paragraph:
-          'Every Supabase project is a dedicated Postgres instance. Use pgvector to store, query, and index your vector embeddings at scale.',
+          // 'Every Supabase project is a dedicated Postgres instance. Use pgvector to store, query, and index your vector embeddings at scale.',
+          'Use pgvector to store, query, and index your vector embeddings at scale in a Postgres instance.',
         image: '',
       },
       {
@@ -25,14 +43,21 @@ export const pageData = {
       },
       {
         title: 'Secure and Scalable',
-        paragraph:
-          'Supabase is SOC2 type 2 compliant, and comes with an advanced permissions system.',
+        paragraph: (
+          <>
+            Supabase is{' '}
+            <Link href="">
+              <a className="text-scale-1200 hover:underline">SOC2 type 2</a>
+            </Link>{' '}
+            compliant, and comes with an advanced permissions system.
+          </>
+        ),
         image: '',
       },
       {
         title: 'Deploy Globally',
         paragraph:
-          'Choose from 12 Fully Managed datacenters or, or Self-Host on your own cloud or servers.',
+          'Choose from 12 Fully Managed datacenters, or Self-Host on your own cloud or servers.',
         image: '',
       },
     ],
@@ -52,33 +77,41 @@ export const pageData = {
     paragraph: 'Go effortlessly from experimentation to production-ready AI applications.',
     useCases: [
       {
-        img: 'toast-messages.svg',
+        img: '',
         title: 'Semantic Search',
         description: 'Search your own knowledge base by semantic similarity.',
+        cta: {
+          label: 'View Template',
+          link: '#',
+        },
       },
       {
-        img: 'live-avatars.svg',
+        img: '',
         title: 'Chatbots',
         description: 'Enhance chatbot memory with content-based long-term retention.',
+        cta: {
+          label: 'View on Github',
+          link: '#',
+        },
       },
       {
-        img: 'live-cursors.svg',
+        img: '',
         title: 'Hybrid search',
         description: 'Combine semantic and full-text search with powerful SQL filtering.',
       },
       {
-        img: 'leaderboard.svg',
+        img: '',
         title: 'Image Similarity',
         description:
           'Transform images into image vector representations to detect similarity patterns.',
       },
       {
-        img: 'stock-market.svg',
+        img: '',
         title: 'Data Management',
         description: 'Automatically tag, deduplicate or detect patterns in your vector store.',
       },
       {
-        img: 'in-app-chat.svg',
+        img: '',
         title: 'Recommendations',
         description: 'Discover related content: articles, videos, restaurants, and more.',
       },
@@ -89,11 +122,15 @@ export const pageData = {
       <>
         <span className="heading-gradient">Simple yet</span>
         <br />
-        <span className="heading-gradient-brand">powerful APIs</span>
+        <span className="text-brand-900">powerful APIs</span>
       </>
     ),
     paragraph:
       'Easy-to-use client libraries for managing and querying vector stores in PostgreSQL.',
+    cta: {
+      label: 'Explore documentation',
+      link: '/docs/guides/ai/vecs-python-client',
+    },
     tabs: [
       {
         label: 'Store',
@@ -118,7 +155,7 @@ docs.upsert(
         `,
       },
       {
-        label: 'Search',
+        label: 'Index',
         code: `
 # index the collection to be queried by cosine distance
 docs.create_index(measure=vecs.IndexMeasure.cosine_distance)
@@ -150,7 +187,7 @@ docs.query(
       <>
         <span className="heading-gradient">Powerful Features</span>
         <br />
-        <span className="heading-gradient-brand">Seamless Development</span>
+        <span className="text-brand-900">Seamless Development</span>
       </>
     ),
     paragraph:
