@@ -14,6 +14,7 @@ import EnterpriseCta from '~/components/Sections/EnterpriseCta'
 import pageData from '~/data/products/vector/pageData'
 
 import 'swiper/swiper.min.css'
+import { PRODUCT_NAMES, PRODUCT_SHORTNAMES } from '../../lib/constants'
 
 function VectorPage() {
   // base path for images
@@ -38,7 +39,7 @@ function VectorPage() {
           ],
         }}
       />
-      <DefaultLayout className="bg-scale-100">
+      <DefaultLayout className="!bg-scale-400 dark:!bg-scale-100">
         <ProductHeaderCentered {...pageData.heroSection} />
         <HighlightCards {...pageData.highlightsSection} />
         <CenteredTitleImage {...pageData.integrations} />
@@ -53,7 +54,7 @@ function VectorPage() {
         </div>
         <div className="bg-scale-200">
           <div className="w-full h-[1px] bg-gradient-to-r from-scale-100 via-scale-500 dark:via-scale-600 to-scale-100" />
-          <ProductsCta />
+          <ProductsCta currentProduct={PRODUCT_SHORTNAMES.VECTOR} />
         </div>
       </DefaultLayout>
     </>

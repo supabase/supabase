@@ -73,9 +73,9 @@ const Feature = ({
       <div className="flex items-center">
         <div className="relative w-full h-6 flex items-center mx-auto">
           <svg
-            width="17"
-            height="17"
-            viewBox="0 0 17 17"
+            width="25"
+            height="25"
+            viewBox="0 0 25 25"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
           >
@@ -83,7 +83,9 @@ const Feature = ({
               d={feature.icon}
               stroke="var(--colors-scale12)"
               strokeMiterlimit="10"
-              strokeLinejoin="bevel"
+              strokeLinejoin="round"
+              strokeLinecap="round"
+              strokeWidth="1.5"
             />
           </svg>
         </div>
