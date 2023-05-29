@@ -886,8 +886,8 @@ export const ai: NavMenuConstant = {
           url: '/guides/ai/examples/headless-vector-search',
         },
         {
-          name: 'Image Search',
-          url: '/guides/ai/examples/image-search-python',
+          name: 'Image Search with OpenAI CLIP',
+          url: '/guides/ai/examples/image-search-openai-clip',
         },
         {
           name: 'Generate image captions using Hugging Face',

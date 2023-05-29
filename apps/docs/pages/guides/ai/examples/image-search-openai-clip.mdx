@@ -2,16 +2,15 @@ import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
   id: 'examples-image-search-python',
-  title: 'Image Search with Python',
+  title: 'Image Search with OpenAI CLIP',
   description: 'Implement image search with the OpenAI CLIP Model and Supabase Vector.',
+  subtitle: 'Implement image search with the OpenAI CLIP Model and Supabase Vector.',
 }
 
-Learn how to implement image (similarity) search using the [OpenAI CLIP Model](https://github.com/openai/CLIP), which was trained on a variety of (image, text)-pairs.
-
-You can use the CLIP model for:
+The [OpenAI CLIP Model](https://github.com/openai/CLIP) was trained on a variety of (image, text)-pairs. You can use the CLIP model for:
 
 - Text-to-Image / Image-To-Text / Image-to-Image / Text-to-Text Search
-- You can fine-tune it on your own image&text data with the regular SentenceTransformers training code.
+- You can fine-tune it on your own image and text data with the regular SentenceTransformers training code.
 
 [SentenceTransformers](https://www.sbert.net/examples/applications/image-search/README.html) provides models that allow you to embed images and text into the same vector space. You can use this to find similar images as well as to implement image search.
 
