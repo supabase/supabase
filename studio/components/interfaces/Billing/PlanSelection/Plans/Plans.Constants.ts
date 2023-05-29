@@ -8,6 +8,8 @@ import { STRIPE_PRODUCT_IDS } from 'lib/constants'
  */
 export const PRICING_META = {
   [STRIPE_PRODUCT_IDS.FREE]: {
+    id: 'tier_free',
+    new: false,
     name: 'Free',
     description: 'Perfect for passion projects & simple websites.',
     priceMonthly: 0,
@@ -29,6 +31,8 @@ export const PRICING_META = {
     scale: 'Free projects are paused after 1 week of inactivity.',
   },
   [STRIPE_PRODUCT_IDS.PRO]: {
+    id: 'tier_pro',
+    new: false,
     name: 'Pro',
     description: 'For production applications with the option to scale.',
     priceMonthly: 25,
@@ -50,6 +54,7 @@ export const PRICING_META = {
     ],
   },
   [STRIPE_PRODUCT_IDS.TEAM]: {
+    id: 'tier_team',
     new: true,
     name: 'Team',
     description: 'Collaborate with different permissions and access patterns.',
@@ -71,9 +76,12 @@ export const PRICING_META = {
     ],
   },
   Enterprise: {
+    id: 'tier_enterprise',
+    new: false,
     name: 'Enterprise',
     href: '/contact/enterprise',
     description: 'For large-scale applications managing serious workloads.',
+    priceMonthly: undefined,
     features: [
       `Designated Support manager & SLAs`,
       `Enterprise OAuth providers`,
@@ -84,7 +92,7 @@ export const PRICING_META = {
       `24×7×365 premium enterprise support`,
       `Custom Security questionnaires`,
       `Private Slack channel`,
-      `Uptime SLA`
+      `Uptime SLA`,
     ],
   },
 }

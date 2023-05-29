@@ -13,7 +13,6 @@ export interface CommonChartProps<D>
   > {
   title?: string
   className?: string
-  isLoading?: boolean
   size?: 'tiny' | 'small' | 'normal' | 'large'
 }
 
