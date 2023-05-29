@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import IntegrationsSVG from '~/components/products/vector/IntegrationsSVG'
 
-export const pageData = {
+export default {
   metaTitle: '',
   metaDescription: '',
   heroSection: {
@@ -256,6 +256,60 @@ docs.query(
         icon: 'M9.23242 7.21593V4.22827C9.23242 3.1237 8.33699 2.22827 7.23242 2.22827H4.23242C3.12785 2.22827 2.23242 3.1237 2.23242 4.22827V7.22827C2.23242 8.33284 3.12785 9.22827 4.23242 9.22827H7.2104M5.61821 5.62404L11.8997 11.9056M12.3322 9.08958V11.1484C12.3322 11.7007 11.8845 12.1484 11.3322 12.1484H9.23242M9.23242 14.2283H12.2324C13.337 14.2283 14.2324 13.3328 14.2324 12.2283V9.22827C14.2324 8.1237 13.337 7.22827 12.2324 7.22827H9.23242C8.12785 7.22827 7.23242 8.1237 7.23242 9.22827V12.2283C7.23242 13.3328 8.12785 14.2283 9.23242 14.2283Z',
         title: 'Highly Scalable',
         text: 'Designed for unparalleled high performance and availability at global scale.',
+      },
+    ],
+  },
+  quotesSection: {
+    customers: [
+      {
+        type: 'customer-story',
+        avatar: '',
+        customer: 'Markprompt',
+        author: 'Michael Fester',
+        role: 'Co-Founder, Markprompt',
+        quote:
+          'We decided to use Supabase over other specialized vector databases because it enabled us to be GDPR compliant from day one with little effort.',
+        image: '/images/product/vector/community/supabase+mendable.svg',
+        abstract: 'Markprompt and Supabase - GDPR-Compliant AI Chatbots for Docs and Websites.',
+        url: '/customers/markprompt',
+      },
+      {
+        type: 'customer-story',
+        avatar: '',
+        customer: 'Mendable',
+        author: 'Caleb Peffer',
+        role: 'CEO, Mendable',
+        quote:
+          'We tried other vector databases - we tried Faiss, we tried Weviate, we tried Pinecone. We found them to be incredibly expensive and not very intuitive. If you’re just doing vector search they’re great, but if you need to store a bunch of metadata that becomes a huge pain.',
+        image: '/images/product/vector/community/supabase+markprompt.svg',
+        abstract: 'Mendable switches from Pinecone to Supabase for PostgreSQL vector embeddings.',
+        url: '/customers/mendable',
+      },
+    ],
+    secondaryLinks: [
+      {
+        type: 'customer-story',
+        avatar: '',
+        customer: 'Markprompt',
+        author: 'Michael Fester',
+        role: 'Co-Founder, Markprompt',
+        quote:
+          'We decided to use Supabase over other specialized vector databases because it enabled us to be GDPR compliant from day one with little effort.',
+        image: '/images/product/vector/community/supabase+mendable.svg',
+        abstract: 'Markprompt and Supabase - GDPR-Compliant AI Chatbots for Docs and Websites.',
+        url: '/customers/markprompt',
+      },
+      {
+        type: 'customer-story',
+        avatar: '',
+        customer: 'Mendable',
+        author: 'Caleb Peffer',
+        role: 'CEO, Mendable',
+        quote:
+          'We tried other vector databases - we tried Faiss, we tried Weviate, we tried Pinecone. We found them to be incredibly expensive and not very intuitive. If you’re just doing vector search they’re great, but if you need to store a bunch of metadata that becomes a huge pain.',
+        image: '/images/product/vector/community/supabase+markprompt.svg',
+        abstract: 'Mendable switches from Pinecone to Supabase for PostgreSQL vector embeddings.',
+        url: '/customers/mendable',
       },
     ],
   },
