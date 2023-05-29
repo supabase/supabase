@@ -2,13 +2,13 @@ import { useParams } from 'common'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 import { BASE_PATH } from 'lib/constants'
-import Image from 'next/image'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { Alert, Button, IconExternalLink } from 'ui'
 import SpendCapSidePanel from './SpendCapSidePanel'
 import Link from 'next/link'
 import ProjectUpdateDisabledTooltip from '../../ProjectUpdateDisabledTooltip'
 import { useFlag } from 'hooks'
+import SVG from 'react-inlinesvg'
 
 export interface CostControlProps {}
 
@@ -81,8 +81,7 @@ const CostControl = ({}: CostControlProps) => {
             <div className="flex space-x-6">
               <div>
                 <div className="rounded-md w-[160px] h-[96px] shadow">
-                  <Image
-                    alt="Spend cap"
+                  <SVG
                     width={160}
                     height={96}
                     src={

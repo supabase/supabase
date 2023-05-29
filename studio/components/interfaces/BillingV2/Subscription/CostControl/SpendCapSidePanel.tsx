@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { Alert, Button, Collapsible, IconChevronRight, IconExternalLink, SidePanel } from 'ui'
 import { USAGE_COSTS } from './CostControl.constants'
+import SVG from 'react-inlinesvg'
 
 const SPEND_CAP_OPTIONS: { name: string; value: 'on' | 'off'; imageUrl: string }[] = [
   {
@@ -183,15 +184,18 @@ const SpendCapSidePanel = () => {
                     className={clsx('col-span-4 group space-y-1', isFreePlan && 'opacity-75')}
                     onClick={() => !isFreePlan && setSelectedOption(option.value)}
                   >
-                    <div
+                    <SVG
                       className={clsx(
-                        'relative rounded-xl transition border bg-no-repeat bg-center bg-cover',
+                        'relative rounded-xl transition border bg-no-repeat bg-center bg-cover w-[160px] h-[96px]',
                         isSelected ? 'border-brand-900' : 'border-scale-800',
                         !isFreePlan && 'cursor-pointer',
                         !isFreePlan && !isSelected && 'group-hover:border-scale-1100'
                       )}
-                      style={{ aspectRatio: ' 160/96', backgroundImage: `url(${option.imageUrl})` }}
+                      width={160}
+                      height={96}
+                      src={option.imageUrl}
                     />
+
                     <p
                       className={clsx(
                         'text-sm transition',
