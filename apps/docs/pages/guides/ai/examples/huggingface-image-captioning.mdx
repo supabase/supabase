@@ -1,18 +1,22 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-  title: 'Hugging Face',
+  title: 'Generate image captions using Hugging Face',
   description:
+    'Use the Hugging Face Inference API to make calls to 100,000+ Machine Learning models from Supabase Edge Functions.',
+  subtitle:
     'Use the Hugging Face Inference API to make calls to 100,000+ Machine Learning models from Supabase Edge Functions.',
   video: 'https://www.youtube.com/v/OgnYxRkxEUw',
   tocVideo: 'OgnYxRkxEUw',
 }
 
+We can combine Hugging Face with [Supabase Storage](https://supabase.com/storage) and [Database Webhooks](https://supabase.com/docs/guides/database/webhooks) to automatically caption for any image we upload to a storage bucket.
+
+## About Hugging Face
+
 [Hugging Face](https://huggingface.co/) is the collaboration platform for the machine learning community.
 
 [Huggingface.js](https://huggingface.co/docs/huggingface.js/index) provides a convenient way to make calls to 100,000+ Machine Learning models, making it easy to incorporate AI functionality into your [Supabase Edge Functions](https://supabase.com/edge-functions).
-
-Putting this together with [Supabase Storage](https://supabase.com/storage) and [Database Webhooks](https://supabase.com/docs/guides/database/webhooks) we can easily put together a service that automatically generates captions for any image we upload to a storage bucket.
 
 ## Setup
 
