@@ -17,7 +17,32 @@ Today `pgvector` indexes use an algorithm called IVFFlat. IVF stands for 'invert
 
 When you create the index, you choose the number of inverted lists (cell clusters). Increase this number to speed up queries, but at the expense of recall.
 
+For example, to create an index with 100 lists on a column that uses the cosine operator:
+
+```sql
+create index on items using ivfflat (column_name vector_cosine_ops) with (lists = 100);
+```
+
+For more info on the different operators, see [Distance operations](#distance-operators).
+
 For every query, you can set the number of probes (1 by default). The number of probes corresponds to the number of nearby cells to probe for a match. Increase this for better recall at the expense of speed.
+
+To set the number of probes for the duration of the session run:
+
+```sql
+set ivfflat.probes = 10;
+```
+
+To set the number of probes only for the current transaction run:
+
+```sql
+begin;
+set local ivfflat.probes = 10;
+select ...
+commit;
+```
+
+If the number of probes is the same as the number of lists, exact nearest neighbor search will be performed and the planner won't use the index.
 
 ### Approximate nearest neighbor
 
@@ -33,7 +58,7 @@ The type of index required depends on the distance operator you are using. `pgve
 | `<#>`    | negative inner product | `vector_ip_ops`                                                                      |
 | `<=>`    | cosine distance        | `vector_cosine_ops`                                                                  |
 
-Use the following SQL commands can create an index for the operator(s) used in your queries.
+Use the following SQL commands to create an index for the operator(s) used in your queries.
 
 ### Euclidean L2 distance (`vector_l2_ops`)
 
@@ -63,7 +88,7 @@ If you are using the `vecs` Python library, follow the instructions in [Managing
 
 ## Resources
 
-You can read more about indexing on `pgvector`'s GitHub page [here](https://github.com/pgvector/pgvector#indexing).
+Read more about indexing on `pgvector`'s [GitHub page](https://github.com/pgvector/pgvector#indexing).
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
