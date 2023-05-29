@@ -919,6 +919,10 @@ export const ai: NavMenuConstant = {
           name: 'Hugging Face',
           url: '/guides/ai/hugging-face',
         },
+        {
+          name: 'Google Colab',
+          url: '/guides/ai/google-colab',
+        },
       ],
     },
   ],
