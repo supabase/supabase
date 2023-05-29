@@ -25,7 +25,7 @@
     "common": "*",
     "config": "*",
     "date-fns": "2.10.0",
-    "dayjs": "^1.11.5",
+    "dayjs": "^1.11.7",
     "framer-motion": "^6.5.1",
     "globby": "^12.0.2",
     "gray-matter": "^4.0.3",
@@ -64,7 +64,7 @@
     "yup": "^0.32.11"
   },
   "devDependencies": {
-    "@tailwindcss/typography": "^0.5.7",
+    "@tailwindcss/typography": "^0.5.9",
     "@types/classnames": "^2.3.1",
     "@types/jest": "^27.4.0",
     "@types/marked": "^4.0.3",
