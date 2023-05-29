@@ -11,16 +11,9 @@ const EnterpriseCta = () => {
           Supabase Vector for Enterprise
         </h2>
         <div className="w-full mt-4 flex items-center justify-center text-center gap-4">
-          <Link href="#">
+          <Link href="https://forms.supabase.com/enterprise">
             <a>
-              <Button size="medium">Contact Support</Button>
-            </a>
-          </Link>
-          <Link href="#">
-            <a>
-              <Button type="default" size="medium">
-                Fill out Enterprise Form
-              </Button>
+              <Button size="medium">Fill out Enterprise Form</Button>
             </a>
           </Link>
         </div>
