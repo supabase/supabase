@@ -24,7 +24,7 @@ export default {
       label: 'Start for free',
       link: '/docs/guides/ai',
     },
-    video: 'asdf',
+    video: '#',
   },
   highlightsSection: {
     highlights: [
@@ -121,7 +121,7 @@ export default {
         description:
           'Transform images into image vector representations to detect similarity patterns.',
         cta: {
-          label: 'Template coming soon',
+          label: 'View Template',
           link: '/docs/examples/ai/image_search/README.md',
         },
       },

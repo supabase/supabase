@@ -40,7 +40,7 @@ const InteractiveShimmerCard = ({
     outerElement.style.backgroundImage = `
       ${activeGlow}radial-gradient(30rem circle at ${x}px ${y}px, ${
       shimmerFromColor ?? 'var(--colors-scale8)'
-    }, ${shimmerToColor ?? 'var(--colors-scale5)'})`
+    }, ${shimmerToColor ?? 'var(--colors-scale3)'})`
 
     innerElement.style.backgroundImage =
       hasInnerShimmer && isActive
