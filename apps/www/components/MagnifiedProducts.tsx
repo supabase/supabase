@@ -1,8 +1,16 @@
 import { useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { MotionValue, motion, useMotionValue, useSpring, useTransform } from 'framer-motion'
+import {
+  MotionValue,
+  motion,
+  useInView,
+  useMotionValue,
+  useSpring,
+  useTransform,
+} from 'framer-motion'
 import { useBreakpoint } from 'common'
+import { DEFAULT_TRANSITION } from '~/lib/animations'
 
 function MagnifiedProducts() {
   let mouseX = useMotionValue(Infinity)
@@ -13,15 +21,16 @@ function MagnifiedProducts() {
       onMouseLeave={() => mouseX.set(Infinity)}
       className="mx-auto w-full max-w-md grid grid-cols-3 md:flex items-center justify-center gap-y-8 md:gap-4 px-4"
     >
-      {Object.entries(products).map(([key, product]) => (
-        <AppIcon mouseX={mouseX} product={product} key={key} />
+      {Object.entries(products).map(([key, product], i) => (
+        <AppIcon mouseX={mouseX} product={product} index={i} key={key} />
       ))}
     </motion.div>
   )
 }
 
-function AppIcon({ mouseX, product }: { mouseX: MotionValue; product: any }) {
+function AppIcon({ mouseX, product, index }: { mouseX: MotionValue; product: any; index: number }) {
   let ref = useRef<HTMLDivElement>(null)
+  const isInView = useInView(ref, { margin: '20%', once: true })
   const isMobile = useBreakpoint(768)
 
   let distance = useTransform(mouseX, (val) => {
@@ -30,18 +39,36 @@ function AppIcon({ mouseX, product }: { mouseX: MotionValue; product: any }) {
     return val - bounds.x - bounds.width / 2
   })
 
-  let widthSync = useTransform(distance, [-150, 0, 150], [75, 130, 75])
+  let widthSync = useTransform(distance, [-150, 0, 150], [75, 110, 75])
   let width = useSpring(widthSync, { mass: 0.1, stiffness: 150, damping: 12 })
 
+  const initial = { x: 0 }
+  const xDelta = 120
+  const animate = {
+    x: index > 2 ? (index - 2) * xDelta - xDelta / 2 : index * -xDelta - xDelta / 2,
+    transition: { ...DEFAULT_TRANSITION, delay: 0.2 },
+  }
+
   return (
-    <motion.div ref={ref} className="relative mx-auto w-[150px] bg-transparent group">
+    <motion.div
+      ref={ref}
+      className="relative md:absolute mx-auto w-[150px] bg-transparent group"
+      initial={initial}
+      animate={!isMobile && isInView ? animate : initial}
+    >
       <Link href={product.url}>
         <a className="flex w-full flex-col items-center text-center">
           <motion.div
             style={isMobile ? (undefined as any) : { width }}
             className="relative w-[50px] aspect-square will-change-transform"
           >
-            <Image src={product.icon} layout="fill" objectFit="contain" />
+            <Image
+              src={product.icon}
+              priority
+              layout="fill"
+              objectFit="contain"
+              lazyBoundary="100px"
+            />
           </motion.div>
           <div className="text-brand-900 flex justify-center relative opacity-70 md:absolute md:bottom-0 md:opacity-0 group-hover:opacity-100 transition-opacity md:translate-y-8 md:-left-20 md:md:-right-20 font-mono uppercase text-center text-xs mt-2">
             <span>{product.name}</span>

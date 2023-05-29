@@ -1,9 +1,9 @@
 import React, { useState, useEffect, ReactNode } from 'react'
+import Link from 'next/link'
 import { motion, useAnimation } from 'framer-motion'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import Link from 'next/link'
 import { Button, IconArrowUpRight } from 'ui'
-import CodeBlock from '../CodeBlock/CodeBlock'
+import CodeBlock from '~/components/CodeBlock/CodeBlock'
 import { Swiper, SwiperSlide } from 'swiper/react'
 
 interface TabProps {
@@ -18,18 +18,22 @@ const Tab = ({ isActive, label, onClick, progress, intervalDuration }: TabProps)
   <button
     onClick={onClick}
     className={`text-left text-lg flex flex-col group gap-1 transition-all ${
-      // isActive ? 'grow-[1]' : 'grow-[0.5]'
       isActive ? 'flex-[2] text-scale-1200' : 'flex-[1] text-scale-1100'
     }`}
     aria-selected={isActive}
     role="tab"
   >
-    <div className="w-full h-[2px] bg-scale-700 group-hover:bg-scale-800 rounded-full overflow-hidden">
-      <motion.div
-        className="bg-brand-900 h-full"
-        style={{ width: `${isActive ? progress : 0}%` }}
-        transition={{ duration: intervalDuration }}
-      />
+    <div className="relative w-full h-[2px] bg-scale-700 group-hover:bg-scale-800 rounded-full overflow-hidden">
+      {isActive && (
+        <motion.div
+          className={[
+            'absolute inset-0 w-full right-full bg-brand-900 h-full transition-opacity',
+            progress! > 99.7 ? 'opacity-0' : 'opacity-100',
+          ].join(' ')}
+          style={{ x: `${progress! - 100}%` }}
+          transition={{ duration: intervalDuration }}
+        />
+      )}
     </div>
     {label}
   </button>
@@ -98,7 +102,7 @@ const TimedTabsSection = ({
   }, [activeTab, controls])
 
   useEffect(() => {
-    if (progress >= 100) {
+    if (progress >= 100.9) {
       setActiveTab((prevActiveTab) => (prevActiveTab === tabs.length - 1 ? 0 : prevActiveTab + 1))
     }
   }, [progress])
