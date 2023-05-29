@@ -18,9 +18,9 @@ SwiperCore.use([Autoplay])
 interface CardInterface {
   type?: string
   avatar?: string
-  author: string
+  author?: string
   role?: string
-  quote: string | React.ReactNode
+  quote?: string | React.ReactNode
   abstract?: string
   image?: string
   url?: string
