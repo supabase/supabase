@@ -32,7 +32,7 @@ const UseCasesSection = ({ title, paragraph, useCases }: Props) => {
       <div className="mx-auto w-full max-w-5xl grid gap-4 grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
         {useCases.map((example) => {
           return (
-            <InteractiveShimmerCard innerClassName="p-8 h-full !bg-scale-200">
+            <InteractiveShimmerCard innerClassName="p-4 md:p-8 h-full !bg-scale-200">
               <div className="h-full flex flex-col gap-4 items-start justify-between">
                 <div className="prose">
                   <div className="flex items-center gap-1">
@@ -43,9 +43,9 @@ const UseCasesSection = ({ title, paragraph, useCases }: Props) => {
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"
                     >
-                      <path d={example.icon} fill="var(--colors-brand12)" />
+                      <path d={example.icon} fill="var(--colors-scale11)" />
                     </svg>
-                    <h4 className="text-lg m-0">{example.title}</h4>
+                    <h4 className="text-sm md:text-lg m-0">{example.title}</h4>
                   </div>
                   <p className="text-sm text-scale-900 mt-2">{example.description}</p>
                 </div>
