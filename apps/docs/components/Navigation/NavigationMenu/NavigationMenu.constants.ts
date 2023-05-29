@@ -886,6 +886,10 @@ export const ai: NavMenuConstant = {
           url: '/guides/ai/examples/headless-vector-search',
         },
         {
+          name: 'Image Search',
+          url: '/guides/ai/examples/image-search-python',
+        },
+        {
           name: 'Hugging Face inference with Edge Functions',
           url: '/guides/ai/examples/huggingface-image-captioning',
         },
