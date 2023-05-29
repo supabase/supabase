@@ -1,11 +1,10 @@
-import { useParams } from 'common'
+import { useParams, useTheme } from 'common'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import dayjs from 'dayjs'
 import { useFlag } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
-import Image from 'next/image'
 import Link from 'next/link'
 import { useMemo } from 'react'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
@@ -22,6 +21,7 @@ const AddOns = ({}: AddOnsProps) => {
   const { ref: projectRef } = useParams()
   const snap = useSubscriptionPageStateSnapshot()
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
+  const { isDarkMode } = useTheme()
 
   // [Joshen] We could possibly look into reducing the interval to be more "realtime"
   // I tried setting the interval to 1m but no data was returned, may need to experiment
@@ -107,15 +107,19 @@ const AddOns = ({}: AddOnsProps) => {
               {/* Compute add on selection */}
               <div className="flex space-x-6">
                 <div>
-                  <div className="rounded-md bg-scale-400 w-[160px] h-[96px] shadow">
-                    <Image
-                      alt="Optimized Compute add-on"
+                  <div className="rounded-md bg-scale-100 dark:bg-scale-400 w-[160px] h-[96px] shadow">
+                    <img
+                      alt="Optimized Compute"
                       width={160}
                       height={96}
                       src={
                         computeInstance !== undefined
-                          ? `${BASE_PATH}/img/optimized-compute-on.svg`
-                          : `${BASE_PATH}/img/optimized-compute-off.svg`
+                          ? `${BASE_PATH}/img/optimized-compute-on${
+                              isDarkMode ? '' : '--light'
+                            }.png`
+                          : `${BASE_PATH}/img/optimized-compute-off${
+                              isDarkMode ? '' : '--light'
+                            }.png`
                       }
                     />
                   </div>
@@ -262,15 +266,15 @@ const AddOns = ({}: AddOnsProps) => {
               {/* PITR selection */}
               <div className="flex space-x-6">
                 <div>
-                  <div className="rounded-md bg-scale-400 w-[160px] h-[96px] shadow">
-                    <Image
+                  <div className="rounded-md bg-scale-100 dark:bg-scale-400 w-[160px] h-[96px] shadow">
+                    <img
                       alt="Point-In-Time-Recovery"
                       width={160}
                       height={96}
                       src={
                         pitr !== undefined
-                          ? `${BASE_PATH}/img/pitr-on.svg`
-                          : `${BASE_PATH}/img/pitr-off.svg`
+                          ? `${BASE_PATH}/img/pitr-on${isDarkMode ? '' : '--light'}.png?v=2`
+                          : `${BASE_PATH}/img/pitr-off${isDarkMode ? '' : '--light'}.png?v=2`
                       }
                     />
                   </div>
@@ -302,15 +306,15 @@ const AddOns = ({}: AddOnsProps) => {
               {/* Custom domain selection */}
               <div className="flex space-x-6">
                 <div>
-                  <div className="rounded-md bg-scale-400 w-[160px] h-[96px] shadow">
-                    <Image
+                  <div className="rounded-md bg-scale-100 dark:bg-scale-400 w-[160px] h-[96px] shadow">
+                    <img
                       alt="Custom Domain"
                       width={160}
                       height={96}
                       src={
                         customDomain !== undefined
-                          ? `${BASE_PATH}/img/custom-domain-on.svg`
-                          : `${BASE_PATH}/img/custom-domain-off.svg`
+                          ? `${BASE_PATH}/img/custom-domain-on${isDarkMode ? '' : '--light'}.png`
+                          : `${BASE_PATH}/img/custom-domain-off${isDarkMode ? '' : '--light'}.png`
                       }
                     />
                   </div>
