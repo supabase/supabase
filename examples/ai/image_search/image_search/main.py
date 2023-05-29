@@ -12,7 +12,7 @@ def seed():
     # create vector store client
     vx = vecs.create_client(DB_CONNECTION)
 
-    # create a collection of vectors with 3 dimensions
+    # create a collection of vectors with 512 dimensions
     images = vx.create_collection(name="image_vectors", dimension=512)
 
     # Load CLIP model
@@ -28,9 +28,9 @@ def seed():
     images.upsert(
         vectors=[
             (
-                "one.jpg",        # the vector's identifier
-                img_emb1,          # the vector. list or np.array
-                {"type": "jpg"}   # associated  metadata
+                "one.jpg",       # the vector's identifier
+                img_emb1,        # the vector. list or np.array
+                {"type": "jpg"}  # associated  metadata
             ), (
                 "two.jpg",
                 img_emb2,
@@ -53,7 +53,7 @@ def seed():
     print("Created index")
 
 
-def start(args=sys.argv):
+def search(args=sys.argv):
     # create vector store client
     vx = vecs.create_client(DB_CONNECTION)
     images = vx.get_collection(name="image_vectors")
