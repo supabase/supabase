@@ -11,6 +11,7 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { Alert, Button, IconExternalLink, Modal, Radio, SidePanel } from 'ui'
+import SVG from 'react-inlinesvg'
 
 const COMPUTE_CATEGORY_OPTIONS: { id: 'micro' | 'optimized'; name: string; imageUrl: string }[] = [
   { id: 'micro', name: 'Micro Compute', imageUrl: `${BASE_PATH}/img/optimized-compute-off.svg` },
@@ -147,17 +148,16 @@ const ComputeInstanceSidePanel = () => {
                         if (option.id === 'micro') setSelectedOption('ci_micro')
                       }}
                     >
-                      <div
+                      <SVG
                         className={clsx(
-                          'relative rounded-xl transition border bg-no-repeat bg-center bg-cover cursor-pointer',
+                          'relative rounded-xl transition border bg-no-repeat bg-center bg-cover cursor-pointer w-[160px] h-[96px]',
                           isSelected
                             ? 'border-brand-900'
                             : 'border-scale-900 opacity-50 group-hover:border-scale-1100 group-hover:opacity-100'
                         )}
-                        style={{
-                          aspectRatio: ' 160/96',
-                          backgroundImage: `url(${option.imageUrl})`,
-                        }}
+                        width={160}
+                        height={96}
+                        src={option.imageUrl}
                       />
                       <p
                         className={clsx(

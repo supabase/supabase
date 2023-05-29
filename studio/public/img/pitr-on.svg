@@ -1,6 +1,6 @@
 <svg width="160" height="96" viewBox="0 0 160 96" fill="none" xmlns="http://www.w3.org/2000/svg">
 <g clip-path="url(#clip0_4562_79171)">
-<rect width="160" height="96" rx="8" fill="#282828"/>
+<rect width="160" height="96" rx="8" fill="var(--colors-scale3)"/>
 <g filter="url(#filter0_b_4562_79171)">
 <rect x="38.6982" y="17.3555" width="81.3482" height="47.2603" rx="4.93375" fill="url(#paint0_linear_4562_79171)"/>
 <rect x="39.1982" y="17.8555" width="80.3482" height="46.2603" rx="4.43375" stroke="url(#paint1_linear_4562_79171)"/>
@@ -18,7 +18,7 @@
 <rect x="20.5" y="43.3359" width="119" height="65.1644" rx="4.43375" stroke="url(#paint7_linear_4562_79171)"/>
 </g>
 </g>
-<rect x="0.5" y="0.5" width="159" height="95" rx="7.5" stroke="#2E2E2E"/>
+<rect x="0.5" y="0.5" width="159" height="95" rx="7.5" stroke="var(--colors-scale5)"/>
 <defs>
 <filter id="filter0_b_4562_79171" x="25.6982" y="4.35547" width="107.349" height="73.2617" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
 <feFlood flood-opacity="0" result="BackgroundImageFix"/>
@@ -64,8 +64,8 @@
 <stop offset="1" stop-color="#1C1C1C" stop-opacity="0"/>
 </linearGradient>
 <linearGradient id="paint3_linear_4562_79171" x1="111.098" y1="15.6709" x2="102.206" y2="51.224" gradientUnits="userSpaceOnUse">
-<stop stop-color="#5CF69D"/>
-<stop offset="1" stop-color="#5CF69D" stop-opacity="0.25"/>
+<stop stop-color="var(--colors-brand9)"/>
+<stop offset="1" stop-color="var(--colors-brand9)" stop-opacity="0.25"/>
 </linearGradient>
 <linearGradient id="paint4_linear_4562_79171" x1="25.5479" y1="96.2497" x2="80.5109" y2="1.64275" gradientUnits="userSpaceOnUse">
 <stop stop-color="#1C1C1C" stop-opacity="0"/>

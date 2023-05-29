@@ -15,6 +15,7 @@ import ComputeInstanceSidePanel from './ComputeInstanceSidePanel'
 import CustomDomainSidePanel from './CustomDomainSidePanel'
 import PITRSidePanel from './PITRSidePanel'
 import ProjectUpdateDisabledTooltip from '../../ProjectUpdateDisabledTooltip'
+import SVG from 'react-inlinesvg'
 
 export interface AddOnsProps {}
 
@@ -108,8 +109,7 @@ const AddOns = ({}: AddOnsProps) => {
               <div className="flex space-x-6">
                 <div>
                   <div className="rounded-md bg-scale-400 w-[160px] h-[96px] shadow">
-                    <Image
-                      alt="Optimized Compute add-on"
+                    <SVG
                       width={160}
                       height={96}
                       src={
@@ -263,8 +263,7 @@ const AddOns = ({}: AddOnsProps) => {
               <div className="flex space-x-6">
                 <div>
                   <div className="rounded-md bg-scale-400 w-[160px] h-[96px] shadow">
-                    <Image
-                      alt="Point-In-Time-Recovery"
+                    <SVG
                       width={160}
                       height={96}
                       src={
@@ -303,8 +302,7 @@ const AddOns = ({}: AddOnsProps) => {
               <div className="flex space-x-6">
                 <div>
                   <div className="rounded-md bg-scale-400 w-[160px] h-[96px] shadow">
-                    <Image
-                      alt="Custom Domain"
+                    <SVG
                       width={160}
                       height={96}
                       src={

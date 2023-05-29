@@ -1,6 +1,6 @@
 <svg width="160" height="96" viewBox="0 0 160 96" fill="none" xmlns="http://www.w3.org/2000/svg">
 <g clip-path="url(#clip0_4562_79169)">
-<rect width="160" height="96" rx="8" fill="#282828"/>
+<rect width="160" height="96" rx="8" fill="var(--colors-scale3)"/>
 <g opacity="0.1" filter="url(#filter0_b_4562_79169)">
 <rect x="38.6982" y="17.3555" width="81.3482" height="47.2603" rx="6" fill="url(#paint0_linear_4562_79169)"/>
 <rect x="39.1982" y="17.8555" width="80.3482" height="46.2603" rx="5.5" stroke="url(#paint1_linear_4562_79169)" stroke-linejoin="round" stroke-dasharray="4 4"/>
@@ -18,7 +18,7 @@
 <rect x="20.5" y="43.3359" width="119" height="65.1644" rx="5.5" stroke="url(#paint7_linear_4562_79169)"/>
 </g>
 </g>
-<rect x="0.5" y="0.5" width="159" height="95" rx="7.5" stroke="#2E2E2E"/>
+<rect x="0.5" y="0.5" width="159" height="95" rx="7.5" stroke="var(--colors-scale5)"/>
 <defs>
 <filter id="filter0_b_4562_79169" x="25.6982" y="4.35547" width="107.349" height="73.2617" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
 <feFlood flood-opacity="0" result="BackgroundImageFix"/>

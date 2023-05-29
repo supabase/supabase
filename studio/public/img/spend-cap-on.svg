@@ -1,11 +1,11 @@
 <svg width="160" height="96" viewBox="0 0 160 96" fill="none" xmlns="http://www.w3.org/2000/svg">
 <g clip-path="url(#clip0_4561_77476)">
-<rect width="160" height="96" rx="8" fill="#282828"/>
-<path d="M-25 14.6328H177.5" stroke="#2E2E2E"/>
-<path d="M-25 30.6328H177.5" stroke="#2E2E2E"/>
-<path d="M-25 46.6328H177.5" stroke="#2E2E2E"/>
-<path d="M-25 62.6328H177.5" stroke="#2E2E2E"/>
-<path d="M-25 78.6328H177.5" stroke="#2E2E2E"/>
+<rect width="160" height="96" rx="8" fill="var(--colors-scale3)"/>
+<path d="M-25 14.6328H177.5" stroke="var(--colors-scale4)"/>
+<path d="M-25 30.6328H177.5" stroke="var(--colors-scale4)"/>
+<path d="M-25 46.6328H177.5" stroke="var(--colors-scale4)"/>
+<path d="M-25 62.6328H177.5" stroke="var(--colors-scale4)"/>
+<path d="M-25 78.6328H177.5" stroke="var(--colors-scale4)"/>
 <g filter="url(#filter0_b_4561_77476)">
 <rect y="62.6328" width="8" height="23.5" rx="2" fill="url(#paint0_linear_4561_77476)"/>
 <rect x="0.5" y="63.1328" width="7" height="22.5" rx="1.5" stroke="url(#paint1_linear_4561_77476)"/>
@@ -30,9 +30,9 @@
 <path d="M135 46.6328H143V84.1328C143 85.2374 142.105 86.1328 141 86.1328H137C135.895 86.1328 135 85.2374 135 84.1328V46.6328Z" fill="url(#paint10_linear_4561_77476)"/>
 <path d="M135.5 47.1328H142.5V84.1328C142.5 84.9612 141.828 85.6328 141 85.6328H137C136.172 85.6328 135.5 84.9612 135.5 84.1328V47.1328Z" stroke="url(#paint11_linear_4561_77476)"/>
 </g>
-<path d="M-25 46.6328H177.5" stroke="#FFB224" stroke-dasharray="2 2"/>
+<path d="M-25 46.6328H177.5" stroke="var(--colors-amber9)" stroke-dasharray="2 2"/>
 </g>
-<rect x="0.5" y="0.5" width="159" height="95" rx="7.5" stroke="#2E2E2E"/>
+<rect x="0.5" y="0.5" width="159" height="95" rx="7.5" stroke="var(--colors-scale4)"/>
 <defs>
 <filter id="filter0_b_4561_77476" x="-13" y="49.6328" width="34" height="49.5" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
 <feFlood flood-opacity="0" result="BackgroundImageFix"/>
