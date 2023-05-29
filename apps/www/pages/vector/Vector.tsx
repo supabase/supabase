@@ -9,6 +9,7 @@ import HighlightCards from '~/components/Sections/HighlightCards'
 import UseCasesSection from '~/components/Sections/UseCasesSection'
 import CenteredTitleImage from '~/components/Sections/CenteredTitleImage'
 import TimedTabsSection from '~/components/Sections/TimedTabsSection'
+import ProductsCta from '~/components/Sections/ProductsCta'
 
 import { pageData } from '~/data/products/vector/page'
 
@@ -45,6 +46,7 @@ function VectorPage() {
         <UseCasesSection {...pageData.useCasesSection} />
         <FeaturesSection {...pageData.featuresSection} />
         <CommunitySlider />
+        <ProductsCta />
 
         <CTABanner />
       </DefaultLayout>
