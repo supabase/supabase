@@ -79,6 +79,22 @@ const App = () => (
 )
 ```
 
+### Options
+
+Options are available within auth-ui via 'queryParams':
+
+```<Auth
+			supabaseClient={supabase}
+			providers={['google']}
+			queryParams={{
+        access_type: 'offline',
+        prompt: 'consent', 
+        hd: 'domain.com'
+        }} 
+			onlyThirdPartyProviders={true}
+		/>
+ ```
+
 ### Supported Views
 
 The Auth component is currently shipped with the following views:
