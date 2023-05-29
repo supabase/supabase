@@ -64,7 +64,6 @@ const TimedTabsSection = ({
   const [activeTab, setActiveTab] = useState(0)
   const [progress, setProgress] = useState(0)
   const [apiSwiper, setApiSwiper] = useState(undefined)
-  const [intervalId, setIntervalId] = useState<any>(null)
   const controls = useAnimation()
 
   useEffect(() => {
@@ -73,29 +72,10 @@ const TimedTabsSection = ({
     apiSwiper.slideTo(activeTab)
   }, [activeTab])
 
-  const startInterval = () => {
-    const interval = setInterval(() => {
-      setActiveTab((prevActiveTab) => (prevActiveTab === tabs.length - 1 ? 0 : prevActiveTab + 1))
-    }, intervalDuration * 1000)
-    setIntervalId(interval)
-  }
-
   const restartInterval = (tabIndex: number) => {
-    clearInterval(intervalId)
     setProgress(0)
-    startInterval()
     setActiveTab(tabIndex)
   }
-
-  useEffect(() => {
-    // const interval = setInterval(() => {
-    //   setActiveTab((prevActiveTab) => (prevActiveTab === tabs.length - 1 ? 0 : prevActiveTab + 1))
-    // }, intervalDuration * 1000) // Change tab every x seconds
-
-    startInterval()
-
-    return () => clearInterval(intervalId)
-  }, [tabs.length, intervalDuration])
 
   const animation = {
     width: '100%',
@@ -116,6 +96,12 @@ const TimedTabsSection = ({
       setProgress(0)
     }
   }, [activeTab, controls])
+
+  useEffect(() => {
+    if (progress >= 100) {
+      setActiveTab((prevActiveTab) => (prevActiveTab === tabs.length - 1 ? 0 : prevActiveTab + 1))
+    }
+  }, [progress])
 
   const handleTabClick = (tabIndex: number) => {
     restartInterval(tabIndex)
