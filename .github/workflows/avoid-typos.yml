@@ -14,7 +14,7 @@ jobs:
         uses: reviewdog/action-misspell@v1
         with:
           github_token: ${{ secrets.github_token }}
-          locale: "US"
+          locale: 'US'
           reporter: github-pr-review
           level: error
           exclude: |
@@ -22,3 +22,4 @@ jobs:
             "**/package.json"
             "**/package-lock.json"
             ".git/*"
+            "*.ipynb"
