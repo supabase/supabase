@@ -16,7 +16,9 @@ interface Props {
 
 const DatabaseLayout: FC<Props> = ({ title, children }) => {
   const { meta, ui, vault, backups } = useStore()
-  const { isLoading } = meta.schemas
+  const { isLoading: isSchemasLoading } = meta.schemas
+  const { isLoading: isVaultLoading } = vault
+
   const { isInitialized, error } = meta.tables
   const project = ui.selectedProject
 
@@ -26,7 +28,9 @@ const DatabaseLayout: FC<Props> = ({ title, children }) => {
   const vaultExtension = meta.extensions.byId('supabase_vault')
   const isVaultEnabled = vaultExtension !== undefined && vaultExtension.installed_version !== null
   const foreignDataWrappersEnabled = useFlag('foreignDataWrappers')
+  const pgNetExtensionExists = meta.extensions.byId('pg_net') !== undefined
 
+  const isLoading = isSchemasLoading || (isVaultEnabled && isVaultLoading)
   const [loaded, setLoaded] = useState<boolean>(isInitialized)
 
   useEffect(() => {
@@ -73,7 +77,7 @@ const DatabaseLayout: FC<Props> = ({ title, children }) => {
       isLoading={!loaded}
       product="Database"
       productMenu={
-        <ProductMenu page={page} menu={generateDatabaseMenu(project, foreignDataWrappersEnabled)} />
+        <ProductMenu page={page} menu={generateDatabaseMenu(project, foreignDataWrappersEnabled, pgNetExtensionExists)} />
       }
     >
       <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">

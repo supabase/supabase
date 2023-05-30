@@ -119,7 +119,7 @@ const TopNavBarRef: FC = () => {
             type="text"
             as="a"
             // @ts-ignore
-            href="https://app.supabase.com"
+            href="https://supabase.com/dashboard"
             target="_blank"
             rel="noreferrer noopener"
           >

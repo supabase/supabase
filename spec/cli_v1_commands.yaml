@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 1.50.13
+  version: 1.62.3
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -401,7 +401,24 @@ commands:
     links: []
     subcommands:
       - supabase-test-db
+      - supabase-test-new
     flags: []
+  - id: supabase-test-new
+    title: supabase test new
+    summary: Create a new test file
+    tags: []
+    links: []
+    usage: supabase test new <name> [flags]
+    subcommands: []
+    flags:
+      - id: template
+        name: -t, --template <[ pgtap ]>
+        description: Template framework to generate.
+        default_value: pgtap
+        accepted_values:
+          - id: pgtap
+            name: pgtap
+            type: '[ pgtap ]'
   - id: supabase-test-db
     title: supabase test db
     summary: Tests local database with pgTAP
@@ -458,9 +475,9 @@ commands:
     usage: supabase stop [flags]
     subcommands: []
     flags:
-      - id: backup
-        name: --backup
-        description: Backs up the current database before stopping.
+      - id: no-backup
+        name: --no-backup
+        description: Deletes all data volumes after stopping.
         default_value: 'false'
   - id: supabase-status
     title: supabase status
@@ -663,7 +680,11 @@ commands:
     links: []
     usage: supabase secrets unset <NAME> ...
     subcommands: []
-    flags: []
+    flags:
+      - id: project-ref
+        name: --project-ref <string>
+        description: Project ref of the Supabase project.
+        default_value: ''
   - id: supabase-secrets-set
     title: supabase secrets set
     summary: Set a secret(s) on Supabase
@@ -677,6 +698,10 @@ commands:
         name: --env-file <string>
         description: Read secrets from a .env file.
         default_value: ''
+      - id: project-ref
+        name: --project-ref <string>
+        description: Project ref of the Supabase project.
+        default_value: ''
   - id: supabase-secrets-list
     title: supabase secrets list
     summary: List all secrets on Supabase
@@ -685,7 +710,11 @@ commands:
     links: []
     usage: supabase secrets list
     subcommands: []
-    flags: []
+    flags:
+      - id: project-ref
+        name: --project-ref <string>
+        description: Project ref of the Supabase project.
+        default_value: ''
   - id: supabase-projects
     title: supabase projects
     summary: Manage Supabase projects
@@ -915,10 +944,19 @@ commands:
       - supabase-migration-list
       - supabase-migration-new
       - supabase-migration-repair
+      - supabase-migration-up
+    flags: []
+  - id: supabase-migration-up
+    title: supabase migration up
+    summary: Apply pending migrations to local database
+    tags: []
+    links: []
+    usage: supabase migration up
+    subcommands: []
     flags: []
   - id: supabase-migration-repair
     title: supabase migration repair
-    summary: Repairs the migration history table
+    summary: Repair the migration history table
     description: |2
 
       Repairs the remote migration history table.
@@ -973,6 +1011,10 @@ commands:
     usage: supabase migration repair <version> [flags]
     subcommands: []
     flags:
+      - id: db-url
+        name: --db-url <string>
+        description: connect using the specified database url
+        default_value: ''
       - id: password
         name: -p, --password <string>
         description: Password to your remote Postgres database.
@@ -989,10 +1031,6 @@ commands:
           - id: reverted
             name: reverted
             type: '[ applied | reverted ]'
-      - id: db-url
-        name: --db-url <string>
-        description: connect using the specified database url
-        default_value: ''
   - id: supabase-migration-new
     title: supabase migration new
     summary: Create an empty migration script
@@ -1018,11 +1056,7 @@ commands:
     links: []
     usage: supabase migration new <migration name>
     subcommands: []
-    flags:
-      - id: db-url
-        name: --db-url <string>
-        description: connect using the specified database url
-        default_value: ''
+    flags: []
   - id: supabase-migration-list
     title: supabase migration list
     summary: List local and remote migrations
@@ -1060,20 +1094,20 @@ commands:
     usage: supabase migration list [flags]
     subcommands: []
     flags:
-      - id: password
-        name: -p, --password <string>
-        description: Password to your remote Postgres database.
-        default_value: ''
       - id: db-url
         name: --db-url <string>
         description: connect using the specified database url
+        default_value: ''
+      - id: password
+        name: -p, --password <string>
+        description: Password to your remote Postgres database.
         default_value: ''
   - id: supabase-login
     title: supabase login
     summary: Authenticate using an access token
     description: |2
 
-      Connect the Supabase CLI to your Supabase account by logging in with your [personal access token](https://app.supabase.com/account/tokens).
+      Connect the Supabase CLI to your Supabase account by logging in with your [personal access token](https://supabase.com/dashboard/account/tokens).
 
       Your access token is stored securely in [native credentials storage](https://github.com/zalando/go-keyring#dependencies). If native credentials storage is unavailable, it will be written to a plain text file at `~/.supabase/access-token`.
 
@@ -1085,7 +1119,7 @@ commands:
         name: Basic usage
         code: supabase login
         response: |
-          You can generate an access token from https://app.supabase.com/account/tokens
+          You can generate an access token from https://supabase.com/dashboard/account/tokens
           Enter your access token: sbp_****************************************
           Finished supabase login.
     tags:
@@ -1176,6 +1210,7 @@ commands:
       - local-dev
     links: []
     subcommands:
+      - supabase-gen-keys
       - supabase-gen-types
     flags: []
   - id: supabase-gen-types
@@ -1216,6 +1251,44 @@ commands:
         name: --schema <stringArray>
         description: Schemas to generate types for.
         default_value: '[]'
+  - id: supabase-gen-keys
+    title: supabase gen keys
+    summary: Generate keys for preview branch
+    tags: []
+    links: []
+    usage: supabase gen keys [flags]
+    subcommands: []
+    flags:
+      - id: output
+        name: -o, --output <[ env | json | toml | yaml ]>
+        description: Output format of key variables.
+        default_value: env
+        accepted_values:
+          - id: env
+            name: env
+            type: '[ env | json | toml | yaml ]'
+          - id: json
+            name: json
+            type: '[ env | json | toml | yaml ]'
+          - id: toml
+            name: toml
+            type: '[ env | json | toml | yaml ]'
+          - id: yaml
+            name: yaml
+            type: '[ env | json | toml | yaml ]'
+      - id: override-name
+        name: --override-name <strings>
+        description: Override specific variable names.
+        default_value: '[]'
+      - id: project-ref
+        name: --project-ref <string>
+        description: Project ref of the Supabase project.
+        default_value: ''
+      - id: experimental
+        name: --experimental
+        description: enable experimental features
+        required: true
+        default_value: 'false'
   - id: supabase-functions
     title: supabase functions
     summary: Manage Supabase Edge functions
@@ -1285,10 +1358,6 @@ commands:
         name: --import-map <string>
         description: Path to import map file.
         default_value: ''
-      - id: legacy-bundle
-        name: --legacy-bundle
-        description: Use legacy bundling mechanism.
-        default_value: 'false'
       - id: no-verify-jwt
         name: --no-verify-jwt
         description: Disable JWT verification for the Function.
@@ -1474,9 +1543,13 @@ commands:
           Finished supabase db reset on branch main.
     tags: []
     links: []
-    usage: supabase db reset
+    usage: supabase db reset [flags]
     subcommands: []
     flags:
+      - id: linked
+        name: --linked
+        description: Resets the linked project to current migrations.
+        default_value: 'false'
       - id: db-url
         name: --db-url <string>
         description: connect using the specified database url
@@ -1492,6 +1565,13 @@ commands:
   - id: supabase-db-remote-commit
     title: supabase db remote commit
     summary: Commit remote changes as a new migration
+    description: |2
+
+      Pulls schema changes from a remote database and inserts a new row into the migration history table.
+
+      Requires your local project to be linked to a remote database by running `supabase link`. For self-hosted databases, you can pass in the connection parameters using `--db-url` flag.
+
+      If no entries exist in the migration history table, `pg_dump` will be used to capture all contents of the remote schemas you have created. After that, a new record will be inserted into the migration history table. Subsequent runs of this command will only diff schema changes against the remote database similar to `db diff --linked`.
     tags: []
     links: []
     usage: supabase db remote commit
@@ -1614,6 +1694,10 @@ commands:
           - id: error
             name: error
             type: '[ warning | error ]'
+      - id: linked
+        name: --linked
+        description: Lints the linked project for schema errors.
+        default_value: 'false'
       - id: schema
         name: -s, --schema <strings>
         description: List of schema to include.
@@ -1666,6 +1750,10 @@ commands:
         name: -f, --file <string>
         description: File path to save the dumped contents.
         default_value: ''
+      - id: keep-comments
+        name: --keep-comments
+        description: Keeps commented lines from pg_dump output.
+        default_value: 'false'
       - id: password
         name: -p, --password <string>
         description: Password to your remote Postgres database.
@@ -1740,7 +1828,7 @@ commands:
         default_value: ''
       - id: linked
         name: --linked
-        description: Diffs local schema against linked project.
+        description: Diffs local schema against the linked project.
         default_value: 'false'
       - id: schema
         name: -s, --schema <strings>
