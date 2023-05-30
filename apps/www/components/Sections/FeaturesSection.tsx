@@ -4,7 +4,7 @@ import { LazyMotion, domAnimation, m, useInView } from 'framer-motion'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { INITIAL_BOTTOM, getAnimation } from '~/lib/animations'
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
-import { Button } from 'ui'
+import { Button, IconArrowUpRight } from 'ui'
 
 interface Feature {
   icon: string
@@ -37,7 +37,7 @@ const FeaturesSection = ({ title, paragraph, cta, features }: Props) => {
             {cta && (
               <Link href={cta.link}>
                 <a>
-                  <Button type="default" size="small">
+                  <Button type="default" size="small" icon={<IconArrowUpRight />}>
                     {cta.label ?? 'Explore documentation'}
                   </Button>
                 </a>

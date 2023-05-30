@@ -18,9 +18,8 @@ export default {
     ),
     subheader: (
       <>
-        Integrate Supabase Vector database with your favorite ML-models{' '}
-        <br className="hidden md:block" />
-        to easily store, access and scale vector embeddings for any AI use case.
+        Use pgvector with Supabase client libraries <br className="hidden md:block" />
+        to store, index, and query your vector embeddings at scale.
       </>
     ),
     image: '/images/product/vector/vector-hero.svg',
@@ -32,19 +31,17 @@ export default {
       label: 'Explore documentation',
       link: '/docs/guides/ai',
     },
-    // video: '',
   },
   highlightsSection: {
     highlights: [
       {
         title: 'Postgres + pgvector',
         paragraph:
-          // 'Every Supabase project is a dedicated Postgres instance. Use pgvector to store, query, and index your vector embeddings at scale.',
           'Use pgvector to store, query, and index your vector embeddings at scale in a Postgres instance.',
         image: PGvectorImg,
       },
       {
-        title: 'Connect with OpenAI',
+        title: 'OpenAI and More',
         paragraph:
           'Easily connect to any LLM or embeddings API, including Hugging Face, SageMaker and more.',
         image: OpenAIImage,
@@ -81,7 +78,7 @@ export default {
       <>
         <span className="heading-gradient">What you can build</span>
         <br />
-        <span className="heading-gradient">with Supabase Vector</span>
+        <span className="heading-gradient">with Supabase Vector?</span>
       </>
     ),
     paragraph: 'Scale effortlessly from experimentation to production-ready AI applications.',
