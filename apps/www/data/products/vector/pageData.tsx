@@ -25,13 +25,13 @@ export default {
     ),
     image: '/images/product/vector/vector-hero.svg',
     cta: {
-      label: 'Start for free',
+      label: 'Quickstart',
+      link: '/docs/guides/ai/vecs-python-client',
+    },
+    secondaryCta: {
+      label: 'Explore documentation',
       link: '/docs/guides/ai',
     },
-    // secondaryCta: {
-    //   label: 'Quickstart',
-    //   link: '/docs/guides/ai/vecs-python-client',
-    // },
     // video: '',
   },
   highlightsSection: {
