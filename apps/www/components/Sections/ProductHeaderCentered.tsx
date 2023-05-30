@@ -1,4 +1,4 @@
-import { Button, IconBookOpen, IconPlayCircle } from 'ui'
+import { Button, IconPlayCircle } from 'ui'
 import Link from 'next/link'
 import ProductIcon from '../ProductIcon'
 import Image from 'next/image'
