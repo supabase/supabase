@@ -62,7 +62,7 @@ const nextConfig = {
       'raw.githubusercontent.com',
       'weweb-changelog.ghost.io',
       'img.youtube.com',
-      'archbee-image-uploads.s3.amazonaws.com'
+      'archbee-image-uploads.s3.amazonaws.com',
     ],
   },
   experimental: {
@@ -109,7 +109,7 @@ const nextConfig = {
 
 const configExport = () => {
   const plugins = [
-    withTM(['ui', 'common', '@supabase/auth-helpers-nextjs']),
+    withTM(['ui', 'common', '@supabase/auth-helpers-nextjs', 'mermaid', 'mdx-mermaid', 'dayjs']),
     withMDX,
     withYaml,
     withBundleAnalyzer,
