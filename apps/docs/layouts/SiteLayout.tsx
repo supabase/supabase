@@ -46,6 +46,10 @@ const levelsData = {
     icon: '/docs/img/icons/menu/storage',
     name: 'Storage',
   },
+  ai: {
+    icon: '/docs/img/icons/menu/ai',
+    name: 'AI & Vectors',
+  },
   supabase_cli: {
     icon: '/docs/img/icons/menu/reference-cli',
     name: 'Supabase CLI',
