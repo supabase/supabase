@@ -1,10 +1,11 @@
 import Link from 'next/link'
 import React, { ReactNode, useRef } from 'react'
-import { Button } from 'ui'
+import { Button, IconArrowUpRight } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import InteractiveShimmerCard from '../InteractiveShimmerCard'
 import { LazyMotion, domAnimation, m, useInView } from 'framer-motion'
 import { INITIAL_BOTTOM, getAnimation } from '~/lib/animations'
+import { ArrowTopRightSvg } from '../LaunchWeek/Releases/LW7/components'
 
 interface UseCase {
   img?: string
@@ -86,8 +87,8 @@ const UseCase = ({
               </Button>
             ) : (
               <Link href={useCase.cta.link}>
-                <a>
-                  <Button size="tiny" type="default">
+                <a target="_blank">
+                  <Button size="tiny" type="default" iconRight={<IconArrowUpRight />}>
                     {useCase.cta.label ?? 'View example'}
                   </Button>
                 </a>

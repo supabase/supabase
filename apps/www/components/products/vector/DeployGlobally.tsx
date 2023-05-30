@@ -1,19 +1,21 @@
 import React from 'react'
+import { useTheme } from 'common/Providers'
 
 function getRandomNumber(min: number, max: number) {
-  // Calculating the range
   var range = max - min
-
-  // Generating a random number within the range
   var randomNumber = Math.random() * range + min
 
-  // Rounding the random number to the nearest integer
   return Math.round(randomNumber)
 }
 
 const DeployGlobally = ({ isHovered }: { isHovered: boolean }) => {
+  const { isDarkMode } = useTheme()
   const ref = React.useRef<any>()
   const states = ['off', 'medium', 'high']
+  const colors = {
+    green: isDarkMode ? '#1CF7C3' : '#00B99F',
+    gray: isDarkMode ? '#151918' : '#D3D3D3',
+  }
   const indices = [
     3, 11, 14, 23, 27, 35, 42, 48, 55, 62, 67, 71, 81, 83, 91, 98, 103, 107, 110, 115,
   ]
@@ -42,7 +44,7 @@ const DeployGlobally = ({ isHovered }: { isHovered: boolean }) => {
             (currentState === 'medium' && nextState === 'high'))
 
         if (pulse) {
-          const delay = getRandomNumber(50, 150)
+          const delay = getRandomNumber(50, 100)
 
           timeoutIds.push(
             setTimeout(() => {
@@ -63,7 +65,7 @@ const DeployGlobally = ({ isHovered }: { isHovered: boolean }) => {
           circle.dataset.state = nextState
         }
       })
-    }, 1000)
+    }, 300)
 
     return () => {
       clearInterval(interval)
@@ -87,126 +89,126 @@ const DeployGlobally = ({ isHovered }: { isHovered: boolean }) => {
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
-        <circle cx="22.5" cy="27.5" r="2.5" fill="#151918" />
-        <circle cx="57.5" cy="27.5" r="2.5" fill="#151918" />
-        <circle cx="34.5" cy="27.5" r="2.5" fill="#1CF7C3" />
-        <circle cx="68.5" cy="27.5" r="2.5" fill="#151918" />
-        <circle cx="45.5" cy="27.5" r="2.5" fill="#151918" />
-        <circle cx="83.5" cy="27.5" r="2.5" fill="#1CF7C3" />
-        <circle cx="118.5" cy="27.5" r="2.5" fill="#1CF7C3" />
-        <circle cx="95.5" cy="27.5" r="2.5" fill="#1CF7C3" />
-        <circle cx="130.5" cy="27.5" r="2.5" fill="#151918" />
-        <circle cx="106.5" cy="27.5" r="2.5" fill="#151918" />
-        <circle cx="22.5" cy="38.5" r="2.5" fill="#151918" />
-        <circle cx="57.5" cy="38.5" r="2.5" fill="#1CF7C3" />
-        <circle cx="34.5" cy="38.5" r="2.5" fill="#151918" />
-        <circle cx="68.5" cy="38.5" r="2.5" fill="#151918" />
-        <circle cx="45.5" cy="38.5" r="2.5" fill="#1CF7C3" />
-        <circle cx="22.5" cy="49.5" r="2.5" fill="#151918" />
-        <circle cx="57.5" cy="49.5" r="2.5" fill="#1CF7C3" />
-        <circle cx="34.5" cy="49.5" r="2.5" fill="#151918" />
-        <circle cx="68.5" cy="49.5" r="2.5" fill="#1CF7C3" />
-        <circle cx="45.5" cy="49.5" r="2.5" fill="#1CF7C3" />
-        <circle cx="22.5" cy="94.5" r="2.5" fill="#151918" />
-        <circle cx="57.5" cy="94.5" r="2.5" fill="#151918" />
-        <circle cx="34.5" cy="94.5" r="2.5" fill="#151918" />
-        <circle cx="68.5" cy="94.5" r="2.5" fill="#151918" />
-        <circle cx="45.5" cy="94.5" r="2.5" fill="#1CF7C3" />
-        <circle cx="83.5" cy="94.5" r="2.5" fill="#151918" />
-        <circle cx="118.5" cy="94.5" r="2.5" fill="#1CF7C3" />
-        <circle cx="95.5" cy="94.5" r="2.5" fill="#1CF7C3" />
-        <circle cx="130.5" cy="94.5" r="2.5" fill="#151918" />
-        <circle cx="106.5" cy="94.5" r="2.5" fill="#151918" />
-        <circle cx="22.5" cy="105.5" r="2.5" fill="#151918" />
-        <circle cx="57.5" cy="105.5" r="2.5" fill="#1CF7C3" />
-        <circle cx="34.5" cy="105.5" r="2.5" fill="#1CF7C3" />
-        <circle cx="68.5" cy="105.5" r="2.5" fill="#151918" />
-        <circle cx="45.5" cy="105.5" r="2.5" fill="#151918" />
-        <circle cx="22.5" cy="116.5" r="2.5" fill="#151918" />
-        <circle cx="57.5" cy="116.5" r="2.5" fill="#151918" />
-        <circle cx="34.5" cy="116.5" r="2.5" fill="#151918" />
-        <circle cx="68.5" cy="116.5" r="2.5" fill="#151918" />
-        <circle cx="45.5" cy="116.5" r="2.5" fill="#1CF7C3" />
-        <circle cx="22.5" cy="160.5" r="2.5" fill="#151918" />
-        <circle cx="57.5" cy="160.5" r="2.5" fill="#151918" />
-        <circle cx="34.5" cy="160.5" r="2.5" fill="#1CF7C3" />
-        <circle cx="68.5" cy="160.5" r="2.5" fill="#1CF7C3" />
-        <circle cx="45.5" cy="160.5" r="2.5" fill="#151918" />
-        <circle cx="83.5" cy="160.5" r="2.5" fill="#1CF7C3" />
-        <circle cx="118.5" cy="160.5" r="2.5" fill="#1CF7C3" />
-        <circle cx="95.5" cy="160.5" r="2.5" fill="#1CF7C3" />
-        <circle cx="130.5" cy="160.5" r="2.5" fill="#151918" />
-        <circle cx="106.5" cy="160.5" r="2.5" fill="#151918" />
-        <circle cx="22.5" cy="171.5" r="2.5" fill="#151918" />
-        <circle cx="57.5" cy="171.5" r="2.5" fill="#1CF7C3" />
-        <circle cx="34.5" cy="171.5" r="2.5" fill="#1CF7C3" />
-        <circle cx="68.5" cy="171.5" r="2.5" fill="#151918" />
-        <circle cx="45.5" cy="171.5" r="2.5" fill="#151918" />
-        <circle cx="22.5" cy="182.5" r="2.5" fill="#1CF7C3" />
-        <circle cx="57.5" cy="182.5" r="2.5" fill="#151918" />
-        <circle cx="34.5" cy="182.5" r="2.5" fill="#151918" />
-        <circle cx="68.5" cy="182.5" r="2.5" fill="#151918" />
-        <circle cx="45.5" cy="182.5" r="2.5" fill="#151918" />
-        <circle cx="154.5" cy="27.5" r="2.5" fill="#151918" />
-        <circle cx="189.5" cy="27.5" r="2.5" fill="#1CF7C3" />
-        <circle cx="166.5" cy="27.5" r="2.5" fill="#151918" />
-        <circle cx="201.5" cy="27.5" r="2.5" fill="#151918" />
-        <circle cx="178.5" cy="27.5" r="2.5" fill="#151918" />
-        <circle cx="216.5" cy="27.5" r="2.5" fill="#1CF7C3" />
-        <circle cx="250.5" cy="27.5" r="2.5" fill="#151918" />
-        <circle cx="227.5" cy="27.5" r="2.5" fill="#1CF7C3" />
-        <circle cx="262.5" cy="27.5" r="2.5" fill="#1CF7C3" />
-        <circle cx="239.5" cy="27.5" r="2.5" fill="#151918" />
-        <circle cx="154.5" cy="38.5" r="2.5" fill="#1CF7C3" />
-        <circle cx="189.5" cy="38.5" r="2.5" fill="#151918" />
-        <circle cx="166.5" cy="38.5" r="2.5" fill="#1CF7C3" />
-        <circle cx="201.5" cy="38.5" r="2.5" fill="#151918" />
-        <circle cx="178.5" cy="38.5" r="2.5" fill="#1CF7C3" />
-        <circle cx="154.5" cy="49.5" r="2.5" fill="#151918" />
-        <circle cx="189.5" cy="49.5" r="2.5" fill="#1CF7C3" />
-        <circle cx="166.5" cy="49.5" r="2.5" fill="#151918" />
-        <circle cx="201.5" cy="49.5" r="2.5" fill="#151918" />
-        <circle cx="178.5" cy="49.5" r="2.5" fill="#151918" />
-        <circle cx="154.5" cy="94.5" r="2.5" fill="#151918" />
-        <circle cx="189.5" cy="94.5" r="2.5" fill="#1CF7C3" />
-        <circle cx="166.5" cy="94.5" r="2.5" fill="#1CF7C3" />
-        <circle cx="201.5" cy="94.5" r="2.5" fill="#151918" />
-        <circle cx="178.5" cy="94.5" r="2.5" fill="#151918" />
-        <circle cx="216.5" cy="94.5" r="2.5" fill="#151918" />
-        <circle cx="250.5" cy="94.5" r="2.5" fill="#1CF7C3" />
-        <circle cx="227.5" cy="94.5" r="2.5" fill="#1CF7C3" />
-        <circle cx="262.5" cy="94.5" r="2.5" fill="#151918" />
-        <circle cx="239.5" cy="94.5" r="2.5" fill="#1CF7C3" />
-        <circle cx="154.5" cy="105.5" r="2.5" fill="#151918" />
-        <circle cx="189.5" cy="105.5" r="2.5" fill="#1CF7C3" />
-        <circle cx="166.5" cy="105.5" r="2.5" fill="#151918" />
-        <circle cx="201.5" cy="105.5" r="2.5" fill="#1CF7C3" />
-        <circle cx="178.5" cy="105.5" r="2.5" fill="#1CF7C3" />
-        <circle cx="154.5" cy="116.5" r="2.5" fill="#151918" />
-        <circle cx="189.5" cy="116.5" r="2.5" fill="#1CF7C3" />
-        <circle cx="166.5" cy="116.5" r="2.5" fill="#151918" />
-        <circle cx="201.5" cy="116.5" r="2.5" fill="#151918" />
-        <circle cx="178.5" cy="116.5" r="2.5" fill="#151918" />
-        <circle cx="154.5" cy="160.5" r="2.5" fill="#1CF7C3" />
-        <circle cx="189.5" cy="160.5" r="2.5" fill="#1CF7C3" />
-        <circle cx="166.5" cy="160.5" r="2.5" fill="#1CF7C3" />
-        <circle cx="201.5" cy="160.5" r="2.5" fill="#1CF7C3" />
-        <circle cx="178.5" cy="160.5" r="2.5" fill="#151918" />
-        <circle cx="216.5" cy="160.5" r="2.5" fill="#1CF7C3" />
-        <circle cx="250.5" cy="160.5" r="2.5" fill="#1CF7C3" />
-        <circle cx="227.5" cy="160.5" r="2.5" fill="#1CF7C3" />
-        <circle cx="262.5" cy="160.5" r="2.5" fill="#151918" />
-        <circle cx="239.5" cy="160.5" r="2.5" fill="#151918" />
-        <circle cx="154.5" cy="171.5" r="2.5" fill="#151918" />
-        <circle cx="189.5" cy="171.5" r="2.5" fill="#151918" />
-        <circle cx="166.5" cy="171.5" r="2.5" fill="#1CF7C3" />
-        <circle cx="201.5" cy="171.5" r="2.5" fill="#151918" />
-        <circle cx="178.5" cy="171.5" r="2.5" fill="#151918" />
-        <circle cx="154.5" cy="182.5" r="2.5" fill="#151918" />
-        <circle cx="189.5" cy="182.5" r="2.5" fill="#1CF7C3" />
-        <circle cx="166.5" cy="182.5" r="2.5" fill="#151918" />
-        <circle cx="201.5" cy="182.5" r="2.5" fill="#151918" />
-        <circle cx="178.5" cy="182.5" r="2.5" fill="#1CF7C3" />
+        <circle cx="22.5" cy="27.5" r="2.5" fill={colors.gray} />
+        <circle cx="57.5" cy="27.5" r="2.5" fill={colors.gray} />
+        <circle cx="34.5" cy="27.5" r="2.5" fill={colors.green} />
+        <circle cx="68.5" cy="27.5" r="2.5" fill={colors.gray} />
+        <circle cx="45.5" cy="27.5" r="2.5" fill={colors.gray} />
+        <circle cx="83.5" cy="27.5" r="2.5" fill={colors.green} />
+        <circle cx="118.5" cy="27.5" r="2.5" fill={colors.green} />
+        <circle cx="95.5" cy="27.5" r="2.5" fill={colors.green} />
+        <circle cx="130.5" cy="27.5" r="2.5" fill={colors.gray} />
+        <circle cx="106.5" cy="27.5" r="2.5" fill={colors.gray} />
+        <circle cx="22.5" cy="38.5" r="2.5" fill={colors.gray} />
+        <circle cx="57.5" cy="38.5" r="2.5" fill={colors.green} />
+        <circle cx="34.5" cy="38.5" r="2.5" fill={colors.gray} />
+        <circle cx="68.5" cy="38.5" r="2.5" fill={colors.gray} />
+        <circle cx="45.5" cy="38.5" r="2.5" fill={colors.green} />
+        <circle cx="22.5" cy="49.5" r="2.5" fill={colors.gray} />
+        <circle cx="57.5" cy="49.5" r="2.5" fill={colors.green} />
+        <circle cx="34.5" cy="49.5" r="2.5" fill={colors.gray} />
+        <circle cx="68.5" cy="49.5" r="2.5" fill={colors.green} />
+        <circle cx="45.5" cy="49.5" r="2.5" fill={colors.green} />
+        <circle cx="22.5" cy="94.5" r="2.5" fill={colors.gray} />
+        <circle cx="57.5" cy="94.5" r="2.5" fill={colors.gray} />
+        <circle cx="34.5" cy="94.5" r="2.5" fill={colors.gray} />
+        <circle cx="68.5" cy="94.5" r="2.5" fill={colors.gray} />
+        <circle cx="45.5" cy="94.5" r="2.5" fill={colors.green} />
+        <circle cx="83.5" cy="94.5" r="2.5" fill={colors.gray} />
+        <circle cx="118.5" cy="94.5" r="2.5" fill={colors.green} />
+        <circle cx="95.5" cy="94.5" r="2.5" fill={colors.green} />
+        <circle cx="130.5" cy="94.5" r="2.5" fill={colors.gray} />
+        <circle cx="106.5" cy="94.5" r="2.5" fill={colors.gray} />
+        <circle cx="22.5" cy="105.5" r="2.5" fill={colors.gray} />
+        <circle cx="57.5" cy="105.5" r="2.5" fill={colors.green} />
+        <circle cx="34.5" cy="105.5" r="2.5" fill={colors.green} />
+        <circle cx="68.5" cy="105.5" r="2.5" fill={colors.gray} />
+        <circle cx="45.5" cy="105.5" r="2.5" fill={colors.gray} />
+        <circle cx="22.5" cy="116.5" r="2.5" fill={colors.gray} />
+        <circle cx="57.5" cy="116.5" r="2.5" fill={colors.gray} />
+        <circle cx="34.5" cy="116.5" r="2.5" fill={colors.gray} />
+        <circle cx="68.5" cy="116.5" r="2.5" fill={colors.gray} />
+        <circle cx="45.5" cy="116.5" r="2.5" fill={colors.green} />
+        <circle cx="22.5" cy="160.5" r="2.5" fill={colors.gray} />
+        <circle cx="57.5" cy="160.5" r="2.5" fill={colors.gray} />
+        <circle cx="34.5" cy="160.5" r="2.5" fill={colors.green} />
+        <circle cx="68.5" cy="160.5" r="2.5" fill={colors.green} />
+        <circle cx="45.5" cy="160.5" r="2.5" fill={colors.gray} />
+        <circle cx="83.5" cy="160.5" r="2.5" fill={colors.green} />
+        <circle cx="118.5" cy="160.5" r="2.5" fill={colors.green} />
+        <circle cx="95.5" cy="160.5" r="2.5" fill={colors.green} />
+        <circle cx="130.5" cy="160.5" r="2.5" fill={colors.gray} />
+        <circle cx="106.5" cy="160.5" r="2.5" fill={colors.gray} />
+        <circle cx="22.5" cy="171.5" r="2.5" fill={colors.gray} />
+        <circle cx="57.5" cy="171.5" r="2.5" fill={colors.green} />
+        <circle cx="34.5" cy="171.5" r="2.5" fill={colors.green} />
+        <circle cx="68.5" cy="171.5" r="2.5" fill={colors.gray} />
+        <circle cx="45.5" cy="171.5" r="2.5" fill={colors.gray} />
+        <circle cx="22.5" cy="182.5" r="2.5" fill={colors.green} />
+        <circle cx="57.5" cy="182.5" r="2.5" fill={colors.gray} />
+        <circle cx="34.5" cy="182.5" r="2.5" fill={colors.gray} />
+        <circle cx="68.5" cy="182.5" r="2.5" fill={colors.gray} />
+        <circle cx="45.5" cy="182.5" r="2.5" fill={colors.gray} />
+        <circle cx="154.5" cy="27.5" r="2.5" fill={colors.gray} />
+        <circle cx="189.5" cy="27.5" r="2.5" fill={colors.green} />
+        <circle cx="166.5" cy="27.5" r="2.5" fill={colors.gray} />
+        <circle cx="201.5" cy="27.5" r="2.5" fill={colors.gray} />
+        <circle cx="178.5" cy="27.5" r="2.5" fill={colors.gray} />
+        <circle cx="216.5" cy="27.5" r="2.5" fill={colors.green} />
+        <circle cx="250.5" cy="27.5" r="2.5" fill={colors.gray} />
+        <circle cx="227.5" cy="27.5" r="2.5" fill={colors.green} />
+        <circle cx="262.5" cy="27.5" r="2.5" fill={colors.green} />
+        <circle cx="239.5" cy="27.5" r="2.5" fill={colors.gray} />
+        <circle cx="154.5" cy="38.5" r="2.5" fill={colors.green} />
+        <circle cx="189.5" cy="38.5" r="2.5" fill={colors.gray} />
+        <circle cx="166.5" cy="38.5" r="2.5" fill={colors.green} />
+        <circle cx="201.5" cy="38.5" r="2.5" fill={colors.gray} />
+        <circle cx="178.5" cy="38.5" r="2.5" fill={colors.green} />
+        <circle cx="154.5" cy="49.5" r="2.5" fill={colors.gray} />
+        <circle cx="189.5" cy="49.5" r="2.5" fill={colors.green} />
+        <circle cx="166.5" cy="49.5" r="2.5" fill={colors.gray} />
+        <circle cx="201.5" cy="49.5" r="2.5" fill={colors.gray} />
+        <circle cx="178.5" cy="49.5" r="2.5" fill={colors.gray} />
+        <circle cx="154.5" cy="94.5" r="2.5" fill={colors.gray} />
+        <circle cx="189.5" cy="94.5" r="2.5" fill={colors.green} />
+        <circle cx="166.5" cy="94.5" r="2.5" fill={colors.green} />
+        <circle cx="201.5" cy="94.5" r="2.5" fill={colors.gray} />
+        <circle cx="178.5" cy="94.5" r="2.5" fill={colors.gray} />
+        <circle cx="216.5" cy="94.5" r="2.5" fill={colors.gray} />
+        <circle cx="250.5" cy="94.5" r="2.5" fill={colors.green} />
+        <circle cx="227.5" cy="94.5" r="2.5" fill={colors.green} />
+        <circle cx="262.5" cy="94.5" r="2.5" fill={colors.gray} />
+        <circle cx="239.5" cy="94.5" r="2.5" fill={colors.green} />
+        <circle cx="154.5" cy="105.5" r="2.5" fill={colors.gray} />
+        <circle cx="189.5" cy="105.5" r="2.5" fill={colors.green} />
+        <circle cx="166.5" cy="105.5" r="2.5" fill={colors.gray} />
+        <circle cx="201.5" cy="105.5" r="2.5" fill={colors.green} />
+        <circle cx="178.5" cy="105.5" r="2.5" fill={colors.green} />
+        <circle cx="154.5" cy="116.5" r="2.5" fill={colors.gray} />
+        <circle cx="189.5" cy="116.5" r="2.5" fill={colors.green} />
+        <circle cx="166.5" cy="116.5" r="2.5" fill={colors.gray} />
+        <circle cx="201.5" cy="116.5" r="2.5" fill={colors.gray} />
+        <circle cx="178.5" cy="116.5" r="2.5" fill={colors.gray} />
+        <circle cx="154.5" cy="160.5" r="2.5" fill={colors.green} />
+        <circle cx="189.5" cy="160.5" r="2.5" fill={colors.green} />
+        <circle cx="166.5" cy="160.5" r="2.5" fill={colors.green} />
+        <circle cx="201.5" cy="160.5" r="2.5" fill={colors.green} />
+        <circle cx="178.5" cy="160.5" r="2.5" fill={colors.gray} />
+        <circle cx="216.5" cy="160.5" r="2.5" fill={colors.green} />
+        <circle cx="250.5" cy="160.5" r="2.5" fill={colors.green} />
+        <circle cx="227.5" cy="160.5" r="2.5" fill={colors.green} />
+        <circle cx="262.5" cy="160.5" r="2.5" fill={colors.gray} />
+        <circle cx="239.5" cy="160.5" r="2.5" fill={colors.gray} />
+        <circle cx="154.5" cy="171.5" r="2.5" fill={colors.gray} />
+        <circle cx="189.5" cy="171.5" r="2.5" fill={colors.gray} />
+        <circle cx="166.5" cy="171.5" r="2.5" fill={colors.green} />
+        <circle cx="201.5" cy="171.5" r="2.5" fill={colors.gray} />
+        <circle cx="178.5" cy="171.5" r="2.5" fill={colors.gray} />
+        <circle cx="154.5" cy="182.5" r="2.5" fill={colors.gray} />
+        <circle cx="189.5" cy="182.5" r="2.5" fill={colors.green} />
+        <circle cx="166.5" cy="182.5" r="2.5" fill={colors.gray} />
+        <circle cx="201.5" cy="182.5" r="2.5" fill={colors.gray} />
+        <circle cx="178.5" cy="182.5" r="2.5" fill={colors.green} />
       </svg>
     </>
   )

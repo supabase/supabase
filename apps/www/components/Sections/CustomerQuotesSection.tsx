@@ -5,6 +5,7 @@ import { useBreakpoint } from 'common'
 import { IconArrowUpRight } from 'ui'
 
 import SectionContainer from '~/components/Layouts/SectionContainer'
+import CustomersVisual from '~/components/products/vector/CustomersVisual'
 
 interface CardInterface {
   type?: string
@@ -60,15 +61,16 @@ const CustomerQuotesSection = (props: Props) => {
   )
 
   return (
-    <div className="py-16 sm:py-18 md:py-24 bg-scale-400 dark:bg-transparent">
-      <div className="relative h-[300px] w-screen mx-auto md:w-full -mb-32 z-0">
-        <Image
+    <div className="py-16 sm:py-18 md:py-24 bg-scale-400 overflow-hidden dark:bg-transparent">
+      <div className="relative h-[300px] w-[300vw] left-[-98vw] md:left-0 mx-auto md:w-full -mb-32 z-0">
+        <CustomersVisual />
+        {/* <Image
           src="/images/product/vector/community/vector-graphics-dark.svg"
           alt="vector graphic"
           layout="fill"
           objectPosition={isSm ? '49%' : '51%'}
           objectFit={isSm ? 'cover' : 'contain'}
-        />
+        /> */}
       </div>
       <SectionContainer className="!py-0">
         <div className="col-span-12 text-center relative z-10">
