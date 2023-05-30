@@ -20,7 +20,7 @@ export default {
       <>
         Integrate Supabase Vector database with your favorite ML-models{' '}
         <br className="hidden md:block" />
-        to easily store, access and scale vector embeddings for any AI use case.
+        to easily store, access and scale vector embeddings for any AI use case
       </>
     ),
     image: '/images/product/vector/vector-hero.svg',
@@ -310,7 +310,7 @@ docs.query(
           'We tried other vector databases - we tried Faiss, we tried Weviate, we tried Pinecone. We found them to be incredibly expensive and not very intuitive. If you’re just doing vector search they’re great, but if you need to store a bunch of metadata that becomes a huge pain.',
         image: '/images/customers/logos/mendableai.png',
         abstract: 'Mendable switches from Pinecone to Supabase for PostgreSQL vector embeddings.',
-        url: '/customers/mendable',
+        url: '/customers/mendableai',
       },
     ],
     secondaryLinks: [
