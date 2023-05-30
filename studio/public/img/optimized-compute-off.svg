@@ -26,16 +26,16 @@
 <path d="M122.985 74.6484L101.492 86.9301L122.985 99.2118L144.478 86.9301L122.985 74.6484Z" stroke="var(--colors-scale4)" stroke-width="0.767606"/>
 <path d="M101.493 86.7383L80 99.02L101.493 111.302L122.986 99.02L101.493 86.7383Z" stroke="var(--colors-scale4)" stroke-width="0.767606"/>
 <g filter="url(#filter0_b_4562_77950)">
-<path d="M58.5088 50.2772L80.1109 62.7492L80.1109 75.2212L58.5088 62.7492L58.5088 50.2772Z" fill="url(#paint0_linear_4562_77950)" fill-opacity="0.75"/>
-<path d="M58.5088 50.2772L80.1109 62.7492L80.1109 75.2212L58.5088 62.7492L58.5088 50.2772Z" stroke="#A0A5A2" stroke-width="0.771505" stroke-linejoin="bevel"/>
+<path d="M58.5088 50.2772L80.1109 62.7492L80.1109 75.2212L58.5088 62.7492L58.5088 50.2772Z" fill="var(--colors-scale5)" fill-opacity="0.75"/>
+<path d="M58.5088 50.2772L80.1109 62.7492L80.1109 75.2212L58.5088 62.7492L58.5088 50.2772Z" stroke="var(--colors-scale8)" stroke-width="0.771505" stroke-linejoin="bevel"/>
 </g>
 <g filter="url(#filter1_b_4562_77950)">
-<path d="M80.1104 62.7498L101.712 50.2778L101.712 62.7497L80.1104 75.2217L80.1104 62.7498Z" fill="url(#paint1_linear_4562_77950)" fill-opacity="0.75"/>
-<path d="M80.1104 62.7498L101.712 50.2778L101.712 62.7497L80.1104 75.2217L80.1104 62.7498Z" stroke="#A0A5A2" stroke-width="0.771505" stroke-linejoin="bevel"/>
+<path d="M80.1104 62.7498L101.712 50.2778L101.712 62.7497L80.1104 75.2217L80.1104 62.7498Z" fill="var(--colors-scale5)" fill-opacity="0.75"/>
+<path d="M80.1104 62.7498L101.712 50.2778L101.712 62.7497L80.1104 75.2217L80.1104 62.7498Z" stroke="var(--colors-scale8)" stroke-width="0.771505" stroke-linejoin="bevel"/>
 </g>
 <g filter="url(#filter2_b_4562_77950)">
-<path d="M80.1143 37.8047L101.716 50.2767L80.1143 62.7487L58.5121 50.2767L80.1143 37.8047Z" fill="url(#paint2_linear_4562_77950)" fill-opacity="0.75"/>
-<path d="M80.1143 37.8047L101.716 50.2767L80.1143 62.7487L58.5121 50.2767L80.1143 37.8047Z" stroke="#A0A5A2" stroke-width="0.771505" stroke-linejoin="bevel"/>
+<path d="M80.1143 37.8047L101.716 50.2767L80.1143 62.7487L58.5121 50.2767L80.1143 37.8047Z" fill="var(--colors-scale5)" fill-opacity="0.75"/>
+<path d="M80.1143 37.8047L101.716 50.2767L80.1143 62.7487L58.5121 50.2767L80.1143 37.8047Z" stroke="var(--colors-scale8)" stroke-width="0.771505" stroke-linejoin="bevel"/>
 </g>
 </g>
 <rect x="0.5" y="0.5" width="159" height="95" rx="7.5" stroke="var(--colors-scale5)"/>
