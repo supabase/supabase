@@ -173,24 +173,27 @@ docs = vx.create_collection(name="docs", dimension=3)
 
 # add records to the collection
 docs.upsert(
-  vectors=[
-    (
-      "vec0",           # the vector's identifier
-      [0.1, 0.2, 0.3],  # the vector. list or np.array
-      {"year": 1973}    # associated  metadata
-    ),
-    (
-      "vec1",
-      [0.7, 0.8, 0.9],
-      {"year": 2012}
-    )
-  ]
+    vectors=[
+        (
+         "vec0",           # the vector's identifier
+         [0.1, 0.2, 0.3],  # the vector. list or np.array
+         {"year": 1973}    # associated  metadata
+        ),
+        (
+         "vec1",
+         [0.7, 0.8, 0.9],
+         {"year": 2012}
+        )
+    ]
 )
         `,
       },
       {
         label: 'Index',
         code: `
+# get an existing collection
+docs = vx.get_collection(name="docs")
+
 # index the collection to be queried by cosine distance
 docs.create_index(measure=vecs.IndexMeasure.cosine_distance)
 
@@ -207,6 +210,9 @@ docs.create_index()
       {
         label: 'Query',
         code: `
+# get an existing collection
+docs = vx.get_collection(name="docs")
+
 # Query vectors with optional Metadata Filtering
 docs.query(
     query_vector=[0.4,0.5,0.6],
