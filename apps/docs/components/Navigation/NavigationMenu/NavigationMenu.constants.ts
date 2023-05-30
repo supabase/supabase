@@ -862,8 +862,8 @@ export const ai: NavMenuConstant = {
     { name: 'Overview', url: '/guides/ai' },
     { name: 'Concepts', url: '/guides/ai/concepts' },
     {
-      name: 'Structured & unstructured embeddings',
-      url: '/guides/ai/structured-unstructured-embeddings',
+      name: 'Structured & unstructured',
+      url: '/guides/ai/structured-unstructured',
     },
     {
       name: 'Quickstarts',
