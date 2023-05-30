@@ -5,7 +5,6 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import InteractiveShimmerCard from '../InteractiveShimmerCard'
 import { LazyMotion, domAnimation, m, useInView } from 'framer-motion'
 import { INITIAL_BOTTOM, getAnimation } from '~/lib/animations'
-import { ArrowTopRightSvg } from '../LaunchWeek/Releases/LW7/components'
 
 interface UseCase {
   img?: string
@@ -38,7 +37,7 @@ const UseCasesSection = ({ title, paragraph, useCases }: Props) => {
         </div>
         <div
           ref={ref}
-          className="mx-auto w-full max-w-5xl grid gap-4 grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3"
+          className="mx-auto w-full max-w-5xl grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3"
         >
           {useCases.map((useCase, i) => {
             return <UseCase useCase={useCase} isInView={isInView} index={i} key={useCase.title} />
@@ -62,11 +61,14 @@ const UseCase = ({
   const animate = getAnimation({ delay: index * 0.1 })
 
   return (
-    <m.div initial={initial} animate={isInView ? animate : initial} className="flex h-full">
-      <InteractiveShimmerCard innerClassName="p-4 md:p-8 h-full !bg-scale-200">
+    <m.div initial={initial} animate={isInView ? animate : initial} className="flex w-full h-full">
+      <InteractiveShimmerCard
+        outerClassName="w-full"
+        innerClassName="p-4 md:p-8 h-full !bg-scale-200"
+      >
         <div className="h-full flex flex-col gap-4 items-start justify-between">
           <div className="prose">
-            <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+            <div className="flex items-center gap-2">
               <svg
                 width="21"
                 height="21"
