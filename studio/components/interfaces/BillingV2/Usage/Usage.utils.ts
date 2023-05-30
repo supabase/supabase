@@ -4,6 +4,7 @@ import { USAGE_APPROACHING_THRESHOLD } from '../Billing.constants'
 import { CategoryAttribute, USAGE_STATUS } from './Usage.constants'
 import { StripeSubscription } from 'components/interfaces/Billing'
 import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
+import { formatBytes } from 'lib/helpers'
 
 // [Joshen] This is just for development to generate some test data for chart rendering
 export const generateUsageData = (attribute: string, days: number): DataPoint[] => {
@@ -45,4 +46,21 @@ export const getUpgradeUrl = (projectRef: string, subscription?: StripeSubscript
     : subscription?.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.FREE
     ? `/project/${projectRef}/settings/billing/update`
     : `/project/${projectRef}/settings/billing/update/pro`
+}
+
+const compactNumberFormatter = new Intl.NumberFormat('en-US', {
+  notation: 'compact',
+  compactDisplay: 'short',
+})
+
+export const ChartYFormatterCompactNumber = (number: number | string, unit: string) => {
+  if (typeof number === 'string') return number
+
+  if (unit === 'bytes') {
+    const formattedBytes = formatBytes(number, 0).replace(/\s/g, '')
+    
+    return formattedBytes === '0bytes' ? '0' : formattedBytes
+  } else {
+    return compactNumberFormatter.format(number)
+  }
 }
