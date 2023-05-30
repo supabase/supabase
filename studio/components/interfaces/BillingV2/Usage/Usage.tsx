@@ -146,11 +146,9 @@ const Usage = () => {
                   onClick={() => scrollTo(category.key)}
                   className="flex items-center opacity-50 space-x-2 py-3 hover:opacity-100 transition cursor-pointer"
                 >
-                  {status === USAGE_STATUS.NORMAL || usageBillingEnabled ? (
-                    <IconCheckCircle size={15} strokeWidth={2} className="text-scale-1100" />
-                  ) : status === USAGE_STATUS.APPROACHING ? (
+                  {!usageBillingEnabled && status === USAGE_STATUS.APPROACHING ? (
                     <IconAlertCircle size={15} strokeWidth={2} className="text-amber-900" />
-                  ) : status === USAGE_STATUS.EXCEEDED ? (
+                  ) : !usageBillingEnabled && status === USAGE_STATUS.EXCEEDED ? (
                     <IconAlertCircle size={15} strokeWidth={2} className="text-red-900" />
                   ) : null}
                   <p className="text-sm">{category.name}</p>
