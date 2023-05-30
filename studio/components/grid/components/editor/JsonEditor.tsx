@@ -6,7 +6,7 @@ import { EditorProps } from '@supabase/react-data-grid'
 import { useTrackedState } from 'components/grid/store'
 import { BlockKeys, MonacoEditor, NullValue } from 'components/grid/components/common'
 import { tryParseJson } from 'lib/helpers'
-import { isNil } from "lodash";
+import { isNil } from 'lodash'
 
 interface JsonEditorProps<TRow, TSummaryRow = unknown> extends EditorProps<TRow, TSummaryRow> {
   onExpandEditor: (column: string, row: TRow) => void
