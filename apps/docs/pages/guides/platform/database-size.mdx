@@ -9,7 +9,7 @@ export const meta = {
 Database size refers to the _monthly average storage usage_, as reported by Postgres. This metric is reported in your project's [billing usage](https://app.supabase.com/project/_/settings/billing/usage) and is updated daily. As you read this document we will refer to "database size" and "disk size":
 
 - "Database size" is the total size of used storage from your database.
-- "Disk size" describes the size of the underlying available storage.
+- "Disk Storage size" describes the size of the underlying available storage.
 
 ## Database space management
 
@@ -23,7 +23,7 @@ select
 from pg_database;
 ```
 
-This value is reported in the [database settings page](https://app.supabase.com/project/_/settings/database).
+This value is reported in the [database report page](https://app.supabase.com/project/_/reports/database).
 
 Database Space is consumed primarily by your data, indexes, and materialized views. You can reduce your disk size by removing any of these and running a Vacuum operation.
 
@@ -61,15 +61,17 @@ Supabase uses network-attached storage to balance performance with scalability. 
 
 Pro and Enterprise projects have auto-scaling Disk Storage.
 
-Disk storage expands automatically when the database reaches 90% of the disk size. The disk is expanded to be 50% larger (e.g., 8GB -> 12GB). Auto-scaling can only take place once every 6 hours. If within those 6 hours you reach 95% of the disk space, your project will enter read-only mode.
+Disk Storage expands automatically when the database reaches 90% of the disk size. The disk is expanded to be 50% larger (e.g., 8GB -> 12GB). Auto-scaling can only take place once every 6 hours. If within those 6 hours you reach 95% of the disk space, your project will enter read-only mode.
 
-<Admonition type="caution">
+The maximum Disk Storage Size for Pro Tier is 64TB. If you need more than this, [contact us](https://app.supabase.com/support/new) to learn more about the Enterprise plan.
 
-If you intend to import a lot of data into your database which requires multiple disk expansions then [reach out to our team](https://app.supabase.com/support/new). For example, uploading more than 1.5x the current size of your database storage will put your database into [read-only mode](#read-only-mode).
+The Disk Storage Size can also be manually expanded in [Database settings page](https://app.supabase.com/project/_/settings/database). The maximum default you can expand the Disk Storage to is 200GB. If you wish to manually expand it any more than 200B, please [contact us](https://app.supabase.com/support/new) to discuss expanding the 200GB limit.
+
+<Admonition type="info">
+
+You may want to import a lot of data into your database which requires multiple disk expansions; for example, uploading more than 1.5x the current size of your database storage will put your database into [read-only mode](#read-only-mode). If so, it is highly recommended you increase the Disk Storage Size manually on the [Database settings page](https://app.supabase.com/project/_/settings/database).
 
 </Admonition>
-
-The maximum Disk Size for Pro Tier is 64TB. If you need more than this, [contact us](https://app.supabase.com/support/new) to learn more about the Enterprise plan.
 
 ### Free Tier Behavior
 

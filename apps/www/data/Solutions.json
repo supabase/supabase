@@ -38,5 +38,14 @@
     "description_short": "",
     "label": "",
     "url": "/realtime"
+  },
+
+  "vector": {
+    "name": "Vector",
+    "icon": "M12.0052 12.6366V21.9858M12.0052 12.6366L20.2539 7.84533M12.0052 12.6366L3.75687 7.84555M3.75687 7.84555V13.579M3.75687 7.84555V7.79644L8.69794 4.92639M20.2543 13.6291V7.79644L15.3132 4.92639M17.2103 19.1471L12.0056 22.1703L6.80082 19.1471M12.0075 1.82983V6.58393M21.4365 18.1456L17.3226 15.7736M2.49609 18.0311L6.60673 15.654",
+    "description": "Integrate your favorite ML-models to store, index and search vector embeddings.",
+    "description_short": "",
+    "label": "",
+    "url": "/vector"
   }
 }
