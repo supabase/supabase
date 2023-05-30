@@ -244,8 +244,8 @@ docs.query(
     paragraph:
       'Develop, integrate and deploy secure and scalable AI applications at unprecedented speed.',
     cta: {
-      label: '',
-      url: '',
+      label: 'Explore documentation',
+      link: '/docs/guides/ai',
     },
     features: [
       {
