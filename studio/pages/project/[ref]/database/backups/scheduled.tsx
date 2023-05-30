@@ -1,6 +1,7 @@
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { IconAlertCircle, IconHelpCircle, IconInfo, IconMessageCircle, Tabs } from 'ui'
+import { IconInfo, Tabs } from 'ui'
+import clsx from 'clsx'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { NextPageWithLayout } from 'types'
@@ -8,7 +9,6 @@ import { checkPermissions, useStore } from 'hooks'
 import { DatabaseLayout } from 'components/layouts'
 import { BackupsList } from 'components/interfaces/Database'
 import NoPermission from 'components/ui/NoPermission'
-import { FormsContainer } from 'components/ui/Forms'
 import InformationBox from 'components/ui/InformationBox'
 
 const DatabaseScheduledBackups: NextPageWithLayout = () => {
@@ -21,7 +21,12 @@ const DatabaseScheduledBackups: NextPageWithLayout = () => {
   const canReadScheduledBackups = checkPermissions(PermissionAction.READ, 'back_ups')
 
   return (
-    <FormsContainer>
+    <div
+      className={clsx(
+        'mx-auto flex flex-col px-5 pt-6 pb-14',
+        'lg:pt-8 lg:px-14 1xl:px-28 2xl:px-32 h-full'
+      )}
+    >
       <div className="space-y-6">
         <h3 className="text-xl text-scale-1200">Backups</h3>
 
@@ -74,7 +79,7 @@ const DatabaseScheduledBackups: NextPageWithLayout = () => {
           )}
         </div>
       </div>
-    </FormsContainer>
+    </div>
   )
 }
 

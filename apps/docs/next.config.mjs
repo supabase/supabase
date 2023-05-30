@@ -1,3 +1,4 @@
+// @ts-check
 import nextMdx from '@next/mdx'
 import remarkGfm from 'remark-gfm'
 import rehypeSlug from 'rehype-slug'
@@ -61,10 +62,12 @@ const nextConfig = {
       'raw.githubusercontent.com',
       'weweb-changelog.ghost.io',
       'img.youtube.com',
+      'archbee-image-uploads.s3.amazonaws.com'
     ],
   },
   experimental: {
-    mdxRs: true,
+    // TODO: @next/mdx ^13.0.2 only supports experimental mdxRs flag. next ^13.0.2 will stop warning about this being unsupported.
+    // mdxRs: true,
     modularizeImports: {
       lodash: {
         transform: 'lodash/{{member}}',

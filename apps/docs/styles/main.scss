@@ -25,7 +25,7 @@
 }
 
 body {
-  @apply bg-scale-200 dark:bg-[#1c1c1c] #{!important};
+  @apply bg-scale-200;
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -78,6 +78,10 @@ article h1 {
 
 .small:not(.prose *):not(.overwrite) {
   @apply text-scale-900 text-xs;
+}
+
+.prose :where(p):not(:where([class~='not-prose'] *)) {
+  white-space: pre-line;
 }
 
 code[class*='language-'],

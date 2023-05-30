@@ -11,6 +11,7 @@ import SectionHeader from './SectionHeader'
 import { COMPUTE_INSTANCE_SPECS, USAGE_CATEGORIES } from './Usage.constants'
 import { getUpgradeUrl } from './Usage.utils'
 import UsageBarChart from './UsageBarChart'
+import Panel from 'components/ui/Panel'
 
 export interface InfrastructureProps {
   projectRef: string
@@ -21,8 +22,19 @@ export interface InfrastructureProps {
 const Infrastructure = ({ projectRef }: InfrastructureProps) => {
   const { data: subscription } = useProjectSubscriptionQuery({ projectRef })
   const { current_period_start, current_period_end } = subscription?.billing ?? {}
-  const startDate = new Date((current_period_start ?? 0) * 1000).toISOString()
-  const endDate = new Date((current_period_end ?? 0) * 1000).toISOString()
+  const startDate =
+    current_period_start !== undefined
+      ? new Date(current_period_start * 1000).toISOString()
+      : undefined
+  let endDate =
+    current_period_end !== undefined ? new Date(current_period_end * 1000).toISOString() : undefined
+
+  // If end date is in future, set end date to now
+  if (endDate && dayjs(endDate).isAfter(dayjs())) {
+    // LF seems to have an issue with the milliseconds, causes infinite loading sometimes
+    endDate = new Date().toISOString().slice(0, -5) + 'Z'
+  }
+
   const categoryMeta = USAGE_CATEGORIES.find((category) => category.key === 'infra')
 
   const upgradeUrl = getUpgradeUrl(projectRef, subscription)
@@ -33,28 +45,43 @@ const Infrastructure = ({ projectRef }: InfrastructureProps) => {
   const currentComputeInstanceSpecs =
     COMPUTE_INSTANCE_SPECS[currentComputeInstance?.supabase_prod_id ?? 'addon_instance_micro']
 
+  // Switch to hourly interval, if the timeframe is <48 hours
+  let interval: '1d' | '1h' = '1d'
+  let dateFormat = 'DD MMM'
+  if (startDate && endDate) {
+    const diffInHours = dayjs(endDate).diff(startDate, 'hours')
+
+    if (diffInHours <= 48) {
+      interval = '1h'
+      dateFormat = 'HH a'
+    }
+  }
+
   const { data: cpuUsageData, isLoading: isLoadingCpuUsageData } = useInfraMonitoringQuery({
     projectRef,
     attribute: 'cpu_usage',
-    interval: '1d',
+    interval,
     startDate,
     endDate,
+    dateFormat,
   })
 
   const { data: memoryUsageData, isLoading: isLoadingMemoryUsageData } = useInfraMonitoringQuery({
     projectRef,
     attribute: 'ram_usage',
-    interval: '1d',
+    interval,
     startDate,
     endDate,
+    dateFormat,
   })
 
   const { data: ioBudgetData, isLoading: isLoadingIoBudgetData } = useInfraMonitoringQuery({
     projectRef,
     attribute: 'disk_io_budget',
-    interval: '1d',
+    interval,
     startDate,
     endDate,
+    dateFormat,
   })
 
   const currentDayIoBudget = Number(
@@ -86,121 +113,133 @@ const Infrastructure = ({ projectRef }: InfrastructureProps) => {
       {categoryMeta.attributes.map((attribute) => {
         const chartData = chartMeta[attribute.key]?.data ?? []
 
-        // [Joshen] Ideally this should come from the API imo, foresee some discrepancies
-        const lastZeroValue = chartData.find(
-          (x: any) => x.loopId > 0 && x[attribute.attribute] === 0
-        )
-        const lastKnownValue =
-          lastZeroValue !== undefined
-            ? dayjs(lastZeroValue.period_start)
-                .subtract(1, 'day')
-                .format('DD MMM YYYY, HH:mma (ZZ)')
-            : undefined
-
         return (
-          <SectionContent key={attribute.key} section={attribute} lastKnownValue={lastKnownValue}>
-            {attribute.key === 'disk_io_budget' && (
-              <>
-                {currentDayIoBudget <= 0 ? (
-                  <Alert withIcon variant="danger" title="IO Budget for today has been used up">
-                    <p className="mb-4">
-                      Your workload has used up all the burst IO throughput minutes during the day
-                      and is running at the baseline performance. If you need consistent disk
-                      performance, consider upgrading to a larger compute add-on.
-                    </p>
-                    <Link href={upgradeUrl}>
-                      <a>
-                        <Button type="danger">
-                          {isFreeTier ? 'Upgrade project' : 'Change compute add-on'}
-                        </Button>
-                      </a>
-                    </Link>
-                  </Alert>
-                ) : currentDayIoBudget <= 20 ? (
-                  <Alert withIcon variant="warning" title="IO Budget for today is running out">
-                    <p className="mb-4">
-                      Your workload is about to use up all the burst IO throughput minutes during
-                      the day. Once this is completely used up, your workload will run at the
-                      baseline performance. If you need consistent disk performance, consider
-                      upgrading to a larger compute add-on.
-                    </p>
-                    <Link href={upgradeUrl}>
-                      <a>
-                        <Button type="warning">
-                          {isFreeTier ? 'Upgrade project' : 'Change compute add-on'}
-                        </Button>
-                      </a>
-                    </Link>
-                  </Alert>
-                ) : null}
-                <div className="space-y-1">
-                  <p>What is Disk IO Bandwidth?</p>
-                  <p className="text-sm text-scale-1000">
-                    Smaller compute instances can burst up to the maximum disk IO bandwidth for 30
-                    minutes in a day. Beyond that, the performance reverts to the baseline disk IO
-                    bandwidth.
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm mb-2">Overview</p>
-                  <div className="flex items-center justify-between border-b py-1">
-                    <p className="text-xs text-scale-1000">Current compute instance</p>
-                    <p className="text-xs">{currentComputeInstance?.name ?? 'Micro'}</p>
-                  </div>
-                  <div className="flex items-center justify-between border-b py-1">
-                    <p className="text-xs text-scale-1000">Maximum IO Bandwidth (burst limit)</p>
-                    <p className="text-xs">
-                      {currentComputeInstanceSpecs.maxBandwidth.toLocaleString()} Mbps
+          <div id={attribute.anchor} key={attribute.key}>
+            <SectionContent section={attribute}>
+              {attribute.key === 'disk_io_budget' && (
+                <>
+                  {currentDayIoBudget <= 0 ? (
+                    <Alert withIcon variant="danger" title="IO Budget for today has been used up">
+                      <p className="mb-4">
+                        Your workload has used up all the burst IO throughput minutes during the day
+                        and is running at the baseline performance. If you need consistent disk
+                        performance, consider upgrading to a larger compute add-on.
+                      </p>
+                      <Link href={upgradeUrl}>
+                        <a>
+                          <Button type="danger">
+                            {isFreeTier ? 'Upgrade project' : 'Change compute add-on'}
+                          </Button>
+                        </a>
+                      </Link>
+                    </Alert>
+                  ) : currentDayIoBudget <= 20 ? (
+                    <Alert withIcon variant="warning" title="IO Budget for today is running out">
+                      <p className="mb-4">
+                        Your workload is about to use up all the burst IO throughput minutes during
+                        the day. Once this is completely used up, your workload will run at the
+                        baseline performance. If you need consistent disk performance, consider
+                        upgrading to a larger compute add-on.
+                      </p>
+                      <Link href={upgradeUrl}>
+                        <a>
+                          <Button type="warning">
+                            {isFreeTier ? 'Upgrade project' : 'Change compute add-on'}
+                          </Button>
+                        </a>
+                      </Link>
+                    </Alert>
+                  ) : null}
+                  <div className="space-y-1">
+                    <p>What is Disk IO Bandwidth?</p>
+                    <p className="text-sm text-scale-1000">
+                      Smaller compute instances can burst up to the maximum disk IO bandwidth for 30
+                      minutes in a day. Beyond that, the performance reverts to the baseline disk IO
+                      bandwidth.
                     </p>
                   </div>
-                  <div className="flex items-center justify-between border-b py-1">
-                    <p className="text-xs text-scale-1000">Baseline IO Bandwidth</p>
-                    <p className="text-xs">
-                      {currentComputeInstanceSpecs.baseBandwidth.toLocaleString()} Mbps
-                    </p>
+                  <div>
+                    <p className="text-sm mb-2">Overview</p>
+                    <div className="flex items-center justify-between border-b py-1">
+                      <p className="text-xs text-scale-1000">Current compute instance</p>
+                      <p className="text-xs">{currentComputeInstance?.name ?? 'Micro'}</p>
+                    </div>
+                    <div className="flex items-center justify-between border-b py-1">
+                      <p className="text-xs text-scale-1000">Maximum IO Bandwidth (burst limit)</p>
+                      <p className="text-xs">
+                        {currentComputeInstanceSpecs.maxBandwidth.toLocaleString()} Mbps
+                      </p>
+                    </div>
+                    <div className="flex items-center justify-between border-b py-1">
+                      <p className="text-xs text-scale-1000">Baseline IO Bandwidth</p>
+                      <p className="text-xs">
+                        {currentComputeInstanceSpecs.baseBandwidth.toLocaleString()} Mbps
+                      </p>
+                    </div>
+                    <div className="flex items-center justify-between py-1">
+                      <p className="text-xs text-scale-1000">Daily burst time limit</p>
+                      <p className="text-xs">30 mins</p>
+                    </div>
                   </div>
-                  <div className="flex items-center justify-between py-1">
-                    <p className="text-xs text-scale-1000">Daily burst time limit</p>
-                    <p className="text-xs">30 mins</p>
-                  </div>
-                </div>
-              </>
-            )}
-            <div className="space-y-1">
-              {attribute.key === 'disk_io_budget' ? (
-                <p>IO Budget remaining each day</p>
-              ) : (
-                <p>
-                  Max{' '}
-                  <span className={attribute.key === 'ram_usage' ? 'lowercase' : ''}>
-                    {attribute.name}
-                  </span>{' '}
-                  usage each day
-                </p>
+                </>
               )}
-              {attribute.chartDescription.split('\n').map((paragraph, idx) => (
-                <p key={`para-${idx}`} className="text-sm text-scale-1000">
-                  {paragraph}
-                </p>
-              ))}
-            </div>
-            {chartMeta[attribute.key].isLoading ? (
-              <div className="space-y-2">
-                <ShimmeringLoader />
-                <ShimmeringLoader className="w-3/4" />
-                <ShimmeringLoader className="w-1/2" />
+              <div className="space-y-1">
+                <div className="flex flex-row justify-between">
+                  {attribute.key === 'disk_io_budget' ? (
+                    <p>IO Budget remaining</p>
+                  ) : (
+                    <p>
+                      Max{' '}
+                      <span className={attribute.key === 'ram_usage' ? 'lowercase' : ''}>
+                        {attribute.name}
+                      </span>{' '}
+                      usage
+                    </p>
+                  )}
+                  <Link href={`/project/${projectRef}/settings/billing/subscription`}>
+                    <a>
+                      <Button type="default" size="tiny">
+                        Upgrade compute
+                      </Button>
+                    </a>
+                  </Link>
+                </div>
+
+                {attribute.chartDescription.split('\n').map((paragraph, idx) => (
+                  <p key={`para-${idx}`} className="text-sm text-scale-1000">
+                    {paragraph}
+                  </p>
+                ))}
               </div>
-            ) : (
-              <UsageBarChart
-                name={attribute.name}
-                unit={attribute.unit}
-                attribute={attribute.attribute}
-                data={chartData}
-                yFormatter={(value) => `${value}%`}
-                yLimit={100}
-              />
-            )}
-          </SectionContent>
+              {chartMeta[attribute.key].isLoading ? (
+                <div className="space-y-2">
+                  <ShimmeringLoader />
+                  <ShimmeringLoader className="w-3/4" />
+                  <ShimmeringLoader className="w-1/2" />
+                </div>
+              ) : chartData.length ? (
+                <UsageBarChart
+                  name={attribute.name}
+                  unit={attribute.unit}
+                  attribute={attribute.attribute}
+                  data={chartData}
+                  yFormatter={(value) => `${value}%`}
+                  yLimit={100}
+                />
+              ) : (
+                <Panel>
+                  <Panel.Content>
+                    <div className="flex flex-col items-center justify-center space-y-2">
+                      <p>No data</p>
+                      <p className="text-sm text-scale-1000">
+                        There is no data in the timeframe available
+                      </p>
+                    </div>
+                  </Panel.Content>
+                </Panel>
+              )}
+            </SectionContent>
+          </div>
         )
       })}
     </>

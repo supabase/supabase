@@ -356,8 +356,28 @@ export function IconMenuStorage({ width = 16, height = 16 }: HomeMenuIcon) {
       <path
         d="M13 7.616V5.6l-3.618-3.6H3v4.03m9.964-.447L9.38 2v3.584h3.584ZM1.974 6v8h12V7.509h-7.59l-1.533-1.51H1.974Z"
         stroke="currentColor"
+        stroke-miterlimit="10"
+        stroke-linejoin="bevel"
+      />
+    </svg>
+  )
+}
+
+export function IconMenuAI({ width = 16, height = 16 }: HomeMenuIcon) {
+  return (
+    <svg
+      width={width}
+      height={height}
+      viewBox="0 0 16 16"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M8.00346 8.42523V14.658M8.00346 8.42523L13.5026 5.23103M8.00346 8.42523L2.50458 5.23118M2.50458 5.23118V9.05347M2.50458 5.23118V5.19844L5.79862 3.28507M13.5028 9.08688V5.19844L10.2088 3.28507M11.4735 12.7656L8.00371 14.781L4.53388 12.7656M8.00499 1.2207V4.3901M14.291 12.0979L11.5484 10.5166M1.66406 12.0215L4.40449 10.4368"
+        stroke="currentColor"
         strokeMiterlimit="10"
-        strokeLinejoin="bevel"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   )

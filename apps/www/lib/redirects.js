@@ -1971,4 +1971,29 @@ module.exports = [
     source: '/blog/how-supabase-accelerates-development-of-all-pull-together',
     destination: '/customers',
   },
+  {
+    permanent: true,
+    source: '/blog/how-supabase-accelerates-development-of-all-pull-together',
+    destination: '/customers',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-helpers/nextjs-server-components',
+    destination: '/docs/guides/auth/auth-helpers/nextjs',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/getting-started/openai/vector-search',
+    destination: '/docs/guides/ai/examples/docs-search',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/functions/examples/huggingface-image-captioning',
+    destination: '/docs/guides/ai/examples/huggingface-image-captioning',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/functions/examples/openai',
+    destination: '/docs/guides/ai/examples/openai',
+  },
 ]

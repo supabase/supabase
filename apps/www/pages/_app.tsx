@@ -1,3 +1,8 @@
+import '../../../packages/ui/build/css/themes/light.css'
+import '../../../packages/ui/build/css/themes/dark.css'
+
+import '../styles/index.css'
+
 import { API_URL, APP_NAME, DESCRIPTION } from 'lib/constants'
 import { DefaultSeo } from 'next-seo'
 import { AppProps } from 'next/app'

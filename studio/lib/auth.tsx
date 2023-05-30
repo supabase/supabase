@@ -1,4 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query'
+import { useRouter } from 'next/router'
 import { PropsWithChildren, useCallback, useEffect } from 'react'
 
 import {
@@ -17,6 +18,7 @@ export const AuthContext = AuthContextInternal
 
 export const AuthProvider = ({ children }: PropsWithChildren<{}>) => {
   const { ui, app } = useStore()
+  const router = useRouter()
   const telemetryProps = useTelemetryProps()
 
   // Check for unverified GitHub users after a GitHub sign in
@@ -34,6 +36,22 @@ export const AuthProvider = ({ children }: PropsWithChildren<{}>) => {
     }
 
     handleEmailVerificationError()
+  }, [])
+
+  useEffect(() => {
+    const {
+      data: { subscription },
+    } = gotrueClient.onAuthStateChange((event) => {
+      if (event === 'SIGNED_IN') {
+        Telemetry.sendEvent(
+          { category: 'account', action: 'sign_in', label: '' },
+          telemetryProps,
+          router
+        )
+      }
+    })
+
+    return subscription.unsubscribe
   }, [])
 
   // Track telemetry for the current user

@@ -132,7 +132,7 @@ const StickyHeader: FC<StickyHeader> = ({ icon, ...props }) => {
 }
 
 const Details: FC<ISectionDetails> = (props) => {
-  return <div className="relative overflow-hidden w-full">{props.children}</div>
+  return <div className="relative w-full">{props.children}</div>
 }
 
 const Examples: FC<ISectionExamples> = (props) => {

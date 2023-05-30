@@ -69,6 +69,11 @@ const menus: Menu[] = [
     type: 'guide',
   },
   {
+    id: 'ai',
+    path: '/guides/ai',
+    type: 'guide',
+  },
+  {
     id: 'platform',
     path: '/guides/platform',
     type: 'guide',
