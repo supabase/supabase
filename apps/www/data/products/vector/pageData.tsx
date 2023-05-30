@@ -1,5 +1,9 @@
 import Link from 'next/link'
 import IntegrationsSVG from '~/components/products/vector/IntegrationsSVG'
+import OpenAIImage from '~/components/products/vector/OpenAIImage'
+import SecureAndScalableImg from '~/components/products/vector/SecureAndScalableImg'
+import PGvectorImg from '~/components/products/vector/PGvectorImg'
+import DeployGlobally from '~/components/products/vector/DeployGlobally'
 
 export default {
   metaTitle: '',
@@ -33,13 +37,14 @@ export default {
         paragraph:
           // 'Every Supabase project is a dedicated Postgres instance. Use pgvector to store, query, and index your vector embeddings at scale.',
           'Use pgvector to store, query, and index your vector embeddings at scale in a Postgres instance.',
-        image: '',
+        image: <PGvectorImg />,
       },
       {
         title: 'Connect with OpenAI',
         paragraph:
           'Easily connect to any LLM or embeddings API, including Hugging Face, SageMaker and more.',
-        image: '',
+        // image: '/images/product/vector/highlight-openai.png',
+        image: <OpenAIImage />,
       },
       {
         title: 'Secure and Scalable',
@@ -52,13 +57,13 @@ export default {
             compliant, and comes with an advanced permissions system.
           </>
         ),
-        image: '',
+        image: <SecureAndScalableImg />,
       },
       {
         title: 'Deploy Globally',
         paragraph:
           'Choose from 12 Fully Managed datacenters, or Self-Host on your own cloud or servers.',
-        image: '',
+        image: <DeployGlobally />,
       },
     ],
   },
@@ -264,6 +269,12 @@ docs.query(
     ],
   },
   quotesSection: {
+    title: (
+      <>
+        Customers building on <br className="hidden md:block" />
+        Supabase Vector
+      </>
+    ),
     customers: [
       {
         type: 'customer-story',

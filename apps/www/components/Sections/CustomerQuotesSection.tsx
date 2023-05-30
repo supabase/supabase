@@ -20,6 +20,7 @@ interface CardInterface {
 }
 
 interface Props {
+  title: string | React.ReactNode
   customers: CardInterface[]
   secondaryLinks: CardInterface[]
 }
@@ -71,10 +72,7 @@ const CustomerQuotesSection = (props: Props) => {
       </div>
       <SectionContainer className="!py-0">
         <div className="col-span-12 text-center relative z-10">
-          <h3 className="text-3xl md:text-4xl heading-gradient">
-            Join a growing <br />
-            community of users
-          </h3>
+          <h3 className="text-3xl md:text-4xl heading-gradient">{props.title}</h3>
         </div>
         <div className="relative mx-auto grid grid-cols-1 lg:grid-cols-3 gap-4 xl:gap-8 pt-16 pb-0">
           {props.customers.map((customer) => (
