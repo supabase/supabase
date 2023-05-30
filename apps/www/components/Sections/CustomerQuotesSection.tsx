@@ -20,6 +20,7 @@ interface CardInterface {
 }
 
 interface Props {
+  title: string | React.ReactNode
   customers: CardInterface[]
   secondaryLinks: CardInterface[]
 }
@@ -43,10 +44,10 @@ const CustomerQuotesSection = (props: Props) => {
           </div>
         </div>
         <div className="border-t pt-4">
-          <p className="text-scale-1200 font-medium">{card.author}</p>
-          <p className="text-scale-900 text-sm">{card.role}</p>
+          <p className="text-scale-1100 text-base">{card.quote}</p>
+          <p className="text-scale-900 mt-4">{card.author}</p>
+          <blockquote className="text-scale-900 text-sm">{card.role}</blockquote>
         </div>
-        <p className="text-scale-900 mt-1 text-base">{card.quote}</p>
       </div>
 
       {card.url && (
@@ -71,12 +72,9 @@ const CustomerQuotesSection = (props: Props) => {
       </div>
       <SectionContainer className="!py-0">
         <div className="col-span-12 text-center relative z-10">
-          <h3 className="text-3xl md:text-4xl heading-gradient">
-            Join a growing <br />
-            community of users
-          </h3>
+          <h3 className="text-3xl md:text-4xl heading-gradient">{props.title}</h3>
         </div>
-        <div className="relative mx-auto grid grid-cols-1 lg:grid-cols-3 gap-4 xl:gap-8 pt-16 pb-0">
+        <div className="relative mx-auto max-w-4xl grid grid-cols-1 lg:grid-cols-2 gap-4 xl:gap-8 pt-16 pb-0">
           {props.customers.map((customer) => (
             <Link href={`${basePath}${customer.url}`}>
               <a className="h-full flex">
@@ -84,7 +82,7 @@ const CustomerQuotesSection = (props: Props) => {
               </a>
             </Link>
           ))}
-          <div className="w-full h-full flex flex-col justify-stretch gap-4 xl:gap-8">
+          {/* <div className="w-full h-full flex flex-col justify-stretch gap-4 xl:gap-8">
             {props.secondaryLinks.map((link) => (
               <Link href={`${basePath}${link.url}`}>
                 <a className="w-full h-auto lg:h-full bg-scale-100 dark:bg-scale-200 hover:border-scale-600 hover:dark:border-scale-700 border-scale-300 dark:border-scale-400 rounded-2xl border p-6 drop-shadow-sm flex flex-col justify-center items-center py-16">
@@ -100,7 +98,7 @@ const CustomerQuotesSection = (props: Props) => {
                 </a>
               </Link>
             ))}
-          </div>
+          </div> */}
         </div>
       </SectionContainer>
     </div>

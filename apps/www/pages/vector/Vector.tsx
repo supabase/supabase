@@ -1,20 +1,22 @@
 import { NextSeo } from 'next-seo'
+import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import DefaultLayout from '~/components/Layouts/Default'
-import CustomerQuotesSection from '~/components/Sections/CustomerQuotesSection'
 import ProductHeaderCentered from '~/components/Sections/ProductHeaderCentered'
-import FeaturesSection from '~/components/Sections/FeaturesSection'
-import HighlightCards from '~/components/Sections/HighlightCards'
-import UseCasesSection from '~/components/Sections/UseCasesSection'
-import CenteredTitleImage from '~/components/Sections/CenteredTitleImage'
-import TimedTabsSection from '~/components/Sections/TimedTabsSection'
-import ProductsCta from '~/components/Sections/ProductsCta'
-import EnterpriseCta from '~/components/Sections/EnterpriseCta'
 
+import { PRODUCT_SHORTNAMES } from '~/lib/constants'
 import pageData from '~/data/products/vector/pageData'
 
 import 'swiper/swiper.min.css'
-import { PRODUCT_NAMES, PRODUCT_SHORTNAMES } from '../../lib/constants'
+
+const HighlightCards = dynamic(() => import('~/components/Sections/HighlightCards'))
+const FeaturesSection = dynamic(() => import('~/components/Sections/FeaturesSection'))
+const UseCasesSection = dynamic(() => import('~/components/Sections/UseCasesSection'))
+const CenteredTitleImage = dynamic(() => import('~/components/Sections/CenteredTitleImage'))
+const CustomerQuotesSection = dynamic(() => import('~/components/Sections/CustomerQuotesSection'))
+const TimedTabsSection = dynamic(() => import('~/components/Sections/TimedTabsSection'))
+const ProductsCta = dynamic(() => import('~/components/Sections/ProductsCta'))
+const EnterpriseCta = dynamic(() => import('~/components/Sections/EnterpriseCta'))
 
 function VectorPage() {
   // base path for images
