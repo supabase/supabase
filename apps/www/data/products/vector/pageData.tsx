@@ -173,6 +173,9 @@ export default {
     tabs: [
       {
         label: 'Store',
+        paragraph: 'Efficiently upsert millions of vectors along with important metadata.',
+        colabUrl:
+          'https://colab.research.google.com/github/supabase/supabase/blob/master/examples/ai/vector_hello_world.ipynb',
         code: `
 docs = vx.create_collection(name="docs", dimension=3)
 
@@ -195,6 +198,10 @@ docs.upsert(
       },
       {
         label: 'Index',
+        paragraph:
+          'Build indexes using Cosine distance, L2-Norm distance, or Max Inner Product for fast and efficient querying.',
+        colabUrl:
+          'https://colab.research.google.com/github/supabase/supabase/blob/master/examples/ai/vector_hello_world.ipynb',
         code: `
 # get an existing collection
 docs = vx.get_collection(name="docs")
@@ -214,6 +221,9 @@ docs.create_index()
       },
       {
         label: 'Query',
+        paragraph: 'Efficient querying and filtering of results based on vector metadata.',
+        colabUrl:
+          'https://colab.research.google.com/github/supabase/supabase/blob/master/examples/ai/vector_hello_world.ipynb',
         code: `
 # get an existing collection
 docs = vx.get_collection(name="docs")
