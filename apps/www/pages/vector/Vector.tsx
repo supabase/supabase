@@ -2,13 +2,13 @@ import { NextSeo } from 'next-seo'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import DefaultLayout from '~/components/Layouts/Default'
-import ProductHeaderCentered from '~/components/Sections/ProductHeaderCentered'
 
 import { PRODUCT_SHORTNAMES } from '~/lib/constants'
 import pageData from '~/data/products/vector/pageData'
 
 import 'swiper/swiper.min.css'
 
+const ProductHeaderCentered = dynamic(() => import('~/components/Sections/ProductHeaderCentered'))
 const HighlightCards = dynamic(() => import('~/components/Sections/HighlightCards'))
 const FeaturesSection = dynamic(() => import('~/components/Sections/FeaturesSection'))
 const UseCasesSection = dynamic(() => import('~/components/Sections/UseCasesSection'))

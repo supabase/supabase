@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import IntegrationsSVG from '~/components/products/vector/IntegrationsSVG'
+import IntegrationsImage from '~/components/products/vector/IntegrationsImage'
 import OpenAIImage from '~/components/products/vector/OpenAIImage'
 import SecureAndScalableImg from '~/components/products/vector/SecureAndScalableImg'
 import PGvectorImg from '~/components/products/vector/PGvectorImg'
@@ -11,7 +11,7 @@ export default {
   heroSection: {
     title: 'Supabase Vector',
     h1: (
-      <span key={'vector-h1'}>
+      <span key={'vector-h1'} className="heading-gradient">
         The open source Vector Database <br />
         for AI applications
       </span>
@@ -69,7 +69,7 @@ export default {
   },
   integrations: {
     title: 'Leverage the tools you love',
-    image: <IntegrationsSVG />,
+    image: <IntegrationsImage />,
   },
   useCasesSection: {
     title: (
@@ -91,7 +91,7 @@ export default {
         description: 'Search your own knowledge base by semantic similarity.',
         cta: {
           label: 'View Template',
-          link: '#',
+          link: 'https://colab.research.google.com/github/supabase/supabase/blob/master/examples/ai/semantic_text_deduplication.ipynb',
         },
       },
       {
@@ -131,7 +131,7 @@ export default {
           'Transform images into image vector representations to detect similarity patterns.',
         cta: {
           label: 'View Template',
-          link: '/docs/examples/ai/image_search/README.md',
+          link: 'https://colab.research.google.com/github/supabase/supabase/blob/master/examples/ai/face_similarity.ipynb',
         },
       },
       {

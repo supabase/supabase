@@ -12,7 +12,7 @@ import {
 import { useBreakpoint } from 'common'
 import { DEFAULT_TRANSITION } from '~/lib/animations'
 import { Products } from './Sections/ProductsCta'
-import { PRODUCT_NAMES, PRODUCT_SHORTNAMES } from '../lib/constants'
+import { PRODUCT_NAMES, PRODUCT_SHORTNAMES } from '~/lib/constants'
 
 function MagnifiedProducts({ currentProduct }: { currentProduct?: Products }) {
   let mouseX = useMotionValue(Infinity)
@@ -48,7 +48,7 @@ function Product({
   isCurrentProduct: boolean
 }) {
   let ref = useRef<HTMLDivElement>(null)
-  const isInView = useInView(ref, { margin: '20%', once: true })
+  const isInView = useInView(ref, { margin: '-25%', once: true })
   const isMobile = useBreakpoint(768)
 
   let distance = useTransform(mouseX, (val) => {
@@ -60,10 +60,12 @@ function Product({
   let widthSync = useTransform(distance, [-150, 0, 150], [75, 110, 75])
   let width = useSpring(widthSync, { mass: 0.1, stiffness: 150, damping: 12 })
 
-  const initial = { x: 0 }
-  const xDelta = 120
+  const xDelta = 91
+  const initial = {
+    x: isMobile ? 0 : index * -xDelta + 225,
+  }
   const animate = {
-    x: index > 2 ? (index - 2) * xDelta - xDelta / 2 : index * -xDelta - xDelta / 2,
+    x: 0,
     transition: { ...DEFAULT_TRANSITION, delay: 0.5 },
   }
 
@@ -71,11 +73,11 @@ function Product({
     <motion.div
       ref={ref}
       className={[
-        'relative md:absolute mx-auto md:w-[150px] bg-transparent group',
+        'relative mx-auto md:w-[150px] bg-transparent group',
         isCurrentProduct ? 'z-10' : 'z-0',
       ].join(' ')}
       initial={initial}
-      animate={!isMobile && isInView ? animate : initial}
+      animate={isInView ? animate : initial}
     >
       <Link href={product.url}>
         <a className="flex w-full flex-col items-center text-center">
