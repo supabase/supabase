@@ -86,7 +86,7 @@ const CustomerQuotesSection = (props: Props) => {
 
   return (
     <LazyMotion features={domAnimation}>
-      <div className="py-16 sm:py-18 md:py-24 bg-scale-400 overflow-hidden dark:bg-transparent">
+      <div className="py-16 sm:py-18 md:py-24 overflow-hidden">
         <div className="relative h-[300px] w-[300vw] left-[-98vw] md:left-0 mx-auto md:w-full -mb-32 z-0">
           <CustomersVisual />
         </div>
