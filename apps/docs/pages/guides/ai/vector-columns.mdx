@@ -98,7 +98,7 @@ Similarity search is the most common use case for vectors. `pgvector` support 3 
 | `<#>`    | negative inner product |
 | `<=>`    | cosine distance        |
 
-Choosing the right operator depends on your needs. If you are searching over OpenAI embeddings, OpenAI recommends using cosine simliarity. For more information on how embeddings work and how they relate to each other, see [What are Embeddings?](/docs/guides/ai/concepts#what-are-embeddings).
+Choosing the right operator depends on your needs. If you are searching over OpenAI embeddings, OpenAI recommends using cosine similarity. For more information on how embeddings work and how they relate to each other, see [What are Embeddings?](/docs/guides/ai/concepts#what-are-embeddings).
 
 Supabase client libraries like `supabase-js` connect to your Postgres instance via [PostgREST](docs/guides/getting-started/architecture#postgrest-api). PostgREST does not currently support `pgvector` similarity operators, so we'll need to wrap our query in a Postgres function and call it via the `rpc()` method:
 
