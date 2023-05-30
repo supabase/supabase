@@ -28,7 +28,7 @@ export default {
       label: 'Start for free',
       link: '/docs/guides/ai',
     },
-    video: '#',
+    // video: '',
   },
   highlightsSection: {
     highlights: [
