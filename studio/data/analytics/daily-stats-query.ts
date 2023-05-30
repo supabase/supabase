@@ -161,6 +161,7 @@ export const useDailyStatsQuery = <TData = DailyStatsData>(
           } as TData
         }
       },
+      staleTime: 1000 * 60 * 60, // default good for an hour for now
       ...options,
     }
   )

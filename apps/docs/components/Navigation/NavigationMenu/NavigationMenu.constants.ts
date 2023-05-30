@@ -52,6 +52,12 @@ export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
       href: '/guides/storage',
       level: 'storage',
     },
+    {
+      label: 'AI & Vectors',
+      icon: 'ai',
+      href: '/guides/ai',
+      level: 'ai',
+    },
   ],
   [
     {
@@ -277,15 +283,6 @@ export const gettingstarted: NavMenuConstant = {
         {
           name: 'Ionic Angular',
           url: '/guides/getting-started/tutorials/with-ionic-angular',
-        },
-      ],
-    },
-    {
-      name: 'AI & ML',
-      items: [
-        {
-          name: 'Vector Search with OpenAI',
-          url: '/guides/getting-started/openai/vector-search',
         },
       ],
     },
@@ -750,8 +747,8 @@ export const functions: NavMenuConstant = {
       items: [
         { name: 'Dart Edge on Supabase', url: '/guides/functions/dart-edge' },
         { name: 'Browserless.io', url: '/guides/functions/examples/screenshots' },
-        { name: 'Hugging Face', url: '/guides/functions/examples/huggingface-image-captioning' },
-        { name: 'OpenAI API', url: '/guides/functions/examples/openai' },
+        { name: 'Hugging Face', url: '/guides/ai/examples/huggingface-image-captioning' },
+        { name: 'OpenAI API', url: '/guides/ai/examples/openai' },
         { name: 'Upstash Redis', url: '/guides/functions/examples/upstash-redis' },
         { name: 'Type-Safe SQL with Kysely', url: '/guides/functions/kysely-postgres' },
       ],
@@ -760,7 +757,7 @@ export const functions: NavMenuConstant = {
       name: 'Examples',
       url: '/guides/functions/examples',
       items: [
-        { name: 'Generating OpenAI GPT3 completions', url: '/guides/functions/examples/openai' },
+        { name: 'Generating OpenAI GPT3 completions', url: '/guides/ai/examples/openai' },
         { name: 'Generating OG images ', url: '/guides/functions/examples/og-image' },
         {
           name: 'CAPTCHA support with Cloudflare Turnstile',
@@ -854,6 +851,83 @@ export const storage: NavMenuConstant = {
     { name: 'Access Control', url: '/guides/storage/access-control' },
     { name: 'CDN', url: '/guides/storage/cdn' },
     { name: 'Image Transformations', url: '/guides/storage/image-transformations' },
+  ],
+}
+
+export const ai: NavMenuConstant = {
+  icon: 'ai',
+  title: 'AI & Vectors',
+  url: '/guides/ai',
+  items: [
+    { name: 'Overview', url: '/guides/ai' },
+    { name: 'Concepts', url: '/guides/ai/concepts' },
+    {
+      name: 'Structured & unstructured embeddings',
+      url: '/guides/ai/structured-unstructured-embeddings',
+    },
+    {
+      name: 'Quickstarts',
+      url: undefined,
+      items: [{ name: 'Python client', url: '/guides/ai/vecs-python-client' }],
+    },
+    {
+      name: 'Guides',
+      url: undefined,
+      items: [
+        { name: 'Managing collections', url: '/guides/ai/managing-collections' },
+        { name: 'Managing indexes', url: '/guides/ai/managing-indexes' },
+        { name: 'Vector columns', url: '/guides/ai/vector-columns' },
+        { name: 'Engineering for scale', url: '/guides/ai/engineering-for-scale' },
+      ],
+    },
+    {
+      name: 'Examples',
+      url: undefined,
+      items: [
+        {
+          name: 'OpenAI completions using Edge Functions',
+          url: '/guides/ai/examples/openai',
+        },
+        {
+          name: 'Image search with OpenAI CLIP',
+          url: '/guides/ai/examples/image-search-openai-clip',
+        },
+        {
+          name: 'Generate image captions using Hugging Face',
+          url: '/guides/ai/examples/huggingface-image-captioning',
+        },
+        {
+          name: 'Building ChatGPT Plugins',
+          url: '/guides/ai/examples/building-chatgpt-plugins',
+        },
+        {
+          name: 'Adding generative Q&A to your documentation',
+          url: '/guides/ai/examples/headless-vector-search',
+        },
+        {
+          name: 'Adding generative Q&A to your Next.js site',
+          url: '/guides/ai/examples/nextjs-vector-search',
+        },
+      ],
+    },
+    {
+      name: 'Third-Party Tools',
+      url: undefined,
+      items: [
+        {
+          name: 'LangChain',
+          url: '/guides/ai/langchain',
+        },
+        {
+          name: 'Hugging Face',
+          url: '/guides/ai/hugging-face',
+        },
+        {
+          name: 'Google Colab',
+          url: '/guides/ai/google-colab',
+        },
+      ],
+    },
   ],
 }
 
@@ -1096,7 +1170,7 @@ export const integrations: NavMenuConstant = {
       items: [
         { name: 'Cloudflare Workers', url: '/guides/integrations/cloudflare-workers' },
         { name: 'Estuary', url: '/guides/integrations/estuary' },
-        { name: 'OpenAI', url: '/guides/functions/examples/openai' },
+        { name: 'OpenAI', url: '/guides/ai/examples/openai' },
         { name: 'pgMustard', url: '/guides/integrations/pgmustard' },
         { name: 'Prisma', url: '/guides/integrations/prisma' },
         { name: 'Sequin', url: '/guides/integrations/sequin' },
@@ -1116,6 +1190,7 @@ export const integrations: NavMenuConstant = {
         { name: 'Directus', url: '/guides/integrations/directus' },
         { name: 'Draftbit', url: '/guides/integrations/draftbit' },
         { name: 'FlutterFlow', url: '/guides/integrations/flutterflow' },
+        { name: 'Forest Admin', url: '/guides/integrations/forestadmin' },
         { name: 'Plasmic', url: '/guides/integrations/plasmic' },
         { name: 'ILLA', url: '/guides/integrations/illa' },
       ],
