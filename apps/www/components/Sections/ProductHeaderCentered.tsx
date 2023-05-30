@@ -15,6 +15,10 @@ interface Types {
     label?: string
     link: string
   }
+  secondaryCta?: {
+    label?: string
+    link: string
+  }
   video?: string
 }
 
@@ -73,6 +77,15 @@ const ProductHeaderCentered = (props: Types) => (
               <a className="ml-2">
                 <Button type="default" size="medium" icon={<IconPlayCircle />}>
                   Watch video
+                </Button>
+              </a>
+            </Link>
+          )}
+          {props.secondaryCta && (
+            <Link href={props.secondaryCta.link} as={props.secondaryCta.link}>
+              <a className="ml-2 md:ml-3">
+                <Button type="default" size="medium">
+                  {props.secondaryCta.label}
                 </Button>
               </a>
             </Link>
