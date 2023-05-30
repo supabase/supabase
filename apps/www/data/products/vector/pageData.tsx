@@ -28,12 +28,16 @@ export default {
       label: 'Start for free',
       link: '/docs/guides/ai',
     },
+    secondaryCta: {
+      label: 'Quickstart',
+      link: '/docs/guides/ai/vecs-python-client',
+    },
     // video: '',
   },
   highlightsSection: {
     highlights: [
       {
-        title: 'PostgreSQL + pgvector',
+        title: 'Postgres + pgvector',
         paragraph:
           // 'Every Supabase project is a dedicated Postgres instance. Use pgvector to store, query, and index your vector embeddings at scale.',
           'Use pgvector to store, query, and index your vector embeddings at scale in a Postgres instance.',
@@ -43,7 +47,6 @@ export default {
         title: 'Connect with OpenAI',
         paragraph:
           'Easily connect to any LLM or embeddings API, including Hugging Face, SageMaker and more.',
-        // image: '/images/product/vector/highlight-openai.png',
         image: OpenAIImage,
       },
       {
@@ -79,7 +82,7 @@ export default {
         <span className="heading-gradient">with Supabase Vector</span>
       </>
     ),
-    paragraph: 'Go effortlessly from experimentation to production-ready AI applications.',
+    paragraph: 'Scale effortlessly from experimentation to production-ready AI applications',
     useCases: [
       {
         icon: `
@@ -90,7 +93,7 @@ export default {
         title: 'Semantic Search',
         description: 'Search your own knowledge base by semantic similarity.',
         cta: {
-          label: 'View Template',
+          label: 'Open in Colab',
           link: 'https://colab.research.google.com/github/supabase/supabase/blob/master/examples/ai/semantic_text_deduplication.ipynb',
         },
       },
@@ -126,7 +129,7 @@ export default {
         description:
           'Transform images into image vector representations to detect similarity patterns.',
         cta: {
-          label: 'View Template',
+          label: 'Open in Colab',
           link: 'https://colab.research.google.com/github/supabase/supabase/blob/master/examples/ai/face_similarity.ipynb',
         },
       },
@@ -135,7 +138,7 @@ export default {
         title: 'Data Management',
         description: 'Automatically tag, deduplicate or detect patterns in your vector store.',
         cta: {
-          label: 'View Template',
+          label: 'Open in Colab',
           link: 'https://colab.research.google.com/github/supabase/supabase/blob/master/examples/ai/semantic_text_deduplication.ipynb',
         },
       },
@@ -159,8 +162,7 @@ export default {
         <span className="text-brand-900">powerful APIs</span>
       </>
     ),
-    paragraph:
-      'Easy-to-use client libraries for managing and querying vector stores in PostgreSQL.',
+    paragraph: 'Easy-to-use client libraries for managing and querying vector stores in Postgres.',
     cta: {
       label: 'Explore documentation',
       link: '/docs/guides/ai/vecs-python-client',
@@ -168,7 +170,7 @@ export default {
     tabs: [
       {
         label: 'Store',
-        paragraph: 'Efficiently upsert millions of vectors along with important metadata.',
+        paragraph: 'Efficiently upsert millions of vectors with important metadata.',
         colabUrl:
           'https://colab.research.google.com/github/supabase/supabase/blob/master/examples/ai/vector_hello_world.ipynb',
         code: `
@@ -237,11 +239,11 @@ docs.query(
       <>
         <span className="heading-gradient">Powerful Features</span>
         <br />
-        <span className="text-brand-900">Seamless Development</span>
+        <span className="text-brand-900">Scale to millions</span>
       </>
     ),
     paragraph:
-      'Develop, integrate and deploy secure and scalable AI applications at unprecedented speed.',
+      'Develop, integrate, and deploy secure and enterprise-grade AI applications at unprecedented speed.',
     cta: {
       label: 'Explore documentation',
       link: '/docs/guides/ai',

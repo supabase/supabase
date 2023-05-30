@@ -65,9 +65,10 @@ const CustomerQuotesSection = (props: Props) => {
             </div>
           </div>
           <div className="border-t pt-4">
-            <p className="text-scale-1100 text-base">{customer.quote}</p>
-            <p className="text-scale-900 mt-4">{customer.author}</p>
-            <blockquote className="text-scale-900 text-sm">{customer.role}</blockquote>
+            <blockquote className="text-scale-1100 text-base">{customer.quote}</blockquote>
+            <p className="text-scale-900 mt-4">
+              {customer.author}, {customer.role}
+            </p>
           </div>
         </div>
 

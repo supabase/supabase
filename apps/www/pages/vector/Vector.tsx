@@ -36,7 +36,7 @@ function VectorPage() {
           url: `https://supabase.com/vector`,
           images: [
             {
-              url: `https://supabase.com${basePath}/images/vector/og.jpg`,
+              url: `https://supabase.com${basePath}/images/product/vector/og.png`,
             },
           ],
         }}
