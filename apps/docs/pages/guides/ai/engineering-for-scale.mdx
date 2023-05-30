@@ -12,80 +12,115 @@ Content sources for vectors can be extremely large. As you grow you should run y
 
 ## Simple workloads
 
-For small workloads it's typical to store your data in a single database. You can expose collections to your application with [views](/docs/guides/database/tables#views):
+For small workloads it's typical to store your data in a single database.
 
-- Main Project
-  - `vecs` (schema)
-    - `collection_one`
-    - `collection_two`
-    - `collection_three`
-  - `public` (schema)
-    - `collection_one` (view)
-    - `collection_two` (view)
-    - `collection_three` (view)
+If you've used [Vecs](/docs/guides/ai/vecs-python-client) to create 3 different collections, you can expose collections to your web or mobile application using [views](/docs/guides/database/tables#views):
+
+![Single Database](/docs/img/ai/scaling/single-database.png)
+
+For example, with 3 collections, called `docs`, `posts`, and `images`, we could expose the "docs" inside the public schema like this:
+
+```sql
+create view public.docs as
+select
+  id,
+  embedding,
+  metadata, # Expose the metadata as JSON
+  (metadata->>'url')::text as url # Extract the URL as a string
+from vector
+```
+
+You can then use any of the client libraries to access your collections within your applications:
+
+{/* prettier-ignore */}
+```js
+const { data, error } = await supabase
+  .from('docs')
+  .select('id, embedding, metadata')
+  .eq('url', '/hello-world')
+```
 
 ## Enterprise workloads
 
-At this stage you should distribute the collections into their own projects, and start querying them directly wherever possible. You can still access them through foreign data wrappers.
+As you move into production, we recommend running splitting your collections into separate projects. This is because it allows your vector stores to scale independently of your production data. Vectors typically grow faster than operational data, and they have different resource requirements. Running them on separate databases removes the single-point-of-failure.
 
-- Project1
-  - `vecs`
-    - `collection_one`
-- Project2
-  - `vecs`
-    - `collection_two`
-    - `collection_three`
-- Main project
-  - `public`
-    - `collection_one` (foreign table)
-    - `collection_two` (foreign table)
-    - `collection_three` (foreign table)
+![With secondaries](/docs/img/ai/scaling/with-secondaries.png)
 
-## Choosing a database size
+You can use as many secondary databases as you need to manage your collections. With this architecture, you have 2 options for accessing collections within your application:
 
-We can estimate the size you require either by the dimensionality of embeddings you require, or by the number of queries you expect to run. This is guidance only, and so you should monitor your database closely to manage any growth that you expect.
+1. Query the collections directly using Vecs.
+2. Access the collections from your Primary database through a Wrapper.
 
-### By dimensionality
+You can use both of these in tandem to suit your use-case. We recommend option `1` wherever possible, as it offers the most scalability.
 
-| `Compute Add-on` | `Dimensions` | `Estimated max vectors` |
-| ---------------- | ------------ | ----------------------- |
-| None             | 512          | TBD                     |
-|                  | 768          | TBD                     |
-|                  | 1024         | TBD                     |
-| Small            | 512          | TBD                     |
-|                  | 768          | TBD                     |
-|                  | 1024         | TBD                     |
-| Medium           | 512          | TBD                     |
-|                  | 768          | TBD                     |
-|                  | 1024         | TBD                     |
-| Large            | 512          | TBD                     |
-|                  | 768          | TBD                     |
-|                  | 1024         | TBD                     |
-| XL               | 512          | TBD                     |
-|                  | 768          | TBD                     |
-|                  | 1024         | TBD                     |
-| 2XL              | 512          | TBD                     |
-|                  | 768          | TBD                     |
-|                  | 1024         | TBD                     |
-| 4XL              | 512          | TBD                     |
-|                  | 768          | TBD                     |
-|                  | 1024         | TBD                     |
-| 8XL              | 512          | TBD                     |
-|                  | 768          | TBD                     |
-|                  | 1024         | TBD                     |
-| 8XL              | 512          | TBD                     |
-|                  | 768          | TBD                     |
-|                  | 1024         | TBD                     |
-| 12XL             | 512          | TBD                     |
-|                  | 768          | TBD                     |
-|                  | 1024         | TBD                     |
-| 16XL             | 512          | TBD                     |
-|                  | 768          | TBD                     |
-|                  | 1024         | TBD                     |
+### Query collections using Vecs
 
-### By queries per second
+Vecs provides methods for querying collections, either using a [cosine similarity function](https://supabase.github.io/vecs/api/#basic) or with [metadata filtering](https://supabase.github.io/vecs/api/#metadata-filtering).
 
-- [ ] TODO
+```python
+# cosine similarity
+docs.query(query_vector=[0.4,0.5,0.6], limit=5)
+
+# metadata filtering
+docs.query(
+    query_vector=[0.4,0.5,0.6],
+    limit=5,
+    filters={"year": {"$eq": 2012}}, # metadata filters
+)
+```
+
+### Accessing external collections using Wrappers
+
+Supabase supports [Foreign Data Wrappers](/blog/postgres-foreign-data-wrappers-rust). Wrappers allow you connect two databases together so that you can query them over the network.
+
+This involves 2 steps: connecting to your remote database from the primary, and creating a Foreign Table.
+
+#### Connecting your remote database
+
+Inside your Primary database we need to provide the credentials to access the secondary database:
+
+```sql
+create extension postgres_fdw;
+
+create server docs_server
+foreign data wrapper postgres_fdw
+options (host 'db.xxx.supabase.co', port '5432', dbname 'postgres');
+
+create user mapping for docs_user
+server docs_server
+options (user 'postgres', password 'password');
+```
+
+#### Create a foreign table
+
+We can now create a foreign table to access the data in our secondary project.
+
+```sql
+create foreign table docs (
+  id text not null,
+  embedding vector(1536),
+  metadata jsonb,
+  url text
+)
+server docs_server
+options (schema_name 'public', table_name 'docs');
+```
+
+This looks very similar to our View example above, and you can continue to use the client libraries to access your collections through the foreign table:
+
+{/* prettier-ignore */}
+```js
+const { data, error } = await supabase
+  .from('docs')
+  .select('id, embedding, metadata')
+  .eq('url', '/hello-world')
+```
+
+### Enterprise architecture
+
+This diagram provides an example architecture, allowing you to access the collections either with our client libraries or using Vecs. You can add as many secondary databases as you need, in this example we show one only:
+
+![Multi Database](/docs/img/ai/scaling/multi-database.png)
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
