@@ -16,8 +16,8 @@ const OpenAIImage = () => {
       <Image
         src={
           isDarkMode
-            ? '/images/product/vector/highlight-openai.svg'
-            : '/images/product/vector/highlight-openai-light.png'
+            ? '/images/product/vector/highlight-openai.jpg'
+            : '/images/product/vector/highlight-openai-light.jpg'
         }
         alt="OpenAI vector graphic"
         layout="fill"
