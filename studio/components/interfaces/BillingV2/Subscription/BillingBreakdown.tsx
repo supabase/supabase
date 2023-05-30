@@ -174,12 +174,10 @@ const BillingBreakdown = ({}: BillingBreakdownProps) => {
                           <IconAlertTriangle size={14} strokeWidth={2} className="text-red-900" />
                           <p className="text-sm text-red-900">Exceeded limit</p>
                         </div>
-                      ) : isApproachingLimit ? (
+                      ) : isApproachingLimit && !isUsageBillingEnabled ? (
                         <div className="flex items-center space-x-2 min-w-[115px]">
                           <IconAlertTriangle size={14} strokeWidth={2} className="text-amber-900" />
-                          <p className="text-sm text-amber-900">
-                            Reaching {isUsageBillingEnabled ? 'limit' : 'quota'}
-                          </p>
+                          <p className="text-sm text-amber-900">Reaching limit</p>
                         </div>
                       ) : null}
                     </div>

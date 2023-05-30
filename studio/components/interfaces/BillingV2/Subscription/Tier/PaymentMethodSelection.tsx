@@ -147,7 +147,10 @@ const PaymentMethodSelection = ({
             category: 'success',
             message: 'Successfully added new payment method',
           })
-          await refetchPaymentMethods()
+          const { data } = await refetchPaymentMethods()
+          if (!selectedPaymentMethod && data?.length) {
+            onSelectPaymentMethod(data[0].id)
+          }
         }}
       />
     </>

@@ -9,6 +9,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useIsHCaptchaLoaded } from 'stores/hcaptcha-loaded-store'
 import { Modal } from 'ui'
 import AddNewPaymentMethodForm from './AddNewPaymentMethodForm'
+import { useTheme } from 'common'
 
 // [Joshen] Directly brought over from old Billing folder, so we can deprecate that folder easily next time
 
@@ -84,9 +85,11 @@ const AddNewPaymentMethodModal = ({
     }
   }
 
+  const { isDarkMode } = useTheme()
+
   const options = {
     clientSecret: intent ? intent.client_secret : '',
-    appearance: { theme: 'night', labels: 'floating' },
+    appearance: { theme: isDarkMode ? 'night' : 'flat', labels: 'floating' },
   } as any
 
   const onLocalCancel = () => {

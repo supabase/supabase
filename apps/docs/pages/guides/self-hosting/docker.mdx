@@ -68,6 +68,10 @@ Update the `.env` file with your own secrets. In particular, these are required:
 
 The Docker setup doesn't include a management database for managing users and logins. If you plan to deploy the Studio to the web we suggest you put it behind a web proxy with Basic Auth or hide it behind a VPN.
 
+## Setting up Edge Functions
+
+Your Functions are stored in `volumes/functions`. The default setup has a `hello` Function that you can invoke on `http://localhost:8000/functions/v1/hello`. You can add new Functions as `volumes/functions/<Function name>/index.ts`.
+
 ## Configuration
 
 Each system can be [configured](../self-hosting#configuration) to suit your particular use-case.

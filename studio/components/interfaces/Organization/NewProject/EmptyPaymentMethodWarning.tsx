@@ -23,7 +23,7 @@ const EmptyPaymentMethodWarning = observer(
     return (
       <div className="mt-4">
         <InformationBox
-          icon={<IconAlertCircle className="text-white" size="large" strokeWidth={1.5} />}
+          icon={<IconAlertCircle size="large" strokeWidth={1.5} />}
           defaultVisibility={true}
           hideCollapse
           title="Your organization has no payment methods"

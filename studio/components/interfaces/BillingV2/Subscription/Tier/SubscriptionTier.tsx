@@ -89,7 +89,7 @@ const SubscriptionTier = ({}: SubscriptionTierProps) => {
                 <p className="text-sm text-scale-1000">
                   When this project exceeds its included usage quotas, it may become unresponsive.
                   {currentPlan?.id === 'free'
-                    ? 'If you wish to exceed the included usage, it is advised you upgrade to a paid plan.'
+                    ? 'If you wish to exceed the included usage, you should upgrade to a paid plan.'
                     : 'You can change the Cost Control settings if you plan on exceeding the included usage quotas.'}
                 </p>
               </Alert>
@@ -98,7 +98,7 @@ const SubscriptionTier = ({}: SubscriptionTierProps) => {
               type="horizontal"
               value={daysWithinCycle - daysToCycleEnd}
               max={daysWithinCycle}
-              barClass="bg-scale-1100"
+              barClass="bg-scale-1200"
               labelBottom={`Current billing cycle (${billingCycleStart.format(
                 'MMM DD'
               )} - ${billingCycleEnd.format('MMM DD')})`}
