@@ -26,7 +26,7 @@ interface Props {
 
 const UseCasesSection = ({ title, paragraph, useCases }: Props) => {
   const ref = useRef(null)
-  const isInView = useInView(ref, { margin: '20%', once: true })
+  const isInView = useInView(ref, { margin: '-25%', once: true })
 
   return (
     <LazyMotion features={domAnimation}>
@@ -65,7 +65,7 @@ const UseCase = ({
       <InteractiveShimmerCard innerClassName="p-4 md:p-8 h-full !bg-scale-200">
         <div className="h-full flex flex-col gap-4 items-start justify-between">
           <div className="prose">
-            <div className="flex items-center gap-2">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2">
               <svg
                 width="21"
                 height="21"
@@ -75,7 +75,7 @@ const UseCase = ({
               >
                 <path d={useCase.icon} fillRule="evenodd" fill="var(--colors-scale11)" />
               </svg>
-              <h4 className="text-sm md:text-lg m-0">{useCase.title}</h4>
+              <h4 className="text-base sm:text-lg m-0">{useCase.title}</h4>
             </div>
             <p className="text-sm text-scale-900 mt-2">{useCase.description}</p>
           </div>

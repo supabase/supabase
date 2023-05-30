@@ -3,9 +3,11 @@ import { LazyMotion, domAnimation, m, useInView } from 'framer-motion'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import InteractiveShimmerCard from '~/components/InteractiveShimmerCard'
 import { INITIAL_BOTTOM, getAnimation } from '~/lib/animations'
+import Image from 'next/image'
 
 interface Highlight {
-  image: string
+  image?: React.ReactNode
+  svg?: React.ReactNode
   title: string
   paragraph: string | React.ReactNode
 }
@@ -34,7 +36,10 @@ const HighlightCard = ({ highlight, index }: { highlight: Highlight; index: numb
   return (
     <m.div ref={ref} initial={initial} animate={isInView ? animate : initial}>
       <InteractiveShimmerCard innerClassName="flex flex-col !bg-scale-200">
-        <div className="w-full aspect-square mb-4"></div>
+        <div className="relative w-full aspect-[1.35/1] mb-4">
+          {highlight.image && highlight.image}
+          {highlight.svg && highlight.svg}
+        </div>
         <div className="p-8">
           <h3 className="text-lg text-scale-1200 font-medium mb-2">{highlight.title}</h3>
           <p className="text-scale-900">{highlight.paragraph}</p>
