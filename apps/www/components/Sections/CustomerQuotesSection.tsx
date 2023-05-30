@@ -66,18 +66,20 @@ const CustomerQuotesSection = (props: Props) => {
           </div>
           <div className="border-t pt-4">
             <blockquote className="text-scale-1100 text-base">{customer.quote}</blockquote>
-            <p className="text-scale-900 mt-4">
-              {customer.author}, {customer.role}
-            </p>
           </div>
         </div>
 
-        {customer.url && (
-          <div className="text-brand-900 border-t mt-4 pt-4 cursor-pointer text-sm flex items-center justify-between">
-            <span>Read Customer Story</span>
-            <IconArrowUpRight />
-          </div>
-        )}
+        <div>
+          <p className="text-scale-900 mt-4">
+            {customer.author}, {customer.role}
+          </p>
+          {customer.url && (
+            <div className="text-brand-900 border-t mt-4 pt-4 cursor-pointer text-sm flex items-center justify-between">
+              <span>Read Customer Story</span>
+              <IconArrowUpRight />
+            </div>
+          )}
+        </div>
       </m.div>
     )
   }

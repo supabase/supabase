@@ -50,7 +50,7 @@ const HighlightCard = ({ highlight, index }: { highlight: Highlight; index: numb
           {highlight.svg && highlight.svg}
         </div>
         <div className="p-8">
-          <h3 className="text-lg text-scale-1200 font-medium mb-2">{highlight.title}</h3>
+          <h3 className="text-lg text-scale-1200 mb-2">{highlight.title}</h3>
           <p className="text-scale-900">{highlight.paragraph}</p>
         </div>
       </InteractiveShimmerCard>
