@@ -3,14 +3,20 @@ import Image from 'next/image'
 import { useTheme } from 'common/Providers'
 import { LazyMotion, domAnimation, m, useInView } from 'framer-motion'
 import { INITIAL_BOTTOM, getAnimation } from '~/lib/animations'
+import { useBreakpoint } from 'common'
 
 const IntegrationsImage = () => {
   const { isDarkMode } = useTheme()
+  const isMobile = useBreakpoint(678)
   const ref = useRef(null)
   const isInView = useInView(ref, { margin: '-25%', once: true })
 
   const initial = INITIAL_BOTTOM
   const animate = getAnimation({})
+
+  const image = isDarkMode
+    ? `/images/product/vector/vector-tools-dark${isMobile ? '-mobile' : ''}.svg`
+    : `/images/product/vector/vector-tools-light${isMobile ? '-mobile' : ''}.svg`
 
   return (
     <LazyMotion features={domAnimation}>
@@ -21,11 +27,7 @@ const IntegrationsImage = () => {
         className="relative w-full h-full"
       >
         <Image
-          src={
-            isDarkMode
-              ? '/images/product/vector/vector-tools-dark.svg'
-              : '/images/product/vector/vector-tools-light.svg'
-          }
+          src={image}
           alt="Diagram of Machine Learning tools that integrate with Supabase Vector"
           layout="fill"
           objectFit="contain"
