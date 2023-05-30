@@ -95,10 +95,12 @@ const OpenSource = () => {
       <DefaultLayout>
         <SectionContainer>
           <div className="container">
-            <div className="text-center space-y-3">
-              <span className="uppercase text-brand-900">The Power of Collaboration</span>
-              <h1 className="text-4xl">Open Source Community</h1>
-              <p className="w-[45%] mx-auto text-sm text-scale-1100">
+            <div className="text-center space-y-2">
+              <span className="text-xs md:text-sm uppercase text-brand-900">
+                The Power of Collaboration
+              </span>
+              <h1 className="text-3xl md:text-4xl">Open Source Community</h1>
+              <p className="max-w-xs sm:max-w-md mx-auto text-sm text-scale-1100">
                 Supabase is an open source company, actively fostering collaboration and supporting
                 existing open source tools and communities.
               </p>
@@ -109,7 +111,7 @@ const OpenSource = () => {
         <SectionContainer>
           <div className="text-center space-y-2">
             <h2 className="text-2xl">Sponsor Appreciation</h2>
-            <p className="w-[40%] mx-auto text-scale-1100 text-sm pb-8">
+            <p className="max-w-xs sm:max-w-md mx-auto text-scale-1100 text-sm pb-8">
               Thanks to our sponsors we're able to advance our open source mission. Their support
               fuels our development, fosters collaboration, and empowers us to shape a more open and
               accessible future.
@@ -119,8 +121,8 @@ const OpenSource = () => {
                 (t: any, i: number) =>
                   !!t.transactions.length && (
                     <div key={i} className="mt-8">
-                      <h3 className="font-bold mb-6">{t.heading}</h3>
-                      <div className="grid grid-cols-3 gap-6">
+                      <h3 className="font-medium mb-6">{t.heading}</h3>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                         {t.transactions.map((x: any, i: number) => (
                           <Link key={i} href={`https://github.com/${x.sponsor}`}>
                             <div className="rounded-2xl bg-scale-300 border-[1px] border-scale-400 p-6 cursor-pointer flex items-center space-x-3">
@@ -147,17 +149,17 @@ const OpenSource = () => {
         <SectionContainer>
           <div className="text-center space-y-2">
             <h2 className="text-2xl">Community Maintainers</h2>
-            <p className="w-[50%] mx-auto text-scale-1100 text-sm pb-8">
+            <p className="max-w-xs sm:max-w-md mx-auto text-scale-1100 text-sm pb-8">
               Thanks to our dedicated community maintainers, we're able to propel our open source
               mission forward. Their unwavering commitment drives our development, nurtures
               collaboration, and empowers us to forge a more inclusive and accessible future.
             </p>
           </div>
           <div className="mt-8">
-            <Tabs size="medium" block>
+            <Tabs size="medium" block scrollable>
               {tags.map((tag: string, i: number) => (
                 <Tabs.Panel id={tag} label={tag} key={i}>
-                  <div className="grid grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {maintainers
                       .filter((x) => tag == 'All' || x.tags.includes(tag))
                       .sort((a, b) => a.handle.localeCompare(b.handle))
@@ -187,7 +189,7 @@ const OpenSource = () => {
 
         <SectionContainer>
           <h2 className="text-2xl">Repositories</h2>
-          <div className="grid grid-cols-3 gap-6 mt-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-6">
             {repos.length < 1 && <div></div>}
             {repos.length >= 1 &&
               repos.map((repo: any, i: number) => (
