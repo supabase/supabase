@@ -14,10 +14,14 @@ interface Feature {
 interface Props {
   title: string | ReactNode
   paragraph: string
+  cta?: {
+    label?: string
+    link: string
+  }
   features: Feature[]
 }
 
-const FeaturesSection = ({ title, paragraph, features }: Props) => {
+const FeaturesSection = ({ title, paragraph, cta, features }: Props) => {
   const ref = useRef(null)
   const isInView = useInView(ref, { margin: '-25%', once: true })
 
@@ -30,13 +34,15 @@ const FeaturesSection = ({ title, paragraph, features }: Props) => {
               {title}
             </h2>
             <p className="text-scale-900 mb-4">{paragraph}</p>
-            <Link href="">
-              <a className="">
-                <Button type="default" size="small">
-                  Explore documentation
-                </Button>
-              </a>
-            </Link>
+            {cta && (
+              <Link href={cta.link}>
+                <a>
+                  <Button type="default" size="small">
+                    {cta.label ?? 'Explore documentation'}
+                  </Button>
+                </a>
+              </Link>
+            )}
           </div>
           <div
             ref={ref}
