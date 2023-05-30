@@ -145,10 +145,6 @@ const TimedTabsSection = ({
           )}
         </div>
         <div className="relative w-full lg:w-1/2 min-h-[300px]">
-          <OpenInColab
-            colabUrl={tabs[activeTab].colabUrl}
-            className="hidden md:flex absolute -top-14 right-0"
-          />
           <Swiper
             // @ts-ignore
             onSwiper={setApiSwiper}
@@ -158,13 +154,18 @@ const TimedTabsSection = ({
             slidesPerView={1}
             speed={300}
             allowTouchMove={false}
-            // autoHeight={true}
           >
             {tabs.map((tab, i) => (
               <SwiperSlide key={i}>
-                <CodeBlock hideCopy key={i} lang="py" size="large" background="#1A1A1A">
-                  {tab.code}
-                </CodeBlock>
+                <>
+                  <OpenInColab
+                    colabUrl={tabs[activeTab].colabUrl}
+                    className="hidden md:flex absolute top-4 right-4"
+                  />
+                  <CodeBlock hideCopy key={i} lang="py" size="large" background="#1A1A1A">
+                    {tab.code}
+                  </CodeBlock>
+                </>
               </SwiperSlide>
             ))}
           </Swiper>
