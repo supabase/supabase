@@ -1,4 +1,4 @@
-import React, { useRef } from 'react'
+import React, { useRef, useState } from 'react'
 import { LazyMotion, domAnimation, m, useInView } from 'framer-motion'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import InteractiveShimmerCard from '~/components/InteractiveShimmerCard'
@@ -28,16 +28,25 @@ const HighlightCards = ({ highlights }: { highlights: Highlight[] }) => {
 
 const HighlightCard = ({ highlight, index }: { highlight: Highlight; index: number }) => {
   const ref = useRef(null)
+  const [isHovered, setIsHovered] = useState(false)
   const isInView = useInView(ref, { once: true })
 
   const initial = INITIAL_BOTTOM
   const animate = getAnimation({ delay: 0.4 + index * 0.1 })
 
+  const Img: any = highlight.image
+
   return (
-    <m.div ref={ref} initial={initial} animate={isInView ? animate : initial}>
+    <m.div
+      ref={ref}
+      initial={initial}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      animate={isInView ? animate : initial}
+    >
       <InteractiveShimmerCard innerClassName="flex flex-col !bg-scale-200">
         <div className="relative w-full aspect-[1.35/1] mb-4">
-          {highlight.image && highlight.image}
+          {highlight.image && <Img isHovered={isHovered} />}
           {highlight.svg && highlight.svg}
         </div>
         <div className="p-8">

@@ -37,14 +37,14 @@ export default {
         paragraph:
           // 'Every Supabase project is a dedicated Postgres instance. Use pgvector to store, query, and index your vector embeddings at scale.',
           'Use pgvector to store, query, and index your vector embeddings at scale in a Postgres instance.',
-        image: <PGvectorImg />,
+        image: PGvectorImg,
       },
       {
         title: 'Connect with OpenAI',
         paragraph:
           'Easily connect to any LLM or embeddings API, including Hugging Face, SageMaker and more.',
         // image: '/images/product/vector/highlight-openai.png',
-        image: <OpenAIImage />,
+        image: OpenAIImage,
       },
       {
         title: 'Secure and Scalable',
@@ -57,13 +57,13 @@ export default {
             compliant, and comes with an advanced permissions system.
           </>
         ),
-        image: <SecureAndScalableImg />,
+        image: SecureAndScalableImg,
       },
       {
         title: 'Deploy Globally',
         paragraph:
           'Choose from 12 Fully Managed datacenters, or Self-Host on your own cloud or servers.',
-        image: <DeployGlobally />,
+        image: DeployGlobally,
       },
     ],
   },
