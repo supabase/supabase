@@ -1,8 +1,8 @@
-import Image from 'next/image'
 import React, { useRef } from 'react'
+import Image from 'next/image'
 import { useTheme } from 'common/Providers'
 import { LazyMotion, domAnimation, m, useInView } from 'framer-motion'
-import { INITIAL_BOTTOM, getAnimation } from '../../../lib/animations'
+import { INITIAL_BOTTOM, getAnimation } from '~/lib/animations'
 
 const IntegrationsImage = () => {
   const { isDarkMode } = useTheme()
