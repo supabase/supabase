@@ -18,8 +18,8 @@ jobs:
           reporter: github-pr-review
           level: error
           exclude: |
-            "*.css"
-            "**/package.json"
-            "**/package-lock.json"
-            ".git/*"
-            "*.ipynb"
+            *.css
+            **/package.json
+            **/package-lock.json
+            .git/*
+            *.ipynb
