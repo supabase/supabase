@@ -1,20 +1,22 @@
 import React, { useState, useEffect, ReactNode } from 'react'
 import Link from 'next/link'
-import { motion, useAnimation } from 'framer-motion'
+import { AnimatePresence, motion, useAnimation } from 'framer-motion'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { Button, IconArrowUpRight } from 'ui'
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
 import { Swiper, SwiperSlide } from 'swiper/react'
+import Image from 'next/image'
 
 interface TabProps {
   label: string
+  paragraph?: string
   isActive: boolean
   onClick: VoidFunction
   progress: number | undefined
   intervalDuration?: number
 }
 
-const Tab = ({ isActive, label, onClick, progress, intervalDuration }: TabProps) => (
+const Tab = ({ isActive, label, paragraph, onClick, progress, intervalDuration }: TabProps) => (
   <button
     onClick={onClick}
     className={`text-left text-lg flex flex-col group gap-1 transition-all ${
@@ -36,12 +38,23 @@ const Tab = ({ isActive, label, onClick, progress, intervalDuration }: TabProps)
       )}
     </div>
     {label}
+    {isActive && (
+      <motion.p
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1, transition: { delay: 0.2 } }}
+        className="hidden md:block text-scale-900 text-sm"
+      >
+        {paragraph}
+      </motion.p>
+    )}
   </button>
 )
 
 interface Tab {
   label: string
+  paragraph?: string
   panel?: JSX.Element
+  colabUrl: string
   code?: string
 }
 
@@ -143,12 +156,19 @@ const TimedTabsSection = ({
           >
             {tabs.map((tab, i) => (
               <SwiperSlide key={i}>
-                <CodeBlock key={i} lang="py" size="large" background="#1A1A1A">
-                  {tab.code}
-                </CodeBlock>
+                <>
+                  <OpenInColab colabUrl={tab.colabUrl} className="hidden md:flex" />
+                  <CodeBlock hideCopy key={i} lang="py" size="large" background="#1A1A1A">
+                    {tab.code}
+                  </CodeBlock>
+                </>
               </SwiperSlide>
             ))}
           </Swiper>
+          <OpenInColab
+            colabUrl={tabs[activeTab]?.colabUrl}
+            className="flex md:hidden !relative !top-0 !right-0 mt-8 w-full justify-center"
+          />
         </div>
       </div>
       <div className="w-full col-span-full flex gap-4 lg:gap-8 xl:gap-10" role="tablist">
@@ -157,14 +177,49 @@ const TimedTabsSection = ({
             key={index}
             isActive={index === activeTab}
             label={tab.label}
+            paragraph={tab.paragraph}
             onClick={() => handleTabClick(index)}
             progress={index === activeTab ? progress : undefined}
             intervalDuration={intervalDuration}
           />
         ))}
       </div>
+      <div className="block md:hidden">
+        <AnimatePresence exitBeforeEnter>
+          <motion.p
+            key={tabs[activeTab]?.paragraph}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1, transition: { duration: 0.1, delay: 0.2 } }}
+            exit={{ opacity: 0, transition: { duration: 0.05 } }}
+            className="text-scale-900 text-sm"
+          >
+            {tabs[activeTab]?.paragraph}
+          </motion.p>
+        </AnimatePresence>
+      </div>
     </SectionContainer>
   )
 }
+
+const OpenInColab = ({ colabUrl, className }: { colabUrl: string; className?: string }) => (
+  <Link href={colabUrl}>
+    <a
+      target="_blank"
+      className={[
+        'absolute flex items-center top-4 right-4 z-10 h-10 bg-scale-300 hover:bg-scale-400 hover:text-scale-1000 text-sm text-scale-900 shadow-md rounded-full py-1 px-3 gap-2',
+        className,
+      ].join(' ')}
+    >
+      <Image
+        className="opacity-100 hover:opacity-80 transition-opacity"
+        src="/images/logos/google-colaboratory.svg"
+        alt="Google Colaboratory logo"
+        width={30}
+        height={30}
+      />
+      <span>Open in Colab</span>
+    </a>
+  </Link>
+)
 
 export default TimedTabsSection
