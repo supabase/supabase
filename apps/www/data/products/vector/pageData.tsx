@@ -92,8 +92,8 @@ export default {
         title: 'Semantic Search',
         description: 'Search your own knowledge base by semantic similarity.',
         cta: {
-          label: 'Open in Colab',
-          link: 'https://colab.research.google.com/github/supabase/supabase/blob/master/examples/ai/semantic_text_deduplication.ipynb',
+          label: 'View example',
+          link: '/docs/guides/ai/examples/headless-vector-search',
         },
       },
       {
@@ -102,7 +102,7 @@ export default {
         description: 'Enhance chatbot memory with content-based long-term retention.',
         cta: {
           label: 'Template coming soon',
-          link: '#',
+          link: '/docs/guides/ai/examples/nextjs-vector-search',
           isDisabled: true,
         },
       },
