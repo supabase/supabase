@@ -54,8 +54,10 @@ export default {
         paragraph: (
           <>
             Supabase is{' '}
-            <Link href="">
-              <a className="text-scale-1100 hover:underline">SOC2 type 2</a>
+            <Link href="https://forms.supabase.com/soc2">
+              <a className="text-scale-1100 hover:underline" target="_blank">
+                SOC2 type 2
+              </a>
             </Link>{' '}
             compliant, and comes with an advanced permissions system.
           </>
@@ -102,8 +104,9 @@ export default {
         title: 'Chatbots',
         description: 'Enhance chatbot memory with content-based long-term retention.',
         cta: {
-          label: 'View on Github',
+          label: 'Template coming soon',
           link: '#',
+          isDisabled: true,
         },
       },
       {
