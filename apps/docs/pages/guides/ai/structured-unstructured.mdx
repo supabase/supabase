@@ -46,16 +46,16 @@ values
     '79409372-7556-4ccc-ab8f-5786a6cfa4f7',
     array[0.1, 0.2, 0.3],
     '{"content": "Hello world", "url": "/hello-world"}'
-  );  
+  );
 ```
 
 An unstructured approach does not specify the metadata fields that are expected. It stores all metadata in a flexible `json`/`jsonb` column. The tradeoff is that the querying/filtering capabilities of a schemaless data type are less flexible than when each field has a dedicated column. It also pushes the burden of metadata data integrity onto application code, which is more error prone than enforcing constraints in the database.
 
 The unstructured approach is recommended:
+
 - for ephemeral/interactive workloads e.g. data science or scientific research
 - when metadata fields are user-defined or unknown
 - during rapid prototyping
-
 
 Client libraries like python's [vecs](https://github.com/supabase/vecs) use this structure. For example, running:
 
@@ -73,11 +73,11 @@ docs.upsert(vectors=[
 
 automatically creates the unstructured SQL table during the call to `create_collection`.
 
-Note that when working with client libraries that emit SQL DDL, like `create table ...`, you should add that SQL to your migrations when moving to production to maintain a single source of truth for your database's schema. 
+Note that when working with client libraries that emit SQL DDL, like `create table ...`, you should add that SQL to your migrations when moving to production to maintain a single source of truth for your database's schema.
 
 ## Hybrid
 
-The structured metadata style is recommended when the fields being tracked are known in advance. If you have a combination of known and unknown metadata fields, you can accommodate the unknown fields by adding a `json`/`jsonb` column to the table. In that situation, known fields should continue to use dedicated columns for best query performance and throughput. 
+The structured metadata style is recommended when the fields being tracked are known in advance. If you have a combination of known and unknown metadata fields, you can accommodate the unknown fields by adding a `json`/`jsonb` column to the table. In that situation, known fields should continue to use dedicated columns for best query performance and throughput.
 
 ```sql
 create table docs (
@@ -97,10 +97,8 @@ values
     'Hello world',
     '/hello-world',
     '{"key": "value"}'
-  );  
+  );
 ```
-
-
 
 ## Choosing the right model
 
