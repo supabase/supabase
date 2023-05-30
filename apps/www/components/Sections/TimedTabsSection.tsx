@@ -37,16 +37,18 @@ const Tab = ({ isActive, label, paragraph, onClick, progress, intervalDuration }
         />
       )}
     </div>
-    {label}
-    {isActive && (
-      <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1, transition: { delay: 0.2 } }}
-        className="hidden md:block text-scale-900 text-sm"
-      >
-        {paragraph}
-      </motion.p>
-    )}
+    <div className="md:h-20">
+      {label}
+      {isActive && (
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1, transition: { delay: 0.2 } }}
+          className="hidden md:block mt-1 text-scale-900 text-sm"
+        >
+          {paragraph}
+        </motion.p>
+      )}
+    </div>
   </button>
 )
 
