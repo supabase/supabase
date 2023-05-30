@@ -95,10 +95,6 @@ export default {
         },
       },
       {
-        //   <svg width="21" height="21" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
-        // <path fill-rule="evenodd" clip-rule="evenodd" d="M18.2324 10.2283C18.2324 14.0943 14.6507 17.2283 10.2324 17.2283C8.74079 17.2283 7.3445 16.8711 6.14919 16.2491L2.23242 17.2283L3.57072 14.1056C2.72522 12.9956 2.23242 11.6623 2.23242 10.2283C2.23242 6.36228 5.81414 3.22827 10.2324 3.22827C14.6507 3.22827 18.2324 6.36228 18.2324 10.2283ZM7.23242 9.22827H5.23242V11.2283H7.23242V9.22827ZM15.2324 9.22827H13.2324V11.2283H15.2324V9.22827ZM9.23242 9.22827H11.2324V11.2283H9.23242V9.22827Z" fill="#F2F2F2"/>
-        // </svg>
-
         icon: 'M18 10C18 13.866 14.4183 17 10 17C8.50836 17 7.11208 16.6428 5.91677 16.0208L2 17L3.3383 13.8773C2.4928 12.7673 2 11.434 2 10C2 6.13401 5.58172 3 10 3C14.4183 3 18 6.13401 18 10ZM7 9H5V11H7V9ZM15 9H13V11H15V9ZM9 9H11V11H9V9Z',
         title: 'Chatbots',
         description: 'Enhance chatbot memory with content-based long-term retention.',
@@ -116,7 +112,7 @@ export default {
         description: 'Combine semantic and full-text search with powerful SQL filtering.',
         cta: {
           label: 'Template coming soon',
-          link: '#',
+          link: '/examples/ai/image_search/README.md',
           isDisabled: true,
         },
       },
@@ -295,39 +291,34 @@ docs.query(
       {
         type: 'customer-story',
         avatar: '',
-        customer: 'Markprompt',
+        customer: 'markprompt',
         author: 'Michael Fester',
         role: 'Co-Founder, Markprompt',
         quote:
           'We decided to use Supabase over other specialized vector databases because it enabled us to be GDPR compliant from day one with little effort.',
-        image: '/images/product/vector/community/supabase+markprompt.svg',
+        image: '/images/customers/logos/markprompt.png',
         abstract: 'Markprompt and Supabase - GDPR-Compliant AI Chatbots for Docs and Websites.',
         url: '/customers/markprompt',
       },
       {
         type: 'customer-story',
         avatar: '',
-        customer: 'Mendable',
+        customer: 'mendableai',
         author: 'Caleb Peffer',
         role: 'CEO, Mendable',
         quote:
           'We tried other vector databases - we tried Faiss, we tried Weviate, we tried Pinecone. We found them to be incredibly expensive and not very intuitive. If you’re just doing vector search they’re great, but if you need to store a bunch of metadata that becomes a huge pain.',
-        image: '/images/product/vector/community/supabase+mendable.svg',
+        image: '/images/customers/logos/mendableai.png',
         abstract: 'Mendable switches from Pinecone to Supabase for PostgreSQL vector embeddings.',
         url: '/customers/mendable',
       },
     ],
     secondaryLinks: [
-      {
-        customer: 'BerriAI',
-        image: '/images/product/vector/community/berriAI.svg',
-        url: '/customers/berriai',
-      },
-      {
-        customer: 'BerriAI',
-        image: '/images/product/vector/community/berriAI.svg',
-        url: '/customers/berriai',
-      },
+      // {
+      //   customer: 'BerriAI',
+      //   image: '/images/product/vector/community/berriAI.svg',
+      //   url: '/customers/berriai',
+      // },
     ],
   },
 }

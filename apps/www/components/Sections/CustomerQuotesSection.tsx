@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useBreakpoint } from 'common'
+import { useTheme } from 'common/Providers'
 import { IconArrowUpRight } from 'ui'
 
 import SectionContainer from '~/components/Layouts/SectionContainer'
@@ -27,38 +27,42 @@ interface Props {
 }
 
 const CustomerQuotesSection = (props: Props) => {
-  const isSm = useBreakpoint(768)
   const { basePath } = useRouter()
 
-  const Card = (card: CardInterface) => (
-    <div className="bg-scale-100 dark:bg-scale-200 hover:border-scale-600 hover:dark:border-scale-700 border-scale-300 dark:border-scale-400 rounded-2xl border p-6 drop-shadow-sm flex flex-col justify-between">
-      <div className="flex flex-col gap-4">
-        <div className="h-24 w-full flex items-center justify-center pb-3">
-          <div className="relative w-full flex items-center justify-center h-10">
-            <Image
-              src={card.image!}
-              alt={`Supabase + ${card.customer}`}
-              layout="fill"
-              objectFit="contain"
-              objectPosition="center"
-            />
+  const Card = (card: CardInterface) => {
+    const { isDarkMode } = useTheme()
+    const logo = `/images/customers/logos/${!isDarkMode ? '' : 'light/'}${card.customer}.png`
+
+    return (
+      <div className="bg-scale-100 dark:bg-scale-200 hover:border-scale-600 hover:dark:border-scale-700 border-scale-300 dark:border-scale-400 rounded-2xl border p-6 drop-shadow-sm flex flex-col justify-between">
+        <div className="flex flex-col gap-4">
+          <div className="h-24 w-full flex items-center justify-center pb-3">
+            <div className="relative w-full flex items-center justify-center h-10">
+              <Image
+                src={logo}
+                alt={`Supabase + ${card.customer}`}
+                layout="fill"
+                objectFit="contain"
+                objectPosition="center"
+              />
+            </div>
+          </div>
+          <div className="border-t pt-4">
+            <p className="text-scale-1100 text-base">{card.quote}</p>
+            <p className="text-scale-900 mt-4">{card.author}</p>
+            <blockquote className="text-scale-900 text-sm">{card.role}</blockquote>
           </div>
         </div>
-        <div className="border-t pt-4">
-          <p className="text-scale-1100 text-base">{card.quote}</p>
-          <p className="text-scale-900 mt-4">{card.author}</p>
-          <blockquote className="text-scale-900 text-sm">{card.role}</blockquote>
-        </div>
-      </div>
 
-      {card.url && (
-        <div className="text-brand-900 border-t mt-4 pt-4 cursor-pointer text-sm flex items-center justify-between">
-          <span>Read Customer Story</span>
-          <IconArrowUpRight />
-        </div>
-      )}
-    </div>
-  )
+        {card.url && (
+          <div className="text-brand-900 border-t mt-4 pt-4 cursor-pointer text-sm flex items-center justify-between">
+            <span>Read Customer Story</span>
+            <IconArrowUpRight />
+          </div>
+        )}
+      </div>
+    )
+  }
 
   return (
     <div className="py-16 sm:py-18 md:py-24 bg-scale-400 overflow-hidden dark:bg-transparent">
