@@ -1,0 +1,126 @@
+---
+title: 'Vecs: Vector Client'
+description: Introducing Supabase Vecs, pgvector client
+author: oli_rice
+image: 
+thumb: 
+tags:
+  - postgres
+  - AI
+  - python
+date: '2023-05-29'
+toc_depth: 3
+---
+
+[Vecs](https://github.com/supabase/vecs) is a newly released Python library for storing embeddings in your Postgres database with the pgvector extension.
+
+It handles:
+- Creating and indexing tables
+- Querying vectors by cosine distance, l2 distance, and max inner dot product
+- Filtering based on user-defined metadata
+
+## Goals
+
+Our goal for `vecs` is to provide an interface that lets Postgres + pgvector look and feel like a dedicated vector store.
+It was designed with ease-of-use, interactivity, and exploratory data analysis in mind, but works equally well as a search workhorse.
+
+If you're interestd in the nuts and bolts of what's going on, its trivial to drop into the SQL layer and see whats happening.
+Alternatively, folks who don't want to know whats happening in the database, don't need to care.
+
+## Usage
+
+`Vecs` gets you started shockingly fast with creating a collection (table) and inserting a few records in just 5 lines of code.
+
+### Connecting
+
+```python
+import vecs
+
+DB_CONNECTION = "postgresql://<user>:<password>@<host>:<port>/<db_name>"
+
+# create vector store client
+vx = vecs.create_client(DB_CONNECTION)
+
+# create a collection of vectors with 3 dimensions
+docs = vx.create_collection(name="docs", dimension=3)
+```
+
+The `create_collection` call sets up a table in the Postgres database specified by `DB_CONNECTION` in a schema named `vecs` with the user defined name `docs`.
+
+Or, more specifically:
+
+```sql
+create table vecs.docs (
+    id text primary key,
+    vec vector(3) not null,
+    metadata jsonb not null default '{}'::jsonb,
+);
+```
+
+### Insert/Update
+
+We can insert a few records in that new SQL table/vecs collection using `Collection.upsert`.
+
+```python
+# add records to the collection
+docs.upsert(
+    vectors=[
+        (
+          "vec0",           # the records user defined identifier
+          [0.1, 0.2, 0.3],  # the vector. A list or np.array
+          {"year": 1973}    # associated metadata
+        )
+    ]
+)
+```
+
+which will add the records to our table if the `id` `"vec0"` does not exist, or updates the existing record if it does exist.
+
+
+### Query
+
+You can query a vecs collection at any time without an index, but its a best practices to create an index on your collection after inserting
+data.
+
+```python
+docs.index()
+```
+
+Where `index` optionally takes an argument for the distance measure to index.
+
+
+Finally, we can search the collection for similar vectors using the `query` method
+
+```python
+docs.query(
+    query_vector=[0.10,0.21,0.29],   # required
+    limit=1,                         # (optional) number of records to return
+    filters={"year": {"$eq": 1973}}, # (optional) metadata filters
+    measure="cosine_distance",       # (optional) distance measure to use
+    include_value=False,             # (optional) should distance measure values be returned?
+    include_metadata=False,          # (optional) should record metadata be returned?
+)
+```
+
+Which returns
+
+```python
+[("vec1", 0.000697, {"year": 1973})]
+```
+
+Since all metadata is stored in a `jsonb` column, there's a [lightweight but flexible DSL](https://supabase.github.io/vecs/concepts_metadata/) wrapped around it for filtering.
+
+When you're done, disconnect with
+
+```python
+vx.disconnect()
+```
+
+And 90% of the time, that minimal interface is all you'll need to touch.
+
+For more in-depth information about `vecs`, checkout the [API Quickstart](https://supabase.github.io/vecs/api/),
+[celebrity look-alike demo](https://github.com/supabase/supabase/blob/be1f4ea85e10cc8134e389dcdbe6a092b08612f1/examples/ai/face_similarity.ipynb),
+or [OpenAI integration example](https://supabase.github.io/vecs/integrations_openai/)
+
+
+
