@@ -16,6 +16,7 @@ import FunctionsExamples from './FunctionsExamples'
 import { Mermaid } from 'mdx-mermaid/lib/Mermaid'
 import RefSubLayout from '~/layouts/ref/RefSubLayout'
 import { Heading } from './CustomHTMLElements'
+import DatabaseSetup from './MDX/database_setup.mdx'
 import ProjectSetup from './MDX/project_setup.mdx'
 import QuickstartIntro from './MDX/quickstart_intro.mdx'
 import SocialProviderSettingsSupabase from './MDX/social_provider_settings_supabase.mdx'
@@ -66,6 +67,7 @@ const components = {
   FunctionsExamples,
   JwtGenerator,
   QuickstartIntro,
+  DatabaseSetup,
   ProjectSetup,
   SocialProviderSetup,
   SocialProviderSettingsSupabase,
