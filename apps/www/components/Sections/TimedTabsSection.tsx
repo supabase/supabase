@@ -142,7 +142,11 @@ const TimedTabsSection = ({
             </Link>
           )}
         </div>
-        <div className="w-full lg:w-1/2 min-h-[300px]">
+        <div className="relative w-full lg:w-1/2 min-h-[300px]">
+          <OpenInColab
+            colabUrl={tabs[activeTab].colabUrl}
+            className="hidden md:flex absolute -top-14 right-0"
+          />
           <Swiper
             // @ts-ignore
             onSwiper={setApiSwiper}
@@ -156,12 +160,9 @@ const TimedTabsSection = ({
           >
             {tabs.map((tab, i) => (
               <SwiperSlide key={i}>
-                <>
-                  <OpenInColab colabUrl={tab.colabUrl} className="hidden md:flex" />
-                  <CodeBlock hideCopy key={i} lang="py" size="large" background="#1A1A1A">
-                    {tab.code}
-                  </CodeBlock>
-                </>
+                <CodeBlock hideCopy key={i} lang="py" size="large" background="#1A1A1A">
+                  {tab.code}
+                </CodeBlock>
               </SwiperSlide>
             ))}
           </Swiper>
@@ -206,12 +207,12 @@ const OpenInColab = ({ colabUrl, className }: { colabUrl: string; className?: st
     <a
       target="_blank"
       className={[
-        'absolute flex items-center top-4 right-4 z-10 h-10 bg-scale-300 hover:bg-scale-400 hover:text-scale-1000 text-sm text-scale-900 shadow-md rounded-full py-1 px-3 gap-2',
+        'flex items-center z-10 h-10 bg-[#fff] hover:bg-[#fff] dark:bg-scale-300 dark:hover:bg-scale-400 hover:text-scale-900 text-sm text-scale-900 shadow-lg hover:shadow-md rounded-full py-1 px-3 gap-2',
         className,
       ].join(' ')}
     >
       <Image
-        className="opacity-100 hover:opacity-80 transition-opacity"
+        className="opacity-100 hover:opacity-80 transition-opacity invert dark:filter-none"
         src="/images/logos/google-colaboratory.svg"
         alt="Google Colaboratory logo"
         width={30}
