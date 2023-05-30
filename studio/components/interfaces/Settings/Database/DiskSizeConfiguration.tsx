@@ -4,15 +4,19 @@ import { useParams } from 'common/hooks'
 import { FormHeader } from 'components/ui/Forms'
 import Panel from 'components/ui/Panel'
 import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
-import { useProjectUsageUpdateMutation } from 'data/usage/project-usage-mutation'
+import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mutation'
 import { useProjectUsageQuery } from 'data/usage/project-usage-query'
 import { checkPermissions, useStore } from 'hooks'
 import Link from 'next/link'
-import { FC, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Alert, Button, Form, InputNumber, Modal } from 'ui'
 import { number, object } from 'yup'
 
-const DiskSizeConfiguration: FC<any> = ({ disabled = false }) => {
+export interface DiskSizeConfigurationProps {
+  disabled?: boolean
+}
+
+const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps) => {
   const { ui } = useStore()
   const { ref: projectRef } = useParams()
 
@@ -23,7 +27,7 @@ const DiskSizeConfiguration: FC<any> = ({ disabled = false }) => {
 
   const { data: projectUsage } = useProjectUsageQuery({ projectRef })
   const { data: projectSubscriptionData } = useProjectSubscriptionQuery({ projectRef })
-  const { mutateAsync: updateProjectUsage } = useProjectUsageUpdateMutation()
+  const { mutateAsync: updateProjectUsage } = useProjectDiskResizeMutation()
 
   useEffect(() => {
     if (showResetDbPass) {
