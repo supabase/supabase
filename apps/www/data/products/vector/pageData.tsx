@@ -20,7 +20,7 @@ export default {
       <>
         Integrate Supabase Vector database with your favorite ML-models{' '}
         <br className="hidden md:block" />
-        to easily store, access and scale vector embeddings for any AI use case
+        to easily store, access and scale vector embeddings for any AI use case.
       </>
     ),
     image: '/images/product/vector/vector-hero.svg',
@@ -135,9 +135,8 @@ export default {
         title: 'Data Management',
         description: 'Automatically tag, deduplicate or detect patterns in your vector store.',
         cta: {
-          label: 'Template coming soon',
-          link: '#',
-          isDisabled: true,
+          label: 'View Template',
+          link: 'https://colab.research.google.com/github/supabase/supabase/blob/master/examples/ai/semantic_text_deduplication.ipynb',
         },
       },
       {
