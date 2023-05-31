@@ -17,7 +17,7 @@ const DeployGlobally = ({ isHovered }: { isHovered: boolean }) => {
     gray: isDarkMode ? '#151918' : '#D3D3D3',
   }
   const indices = [
-    3, 11, 14, 23, 27, 35, 42, 48, 55, 62, 67, 71, 81, 83, 91, 98, 103, 107, 110, 115,
+    3, 11, 14, 23, 27, 31, 35, 42, 48, 55, 62, 67, 71, 81, 83, 91, 98, 100, 103, 107, 110, 115,
   ]
   const transitionDuration = 250
 
@@ -44,7 +44,7 @@ const DeployGlobally = ({ isHovered }: { isHovered: boolean }) => {
             (currentState === 'medium' && nextState === 'high'))
 
         if (pulse) {
-          const delay = getRandomNumber(50, 100)
+          const delay = getRandomNumber(40, 90)
 
           timeoutIds.push(
             setTimeout(() => {
@@ -65,7 +65,7 @@ const DeployGlobally = ({ isHovered }: { isHovered: boolean }) => {
           circle.dataset.state = nextState
         }
       })
-    }, 300)
+    }, 200)
 
     return () => {
       clearInterval(interval)
