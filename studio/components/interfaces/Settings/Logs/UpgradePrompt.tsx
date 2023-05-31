@@ -17,7 +17,7 @@ const UpgradePrompt: React.FC<Props> = ({ show, setShowUpgradePrompt, subscripti
   const router = useRouter()
   const { ref } = router.query
 
-  // Team tier is enabled when the flag is turned on OR the user is already on the team tier (manually assigned by us)
+  // Team plan is enabled when the flag is turned on OR the user is already on the team plan (manually assigned by us)
   const userIsOnTeamTier = subscription?.tier?.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.TEAM
   const teamTierEnabled = useFlag('teamTier') || userIsOnTeamTier
 
