@@ -142,7 +142,7 @@ const PaymentSummaryPanel = ({
 
   const getPlanName = (plan: any) => {
     if (plan.prod_id === STRIPE_PRODUCT_IDS.PAYG || plan.id === STRIPE_PRODUCT_IDS.PAYG) {
-      return 'Pro tier (No spend caps)'
+      return 'Pro plan (No spend caps)'
     } else return plan.name
   }
 
