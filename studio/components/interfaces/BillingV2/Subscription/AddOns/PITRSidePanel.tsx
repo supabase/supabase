@@ -13,8 +13,8 @@ import { Alert, Button, IconExternalLink, Radio, SidePanel } from 'ui'
 import SVG from 'react-inlinesvg'
 
 const PITR_CATEGORY_OPTIONS: { id: 'off' | 'on'; name: string; imageUrl: string }[] = [
-  { id: 'off', name: 'No point in time recovery', imageUrl: `${BASE_PATH}/img/pitr-off.svg` },
-  { id: 'on', name: 'Enable point in time recovery', imageUrl: `${BASE_PATH}/img/pitr-on.svg` },
+  { id: 'off', name: 'Disable PITR', imageUrl: `${BASE_PATH}/img/pitr-off.svg` },
+  { id: 'on', name: 'Enable PITR', imageUrl: `${BASE_PATH}/img/pitr-on.svg` },
 ]
 
 const PITRSidePanel = () => {
@@ -118,7 +118,7 @@ const PITRSidePanel = () => {
           </p>
 
           <div className="!mt-8 pb-4">
-            <div className="grid grid-cols-12 gap-3">
+            <div className="flex gap-3">
               {PITR_CATEGORY_OPTIONS.map((option) => {
                 const isSelected = selectedCategory === option.id
                 return (
@@ -134,8 +134,8 @@ const PITRSidePanel = () => {
                       className={clsx(
                         'relative rounded-xl transition border bg-no-repeat bg-center bg-cover cursor-pointer w-[160px] h-[96px]',
                         isSelected
-                          ? 'border-brand-900'
-                          : 'border-scale-900 opacity-50 group-hover:border-scale-1100 group-hover:opacity-100'
+                          ? 'border-scale-1200'
+                          : 'border-scale-900 opacity-50 group-hover:border-scale-1000 group-hover:opacity-100'
                       )}
                       width={160}
                       height={96}
@@ -210,7 +210,7 @@ const PITRSidePanel = () => {
                     value={option.identifier}
                   >
                     <div className="w-full group">
-                      <div className="border-b border-scale-500 px-4 py-2 group-hover:border-scale-600">
+                      <div className="border-b border-scale-500 px-4 py-2">
                         <p className="text-sm">{option.name}</p>
                       </div>
                       <div className="px-4 py-2">
