@@ -29,7 +29,7 @@ Database Space is consumed primarily by your data, indexes, and materialized vie
 
 <Admonition type="note">
 
-Depending on your billing tier, your database can go into read-only mode which can prevent you inserting and deleting data. There are instructions for managing read-only mode in the [Disk Management](#disk-management) section.
+Depending on your billing plan, your database can go into read-only mode which can prevent you inserting and deleting data. There are instructions for managing read-only mode in the [Disk Management](#disk-management) section.
 
 </Admonition>
 
@@ -55,15 +55,15 @@ New Supabase projects have a database size of ~40-60mb. This space includes pre-
 
 ## Disk management
 
-Supabase uses network-attached storage to balance performance with scalability. The behavior of your disk depends on your billing tier.
+Supabase uses network-attached storage to balance performance with scalability. The behavior of your disk depends on your billing plan.
 
-### Paid Tier Behavior
+### Paid Plan Behavior
 
 Pro and Enterprise projects have auto-scaling Disk Storage.
 
 Disk Storage expands automatically when the database reaches 90% of the disk size. The disk is expanded to be 50% larger (e.g., 8GB -> 12GB). Auto-scaling can only take place once every 6 hours. If within those 6 hours you reach 95% of the disk space, your project will enter read-only mode.
 
-The maximum Disk Storage Size for Pro Tier is 64TB. If you need more than this, [contact us](https://app.supabase.com/support/new) to learn more about the Enterprise plan.
+The maximum Disk Storage Size for Pro plan is 64TB. If you need more than this, [contact us](https://app.supabase.com/support/new) to learn more about the Enterprise plan.
 
 The Disk Storage Size can also be manually expanded in [Database settings page](https://app.supabase.com/project/_/settings/database). The maximum default you can expand the Disk Storage to is 200GB. If you wish to manually expand it any more than 200B, please [contact us](https://app.supabase.com/support/new) to discuss expanding the 200GB limit.
 
@@ -73,11 +73,11 @@ You may want to import a lot of data into your database which requires multiple 
 
 </Admonition>
 
-### Free Tier Behavior
+### Free Plan Behavior
 
-Free Tier projects enter [read-only](#read-only-mode) mode when you exceed the 500mb limit. Once in read-only mode, you have several options:
+Free Plan projects enter [read-only](#read-only-mode) mode when you exceed the 500mb limit. Once in read-only mode, you have several options:
 
-- [Upgrade to the Pro or Enterprise tier](https://app.supabase.com/project/_/settings/billing/subscription) to enable auto-scaling and expand beyond the 500mb database size limit.
+- [Upgrade to the Pro or Enterprise plan](https://app.supabase.com/project/_/settings/billing/subscription) to enable auto-scaling and expand beyond the 500mb database size limit.
 - [Disable read-only mode](#disabling-read-only-mode) and reduce your database size.
 
 ### Read-only mode

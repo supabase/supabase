@@ -21,7 +21,7 @@ Daily Backups and PITR are mutually exclusive. If your project opts into using P
 
 ## Daily Backups
 
-All Pro and Enterprise tier Supabase projects are backed up automatically on a daily basis. In terms of Recovery Point Objective (RPO), Daily Backups would be suitable for projects willing to lose up to 24 hours worth of data if disaster hits at the most inopportune time. If a lower RPO is required, enabling Point-in-Time Recovery should be considered.
+All Pro and Enterprise plan Supabase projects are backed up automatically on a daily basis. In terms of Recovery Point Objective (RPO), Daily Backups would be suitable for projects willing to lose up to 24 hours worth of data if disaster hits at the most inopportune time. If a lower RPO is required, enabling Point-in-Time Recovery should be considered.
 
 <Admonition type="note">
   For security purposes, passwords for custom roles are not stored in daily backups, and will not be
@@ -35,7 +35,7 @@ The PostgreSQL utility [pg_dumpall](https://www.postgresql.org/docs/current/app-
 
 ![Scheduled backups dashboard](/docs/img/backups-daily-dashboard.png)
 
-You can access daily backups in the [Scheduled backups](https://app.supabase.com/project/_/database/backups/scheduled) settings in the Dashboard. Pro tier projects can access the last 7 days’ worth of daily backups while Enterprise tier projects can access up to 30 days’ worth of daily backups. Users can restore their project to any one of the backups or download them as a zipped SQL file.
+You can access daily backups in the [Scheduled backups](https://app.supabase.com/project/_/database/backups/scheduled) settings in the Dashboard. Pro plan projects can access the last 7 days’ worth of daily backups while Enterprise plan projects can access up to 30 days’ worth of daily backups. Users can restore their project to any one of the backups or download them as a zipped SQL file.
 
 ### Restoration Process [#daily-backups-restoration-process]
 
@@ -52,7 +52,7 @@ The Dashboard will then prompt for a confirmation before proceeding with the res
 Point-in-Time Recovery (PITR) allows a project to be backed up at much shorter intervals. This provides users an option to restore to any chosen point of up to seconds in granularity. Even with daily backups, a day’s worth of data could still be lost. With PITR, backups could be performed up to the point of disaster.
 
 <Admonition type="note">
-  This feature is available to all Enterprise tier projects. Pro tier projects can enable PITR as an
+  This feature is available to all Enterprise plan projects. Pro plan projects can enable PITR as an
   add-on.
 </Admonition>
 
