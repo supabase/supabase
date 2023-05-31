@@ -238,3 +238,15 @@ div[data-radix-portal]:not(.portal--toast) {
 [data-radix-popper-content-wrapper] {
   @apply z-50 #{!important};
 }
+
+// Dropdowns on SQL Snippets
+// can't quite target this properly with Tailwind
+.sql-snippet-queryitem-dropdown {
+  button[data-state='open'] {
+    @apply bg-scale-400 text-scale-900;
+
+    svg {
+      @apply stroke-scale-900;
+    }
+  }
+}
