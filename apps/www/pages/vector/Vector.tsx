@@ -21,7 +21,7 @@ const EnterpriseCta = dynamic(() => import('~/components/Sections/EnterpriseCta'
 function VectorPage() {
   // base path for images
   const { basePath } = useRouter()
-  const meta_title = 'Vector | The open source vector database for AI applications'
+  const meta_title = 'Vector | The open source vector toolkit for Postgres'
   const meta_description =
     'Integrate Supabase Vector database with your favorite ML-models to store, index and access vector embeddings for any AI use case.'
 
