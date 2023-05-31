@@ -3,20 +3,17 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   id: 'column-encryption',
   title: 'Column Encryption',
-  description: 'Use Supabase to store and serve files.',
+  description: 'Encrypt columns using Transparent Column Encryption.',
+  subtitle: 'Encrypt columns using Transparent Column Encryption.',
   sidebar_label: 'Overview',
   video: 'https://www.youtube.com/v/J9mTPY8rIXE',
 }
 
-Encrypted Columns for Tables
+Supabase provides a secure method for encrypting columns using [Vault](/docs/guides/database/vault), our Postgres secrets manager. Vault is Postgres extension with an integrated UI intended to act as a secure global secrets management for you project.
 
-## Transparent Column Encryption (TCE)
+Vault enables an advance feature called Transparent Column Encryption (TCE) which provides a safe way to encrypt your data so that it doesn't leak into logs and backups. TCE provides a safe way to encrypt your data so that it doesn't leak into logs and backups. It can also provide row-level authenticated encryption.
 
-TCE provides a safe way to encrypt your data so that it doesn't leak into logs and backups. It can also provide row-level authenticated encryption.
-
-TCE is the primary building block of [Vault](/docs/guides/database/vault), Supabase's Postgres secrets manager. Vault is a built-in table with an integrated UI intended to act as a secure global secrets management for you project. However if you need more fine-grain control over your encrypted data, such as encrypting columns in your own tables, you can use TCE directly. Any Postgres value that can be cast to `text` or `bytea` can be encrypted using TCE.
-
-### Encrypting columns
+## Encrypting columns
 
 When creating a new column in the Dashboard, you can choose to encrypt a `text` or `bytea` column. You will choose which key you would like to encrypt it with by selecting an existing key ID or creating a new one.
 
@@ -26,9 +23,49 @@ Once you've created an encrypted column, you can insert data into the table like
 
 ![Encrypted data](/docs/img/guides/database/vault-encrypted-data.png)
 
+## Decrypting data
+
 Decrypted data is accessed using a special view that is automatically created after adding an encrypted column to a table. This view decrypts the data row-by-row as you access it. By default, this view is called `decrypted_<your-table-name>`. In the example below, the decryption view for the `profiles` table is called `decrypted_profiles`. Notice there is a new column in the view called `decrypted_emails` that contains the decrypted email value.
 
 ![Decrypted data](/docs/img/guides/database/vault-decrypted-data.png)
+
+## Using an Encrypted Table
+
+Now that you have TCE setup for a table, it's easy to use by simply inserting data into the table, and querying that data by looking at its generated view. The view is named `decrypted_<table_name>` and by default is in the same schema as your table:
+
+```sql
+insert into secrets
+  (secret, account_id)
+values
+  ('1234-5678-8765-4321', 123);
+```
+
+Now that you have inserted data, look at the table and notice how the secret is encrypted. This is the data that is stored on disk, the encrypted card number, the key id, and the account id, **but the key itself is not stored**. This means if someone gets a backup or dump of your database, they cannot decrypt the secret, they do not have the key, only the key ID:
+
+```sql
+> select * from secrets where account_id = 123;
+-[ RECORD 1 ]------+---------------------------------------------------------------------
+id                 | 1
+secret | jf8KfImkKTr+j4gzyDZQtLDEFL9eSlFuKjNlNEJvDg+OIKUr2wjF/8NnYcLisb5F9xiN
+account_id         | 123
+key_id             | 7f753c4f-8c68-457a-8801-1798b2e9f44d
+nonce              | \x300a14aa721184ff7cf0f6bf088da267
+```
+
+For you, the developer, you need the unencrypted secret for you application. No problem, you can access that data using the dynamically generated decryption view `decrypted_secrets`:
+
+```sql
+> select * from decrypted_secrets where account_id = 123;
+-[ RECORD 1 ]----------------+---------------------------------------------------------------------
+id                           | 1
+secret           | jf8KfImkKTr+j4gzyDZQtLDEFL9eSlFuKjNlNEJvDg+OIKUr2wjF/8NnYcLisb5F9xiN
+decrypted_secret | 1234-5678-8765-4321
+account_id                   | 123
+key_id                       | 7f753c4f-8c68-457a-8801-1798b2e9f44d
+nonce                        | \x300a14aa721184ff7cf0f6bf088da267
+```
+
+Notice how there is a new column called `decrypted_secret`. This column is not stored in database or on disk at all, it is generated “on-the-fly” as you select from the view. Database dumps do not contain this information, only the view itself, and most importantly, **raw decryption keys are never stored**.
 
 ## How Key Derivation Works
 
@@ -202,43 +239,7 @@ security label for pgsodium
 
 The new label indicates which column is to be associated with the secret, and that's it! Your `account_id` and secret are now protected under the same authentication signature as the secret itself.
 
-## Using an Encrypted Table
-
-Now that you have TCE setup for a table, it's easy to use by simply inserting data into the table, and querying that data by looking at its generated view. The view is named `decrypted_<table_name>` and by default is in the same schema as your table:
-
-```sql
-insert into secrets
-  (secret, account_id)
-values
-  ('1234-5678-8765-4321', 123);
-```
-
-Now that you have inserted data, look at the table and notice how the secret is encrypted. This is the data that is stored on disk, the encrypted card number, the key id, and the account id, **but the key itself is not stored**. This means if someone gets a backup or dump of your database, they cannot decrypt the secret, they do not have the key, only the key ID:
-
-```sql
-> select * from secrets where account_id = 123;
--[ RECORD 1 ]------+---------------------------------------------------------------------
-id                 | 1
-secret | jf8KfImkKTr+j4gzyDZQtLDEFL9eSlFuKjNlNEJvDg+OIKUr2wjF/8NnYcLisb5F9xiN
-account_id         | 123
-key_id             | 7f753c4f-8c68-457a-8801-1798b2e9f44d
-nonce              | \x300a14aa721184ff7cf0f6bf088da267
-```
-
-For you, the developer, you need the unencrypted secret for you application. No problem, you can access that data using the dynamically generated decryption view `decrypted_secrets`:
-
-```sql
-> select * from decrypted_secrets where account_id = 123;
--[ RECORD 1 ]----------------+---------------------------------------------------------------------
-id                           | 1
-secret           | jf8KfImkKTr+j4gzyDZQtLDEFL9eSlFuKjNlNEJvDg+OIKUr2wjF/8NnYcLisb5F9xiN
-decrypted_secret | 1234-5678-8765-4321
-account_id                   | 123
-key_id                       | 7f753c4f-8c68-457a-8801-1798b2e9f44d
-nonce                        | \x300a14aa721184ff7cf0f6bf088da267
-```
-
-Notice how there is a new column called `decrypted_secret`. This column is not stored in database or on disk at all, it is generated “on-the-fly” as you select from the view. Database dumps do not contain this information, only the view itself, and most importantly, **raw decryption keys are never stored**.
+## Resources
 
 - [Supabase Vault](/docs/guides/database/vault)
 - Read more about Supabase Vault in the [blog post](https://supabase.com/blog/vault-now-in-beta)
