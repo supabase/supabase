@@ -304,13 +304,13 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
                 <p className="text-sm text-scale-1000 mt-2">
                   This project is on the{' '}
                   <span className="text-scale-1100">
-                    {planNames[selectedProject?.subscription_tier]} tier
+                    {planNames[selectedProject?.subscription_tier]} plan
                   </span>
                 </p>
               ) : selectedProject?.ref !== 'no-project' ? (
                 <div className="flex items-center space-x-2 mt-2">
                   <IconLoader size={14} className="animate-spin" />
-                  <p className="text-sm text-scale-1000">Checking project's tier</p>
+                  <p className="text-sm text-scale-1000">Checking project's plan</p>
                 </div>
               ) : (
                 <></>
@@ -343,14 +343,14 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
               <div className="px-6">
                 <InformationBox
                   icon={<IconAlertCircle strokeWidth={2} />}
-                  title="Expected response times are based on your project's tier"
+                  title="Expected response times are based on your project's plan"
                   description={
                     <div className="space-y-4 mb-1">
                       <p>
-                        Free tier support is available within the community and officially by the
+                        Free plan support is available within the community and officially by the
                         team on a best efforts basis, though we cannot guarantee a response time.
-                        For a guaranteed response time we recommend upgrading to the Pro tier.
-                        Enhanced SLAs for support are available on our Enterprise Tier.
+                        For a guaranteed response time we recommend upgrading to the Pro plan.
+                        Enhanced SLAs for support are available on our Enterprise Plan.
                       </p>
                       <div className="flex items-center space-x-2">
                         <Link href={`/project/${values.projectRef}/settings/billing/update`}>
