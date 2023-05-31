@@ -5,7 +5,7 @@ import { useProjectUsageQuery } from 'data/usage/project-usage-query'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import { useRef, useState } from 'react'
-import { Button, IconAlertCircle, IconCheckCircle, IconLoader, Listbox } from 'ui'
+import { Button, IconAlertCircle, IconCheckCircle, IconLoader, Listbox, Tabs } from 'ui'
 import Activity from './Activity'
 import Bandwidth from './Bandwidth'
 import Infrastructure from './Infrastructure'
@@ -14,6 +14,10 @@ import { USAGE_CATEGORIES, USAGE_STATUS } from './Usage.constants'
 import { getUsageStatus } from './Usage.utils'
 import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
 import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
+import { useInView, InView } from 'react-intersection-observer'
+import { cn } from 'ui/src/utils/cn'
+
+export type usageSectionIds = 'infra' | 'bandwidth' | 'sizeCount' | 'activity'
 
 const Usage = () => {
   const { ref } = useParams()
@@ -26,6 +30,8 @@ const Usage = () => {
   const bandwidthRef = useRef<HTMLDivElement>(null)
   const sizeAndCountsRef = useRef<HTMLDivElement>(null)
   const activityRef = useRef<HTMLDivElement>(null)
+
+  const [activeTab, setActiveTab] = useState<usageSectionIds>('infra')
 
   const { data: usage } = useProjectUsageQuery({ projectRef: ref })
   const { data: subscription, isLoading: isLoadingSubscription } = useProjectSubscriptionQuery({
@@ -59,7 +65,7 @@ const Usage = () => {
   const usageBillingEnabled =
     subscriptionTierId === PRICING_TIER_PRODUCT_IDS.FREE || PRICING_TIER_PRODUCT_IDS.PRO
 
-  const scrollTo = (id: 'infra' | 'bandwidth' | 'sizeCount' | 'activity') => {
+  const scrollTo = (id: usageSectionIds) => {
     switch (id) {
       case 'infra':
         if (infrastructureRef.current)
@@ -78,9 +84,21 @@ const Usage = () => {
     }
   }
 
+  // const {
+  //   ref: inViewRef,
+  //   inView,
+  //   entry,
+  // } = useInView({
+  //   /* Optional options */
+  //   threshold: 0,
+  // })
+
+  // console.log('inView', inView)
+  // console.log('entry', entry)
+
   return (
     <>
-      <div className="border-b">
+      <div className="">
         <div className="1xl:px-28 mx-auto flex flex-col px-5 lg:px-16 2xl:px-32 pt-6 space-y-4">
           <h3 className="text-scale-1200 text-xl">Usage</h3>
           <div className="flex items-center justify-between">
@@ -104,7 +122,7 @@ const Usage = () => {
               {isLoadingSubscription ? (
                 <IconLoader className="animate-spin" size={14} />
               ) : subscription !== undefined ? (
-                <div>
+                <div className="flex flex-col xl:flex-row xl:gap-3">
                   <p className={clsx('text-sm transition', isLoadingSubscription && 'opacity-50')}>
                     Project is on {subscription.tier.name}
                   </p>
@@ -128,8 +146,11 @@ const Usage = () => {
               </Link>
             </div>
           </div>
-
-          <div className="flex items-center space-x-6 !mt-2">
+        </div>
+      </div>
+      <div>
+        <div className="lg:sticky top-0 z-10 overflow-hidden bg-scale-200 border-b">
+          <div className="1xl:px-28 mx-auto px-5 lg:px-16 2xl:px-32 flex gap-6">
             {USAGE_CATEGORIES.map((category) => {
               const infraStatus =
                 currentDayIoBudget <= 0
@@ -141,10 +162,16 @@ const Usage = () => {
                 category.key === 'infra' ? infraStatus : getUsageStatus(category.attributes, usage)
 
               return (
-                <div
+                <button
+                  role="tab"
                   key={category.key}
                   onClick={() => scrollTo(category.key)}
-                  className="flex items-center opacity-50 space-x-2 py-3 hover:opacity-100 transition cursor-pointer"
+                  className={cn(
+                    'flex items-center space-x-2 py-3 hover:opacity-100 transition cursor-pointer',
+                    activeTab === category.key
+                      ? 'border-b border-scale-1200 text-scale-1200'
+                      : 'opacity-50'
+                  )}
                 >
                   {!usageBillingEnabled && status === USAGE_STATUS.APPROACHING ? (
                     <IconAlertCircle size={15} strokeWidth={2} className="text-amber-900" />
@@ -152,30 +179,55 @@ const Usage = () => {
                     <IconAlertCircle size={15} strokeWidth={2} className="text-red-900" />
                   ) : null}
                   <p className="text-sm">{category.name}</p>
-                </div>
+                </button>
               )
             })}
           </div>
         </div>
-      </div>
 
-      {/*
+        {/*
         [Joshen] Could potentially run a map here based on USAGE_CATEGORIES, rather than defining each section
         but thinking it's gonna "cover up" too much details and make it harder to add attribute specific components
         e.g for database size, we also need to show disk volume size. Not to mention that are little nuances across
         each attribute RE formatting (bytes vs locale string)
       */}
-      <div id="infrastructure" ref={infrastructureRef}>
-        <Infrastructure projectRef={selectedProjectRef} />
-      </div>
-      <div id="bandwidth" ref={bandwidthRef}>
-        <Bandwidth projectRef={selectedProjectRef} />
-      </div>
-      <div id="size_and_counts" ref={sizeAndCountsRef}>
-        <SizeAndCounts projectRef={selectedProjectRef} />
-      </div>
-      <div id="activity" ref={activityRef}>
-        <Activity projectRef={selectedProjectRef} />
+
+        <InView
+          as="div"
+          id="infrastructure"
+          onChange={(inView, entry) => (inView || entry) && setActiveTab('infra')}
+        >
+          <div ref={infrastructureRef}>
+            <Infrastructure projectRef={selectedProjectRef} />
+          </div>
+        </InView>
+        <InView
+          as="div"
+          id="bandwidth"
+          onChange={(inView, entry) => (inView || entry) && setActiveTab('bandwidth')}
+        >
+          <div ref={bandwidthRef}>
+            <Bandwidth projectRef={selectedProjectRef} />
+          </div>
+        </InView>
+        <InView
+          as="div"
+          id="size_and_counts"
+          onChange={(inView, entry) => (inView || entry) && setActiveTab('sizeCount')}
+        >
+          <div ref={sizeAndCountsRef}>
+            <SizeAndCounts projectRef={selectedProjectRef} />
+          </div>
+        </InView>
+        <InView
+          as="div"
+          id="activity"
+          onChange={(inView, entry) => (inView || entry) && setActiveTab('activity')}
+        >
+          <div ref={activityRef}>
+            <Activity projectRef={selectedProjectRef} />
+          </div>
+        </InView>
       </div>
     </>
   )
