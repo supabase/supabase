@@ -12,8 +12,8 @@ export default {
     title: 'Supabase Vector',
     h1: (
       <span key={'vector-h1'} className="heading-gradient">
-        The open source Vector Database <br />
-        for AI applications
+        The open source Vector Toolkit <br />
+        for Postgres
       </span>
     ),
     subheader: (
