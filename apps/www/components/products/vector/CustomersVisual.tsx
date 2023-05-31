@@ -94,8 +94,8 @@ const CustomersVisual = () => {
         fill="url(#paint11_linear_4353_100693)"
         stroke="url(#paint12_linear_4353_100693)"
         strokeWidth="0.617486"
-        stroke-miterlimit="10"
-        stroke-linejoin="round"
+        strokeMiterlimit="10"
+        strokeLinejoin="round"
       />
       <circle
         cx="864.593"
