@@ -1824,6 +1824,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/supasquad',
+    destination: '/open-source/contributing/supasquad',
+  },
+  {
+    permanent: true,
     source: '/contact/enterprise',
     destination: 'https://forms.supabase.com/enterprise',
   },
