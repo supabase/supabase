@@ -77,17 +77,16 @@ const Infrastructure = ({ projectRef }: InfrastructureProps) => {
 
   const { data: ioBudgetData, isLoading: isLoadingIoBudgetData } = useInfraMonitoringQuery({
     projectRef,
-    attribute: 'disk_io_budget',
+    attribute: 'disk_io_consumption',
     interval,
     startDate,
     endDate,
     dateFormat,
   })
 
-  const currentDayIoBudget = Number(
-    ioBudgetData?.data.find((x) => x.periodStartFormatted === dayjs().format('DD MMM'))?.[
-      'disk_io_budget'
-    ] ?? 100
+  const highestIoBudgetConsumption = Math.max(
+    ...(ioBudgetData?.data || []).map((x) => Number(x.disk_io_consumption) ?? 0),
+    0
   )
 
   const chartMeta: { [key: string]: { data: DataPoint[]; isLoading: boolean } } = {
@@ -99,7 +98,7 @@ const Infrastructure = ({ projectRef }: InfrastructureProps) => {
       isLoading: isLoadingMemoryUsageData,
       data: memoryUsageData?.data ?? [],
     },
-    disk_io_budget: {
+    disk_io_consumption: {
       isLoading: isLoadingIoBudgetData,
       data: ioBudgetData?.data ?? [],
     },
@@ -116,14 +115,14 @@ const Infrastructure = ({ projectRef }: InfrastructureProps) => {
         return (
           <div id={attribute.anchor} key={attribute.key}>
             <SectionContent section={attribute}>
-              {attribute.key === 'disk_io_budget' && (
+              {attribute.key === 'disk_io_consumption' && (
                 <>
-                  {currentDayIoBudget <= 0 ? (
+                  {highestIoBudgetConsumption >= 100 ? (
                     <Alert withIcon variant="danger" title="IO Budget for today has been used up">
                       <p className="mb-4">
-                        Your workload has used up all the burst IO throughput minutes during the day
-                        and is running at the baseline performance. If you need consistent disk
-                        performance, consider upgrading to a larger compute add-on.
+                        Your workload has used up all the burst IO throughput minutes and ran at the
+                        baseline performance. If you need consistent disk performance, consider
+                        upgrading to a larger compute add-on.
                       </p>
                       <Link href={upgradeUrl}>
                         <a>
@@ -133,7 +132,7 @@ const Infrastructure = ({ projectRef }: InfrastructureProps) => {
                         </a>
                       </Link>
                     </Alert>
-                  ) : currentDayIoBudget <= 20 ? (
+                  ) : highestIoBudgetConsumption >= 80 ? (
                     <Alert withIcon variant="warning" title="IO Budget for today is running out">
                       <p className="mb-4">
                         Your workload is about to use up all the burst IO throughput minutes during
@@ -185,24 +184,17 @@ const Infrastructure = ({ projectRef }: InfrastructureProps) => {
               )}
               <div className="space-y-1">
                 <div className="flex flex-row justify-between">
-                  {attribute.key === 'disk_io_budget' ? (
-                    <p>IO Budget remaining</p>
+                  {attribute.key === 'disk_io_consumption' ? (
+                    <p>IO consumed per day</p>
                   ) : (
                     <p>
                       Max{' '}
                       <span className={attribute.key === 'ram_usage' ? 'lowercase' : ''}>
                         {attribute.name}
                       </span>{' '}
-                      usage
+                      per {interval === '1d' ? 'day' : 'hour'}
                     </p>
                   )}
-                  <Link href={`/project/${projectRef}/settings/billing/subscription`}>
-                    <a>
-                      <Button type="default" size="tiny">
-                        Upgrade compute
-                      </Button>
-                    </a>
-                  </Link>
                 </div>
 
                 {attribute.chartDescription.split('\n').map((paragraph, idx) => (
@@ -219,7 +211,7 @@ const Infrastructure = ({ projectRef }: InfrastructureProps) => {
                 </div>
               ) : chartData.length ? (
                 <UsageBarChart
-                  name={attribute.name}
+                  name={`${attribute.chartPrefix || ''}${attribute.name}`}
                   unit={attribute.unit}
                   attribute={attribute.attribute}
                   data={chartData}

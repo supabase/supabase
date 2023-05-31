@@ -4,7 +4,6 @@ import {
   CartesianGrid,
   Cell,
   ComposedChart,
-  ReferenceLine,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -21,11 +20,9 @@ export interface UsageBarChartProps {
   name: string // Used within the tooltip
   attribute: string
   unit: 'bytes' | 'absolute' | 'percentage'
-  hasQuota?: boolean
   yLimit?: number
   yLeftMargin?: number
   yFormatter?: (value: number | string) => string
-  quotaWarningType?: 'warning' | 'danger'
 }
 
 const UsageBarChart = ({
@@ -33,23 +30,14 @@ const UsageBarChart = ({
   name,
   attribute,
   unit,
-  hasQuota = false,
   yLimit,
   yLeftMargin = 10,
   yFormatter,
-  quotaWarningType = 'warning',
 }: UsageBarChartProps) => {
   const yMin = 0 // We can consider passing this as a prop if there's a use case in the future
-  const yMax = (yLimit ?? 0) * Y_DOMAIN_CEILING_MULTIPLIER
-  const quotaWarningClass = quotaWarningType === 'warning' ? 'fill-amber-900' : 'fill-red-900'
 
   const yDomain = [yMin, yLimit ?? 0]
-  const ticks =
-    yLimit !== undefined && hasQuota
-      ? [yMin, (yMax - yMin) * 0.25, (yMax - yMin) * 0.5, (yMax - yMin) * 0.75, yMax].map((x) =>
-          Math.ceil(x)
-        )
-      : undefined
+
 
   return (
     <div className="w-full h-[200px]">
@@ -62,7 +50,6 @@ const UsageBarChart = ({
             axisLine={false}
             tickLine={{ stroke: 'none' }}
             domain={yDomain}
-            ticks={ticks}
             tickFormatter={yFormatter}
           />
           <Tooltip
@@ -97,35 +84,9 @@ const UsageBarChart = ({
           />
           <Bar dataKey={attribute}>
             {data.map((entry) => {
-              return (
-                <Cell
-                  key={`${entry.period_start}`}
-                  className={
-                    yLimit !== undefined && Number(entry[attribute]) >= yLimit && hasQuota
-                      ? quotaWarningClass
-                      : 'fill-scale-1200'
-                  }
-                />
-              )
+              return <Cell key={`${entry.period_start}`} className="fill-scale-1200" />
             })}
           </Bar>
-          {hasQuota && yLimit && (
-            <ReferenceLine
-              y={yLimit}
-              label={(props) => (
-                <foreignObject
-                  x={props.viewBox.x + 30}
-                  y={props.viewBox.y - 10}
-                  width={200}
-                  height={24}
-                >
-                  <div className="text-[0.7rem] font-bold text-scale-1200 bg-scale-100 w-fit p-1.5 py-0.5 rounded-md">
-                    INCLUDED USAGE
-                  </div>
-                </foreignObject>
-              )}
-            />
-          )}
         </ComposedChart>
       </ResponsiveContainer>
     </div>
