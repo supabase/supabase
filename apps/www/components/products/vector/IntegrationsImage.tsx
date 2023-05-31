@@ -7,12 +7,14 @@ import { useBreakpoint } from 'common'
 
 const IntegrationsImage = () => {
   const { isDarkMode } = useTheme()
-  const isMobile = useBreakpoint(678)
+  const isMobile = useBreakpoint(767)
   const ref = useRef(null)
   const isInView = useInView(ref, { margin: '-25%', once: true })
 
   const initial = INITIAL_BOTTOM
   const animate = getAnimation({})
+
+  console.log('ismobile', isMobile)
 
   const image = isDarkMode
     ? `/images/product/vector/vector-tools-dark${isMobile ? '-mobile' : ''}.svg`
