@@ -8,11 +8,11 @@ export const meta = {
 
 Every project on the Supabase Platform comes with its own dedicated Postgres instance running inside a virtual machine (VM). The following table describes the base instance with additional compute add-ons available if you need extra performance when scaling up Supabase.
 
-| Plan            | Pricing | CPU                     | Memory | Maximum Disk IO Bandwidth | Baseline Disk IO Bandwidth | Connections: Direct (recommended) | Connections: Pooler (recommended) |
+| Plan            | Pricing | CPU                     | Memory | Max Disk Throughput | Baseline Disk Throughput | Connections: Direct (recommended) | Connections: Pooler (recommended) |
 | --------------- | ------- | ----------------------- | ------ | ------------------------- | -------------------------- | --------------------------------- | --------------------------------- |
-| Free (Included) | $0      | 2-core ARM (shared)     | 1 GB   | 2,606 Mbps                | 87 Mbps                    | 60                                | 200                               |
-| Small           | $5      | 2-core ARM (shared)     | 2 GB   | 2,606 Mbps                | 174 Mbps                   | 90                                | 200                               |
-| Medium          | $50     | 2-core ARM (shared)     | 4 GB   | 2,606 Mbps                | 347 Mbps                   | 120                               | 200                               |
+| Free (Included) | $0      | 2-core ARM (shared)     | 1 GB   | 2,085 Mbps                | 87 Mbps                    | 60                                | 200                               |
+| Small           | $5      | 2-core ARM (shared)     | 2 GB   | 2,085 Mbps                | 174 Mbps                   | 90                                | 200                               |
+| Medium          | $50     | 2-core ARM (shared)     | 4 GB   | 2,085 Mbps                | 347 Mbps                   | 120                               | 200                               |
 | Large           | $100    | 2-core ARM (dedicated)  | 8 GB   | 4,750 Mbps                | 630 Mbps                   | 160                               | 300                               |
 | XL              | $200    | 4-core ARM (dedicated)  | 16 GB  | 4,750 Mbps                | 1,188 Mbps                 | 240                               | 700                               |
 | 2XL             | $400    | 8-core ARM (dedicated)  | 32 GB  | 4,750 Mbps                | 2,375 Mbps                 | 380                               | 1500                              |
