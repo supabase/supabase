@@ -25,7 +25,7 @@ export default {
     image: '/images/product/vector/vector-hero.svg',
     cta: {
       label: 'Quickstart',
-      link: '/docs/guides/ai/vecs-python-client',
+      link: '/docs/guides/ai/quickstarts/hello-world',
     },
     secondaryCta: {
       label: 'Explore documentation',
