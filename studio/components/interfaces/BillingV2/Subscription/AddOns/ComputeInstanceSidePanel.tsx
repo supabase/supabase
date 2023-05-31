@@ -126,17 +126,8 @@ const ComputeInstanceSidePanel = () => {
               database instance.
             </p>
 
-            <Alert
-              withIcon
-              variant="info"
-              title="Your project will need to be restarted when changing it's compute size"
-            >
-              It will take up to 2 minutes for changes to take place, in which your project will be
-              unavailable during that time.
-            </Alert>
-
             <div className="!mt-8 pb-4">
-              <div className="grid grid-cols-12 gap-3">
+              <div className="flex gap-3">
                 {COMPUTE_CATEGORY_OPTIONS.map((option) => {
                   const isSelected = selectedCategory === option.id
                   return (
@@ -152,8 +143,8 @@ const ComputeInstanceSidePanel = () => {
                         className={clsx(
                           'relative rounded-xl transition border bg-no-repeat bg-center bg-cover cursor-pointer w-[160px] h-[96px]',
                           isSelected
-                            ? 'border-brand-900'
-                            : 'border-scale-900 opacity-50 group-hover:border-scale-1100 group-hover:opacity-100'
+                            ? 'border-scale-1200'
+                            : 'border-scale-900 opacity-50 group-hover:border-scale-1000 group-hover:opacity-100'
                         )}
                         width={160}
                         height={96}
@@ -208,7 +199,7 @@ const ComputeInstanceSidePanel = () => {
                       value={option.identifier}
                     >
                       <div className="w-full group">
-                        <div className="border-b border-scale-500 px-4 py-2 group-hover:border-scale-600">
+                        <div className="border-b border-scale-500 px-4 py-2">
                           <p className="text-sm">{option.name}</p>
                         </div>
                         <div className="px-4 py-2">
@@ -256,6 +247,17 @@ const ComputeInstanceSidePanel = () => {
                   time.
                 </p>
               ))}
+
+            {hasChanges && (
+              <Alert
+                withIcon
+                variant="info"
+                title="Your project will need to be restarted when changing it's compute size"
+              >
+                It will take up to 2 minutes for changes to take place, in which your project will
+                be unavailable during that time.
+              </Alert>
+            )}
           </div>
         </SidePanel.Content>
       </SidePanel>
