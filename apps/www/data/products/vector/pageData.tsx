@@ -12,14 +12,15 @@ export default {
     title: 'Supabase Vector',
     h1: (
       <span key={'vector-h1'} className="heading-gradient">
-        The open source Vector Toolkit <br />
-        for Postgres
+        The best vector database  <br />
+        is the database you already have
       </span>
     ),
     subheader: (
       <>
-        Use pgvector with Supabase client libraries <br className="hidden md:block" />
-        to store, index, and query your vector embeddings at scale.
+        An open source toolkit for developing AI applications using Postgres and pgvector. 
+        <br className="hidden md:block" />
+        Use the Supabase client libraries to store, index, and query your vector embeddings at scale.
       </>
     ),
     image: '/images/product/vector/vector-hero.svg',
