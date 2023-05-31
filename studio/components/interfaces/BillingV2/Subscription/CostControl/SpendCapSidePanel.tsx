@@ -174,7 +174,7 @@ const SpendCapSidePanel = () => {
           )}
 
           <div className="!mt-8 pb-4">
-            <div className="grid grid-cols-12 gap-3">
+            <div className="flex gap-3">
               {SPEND_CAP_OPTIONS.map((option) => {
                 const isSelected = selectedOption === option.value
 
@@ -187,7 +187,9 @@ const SpendCapSidePanel = () => {
                     <SVG
                       className={clsx(
                         'relative rounded-xl transition border bg-no-repeat bg-center bg-cover w-[160px] h-[96px]',
-                        isSelected ? 'border-brand-900' : 'border-scale-800',
+                        isSelected
+                          ? 'border-scale-1200'
+                          : 'border-scale-900 opacity-50 group-hover:border-scale-1000 group-hover:opacity-100',
                         !isFreePlan && 'cursor-pointer',
                         !isFreePlan && !isSelected && 'group-hover:border-scale-1100'
                       )}
