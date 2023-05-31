@@ -19,7 +19,7 @@ export interface QueryItemProps {
 
 const QueryItem = ({ tabInfo }: QueryItemProps) => {
   const { ref, id: activeId } = useParams()
-  const { id, name } = tabInfo || {}
+  const { id, name, description } = tabInfo || {}
   const isActive = id === activeId
   const activeItemRef = useRef<HTMLElement | null>(null)
 
@@ -45,7 +45,7 @@ const QueryItem = ({ tabInfo }: QueryItemProps) => {
       <Link href={`/project/${ref}/sql/${id}`}>
         <a className="py-1 px-3 w-full">
           <p
-            title={name}
+            title={description}
             className="text-sm text-scale-1100 group-hover:text-scale-1200 transition"
           >
             {name}
