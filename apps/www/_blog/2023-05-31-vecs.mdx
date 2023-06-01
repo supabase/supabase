@@ -15,6 +15,7 @@ toc_depth: 3
 [Vecs](https://github.com/supabase/vecs) is a newly released Python library for storing embeddings in your Postgres database with the pgvector extension.
 
 It handles:
+
 - Creating and indexing tables
 - Querying vectors by cosine distance, l2 distance, and max inner dot product
 - Filtering based on user-defined metadata
@@ -76,7 +77,6 @@ docs.upsert(
 
 which will add the records to our table if the `id` `"vec0"` does not exist, or updates the existing record if it does exist.
 
-
 ### Query
 
 You can query a vecs collection at any time without an index, but its a best practices to create an index on your collection after inserting
@@ -87,7 +87,6 @@ docs.index()
 ```
 
 Where `index` optionally takes an argument for the distance measure to index.
-
 
 Finally, we can search the collection for similar vectors using the `query` method
 
@@ -122,12 +121,10 @@ For more in-depth information about `vecs`, checkout the [API Quickstart](https:
 [celebrity look-alike demo](https://github.com/supabase/supabase/blob/be1f4ea85e10cc8134e389dcdbe6a092b08612f1/examples/ai/face_similarity.ipynb),
 or [OpenAI integration example](https://supabase.github.io/vecs/integrations_openai/)
 
-
 ## Deploying with Supabase
 
 As usual, if you combine [supabase/vecs](https://github.com/supabase/vecs) with the rest of Supabase, you get more than the sum of the parts.
 Once you're happy with your vecs collection, you can make it acessible to your front-end and supabase-js by exposing the collection as a view
-
 
 ## Future ideas
 
@@ -137,7 +134,6 @@ streamline those workflows for users.
 
 One option we're exploring is to optionally assign transformation pipelines to collections along the lines of:
 
-
 ```python
 # This is mock code only, not currently functional
 
@@ -146,7 +142,7 @@ docs: Collection =vx.create_collection(
     dimension=512,
     transform = TextPreprocessor(  # this is new
         model="sentence-transformers/all-Mini-L6-v2"
-    )    
+    )
 )
 
 docs.upsert([
