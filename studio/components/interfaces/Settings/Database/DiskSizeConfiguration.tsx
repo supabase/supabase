@@ -150,7 +150,7 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
         <Alert
           withIcon
           variant="info"
-          title={'Disk size configuration is not available for projects on the Free tier'}
+          title={'Disk size configuration is not available for projects on the Free plan'}
           actions={
             <Link href={`/project/${projectRef}/settings/billing/subscription`}>
               <Button type="default">Upgrade subscription</Button>
@@ -159,7 +159,7 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
         >
           <div>
             If you are intending to use more than 500MB of disk space, then you will need to upgrade
-            to at least the Pro tier.
+            to at least the Pro plan.
           </div>
         </Alert>
       )}

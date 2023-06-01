@@ -254,7 +254,7 @@ describe.each(['FREE', 'PRO', 'TEAM', 'ENTERPRISE'])('upgrade modal for %s', (ke
       fireEvent.click(option)
     })
 
-    // only free tier will show modal
+    // only free plan will show modal
     if (key === 'FREE') {
       await screen.findByText('Log retention') // assert modal title is present
     } else {
