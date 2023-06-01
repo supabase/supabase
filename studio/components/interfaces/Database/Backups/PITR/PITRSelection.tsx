@@ -77,23 +77,24 @@ const PITRSelection = ({}) => {
   const { earliestPhysicalBackupDateUnix, latestPhysicalBackupDateUnix } =
     backups?.configuration?.physicalBackupData ?? {}
   const hasNoBackupsAvailable = !earliestPhysicalBackupDateUnix || !latestPhysicalBackupDateUnix
-  const earliestAvailableBackup = dayjs(earliestPhysicalBackupDateUnix * 1000).tz(
-    selectedTimezone?.utc[0]
-  )
-  const latestAvailableBackup = dayjs(latestPhysicalBackupDateUnix * 1000).tz(
-    selectedTimezone?.utc[0]
-  )
+  const earliestAvailableBackup = dayjs
+    .unix(earliestPhysicalBackupDateUnix)
+    .tz(selectedTimezone?.utc[0])
+  const latestAvailableBackup = dayjs
+    .unix(latestPhysicalBackupDateUnix)
+    .tz(selectedTimezone?.utc[0])
 
   // Start: Variables specifically for date picker component
   // Required as it only works with vanilla Date object which is not timezone localized
-  const earliestAvailableBackupFormatted = new Date(earliestAvailableBackup.format('YYYY-MM-DD'))
-  const latestAvailableBackupFormatted = new Date(latestAvailableBackup.format('YYYY-MM-DD'))
+  const earliestAvailableBackupFormatted = earliestAvailableBackup.toDate()
+  const latestAvailableBackupFormatted = latestAvailableBackup.toDate()
   const isSelectedOnEarliest = checkMatchingDates(selectedDate, earliestAvailableBackupFormatted)
   const isSelectedOnLatest = checkMatchingDates(selectedDate, latestAvailableBackupFormatted)
   const availableDates = getDatesBetweenRange(
     earliestAvailableBackupFormatted,
     latestAvailableBackupFormatted
   )
+
   // End: Variables specifically for date picker component
 
   const earliestAvailableBackupTime = {
