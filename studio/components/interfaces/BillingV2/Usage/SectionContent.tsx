@@ -2,6 +2,7 @@ import { PropsWithChildren } from 'react'
 import { Badge, IconExternalLink } from 'ui'
 import { CategoryAttribute } from './Usage.constants'
 import Link from 'next/link'
+import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
 
 export interface SectionContent {
   section: CategoryAttribute
@@ -26,11 +27,13 @@ const SectionContent = ({
                   <p className="text-base capitalize">{name}</p>
                   {includedInPlan === false && <Badge color="gray">Not included</Badge>}
                 </div>
-                {description.split('\n').map((value, idx) => (
-                  <p key={`desc-${idx}`} className="text-sm text-scale-1000 pr-8">
-                    {value}
-                  </p>
-                ))}
+                <div className="grid gap-4">
+                  {description.split('\n').map((value, idx) => (
+                    <p key={`desc-${idx}`} className="text-sm text-scale-1000 pr-8">
+                      {value}
+                    </p>
+                  ))}
+                </div>
               </div>
               {links && links.length && (
                 <div className="space-y-2">

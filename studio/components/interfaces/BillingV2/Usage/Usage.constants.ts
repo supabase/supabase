@@ -11,6 +11,7 @@ export interface CategoryAttribute {
   key: string // Property from project usage
   attribute: string // For querying against stats-daily / infra-monitoring
   name: string
+  chartPrefix?: string
   unit: 'bytes' | 'absolute' | 'percentage'
   links?: {
     name: string
@@ -29,7 +30,7 @@ export const USAGE_CATEGORIES: {
   {
     key: 'infra',
     name: 'Infrastructure',
-    description: 'Usage statistics related to your Postgres server',
+    description: 'Usage statistics related to your server instance',
     attributes: [
       {
         anchor: 'cpu',
@@ -63,19 +64,19 @@ export const USAGE_CATEGORIES: {
         ],
       },
       {
-        anchor: 'disk_io_budget',
-        key: 'disk_io_budget',
-        attribute: 'disk_io_budget',
+        anchor: 'disk_io',
+        key: 'disk_io_consumption',
+        attribute: 'disk_io_consumption',
         name: 'Disk IO bandwidth',
         unit: 'percentage',
         links: [
           {
             name: 'Documentation',
-            url: 'https://supabase.com/docs/guides/platform/compute-add-ons#disk-io-bandwidth',
+            url: 'https://supabase.com/docs/guides/platform/compute-add-ons#disk-throughput-and-iops',
           },
         ],
         description:
-          'SSD Disks are attached to your servers and the disk performance of your workload is determined by the Disk IO bandwidth of this connection.',
+          'SSD Disks are attached to your servers. The disk performance of your workload is determined by the Disk IO bandwidth of this connection.',
         chartDescription: '',
       },
     ],
@@ -92,8 +93,8 @@ export const USAGE_CATEGORIES: {
         name: 'Database egress',
         unit: 'bytes',
         description:
-          'Contains any outgoing traffic (egress) from your database\nBilling is based on the total sum of egress in GB throughout your billing period.',
-        chartDescription: 'The data shown here is refreshed over a period of 24 hours.',
+          'Contains any outgoing traffic (egress) from your database.\nBilling is based on the total sum of egress in GB throughout your billing period.',
+        chartDescription: 'The data shown here refreshes every 24 hours.',
       },
       {
         anchor: 'storageEgress',
@@ -103,7 +104,7 @@ export const USAGE_CATEGORIES: {
         unit: 'bytes',
         description:
           'All requests to download/view your storage items go through our CDN. We sum up all outgoing traffic (egress) for storage related requests through our CDN. We do not differentiate between cache and no cache hits.\nBilling is based on the total amount of egress in GB throughout your billing period.',
-        chartDescription: 'The data shown here is refreshed over a period of 24 hours.',
+        chartDescription: 'The data shown here refreshes every 24 hours.',
       },
     ],
   },
@@ -117,6 +118,7 @@ export const USAGE_CATEGORIES: {
         key: 'db_size',
         attribute: 'total_db_size_bytes',
         name: 'Database size',
+        chartPrefix: 'Average ',
         unit: 'bytes',
         description:
           'Billing is based on the average daily database size in GB throughout the billing period.',
@@ -126,27 +128,29 @@ export const USAGE_CATEGORIES: {
             url: 'https://supabase.com/docs/guides/platform/database-size',
           },
         ],
-        chartDescription: 'The data shown here is refreshed over a period of 24 hours.',
+        chartDescription: 'The data shown here refreshes every 24 hours.',
       },
       {
         anchor: 'storageSize',
         key: 'storage_size',
         attribute: 'total_storage_size_bytes',
         name: 'Storage size',
+        chartPrefix: 'Max ',
         unit: 'bytes',
         description:
-          'Sum of all objects in your storage buckets\nBilling is based on the average size in GB throughout your billing period',
-        chartDescription: 'The data shown here is refreshed over a period of 24 hours.',
+          'Sum of all objects in your storage buckets.\nBilling is based on the average size in GB throughout your billing period',
+        chartDescription: 'The data shown here refreshes every 24 hours.',
       },
       {
         anchor: 'funcCount',
         key: 'func_count',
         attribute: 'total_func_count',
         name: 'Edge function count',
+        chartPrefix: 'Max ',
         unit: 'absolute',
         description:
-          'Number of serverless functions in your project\nBilling is based on the maximum amount of functions at any point in time throughout your billing period',
-        chartDescription: 'The data shown here is refreshed over a period of 24 hours.',
+          'Number of serverless functions in your project.\nBilling is based on the maximum amount of functions at any point in time throughout your billing period',
+        chartDescription: 'The data shown here refreshes every 24 hours.',
       },
     ],
   },
@@ -159,23 +163,23 @@ export const USAGE_CATEGORIES: {
         anchor: 'mau',
         key: 'monthly_active_users',
         attribute: 'total_auth_billing_period_mau',
-        name: 'Monthly active users',
+        name: 'Monthly Active Users',
         unit: 'absolute',
         description:
-          'Users who log in or refresh their token\nBilling is based on the sum of distinct users requesting your API throughout the billing period. Resets every billing cycle.',
+          'Users who log in or refresh their token count towards MAU.\nBilling is based on the sum of distinct users requesting your API throughout the billing period. Resets every billing cycle.',
         chartDescription:
-          'The data shown here is refreshed over a period of 24 hours and resets at the beginning of every billing period.',
+          'The data shown here is refreshed over a period of 24 hours and resets at the beginning of every billing period.\nThe data points are relative to the beginning of your billing period.',
       },
       {
         anchor: 'mauSso',
         key: 'monthly_active_sso_users',
         attribute: 'total_auth_billing_period_sso_mau',
-        name: 'Monthly active single sign-on users',
+        name: 'Monthly Active SSO Users',
         unit: 'absolute',
         description:
-          'SSO users who log in or refresh their token\nBilling is based on the sum of distinct Single Sign-On users requesting your API throughout the billing period. Resets every billing cycle.',
+          'SSO users who log in or refresh their token count towards SSO MAU.\nBilling is based on the sum of distinct Single Sign-On users requesting your API throughout the billing period. Resets every billing cycle.',
         chartDescription:
-          'The data shown here is refreshed over a period of 24 hours and resets at the beginning of every billing period.',
+          'The data shown here is refreshed over a period of 24 hours and resets at the beginning of every billing period.\nThe data points are relative to the beginning of your billing period.',
       },
       {
         anchor: 'storageImageTransformations',
@@ -185,7 +189,8 @@ export const USAGE_CATEGORIES: {
         unit: 'absolute',
         description:
           'We distinctly count all images that were transformed in the billing period, ignoring any transformations. If you transform one image with different transformations, it only counts as one.\nBilling is based on the unique count of (origin) images that used transformations throughout the billing period. Resets every billing cycle.',
-        chartDescription: 'The data shown here is refreshed over a period of 24 hours.',
+        chartDescription:
+          'The data shown here refreshes every 24 hours.\nThe data points are relative to the beginning of your billing period.',
       },
       {
         anchor: 'functionInvocations',
@@ -195,7 +200,7 @@ export const USAGE_CATEGORIES: {
         unit: 'absolute',
         description:
           'Every single serverless function invocation independent of response status is counted.\nBilling is based on the sum of all invocations throughout your billing period.',
-        chartDescription: 'The data shown here is refreshed over a period of 24 hours.',
+        chartDescription: 'The data shown here refreshes every 24 hours.',
       },
       {
         anchor: 'realtimeMessageCount',
@@ -205,17 +210,18 @@ export const USAGE_CATEGORIES: {
         unit: 'absolute',
         description:
           "Count of messages going through Realtime. If you do a database change and 5 clients listen to that change via Realtime, that's 5 messages. If you broadcast a message and 4 clients listen to that, that's 5 messages (1 message sent, 4 received).\nBilling is based on the total amount of messages throughout your billing period.",
-        chartDescription: 'The data shown here is refreshed over a period of 24 hours.',
+        chartDescription: 'The data shown here refreshes every 24 hours.',
       },
       {
         anchor: 'realtimePeakConnection',
         key: 'realtime_peak_connection',
         attribute: 'total_realtime_peak_connection',
         name: 'Realtime peak connections',
+        chartPrefix: 'Max ',
         unit: 'absolute',
         description:
-          'Total number of successful connections (not connection attempts)\nBilling is based on the maximum amount of concurrent peak connections throughout your billing period.',
-        chartDescription: 'The data shown here is refreshed over a period of 24 hours.',
+          'Total number of successful connections (not connection attempts).\nBilling is based on the maximum amount of concurrent peak connections throughout your billing period.',
+        chartDescription: 'The data shown here refreshes every 24 hours.',
       },
     ],
   },
@@ -226,15 +232,15 @@ export const COMPUTE_INSTANCE_SPECS: {
   [key: string]: { maxBandwidth: number; baseBandwidth: number }
 } = {
   addon_instance_micro: {
-    maxBandwidth: 2606,
+    maxBandwidth: 2085,
     baseBandwidth: 87,
   },
   addon_instance_small: {
-    maxBandwidth: 2606,
+    maxBandwidth: 2085,
     baseBandwidth: 174,
   },
   addon_instance_medium: {
-    maxBandwidth: 2606,
+    maxBandwidth: 2085,
     baseBandwidth: 347,
   },
   addon_instance_large: {
