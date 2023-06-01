@@ -12,8 +12,8 @@ export default {
     title: 'Supabase Vector',
     h1: (
       <span key={'vector-h1'} className="heading-gradient">
-        The open source Vector Database <br />
-        for AI applications
+        The open source Vector Toolkit <br />
+        for Postgres
       </span>
     ),
     subheader: (
@@ -25,7 +25,7 @@ export default {
     image: '/images/product/vector/vector-hero.svg',
     cta: {
       label: 'Quickstart',
-      link: '/docs/guides/ai/vecs-python-client',
+      link: '/docs/guides/ai/quickstarts/hello-world',
     },
     secondaryCta: {
       label: 'Explore documentation',
