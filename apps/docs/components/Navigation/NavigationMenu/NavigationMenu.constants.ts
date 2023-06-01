@@ -876,6 +876,16 @@ export const ai: NavMenuConstant = {
       ],
     },
     {
+      name: 'Python Client',
+      url: undefined,
+      items: [
+        { name: 'API', url: '/guides/ai/python/api' },
+        { name: 'Collections', url: '/guides/ai/python/collections' },
+        { name: 'Indexes', url: '/guides/ai/python/indexes' },
+        { name: 'Metadata', url: '/guides/ai/python/metadata' },
+      ],
+    },
+    {
       name: 'Guides',
       url: undefined,
       items: [
