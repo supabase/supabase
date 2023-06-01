@@ -58,7 +58,7 @@ Smaller compute instances can burst up to their largest throughput and IOPS for 
 
 If you need consistent disk performance, choose the 4XL or larger compute add-on which has the same baseline and maximum disk throughput and IOPS.
 
-If you're unsure of how much throughput or IOPS your application requires, you can load test your project and inspect these [metrics in the Dashboard](https://app.supabase.com/project/_/reports). If the `Daily Disk IO Budget % Remaining` stat is less than 100%, it indicates that your workload has burst beyond the baseline IO throughput during the day. If this metric drops to zero, the workload has used up all the burst IO throughput minutes during the day and is running at the baseline performance. These projects are good candidates for upgrading to a larger compute add with higher baseline throughput.
+If you're unsure of how much throughput or IOPS your application requires, you can load test your project and inspect these [metrics in the Dashboard](https://app.supabase.com/project/_/reports). If the `Daily Disk IO Budget % Remaining` stat is less than 100%, it indicates that your workload has burst beyond the baseline IO throughput during the day. If this metric drops to zero, the workload has used up all the burst IO throughput minutes during the day and is running at the baseline performance. These projects are good candidates for upgrading to a larger compute add-on with higher baseline throughput.
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
