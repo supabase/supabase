@@ -18,9 +18,11 @@ export default {
     ),
     subheader: (
       <>
-        Use the Supabase client libraries to store, index, and query your vector embeddings at scale.
+        Use the Supabase client libraries to store, index, and query your vector embeddings at
+        scale.
         <br className="hidden md:block" />
-        Build AI applications with your Postgres and pgvector. The best vector database is the database you already have.
+        Build AI applications with your Postgres and pgvector. The best vector database is the
+        database you already have.
       </>
     ),
     image: '/images/product/vector/vector-hero.svg',
