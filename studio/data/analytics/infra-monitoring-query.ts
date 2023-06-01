@@ -8,7 +8,7 @@ import { analyticsKeys } from './keys'
 
 export type InfraMonitoringVariables = {
   projectRef?: string
-  attribute: 'cpu_usage' | 'disk_io_budget' | 'ram_usage'
+  attribute: 'cpu_usage' | 'disk_io_budget' | 'ram_usage' | 'disk_io_consumption'
   startDate?: string
   endDate?: string
   interval?: '1m' | '5m' | '10m' | '30m' | '1h' | '1d'
@@ -78,6 +78,7 @@ export const useInfraMonitoringQuery = <TData = InfraMonitoringData>(
           }),
         } as TData
       },
+      staleTime: 1000 * 60, // default good for a minute
       ...options,
     }
   )

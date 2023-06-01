@@ -101,7 +101,7 @@ const Bandwidth = ({ projectRef }: BandwidthProps) => {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
-                    <p className="text-sm">{attribute.name} quota usage</p>
+                    <p className="text-sm">{attribute.name} usage</p>
                     {!usageBasedBilling && usageRatio >= 1 ? (
                       <div className="flex items-center space-x-2 min-w-[115px]">
                         <IconAlertTriangle
@@ -154,7 +154,9 @@ const Bandwidth = ({ projectRef }: BandwidthProps) => {
                     </p>
                   </div>
                   <div className="flex items-center justify-between py-1">
-                    <p className="text-xs text-scale-1000">Used</p>
+                    <p className="text-xs text-scale-1000">
+                      {attribute.chartPrefix || 'Used '}in period
+                    </p>
                     <p className="text-xs">{formatBytes(usageMeta?.usage ?? 0)}</p>
                   </div>
                   {usageMeta?.limit > 0 && (
@@ -168,7 +170,7 @@ const Bandwidth = ({ projectRef }: BandwidthProps) => {
                 </div>
               </div>
               <div className="space-y-1">
-                <p>{attribute.name} over time</p>
+                <p>{attribute.name} per day</p>
                 {attribute.chartDescription.split('\n').map((paragraph, idx) => (
                   <p key={`para-${idx}`} className="text-sm text-scale-1000">
                     {paragraph}
@@ -183,15 +185,12 @@ const Bandwidth = ({ projectRef }: BandwidthProps) => {
                 </div>
               ) : (
                 <UsageBarChart
-                  hasQuota={usageMeta?.limit > 0}
-                  name={attribute.name}
+                  name={`${attribute.chartPrefix || ''}${attribute.name}`}
                   unit={attribute.unit}
                   attribute={attribute.attribute}
                   data={chartData}
-                  yLimit={usageMeta?.limit ?? 0}
                   yLeftMargin={chartMeta[attribute.key].margin}
-                  yFormatter={value => ChartYFormatterCompactNumber(value, attribute.unit)}
-                  quotaWarningType={isFreeTier || isProTier ? 'danger' : 'warning'}
+                  yFormatter={(value) => ChartYFormatterCompactNumber(value, attribute.unit)}
                 />
               )}
             </SectionContent>

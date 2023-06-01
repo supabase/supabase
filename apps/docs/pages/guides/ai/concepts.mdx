@@ -53,14 +53,14 @@ Compared to our 2-dimensional example above, most embedding models will output m
 Why is this useful? Once we have generated embeddings on multiple texts, it is trivial to calculate how similar they are using vector math operations like cosine distance. A common use case for this is search. Your process might look something like this:
 
 1. Pre-process your knowledge base and generate embeddings for each page
-2. Store your embeddings to be referenced later (more on this)
+2. Store your embeddings to be referenced later
 3. Build a search page that prompts your user for input
 4. Take user's input, generate a one-time embedding, then perform a similarity search against your pre-processed embeddings.
 5. Return the most similar pages to the user
 
 ## See also
 
-- [Structured and Unstructured embeddings](/docs/guides/ai/structured-unstructured-embeddings)
+- [Structured and Unstructured embeddings](/docs/guides/ai/structured-unstructured)
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

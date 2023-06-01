@@ -1,10 +1,23 @@
 import React, { PropsWithChildren, useEffect, useRef } from 'react'
 
+interface Props {
+  outerClassName?: string
+  innerClassName?: string
+  hasActiveOnHover?: boolean
+  hasInnerShimmer?: boolean
+  shimmerFromColor?: string
+  shimmerToColor?: string
+}
+
 const InteractiveShimmerCard = ({
   outerClassName,
   innerClassName,
+  hasActiveOnHover = false,
+  hasInnerShimmer = false,
+  shimmerFromColor,
+  shimmerToColor,
   children,
-}: PropsWithChildren<{ outerClassName?: string; innerClassName?: string }>) => {
+}: PropsWithChildren<Props>) => {
   const outerRef = useRef(null)
   const innerRef = useRef(null)
 
@@ -19,16 +32,20 @@ const InteractiveShimmerCard = ({
     x = event.clientX - elX
     y = event.clientY - elY
     const isActive = x > -3 && x < width + 3 && y > -3 && y < height + 3
-    const activeGlow = isActive
-      ? `radial-gradient(65rem circle at ${x}px ${y}px, var(--colors-brand9), transparent), `
-      : ''
+    const activeGlow =
+      hasActiveOnHover && isActive
+        ? `radial-gradient(65rem circle at ${x}px ${y}px, var(--colors-brand9), transparent), `
+        : ''
     outerElement.style.background = isActive ? `var(--colors-brand9)` : `var(--colors-scale3)`
     outerElement.style.backgroundImage = `
-      ${activeGlow}radial-gradient(30rem circle at ${x}px ${y}px, var(--colors-scale9), var(--colors-scale6))`
+      ${activeGlow}radial-gradient(30rem circle at ${x}px ${y}px, ${
+      shimmerFromColor ?? 'var(--colors-scale8)'
+    }, ${shimmerToColor ?? 'var(--colors-scale3)'})`
 
-    innerElement.style.backgroundImage = isActive
-      ? `radial-gradient(7rem circle at ${x}px ${y}px, var(--colors-scale5), transparent), radial-gradient(20rem circle at ${x}px ${y}px, var(--colors-scale4), transparent)`
-      : ''
+    innerElement.style.backgroundImage =
+      hasInnerShimmer && isActive
+        ? `radial-gradient(7rem circle at ${x}px ${y}px, var(--colors-scale5), transparent), radial-gradient(20rem circle at ${x}px ${y}px, var(--colors-scale4), transparent)`
+        : ''
   }
 
   useEffect(() => {
@@ -44,13 +61,13 @@ const InteractiveShimmerCard = ({
     <div
       ref={outerRef}
       className={[
-        'relative rounded-xl bg-slate-400 from-slate-800 to-slate-800 p-px transition-all shadow-md',
+        'relative rounded-xl bg-scale-400 from-scale-800 to-scale-800 p-px transition-all shadow-md',
         outerClassName,
       ].join(' ')}
     >
       <div
         className={[
-          'relative rounded-xl bg-scale-300 overflow-hidden transition-all flex flex-col text-slate-1100 lg:items-center lg:text-center',
+          'relative h-full rounded-xl bg-scale-200 dark:bg-scale-300 overflow-hidden transition-all text-scale-1100',
           innerClassName,
         ].join(' ')}
       >
