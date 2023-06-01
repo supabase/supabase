@@ -88,7 +88,7 @@ jobs:
 
       - uses: supabase/setup-cli@v1
         with:
-          version: 1.0.0
+          version: latest
 
       - run: supabase functions deploy --project-ref $PROJECT_ID
 ```
