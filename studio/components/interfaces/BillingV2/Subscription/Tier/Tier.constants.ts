@@ -17,7 +17,8 @@ export const SUBSCRIPTION_PLANS: PricingInformation[] = [
     preface: undefined,
     features: [
       'Social OAuth providers',
-      'Up to 500MB database & 1GB file storage',
+      'Up to 500MB database space',
+      'Up to 1GB file storage',
       'Up to 2GB bandwidth',
       'Up to 50MB file uploads',
       '50,000 monthly active users',
@@ -36,7 +37,8 @@ export const SUBSCRIPTION_PLANS: PricingInformation[] = [
     preface: undefined,
     features: [
       'No project pausing',
-      '8GB database & 100GB file storage',
+      '8GB database space',
+      '100GB file storage',
       '50GB bandwidth',
       '5GB file uploads',
       '100,000 monthly active users',
@@ -71,7 +73,7 @@ export const SUBSCRIPTION_PLANS: PricingInformation[] = [
     new: false,
     name: 'Enterprise',
     preface: 'For large-scale applications managing serious workloads',
-    features: [`Designated Support manager & SLAs`, `SSO/ SAML`, `Custom contracts & invoicing`],
+    features: [`Designated Support manager & SLAs`, `SSO/SAML`, `Custom contracts & invoicing`],
     footer: undefined,
   },
 ]
