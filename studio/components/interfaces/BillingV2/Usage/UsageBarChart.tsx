@@ -120,7 +120,7 @@ const UsageBarChart = ({
                   height={24}
                 >
                   <div className="text-[0.7rem] font-bold text-scale-1200 bg-scale-100 w-fit p-1.5 py-0.5 rounded-md">
-                    PLAN QUOTA
+                    INCLUDED USAGE
                   </div>
                 </foreignObject>
               )}

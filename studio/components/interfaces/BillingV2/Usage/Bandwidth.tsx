@@ -190,7 +190,7 @@ const Bandwidth = ({ projectRef }: BandwidthProps) => {
                   data={chartData}
                   yLimit={usageMeta?.limit ?? 0}
                   yLeftMargin={chartMeta[attribute.key].margin}
-                  yFormatter={value => ChartYFormatterCompactNumber(value, attribute.unit)}
+                  yFormatter={(value) => ChartYFormatterCompactNumber(value, attribute.unit)}
                   quotaWarningType={isFreeTier || isProTier ? 'danger' : 'warning'}
                 />
               )}

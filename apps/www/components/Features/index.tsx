@@ -44,6 +44,12 @@ const Features = () => {
           telemetryProps,
           router
         )
+      case 'Vector':
+        return await Telemetry.sendEvent(
+          gaEvents['www_hp_subhero_products_vector'],
+          telemetryProps,
+          router
+        )
     }
   }
 
@@ -54,7 +60,7 @@ const Features = () => {
       <div key={name} className="mb-10 space-y-4 md:mb-0">
         <div className="flex items-center">
           <ProductIcon icon={icon} />
-          <dt className="text-scale-1200 ml-4 flex flex-row xl:flex-col">{name}</dt>
+          <dt className="text-scale-1200 ml-3 flex flex-row xl:flex-col">{name}</dt>
         </div>
 
         <p className="p">{description}</p>
@@ -78,7 +84,7 @@ const Features = () => {
   return (
     <SectionContainer className="space-y-16 pb-0">
       <h3 className="h3 text-center">Build faster and focus on your products</h3>
-      <dl className="grid grid-cols-1 gap-y-4 sm:grid-cols-2 md:grid-cols-2 md:gap-16 xl:grid-cols-5 lg:gap-x-8 xl:gap-x-12">
+      <dl className="grid grid-cols-1 gap-y-4 sm:grid-cols-2 md:grid-cols-2 md:gap-16 xl:grid-cols-6 lg:gap-x-8">
         {IconSections}
       </dl>
     </SectionContainer>
