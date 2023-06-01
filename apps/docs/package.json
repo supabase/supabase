@@ -65,6 +65,7 @@
     "framer-motion": "^6.5.1",
     "github-slugger": "^2.0.0",
     "gray-matter": "^4.0.3",
+    "hast-util-has-property": "^2.0.1",
     "isbot": "^3.6.5",
     "jsrsasign": "^10.5.26",
     "lodash": "^4.17.21",
@@ -101,12 +102,15 @@
     "ui": "*",
     "unist-builder": "^3.0.1",
     "unist-util-filter": "^4.0.1",
+    "unist-util-visit": "^4.1.2",
     "uuid": "^9.0.0",
     "valtio": "^1.7.6"
   },
   "devDependencies": {
+    "@types/hast": "^2.3.4",
     "@types/node": "^17.0.12",
     "@types/react": "17.0.39",
+    "@types/unist": "^2.0.6",
     "config": "*",
     "dotenv": "^16.0.3",
     "ejs": "^3.1.8",
