@@ -39,7 +39,7 @@ const EnterpriseCard = ({ plan, isCurrentPlan, isTeamTierEnabled }: EnterpriseCa
         <Link href="https://supabase.com/contact/enterprise">
           <a target="blank" rel="noreferrer">
             <Button block={!isTeamTierEnabled} type="default">
-              Contact 24hr Sales Team
+              Contact Sales Team
             </Button>
           </a>
         </Link>
