@@ -1,9 +1,9 @@
 ---
-title: 'Vecs: Vector Client'
-description: Introducing Supabase Vecs, pgvector client
+title: 'Supabase Vecs: a vector client for Postgres'
+description: Introducing Supabase Vecs, a PostgreSQL vector client
 author: oli_rice
-image: 
-thumb: 
+image: 2023-06-01-vecs/og-image.jpg
+thumb: 2023-06-01-vecs/og-image.jpg
 tags:
   - postgres
   - AI
@@ -123,4 +123,50 @@ For more in-depth information about `vecs`, checkout the [API Quickstart](https:
 or [OpenAI integration example](https://supabase.github.io/vecs/integrations_openai/)
 
 
+## Deploying with Supabase
 
+As usual, if you combine [supabase/vecs](https://github.com/supabase/vecs) with the rest of Supabase, you get more than the sum of the parts.
+Once you're happy with your vecs collection, you can make it acessible to your front-end and supabase-js by exposing the collection as a view
+
+
+## Future ideas
+
+Currently, `vecs` is unopinionated about where vectors come from or how their produced. While there will always be a need for generic vector
+storage and querying, its becoming clear that text and image vectorization make up +95% of usage. That gives us the opportunity to
+streamline those workflows for users.
+
+One option we're exploring is to optionally assign transformation pipelines to collections along the lines of:
+
+
+```python
+# This is mock code only, not currently functional
+
+docs: Collection =vx.create_collection(
+    docs='docs',
+    dimension=512,
+    transform = TextPreprocessor(  # this is new
+        model="sentence-transformers/all-Mini-L6-v2"
+    )    
+)
+
+docs.upsert([
+    ("id_0", "# Some markdown", {}),
+    ("id_1", "# Some more markdown", {})
+])
+```
+
+so users can choose to work with their preferred media type without ever thinking about vectors.
+
+Another direction we're considering is adding an async client to avoid blocking when waiting on the database or network i.e.
+
+```python
+# This is mock code only, not currently functional
+
+await docs.upsert([
+    ("id_0", [0.1, 0.2, 0.3], {}),
+])
+```
+
+Both possibilities are still up for debate. If you have view on either, feel free to weigh in on the
+[Feature Request: Preprocessing Transform](https://github.com/supabase/vecs/issues/5)
+and [Feature Request: Async Client](https://github.com/supabase/vecs/issues/6) GitHub issues.
