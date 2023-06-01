@@ -102,11 +102,13 @@
     "unist-builder": "^3.0.1",
     "unist-util-filter": "^4.0.1",
     "uuid": "^9.0.0",
-    "valtio": "^1.7.6"
+    "valtio": "^1.7.6",
+    "yargs": "^17.7.2"
   },
   "devDependencies": {
     "@types/node": "^17.0.12",
     "@types/react": "17.0.39",
+    "@types/yargs": "^17.0.24",
     "config": "*",
     "dotenv": "^16.0.3",
     "ejs": "^3.1.8",
