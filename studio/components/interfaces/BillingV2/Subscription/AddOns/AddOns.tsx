@@ -221,7 +221,7 @@ const AddOns = ({}: AddOnsProps) => {
                       <a>
                         <div className="group flex items-center space-x-2">
                           <p className="text-sm text-scale-1100 group-hover:text-scale-1200 transition cursor-pointer">
-                            Disk IO Bandwidth max burst
+                            Max Disk Throughput
                           </p>
                           <IconChevronRight
                             strokeWidth={1.5}
@@ -232,7 +232,7 @@ const AddOns = ({}: AddOnsProps) => {
                       </a>
                     </Link>
                     <p className="text-sm">
-                      {computeInstanceSpecs?.max_disk_io_mbs?.toLocaleString() ?? '2,606'} Mbps
+                      {computeInstanceSpecs?.max_disk_io_mbs?.toLocaleString() ?? '2,085'} Mbps
                     </p>
                   </div>
                   <div className="w-full flex items-center justify-between py-2">
@@ -240,7 +240,7 @@ const AddOns = ({}: AddOnsProps) => {
                       <a>
                         <div className="group flex items-center space-x-2">
                           <p className="text-sm text-scale-1100 group-hover:text-scale-1200 transition cursor-pointer">
-                            Baseline Disk IO Bandwidth
+                            Baseline Disk Throughput
                           </p>
                           <IconChevronRight
                             strokeWidth={1.5}
