@@ -16,6 +16,11 @@ function modify(node: Element, prop: string, fn?: UrlTransformFunction) {
   }
 }
 
+/**
+ * Transforms every HAST element that contains a `href` or `src`.
+ * A `UrlTransformFunction` is called with the current URL. The
+ * return value from this function will be used as the replacement.
+ */
 export function linkTransform(fn?: UrlTransformFunction) {
   return function transformer(tree: Node) {
     visit(tree, 'element', (node: Element) => {

@@ -6,7 +6,8 @@ import rehypeSlug from 'rehype-slug'
 import remarkGfm from 'remark-gfm'
 import components from '~/components'
 import Layout from '~/layouts/DefaultGuideLayout'
-import { UrlTransformFunction, linkTransform } from '~/lib/mdx/rehypeLinkTransform'
+import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
+import { removeTitle } from '~/lib/mdx/plugins/remarkRemoveTitle'
 
 // We fetch these docs at build time from an external repo
 const org = 'supabase'
@@ -116,7 +117,7 @@ export const getStaticProps: GetStaticProps<PythonClientDocsProps> = async ({ pa
 
   const mdxSource = await serialize(source, {
     mdxOptions: {
-      remarkPlugins: [remarkGfm],
+      remarkPlugins: [remarkGfm, [removeTitle, meta.title]],
       rehypePlugins: [[linkTransform, urlTransform], rehypeSlug],
     },
   })
