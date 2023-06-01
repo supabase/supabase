@@ -20,14 +20,14 @@ const PlanCTAButton = ({ plan, currentPlan, onSelectPlan }: PlanCTAButtonProps) 
   const isTeamTier = currentPlan?.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.TEAM
 
   const getButtonType = (plan: any, currentPlan: any) => {
-    if (['Free tier'].includes(plan.name)) {
+    if (['Free tier', 'Free plan'].includes(plan.name)) {
       // Free is always default
       return 'default'
     } else if (currentPlan.prod_id === STRIPE_PRODUCT_IDS.FREE) {
       // If the current plan is free, other plans are primary
       return 'primary'
-    } else if (currentPlan.prod_id === STRIPE_PRODUCT_IDS.TEAM && plan.name !== 'Team tier') {
-      // Non-free plans are default (pro), when team tier is selected
+    } else if (currentPlan.prod_id === STRIPE_PRODUCT_IDS.TEAM && !['Team tier', 'Team plan'].includes(plan.name)) {
+      // Non-free plans are default (pro), when team plan is selected
       return 'default'
     }
 
@@ -88,7 +88,7 @@ const PlanCTAButton = ({ plan, currentPlan, onSelectPlan }: PlanCTAButtonProps) 
   const ctaText = getButtonText(plan, currentPlan)
   const disabled =
     (!isProjectActive && plan.name !== 'Enterprise') ||
-    (isTeamTier && plan.name !== 'Enterprise' && plan.name !== 'Team tier') ||
+    (isTeamTier && plan.name !== 'Enterprise' && !['Team tier', 'Team plan'].includes(plan.name)) ||
     (plan.id === STRIPE_PRODUCT_IDS.FREE && currentPlan.prod_id === STRIPE_PRODUCT_IDS.FREE)
 
   if (plan.name === 'Enterprise') {
