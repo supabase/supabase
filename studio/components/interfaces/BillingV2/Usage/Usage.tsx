@@ -57,7 +57,8 @@ const Usage = () => {
 
   const subscriptionTierId = subscription?.tier?.supabase_prod_id
   const usageBillingEnabled =
-    subscriptionTierId === PRICING_TIER_PRODUCT_IDS.FREE || PRICING_TIER_PRODUCT_IDS.PRO
+    subscriptionTierId !== PRICING_TIER_PRODUCT_IDS.FREE &&
+    subscriptionTierId !== PRICING_TIER_PRODUCT_IDS.PRO
 
   const scrollTo = (id: 'infra' | 'bandwidth' | 'sizeCount' | 'activity') => {
     switch (id) {
