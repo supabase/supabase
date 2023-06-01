@@ -221,7 +221,7 @@ const AddOns = ({}: AddOnsProps) => {
                     <p className="text-sm">{computeInstanceSpecs?.connections_pooler ?? 200}</p>
                   </div>
                   <div className="w-full flex items-center justify-between border-b py-2">
-                    <Link href={`/project/${projectRef}/settings/billing/usage#disk_io_budget`}>
+                    <Link href={`/project/${projectRef}/settings/billing/usage#disk_io`}>
                       <a>
                         <div className="group flex items-center space-x-2">
                           <p className="text-sm text-scale-1100 group-hover:text-scale-1200 transition cursor-pointer">
@@ -240,7 +240,7 @@ const AddOns = ({}: AddOnsProps) => {
                     </p>
                   </div>
                   <div className="w-full flex items-center justify-between py-2">
-                    <Link href={`/project/${projectRef}/settings/billing/usage#disk_io_budget`}>
+                    <Link href={`/project/${projectRef}/settings/billing/usage#disk_io`}>
                       <a>
                         <div className="group flex items-center space-x-2">
                           <p className="text-sm text-scale-1100 group-hover:text-scale-1200 transition cursor-pointer">
