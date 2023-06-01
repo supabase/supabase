@@ -82,7 +82,7 @@ function Product({
       <Link href={product.url}>
         <a className="flex w-full flex-col items-center text-center">
           <motion.div
-            style={isMobile ? (undefined as any) : { width }}
+            style={isMobile ? (undefined as any) : { width, willChange: 'width' }}
             className="relative w-[50px] aspect-square will-change-transform"
           >
             <Image

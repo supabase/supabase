@@ -521,6 +521,14 @@ export default function Home() {
 
 > check out [this repo](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs) for more examples, including [realtime subscriptions](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs/app/realtime-posts.tsx).
 
+#### Singleton
+
+The `createClientComponentClient` function implements a [Singleton pattern](https://en.wikipedia.org/wiki/Singleton_pattern) to simplify instantiating Supabase clients. If you need multiple Supabase instances across Client Components - for example, when using multiple schemas - you can pass an additional configuration option for `{ isSingleton: false }` to get a new client every time this function is called.
+
+```jsx
+const supabase = createClientComponentClient({ isSingleton: false })
+```
+
 ### Server Component
 
 [Server Components](https://nextjs.org/docs/getting-started/react-essentials#server-components) allow for asynchronous data to be fetched server-side.
@@ -736,7 +744,7 @@ With v0.7.x of the Next.js Auth Helpers a new naming convention has been impleme
 
 #### createClientComponentClient returns singleton
 
-You no longer need to implement logic to ensure there is only a single instance of the Supabase Client shared across all Client Components - this is now handled by the `createClientComponentClient` function. Call it as many times as you want!
+You no longer need to implement logic to ensure there is only a single instance of the Supabase Client shared across all Client Components - this is now the default and handled by the `createClientComponentClient` function. Call it as many times as you want!
 
 ```jsx
 "use client";
@@ -748,6 +756,8 @@ export default function() {
   return ...
 }
 ```
+
+For an example of creating multiple Supabase clients, check [Singleton section](/docs/guides/auth/auth-helpers/nextjs#singleton) above.
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
