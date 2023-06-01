@@ -100,6 +100,17 @@ const HomePageCover = (props) => {
               />
             </a>
           </Link>
+          <Link href={`/guides/getting-started/quickstarts/astro`} passHref>
+            <a className="no-underline">
+              <IconPanel
+                iconSize={iconSize}
+                hideArrow
+                tooltip="Astro"
+                icon="/docs/img/icons/astro-icon"
+                hasLightIcon
+              />
+            </a>
+          </Link>
         </div>
       </div>
     </div>
