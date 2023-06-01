@@ -19,6 +19,7 @@
   - [x] Database Functions. [Docs](https://supabase.com/docs/guides/database/functions)
   - [x] Edge Functions [Docs](https://supabase.com/docs/guides/functions)
 - [x] File Storage. [Docs](https://supabase.com/docs/guides/storage)
+- [x] AI + Vector/Embeddings Toolkit. [Docs](https://supabase.com/docs/guides/ai)
 - [x] Dashboard
 
 ![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
@@ -247,8 +248,3 @@ Our approach for client libraries is modular. Each sub-library is a standalone i
 - [Vietnamese / Tiếng Việt](/i18n/README.vi-vn.md)
 - [List of translations](/i18n/languages.md) <!--- Keep only this -->
 
----
-
-## Sponsors
-
-[![New Sponsor](https://user-images.githubusercontent.com/10214025/90518111-e74bbb00-e198-11ea-8f88-c9e3c1aa4b5b.png)](https://github.com/sponsors/supabase)
