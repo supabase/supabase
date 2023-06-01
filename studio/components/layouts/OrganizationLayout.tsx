@@ -17,11 +17,12 @@ const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
       title={ui.selectedOrganization?.name ?? 'Supabase'}
       breadcrumbs={[{ key: `org-settings`, label: 'Settings' }]}
     >
-      <div className="p-4 pt-0">
+      <div className="mx-auto flex flex-col px-5 pt-6 pb-14 lg:pt-8 lg:px-14 1xl:px-28 2xl:px-32">
         <div className="space-y-3">
           <section className="mt-4">
             <h1 className="text-3xl">{ui.selectedOrganization?.name ?? 'Organization'} settings</h1>
           </section>
+
           <nav>
             <Tabs
               size="small"

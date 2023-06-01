@@ -248,3 +248,10 @@ export const detectOS = () => {
     return undefined
   }
 }
+
+/**
+ * Pluralize a word based on a count
+ */
+export function pluralize(count: number, singular: string, plural?: string) {
+  return count === 1 ? singular : plural || singular + 's'
+}
