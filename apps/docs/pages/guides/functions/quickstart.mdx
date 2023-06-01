@@ -41,6 +41,8 @@ This creates a function stub in your `supabase` folder at `./functions/hello-wor
 
 ## Deploy to production
 
+### Deploy a specific function
+
 ```bash
 supabase functions deploy hello-world
 ```
@@ -55,6 +57,21 @@ By default, Edge Functions require a valid JWT in the authorization header. This
 If you want to use Edge Functions to handle webhooks (e.g. [Stripe payment webhooks](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/stripe-webhooks) etc.), you need to pass the `--no-verify-jwt` flag when deploying your function.
 
 </Admonition>
+
+### Deploy all functions
+
+```bash
+supabase functions deploy
+```
+
+Since Supabase CLI [v1.62.0](https://github.com/supabase/cli/releases/tag/v1.62.0) you can deploy all functions with a single command. This is useful for example when [deploying with GitHub Actions](/docs/guides/functions/cicd-workflow).
+
+Individual function configuration like [JWT verification](/docs/reference/cli/config#functions.function_name.verify_jwt) and [import map location](/docs/reference/cli/config#functions.function_name.import_map) can be set via the `config.toml` file.
+
+```toml
+[functions.hello-world]
+verify_jwt = false
+```
 
 ## Invoking remote functions
 
