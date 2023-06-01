@@ -25,12 +25,12 @@ It handles:
 Our goal for `vecs` is to provide an interface that lets Postgres + pgvector look and feel like a dedicated vector store.
 It was designed with ease-of-use, interactivity, and exploratory data analysis in mind, but works equally well as a search workhorse.
 
-If you're interestd in the nuts and bolts of what's going on, its trivial to drop into the SQL layer and see whats happening.
-Alternatively, folks who don't want to know whats happening in the database, don't need to care.
+If you're interested in the nuts and bolts of what's going on, it's trivial to drop into the SQL layer and see what's happening.
+Alternatively, folks who don't want to know what's happening in the database, don't need to care.
 
 ## Usage
 
-`Vecs` gets you started shockingly fast with creating a collection (table) and inserting a few records in just 5 lines of code.
+`Vecs` makes it easy to create a collection (table) and insert a few records - just 5 lines of code.
 
 ### Connecting
 
@@ -79,7 +79,7 @@ which will add the records to our table if the `id` `"vec0"` does not exist, or 
 
 ### Query
 
-You can query a vecs collection at any time without an index, but its a best practices to create an index on your collection after inserting
+You can query a vecs collection at any time without an index, but it's a best practices to create an index on your collection after inserting
 data.
 
 ```python
@@ -88,7 +88,7 @@ docs.index()
 
 Where `index` optionally takes an argument for the distance measure to index.
 
-Finally, we can search the collection for similar vectors using the `query` method
+Finally, we can search the collection for similar vectors using the `query` method:
 
 ```python
 docs.query(
@@ -101,7 +101,7 @@ docs.query(
 )
 ```
 
-Which returns
+Which returns:
 
 ```python
 [("vec1", 0.000697, {"year": 1973})]
@@ -109,7 +109,7 @@ Which returns
 
 Since all metadata is stored in a `jsonb` column, there's a [lightweight but flexible DSL](https://supabase.github.io/vecs/concepts_metadata/) wrapped around it for filtering.
 
-When you're done, disconnect with
+When you're done, disconnect with:
 
 ```python
 vx.disconnect()
@@ -156,7 +156,7 @@ For more deployment options, including enterprise scalable architecture, check o
 ## Future ideas
 
 Currently, `vecs` is unopinionated about where vectors come from or how they're produced. While there will always be a need for generic vector
-storage and querying, its becoming clear that text and image vectorization make up +95% of usage. That gives us the opportunity to
+storage and querying, it's becoming clear that text and image vectorization make up +95% of usage. That gives us the opportunity to
 streamline those workflows for users.
 
 One option we're exploring is to optionally assign transformation pipelines to collections along the lines of:
