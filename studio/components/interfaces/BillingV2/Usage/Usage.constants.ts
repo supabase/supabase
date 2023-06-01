@@ -226,15 +226,15 @@ export const COMPUTE_INSTANCE_SPECS: {
   [key: string]: { maxBandwidth: number; baseBandwidth: number }
 } = {
   addon_instance_micro: {
-    maxBandwidth: 2606,
+    maxBandwidth: 2085,
     baseBandwidth: 87,
   },
   addon_instance_small: {
-    maxBandwidth: 2606,
+    maxBandwidth: 2085,
     baseBandwidth: 174,
   },
   addon_instance_medium: {
-    maxBandwidth: 2606,
+    maxBandwidth: 2085,
     baseBandwidth: 347,
   },
   addon_instance_large: {
