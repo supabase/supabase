@@ -16,7 +16,18 @@ For small workloads it's typical to store your data in a single database.
 
 If you've used [Vecs](/docs/guides/ai/vecs-python-client) to create 3 different collections, you can expose collections to your web or mobile application using [views](/docs/guides/database/tables#views):
 
-![Single Database](/docs/img/ai/scaling/single-database.png)
+<div>
+  <img
+    alt="single database"
+    className="dark:hidden"
+    src="/docs/img/ai/scaling/engineering-for-scale--single-database--light.png"
+  />
+  <img
+    alt="single database"
+    className="hidden dark:block"
+    src="/docs/img/ai/scaling/engineering-for-scale--single-database--dark.png"
+  />
+</div>
 
 For example, with 3 collections, called `docs`, `posts`, and `images`, we could expose the "docs" inside the public schema like this:
 
@@ -44,7 +55,18 @@ const { data, error } = await supabase
 
 As you move into production, we recommend running splitting your collections into separate projects. This is because it allows your vector stores to scale independently of your production data. Vectors typically grow faster than operational data, and they have different resource requirements. Running them on separate databases removes the single-point-of-failure.
 
-![With secondaries](/docs/img/ai/scaling/with-secondaries.png)
+<div>
+  <img
+    alt="With secondaries"
+    className="dark:hidden"
+    src="/docs/img/ai/scaling/engineering-for-scale--with-secondaries--light.png"
+  />
+  <img
+    alt="With secondaries"
+    className="hidden dark:block"
+    src="/docs/img/ai/scaling/engineering-for-scale--with-secondaries--dark.png"
+  />
+</div>
 
 You can use as many secondary databases as you need to manage your collections. With this architecture, you have 2 options for accessing collections within your application:
 
@@ -120,7 +142,18 @@ const { data, error } = await supabase
 
 This diagram provides an example architecture, allowing you to access the collections either with our client libraries or using Vecs. You can add as many secondary databases as you need, in this example we show one only:
 
-![Multi Database](/docs/img/ai/scaling/multi-database.png)
+<div>
+  <img
+    alt="multi database"
+    className="dark:hidden"
+    src="/docs/img/ai/scaling/engineering-for-scale--multi-database--light.png"
+  />
+  <img
+    alt="multi database"
+    className="hidden dark:block"
+    src="/docs/img/ai/scaling/engineering-for-scale--multi-database--dark.png"
+  />
+</div>
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

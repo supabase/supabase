@@ -22,7 +22,7 @@ export default function IndexPage() {
 
   const meta_title = 'Pricing & fees | Supabase'
   const meta_description =
-    'Explore Supabase fees and pricing information. Find our competitive pricing tiers, with no hidden pricing. We have generous free tiers for those getting started, and Pay As You Go for those scaling up.'
+    'Explore Supabase fees and pricing information. Find our competitive pricing tiers, with no hidden pricing. We have a generous free plan for those getting started, and Pay As You Go for those scaling up.'
 
   // Ability to scroll into pricing sections like storage
   useEffect(() => {
@@ -479,7 +479,7 @@ export default function IndexPage() {
             </span>
             <h2 className="text-scale-1200 text-4xl mt-4">Cost control with spend caps</h2>
             <p className="mt-3 prose lg:max-w-lg">
-              The Pro tier has a usage quota included and a spend cap turned on by default. If you
+              The Pro plan has a usage quota included and a spend cap turned on by default. If you
               need to go beyond the inclusive limits, simply switch off your spend cap to pay for
               additional usage and scale seamlessly. Note that your project will run into
               restrictions if you have the spend cap enabled and exhaust your quota.
