@@ -9,14 +9,18 @@ import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wo
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
 import { useRouter } from 'next/router'
 
-const Footer = () => {
+interface Props {
+  className?: string
+}
+
+const Footer = (props: Props) => {
   const { isDarkMode } = useTheme()
   const { pathname } = useRouter()
   const isLaunchWeekPage = pathname.includes('launch-week')
 
   return (
     <footer
-      className="border-scale-500 dark:border-scale-600 border-t"
+      className={['border-scale-500 dark:border-scale-600 border-t', props.className].join(' ')}
       aria-labelledby="footerHeading"
     >
       <h2 id="footerHeading" className="sr-only">

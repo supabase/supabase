@@ -86,6 +86,14 @@ h6:not(.overwrite) {
   line-height: 1.2 !important;
 }
 
+.heading-gradient {
+  @apply text-[#F4FFFA00] bg-clip-text bg-gradient-to-b from-scale-1200 to-scale-1200 dark:to-scale-1100;
+}
+
+.heading-gradient-brand {
+  @apply text-[#3ECF8E00] bg-clip-text bg-gradient-to-b from-brand-1000 to-brand-900 dark:to-brand-800;
+}
+
 .toc-animate {
   @apply !translate-x-1 !text-brand-900;
 }
@@ -773,6 +781,7 @@ launch week
   }
 }
 
-.ticket-brick-swiper .swiper-wrapper {
+.ticket-brick-swiper .swiper-wrapper,
+.swiper-transition-linear .swiper-wrapper {
   transition-timing-function: linear;
 }

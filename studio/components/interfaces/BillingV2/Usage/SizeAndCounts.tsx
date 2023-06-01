@@ -144,7 +144,7 @@ const SizeAndCounts = ({ projectRef }: SizeAndCountsProps) => {
                     </Link>
                   )}
                 </div>
-                {usageMeta.limit > 0 && (
+                {usageMeta?.limit > 0 && (
                   <SparkBar
                     type="horizontal"
                     barClass={clsx(
@@ -179,7 +179,7 @@ const SizeAndCounts = ({ projectRef }: SizeAndCountsProps) => {
                         : (usageMeta?.usage ?? 0).toLocaleString()}
                     </p>
                   </div>
-                  {usageMeta.limit > 0 && (
+                  {usageMeta?.limit > 0 && (
                     <div className="flex items-center justify-between border-t py-1">
                       <p className="text-xs text-scale-1000">Overage this month</p>
                       <p className="text-xs">

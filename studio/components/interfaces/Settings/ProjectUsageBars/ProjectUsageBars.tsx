@@ -129,7 +129,7 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
                       {subscriptionTier === PRICING_TIER_PRODUCT_IDS.FREE ? (
                         <div>
                           <p>
-                            Your project is currently on the Free tier - upgrade to the Pro tier for
+                            Your project is currently on the Free plan - upgrade to the Pro plan for
                             a greatly increased quota and continue to scale.
                           </p>
                           <p className="mb-4">
@@ -213,7 +213,7 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
                         if (!isAvailableInPlan) {
                           usageElement = (
                             <div className="flex items-center justify-between">
-                              <span>Not included in {planName} tier</span>
+                              <span>Not included in {planName} plan</span>
                               {canUpdateSubscription && (
                                 <Button
                                   size="tiny"

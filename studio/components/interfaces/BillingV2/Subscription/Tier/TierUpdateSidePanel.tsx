@@ -67,7 +67,7 @@ const TierUpdateSidePanel = () => {
 
   const onUpdateSubscription = async () => {
     if (!projectRef) return console.error('Project ref is required')
-    if (!selectedTier) return console.error('Selected tier is required')
+    if (!selectedTier) return console.error('Selected plan is required')
     if (!selectedPaymentMethod) {
       return ui.setNotification({ category: 'error', message: 'Please select a payment method' })
     }
