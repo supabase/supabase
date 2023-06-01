@@ -108,7 +108,7 @@ export const getStaticProps: GetStaticProps<PythonClientDocsProps> = async ({ pa
       }
 
       // If we don't have this page in our docs, link to original docs
-      return join(externalSite, relativePage)
+      return join(externalSite, relativePage) + hash
     } catch (err) {
       console.error('Error transforming markdown URL', err)
       return url
