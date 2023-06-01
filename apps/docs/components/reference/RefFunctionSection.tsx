@@ -119,7 +119,7 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                         (example.code &&
                           example.code
                             .trim()
-                            .replace(/^```(js|ts|dart|c#|kotlin)/, '')
+                            .replace(/^```.*/, '')
                             .replace(/```$/, ''))
 
                       const codeBlockLang = example?.code?.startsWith('```js')
