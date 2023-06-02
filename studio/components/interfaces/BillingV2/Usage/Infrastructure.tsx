@@ -150,12 +150,26 @@ const Infrastructure = ({ projectRef }: InfrastructureProps) => {
                     </Alert>
                   ) : null}
                   <div className="space-y-1">
-                    <p>What is Disk IO Bandwidth?</p>
+                    <p>Disk IO Bandwidth</p>
+
                     <p className="text-sm text-scale-1000">
-                      Smaller compute instances can burst up to the maximum disk IO bandwidth for 30
-                      minutes in a day. Beyond that, the performance reverts to the baseline disk IO
-                      bandwidth.
+                      The disk performance of your workload is determined by the Disk IO bandwidth.
                     </p>
+
+                    {currentComputeInstanceSpecs.maxBandwidth ===
+                    currentComputeInstanceSpecs.baseBandwidth ? (
+                      <p className="text-sm text-scale-1000">
+                        Your current compute can has a baseline and maximum disk throughput of
+                        {currentComputeInstanceSpecs.maxBandwidth.toLocaleString()} Mbps.
+                      </p>
+                    ) : (
+                      <p className="text-sm text-scale-1000">
+                        Your current compute can burst up to{' '}
+                        {currentComputeInstanceSpecs.maxBandwidth.toLocaleString()} Mbps for 30
+                        minutes a day and reverts to the baseline performance of{' '}
+                        {currentComputeInstanceSpecs.baseBandwidth.toLocaleString()} Mbps.
+                      </p>
+                    )}
                   </div>
                   <div>
                     <p className="text-sm mb-2">Overview</p>
@@ -185,7 +199,7 @@ const Infrastructure = ({ projectRef }: InfrastructureProps) => {
               <div className="space-y-1">
                 <div className="flex flex-row justify-between">
                   {attribute.key === 'disk_io_consumption' ? (
-                    <p>IO consumed per day</p>
+                    <p>IO consumed per {interval === '1d' ? 'day' : 'hour'}</p>
                   ) : (
                     <p>
                       Max{' '}
