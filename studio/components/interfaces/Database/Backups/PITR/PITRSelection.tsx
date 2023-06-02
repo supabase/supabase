@@ -124,20 +124,23 @@ const PITRSelection = ({}) => {
   //   dayjs(earliestAvailableBackup).utc().format('YYYY MM DD HH:mm:ss')
   // )
 
-  // Start: Variables specifically for date picker component
-  // Required as it only works with vanilla Date object which is not timezone localized
   const earliestAvailableBackupFormatted: dayjs.Dayjs = earliestAvailableBackup
   const latestAvailableBackupFormatted: dayjs.Dayjs = latestAvailableBackup
 
   const earliestAvailableBackupFormattedYYYYMMDD = earliestAvailableBackup.format('YYYY-MM-DD')
   const latestAvailableBackupFormattedYYYYMMDD = latestAvailableBackup.format('YYYY-MM-DD')
+  const selectedDateFormatted = selectedDate ? selectedDate.format(STANDARD_DATE_FORMAT) : undefined
 
+  // Start: Variables specifically for date picker component using toDate (Date) format
+  // Required as it only works with vanilla Date object which is not timezone localized
   const earliestAvailableBackupFormattedForDatePicker = dayjs(
     earliestAvailableBackupFormattedYYYYMMDD
   ).toDate()
   const latestAvailableBackupFormattedForDatePicker = dayjs(
     latestAvailableBackupFormattedYYYYMMDD
   ).toDate()
+  const selectedDateFormattedForDatePicker = dayjs(selectedDateFormatted).toDate()
+  // End: Variables specifically for date picker component
 
   const isSelectedOnEarliest = checkMatchingDates(selectedDate, earliestAvailableBackupFormatted)
   const isSelectedOnLatest = checkMatchingDates(selectedDate, latestAvailableBackupFormatted)
@@ -145,12 +148,8 @@ const PITRSelection = ({}) => {
     earliestAvailableBackupFormatted,
     latestAvailableBackupFormatted
   )
-  // End: Variables specifically for date picker component
 
-  console.log('earliestAvailableBackupFormatted', earliestAvailableBackupFormatted)
-
-  const selectedDateFormatted = selectedDate ? selectedDate.format(STANDARD_DATE_FORMAT) : undefined
-  const selectedDateFormattedForDatePicker = dayjs(selectedDateFormatted).toDate()
+  // console.log('earliestAvailableBackupFormatted', earliestAvailableBackupFormatted)
 
   // console.log(
   //   'earliestAvailableBackupFormatted on dayjs',
