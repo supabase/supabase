@@ -1095,6 +1095,7 @@ export const integrations: NavMenuConstant = {
       name: 'Developer Tools',
       url: undefined,
       items: [
+        { name: 'Bracket', url: '/guides/integrations/bracket' },        
         { name: 'Cloudflare Workers', url: '/guides/integrations/cloudflare-workers' },
         { name: 'Estuary', url: '/guides/integrations/estuary' },
         { name: 'OpenAI', url: '/guides/functions/examples/openai' },
