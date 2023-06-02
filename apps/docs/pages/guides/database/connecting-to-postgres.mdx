@@ -3,8 +3,8 @@ import StepHikeCompact from '~/components/StepHikeCompact'
 
 export const meta = {
   id: 'connecting-to-postgres',
-  title: 'Database Connections',
-  description: 'There are various ways to connect to your Postgres database.',
+  title: 'Connecting to your database',
+  description: 'Explore the options for connecting to your Postgres database.',
 }
 
 Supabase provides several options for programmatically connecting to your Postgres database:
@@ -97,6 +97,83 @@ Some session-based PostgreSQL features such as prepared statements are not avail
 This is the most granular option. Connections are returned to the pool after every statement. Transactions with multiple statements are not allowed. This is best used when `AUTOCOMMIT` is in use.
 
 ## Integrations
+
+### Connecting with Drizzle
+
+[Drizzle ORM](https://github.com/drizzle-team/drizzle-orm) is a TypeScript ORM for SQL databases designed with maximum type safety in mind. You can used their ORM to connect to your database.
+
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={1}>
+
+    <StepHikeCompact.Details title="Install">
+
+    Install Drizzle and releated dependencies.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+     ```shell
+     npm i drizzle-orm postgres
+     npm i -D drizzle-kit
+     ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={2}>
+
+    <StepHikeCompact.Details title="Create your models">
+
+    Create a `schema.ts` file and define your models.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+    ```ts
+    import { pgTable, serial, text, varchar } from "drizzle-orm/pg-core";
+
+    export const users = pgTable('users', {
+      id: serial('id').primaryKey(),
+      fullName: text('full_name'),
+      phone: varchar('phone', { length: 256 }),
+    });
+    ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={3}>
+
+    <StepHikeCompact.Details title="Connect">
+
+    Connect to your database using the Connection Pooler for serverless environments, and the Direct Connection for long-running servers.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+    ```ts
+    import { drizzle } from 'drizzle-orm/postgres-js'
+    import postgres from 'postgres'
+    import { users } from './schema'
+
+    const connectionString = process.env.DATABASE_URL
+    const client = postgres(connectionString)
+    const db = drizzle(client);
+
+    const allUsers = await db.select().from(users);
+    ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+</StepHikeCompact>
 
 ### Connecting with psql
 
