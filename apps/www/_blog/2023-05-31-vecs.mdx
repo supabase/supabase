@@ -34,7 +34,7 @@ Alternatively, folks who don't want to know what's happening in the database, do
 
 ### Connecting
 
-```python
+```py
 import vecs
 
 DB_CONNECTION = "postgresql://<user>:<password>@<host>:<port>/<db_name>"
@@ -62,7 +62,7 @@ create table vecs.docs (
 
 We can insert a few records in that new SQL table/vecs collection using `Collection.upsert`.
 
-```python
+```py
 # add records to the collection
 docs.upsert(
     vectors=[
@@ -82,7 +82,7 @@ which will add the records to our table if the `id` `"vec0"` does not exist, or 
 You can query a vecs collection at any time without an index, but it's a best practices to create an index on your collection after inserting
 data.
 
-```python
+```py
 docs.index()
 ```
 
@@ -90,7 +90,7 @@ Where `index` optionally takes an argument for the distance measure to index.
 
 Finally, we can search the collection for similar vectors using the `query` method:
 
-```python
+```py
 docs.query(
     query_vector=[0.10,0.21,0.29],   # required
     limit=1,                         # (optional) number of records to return
@@ -103,7 +103,7 @@ docs.query(
 
 Which returns:
 
-```python
+```py
 [("vec1", 0.000697, {"year": 1973})]
 ```
 
@@ -111,7 +111,7 @@ Since all metadata is stored in a `jsonb` column, there's a [lightweight but fle
 
 When you're done, disconnect with:
 
-```python
+```py
 vx.disconnect()
 ```
 
@@ -161,7 +161,7 @@ streamline those workflows for users.
 
 One option we're exploring is to optionally assign transformation pipelines to collections along the lines of:
 
-```python
+```py
 # This is mock code only, not currently functional
 
 docs: Collection =vx.create_collection(
@@ -182,7 +182,7 @@ so users can choose to work with their preferred media type without ever thinkin
 
 Another direction we're considering is adding an async client to avoid blocking when waiting on the database or network i.e.
 
-```python
+```py
 # This is mock code only, not currently functional
 
 await docs.upsert([
