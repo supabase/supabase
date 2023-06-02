@@ -175,16 +175,6 @@ This is the most granular option. Connections are returned to the pool after eve
 
 </StepHikeCompact>
 
-### Connecting with psql
-
-[`psql`](https://www.postgresql.org/docs/current/app-psql.html) is a command-line tool that comes with Postgres.
-
-Assuming you've downloaded your SSL certificate to `$HOME/Downloads/prod-supabase.cer`, and your host address is `db.ref.supabase.co` you connect to your database via SSL:
-
-```shell
-psql "sslmode=verify-full sslrootcert=$HOME/Downloads/prod-supabase.cer host=db.ref.supabase.co dbname=postgres user=postgres"
-```
-
 ### Connecting with pgAdmin
 
 [`pgAdmin`](https://www.pgadmin.org/) is a GUI tool for managing Postgres databases. You can use it to connect to your database via SSL:
@@ -250,6 +240,95 @@ psql "sslmode=verify-full sslrootcert=$HOME/Downloads/prod-supabase.cer host=db.
     <StepHikeCompact.Code>
 
      ![Add Connection Info.](/docs/img/guides/database/add-ssl-config.png)
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+</StepHikeCompact>
+
+### Connecting with psql
+
+[`psql`](https://www.postgresql.org/docs/current/app-psql.html) is a command-line tool that comes with Postgres.
+
+Assuming you've downloaded your SSL certificate to `$HOME/Downloads/prod-supabase.cer`, and your host address is `db.ref.supabase.co` you connect to your database via SSL:
+
+```shell
+psql "sslmode=verify-full sslrootcert=$HOME/Downloads/prod-supabase.cer host=db.ref.supabase.co dbname=postgres user=postgres"
+```
+
+### Connecting with Postgres.js
+
+[Postgres.js](https://github.com/porsager/postgres) is a full-featured PostgreSQL client for Node.js and Deno.
+
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={1}>
+
+    <StepHikeCompact.Details title="Install">
+
+    Install Drizzle and releated dependencies.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+     ```shell
+     npm i postgres
+     npm i -D drizzle-kit
+     ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={2}>
+
+    <StepHikeCompact.Details title="Connect">
+
+    Create a `db.js` file with the connection details. Use the Connection Pooler for serverless environments, and the Direct Connection for long-running servers.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+    ```ts
+    // db.js
+    import postgres from 'postgres'
+
+    const connectionString = process.env.DATABASE_URL
+    const sql = postgres(connectionString)
+
+    export default sql
+    ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={3}>
+
+    <StepHikeCompact.Details title="Execute commands">
+
+    Use the connection to execute commands.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+    ```ts
+    import sql from './db.js'
+
+    async function getUsersOver(age) {
+      const users = await sql`
+        select name, age
+        from users
+        where age > ${ age }
+      `
+      // users = Result [{ name: "Walter", age: 80 }, { name: 'Murray', age: 68 }, ...]
+      return users
+    }
+    ```
 
     </StepHikeCompact.Code>
 
