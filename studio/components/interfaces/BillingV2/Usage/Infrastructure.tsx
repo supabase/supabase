@@ -2,16 +2,16 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { DataPoint } from 'data/analytics/constants'
 import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
 import dayjs from 'dayjs'
-import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import Link from 'next/link'
 import { Alert, Button } from 'ui'
 import SectionContent from './SectionContent'
 import SectionHeader from './SectionHeader'
 import { COMPUTE_INSTANCE_SPECS, USAGE_CATEGORIES } from './Usage.constants'
-import { getUpgradeUrl, getUpgradeUrlFromV2Subscription } from './Usage.utils'
+import { getUpgradeUrlFromV2Subscription } from './Usage.utils'
 import UsageBarChart from './UsageBarChart'
 import Panel from 'components/ui/Panel'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
+import { useMemo } from 'react'
 
 export interface InfrastructureProps {
   projectRef: string
@@ -22,18 +22,20 @@ export interface InfrastructureProps {
 const Infrastructure = ({ projectRef }: InfrastructureProps) => {
   const { data: subscription } = useProjectSubscriptionV2Query({ projectRef })
   const { current_period_start, current_period_end } = subscription ?? {}
-  const startDate =
-    current_period_start !== undefined
-      ? new Date(current_period_start * 1000).toISOString()
-      : undefined
-  let endDate =
-    current_period_end !== undefined ? new Date(current_period_end * 1000).toISOString() : undefined
+  const startDate = useMemo(() => {
+    return current_period_start ? new Date(current_period_start * 1000).toISOString() : undefined
+  }, [current_period_start])
 
-  // If end date is in future, set end date to now
-  if (endDate && dayjs(endDate).isAfter(dayjs())) {
-    // LF seems to have an issue with the milliseconds, causes infinite loading sometimes
-    endDate = new Date().toISOString().slice(0, -5) + 'Z'
-  }
+  const endDate = useMemo(() => {
+    const periodEndDate = current_period_end ? new Date(current_period_end * 1000) : undefined
+    // If end date is in future, set end date to now
+    if (periodEndDate && dayjs(periodEndDate).isAfter(dayjs())) {
+      // LF seems to have an issue with the milliseconds, causes infinite loading sometimes
+      return new Date().toISOString().slice(0, -5) + 'Z'
+    } else if (periodEndDate) {
+      return periodEndDate.toISOString()
+    }
+  }, [current_period_end])
 
   const categoryMeta = USAGE_CATEGORIES.find((category) => category.key === 'infra')
 
