@@ -211,6 +211,18 @@ const Infrastructure = ({ projectRef }: InfrastructureProps) => {
                   )}
                 </div>
 
+                {attribute.key === 'ram_usage' && (
+                  <p className="text-sm text-scale-1000">
+                    Your compute instance has {currentComputeInstanceSpecs.memoryGb} GB memory.
+                  </p>
+                )}
+
+                {attribute.key === 'cpu_usage' && (
+                  <p className="text-sm text-scale-1000">
+                    Your compute instance has {currentComputeInstanceSpecs.cpuCores} CPU cores.
+                  </p>
+                )}
+
                 {attribute.chartDescription.split('\n').map((paragraph, idx) => (
                   <p key={`para-${idx}`} className="text-sm text-scale-1000">
                     {paragraph}
