@@ -219,6 +219,7 @@ const Activity = ({ projectRef }: ActivityProps) => {
                             ? 'bg-amber-900'
                             : 'bg-scale-1100'
                         )}
+                        bgClass="bg-gray-300 dark:bg-gray-600"
                         value={usageMeta?.usage ?? 0}
                         max={usageMeta?.limit || 1}
                       />
@@ -244,7 +245,7 @@ const Activity = ({ projectRef }: ActivityProps) => {
                       </div>
                       {usageMeta.limit > 0 && (
                         <div className="flex items-center justify-between border-t py-1">
-                          <p className="text-xs text-scale-1000">Overage this month</p>
+                          <p className="text-xs text-scale-1000">Overage in period</p>
                           <p className="text-xs">
                             {((usageMeta?.limit ?? 0) === -1 || usageExcess < 0
                               ? 0
