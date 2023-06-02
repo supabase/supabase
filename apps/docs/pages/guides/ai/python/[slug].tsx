@@ -7,6 +7,7 @@ import remarkGfm from 'remark-gfm'
 import components from '~/components'
 import Layout from '~/layouts/DefaultGuideLayout'
 import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
+import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
 import { removeTitle } from '~/lib/mdx/plugins/remarkRemoveTitle'
 
 // We fetch these docs at build time from an external repo
@@ -117,7 +118,7 @@ export const getStaticProps: GetStaticProps<PythonClientDocsProps> = async ({ pa
 
   const mdxSource = await serialize(source, {
     mdxOptions: {
-      remarkPlugins: [remarkGfm, [removeTitle, meta.title]],
+      remarkPlugins: [remarkGfm, remarkMkDocsAdmonition, [removeTitle, meta.title]],
       rehypePlugins: [[linkTransform, urlTransform], rehypeSlug],
     },
   })
