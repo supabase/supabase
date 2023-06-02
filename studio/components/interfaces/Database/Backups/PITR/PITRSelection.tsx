@@ -27,6 +27,8 @@ import BackupsEmpty from '../BackupsEmpty'
 
 const DEFAULT_TIME = { h: 0, m: 0, s: 0 }
 
+export const STANDARD_DATE_FORMAT = 'ddd MMM DD YYYY HH:mm:ss [GMT]ZZ (ZZZ)'
+
 const PITRSelection = ({}) => {
   const router = useRouter()
   const { ref } = router.query
@@ -34,7 +36,7 @@ const PITRSelection = ({}) => {
   const { app, ui, backups } = useStore()
   const projectId = ui.selectedProject?.id ?? -1
 
-  const [selectedDate, setSelectedDate] = useState<Date>()
+  const [selectedDate, setSelectedDate] = useState<dayjs.Dayjs>()
   const [selectedTime, setSelectedTime] = useState<Time>({ h: 0, m: 0, s: 0 })
   const [selectedTimezone, setSelectedTimezone] = useState<Timezone>(getClientTimezone())
 
@@ -42,15 +44,31 @@ const PITRSelection = ({}) => {
   const [showConfirmation, setShowConfirmation] = useState(false)
   const [isRestoring, setIsRestoring] = useState(false)
 
+  // useEffect(() => {
+  //   if (selectedDate) {
+  //     if (selectedDate < earliestAvailableBackupFormatted) {
+  //       setSelectedDate(earliestAvailableBackupFormatted)
+  //     } else if (selectedDate > latestAvailableBackupFormatted) {
+  //       setSelectedDate(latestAvailableBackupFormatted)
+  //     }
+  //   }
+  // }, [selectedTimezone])
+
   useEffect(() => {
     if (selectedDate) {
-      if (selectedDate < earliestAvailableBackupFormatted) {
+      const earliestFormatted = earliestAvailableBackupFormatted.startOf('day')
+      const latestFormatted = latestAvailableBackupFormatted.startOf('day')
+      const selectedFormatted = selectedDate.startOf('day')
+
+      if (selectedFormatted.isBefore(earliestFormatted)) {
         setSelectedDate(earliestAvailableBackupFormatted)
-      } else if (selectedDate > latestAvailableBackupFormatted) {
+      } else if (selectedFormatted.isAfter(latestFormatted)) {
         setSelectedDate(latestAvailableBackupFormatted)
       }
     }
   }, [selectedTimezone])
+
+  console.log('selectedDate', selectedDate)
 
   useEffect(() => {
     const formattedSelectedTime = dayjs(formatTimeToTimeString(selectedTime), 'HH:mm:ss', true)
@@ -76,25 +94,68 @@ const PITRSelection = ({}) => {
 
   const { earliestPhysicalBackupDateUnix, latestPhysicalBackupDateUnix } =
     backups?.configuration?.physicalBackupData ?? {}
+
   const hasNoBackupsAvailable = !earliestPhysicalBackupDateUnix || !latestPhysicalBackupDateUnix
+
+  console.log('hasNoBackupsAvailable', hasNoBackupsAvailable)
+
+  const dayJSFormattedEarliestPhysicalBackupDateUnix = dayjs(earliestPhysicalBackupDateUnix * 1000)
+    .utc()
+    .format('YYYY MM DD HH:mm:ss')
+
+  console.log(
+    'dayJSFormattedEarliestPhysicalBackupDateUnix',
+    dayJSFormattedEarliestPhysicalBackupDateUnix
+  )
+
   const earliestAvailableBackup = dayjs(earliestPhysicalBackupDateUnix * 1000).tz(
     selectedTimezone?.utc[0]
   )
+
+  // console.log('earliestAvailableBackup', earliestAvailableBackup)
+  console.log('earliestAvailableBackup timezoned', earliestAvailableBackup.format())
+
   const latestAvailableBackup = dayjs(latestPhysicalBackupDateUnix * 1000).tz(
     selectedTimezone?.utc[0]
   )
 
+  // console.log(
+  //   'earliestAvailableBackup cheched on dayjs',
+  //   dayjs(earliestAvailableBackup).utc().format('YYYY MM DD HH:mm:ss')
+  // )
+
   // Start: Variables specifically for date picker component
   // Required as it only works with vanilla Date object which is not timezone localized
-  const earliestAvailableBackupFormatted = new Date(earliestAvailableBackup.format('YYYY-MM-DD'))
-  const latestAvailableBackupFormatted = new Date(latestAvailableBackup.format('YYYY-MM-DD'))
+  const earliestAvailableBackupFormatted: dayjs.Dayjs = earliestAvailableBackup
+  const latestAvailableBackupFormatted: dayjs.Dayjs = latestAvailableBackup
+
+  const earliestAvailableBackupFormattedYYYYMMDD = earliestAvailableBackup.format('YYYY-MM-DD')
+  const latestAvailableBackupFormattedYYYYMMDD = latestAvailableBackup.format('YYYY-MM-DD')
+
+  const earliestAvailableBackupFormattedForDatePicker = dayjs(
+    earliestAvailableBackupFormattedYYYYMMDD
+  ).toDate()
+  const latestAvailableBackupFormattedForDatePicker = dayjs(
+    latestAvailableBackupFormattedYYYYMMDD
+  ).toDate()
+
   const isSelectedOnEarliest = checkMatchingDates(selectedDate, earliestAvailableBackupFormatted)
   const isSelectedOnLatest = checkMatchingDates(selectedDate, latestAvailableBackupFormatted)
-  const availableDates = getDatesBetweenRange(
+  const availableDates: Array<Date> = getDatesBetweenRange(
     earliestAvailableBackupFormatted,
     latestAvailableBackupFormatted
   )
   // End: Variables specifically for date picker component
+
+  console.log('earliestAvailableBackupFormatted', earliestAvailableBackupFormatted)
+
+  const selectedDateFormatted = selectedDate ? selectedDate.format(STANDARD_DATE_FORMAT) : undefined
+  const selectedDateFormattedForDatePicker = dayjs(selectedDateFormatted).toDate()
+
+  // console.log(
+  //   'earliestAvailableBackupFormatted on dayjs',
+  //   dayjs(earliestAvailableBackupFormatted).utc().format('YYYY MM DD HH:mm:ss')
+  // )
 
   const earliestAvailableBackupTime = {
     h: earliestAvailableBackup.hour(),
@@ -122,7 +183,7 @@ const PITRSelection = ({}) => {
     (recoveryTimeTargetUnix < earliestPhysicalBackupDateUnix ||
       recoveryTimeTargetUnix > latestPhysicalBackupDateUnix)
 
-  const onUpdateDate = (date: Date) => setSelectedDate(date)
+  const onUpdateDate = (date: Date) => setSelectedDate(dayjs(date))
 
   const onCancel = () => {
     setShowConfiguration(false)
@@ -216,11 +277,11 @@ const PITRSelection = ({}) => {
                 <div className="w-1/3 space-y-2">
                   <DatePicker
                     inline
-                    selected={selectedDate}
+                    selected={selectedDateFormattedForDatePicker}
                     onChange={onUpdateDate}
                     dayClassName={() => 'cursor-pointer'}
-                    minDate={earliestAvailableBackupFormatted}
-                    maxDate={latestAvailableBackupFormatted}
+                    minDate={earliestAvailableBackupFormattedForDatePicker}
+                    maxDate={latestAvailableBackupFormattedForDatePicker}
                     highlightDates={availableDates}
                     renderCustomHeader={({
                       date,
