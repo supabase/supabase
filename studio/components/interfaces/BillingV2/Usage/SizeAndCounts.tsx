@@ -20,6 +20,7 @@ import { ChartYFormatterCompactNumber, getUpgradeUrlFromV2Subscription } from '.
 import { DataPoint } from 'data/analytics/constants'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 import Panel from 'components/ui/Panel'
+import { useMemo } from 'react'
 
 export interface SizeAndCountsProps {
   projectRef: string
@@ -29,17 +30,30 @@ const SizeAndCounts = ({ projectRef }: SizeAndCountsProps) => {
   const { data: usage } = useProjectUsageQuery({ projectRef })
   const { data: subscription } = useProjectSubscriptionV2Query({ projectRef })
   const { current_period_start, current_period_end } = subscription ?? {}
-  const startDate =
-    current_period_start !== undefined
-      ? new Date(current_period_start * 1000).toISOString()
-      : undefined
-  let endDate =
-    current_period_end !== undefined ? new Date(current_period_end * 1000).toISOString() : undefined
-  // If end date is in future, set end date to now
-  if (endDate && dayjs(endDate).isAfter(dayjs())) {
-    // LF seems to have an issue with the milliseconds, causes infinite loading sometimes
-    endDate = new Date().toISOString().slice(0, -5) + 'Z'
-  }
+
+  const startDate = useMemo(() => {
+    return current_period_start ? new Date(current_period_start * 1000).toISOString() : undefined
+  }, [current_period_start])
+
+  const endDate = useMemo(() => {
+    const periodEndDate = current_period_end ? new Date(current_period_end * 1000) : undefined
+    // If end date is in future, set end date to now
+    if (periodEndDate && dayjs(periodEndDate).isAfter(dayjs())) {
+      const yesterday = dayjs(new Date()).subtract(1, 'day')
+
+      /**
+       * Currently, daily-stats data is only available a day later, so we'll use yesterday as end date, as otherwise the current day would just show up with "0" values
+       *
+       * We are actively working on removing this restriction on the data-eng/LF side and can remove this workaround once that's done
+       */
+      const newEndDate = yesterday.isAfter(dayjs(startDate)) ? yesterday : new Date()
+
+      // LF seems to have an issue with the milliseconds, causes infinite loading sometimes
+      return newEndDate.toISOString().slice(0, -5) + 'Z'
+    } else if (periodEndDate) {
+      return periodEndDate.toISOString()
+    }
+  }, [current_period_end, startDate])
 
   const categoryMeta = USAGE_CATEGORIES.find((category) => category.key === 'sizeCount')
 
