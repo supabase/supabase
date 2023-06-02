@@ -2,7 +2,6 @@ import clsx from 'clsx'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import SparkBar from 'components/ui/SparkBar'
 import { useDailyStatsQuery } from 'data/analytics/daily-stats-query'
-import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
 import {
   ProjectUsageResponse,
   UsageMetric,
@@ -16,10 +15,10 @@ import UsageBarChart from './UsageBarChart'
 import SectionContent from './SectionContent'
 import SectionHeader from './SectionHeader'
 import { USAGE_CATEGORIES } from './Usage.constants'
-import { ChartYFormatterCompactNumber, getUpgradeUrl } from './Usage.utils'
-import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
+import { ChartYFormatterCompactNumber, getUpgradeUrlFromV2Subscription } from './Usage.utils'
 import { DataPoint } from 'data/analytics/constants'
 import Panel from 'components/ui/Panel'
+import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 
 export interface ActivityProps {
   projectRef: string
@@ -27,8 +26,8 @@ export interface ActivityProps {
 
 const Activity = ({ projectRef }: ActivityProps) => {
   const { data: usage } = useProjectUsageQuery({ projectRef })
-  const { data: subscription } = useProjectSubscriptionQuery({ projectRef })
-  const { current_period_start, current_period_end } = subscription?.billing ?? {}
+  const { data: subscription } = useProjectSubscriptionV2Query({ projectRef })
+  const { current_period_start, current_period_end } = subscription ?? {}
   const startDate =
     current_period_start !== undefined
       ? new Date(current_period_start * 1000).toISOString()
@@ -53,11 +52,9 @@ const Activity = ({ projectRef }: ActivityProps) => {
 
   const categoryMeta = USAGE_CATEGORIES.find((category) => category.key === 'activity')
 
-  const upgradeUrl = getUpgradeUrl(projectRef, subscription)
+  const upgradeUrl = getUpgradeUrlFromV2Subscription(projectRef, subscription)
 
-  const isFreeTier = subscription?.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.FREE
-  const isProTier = subscription?.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.PRO
-  const usageBasedBilling = !isFreeTier && !isProTier
+  const usageBasedBilling = subscription?.usage_billing_enabled
   const exceededLimitStyle = !usageBasedBilling ? 'text-red-900' : 'text-amber-900'
 
   const { data: mauData, isLoading: isLoadingMauData } = useDailyStatsQuery({
@@ -168,6 +165,10 @@ const Activity = ({ projectRef }: ActivityProps) => {
 
         const chartData = chartMeta[attribute.key]?.data ?? []
 
+        const notAllValuesZero = chartData.some(
+          (dataPoint) => Number(dataPoint[attribute.attribute]) !== 0
+        )
+
         return (
           <div id={attribute.anchor} key={attribute.key}>
             <SectionContent section={attribute} includedInPlan={usageMeta?.available_in_plan}>
@@ -227,7 +228,7 @@ const Activity = ({ projectRef }: ActivityProps) => {
                     <div>
                       <div className="flex items-center justify-between border-b py-1">
                         <p className="text-xs text-scale-1000">
-                          Included in {subscription?.tier.name.toLowerCase()}
+                          Included in {subscription?.plan?.name.toLowerCase()} plan
                         </p>
                         {usageMeta?.limit === -1 ? (
                           <p className="text-xs">None</p>
@@ -270,7 +271,7 @@ const Activity = ({ projectRef }: ActivityProps) => {
                       <ShimmeringLoader className="w-3/4" />
                       <ShimmeringLoader className="w-1/2" />
                     </div>
-                  ) : (
+                  ) : chartData.length > 1 && notAllValuesZero ? (
                     <UsageBarChart
                       name={`${attribute.chartPrefix || ''}${attribute.name}`}
                       unit={attribute.unit}
@@ -279,6 +280,17 @@ const Activity = ({ projectRef }: ActivityProps) => {
                       yLeftMargin={chartMeta[attribute.key].margin}
                       yFormatter={(value) => ChartYFormatterCompactNumber(value, attribute.unit)}
                     />
+                  ) : (
+                    <Panel>
+                      <Panel.Content>
+                        <div className="flex flex-col items-center justify-center space-y-2">
+                          <p>No data</p>
+                          <p className="text-sm text-scale-1000">
+                            No {notAllValuesZero ? 'data' : 'usage'} in period
+                          </p>
+                        </div>
+                      </Panel.Content>
+                    </Panel>
                   )}
                 </>
               ) : (

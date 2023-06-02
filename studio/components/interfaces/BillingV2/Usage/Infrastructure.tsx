@@ -1,7 +1,6 @@
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { DataPoint } from 'data/analytics/constants'
 import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
-import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
 import dayjs from 'dayjs'
 import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import Link from 'next/link'
@@ -9,9 +8,10 @@ import { Alert, Button } from 'ui'
 import SectionContent from './SectionContent'
 import SectionHeader from './SectionHeader'
 import { COMPUTE_INSTANCE_SPECS, USAGE_CATEGORIES } from './Usage.constants'
-import { getUpgradeUrl } from './Usage.utils'
+import { getUpgradeUrl, getUpgradeUrlFromV2Subscription } from './Usage.utils'
 import UsageBarChart from './UsageBarChart'
 import Panel from 'components/ui/Panel'
+import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 
 export interface InfrastructureProps {
   projectRef: string
@@ -20,8 +20,8 @@ export interface InfrastructureProps {
 // [Joshen] Need to update the IO budget chart to show burst mbps and duration next time
 
 const Infrastructure = ({ projectRef }: InfrastructureProps) => {
-  const { data: subscription } = useProjectSubscriptionQuery({ projectRef })
-  const { current_period_start, current_period_end } = subscription?.billing ?? {}
+  const { data: subscription } = useProjectSubscriptionV2Query({ projectRef })
+  const { current_period_start, current_period_end } = subscription ?? {}
   const startDate =
     current_period_start !== undefined
       ? new Date(current_period_start * 1000).toISOString()
@@ -37,8 +37,8 @@ const Infrastructure = ({ projectRef }: InfrastructureProps) => {
 
   const categoryMeta = USAGE_CATEGORIES.find((category) => category.key === 'infra')
 
-  const upgradeUrl = getUpgradeUrl(projectRef, subscription)
-  const isFreeTier = subscription?.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.FREE
+  const upgradeUrl = getUpgradeUrlFromV2Subscription(projectRef, subscription)
+  const isFreeTier = subscription?.plan?.id === 'free'
   const currentComputeInstance = subscription?.addons.find((addon) =>
     addon.supabase_prod_id.includes('_instance_')
   )
@@ -249,9 +249,7 @@ const Infrastructure = ({ projectRef }: InfrastructureProps) => {
                   <Panel.Content>
                     <div className="flex flex-col items-center justify-center space-y-2">
                       <p>No data</p>
-                      <p className="text-sm text-scale-1000">
-                        There is no data in the timeframe available
-                      </p>
+                      <p className="text-sm text-scale-1000">There is no data in period</p>
                     </div>
                   </Panel.Content>
                 </Panel>

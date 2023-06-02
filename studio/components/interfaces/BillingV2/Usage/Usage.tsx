@@ -1,11 +1,10 @@
 import clsx from 'clsx'
 import { useParams } from 'common'
-import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
 import { useProjectUsageQuery } from 'data/usage/project-usage-query'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import { useRef, useState } from 'react'
-import { Button, IconAlertCircle, IconCheckCircle, IconLoader, Listbox } from 'ui'
+import { Button, IconAlertCircle, IconLoader, Listbox } from 'ui'
 import Activity from './Activity'
 import Bandwidth from './Bandwidth'
 import Infrastructure from './Infrastructure'
@@ -13,7 +12,7 @@ import SizeAndCounts from './SizeAndCounts'
 import { USAGE_CATEGORIES, USAGE_STATUS } from './Usage.constants'
 import { getUsageStatus } from './Usage.utils'
 import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
-import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
+import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 
 const Usage = () => {
   const { ref } = useParams()
@@ -28,11 +27,11 @@ const Usage = () => {
   const activityRef = useRef<HTMLDivElement>(null)
 
   const { data: usage } = useProjectUsageQuery({ projectRef: ref })
-  const { data: subscription, isLoading: isLoadingSubscription } = useProjectSubscriptionQuery({
+  const { data: subscription, isLoading: isLoadingSubscription } = useProjectSubscriptionV2Query({
     projectRef: selectedProjectRef,
   })
 
-  const { current_period_start, current_period_end } = subscription?.billing ?? {}
+  const { current_period_start, current_period_end } = subscription ?? {}
   const startDate =
     current_period_start !== undefined
       ? new Date(current_period_start * 1000).toISOString()
@@ -52,13 +51,10 @@ const Usage = () => {
     ] ?? 100
   )
 
-  const billingCycleStart = dayjs.unix(subscription?.billing?.current_period_start ?? 0).utc()
-  const billingCycleEnd = dayjs.unix(subscription?.billing?.current_period_end ?? 0).utc()
+  const billingCycleStart = dayjs.unix(subscription?.current_period_start ?? 0).utc()
+  const billingCycleEnd = dayjs.unix(subscription?.current_period_end ?? 0).utc()
 
-  const subscriptionTierId = subscription?.tier?.supabase_prod_id
-  const usageBillingEnabled =
-    subscriptionTierId !== PRICING_TIER_PRODUCT_IDS.FREE &&
-    subscriptionTierId !== PRICING_TIER_PRODUCT_IDS.PRO
+  const usageBillingEnabled = subscription?.usage_billing_enabled
 
   const scrollTo = (id: 'infra' | 'bandwidth' | 'sizeCount' | 'activity') => {
     switch (id) {
@@ -107,7 +103,7 @@ const Usage = () => {
               ) : subscription !== undefined ? (
                 <div>
                   <p className={clsx('text-sm transition', isLoadingSubscription && 'opacity-50')}>
-                    Project is on {subscription.tier.name}
+                    Project is on {subscription.plan.name} plan
                   </p>
                   <p className="text-sm text-scale-1000">
                     {billingCycleStart.format('DD MMM YYYY')} -{' '}
