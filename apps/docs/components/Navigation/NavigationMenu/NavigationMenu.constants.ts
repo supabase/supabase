@@ -508,14 +508,33 @@ export const database: NavMenuConstant = {
   title: 'Database',
   url: '/guides/database',
   items: [
-    { name: 'Database Connections', url: '/guides/database/connecting-to-postgres' },
-    { name: 'Tables and Data', url: '/guides/database/tables' },
-    { name: 'Database Functions', url: '/guides/database/functions' },
-    { name: 'Database Webhooks', url: '/guides/database/webhooks' },
-    { name: 'Full Text Search', url: '/guides/database/full-text-search' },
-    { name: 'Database Testing', url: '/guides/database/testing' },
-    { name: 'Managing Secrets with Vault', url: '/guides/database/vault' },
-    { name: 'Column Encryption', url: '/guides/database/column-encryption' },
+    { name: 'Overview', url: '/guides/database' },
+    {
+      name: 'Fundamentals',
+      url: undefined,
+      items: [
+        { name: 'Connecting to your database', url: '/guides/database/connecting-to-postgres' },
+        { name: 'Managing tables, views, and data', url: '/guides/database/tables' },
+        { name: 'Managing database functions', url: '/guides/database/functions' },
+        { name: 'Managing indexes', url: '/guides/database/postgres/indexes' },
+        { name: 'Managing database webhooks', url: '/guides/database/webhooks' },
+        { name: 'Managing database replication', url: '/guides/database/replication' },
+        { name: 'Managing secrets with Vault', url: '/guides/database/vault' },
+      ],
+    },
+    {
+      name: 'Postgres Guides',
+      url: undefined,
+      items: [
+        { name: 'Implementing Full Text Search', url: '/guides/database/full-text-search' },
+        { name: 'Implementing Cascade Deletes', url: '/guides/database/postgres/cascade-deletes' },
+        { name: 'Implementing column encryption', url: '/guides/database/column-encryption' },
+        { name: 'Testing your database', url: '/guides/database/testing' },
+        { name: 'Managing Timeouts', url: '/guides/database/timeouts' },
+        { name: 'Managing Passwords', url: '/guides/database/managing-passwords' },
+        { name: 'Configuring Timezones', url: '/guides/database/managing-timezones' },
+      ],
+    },
     {
       name: 'Extensions',
       url: undefined,
@@ -622,17 +641,9 @@ export const database: NavMenuConstant = {
       ],
     },
     {
-      name: 'Postgres resources',
+      name: 'Examples',
       url: undefined,
       items: [
-        {
-          name: 'Managing Indexes',
-          url: '/guides/database/postgres/indexes',
-        },
-        {
-          name: 'Cascade Deletes',
-          url: '/guides/database/postgres/cascade-deletes',
-        },
         {
           name: 'Drop All Tables in Schema',
           url: '/guides/database/postgres/dropping-all-tables-in-schema',
@@ -645,16 +656,6 @@ export const database: NavMenuConstant = {
           name: 'Print PostgreSQL Version',
           url: '/guides/database/postgres/which-version-of-postgres',
         },
-      ],
-    },
-    {
-      name: 'Configuration',
-      url: undefined,
-      items: [
-        { name: 'Timeouts', url: '/guides/database/timeouts' },
-        { name: 'Replication', url: '/guides/database/replication' },
-        { name: 'Passwords', url: '/guides/database/managing-passwords' },
-        { name: 'Timezones', url: '/guides/database/managing-timezones' },
       ],
     },
   ],
@@ -726,7 +727,7 @@ export const functions: NavMenuConstant = {
       url: undefined,
       items: [
         { name: 'Developing Functions locally', url: '/guides/functions/local-development' },
-        { name: 'Deploying with Git', url: '/guides/functions/cicd-workflow' },
+        { name: 'Deploying with GitHub', url: '/guides/functions/cicd-workflow' },
         { name: 'Managing Secrets and Environment Variables', url: '/guides/functions/secrets' },
         { name: 'Integrating With Supabase Auth', url: '/guides/functions/auth' },
         {

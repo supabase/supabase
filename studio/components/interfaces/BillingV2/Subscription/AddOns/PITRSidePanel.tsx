@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { useParams } from 'common'
+import { useParams, useTheme } from 'common'
 import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-remove-mutation'
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
@@ -11,14 +11,30 @@ import { useEffect, useState } from 'react'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { Alert, Button, IconExternalLink, Radio, SidePanel } from 'ui'
 
-const PITR_CATEGORY_OPTIONS: { id: 'off' | 'on'; name: string; imageUrl: string }[] = [
-  { id: 'off', name: 'No point in time recovery', imageUrl: `${BASE_PATH}/img/pitr-off.svg` },
-  { id: 'on', name: 'Enable point in time recovery', imageUrl: `${BASE_PATH}/img/pitr-on.svg` },
+const PITR_CATEGORY_OPTIONS: {
+  id: 'off' | 'on'
+  name: string
+  imageUrl: string
+  imageUrlLight: string
+}[] = [
+  {
+    id: 'off',
+    name: 'Disable PITR',
+    imageUrl: `${BASE_PATH}/img/pitr-off.png?v=2`,
+    imageUrlLight: `${BASE_PATH}/img/pitr-off--light.png?v=2`,
+  },
+  {
+    id: 'on',
+    name: 'Enable PITR',
+    imageUrl: `${BASE_PATH}/img/pitr-on.png?v=2`,
+    imageUrlLight: `${BASE_PATH}/img/pitr-on--light.png?v=2`,
+  },
 ]
 
 const PITRSidePanel = () => {
   const { ui } = useStore()
   const { ref: projectRef } = useParams()
+  const { isDarkMode } = useTheme()
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState<'on' | 'off'>('off')
@@ -117,7 +133,7 @@ const PITRSidePanel = () => {
           </p>
 
           <div className="!mt-8 pb-4">
-            <div className="grid grid-cols-12 gap-3">
+            <div className="flex gap-3">
               {PITR_CATEGORY_OPTIONS.map((option) => {
                 const isSelected = selectedCategory === option.id
                 return (
@@ -129,18 +145,19 @@ const PITRSidePanel = () => {
                       if (option.id === 'off') setSelectedOption('pitr_0')
                     }}
                   >
-                    <div
+                    <img
+                      alt="Point-In-Time-Recovery"
                       className={clsx(
-                        'relative rounded-xl transition border bg-no-repeat bg-center bg-cover cursor-pointer',
+                        'relative rounded-xl transition border bg-no-repeat bg-center bg-cover cursor-pointer w-[160px] h-[96px]',
                         isSelected
-                          ? 'border-brand-900'
-                          : 'border-scale-900 opacity-50 group-hover:border-scale-1100 group-hover:opacity-100'
+                          ? 'border-scale-1200'
+                          : 'border-scale-900 opacity-50 group-hover:border-scale-1000 group-hover:opacity-100'
                       )}
-                      style={{
-                        aspectRatio: ' 160/96',
-                        backgroundImage: `url(${option.imageUrl})`,
-                      }}
+                      width={160}
+                      height={96}
+                      src={isDarkMode ? option.imageUrl : option.imageUrlLight}
                     />
+
                     <p
                       className={clsx(
                         'text-sm transition',
@@ -210,7 +227,7 @@ const PITRSidePanel = () => {
                     value={option.identifier}
                   >
                     <div className="w-full group">
-                      <div className="border-b border-scale-500 px-4 py-2 group-hover:border-scale-600">
+                      <div className="border-b border-scale-500 px-4 py-2">
                         <p className="text-sm">{option.name}</p>
                       </div>
                       <div className="px-4 py-2">

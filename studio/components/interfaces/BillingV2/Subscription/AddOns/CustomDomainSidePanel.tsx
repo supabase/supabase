@@ -111,23 +111,6 @@ const CustomDomainSidePanel = () => {
             page after enabling the add-on.
           </p>
 
-          {isFreePlan ? (
-            <Alert
-              withIcon
-              variant="info"
-              title="Changing your compute size is only available on the Pro plan"
-              actions={
-                <Button type="default" onClick={() => snap.setPanelKey('subscriptionPlan')}>
-                  View available plans
-                </Button>
-              }
-            >
-              Upgrade your project's plan to change the compute size of your project
-            </Alert>
-          ) : (
-            <p className="text-sm">Your project can be upgraded to enable custom domains.</p>
-          )}
-
           <div className={clsx('!mt-8 pb-4', isFreePlan && 'opacity-75')}>
             <Radio.Group
               type="large-cards"
@@ -202,6 +185,21 @@ const CustomDomainSidePanel = () => {
                 </p>
               )}
             </>
+          )}
+
+          {isFreePlan && (
+            <Alert
+              withIcon
+              variant="info"
+              title="Custom domains are unavailable on the free plan"
+              actions={
+                <Button type="default" onClick={() => snap.setPanelKey('subscriptionPlan')}>
+                  View available plans
+                </Button>
+              }
+            >
+              Upgrade your project's plan to add a custom domain to your project
+            </Alert>
           )}
         </div>
       </SidePanel.Content>
