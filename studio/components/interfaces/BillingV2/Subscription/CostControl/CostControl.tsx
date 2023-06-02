@@ -1,8 +1,7 @@
-import { useParams } from 'common'
+import { useParams, useTheme } from 'common'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 import { BASE_PATH } from 'lib/constants'
-import Image from 'next/image'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { Alert, Button, IconExternalLink } from 'ui'
 import SpendCapSidePanel from './SpendCapSidePanel'
@@ -16,13 +15,15 @@ const CostControl = ({}: CostControlProps) => {
   const { ref: projectRef } = useParams()
   const snap = useSubscriptionPageStateSnapshot()
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
+  const { isDarkMode } = useTheme()
 
   const { data: subscription, isLoading } = useProjectSubscriptionV2Query({ projectRef })
 
   const currentPlan = subscription?.plan
   const isUsageBillingEnabled = subscription?.usage_billing_enabled ?? false
 
-  const canChangeTier = !projectUpdateDisabled && !['team', 'enterprise'].includes(currentPlan?.id || '')
+  const canChangeTier =
+    !projectUpdateDisabled && !['team', 'enterprise'].includes(currentPlan?.id || '')
 
   return (
     <>
@@ -30,10 +31,12 @@ const CostControl = ({}: CostControlProps) => {
         <div className="col-span-12 lg:col-span-5">
           <div className="sticky top-16">
             <div className="space-y-6">
-              <p className="text-base">Cost control</p>
-              <p className="text-sm text-scale-1000">
-                Control whether to allow over-usage and avoid surprise bills
-              </p>
+              <div>
+                <p className="text-base">Cost control</p>
+                <p className="text-sm text-scale-1000">
+                  Control whether to allow over-usage and avoid surprise bills
+                </p>
+              </div>
               <div className="space-y-2">
                 <p className="text-sm text-scale-1100">More information</p>
                 <div>
@@ -80,15 +83,15 @@ const CostControl = ({}: CostControlProps) => {
 
             <div className="flex space-x-6">
               <div>
-                <div className="rounded-md w-[160px] h-[96px] shadow">
-                  <Image
-                    alt="Spend cap"
+                <div className="rounded-md bg-scale-100 dark:bg-scale-400 w-[160px] h-[96px] shadow">
+                  <img
+                    alt="Spend Cap"
                     width={160}
                     height={96}
                     src={
                       isUsageBillingEnabled
-                        ? `${BASE_PATH}/img/spend-cap-off.svg`
-                        : `${BASE_PATH}/img/spend-cap-on.svg`
+                        ? `${BASE_PATH}/img/spend-cap-off${isDarkMode ? '' : '--light'}.png?v=3`
+                        : `${BASE_PATH}/img/spend-cap-on${isDarkMode ? '' : '--light'}.png?v=3`
                     }
                   />
                 </div>
