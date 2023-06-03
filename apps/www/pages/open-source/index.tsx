@@ -121,7 +121,7 @@ const OpenSource = () => {
                 (t: any, i: number) =>
                   !!t.transactions.length && (
                     <div key={i} className="mt-8">
-                      <h3 className="font-medium mb-6">{t.heading}</h3>
+                      <h3 className="font-mono text-scale-900 mb-6">{t.heading}</h3>
                       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                         {t.transactions.map((x: any, i: number) => (
                           <Link key={i} href={`https://github.com/${x.sponsor}`}>
