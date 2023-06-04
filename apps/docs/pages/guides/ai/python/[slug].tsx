@@ -1,5 +1,4 @@
-import { remarkCodeHike, CodeHikeConfig } from '@code-hike/mdx'
-import { CH } from '@code-hike/mdx/components'
+import { CodeHikeConfig, remarkCodeHike } from '@code-hike/mdx'
 import { GetStaticPaths, GetStaticProps } from 'next'
 import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
 import { serialize } from 'next-mdx-remote/serialize'
@@ -63,7 +62,7 @@ interface PythonClientDocsProps {
 export default function PythonClientDocs({ source, meta }: PythonClientDocsProps) {
   return (
     <Layout meta={meta}>
-      <MDXRemote {...source} components={{ ...components, CH }} />
+      <MDXRemote {...source} components={components} />
     </Layout>
   )
 }
