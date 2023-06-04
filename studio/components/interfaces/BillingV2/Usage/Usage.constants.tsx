@@ -30,6 +30,8 @@ export interface CategoryAttribute {
   ) => JSX.Element | null
 }
 
+export type CategoryMetaKey = 'infra' | 'bandwidth' | 'sizeCount' | 'activity'
+
 export interface CategoryMeta {
   key: 'infra' | 'bandwidth' | 'sizeCount' | 'activity'
   name: string

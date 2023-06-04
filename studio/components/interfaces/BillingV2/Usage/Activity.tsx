@@ -1,8 +1,7 @@
 import { useDailyStatsQuery } from 'data/analytics/daily-stats-query'
-import { USAGE_CATEGORIES } from './Usage.constants'
 import { DataPoint } from 'data/analytics/constants'
 import { ProjectSubscriptionResponse } from 'data/subscriptions/project-subscription-v2-query'
-import UsageFoo from './UsageFoo'
+import UsageSection from './UsageSection'
 
 export interface ActivityProps {
   projectRef: string
@@ -12,8 +11,6 @@ export interface ActivityProps {
 }
 
 const Activity = ({ projectRef, subscription, startDate, endDate }: ActivityProps) => {
-  const categoryMeta = USAGE_CATEGORIES.find((category) => category.key === 'activity')
-
   const { data: mauData, isLoading: isLoadingMauData } = useDailyStatsQuery({
     projectRef,
     attribute: 'total_auth_billing_period_mau',
@@ -108,12 +105,10 @@ const Activity = ({ projectRef, subscription, startDate, endDate }: ActivityProp
     },
   }
 
-  if (categoryMeta === undefined) return null
-
   return (
-    <UsageFoo
+    <UsageSection
       projectRef={projectRef}
-      categoryMeta={categoryMeta}
+      categoryKey='activity'
       chartMeta={chartMeta}
       subscription={subscription}
     />

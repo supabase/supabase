@@ -1,6 +1,6 @@
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import SectionHeader from './SectionHeader'
-import { CategoryMeta } from './Usage.constants'
+import { CategoryMetaKey, USAGE_CATEGORIES } from './Usage.constants'
 import {
   ProjectUsageResponse,
   UsageMetric,
@@ -19,17 +19,21 @@ import { formatBytes } from 'lib/helpers'
 import UsageBarChart from './UsageBarChart'
 import Panel from 'components/ui/Panel'
 
-interface UsageFooProps {
+interface UsageSectionProps {
   projectRef: string
-  categoryMeta: CategoryMeta
+  categoryKey: CategoryMetaKey
   subscription: ProjectSubscriptionResponse | undefined
   chartMeta: {
     [key: string]: { data: DataPoint[]; margin: number; isLoading: boolean; hasNoData: boolean }
   }
 }
 
-const UsageFoo = ({ projectRef, categoryMeta, chartMeta, subscription }: UsageFooProps) => {
+const UsageSection = ({ projectRef, categoryKey, chartMeta, subscription }: UsageSectionProps) => {
   const { data: usage } = useProjectUsageQuery({ projectRef })
+  const categoryMeta = USAGE_CATEGORIES.find((category) => category.key === categoryKey)
+
+  if (!categoryMeta) return null
+
   const usageBasedBilling = subscription?.usage_billing_enabled
   const exceededLimitStyle = !usageBasedBilling ? 'text-red-900' : 'text-amber-900'
 
@@ -188,4 +192,4 @@ const UsageFoo = ({ projectRef, categoryMeta, chartMeta, subscription }: UsageFo
   )
 }
 
-export default UsageFoo
+export default UsageSection
