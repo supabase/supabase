@@ -16,7 +16,6 @@
 	const downloadImage = async (path: string) => {
 		try {
 			const { data, error } = await supabase.storage.from('avatars').download(path)
-			console.log({ data, error })
 
 			if (error) {
 				throw error
@@ -42,14 +41,17 @@
 			const file = files[0]
 			const fileExt = file.name.split('.').pop()
 			const filePath = `${Math.random()}.${fileExt}`
-			console.log({ filePath })
-			let { data, error } = await supabase.storage.from('avatars').upload(filePath, file)
-			console.log({ data })
+
+			let { error } = await supabase.storage.from('avatars').upload(filePath, file)
+
 			if (error) {
 				throw error
 			}
 
-			dispatch('upload')
+			url = filePath
+			setTimeout(() => {
+				dispatch('upload')
+			}, 100)
 		} catch (error) {
 			if (error instanceof Error) {
 				alert(error.message)
