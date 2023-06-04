@@ -1,6 +1,6 @@
 # A string used to distinguish different Supabase projects on the same host. Defaults to the working
 # directory name when running `supabase init`.
-project_id = "nextjs-ts-user-management"
+project_id = "nextjs-user-management"
 
 [api]
 # Port to use for the API URL.

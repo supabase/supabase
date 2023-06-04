@@ -1,6 +1,8 @@
+'use client'
 import React, { useEffect, useState } from 'react'
-import { useSupabaseClient } from '@supabase/auth-helpers-react'
-import { Database } from '../utils/database.types'
+import { Database } from '../database.types'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import Image from 'next/image'
 type Profiles = Database['public']['Tables']['profiles']['Row']
 
 export default function Avatar({
@@ -14,19 +16,13 @@ export default function Avatar({
   size: number
   onUpload: (url: string) => void
 }) {
-  const supabase = useSupabaseClient<Database>()
-  const [avatarUrl, setAvatarUrl] = useState<Profiles['avatar_url']>(null)
+  const supabase = createClientComponentClient<Database>()
+  const [avatarUrl, setAvatarUrl] = useState<Profiles['avatar_url']>(url)
   const [uploading, setUploading] = useState(false)
-  const [blobUrlCache, setBlobUrlCache] = useState<Record<string, string>>({})
 
   useEffect(() => {
     async function downloadImage(path: string) {
       try {
-        if (blobUrlCache[path]) {
-          setAvatarUrl(blobUrlCache[path])
-          return
-        }
-
         const { data, error } = await supabase.storage.from('avatars').download(path)
         if (error) {
           throw error
@@ -34,14 +30,13 @@ export default function Avatar({
 
         const url = URL.createObjectURL(data)
         setAvatarUrl(url)
-        setBlobUrlCache((prevCache) => ({ ...prevCache, [path]: url }))
       } catch (error) {
         console.log('Error downloading image: ', error)
       }
     }
 
     if (url) downloadImage(url)
-  }, [url, supabase.storage, blobUrlCache])
+  }, [url, supabase])
 
   const uploadAvatar: React.ChangeEventHandler<HTMLInputElement> = async (event) => {
     try {
@@ -53,12 +48,9 @@ export default function Avatar({
 
       const file = event.target.files[0]
       const fileExt = file.name.split('.').pop()
-      const fileName = `${uid}.${fileExt}`
-      const filePath = `${fileName}`
+      const filePath = `${uid}-${Math.random()}.${fileExt}`
 
-      let { error: uploadError } = await supabase.storage
-        .from('avatars')
-        .upload(filePath, file, { upsert: true })
+      let { error: uploadError } = await supabase.storage.from('avatars').upload(filePath, file)
 
       if (uploadError) {
         throw uploadError
@@ -67,7 +59,6 @@ export default function Avatar({
       onUpload(filePath)
     } catch (error) {
       alert('Error uploading avatar!')
-      console.log(error)
     } finally {
       setUploading(false)
     }
@@ -76,7 +67,9 @@ export default function Avatar({
   return (
     <div>
       {avatarUrl ? (
-        <img
+        <Image
+          width={size}
+          height={size}
           src={avatarUrl}
           alt="Avatar"
           className="avatar image"

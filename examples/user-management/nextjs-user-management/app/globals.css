@@ -1,7 +1,7 @@
 html,
 body {
-  --custom-font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu,
-    Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  --custom-font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
+    Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
   --custom-bg-color: #101010;
   --custom-panel-color: #222;
   --custom-box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.8);
@@ -43,7 +43,7 @@ body,
   position: relative;
   width: 100%;
 }
-.row [class^='col'] {
+.row [class^="col"] {
   float: left;
   margin: 0.5rem 2%;
   min-height: 0.125rem;
@@ -99,7 +99,7 @@ body,
   width: 96%;
 }
 .row::after {
-  content: '';
+  content: "";
   display: table;
   clear: both;
 }
@@ -345,15 +345,13 @@ button.primary,
   justify-content: center;
 }
 
-/* Auth */
-
-.auth-widget {
+.form-widget {
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
-.auth-widget > .button {
+.form-widget > .button {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -363,71 +361,12 @@ button.primary,
   transition: all 0.2s ease;
 }
 
-.auth-widget .button:hover {
+.form-widget .button:hover {
   background-color: #2a2a2a;
 }
 
-.auth-widget .button > .loader,
-.account .button > .loader {
+.form-widget .button > .loader {
   width: 17px;
   animation: spin 1s linear infinite;
   filter: invert(1);
-}
-
-/* Account */
-
-.account {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.account > * > .avatarField {
-  display: flex;
-  align-items: center;
-  margin-bottom: 30px;
-}
-
-.account > * > .avatarField > .avatarContainer {
-  margin-right: 20px;
-}
-
-/* Profile Card */
-
-.profileCard {
-  border-radius: 5px;
-  display: flex;
-  border: var(--custom-border);
-  background-color: var(--custom-panel-color);
-  padding: 20px 20px;
-  margin-bottom: 20px;
-}
-
-.profileCard:last-child {
-  margin-bottom: 0px;
-}
-
-.profileCard > .userInfo {
-  margin-left: 20px;
-  font-weight: 300;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.profileCard > .userInfo > p {
-  margin: 0;
-}
-
-.profileCard > .userInfo > .username {
-  font-size: 1.3rem;
-  font-weight: 500;
-  margin-bottom: 5px;
-}
-
-.profileCard > .userInfo > .website {
-  font-size: 0.9rem;
-  color: var(--custom-color-brand);
-  margin-bottom: 10px;
-  text-decoration: none;
 }
