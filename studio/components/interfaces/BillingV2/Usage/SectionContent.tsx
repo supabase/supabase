@@ -2,7 +2,6 @@ import { PropsWithChildren } from 'react'
 import { Badge, IconExternalLink } from 'ui'
 import { CategoryAttribute } from './Usage.constants'
 import Link from 'next/link'
-import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
 
 export interface SectionContent {
   section: CategoryAttribute
