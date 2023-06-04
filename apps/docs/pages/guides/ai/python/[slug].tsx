@@ -1,9 +1,12 @@
+import { remarkCodeHike, CodeHikeConfig } from '@code-hike/mdx'
+import { CH } from '@code-hike/mdx/components'
 import { GetStaticPaths, GetStaticProps } from 'next'
 import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
 import { serialize } from 'next-mdx-remote/serialize'
-import { join, relative } from 'path'
+import { relative } from 'path'
 import rehypeSlug from 'rehype-slug'
 import remarkGfm from 'remark-gfm'
+import codeHikeTheme from '~/code-hike.theme.json' assert { type: 'json' }
 import components from '~/components'
 import Layout from '~/layouts/DefaultGuideLayout'
 import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
@@ -60,7 +63,7 @@ interface PythonClientDocsProps {
 export default function PythonClientDocs({ source, meta }: PythonClientDocsProps) {
   return (
     <Layout meta={meta}>
-      <MDXRemote {...source} components={components} />
+      <MDXRemote {...source} components={{ ...components, CH }} />
     </Layout>
   )
 }
@@ -116,9 +119,25 @@ export const getStaticProps: GetStaticProps<PythonClientDocsProps> = async ({ pa
     }
   }
 
+  const codeHikeOptions: CodeHikeConfig = {
+    theme: codeHikeTheme,
+    lineNumbers: true,
+    showCopyButton: true,
+    skipLanguages: [],
+    autoImport: false,
+  }
+
   const mdxSource = await serialize(source, {
+    scope: {
+      chCodeConfig: codeHikeOptions,
+    },
     mdxOptions: {
-      remarkPlugins: [remarkGfm, remarkMkDocsAdmonition, [removeTitle, meta.title]],
+      remarkPlugins: [
+        remarkGfm,
+        remarkMkDocsAdmonition,
+        [removeTitle, meta.title],
+        [remarkCodeHike, codeHikeOptions],
+      ],
       rehypePlugins: [[linkTransform, urlTransform], rehypeSlug],
     },
   })
