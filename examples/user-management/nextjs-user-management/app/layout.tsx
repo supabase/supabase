@@ -1,7 +1,4 @@
 import './globals.css'
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
-import SupabaseProvider from './supabase-provider'
-import { cookies } from 'next/headers'
 
 export const metadata = {
   title: 'User Management',
@@ -9,22 +6,12 @@ export const metadata = {
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const supabase = createServerComponentClient({
-    cookies,
-  })
-
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
-
   return (
     <html lang="en">
       <body>
-        <SupabaseProvider session={session}>
-          <div className="container" style={{ padding: '50px 0 100px 0' }}>
-            {children}
-          </div>
-        </SupabaseProvider>
+        <div className="container" style={{ padding: '50px 0 100px 0' }}>
+          {children}
+        </div>
       </body>
     </html>
   )
