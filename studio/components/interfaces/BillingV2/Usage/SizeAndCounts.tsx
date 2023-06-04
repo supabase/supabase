@@ -1,8 +1,7 @@
 import { useDailyStatsQuery } from 'data/analytics/daily-stats-query'
-import { USAGE_CATEGORIES } from './Usage.constants'
 import { DataPoint } from 'data/analytics/constants'
 import { ProjectSubscriptionResponse } from 'data/subscriptions/project-subscription-v2-query'
-import UsageFoo from './UsageFoo'
+import UsageSection from './UsageSection'
 
 export interface SizeAndCountsProps {
   projectRef: string
@@ -12,8 +11,6 @@ export interface SizeAndCountsProps {
 }
 
 const SizeAndCounts = ({ projectRef, startDate, endDate, subscription }: SizeAndCountsProps) => {
-  const categoryMeta = USAGE_CATEGORIES.find((category) => category.key === 'sizeCount')
-
   const { data: dbSizeData, isLoading: isLoadingDbSizeData } = useDailyStatsQuery({
     projectRef,
     attribute: 'total_db_size_bytes',
@@ -61,12 +58,10 @@ const SizeAndCounts = ({ projectRef, startDate, endDate, subscription }: SizeAnd
     },
   }
 
-  if (categoryMeta === undefined) return null
-
   return (
-    <UsageFoo
+    <UsageSection
       projectRef={projectRef}
-      categoryMeta={categoryMeta}
+      categoryKey='sizeCount'
       chartMeta={chartMeta}
       subscription={subscription}
     />

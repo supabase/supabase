@@ -1,8 +1,7 @@
 import { DataPoint } from 'data/analytics/constants'
 import { useDailyStatsQuery } from 'data/analytics/daily-stats-query'
-import { USAGE_CATEGORIES } from './Usage.constants'
 import { ProjectSubscriptionResponse } from 'data/subscriptions/project-subscription-v2-query'
-import UsageFoo from './UsageFoo'
+import UsageSection from './UsageSection'
 
 export interface BandwidthProps {
   projectRef: string
@@ -12,8 +11,6 @@ export interface BandwidthProps {
 }
 
 const Bandwidth = ({ projectRef, subscription, startDate, endDate }: BandwidthProps) => {
-  const categoryMeta = USAGE_CATEGORIES.find((category) => category.key === 'bandwidth')
-
   const { data: dbEgressData, isLoading: isLoadingDbEgressData } = useDailyStatsQuery({
     projectRef,
     attribute: 'total_egress_modified',
@@ -47,12 +44,10 @@ const Bandwidth = ({ projectRef, subscription, startDate, endDate }: BandwidthPr
     },
   }
 
-  if (categoryMeta === undefined) return null
-
   return (
-    <UsageFoo
+    <UsageSection
       projectRef={projectRef}
-      categoryMeta={categoryMeta}
+      categoryKey='bandwidth'
       chartMeta={chartMeta}
       subscription={subscription}
     />
