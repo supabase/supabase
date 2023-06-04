@@ -3,7 +3,7 @@ import { useParams } from 'common'
 import { useProjectUsageQuery } from 'data/usage/project-usage-query'
 import dayjs from 'dayjs'
 import Link from 'next/link'
-import { useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { Button, IconAlertCircle, IconLoader, Listbox } from 'ui'
 import Activity from './Activity'
 import Bandwidth from './Bandwidth'
@@ -32,12 +32,33 @@ const Usage = () => {
   })
 
   const { current_period_start, current_period_end } = subscription ?? {}
-  const startDate =
-    current_period_start !== undefined
-      ? new Date(current_period_start * 1000).toISOString()
-      : undefined
+
+  const startDate = useMemo(() => {
+    return current_period_start ? new Date(current_period_start * 1000).toISOString() : undefined
+  }, [current_period_start])
+
   const endDate =
     current_period_end !== undefined ? new Date(current_period_end * 1000).toISOString() : undefined
+
+  const dailyStatsEndDate = useMemo(() => {
+    // If end date is in future, set end date to now
+    if (endDate && dayjs(endDate).isAfter(dayjs())) {
+      const yesterday = dayjs(new Date()).subtract(1, 'day')
+
+      /**
+       * Currently, daily-stats data is only available a day later, so we'll use yesterday as end date, as otherwise the current day would just show up with "0" values
+       *
+       * We are actively working on removing this restriction on the data-eng/LF side and can remove this workaround once that's done
+       */
+      const newEndDate = yesterday.isAfter(dayjs(startDate)) ? yesterday : new Date()
+
+      // LF seems to have an issue with the milliseconds, causes infinite loading sometimes
+      return newEndDate.toISOString().slice(0, -5) + 'Z'
+    } else if (endDate) {
+      return endDate
+    }
+  }, [endDate, startDate])
+
   const { data: ioBudgetData } = useInfraMonitoringQuery({
     projectRef: selectedProjectRef,
     attribute: 'disk_io_budget',
@@ -166,13 +187,28 @@ const Usage = () => {
         <Infrastructure projectRef={selectedProjectRef} />
       </div>
       <div id="bandwidth" ref={bandwidthRef}>
-        <Bandwidth projectRef={selectedProjectRef} />
+        <Bandwidth
+          projectRef={selectedProjectRef}
+          subscription={subscription}
+          startDate={startDate}
+          endDate={dailyStatsEndDate}
+        />
       </div>
       <div id="size_and_counts" ref={sizeAndCountsRef}>
-        <SizeAndCounts projectRef={selectedProjectRef} />
+        <SizeAndCounts
+          projectRef={selectedProjectRef}
+          subscription={subscription}
+          startDate={startDate}
+          endDate={dailyStatsEndDate}
+        />
       </div>
       <div id="activity" ref={activityRef}>
-        <Activity projectRef={selectedProjectRef} />
+        <Activity
+          projectRef={selectedProjectRef}
+          subscription={subscription}
+          startDate={startDate}
+          endDate={dailyStatsEndDate}
+        />
       </div>
     </>
   )

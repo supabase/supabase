@@ -1,3 +1,8 @@
+import { ProjectSubscriptionResponse } from 'data/subscriptions/project-subscription-v2-query'
+import { ProjectUsageData } from 'data/usage/project-usage-query'
+import Link from 'next/link'
+import { Badge, Button, IconExternalLink } from 'ui'
+
 export const Y_DOMAIN_CEILING_MULTIPLIER = 4 / 3
 
 export const USAGE_STATUS = {
@@ -19,14 +24,20 @@ export interface CategoryAttribute {
   }[]
   description: string
   chartDescription: string
+  additionalInfo?: (
+    subscription?: ProjectSubscriptionResponse,
+    usage?: ProjectUsageData
+  ) => JSX.Element | null
 }
 
-export const USAGE_CATEGORIES: {
+export interface CategoryMeta {
   key: 'infra' | 'bandwidth' | 'sizeCount' | 'activity'
   name: string
   description: string
   attributes: CategoryAttribute[]
-}[] = [
+}
+
+export const USAGE_CATEGORIES: CategoryMeta[] = [
   {
     key: 'infra',
     name: 'Infrastructure',
@@ -129,6 +140,25 @@ export const USAGE_CATEGORIES: {
           },
         ],
         chartDescription: 'The data refreshes every 24 hours.',
+        additionalInfo: (subscription?: ProjectSubscriptionResponse, usage?: ProjectUsageData) =>
+          subscription?.plan?.id !== 'free' ? (
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <p className="text-sm">Disk size:</p>
+                <p className="text-sm">{usage?.disk_volume_size_gb} GB</p>
+                <Badge color="green" size="small">
+                  Auto-scaling
+                </Badge>
+              </div>
+              <Link href="https://supabase.com/docs/guides/platform/database-usage#disk-management">
+                <a>
+                  <Button size="tiny" type="default" icon={<IconExternalLink size={14} />}>
+                    What is disk size?
+                  </Button>
+                </a>
+              </Link>
+            </div>
+          ) : null,
       },
       {
         anchor: 'storageSize',
