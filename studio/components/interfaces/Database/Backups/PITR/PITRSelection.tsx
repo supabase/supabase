@@ -74,6 +74,7 @@ const PITRSelection = ({}) => {
   const recoveryTimeTargetUnix = selectedDate.unix()
   // Formatting from the unix again just to double check correctness
   const recoveryTimeString = selectedDate.format('DD MMM YYYY HH:mm:ss')
+  const recoveryTimeStringUtc = selectedDate.utc().format('DD MMM YYYY HH:mm:ss')
 
   const isSelectedOutOfRange =
     selectedDate &&
@@ -314,6 +315,7 @@ const PITRSelection = ({}) => {
         size="medium"
         visible={showConfirmation}
         onCancel={() => setShowConfirmation(false)}
+        header="Point in time recovery review"
         customFooter={
           <div className="flex items-center justify-end space-x-2">
             <Button
@@ -336,14 +338,18 @@ const PITRSelection = ({}) => {
       >
         <div className="space-y-4 py-3">
           <Modal.Content>
-            <p>Point in time recovery review</p>
-          </Modal.Content>
-          <Modal.Separator />
-          <Modal.Content>
             <div className="py-2 space-y-1">
-              <p className="text-sm text-scale-1100"> Your database will be restored to</p>
-              <p className="text-2xl">{recoveryTimeString}</p>
-              <p className="text-lg">{selectedTimezone?.text}</p>
+              <p className="text-sm text-scale-1100">Your database will be restored to:</p>
+            </div>
+            <div className="py-2 flex flex-col gap-3">
+              <div>
+                <p className="text-sm font-mono text-scale-900">{selectedTimezone?.text}</p>
+                <p className="text-2xl">{recoveryTimeString}</p>
+              </div>
+              <div>
+                <p className="text-sm font-mono text-scale-900">(UTC+00:00)</p>
+                <p className="text-2xl">{recoveryTimeStringUtc}</p>
+              </div>
             </div>
           </Modal.Content>
           <Modal.Separator />
@@ -353,17 +359,13 @@ const PITRSelection = ({}) => {
               variant="warning"
               title="This action cannot be undone, not cancelled once started"
             >
-              <div className="space-y-3">
-                <p>
-                  Any changes made to your database after this point in time will be lost. This
-                  includes any changes to your project's storage and authentication.
-                </p>
-              </div>
+              Any changes made to your database after this point in time will be lost. This includes
+              any changes to your project's storage and authentication.
             </Alert>
           </Modal.Content>
           <Modal.Separator />
           <Modal.Content>
-            <p className="text-sm">
+            <p className="text-sm text-scale-1100">
               Restores may take from a few minutes up to several hours depending on the size of your
               database. During this period, your project will not be available, until the
               restoration is completed.
