@@ -1,21 +1,20 @@
 import clsx from 'clsx'
 import { useParams } from 'common'
-import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
+import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
+import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 import { useProjectUsageQuery } from 'data/usage/project-usage-query'
 import dayjs from 'dayjs'
 import Link from 'next/link'
-import { useRef, useState } from 'react'
-import { Button, IconAlertCircle, IconCheckCircle, IconLoader, Listbox, Tabs } from 'ui'
+import { useMemo, useRef, useState } from 'react'
+import { InView } from 'react-intersection-observer'
+import { Button, IconAlertCircle, IconLoader, Listbox } from 'ui'
+import { cn } from 'ui/src/utils/cn'
 import Activity from './Activity'
 import Bandwidth from './Bandwidth'
 import Infrastructure from './Infrastructure'
 import SizeAndCounts from './SizeAndCounts'
 import { USAGE_CATEGORIES, USAGE_STATUS } from './Usage.constants'
 import { getUsageStatus } from './Usage.utils'
-import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
-import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
-import { InView } from 'react-intersection-observer'
-import { cn } from 'ui/src/utils/cn'
 
 export type usageSectionIds = 'infra' | 'bandwidth' | 'sizeCount' | 'activity'
 
@@ -34,17 +33,38 @@ const Usage = () => {
   const [activeTab, setActiveTab] = useState<usageSectionIds>('infra')
 
   const { data: usage } = useProjectUsageQuery({ projectRef: ref })
-  const { data: subscription, isLoading: isLoadingSubscription } = useProjectSubscriptionQuery({
+  const { data: subscription, isLoading: isLoadingSubscription } = useProjectSubscriptionV2Query({
     projectRef: selectedProjectRef,
   })
 
-  const { current_period_start, current_period_end } = subscription?.billing ?? {}
-  const startDate =
-    current_period_start !== undefined
-      ? new Date(current_period_start * 1000).toISOString()
-      : undefined
+  const { current_period_start, current_period_end } = subscription ?? {}
+
+  const startDate = useMemo(() => {
+    return current_period_start ? new Date(current_period_start * 1000).toISOString() : undefined
+  }, [current_period_start])
+
   const endDate =
     current_period_end !== undefined ? new Date(current_period_end * 1000).toISOString() : undefined
+
+  const dailyStatsEndDate = useMemo(() => {
+    // If end date is in future, set end date to now
+    if (endDate && dayjs(endDate).isAfter(dayjs())) {
+      const yesterday = dayjs(new Date()).subtract(1, 'day')
+
+      /**
+       * Currently, daily-stats data is only available a day later, so we'll use yesterday as end date, as otherwise the current day would just show up with "0" values
+       *
+       * We are actively working on removing this restriction on the data-eng/LF side and can remove this workaround once that's done
+       */
+      const newEndDate = yesterday.isAfter(dayjs(startDate)) ? yesterday : new Date()
+
+      // LF seems to have an issue with the milliseconds, causes infinite loading sometimes
+      return newEndDate.toISOString().slice(0, -5) + 'Z'
+    } else if (endDate) {
+      return endDate
+    }
+  }, [endDate, startDate])
+
   const { data: ioBudgetData } = useInfraMonitoringQuery({
     projectRef: selectedProjectRef,
     attribute: 'disk_io_budget',
@@ -58,13 +78,10 @@ const Usage = () => {
     ] ?? 100
   )
 
-  const billingCycleStart = dayjs.unix(subscription?.billing?.current_period_start ?? 0).utc()
-  const billingCycleEnd = dayjs.unix(subscription?.billing?.current_period_end ?? 0).utc()
+  const billingCycleStart = dayjs.unix(subscription?.current_period_start ?? 0).utc()
+  const billingCycleEnd = dayjs.unix(subscription?.current_period_end ?? 0).utc()
 
-  const subscriptionTierId = subscription?.tier?.supabase_prod_id
-  const usageBillingEnabled =
-    subscriptionTierId !== PRICING_TIER_PRODUCT_IDS.FREE &&
-    subscriptionTierId !== PRICING_TIER_PRODUCT_IDS.PRO
+  const usageBillingEnabled = subscription?.usage_billing_enabled
 
   const scrollTo = (id: usageSectionIds) => {
     switch (id) {
@@ -120,7 +137,7 @@ const Usage = () => {
       </div>
       <div>
         <div className="lg:sticky top-0 z-10 overflow-hidden bg-scale-200 border-b">
-          <div className="1xl:px-28 mx-auto px-5 lg:px-16 2xl:px-32 flex flex-col gap-4">
+          <div className="1xl:px-28 mx-auto px-5 lg:px-16 2xl:px-32 flex flex-col gap-2">
             <div className="flex items-center mt-4 justify-between">
               <div className="flex items-center space-x-4">
                 <Listbox
@@ -146,7 +163,7 @@ const Usage = () => {
                     <p
                       className={clsx('text-sm transition', isLoadingSubscription && 'opacity-50')}
                     >
-                      Project is on {subscription.tier.name}
+                      Project is on {subscription.plan.name}
                     </p>
                     <p className="text-sm text-scale-1000">
                       {billingCycleStart.format('DD MMM YYYY')} -{' '}
@@ -207,18 +224,17 @@ const Usage = () => {
         </div>
 
         {/*
-         * [Joshen] Could potentially run a map here based on USAGE_CATEGORIES, rather than defining each section
-         * but thinking it's gonna "cover up" too much details and make it harder to add attribute specific components
-         * e.g for database size, we also need to show disk volume size. Not to mention that are little nuances across
-         * each attribute RE formatting (bytes vs locale string)
-         */}
-
+        [Joshen] Could potentially run a map here based on USAGE_CATEGORIES, rather than defining each section
+        but thinking it's gonna "cover up" too much details and make it harder to add attribute specific components
+        e.g for database size, we also need to show disk volume size. Not to mention that are little nuances across
+        each attribute RE formatting (bytes vs locale string)
+      */}
         <InView
           as="div"
           id="infrastructure"
           onChange={(inView, entry) => inView && setActiveTab('infra')}
         >
-          <div ref={infrastructureRef}>
+          <div id="infrastructure" ref={infrastructureRef}>
             <Infrastructure projectRef={selectedProjectRef} />
           </div>
         </InView>
@@ -227,8 +243,13 @@ const Usage = () => {
           id="bandwidth"
           onChange={(inView, entry) => inView && setActiveTab('bandwidth')}
         >
-          <div ref={bandwidthRef}>
-            <Bandwidth projectRef={selectedProjectRef} />
+          <div id="bandwidth" ref={bandwidthRef}>
+            <Bandwidth
+              projectRef={selectedProjectRef}
+              subscription={subscription}
+              startDate={startDate}
+              endDate={dailyStatsEndDate}
+            />
           </div>
         </InView>
         <InView
@@ -236,8 +257,13 @@ const Usage = () => {
           id="size_and_counts"
           onChange={(inView, entry) => inView && setActiveTab('sizeCount')}
         >
-          <div ref={sizeAndCountsRef}>
-            <SizeAndCounts projectRef={selectedProjectRef} />
+          <div id="size_and_counts" ref={sizeAndCountsRef}>
+            <SizeAndCounts
+              projectRef={selectedProjectRef}
+              subscription={subscription}
+              startDate={startDate}
+              endDate={dailyStatsEndDate}
+            />
           </div>
         </InView>
         <InView
@@ -245,8 +271,13 @@ const Usage = () => {
           id="activity"
           onChange={(inView, entry) => inView && setActiveTab('activity')}
         >
-          <div ref={activityRef}>
-            <Activity projectRef={selectedProjectRef} />
+          <div id="activity" ref={activityRef}>
+            <Activity
+              projectRef={selectedProjectRef}
+              subscription={subscription}
+              startDate={startDate}
+              endDate={dailyStatsEndDate}
+            />
           </div>
         </InView>
       </div>
