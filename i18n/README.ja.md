@@ -7,11 +7,11 @@
 
 # Supabase
 
-[Supabase](https://supabase.com) は、オープンソースのFirebaseの代替品です。エンタープライズグレードのオープンソースツールを使って、Firebaseの機能を構築しています。
+[Supabase](https://supabase.com) は、オープンソースの Firebase の代替品です。エンタープライズグレードのオープンソースツールを使って、Firebase の機能を構築しています。
 
-- [x] ホスティングされたPostgresデータベースです。[ドックス](https://supabase.com/docs/guides/database)
+- [x] ホスティングされた Postgres データベースです。[ドックス](https://supabase.com/docs/guides/database)
 - [x] 認証と認可。[ドキュメント](https://supabase.com/docs/guides/auth)
-- [x] 自動生成されるAPI。
+- [x] 自動生成される API。
   - [x] REST。[ドキュメント](https://supabase.com/docs/guides/database/api#rest-api)
   - [x] GraphQL。[Docs](https://supabase.com/docs/guides/database/api#graphql-api)
   - [x] リアルタイムサブスクリプション。[ドキュメント](https://supabase.com/docs/guides/database/api#realtime-api)
@@ -32,13 +32,13 @@
 ## コミュニティとサポート
 
 - [コミュニティ・フォーラム](https://github.com/supabase/supabase/discussions)。最適な場所：構築に関するヘルプ、データベースのベストプラクティスに関する議論。
-- [GitHub Issues](https://github.com/supabase/supabase/issues).Supabaseを使用していて遭遇したバグやエラーに最適です。
+- [GitHub Issues](https://github.com/supabase/supabase/issues).Supabase を使用していて遭遇したバグやエラーに最適です。
 - [メールサポート](https://supabase.com/docs/support#business-support).あなたのデータベースやインフラに関する問題。
 - [Discord】(https://discord.supabase.com).アプリケーションを共有したり、コミュニティと交流するのに適しています。
 
 ## ステータス
 
-- [x] アルファ：Supabaseをクローズドな顧客セットでテストしています。
+- [x] アルファ：Supabase をクローズドな顧客セットでテストしています。
 - [x] Public Alpha：誰でも [app.supabase.com](https://app.supabase.com) でサインアップすることができます。しかし、いくつかの問題がありますので、ご容赦ください。
 - [x] パブリックベータ版：企業以外のほとんどのユースケースで十分に安定している。
 - [ ] パブリック：一般公開 [[ステータス](https://supabase.com/docs/guides/getting-started/features#feature-status)]。
@@ -51,27 +51,27 @@
 
 ## How it works
 
-Supabaseは、オープンソースツールの組み合わせです。私たちは、エンタープライズグレードのオープンソース製品を使ってFirebaseの機能を構築しています。ツールやコミュニティが存在し、MIT、Apache 2、または同等のオープンライセンスがあれば、そのツールを使用しサポートします。ツールが存在しない場合は、私たち自身で構築し、オープンソース化します。Supabaseは、Firebaseの1対1マッピングではありません。私たちの目的は、オープンソースツールを使ってFirebaseのような開発者体験を開発者に提供することです。
+Supabase は、オープンソースツールの組み合わせです。私たちは、エンタープライズグレードのオープンソース製品を使って Firebase の機能を構築しています。ツールやコミュニティが存在し、MIT、Apache 2、または同等のオープンライセンスがあれば、そのツールを使用しサポートします。ツールが存在しない場合は、私たち自身で構築し、オープンソース化します。Supabase は、Firebase の 1 対 1 マッピングではありません。私たちの目的は、オープンソースツールを使って Firebase のような開発者体験を開発者に提供することです。
 
 **アーキテクチャー**
 
-Supabaseは[hosted platform](https://app.supabase.com)です。サインアップすれば、何もインストールすることなくSupabaseを使い始めることができます。
+Supabase は[hosted platform](https://app.supabase.com)です。サインアップすれば、何もインストールすることなく Supabase を使い始めることができます。
 また、[セルフホスト](https://supabase.com/docs/guides/hosting/overview)や[ローカル開発](https://supabase.com/docs/guides/local-development)も可能です。
 
 ![アーキテクチャ](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
 
-- [PostgreSQL](https://www.postgresql.org/)は、オブジェクトリレーショナルデータベースシステムで、30年以上の活発な開発により、信頼性、機能の堅牢性、パフォーマンスで高い評価を受けています。
-- [Realtime](https://github.com/supabase/realtime) はElixirサーバーで、PostgreSQLの挿入、更新、削除をwebsocketを使ってリッスンすることが可能です。Realtimeは、Postgresの組み込みレプリケーション機能でデータベースの変更をポーリングし、変更をJSONに変換し、JSONをwebsocketで認可されたクライアントにブロードキャストします。
-- [PostgREST](http://postgrest.org/) は、PostgreSQLデータベースを直接RESTful APIに変換するウェブサーバです。
-- [pg_graphql](http://github.com/supabase/pg_graphql/) GraphQL APIを公開するPostgreSQL拡張です。
-- [Storage](https://github.com/supabase/storage-api)は、S3に保存されたファイルを管理するためのRESTfulインターフェースを提供し、Postgresを使用してパーミッションを管理する。
-- [Postgres-meta](https://github.com/supabase/postgres-meta) は、Postgresを管理するためのRESTful APIで、テーブルの取得、ロールの追加、クエリの実行などを行うことができます。
-- [GoTrue](https://github.com/netlify/gotrue)は、ユーザーを管理し、SWTトークンを発行するためのSWTベースのAPIです。
-- [Kong](https://github.com/Kong/kong)は、クラウドネイティブなAPIゲートウェイです。
+- [PostgreSQL](https://www.postgresql.org/)は、オブジェクトリレーショナルデータベースシステムで、30 年以上の活発な開発により、信頼性、機能の堅牢性、パフォーマンスで高い評価を受けています。
+- [Realtime](https://github.com/supabase/realtime) は Elixir サーバーで、PostgreSQL の挿入、更新、削除を websocket を使ってリッスンすることが可能です。Realtime は、Postgres の組み込みレプリケーション機能でデータベースの変更をポーリングし、変更を JSON に変換し、JSON を websocket で認可されたクライアントにブロードキャストします。
+- [PostgREST](http://postgrest.org/) は、PostgreSQL データベースを直接 RESTful API に変換するウェブサーバです。
+- [pg_graphql](http://github.com/supabase/pg_graphql/) GraphQL API を公開する PostgreSQL 拡張です。
+- [Storage](https://github.com/supabase/storage-api)は、S3 に保存されたファイルを管理するための RESTful インターフェースを提供し、Postgres を使用してパーミッションを管理する。
+- [Postgres-meta](https://github.com/supabase/postgres-meta) は、Postgres を管理するための RESTful API で、テーブルの取得、ロールの追加、クエリの実行などを行うことができます。
+- [GoTrue](https://github.com/netlify/gotrue)は、ユーザーを管理し、SWT トークンを発行するための SWT ベースの API です。
+- [Kong](https://github.com/Kong/kong)は、クラウドネイティブな API ゲートウェイです。
 
 #### クライアントライブラリ
 
-クライアントライブラリのアプローチはモジュール化されています。各サブライブラリは、1つの外部システムに対するスタンドアロンな実装です。これは、私たちが既存のツールをサポートする方法の1つです。
+クライアントライブラリのアプローチはモジュール化されています。各サブライブラリは、1 つの外部システムに対するスタンドアロンな実装です。これは、私たちが既存のツールをサポートする方法の 1 つです。
 
 <table style="table-layout:fixed; white-space: nowrap;">
   <tr>
@@ -213,8 +213,8 @@ Supabaseは[hosted platform](https://app.supabase.com)です。サインアッ�
 
 ## 翻訳
 
-- [アラビア語｜العربية](/i18n/README.ar.md)
-- [アルバニア語｜Shqip](/i18n/README.sq.md)
+- [アラビア語｜ العربية](/i18n/README.ar.md)
+- [アルバニア語｜ Shqip](/i18n/README.sq.md)
 - [バングラ / বাংলা](/i18n/README.bn.md)
 - [ブルガリア語 / Български](/i18n/README.bg.md)
 - [カタルーニャ語 / Català](/i18n/README.ca.md)

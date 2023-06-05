@@ -9,9 +9,9 @@
 
 [Supabase]（https://supabase.com）是一个开源的Firebase替代品。我们正在使用企业级的开源工具构建Firebase的功能。
 
-- [x] 托管的Postgres数据库。[文档](https://supabase.com/docs/guides/database)
+- [x] 托管的 Postgres 数据库。[文档](https://supabase.com/docs/guides/database)
 - [x] 认证和授权。[文档](https://supabase.com/docs/guides/auth)
-- [x] 自动生成的API。
+- [x] 自动生成的 API。
   - [x] REST.[文档](https://supabase.com/docs/guides/database/api#rest-api)
   - [x] GraphQL。[文件](https://supabase.com/docs/guides/database/api#graphql-api)
   - [x] 实时订阅。[文档](https://supabase.com/docs/guides/database/api#realtime-api)
@@ -32,13 +32,13 @@
 ## 社区与支持
 
 - [社区论坛](https://github.com/supabase/supabase/discussions)。最适合：帮助构建，讨论数据库的最佳实践。
-- [GitHub问题](https://github.com/supabase/supabase/issues)。最适合：你在使用Supabase时遇到的bug和错误。
+- [GitHub 问题](https://github.com/supabase/supabase/issues)。最适合：你在使用 Supabase 时遇到的 bug 和错误。
 - [电子邮件支持](https://supabase.com/docs/support#business-support)。最适合：你的数据库或基础设施的问题。
 - [Discord](https://discord.supabase.com)。最适合：分享你的应用程序并与社区一起玩耍。
 
 ## 状态
 
-- [x] 阿尔法：我们正在与一组封闭的客户测试Supabase。
+- [x] 阿尔法：我们正在与一组封闭的客户测试 Supabase。
 - [x] 公开阿尔法：任何人都可以在[app.supabase.com]（https://app.supabase.com）上注册。但请对我们宽容一些，有一些小问题。
 - [x] 公开测试版：足够稳定，适合大多数非企业使用的情况。
 - [] 公开：普遍可用 [[状态](https://supabase.com/docs/guides/getting-started/features#feature-status)]
@@ -51,23 +51,23 @@
 
 ### 它是如何工作的
 
-Supabase是一个开源工具的组合。我们正在使用企业级的开源产品来构建Firebase的功能。如果这些工具和社区存在，并且有MIT、Apache 2或同等的开放许可，我们将使用并支持该工具。如果该工具不存在，我们就自己建立并开放源代码。Supabase不是Firebase的1对1映射。我们的目标是使用开源工具为开发者提供类似Firebase的开发者体验。
+Supabase 是一个开源工具的组合。我们正在使用企业级的开源产品来构建 Firebase 的功能。如果这些工具和社区存在，并且有 MIT、Apache 2 或同等的开放许可，我们将使用并支持该工具。如果该工具不存在，我们就自己建立并开放源代码。Supabase 不是 Firebase 的 1 对 1 映射。我们的目标是使用开源工具为开发者提供类似 Firebase 的开发者体验。
 
 **架构**
 
-Supabase是一个[托管平台]（https://app.supabase.com）。你可以注册并开始使用Supabase，无需安装任何东西。
+Supabase 是一个[托管平台]（https://app.supabase.com）。你可以注册并开始使用Supabase，无需安装任何东西。
 你也可以[自我托管](https://supabase.com/docs/guides/hosting/overview)和[本地开发](https://supabase.com/docs/guides/local-development)。
 
 ! [架构](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
 
-- [PostgreSQL](https://www.postgresql.org/)是一个对象关系型数据库系统，经过30多年的积极开发，它在可靠性、功能稳健性和性能方面赢得了良好的声誉。
-- [Realtime](https://github.com/supabase/realtime)是一个Elixir服务器，允许你使用websockets监听PostgreSQL的插入、更新和删除。Realtime对Postgres内置的复制功能进行投票，以了解数据库的变化，将变化转换为JSON，然后通过websockets将JSON广播给授权客户。
-- [PostgREST](http://postgrest.org/)是一个网络服务器，它把你的PostgreSQL数据库直接变成一个RESTful API。
-- [pg_graphql](http://github.com/supabase/pg_graphql/)是一个PostgreSQL的扩展，暴露了一个GraphQL API。
-- [Storage](https://github.com/supabase/storage-api) 提供了一个RESTful接口来管理存储在S3中的文件，使用Postgres来管理权限。
-- [postgres-meta](https://github.com/supabase/postgres-meta) 是一个用于管理你的Postgres的RESTful API，允许你获取表、添加角色和运行查询等。
-- [GoTrue](https://github.com/netlify/gotrue) 是一个基于SWT的API，用于管理用户和发行SWT令牌。
-- [Kong](https://github.com/Kong/kong)是一个云原生API网关。
+- [PostgreSQL](https://www.postgresql.org/)是一个对象关系型数据库系统，经过 30 多年的积极开发，它在可靠性、功能稳健性和性能方面赢得了良好的声誉。
+- [Realtime](https://github.com/supabase/realtime)是一个 Elixir 服务器，允许你使用 websockets 监听 PostgreSQL 的插入、更新和删除。Realtime 对 Postgres 内置的复制功能进行投票，以了解数据库的变化，将变化转换为 JSON，然后通过 websockets 将 JSON 广播给授权客户。
+- [PostgREST](http://postgrest.org/)是一个网络服务器，它把你的 PostgreSQL 数据库直接变成一个 RESTful API。
+- [pg_graphql](http://github.com/supabase/pg_graphql/)是一个 PostgreSQL 的扩展，暴露了一个 GraphQL API。
+- [Storage](https://github.com/supabase/storage-api) 提供了一个 RESTful 接口来管理存储在 S3 中的文件，使用 Postgres 来管理权限。
+- [postgres-meta](https://github.com/supabase/postgres-meta) 是一个用于管理你的 Postgres 的 RESTful API，允许你获取表、添加角色和运行查询等。
+- [GoTrue](https://github.com/netlify/gotrue) 是一个基于 SWT 的 API，用于管理用户和发行 SWT 令牌。
+- [Kong](https://github.com/Kong/kong)是一个云原生 API 网关。
 
 #### 客户端库
 
