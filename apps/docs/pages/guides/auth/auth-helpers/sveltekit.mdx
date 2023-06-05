@@ -317,7 +317,7 @@ TypeScript types can be [generated with the Supabase CLI](https://supabase.com/d
 </TabPanel>
 </Tabs>
 
-Access the client inside pages by `$page.data.supabase` or `data.supabase` when using `export let data: PageData`.
+Access the client inside pages by `$page.data.supabase` or `data.supabase` when using `export let data`.
 
 The usage of `depends` tells sveltekit that this load function should be executed whenever `invalidate` is called to keep the page store in sync.
 
@@ -335,6 +335,7 @@ We need to create an event listener in the root `+layout.svelte` file in order t
 
   export let data
 
+  let { supabase, session } = data
   $: ({ supabase, session } = data)
 
   onMount(() => {
