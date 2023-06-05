@@ -10,8 +10,8 @@ import { includes, without } from 'lodash'
 import { useRouter } from 'next/router'
 import { useReducer, useRef, useState } from 'react'
 import { Button, Input, Modal } from 'ui'
-import { CANCELLATION_REASONS } from './Tier.constants'
 import ProjectUpdateDisabledTooltip from '../../ProjectUpdateDisabledTooltip'
+import { CANCELLATION_REASONS } from '../../Billing.constants'
 
 export interface ExitSurveyModalProps {
   visible: boolean

@@ -1,16 +1,30 @@
-import { STRIPE_PRODUCT_IDS } from 'lib/constants'
+export interface PricingInformation {
+  id: string
+  name: string
+  nameBadge?: string
+  costUnit?: string
+  href: string
+  priceLabel?: string
+  priceMonthly: number | string
+  warning?: string
+  description: string
+  preface: string
+  features: string[]
+  footer?: string
+  cta: string
+}
 
-// This file will get deleted soon and superseded by components in BillingV2/*
-
-export const PRICING_META = {
-  [STRIPE_PRODUCT_IDS.FREE]: {
+export const plans: PricingInformation[] = [
+  {
     id: 'tier_free',
-    new: false,
     name: 'Free',
-    description: 'Perfect for passion projects & simple websites.',
+    nameBadge: '',
+    costUnit: '/ month',
+    href: 'https://supabase.com/dashboard/new/new-project',
+    priceLabel: '',
     priceMonthly: 0,
-    priceUnit: '/ month',
     warning: 'Limit of 2 free projects',
+    description: 'Perfect for passion projects & simple websites.',
     preface: 'Get started with:',
     features: [
       'Unlimited API requests',
@@ -26,17 +40,19 @@ export const PRICING_META = {
       '1-day log retention',
       'Community support',
     ],
-    scale: 'Free projects are paused after 1 week of inactivity.',
+    footer: 'Free projects are paused after 1 week of inactivity.',
+    cta: 'Get Started',
   },
-  [STRIPE_PRODUCT_IDS.PRO]: {
+  {
     id: 'tier_pro',
-    new: false,
     name: 'Pro',
-    description: 'For production applications with the option to scale.',
-    priceMonthly: 25,
-    priceUnit: '/ month',
+    nameBadge: '',
+    costUnit: '/ month',
+    href: 'https://supabase.com/dashboard/new/new-project',
+    priceLabel: 'From',
     warning: 'Usage based plan',
-    preface: 'Everything in the Free plan, plus:',
+    priceMonthly: 25,
+    description: 'For production applications with the option to scale.',
     features: [
       'No project pausing',
       'Daily backups stored for 7 days',
@@ -51,16 +67,21 @@ export const PRICING_META = {
       '7-day log retention',
       'Email support',
     ],
+    footer:
+      'Your cost control settings determine if you allow over-usage.',
+    preface: 'Everything in the Free plan, plus:',
+    cta: 'Get Started',
   },
-  [STRIPE_PRODUCT_IDS.TEAM]: {
+  {
     id: 'tier_team',
-    new: true,
     name: 'Team',
-    description: 'Collaborate with different permissions and access patterns.',
-    priceMonthly: 599,
-    priceUnit: '/ month',
+    nameBadge: 'New',
+    costUnit: '/ month',
+    href: 'https://forms.supabase.com/team',
+    priceLabel: 'From',
     warning: 'Usage based plan',
-    preface: 'Everything in the Pro plan, plus:',
+    priceMonthly: 599,
+    description: 'Collaborate with different permissions and access patterns.',
     features: [
       'Additional Organization member roles',
       'Daily backups stored for 14 days',
@@ -70,14 +91,15 @@ export const PRICING_META = {
       'Priority email support & SLAs',
       '28-day log retention',
     ],
+    footer: 'Additional fees apply for usage beyond included usage.',
+    preface: 'Everything in the Pro plan, plus:',
+    cta: 'Contact Us',
   },
-  Enterprise: {
+  {
     id: 'tier_enterprise',
-    new: false,
     name: 'Enterprise',
-    href: '/contact/enterprise',
+    href: 'https://forms.supabase.com/enterprise',
     description: 'For large-scale applications managing serious workloads.',
-    priceMonthly: undefined,
     features: [
       `Designated Support manager & SLAs`,
       `Enterprise OAuth providers`,
@@ -86,5 +108,10 @@ export const PRICING_META = {
       `24×7×365 premium enterprise support`,
       `Private Slack channel`,
     ],
+    priceLabel: '',
+    priceMonthly: 'Contact us',
+    preface: '',
+    footer: '',
+    cta: 'Contact Us',
   },
-}
+]
