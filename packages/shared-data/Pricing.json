@@ -11,6 +11,7 @@
         "tiers": {
           "free": true,
           "pro": true,
+          "team": true,
           "enterprise": true
         }
       },
@@ -19,6 +20,7 @@
         "tiers": {
           "free": true,
           "pro": true,
+          "team": true,
           "enterprise": true
         }
       },
@@ -30,6 +32,7 @@
         "tiers": {
           "free": "500 MB",
           "pro": "8 GB, then $0.125 per GB",
+          "team": "8 GB, then $0.125 per GB",
           "enterprise": "Unlimited"
         }
       },
@@ -42,6 +45,7 @@
         "tiers": {
           "free": false,
           "pro": "7 days",
+          "team": "14 days",
           "enterprise": "Custom"
         }
       },
@@ -54,6 +58,7 @@
         "tiers": {
           "free": false,
           "pro": "$100 per 7 days",
+          "team": "$100 per 7 days",
           "enterprise": true
         }
       },
@@ -65,6 +70,7 @@
         "tiers": {
           "free": "After 1 inactive week",
           "pro": "Never",
+          "team": "Never",
           "enterprise": "Never"
         }
       },
@@ -76,6 +82,7 @@
         "tiers": {
           "free": "2GB",
           "pro": "50 GB, then $0.09 per GB",
+          "team": "50 GB, then $0.09 per GB",
           "enterprise": "Unlimited"
         }
       }
@@ -91,6 +98,7 @@
         "tiers": {
           "free": "Unlimited",
           "pro": "Unlimited",
+          "team": "Unlimited",
           "enterprise": "Unlimited"
         }
       },
@@ -102,6 +110,7 @@
         "tiers": {
           "free": "50,000",
           "pro": "100,000, then $0.00325 per MAU",
+          "team": "100,000, then $0.00325 per MAU",
           "enterprise": "Unlimited"
         }
       },
@@ -110,6 +119,7 @@
         "tiers": {
           "free": true,
           "pro": true,
+          "team": true,
           "enterprise": true
         }
       },
@@ -118,6 +128,7 @@
         "tiers": {
           "free": true,
           "pro": true,
+          "team": true,
           "enterprise": true
         }
       },
@@ -126,6 +137,7 @@
         "tiers": {
           "free": false,
           "pro": true,
+          "team": true,
           "enterprise": true
         }
       },
@@ -142,6 +154,7 @@
         "tiers": {
           "free": "1 hour",
           "pro": "7 days",
+          "team": "28 days",
           "enterprise": true
         }
       },
@@ -151,6 +164,7 @@
         "tiers": {
           "free": "30 / hour",
           "pro": "100 / hour",
+          "team": "100 / hour",
           "enterprise": "Contact Us"
         }
       },
@@ -159,6 +173,7 @@
         "tiers": {
           "free": false,
           "pro": "50 free, then $0.015 per MAU",
+          "team": "50 free, then $0.015 per MAU",
           "enterprise": "Contact Us"
         }
       },
@@ -167,6 +182,7 @@
         "tiers": {
           "free": false,
           "pro": false,
+          "team": false,
           "enterprise": "Contact Us"
         }
       }
@@ -185,6 +201,7 @@
         "tiers": {
           "free": "1 GB",
           "pro": "100 GB, then $0.021 per GB",
+          "team": "100 GB, then $0.021 per GB",
           "enterprise": "Unlimited"
         }
       },
@@ -196,6 +213,7 @@
         "tiers": {
           "free": "2 GB",
           "pro": "200 GB, then $0.09 per GB",
+          "team": "200 GB, then $0.09 per GB",
           "enterprise": "Unlimited"
         }
       },
@@ -204,6 +222,7 @@
         "tiers": {
           "free": true,
           "pro": true,
+          "team": true,
           "enterprise": true
         }
       },
@@ -213,6 +232,7 @@
         "tiers": {
           "free": "50MB",
           "pro": "5GB",
+          "team": "5GB",
           "enterprise": "Unlimited"
         }
       },
@@ -223,7 +243,8 @@
         },
         "tiers": {
           "free": false,
-          "pro": "100 origin images, then $5 per 1000 origin images"
+          "pro": "100 origin images, then $5 per 1000 origin images",
+          "team": "100 origin images, then $5 per 1000 origin images"
         }
       }
     ]
@@ -241,6 +262,7 @@
         "tiers": {
           "free": "500K/month",
           "pro": "2 Million, then $2 per 1 Million",
+          "team": "2 Million, then $2 per 1 Million",
           "enterprise": "Unlimited"
         }
       },
@@ -249,6 +271,7 @@
         "tiers": {
           "free": "2 MB",
           "pro": "10 MB",
+          "team": "10 MB",
           "enterprise": "Unlimited"
         }
       },
@@ -260,6 +283,7 @@
         "tiers": {
           "free": "10",
           "pro": "100, then $10 per additional 100",
+          "team": "100, then $10 per additional 100",
           "enterprise": "Unlimited"
         }
       }
@@ -285,6 +309,7 @@
         "tiers": {
           "free": "200",
           "pro": "500, then $10 per 1000",
+          "team": "500, then $10 per 1000",
           "enterprise": "Unlimited concurrent connections and volume discount"
         }
       },
@@ -296,6 +321,7 @@
         "tiers": {
           "free": "2 Million",
           "pro": "5 Million, then $2.50 per Million",
+          "team": "5 Million, then $2.50 per Million",
           "enterprise": "Volume discounts on messages"
         }
       },
@@ -304,6 +330,7 @@
         "tiers": {
           "free": "250 KB",
           "pro": "3 MB",
+          "team": "3 MB",
           "enterprise": "Custom"
         }
       }
@@ -318,6 +345,7 @@
         "tiers": {
           "free": "Unlimited",
           "pro": "Unlimited",
+          "team": "Unlimited",
           "enterprise": "Unlimited"
         }
       },
@@ -326,6 +354,7 @@
         "tiers": {
           "free": "Coming soon",
           "pro": "Coming soon",
+          "team": "Coming soon",
           "enterprise": true
         }
       },
@@ -334,6 +363,7 @@
         "tiers": {
           "free": false,
           "pro": false,
+          "team": false,
           "enterprise": true
         }
       }
@@ -348,6 +378,7 @@
         "tiers": {
           "free": false,
           "pro": false,
+          "team": false,
           "enterprise": true
         }
       },
@@ -356,6 +387,7 @@
         "tiers": {
           "free": "1 day",
           "pro": "7 days",
+          "team": "28 days",
           "enterprise": "90 days"
         }
       },
@@ -364,6 +396,7 @@
         "tiers": {
           "free": false,
           "pro": false,
+          "team": "Coming soon",
           "enterprise": "Coming soon"
         }
       },
@@ -372,6 +405,7 @@
         "tiers": {
           "free": false,
           "pro": true,
+          "team": true,
           "enterprise": true
         }
       },
@@ -380,6 +414,7 @@
         "tiers": {
           "free": false,
           "pro": false,
+          "team": true,
           "enterprise": true
         }
       },
@@ -388,6 +423,7 @@
         "tiers": {
           "free": false,
           "pro": false,
+          "team": "Contact Us",
           "enterprise": "Contact Us"
         }
       },
@@ -396,6 +432,7 @@
         "tiers": {
           "free": false,
           "pro": false,
+          "team": false,
           "enterprise": true
         }
       },
@@ -404,6 +441,7 @@
         "tiers": {
           "free": "Owner, Developer",
           "pro": "Owner, Developer",
+          "team": "Additional owner(s), admin, read-only, billing admin, custom",
           "enterprise": "Additional owner(s), admin, read-only, billing admin, custom"
         }
       },
@@ -412,6 +450,7 @@
         "tiers": {
           "free": false,
           "pro": true,
+          "team": true,
           "enterprise": true
         }
       },
@@ -423,6 +462,7 @@
         "tiers": {
           "free": false,
           "pro": "$10 per domain per month per project add on",
+          "team": "$10 per domain per month per project add on",
           "enterprise": "1, additional $10/domain/month"
         }
       }
@@ -437,6 +477,7 @@
         "tiers": {
           "free": true,
           "pro": true,
+          "team": true,
           "enterprise": true
         }
       },
@@ -445,6 +486,7 @@
         "tiers": {
           "free": false,
           "pro": true,
+          "team": true,
           "enterprise": true
         }
       },
@@ -453,6 +495,7 @@
         "tiers": {
           "free": false,
           "pro": false,
+          "team": true,
           "enterprise": true
         }
       },
@@ -469,6 +512,7 @@
         "tiers": {
           "free": false,
           "pro": false,
+          "team": false,
           "enterprise": true
         }
       },
@@ -477,6 +521,7 @@
         "tiers": {
           "free": false,
           "pro": false,
+          "team": false,
           "enterprise": true
         }
       },
@@ -485,6 +530,7 @@
         "tiers": {
           "free": false,
           "pro": false,
+          "team": true,
           "enterprise": true
         }
       }

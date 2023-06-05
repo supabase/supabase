@@ -1,20 +1,13 @@
-import { STRIPE_PRODUCT_IDS } from 'lib/constants'
-
-/**
- * @mildtomato same plan metadata is also in /www website
- * would be good if this constant was shared across apps
- *
- * https://github.com/supabase/supabase/blob/master/studio/components/interfaces/Billing/PlanSelection/Plans/Plans.Constants.ts
- */
-export const PRICING_META = {
-  [STRIPE_PRODUCT_IDS.FREE]: {
-    id: 'tier_free',
-    new: false,
+export const tiers = [
+  {
     name: 'Free',
-    description: 'Perfect for passion projects & simple websites.',
+    nameBadge: '',
+    costUnit: 'per month',
+    href: 'https://supabase.com/dashboard/new/new-project',
+    priceLabel: 'Starting from',
     priceMonthly: 0,
-    priceUnit: 'per month',
     warning: 'Limit of 2 free projects',
+    description: 'Perfect for passion projects & simple websites.',
     preface: 'Get started with:',
     features: [
       'Social OAuth providers',
@@ -29,16 +22,19 @@ export const PRICING_META = {
       'Community support',
     ],
     scale: 'Free projects are paused after 1 week of inactivity.',
+
+    cta: 'Get Started',
   },
-  [STRIPE_PRODUCT_IDS.PRO]: {
-    id: 'tier_pro',
-    new: false,
+  {
     name: 'Pro',
-    description: 'For production applications with the option to scale.',
+    nameBadge: '',
+    costUnit: 'per month',
+    href: 'https://supabase.com/dashboard/new/new-project',
+    from: true,
+    priceLabel: 'Starting from',
+    warning: '+ usage',
     priceMonthly: 25,
-    priceUnit: 'per month',
-    warning: '+ any additional usage',
-    preface: 'Everything in the Free plan, plus:',
+    description: 'For production applications with the option to scale.',
     features: [
       'No project pausing',
       '8GB database & 100GB file storage',
@@ -52,36 +48,41 @@ export const PRICING_META = {
       'Email support',
       'Daily backups',
     ],
+    scale: 'Additional fees apply for usage and storage beyond the limits above.',
+    shutdown: '',
+    preface: 'Everything in the Free plan, plus:',
+    additional: '',
+    cta: 'Get Started',
   },
-  [STRIPE_PRODUCT_IDS.TEAM]: {
-    id: 'tier_team',
-    new: true,
+  {
     name: 'Team',
-    description: 'Collaborate with different permissions and access patterns.',
-    priceMonthly: 599,
-    priceUnit: 'per month per organization',
+    nameBadge: '',
+    costUnit: 'per month',
+    href: 'https://forms.supabase.com/team',
+    from: true,
+    priceLabel: 'Starting from',
     warning: '+ usage',
-    preface: 'The following features will apply to all projects within the organization:',
+    priceMonthly: 599,
+    description: 'Collaborate with different permissions and access patterns.',
     features: [
-      'Usage-based pricing',
-      '100,000 monthly active users included',
       'Organization member roles (ABAC)',
       'Standardised Security Questionnaire',
       'SOC2',
       'SSO for Supabase Dashboard',
       'Priority email support & SLAs',
-      '1 XS compute instance',
       '14 day backups',
       '28 day log retention',
     ],
+    scale: 'Additional fees apply for usage and storage beyond the limits above.',
+    shutdown: '',
+    preface: 'Everything in the Pro plan, plus:',
+    additional: '',
+    cta: 'Contact Us',
   },
-  Enterprise: {
-    id: 'tier_enterprise',
-    new: false,
+  {
     name: 'Enterprise',
-    href: '/contact/enterprise',
+    href: 'https://forms.supabase.com/enterprise',
     description: 'For large-scale applications managing serious workloads.',
-    priceMonthly: undefined,
     features: [
       `Designated Support manager & SLAs`,
       `Enterprise OAuth providers`,
@@ -94,5 +95,11 @@ export const PRICING_META = {
       `Private Slack channel`,
       `Uptime SLA`,
     ],
+    priceLabel: '',
+    priceMonthly: 'Contact us',
+    preface: 'These apply to all projects within the organization:',
+    scale: '',
+    shutdown: '',
+    cta: 'Contact Us',
   },
-}
+]

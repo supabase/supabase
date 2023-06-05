@@ -8,10 +8,11 @@ import ReactMarkdown from 'react-markdown'
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
 import { PricingTableRowDesktop, PricingTableRowMobile } from '~/components/Pricing/PricingTableRow'
-import pricing from '~/data/Pricing.json'
+import pricing from 'shared-data/Pricing.json'
 import pricingFaq from '~/data/PricingFAQ.json'
 import { useTheme } from 'common/Providers'
 import ComputePricingModal from '~/components/Pricing/ComputePricingModal'
+import { tiers } from 'shared-data/tiers'
 
 export default function IndexPage() {
   const router = useRouter()
@@ -44,93 +45,6 @@ export default function IndexPage() {
       element.scrollIntoView({ behavior: 'smooth', block: 'start' })
     }
   }, [asPath])
-
-  /**
-   * @mildtomato same plan metadata is also in /studio dashboard
-   * would be good if this constant was shared across apps
-   *
-   * https://github.com/supabase/supabase/blob/master/www/pages/pricing/index.tsx
-   */
-  const tiers = [
-    {
-      name: 'Free',
-      nameBadge: '',
-      costUnit: 'per month per project',
-      href: 'https://supabase.com/dashboard/new/new-project',
-      priceLabel: 'Starting from',
-      priceMonthly: 0,
-      warning: 'Limit of 2 free projects',
-      description: 'Perfect for passion projects & simple websites.',
-      preface: 'Get started with:',
-      features: [
-        'Social OAuth providers',
-        'Up to 500MB database & 1GB file storage',
-        'Up to 2GB bandwidth',
-        'Up to 50MB file uploads',
-        '50,000 monthly active users',
-        'Up to 500K Edge Function invocations',
-        '200 concurrent Realtime connections',
-        '2 million Realtime messages',
-        '1-day log retention',
-        'Community support',
-      ],
-      scale: 'Free projects are paused after 1 week of inactivity.',
-
-      cta: 'Get Started',
-    },
-    {
-      name: 'Pro',
-      nameBadge: '',
-      costUnit: 'per month per project',
-      href: 'https://supabase.com/dashboard/new/new-project',
-      from: true,
-      priceLabel: 'Starting from',
-      warning: '+ usage',
-      priceMonthly: 25,
-      description: 'For production applications with the option to scale.',
-      features: [
-        'No project pausing',
-        '8GB database & 100GB file storage',
-        '50GB bandwidth',
-        '5GB file uploads',
-        '100,000 monthly active users',
-        '2M Edge Function invocations',
-        '500 concurrent Realtime connections',
-        '5 million Realtime messages',
-        '7-day log retention',
-        'Email support',
-        'Daily backups',
-      ],
-      scale: 'Additional fees apply for usage and storage beyond the limits above.',
-      shutdown: '',
-      preface: 'Everything in the Free plan, plus:',
-      additional: '',
-      cta: 'Get Started',
-    },
-    {
-      name: 'Enterprise',
-      href: 'https://forms.supabase.com/enterprise',
-      description: 'For large-scale applications managing serious workloads.',
-      features: [
-        `Designated Support manager & SLAs`,
-        `Enterprise OAuth providers`,
-        `SSO/ SAML`,
-        `SOC2`,
-        `Custom contracts & invoicing`,
-        `On-premise support`,
-        `24×7×365 premium enterprise support`,
-        `Custom Security questionnaires`,
-        `Private Slack channel`,
-        `Uptime SLA`,
-      ],
-      priceLabel: '',
-      priceMonthly: 'Contact us',
-      preface: 'These apply to all projects within the organization:',
-      scale: '',
-      shutdown: '',
-      cta: 'Contact Us',
-    },
-  ]
 
   const addons = [
     {
@@ -242,7 +156,7 @@ export default function IndexPage() {
           </div>
         </div>
 
-        <div className="mx-auto flex max-w-7xl flex-col">
+        <div className="mx-auto flex flex-col">
           {/* <div className="absolute inset-0 shadow-sm bg-scale-200 h-3/5" /> */}
 
           <div
@@ -251,7 +165,7 @@ export default function IndexPage() {
             lg:px-8
           "
           >
-            <div className="mx-auto max-w-md grid lg:max-w-6xl lg:grid-cols-3 gap-24 lg:gap-5">
+            <div className="mx-auto max-w-md grid lg:max-w-[1200px] xl:max-w-[1500px] lg:grid-cols-2 xl:grid-cols-4 gap-24 lg:gap-5">
               {tiers.map((tier) => (
                 <div
                   key={`row-${tier.name}`}
@@ -291,7 +205,7 @@ export default function IndexPage() {
                           )}
                         </div>
                       </div>
-                      <p className="text-scale-1100 my-4 h-[55px] text-sm  border-b dark:border-scale-500 pb-4 lg:pr-20">
+                      <p className="text-scale-1100 my-4 text-sm  border-b dark:border-scale-500 pb-4 2xl:pr-20">
                         {tier.description}
                       </p>
 
@@ -384,6 +298,7 @@ export default function IndexPage() {
             </div>
           </div>
         </div>
+
         <div className="text-center mt-24">
           <a href="#compare-plans">
             <Button size="tiny" type="default">
@@ -486,12 +401,10 @@ export default function IndexPage() {
             </p>
           </div>
           <div>
-            <div className="">
-              <img
-                className="w-full"
-                src={`${basePath}/images/pricing/spend-cap${isDarkMode ? '' : '-light'}.png`}
-              />
-            </div>
+            <img
+              className="w-full"
+              src={`${basePath}/images/pricing/spend-cap${isDarkMode ? '' : '-light'}.png`}
+            />
           </div>
         </div>
       </div>
@@ -525,6 +438,7 @@ export default function IndexPage() {
                   >
                     <Select.Option value="Free">Free</Select.Option>
                     <Select.Option value="Pro">Pro</Select.Option>
+                    <Select.Option value="Team">Team</Select.Option>
                     <Select.Option value="Enterprise">Enterprise</Select.Option>
                   </Select>
                 </div>
@@ -640,6 +554,58 @@ export default function IndexPage() {
                 </>
               )}
 
+              {activeMobileTier === 'Team' && (
+                <>
+                  <MobileHeader
+                    tier="Team"
+                    from={false}
+                    price={'599'}
+                    priceDescription={'/mo + additional use'}
+                    description={'Collaborate with different permissions and access patterns'}
+                  />
+                  <PricingTableRowMobile
+                    category={pricing.database}
+                    tier={'team'}
+                    icon={Solutions['database'].icon}
+                  />
+                  <PricingTableRowMobile
+                    category={pricing.auth}
+                    tier={'team'}
+                    icon={Solutions['authentication'].icon}
+                  />
+                  <PricingTableRowMobile
+                    category={pricing.storage}
+                    tier={'team'}
+                    icon={Solutions['storage'].icon}
+                  />
+                  <PricingTableRowMobile
+                    category={pricing.realtime}
+                    tier={'team'}
+                    icon={Solutions['realtime'].icon}
+                  />
+                  <PricingTableRowMobile
+                    category={pricing['edge-functions']}
+                    tier={'team'}
+                    icon={Solutions['edge-functions'].icon}
+                  />
+                  <PricingTableRowMobile
+                    category={pricing.dashboard}
+                    tier={'team'}
+                    icon={pricing.dashboard.icon}
+                  />
+                  <PricingTableRowMobile
+                    category={pricing.security}
+                    tier={'team'}
+                    icon={pricing.security.icon}
+                  />
+                  <PricingTableRowMobile
+                    category={pricing.support}
+                    tier={'team'}
+                    icon={pricing.support.icon}
+                  />
+                </>
+              )}
+
               {activeMobileTier === 'Enterprise' && (
                 <>
                   <MobileHeader
@@ -750,7 +716,7 @@ export default function IndexPage() {
                   ))}
                 </tr>
                 <tbody className="border-scale-700 dark:border-scale-400 divide-scale-700 dark:divide-scale-400 divide-y">
-                  <tr className="">
+                  <tr>
                     <th
                       className="text-scale-900 px-6 py-8 text-left align-top text-sm font-medium dark:text-white"
                       scope="row"
@@ -769,8 +735,11 @@ export default function IndexPage() {
                                 {tier.name !== 'Enterprise' && '$'}
                                 {tier.priceMonthly}
                               </span>
-                              {tier.name !== 'Enterprise' && (
-                                <p className="p text-xs mt-1">per project per month</p>
+                              {['Pro', 'Free'].includes(tier.name) && (
+                                <p className="p text-xs mt-1">per month</p>
+                              )}
+                              {['Team'].includes(tier.name) && (
+                                <p className="p text-xs mt-1">per month</p>
                               )}
                             </>
 
