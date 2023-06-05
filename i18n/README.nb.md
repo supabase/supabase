@@ -7,77 +7,77 @@
 
 # Supabase
 
-[Supabase](https://supabase.com) este o alternativă open source la Firebase. Construim caracteristicile Firebase folosind instrumente open source de nivel enterprise.
+[Supabase](https://supabase.com) er et alternativ til Firebase med åpen kildekode. Vi bygger funksjonene i Firebase ved hjelp av åpen kildekode-verktøy for bedrifter.
 
-- [x] Baza de date Postgres găzduită. [Docs](https://supabase.com/docs/guides/database)
-- [x] Autentificare și autorizare. [Docs](https://supabase.com/docs/guides/auth)
-- [x] API-uri generate automat.
-  - [x] REST. [Docs](https://supabase.com/docs/guides/database/api#rest-api)
-  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/database/api#graphql-api)
-  - [x] Abonamente în timp real. [Docs](https://supabase.com/docs/guides/database/api#realtime-api)
-- [x] Funcții.
-  - [x] Funcții de baze de date. [Docs](https://supabase.com/docs/guides/database/functions)
-  - [x] Funcții de margine. [Docs](https://supabase.com/docs/guides/functions)
-- [x] Stocarea fișierelor. [Docs](https://supabase.com/docs/guides/storage)
-- [x] Tablou de bord
+- [x] Hostet Postgres-database. [Dokumenter](https://supabase.com/docs/guides/database)
+- [x] Autentisering og autorisasjon. [Dokumenter](https://supabase.com/docs/guides/auth)
+- [x] Autogenererte API-er.
+  - [x] REST. [Dokumenter](https://supabase.com/docs/guides/database/api#rest-api)
+  - [x] GraphQL. [Dokumenter](https://supabase.com/docs/guides/database/api#graphql-api)
+  - [x] Sanntidsabonnementer. [Dokumenter](https://supabase.com/docs/guides/database/api#realtime-api)
+- [x] Funksjoner.
+  - [x] Databasefunksjoner. [Dokumenter](https://supabase.com/docs/guides/database/functions)
+  - [x] Edge-funksjoner [Dokumenter](https://supabase.com/docs/guides/functions)
+- [x] Lagring av filer. [Dokumenter](https://supabase.com/docs/guides/storage)
+- [x] Dashbord
 
-![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
+supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png) [x] [x] [x] [x][Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
-## Documentație
+## Dokumentasjon
 
-Pentru documentația completă, vizitați [supabase.com/docs](https://supabase.com/docs)
+For fullstendig dokumentasjon, besøk [supabase.com/docs](https://supabase.com/docs)
 
-Pentru a vedea cum să contribui, vizitați [Getting Started](./DEVELOPERS.md)
+For å se hvordan du kan bidra, gå til [Getting Started](./DEVELOPERS.md)
 
-## Comunitate și asistență
+## Fellesskap og støtte
 
-- [Community Forum](https://github.com/supabase/supabase/discussions). Cel mai bun pentru: ajutor la construcție, discuții despre cele mai bune practici în materie de baze de date.
-- [Probleme GitHub](https://github.com/supabase/supabase/issues). Cel mai bun pentru: bug-uri și erori pe care le întâlniți folosind Supabase.
-- [Email Support](https://supabase.com/docs/support#business-support). Cel mai bun pentru: probleme cu baza de date sau cu infrastructura.
-- [Discord](https://discord.supabase.com). Cel mai bun pentru: împărtășirea aplicațiilor dvs. și petrecerea timpului cu comunitatea.
+- [Community Forum](https://github.com/supabase/supabase/discussions). Best for: hjelp med å bygge, diskusjon om beste praksis for databaser.
+- [GitHub Issues](https://github.com/supabase/supabase/issues). Best for: feil og feil du støter på ved bruk av Supabase.
+- [E-poststøtte](https://supabase.com/docs/support#business-support). Best for: problemer med databasen eller infrastrukturen din.
+- [Discord](https://discord.supabase.com). Best for: å dele applikasjonene dine og henge med fellesskapet.
 
 ## Status
 
-- [x] Alpha: Testăm Supabase cu un set închis de clienți
-- [x] Public Alpha: Oricine se poate înscrie la [app.supabase.com](https://app.supabase.com). Dar fiți blânzi cu noi, există câteva probleme
-- [x] Public Beta: Suficient de stabilă pentru majoritatea cazurilor de utilizare non-întreprindere
-- [ ] Public: Disponibilitate generală [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
+- [x] Alpha: Vi tester Supabase med en lukket gruppe kunder
+- [x] Offentlig Alpha: Alle kan registrere seg på [app.supabase.com](https://app.supabase.com). Men vær snill med oss, det er noen små problemer
+- [x] Offentlig beta: Stabilt nok for de fleste brukstilfeller som ikke er for bedrifter
+- [ ] Offentlig: Generell tilgjengelighet [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
 
-În prezent, suntem în faza Public Beta. Urmăriți "releases" din acest repo pentru a fi anunțați de actualizările majore.
+Vi er for tiden i offentlig betaversjon. Følg med på "utgivelser" av denne repoen for å bli varslet om større oppdateringer.
 
 <kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="Watch this repo"/></kbd>
 
 ---
 
-## Cum funcționează
+## Slik fungerer det
 
-Supabase este o combinație de instrumente open source. Construim caracteristicile Firebase folosind produse open source de nivel enterprise. Dacă instrumentele și comunitățile există, cu o licență MIT, Apache 2 sau o licență deschisă echivalentă, vom folosi și vom sprijini instrumentul respectiv. În cazul în care instrumentul nu există, îl construim și îl folosim noi înșine ca sursă deschisă. Supabase nu este o cartografiere 1 la 1 a Firebase. Scopul nostru este de a oferi dezvoltatorilor o experiență de dezvoltare similară cu cea a Firebase, folosind instrumente open source.
+Supabase er en kombinasjon av verktøy med åpen kildekode. Vi bygger funksjonene i Firebase ved hjelp av åpen kildekode-produkter på bedriftsnivå. Hvis verktøyene og fellesskapene finnes, med en MIT, Apache 2 eller tilsvarende åpen lisens, vil vi bruke og støtte det verktøyet. Hvis verktøyet ikke finnes, bygger vi det selv med åpen kildekode. Supabase er ikke en 1-til-1-kartlegging av Firebase. Målet vårt er å gi utviklere en Firebase-lignende utvikleropplevelse ved hjelp av verktøy med åpen kildekode.
 
-**Arhitectură**
+\*\*Arkitektur
 
-Supabase este o [platformă găzduită](https://app.supabase.com). Vă puteți înscrie și puteți începe să utilizați Supabase fără a instala nimic.
-Puteți, de asemenea, [auto-hosting](https://supabase.com/docs/guides/hosting/overview) și [dezvolta local](https://supabase.com/docs/guides/local-development).
+Supabase er en [vertsplattform] (https://app.supabase.com). Du kan registrere deg og begynne å bruke Supabase uten å installere noe.
+Du kan også [selv være vert](https://supabase.com/docs/guides/hosting/overview) og [utvikle lokalt](https://supabase.com/docs/guides/local-development).
 
-![Arhitectură](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
+arkitektur](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
 
-- [PostgreSQL](https://www.postgresql.org/) este un sistem de baze de date obiectual-relaționale cu peste 30 de ani de dezvoltare activă care i-a adus o reputație solidă în ceea ce privește fiabilitatea, robustețea funcțiilor și performanța.
-- [Realtime](https://github.com/supabase/realtime) este un server Elixir care vă permite să ascultați inserțiile, actualizările și ștergerile PostgreSQL folosind websockets. Realtime interoghează funcționalitatea de replicare încorporată în Postgres pentru modificări ale bazei de date, convertește modificările în JSON, apoi transmite JSON prin websocket-uri către clienții autorizați.
-- [PostgREST](http://postgrest.org/) este un server web care transformă baza de date PostgresQL direct într-un API RESTful
-- [pg_graphql](http://github.com/supabase/pg_graphql/) este o extensie PostgreSQL care expune o API GraphQL
-- [Storage](https://github.com/supabase/storage-api) oferă o interfață RESTful pentru gestionarea Fișierelor stocate în S3, utilizând Postgres pentru a gestiona permisiunile.
-- [postgres-meta](https://github.com/supabase/postgres-meta) este o API RESTful pentru gestionarea Postgres, care vă permite să accesați tabele, să adăugați roluri și să executați interogări etc.
-- [GoTrue](https://github.com/netlify/gotrue) este un API bazat pe SWT pentru gestionarea utilizatorilor și emiterea de token-uri SWT.
-- [Kong](https://github.com/Kong/kong) este un gateway API de tip cloud-nativ.
+- [PostgreSQL](https://www.postgresql.org/) er et objektrelasjonsdatabasesystem med over 30 års aktiv utvikling som har gitt det et sterkt rykte for pålitelighet, robusthet og ytelse.
+- [Realtime](https://github.com/supabase/realtime) er en Elixir-server som lar deg lytte til PostgreSQL-innlegg, oppdateringer og slettinger ved hjelp av websockets. Realtime polls Postgres' innebygde replikeringsfunksjonalitet for databaseendringer, konverterer endringer til JSON og sender deretter JSON over websockets til autoriserte klienter.
+- [PostgREST] (http://postgrest.org/) er en webserver som gjør PostgreSQL-databasen din direkte om til et RESTful API
+- [pg_graphql](http://github.com/supabase/pg_graphql/) en PostgreSQL-utvidelse som eksponerer et GraphQL API
+- [Storage](https://github.com/supabase/storage-api) gir et RESTful-grensesnitt for å administrere filer som er lagret i S3, ved hjelp av Postgres for å administrere tillatelser.
+- [postgres-meta](https://github.com/supabase/postgres-meta) er et RESTful API for å administrere Postgres, slik at du kan hente tabeller, legge til roller og kjøre spørringer osv.
+- [GoTrue](https://github.com/netlify/gotrue) er et SWT-basert API for administrasjon av brukere og utstedelse av SWT-tokens.
+- [Kong](https://github.com/Kong/kong) er en skybasert API-gateway.
 
-#### Biblioteci client
+#### Klientbiblioteker
 
-Abordarea noastră pentru bibliotecile client este modulară. Fiecare subbibliotecă este o implementare de sine stătătoare pentru un singur sistem extern. Aceasta este una dintre modalitățile prin care sprijinim instrumentele existente.
+Vår tilnærming til klientbiblioteker er modulbasert. Hvert underbibliotek er en frittstående implementering for ett enkelt eksternt system. Dette er en av måtene vi støtter eksisterende verktøy på.
 
 <table style="table-layout:fixed; white-space: nowrap;">
   <tr>
-    <th>Limbaj</th>
-    <th>Client</th>
-    <th colspan="5">Feature-Clienți (inclus în clientul Supabase)</th>
+    <th>Språk</th>
+    <th>Klient</th>
+    <th colspan="5">Funksjonsklienter (inkludert i Supabase-klienten)</th>
   </tr>
   
   <tr>
@@ -101,7 +101,7 @@ Abordarea noastră pentru bibliotecile client este modulară. Fiecare subbibliot
   </tr>
   END ROW -->
   
-  <th colspan="7">⚡️ Oficial ⚡️</th>
+  <th colspan="7">⚡️ Offisiell ⚡️</th>
   
   <tr>
     <td>JavaScript (TypeScript)</td>
@@ -122,7 +122,7 @@ Abordarea noastră pentru bibliotecile client este modulară. Fiecare subbibliot
     <td><a href="https://github.com/supabase/functions-dart" target="_blank" rel="noopener noreferrer">functions-dart</a></td>
   </tr>
   
-  <th colspan="7">💚 Comunitate 💚</th>
+  <th colspan="7">💚 Fellesskap 💚</th>
   
   <tr>
     <td>C#</td>
@@ -211,50 +211,50 @@ Abordarea noastră pentru bibliotecile client este modulară. Fiecare subbibliot
 <!--- Remove this list if you're translating to another language, it's hard to keep updated across multiple files-->
 <!--- Keep only the link to the list of translation files-->
 
-## Traduceri
+## Oversettelser
 
-- [arabă | العربية](/i18n/README.ar.md)
-- [Albaneză / Shqip](/i18n/README.sq.md)
+- [Arabisk | العربية](/i18n/README.ar.md)
+- [Albansk / Shqip](/i18n/README.sq.md)
 - [Bangla / বাংলা](/i18n/README.bn.md)
-- [Bulgară / Български](/i18n/README.bg.md)
-- [Catalan / Català](/i18n/README.ca.md)
-- [Danish / Dansk](/i18n/README.da.md)
-- [Dutch / Nederlands](/i18n/README.nl.md)
-- [English](https://github.com/supabase/supabase)
-- [Finnish / Suomalainen](/i18n/README.fi.md)
-- [French / Français](/i18n/README.fr.md)
-- [German / Deutsch](/i18n/README.de.md)
-- [Greek / Ελληνικά](/i18n/README.gr.md)
-- [Hebrew / עברית](/i18n/README.he.md)
+- [Bulgarsk / Български](/i18n/README.bg.md)
+- [Katalansk / Català](/i18n/README.ca.md)
+- [Dansk / Dansk](/i18n/README.da.md) [Norsk / Nederlands](/i18n/README.da.md)
+- [nederlandsk / Nederlands](/i18n/README.nl.md)
+- [engelsk](https://github.com/supabase/supabase)
+- [Finsk / Suomalainen](/i18n/README.fi.md) [Finsk / Suomalainen](/i18n/README.fi.md)
+- [Fransk / Français](/i18n/README.fr.md)
+- [tysk / Deutsch](/i18n/README.de.md)
+- [Gresk / Ελληνικά](/i18n/README.gr.md)
+- [Hebraisk / עברית](/i18n/README.he.md)
 - [Hindi / हिंदी](/i18n/README.hi.md)
-- [Hungarian / Magyar](/i18n/README.hu.md)
-- [Nepali / Nepali / नेपाली](/i18n/README.ne.md)
-- [Indonesian / Bahasa Indonesia](/i18n/README.id.md)
-- [Italian / Italiano](/i18n/README.it.md)
-- [Japanese / 日本語](/i18n/README.jp.md)
-- [Korean / 한국어](/i18n/README.ko.md)
-- [Malay / Bahasa Malaysia](/i18n/README.ms.md)
+- [Ungarsk / Magyar](/i18n/README.hu.md)
+- [nepali / नेपाली](/i18n/README.ne.md)
+- [Indonesisk / Bahasa Indonesia](/i18n/README.id.md)
+- [Italiensk / Italiano](/i18n/README.it.md)
+- [Japansk / 日本語](/i18n/README.jp.md)
+- [koreansk / 한국어](/i18n/README.ko.md)
+- [Malaysisk / Bahasa Malaysia](/i18n/README.ms.md)
 - [Norwegian (Bokmål) / Norsk (Bokmål)](/i18n/README.nb-no.md)
-- [Persană / فارسی](/i18n/README.fa.md)
-- [Polish / Polski](/i18n/README.pl.md)
-- [Portuguese / Português](/i18n/README.pt.md)
-- [Portuguese (Brazilian) / Português Brasileiro](/i18n/README.pt-br.md)
-- [Romanian / Română](/i18n/README.ro.md)
-- [Russian / Pусский](/i18n/README.ru.md)
-- [Serbian / Srpski](/i18n/README.sr.md)
-- [Sinhala / Sinhala / සිංහල](/i18n/README.si.md)
-- [Spanish / Español](/i18n/README.es.md)
-- [Simplified Chinese / 简体中文](/i18n/README.zh-cn.md)
-- [Swedish / Svenska](/i18n/README.sv.md)
+- [Persisk / فارسی](/i18n/README.fa.md)
+- [Polsk / Polski](/i18n/README.pl.md)
+- [Portugisisk / Português](/i18n/README.pt.md)
+- [Portugisisk (brasiliansk) / Português Brasileiro](/i18n/README.pt-br.md)
+- [Rumensk / Română](/i18n/README.ro.md)
+- [Russisk / Pусский](/i18n/README.ru.md)
+- [Serbisk / Srpski](/i18n/README.sr.md)
+- [Singalesisk / සිංහල](/i18n/README.si.md)
+- [Spansk / Español](/i18n/README.es.md)
+- [Simplified Chinese / 简体中文](/i18n/README.zh-cn.md) [Forenklet kinesisk / 简体中文](/i18n/README.zh-cn.md)
+- [Svensk / Svenska](/i18n/README.sv.md)
 - [Thai / ไทย](/i18n/README.th.md)
-- [Traditional Chinese / 繁体中文](/i18n/README.zh-tw.md)
-- [Turkish / Türkçe](/i18n/README.tr.md)
-- [Ukrainian / Українська](/i18n/README.uk.md)
-- [Vietnamese / Tiếng Việt](/i18n/README.vi-vn.md)
-- [List of translations](/i18n/languages.md) <!--- Keep only this -->
+- [Tradisjonell kinesisk / 繁体中文](/i18n/README.zh-tw.md)
+- [Tyrkisk / Türkçe](/i18n/README.tr.md)
+- [Ukrainsk / Українська](/i18n/README.uk.md)
+- [Vietnamesisk / Tiếng Việt](/i18n/README.vi-vn.md)
+- [Liste over oversettelser](/i18n/languages.md) [Vietnamesisk / Tiếng Việt](/i18n/README.vi-vn.md) <!--- Keep only this -->
 
 ---
 
-## Sponsori
+## Sponsorer
 
-[![Sponsor nou](https://user-images.githubusercontent.com/10214025/90518111-e74bbb00-e198-11ea-8f88-c9e3c1aa4b5b.png)](https://github.com/sponsors/supabase)
+[![Ny sponsor](https://user-images.githubusercontent.com/10214025/90518111-e74bbb00-e198-11ea-8f88-c9e3c1aa4b5b.png)](https://github.com/sponsors/supabase)
