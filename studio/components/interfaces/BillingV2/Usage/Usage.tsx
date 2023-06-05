@@ -14,7 +14,7 @@ import { USAGE_CATEGORIES, USAGE_STATUS } from './Usage.constants'
 import { getUsageStatus } from './Usage.utils'
 import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
 import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
-import { useInView, InView } from 'react-intersection-observer'
+import { InView } from 'react-intersection-observer'
 import { cn } from 'ui/src/utils/cn'
 
 export type usageSectionIds = 'infra' | 'bandwidth' | 'sizeCount' | 'activity'
@@ -93,18 +93,6 @@ const Usage = () => {
         break
     }
   }
-
-  // const {
-  //   ref: inViewRef,
-  //   inView,
-  //   entry,
-  // } = useInView({
-  //   /* Optional options */
-  //   threshold: 0,
-  // })
-
-  // console.log('inView', inView)
-  // console.log('entry', entry)
 
   return (
     <>
@@ -202,11 +190,11 @@ const Usage = () => {
         </div>
 
         {/*
-        [Joshen] Could potentially run a map here based on USAGE_CATEGORIES, rather than defining each section
-        but thinking it's gonna "cover up" too much details and make it harder to add attribute specific components
-        e.g for database size, we also need to show disk volume size. Not to mention that are little nuances across
-        each attribute RE formatting (bytes vs locale string)
-      */}
+         * [Joshen] Could potentially run a map here based on USAGE_CATEGORIES, rather than defining each section
+         * but thinking it's gonna "cover up" too much details and make it harder to add attribute specific components
+         * e.g for database size, we also need to show disk volume size. Not to mention that are little nuances across
+         * each attribute RE formatting (bytes vs locale string)
+         */}
 
         <InView
           as="div"
