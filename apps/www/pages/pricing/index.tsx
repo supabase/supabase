@@ -844,6 +844,16 @@ export default function IndexPage() {
                     </td>
 
                     <td className="px-6 pt-5">
+                      <Link href="https://forms.supabase.com/team">
+                        <a>
+                          <Button size="tiny" type="primary" block>
+                            Contact us
+                          </Button>
+                        </a>
+                      </Link>
+                    </td>
+
+                    <td className="px-6 pt-5">
                       <Link href="https://forms.supabase.com/enterprise">
                         <a>
                           <Button size="tiny" type="primary" block>

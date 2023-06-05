@@ -86,7 +86,7 @@ export const tiers = [
     features: [
       `Designated Support manager & SLAs`,
       `Enterprise OAuth providers`,
-      `SSO/ SAML`,
+      `SSO/SAML`,
       `SOC2`,
       `Custom contracts & invoicing`,
       `On-premise support`,
