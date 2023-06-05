@@ -57,7 +57,7 @@ npm install @supabase/supabase-js
 And finally we want to save the environment variables in a `.env.local`.
 All we need are the API URL and the `anon` key that you copied [earlier](#get-the-api-keys).
 
-```bash title=.env.local
+```bash .env.local
 NEXT_PUBLIC_SUPABASE_URL=YOUR_SUPABASE_URL
 NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
 ```
@@ -93,8 +93,7 @@ Create a `middleware.js` file and include the following content to:
 - Validate if the user is authenticated and currently on the sign-in page, redirecting them to the `account` page
 - Verify if the user is not authenticated and currently on the account page, redirecting them to the `sign-in` page.
 
-```tsx title=middleware.js
-// middleware.js
+```tsx middleware.js
 import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
 import { NextResponse } from 'next/server'
 
@@ -133,8 +132,7 @@ Create a `middleware.ts` file and include the following content to:
 - Validate if the user is authenticated and currently on the sign-in page, redirecting them to the `account` page
 - Verify if the user is not authenticated and currently on the account page, redirecting them to the `sign-in` page.
 
-```tsx title=middleware.ts
-// middleware.ts
+```tsx middleware.ts
 import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
 import { NextResponse } from 'next/server'
 
@@ -191,8 +189,7 @@ Create an `AuthForm` client side component with the `Auth` component rendered wi
 >
 <TabPanel id="js" label="JavaScript">
 
-```jsx title=app/auth-form.jsx
-// app/auth-form.jsx
+```jsx app/auth-form.jsx
 'use client'
 import { Auth } from '@supabase/auth-ui-react'
 import { ThemeSupa } from '@supabase/auth-ui-shared'
@@ -218,8 +215,7 @@ export default function AuthForm() {
 </TabPanel>
 <TabPanel id="ts" label="TypeScript">
 
-```jsx title=app/auth-form.tsx
-// app/auth-form.tsx
+```jsx app/auth-form.tsx
 'use client'
 import { Auth } from '@supabase/auth-ui-react'
 import { ThemeSupa } from '@supabase/auth-ui-shared'
@@ -248,8 +244,7 @@ export default function AuthForm() {
 
 Add the `AuthForm` component to your home page
 
-```jsx title=app/page.js
-// app/page.[j|t]sx
+```jsx app/page.js
 import AuthForm from './auth-form'
 
 export default function Home() {
@@ -288,8 +283,7 @@ In the following code snippet, we perform the following steps:
 >
 <TabPanel id="js" label="JavaScript">
 
-```js title=app/auth/callback/route.js
-// app/auth/callback/route.js
+```js app/auth/callback/route.js
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
@@ -310,8 +304,7 @@ export async function GET(req) {
 </TabPanel>
 <TabPanel id="ts" label="TypeScript">
 
-```ts title=app/auth/callback/route.ts
-// app/auth/callback/route.ts
+```ts app/auth/callback/route.ts
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
@@ -344,8 +337,7 @@ Let's create an route handler to handle the signout from the server side.
 >
 <TabPanel id="js" label="JavaScript">
 
-```js title=app/auth/signout/route.js
-// app/auth/signout/route.js
+```js app/auth/signout/route.js
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
@@ -371,8 +363,7 @@ export async function POST(req) {
 </TabPanel>
 <TabPanel id="ts" label="TypeScript">
 
-```ts title=app/auth/signout/route.ts
-// app/auth/signout/route.ts
+```ts app/auth/signout/route.ts
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { type NextRequest, NextResponse } from 'next/server'
@@ -412,8 +403,7 @@ Let's create a new component for that called `AccountForm` within the `app/accou
 >
 <TabPanel id="js" label="JavaScript">
 
-```jsx title=app/account/account-form.jsx
-// app/account/account-form.jsx
+```jsx app/account/account-form.jsx
 'use client'
 import { useCallback, useEffect, useState } from 'react'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
@@ -542,8 +532,7 @@ export default function AccountForm({ session }) {
 </TabPanel>
 <TabPanel id="ts" label="TypeScript">
 
-```tsx title=app/account/account-form.tsx
-// app/account/account-form.tsx
+```tsx app/account/account-form.tsx
 'use client'
 import { useCallback, useEffect, useState } from 'react'
 import { Database } from '../database.types'
@@ -688,8 +677,7 @@ Create a account page for the `AccountForm` component we just created
 >
 <TabPanel id="js" label="JavaScript">
 
-```jsx title=app/account/page.jsx
-// app/account/page.jsx
+```jsx app/account/page.jsx
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import AccountForm from './account-form'
@@ -708,8 +696,7 @@ export default async function Account() {
 </TabPanel>
 <TabPanel id="ts" label="TypeScript">
 
-```tsx title=app/account/page.tsx
-// app/account/page.tsx
+```tsx app/account/page.tsx
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { Database } from '../database.types'
@@ -756,7 +743,7 @@ Let's create an avatar widget for the user so that they can upload a profile pho
 >
 <TabPanel id="js" label="JavaScript">
 
-```jsx title=app/account/avatar.jsx
+```jsx app/account/avatar.jsx
 'use client'
 import React, { useEffect, useState } from 'react'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
@@ -849,7 +836,7 @@ export default function Avatar({ uid, url, size, onUpload }) {
 </TabPanel>
 <TabPanel id="ts" label="TypeScript">
 
-```tsx title=app/account/avatar.tsx
+```tsx app/account/avatar.tsx
 'use client'
 import React, { useEffect, useState } from 'react'
 import { Database } from '../database.types'
@@ -958,8 +945,7 @@ export default function Avatar({
 
 And then we can add the widget to the `AccountForm` component:
 
-```jsx title=app/account/account-form.js
-// app/account/account-form.[j|t]sx
+```jsx app/account/account-form.js
 // Import the new component
 import Avatar from './avatar'
 
