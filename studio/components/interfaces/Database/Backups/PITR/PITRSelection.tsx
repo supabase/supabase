@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 import { format } from 'date-fns'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import DatePicker from 'react-datepicker'
 import { Button, Modal, IconChevronLeft, IconChevronRight, IconHelpCircle, Alert } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
@@ -13,7 +13,7 @@ import { FormHeader, FormPanel } from 'components/ui/Forms'
 import InformationBox from 'components/ui/InformationBox'
 import TimeInput from './TimeInput'
 import TimezoneSelection from './TimezoneSelection'
-import { Time, Timezone } from './PITR.types'
+import { Timezone } from './PITR.types'
 import PITRStatus from './PITRStatus'
 import {
   constrainDateToRange,
