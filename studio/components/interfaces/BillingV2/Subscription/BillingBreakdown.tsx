@@ -198,6 +198,7 @@ const BillingBreakdown = ({}: BillingBreakdownProps) => {
                             ? 'bg-amber-900'
                             : 'bg-scale-1100'
                         }
+                        bgClass="bg-gray-300 dark:bg-gray-600"
                         labelBottom={usageLabel}
                         labelBottomClass="!text-scale-1000"
                         labelTop={hasLimit ? percentageLabel : undefined}
