@@ -43,7 +43,7 @@ yarn add @supabase/auth-helpers-nextjs
 
 Retrieve your project's URL and anon key from your [API settings](https://app.supabase.com/project/_/settings/api), and create a `.env.local` file with the following environment variables:
 
-```bash title=".env.local"
+```bash .env.local
 NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
 ```
@@ -62,7 +62,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
 
 Create a new `middleware.js` file in the root of your project and populate with the following:
 
-```jsx title="middleware.js"
+```jsx middleware.js
 import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
 import { NextResponse } from 'next/server'
 
@@ -80,7 +80,7 @@ export async function middleware(req) {
 
 Create a new `middleware.ts` file in the root of your project and populate with the following:
 
-```tsx title="middleware.ts"
+```tsx middleware.ts
 import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
 import { NextResponse } from 'next/server'
 
@@ -116,7 +116,7 @@ The `Code Exchange` route is required for the [server-side auth flow](https://su
 
 Create a new file at `app/auth/callback/route.js` and populate with the following:
 
-```jsx title="app/auth/callback.route.js"
+```jsx app/auth/callback.route.js
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
@@ -141,7 +141,7 @@ export async function GET(request) {
 
 Create a new file at `app/auth/callback/route.ts` and populate with the following:
 
-```tsx title="app/auth/callback.route.ts"
+```tsx app/auth/callback.route.ts
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
@@ -186,7 +186,7 @@ Client Components can be used to trigger the authentication process from event h
 >
 <TabPanel id="js" label="JavaScript">
 
-```jsx title="app/login.js"
+```jsx app/login.js
 'use client'
 
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
@@ -244,7 +244,7 @@ export default function Login() {
 
 <TabPanel id="ts" label="TypeScript">
 
-```tsx title="app/login.ts"
+```tsx app/login.ts
 'use client'
 
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
@@ -319,7 +319,7 @@ The combination of [Server Components](https://nextjs.org/docs/getting-started/r
 >
 <TabPanel id="js" label="JavaScript">
 
-```jsx title="app/login.js"
+```jsx app/login.js
 import { createServerActionClient } from '@supabase/auth-helpers-nextjs'
 import { revalidatePath } from 'next/cache'
 import { cookies } from 'next/headers'
@@ -379,7 +379,7 @@ export default async function Login() {
 
 <TabPanel id="ts" label="TypeScript">
 
-```tsx title="app/login.ts"
+```tsx app/login.ts
 import { createServerActionClient } from '@supabase/auth-helpers-nextjs'
 import { revalidatePath } from 'next/cache'
 import { cookies } from 'next/headers'
@@ -456,7 +456,7 @@ export default async function Login() {
 >
 <TabPanel id="js" label="JavaScript">
 
-```jsx title="app/client/page.jsx"
+```jsx app/client/page.jsx
 'use client'
 
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
@@ -483,7 +483,7 @@ export default function Home() {
 
 <TabPanel id="ts" label="TypeScript">
 
-```jsx title="app/new-post.tsx"
+```jsx app/new-post.tsx
 "use client";
 
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
@@ -543,7 +543,7 @@ const supabase = createClientComponentClient({ isSingleton: false })
 >
 <TabPanel id="js" label="JavaScript">
 
-```jsx title="app/page.jsx"
+```jsx app/page.jsx
 import { cookies } from 'next/headers'
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 
@@ -558,7 +558,7 @@ export default async function Home() {
 
 <TabPanel id="ts" label="TypeScript">
 
-```tsx title="app/page.tsx"
+```tsx app/page.tsx
 import { cookies } from 'next/headers'
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 
@@ -592,7 +592,7 @@ export default async function ServerComponent() {
 >
 <TabPanel id="js" label="JavaScript">
 
-```jsx title="app/new-post.jsx"
+```jsx app/new-post.jsx
 import { cookies } from 'next/headers'
 import { createServerActionClient } from '@supabase/auth-helpers-nextjs'
 import { revalidatePath } from 'next/cache'
@@ -619,7 +619,7 @@ export default async function NewTodo() {
 
 <TabPanel id="ts" label="TypeScript">
 
-```tsx title="app/new-post.tsx"
+```tsx app/new-post.tsx
 import { cookies } from 'next/headers'
 import { createServerActionClient } from '@supabase/auth-helpers-nextjs'
 import { revalidatePath } from 'next/cache'
@@ -661,7 +661,7 @@ export default async function NewTodo() {
 >
 <TabPanel id="js" label="JavaScript">
 
-```jsx title="app/api/todos/route.jsx"
+```jsx app/api/todos/route.jsx
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
@@ -678,7 +678,7 @@ export async function POST(request) {
 
 <TabPanel id="ts" label="TypeScript">
 
-```tsx title="app/api/todos/route.tsx"
+```tsx app/api/todos/route.tsx
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
