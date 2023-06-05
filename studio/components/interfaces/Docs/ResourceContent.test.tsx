@@ -62,6 +62,21 @@ describe('ResourceContent', () => {
     expect(() => render(<ResourceContent {...props} />)).not.toThrow()
   })
 
+  it.each([undefined, null])(
+    "should not throw when 'paths./{resourceId}' is %p",
+    (value: undefined | null) => {
+      // Arbitrary value, but we are intentionally nulling out `/resourceId` in the paths object
+      const resourceId = 'resourceId'
+      const props = buildProps({
+        paths: {
+          [`/${resourceId}`]: value,
+        },
+      })
+
+      expect(() => render(<ResourceContent {...props} />)).not.toThrow()
+    }
+  )
+
   it('should render', () => {
     const props = buildProps()
 

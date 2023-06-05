@@ -30,7 +30,7 @@ const ResourceContent = ({
   }
 
   const keyToShow = !!apiKey ? apiKey : 'SUPABASE_KEY'
-  const resourcePaths = paths[`/${resourceId}`]
+  const resourcePaths = paths[`/${resourceId}`] || {}
   const resourceDefinition = definitions[resourceId]
   const resourceMeta = resources[resourceId]
   const description = resourceDefinition?.description || null
