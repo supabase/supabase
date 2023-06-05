@@ -19,6 +19,7 @@ import { CLIENT_LIBRARIES } from 'common/constants'
 
 import { Project } from 'types'
 import { useStore, useFlag } from 'hooks'
+import useProfile from 'hooks/misc/useProfile'
 import { post, get } from 'lib/common/fetch'
 import { detectBrowser } from 'lib/helpers'
 import { API_URL, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
@@ -74,6 +75,9 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
       objectUrls.forEach((url: any) => URL.revokeObjectURL(url))
     }
   }, [uploadedFiles])
+
+  const { data: profile } = useProfile()
+  const respondToEmail = profile?.primary_email ?? 'your email'
 
   if (!isInitialized) {
     return (
@@ -300,13 +304,13 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
                 <p className="text-sm text-scale-1000 mt-2">
                   This project is on the{' '}
                   <span className="text-scale-1100">
-                    {planNames[selectedProject?.subscription_tier]} tier
+                    {planNames[selectedProject?.subscription_tier]} plan
                   </span>
                 </p>
               ) : selectedProject?.ref !== 'no-project' ? (
                 <div className="flex items-center space-x-2 mt-2">
                   <IconLoader size={14} className="animate-spin" />
-                  <p className="text-sm text-scale-1000">Checking project's tier</p>
+                  <p className="text-sm text-scale-1000">Checking project's plan</p>
                 </div>
               ) : (
                 <></>
@@ -339,14 +343,14 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
               <div className="px-6">
                 <InformationBox
                   icon={<IconAlertCircle strokeWidth={2} />}
-                  title="Expected response times are based on your project's tier"
+                  title="Expected response times are based on your project's plan"
                   description={
                     <div className="space-y-4 mb-1">
                       <p>
-                        Free tier support is available within the community and officially by the
+                        Free plan support is available within the community and officially by the
                         team on a best efforts basis, though we cannot guarantee a response time.
-                        For a guaranteed response time we recommend upgrading to the Pro tier.
-                        Enhanced SLAs for support are available on our Enterprise Tier.
+                        For a guaranteed response time we recommend upgrading to the Pro plan.
+                        Enhanced SLAs for support are available on our Enterprise Plan.
                       </p>
                       <div className="flex items-center space-x-2">
                         <Link href={`/project/${values.projectRef}/settings/billing/update`}>
@@ -355,7 +359,7 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
                           </a>
                         </Link>
                         <Link href="https://supabase.com/contact/enterprise">
-                          <a target="_blank">
+                          <a target="_blank" rel="noreferrer">
                             <Button type="default" icon={<IconExternalLink size={14} />}>
                               Enquire about Enterprise
                             </Button>
@@ -451,7 +455,7 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
                                 </div>
                                 <div>
                                   <Link href={library.url}>
-                                    <a target="_blank">
+                                    <a target="_blank" rel="noreferrer">
                                       <Button
                                         type="default"
                                         icon={<IconExternalLink size={14} strokeWidth={1.5} />}
@@ -478,7 +482,7 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
                             </div>
                             <div>
                               <Link href="https://github.com/supabase/supabase">
-                                <a target="_blank">
+                                <a target="_blank" rel="noreferrer">
                                   <Button
                                     type="default"
                                     icon={<IconExternalLink size={14} strokeWidth={1.5} />}
@@ -576,6 +580,11 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
                       </div>
                     </div>
                     <div className="px-6">
+                      <div className="flex justify-end">
+                        <p className="block text-sm text-scale-1000 mt-0 mb-2">
+                          We will contact you at {respondToEmail}.
+                        </p>
+                      </div>
                       <div className="flex justify-end">
                         <Button
                           htmlType="submit"

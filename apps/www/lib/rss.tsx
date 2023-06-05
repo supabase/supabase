@@ -13,7 +13,7 @@ const generateRssItem = (post: any): string => {
   <title>${post.title}</title>
   <link>https://supabase.com${post.path}</link>
   <description>${post.description}</description>
-  <pubDate>${dayjs(post.date).utc().format('ddd, DD MMM YYYY HH:hh:mm ZZ')}</pubDate>
+  <pubDate>${dayjs(post.date).utc().format('ddd, DD MMM YYYY HH:mm:ss [GMT]')}</pubDate>
 </item>
 `
 }
@@ -33,7 +33,7 @@ export const generateRss = (posts: any[], authorID?: string): string => {
       <language>en</language>
       <lastBuildDate>${dayjs(posts[0].date)
         .utc()
-        .format('ddd, DD MMM YYYY HH:hh:mm ZZ')}</lastBuildDate>
+        .format('ddd, DD MMM YYYY HH:mm:ss [GMT]')}</lastBuildDate>
       <atom:link href="https://supabase.com/planetpg-${authorID}-rss.xml" rel="self" type="application/rss+xml"/>
       ${posts.map(generateRssItem).join('')}
     </channel>
@@ -49,7 +49,7 @@ export const generateRss = (posts: any[], authorID?: string): string => {
       <language>en</language>
       <lastBuildDate>${dayjs(posts[0].date)
         .utc()
-        .format('ddd, DD MMM YYYY HH:hh:mm ZZ')}</lastBuildDate>
+        .format('ddd, DD MMM YYYY HH:mm:ss [GMT]')}</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       ${posts.map(generateRssItem).join('')}
     </channel>

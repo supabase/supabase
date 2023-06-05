@@ -16,6 +16,7 @@ Chase Granberry
 Chris Copplestone
 Dave Wilson
 Div Arora
+Divit D
 Egor Romanov
 Fabrizio Fenoglio
 Francesco Sansalvadore
@@ -44,6 +45,7 @@ Michel Pelletier
 Monica El Khoury
 Nikita Kotlyarov
 Oli R
+Pamela Chia
 Paul Cioanca
 Paul Copplestone
 Pavel Borisov

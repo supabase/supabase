@@ -31,8 +31,7 @@ const BillingUpdate: NextPageWithLayout = () => {
   const [subscription, setSubscription] = useState<StripeSubscription>()
   const [selectedPlan, setSelectedPlan] = useState<any>()
 
-  const isEnterprise =
-    subscription && subscription.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
+  const isEnterprise = subscription?.tier?.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
 
   useEffect(() => {
     if (projectRef) {
@@ -135,8 +134,8 @@ const BillingUpdate: NextPageWithLayout = () => {
         danger
         visible={showConfirmDowngrade}
         title="Are you sure?"
-        description="Downgrading to the free tier will lead to reductions in your project’s capacity.
-        If you're already past the limits of the free tier, your project will be throttled greatly."
+        description="Downgrading to the free plan will lead to reductions in your project’s capacity.
+        If you're already past the limits of the free plan, your project will be throttled greatly."
         buttonLabel="Confirm"
         buttonLoadingLabel="Confirm"
         onSelectCancel={() => {
@@ -158,7 +157,7 @@ const BillingUpdate: NextPageWithLayout = () => {
             <div className="space-y-2">
               <p className="text-sm text-scale-1100">
                 The following members have reached their maximum limits for the number of active
-                free tier projects within organizations where they are an administrator or owner:
+                free plan projects within organizations where they are an administrator or owner:
               </p>
               <ul className="pl-5 text-sm list-disc text-scale-1100">
                 {(membersExceededLimit || []).map((member, idx: number) => (

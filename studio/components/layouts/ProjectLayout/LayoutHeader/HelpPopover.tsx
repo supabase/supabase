@@ -59,7 +59,7 @@ const HelpPopover: FC<Props> = () => {
               </Link>
             </div>
             <p className="text-sm text-scale-900">
-              Expected response time is based on your billing tier. Pro and Pay as You Go plans are
+              Expected response time is based on your billing plan. Pro and Pay as You Go plans are
               prioritized.
             </p>
           </div>
@@ -81,6 +81,7 @@ const HelpPopover: FC<Props> = () => {
                 <a
                   href="https://discord.supabase.com"
                   target="_blank"
+                  rel="noreferrer"
                   className="dark block cursor-pointer"
                 >
                   <Image
@@ -106,6 +107,7 @@ const HelpPopover: FC<Props> = () => {
                 <a
                   href="https://github.com/supabase/supabase/discussions"
                   target="_blank"
+                  rel="noreferrer"
                   className="block cursor-pointer"
                 >
                   <Image

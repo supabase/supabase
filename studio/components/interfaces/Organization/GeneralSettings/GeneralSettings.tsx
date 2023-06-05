@@ -167,6 +167,7 @@ const GeneralSettings = () => {
                               <Link href="https://supabase.com/privacy">
                                 <a
                                   target="_blank"
+                                  rel="noreferrer"
                                   className="text-brand-900 border-b border-brand-900"
                                 >
                                   privacy policy

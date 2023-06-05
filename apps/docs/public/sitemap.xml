@@ -235,7 +235,7 @@
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/cli/local-development</loc>
+    <loc>https://supabase.com/docs/guides/getting-started/local-development</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
@@ -553,6 +553,12 @@
   </url>
 
   <url>
+    <loc>https://supabase.com/docs/guides/integrations/cloudflare-workers</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
     <loc>https://supabase.com/docs/guides/integrations/dhiwise</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
@@ -829,13 +835,13 @@
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/auth/auth-helpers/nextjs-server-components</loc>
+    <loc>https://supabase.com/docs/guides/auth/auth-helpers/nextjs</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/auth/auth-helpers/nextjs</loc>
+    <loc>https://supabase.com/docs/guides/auth/auth-helpers/nextjs-pages</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>

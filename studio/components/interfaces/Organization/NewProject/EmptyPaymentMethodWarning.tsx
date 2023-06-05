@@ -8,16 +8,22 @@ import InformationBox from 'components/ui/InformationBox'
 import { AddNewPaymentMethodModal } from 'components/interfaces/Billing'
 
 const EmptyPaymentMethodWarning = observer(
-  ({ stripeCustomerId }: { stripeCustomerId: string | undefined }) => {
+  ({ onPaymentMethodAdded }: { onPaymentMethodAdded: () => void }) => {
     const { ui } = useStore()
     const slug = ui.selectedOrganization?.slug
 
     const [showAddPaymentMethodModal, setShowAddPaymentMethodModal] = useState<boolean>(false)
 
+    const onLocalPaymentMethodAdded = () => {
+      setShowAddPaymentMethodModal(false)
+
+      return onPaymentMethodAdded()
+    }
+
     return (
       <div className="mt-4">
         <InformationBox
-          icon={<IconAlertCircle className="text-white" size="large" strokeWidth={1.5} />}
+          icon={<IconAlertCircle size="large" strokeWidth={1.5} />}
           defaultVisibility={true}
           hideCollapse
           title="Your organization has no payment methods"
@@ -37,6 +43,7 @@ const EmptyPaymentMethodWarning = observer(
           visible={showAddPaymentMethodModal}
           returnUrl={`${getURL()}/new/${slug}`}
           onCancel={() => setShowAddPaymentMethodModal(false)}
+          onConfirm={() => onLocalPaymentMethodAdded()}
         />
       </div>
     )

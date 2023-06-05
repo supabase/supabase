@@ -116,6 +116,7 @@ const DatabaseUsage: FC<any> = () => {
                   <Button type="default" icon={<IconExternalLink size={14} strokeWidth={1.5} />}>
                     <a
                       target="_blank"
+                      rel="noreferrer"
                       href="https://supabase.com/docs/guides/platform/database-usage"
                     >
                       What is disk size?

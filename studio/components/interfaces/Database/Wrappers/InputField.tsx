@@ -27,7 +27,7 @@ const InputField: FC<Props> = ({ option, loading, error }) => {
               <p>{option.label}</p>
               {option.urlHelper !== undefined && (
                 <Link href={option.urlHelper}>
-                  <a target="_blank">
+                  <a target="_blank" rel="noreferrer">
                     <IconHelpCircle
                       strokeWidth={2}
                       size={14}
@@ -55,7 +55,7 @@ const InputField: FC<Props> = ({ option, loading, error }) => {
             <p>{option.label}</p>
             {option.urlHelper !== undefined && (
               <Link href={option.urlHelper}>
-                <a target="_blank">
+                <a target="_blank" rel="noreferrer">
                   <IconHelpCircle
                     strokeWidth={2}
                     size={14}

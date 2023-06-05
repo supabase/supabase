@@ -280,26 +280,29 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
         }
       >
         <Form validateOnBlur initialValues={initialValues} onSubmit={onSubmit} validate={validate}>
-          {({ values, resetForm, errors }: any) => (
-            <FormContents
-              values={values}
-              resetForm={resetForm}
-              errors={errors}
-              projectRef={ref}
-              restUrlTld={restUrlTld}
-              functions={functions}
-              isEdgeFunction={isEdgeFunction}
-              tables={tables}
-              events={events}
-              eventsError={eventsError}
-              onUpdateSelectedEvents={onUpdateSelectedEvents}
-              httpHeaders={httpHeaders}
-              httpParameters={httpParameters}
-              setHttpHeaders={setHttpHeaders}
-              setHttpParameters={setHttpParameters}
-              submitRef={submitRef}
-            />
-          )}
+          {({ values, resetForm, errors }: any) => {
+            return (
+              <FormContents
+                values={values}
+                resetForm={resetForm}
+                errors={errors}
+                projectRef={ref}
+                restUrlTld={restUrlTld}
+                functions={functions}
+                isEdgeFunction={isEdgeFunction}
+                tables={tables}
+                events={events}
+                eventsError={eventsError}
+                onUpdateSelectedEvents={onUpdateSelectedEvents}
+                httpHeaders={httpHeaders}
+                httpParameters={httpParameters}
+                setHttpHeaders={setHttpHeaders}
+                setHttpParameters={setHttpParameters}
+                submitRef={submitRef}
+                selectedHook={selectedHook}
+              />
+            )
+          }}
         </Form>
       </SidePanel>
       <ConfirmationModal
