@@ -23,4 +23,4 @@ jobs:
             **/package-lock.json
             .git/*
             *.ipynb
-            i18n/*
+            i18n/README.*.md
