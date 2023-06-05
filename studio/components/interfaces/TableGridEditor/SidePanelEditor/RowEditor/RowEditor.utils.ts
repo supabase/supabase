@@ -84,7 +84,7 @@ export const validateFields = (fields: RowField[]) => {
 
 const parseValue = (originalValue: any, format: string) => {
   try {
-    if (originalValue === null || originalValue.length === 0) {
+    if ((originalValue === null || originalValue.length === 0) && typeof originalValue !== 'object') {
       return originalValue
     } else if (typeof originalValue === 'number' || !format) {
       return originalValue
