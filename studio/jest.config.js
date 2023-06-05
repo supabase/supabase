@@ -2,6 +2,7 @@ module.exports = {
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   moduleDirectories: ['<rootDir>', 'node_modules'],
   setupFiles: ['jest-canvas-mock', './tests/setup/radix'],
+  setupFilesAfterEnv: ['@testing-library/jest-dom/extend-expect'],
   testEnvironment: 'jsdom',
   testTimeout: 10000,
   testRegex: '(.*\\.test.(js|jsx|ts|tsx)$)',

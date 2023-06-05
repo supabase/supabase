@@ -4,6 +4,17 @@ import Param from 'components/to-be-cleaned/Docs/Param'
 import Description from 'components/to-be-cleaned/Docs/Description'
 import { IconTable } from 'ui'
 
+export interface ResourceContentProps {
+  autoApiService: any
+  resourceId: string | undefined
+  resources: any
+  definitions: any
+  paths: any
+  selectedLang: string
+  apiKey: string
+  refreshDocs: () => void
+}
+
 const ResourceContent = ({
   autoApiService,
   resourceId,
@@ -11,18 +22,20 @@ const ResourceContent = ({
   definitions,
   paths,
   selectedLang,
-  showApiKey,
+  apiKey,
   refreshDocs,
-}: any) => {
-  if (!paths || !definitions) return null
+}: ResourceContentProps) => {
+  if (!paths || !definitions || !resourceId) {
+    return null
+  }
 
-  const keyToShow = !!showApiKey ? showApiKey : 'SUPABASE_KEY'
+  const keyToShow = !!apiKey ? apiKey : 'SUPABASE_KEY'
   const resourcePaths = paths[`/${resourceId}`]
   const resourceDefinition = definitions[resourceId]
   const resourceMeta = resources[resourceId]
-  const description = resourceDefinition.description || null
+  const description = resourceDefinition?.description || null
   const methods = Object.keys(resourcePaths).map((x) => x.toUpperCase())
-  const properties = Object.entries(resourceDefinition.properties || []).map(([id, val]: any) => ({
+  const properties = Object.entries(resourceDefinition?.properties || []).map(([id, val]: any) => ({
     ...val,
     id,
     required: resourceDefinition?.required?.includes(id),

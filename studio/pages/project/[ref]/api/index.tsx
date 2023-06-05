@@ -140,7 +140,7 @@ const DocView: FC<any> = observer(({}) => {
               resources={PageState.resources}
               definitions={definitions}
               paths={paths}
-              showApiKey={showApiKey.key}
+              apiKey={showApiKey.key}
               refreshDocs={refreshDocs}
             />
           ) : rpc ? (

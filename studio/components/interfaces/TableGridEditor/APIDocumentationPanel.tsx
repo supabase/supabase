@@ -10,6 +10,7 @@ import ActionBar from './SidePanelEditor/ActionBar'
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useProjectJsonSchemaQuery } from 'data/docs/project-json-schema-query'
 import { snakeToCamel } from 'lib/helpers'
+import { ShowApiKey } from 'components/interfaces/Docs/Docs.types'
 
 interface APIDocumentationPanelProps {
   visible: boolean
@@ -27,8 +28,8 @@ const APIDocumentationPanel = ({ visible, onClose }: APIDocumentationPanelProps)
   const { data: settings } = useProjectApiQuery({ projectRef: ref })
 
   const DEFAULT_KEY = { name: 'hide', key: 'SUPABASE_KEY' }
-  const [selectedLang, setSelectedLang] = useState<any>('js')
-  const [showApiKey, setShowApiKey] = useState<any>(DEFAULT_KEY)
+  const [selectedLang, setSelectedLang] = useState<string>('js')
+  const [showApiKey, setShowApiKey] = useState<ShowApiKey>(DEFAULT_KEY)
 
   const tables = meta.tables.list()
   const autoApiService = {
@@ -41,6 +42,7 @@ const APIDocumentationPanel = ({ visible, onClose }: APIDocumentationPanelProps)
   const anonKey = apiService?.service_api_keys.find((x) => x.name === 'anon key')
     ? apiService.defaultApiKey
     : undefined
+
   const resources = getResourcesFromJsonSchema(jsonSchema)
 
   function getResourcesFromJsonSchema(value: any) {
@@ -114,7 +116,7 @@ const APIDocumentationPanel = ({ visible, onClose }: APIDocumentationPanelProps)
                       resources={resources}
                       definitions={jsonSchema.definitions}
                       paths={jsonSchema.paths}
-                      showApiKey={showApiKey.key}
+                      apiKey={showApiKey.key}
                       refreshDocs={async () => await refetch()}
                     />
                   )}
