@@ -15,7 +15,7 @@ This submodule provides convenience helpers for implementing user authentication
 
 This library supports Node.js `^16.15.0`.
 
-```sh
+```sh Terminal
 npm install @supabase/auth-helpers-sveltekit
 ```
 
@@ -176,7 +176,7 @@ export const GET = async ({ url, locals: { supabase } }) => {
 
 In order to get the most out of TypeScript and it's intellisense, you should import the generated Database types into the `app.d.ts` type definition file that comes with your SvelteKit project, where `import('./DatabaseDefinitions')` points to the generated types file outlined in [v2 docs here](https://supabase.com/docs/reference/javascript/release-notes#typescript-support) after you have logged in, linked, and generated types through the Supabase CLI.
 
-```ts
+```ts src/app.d.ts
 // src/app.d.ts
 
 import { SupabaseClient, Session } from '@supabase/supabase-js'

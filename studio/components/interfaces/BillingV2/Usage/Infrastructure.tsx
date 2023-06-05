@@ -1,17 +1,17 @@
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { DataPoint } from 'data/analytics/constants'
 import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
-import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
 import dayjs from 'dayjs'
-import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import Link from 'next/link'
 import { Alert, Button } from 'ui'
 import SectionContent from './SectionContent'
 import SectionHeader from './SectionHeader'
 import { COMPUTE_INSTANCE_SPECS, USAGE_CATEGORIES } from './Usage.constants'
-import { getUpgradeUrl } from './Usage.utils'
+import { getUpgradeUrlFromV2Subscription } from './Usage.utils'
 import UsageBarChart from './UsageBarChart'
 import Panel from 'components/ui/Panel'
+import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
+import { useMemo } from 'react'
 
 export interface InfrastructureProps {
   projectRef: string
@@ -20,25 +20,27 @@ export interface InfrastructureProps {
 // [Joshen] Need to update the IO budget chart to show burst mbps and duration next time
 
 const Infrastructure = ({ projectRef }: InfrastructureProps) => {
-  const { data: subscription } = useProjectSubscriptionQuery({ projectRef })
-  const { current_period_start, current_period_end } = subscription?.billing ?? {}
-  const startDate =
-    current_period_start !== undefined
-      ? new Date(current_period_start * 1000).toISOString()
-      : undefined
-  let endDate =
-    current_period_end !== undefined ? new Date(current_period_end * 1000).toISOString() : undefined
+  const { data: subscription } = useProjectSubscriptionV2Query({ projectRef })
+  const { current_period_start, current_period_end } = subscription ?? {}
+  const startDate = useMemo(() => {
+    return current_period_start ? new Date(current_period_start * 1000).toISOString() : undefined
+  }, [current_period_start])
 
-  // If end date is in future, set end date to now
-  if (endDate && dayjs(endDate).isAfter(dayjs())) {
-    // LF seems to have an issue with the milliseconds, causes infinite loading sometimes
-    endDate = new Date().toISOString().slice(0, -5) + 'Z'
-  }
+  const endDate = useMemo(() => {
+    const periodEndDate = current_period_end ? new Date(current_period_end * 1000) : undefined
+    // If end date is in future, set end date to now
+    if (periodEndDate && dayjs(periodEndDate).isAfter(dayjs())) {
+      // LF seems to have an issue with the milliseconds, causes infinite loading sometimes
+      return new Date().toISOString().slice(0, -5) + 'Z'
+    } else if (periodEndDate) {
+      return periodEndDate.toISOString()
+    }
+  }, [current_period_end])
 
   const categoryMeta = USAGE_CATEGORIES.find((category) => category.key === 'infra')
 
-  const upgradeUrl = getUpgradeUrl(projectRef, subscription)
-  const isFreeTier = subscription?.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.FREE
+  const upgradeUrl = getUpgradeUrlFromV2Subscription(projectRef, subscription)
+  const isFreeTier = subscription?.plan?.id === 'free'
   const currentComputeInstance = subscription?.addons.find((addon) =>
     addon.supabase_prod_id.includes('_instance_')
   )
@@ -150,12 +152,26 @@ const Infrastructure = ({ projectRef }: InfrastructureProps) => {
                     </Alert>
                   ) : null}
                   <div className="space-y-1">
-                    <p>What is Disk IO Bandwidth?</p>
+                    <p>Disk IO Bandwidth</p>
+
                     <p className="text-sm text-scale-1000">
-                      Smaller compute instances can burst up to the maximum disk IO bandwidth for 30
-                      minutes in a day. Beyond that, the performance reverts to the baseline disk IO
-                      bandwidth.
+                      The disk performance of your workload is determined by the Disk IO bandwidth.
                     </p>
+
+                    {currentComputeInstanceSpecs.maxBandwidth ===
+                    currentComputeInstanceSpecs.baseBandwidth ? (
+                      <p className="text-sm text-scale-1000">
+                        Your current compute can has a baseline and maximum disk throughput of
+                        {currentComputeInstanceSpecs.maxBandwidth.toLocaleString()} Mbps.
+                      </p>
+                    ) : (
+                      <p className="text-sm text-scale-1000">
+                        Your current compute can burst up to{' '}
+                        {currentComputeInstanceSpecs.maxBandwidth.toLocaleString()} Mbps for 30
+                        minutes a day and reverts to the baseline performance of{' '}
+                        {currentComputeInstanceSpecs.baseBandwidth.toLocaleString()} Mbps.
+                      </p>
+                    )}
                   </div>
                   <div>
                     <p className="text-sm mb-2">Overview</p>
@@ -185,7 +201,7 @@ const Infrastructure = ({ projectRef }: InfrastructureProps) => {
               <div className="space-y-1">
                 <div className="flex flex-row justify-between">
                   {attribute.key === 'disk_io_consumption' ? (
-                    <p>IO consumed per day</p>
+                    <p>IO consumed per {interval === '1d' ? 'day' : 'hour'}</p>
                   ) : (
                     <p>
                       Max{' '}
@@ -196,6 +212,18 @@ const Infrastructure = ({ projectRef }: InfrastructureProps) => {
                     </p>
                   )}
                 </div>
+
+                {attribute.key === 'ram_usage' && (
+                  <p className="text-sm text-scale-1000">
+                    Your compute instance has {currentComputeInstanceSpecs.memoryGb} GB memory.
+                  </p>
+                )}
+
+                {attribute.key === 'cpu_usage' && (
+                  <p className="text-sm text-scale-1000">
+                    Your compute instance has {currentComputeInstanceSpecs.cpuCores} CPU cores.
+                  </p>
+                )}
 
                 {attribute.chartDescription.split('\n').map((paragraph, idx) => (
                   <p key={`para-${idx}`} className="text-sm text-scale-1000">
@@ -223,9 +251,7 @@ const Infrastructure = ({ projectRef }: InfrastructureProps) => {
                   <Panel.Content>
                     <div className="flex flex-col items-center justify-center space-y-2">
                       <p>No data</p>
-                      <p className="text-sm text-scale-1000">
-                        There is no data in the timeframe available
-                      </p>
+                      <p className="text-sm text-scale-1000">There is no data in period</p>
                     </div>
                   </Panel.Content>
                 </Panel>
