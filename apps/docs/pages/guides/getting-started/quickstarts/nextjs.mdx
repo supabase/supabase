@@ -21,16 +21,17 @@ export const meta = {
 
     <StepHikeCompact.Code>
 
-     ```sql SQL_EDITOR
+     ```sql Editor
       -- Create the table
-      CREATE TABLE countries (
-      id SERIAL PRIMARY KEY,
-      name VARCHAR(255) NOT NULL
+      create table countries (
+        id serial primary key,
+        name varchar(255) not null
       );
+
       -- Insert some sample data into the table
-      INSERT INTO countries (name) VALUES ('United States');
-      INSERT INTO countries (name) VALUES ('Canada');
-      INSERT INTO countries (name) VALUES ('Mexico');
+      insert into countries (name) values ('United States');
+      insert into countries (name) values ('Canada');
+      insert into countries (name) values ('Mexico');
       ````
 
     </StepHikeCompact.Code>
