@@ -5,6 +5,7 @@ import { CategoryAttribute, USAGE_STATUS } from './Usage.constants'
 import { StripeSubscription } from 'components/interfaces/Billing'
 import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
+import { ProjectSubscriptionResponse } from 'data/subscriptions/project-subscription-v2-query'
 
 // [Joshen] This is just for development to generate some test data for chart rendering
 export const generateUsageData = (attribute: string, days: number): DataPoint[] => {
@@ -48,6 +49,21 @@ export const getUpgradeUrl = (projectRef: string, subscription?: StripeSubscript
     : `/project/${projectRef}/settings/billing/update/pro`
 }
 
+export const getUpgradeUrlFromV2Subscription = (
+  projectRef: string,
+  subscription?: ProjectSubscriptionResponse
+) => {
+  if (!subscription) return `/project/${projectRef}/settings/billing/update`
+
+  return subscription?.plan.id === 'enterprise'
+    ? `/project/${projectRef}/settings/billing/update/enterprise`
+    : subscription?.plan.id === 'team'
+    ? `/project/${projectRef}/settings/billing/update/team`
+    : subscription?.plan.id === 'free'
+    ? `/project/${projectRef}/settings/billing/update`
+    : `/project/${projectRef}/settings/billing/update/pro`
+}
+
 const compactNumberFormatter = new Intl.NumberFormat('en-US', {
   notation: 'compact',
   compactDisplay: 'short',
@@ -58,7 +74,7 @@ export const ChartYFormatterCompactNumber = (number: number | string, unit: stri
 
   if (unit === 'bytes') {
     const formattedBytes = formatBytes(number, 0).replace(/\s/g, '')
-    
+
     return formattedBytes === '0bytes' ? '0' : formattedBytes
   } else {
     return compactNumberFormatter.format(number)

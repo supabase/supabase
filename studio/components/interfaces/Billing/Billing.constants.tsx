@@ -164,7 +164,7 @@ export const USAGE_BASED_PRODUCTS = [
         costPerUnit: 0.000002,
         tooltip: (
           <span>
-            Every single serverless function invocation independent of response status is counted.
+            Every serverless function invocation independent of response status is counted.
             Billing is based on the sum of all invocations throughout your billing period.
           </span>
         ),
