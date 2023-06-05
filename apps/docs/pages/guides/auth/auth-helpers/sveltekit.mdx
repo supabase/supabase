@@ -646,7 +646,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 For [row level security](https://supabase.com/docs/guides/auth/row-level-security) to work properly when fetching data client-side, you need to use `supabaseClient` from `PageData` and only run your query once the session is defined client-side:
 
-```html
+```svelte src/routes/+page.svelte
 <script lang="ts">
   export let data
 
@@ -669,7 +669,7 @@ For [row level security](https://supabase.com/docs/guides/auth/row-level-securit
 
 ### Server-side data fetching with RLS
 
-```html src/routes/profile/+page.svelte
+```svelte src/routes/profile/+page.svelte
 <!-- src/routes/profile/+page.svelte -->
 <script lang="ts">
   export let data
@@ -846,7 +846,7 @@ In order to use the Supabase library in your client code you will need to setup 
 >
 <TabPanel id="older-0.8" label="0.8.x">
 
-```html src/routes/+layout.svelte
+```svelte src/routes/+layout.svelte
 <!-- src/routes/+layout.svelte -->
 <script lang="ts">
   import { supabaseClient } from '$lib/db'
@@ -1000,7 +1000,7 @@ declare global {
 >
 <TabPanel id="older-0-8" label="0.8.x">
 
-```html src/routes/profile/+page.svelte
+```svelte src/routes/profile/+page.svelte
 <!-- src/routes/profile/+page.svelte -->
 <script lang="ts">
   /** @type {import('./$types').PageData} */
@@ -1036,7 +1036,7 @@ export const load: PageLoad = async (event) => {
 </TabPanel>
 <TabPanel id="0.9.0" label="0.9.0">
 
-```html src/routes/profile/+page.svelte
+```svelte src/routes/profile/+page.svelte
 <!-- src/routes/profile/+page.svelte -->
 <script lang="ts">
   import type { PageData } from './$types'
@@ -1182,7 +1182,7 @@ export const supabaseClient = createClient(env.PUBLIC_SUPABASE_URL, env.PUBLIC_S
 >
 <TabPanel id="older-0.7" label="0.7.x">
 
-```html src/routes/+layout.svelte
+```svelte src/routes/+layout.svelte
 <script lang="ts">
   // make sure the supabase instance is initialized on the client
   import '$lib/db'
@@ -1203,7 +1203,7 @@ export const supabaseClient = createClient(env.PUBLIC_SUPABASE_URL, env.PUBLIC_S
 </TabPanel>
 <TabPanel id="0.8.0" label="0.8.0">
 
-```html src/routes/+layout.svelte
+```svelte src/routes/+layout.svelte
 <script>
   import { supabaseClient } from '$lib/db'
   import { invalidate } from '$app/navigation'
@@ -1342,7 +1342,7 @@ declare namespace App {
 >
 <TabPanel id="older-0-7" label="0.7.x">
 
-```html src/routes/protected-route/+page.svelte
+```svelte src/routes/protected-route/+page.svelte
 <script lang="ts">
   import type { PageData } from './$types'
 
@@ -1375,7 +1375,7 @@ export const load: PageLoad = withAuth(async ({ session, getSupabaseClient }) =>
 </TabPanel>
 <TabPanel id="0.8.0" label="0.8.0">
 
-```html src/routes/protected-route/+page.svelte
+```svelte src/routes/protected-route/+page.svelte
 <script>
   /** @type {import('./$types').PageData} */
   export let data
@@ -1530,7 +1530,7 @@ setupSupabaseHelpers({
 >
 <TabPanel id="older" label="0.6.11 and below">
 
-```html src/routes/__layout.svelte
+```svelte src/routes/__layout.svelte
 <script>
   import { session } from '$app/stores'
   import { supabaseClient } from '$lib/db'
@@ -1547,7 +1547,7 @@ setupSupabaseHelpers({
 
 The `@supabase/auth-helpers-svelte` library is no longer required as the `@supabase/auth-helpers-sveltekit` library handles all the client-side code.
 
-```html src/routes/+layout.svelte
+```svelte src/routes/+layout.svelte
 <script lang="ts">
   // make sure the supabase instance is initialized on the client
   import '$lib/db'
@@ -1689,7 +1689,7 @@ declare namespace App {
 >
 <TabPanel id="older" label="0.6.11 and below">
 
-```html src/routes/index.svelte
+```svelte src/routes/index.svelte
 <script>
   import { session } from '$app/stores'
 </script>
@@ -1705,7 +1705,7 @@ declare namespace App {
 </TabPanel>
 <TabPanel id="0.7.0" label="0.7.0">
 
-```html src/routes/+page.svelte
+```svelte src/routes/+page.svelte
 <script>
   import { page } from '$app/stores'
 </script>
@@ -1731,7 +1731,7 @@ declare namespace App {
 >
 <TabPanel id="older" label="0.6.11 and below">
 
-```html src/routes/protected-route.svelte
+```svelte src/routes/protected-route.svelte
 <script lang="ts" context="module">
   import { supabaseServerClient, withPageAuth } from '@supabase/auth-helpers-sveltekit'
   import type { Load } from './__types/protected-page'
@@ -1764,7 +1764,7 @@ declare namespace App {
 </TabPanel>
 <TabPanel id="0.7.0" label="0.7.0">
 
-```html src/routes/protected-route/+page.svelte
+```svelte src/routes/protected-route/+page.svelte
 <script lang="ts">
   import type { PageData } from './$types'
 
