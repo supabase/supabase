@@ -267,36 +267,46 @@ const PITRSelection = ({}) => {
                             />
                           </div>
                         </div>
-                        <div className="space-y-1">
-                          <p className="text-sm text-scale-1100">Time of recovery</p>
-                          <TimeInput
-                            defaultTime={selectedTime}
-                            minimumTime={
-                              isSelectedOnEarliestDay ? earliestAvailableBackupTime : undefined
-                            }
-                            maximumTime={
-                              isSelectedOnLatestDay ? latestAvailableBackupTime : undefined
-                            }
-                            onChange={({ h, m, s }) => {
-                              const newDate = dayjs(selectedDateRaw)
-                                .set('hour', h)
-                                .set('minute', m)
-                                .set('second', s)
+                        <div>
+                          <div className="space-y-1">
+                            <p className="text-sm text-scale-1100">Recovery time</p>
+                            <TimeInput
+                              defaultTime={selectedTime}
+                              minimumTime={
+                                isSelectedOnEarliestDay ? earliestAvailableBackupTime : undefined
+                              }
+                              maximumTime={
+                                isSelectedOnLatestDay ? latestAvailableBackupTime : undefined
+                              }
+                              onChange={({ h, m, s }) => {
+                                const newDate = dayjs(selectedDateRaw)
+                                  .set('hour', h)
+                                  .set('minute', m)
+                                  .set('second', s)
 
-                              setSelectedDateRaw(newDate.toDate())
-                            }}
-                          />
+                                setSelectedDateRaw(newDate.toDate())
+                              }}
+                            />
+                          </div>
+
+                          <p className="text-sm text-scale-1000 mt-8">
+                            Enter a time within the available range to restore from. <br /> Backups
+                            are captured every 2 minutes, allowing you to enter a time and restore
+                            your database to the closest backup point. We'll match the time you
+                            enter to the closest backup within the 2-minute window
+                          </p>
                         </div>
                         <div className="!mt-4 space-y-1">
+                          <h3 className="text-sm text-scale-1100"></h3>
                           {isSelectedOnEarliestDay && (
                             <p className="text-sm text-scale-1000">
-                              Earliest available backup on this date is at{' '}
+                              <strong>Earliest backup available for this date</strong>:{' '}
                               {earliestAvailableBackup.format('HH:mm:ss')}
                             </p>
                           )}
                           {isSelectedOnLatestDay && (
                             <p className="text-sm text-scale-1000">
-                              Latest available backup on this date is at{' '}
+                              <strong>Latest backup available for this date</strong>:{' '}
                               {latestAvailableBackup.format('HH:mm:ss')}
                             </p>
                           )}
