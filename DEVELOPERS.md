@@ -134,7 +134,7 @@ Create a new entry in the [`redirects.js`](https://github.com/supabase/supabase/
 
 ## Community channels
 
-If you are stuck somewhere or have any questions, Join our [Discord Community Server](https://discord.supabase.com/) or the [Github Discussions](https://github.com/supabase/supabase/discussions). We are here to help!
+If you are stuck somewhere or have any questions, join our [Discord Community Server](https://discord.supabase.com/) or the [Github Discussions](https://github.com/supabase/supabase/discussions). We are here to help!
 
 ## Contributors
 
