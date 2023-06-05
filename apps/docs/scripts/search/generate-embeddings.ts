@@ -5,13 +5,18 @@ import { Configuration, OpenAIApi } from 'openai'
 import { inspect } from 'util'
 import { v4 as uuidv4 } from 'uuid'
 import { fetchSources } from './sources'
+import yargs from 'yargs'
 
 dotenv.config()
 
 async function generateEmbeddings() {
-  // TODO: use better CLI lib like yargs
-  const args = process.argv.slice(2)
-  const shouldRefresh = args.includes('--refresh')
+  const argv = await yargs.option('refresh', {
+    alias: 'r',
+    description: 'Refresh data',
+    type: 'boolean',
+  }).argv
+
+  const shouldRefresh = argv.refresh
 
   const requiredEnvVars = [
     'NEXT_PUBLIC_SUPABASE_URL',
