@@ -69,25 +69,41 @@ const Usage = () => {
     switch (id) {
       case 'infra':
         if (infrastructureRef.current) {
-          infrastructureRef.current.scrollIntoView({ behavior: 'smooth' })
+          infrastructureRef.current.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start', // or 'end' to scroll to the bottom
+            inline: 'start', //
+          })
           setActiveTab('infra')
         }
         break
       case 'bandwidth':
         if (bandwidthRef.current) {
-          bandwidthRef.current.scrollIntoView({ behavior: 'smooth' })
+          bandwidthRef.current.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start', // or 'end' to scroll to the bottom
+            inline: 'start', //
+          })
           setActiveTab('bandwidth')
         }
         break
       case 'sizeCount':
         if (sizeAndCountsRef.current) {
-          sizeAndCountsRef.current.scrollIntoView({ behavior: 'smooth' })
+          sizeAndCountsRef.current.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start', // or 'end' to scroll to the bottom
+            inline: 'start', //
+          })
           setActiveTab('sizeCount')
         }
         break
       case 'activity':
         if (activityRef.current) {
-          activityRef.current.scrollIntoView({ behavior: 'smooth' })
+          activityRef.current.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start', // or 'end' to scroll to the bottom
+            inline: 'start', //
+          })
           setActiveTab('activity')
         }
         break
