@@ -41,7 +41,7 @@ Para ver como Contribuir, visite [Primeiros Passos](../DEVELOPERS.md)
 - [x] Alfa: Nós estamos testando Supabase com um grupo fechado de clientes.
 - [x] Alfa Público: Qualquer um pode se registrar em [app.supabase.com](https://app.supabase.com). Porém seja flexível com a gente, ainda existem alguns obstáculos.
 - [x] Beta Público: Estável o suficiente para a maioria dos casos não empresariais.
-- [ ] Público: Pronto para produção.
+- [ ] Público: Pronto para produção. [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
 
 Estamos atualmente na fase Beta Público. Siga as "entregas" (_releases_) deste repositório para receber uma notificação quando houver uma grande atualização (_major releases_).
 
@@ -148,8 +148,8 @@ Nossa biblioteca de cliente é modular. Cada sub-biblioteca é uma implementaç�
   <tr>
     <td>Kotlin</td>
     <td><a href="https://github.com/supabase-community/supabase-kt" target="_blank" rel="noopener noreferrer">supabase-kt</a></td>
-    <td><a href="https://github.com/supabase-community/postgrest-kt" target="_blank" rel="noopener noreferrer">postgrest-kt</a></td>
-    <td><a href="https://github.com/supabase-community/gotrue-kt" target="_blank" rel="noopener noreferrer">gotrue-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Postgrest" target="_blank" rel="noopener noreferrer">postgrest-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/GoTrue" target="_blank" rel="noopener noreferrer">gotrue-kt</a></td>
     <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Realtime" target="_blank" rel="noopener noreferrer">realtime-kt</a></td>
     <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Storage" target="_blank" rel="noopener noreferrer">storage-kt</a></td>
     <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Functions" target="_blank" rel="noopener noreferrer">functions-kt</a></td>

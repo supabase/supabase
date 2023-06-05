@@ -3,7 +3,7 @@ Pricing Changelog
 ### 18 Jan 2023
 
 - Clarified over-usage of Realtime messages per month
-    - On the Pro tier, $2.50 per million after included 5 million messages
+    - On the Pro plan, $2.50 per million after included 5 million messages
 
 ### 09 Jan 2023
 ----
@@ -47,7 +47,7 @@ Auth
 - New item “MAUs (Monthly Active Users)”
 Security & Compliance
 - New item: “Security questionnaire help” for enterprise
-- New item - “Metrics Endpoint” for enterprise and pro tier users
+- New item - “Metrics Endpoint” for enterprise and pro plan users
 Database Compute Add ons
 - New item: “4XL”
 - New item: “8XL”
@@ -61,7 +61,7 @@ Clarifications
 - Storage - file upload size - clarified that it can be changed in dashboard
 - All products - “Transfer” renamed to “Egress”
 - Database compute add-ons - Number of connections more accurate
-- Storage - Free tier egress per month clarified
+- Storage - Free plan egress per month clarified
 
 ### 31 March 2022
 ----

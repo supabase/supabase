@@ -5,13 +5,62 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Thu, 13 Apr 2023 22:10:00 +0000</lastBuildDate>
+      <lastBuildDate>Sun, 14 May 2023 22:10:00 +0000</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/building-chatgpt-plugins-template</guid>
+  <title>Building ChatGPT Plugins with Supabase Edge Runtime</title>
+  <link>https://supabase.com/blog/building-chatgpt-plugins-template</link>
+  <description>We're releasing a ChatGPT plugin template written in TypeScript and running on Deno!</description>
+  <pubDate>Sun, 14 May 2023 22:10:00 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/flutter-hackathon</guid>
+  <title>Flutter Hackathon</title>
+  <link>https://supabase.com/blog/flutter-hackathon</link>
+  <description>Build Flutter apps and win limited edition swag.</description>
+  <pubDate>Thu, 11 May 2023 22:10:00 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/supabase-beta-update-april-2023</guid>
+  <title>Supabase Beta April 2023</title>
+  <link>https://supabase.com/blog/supabase-beta-update-april-2023</link>
+  <description>A review of Launch Week 7 and more exciting updates from last month.</description>
+  <pubDate>Mon, 08 May 2023 22:10:00 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/flutter-multi-factor-authentication</guid>
+  <title>Securing your Flutter apps with Multi-Factor Authentication</title>
+  <link>https://supabase.com/blog/flutter-multi-factor-authentication</link>
+  <description>Build a Flutter app where the user is required to authenticate using Multi-Factor Authentication.</description>
+  <pubDate>Wed, 03 May 2023 22:10:00 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/postgres-pluggable-strorage</guid>
+  <title>Next steps for Postgres pluggable storage</title>
+  <link>https://supabase.com/blog/postgres-pluggable-strorage</link>
+  <description>Exploring history of Postgres pluggable storage and the possibility of landing it in the Postgres core.</description>
+  <pubDate>Sun, 30 Apr 2023 22:10:00 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/launch-week-7-hackathon-winners</guid>
+  <title>Launch Week 7 Hackathon Winners</title>
+  <link>https://supabase.com/blog/launch-week-7-hackathon-winners</link>
+  <description>Announcing the winners of the Launch Week 7 Hackathon!</description>
+  <pubDate>Sun, 23 Apr 2023 22:10:00 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/whats-new-in-pg-graphql-v1-2</guid>
+  <title>What's New in pg_graphql v1.2</title>
+  <link>https://supabase.com/blog/whats-new-in-pg-graphql-v1-2</link>
+  <description>New Features in the v1.2 release of pg_graphql</description>
+  <pubDate>Thu, 20 Apr 2023 22:10:00 +0000</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/supabase-studio-2.0</guid>
   <title>Supabase Studio 2.0: help when you need it most</title>
   <link>https://supabase.com/blog/supabase-studio-2.0</link>
-  <description>undefined</description>
+  <description>Supabase Studio now comes with ChatGPT, and GraphiQL built in, Cascade Deletes, and Foreign Key Selectors, and much more.</description>
   <pubDate>Thu, 13 Apr 2023 22:10:00 +0000</pubDate>
 </item>
 <item>
@@ -25,42 +74,42 @@
   <guid>https://supabase.com/blog/pg-tle</guid>
   <title>Trusted Language Extensions for Postgres</title>
   <link>https://supabase.com/blog/pg-tle</link>
-  <description>undefined</description>
+  <description>We're collaborating with AWS to bring Trusted Language Extensions to Postgres.</description>
   <pubDate>Thu, 13 Apr 2023 22:10:00 +0000</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/launch-week-7-community-highlights</guid>
   <title>Launch Week 7 Community Highlights</title>
   <link>https://supabase.com/blog/launch-week-7-community-highlights</link>
-  <description>undefined</description>
+  <description>We're honored to work with, sponsor, and support incredible people and tools. Here is a highlight of the last 3 months.</description>
   <pubDate>Thu, 13 Apr 2023 22:10:00 +0000</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-auth-sso-pkce</guid>
   <title>Supabase Auth: SSO,  Mobile, and Server-side support</title>
   <link>https://supabase.com/blog/supabase-auth-sso-pkce</link>
-  <description>undefined</description>
+  <description>Supacharging Supabase Auth with Sign in with Apple on iOS, Single-Sign-On support with SAML 2.0, and PKCE for server-side rendering and mobile auth.</description>
   <pubDate>Wed, 12 Apr 2023 22:10:00 +0000</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/storage-v3-resumable-uploads</guid>
   <title>Supabase Storage v3: Resumable Uploads with support for 50GB files</title>
   <link>https://supabase.com/blog/storage-v3-resumable-uploads</link>
-  <description>undefined</description>
+  <description>Storage V3 with lots of new features including resumable uploads, more image transformationsm a Next.js image loader and more.</description>
   <pubDate>Tue, 11 Apr 2023 22:10:00 +0000</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/edge-runtime-self-hosted-deno-functions</guid>
   <title>Supabase Edge Runtime: Self-hosted Deno Functions</title>
   <link>https://supabase.com/blog/edge-runtime-self-hosted-deno-functions</link>
-  <description>undefined</description>
+  <description>We are open-sourcing Supabase Edge Runtime allowing you to host your Edge Functions anywhere.</description>
   <pubDate>Mon, 10 Apr 2023 22:10:00 +0000</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-logs-self-hosted</guid>
   <title>Supabase Logs: open source logging server</title>
   <link>https://supabase.com/blog/supabase-logs-self-hosted</link>
-  <description>undefined</description>
+  <description>We're releasing Supabase Logs for both self-hosted users and CLI development.</description>
   <pubDate>Sun, 09 Apr 2023 22:10:00 +0000</pubDate>
 </item>
 <item>
@@ -620,7 +669,7 @@
   <guid>https://supabase.com/blog/graphql-now-available</guid>
   <title>GraphQL is now available in Supabase</title>
   <link>https://supabase.com/blog/graphql-now-available</link>
-  <description>GraphQL support is now in general availability on the Supabase platform via our open source PostgreSQL extension, pg_graphql (beta).</description>
+  <description>GraphQL support is now in general availability on the Supabase platform via our open source PostgreSQL extension, pg_graphql.</description>
   <pubDate>Mon, 28 Mar 2022 22:10:00 +0000</pubDate>
 </item>
 <item>
@@ -645,9 +694,9 @@
   <pubDate>Thu, 24 Mar 2022 23:11:00 +0000</pubDate>
 </item>
 <item>
-  <guid>https://supabase.com/blog/audit</guid>
+  <guid>https://supabase.com/blog/postgres-audit</guid>
   <title>Postgres Auditing in 150 lines of SQL</title>
-  <link>https://supabase.com/blog/audit</link>
+  <link>https://supabase.com/blog/postgres-audit</link>
   <description>PostgreSQL has a robust set of features which we can leverage to create a generic auditing solution in 150 lines of SQL.</description>
   <pubDate>Mon, 07 Mar 2022 23:11:00 +0000</pubDate>
 </item>

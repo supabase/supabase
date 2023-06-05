@@ -12,6 +12,7 @@ export const PricingTableRowDesktop = (props: any) => {
       <tr
         className="divide-scale-600 dark:divide-scale-400 bg-scale-200"
         style={{ borderTop: 'none' }}
+        id={`${props.sectionId}-desktop`}
       >
         <th
           className="border-b border-scale-600 bg-scale-200 bg-scale-50 dark:bg-scale-200 text-scale-1200 sticky top-[62px] z-10 py-3 pl-6 text-left text-sm font-medium dark:text-white"
@@ -99,7 +100,7 @@ export const PricingTableRowMobile = (props: any) => {
 
   return (
     <>
-      <table className="mt-8 w-full">
+      <table className="mt-8 w-full" id={`${props.sectionId}-mobile`}>
         <caption className="bg-scale-50 dark:bg-dark-900 border-scale-400 border-t px-4 py-3 text-left text-sm font-medium dark:text-white">
           <div className="flex items-center gap-2">
             {category.icon ? <ProductIcon icon={props.icon} /> : null}

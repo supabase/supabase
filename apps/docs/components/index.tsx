@@ -1,7 +1,6 @@
 import Link from 'next/link'
 import { Alert, Button, CodeBlock, GlassPanel, markdownComponents, Tabs } from 'ui'
 import StepHikeCompact from '~/components/StepHikeCompact'
-
 // Common components
 import Admonition from './Admonition'
 import ButtonCard from './ButtonCard'
@@ -17,6 +16,7 @@ import FunctionsExamples from './FunctionsExamples'
 import { Mermaid } from 'mdx-mermaid/lib/Mermaid'
 import RefSubLayout from '~/layouts/ref/RefSubLayout'
 import { Heading } from './CustomHTMLElements'
+import DatabaseSetup from './MDX/database_setup.mdx'
 import ProjectSetup from './MDX/project_setup.mdx'
 import QuickstartIntro from './MDX/quickstart_intro.mdx'
 import SocialProviderSettingsSupabase from './MDX/social_provider_settings_supabase.mdx'
@@ -31,6 +31,29 @@ import CliGlobalFlagsHandler from '~/components/reference/enrichments/cli/CliGlo
 import Options from '~/components/Options'
 import Param from '~/components/Params'
 
+import {
+  IconMenuJavascript,
+  IconMenuHome,
+  IconMenuGettingStarted,
+  IconMenuDatabase,
+  IconMenuServerlessApis,
+  IconMenuAuth,
+  IconMenuEdgeFunctions,
+  IconMenuRealtime,
+  IconMenuStorage,
+  IconMenuPlatform,
+  IconMenuResources,
+  IconMenuSelfHosting,
+  IconMenuIntegrations,
+  IconMenuFlutter,
+  IconMenuPython,
+  IconMenuCsharp,
+  IconMenuSwift,
+  IconMenuKotlin,
+  IconMenuApi,
+  IconMenuCli,
+} from './Navigation/NavigationMenu/HomeMenuIcons'
+
 const components = {
   ...markdownComponents,
   Admonition,
@@ -44,6 +67,7 @@ const components = {
   FunctionsExamples,
   JwtGenerator,
   QuickstartIntro,
+  DatabaseSetup,
   ProjectSetup,
   SocialProviderSetup,
   SocialProviderSettingsSupabase,
@@ -73,6 +97,26 @@ const components = {
   CliGlobalFlagsHandler: () => <CliGlobalFlagsHandler />,
   Options,
   Param,
+  IconMenuJavascript,
+  IconMenuHome,
+  IconMenuGettingStarted,
+  IconMenuDatabase,
+  IconMenuServerlessApis,
+  IconMenuAuth,
+  IconMenuEdgeFunctions,
+  IconMenuRealtime,
+  IconMenuStorage,
+  IconMenuPlatform,
+  IconMenuResources,
+  IconMenuSelfHosting,
+  IconMenuIntegrations,
+  IconMenuFlutter,
+  IconMenuPython,
+  IconMenuCsharp,
+  IconMenuKotlin,
+  IconMenuSwift,
+  IconMenuApi,
+  IconMenuCli,
 }
 
 export default components

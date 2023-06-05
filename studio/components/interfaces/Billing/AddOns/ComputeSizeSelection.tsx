@@ -1,5 +1,6 @@
-import { FC } from 'react'
 import Link from 'next/link'
+import { FC, useEffect } from 'react'
+import { useRouter } from 'next/router'
 import { Badge, Button, IconExternalLink, Radio } from 'ui'
 
 import { useFlag } from 'hooks'
@@ -22,14 +23,25 @@ const ComputeSizeSelection: FC<Props> = ({
   onSelectOption,
 }) => {
   const { ref } = useParams()
+  const { asPath } = useRouter()
+  useEffect(() => {
+    const hash = asPath.split('#')[1]
+    if (hash !== undefined) {
+      window.location.hash = ''
+      window.location.hash = hash
+    }
+  }, [asPath])
   const addonUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
-
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
           <div className="flex items-center space-x-2">
-            <h4 className="text-lg">Compute add-ons</h4>
+            <h4 id="compute-addon" className="text-lg">
+              <Link href="#compute-addon" prefetch={false}>
+                <a>Compute add-ons</a>
+              </Link>
+            </h4>
             <Badge color="green">Optional</Badge>
           </div>
           <p className="text-sm text-scale-1100">
@@ -37,7 +49,7 @@ const ComputeSizeSelection: FC<Props> = ({
           </p>
         </div>
         <Link href="https://supabase.com/docs/guides/platform/compute-add-ons">
-          <a target="_blank">
+          <a target="_blank" rel="noreferrer">
             <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
               About compute add-ons
             </Button>
@@ -63,7 +75,7 @@ const ComputeSizeSelection: FC<Props> = ({
           </div>
           <div className="">
             <Link
-              href={`/support/new?ref=${ref}&category=sales&subject=Disable%20custom%20domains%20`}
+              href={`/support/new?ref=${ref}&category=sales&subject=Disable%20custom%20domains`}
             >
               <a>
                 <Button>Contact us</Button>

@@ -57,7 +57,7 @@ export const meta = {
 <div className="grid lg:grid-cols-12 gap-6 not-prose">
   {quickstarts.map((item) => {
     return (
-      <Link href={`/${item.href}`} key={item.title} passHref>
+      <Link href={`${item.href}`} key={item.title} passHref>
         <a className={'col-span-4'}>
           <GlassPanel title={item.title} span="col-span-6" background={false} icon={item.icon}>
             {item.description}
@@ -73,7 +73,7 @@ export const meta = {
 <div className="grid lg:grid-cols-12 gap-6 not-prose">
   {webapps.map((item) => {
     return (
-      <Link href={`/${item.href}`} key={item.title} passHref>
+      <Link href={`${item.href}`} key={item.title} passHref>
         <a className={'col-span-4'}>
           <GlassPanel title={item.title} span="col-span-6" background={false} icon={item.icon}>
             {item.description}
@@ -89,7 +89,7 @@ export const meta = {
 <div className="grid lg:grid-cols-12 gap-6 not-prose">
   {mobile.map((item) => {
     return (
-      <Link href={`/${item.href}`} key={item.title} passHref>
+      <Link href={`${item.href}`} key={item.title} passHref>
         <a className={'col-span-4'}>
           <GlassPanel title={item.title} span="col-span-6" background={false} icon={item.icon}>
             {item.description}
@@ -102,9 +102,9 @@ export const meta = {
 
 export const useCases = [
   {
-    title: 'OpenAI Vector Search',
-    href: '/guides/getting-started/openai/vector-search',
-    description: `Build your own custom ChatGPT with Next.js, OpenAI and pg_vector.`,
+    title: 'AI, Vectors, and embeddings',
+    href: '/docs/guides/ai#examples',
+    description: `Build AI-enabled applications using our Vector toolkit.`,
     icon: '/docs/img/icons/openai_logo',
   },
   {
@@ -286,7 +286,7 @@ export const resources = [
   {
     title: 'Local Development',
     hasLightIcon: true,
-    href: '/guides/cli/local-development',
+    href: '/guides/getting-started/local-development',
     description: 'Use the Supabase CLI to develop locally and collaborate between teams.',
   },
 ]

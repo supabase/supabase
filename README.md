@@ -19,6 +19,7 @@
   - [x] Database Functions. [Docs](https://supabase.com/docs/guides/database/functions)
   - [x] Edge Functions [Docs](https://supabase.com/docs/guides/functions)
 - [x] File Storage. [Docs](https://supabase.com/docs/guides/storage)
+- [x] AI + Vector/Embeddings Toolkit. [Docs](https://supabase.com/docs/guides/ai)
 - [x] Dashboard
 
 ![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
@@ -149,8 +150,8 @@ Our approach for client libraries is modular. Each sub-library is a standalone i
   <tr>
     <td>Kotlin</td>
     <td><a href="https://github.com/supabase-community/supabase-kt" target="_blank" rel="noopener noreferrer">supabase-kt</a></td>
-    <td><a href="https://github.com/supabase-community/postgrest-kt" target="_blank" rel="noopener noreferrer">postgrest-kt</a></td>
-    <td><a href="https://github.com/supabase-community/gotrue-kt" target="_blank" rel="noopener noreferrer">gotrue-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Postgrest" target="_blank" rel="noopener noreferrer">postgrest-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/GoTrue" target="_blank" rel="noopener noreferrer">gotrue-kt</a></td>
     <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Realtime" target="_blank" rel="noopener noreferrer">realtime-kt</a></td>
     <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Storage" target="_blank" rel="noopener noreferrer">storage-kt</a></td>
     <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Functions" target="_blank" rel="noopener noreferrer">functions-kt</a></td>
@@ -231,7 +232,7 @@ Our approach for client libraries is modular. Each sub-library is a standalone i
 - [Norwegian (Bokmål) / Norsk (Bokmål)](/i18n/README.nb-no.md)
 - [Persian / فارسی](/i18n/README.fa.md)
 - [Polish / Polski](/i18n/README.pl.md)
-- [Portuguese / Portuguese](/i18n/README.pt.md)
+- [Portuguese / Português](/i18n/README.pt.md)
 - [Portuguese (Brazilian) / Português Brasileiro](/i18n/README.pt-br.md)
 - [Romanian / Română](/i18n/README.ro.md)
 - [Russian / Pусский](/i18n/README.ru.md)
@@ -247,8 +248,3 @@ Our approach for client libraries is modular. Each sub-library is a standalone i
 - [Vietnamese / Tiếng Việt](/i18n/README.vi-vn.md)
 - [List of translations](/i18n/languages.md) <!--- Keep only this -->
 
----
-
-## Sponsors
-
-[![New Sponsor](https://user-images.githubusercontent.com/10214025/90518111-e74bbb00-e198-11ea-8f88-c9e3c1aa4b5b.png)](https://github.com/sponsors/supabase)

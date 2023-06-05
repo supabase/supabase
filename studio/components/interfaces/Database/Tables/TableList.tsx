@@ -70,7 +70,7 @@ const TableList: FC<Props> = ({
     <>
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <div className="w-[230px]">
+          <div className="w-[260px]">
             <Listbox
               size="small"
               value={selectedSchema}

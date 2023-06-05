@@ -12,7 +12,10 @@ In some cases, access to new features require upgrading or migrating your Supaba
 
 ## Upgrade your project
 
-<Admonition type="note">This is only available for projects on the Free plan.</Admonition>
+<Admonition type="note">
+  This is only available for projects on the Free plan. For projects on the Pro plan, please contact
+  support for assistance with upgrading.
+</Admonition>
 
 When you pause and restore a project, the restored database includes the latest features. This method _does_ include downtime, so be aware that your project will be inaccessible for a short period of time.
 
@@ -46,7 +49,6 @@ In your new project:
 
 1. Enable [Database Webhooks](https://app.supabase.com/project/_/database/hooks) if you enabled them in your old project.
 2. Enable any [extensions](https://app.supabase.com/project/_/database/extensions) that were enabled in your old project.
-3. Create any [custom roles](https://app.supabase.com/project/_/database/roles) that were created in your old project.
 
 Then run the following command from your terminal:
 
@@ -54,10 +56,13 @@ Then run the following command from your terminal:
 psql \
   --single-transaction \
   --variable ON_ERROR_STOP=1 \
+  --file roles.sql \
   --file schema.sql \
   --file data.sql \
   --dbname "$NEW_DB_URL"
 ```
+
+Note if you have created any [custom roles](https://app.supabase.com/project/_/database/roles) with `login` attribute, you have to manually set their passwords in the new project.
 
 ### Enable publication on tables
 
@@ -79,7 +84,9 @@ const NEW_PROJECT_SERVICE_KEY = 'new-project-service-key-yyy'
 
 ;(async () => {
   const oldSupabaseRestClient = createClient(OLD_PROJECT_URL, OLD_PROJECT_SERVICE_KEY, {
-    schema: 'storage',
+    db: {
+      schema: 'storage',
+    },
   })
   const oldSupabaseClient = createClient(OLD_PROJECT_URL, OLD_PROJECT_SERVICE_KEY)
   const newSupabaseClient = createClient(NEW_PROJECT_URL, NEW_PROJECT_SERVICE_KEY)

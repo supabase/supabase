@@ -100,10 +100,11 @@ Next, under the database, select "SupabaseDB".
 We will be using the following SQL query:
 
 ```sql
-SELECT "Vendor".vendor_name, product_name, "Vendor".total_employees
-FROM "Product"
-LEFT JOIN "Vendor" on "Product".vendor_id = "Vendor".vendor_id
-WHERE "Vendor".total_employees
+select "Vendor".vendor_name, product_name, "Vendor".total_employees
+from
+  "Product"
+  left join "Vendor" on "Product".vendor_id = "Vendor".vendor_id
+where "Vendor".total_employees;
 ```
 
 This query should fetch us the vendor name and the product where the number of employees for a given vendor is less than 110.
@@ -130,7 +131,7 @@ Data visualization empowers organizations to turn unused data into actionable in
 
 ![screen shot of a meme saying visualization works every time](/images/blog/python-1/final-meme.png)
 
-With our [free tier Supabase account](https://app.supabase.com/), you can start a new project today and use Metabase to visualize your app data.
+With our [free plan Supabase account](https://app.supabase.com/), you can start a new project today and use Metabase to visualize your app data.
 
 If you have any questions please reach out via [Twitter](https://twitter.com/supabase) or join our [Discord](https://discord.supabase.com).
 

@@ -15,7 +15,7 @@ const ExampleProject: FC<Props> = ({ framework, title, description, url }) => {
 
   return (
     <Link href={url}>
-      <a target="_blank">
+      <a target="_blank" rel="noreferrer">
         <div
           className={[
             'group relative',

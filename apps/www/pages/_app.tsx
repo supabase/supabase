@@ -1,22 +1,32 @@
-import { APP_NAME, DESCRIPTION } from 'lib/constants'
+import '../../../packages/ui/build/css/themes/light.css'
+import '../../../packages/ui/build/css/themes/dark.css'
+
+import '../styles/index.css'
+
+import { API_URL, APP_NAME, DESCRIPTION } from 'lib/constants'
 import { DefaultSeo } from 'next-seo'
 import { AppProps } from 'next/app'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import Meta from '~/components/Favicons'
 import '../styles/index.css'
-import { post } from './../lib/fetchWrapper'
-import { AuthProvider, ThemeProvider } from 'common'
+import { post } from '~/lib/fetchWrapper'
+import { AuthProvider, ThemeProvider, useTelemetryProps } from 'common'
 import Head from 'next/head'
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter()
+  const telemetryProps = useTelemetryProps()
 
   function handlePageTelemetry(route: string) {
-    return post(`https://api.supabase.io/platform/telemetry/page`, {
+    return post(`${API_URL}/telemetry/page`, {
       referrer: document.referrer,
       title: document.title,
       route,
+      ga: {
+        screen_resolution: telemetryProps?.screenResolution,
+        language: telemetryProps?.language,
+      },
     })
   }
 

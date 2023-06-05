@@ -192,10 +192,6 @@ const SpreadsheetImport: FC<Props> = ({
           applyFunction={onConfirm}
         />
       }
-      onInteractOutside={(event) => {
-        const isToast = (event.target as Element)?.closest('#toast')
-        if (isToast) event.preventDefault()
-      }}
     >
       <SidePanel.Content>
         <div className="pt-6">

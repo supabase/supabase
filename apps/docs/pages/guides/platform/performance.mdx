@@ -6,7 +6,7 @@ export const meta = {
   description: 'Getting the best results out of your Supabase project',
 }
 
-The Supabase platform automatically optimizes your Postgres database to take advantage of the compute resources of the tier your project is on. However, these optimizations are based on assumptions about the type of workflow the project is being utilized for, and it is likely that better results can be obtained by tuning the database for your particular workflow.
+The Supabase platform automatically optimizes your Postgres database to take advantage of the compute resources of the plan your project is on. However, these optimizations are based on assumptions about the type of workflow the project is being utilized for, and it is likely that better results can be obtained by tuning the database for your particular workflow.
 
 ## Examining Query Performance
 
@@ -124,7 +124,7 @@ Queries which are the most time consuming are not necessarily bad, you may have 
 
 Generally for most applications a small percentage of data is accessed more regularly than the rest. To make sure that your regularly accessed data is available, Postgres tracks your data access patterns and keeps this in its [shared_buffers](https://www.postgresql.org/docs/15/runtime-config-resource.html#RUNTIME-CONFIG-RESOURCE-MEMORY) cache.
 
-Applications with lower cache hit rates generally perform more poorly since they have to hit the disk to get results rather than serving them from memory. Very poor hit rates can also cause you to burst past your [Disk I/O limits](https://supabase.com/docs/guides/platform/compute-add-ons#disk-io-bandwidth) causing significant performance issues.
+Applications with lower cache hit rates generally perform more poorly since they have to hit the disk to get results rather than serving them from memory. Very poor hit rates can also cause you to burst past your [Disk I/O limits](https://supabase.com/docs/guides/platform/compute-add-ons#disk-throughput-and-iops) causing significant performance issues.
 
 You can view your cache and index hit rate by executing the following query:
 
@@ -207,7 +207,7 @@ You can configure Postgres by executing the following statement, followed by a s
 alter system set max_connections = '<val-here>';
 ```
 
-Note that [the default configuration used by the Supabase platform](https://github.com/supabase/supabase-admin-api/blob/master/optimizations/postgres.go) optimizes the database to maximize resource utilization, and as a result, you might also need to configure other options (e.g. `work_mem`, `shared_buffers`, `maintenance_work_mem`) in order to tune them towards your use-case, and to avoid causing instability in your database.
+Note that the default configuration used by the Supabase platform optimizes the database to maximize resource utilization, and as a result, you might also need to configure other options (e.g. `work_mem`, `shared_buffers`, `maintenance_work_mem`) in order to tune them towards your use-case, and to avoid causing instability in your database.
 
 Once overridden, the Supabase platform will continue to respect your manually configured value (even if the add-on size is changed), unless the override is removed with the following statement, followed by a server restart:
 

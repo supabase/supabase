@@ -56,7 +56,6 @@ const EditWrapper = () => {
   const foundWrapper = wrappers.find((w) => Number(w.id) === Number(id))
   // this call to useImmutableValue should be removed if the redirect after update is also removed
   const wrapper = useImmutableValue(foundWrapper)
-
   const wrapperMeta = WRAPPERS.find((w) => w.handlerName === wrapper?.handler)
 
   const { mutateAsync: updateFDW, isLoading: isSaving } = useFDWUpdateMutation()
@@ -196,7 +195,7 @@ const EditWrapper = () => {
           <h3 className="mb-2 text-xl text-scale-1200">Edit wrapper: {wrapper.name}</h3>
           <div className="flex items-center space-x-2">
             <Link href="https://supabase.github.io/wrappers/stripe/">
-              <a target="_blank">
+              <a target="_blank" rel="noreferrer">
                 <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
                   Documentation
                 </Button>
@@ -342,7 +341,8 @@ const EditWrapper = () => {
                                 {table.schema_name}.{table.table_name}
                               </p>
                               <p className="text-sm text-scale-1000">
-                                {wrapperMeta.tables[table.index].label}: {table.columns.join(', ')}
+                                {wrapperMeta.tables[table.index].label}:{' '}
+                                {table.columns.map((column: any) => column.name).join(', ')}
                               </p>
                             </div>
                             <div className="flex items-center space-x-2">
