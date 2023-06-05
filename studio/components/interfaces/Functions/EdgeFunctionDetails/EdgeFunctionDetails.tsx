@@ -60,13 +60,7 @@ const EdgeFunctionDetails: FC<Props> = () => {
     : '[YOUR ANON KEY]'
 
   const endpoint = apiService?.app_config.endpoint ?? ''
-  const endpointSections = endpoint.split('.')
-  const functionsEndpoint = [
-    ...endpointSections.slice(0, 1),
-    'functions',
-    ...endpointSections.slice(1),
-  ].join('.')
-  const functionUrl = `${apiService?.protocol}://${functionsEndpoint}/${selectedFunction?.slug}`
+  const functionUrl = `${apiService?.protocol}://${endpoint}/functions/v1/${selectedFunction?.slug}`
 
   const { managementCommands, secretCommands, invokeCommands } = generateCLICommands(
     selectedFunction,
