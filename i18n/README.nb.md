@@ -53,7 +53,7 @@ Vi er for tiden i offentlig betaversjon. Følg med på "utgivelser" av denne rep
 
 Supabase er en kombinasjon av verktøy med åpen kildekode. Vi bygger funksjonene i Firebase ved hjelp av åpen kildekode-produkter på bedriftsnivå. Hvis verktøyene og fellesskapene finnes, med en MIT, Apache 2 eller tilsvarende åpen lisens, vil vi bruke og støtte det verktøyet. Hvis verktøyet ikke finnes, bygger vi det selv med åpen kildekode. Supabase er ikke en 1-til-1-kartlegging av Firebase. Målet vårt er å gi utviklere en Firebase-lignende utvikleropplevelse ved hjelp av verktøy med åpen kildekode.
 
-**Arkitektur
+\*\*Arkitektur
 
 Supabase er en [vertsplattform] (https://app.supabase.com). Du kan registrere deg og begynne å bruke Supabase uten å installere noe.
 Du kan også [selv være vert](https://supabase.com/docs/guides/hosting/overview) og [utvikle lokalt](https://supabase.com/docs/guides/local-development).
