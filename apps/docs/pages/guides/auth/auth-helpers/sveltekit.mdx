@@ -135,7 +135,7 @@ The `Code Exchange` route is required for the [server-side auth flow](https://su
 
 Create a new file at `src/routes/auth/callback/+server.js` and populate with the following:
 
-```jsx src/routes/auth/callback/+server.js
+```js src/routes/auth/callback/+server.js
 import { redirect } from '@sveltejs/kit'
 
 export const GET = async ({ url, locals: { supabase } }) => {
@@ -155,7 +155,7 @@ export const GET = async ({ url, locals: { supabase } }) => {
 
 Create a new file at `src/routes/auth/callback/+server.ts` and populate with the following:
 
-```tsx src/routes/auth/callback/+server.ts
+```ts src/routes/auth/callback/+server.ts
 import { redirect } from '@sveltejs/kit'
 
 export const GET = async ({ url, locals: { supabase } }) => {
