@@ -104,6 +104,8 @@ create policy "Users can update their own profiles."
 2. Enables RLS.
 3. Creates a policy which allows logged in users to update their own data.
 
+**Note:** If you want to use upsert operations, the user needs to have `INSERT`, `UPDATE`, and `SELECT` permissions.
+
 ### Only anon or authenticated access
 
 You can add a Postgres role
