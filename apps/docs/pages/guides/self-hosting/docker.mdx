@@ -30,23 +30,23 @@ cp .env.example .env
 docker compose up
 ```
 
-Now visit [http://localhost:3000](http://localhost:3000) to start using Supabase Studio.
+Now visit [localhost:3000](http://localhost:3000) to start using Supabase Studio.
 
-That's everything you need to get started. The rest of this guide will focus on customizing your setup.
+That's everything you need to get started. The rest of this guide will help you to customize your setup.
 
-## Customizing your setup
+## Securing your setup
 
 While we provided you with some example secrets for getting started, you should NEVER deploy your Supabase setup using the defaults we have provided.
-
-We strongly recommend using a [secrets manager](../self-hosting#managing-your-secrets) when deploying to production, rather than using an `.env` file.
 
 ### Generate API Keys
 
 Create a new `JWT_SECRET` and store it securely. 
 
-Now we can use it to generate a `anon` and `service` API keys by updating the "JWT Secret" and then running "Generate JWT" once for the `SERVICE_KEY` and once for the `ANON_KEY`:
+We can use your JWT Secret to generate new `anon` and `service` API keys using the form below. Update the "JWT Secret" and then run "Generate JWT" once for the `SERVICE_KEY` and once for the `ANON_KEY`:
 
 <JwtGenerator />
+
+### Update API Keys
 
 Replace the values in these files:
 
@@ -65,7 +65,6 @@ Update the `.env` file with your own secrets. In particular, these are required:
 - `JWT_SECRET`: used by PostgREST and GoTrue, among others.
 - `SITE_URL`: the base URL of your site.
 - `SMTP_*`: mail server credentials. You can use any SMTP server.
-
 
 ## Exposing services
 
@@ -134,11 +133,6 @@ However, you might miss important log messages such as database errors. Configur
 ### File storage backend on macOS
 
 By default, Storage backend is set to `file`, which is to use local files as the storage backend. To make it work on macOS, you need to choose `VirtioFS` as the Docker container file sharing implementation (in Docker Desktop -> Preferences -> General).
-
-## Next steps
-
-- Got a question? [Ask here](https://github.com/supabase/supabase/discussions).
-- Sign in: [app.supabase.com](https://app.supabase.com)
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
