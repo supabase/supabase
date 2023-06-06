@@ -92,7 +92,6 @@ const Usage = () => {
             block: 'start', // or 'end' to scroll to the bottom
             inline: 'start', //
           })
-          setActiveTab('infra')
         }
         break
       case 'bandwidth':
@@ -102,7 +101,6 @@ const Usage = () => {
             block: 'start', // or 'end' to scroll to the bottom
             inline: 'start', //
           })
-          setActiveTab('bandwidth')
         }
         break
       case 'sizeCount':
@@ -112,7 +110,6 @@ const Usage = () => {
             block: 'start', // or 'end' to scroll to the bottom
             inline: 'start', //
           })
-          setActiveTab('sizeCount')
         }
         break
       case 'activity':
@@ -122,7 +119,6 @@ const Usage = () => {
             block: 'start', // or 'end' to scroll to the bottom
             inline: 'start', //
           })
-          setActiveTab('activity')
         }
         break
     }
@@ -225,7 +221,7 @@ const Usage = () => {
 
         <InView
           as="div"
-          threshold={0.6}
+          threshold={0.2}
           onChange={(inView, entry) => inView && setActiveTab('infra')}
         >
           <div id="infrastructure" ref={infrastructureRef}>
@@ -234,7 +230,7 @@ const Usage = () => {
         </InView>
         <InView
           as="div"
-          threshold={0.6}
+          rootMargin="85% 0% -85% 0px"
           onChange={(inView, entry) => inView && setActiveTab('bandwidth')}
         >
           <div id="bandwidth" ref={bandwidthRef}>
@@ -248,7 +244,7 @@ const Usage = () => {
         </InView>
         <InView
           as="div"
-          threshold={0.6}
+          rootMargin="85% 0% -85% 0px"
           onChange={(inView, entry) => inView && setActiveTab('sizeCount')}
         >
           <div id="size_and_counts" ref={sizeAndCountsRef}>
@@ -262,7 +258,7 @@ const Usage = () => {
         </InView>
         <InView
           as="div"
-          threshold={0.3}
+          rootMargin="85% 0% -85% 0px"
           onChange={(inView, entry) => inView && setActiveTab('activity')}
         >
           <div id="activity" ref={activityRef}>
