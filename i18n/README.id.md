@@ -7,7 +7,7 @@
 
 # Supabase
 
-[Supabase] (https://supabase.com) adalah alternatif Firebase open source. Kami membangun fitur-fitur Firebase menggunakan alat bantu open source tingkat perusahaan.
+[Supabase](https://supabase.com) adalah alternatif Firebase open source. Kami membangun fitur-fitur Firebase menggunakan alat bantu open source tingkat perusahaan.
 
 - [x] Basis Data Postgres yang dihosting. [Dokumen](https://supabase.com/docs/guides/database)
 - [x] Otentikasi dan Otorisasi. [Dokumen](https://supabase.com/docs/guides/auth)
@@ -55,19 +55,19 @@ Supabase adalah kombinasi dari alat sumber terbuka. Kami membangun fitur-fitur F
 
 **Arsitektur**
 
-Supabase adalah [platform yang di-host] (https://app.supabase.com). Anda bisa mendaftar dan mulai menggunakan Supabase tanpa menginstal apa pun.
+Supabase adalah [platform yang di-host](https://app.supabase.com). Anda bisa mendaftar dan mulai menggunakan Supabase tanpa menginstal apa pun.
 Anda juga bisa [menghosting sendiri](https://supabase.com/docs/guides/hosting/overview) dan [mengembangkan secara lokal](https://supabase.com/docs/guides/local-development).
 
 ![Arsitektur](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
 
 - [PostgreSQL](https://www.postgresql.org/) adalah sistem basis data relasional objek dengan lebih dari 30 tahun pengembangan aktif yang telah membuatnya memiliki reputasi yang kuat dalam hal keandalan, ketangguhan fitur, dan kinerja.
-- [Realtime] (https://github.com/supabase/realtime) adalah server Elixir yang memungkinkan Anda untuk mendengarkan penyisipan, pembaruan, dan penghapusan PostgreSQL menggunakan websocket. Realtime melakukan polling terhadap fungsionalitas replikasi bawaan Postgres untuk perubahan database, mengkonversi perubahan ke JSON, kemudian menyiarkan JSON melalui websockets ke klien yang berwenang.
-- [PostgREST] (http://postgrest.org/) adalah server web yang mengubah basis data PostgreSQL Anda secara langsung menjadi RESTful API
-- [pg_graphql] (http://github.com/supabase/pg_graphql/) ekstensi PostgreSQL yang mengekspos API GraphQL
+- [Realtime](https://github.com/supabase/realtime) adalah server Elixir yang memungkinkan Anda untuk mendengarkan penyisipan, pembaruan, dan penghapusan PostgreSQL menggunakan websocket. Realtime melakukan polling terhadap fungsionalitas replikasi bawaan Postgres untuk perubahan database, mengkonversi perubahan ke JSON, kemudian menyiarkan JSON melalui websockets ke klien yang berwenang.
+- [PostgREST](http://postgrest.org/) adalah server web yang mengubah basis data PostgreSQL Anda secara langsung menjadi RESTful API
+- [pg_graphql](http://github.com/supabase/pg_graphql/) ekstensi PostgreSQL yang mengekspos API GraphQL
 - [Storage](https://github.com/supabase/storage-api) menyediakan antarmuka RESTful untuk mengelola File yang disimpan di S3, menggunakan Postgres untuk mengelola izin.
 - [postgres-meta](https://github.com/supabase/postgres-meta) adalah API RESTful untuk mengelola Postgres Anda, yang memungkinkan Anda untuk mengambil tabel, menambahkan peran, dan menjalankan kueri, dll.
-- [GoTrue] (https://github.com/netlify/gotrue) adalah API berbasis SWT untuk mengelola pengguna dan menerbitkan token SWT.
-- [Kong] (https://github.com/Kong/kong) adalah gateway API asli cloud.
+- [GoTrue](https://github.com/netlify/gotrue) adalah API berbasis SWT untuk mengelola pengguna dan menerbitkan token SWT.
+- [Kong](https://github.com/Kong/kong) adalah gateway API asli cloud.
 
 #### Perpustakaan klien
 
@@ -239,7 +239,7 @@ Pendekatan kami untuk pustaka klien bersifat modular. Setiap sub-pustaka adalah 
 - [Bahasa Polandia / Polski](/i18n/README.pl.md)
 - [Bahasa Portugis / Português](/i18n/README.pt.md)
 - [Portugis (Brasil) / Português Brasileiro](/i18n/README.pt-br.md)
-- [Bahasa Rumania / Rumania] (/i18n/README.ro.md)
+- [Bahasa Rumania / Rumania](/i18n/README.ro.md)
 - [Bahasa Rusia / Pусский](/i18n/README.ru.md)
 - [Bahasa Serbia / Srpski](/i18n/README.sr.md)
 - [Sinhala / සිංහල](/i18n/README.si.md)

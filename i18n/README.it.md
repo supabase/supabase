@@ -55,7 +55,7 @@ Supabase è una combinazione di strumenti open source. Stiamo costruendo le funz
 
 **Architettura**
 
-Supabase è una [piattaforma ospitata] (https://app.supabase.com). È possibile registrarsi e iniziare a usare Supabase senza installare nulla.
+Supabase è una [piattaforma ospitata](https://app.supabase.com). È possibile registrarsi e iniziare a usare Supabase senza installare nulla.
 È anche possibile [auto-ospitare](https://supabase.com/docs/guides/hosting/overview) e [sviluppare localmente](https://supabase.com/docs/guides/local-development).
 
 ![Architettura](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
