@@ -3,7 +3,7 @@ import fs from 'fs'
 import { CodeHikeConfig, remarkCodeHike } from '@code-hike/mdx'
 import matter from 'gray-matter'
 import { serialize } from 'next-mdx-remote/serialize'
-import codeHikeTheme from '~/code-hike.theme.json' assert { type: 'json' }
+import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
 import { ICommonMarkdown } from '~/components/reference/Reference.types'
 
 async function generateRefMarkdown(sections: ICommonMarkdown[], slug: string) {
