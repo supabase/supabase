@@ -8,7 +8,7 @@ import {
 } from 'data/usage/project-usage-query'
 import { DataPoint } from 'data/analytics/constants'
 import SectionContent from './SectionContent'
-import { Button, IconAlertTriangle } from 'ui'
+import { Button, IconAlertTriangle, IconBarChart2 } from 'ui'
 import { USAGE_APPROACHING_THRESHOLD } from '../Billing.constants'
 import Link from 'next/link'
 import SparkBar from 'components/ui/SparkBar'
@@ -175,10 +175,11 @@ const UsageSection = ({ projectRef, categoryKey, chartMeta, subscription }: Usag
               ) : (
                 <Panel>
                   <Panel.Content>
-                    <div className="flex flex-col items-center justify-center space-y-2">
-                      <p>No data</p>
+                    <div className="flex flex-col items-center justify-center">
+                      <IconBarChart2 className="text-scale-1100 mb-2" />
+                      <p className='text-sm'>No data in period</p>
                       <p className="text-sm text-scale-1000">
-                        No {notAllValuesZero ? 'data' : 'usage'} in period
+                        May take up to 24 hours to show
                       </p>
                     </div>
                   </Panel.Content>

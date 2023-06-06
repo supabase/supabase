@@ -49,21 +49,12 @@ const Usage = () => {
   const dailyStatsEndDate = useMemo(() => {
     // If end date is in future, set end date to now
     if (endDate && dayjs(endDate).isAfter(dayjs())) {
-      const yesterday = dayjs(new Date()).subtract(1, 'day')
-
-      /**
-       * Currently, daily-stats data is only available a day later, so we'll use yesterday as end date, as otherwise the current day would just show up with "0" values
-       *
-       * We are actively working on removing this restriction on the data-eng/LF side and can remove this workaround once that's done
-       */
-      const newEndDate = yesterday.isAfter(dayjs(startDate)) ? yesterday : new Date()
-
       // LF seems to have an issue with the milliseconds, causes infinite loading sometimes
-      return newEndDate.toISOString().slice(0, -5) + 'Z'
+      return new Date().toISOString().slice(0, -5) + 'Z'
     } else if (endDate) {
       return endDate
     }
-  }, [endDate, startDate])
+  }, [endDate])
 
   const { data: ioBudgetData } = useInfraMonitoringQuery({
     projectRef: selectedProjectRef,
