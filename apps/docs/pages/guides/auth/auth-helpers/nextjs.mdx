@@ -116,7 +116,7 @@ The `Code Exchange` route is required for the [server-side auth flow](https://su
 
 Create a new file at `app/auth/callback/route.js` and populate with the following:
 
-```jsx app/auth/callback.route.js
+```jsx app/auth/callback/route.js
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
@@ -141,7 +141,7 @@ export async function GET(request) {
 
 Create a new file at `app/auth/callback/route.ts` and populate with the following:
 
-```tsx app/auth/callback.route.ts
+```tsx app/auth/callback/route.ts
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
