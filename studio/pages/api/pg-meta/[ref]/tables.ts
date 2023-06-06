@@ -35,7 +35,7 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
   const includeAuthSchema = true // req.query['auth-schema'] === 'true'
   const includeStorageSchema = true // req.query['storage-schema'] === 'true'
 
-  const response = await get(`${PG_META_URL}/tables`, { headers })
+  const response = await get(`${PG_META_URL}/tables?include_columns=false`, { headers })
   if (response.error) {
     return res.status(400).json({ error: response.error })
   }

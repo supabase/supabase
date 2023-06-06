@@ -225,7 +225,13 @@ export default class PostgresMetaInterface<T> implements IPostgresMetaInterface<
   async del(id: number | string, cascade: boolean = false) {
     try {
       const headers = { 'Content-Type': 'application/json', ...this.headers }
-      const url = cascade ? `${this.url}?id=${id}&cascade=${cascade}` : `${this.url}?id=${id}`
+
+      const _url = new URL(this.url)
+      _url.searchParams.set('id', `${id}`)
+      if (cascade) {
+        _url.searchParams.set('cascade', 'true')
+      }
+      const url = _url.toString()
       const response = await delete_<T>(url, {}, { headers })
       if (response.error) throw response.error
 

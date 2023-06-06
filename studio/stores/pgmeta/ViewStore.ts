@@ -21,7 +21,7 @@ export default class ViewStore extends PostgresMetaInterface<SchemaView> {
 
   async loadById(id: number | string) {
     try {
-      const url = `${this.url}?id=${id}`
+      const url = this.url.includes('?') ? `${this.url}&id=${id}` : `${this.url}?id=${id}`
       const response = await get(url, { headers: this.headers })
       if (response.error) throw response.error
 

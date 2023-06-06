@@ -204,18 +204,18 @@ export default class MetaStore implements IMetaStore {
       this.rootStore,
       `${API_URL}/projects/${this.projectRef}/api/rest`
     )
-    this.tables = new TableStore(this.rootStore, `${this.baseUrl}/tables`, this.headers)
+    this.tables = new TableStore(this.rootStore, `${this.baseUrl}/tables?include_columns=false`, this.headers)
     this.columns = new ColumnStore(this.rootStore, `${this.baseUrl}/columns`, this.headers)
     this.schemas = new SchemaStore(this.rootStore, `${this.baseUrl}/schemas`, this.headers)
-    this.views = new ViewStore(this.rootStore, `${this.baseUrl}/views`, this.headers)
+    this.views = new ViewStore(this.rootStore, `${this.baseUrl}/views?include_columns=false`, this.headers)
     this.materializedViews = new MaterializedViewStore(
       this.rootStore,
-      `${this.baseUrl}/materialized-views`,
+      `${this.baseUrl}/materialized-views?include_columns=false`,
       this.headers
     )
     this.foreignTables = new ForeignTableStore(
       this.rootStore,
-      `${this.baseUrl}/foreign-tables`,
+      `${this.baseUrl}/foreign-tables?include_columns=false`,
       this.headers
     )
 
@@ -985,7 +985,7 @@ export default class MetaStore implements IMetaStore {
     this.openApi.setUrl(`${API_URL}/projects/${this.projectRef}/api/rest`)
     this.openApi.setHeaders(this.headers)
 
-    this.tables.setUrl(`${this.baseUrl}/tables`)
+    this.tables.setUrl(`${this.baseUrl}/tables?include_columns=false`)
     this.tables.setHeaders(this.headers)
 
     this.columns.setUrl(`${this.baseUrl}/columns`)
@@ -994,10 +994,10 @@ export default class MetaStore implements IMetaStore {
     this.schemas.setUrl(`${this.baseUrl}/schemas`)
     this.schemas.setHeaders(this.headers)
 
-    this.views.setUrl(`${this.baseUrl}/views`)
+    this.views.setUrl(`${this.baseUrl}/views?include_columns=false`)
     this.views.setHeaders(this.headers)
 
-    this.materializedViews.setUrl(`${this.baseUrl}/materialized-views`)
+    this.materializedViews.setUrl(`${this.baseUrl}/materialized-views?include_columns=false`)
     this.materializedViews.setHeaders(this.headers)
 
     this.foreignTables.setUrl(`${this.baseUrl}/foreign-tables`)

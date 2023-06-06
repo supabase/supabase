@@ -1,8 +1,8 @@
-import { FC, useState } from 'react'
+import { FC, useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { Input, Button, IconSearch, IconPlus, IconChevronLeft, IconEdit3, IconTrash } from 'ui'
-import type { PostgresTable } from '@supabase/postgres-meta'
+import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { useStore, checkPermissions } from 'hooks'
@@ -26,11 +26,19 @@ const ColumnList: FC<Props> = ({
 }) => {
   const { meta } = useStore()
   const [filterString, setFilterString] = useState<string>('')
+  const [selectedTableColumns, setSelectedTableColumns] = useState<PostgresColumn[]>([])
+
+  useEffect(() => {
+    (async () => {
+      const res = await meta.tables.loadById(selectedTable.id) as { columns: PostgresColumn[] }
+      setSelectedTableColumns(res.columns)
+    })()
+  }, [selectedTable])
+
   const columns =
     (filterString.length === 0
-      ? selectedTable.columns
-      : selectedTable.columns?.filter((column: any) => column.name.includes(filterString))) ?? []
-
+      ? selectedTableColumns
+      : selectedTableColumns?.filter((column: any) => column.name.includes(filterString))) ?? []
   const isLocked = meta.excludedSchemas.includes(selectedTable.schema ?? '')
   const canUpdateColumns = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
 

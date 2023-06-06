@@ -216,7 +216,7 @@ const TableList: FC<Props> = ({
                       style={{ paddingTop: 3, paddingBottom: 3 }}
                       onClick={() => onOpenTable(x)}
                     >
-                      {x.columns.length} columns
+                      Columns
                     </Button>
 
                     <Tooltip.Root delayDuration={0}>

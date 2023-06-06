@@ -106,6 +106,7 @@ const TableGridEditor = ({
   const isVaultEnabled = useFlag('vaultExtension')
   const [encryptedColumns, setEncryptedColumns] = useState([])
   const [apiPreviewPanelOpen, setApiPreviewPanelOpen] = useState(false)
+  const [selectedTableColumns, setSelectedTableColumns] = useState<PostgresColumn[]>([])
 
   const [{ view: selectedView = 'data' }, setUrlState] = useUrlState()
   const setSelectedView = (view: string) => {
@@ -194,13 +195,24 @@ const TableGridEditor = ({
   })
   const foreignKeyMeta = data || []
 
+  const entityType = useEntityType(selectedTable?.id)
+
   useEffect(() => {
+    (async () => {
+      if (entityType?.type === ENTITY_TYPE.TABLE) {
+        setSelectedTableColumns((await meta.tables.loadById(selectedTable.id) as any).columns)
+      } else if (entityType?.type === ENTITY_TYPE.VIEW) {
+        setSelectedTableColumns((await meta.views.loadById(selectedTable.id) as any).columns)
+      } else if (entityType?.type === ENTITY_TYPE.MATERIALIZED_VIEW) {
+        setSelectedTableColumns((await meta.materializedViews.loadById(selectedTable.id) as any).columns)
+      } else if (entityType?.type === ENTITY_TYPE.FOREIGN_TABLE) {
+        setSelectedTableColumns((await meta.foreignTables.loadById(selectedTable.id) as any).columns)
+      }
+    })()
     if (selectedTable !== undefined && selectedTable.id !== undefined && isVaultEnabled) {
       getEncryptedColumns(selectedTable)
     }
   }, [selectedTable?.id])
-
-  const entityType = useEntityType(selectedTable?.id)
 
   // NOTE: DO NOT PUT HOOKS AFTER THIS LINE
   if (isUndefined(selectedTable)) {
@@ -236,7 +248,7 @@ const TableGridEditor = ({
       ? parseSupaTable(
           {
             table: selectedTable as PostgresTable,
-            columns: (selectedTable as PostgresTable).columns ?? [],
+            columns: selectedTableColumns,
             primaryKeys: (selectedTable as PostgresTable).primary_keys ?? [],
             relationships: formattedRelationships,
           },
@@ -244,7 +256,7 @@ const TableGridEditor = ({
         )
       : parseSupaTable({
           table: selectedTable as SchemaView,
-          columns: (selectedTable as SchemaView).columns ?? [],
+          columns: selectedTableColumns,
           primaryKeys: [],
           relationships: [],
         })
@@ -279,23 +291,20 @@ const TableGridEditor = ({
   const onSelectEditColumn = async (name: string) => {
     // For some reason, selectedTable here is stale after adding a table
     // temporary workaround is to list grab the selected table again
-    const tables: PostgresTable[] = meta.tables.list()
-    // @ts-ignore
-    const table = tables.find((table) => table.id === Number(tableId))
-    const column = find(table!.columns, { name }) as PostgresColumn
+    const table: any = await meta.tables.loadById(tableId)
+    const column = find(table.columns, { name }) as PostgresColumn
     if (column) {
       onEditColumn(column)
     } else {
-      console.error(`Unable to find column ${name} in ${table?.name}`)
+      console.error(`Unable to find column ${name} in ${table.name}`)
     }
   }
 
   const onSelectDeleteColumn = async (name: string) => {
     // For some reason, selectedTable here is stale after adding a table
     // temporary workaround is to list grab the selected table again
-    const tables: PostgresTable[] = meta.tables.list()
-    const table = tables.find((table) => table.id === Number(tableId))
-    const column = find(table!.columns, { name }) as PostgresColumn
+    const table: any = await meta.tables.loadById(tableId)
+    const column = find(table.columns, { name }) as PostgresColumn
     onDeleteColumn(column)
   }
 
@@ -309,7 +318,7 @@ const TableGridEditor = ({
   const updateTableRow = (previousRow: any, updatedData: any) => {
     if (!project) return
 
-    const enumArrayColumns = selectedTable.columns
+    const enumArrayColumns = selectedTableColumns
       .filter((column: any) => {
         return (column?.enums ?? []).length > 0 && column.data_type.toLowerCase() === 'array'
       })
