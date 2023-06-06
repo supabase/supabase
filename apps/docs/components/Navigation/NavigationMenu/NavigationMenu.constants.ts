@@ -29,6 +29,12 @@ export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
       level: 'api',
     },
     {
+      label: 'GraphQL',
+      icon: 'serverless-apis',
+      href: '/guides/pg_graphql/graphql',
+      level: 'graphql',
+    },
+    {
       label: 'Auth',
       icon: 'auth',
       href: '/guides/auth',
