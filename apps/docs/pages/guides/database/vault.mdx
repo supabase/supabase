@@ -233,6 +233,7 @@ To encrypt data, you need a _key id_. You can use the default key id created aut
 
 Both `vault.create_secret()` and `vault.update_secret()` take an optional fourth `new_key_id` argument. This argument can be used to store a different key id for the secret instead of the default value.
 
+{/* prettier-ignore */}
 ```sql
 select vault.create_secret(
   'another_s3kre3t_key', 
