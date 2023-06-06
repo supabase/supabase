@@ -71,7 +71,7 @@ Use SupaMagicAuth widget to create a magic link signIn form.
 
 ```bash
 SupaMagicAuth(
-  redirectUrl: kIsWeb ? null : 'io.supabase.flutter://reset-callback/',
+  redirectUrl: kIsWeb ? null : 'io.mydomain.myapp://callback',
   onSuccess: (Session response) {},
   onError: (error) {},
 )
@@ -91,6 +91,15 @@ SupaResetPassword(
 
 ### Phone Auth
 
+Use SupaPhoneAuth to create a phone authentication form.
+
+```bash
+SupaPhoneAuth(
+    authAction: SupaAuthAction.signUp,
+    onSuccess: (AuthResponse response) {},
+  ),
+```
+
 ### Social Auth
 
 The package supports login with [official social providers](../../auth#providers).
@@ -106,7 +115,7 @@ SupaSocialsAuth(
   colored: true,
   redirectUrl: kIsWeb
   ? null
-  : 'io.supabase.flutter://reset-callback/',
+  : 'io.mydomain.myapp://callback',
   onSuccess: (Session response) {},
   onError: (error) {},
 )
