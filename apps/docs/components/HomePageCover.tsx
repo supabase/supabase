@@ -66,7 +66,7 @@ const HomePageCover = (props) => {
                 iconSize={iconSize}
                 hideArrow
                 tooltip="Flutter"
-                icon="/docs/img/icons/kotlin-icon"
+                icon="/docs/img/icons/flutter-icon"
               />
             </a>
           </Link>
@@ -76,7 +76,7 @@ const HomePageCover = (props) => {
                 iconSize={iconSize}
                 hideArrow
                 tooltip="Kotlin"
-                icon="/docs/img/icons/flutter-icon"
+                icon="/docs/img/icons/kotlin-icon"
               />
             </a>
           </Link>
