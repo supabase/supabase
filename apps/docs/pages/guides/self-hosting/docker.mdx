@@ -74,8 +74,8 @@ We have provided an example Caddy configuration in the `docker` folder that you 
 
 1. Install Caddy using the official [instructions](https://caddyserver.com/docs/install).
 2. Modify the `Caddyfile` at `./docker/deploy/caddy/Caddyfile`.
-  a. Replace `localhost` with your domain.
-  b. Uncomment the "Dashboard" section if you want to expose the Supabase Dashboard. You MUST set a password for this to be secure.
+    1. Replace `localhost` with your domain.
+    2. Uncomment the "Dashboard" section if you want to expose the Supabase Dashboard. You **MUST** set a password for this to be secure.
 3. Run `caddy run --config ./docker/deploy/caddy/Caddyfile` to start Caddy.
 
 You can now access your services at the following URLs:
