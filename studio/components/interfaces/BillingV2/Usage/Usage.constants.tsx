@@ -80,7 +80,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         anchor: 'disk_io',
         key: 'disk_io_consumption',
         attribute: 'disk_io_consumption',
-        name: 'Disk IO bandwidth',
+        name: 'Disk IO Bandwidth',
         unit: 'percentage',
         links: [
           {
@@ -89,7 +89,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
           },
         ],
         description:
-          'Smaller compute instances (below 4XL) can burst up to their largest throughput and IOPS for 30 minutes in a day. Beyond that, the performance reverts to the baseline. Your disk budget gets replenished throughout the day.',
+          'The disk performance of your workload is determined by the Disk IO bandwidth.\nSmaller compute instances (below 4XL) can burst up to their largest throughput and IOPS for 30 minutes in a day. Beyond that, the performance reverts to the baseline. Your disk budget gets replenished throughout the day.',
         chartDescription: '',
       },
     ],
@@ -103,7 +103,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         anchor: 'dbEgress',
         key: 'db_egress',
         attribute: 'total_egress_modified',
-        name: 'Database egress',
+        name: 'Database Egress',
         unit: 'bytes',
         description:
           'Contains any outgoing traffic (egress) from your database.\nBilling is based on the total sum of egress in GB throughout your billing period.',
@@ -113,7 +113,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         anchor: 'storageEgress',
         key: 'storage_egress',
         attribute: 'total_storage_egress',
-        name: 'Storage egress',
+        name: 'Storage Egress',
         unit: 'bytes',
         description:
           'All requests to view and download your storage items go through our CDN. We sum up all outgoing traffic (egress) for storage related requests through our CDN. We do not differentiate between cache and no cache hits.\nBilling is based on the total amount of egress in GB throughout your billing period.',
@@ -166,7 +166,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         anchor: 'storageSize',
         key: 'storage_size',
         attribute: 'total_storage_size_bytes',
-        name: 'Storage size',
+        name: 'Storage Size',
         chartPrefix: 'Max ',
         unit: 'bytes',
         description:
@@ -177,7 +177,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         anchor: 'funcCount',
         key: 'func_count',
         attribute: 'total_func_count',
-        name: 'Edge function count',
+        name: 'Edge Function Count',
         chartPrefix: 'Max ',
         unit: 'absolute',
         description:
@@ -217,7 +217,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         anchor: 'storageImageTransformations',
         key: 'storage_image_render_count',
         attribute: 'total_storage_image_render_count',
-        name: 'Storage image transformations',
+        name: 'Storage Image Transformations',
         unit: 'absolute',
         description:
           'We count all images that were transformed in the billing period, ignoring any transformations.\nUsage example: You transform one image with four different size transformations and another image with just a single transformations. It counts as two, as only two images were transformed.\nBilling is based on the count of (origin) images that used transformations throughout the billing period. Resets every billing cycle.',
@@ -228,7 +228,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         anchor: 'functionInvocations',
         key: 'func_invocations',
         attribute: 'total_func_invocations',
-        name: 'Edge function invocations',
+        name: 'Edge Function Invocations',
         unit: 'absolute',
         description:
           'Every serverless function invocation independent of response status is counted.\nBilling is based on the sum of all invocations throughout your billing period.',
@@ -238,7 +238,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         anchor: 'realtimeMessageCount',
         key: 'realtime_message_count',
         attribute: 'total_realtime_message_count',
-        name: 'Realtime message count',
+        name: 'Realtime Message Count',
         unit: 'absolute',
         description:
           "Count of messages going through Realtime.\nUsage example: If you do a database change and 5 clients listen to that change via Realtime, that's 5 messages. If you broadcast a message and 4 clients listen to that, that's 5 messages (1 message sent, 4 received).\nBilling is based on the total amount of messages throughout your billing period.",
@@ -248,11 +248,11 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         anchor: 'realtimePeakConnection',
         key: 'realtime_peak_connection',
         attribute: 'total_realtime_peak_connection',
-        name: 'Realtime peak connections',
+        name: 'Realtime Peak Connections',
         chartPrefix: 'Max ',
         unit: 'absolute',
         description:
-          'Total number of successful connections (not connection attempts).\nBilling is based on the maximum amount of concurrent peak connections throughout your billing period.',
+          'Total number of successful connections. Connections attempts are not counted towards usage.\nBilling is based on the maximum amount of concurrent peak connections throughout your billing period.',
         chartDescription: 'The data refreshes every 24 hours.',
       },
     ],

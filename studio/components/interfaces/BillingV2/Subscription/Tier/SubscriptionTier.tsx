@@ -41,10 +41,10 @@ const SubscriptionTier = ({}: SubscriptionTierProps) => {
             <div className="text-sm text-scale-1000">
               To manage your billing address, emails or tax IDs, head to your{' '}
               <Link href={`/org/${orgSlug}/billing`}>
-                <a rel="noreferrer">
-                  <p className="text-sm text-green-900 transition hover:text-green-1000">
+                <a>
+                  <span className="text-sm text-green-900 transition hover:text-green-1000">
                     organization settings
-                  </p>
+                  </span>.
                 </a>
               </Link>
             </div>
