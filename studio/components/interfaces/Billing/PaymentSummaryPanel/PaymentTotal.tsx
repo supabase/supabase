@@ -74,7 +74,8 @@ const PaymentTotal: FC<Props> = ({
                 <div className="space-y-2">
                   {amountDueImmediately < 0 ? (
                     <p className="text-sm text-scale-1100">
-                      A total of ${Math.abs(amountDueImmediately).toFixed(2)} will be returned on{' '}
+                      A total of ${Math.abs(amountDueImmediately).toFixed(2)} will be returned as
+                      credits on{' '}
                       <span className="text-brand-900">
                         {billingDate.toLocaleDateString('en-US', {
                           day: 'numeric',
