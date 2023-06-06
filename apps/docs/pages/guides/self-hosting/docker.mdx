@@ -3,6 +3,7 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   title: 'Self-Hosting with Docker',
   description: 'Learn how to configure and deploy Supabase with Docker.',
+  subtitle: 'Learn how to configure and deploy Supabase with Docker.',
 }
 
 Docker is the easiest way to get started with self-hosted Supabase. This guide assumes you are running the command from the machine you intend to host from.
@@ -68,9 +69,7 @@ Update the `.env` file with your own secrets. In particular, these are required:
 
 ## Exposing services
 
-The services running on the machine are not exposed to the internet by default. To do this, we recommend using a reverse proxy such as [NGINX](https://www.nginx.com/) or [Caddy](https://caddyserver.com/).
-
-We have provided an example Caddy configuration in the `docker` folder that you cloned. You can use this as a starting point for your own configuration.
+The services running on the machine are not exposed to the internet by default. We recommend using a reverse proxy such as [NGINX](https://www.nginx.com/) or [Caddy](https://caddyserver.com/) if you want to expose the services publicly:
 
 1. Install Caddy using the official [instructions](https://caddyserver.com/docs/install).
 2. Modify the `Caddyfile` at `./docker/deploy/caddy/Caddyfile`.
@@ -80,10 +79,10 @@ We have provided an example Caddy configuration in the `docker` folder that you 
 
 You can now access your services at the following URLs:
 
-- Supabase Dashboard: `https://<your-domain>/`
 - REST: `https://<your-domain>/proxy/rest/v1/`
 - Auth: `https://<your-domain>/proxy/auth/v1/`
 - Storage: `https://<your-domain>/proxy/storage/v1/`
+- Dashboard: `https://<your-domain>/` (if you uncommented the Dashboard section in the Caddyfile)
 
 ## Stop 
 
