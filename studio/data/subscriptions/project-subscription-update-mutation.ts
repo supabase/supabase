@@ -3,10 +3,12 @@ import { put } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { subscriptionKeys } from './keys'
 
+export type SubscriptionTier =  'tier_free' | 'tier_pro' | 'tier_payg' | 'tier_team' | 'tier_enterprise'
+
 export type ProjectSubscriptionUpdateVariables = {
   projectRef: string
   paymentMethod?: string
-  tier: 'tier_free' | 'tier_pro' | 'tier_payg' | 'tier_team'
+  tier: SubscriptionTier
 }
 
 export type ProjectSubscriptionUpdateResponse = {
