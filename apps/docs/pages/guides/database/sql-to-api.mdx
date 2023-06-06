@@ -71,7 +71,7 @@ where team_id = 'NYM';
 ```
 
 ```js
-const { data, error } = await supabase
+const { count, error } = await supabase
   .from('players')
   .select('*', { count: 'exact', head: true }) // exact, planned, or executed
   .eq('team_id', 'NYM')
