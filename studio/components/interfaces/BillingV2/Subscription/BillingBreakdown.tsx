@@ -45,7 +45,7 @@ const BillingBreakdown = ({}: BillingBreakdownProps) => {
   const totalUsageFees = usageFees.reduce((a, b) => a + b.amount, 0)
 
   const hasExceededAnyLimits =
-    !isUsageBillingEnabled &&
+    isUsageBillingEnabled === false &&
     Object.values(usage ?? {})
       .map((metric) => {
         if (typeof metric !== 'object') return false

@@ -210,9 +210,9 @@ const Usage = () => {
                         : 'opacity-50'
                     )}
                   >
-                    {!usageBillingEnabled && status === USAGE_STATUS.APPROACHING ? (
+                    {usageBillingEnabled === false && status === USAGE_STATUS.APPROACHING ? (
                       <IconAlertCircle size={15} strokeWidth={2} className="text-amber-900" />
-                    ) : !usageBillingEnabled && status === USAGE_STATUS.EXCEEDED ? (
+                    ) : usageBillingEnabled === false && status === USAGE_STATUS.EXCEEDED ? (
                       <IconAlertCircle size={15} strokeWidth={2} className="text-red-900" />
                     ) : null}
                     <p className="text-sm">{category.name}</p>
