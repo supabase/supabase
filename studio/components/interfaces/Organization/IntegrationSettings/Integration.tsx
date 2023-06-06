@@ -1,38 +1,29 @@
+import { Integration as TIntegration } from 'data/integrations/integrations-query'
 import dayjs from 'dayjs'
 import { pluralize } from 'lib/helpers'
 import { EMPTY_ARR } from 'lib/void'
+import { useMemo } from 'react'
 import { Button, IconArrowRight } from 'ui'
-
-export interface OrganizationConnection {
-  id: string
-  orgName: string
-  addedByUser: string
-}
-
-export interface ProjectConnection {
-  id: string
-  createdAt: string
-  /** External resource name */
-  fromProjectName: string
-  /** Supabase project name */
-  toProjectName: string
-}
-
 export interface IntegrationProps {
   title: string
+  orgName?: string
   description?: string
   note?: string
-  organizationConnections?: OrganizationConnection[]
-  projectConnections?: ProjectConnection[]
+  integrations?: TIntegration[]
 }
 
 const Integration = ({
   title,
+  orgName,
   description,
   note,
-  organizationConnections = EMPTY_ARR,
-  projectConnections = EMPTY_ARR,
+  integrations = EMPTY_ARR,
 }: IntegrationProps) => {
+  const projectConnections = useMemo(
+    () => integrations.flatMap((integration) => integration.connections),
+    [integrations]
+  )
+
   return (
     <>
       <div>
@@ -47,18 +38,18 @@ const Integration = ({
           </div>
         )}
 
-        {organizationConnections.length > 0 && (
+        {integrations.length > 0 && (
           <ul className="flex flex-col gap-2">
-            {organizationConnections.map((connection) => (
+            {integrations.map((connection) => (
               <li
                 key={connection.id}
                 className="flex justify-between items-center px-6 py-4 rounded-lg border border-scale-500 bg-panel-body-light dark:bg-panel-body-dark"
               >
                 <div className="flex flex-col gap-1">
-                  <span className="text-scale-1100 font-medium">
-                    {title} integration connection | {connection.orgName}
+                  <span className="text-scale-1200 font-medium">
+                    {title} integration connection | {orgName}
                   </span>
-                  <span className="text-scale-900 text-sm">Added by {connection.addedByUser}</span>
+                  <span className="text-scale-900 text-sm">Added by {connection.createdBy}</span>
                 </div>
 
                 <div>
@@ -86,9 +77,9 @@ const Integration = ({
                 >
                   <div className="flex flex-col gap-1">
                     <div className="flex gap-2">
-                      <span>{connection.fromProjectName}</span>
+                      <span>{connection.from.name}</span>
                       <IconArrowRight />
-                      <span>{connection.toProjectName}</span>
+                      <span>{connection.to.name}</span>
                     </div>
 
                     <span className="text-scale-900 text-sm">
