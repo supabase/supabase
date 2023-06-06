@@ -223,15 +223,9 @@ const Usage = () => {
           </div>
         </div>
 
-        {/*
-        [Joshen] Could potentially run a map here based on USAGE_CATEGORIES, rather than defining each section
-        but thinking it's gonna "cover up" too much details and make it harder to add attribute specific components
-        e.g for database size, we also need to show disk volume size. Not to mention that are little nuances across
-        each attribute RE formatting (bytes vs locale string)
-      */}
         <InView
           as="div"
-          id="infrastructure"
+          threshold={0.6}
           onChange={(inView, entry) => inView && setActiveTab('infra')}
         >
           <div id="infrastructure" ref={infrastructureRef}>
@@ -240,7 +234,7 @@ const Usage = () => {
         </InView>
         <InView
           as="div"
-          id="bandwidth"
+          threshold={0.6}
           onChange={(inView, entry) => inView && setActiveTab('bandwidth')}
         >
           <div id="bandwidth" ref={bandwidthRef}>
@@ -254,7 +248,7 @@ const Usage = () => {
         </InView>
         <InView
           as="div"
-          id="size_and_counts"
+          threshold={0.6}
           onChange={(inView, entry) => inView && setActiveTab('sizeCount')}
         >
           <div id="size_and_counts" ref={sizeAndCountsRef}>
@@ -268,7 +262,7 @@ const Usage = () => {
         </InView>
         <InView
           as="div"
-          id="activity"
+          threshold={0.3}
           onChange={(inView, entry) => inView && setActiveTab('activity')}
         >
           <div id="activity" ref={activityRef}>
