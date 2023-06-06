@@ -2,7 +2,6 @@ import { PropsWithChildren } from 'react'
 import { Badge, IconExternalLink } from 'ui'
 import { CategoryAttribute } from './Usage.constants'
 import Link from 'next/link'
-import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
 
 export interface SectionContent {
   section: CategoryAttribute
@@ -37,7 +36,7 @@ const SectionContent = ({
               </div>
               {links && links.length && (
                 <div className="space-y-2">
-                  <p className="text-sm text-scale-1100 mb-2">More information</p>
+                  <p className="text-sm text-scale-1200 dark:text-scale-1100 mb-2">More information</p>
                   {links.map((link) => (
                     <div key={link.url}>
                       <Link href={link.url}>

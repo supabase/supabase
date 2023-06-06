@@ -9,7 +9,7 @@ class MyDocument extends Document {
 
   render() {
     return (
-      <Html>
+      <Html lang="en">
         <Head>
           {/* Workaround for https://github.com/suren-atoyan/monaco-react/issues/272 */}
           <link
