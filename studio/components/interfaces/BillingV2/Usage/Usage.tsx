@@ -210,11 +210,7 @@ const Usage = () => {
           </div>
         </div>
 
-        <InView
-          as="div"
-          threshold={0.2}
-          onChange={(inView, entry) => inView && setActiveTab('infra')}
-        >
+        <InView as="div" threshold={0.2} onChange={(inView) => inView && setActiveTab('infra')}>
           <div id="infrastructure" ref={infrastructureRef} style={{ scrollMarginTop: '100px' }}>
             <Infrastructure projectRef={selectedProjectRef} />
           </div>
@@ -222,7 +218,7 @@ const Usage = () => {
         <InView
           as="div"
           rootMargin="85% 0% -85% 0px"
-          onChange={(inView, entry) => inView && setActiveTab('bandwidth')}
+          onChange={(inView) => inView && setActiveTab('bandwidth')}
         >
           <div id="bandwidth" ref={bandwidthRef} style={{ scrollMarginTop: '100px' }}>
             <Bandwidth
@@ -236,7 +232,7 @@ const Usage = () => {
         <InView
           as="div"
           rootMargin="85% 0% -85% 0px"
-          onChange={(inView, entry) => inView && setActiveTab('sizeCount')}
+          onChange={(inView) => inView && setActiveTab('sizeCount')}
         >
           <div id="size_and_counts" ref={sizeAndCountsRef} style={{ scrollMarginTop: '100px' }}>
             <SizeAndCounts
@@ -250,7 +246,7 @@ const Usage = () => {
         <InView
           as="div"
           rootMargin="85% 0% -85% 0px"
-          onChange={(inView, entry) => inView && setActiveTab('activity')}
+          onChange={(inView) => inView && setActiveTab('activity')}
         >
           <div id="activity" ref={activityRef} style={{ scrollMarginTop: '100px' }}>
             <Activity
