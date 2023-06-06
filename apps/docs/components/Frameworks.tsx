@@ -40,8 +40,8 @@ const Frameworks = () => {
     {
       name: 'Kotlin',
       logo: {
-        light: '/docs/img/icons/flutter-icon.svg',
-        dark: '/docs/img/icons/flutter-icon.svg',
+        light: '/docs/img/icons/kotlin-icon.svg',
+        dark: '/docs/img/icons/kotlin-icon.svg',
       },
       href: '/guides/with-kotlin',
     },
