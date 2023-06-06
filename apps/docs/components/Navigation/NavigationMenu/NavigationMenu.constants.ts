@@ -942,6 +942,10 @@ export const ai: NavMenuConstant = {
           name: 'Google Colab',
           url: '/guides/ai/google-colab',
         },
+        {
+          name: 'LlamaIndex',
+          url: '/guides/ai/integrations/llamaindex',
+        },
       ],
     },
   ],
