@@ -45,7 +45,7 @@ const BillingBreakdown = ({}: BillingBreakdownProps) => {
   const totalUsageFees = usageFees.reduce((a, b) => a + b.amount, 0)
 
   const hasExceededAnyLimits =
-    !isUsageBillingEnabled &&
+    isUsageBillingEnabled === false &&
     Object.values(usage ?? {})
       .map((metric) => {
         if (typeof metric !== 'object') return false
@@ -198,6 +198,7 @@ const BillingBreakdown = ({}: BillingBreakdownProps) => {
                             ? 'bg-amber-900'
                             : 'bg-scale-1100'
                         }
+                        bgClass="bg-gray-300 dark:bg-gray-600"
                         labelBottom={usageLabel}
                         labelBottomClass="!text-scale-1000"
                         labelTop={hasLimit ? percentageLabel : undefined}
