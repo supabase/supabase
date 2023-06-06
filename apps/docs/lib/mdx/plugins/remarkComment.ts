@@ -4,6 +4,7 @@ import { codes } from 'micromark-util-symbol/codes.js'
 import { types } from 'micromark-util-symbol/types.js'
 import { HtmlExtension, Extension as MicromarkExtension, Tokenizer } from 'micromark-util-types'
 import { Plugin } from 'unified'
+import { Node } from 'unist'
 
 declare module 'micromark-util-types' {
   export interface TokenTypeMap {
@@ -23,7 +24,7 @@ declare module 'mdast-util-to-markdown' {
   }
 }
 
-export type CommentElement = {
+export interface CommentElement extends Node {
   type: 'comment'
   value: string
   commentValue: string

@@ -110,6 +110,7 @@
   },
   "devDependencies": {
     "@types/hast": "^2.3.4",
+    "@types/mdast": "^3.0.11",
     "@types/node": "^17.0.12",
     "@types/react": "17.0.39",
     "@types/unist": "^2.0.6",
