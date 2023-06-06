@@ -65,19 +65,36 @@ val url = BuildConfig.SUPABASE_URL
 val apiKey = BuildConfig.API_KEY
 ```
 
-### 3. Set up Supabase dependencies including Postgrest, GoTrue, Storage
+### 3. Set up Supabase dependencies including Postgrest, GoTrue, Storage and serialization plugin
 <img width="720" alt="Screen Shot 2023-06-05 at 21 39 24" src="https://github.com/hieuwu/product-sample-supabase-kt/assets/43868345/3f154fda-aa9e-4baa-81f2-5b744c7ad2fe"></img>
 
-In build.gradle (app) file, add these dependencies then press Sync now
+In build.gradle (app) file, add these dependencies then press Sync now. Replace place holder of the dependency versions `$supabase_version` and `$ktor_version` with latest versions as below
+    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}> 
+      <a href="https://github.com/supabase-community/supabase-kt/releases" style={{ marginRight: '8px' }}> 
+          <img src="https://img.shields.io/github/release/supabase-community/supabase-kt?label=supabase-kt stable" alt="latest stable supabase-kt version"/> 
+      </a> 
+      <a href="https://github.com/supabase-community/supabase-kt/releases"> 
+          <img src="https://img.shields.io/github/v/release/ktorio/ktor.svg?label=ktor" alt="latest ktor version"/> 
+      </a> 
+    </div> 
 ```kotlin
 // Supabase setup
-implementation("io.ktor:ktor-client-cio:1.6.0")
-implementation("io.github.jan-tennert.supabase:postgrest-kt-android:1.0.0")
-implementation("io.github.jan-tennert.supabase:storage-kt:1.0.0")
-implementation "io.ktor:ktor-client-android:2.2.1"
-implementation "io.ktor:ktor-utils-jvm:1.6.0"
-implementation "io.ktor:ktor-client-logging-jvm:1.6.0"
-implementation("io.ktor:ktor-client-core:2.2.4")
+implementation "io.github.jan-tennert.supabase:postgrest-kt-android:$supabase_version"
+implementation "io.github.jan-tennert.supabase:storage-kt:$supabase_version"
+implementation "io.ktor:ktor-client-android:$ktor_version"
+implementation "io.ktor:ktor-client-logging-jvm:$ktor_version"
+implementation "io.ktor:ktor-client-core:$ktor_version"
+implementation "io.ktor:ktor-client-cio:$ktor_version"
+implementation "io.ktor:ktor-utils-jvm:$ktor_version"
+```
+
+Also in build.gradle (app) file, add plugin for serialization
+```kotlin
+plugins {
+    ...
+    id 'org.jetbrains.kotlin.plugin.serialization' version '1.7.0'
+    ...
+}
 ```
 
 ### 4. Set up Hilt for dependency injection
@@ -287,7 +304,7 @@ class ProductListViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _productList = MutableStateFlow<List<Product>?>(listOf())
-    override val productList: Flow<List<Product>?> = _productList
+    val productList: Flow<List<Product>?> = _productList
 
 
     private val _isLoading = MutableStateFlow(false)
@@ -297,14 +314,14 @@ class ProductListViewModel @Inject constructor(
         getProducts()
     }
 
-    override fun getProducts() {
+    fun getProducts() {
         viewModelScope.launch {
             val products = productRepository.getProducts()
             _productList.emit(products?.map { it -> it.asDomainModel() })
         }
     }
 
-    override fun removeItem(product: Product) {
+    fun removeItem(product: Product) {
         viewModelScope.launch {
             val newList = mutableListOf<Product>().apply { _productList.value?.let { addAll(it) } }
             newList.remove(product)
@@ -456,16 +473,16 @@ class ProductDetailsViewModel @Inject constructor(
 
     ) : ViewModel() {
     private val _product = MutableStateFlow<Product?>(null)
-    override val product: Flow<Product?> = _product
+    val product: Flow<Product?> = _product
 
     private val _name = MutableStateFlow("")
-    override val name: Flow<String> = _name
+    val name: Flow<String> = _name
 
     private val _price = MutableStateFlow(0.0)
-    override val price: Flow<Double> = _price
+    val price: Flow<Double> = _price
 
     private val _imageUrl = MutableStateFlow("")
-    override val imageUrl: Flow<String> = _imageUrl
+    val imageUrl: Flow<String> = _imageUrl
 
     init {
         val productId = savedStateHandle.get<String>(ProductDetailsDestination.productId)
@@ -491,7 +508,7 @@ class ProductDetailsViewModel @Inject constructor(
         _price.value = price
     }
 
-    override fun onSaveProduct(image: ByteArray) {
+    fun onSaveProduct(image: ByteArray) {
         viewModelScope.launch {
             productRepository.updateProduct(
                 id = _product.value?.id ?: "",
@@ -503,7 +520,7 @@ class ProductDetailsViewModel @Inject constructor(
         }
     }
 
-    override fun onImageChange(url: String) {
+    fun onImageChange(url: String) {
         _imageUrl.value = url
     }
 
@@ -757,11 +774,12 @@ class AddProductViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _isLoading = MutableStateFlow(false)
-    override val isLoading: Flow<Boolean> = _isLoading
+    val isLoading: Flow<Boolean> = _isLoading
 
     private val _showSuccessMessage = MutableStateFlow(false)
-    override val showSuccessMessage: Flow<Boolean> = _showSuccessMessage
-    override fun onCreateProduct(name: String, price: Double) {
+    val showSuccessMessage: Flow<Boolean> = _showSuccessMessage
+
+    fun onCreateProduct(name: String, price: Double) {
         if (name.isEmpty() || price <= 0) return
         viewModelScope.launch {
             _isLoading.value = true

@@ -55,19 +55,27 @@ export const meta = {
   <StepHikeCompact.Step step={3}>
 
     <StepHikeCompact.Details title="Install the Supabase client library">
-    Setup Supabase libraries requires some others libraries from ktor, so make sure all dependencies are added
-      
+    Setup Supabase libraries requires some others libraries from ktor, so make sure all dependencies are added.
+    Replace place holder of the dependency versions `$supabase_version` and `$ktor_version` with latest versions as below
+    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}> 
+      <a href="https://github.com/supabase-community/supabase-kt/releases" style={{ marginRight: '8px' }}> 
+          <img src="https://img.shields.io/github/release/supabase-community/supabase-kt?label=supabase-kt stable" alt="latest stable supabase-kt version"/> 
+      </a> 
+      <a href="https://github.com/supabase-community/supabase-kt/releases"> 
+          <img src="https://img.shields.io/github/v/release/ktorio/ktor.svg?label=ktor" alt="latest ktor version"/> 
+      </a> 
+    </div> 
+
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
-
       ```kotlin
-        implementation("io.ktor:ktor-client-cio:1.6.0")
-        implementation("io.github.jan-tennert.supabase:postgrest-kt-android:0.9.0-alpha-4")
-        implementation "io.ktor:ktor-client-android:2.2.1"
-        implementation "io.ktor:ktor-utils-jvm:1.6.0"
-        implementation "io.ktor:ktor-client-logging-jvm:1.6.0"
-        implementation("io.ktor:ktor-client-core:2.2.4")
+        implementation "io.github.jan-tennert.supabase:postgrest-kt-android:$supabase_version"
+        implementation "io.ktor:ktor-client-android:$ktor_version"
+        implementation "io.ktor:ktor-client-logging-jvm:$ktor_version"
+        implementation "io.ktor:ktor-client-core:$ktor_version"
+        implementation "io.ktor:ktor-client-cio:$ktor_version"
+        implementation "io.ktor:ktor-utils-jvm:$ktor_version"
       ```
 
     </StepHikeCompact.Code>
@@ -75,6 +83,26 @@ export const meta = {
   </StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={4}>
+
+    <StepHikeCompact.Details title="Install the serializable plugin">
+    Open `build.gradle` (app), add serialization plugin to use annotation for data parsing
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+      ```kotlin
+        plugins {
+            ...
+            id 'org.jetbrains.kotlin.plugin.serialization' version '1.7.0'
+            ...
+        }
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={5}>
 
     <StepHikeCompact.Details title="Initialize the Supabase client">
     You can create a whenever you need to perform some API call.
@@ -86,19 +114,19 @@ export const meta = {
       ```kotlin
       // Handy create instance when need
       val client = createSupabaseClient(
-      supabaseUrl = "https://xyzcompany.supabase.co", 
-      supabaseKey = "public-anon-key") {
-          install(GoTrue)
-          install(Postgrest)
-          //install other modules
-      }
+          supabaseUrl = "https://xyzcompany.supabase.co", 
+          supabaseKey = "public-anon-key") {
+              install(GoTrue)
+              install(Postgrest)
+              install(Storage)
+          }
       ```
 
     </StepHikeCompact.Code>
 
   </StepHikeCompact.Step>
 
-  <StepHikeCompact.Step step={4}>
+  <StepHikeCompact.Step step={6}>
 
     <StepHikeCompact.Details title="Create data transfer object">
     </StepHikeCompact.Details>
@@ -130,7 +158,7 @@ export const meta = {
 
   </StepHikeCompact.Step>
 
-  <StepHikeCompact.Step step={5}>
+  <StepHikeCompact.Step step={7}>
 
     <StepHikeCompact.Details title="Query data from the app">
       
@@ -138,8 +166,8 @@ export const meta = {
 
     <StepHikeCompact.Code>
       ```kotlin
-      override suspend fun getProducts() {
-        val result = supabasePostgrest["products"]
+      suspend fun getProducts() {
+        val result = client.postgrest["products"]
             .select().decodeList<ProductDto>()
         // Handle result data for next step
       }
@@ -148,7 +176,7 @@ export const meta = {
 
   </StepHikeCompact.Step>
 
-  <StepHikeCompact.Step step={7}>
+  <StepHikeCompact.Step step={8}>
     <StepHikeCompact.Details title="Start the app">
 
     </StepHikeCompact.Details>
