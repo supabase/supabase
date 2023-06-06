@@ -224,7 +224,7 @@ const Usage = () => {
           threshold={0.2}
           onChange={(inView, entry) => inView && setActiveTab('infra')}
         >
-          <div id="infrastructure" ref={infrastructureRef}>
+          <div id="infrastructure" ref={infrastructureRef} style={{ scrollMarginTop: '100px' }}>
             <Infrastructure projectRef={selectedProjectRef} />
           </div>
         </InView>
@@ -233,7 +233,7 @@ const Usage = () => {
           rootMargin="85% 0% -85% 0px"
           onChange={(inView, entry) => inView && setActiveTab('bandwidth')}
         >
-          <div id="bandwidth" ref={bandwidthRef}>
+          <div id="bandwidth" ref={bandwidthRef} style={{ scrollMarginTop: '100px' }}>
             <Bandwidth
               projectRef={selectedProjectRef}
               subscription={subscription}
@@ -247,7 +247,7 @@ const Usage = () => {
           rootMargin="85% 0% -85% 0px"
           onChange={(inView, entry) => inView && setActiveTab('sizeCount')}
         >
-          <div id="size_and_counts" ref={sizeAndCountsRef}>
+          <div id="size_and_counts" ref={sizeAndCountsRef} style={{ scrollMarginTop: '100px' }}>
             <SizeAndCounts
               projectRef={selectedProjectRef}
               subscription={subscription}
@@ -261,7 +261,7 @@ const Usage = () => {
           rootMargin="85% 0% -85% 0px"
           onChange={(inView, entry) => inView && setActiveTab('activity')}
         >
-          <div id="activity" ref={activityRef}>
+          <div id="activity" ref={activityRef} style={{ scrollMarginTop: '100px' }}>
             <Activity
               projectRef={selectedProjectRef}
               subscription={subscription}
