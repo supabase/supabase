@@ -311,7 +311,7 @@ docs.query(
         author: 'Caleb Peffer',
         role: 'CEO at Mendable',
         quote:
-          'We tried other vector databases - we tried Faiss, we tried Weviate, we tried Pinecone. If you’re just doing vector search they’re great, but if you need to store a bunch of metadata that becomes a huge pain.',
+          'We tried other vector databases - we tried Faiss, we tried Weaviate, we tried Pinecone. If you’re just doing vector search they’re great, but if you need to store a bunch of metadata that becomes a huge pain.',
         image: '/images/customers/logos/mendableai.png',
         abstract: 'Mendable switches from Pinecone to Supabase for PostgreSQL vector embeddings.',
         url: '/customers/mendableai',
