@@ -200,13 +200,17 @@ const TableGridEditor = ({
   useEffect(() => {
     (async () => {
       if (entityType?.type === ENTITY_TYPE.TABLE) {
-        setSelectedTableColumns((await meta.tables.loadById(selectedTable.id) as any).columns)
+        const { columns } = await meta.tables.loadById(selectedTable.id) as { columns: PostgresColumn[] }
+        setSelectedTableColumns(columns)
       } else if (entityType?.type === ENTITY_TYPE.VIEW) {
-        setSelectedTableColumns((await meta.views.loadById(selectedTable.id) as any).columns)
+        const { columns } = await meta.views.loadById(selectedTable.id) as { columns: PostgresColumn[] }
+        setSelectedTableColumns(columns)
       } else if (entityType?.type === ENTITY_TYPE.MATERIALIZED_VIEW) {
-        setSelectedTableColumns((await meta.materializedViews.loadById(selectedTable.id) as any).columns)
+        const { columns } = await meta.materializedViews.loadById(selectedTable.id) as { columns: PostgresColumn[] }
+        setSelectedTableColumns(columns)
       } else if (entityType?.type === ENTITY_TYPE.FOREIGN_TABLE) {
-        setSelectedTableColumns((await meta.foreignTables.loadById(selectedTable.id) as any).columns)
+        const { columns } = await meta.foreignTables.loadById(selectedTable.id) as { columns: PostgresColumn[] }
+        setSelectedTableColumns(columns)
       }
     })()
     if (selectedTable !== undefined && selectedTable.id !== undefined && isVaultEnabled) {
@@ -291,8 +295,8 @@ const TableGridEditor = ({
   const onSelectEditColumn = async (name: string) => {
     // For some reason, selectedTable here is stale after adding a table
     // temporary workaround is to list grab the selected table again
-    const table: any = await meta.tables.loadById(tableId)
-    const column = find(table.columns, { name }) as PostgresColumn
+    const table = await meta.tables.loadById(tableId) as { name: string; columns: PostgresColumn[] }
+    const column = find(table.columns, { name })
     if (column) {
       onEditColumn(column)
     } else {
@@ -303,8 +307,8 @@ const TableGridEditor = ({
   const onSelectDeleteColumn = async (name: string) => {
     // For some reason, selectedTable here is stale after adding a table
     // temporary workaround is to list grab the selected table again
-    const table: any = await meta.tables.loadById(tableId)
-    const column = find(table.columns, { name }) as PostgresColumn
+    const table = await meta.tables.loadById(tableId) as { name: string; columns: PostgresColumn[] }
+    const column = find(table.columns, { name })
     onDeleteColumn(column)
   }
 
