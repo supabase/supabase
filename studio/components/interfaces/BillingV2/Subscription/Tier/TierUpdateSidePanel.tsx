@@ -178,7 +178,7 @@ const TierUpdateSidePanel = () => {
                       )}
                     >
                       <div className="text-xs bg-brand-400 text-brand-900 rounded px-2 py-0.5">
-                        Usage based plan
+                        Usage-based plan
                       </div>
                     </div>
                     {isCurrentPlan ? (

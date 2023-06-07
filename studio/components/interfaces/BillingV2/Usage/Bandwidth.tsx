@@ -8,9 +8,16 @@ export interface BandwidthProps {
   startDate: string | undefined
   endDate: string | undefined
   subscription: ProjectSubscriptionResponse | undefined
+  currentBillingCycleSelected: boolean
 }
 
-const Bandwidth = ({ projectRef, subscription, startDate, endDate }: BandwidthProps) => {
+const Bandwidth = ({
+  projectRef,
+  subscription,
+  startDate,
+  endDate,
+  currentBillingCycleSelected,
+}: BandwidthProps) => {
   const { data: dbEgressData, isLoading: isLoadingDbEgressData } = useDailyStatsQuery({
     projectRef,
     attribute: 'total_egress_modified',
@@ -47,9 +54,10 @@ const Bandwidth = ({ projectRef, subscription, startDate, endDate }: BandwidthPr
   return (
     <UsageSection
       projectRef={projectRef}
-      categoryKey='bandwidth'
+      categoryKey="bandwidth"
       chartMeta={chartMeta}
       subscription={subscription}
+      currentBillingCycleSelected={currentBillingCycleSelected}
     />
   )
 }
