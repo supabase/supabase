@@ -21,7 +21,7 @@ const ProjectBillingUsage: NextPageWithLayout = () => {
   return (
     <div className="relative">
       {enableUsageV2 && (
-        <div className="absolute top-[1.9rem] right-16 flex items-center space-x-3">
+        <div className="absolute top-[1.9rem] right-16 xl:right-32 flex items-center space-x-3">
           <Toggle
             size="tiny"
             checked={showNewUsageUI}
