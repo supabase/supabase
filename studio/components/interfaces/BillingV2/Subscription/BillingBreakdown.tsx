@@ -42,7 +42,7 @@ const BillingBreakdown = ({}: BillingBreakdownProps) => {
   const currentPlan = subscription?.plan
   const isUsageBillingEnabled = subscription?.usage_billing_enabled
   const [usageFees, fixedFees] = partition(upcomingInvoice?.lines ?? [], (item) => item.usage_based)
-  const totalUsageFees = +usageFees.reduce((a, b) => a + b.amount, 0).toFixed(2)
+  const totalUsageFees = Number(usageFees.reduce((a, b) => a + b.amount, 0).toFixed(2))
 
   const hasExceededAnyLimits =
     isUsageBillingEnabled === false &&
