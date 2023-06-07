@@ -45,7 +45,7 @@ export default class TableStore extends PostgresMetaInterface<PostgresTable> {
     const tables: PostgresTable[] = []
     tablesResponse.forEach((table: PostgresTable) => {
       const tableId = table.id
-      const columns = columnsResponse.find((x: PostgresColumn) => x.table_id === tableId)
+      const columns = columnsResponse.filter((x: PostgresColumn) => x.table_id === tableId)
       tables.push({ ...table, columns })
     })
 
