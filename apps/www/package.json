@@ -13,6 +13,7 @@
     "postbuild": "node ./internals/generate-sitemap.mjs"
   },
   "dependencies": {
+    "@code-hike/mdx": "^0.8.3",
     "@heroicons/react": "^1.0.6",
     "@mdx-js/loader": "^2.1.5",
     "@mdx-js/react": "^2.1.5",

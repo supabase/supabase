@@ -5,7 +5,7 @@ import { serialize } from 'next-mdx-remote/serialize'
 import { relative } from 'path'
 import rehypeSlug from 'rehype-slug'
 import remarkGfm from 'remark-gfm'
-import codeHikeTheme from '~/code-hike.theme.json' assert { type: 'json' }
+import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
 import components from '~/components'
 import Layout from '~/layouts/DefaultGuideLayout'
 import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
