@@ -1,5 +1,5 @@
 import { action, makeObservable } from 'mobx'
-import type { PostgresTable } from '@supabase/postgres-meta'
+import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 
 import PostgresMetaInterface, { IPostgresMetaInterface } from '../common/PostgresMetaInterface'
 import { IRootStore } from '../RootStore'
@@ -23,6 +23,34 @@ export default class TableStore extends PostgresMetaInterface<PostgresTable> {
     makeObservable(this, {
       loadById: action,
     })
+  }
+
+  // Customize TableStore fetchData method to improve request performance
+  async fetchData() {
+    const headers = { 'Content-Type': 'application/json', ...this.headers }
+    // load all tables w/o columns info
+    const urlTables = this.url.includes('?')
+      ? `${this.url}&include_columns=false`
+      : `${this.url}?include_columns=false`
+    // load all columns
+    const urlColumns = this.url.replace('/tables', '/columns')
+    const [tablesResponse, columnsResponse] = await Promise.all([
+      get(urlTables, { headers }),
+      get(urlColumns, { headers }),
+    ])
+    if (tablesResponse.error) throw tablesResponse.error
+    if (columnsResponse.error) throw columnsResponse.error
+
+    // merge 2 response to create the final array
+    const tables: PostgresTable[] = []
+    tablesResponse.forEach((table: PostgresTable) => {
+      const tableId = table.id
+      const columns = columnsResponse.find((x: PostgresColumn) => x.table_id === tableId)
+      tables.push({ ...table, columns })
+    })
+
+    this.setDataArray(tables)
+    return tables as any
   }
 
   async loadById(id: number | string) {
