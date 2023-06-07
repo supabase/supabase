@@ -10,6 +10,15 @@ export const meta = {
 
 The [Next.js Auth Helpers package](https://github.com/supabase/auth-helpers) configures Supabase Auth to store the user's `session` in a `cookie`, rather than `localStorage`. This makes it available across the client and server of the App Router - [Client Components](/docs/guides/auth/auth-helpers/nextjs#client-components), [Server Components](/docs/guides/auth/auth-helpers/nextjs#server-components), [Server Actions](/docs/guides/auth/auth-helpers/nextjs#server-actions), [Route Handlers](/docs/guides/auth/auth-helpers/nextjs#route-handlers) and [Middleware](/docs/guides/auth/auth-helpers/nextjs#middleware). The `session` is automatically sent along with any requests to Supabase.
 
+<div className="video-container">
+  <iframe
+    src="https://www.youtube-nocookie.com/embed/MVYhyGZGLuo"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
+
 > Note: If you are using the `pages` directory, check out [Auth Helpers in Next.js Pages Directory](/docs/guides/auth/auth-helpers/nextjs-pages).
 
 ## Configuration
@@ -169,6 +178,15 @@ export async function GET(request: NextRequest) {
 </Tabs>
 
 ## Authentication
+
+<div className="video-container">
+  <iframe
+    src="https://www.youtube-nocookie.com/embed/11zi7sUJFoU"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
 
 Authentication can be initiated [client](/docs/guides/auth/auth-helpers/nextjs#client-side) or [server-side](/docs/guides/auth/auth-helpers/nextjs#server-side). All of the [supabase-js authentication strategies](/docs/reference/javascript/auth-api) are supported with the Auth Helpers client.
 
@@ -446,6 +464,15 @@ export default async function Login() {
 
 ### Client Component
 
+<div className="video-container">
+  <iframe
+    src="https://www.youtube-nocookie.com/embed/f4yAnVgcJqI"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
+
 [Client Components](https://nextjs.org/docs/getting-started/react-essentials#client-components) allow the use of client-side hooks - such as `useEffect` and `useState`. They can be used to request data from Supabase client-side, and [subscribe to realtime events](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs/app/realtime-posts.tsx).
 
 <Tabs
@@ -531,6 +558,15 @@ const supabase = createClientComponentClient({ isSingleton: false })
 
 ### Server Component
 
+<div className="video-container">
+  <iframe
+    src="https://www.youtube-nocookie.com/embed/SUS1t6Kq7-8"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
+
 [Server Components](https://nextjs.org/docs/getting-started/react-essentials#server-components) allow for asynchronous data to be fetched server-side.
 
 > Note: In order to use Supabase in Server Components, you need to have implemented the [Middleware](/docs/guides/auth/auth-helpers/nextjs#refresh-session-with-middleware) steps above.
@@ -579,6 +615,15 @@ export default async function ServerComponent() {
 > check out [this repo](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs) for more examples, including redirecting unauthenticated users - [protected pages](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs/app/[id]/page.tsx).
 
 ### Server Action
+
+<div className="video-container">
+  <iframe
+    src="https://www.youtube-nocookie.com/embed/B5TUzTKO9CE"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
 
 [Server Actions](https://nextjs.org/docs/app/building-your-application/data-fetching/server-actions) allow mutations to be performed server-side.
 
@@ -651,6 +696,15 @@ export default async function NewTodo() {
 
 ### Route Handler
 
+<div className="video-container">
+  <iframe
+    src="https://www.youtube-nocookie.com/embed/3kK-40z0DHI"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
+
 [Route Handlers](https://nextjs.org/docs/app/building-your-application/routing/router-handlers) replace API Routes and allow for logic to be performed server-side. They can respond to `GET`, `POST`, `PUT`, `PATCH`, `DELETE`, `HEAD`, and `OPTIONS` requests.
 
 <Tabs
@@ -704,8 +758,9 @@ See [refreshing session example](/docs/guides/auth/auth-helpers/nextjs#refresh-s
 
 ## More examples
 
-- [Full App Router repo](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs)
-- [Realtime](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs/app/realtime-posts.tsx)
+- [Cookie-based Auth and the Next.js 13 App Router (free course)](https://youtube.com/playlist?list=PL5S4mPUpp4OtMhpnp93EFSo42iQ40XjbF)
+- [Full App Router example](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs)
+- [Realtime Subscriptions](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs/app/realtime-posts.tsx)
 - [Protected Routes](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs/app/[id]/page.tsx)
 - [Conditional Rendering in Client Components with SSR](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs/app/login-form.tsx)
 
