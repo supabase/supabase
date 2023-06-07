@@ -8,6 +8,7 @@ import { useRouter } from 'next/router'
 // import TabsStyles from './Tabs.module.css'
 
 import styleHandler from '../../lib/theme/styleHandler'
+import { Children } from 'react'
 
 interface TabsProps {
   type?: 'pills' | 'underlined' | 'cards' | 'rounded-pills'
@@ -44,13 +45,10 @@ const Tabs: React.FC<TabsProps> & TabsSubComponents = ({
   listClassNames,
   children,
 }) => {
+  const [firstChild] = Children.toArray(children)
   const [activeTab, setActiveTab] = React.useState(
-    defaultActiveId
-      ? defaultActiveId
-      : // if no defaultActiveId is set use the first panel
-      children && children[0].props
-      ? children[0].props.id
-      : ''
+    defaultActiveId ??
+      (typeof firstChild === 'object' && 'props' in firstChild ? firstChild.props.id : '')
   )
 
   const router = useRouter()
@@ -58,8 +56,8 @@ const Tabs: React.FC<TabsProps> & TabsSubComponents = ({
 
   let __styles = styleHandler('tabs')
 
-  // activeId state can be overriden externally with `active`
-  // defaults to the first panelif we have one or url hash if not
+  // activeId state can be overridden externally with `active`
+  // defaults to the first panel if we have one or url hash if not
   const active = activeId ? activeId : activeTab ? activeTab : hash
 
   function onTabClick(id: string) {
