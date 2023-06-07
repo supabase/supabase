@@ -202,7 +202,7 @@ const Nav = () => {
       <div className="sticky top-0 z-40 transform" style={{ transform: 'translate3d(0,0,999px)' }}>
         <div
           className={[
-            'absolute inset-0 h-full w-full opacity-80 bg-scale-200',
+            'absolute inset-0 h-full w-full opacity-100 bg-[#03030890] backdrop-blur-lg',
             !showLaunchWeekNavMode && '!opacity-100 transition-opacity',
             showLaunchWeekNavMode && '!bg-transparent transition-all',
           ].join(' ')}
