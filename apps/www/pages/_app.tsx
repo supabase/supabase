@@ -13,8 +13,6 @@ import '../styles/index.css'
 import { post } from '~/lib/fetchWrapper'
 import { AuthProvider, ThemeProvider, useTelemetryProps } from 'common'
 import Head from 'next/head'
-
-import '@code-hike/mdx/dist/index.css'
 import 'config/code-hike.scss'
 
 export default function MyApp({ Component, pageProps }: AppProps) {
