@@ -39,7 +39,7 @@ const SubscriptionTier = ({}: SubscriptionTierProps) => {
           <div className="sticky space-y-6 top-16">
             <p className="text-base">Subscription plan</p>
             <div className="text-sm text-scale-1000">
-              To manage your billing address, emails or tax IDs, head to your{' '}
+              To manage your billing address, emails or Tax ID, head to your{' '}
               <Link href={`/org/${orgSlug}/billing`}>
                 <a>
                   <span className="text-sm text-green-900 transition hover:text-green-1000">

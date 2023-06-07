@@ -114,7 +114,7 @@ const UsageSection = ({
                                   your project.
                                 </p>
                                 <p className="text-xs text-scale-1200">
-                                  Upgrade to a usage based plan or disable the spend cap to avoid
+                                  Upgrade to a usage-based plan or disable the spend cap to avoid
                                   restrictions.
                                 </p>
                               </div>
