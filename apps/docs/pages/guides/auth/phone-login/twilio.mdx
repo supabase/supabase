@@ -349,17 +349,24 @@ let { data, error } = await supabase.auth.verifyOtp({
 
 ### Twilio Verify
 
-Twilio Verify is an alternative service by Twilio which can be used to replace Twilio Programmable Messaging which is described above. Twilio Verify has built in fraud detection and allows developers to make use of Message Services instead of registering their phone number.
+Twilio Verify is an alternative service by Twilio which can be used to replace Twilio Programmable Messaging which is described above. Some reasons that might compel a developer to migrate from Twilio Messaging which was described in previous sections would be:
+
+1. Built in fraud detection
+2. Use of Message Services instead of a registered phone number.
+
+To set up Twilio Verify, you will need to:
 
 1. [Create a Verification Service on Twilio](https://support.twilio.com/hc/en-us/articles/360033309133-Getting-Started-with-Twilio-Verify-V2)
-2. Fill in the Message Service ID field with the Verification Service ID obtained in 1.
-3. Enable Twilio Verify
+2. Enable Twilio Verify on the Dashboard
+3. Fill in the Message Service ID field on the Dashboard with the Verification Service ID
 
-Note that you can only use one of Twilio Verify or Twilio Programmable Messaging at any point in time. At this time, Twilio Verify is only supported
+Note that you can only use one of Twilio Verify or Twilio Programmable Messaging at any point in time - you will not be able to verify an OTP issued with Twilio Verify when Twilio Verify is disabled. At this time, Twilio Verify is only supported
 on the `whatsapp` and `sms` channels.
 
 <Admonition type="caution">
-  When using Twilio Verify the OTP expiry duration and Message content fields, and rate are managed by Twilio. Consequently, the OTP Expiry and Message fields shown on the Supabase Dashboard will not apply.
+  When Twilio Verify is enabled, the OTP Expiry and Message fields shown on the Supabase Dashboard
+  will not apply.The OTP expiry duration, message content fields, and rate limits are managed by
+  Twilio when Twilio Verify is enabled.
 </Admonition>
 
 ## Resources
