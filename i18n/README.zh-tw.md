@@ -7,7 +7,7 @@
 
 # Supabase
 
-[Supabase](https://supabase.com)是一个开源的Firebase替代品。我们正在使用企业级的开源工具构建Firebase的功能。
+[Supabase](https://supabase.com)是一个开源的 Firebase 替代品。我们正在使用企业级的开源工具构建 Firebase 的功能。
 
 - [x] 托管的 Postgres 数据库。[文档](https://supabase.com/docs/guides/database)
 - [x] 认证和授权。[文档](https://supabase.com/docs/guides/auth)
@@ -55,7 +55,7 @@ Supabase 是一个开源工具的组合。我们正在使用企业级的开源�
 
 **架构**
 
-Supabase 是一个[托管平台](https://app.supabase.com)。你可以注册并开始使用Supabase，无需安装任何东西。
+Supabase 是一个[托管平台](https://app.supabase.com)。你可以注册并开始使用 Supabase，无需安装任何东西。
 你也可以[自我托管](https://supabase.com/docs/guides/hosting/overview)和[本地开发](https://supabase.com/docs/guides/local-development)。
 
 ![架构](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
