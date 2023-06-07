@@ -727,7 +727,7 @@ export const functions: NavMenuConstant = {
       url: undefined,
       items: [
         { name: 'Developing Functions locally', url: '/guides/functions/local-development' },
-        { name: 'Deploying with Git', url: '/guides/functions/cicd-workflow' },
+        { name: 'Deploying with GitHub', url: '/guides/functions/cicd-workflow' },
         { name: 'Managing Secrets and Environment Variables', url: '/guides/functions/secrets' },
         { name: 'Integrating With Supabase Auth', url: '/guides/functions/auth' },
         {
@@ -877,6 +877,16 @@ export const ai: NavMenuConstant = {
       ],
     },
     {
+      name: 'Python Client',
+      url: undefined,
+      items: [
+        { name: 'API', url: '/guides/ai/python/api' },
+        { name: 'Collections', url: '/guides/ai/python/collections' },
+        { name: 'Indexes', url: '/guides/ai/python/indexes' },
+        { name: 'Metadata', url: '/guides/ai/python/metadata' },
+      ],
+    },
+    {
       name: 'Guides',
       url: undefined,
       items: [
@@ -931,6 +941,10 @@ export const ai: NavMenuConstant = {
         {
           name: 'Google Colab',
           url: '/guides/ai/google-colab',
+        },
+        {
+          name: 'LlamaIndex',
+          url: '/guides/ai/integrations/llamaindex',
         },
       ],
     },

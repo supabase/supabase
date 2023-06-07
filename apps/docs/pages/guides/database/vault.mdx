@@ -233,16 +233,26 @@ To encrypt data, you need a _key id_. You can use the default key id created aut
 
 Both `vault.create_secret()` and `vault.update_secret()` take an optional fourth `new_key_id` argument. This argument can be used to store a different key id for the secret instead of the default value.
 
+{/* prettier-ignore */}
 ```sql
-postgres=> select vault.create_secret('another_s3kre3t_key', 'another_unique_name',
-   'This is another description', (pgsodium.create_key()).id);
+select vault.create_secret(
+  'another_s3kre3t_key', 
+  'another_unique_name',
+  'This is another description',
+  (pgsodium.create_key()).id
+);
+```
+
+Result:
+
+```sh
 -[ RECORD 1 ]-+-------------------------------------
 create_secret | cec9e005-a44d-4b19-86e1-febf3cd40619
 ```
 
 Which roles should have access to the `vault.secrets` table should be carefully considered. There are two ways to grant access, the first is that the `postgres` user can explicitly grant access to the vault table itself.
 
-## Turning off Statement Logging
+### Turning off Statement Logging
 
 When you insert secrets into the vault table with an INSERT statement, those statements get logged by default into the Supabase logs. Since this would mean your secrets are stored unencrypted in the logs, you should turn off statement logging while using the Vault.
 
@@ -256,7 +266,7 @@ And then restart your project from the dashboard to enable that change.
 
 In the future we are researching various ways to refine the way statement logging interacts with sensitive columns.
 
-## Resources
+### Resources
 
 - Read more about Supabase Vault in the [blog post](https://supabase.com/blog/vault-now-in-beta)
 - [Supabase Vault on GitHub](https://github.com/supabase/vault)
