@@ -362,8 +362,8 @@ const Nav = () => {
           >
             <div
               className={[
-                'dark:bg-scale-300 fixed -inset-y-0 z-50 h-screen w-screen transform overflow-y-scroll bg-white p-4 md:p-8',
-                open && '!bg-scale-300',
+                'dark:bg-[#03030890] fixed -inset-y-0 z-50 h-screen w-screen transform overflow-y-scroll bg-white p-4 md:p-8',
+                open && '!bg-[#03030890]',
               ].join(' ')}
             >
               <div className="absolute items-center justify-between right-4 top-4">
@@ -371,7 +371,7 @@ const Nav = () => {
                   <button
                     onClick={() => setOpen(false)}
                     type="button"
-                    className="inline-flex items-center justify-center p-2 bg-white rounded-md text-scale-900 focus:ring-brand-900 dark:bg-scale-300 dark:hover:bg-scale-400 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset"
+                    className="inline-flex items-center justify-center p-2 bg-white rounded-md text-scale-900 focus:ring-brand-900 dark:bg-[#03030890] dark:hover:bg-[#03030890] hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset"
                   >
                     <span className="sr-only">Close menu</span>
                     <svg

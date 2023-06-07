@@ -36,9 +36,9 @@ const SBLogoVisual = ({ className }: { className: string }) => {
             width="530.117"
             height="534.758"
             filterUnits="userSpaceOnUse"
-            color-interpolation-filters="sRGB"
+            colorInterpolationFilters="sRGB"
           >
-            <feFlood flood-opacity="0" result="BackgroundImageFix" />
+            <feFlood floodOpacity="0" result="BackgroundImageFix" />
             <feColorMatrix
               in="SourceAlpha"
               type="matrix"
@@ -85,9 +85,9 @@ const SBLogoVisual = ({ className }: { className: string }) => {
             width="147.492"
             height="189.812"
             filterUnits="userSpaceOnUse"
-            color-interpolation-filters="sRGB"
+            colorInterpolationFilters="sRGB"
           >
-            <feFlood flood-opacity="0" result="BackgroundImageFix" />
+            <feFlood floodOpacity="0" result="BackgroundImageFix" />
             <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
             <feColorMatrix
               in="SourceAlpha"
@@ -112,9 +112,9 @@ const SBLogoVisual = ({ className }: { className: string }) => {
             y2="242.622"
             gradientUnits="userSpaceOnUse"
           >
-            <stop stop-color="#CDE4E4" stop-opacity="0" />
-            <stop offset="0.489583" stop-color="#CDE4E4" />
-            <stop offset="1" stop-color="#CDE4E4" stop-opacity="0" />
+            <stop stopColor="#CDE4E4" stopOpacity="0" />
+            <stop offset="0.489583" stopColor="#CDE4E4" />
+            <stop offset="1" stopColor="#CDE4E4" stopOpacity="0" />
           </linearGradient>
           <linearGradient
             id="paint1_linear_4455_109077"
@@ -124,9 +124,9 @@ const SBLogoVisual = ({ className }: { className: string }) => {
             y2="192"
             gradientUnits="userSpaceOnUse"
           >
-            <stop stop-color="#CDE4E4" stop-opacity="0" />
-            <stop offset="0.489583" stop-color="#CDE4E4" />
-            <stop offset="1" stop-color="#CDE4E4" stop-opacity="0" />
+            <stop stopColor="#CDE4E4" stopOpacity="0" />
+            <stop offset="0.489583" stopColor="#CDE4E4" />
+            <stop offset="1" stopColor="#CDE4E4" stopOpacity="0" />
           </linearGradient>
         </defs>
       </svg>

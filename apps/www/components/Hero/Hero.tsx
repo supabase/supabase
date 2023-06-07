@@ -31,8 +31,10 @@ const Hero = () => {
               >
                 <div className="relative w-screen min-h-[250px] -mb-[50px] lg:-mb-[150px] z-10 h-[200px] lg:min-h-[450px] lg:h-[45vh]">
                   <Particles />
-                  <div className="absolute w-full h-full z-20 inset-0 bg-gradient-to-t from-[#030308] via-transparent to-transparent" />
-                  <div className="absolute w-full h-full z-10 inset-0 bg-[#030308] top-[130%]" />
+                  <div className="absolute w-full h-full z-20 inset-0 bg-gradient-to-t from-[#06060a] via-transparent to-transparent" />
+                  <div className="absolute w-full h-full z-10 inset-0 bg-[#06060a] top-[130%]" />
+                  {/* <div className="absolute w-full h-full z-20 inset-0 bg-gradient-to-t from-slate-100 via-transparent to-transparent" />
+                  <div className="absolute w-full h-full z-10 inset-0 bg-slate-100 top-[130%]" /> */}
                   <SBLogoVisual className="mx-auto absolute z-10 w-[50vw] max-w-[531px] h-full lg:h-[500px] max-h-[500px] bottom-[-50px] left-0 right-0" />
                 </div>
                 <div className="relative z-30">
@@ -71,9 +73,9 @@ const Hero = () => {
           </div>
         </div>
       </SectionContainer>
-      <div className="absolute z-0 w-full max-w-5xl h-[300px] top-0 left-0 right-0 mx-auto ![perspective:1200px] sm:![perspective:1200px] md:![perspective:1200px] lg:![perspective:1200px]">
+      <div className="absolute z-0 w-2/3 lg:w-full max-w-5xl h-[150px] lg:h-[300px] top-0 left-0 right-0 mx-auto ![perspective:1200px] sm:![perspective:1200px] md:![perspective:1200px] lg:![perspective:1200px]">
         <div
-          className="absolute inset-0 w-full h-full top-0 mx-auto left-0 right-0 bg-gradient-to-r from-[#03C9B1] to-[#7D0CED] blur-[300px]"
+          className="absolute inset-0 w-full h-full top-0 mx-auto left-0 right-0 bg-gradient-to-r from-[#03C9B1] to-[#7D0CED] blur-[150px] lg:blur-[300px]"
           style={{
             transform: 'rotateX(-45deg)',
           }}
