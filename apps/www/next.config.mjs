@@ -9,10 +9,23 @@ import redirects from './lib/redirects.js'
 
 import withTM from 'next-transpile-modules'
 
+import { remarkCodeHike } from '@code-hike/mdx'
+import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
+
 const withMDX = nextMdx({
   extension: /\.mdx?$/,
   options: {
-    remarkPlugins: [remarkGfm],
+    remarkPlugins: [
+      [
+        remarkCodeHike,
+        {
+          theme: codeHikeTheme,
+          lineNumbers: true,
+          showCopyButton: true,
+        },
+      ],
+      remarkGfm,
+    ],
     rehypePlugins: [rehypeSlug],
     // This is required for `MDXProvider` component
     providerImportSource: '@mdx-js/react',
