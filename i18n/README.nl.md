@@ -55,7 +55,7 @@ Supabase is een combinatie van open source tools. We bouwen de functies van Fire
 
 **Architectuur**
 
-Supabase is een [gehost platform] (https://app.supabase.com). U kunt zich aanmelden en Supabase gebruiken zonder iets te installeren.
+Supabase is een [gehost platform](https://app.supabase.com). U kunt zich aanmelden en Supabase gebruiken zonder iets te installeren.
 U kunt ook [zelf hosten](https://supabase.com/docs/guides/hosting/overview) en [lokaal ontwikkelen](https://supabase.com/docs/guides/local-development).
 
 architectuur](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
