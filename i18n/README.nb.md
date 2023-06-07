@@ -55,14 +55,14 @@ Supabase er en kombinasjon av verktøy med åpen kildekode. Vi bygger funksjonen
 
 \*\*Arkitektur
 
-Supabase er en [vertsplattform] (https://app.supabase.com). Du kan registrere deg og begynne å bruke Supabase uten å installere noe.
+Supabase er en [vertsplattform](https://app.supabase.com). Du kan registrere deg og begynne å bruke Supabase uten å installere noe.
 Du kan også [selv være vert](https://supabase.com/docs/guides/hosting/overview) og [utvikle lokalt](https://supabase.com/docs/guides/local-development).
 
 arkitektur](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
 
 - [PostgreSQL](https://www.postgresql.org/) er et objektrelasjonsdatabasesystem med over 30 års aktiv utvikling som har gitt det et sterkt rykte for pålitelighet, robusthet og ytelse.
 - [Realtime](https://github.com/supabase/realtime) er en Elixir-server som lar deg lytte til PostgreSQL-innlegg, oppdateringer og slettinger ved hjelp av websockets. Realtime polls Postgres' innebygde replikeringsfunksjonalitet for databaseendringer, konverterer endringer til JSON og sender deretter JSON over websockets til autoriserte klienter.
-- [PostgREST] (http://postgrest.org/) er en webserver som gjør PostgreSQL-databasen din direkte om til et RESTful API
+- [PostgREST](http://postgrest.org/) er en webserver som gjør PostgreSQL-databasen din direkte om til et RESTful API
 - [pg_graphql](http://github.com/supabase/pg_graphql/) en PostgreSQL-utvidelse som eksponerer et GraphQL API
 - [Storage](https://github.com/supabase/storage-api) gir et RESTful-grensesnitt for å administrere filer som er lagret i S3, ved hjelp av Postgres for å administrere tillatelser.
 - [postgres-meta](https://github.com/supabase/postgres-meta) er et RESTful API for å administrere Postgres, slik at du kan hente tabeller, legge til roller og kjøre spørringer osv.
