@@ -32,14 +32,14 @@ Za celotno dokumentacijo obiščite [supabase.com/docs](https://supabase.com/doc
 ## Skupnost in podpora
 
 - [Forum skupnosti](https://github.com/supabase/supabase/discussions). Najprimernejši za: pomoč pri gradnji, razpravo o najboljših praksah zbirke podatkov.
-- [GitHub Issues] (https://github.com/supabase/supabase/issues). Najprimernejši za: hrošče in napake, na katere naletite pri uporabi zbirke Supabase.
+- [GitHub Issues](https://github.com/supabase/supabase/issues). Najprimernejši za: hrošče in napake, na katere naletite pri uporabi zbirke Supabase.
 - [E-poštna podpora](https://supabase.com/docs/support#business-support). Najboljše za: težave s podatkovno zbirko ali infrastrukturo.
 - [Discord](https://discord.supabase.com). Najboljši za: izmenjavo aplikacij in druženje s skupnostjo.
 
 ## Status
 
 - [x] Alfa: Testiramo bazo Supabase z zaprtim naborom strank
-- [x] Javna alfa: [app.supabase.com] (https://app.supabase.com). Vendar nas ne obremenjujte, saj je še nekaj pomanjkljivosti
+- [x] Javna alfa: [app.supabase.com](https://app.supabase.com). Vendar nas ne obremenjujte, saj je še nekaj pomanjkljivosti
 - [x] Javna beta različica: Dovolj stabilna za večino primerov uporabe, ki niso povezani s podjetji
 - [ ] Javna: Splošna razpoložljivost [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
 
