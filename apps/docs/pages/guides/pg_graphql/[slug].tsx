@@ -2,7 +2,7 @@ import { CodeHikeConfig, remarkCodeHike } from '@code-hike/mdx'
 import { GetStaticPaths, GetStaticProps } from 'next'
 import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
 import { serialize } from 'next-mdx-remote/serialize'
-import { relative } from 'path'
+import { isAbsolute, relative } from 'path'
 import rehypeSlug from 'rehype-slug'
 import remarkGfm from 'remark-gfm'
 import codeHikeTheme from '~/code-hike.theme.json' assert { type: 'json' }
@@ -27,7 +27,7 @@ const pageMap = [
       title: 'GraphQL',
     },
     remoteFile: 'supabase.md',
-  }
+  },
 ]
 
 interface PGGraphQLDocsProps {
@@ -49,7 +49,7 @@ export default function PGGraphQLDocs({ source, meta }: PGGraphQLDocsProps) {
 /**
  * Fetch markdown from external repo and transform links
  */
-export const getStaticProps: GetStaticProps<PGGraphQLProps> = async ({ params }) => {
+export const getStaticProps: GetStaticProps<PGGraphQLDocsProps> = async ({ params }) => {
   const page = pageMap.find(({ slug }) => slug === params.slug)
 
   if (!page) {
@@ -76,13 +76,19 @@ export const getStaticProps: GetStaticProps<PGGraphQLProps> = async ({ params })
         return url
       }
 
-      const relativePage = (
-        pathname.endsWith('.md')
-          ? pathname.replace(/\.md$/, '')
-          : relative(externalSiteUrl.pathname, pathname)
-      ).replace(/^\//, '')
+      const getRelativePath = () => {
+        if (pathname.endsWith('.md')) {
+          return pathname.replace(/\.md$/, '')
+        }
+        if (isAbsolute(url)) {
+          return relative(externalSiteUrl.pathname, pathname)
+        }
+        return pathname
+      }
 
-      const page = pageMap.find(({ remoteFile }) => `${relativePage}.md` === remoteFile)
+      const relativePath = getRelativePath().replace(/^\//, '')
+
+      const page = pageMap.find(({ remoteFile }) => `${relativePath}.md` === remoteFile)
 
       // If we have a mapping for this page, use the mapped path
       if (page) {
@@ -90,7 +96,7 @@ export const getStaticProps: GetStaticProps<PGGraphQLProps> = async ({ params })
       }
 
       // If we don't have this page in our docs, link to original docs
-      return `${externalSite}/${relativePage}${hash}`
+      return `${externalSite}/${relativePath}${hash}`
     } catch (err) {
       console.error('Error transforming markdown URL', err)
       return url
