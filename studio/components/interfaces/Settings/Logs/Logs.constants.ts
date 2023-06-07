@@ -1,5 +1,4 @@
 import dayjs from 'dayjs'
-import { IS_PLATFORM } from 'lib/constants'
 import { DatetimeHelper, FilterTableSet, LogTemplate } from '.'
 
 export const LOGS_EXPLORER_DOCS_URL =
@@ -666,5 +665,3 @@ export const TIER_QUERY_LIMITS: {
   TEAM: { text: '28 days', value: 28, unit: 'day', promptUpgrade: true },
   ENTERPRISE: { text: '90 days', value: 90, unit: 'day', promptUpgrade: false },
 }
-
-export const SHOW_O11Y = IS_PLATFORM || process.env.NEXT_PUBLIC_ENABLE_LOGS == 'true'

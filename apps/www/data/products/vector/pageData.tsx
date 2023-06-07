@@ -18,8 +18,11 @@ export default {
     ),
     subheader: (
       <>
-        Use pgvector with Supabase client libraries <br className="hidden md:block" />
-        to store, index, and query your vector embeddings at scale.
+        Use the Supabase client libraries to store, index, and query your vector embeddings at
+        scale.
+        <br className="hidden md:block" />
+        Build AI applications with your Postgres and pgvector. The best vector database is the
+        database you already have.
       </>
     ),
     image: '/images/product/vector/vector-hero.svg',
@@ -308,7 +311,7 @@ docs.query(
         author: 'Caleb Peffer',
         role: 'CEO at Mendable',
         quote:
-          'We tried other vector databases - we tried Faiss, we tried Weviate, we tried Pinecone. If you’re just doing vector search they’re great, but if you need to store a bunch of metadata that becomes a huge pain.',
+          'We tried other vector databases - we tried Faiss, we tried Weaviate, we tried Pinecone. If you’re just doing vector search they’re great, but if you need to store a bunch of metadata that becomes a huge pain.',
         image: '/images/customers/logos/mendableai.png',
         abstract: 'Mendable switches from Pinecone to Supabase for PostgreSQL vector embeddings.',
         url: '/customers/mendableai',

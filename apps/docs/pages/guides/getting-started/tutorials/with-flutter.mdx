@@ -53,7 +53,7 @@ For Android, edit the `android/app/src/main/AndroidManifest.xml` file.
 
 Add an intent-filter to enable deep linking:
 
-```xml title=android/app/src/main/AndroidManifest.xml
+```xml android/app/src/main/AndroidManifest.xml
 <manifest ...>
   <!-- ... other tags -->
   <application ...>
@@ -80,7 +80,7 @@ For iOS, edit the ios/Runner/Info.plist file.
 
 Add CFBundleURLTypes to enable deep linking:
 
-```xml title=ios/Runner/Info.plist"
+```xml ios/Runner/Info.plist"
 <!-- ... other tags -->
 <plist>
 <dict>
@@ -113,7 +113,7 @@ Now that we have deep links ready let's initialize the Supabase client inside ou
 These variables will be exposed on the app, and that's completely fine since we have
 [Row Level Security](/docs/guides/auth#row-level-security) enabled on our Database.
 
-```dart title=lib/main.dart
+```dart lib/main.dart
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -130,7 +130,7 @@ Future<void> main() async {
 Let's also create a constant file to make it easier to use Supabase client.
 We will also include an extension method declaration to call `showSnackBar` with one line of code.
 
-```dart title=lib/constants.dart
+```dart lib/constants.dart
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -158,7 +158,7 @@ extension ShowSnackBar on BuildContext {
 Let's create a splash screen that will be shown to users right after they open the app.
 This screen retrieves the current session and redirects the user accordingly.
 
-```dart title=lib/pages/splash_page.dart
+```dart lib/pages/splash_page.dart
 import 'package:flutter/material.dart';
 import 'package:supabase_quickstart/constants.dart';
 
@@ -209,7 +209,7 @@ We'll use Magic Links, so users can sign in with their email without using passw
 Notice that this page sets up a listener on the user's auth state using `onAuthStateChange`.
 A new event will fire when the user comes back to the app by clicking their magic link, which this page can catch and redirect the user accordingly.
 
-```dart title=lib/pages/login_page.dart
+```dart lib/pages/login_page.dart
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
@@ -307,7 +307,7 @@ class _LoginPageState extends State<LoginPage> {
 After a user is signed in we can allow them to edit their profile details and manage their account.
 Let's create a new widget called `account_page.dart` for that.
 
-```dart title=lib/pages/account_page.dart"
+```dart lib/pages/account_page.dart"
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:supabase_quickstart/components/avatar.dart';
@@ -442,7 +442,7 @@ class _AccountPageState extends State<AccountPage> {
 
 Now that we have all the components in place, let's update `lib/main.dart`:
 
-```dart title=lib/main.dart
+```dart lib/main.dart
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:supabase_quickstart/pages/account_page.dart';
@@ -535,7 +535,7 @@ Once you are done with all of the above, it is time to dive into coding.
 Let's create an avatar for the user so that they can upload a profile photo.
 We can start by creating a new component:
 
-```dart title=lib/components/avatar.dart
+```dart lib/components/avatar.dart
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -631,7 +631,7 @@ class _AvatarState extends State<Avatar> {
 
 And then we can add the widget to the Account page as well as some logic to update the `avatar_url` whenever the user uploads a new avatar.
 
-```dart title=lib/pages/account_page.dart
+```dart lib/pages/account_page.dart
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:supabase_quickstart/components/avatar.dart';

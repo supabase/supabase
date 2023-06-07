@@ -12,7 +12,7 @@ type CommunityItem = {
 const data: CommunityItem[] = [
   {
     title: 'Developers',
-    stat: '150,000+',
+    stat: '250,000+',
     statLabel: 'Registered developers',
     img: 'supabase.png',
     detail: () => (
