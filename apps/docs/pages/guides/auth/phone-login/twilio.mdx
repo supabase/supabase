@@ -347,8 +347,24 @@ let { data, error } = await supabase.auth.verifyOtp({
 })
 ```
 
+### Twilio Verify
+
+Twilio Verify is an alternative service by Twilio which can be used to replace Twilio Programmable Messaging which is described above. Twilio Verify has built in fraud detection and allows developers to make use of Message Services instead of registering their phone number.
+
+1. [Create a Verification Service on Twilio](https://support.twilio.com/hc/en-us/articles/360033309133-Getting-Started-with-Twilio-Verify-V2)
+2. Fill in the Message Service ID field with the Verification Service ID obtained in 1.
+3. Enable Twilio Verify
+
+Note that you can only use one of Twilio Verify or Twilio Programmable Messaging at any point in time. At this time, Twilio Verify is only supported
+on the `whatsapp` and `sms` channels.
+
+<Admonition type="caution">
+  When using Twilio Verify the OTP expiry duration and Message content fields, and rate are managed by Twilio. Consequently, the OTP Expiry and Message fields shown on the Supabase Dashboard will not apply.
+</Admonition>
+
 ## Resources
 
+- [Twilio Verify Documentation](https://www.twilio.com/docs/verify)
 - [Twilio Signup](https://www.twilio.com/try-twilio)
 - [Supabase Dashboard](https://app.supabase.com)
 - [Supabase Row Level Security](/docs/guides/auth#row-level-security)
