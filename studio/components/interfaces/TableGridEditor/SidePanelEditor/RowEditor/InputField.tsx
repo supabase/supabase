@@ -201,6 +201,9 @@ const InputField = ({
       { value: 'false', label: 'FALSE' },
       ...(field.isNullable ? [{ value: 'null', label: 'NULL' }] : []),
     ]
+
+    const defaultValue = field.value === null ? 'null' : field.value
+
     return (
       <Listbox
         size="small"
@@ -209,7 +212,7 @@ const InputField = ({
         label={field.name}
         labelOptional={field.format}
         descriptionText={field.comment}
-        defaultValue={field.value}
+        defaultValue={defaultValue}
         onChange={(value: string) => {
           if (value === 'null') onUpdateField({ [field.name]: null })
           else onUpdateField({ [field.name]: value })

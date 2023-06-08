@@ -1,3 +1,8 @@
+import '../../../packages/ui/build/css/themes/light.css'
+import '../../../packages/ui/build/css/themes/dark.css'
+
+import '../styles/index.css'
+
 import { API_URL, APP_NAME, DESCRIPTION } from 'lib/constants'
 import { DefaultSeo } from 'next-seo'
 import { AppProps } from 'next/app'
@@ -8,6 +13,7 @@ import '../styles/index.css'
 import { post } from '~/lib/fetchWrapper'
 import { AuthProvider, ThemeProvider, useTelemetryProps } from 'common'
 import Head from 'next/head'
+import 'config/code-hike.scss'
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter()

@@ -52,9 +52,10 @@ const Users = () => {
             value={PageState.filterInputValue}
             onChange={onFilterChange}
             onKeyDown={onFilterKeyPress}
+            className="min-w-[275px]"
             name="email"
             id="email"
-            placeholder="Search by email"
+            placeholder="Search by email or phone number"
             icon={<IconSearch size="tiny" />}
             actions={[
               PageState.filterInputValue && (

@@ -1,10 +1,9 @@
 import { NextRouter, useRouter } from 'next/router'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Button, IconExternalLink, IconHelpCircle } from 'ui'
+import { Button, IconExternalLink, IconHelpCircle, Loading } from 'ui'
 import { BaseReportParams } from './Reports.types'
 import { LogsEndpointParams } from '../Settings/Logs'
 import Panel from 'components/ui/Panel'
-import LoadingOpacity from 'components/ui/LoadingOpacity'
 
 export interface ReportWidgetProps<T = any> {
   data: T[]
@@ -102,9 +101,9 @@ const ReportWidget: React.FC<ReportWidgetProps> = (props) => {
           )}
         </div>
 
-        <LoadingOpacity className="w-full" active={props.isLoading}>
+        <Loading active={props.isLoading}>
           {props.data === undefined ? null : props.renderer({ ...props, router, projectRef })}
-        </LoadingOpacity>
+        </Loading>
 
         {props.append &&
           props.append({ ...props, ...(props.appendProps || {}), router, projectRef })}

@@ -10,7 +10,7 @@ For `supabase-flutter`, you will be using the static `initialize()` method on `S
 
 ### Flutter `initialize()`
 
-```dart title=main.dart
+```dart main.dart
 Future<void> main() async {
   await Supabase.initialize(url: 'https://xyzcompany.supabase.co', anonKey: 'public-anon-key');
   runApp(MyApp());
@@ -30,7 +30,7 @@ final supabase = Supabase.instance.client;
 You can pass `headers` to initialize your Supabase client with customer headers.
 Here is an example of passing a custom auth header to Supabase client.
 
-```dart title=main.dart
+```dart main.dart
 Future<void> main() async {
   await Supabase.initialize(
     url: 'https://xyzcompany.supabase.co',

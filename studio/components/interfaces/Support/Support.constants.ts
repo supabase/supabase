@@ -20,7 +20,7 @@ export const CATEGORY_OPTIONS = [
   {
     value: 'Performance',
     label: 'Performance issues',
-    description: 'Reporting of performance issues is only available on the Pro tier',
+    description: 'Reporting of performance issues is only available on the Pro plan',
     query: 'Performance',
   },
   {
