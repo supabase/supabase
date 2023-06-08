@@ -35,7 +35,7 @@ export const PRICING_META = {
     description: 'For production applications with the option to scale.',
     priceMonthly: 25,
     priceUnit: '/ month',
-    warning: 'Usage based plan',
+    warning: 'Usage-based plan',
     preface: 'Everything in the Free plan, plus:',
     features: [
       'No project pausing',
@@ -59,7 +59,7 @@ export const PRICING_META = {
     description: 'Collaborate with different permissions and access patterns.',
     priceMonthly: 599,
     priceUnit: '/ month',
-    warning: 'Usage based plan',
+    warning: 'Usage-based plan',
     preface: 'Everything in the Pro plan, plus:',
     features: [
       'Additional Organization member roles',
