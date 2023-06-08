@@ -1,6 +1,6 @@
 on:
   schedule:
-    - cron: * * * * *
+    - cron: '* * * * *' # every minute
   repository_dispatch: # run manually
     types: [check-link]
 
