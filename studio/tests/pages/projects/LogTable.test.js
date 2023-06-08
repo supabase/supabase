@@ -131,6 +131,9 @@ test.each([
     data: [
       {
         event_message: JSON.stringify({ msg: 'some message', path: '/auth-path', level: 'info' }),
+        msg: 'some message',
+        path: '/auth-path',
+        level: 'info',
         timestamp: 1659545029083869,
         id: '4475cf6f-2929-4296-ab44-ce2c17069937',
       },

@@ -223,7 +223,7 @@ const NotificationsPopover: FC<Props> = () => {
         }
       >
         <Tooltip.Root delayDuration={0}>
-          <Tooltip.Trigger>
+          <Tooltip.Trigger asChild>
             <div className="relative flex">
               <Button
                 as="span"
