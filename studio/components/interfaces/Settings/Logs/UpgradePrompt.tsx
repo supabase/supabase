@@ -17,10 +17,6 @@ const UpgradePrompt: React.FC<Props> = ({ show, setShowUpgradePrompt, subscripti
   const router = useRouter()
   const { ref } = router.query
 
-  // Team plan is enabled when the flag is turned on OR the user is already on the team plan (manually assigned by us)
-  const userIsOnTeamTier = subscription?.tier?.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.TEAM
-  const teamTierEnabled = useFlag('teamTier') || userIsOnTeamTier
-
   return (
     <Modal
       hideFooter
@@ -51,12 +47,10 @@ const UpgradePrompt: React.FC<Props> = ({ show, setShowUpgradePrompt, subscripti
                   <p className="w-[40%] text-sm">Pro</p>
                   <p className="w-[60%] text-sm">{TIER_QUERY_LIMITS.PRO.text}</p>
                 </div>
-                {teamTierEnabled && (
-                  <div className="flex items-center px-4 py-1">
-                    <p className="w-[40%] text-sm">Team</p>
-                    <p className="w-[60%] text-sm">{TIER_QUERY_LIMITS.TEAM.text}</p>
-                  </div>
-                )}
+                <div className="flex items-center px-4 py-1">
+                  <p className="w-[40%] text-sm">Team</p>
+                  <p className="w-[60%] text-sm">{TIER_QUERY_LIMITS.TEAM.text}</p>
+                </div>
                 <div className="flex items-center px-4 py-1">
                   <p className="w-[40%] text-sm">Enterprise</p>
                   <p className="w-[60%] text-sm">{TIER_QUERY_LIMITS.ENTERPRISE.text}</p>
