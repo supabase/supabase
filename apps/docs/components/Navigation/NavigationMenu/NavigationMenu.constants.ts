@@ -526,6 +526,10 @@ export const database: NavMenuConstant = {
       name: 'Postgres Guides',
       url: undefined,
       items: [
+        {
+          name: 'JSON and unstructured data',
+          url: '/guides/database/json',
+        },
         { name: 'Implementing Full Text Search', url: '/guides/database/full-text-search' },
         { name: 'Implementing Cascade Deletes', url: '/guides/database/postgres/cascade-deletes' },
         { name: 'Implementing column encryption', url: '/guides/database/column-encryption' },
