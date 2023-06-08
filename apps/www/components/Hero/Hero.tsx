@@ -9,6 +9,8 @@ import HeroFrameworks from './HeroFrameworks'
 import styles from './hero.module.css'
 import Particles from './Particles'
 import SBLogoVisual from './SBLogoVisual'
+import { Application } from '@splinetool/runtime'
+import { useEffect } from 'react'
 
 const Hero = () => {
   const router = useRouter()
@@ -16,6 +18,18 @@ const Hero = () => {
   const sendTelemetryEvent = async (event: TelemetryEvent) => {
     await Telemetry.sendEvent(event, telemetryProps, router)
   }
+
+  useEffect(() => {
+    if (!document) return
+    const canvas = document.getElementById('canvas3d')
+    if (!canvas) return
+
+    const spline = new Application(canvas as any)
+    spline.load('https://prod.spline.design/EVQrv4Zsx5JT2pDe/scene.splinecode').then(() => {
+      // const obj = spline.findObjectById('ab3a4cd0-90a8-47c7-b2c7-b0ee1e0bb8a6')
+      spline.setZoom(2)
+    })
+  }, [])
 
   return (
     <div className="relative">
@@ -31,11 +45,13 @@ const Hero = () => {
               >
                 <div className="relative w-screen min-h-[250px] -mb-[50px] lg:-mb-[150px] z-10 h-[200px] lg:min-h-[450px] lg:h-[45vh]">
                   <Particles />
-                  <div className="absolute w-full h-full z-20 inset-0 bg-gradient-to-t from-[#06060a] via-transparent to-transparent" />
+                  <canvas
+                    className="relative z-20 w-[500px] h-[500px] bottom-[-40px] lg:bottom-[-60px]"
+                    id="canvas3d"
+                  ></canvas>
+                  <div className="absolute w-full h-full z-50 pointer-events-none inset-0 bg-gradient-to-t from-[#06060a] via-transparent to-transparent" />
                   <div className="absolute w-full h-full z-10 inset-0 bg-[#06060a] top-[130%]" />
-                  {/* <div className="absolute w-full h-full z-20 inset-0 bg-gradient-to-t from-slate-100 via-transparent to-transparent" />
-                  <div className="absolute w-full h-full z-10 inset-0 bg-slate-100 top-[130%]" /> */}
-                  <SBLogoVisual className="mx-auto absolute z-10 w-[50vw] max-w-[531px] h-full lg:h-[500px] max-h-[500px] bottom-[-50px] left-0 right-0" />
+                  {/* <SBLogoVisual className="mx-auto absolute z-10 w-[50vw] max-w-[531px] h-full lg:h-[500px] max-h-[500px] bottom-[-50px] left-0 right-0" /> */}
                 </div>
                 <div className="relative z-30">
                   <h1 className="text-scale-1200 text-4xl sm:text-5xl sm:leading-none lg:text-7xl">
@@ -73,7 +89,7 @@ const Hero = () => {
           </div>
         </div>
       </SectionContainer>
-      <div className="absolute z-0 w-2/3 lg:w-full max-w-5xl h-[150px] lg:h-[300px] top-0 left-0 right-0 mx-auto ![perspective:1200px] sm:![perspective:1200px] md:![perspective:1200px] lg:![perspective:1200px]">
+      <div className="absolute pointer-events-none z-0 w-2/3 lg:w-full max-w-5xl h-[150px] lg:h-[300px] top-0 left-0 right-0 mx-auto ![perspective:1200px] sm:![perspective:1200px] md:![perspective:1200px] lg:![perspective:1200px]">
         <div
           className="absolute inset-0 w-full h-full top-0 mx-auto left-0 right-0 bg-gradient-to-r from-[#03C9B1] to-[#7D0CED] blur-[150px] lg:blur-[300px]"
           style={{

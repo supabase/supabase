@@ -18,6 +18,7 @@
     "@mdx-js/react": "^2.1.5",
     "@next/bundle-analyzer": "^13.0.0",
     "@next/mdx": "^12.3.2",
+    "@splinetool/runtime": "^0.9.362",
     "@supabase/auth-ui-react": "^0.1.6",
     "@supabase/supabase-js": "^2.13.0",
     "classnames": "^2.3.1",
