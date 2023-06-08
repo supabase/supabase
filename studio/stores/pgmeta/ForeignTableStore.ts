@@ -37,9 +37,15 @@ export default class ForeignTableStore extends PostgresMetaInterface<Partial<Pos
     if (columnsResponse.error) throw columnsResponse.error
 
     // merge 2 response to create the final array
+    const columnsByTableId = (columnsResponse as PostgresColumn[])
+      .reduce((acc, curr) => {
+        acc[curr.table_id] ??= []
+        acc[curr.table_id].push(curr)
+        return acc
+      }, {} as Record<string, PostgresColumn[]>)
     const foreignTables: PostgresTable[] = []
     foreignTablesResponse.forEach((foreignTable: PostgresTable) => {
-      const columns = columnsResponse.filter((x: PostgresColumn) => x.table_id === foreignTable.id)
+      const columns = columnsByTableId[foreignTable.id]
       foreignTables.push({ ...foreignTable, columns })
     })
 
