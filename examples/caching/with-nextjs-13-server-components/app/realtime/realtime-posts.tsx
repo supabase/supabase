@@ -17,7 +17,7 @@ export default function RealtimePosts({ serverPosts }: { serverPosts: any }) {
 
   useEffect(() => {
     // ensure you have enabled replication on the `posts` table
-    // https://app.supabase.com/project/_/database/replication
+    // https://supabase.com/dashboard/project/_/database/replication
     const channel = supabase
       .channel('*')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'posts' }, (payload) =>

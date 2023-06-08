@@ -2,7 +2,16 @@ import dayjs from 'dayjs'
 import Link from 'next/link'
 import { FC, useState } from 'react'
 import { useRouter } from 'next/router'
-import { Button, Dropdown, IconArchive, IconChevronDown, IconDatabase, IconKey, IconZap } from 'ui'
+import {
+  Button,
+  Dropdown,
+  IconArchive,
+  IconChevronDown,
+  IconDatabase,
+  IconKey,
+  IconZap,
+  Loading,
+} from 'ui'
 import Panel from 'components/ui/Panel'
 import { ChartIntervals } from 'types'
 import { useParams } from 'common/hooks'
@@ -99,16 +108,17 @@ const ProjectUsage: FC<Props> = ({}) => {
               href={`/project/${projectRef}/editor`}
             />
 
-            <BarChart
-              title="REST Requests"
-              data={charts}
-              xAxisKey="timestamp"
-              yAxisKey="total_rest_requests"
-              isLoading={isLoading}
-              onBarClick={(v: unknown) => handleBarClick(v as UsageApiCounts, 'rest')}
-              customDateFormat={datetimeFormat}
-              highlightedValue={sumBy(charts, 'total_rest_requests')}
-            />
+            <Loading active={isLoading}>
+              <BarChart
+                title="REST Requests"
+                data={charts}
+                xAxisKey="timestamp"
+                yAxisKey="total_rest_requests"
+                onBarClick={(v: unknown) => handleBarClick(v as UsageApiCounts, 'rest')}
+                customDateFormat={datetimeFormat}
+                highlightedValue={sumBy(charts, 'total_rest_requests')}
+              />
+            </Loading>
           </Panel.Content>
         </Panel>
         <Panel>
@@ -122,16 +132,17 @@ const ProjectUsage: FC<Props> = ({}) => {
               title="Auth"
               href={`/project/${projectRef}/auth/users`}
             />
-            <BarChart
-              title="Auth Requests"
-              data={charts}
-              xAxisKey="timestamp"
-              yAxisKey="total_auth_requests"
-              isLoading={!charts && !error ? true : false}
-              onBarClick={(v: unknown) => handleBarClick(v as UsageApiCounts, 'auth')}
-              customDateFormat={datetimeFormat}
-              highlightedValue={sumBy(charts || [], 'total_auth_requests')}
-            />
+            <Loading active={isLoading}>
+              <BarChart
+                title="Auth Requests"
+                data={charts}
+                xAxisKey="timestamp"
+                yAxisKey="total_auth_requests"
+                onBarClick={(v: unknown) => handleBarClick(v as UsageApiCounts, 'auth')}
+                customDateFormat={datetimeFormat}
+                highlightedValue={sumBy(charts || [], 'total_auth_requests')}
+              />
+            </Loading>
           </Panel.Content>
         </Panel>
         <Panel>
@@ -146,16 +157,17 @@ const ProjectUsage: FC<Props> = ({}) => {
               href={`/project/${projectRef}/storage/buckets`}
             />
 
-            <BarChart
-              title="Storage Requests"
-              data={charts}
-              xAxisKey="timestamp"
-              yAxisKey="total_storage_requests"
-              isLoading={isLoading}
-              onBarClick={(v: unknown) => handleBarClick(v as UsageApiCounts, 'storage')}
-              customDateFormat={datetimeFormat}
-              highlightedValue={sumBy(charts, 'total_storage_requests')}
-            />
+            <Loading active={isLoading}>
+              <BarChart
+                title="Storage Requests"
+                data={charts}
+                xAxisKey="timestamp"
+                yAxisKey="total_storage_requests"
+                onBarClick={(v: unknown) => handleBarClick(v as UsageApiCounts, 'storage')}
+                customDateFormat={datetimeFormat}
+                highlightedValue={sumBy(charts, 'total_storage_requests')}
+              />
+            </Loading>
           </Panel.Content>
         </Panel>
         <Panel>
@@ -169,16 +181,17 @@ const ProjectUsage: FC<Props> = ({}) => {
               title="Realtime"
             />
 
-            <BarChart
-              title="Realtime Requests"
-              data={charts}
-              xAxisKey="timestamp"
-              yAxisKey="total_realtime_requests"
-              isLoading={isLoading}
-              onBarClick={(v: unknown) => handleBarClick(v as UsageApiCounts, 'realtime')}
-              customDateFormat={datetimeFormat}
-              highlightedValue={sumBy(charts, 'total_realtime_requests')}
-            />
+            <Loading active={isLoading}>
+              <BarChart
+                title="Realtime Requests"
+                data={charts}
+                xAxisKey="timestamp"
+                yAxisKey="total_realtime_requests"
+                onBarClick={(v: unknown) => handleBarClick(v as UsageApiCounts, 'realtime')}
+                customDateFormat={datetimeFormat}
+                highlightedValue={sumBy(charts, 'total_realtime_requests')}
+              />
+            </Loading>
           </Panel.Content>
         </Panel>
       </div>
@@ -197,7 +210,7 @@ const PanelHeader = (props: any) => {
           (props.href ? 'cursor-pointer hover:text-gray-1200 hover:opacity-100' : '')
         }
       >
-        <p>{props.icon}</p>
+        <div>{props.icon}</div>
         <span className="flex items-center space-x-1">
           <h4 className="mb-0 text-lg">{props.title}</h4>
         </span>

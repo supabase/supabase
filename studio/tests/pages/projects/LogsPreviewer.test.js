@@ -87,25 +87,27 @@ test.each([
     queryType: 'auth',
     tableName: undefined,
     tableLog: logDataFixture({
-      event_message: JSON.stringify({
-        msg: 'some message',
-        path: '/auth-path',
-        level: 'info',
-        status: 300,
-      }),
+      event_message: "some event_message",
+      level: "info",
+      path: '/auth-path',
+      msg: 'some metadata_msg',
+      level: 'info',
+      status: 300,
+      metadata: undefined
     }),
     selectionLog: logDataFixture({
-      event_message: JSON.stringify({
-        msg: 'some message',
+      event_message: "some event_message",
+      metadata: {
+        msg: 'some metadata_msg',
         path: '/auth-path',
         level: 'info',
         status: 300,
-      }),
+      }
     }),
-    tableTexts: [/auth\-path/, /some message/, /INFO/],
+    tableTexts: [/auth\-path/, /some metadata_msg/, /INFO/],
     selectionTexts: [
       /auth\-path/,
-      /some message/,
+      /some metadata_msg/,
       /INFO/,
       /300/,
       /Timestamp/,

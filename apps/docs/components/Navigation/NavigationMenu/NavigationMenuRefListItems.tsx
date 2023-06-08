@@ -197,7 +197,7 @@ const NavigationMenuRefListItems = ({
         <HeaderLink title={menu.title} url={menu.url} id={id} />
         <RevVersionDropdown />
       </div>
-      <ul className="function-link-list flex flex-col gap-2">
+      <ul className="function-link-list flex flex-col gap-2 pb-5">
         {filteredSections.map((section) => {
           return (
             <Fragment key={section.title}>

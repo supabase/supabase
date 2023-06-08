@@ -16,7 +16,9 @@ interface Props {
 
 const DatabaseLayout: FC<Props> = ({ title, children }) => {
   const { meta, ui, vault, backups } = useStore()
-  const { isLoading } = meta.schemas
+  const { isLoading: isSchemasLoading } = meta.schemas
+  const { isLoading: isVaultLoading } = vault
+
   const { isInitialized, error } = meta.tables
   const project = ui.selectedProject
 
@@ -28,6 +30,7 @@ const DatabaseLayout: FC<Props> = ({ title, children }) => {
   const foreignDataWrappersEnabled = useFlag('foreignDataWrappers')
   const pgNetExtensionExists = meta.extensions.byId('pg_net') !== undefined
 
+  const isLoading = isSchemasLoading || (isVaultEnabled && isVaultLoading)
   const [loaded, setLoaded] = useState<boolean>(isInitialized)
 
   useEffect(() => {
