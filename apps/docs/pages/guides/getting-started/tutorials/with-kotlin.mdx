@@ -181,10 +181,20 @@ data class ProductDto(
     val price: Double,
 
     @SerialName("image")
-    val image: String? = "",
+    val image: String?,
 
     @SerialName("id")
-    val id: String? = "",
+    val id: String,
+)
+```
+
+Domain object `Product.kt`to provide to view
+```kotlin
+data class Product(
+    val id: String,
+    val name: String,
+    val price: Double,
+    val image: String?
 )
 ```
 
@@ -294,8 +304,8 @@ class ProductRepositoryImpl @Inject constructor(
 <Admonition type="note">
   By the time this page is written, there might be some changes in the code to make it more simple. If you face any problem when implement, feel free to refer the example repository above
 </Admonition>
-#### 8.1 Product list
 
+#### 8.1 Product list
 Create ProductListViewModel
 ```kotlin
 @HiltViewModel
@@ -335,10 +345,10 @@ class ProductListViewModel @Inject constructor(
 
     private fun ProductDto.asDomainModel(): Product {
         return Product(
-            id = this.id ?: "",
+            id = this.id,
             name = this.name,
             price = this.price,
-            image = this.image ?: ""
+            image = this.image
         )
     }
 }
@@ -511,11 +521,11 @@ class ProductDetailsViewModel @Inject constructor(
     fun onSaveProduct(image: ByteArray) {
         viewModelScope.launch {
             productRepository.updateProduct(
-                id = _product.value?.id ?: "",
+                id = _product.value?.id,
                 price = _price.value,
                 name = _name.value,
                 imageFile = image,
-                imageName = "image_${_product.value?.id}",
+                imageName = "image_${_product.value.id}",
             )
         }
     }
@@ -526,10 +536,10 @@ class ProductDetailsViewModel @Inject constructor(
 
     private fun ProductDto.asDomainModel(): Product {
         return Product(
-            id = this.id ?: "",
+            id = this.id,
             name = this.name,
             price = this.price,
-            image = this.image ?: ""
+            image = this.image
         )
     }
 }
@@ -577,7 +587,7 @@ fun ProductDetailsScreen(
     ) {
         val name = viewModel.name.collectAsState(initial = "")
         val price = viewModel.price.collectAsState(initial = 0.0)
-        var imageUrl = Uri.parse(viewModel.imageUrl.collectAsState(initial = "").value)
+        var imageUrl = Uri.parse(viewModel.imageUrl.collectAsState(initial = null).value)
         val contentResolver = LocalContext.current.contentResolver
 
         Column(
