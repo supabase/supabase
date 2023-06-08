@@ -16,7 +16,7 @@ import MembersExceedLimitModal from './MembersExceedLimitModal'
 import PaymentMethodSelection from './PaymentMethodSelection'
 import { plans as subscriptionsPlans } from 'shared-data/plans'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
-import { PRICING_TIER_PRODUCT_IDS, STRIPE_PRODUCT_IDS } from 'lib/constants'
+import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 
 const TierUpdateSidePanel = () => {
   const { ui } = useStore()
