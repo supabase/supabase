@@ -61,7 +61,7 @@ export const meta = {
       <a href="https://github.com/supabase-community/supabase-kt/releases" style={{ marginRight: '8px' }}> 
           <img src="https://img.shields.io/github/release/supabase-community/supabase-kt?label=supabase-kt stable" alt="latest stable supabase-kt version"/> 
       </a> 
-      <a href="https://github.com/supabase-community/supabase-kt/releases"> 
+      <a href="https://github.com/ktorio/ktor/releases"> 
           <img src="https://img.shields.io/github/v/release/ktorio/ktor.svg?label=ktor" alt="latest ktor version"/> 
       </a> 
     </div> 
@@ -85,15 +85,17 @@ export const meta = {
   <StepHikeCompact.Step step={4}>
 
     <StepHikeCompact.Details title="Install the serializable plugin">
-    Open `build.gradle` (app), add serialization plugin to use annotation for data parsing
-
+    Open `build.gradle` (app), add serialization plugin to use annotation for data parsing. Please note that the plugin version should be the same with Kotlin version in your app.
+    <a href="https://github.com/JetBrains/kotlin" style={{ marginRight: '8px' }}> 
+          <img src="https://img.shields.io/maven-central/v/org.jetbrains.kotlin/kotlin-maven-plugin.svg?label=kotlin_version" alt="latest stable supabase-kt version"/> 
+    </a>
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
       ```kotlin
         plugins {
             ...
-            id 'org.jetbrains.kotlin.plugin.serialization' version '1.7.0'
+            id 'org.jetbrains.kotlin.plugin.serialization' version '$kotlin_version'
             ...
         }
       ```
@@ -115,7 +117,8 @@ export const meta = {
       // Handy create instance when need
       val client = createSupabaseClient(
           supabaseUrl = "https://xyzcompany.supabase.co", 
-          supabaseKey = "public-anon-key") {
+          supabaseKey = "public-anon-key"
+        ) {
               install(GoTrue)
               install(Postgrest)
               install(Storage)

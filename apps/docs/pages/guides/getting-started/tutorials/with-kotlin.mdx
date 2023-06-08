@@ -88,11 +88,14 @@ implementation "io.ktor:ktor-client-cio:$ktor_version"
 implementation "io.ktor:ktor-utils-jvm:$ktor_version"
 ```
 
-Also in build.gradle (app) file, add plugin for serialization
+Also in build.gradle (app) file, add plugin for serialization. The version of this plugin should be the same with Kotlin version
+<a href="https://github.com/JetBrains/kotlin" style={{ marginRight: '8px' }}> 
+        <img src="https://img.shields.io/maven-central/v/org.jetbrains.kotlin/kotlin-maven-plugin.svg?label=kotlin_version" alt="latest stable supabase-kt version"/> 
+</a>
 ```kotlin
 plugins {
     ...
-    id 'org.jetbrains.kotlin.plugin.serialization' version '1.7.0'
+    id 'org.jetbrains.kotlin.plugin.serialization' version '$kotlin_version'
     ...
 }
 ```
