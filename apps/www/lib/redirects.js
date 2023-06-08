@@ -1032,7 +1032,7 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/blog/2022/03/08/audit',
+    source: '/blog/audit',
     destination: '/blog/postgres-audit',
   },
   {
