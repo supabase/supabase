@@ -536,6 +536,24 @@ export const database: NavMenuConstant = {
       ],
     },
     {
+      name: 'Wrappers',
+      url: undefined,
+      items: [
+        {
+          name: 'Overview',
+          url: '/guides/database/foreign-data-wrappers',
+        },
+        {
+          name: 'Connecting to an external Postgres database',
+          url: '/guides/database/wrappers/stripe-foreign-data-wrapper',
+        },
+        {
+          name: 'Connecting to Stripe',
+          url: '/guides/database/wrappers/stripe-foreign-data-wrapper',
+        },
+      ],
+    },
+    {
       name: 'Extensions',
       url: undefined,
       items: [
