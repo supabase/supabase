@@ -51,17 +51,28 @@ export const getUpgradeUrl = (projectRef: string, subscription?: StripeSubscript
 
 export const getUpgradeUrlFromV2Subscription = (
   projectRef: string,
-  subscription?: ProjectSubscriptionResponse
+  subscription?: ProjectSubscriptionResponse,
+  newSubscriptionPage?: boolean
 ) => {
-  if (!subscription) return `/project/${projectRef}/settings/billing/update`
+  if (!subscription) {
+    return !newSubscriptionPage
+      ? `/project/${projectRef}/settings/billing/update`
+      : `/project/${projectRef}/settings/billing/subscription`
+  }
 
-  return subscription?.plan.id === 'enterprise'
-    ? `/project/${projectRef}/settings/billing/update/enterprise`
-    : subscription?.plan.id === 'team'
-    ? `/project/${projectRef}/settings/billing/update/team`
-    : subscription?.plan.id === 'free'
-    ? `/project/${projectRef}/settings/billing/update`
-    : `/project/${projectRef}/settings/billing/update/pro`
+  if (!newSubscriptionPage) {
+    return subscription?.plan.id === 'enterprise'
+      ? `/project/${projectRef}/settings/billing/update/enterprise`
+      : subscription?.plan.id === 'team'
+      ? `/project/${projectRef}/settings/billing/update/team`
+      : subscription?.plan.id === 'free'
+      ? `/project/${projectRef}/settings/billing/update`
+      : `/project/${projectRef}/settings/billing/update/pro`
+  } else {
+    return subscription?.plan?.id === 'pro' && subscription?.usage_billing_enabled === false
+      ? `/project/${projectRef}/settings/billing/subscription#cost-control`
+      : `/project/${projectRef}/settings/billing/subscription?panel=subscriptionPlan`
+  }
 }
 
 const compactNumberFormatter = new Intl.NumberFormat('en-US', {

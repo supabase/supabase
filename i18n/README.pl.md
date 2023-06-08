@@ -55,7 +55,7 @@ Supabase to połączenie narzędzi open source. Tworzymy funkcje Firebase przy u
 
 **Architektura**
 
-Supabase jest [platformą hostowaną] (https://app.supabase.com). Możesz zarejestrować się i zacząć korzystać z Supabase bez instalowania czegokolwiek.
+Supabase jest [platformą hostowaną](https://app.supabase.com). Możesz zarejestrować się i zacząć korzystać z Supabase bez instalowania czegokolwiek.
 Możesz także [self-host](https://supabase.com/docs/guides/hosting/overview) i [rozwijać lokalnie](https://supabase.com/docs/guides/local-development).
 
 ![Architektura](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)

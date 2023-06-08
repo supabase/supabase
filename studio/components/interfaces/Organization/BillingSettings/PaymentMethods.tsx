@@ -165,6 +165,7 @@ const PaymentMethods: FC<Props> = ({
                       <div key={paymentMethod.id} className="flex items-center justify-between">
                         <div className="flex items-center space-x-8">
                           <img
+                            alt="Credit card brand"
                             src={`${BASE_PATH}/img/payment-methods/${paymentMethod.card.brand
                               .replace(' ', '-')
                               .toLowerCase()}.png`}

@@ -11,7 +11,7 @@ const ProjectUpdateDisabledTooltip = ({
 }: PropsWithChildren<ProjectUpdateDisabledTooltipProps>) => {
   return (
     <Tooltip.Root delayDuration={0}>
-      <Tooltip.Trigger>{children}</Tooltip.Trigger>
+      <Tooltip.Trigger asChild>{children}</Tooltip.Trigger>
       {projectUpdateDisabled ? (
         <Tooltip.Portal>
           <Tooltip.Content side="bottom">

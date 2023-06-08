@@ -36,6 +36,14 @@ export type ProjectSubscriptionResponse = {
       freeUnits: number
     }
   }[]
+  payment_method_id?: string
+  payment_method_type: 'invoice' | 'card' | 'none'
+  payment_method_card_details?: {
+    last_4_digits: string
+    brand: string
+    expiry_month: number
+    expiry_year: number
+  }
 }
 
 export async function getProjectSubscription(

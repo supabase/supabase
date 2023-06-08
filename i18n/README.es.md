@@ -53,7 +53,7 @@ Actualmente estamos en Beta Pública. Esté atento a "releases" de este reposito
 
 Supabase es una combinación de herramientas de código abierto. Estamos construyendo las características de Firebase utilizando productos de código abierto de nivel empresarial. Si las herramientas y las comunidades existen, con una licencia abierta MIT, Apache 2 o equivalente, utilizaremos y daremos soporte a esa herramienta. Si la herramienta no existe, la construimos y la desarrollamos nosotros mismos. Supabase no es un mapeo 1 a 1 de Firebase. Nuestro objetivo es ofrecer a los desarrolladores una experiencia similar a la de Firebase utilizando herramientas de código abierto.
 
-\*\*Arquitectura
+**Arquitectura**
 
 Supabase es una [plataforma alojada](https://app.supabase.com). Puedes registrarte y empezar a usar Supabase sin instalar nada.
 También puede [autoalojarse](https://supabase.com/docs/guides/hosting/overview) y [desarrollar localmente](https://supabase.com/docs/guides/local-development).
