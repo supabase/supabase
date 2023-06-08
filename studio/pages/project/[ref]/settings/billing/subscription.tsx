@@ -1,23 +1,41 @@
+import { useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Loading } from 'ui'
+import { Loading, Toggle } from 'ui'
 
 import { SettingsLayout } from 'components/layouts'
 import LoadingUI from 'components/ui/Loading'
-import OveragesBanner from 'components/ui/OveragesBanner/OveragesBanner'
-import { useStore } from 'hooks'
+import { useStore, useFlag } from 'hooks'
 import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
 import { NextPageWithLayout } from 'types'
 
 import { Subscription } from 'components/interfaces/Billing'
+import SubscriptionV2 from 'components/interfaces/BillingV2/Subscription/Subscription'
 
 const ProjectBilling: NextPageWithLayout = () => {
-  const { ui } = useStore()
+  const enableSubscriptionV2 = useFlag('subscriptionV2')
+  const [showNewSubscriptionUI, setShowNewSubscriptionUI] = useState(enableSubscriptionV2)
 
   return (
-    <div className="w-full h-full overflow-y-auto content">
-      <div className="w-full mx-auto">
-        <Settings />
-      </div>
+    <div className="relative">
+      {enableSubscriptionV2 && (
+        <div className="absolute top-[1.9rem] right-16 xl:right-32 flex items-center space-x-3">
+          <Toggle
+            size="tiny"
+            checked={showNewSubscriptionUI}
+            onChange={() => setShowNewSubscriptionUI(!showNewSubscriptionUI)}
+          />
+          <p className="text-xs text-scale-1100 -translate-y-[1px]">Preview new interface</p>
+        </div>
+      )}
+      {showNewSubscriptionUI ? (
+        <SubscriptionV2 />
+      ) : (
+        <div className="w-full h-full overflow-y-auto content">
+          <div className="w-full mx-auto">
+            <Settings />
+          </div>
+        </div>
+      )}
     </div>
   )
 }

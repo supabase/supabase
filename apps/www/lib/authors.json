@@ -328,5 +328,12 @@
     "position": "Product Management Leader @ AWS",
     "author_url": "https://github.com/daltjoh-aws",
     "author_image_url": "https://github.com/daltjoh-aws.png"
+  },
+  {
+    "author_id": "egor_romanov",
+    "author": "Egor Romanov",
+    "position": "Engineering",
+    "author_url": "https://github.com/egor-romanov",
+    "author_image_url": "https://github.com/egor-romanov.png"
   }
 ]

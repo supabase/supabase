@@ -62,8 +62,8 @@ function CaseStudyPage(props: any) {
   const { basePath } = useRouter()
 
   const meta = {
-    title: `${props.blog.name} | Supabase Customer Stories`,
-    description: props.blog.description,
+    title: props.blog.meta_title ?? `${props.blog.name} | Supabase Customer Stories`,
+    description: props.blog.meta_description ?? props.blog.description,
     image: props.blog.og_image ?? `${basePath}/images/customers/og/customer-stories.jpg`,
     url: `https://supabase.io/customers/${props.blog.slug}`,
   }
@@ -98,7 +98,7 @@ function CaseStudyPage(props: any) {
           "
         >
           <div className="grid grid-cols-12 gap-4">
-            <div className="col-span-12 mb-2 lg:col-span-2">
+            <div className="col-span-12 mb-2 xl:col-span-2">
               {/* Back button */}
               <p>
                 <a
@@ -113,7 +113,7 @@ function CaseStudyPage(props: any) {
 
             <div
               className="col-span-12 lg:col-span-8
-          
+
           "
             >
               <div className="">
@@ -146,8 +146,8 @@ function CaseStudyPage(props: any) {
                               objectPosition="left"
                               className="
                       bg-no-repeat
-                      
-                      dark:brightness-200 
+
+                      dark:brightness-200
                       dark:contrast-0
                       dark:filter
                     "

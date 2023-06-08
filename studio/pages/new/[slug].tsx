@@ -4,7 +4,17 @@ import { debounce, isUndefined, values } from 'lodash'
 import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import generator from 'generate-password'
-import { Button, Listbox, IconUsers, Input, Alert, IconHelpCircle, Toggle } from 'ui'
+import {
+  Button,
+  Listbox,
+  IconUsers,
+  Input,
+  Alert,
+  IconHelpCircle,
+  Toggle,
+  IconAlertCircle,
+  IconInfo,
+} from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { NextPageWithLayout } from 'types'
@@ -35,6 +45,7 @@ import {
   EmptyPaymentMethodWarning,
 } from 'components/interfaces/Organization/NewProject'
 import SpendCapModal from 'components/interfaces/Billing/SpendCapModal'
+import InformationBox from 'components/ui/InformationBox'
 
 const Wizard: NextPageWithLayout = () => {
   const router = useRouter()
@@ -63,7 +74,7 @@ const Wizard: NextPageWithLayout = () => {
 
   const organizations = values(toJS(app.organizations.list()))
   const currentOrg = organizations.find((o: any) => o.slug === slug)
-  const stripeCustomerId = currentOrg?.stripe_customer_id
+  const billedViaOrg = Boolean(currentOrg?.subscription_id)
 
   const availableRegions = getAvailableRegions()
   const isAdmin = checkPermissions(PermissionAction.CREATE, 'projects')
@@ -82,8 +93,7 @@ const Wizard: NextPageWithLayout = () => {
     projectName !== '' &&
     passwordStrengthScore >= DEFAULT_MINIMUM_PASSWORD_STRENGTH &&
     dbRegion !== '' &&
-    dbPricingTierKey !== '' &&
-    (isSelectFreeTier || (!isSelectFreeTier && !isEmptyPaymentMethod))
+    dbPricingTierKey !== ''
 
   const delayedCheckPasswordStrength = useRef(
     debounce((value) => checkPasswordStrength(value), 300)
@@ -291,6 +301,24 @@ const Wizard: NextPageWithLayout = () => {
                 </Listbox>
               )}
 
+              {billedViaOrg && (
+                <InformationBox
+                  icon={<IconInfo size="large" strokeWidth={1.5} />}
+                  defaultVisibility={true}
+                  hideCollapse
+                  title="Billed via organization"
+                  description={
+                    <div className="space-y-3">
+                      <p className="text-sm leading-normal">
+                        This is heavy Work-In-Progress and not customer facing yet, use with
+                        caution! This organization uses the new org level billing, instead of having
+                        individual subscriptions per project.
+                      </p>
+                    </div>
+                  }
+                />
+              )}
+
               {!isAdmin && <NotOrganizationOwnerWarning />}
             </Panel.Content>
 
@@ -398,7 +426,7 @@ const Wizard: NextPageWithLayout = () => {
               </>
             )}
 
-            {isAdmin && (
+            {isAdmin && !billedViaOrg && (
               <Panel.Content>
                 <Listbox
                   label="Pricing Plan"

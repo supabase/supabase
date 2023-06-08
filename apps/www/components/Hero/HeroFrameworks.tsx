@@ -5,6 +5,7 @@ import ReactTooltip from 'react-tooltip'
 import Telemetry from '~/lib/telemetry'
 import { useTelemetryProps } from 'common/hooks/useTelemetryProps'
 import { useRouter } from 'next/router'
+import { useBreakpoint } from 'common'
 
 const frameworks = [
   {
@@ -60,6 +61,7 @@ const frameworks = [
 const HeroFrameworks = ({ className }: { className?: string }) => {
   const router = useRouter()
   const telemetryProps = useTelemetryProps()
+  const isXs = useBreakpoint(640)
 
   const sendTelemetryEvent = async (gaEvent: string) => {
     return await Telemetry.sendEvent(
@@ -77,7 +79,7 @@ const HeroFrameworks = ({ className }: { className?: string }) => {
     <div className={['flex text-center flex-col items-center', className].join(' ')}>
       <small className="small !text-scale-1100">Works seamlessly with 20+ frameworks</small>
       <div className="w-full sm:max-w-lg mt-4 md:mt-3 lg:ml-0">
-        <div className="flex flex-wrap items-center justify-center gap-2 sm:flex-nowrap">
+        <div className="flex flex-wrap items-center justify-center gap-1 xs:gap-2 sm:flex-nowrap">
           {frameworks.map((framework) => (
             <Link href={framework.docs} key={framework.name}>
               <a
@@ -91,8 +93,8 @@ const HeroFrameworks = ({ className }: { className?: string }) => {
                   className="opacity-100 hover:opacity-80 transition-opacity"
                   src={framework.icon}
                   alt={framework.name}
-                  width={45}
-                  height={45}
+                  width={isXs ? 35 : 45}
+                  height={isXs ? 35 : 45}
                 />
               </a>
             </Link>

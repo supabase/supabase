@@ -150,6 +150,13 @@ export const genDefaultQuery = (table: LogsTableName, filters: Filters) => {
   limit 100
     `
 
+    case 'auth_logs':
+      return `select id, ${table}.timestamp, event_message, metadata.level, metadata.status, metadata.path, metadata.msg as msg, metadata.error from ${table}
+  cross join unnest(metadata) as metadata
+  ${where}
+  limit 100
+    `
+
     case 'function_edge_logs':
       return `select id, ${table}.timestamp, event_message, response.status_code, request.method, m.function_id, m.execution_time_ms, m.deployment_id, m.version from ${table}
   cross join unnest(metadata) as m
@@ -379,8 +386,9 @@ export const fillTimeseries = (
   const maxDate = max ? dayjs.utc(max) : dayjs.utc(Math.max.apply(null, dates as number[]))
   const minDate = min ? dayjs.utc(min) : dayjs.utc(Math.min.apply(null, dates as number[]))
 
-  const truncationSample = timeseriesData.length > 0 ? timeseriesData[0][timestampKey] : min || max
-  const truncation = getTimestampTruncation(truncationSample)
+  // const truncationSample = timeseriesData.length > 0 ? timeseriesData[0][timestampKey] : min || max
+  const truncationSamples = timeseriesData.length > 0 ? dates : [minDate, maxDate]
+  const truncation = getTimestampTruncation(truncationSamples as Dayjs[])
 
   const newData = timeseriesData.map((datum) => {
     const iso = dayjs.utc(datum[timestampKey]).toISOString()
@@ -413,10 +421,30 @@ export const fillTimeseries = (
   return newData
 }
 
-export const getTimestampTruncation = (datetime: string): 'second' | 'minute' | 'hour' | 'day' => {
-  const values = ['second', 'minute', 'hour', 'day'].map((key) =>
-    dayjs(datetime).get(key as dayjs.UnitType)
+export const getTimestampTruncation = (samples: Dayjs[]): 'second' | 'minute' | 'hour' | 'day' => {
+  const truncationCounts = samples.reduce(
+    (acc, sample) => {
+      const truncation = _getTruncation(sample)
+      acc[truncation] += 1
+
+      return acc
+    },
+    {
+      second: 0,
+      minute: 0,
+      hour: 0,
+      day: 0,
+    }
   )
+
+  const mostLikelyTruncation = (
+    Object.keys(truncationCounts) as (keyof typeof truncationCounts)[]
+  ).reduce((a, b) => (truncationCounts[a] > truncationCounts[b] ? a : b))
+  return mostLikelyTruncation
+}
+
+const _getTruncation = (date: Dayjs) => {
+  const values = ['second', 'minute', 'hour'].map((key) => date.get(key as dayjs.UnitType))
   const zeroCount = values.reduce((acc, value) => {
     if (value === 0) {
       acc += 1
