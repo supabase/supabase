@@ -63,17 +63,17 @@ const Usage = () => {
   }, [dateRange, subscription])
 
   const endDate = useMemo(() => {
-    // If end date is in future, set end date to now
+    // If end date is in future, set end date to end of current day
     if (dateRange?.period_end?.date && dayjs(dateRange.period_end.date).isAfter(dayjs())) {
       // LF seems to have an issue with the milliseconds, causes infinite loading sometimes
-      return new Date().toISOString().slice(0, -5) + 'Z'
+      // In order to have full days from Prometheus metrics when using 1d interval,
+      // the time needs to be greater or equal than the time of the start date
+      return dayjs().endOf('day').toISOString().slice(0, -5) + 'Z'
     } else if (dateRange?.period_end?.date) {
       // LF seems to have an issue with the milliseconds, causes infinite loading sometimes
       return new Date(dateRange.period_end.date).toISOString().slice(0, -5) + 'Z'
     }
   }, [dateRange, subscription])
-
-  console.log({ startDate, endDate })
 
   const { data: ioBudgetData } = useInfraMonitoringQuery({
     projectRef: selectedProjectRef,
