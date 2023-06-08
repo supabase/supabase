@@ -10,12 +10,16 @@ date: '2022-08-19'
 toc_depth: 2
 ---
 
-Today we're announcing [Supabase Vault]([https://github.com/supabase/vault](https://supabase.com/docs/guides/database/vault), a Postgres extension for managing secrets and encryption inside your database.
+Today we're announcing [Supabase Vault](https://supabase.com/docs/guides/database/vault), a Postgres extension for managing secrets and encryption inside your database.
 Vault is a thin usability-layer on top of [pgsodium](https://github.com/michelp/pgsodium).
 
-UPDATE JUNE 2023
+<div className="bg-gray-300 rounded-lg px-6 py-2 bold">
 
-Vault is now available on every Supabase project. [Check it out](https://app.supabase.com/project/_/settings/vault/secrets)
+❇️ UPDATE JUNE 2023 ❇️
+  
+  Vault is now available on every Supabase project. [Check it out](https://app.supabase.com/project/_/settings/vault/secrets)
+
+</div>
 
 [Transparent Column Encryption with Postgres](https://supabase.com/blog/transparent-column-encryption-with-postgres) is a blog post that describes the technology behind Vault - [libsodium](https://doc.libsodium.org/) and
 [pgsodium](https://doc.libsodium.org/). Now, we will go through a quick example of storing a secret, like a service access token, into the Vault.
