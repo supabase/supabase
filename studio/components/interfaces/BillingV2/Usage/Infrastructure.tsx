@@ -47,7 +47,7 @@ const Infrastructure = ({
 
     if (diffInHours <= 48) {
       interval = '1h'
-      dateFormat = 'HH a'
+      dateFormat = 'h a'
     }
   }
 
