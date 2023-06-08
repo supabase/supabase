@@ -90,6 +90,6 @@ const nextConfig = {
 
 // next.config.js.
 export default () => {
-  const plugins = [withMDX, withBundleAnalyzer, withTM(['ui', 'common'])]
+  const plugins = [withMDX, withBundleAnalyzer, withTM(['ui', 'common', 'shared-data'])]
   return plugins.reduce((acc, next) => next(acc), nextConfig)
 }

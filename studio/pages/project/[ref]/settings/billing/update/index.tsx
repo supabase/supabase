@@ -3,7 +3,7 @@ import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { Button, Modal } from 'ui'
 
-import { useFlag, useStore } from 'hooks'
+import { useStore } from 'hooks'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 import { get } from 'lib/common/fetch'
 import { API_URL, PRICING_TIER_PRODUCT_IDS, STRIPE_PRODUCT_IDS } from 'lib/constants'
@@ -103,10 +103,6 @@ const BillingUpdate: NextPageWithLayout = () => {
     }
   }
 
-  // Team tier is enabled when the flag is turned on OR the user is already on the team tier (manually assigned by us)
-  const userIsOnTeamTier = subscription?.tier?.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.TEAM
-  const teamTierEnabled = useFlag('teamTier') || userIsOnTeamTier
-
   if (isLoadingProducts || isEnterprise) {
     return (
       <div className="flex items-center justify-center w-full h-full">
@@ -115,13 +111,11 @@ const BillingUpdate: NextPageWithLayout = () => {
     )
   }
 
-  const productTiers = (products?.tiers ?? []).filter(
-    (tier) => teamTierEnabled || tier.id !== STRIPE_PRODUCT_IDS.TEAM
-  )
+  const productTiers = (products?.tiers ?? [])
 
   return (
     <>
-      <div className={`mx-auto my-10 ${teamTierEnabled ? 'max-w-[90vw]' : 'max-w-[80vw]'}`}>
+      <div className={`mx-auto my-10 max-w-[90vw] xl:max-w-[80vw]`}>
         <PlanSelection
           visible={!selectedPlan || (selectedPlan && showConfirmDowngrade)}
           tiers={productTiers}

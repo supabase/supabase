@@ -8,17 +8,19 @@
         "tooltips": {
           "main": "A Postgres database with no restrictions? You get it. No pseudo limited users, you are the postgres root user.  No caveats."
         },
-        "tiers": {
+        "plans": {
           "free": true,
           "pro": true,
+          "team": true,
           "enterprise": true
         }
       },
       {
         "title": "Unlimited API requests",
-        "tiers": {
+        "plans": {
           "free": true,
           "pro": true,
+          "team": true,
           "enterprise": true
         }
       },
@@ -27,9 +29,10 @@
         "tooltips": {
           "main": "Billing is based on the average database size in GB throughout the billing period."
         },
-        "tiers": {
+        "plans": {
           "free": "500 MB",
           "pro": "8 GB, then $0.125 per GB",
+          "team": "8 GB, then $0.125 per GB",
           "enterprise": "Unlimited"
         }
       },
@@ -37,11 +40,13 @@
         "title": "Automatic backups",
         "tooltips": {
           "main": "Backups are entire copies of your database that can be restored in the future.",
-          "pro": "7 days of backup (if > 1TB, contact for Enterprise pricing)"
+          "pro": "7 days of backup (if > 1TB, contact for Enterprise pricing)",
+          "team": "14 days of backup (if > 1TB, contact for Enterprise pricing)"
         },
-        "tiers": {
+        "plans": {
           "free": false,
           "pro": "7 days",
+          "team": "14 days",
           "enterprise": "Custom"
         }
       },
@@ -49,11 +54,13 @@
         "title": "Point in time recovery",
         "tooltips": {
           "main": "PITR cannot be applied retroactively, projects can only be rolled back to the point from which PITR has been applied.",
-          "pro": "$100 per 7 days. If > 28 day rollback period, contact enterprise"
+          "pro": "$100 per 7 days. If > 28 day rollback period, contact enterprise",
+          "team": "$100 per 7 days. If > 28 day rollback period, contact enterprise"
         },
-        "tiers": {
+        "plans": {
           "free": false,
           "pro": "$100 per 7 days",
+          "team": "$100 per 7 days",
           "enterprise": true
         }
       },
@@ -62,9 +69,10 @@
         "tooltips": {
           "main": "Projects that have no activity or API requests will be paused. They can be reactivated via the dashboard"
         },
-        "tiers": {
+        "plans": {
           "free": "After 1 inactive week",
           "pro": "Never",
+          "team": "Never",
           "enterprise": "Never"
         }
       },
@@ -73,9 +81,10 @@
         "tooltips": {
           "main": "Billing is based on the total sum of outgoing traffic of your database in GB throughout your billing period. Only download operations are counted towards the limit"
         },
-        "tiers": {
+        "plans": {
           "free": "2GB",
           "pro": "50 GB, then $0.09 per GB",
+          "team": "50 GB, then $0.09 per GB",
           "enterprise": "Unlimited"
         }
       }
@@ -88,9 +97,10 @@
       {
         "title": "Total Users",
         "tooltips": { "main": "The maximum number of users your project can have" },
-        "tiers": {
+        "plans": {
           "free": "Unlimited",
           "pro": "Unlimited",
+          "team": "Unlimited",
           "enterprise": "Unlimited"
         }
       },
@@ -99,74 +109,83 @@
         "tooltips": {
           "main": "Distinct users requesting your API throughout the billing period."
         },
-        "tiers": {
+        "plans": {
           "free": "50,000",
           "pro": "100,000, then $0.00325 per MAU",
+          "team": "100,000, then $0.00325 per MAU",
           "enterprise": "Unlimited"
         }
       },
       {
         "title": "Social OAuth providers",
-        "tiers": {
+        "plans": {
           "free": true,
           "pro": true,
+          "team": true,
           "enterprise": true
         }
       },
       {
         "title": "Custom SMTP server",
-        "tiers": {
+        "plans": {
           "free": true,
           "pro": true,
+          "team": true,
           "enterprise": true
         }
       },
       {
         "title": "Remove Supabase branding from emails",
-        "tiers": {
+        "plans": {
           "free": false,
           "pro": true,
+          "team": true,
           "enterprise": true
         }
       },
       {
         "title": "Enterprise OAuth providers",
-        "tiers": {
+        "plans": {
           "free": false,
           "pro": false,
+          "team": false,
           "enterprise": true
         }
       },
       {
         "title": "Audit trails",
-        "tiers": {
+        "plans": {
           "free": "1 hour",
           "pro": "7 days",
+          "team": "28 days",
           "enterprise": true
         }
       },
       {
         "title": "Supabase Auth emails",
         "tooltips": { "main": "Rate limits do not apply to Custom SMTP" },
-        "tiers": {
+        "plans": {
           "free": "30 / hour",
           "pro": "100 / hour",
+          "team": "100 / hour",
           "enterprise": "Contact Us"
         }
       },
       {
         "title": "Single Sign-On (SAML 2.0)",
-        "tiers": {
+        "plans": {
           "free": false,
           "pro": "50 free, then $0.015 per MAU",
+          "team": "50 free, then $0.015 per MAU",
           "enterprise": "Contact Us"
         }
       },
       {
         "title": "Advanced security features",
-        "tiers": {
+        "plans": {
           "free": false,
           "pro": false,
+          "team": false,
           "enterprise": "Contact Us"
         }
       }
@@ -182,9 +201,10 @@
         "tooltips": {
           "main": "The sum of all objects' size in your storage buckets."
         },
-        "tiers": {
+        "plans": {
           "free": "1 GB",
           "pro": "100 GB, then $0.021 per GB",
+          "team": "100 GB, then $0.021 per GB",
           "enterprise": "Unlimited"
         }
       },
@@ -193,26 +213,29 @@
         "tooltips": {
           "main": "Total sum of outgoing traffic (egress) from your storage buckets, only download operations are counted."
         },
-        "tiers": {
+        "plans": {
           "free": "2 GB",
           "pro": "200 GB, then $0.09 per GB",
+          "team": "200 GB, then $0.09 per GB",
           "enterprise": "Unlimited"
         }
       },
       {
         "title": "Custom access controls",
-        "tiers": {
+        "plans": {
           "free": true,
           "pro": true,
+          "team": true,
           "enterprise": true
         }
       },
       {
         "title": "Max file upload size",
         "tooltips": { "main": "You can change the upload size in the dashboard" },
-        "tiers": {
+        "plans": {
           "free": "50MB",
           "pro": "5GB",
+          "team": "5GB",
           "enterprise": "Unlimited"
         }
       },
@@ -221,9 +244,11 @@
         "tooltips": {
           "main": "Distinct count of all images that were transformed in the billing period, ignoring any transformations."
         },
-        "tiers": {
+        "plans": {
           "free": false,
-          "pro": "100 origin images, then $5 per 1000 origin images"
+          "pro": "100 origin images, then $5 per 1000 origin images",
+          "team": "100 origin images, then $5 per 1000 origin images",
+          "enterprise": "Unlimited"
         }
       }
     ]
@@ -238,17 +263,19 @@
           "main": "Billing is based on the sum of all invocations, independent of response status, throughout your billing period."
         },
         "main": "Billing is based on the sum of all invocations, independent of response status, throughout your billing period.",
-        "tiers": {
+        "plans": {
           "free": "500K/month",
           "pro": "2 Million, then $2 per 1 Million",
+          "team": "2 Million, then $2 per 1 Million",
           "enterprise": "Unlimited"
         }
       },
       {
         "title": "Script size",
-        "tiers": {
+        "plans": {
           "free": "2 MB",
           "pro": "10 MB",
+          "team": "10 MB",
           "enterprise": "Unlimited"
         }
       },
@@ -257,9 +284,10 @@
         "tooltips": {
           "main": "Billing is based on the maximum amount of functions at any point in time throughout your billing period."
         },
-        "tiers": {
+        "plans": {
           "free": "10",
           "pro": "100, then $10 per additional 100",
+          "team": "100, then $10 per additional 100",
           "enterprise": "Unlimited"
         }
       }
@@ -271,9 +299,10 @@
     "features": [
       {
         "title": "Postgres Changes",
-        "tiers": {
+        "plans": {
           "free": true,
           "pro": true,
+          "team": true,
           "enterprise": true
         }
       },
@@ -282,9 +311,10 @@
         "tooltips": {
           "main": "We only charge for successful connections - not connection attempts!"
         },
-        "tiers": {
+        "plans": {
           "free": "200",
           "pro": "500, then $10 per 1000",
+          "team": "500, then $10 per 1000",
           "enterprise": "Unlimited concurrent connections and volume discount"
         }
       },
@@ -293,17 +323,19 @@
         "tooltips": {
           "main": "Billing is based on the total sum of Realtime messages throughout your billing period."
         },
-        "tiers": {
+        "plans": {
           "free": "2 Million",
           "pro": "5 Million, then $2.50 per Million",
+          "team": "5 Million, then $2.50 per Million",
           "enterprise": "Volume discounts on messages"
         }
       },
       {
         "title": "Max Message Size",
-        "tiers": {
+        "plans": {
           "free": "250 KB",
           "pro": "3 MB",
+          "team": "3 MB",
           "enterprise": "Custom"
         }
       }
@@ -315,25 +347,28 @@
     "features": [
       {
         "title": "Team members",
-        "tiers": {
+        "plans": {
           "free": "Unlimited",
           "pro": "Unlimited",
+          "team": "Unlimited",
           "enterprise": "Unlimited"
         }
       },
       {
         "title": "Access controls",
-        "tiers": {
+        "plans": {
           "free": "Coming soon",
           "pro": "Coming soon",
+          "team": true,
           "enterprise": true
         }
       },
       {
         "title": "Audit trails",
-        "tiers": {
+        "plans": {
           "free": false,
           "pro": false,
+          "team": true,
           "enterprise": true
         }
       }
@@ -345,73 +380,82 @@
     "features": [
       {
         "title": "On Premises / BYO cloud",
-        "tiers": {
+        "plans": {
           "free": false,
           "pro": false,
+          "team": false,
           "enterprise": true
         }
       },
       {
         "title": "Log retention (API & Database)",
-        "tiers": {
+        "plans": {
           "free": "1 day",
           "pro": "7 days",
+          "team": "28 days",
           "enterprise": "90 days"
         }
       },
       {
         "title": "Log drain",
-        "tiers": {
+        "plans": {
           "free": false,
           "pro": false,
+          "team": "Coming soon",
           "enterprise": "Coming soon"
         }
       },
       {
         "title": "Metrics endpoint",
-        "tiers": {
+        "plans": {
           "free": false,
           "pro": true,
+          "team": true,
           "enterprise": true
         }
       },
       {
         "title": "SOC2",
-        "tiers": {
+        "plans": {
           "free": false,
           "pro": false,
+          "team": true,
           "enterprise": true
         }
       },
       {
         "title": "SSO",
-        "tiers": {
+        "plans": {
           "free": false,
           "pro": false,
+          "team": "Contact Us",
           "enterprise": "Contact Us"
         }
       },
       {
         "title": "99.9% SLA",
-        "tiers": {
+        "plans": {
           "free": false,
           "pro": false,
+          "team": false,
           "enterprise": true
         }
       },
       {
         "title": "Access Roles",
-        "tiers": {
+        "plans": {
           "free": "Owner, Developer",
           "pro": "Owner, Developer",
+          "team": "Additional owner(s), admin, read-only, billing admin, custom",
           "enterprise": "Additional owner(s), admin, read-only, billing admin, custom"
         }
       },
       {
         "title": "Vanity URLs",
-        "tiers": {
+        "plans": {
           "free": false,
           "pro": true,
+          "team": true,
           "enterprise": true
         }
       },
@@ -420,9 +464,10 @@
         "tooltips": {
           "enterprise": "Volume discounts available."
         },
-        "tiers": {
+        "plans": {
           "free": false,
           "pro": "$10 per domain per month per project add on",
+          "team": "$10 per domain per month per project add on",
           "enterprise": "1, additional $10/domain/month"
         }
       }
@@ -434,57 +479,64 @@
     "features": [
       {
         "title": "Community support",
-        "tiers": {
+        "plans": {
           "free": true,
           "pro": true,
+          "team": true,
           "enterprise": true
         }
       },
       {
         "title": "Email support",
-        "tiers": {
+        "plans": {
           "free": false,
           "pro": true,
+          "team": true,
           "enterprise": true
         }
       },
       {
         "title": "Email support SLA",
-        "tiers": {
+        "plans": {
           "free": false,
           "pro": false,
+          "team": true,
           "enterprise": true
         }
       },
       {
         "title": "Designated support",
-        "tiers": {
+        "plans": {
           "free": false,
           "pro": false,
+          "team": false,
           "enterprise": true
         }
       },
       {
         "title": "On Boarding Support",
-        "tiers": {
+        "plans": {
           "free": false,
           "pro": false,
+          "team": false,
           "enterprise": true
         }
       },
       {
         "title": "Designated customer success engineer ",
-        "tiers": {
+        "plans": {
           "free": false,
           "pro": false,
+          "team": false,
           "enterprise": true
         }
       },
       {
         "title": "Security Questionnaire Help",
-        "tiers": {
+        "plans": {
           "free": false,
           "pro": false,
+          "team": true,
           "enterprise": true
         }
       }

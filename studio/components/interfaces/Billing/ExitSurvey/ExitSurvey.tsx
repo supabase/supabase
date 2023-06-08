@@ -8,11 +8,11 @@ import { Button, Form, Input, Modal, IconArrowLeft, Alert } from 'ui'
 import { useFlag, useStore } from 'hooks'
 import { post, patch } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
-import { CANCELLATION_REASONS } from '../Billing.constants'
 import { UpdateSuccess } from '../'
 import { SubscriptionPreview } from '../Billing.types'
 import { StripeSubscription } from 'components/interfaces/Billing'
 import HCaptcha from '@hcaptcha/react-hcaptcha'
+import { CANCELLATION_REASONS } from 'components/interfaces/BillingV2/Billing.constants'
 
 interface ExitSurveyProps {
   freeTier: any
