@@ -1,8 +1,8 @@
 name: Broken Link Check
 on:
   schedule:
-    - cron: '* * * * *' # every minute
-  repository_dispatch: # run manually
+    - cron: '26 6 * * *' # every day at 6:26am
+  repository_dispatch:   # to run manually
     types: [check-link]
   push:
     branches:
@@ -17,3 +17,4 @@ jobs:
         with:
           TARGET: https://supabase.com
           EXCLUDED_KEYWORDS: twitter.com
+          RECURSIVE: true
