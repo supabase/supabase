@@ -1037,6 +1037,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/blog/2022/03/08/audit',
+    destination: '/blog/postgres-audit',
+  },
+  {
+    permanent: true,
     source: '/blog/2022/03/25/should-i-open-source-my-company',
     destination: '/blog/should-i-open-source-my-company',
   },
