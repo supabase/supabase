@@ -50,7 +50,7 @@ export const plans: PricingInformation[] = [
     costUnit: '/ month',
     href: 'https://supabase.com/dashboard/new/new-project',
     priceLabel: 'From',
-    warning: 'Usage based plan',
+    warning: 'Usage-based plan',
     priceMonthly: 25,
     description: 'For production applications with the option to scale.',
     features: [
@@ -79,7 +79,7 @@ export const plans: PricingInformation[] = [
     costUnit: '/ month',
     href: 'https://forms.supabase.com/team',
     priceLabel: 'From',
-    warning: 'Usage based plan',
+    warning: 'Usage-based plan',
     priceMonthly: 599,
     description: 'Collaborate with different permissions and access patterns.',
     features: [

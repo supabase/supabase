@@ -15,6 +15,8 @@ import ExitSurveyModal from './ExitSurveyModal'
 import MembersExceedLimitModal from './MembersExceedLimitModal'
 import PaymentMethodSelection from './PaymentMethodSelection'
 import { plans as subscriptionsPlans } from 'shared-data/plans'
+import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
+import { PRICING_TIER_PRODUCT_IDS, STRIPE_PRODUCT_IDS } from 'lib/constants'
 
 const TierUpdateSidePanel = () => {
   const { ui } = useStore()
@@ -32,6 +34,7 @@ const TierUpdateSidePanel = () => {
   const onClose = () => snap.setPanelKey(undefined)
 
   const { data: plans, isLoading: isLoadingPlans } = useProjectPlansQuery({ projectRef })
+  const { data: subscription } = useProjectSubscriptionV2Query({ projectRef })
   const { data: addons } = useProjectAddonsQuery({ projectRef })
   const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery({ slug })
   const { mutateAsync: updateSubscriptionTier } = useProjectSubscriptionUpdateMutation()
@@ -168,9 +171,14 @@ const TierUpdateSidePanel = () => {
                       <Button block disabled type="default">
                         Current plan
                       </Button>
-                    ) : plan.id !== 'tier_team' ? (
+                    ) : plan.id !== PRICING_TIER_PRODUCT_IDS.TEAM ? (
                       <Button
                         block
+                        // no self-serve downgrades from team plan right now
+                        disabled={
+                          plan.id !== PRICING_TIER_PRODUCT_IDS.TEAM &&
+                          ['team', 'enterprise'].includes(subscription?.plan?.id || '')
+                        }
                         type={isDowngradeOption ? 'default' : 'primary'}
                         onClick={() => setSelectedTier(plan.id as any)}
                       >

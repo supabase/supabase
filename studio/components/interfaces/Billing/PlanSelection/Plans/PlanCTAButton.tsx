@@ -105,7 +105,7 @@ const PlanCTAButton = ({ plan, currentPlan, onSelectPlan }: PlanCTAButtonProps) 
     )
   }
 
-  if (isTeamTier && plan.name === 'Team plan') {
+  if (!isTeamTier && plan.name === 'Team plan') {
     return (
       <Link href="https://forms.supabase.com/team">
         <a>
