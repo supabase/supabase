@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import Avatar from '~/components/Avatar'
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
+import { CH } from '@code-hike/mdx/components'
 import ImageGrid from '~/components/ImageGrid'
 import Quote from '~/components/Quote'
 import Chart from '~/components/Charts/PGCharts'
@@ -28,6 +29,7 @@ const getCaptionAlign = (align?: 'left' | 'center' | 'right') => {
 export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
   const components = {
     CodeBlock,
+    CH,
     Badge,
     Quote,
     Avatar,

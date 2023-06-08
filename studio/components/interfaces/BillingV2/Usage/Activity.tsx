@@ -8,9 +8,16 @@ export interface ActivityProps {
   startDate: string | undefined
   endDate: string | undefined
   subscription: ProjectSubscriptionResponse | undefined
+  currentBillingCycleSelected: boolean
 }
 
-const Activity = ({ projectRef, subscription, startDate, endDate }: ActivityProps) => {
+const Activity = ({
+  projectRef,
+  subscription,
+  startDate,
+  endDate,
+  currentBillingCycleSelected,
+}: ActivityProps) => {
   const { data: mauData, isLoading: isLoadingMauData } = useDailyStatsQuery({
     projectRef,
     attribute: 'total_auth_billing_period_mau',
@@ -108,9 +115,10 @@ const Activity = ({ projectRef, subscription, startDate, endDate }: ActivityProp
   return (
     <UsageSection
       projectRef={projectRef}
-      categoryKey='activity'
+      categoryKey="activity"
       chartMeta={chartMeta}
       subscription={subscription}
+      currentBillingCycleSelected={currentBillingCycleSelected}
     />
   )
 }

@@ -32,14 +32,14 @@ Norėdami sužinoti, kaip prisidėti, apsilankykite [Getting Started](./DEVELOPE
 ## Bendruomenė ir palaikymas
 
 - [Bendrijos forumas](https://github.com/supabase/supabase/discussions). Geriausiai tinka: pagalbai kuriant, diskusijoms apie geriausią duomenų bazių praktiką.
-- [GitHub Issues] (https://github.com/supabase/supabase/issues). Geriausia: klaidos ir klaidos, su kuriomis susiduriate naudodami "Supabase".
+- [GitHub Issues](https://github.com/supabase/supabase/issues). Geriausia: klaidos ir klaidos, su kuriomis susiduriate naudodami "Supabase".
 - [Pagalba el. paštu](https://supabase.com/docs/support#business-support). Geriausiai tinka: problemoms, susijusioms su jūsų duomenų baze ar infrastruktūra, spręsti.
 - [Discord](https://discord.supabase.com). Geriausiai tinka: dalytis savo programomis ir bendrauti su bendruomene.
 
 ## Statusas
 
 - [x] Alfa: Bandome "Supabase" su uždaru klientų rinkiniu
-- [x] Viešoji Alfa versija: [app.supabase.com] (https://app.supabase.com). Tačiau neskubėkite su mumis, yra keletas trūkumų
+- [x] Viešoji Alfa versija: [app.supabase.com](https://app.supabase.com). Tačiau neskubėkite su mumis, yra keletas trūkumų
 - [x] Viešoji beta versija: Pakankamai stabili daugeliui ne įmonių naudojimo atvejų
 - [ ] Vieša: Bendras prieinamumas [[statusas](https://supabase.com/docs/guides/getting-started/features#feature-status)]
 
