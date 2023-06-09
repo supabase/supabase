@@ -339,6 +339,12 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         description:
           'Total number of successful connections. Connections attempts are not counted towards usage.\nBilling is based on the maximum amount of concurrent peak connections throughout your billing period.',
         chartDescription: 'The data refreshes every 24 hours.',
+        links: [
+          {
+            name: 'Realtime Rate Limits',
+            url: 'https://supabase.com/docs/guides/realtime/rate-limits',
+          },
+        ],
       },
     ],
   },
