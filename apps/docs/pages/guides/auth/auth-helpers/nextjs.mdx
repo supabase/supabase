@@ -63,7 +63,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
 
 Make sure you name these variables exactly as seen here, since these are picked up by the auth helpers library — you no longer have to explicitly pass them to a `createClient()` function as before.
 
-### Refresh session with Middleware
+### Managing session with Middleware
 
 When using the Supabase client on the server, you must perform extra steps to ensure the user's auth session remains active. Since the user's session is tracked in a cookie, we need to read this cookie and update it if necessary.
 
@@ -129,9 +129,11 @@ The `getSession` function must be called for any Server Component routes that us
 
 </Admonition>
 
-### Code Exchange Route
+### Managing sign-in with Code Exchange
 
-The `Code Exchange` route is required for the [server-side auth flow](/docs/guides/auth/server-side-rendering) implemented by the Next.js Auth Helpers. It exchanges an auth `code` for the user's `session`, which is set as a cookie for future requests made to Supabase.
+If you are using the [server-side auth flow](/docs/guides/auth/server-side-rendering) to sign users into your application, `Code Exchange` is used. It exchanges an auth `code` for the user's `session`, which is set as a cookie for future requests made to Supabase.
+
+To make this work with Next.js, we create a callback route handler that performs this exchange:
 
 <Tabs
   scrollable
