@@ -20,7 +20,7 @@ type Props = { customerStories: PostTypes[] }
 
 const Index = ({ customerStories }: Props) => {
   return (
-    <Layout className="bg-[#0D0D0D  ]">
+    <Layout className="bg-[#0A0B0F]">
       {/* <Layout className="bg-slate-100"> */}
       <Hero />
       <Features />
