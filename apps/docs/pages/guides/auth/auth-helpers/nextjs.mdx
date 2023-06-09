@@ -50,7 +50,9 @@ yarn add @supabase/auth-helpers-nextjs
 
 ### Declare Environment Variables
 
-Retrieve your project's URL and anon key from your [API settings](https://app.supabase.com/project/_/settings/api), and create a `.env.local` file with the following environment variables:
+Retrieve your project's URL and anon key from your [API settings](https://app.supabase.com/project/_/settings/api), and create a `.env.local` file with the following environment variables.
+
+Make sure you get the names exactly right as these are picked up by the auth helpers library — you no longer have to explicitly pass them to a `createClient()` function as before:
 
 ```bash .env.local
 NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
@@ -462,7 +464,16 @@ export default async function Login() {
 
 ## Creating a Supabase Client
 
-### Client Component
+There are 5 ways to access the Supabase client with the Next.js Auth Helpers:
+- [Client](/docs/guides/auth/auth-helpers/nextjs#client-component) — `createClientComponentClient` in client components
+- [Server](/docs/guides/auth/auth-helpers/nextjs#server-components) — `createServerComponentClient` in server components
+- [Server actions](/docs/guides/auth/auth-helpers/nextjs#server-actions) — `createServerActionClient` in Server Actions
+- [Route Handlers](/docs/guides/auth/auth-helpers/nextjs#route-handler) — `createRouteHandlerClient` in Route Handlers
+- [Middleware](/docs/guides/auth/auth-helpers/nextjs#middleware) — `createMiddlewareClient` in Middleware
+
+While this may seem like a lot of options, it allows for the Supabase client to be easily instantiated in the correct context. All you need to change is the context in the middle `create[Client|Server|ServerAction|RouteHandler|Middleware]Client` and the Auth Helpers will take care of the rest.
+
+### Client Components
 
 <div className="video-container">
   <iframe
@@ -556,7 +567,7 @@ The `createClientComponentClient` function implements a [Singleton pattern](http
 const supabase = createClientComponentClient({ isSingleton: false })
 ```
 
-### Server Component
+### Server Components
 
 <div className="video-container">
   <iframe
@@ -614,7 +625,7 @@ export default async function ServerComponent() {
 
 > check out [this repo](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs) for more examples, including redirecting unauthenticated users - [protected pages](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs/app/[id]/page.tsx).
 
-### Server Action
+### Server Actions
 
 <div className="video-container">
   <iframe
@@ -694,7 +705,7 @@ export default async function NewTodo() {
 </TabPanel>
 </Tabs>
 
-### Route Handler
+### Route Handlers
 
 <div className="video-container">
   <iframe
