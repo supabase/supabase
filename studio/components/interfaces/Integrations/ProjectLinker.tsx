@@ -1,46 +1,66 @@
+import { databaseIcon, vercelIcon } from 'components/to-be-cleaned/ListIcons'
+import { useState } from 'react'
 import { IconChevronRight, Listbox } from 'ui'
 
-const ProjectLinker = () => {
-  return <div></div>
+interface Project {
+  id: string
+  name: string
+}
+
+export interface ProjectLinkerProps {
+  foreignProjects: Project[]
+  supabaseProjects: Project[]
+}
+
+const ProjectLinker = ({ foreignProjects, supabaseProjects }: ProjectLinkerProps) => {
+  return (
+    <div>
+      <ProjectLinkerItem foreignProjects={foreignProjects} supabaseProjects={supabaseProjects} />
+    </div>
+  )
 }
 
 export default ProjectLinker
 
-type ProjectLinkerItemProps = {}
-const ProjectLinkerItem = ({}: ProjectLinkerItemProps) => {
-  function onVercelProjectChange(e: string) {
-    const value = e != UNDEFINED_SELECT_VALUE ? e : undefined
-  }
+const UNDEFINED_SELECT_VALUE = 'undefined'
 
-  function onSupabaseProjectChange(e: string) {
-    const value = e != UNDEFINED_SELECT_VALUE ? e : undefined
-  }
+interface ProjectLinkerItemProps {
+  foreignProjects: Project[]
+  supabaseProjects: Project[]
+}
 
-  function onRemove() {}
+const ProjectLinkerItem = ({ foreignProjects, supabaseProjects }: ProjectLinkerItemProps) => {
+  const [foreignProjectId, setForeignProjectId] = useState<string>(UNDEFINED_SELECT_VALUE)
+  const [supabaseProjectId, setSupabaseProjectId] = useState<string>(UNDEFINED_SELECT_VALUE)
 
   return (
     <li className="py-2">
       <div className="relative flex w-full space-x-2">
         <div className="w-1/2 flex-grow">
           <Listbox
-            value={vercelProjectId ?? UNDEFINED_SELECT_VALUE}
-            onChange={onVercelProjectChange}
+            value={foreignProjectId ?? UNDEFINED_SELECT_VALUE}
+            onChange={setForeignProjectId}
           >
             <Listbox.Option value={UNDEFINED_SELECT_VALUE} label="Choose a project" disabled>
               Choose a project
             </Listbox.Option>
-            {selectedVercelProject && (
+            {/* {selectedForeignProject && (
               <Listbox.Option
-                value={selectedVercelProject.id}
-                label={selectedVercelProject.name}
+                value={selectedForeignProject.id}
+                label={selectedForeignProject.name}
                 addOnBefore={() => vercelIcon}
               >
-                {selectedVercelProject.name}
+                {selectedForeignProject.name}
               </Listbox.Option>
-            )}
-            {_store.vercelProjectsAvailable.map((x) => (
-              <Listbox.Option key={x.id} value={x.id} label={x.name} addOnBefore={() => vercelIcon}>
-                {x.name}
+            )} */}
+            {foreignProjects.map((project) => (
+              <Listbox.Option
+                key={project.id}
+                value={project.id}
+                label={project.name}
+                addOnBefore={() => vercelIcon}
+              >
+                {project.name}
               </Listbox.Option>
             ))}
           </Listbox>
@@ -50,20 +70,20 @@ const ProjectLinkerItem = ({}: ProjectLinkerItemProps) => {
         </div>
         <div className="w-1/2 flex-grow">
           <Listbox
-            value={supabaseProjectRef ?? UNDEFINED_SELECT_VALUE}
-            onChange={onSupabaseProjectChange}
+            value={supabaseProjectId ?? UNDEFINED_SELECT_VALUE}
+            onChange={setSupabaseProjectId}
           >
             <Listbox.Option value={UNDEFINED_SELECT_VALUE} label="Choose a project" disabled>
               Choose a project
             </Listbox.Option>
-            {sortedProjects?.map((x: Dictionary<any>) => (
+            {supabaseProjects.map((project) => (
               <Listbox.Option
-                key={x.id}
-                value={x.ref}
-                label={x.name}
+                key={project.id}
+                value={project.id}
+                label={project.name}
                 addOnBefore={() => databaseIcon}
               >
-                {x.name}
+                {project.name}
               </Listbox.Option>
             ))}
           </Listbox>
