@@ -65,7 +65,11 @@ Make sure you name these variables exactly as seen here, since these are picked 
 
 ### Refresh session with Middleware
 
-[Middleware](https://nextjs.org/docs/app/building-your-application/routing/middleware) runs immediately before each route is rendered. Next.js only provides read access to cookies in Server Components, therefore, Middleware is used to refresh the user's session before loading Server Component routes.
+When using the Supabase client on the server, you must perform extra steps to ensure the user's auth session remains active. Since the user's session is tracked in a cookie, we need to read this cookie and update it if necessary.
+
+In Next.js Server Components, you can read a cookie, but you can't write back to it. Middleware on the other hand, allow you to both read a write to cookies.
+
+Next.js [Middleware](https://nextjs.org/docs/app/building-your-application/routing/middleware) runs immediately before each route is rendered. We'll use Middleware to refresh the user's session before loading Server Component routes.
 
 <Tabs
   scrollable
