@@ -53,10 +53,10 @@ const Hero = () => {
                   <div className="absolute w-full h-full z-50 pointer-events-none inset-0 bg-gradient-to-t from-[#06060a] via-transparent to-transparent" />
                   <div className="absolute w-full h-full z-50 inset-0 bg-[#06060a] top-[100%]" />
                   {/* <SBLogoVisual className="mx-auto absolute z-10 w-[50vw] max-w-[531px] h-full lg:h-[500px] max-h-[500px] bottom-[-50px] left-0 right-0" /> */}
-                  <img
+                  {/* <img
                     src="/images/index/synth-grid.svg"
-                    className="absolute mx-auto top-0 left-0 right-0 z-0 w-screen max-w-[800px] aspect-square opacity-10"
-                  />
+                    className="absolute mx-auto top-0 left-0 right-0 z-0 w-screen max-w-[800px] aspect-square opacity-40"
+                  /> */}
                 </div>
                 <div className="relative z-30">
                   <h1 className="text-scale-1200 text-4xl sm:text-5xl sm:leading-none lg:text-7xl">
