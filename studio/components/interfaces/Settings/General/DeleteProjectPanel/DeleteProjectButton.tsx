@@ -8,7 +8,7 @@ import { useStore, checkPermissions } from 'hooks'
 import { API_URL, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import { delete_, post } from 'lib/common/fetch'
 import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
-import { CANCELLATION_REASONS } from 'components/interfaces/Billing/Billing.constants'
+import { CANCELLATION_REASONS } from 'components/interfaces/BillingV2/Billing.constants'
 
 interface Props {
   type?: 'danger' | 'default'

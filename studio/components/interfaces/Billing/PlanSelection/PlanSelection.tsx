@@ -5,6 +5,7 @@ import { Transition } from '@headlessui/react'
 import PlanCard from './Plans/PlanCard'
 import { formatTierOptions } from './PlanSelection.utils'
 import { Button, IconExternalLink } from 'ui'
+import PlanCardEnterprise from './Plans/PlanCardEnterprise'
 
 interface Props {
   visible: boolean
@@ -16,11 +17,7 @@ interface Props {
 const PlanSelection: FC<Props> = ({ visible, tiers, currentPlan, onSelectPlan }) => {
   const formattedTiers = formatTierOptions(tiers)
 
-  // [Kevin] TODO Remove after team plan is generally available
-  const gridCols =
-    formattedTiers.length === 3
-      ? 'gap-8 lg:grid-cols-3'
-      : 'gap-4 lg:grid-cols-3 xl:grid-cols-billingWithTeam'
+  const enterprisePlan = formattedTiers.find((it) => it.name === 'Enterprise')!
 
   return (
     <Transition
@@ -31,17 +28,26 @@ const PlanSelection: FC<Props> = ({ visible, tiers, currentPlan, onSelectPlan })
     >
       <div>
         <h4 className="text-lg">Change your project's subscription</h4>
-        <div className={`grid py-8 grid-cols-2 ${gridCols}`}>
-          {formattedTiers.map((plan) => {
-            return (
-              <PlanCard
-                key={plan.id}
-                plan={plan}
-                currentPlan={currentPlan}
-                onSelectPlan={() => onSelectPlan(plan)}
-              />
-            )
-          })}
+        <div className={`grid py-8 grid-cols-1 gap-8 md:grid-cols-3`}>
+          {formattedTiers
+            .filter((it) => it.name !== 'Enterprise')
+            .map((plan) => {
+              return (
+                <PlanCard
+                  key={plan.id}
+                  plan={plan}
+                  currentPlan={currentPlan}
+                  onSelectPlan={() => onSelectPlan(plan)}
+                />
+              )
+            })}
+        </div>
+        <div>
+          <PlanCardEnterprise
+            plan={enterprisePlan}
+            currentPlan={currentPlan}
+            onSelectPlan={() => onSelectPlan(enterprisePlan)}
+          />
         </div>
         <div className="flex justify-center items-center mt-4">
           <Link href="https://supabase.com/pricing">
