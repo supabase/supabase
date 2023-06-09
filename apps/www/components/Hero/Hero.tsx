@@ -27,7 +27,8 @@ const Hero = () => {
     const spline = new Application(canvas as any)
     // spline.load('https://prod.spline.design/EVQrv4Zsx5JT2pDe/scene.splinecode').then(() => {
     spline.load('https://prod.spline.design/0Txq7YaSsBK2XeDK/scene.splinecode').then(() => {
-      // const obj = spline.findObjectById('ab3a4cd0-90a8-47c7-b2c7-b0ee1e0bb8a6')
+      const obj = spline.findObjectById('ab3a4cd0-90a8-47c7-b2c7-b0ee1e0bb8a6')
+      console.log(obj, spline)
       spline.setZoom(2)
     })
   }, [])
@@ -50,8 +51,8 @@ const Hero = () => {
                     className="relative z-20 w-[500px] h-[500px] bottom-[-40px] lg:bottom-[-60px]"
                     id="canvas3d"
                   ></canvas>
-                  <div className="absolute w-full h-full z-50 pointer-events-none inset-0 bg-gradient-to-t from-[#06060a] via-transparent to-transparent" />
-                  <div className="absolute w-full h-full z-50 inset-0 bg-[#06060a] top-[100%]" />
+                  <div className="absolute w-full h-full z-50 pointer-events-none inset-0 bg-gradient-to-t from-[#0A0B0F] via-transparent to-transparent" />
+                  <div className="absolute w-full h-full z-50 inset-0 bg-[#0A0B0F] top-[100%]" />
                   {/* <SBLogoVisual className="mx-auto absolute z-10 w-[50vw] max-w-[531px] h-full lg:h-[500px] max-h-[500px] bottom-[-50px] left-0 right-0" /> */}
                   {/* <img
                     src="/images/index/synth-grid.svg"

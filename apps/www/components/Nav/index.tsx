@@ -202,7 +202,7 @@ const Nav = () => {
       <div className="sticky top-0 z-40 transform" style={{ transform: 'translate3d(0,0,999px)' }}>
         <div
           className={[
-            'absolute inset-0 h-full w-full opacity-100 bg-[#03030890] backdrop-blur-lg',
+            'absolute inset-0 h-full w-full opacity-100 bg-[#0D0D0D90] backdrop-blur-lg',
             !showLaunchWeekNavMode && '!opacity-100 transition-opacity',
             showLaunchWeekNavMode && '!bg-transparent transition-all',
           ].join(' ')}
@@ -362,8 +362,8 @@ const Nav = () => {
           >
             <div
               className={[
-                'dark:bg-[#03030890] fixed -inset-y-0 z-50 h-screen w-screen transform overflow-y-scroll bg-white p-4 md:p-8',
-                open && '!bg-[#03030890]',
+                'dark:bg-[#0D0D0D] fixed -inset-y-0 z-50 h-screen w-screen transform overflow-y-scroll bg-white p-4 md:p-8',
+                open && '!bg-[#0D0D0D]',
               ].join(' ')}
             >
               <div className="absolute items-center justify-between right-4 top-4">
@@ -371,7 +371,7 @@ const Nav = () => {
                   <button
                     onClick={() => setOpen(false)}
                     type="button"
-                    className="inline-flex items-center justify-center p-2 bg-white rounded-md text-scale-900 focus:ring-brand-900 dark:bg-[#03030890] dark:hover:bg-[#03030890] hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset"
+                    className="inline-flex items-center justify-center p-2 bg-white rounded-md text-scale-900 focus:ring-brand-900 dark:bg-[#0D0D0D] dark:hover:bg-[#0D0D0D] hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset"
                   >
                     <span className="sr-only">Close menu</span>
                     <svg

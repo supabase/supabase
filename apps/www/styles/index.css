@@ -27,7 +27,7 @@ html {
 }
 
 body {
-  @apply bg-scale-200;
+  @apply bg-[#0D0D0D];
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -160,7 +160,7 @@ h6:not(.overwrite) {
 }
 
 .section--bg {
-  @apply bg-[#0A0B0F] dark:bg-[#0A0B0F];
+  @apply bg-[#0D0D0D] dark:bg-[#0D0D0D];
   /* @apply bg-scale-100 dark:bg-scale-100; */
   position: relative;
   height: 100%;
