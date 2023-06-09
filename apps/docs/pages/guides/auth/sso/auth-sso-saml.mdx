@@ -271,6 +271,12 @@ At this time it is not possible to have users without an email address, so SAML 
 
 Most SAML 2.0 identity providers use Lightweight Directory Access Protocol (LDAP) attribute names. However, due to their variability and complexity operators of identity providers are able to customize both the `Name` and attribute value that is sent to Supabase Auth in an assertion. Please refer to the identity provider's documentation and contact the operator for details on what attributes are mapped for your project.
 
+**Accessing the stored attributes**
+
+The stored attributes, once mapped, show up in the access token (a JWT) of the user. If you need to look these values up in the database, you can find them in the `auth.identities` table under the `identity_data` JSON column. Identities created for SSO providers have `sso:<uuid-of-provider>` in the `provider` column, while `id` contains the unique NameID of the user account.
+
+Furthermore, you can find the same identity data under `raw_app_meta_data` inside `auth.users`.
+
 ### Remove a connection
 
 Once a connection to an identity provider is established, you can [remove it](/docs/reference/cli/supabase-sso-remove) by running:
