@@ -11,6 +11,7 @@ export type VercelProjectsVariables = {
 
 export type VercelProjectsResponse = {
   id: string
+  name: string
 }
 
 export async function getVercelProjects({ orgId }: VercelProjectsVariables, signal?: AbortSignal) {
