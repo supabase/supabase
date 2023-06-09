@@ -161,6 +161,30 @@ export const meta = {
 
   </StepHikeCompact.Step>
 
+  <StepHikeCompact.Step step={6}>
+
+    <StepHikeCompact.Details title="Create domain object">
+      This kind of object will be consumed by the view
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+      ```kotlin
+      data class Product(
+          val productId: String,
+          val name: String,
+          val description: String,
+          val price: Double,
+          val image: String,
+          val category: String,
+          val nutrition: String,
+          val _id: Int,
+      )
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
   <StepHikeCompact.Step step={7}>
 
     <StepHikeCompact.Details title="Query data from the app">
@@ -169,10 +193,11 @@ export const meta = {
 
     <StepHikeCompact.Code>
       ```kotlin
-      suspend fun getProducts() {
+      suspend fun getProducts(): ProductDto {
         val result = client.postgrest["products"]
             .select().decodeList<ProductDto>()
         // Handle result data for next step
+        return result
       }
       ```
     </StepHikeCompact.Code>
@@ -180,6 +205,86 @@ export const meta = {
   </StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={8}>
+    <StepHikeCompact.Details title="Get data from ViewModel inside a coroutine scope">
+     
+
+    </StepHikeCompact.Details>
+    <StepHikeCompact.Code>
+      ```kotlin
+      class ProductListViewModel @Inject constructor(
+        private val productRepository: ProductRepository
+      ) : ViewModel() {
+
+      private val _productList = MutableStateFlow<List<Product>?>(listOf())
+      val productList: Flow<List<Product>?> = _productList
+
+      init {
+          getProducts()
+      }
+
+      fun getProducts() {
+          viewModelScope.launch {
+              val products = productRepository.getProducts()
+              _productList.emit(products?.map { it -> it.asDomainModel() })
+          }
+      }
+
+      private fun ProductDto.asDomainModel(): Product {
+        return Product(
+            productId = this.productId,
+            name = this.name,
+            price = this.price,
+            image = this.image,
+            description = this.description,
+            category = this.category,
+            nutrition = this.nutrition,
+            _id = this._id 
+        )
+      }
+      ```
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+    <StepHikeCompact.Step step={9}>
+    <StepHikeCompact.Details title="Observe data in Composable">
+    </StepHikeCompact.Details>
+    <StepHikeCompact.Code>
+      ```kotlin
+        @Composable
+        fun ProductListScreen(
+            modifier: Modifier = Modifier,
+            navController: NavController,
+            viewModel: ProductListViewModel = hiltViewModel(),
+        ) {
+            val productList = viewModel.productList.collectAsState(initial = listOf()).value
+            if (!productList.isNullOrEmpty()) {
+                LazyColumn(
+                    modifier = modifier.padding(24.dp),
+                    contentPadding = PaddingValues(5.dp)
+                ) {
+                    items(productList) { item ->
+                        ProductListItem(
+                            product = item,
+                            modifier = modifier,
+                            onClick = {
+                                navController.navigate(
+                                    ProductDetailsDestination.createRouteWithParam(
+                                        item.id
+                                    )
+                                )
+                            },
+                        )
+                    }
+                }
+            }
+        }
+      ```
+      </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={10}>
     <StepHikeCompact.Details title="Start the app">
 
     </StepHikeCompact.Details>
