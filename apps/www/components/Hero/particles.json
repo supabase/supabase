@@ -284,7 +284,7 @@
       },
       "random": true,
       "size": false,
-      "speed": 0.5,
+      "speed": 0,
       "spin": {
         "acceleration": 0,
         "enable": false
@@ -305,7 +305,7 @@
         "height": 1080
       },
       "limit": 0,
-      "value": 120
+      "value": 200
     },
     "opacity": {
       "random": {
@@ -349,7 +349,7 @@
     "size": {
       "random": {
         "enable": true,
-        "minimumValue": 1
+        "minimumValue": 0.5
       },
       "value": 1,
       "animation": {
