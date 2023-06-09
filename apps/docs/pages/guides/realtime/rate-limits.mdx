@@ -1,25 +1,22 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-  id: 'rate-limits',
-  title: 'Realtime Rate Limits',
-  description: 'Understanding Realtime rate limiting',
-  sidebar_label: 'Rate Limits',
+  id: 'quotas',
+  title: 'Realtime Quotas',
+  description: 'Understanding Realtime quotas',
+  sidebar_label: 'Quotas',
 }
 
-Supabase Realtime is a global cluster. We've implemented some rate limits to help ensure high availability for all customers.
+<Admonition type="note">
+  [Contact support](https://app.supabase.com/support/new) if you need your quotas increased. Quotas
+  are configurable per project and our cluster supports millions of concurrent connections.
+</Admonition>
 
-Rate limits are configurable per project and our cluster supports millions of concurrent connections. [Contact support](https://app.supabase.com/support/new) if these limits are causing issues.
+## Quotas by Plan
 
-## Rate Limits by Plan
+You can increase your quotas by upgrading your plan and removing your spend cap. We still have a starting quota set even without a spend cap to protect your budget just in case.
 
-Rate limits are different than usage limits. The usage limits for Free and Pro projects can be found on the See our [pricing page](https://supabase.com/pricing).
-
-Rate limits protect our infrasructure. You can increase your rate limits by upgrading your plan and removing your spend cap.
-
-If you need your rate limits increased further please [contact support](https://app.supabase.com/support/new).
-
-We have different rate limits per plan:
+If you need your quotas increased further please [contact support](https://app.supabase.com/support/new).
 
 ### Free
 
@@ -37,21 +34,21 @@ We have different rate limits per plan:
 
 Starts at:
 
-- 5,000 concurrent clients
-- 1,000 messages per second
-- 1,000 Channel joins per second
+- 10,000 concurrent clients
+- 2,500 messages per second
+- 2,500 Channel joins per second
 
 ### Enterprise
 
 Starts at:
 
-- 5,000 concurrent clients
-- 1,000 messages per second
-- 1,000 Channel joins per second
+- 10,000 concurrent clients
+- 2,500 messages per second
+- 2,500 Channel joins per second
 
-## System Limits
+## System Quotas
 
-The following limits apply to all projects:
+The following quotas apply to all projects:
 
 - 100 Channels per connected client
 
@@ -61,50 +58,52 @@ Some basic WebSocket message rate limiting is implemented client-side.
 
 For example, the [multiplayer.dev demo](/docs/guides/realtime/quickstart#cursor-positions) instantiates the Supabase client with an `eventsPerSecond` parameter.
 
-## Rate Limiting Errors
+## Quota Errors
 
-Rate limiting errors can appear in backend logs and messages in the WebSocket connection.
+When you reach a quota errors can appear in backend logs and messages in the WebSocket connection.
 
 <Admonition type="note">
-
-Use the [Realtime Inspector](https://realtime.supabase.com/inspector/new) to reproduce an error and share those connection details with Supabase support.
-
+  Use the [Realtime Inspector](https://realtime.supabase.com/inspector/new) to reproduce an error
+  and share those connection details with Supabase support.
 </Admonition>
 
 ### Backend Logs
 
-If your project is being rate limited, check your [Realtime logs](https://app.supabase.com/project/_/database/realtime-logs).
+If your project is being limited by a quota, check your [Realtime logs](https://app.supabase.com/project/_/database/realtime-logs).
 
 ### WebSocket Errors
 
-- `tenant_events`: Clients will be disconnected if your project is generating too many messages per second. `supabase-js` should reconnect automatically when the message rate decreases below your plan limit.
+- `tenant_events`: Clients will be disconnected if your project is generating too many messages per second. `supabase-js` should reconnect automatically when the message throughput decreases below your plan quota.
 
-Some limits can cause a Channel join to be refused. Realtime will reply with one of the following WebSocket messages:
+<Admonition type="note">
+  An `event` is a WebSocket message delivered to, or sent from a client.
+</Admonition>
+
+Some quotas can cause a Channel join to be refused. Realtime will reply with one of the following WebSocket messages:
 
 - `too_many_channels`: Too many channels currently joined for a single client.
 - `too_many_connections`: Too many total concurrent connections for a project.
 - `too_many_joins`: Too many Channel joins per second.
 
 <Admonition type="note">
-
-Use your browser's developer tools to find the WebSocket initiation request and view individual messages.
-
+  Use your browser's developer tools to find the WebSocket initiation request and view individual
+  messages.
 </Admonition>
 
-## Postgres Changes Payload Limit
+## Postgres Changes Payload Quota
 
-Realtime Postgres Changes has a change payload size limit of 1 mebibyte (MiB).
+Realtime Postgres Changes has a change payload size quota of 1 mebibyte (MiB).
 
-When this limit is reached, the `new` and `old` record payloads only include the fields with a value size of less than or equal to 64 bytes.
+When this quota is reached, the `new` and `old` record payloads only include the fields with a value size of less than or equal to 64 bytes.
 
-## Presence Limits
+## Presence Quotas
 
 Realtime Presence is a CRDT backed in-memory key value store based on Phoenix Presence. It's more expensive to update a Presence than Broadcast a message.
 
-The following limits apply to Presence messages:
+The following quotas apply to Presence messages:
 
 - 10 keys per object
-- Message rate limit is 10% of your Realtime message rate limit
+- Message per second quota is 10% of your total Realtime message per second quota
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
