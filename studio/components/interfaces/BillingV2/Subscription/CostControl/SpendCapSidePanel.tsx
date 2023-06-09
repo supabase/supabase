@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { useParams } from 'common'
+import { useParams, useTheme } from 'common'
 import Table from 'components/to-be-cleaned/Table'
 import { useProjectSubscriptionUpdateMutation } from 'data/subscriptions/project-subscription-update-mutation'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
@@ -11,22 +11,30 @@ import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { Alert, Button, Collapsible, IconChevronRight, IconExternalLink, SidePanel } from 'ui'
 import { USAGE_COSTS } from './CostControl.constants'
 
-const SPEND_CAP_OPTIONS: { name: string; value: 'on' | 'off'; imageUrl: string }[] = [
+const SPEND_CAP_OPTIONS: {
+  name: string
+  value: 'on' | 'off'
+  imageUrl: string
+  imageUrlLight: string
+}[] = [
   {
     name: 'Spend cap enabled',
     value: 'on',
-    imageUrl: `${BASE_PATH}/img/spend-cap-on.svg`,
+    imageUrl: `${BASE_PATH}/img/spend-cap-on.png`,
+    imageUrlLight: `${BASE_PATH}/img/spend-cap-on--light.png`,
   },
   {
     name: 'Spend cap disabled',
     value: 'off',
-    imageUrl: `${BASE_PATH}/img/spend-cap-off.svg`,
+    imageUrl: `${BASE_PATH}/img/spend-cap-off.png`,
+    imageUrlLight: `${BASE_PATH}/img/spend-cap-off--light.png`,
   },
 ]
 
 const SpendCapSidePanel = () => {
   const { ui } = useStore()
   const { ref: projectRef } = useParams()
+  const { isDarkMode } = useTheme()
 
   const [showUsageCosts, setShowUsageCosts] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
@@ -173,7 +181,7 @@ const SpendCapSidePanel = () => {
           )}
 
           <div className="!mt-8 pb-4">
-            <div className="grid grid-cols-12 gap-3">
+            <div className="flex gap-3">
               {SPEND_CAP_OPTIONS.map((option) => {
                 const isSelected = selectedOption === option.value
 
@@ -183,15 +191,21 @@ const SpendCapSidePanel = () => {
                     className={clsx('col-span-4 group space-y-1', isFreePlan && 'opacity-75')}
                     onClick={() => !isFreePlan && setSelectedOption(option.value)}
                   >
-                    <div
+                    <img
+                      alt="Spend Cap"
                       className={clsx(
-                        'relative rounded-xl transition border bg-no-repeat bg-center bg-cover',
-                        isSelected ? 'border-brand-900' : 'border-scale-800',
+                        'relative rounded-xl transition border bg-no-repeat bg-center bg-cover w-[160px] h-[96px]',
+                        isSelected
+                          ? 'border-scale-1200'
+                          : 'border-scale-900 opacity-50 group-hover:border-scale-1000 group-hover:opacity-100',
                         !isFreePlan && 'cursor-pointer',
                         !isFreePlan && !isSelected && 'group-hover:border-scale-1100'
                       )}
-                      style={{ aspectRatio: ' 160/96', backgroundImage: `url(${option.imageUrl})` }}
+                      width={160}
+                      height={96}
+                      src={isDarkMode ? option.imageUrl : option.imageUrlLight}
                     />
+
                     <p
                       className={clsx(
                         'text-sm transition',

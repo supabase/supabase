@@ -42,14 +42,14 @@ After developing your project and deciding it's Production Ready, you should run
 - Use your own SMTP credentials so that you have full control over the deliverability of your transactional auth emails (see Auth > Settings)
   - you can grab SMTP credentials from any major email provider such as SendGrid, AWS SES, etc.
   - The default rate limit for auth emails provided by Supabase is 30 new users per hour, if doing a major public announcement you will likely require more than this.
-- If your application is on the free tier and is **not** expected to be queried at least once every 7 days, then it may be paused by Supabase to save on server resources.
+- If your application is on the free plan and is **not** expected to be queried at least once every 7 days, then it may be paused by Supabase to save on server resources.
   - You can restore paused projects from the Supabase dashboard.
   - Upgrade to Pro to guarantee that your project will not be paused for inactivity.
-- Database backups are not available for download on the free tier.
+- Database backups are not available for download on the free plan.
   - You can set up your own backup systems using tools like [pg_dump](https://www.postgresqltutorial.com/postgresql-backup-database/) or [wal-g](https://github.com/wal-g/wal-g).
-  - Nightly backups for Pro tier projects are available on the Supabase dashboard for up to 7 days.
+  - Nightly backups for Pro plan projects are available on the Supabase dashboard for up to 7 days.
   - Point in Time Recovery (PITR) allows a project to be backed up at much shorter intervals. This provides users an option to restore to any chosen point of up to seconds in granularity. In terms of Recovery Point Objective (RPO), Daily Backups would be suitable for projects willing to lose up to 24 hours worth of data. If a lower RPO is required, enable PITR.
-- Upgrading to the Supabase Pro Tier will give you [access to our support team](https://app.supabase.com/support/new).
+- Upgrading to the Supabase Pro plan will give you [access to our support team](https://app.supabase.com/support/new).
 
 ## Rate Limiting, Resource Allocation, & Abuse Prevention
 

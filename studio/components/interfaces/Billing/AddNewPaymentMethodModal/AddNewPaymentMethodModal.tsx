@@ -9,6 +9,7 @@ import { useIsHCaptchaLoaded } from 'stores/hcaptcha-loaded-store'
 import { post } from 'lib/common/fetch'
 import { API_URL, STRIPE_PUBLIC_KEY } from 'lib/constants'
 import AddPaymentMethodForm from './AddPaymentMethodForm'
+import { useTheme } from 'common'
 
 interface Props {
   visible: boolean
@@ -78,9 +79,11 @@ const AddNewPaymentMethodModal: FC<Props> = ({ visible, returnUrl, onCancel, onC
     }
   }
 
+  const { isDarkMode } = useTheme()
+
   const options = {
     clientSecret: intent ? intent.client_secret : '',
-    appearance: { theme: 'night', labels: 'floating' },
+    appearance: { theme: isDarkMode ? 'night' : 'flat', labels: 'floating' },
   } as any
 
   const onLocalCancel = () => {
