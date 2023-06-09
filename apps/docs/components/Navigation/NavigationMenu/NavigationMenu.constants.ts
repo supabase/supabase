@@ -472,6 +472,7 @@ export const auth = {
       items: [
         { name: 'Overview', url: '/guides/auth/auth-helpers' },
         { name: 'Auth UI', url: '/guides/auth/auth-helpers/auth-ui' },
+        { name: 'Flutter Auth UI', url: '/guides/auth/auth-helpers/flutter-auth-ui' },
         {
           name: 'Next.js',
           url: '/guides/auth/auth-helpers/nextjs',
@@ -526,6 +527,10 @@ export const database: NavMenuConstant = {
       name: 'Postgres Guides',
       url: undefined,
       items: [
+        {
+          name: 'JSON and unstructured data',
+          url: '/guides/database/json',
+        },
         { name: 'Implementing Full Text Search', url: '/guides/database/full-text-search' },
         { name: 'Implementing Cascade Deletes', url: '/guides/database/postgres/cascade-deletes' },
         { name: 'Implementing column encryption', url: '/guides/database/column-encryption' },

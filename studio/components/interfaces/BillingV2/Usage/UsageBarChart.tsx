@@ -9,7 +9,6 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
-import { Y_DOMAIN_CEILING_MULTIPLIER } from './Usage.constants'
 import dayjs from 'dayjs'
 
 // [Joshen] This BarChart is specifically for usage, hence not a reusable component, and not

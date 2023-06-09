@@ -20,13 +20,23 @@ const PlanCTAButton = ({ plan, currentPlan, onSelectPlan }: PlanCTAButtonProps) 
   const isTeamTier = currentPlan?.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.TEAM
 
   const getButtonType = (plan: any, currentPlan: any) => {
+    if (
+      currentPlan.supabase_prod_id !== PRICING_TIER_PRODUCT_IDS.ENTERPRISE &&
+      plan.name === 'Enterprise'
+    ) {
+      return 'default'
+    }
+
     if (['Free tier', 'Free plan'].includes(plan.name)) {
       // Free is always default
       return 'default'
     } else if (currentPlan.prod_id === STRIPE_PRODUCT_IDS.FREE) {
       // If the current plan is free, other plans are primary
       return 'primary'
-    } else if (currentPlan.prod_id === STRIPE_PRODUCT_IDS.TEAM && !['Team tier', 'Team plan'].includes(plan.name)) {
+    } else if (
+      currentPlan.prod_id === STRIPE_PRODUCT_IDS.TEAM &&
+      !['Team tier', 'Team plan'].includes(plan.name)
+    ) {
       // Non-free plans are default (pro), when team plan is selected
       return 'default'
     }
@@ -60,18 +70,10 @@ const PlanCTAButton = ({ plan, currentPlan, onSelectPlan }: PlanCTAButtonProps) 
       }
     }
 
-    if (plan.id === STRIPE_PRODUCT_IDS.TEAM) {
-      if (currentPlan.prod_id === STRIPE_PRODUCT_IDS.TEAM) {
-        return 'Edit plan configuration'
-      } else if (
-        [STRIPE_PRODUCT_IDS.FREE, STRIPE_PRODUCT_IDS.PRO, STRIPE_PRODUCT_IDS.PAYG].includes(
-          currentPlan.prod_id
-        )
-      ) {
-        return 'Upgrade to Team'
-      } else {
-        return 'Contact sales'
-      }
+    if (plan.id === STRIPE_PRODUCT_IDS.TEAM && currentPlan.prod_id === STRIPE_PRODUCT_IDS.TEAM) {
+      return 'Edit plan configuration'
+    } else {
+      return 'Contact sales'
     }
   }
 
@@ -94,6 +96,18 @@ const PlanCTAButton = ({ plan, currentPlan, onSelectPlan }: PlanCTAButtonProps) 
   if (plan.name === 'Enterprise') {
     return (
       <Link href="https://supabase.com/contact/enterprise">
+        <a>
+          <Button disabled={disabled} type={type} block>
+            {ctaText}
+          </Button>
+        </a>
+      </Link>
+    )
+  }
+
+  if (!isTeamTier && plan.name === 'Team plan') {
+    return (
+      <Link href="https://forms.supabase.com/team">
         <a>
           <Button disabled={disabled} type={type} block>
             {ctaText}
