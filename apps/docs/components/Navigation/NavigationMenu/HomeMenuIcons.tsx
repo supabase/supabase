@@ -356,8 +356,8 @@ export function IconMenuStorage({ width = 16, height = 16 }: HomeMenuIcon) {
       <path
         d="M13 7.616V5.6l-3.618-3.6H3v4.03m9.964-.447L9.38 2v3.584h3.584ZM1.974 6v8h12V7.509h-7.59l-1.533-1.51H1.974Z"
         stroke="currentColor"
-        stroke-miterlimit="10"
-        stroke-linejoin="bevel"
+        strokeMiterlimit="10"
+        strokeLinejoin="bevel"
       />
     </svg>
   )
