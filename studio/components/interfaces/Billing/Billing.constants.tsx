@@ -1,22 +1,5 @@
 import { IconArchive, IconCode, IconDatabase, IconKey, IconZap } from 'ui'
 
-export const CANCELLATION_REASONS = [
-  'Pricing',
-  "My project isn't getting traction",
-  'Poor customer service',
-  'Missing feature',
-  "I didn't see the value",
-  "Supabase didn't meet my needs",
-  'Dashboard is too complicated',
-  'Postgres is too complicated',
-  'Problem not solved',
-  'Bug issues',
-  'I decided to use something else',
-  'My work has finished/discontinued',
-  'I’m migrating to/starting a new project',
-  'None of the above',
-]
-
 export const USAGE_BASED_PRODUCTS = [
   {
     title: 'Database',
@@ -31,7 +14,11 @@ export const USAGE_BASED_PRODUCTS = [
         tooltip: (
           <span>
             Billing is based on the average daily database size in GB throughout the billing period.{' '}
-            <a href="https://supabase.com/docs/guides/platform/database-usage" target="_blank">
+            <a
+              href="https://supabase.com/docs/guides/platform/database-usage"
+              target="_blank"
+              rel="noreferrer"
+            >
               Docs
             </a>
           </span>
@@ -66,6 +53,19 @@ export const USAGE_BASED_PRODUCTS = [
           <span>
             The amount of distinct users requesting your API throughout the billing period. Resets
             at the beginning of every billing period.
+          </span>
+        ),
+      },
+      {
+        key: 'monthly_active_sso_users',
+        attribute: 'total_auth_billing_period_sso_mau',
+        title: 'Monthly Single Sign-On Users',
+        units: 'absolute',
+        costPerUnit: 0.015,
+        tooltip: (
+          <span>
+            The amount of distinct Single Sign-On users requesting your API throughout the billing
+            period. Resets at the beginning of every billing period.
           </span>
         ),
       },
@@ -106,15 +106,15 @@ export const USAGE_BASED_PRODUCTS = [
       {
         key: 'storage_image_render_count',
         attribute: 'total_storage_image_render_count',
-        title: 'Storage Images Transformed',
+        title: 'Storage Image Transformations',
         units: 'absolute',
         costPerUnit: 0.005,
         tooltip: (
           <span>
-            We distinctly count all images that were transformed in the billing period, ignoring any
-            transformations. If you transform one image with different transformations (i.e. once
-            with height=50 and once with height=150), it only counts as one. We only count the
-            unique (origin) images being transformed.
+            We distinctly count all images transformed in the billing period, ignoring any
+            transformations. Transforming one image with different transformations (i.e. once with
+            height=50 and once with height=150), only counts as one. Resets at the beginning of
+            every billing period.
           </span>
         ),
       },
@@ -147,7 +147,7 @@ export const USAGE_BASED_PRODUCTS = [
         costPerUnit: 0.000002,
         tooltip: (
           <span>
-            Every single serverless function invocation independent of response status is counted.
+            Every serverless function invocation independent of response status is counted.
             Billing is based on the sum of all invocations throughout your billing period.
           </span>
         ),

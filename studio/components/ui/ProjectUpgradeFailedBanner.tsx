@@ -15,7 +15,7 @@ const ProjectUpgradeFailedBanner = () => {
   const { target_version, status, initiated_at, error } = data?.databaseUpgradeStatus ?? {}
 
   const key = `supabase-upgrade-${ref}-${initiated_at}`
-  const isAcknowledged = localStorage.getItem(key) === 'true'
+  const isAcknowledged = localStorage?.getItem(key) === 'true' ?? false
   const [showMessage, setShowMessage] = useState(!isAcknowledged)
 
   const isFailed = status === DatabaseUpgradeStatus.Failed
@@ -44,7 +44,7 @@ const ProjectUpgradeFailedBanner = () => {
             <Link
               href={`/support/new?category=Database_unresponsive&ref=${ref}&subject=${subject}&message=${message}`}
             >
-              <a target="_blank">
+              <a target="_blank" rel="noreferrer">
                 <Button type="default">Contact support</Button>
               </a>
             </Link>

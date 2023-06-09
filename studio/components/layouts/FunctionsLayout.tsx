@@ -3,10 +3,10 @@ import { FC, ReactNode, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { Button, IconExternalLink, IconCode, Modal, IconTerminal } from 'ui'
 
+import ProjectLayout from './'
 import { checkPermissions, withAuth } from 'hooks'
 import { useParams } from 'common/hooks'
 import FunctionsNav from '../interfaces/Functions/FunctionsNav'
-import BaseLayout from 'components/layouts'
 import NoPermission from 'components/ui/NoPermission'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { TerminalInstructions } from 'components/interfaces/Functions'
@@ -27,11 +27,11 @@ const FunctionsLayout: FC<Props> = ({ title, children }) => {
   const canReadFunctions = checkPermissions(PermissionAction.FUNCTIONS_READ, '*')
   if (!canReadFunctions) {
     return (
-      <BaseLayout title={title || 'Edge Functions'} product="Edge Functions">
+      <ProjectLayout title={title || 'Edge Functions'} product="Edge Functions">
         <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">
           <NoPermission isFullPage resourceText="access your project's edge functions" />
         </main>
-      </BaseLayout>
+      </ProjectLayout>
     )
   }
 
@@ -40,7 +40,7 @@ const FunctionsLayout: FC<Props> = ({ title, children }) => {
   const centered = !hasFunctions
 
   return (
-    <BaseLayout isLoading={isLoading} title={title || 'Edge Functions'} product="Edge Functions">
+    <ProjectLayout isLoading={isLoading} title={title || 'Edge Functions'} product="Edge Functions">
       {centered ? (
         <>
           <div className="mx-auto max-w-5xl py-24 px-5">
@@ -171,7 +171,7 @@ const FunctionsLayout: FC<Props> = ({ title, children }) => {
           <TerminalInstructions removeBorder />
         </div>
       </Modal>
-    </BaseLayout>
+    </ProjectLayout>
   )
 }
 

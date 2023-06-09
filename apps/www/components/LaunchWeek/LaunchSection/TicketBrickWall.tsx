@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import React from 'react'
 import { Button } from 'ui'
-import { useMobileViewport } from '../../../hooks/useMobileViewport'
+import { useBreakpoint } from 'common/hooks/useBreakpoint'
 import { UserData } from '../Ticket/hooks/use-conf-data'
 import { TicketBrickWallSlider } from './TicketBrickWallSlider'
 
@@ -12,7 +12,7 @@ interface Props {
 }
 
 export default function TicketBrickWall({ users }: Props) {
-  const isMobile = useMobileViewport(768)
+  const isMobile = useBreakpoint(768)
   return (
     <div className="relative pb-20 pt-28 md:pt-40">
       <div className="mx-auto bg-[#1C1C1C]">
@@ -37,7 +37,12 @@ export default function TicketBrickWall({ users }: Props) {
         <div className="flex justify-center w-full mx-auto mt-2 lg:mt-4">
           <Link href="/launch-week/tickets">
             <a>
-              <Button type="outline" size="medium" onClick={() => window.scrollTo(0, 0)}>
+              <Button
+                type="outline"
+                size="medium"
+                onClick={() => window.scrollTo(0, 0)}
+                className="text-white"
+              >
                 View all tickets
               </Button>
             </a>

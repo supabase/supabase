@@ -170,34 +170,32 @@ const DatabaseTables: NextPageWithLayout = () => {
         header={
           <span className="break-words">{`Confirm deletion of table "${selectedTableToDelete?.name}"`}</span>
         }
-        children={
-          <Modal.Content>
-            <p className="py-4 text-sm text-scale-1100">
-              Are you sure you want to delete the selected table? This action cannot be undone.
-            </p>
-          </Modal.Content>
-        }
         buttonLabel="Delete"
         buttonLoadingLabel="Deleting"
         onSelectCancel={() => setIsDeleting(false)}
         onSelectConfirm={onConfirmDeleteTable}
-      />
+      >
+        <Modal.Content>
+          <p className="py-4 text-sm text-scale-1100">
+            Are you sure you want to delete the selected table? This action cannot be undone.
+          </p>
+        </Modal.Content>
+      </ConfirmationModal>
       <ConfirmationModal
         danger
         visible={isDeleting && !isUndefined(selectedColumnToDelete)}
         header={`Confirm deletion of column "${selectedColumnToDelete?.name}"`}
-        children={
-          <Modal.Content>
-            <p className="py-4 text-sm text-scale-1100">
-              Are you sure you want to delete the selected column? This action cannot be undone.
-            </p>
-          </Modal.Content>
-        }
         buttonLabel="Delete"
         buttonLoadingLabel="Deleting"
         onSelectCancel={() => setIsDeleting(false)}
         onSelectConfirm={onConfirmDeleteColumn}
-      />
+      >
+        <Modal.Content>
+          <p className="py-4 text-sm text-scale-1100">
+            Are you sure you want to delete the selected column? This action cannot be undone.
+          </p>
+        </Modal.Content>
+      </ConfirmationModal>
       <SidePanelEditor
         sidePanelKey={sidePanelKey}
         selectedSchema={selectedSchema}

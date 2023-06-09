@@ -1,12 +1,22 @@
 import { partition } from 'lodash'
 import { useState, useMemo } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Button, Menu, Input, IconSearch, IconPlus, IconX } from 'ui'
+import {
+  Button,
+  Menu,
+  Input,
+  IconSearch,
+  IconPlus,
+  IconX,
+  Dropdown,
+  IconChevronDown,
+  useCommandMenu,
+} from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useStore } from 'hooks'
+import { checkPermissions, useFlag, useStore } from 'hooks'
+import useProfile from 'hooks/misc/useProfile'
 import { IS_PLATFORM } from 'lib/constants'
-import { useProfileQuery } from 'data/profile/profile-query'
 import { uuidv4 } from 'lib/helpers'
 
 import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
@@ -17,13 +27,16 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import QueryItem from './QueryItem'
 import { createSqlSnippetSkeleton } from 'components/interfaces/SQLEditor/SQLEditor.utils'
 import { useRouter } from 'next/router'
+import { COMMAND_ROUTES } from 'ui/src/components/Command/Command.constants'
 
 const SideBarContent = observer(() => {
   const { ui } = useStore()
   const { ref, id } = useParams()
   const router = useRouter()
-  const { data: profile } = useProfileQuery()
+  const { data: profile } = useProfile()
   const [filterString, setFilterString] = useState('')
+  const { setPages, setIsOpen } = useCommandMenu()
+  const showCmdkHelper = useFlag('dashboardCmdk')
 
   const snap = useSqlEditorStateSnapshot()
   const { isLoading, isSuccess } = useSqlSnippetsQuery(ref, {
@@ -48,7 +61,6 @@ const SideBarContent = observer(() => {
     filterString.length === 0
       ? queries
       : queries.filter((tab) => tab.name.toLowerCase().includes(filterString.toLowerCase()))
-
   const canCreateSQLSnippet = checkPermissions(PermissionAction.CREATE, 'user_content', {
     resource: { type: 'sql', owner_id: profile?.id },
     subject: { id: profile?.id },
@@ -83,16 +95,50 @@ const SideBarContent = observer(() => {
       <Menu type="pills">
         {IS_PLATFORM && (
           <div className="my-4 mx-3 space-y-1 px-3">
-            <Button
-              block
-              icon={<IconPlus />}
-              type="default"
-              disabled={isLoading}
-              style={{ justifyContent: 'start' }}
-              onClick={() => handleNewQuery()}
-            >
-              New query
-            </Button>
+            <div className="flex items-center">
+              <Button
+                className={showCmdkHelper ? 'rounded-r-none px-3' : undefined}
+                block
+                icon={<IconPlus />}
+                type="default"
+                disabled={isLoading}
+                style={{ justifyContent: 'start' }}
+                onClick={() => handleNewQuery()}
+              >
+                New query
+              </Button>
+              {showCmdkHelper && (
+                <Dropdown
+                  align="end"
+                  side="bottom"
+                  sideOffset={3}
+                  className="max-w-[210px]"
+                  overlay={[
+                    <Dropdown.Item
+                      key="new-ai-query"
+                      onClick={() => {
+                        setIsOpen(true)
+                        setPages([COMMAND_ROUTES.GENERATE_SQL])
+                      }}
+                    >
+                      <div className="space-y-1">
+                        <p className="block text-scale-1200">New AI query</p>
+                        <p className="block text-scale-1100">
+                          Generate a SQL query using Supabase AI
+                        </p>
+                      </div>
+                    </Dropdown.Item>,
+                  ]}
+                >
+                  <Button
+                    disabled={isLoading}
+                    type="default"
+                    className="rounded-l-none px-[4px] py-[5px]"
+                    icon={<IconChevronDown />}
+                  />
+                </Dropdown>
+              )}
+            </div>
             <Input
               size="tiny"
               icon={<IconSearch size="tiny" />}
@@ -145,7 +191,7 @@ const SideBarContent = observer(() => {
               {queryTabs.length >= 1 && (
                 <div className="editor-product-menu">
                   <Menu.Group title="SQL snippets" />
-                  <div className="space-y-1">
+                  <div className="space-y-1 pb-8">
                     {queryTabs.map((tabInfo) => {
                       const { id } = tabInfo || {}
                       return <QueryItem key={id} tabInfo={tabInfo} />

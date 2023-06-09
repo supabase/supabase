@@ -1,4 +1,4 @@
-import { Button, Dropdown, IconChevronDown } from 'ui'
+import { Button, Dropdown, IconChevronDown, IconClipboard, IconDownload } from 'ui'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useStore } from 'hooks'
 import { copyToClipboard } from 'lib/helpers'
@@ -9,6 +9,8 @@ import { CSVLink } from 'react-csv'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 // @ts-ignore
 import MarkdownTable from 'markdown-table'
+import { useTelemetryProps } from 'common'
+import { useRouter } from 'next/router'
 
 export type ResultsDropdownProps = {
   id: string
@@ -17,9 +19,11 @@ export type ResultsDropdownProps = {
 const ResultsDropdown = ({ id }: ResultsDropdownProps) => {
   const { project } = useProjectContext()
   const snap = useSqlEditorStateSnapshot()
+  const telemetryProps = useTelemetryProps()
   const result = snap.results?.[id]?.[0] ?? undefined
   const { ui } = useStore()
   const csvRef = useRef<CSVLink & HTMLAnchorElement & { link: HTMLAnchorElement }>(null)
+  const router = useRouter()
 
   const csvData = useMemo(
     () => (result?.rows ? compact(Array.from(result.rows || [])) : ''),
@@ -30,7 +34,8 @@ const ResultsDropdown = ({ id }: ResultsDropdownProps) => {
     csvRef.current?.link.click()
     Telemetry.sendEvent(
       { category: 'sql_editor', action: 'sql_download_csv', label: '' },
-      ui.googleAnalyticsProps
+      telemetryProps,
+      router
     )
   }
 
@@ -53,7 +58,8 @@ const ResultsDropdown = ({ id }: ResultsDropdownProps) => {
         ui.setNotification({ category: 'success', message: 'Copied results to clipboard' })
         Telemetry.sendEvent(
           { category: 'sql_editor', action: 'sql_copy_as_markdown', label: '' },
-          ui.googleAnalyticsProps
+          telemetryProps,
+          router
         )
       })
     }
@@ -65,8 +71,12 @@ const ResultsDropdown = ({ id }: ResultsDropdownProps) => {
       align="start"
       overlay={
         <>
-          <Dropdown.Item onClick={onDownloadCSV}>Download CSV</Dropdown.Item>
-          <Dropdown.Item onClick={onCopyAsMarkdown}>Copy as markdown</Dropdown.Item>
+          <Dropdown.Item icon={<IconDownload size="tiny" />} onClick={onDownloadCSV}>
+            Download CSV
+          </Dropdown.Item>
+          <Dropdown.Item icon={<IconClipboard size="tiny" />} onClick={onCopyAsMarkdown}>
+            Copy as markdown
+          </Dropdown.Item>
         </>
       }
     >

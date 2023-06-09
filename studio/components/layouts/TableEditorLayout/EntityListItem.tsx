@@ -45,7 +45,7 @@ const EntityListItem = ({
       )}
     >
       <Link href={`/project/${projectRef}/editor/${entity.id}`}>
-        <a className="flex items-center py-1 px-3 w-full space-x-3">
+        <a className="flex items-center py-1 px-3 w-full space-x-3 max-w-[90%]">
           <Tooltip.Root delayDuration={0} disableHoverableContent={true}>
             <Tooltip.Trigger className="flex items-center">
               {entity.type === ENTITY_TYPE.TABLE ? (
@@ -98,11 +98,30 @@ const EntityListItem = ({
               </Tooltip.Content>
             </Tooltip.Portal>
           </Tooltip.Root>
-          <p
-            title={entity.name}
-            className="text-sm text-scale-1100 group-hover:text-scale-1200 transition"
-          >
-            {entity.name}
+          <p className="text-sm text-scale-1100 group-hover:text-scale-1200 transition max-w-[85%] overflow-hidden text-ellipsis whitespace-nowrap">
+            {/* only show tooltips if required, to reduce noise */}
+            {entity.name.length > 20 ? (
+              <Tooltip.Root delayDuration={0} disableHoverableContent={true}>
+                <Tooltip.Trigger className="max-w-[95%] overflow-hidden text-ellipsis whitespace-nowrap">
+                  {entity.name}
+                </Tooltip.Trigger>
+                <Tooltip.Portal>
+                  <Tooltip.Content side="bottom">
+                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                    <div
+                      className={[
+                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                        'border border-scale-200',
+                      ].join(' ')}
+                    >
+                      <span className="text-xs text-scale-1200">{entity.name}</span>
+                    </div>
+                  </Tooltip.Content>
+                </Tooltip.Portal>
+              </Tooltip.Root>
+            ) : (
+              entity.name
+            )}
           </p>
         </a>
       </Link>
@@ -135,7 +154,10 @@ const EntityListItem = ({
               >
                 Duplicate Table
               </Dropdown.Item>,
-              <Link href={`/project/${projectRef}/auth/policies?search=${entity.id}`}>
+              <Link
+                key="view-policies"
+                href={`/project/${projectRef}/auth/policies?search=${entity.id}`}
+              >
                 <a>
                   <Dropdown.Item key="delete-table" icon={<IconLock size="tiny" />}>
                     View Policies

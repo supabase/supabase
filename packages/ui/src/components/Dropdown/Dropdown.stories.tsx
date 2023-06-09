@@ -1,19 +1,15 @@
 import React, { useState } from 'react'
-import { Button } from '../Button'
-import { Divider } from '../Divider'
-import {
-  IconSettings,
-  IconLogOut,
-  IconChevronDown,
-  IconChevronRight,
-  IconHardDrive,
-} from './../../index'
-import Typography from '../Typography'
-
 import { Dropdown } from './'
-import { IconLogIn } from '../Icon/icons/IconLogIn'
+import { Button } from '../Button'
 import { Input } from '../Input'
-import { IconSearch } from '../Icon/icons/IconSearch'
+
+import { IconSettings } from './../Icon/icons/IconSettings'
+import { IconLogOut } from './../Icon/icons/IconLogOut'
+import { IconChevronDown } from './../Icon/icons/IconChevronDown'
+import { IconChevronRight } from './../Icon/icons/IconChevronRight'
+import { IconHardDrive } from './../Icon/icons/IconHardDrive'
+import { IconLogIn } from './../Icon/icons/IconLogIn'
+import { IconSearch } from './../Icon/icons/IconSearch'
 
 export default {
   title: 'Navigation/Dropdown',
@@ -29,17 +25,20 @@ const DemoContainer = ({ children }: { children: React.ReactNode }) => (
   >
     <div
       className="
+      bg border 
+
       p-3 px-5 
-      bg-scale-300 border border-scale-600 rounded flex gap-4 
+      shadow-sm 
+      rounded-md 
+      flex 
+      gap-4 
       justify-between
       items-center
       w-3/4
       "
     >
       <div>
-        <h4 className="text-scale-1200 text-base">
-          Shall we nest some components?
-        </h4>
+        <h4 className="text-scale-1200 text-base">Shall we nest some components?</h4>
         <p className="text-scale-1100 text-sm">yea sure, go on then.</p>
       </div>
       <div className="relative">{children}</div>
@@ -59,20 +58,14 @@ export const DefaultFull = (args: any) => {
         overlay={[
           <Dropdown.Misc>
             <div>
-              <Typography.Text small className="block">
-                Signed in as{' '}
-              </Typography.Text>
+              <span className="block text-body">Signed in as </span>
 
-              <Typography.Text small strong>
-                tom@example.com{' '}
-              </Typography.Text>
+              <span className="text-body-light">tom@example.com </span>
             </div>
           </Dropdown.Misc>,
           <Dropdown.Separator />,
           <Dropdown.Label>Group label</Dropdown.Label>,
-          <Dropdown.Item onClick={() => console.log('clicked')}>
-            Account
-          </Dropdown.Item>,
+          <Dropdown.Item onClick={() => console.log('clicked')}>Account</Dropdown.Item>,
           <Dropdown.Item>
             Settings <Dropdown.RightSlot>⌘+T</Dropdown.RightSlot>
           </Dropdown.Item>,
@@ -97,9 +90,7 @@ export const DefaultFull = (args: any) => {
               </Dropdown.RadioGroup>,
               <Dropdown.Separator />,
               <Dropdown.Label>Group label</Dropdown.Label>,
-              <Dropdown.Item onClick={() => console.log('clicked')}>
-                Account
-              </Dropdown.Item>,
+              <Dropdown.Item onClick={() => console.log('clicked')}>Account</Dropdown.Item>,
               <Dropdown.Item>
                 Settings <Dropdown.RightSlot>⌘+T</Dropdown.RightSlot>
               </Dropdown.Item>,
@@ -113,9 +104,7 @@ export const DefaultFull = (args: any) => {
             </Dropdown.TriggerItem>
           </Dropdown>,
           <Dropdown.Separator />,
-          <Dropdown.Item icon={<IconLogIn size="tiny" />}>
-            Log out
-          </Dropdown.Item>,
+          <Dropdown.Item icon={<IconLogIn size="tiny" />}>Log out</Dropdown.Item>,
         ]}
       >
         <Button as="span" type="default" iconRight={<IconChevronDown />}>
@@ -133,20 +122,14 @@ export const Default = (args: any) => (
       overlay={[
         <Dropdown.Misc>
           <div>
-            <Typography.Text small className="block">
-              Signed in as{' '}
-            </Typography.Text>
+            <span className="block">Signed in as </span>
 
-            <Typography.Text small strong>
-              tom@example.com{' '}
-            </Typography.Text>
+            <span>tom@example.com </span>
           </div>
         </Dropdown.Misc>,
         <Dropdown.Separator />,
         <Dropdown.Label>Group label</Dropdown.Label>,
-        <Dropdown.Item onClick={() => console.log('clicked')}>
-          Account
-        </Dropdown.Item>,
+        <Dropdown.Item onClick={() => console.log('clicked')}>Account</Dropdown.Item>,
         <Dropdown.Item>
           Settings <Dropdown.RightSlot>⌘+T</Dropdown.RightSlot>
         </Dropdown.Item>,
@@ -169,8 +152,8 @@ export const doNotcloseOverlay = (args: any) => (
       {...args}
       overlay={[
         <Dropdown.Misc>
-          <Typography.Text>Signed in as </Typography.Text>
-          <Typography.Text strong>tom@example.com </Typography.Text>
+          <span>Signed in as </span>
+          <span>tom@example.com </span>
         </Dropdown.Misc>,
         <Dropdown.Separator />,
         <Dropdown.Item>Account</Dropdown.Item>,
@@ -204,8 +187,8 @@ export const withCustomStyles = (args: any) => (
       {...args}
       overlay={[
         <Dropdown.Item>
-          <Typography.Text>Signed in as </Typography.Text>
-          <Typography.Text strong>tom@example.com </Typography.Text>
+          <span>Signed in as </span>
+          <span>tom@example.com </span>
         </Dropdown.Item>,
         <Dropdown.Separator />,
         <Dropdown.Item>Account</Dropdown.Item>,
@@ -232,20 +215,20 @@ export const SearchList = (args: any) => (
     <Dropdown
       {...args}
       overlay={[
+        <Dropdown.Misc>
+          <Input size="tiny" icon={<IconSearch size={14} />} autoFocus={false} />
+        </Dropdown.Misc>,
         <Dropdown.Item>
-          <Input size="tiny" icon={<IconSearch />} autofocus={false} />
+          <span>Signed in as </span>
+          <span>tom@example.com </span>
         </Dropdown.Item>,
         <Dropdown.Item>
-          <Typography.Text>Signed in as </Typography.Text>
-          <Typography.Text strong>tom@example.com </Typography.Text>
-        </Dropdown.Item>,
-        <Dropdown.Item>
-          <Typography.Text>Signed in as </Typography.Text>
-          <Typography.Text strong>tom@example.com </Typography.Text>
+          <span>Signed in as </span>
+          <span>tom@example.com </span>
         </Dropdown.Item>,
         <Dropdown.Separator />,
         <Dropdown.Item icon={<IconLogIn />}>
-          <Typography.Text>Log out</Typography.Text>
+          <span>Log out</span>
         </Dropdown.Item>,
       ]}
     >
@@ -266,9 +249,7 @@ export const Checkbox = (args: any) => {
       <Dropdown
         {...args}
         overlay={[
-          <Dropdown.Item icon={<IconSettings size="small" />}>
-            Account
-          </Dropdown.Item>,
+          <Dropdown.Item icon={<IconSettings size="small" />}>Account</Dropdown.Item>,
           <Dropdown.Item>Settings</Dropdown.Item>,
           <Dropdown.Separator />,
           <Dropdown.Checkbox checked={checked} onChange={setChecked}>

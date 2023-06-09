@@ -1,19 +1,7 @@
 import Link from 'next/link'
 import { FC, useEffect, useState } from 'react'
 import { isUndefined, isEmpty } from 'lodash'
-import {
-  Badge,
-  Checkbox,
-  SidePanel,
-  Input,
-  Alert,
-  IconBookOpen,
-  Button,
-  Modal,
-  IconShieldOff,
-  IconLock,
-  IconAlertOctagon,
-} from 'ui'
+import { Badge, Checkbox, SidePanel, Input, Alert, IconBookOpen, Button, Modal } from 'ui'
 import type { PostgresTable, PostgresType } from '@supabase/postgres-meta'
 
 import { useStore } from 'hooks'
@@ -195,12 +183,6 @@ const TableEditor: FC<Props> = ({
           applyFunction={(resolve: () => void) => onSaveChanges(resolve)}
         />
       }
-      onInteractOutside={(event) => {
-        const isToast = (event.target as Element)?.closest('#toast')
-        if (isToast) {
-          event.preventDefault()
-        }
-      }}
     >
       <>
         <SidePanel.Content>
@@ -270,7 +252,7 @@ const TableEditor: FC<Props> = ({
                 )}
                 <p className="mt-4">
                   <Link href="https://supabase.com/docs/guides/auth/row-level-security">
-                    <a target="_blank">
+                    <a target="_blank" rel="noreferrer">
                       <Button type="default" icon={<IconBookOpen strokeWidth={1.5} />}>
                         RLS Documentation
                       </Button>
@@ -285,10 +267,13 @@ const TableEditor: FC<Props> = ({
                 className="!px-4 !py-3 mt-3"
                 title="You are allowing anonymous access to your table"
               >
-                <p>The table foo will be publicly writable and readable</p>
+                <p>
+                  {tableFields.name ? `The table ${tableFields.name}` : 'Your table'} will be
+                  publicly writable and readable
+                </p>
                 <p className="mt-4">
                   <Link href="https://supabase.com/docs/guides/auth/row-level-security">
-                    <a target="_blank">
+                    <a target="_blank" rel="noreferrer">
                       <Button type="default" icon={<IconBookOpen strokeWidth={1.5} />}>
                         RLS Documentation
                       </Button>
@@ -359,12 +344,11 @@ const TableEditor: FC<Props> = ({
                 onUpdateField({ isRLSEnabled: !tableFields.isRLSEnabled })
                 setRlsConfirmVisible(false)
               }}
-              children={
-                <Modal.Content>
-                  <RLSDisableModalContent />
-                </Modal.Content>
-              }
-            />
+            >
+              <Modal.Content>
+                <RLSDisableModalContent />
+              </Modal.Content>
+            </ConfirmationModal>
           </div>
         </SidePanel.Content>
       </>

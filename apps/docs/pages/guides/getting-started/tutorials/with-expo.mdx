@@ -44,22 +44,22 @@ We need the API URL and the `anon` key that you copied [earlier](#get-the-api-ke
 These variables will be exposed on the browser, and that's completely fine since we have
 [Row Level Security](/docs/guides/auth#row-level-security) enabled on our Database.
 
-```ts title=lib/supabase.ts
-import * as SecureStore from "expo-secure-store";
+```ts lib/supabase.ts
+import 'react-native-url-polyfill/auto'
+import * as SecureStore from 'expo-secure-store'
 import { createClient } from '@supabase/supabase-js'
-
 
 const ExpoSecureStoreAdapter = {
   getItem: (key: string) => {
-    return SecureStore.getItemAsync(key);
+    return SecureStore.getItemAsync(key)
   },
   setItem: (key: string, value: string) => {
-    SecureStore.setItemAsync(key, value);
+    SecureStore.setItemAsync(key, value)
   },
   removeItem: (key: string) => {
-    SecureStore.deleteItemAsync(key);
+    SecureStore.deleteItemAsync(key)
   },
-};
+}
 
 const supabaseUrl = YOUR_REACT_NATIVE_SUPABASE_URL
 const supabaseAnonKey = YOUR_REACT_NATIVE_SUPABASE_ANON_KEY
@@ -79,7 +79,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 Let's set up a React Native component to manage logins and sign ups.
 Users would be able to sign in with their email and password.
 
-```tsx title=components/Auth.tsx
+```tsx components/Auth.tsx
 import React, { useState } from 'react'
 import { Alert, StyleSheet, View } from 'react-native'
 import { supabase } from '../lib/supabase'
@@ -167,7 +167,7 @@ After a user is signed in we can allow them to edit their profile details and ma
 
 Let's create a new component for that called `Account.tsx`.
 
-```tsx title=components/Account.tsx
+```tsx components/Account.tsx
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { StyleSheet, View, Alert } from 'react-native'
@@ -294,7 +294,7 @@ const styles = StyleSheet.create({
 
 Now that we have all the components in place, let's update `App.tsx`:
 
-```tsx title=App.tsx
+```tsx App.tsx
 import 'react-native-url-polyfill/auto'
 import { useState, useEffect } from 'react'
 import { supabase } from './lib/supabase'
@@ -350,7 +350,7 @@ expo install react-native-document-picker
 Let's create an avatar for the user so that they can upload a profile photo.
 We can start by creating a new component:
 
-```tsx title=components/Avatar.tsx
+```tsx components/Avatar.tsx
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { StyleSheet, View, Alert, Image, Button } from 'react-native'
@@ -481,7 +481,7 @@ const styles = StyleSheet.create({
 
 And then we can add the widget to the Account page:
 
-```tsx title=components/Account.tsx
+```tsx components/Account.tsx
 // Import the new component
 import Avatar from './Avatar'
 

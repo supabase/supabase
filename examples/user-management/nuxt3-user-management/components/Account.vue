@@ -11,7 +11,7 @@
         </div>
         <div>
             <label for="website">Website</label>
-            <input id="website" type="website" v-model="website" />
+            <input id="website" type="url" v-model="website" />
         </div>
 
         <div>

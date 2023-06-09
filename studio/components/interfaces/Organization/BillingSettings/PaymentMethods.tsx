@@ -28,6 +28,7 @@ interface Props {
   paymentMethods: any[]
   onDefaultMethodUpdated: (updatedCustomer: any) => void
   onPaymentMethodsDeleted: () => void
+  onPaymentMethodAdded: () => void
 }
 
 const PaymentMethods: FC<Props> = ({
@@ -36,6 +37,7 @@ const PaymentMethods: FC<Props> = ({
   paymentMethods,
   onDefaultMethodUpdated,
   onPaymentMethodsDeleted,
+  onPaymentMethodAdded,
 }) => {
   const { ui } = useStore()
   const orgSlug = ui.selectedOrganization?.slug ?? ''
@@ -99,6 +101,11 @@ const PaymentMethods: FC<Props> = ({
     }
   }
 
+  const onLocalPaymentMethodAdded = () => {
+    setShowAddPaymentMethodModal(false)
+    return onPaymentMethodAdded()
+  }
+
   return (
     <>
       <div className="space-y-2">
@@ -158,6 +165,7 @@ const PaymentMethods: FC<Props> = ({
                       <div key={paymentMethod.id} className="flex items-center justify-between">
                         <div className="flex items-center space-x-8">
                           <img
+                            alt="Credit card brand"
                             src={`${BASE_PATH}/img/payment-methods/${paymentMethod.card.brand
                               .replace(' ', '-')
                               .toLowerCase()}.png`}
@@ -252,6 +260,7 @@ const PaymentMethods: FC<Props> = ({
         visible={showAddPaymentMethodModal}
         returnUrl={`${getURL()}/org/${orgSlug}/billing`}
         onCancel={() => setShowAddPaymentMethodModal(false)}
+        onConfirm={() => onLocalPaymentMethodAdded()}
       />
 
       <Modal

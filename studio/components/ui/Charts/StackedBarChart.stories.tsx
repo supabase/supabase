@@ -65,8 +65,8 @@ export const StackedBarChart = () => (
         { title: 'Value format (c suffix)', props: { format: 'c' } },
         { title: 'Minimal Value format', props: { minimalHeader: true, format: 'c' } },
         { title: 'No data', props: { data: [] } },
-      ].map(({ title, props }) => (
-        <div className="w-72 h-72">
+      ].map(({ title, props }, i) => (
+        <div key={i} className="w-72 h-72">
           <ExampleName>{title}</ExampleName>
           <div className="w-full h-full mt-4">
             <Chart {...PROPS} {...props} />

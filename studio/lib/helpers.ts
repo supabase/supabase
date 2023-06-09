@@ -49,7 +49,7 @@ export const getURL = () => {
       ? process.env.NEXT_PUBLIC_SITE_URL
       : process?.env?.VERCEL_URL && process.env.VERCEL_URL !== ''
       ? process.env.VERCEL_URL
-      : 'https://app.supabase.com'
+      : 'https://supabase.com/dashboard'
   return url.includes('http') ? url : `https://${url}`
 }
 
@@ -136,15 +136,17 @@ export const propsAreEqual = (prevProps: any, nextProps: any) => {
   }
 }
 
-export const formatBytes = (bytes: any, decimals = 2) => {
-  if (bytes === 0 || bytes === undefined) return '0 bytes'
-
+export const formatBytes = (
+  bytes: any,
+  decimals = 2,
+  size?: 'bytes' | 'KB' | 'MB' | 'GB' | 'TB' | 'PB' | 'EB' | 'ZB' | 'YB'
+) => {
   const k = 1024
   const dm = decimals < 0 ? 0 : decimals
   const sizes = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
 
-  const i = Math.floor(Math.log(bytes) / Math.log(k))
-
+  if (bytes === 0 || bytes === undefined) return size !== undefined ? `0 ${size}` : '0 bytes'
+  const i = size !== undefined ? sizes.indexOf(size) : Math.floor(Math.log(bytes) / Math.log(k))
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
 }
 
@@ -153,10 +155,26 @@ export const snakeToCamel = (str: string) =>
     group.toUpperCase().replace('-', '').replace('_', '')
   )
 
-export const copyToClipboard = (str: string, callback = () => {}) => {
+/**
+ * Copy text content (string or Promise<string>) into Clipboard.
+ * Safari doesn't support write text into clipboard async, so if you need to load
+ * text content async before coping, please use Promise<string> for the 1st arg.
+ */
+export const copyToClipboard = (str: string | Promise<string>, callback = () => {}) => {
   const focused = window.document.hasFocus()
   if (focused) {
-    window.navigator?.clipboard?.writeText(str).then(callback)
+    if (window.ClipboardItem) {
+      const text = new ClipboardItem({
+        'text/plain': Promise.resolve(str).then((text) => new Blob([text], { type: 'text/plain' })),
+      })
+      window.navigator?.clipboard?.write([text]).then(callback)
+
+      return
+    }
+
+    Promise.resolve(str)
+      .then((text) => window.navigator?.clipboard?.writeText(text))
+      .then(callback)
   } else {
     console.warn('Unable to copy to clipboard')
   }

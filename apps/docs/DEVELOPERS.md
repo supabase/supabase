@@ -45,7 +45,7 @@ You can use any standard React components in these `.mdx` files without having t
 
 ### Reference docs for client libraries
 
-We maintain client libraries for [Javascript](https://supabase.com/docs/reference/javascript) and [Flutter/Dart](https://supabase.com/docs/reference/dart) (with more to come). These reference docs document every object and method available for developers to use. The are assembled from different sources and work much differently than the `.mdx` Guides we just looked at.
+We maintain client libraries for [JavaScript](https://supabase.com/docs/reference/javascript) and [Flutter/Dart](https://supabase.com/docs/reference/dart) (with more to come). These reference docs document every object and method available for developers to use. They are assembled from different sources and work much differently than the `.mdx` Guides we just looked at.
 
 The client libraries are essentially wrappers around the clients for the various tools we use — GoTrue, PostgREST, Storage, Functions, and Realtime. The easiest way to describe how the things fit together is to look at an example and trace where the various pieces of information are coming from.
 
@@ -96,4 +96,6 @@ On the Next.JS side of things, these work almost exactly the same as the client 
 
 #### Search
 
-Search is handled through Algolia. When the site is built, a [search script](https://github.com/supabase/supabase/blob/master/apps/docs/scripts/build-search.ts) runs through all of the types of content, generating search objects that are sent to Algolia to index.
+Search is handled using a Supabase instance. During CI, [a script](https://github.com/supabase/supabase/blob/master/apps/docs/scripts/search/generate-embeddings.ts) aggregates all content sources (eg. guides, reference docs, etc), indexes them using OpenAI embeddings, and stores them in a Supabase database.
+
+At runtime, an [Edge Function](https://github.com/supabase/supabase/blob/master/supabase/functions) is executed that performs a similarity search between the user's query and the above content sources using [`pgvector`](https://github.com/pgvector/pgvector) embeddings.

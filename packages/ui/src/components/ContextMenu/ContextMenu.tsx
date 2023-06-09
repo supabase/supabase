@@ -1,10 +1,6 @@
 import React, { useState } from 'react'
 
-// import * as RadixContextMenu from '@radix-ui/react-dropdown-menu'
 import { IconCheck } from '../Icon/icons/IconCheck'
-
-// @ts-ignore
-// import ContextMenuStyles from './ContextMenu.module.css'
 
 import type * as RadixContextMenuTypes from '@radix-ui/react-context-menu/'
 

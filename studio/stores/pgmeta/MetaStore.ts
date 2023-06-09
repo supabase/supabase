@@ -13,7 +13,7 @@ import type {
 
 import { IS_PLATFORM, API_URL } from 'lib/constants'
 import { post } from 'lib/common/fetch'
-import { timeout } from 'lib/helpers'
+import { timeout, tryParseJson } from 'lib/helpers'
 import { ResponseError } from 'types'
 
 import { IRootStore } from '../RootStore'
@@ -137,6 +137,12 @@ export interface IMetaStore {
     selectedHeaders: string[],
     onProgressUpdate: (progress: number) => void
   ) => void
+  insertTableRows: (
+    table: PostgresTable,
+    rows: any,
+    selectedHeaders: string[],
+    onProgressUpdate: (progress: number) => void
+  ) => any
   setProjectDetails: (details: { ref: string; connectionString?: string }) => void
 }
 export default class MetaStore implements IMetaStore {
@@ -172,9 +178,11 @@ export default class MetaStore implements IMetaStore {
     'pgsodium',
     'pgsodium_masks',
     'pgbouncer',
+    'pgtle',
     'realtime',
     'storage',
     'supabase_functions',
+    'supabase_migrations',
     'vault',
     'graphql',
     'graphql_public',
@@ -282,8 +290,8 @@ export default class MetaStore implements IMetaStore {
   }
 
   async addPrimaryKey(schema: string, table: string, columns: string[]) {
-    const primaryKeyColumns = columns.join(',')
-    const query = `ALTER TABLE "${schema}"."${table}" ADD PRIMARY KEY (${primaryKeyColumns})`
+    const primaryKeyColumns = columns.join('","')
+    const query = `ALTER TABLE "${schema}"."${table}" ADD PRIMARY KEY ("${primaryKeyColumns}")`
     return await this.query(query)
   }
 
@@ -463,8 +471,6 @@ export default class MetaStore implements IMetaStore {
         category: 'error',
         message: `An error occurred while creating the column "${payload.name}"`,
       })
-      const query = `alter table "${selectedTable.name}" drop column if exists "${payload.name}";`
-      await this.rootStore.meta.query(query)
       return { error }
     }
   }
@@ -495,11 +501,15 @@ export default class MetaStore implements IMetaStore {
           const removePK = await this.removePrimaryKey(column.schema, column.table)
           if (removePK.error) throw removePK.error
         }
+
         const primaryKeyColumns = isPrimaryKey
           ? existingPrimaryKeys.concat([column.name])
           : existingPrimaryKeys.filter((x) => x !== column.name)
-        const addPK = await this.addPrimaryKey(column.schema, column.table, primaryKeyColumns)
-        if (addPK.error) throw addPK.error
+
+        if (primaryKeyColumns.length) {
+          const addPK = await this.addPrimaryKey(column.schema, column.table, primaryKeyColumns)
+          if (addPK.error) throw addPK.error
+        }
       }
 
       // For updating of foreign key relationship, we remove the original one by default
@@ -644,7 +654,7 @@ export default class MetaStore implements IMetaStore {
       // Then add the primary key constraints here to support composite keys
       const primaryKeyColumns = columns
         .filter((column: ColumnField) => column.isPrimaryKey)
-        .map((column: ColumnField) => `"${column.name}"`)
+        .map((column: ColumnField) => column.name)
       if (primaryKeyColumns.length > 0) {
         const primaryKeys = await this.addPrimaryKey(table.schema, table.name, primaryKeyColumns)
         if (primaryKeys.error) throw primaryKeys.error
@@ -699,14 +709,21 @@ export default class MetaStore implements IMetaStore {
           }
         } else {
           // Via text copy and paste
-          await this.insertTableRows(table, importContent.rows, (progress: number) => {
-            this.rootStore.ui.setNotification({
-              id: toastId,
-              progress,
-              category: 'loading',
-              message: `Adding ${importContent.rows.length.toLocaleString()} rows to ${table.name}`,
-            })
-          })
+          await this.insertTableRows(
+            table,
+            importContent.rows,
+            importContent.selectedHeaders,
+            (progress: number) => {
+              this.rootStore.ui.setNotification({
+                id: toastId,
+                progress,
+                category: 'loading',
+                message: `Adding ${importContent.rows.length.toLocaleString()} rows to ${
+                  table.name
+                }`,
+              })
+            }
+          )
 
           // For identity columns, manually raise the sequences
           const identityColumns = columns.filter((column) => column.isIdentity)
@@ -737,11 +754,9 @@ export default class MetaStore implements IMetaStore {
     // Prepare a check to see if primary keys to the tables were updated or not
     const primaryKeyColumns = columns
       .filter((column) => column.isPrimaryKey)
-      .map((column) => `"${column.name}"`)
+      .map((column) => column.name)
     // @ts-ignore
-    const existingPrimaryKeyColumns = table.primary_keys.map(
-      (pk: PostgresPrimaryKey) => `"${pk.name}"`
-    )
+    const existingPrimaryKeyColumns = table.primary_keys.map((pk: PostgresPrimaryKey) => pk.name)
     const isPrimaryKeyUpdated = !isEqual(primaryKeyColumns, existingPrimaryKeyColumns)
 
     if (isPrimaryKeyUpdated) {
@@ -866,7 +881,17 @@ export default class MetaStore implements IMetaStore {
 
           const formattedData = results.data.map((row: any) => {
             const formattedRow: any = {}
-            selectedHeaders.forEach((header) => (formattedRow[header] = row[header]))
+            selectedHeaders.forEach((header) => {
+              const column = table.columns?.find((c) => c.name === header)
+              if (
+                (column?.data_type ?? '') === 'ARRAY' ||
+                (column?.format ?? '').includes('json')
+              ) {
+                formattedRow[header] = tryParseJson(row[header])
+              } else {
+                formattedRow[header] = row[header]
+              }
+            })
             return formattedRow
           })
 
@@ -900,11 +925,26 @@ export default class MetaStore implements IMetaStore {
   async insertTableRows(
     table: PostgresTable,
     rows: any,
+    selectedHeaders: string[],
     onProgressUpdate: (progress: number) => void
   ) {
     let insertError = undefined
     let insertProgress = 0
-    const batches = chunk(rows, BATCH_SIZE)
+
+    const formattedRows = rows.map((row: any) => {
+      const formattedRow: any = {}
+      selectedHeaders.forEach((header) => {
+        const column = table.columns?.find((c) => c.name === header)
+        if ((column?.data_type ?? '') === 'ARRAY' || (column?.format ?? '').includes('json')) {
+          formattedRow[header] = tryParseJson(row[header])
+        } else {
+          formattedRow[header] = row[header]
+        }
+      })
+      return formattedRow
+    })
+
+    const batches = chunk(formattedRows, BATCH_SIZE)
     const promises = batches.map((batch: any) => {
       return () => {
         return Promise.race([
@@ -928,11 +968,10 @@ export default class MetaStore implements IMetaStore {
     for (const batchedPromise of batchedPromises) {
       const res = await Promise.allSettled(batchedPromise.map((batch) => batch()))
       const hasFailedBatch = find(res, { status: 'rejected' })
-      if (hasFailedBatch) {
-        break
-      }
+      if (hasFailedBatch) break
       onProgressUpdate(insertProgress * 100)
     }
+    return { error: insertError }
   }
 
   setProjectDetails({ ref, connectionString }: { ref: string; connectionString?: string }) {

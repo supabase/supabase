@@ -3,18 +3,35 @@ import type {
   CreateChatCompletionResponse,
   CreateChatCompletionResponseChoicesInner,
 } from 'openai'
-import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useReducer,
+  useRef,
+  useState,
+} from 'react'
 
 import { SSE } from 'sse.js'
 
-import { Button, IconAlertTriangle, IconCornerDownLeft, IconUser, Input } from 'ui'
+import {
+  Button,
+  IconAlertTriangle,
+  IconCornerDownLeft,
+  IconUser,
+  Input,
+  markdownComponents,
+} from 'ui'
 import { AiIcon, AiIconChat } from './Command.icons'
-import { CommandGroup, CommandItem } from './Command.utils'
+import { CommandGroup, CommandItem, useAutoInputFocus, useHistoryKeys } from './Command.utils'
 
+import { AiWarning } from './Command.alerts'
 import { useCommandMenu } from './CommandMenuProvider'
 
+import ReactMarkdown from 'react-markdown'
 import { cn } from './../../utils/cn'
-import { COMMAND_ROUTES } from './Command.constants'
+import remarkGfm from 'remark-gfm'
 
 const questions = [
   'How do I get started with Supabase?',
@@ -52,18 +69,18 @@ function getEdgeFunctionUrl() {
 
 const edgeFunctionUrl = getEdgeFunctionUrl()
 
-enum MessageRole {
+export enum MessageRole {
   User = 'user',
   Assistant = 'assistant',
 }
 
-enum MessageStatus {
+export enum MessageStatus {
   Pending = 'pending',
   InProgress = 'in-progress',
   Complete = 'complete',
 }
 
-interface Message {
+export interface Message {
   role: MessageRole
   content: string
   status: MessageStatus
@@ -86,7 +103,11 @@ interface AppendContentAction {
   content: string
 }
 
-type MessageAction = NewMessageAction | UpdateMessageAction | AppendContentAction
+interface ResetAction {
+  type: 'reset'
+}
+
+type MessageAction = NewMessageAction | UpdateMessageAction | AppendContentAction | ResetAction
 
 function messageReducer(state: Message[], messageAction: MessageAction) {
   let current = [...state]
@@ -100,12 +121,20 @@ function messageReducer(state: Message[], messageAction: MessageAction) {
     }
     case 'update': {
       const { index, message } = messageAction
-      Object.assign(current[index], message)
+      if (current[index]) {
+        Object.assign(current[index], message)
+      }
       break
     }
     case 'append-content': {
       const { index, content } = messageAction
-      current[index].content += content
+      if (current[index]) {
+        current[index].content += content
+      }
+      break
+    }
+    case 'reset': {
+      current = []
       break
     }
     default: {
@@ -116,21 +145,27 @@ function messageReducer(state: Message[], messageAction: MessageAction) {
   return current
 }
 
-const AiCommand = () => {
+export interface UseAiChatOptions {
+  messageTemplate?: (message: string) => string
+  setIsLoading?: Dispatch<SetStateAction<boolean>>
+}
+
+export function useAiChat({
+  messageTemplate = (message) => message,
+  setIsLoading,
+}: UseAiChatOptions) {
+  const eventSourceRef = useRef<SSE>()
+
   const [isResponding, setIsResponding] = useState(false)
   const [hasError, setHasError] = useState(false)
-  const eventSourceRef = useRef<SSE>()
-  const { isLoading, setIsLoading, currentPage, search, setSearch, MarkdownHandler } =
-    useCommandMenu()
 
   const [currentMessageIndex, setCurrentMessageIndex] = useState(1)
   const [messages, dispatchMessage] = useReducer(messageReducer, [])
 
-  const handleConfirm = useCallback(
+  const submit = useCallback(
     async (query: string) => {
       if (!edgeFunctionUrl) return console.error('No edge function url')
 
-      setSearch('')
       dispatchMessage({
         type: 'new',
         message: {
@@ -149,30 +184,7 @@ const AiCommand = () => {
       })
       setIsResponding(false)
       setHasError(false)
-      setIsLoading(true)
-
-      let queryToSend = query
-
-      switch (currentPage) {
-        case COMMAND_ROUTES.AI:
-          queryToSend = query
-          break
-        case COMMAND_ROUTES.AI_ASK_ANYTHING:
-          queryToSend = query
-          break
-
-        case COMMAND_ROUTES.AI_RLS_POLICY:
-          queryToSend = `Given this table schema:
-
-          Schema STRIPE has tables:
-            CHARGE with columns [ID, AMOUNT, CREATED, CURRENCY, CUSTOMER_ID]
-            CUSTOMER with columns [ID, NAME, CREATED, SHIPPING_ADDRESS_STATE]
-
-          \n\nAnswer with only an RLS policy in SQL, no other text: ${query}`
-          break
-        default:
-          break
-      }
+      setIsLoading?.(true)
 
       const eventSource = new SSE(`${edgeFunctionUrl}/ai-docs`, {
         headers: {
@@ -184,21 +196,21 @@ const AiCommand = () => {
           messages: messages
             .filter(({ status }) => status === MessageStatus.Complete)
             .map(({ role, content }) => ({ role, content }))
-            .concat({ role: MessageRole.User, content: query }),
+            .concat({ role: MessageRole.User, content: messageTemplate(query) }),
         }),
       })
 
       function handleError<T>(err: T) {
-        setIsLoading(false)
+        setIsLoading?.(false)
         setIsResponding(false)
         setHasError(true)
         console.error(err)
       }
 
       eventSource.addEventListener('error', handleError)
-      eventSource.addEventListener('message', (e: any) => {
+      eventSource.addEventListener('message', (e) => {
         try {
-          setIsLoading(false)
+          setIsLoading?.(false)
 
           if (e.data === '[DONE]') {
             setIsResponding(false)
@@ -230,13 +242,13 @@ const AiCommand = () => {
             },
           ] = completionResponse.choices as CreateChatCompletionResponseChoicesInnerDelta[]
 
-          const text = content ?? ''
-
-          dispatchMessage({
-            type: 'append-content',
-            index: currentMessageIndex,
-            content: text,
-          })
+          if (content) {
+            dispatchMessage({
+              type: 'append-content',
+              index: currentMessageIndex,
+              content,
+            })
+          }
         } catch (err) {
           handleError(err)
         }
@@ -246,28 +258,136 @@ const AiCommand = () => {
 
       eventSourceRef.current = eventSource
 
-      setIsLoading(true)
+      setIsLoading?.(true)
     },
-    [currentMessageIndex, messages]
+    [currentMessageIndex, messages, messageTemplate]
   )
 
-  function handleResetPrompt() {
+  function reset() {
     eventSourceRef.current?.close()
     eventSourceRef.current = undefined
-    setSearch('')
     setIsResponding(false)
     setHasError(false)
+    dispatchMessage({
+      type: 'reset',
+    })
   }
+
+  return {
+    submit,
+    reset,
+    messages,
+    isResponding,
+    hasError,
+  }
+}
+
+/**
+ * Perform a one-off query to AI based on a snapshot of messages
+ */
+export function queryAi(messages: Message[], timeout = 0) {
+  return new Promise<string>((resolve, reject) => {
+    const eventSource = new SSE(`${edgeFunctionUrl}/ai-docs`, {
+      headers: {
+        apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '',
+        Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      payload: JSON.stringify({
+        messages: messages.map(({ role, content }) => ({ role, content })),
+      }),
+    })
+
+    let timeoutId: number | undefined
+
+    function handleError<T>(err: T) {
+      if (timeoutId) {
+        clearTimeout(timeoutId)
+      }
+      console.error(err)
+      reject(err)
+    }
+
+    if (timeout > 0) {
+      timeoutId = window.setTimeout(() => {
+        handleError(new Error('AI query timed out'))
+      }, timeout)
+    }
+
+    let answer = ''
+
+    eventSource.addEventListener('error', handleError)
+    eventSource.addEventListener('message', (e) => {
+      try {
+        if (e.data === '[DONE]') {
+          if (timeoutId) {
+            clearTimeout(timeoutId)
+          }
+          resolve(answer)
+          return
+        }
+
+        const completionResponse: CreateChatCompletionResponse = JSON.parse(e.data)
+        const [
+          {
+            delta: { content },
+          },
+        ] = completionResponse.choices as CreateChatCompletionResponseChoicesInnerDelta[]
+
+        if (content) {
+          answer += content
+        }
+      } catch (err) {
+        handleError(err)
+      }
+    })
+
+    eventSource.stream()
+  })
+}
+
+const AiCommand = () => {
+  const { isLoading, setIsLoading, search, setSearch } = useCommandMenu()
+
+  const { submit, reset, messages, isResponding, hasError } = useAiChat({
+    setIsLoading,
+  })
+
+  const inputRef = useAutoInputFocus()
+
+  useHistoryKeys({
+    enable: !isResponding,
+    messages: messages
+      .filter(({ role }) => role === MessageRole.User)
+      .map(({ content }) => content),
+    setPrompt: setSearch,
+  })
+
+  const handleSubmit = useCallback(
+    (message: string) => {
+      setSearch('')
+      submit(message)
+    },
+    [submit]
+  )
+
+  const handleReset = useCallback(() => {
+    setSearch('')
+    reset()
+  }, [reset])
 
   useEffect(() => {
     if (search) {
-      handleConfirm(search)
+      handleSubmit(search)
     }
   }, [])
 
+  // Detect an IME composition (so that we can ignore Enter keypress)
+  const [isImeComposing, setIsImeComposing] = useState(false)
+
   return (
     <div onClick={(e) => e.stopPropagation()}>
-      <div className={cn('relative mb-[62px] py-4 max-h-[720px] overflow-auto')}>
+      <div className={cn('relative mb-[145px] py-4 max-h-[720px] overflow-auto')}>
         {messages.map((message, index) => {
           switch (message.role) {
             case MessageRole.User:
@@ -295,7 +415,9 @@ const AiCommand = () => {
                       {message.status === MessageStatus.Pending ? (
                         <div className="bg-scale-700 h-[21px] w-[13px] mt-1 animate-pulse animate-bounce"></div>
                       ) : (
-                        <MarkdownHandler
+                        <ReactMarkdown
+                          remarkPlugins={[remarkGfm]}
+                          components={markdownComponents}
                           linkTarget="_blank"
                           className="prose dark:prose-dark"
                           transformLinkUri={(href) => {
@@ -310,7 +432,7 @@ const AiCommand = () => {
                           }}
                         >
                           {message.content}
-                        </MarkdownHandler>
+                        </ReactMarkdown>
                       )}
                     </>
                   </div>
@@ -328,7 +450,7 @@ const AiCommand = () => {
                   type="command"
                   onSelect={() => {
                     if (!search) {
-                      handleConfirm(question)
+                      handleSubmit(question)
                     }
                   }}
                   forceMount
@@ -348,7 +470,7 @@ const AiCommand = () => {
               Sorry, looks like Clippy is having a hard time!
             </p>
             <p className="text-sm text-scale-900 text-center">Please try again in a bit.</p>
-            <Button size="tiny" type="secondary" onClick={handleResetPrompt}>
+            <Button size="tiny" type="secondary" onClick={handleReset}>
               Try again?
             </Button>
           </div>
@@ -357,8 +479,10 @@ const AiCommand = () => {
         <div className="[overflow-anchor:auto] h-px w-full"></div>
       </div>
       <div className="absolute bottom-0 w-full bg-scale-200 py-3">
+        {messages.length > 0 && !hasError && <AiWarning className="mb-3 mx-3" />}
         <Input
-          className="bg-scale-100 rounded mx-3"
+          className="bg-scale-100 rounded mx-3 [&_input]:pr-32 md:[&_input]:pr-40"
+          inputRef={inputRef}
           autoFocus
           placeholder={
             isLoading || isResponding ? 'Waiting on an answer...' : 'Ask Supabase AI a question...'
@@ -385,17 +509,15 @@ const AiCommand = () => {
               setSearch(e.target.value)
             }
           }}
+          onCompositionStart={() => setIsImeComposing(true)}
+          onCompositionEnd={() => setIsImeComposing(false)}
           onKeyDown={(e) => {
             switch (e.key) {
               case 'Enter':
-                if (!search) {
+                if (!search || isLoading || isResponding || isImeComposing) {
                   return
                 }
-                if (isLoading || isResponding) {
-                  return
-                }
-                handleConfirm(search)
-                return
+                return handleSubmit(search)
               default:
                 return
             }

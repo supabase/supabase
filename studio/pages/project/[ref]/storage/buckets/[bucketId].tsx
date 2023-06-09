@@ -24,7 +24,7 @@ const PageLayout: NextPageWithLayout = () => {
   const project = ui.selectedProject
 
   const storageStore = useStorageStore()
-  const { buckets, loaded, openCreateBucketModal } = storageStore
+  const { buckets, loaded } = storageStore
 
   const kpsEnabled = useFlag('initWithKps')
 
@@ -43,20 +43,7 @@ const PageLayout: NextPageWithLayout = () => {
       {loaded ? (
         !bucket ? (
           <div className="flex h-full w-full items-center justify-center">
-            <ProductEmptyState
-              title="Storage"
-              ctaButtonLabel="Create a new bucket"
-              infoButtonLabel="About storage"
-              infoButtonUrl="https://supabase.com/docs/guides/storage"
-              onClickCta={openCreateBucketModal}
-            >
-              <p className="text-scale-1100 text-sm">
-                Create buckets to store and serve any type of digital content.
-              </p>
-              <p className="text-scale-1100 text-sm">
-                Make your buckets private or public depending on your security preference.
-              </p>
-            </ProductEmptyState>
+            <p className="text-sm text-scale-1100">Bucket {bucketId} cannot be found</p>
           </div>
         ) : (
           // @ts-ignore

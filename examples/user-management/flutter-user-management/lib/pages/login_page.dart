@@ -25,7 +25,7 @@ class _LoginPageState extends State<LoginPage> {
     });
     try {
       await supabase.auth.signInWithOtp(
-        email: _emailController.text,
+        email: _emailController.text.trim(),
         emailRedirectTo:
             kIsWeb ? null : 'io.supabase.flutterquickstart://login-callback/',
       );

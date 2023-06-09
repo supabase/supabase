@@ -1,10 +1,9 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { LOGS_EXPLORER_DOCS_URL } from 'components/interfaces/Settings/Logs'
 import Table from 'components/to-be-cleaned/Table'
-import { useStore } from 'hooks'
 import { copyToClipboard } from 'lib/helpers'
 import Link from 'next/link'
-import { FC, useState } from 'react'
+import { useState } from 'react'
 import { logConstants } from 'shared-data'
 import {
   Button,
@@ -18,12 +17,11 @@ import {
   Tabs,
 } from 'ui'
 
-interface Props {
+export interface LogsExplorerHeaderProps {
   subtitle?: string
 }
 
-const LogsExplorerHeader: FC<Props> = ({ subtitle }) => {
-  const { ui } = useStore()
+const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
   const [showReference, setShowReference] = useState(false)
 
   return (
@@ -83,7 +81,7 @@ const LogsExplorerHeader: FC<Props> = ({ subtitle }) => {
                 respective source. Do note that to access nested keys, you would need to perform the
                 necessary{' '}
                 <Link href="https://supabase.com/docs/guides/platform/logs#unnesting-arrays">
-                  <a target="_blank" className="text-brand-900">
+                  <a target="_blank" rel="noreferrer" className="text-brand-900">
                     unnesting joins
                     <IconExternalLink
                       size="tiny"
@@ -104,7 +102,12 @@ const LogsExplorerHeader: FC<Props> = ({ subtitle }) => {
             listClassNames="px-2"
           >
             {logConstants.schemas.map((schema) => (
-              <Tabs.Panel id={schema.reference} label={schema.name} className="px-4 pb-4">
+              <Tabs.Panel
+                key={schema.reference}
+                id={schema.reference}
+                label={schema.name}
+                className="px-4 pb-4"
+              >
                 <Table
                   head={[
                     <Table.th className="text-xs !p-2" key="path">
@@ -116,64 +119,9 @@ const LogsExplorerHeader: FC<Props> = ({ subtitle }) => {
                   ]}
                   body={schema.fields
                     .sort((a: any, b: any) => a.path - b.path)
-                    .map((field) => {
-                      const [isCopied, setIsCopied] = useState(false)
-                      return (
-                        <Table.tr key={field.path}>
-                          <Table.td
-                            className="font-mono text-xs !p-2 cursor-pointer hover:text-scale-1200 transition flex items-center space-x-2"
-                            onClick={() =>
-                              copyToClipboard(field.path, () => {
-                                setIsCopied(true)
-                                setTimeout(() => setIsCopied(false), 3000)
-                              })
-                            }
-                          >
-                            <span>{field.path}</span>
-                            {isCopied ? (
-                              <Tooltip.Root delayDuration={0}>
-                                <Tooltip.Trigger>
-                                  <IconCheck size={14} strokeWidth={3} className="text-brand-900" />
-                                </Tooltip.Trigger>
-                                <Tooltip.Portal>
-                                  <Tooltip.Content side="bottom">
-                                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                                    <div
-                                      className={[
-                                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                                        'border border-scale-200',
-                                      ].join(' ')}
-                                    >
-                                      <span className="text-xs text-scale-1200">Copied</span>
-                                    </div>
-                                  </Tooltip.Content>
-                                </Tooltip.Portal>
-                              </Tooltip.Root>
-                            ) : (
-                              <Tooltip.Root delayDuration={0}>
-                                <Tooltip.Trigger>
-                                  <IconClipboard size="tiny" strokeWidth={1.5} />
-                                </Tooltip.Trigger>
-                                <Tooltip.Portal>
-                                  <Tooltip.Content side="bottom">
-                                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                                    <div
-                                      className={[
-                                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                                        'border border-scale-200',
-                                      ].join(' ')}
-                                    >
-                                      <span className="text-xs text-scale-1200">Copy value</span>
-                                    </div>
-                                  </Tooltip.Content>
-                                </Tooltip.Portal>
-                              </Tooltip.Root>
-                            )}
-                          </Table.td>
-                          <Table.td className="font-mono text-xs !p-2">{field.type}</Table.td>
-                        </Table.tr>
-                      )
-                    })}
+                    .map((field) => (
+                      <Field key={field.path} field={field} />
+                    ))}
                 />
               </Tabs.Panel>
             ))}
@@ -183,4 +131,72 @@ const LogsExplorerHeader: FC<Props> = ({ subtitle }) => {
     </div>
   )
 }
+
 export default LogsExplorerHeader
+
+const Field = ({
+  field,
+}: {
+  field: {
+    path: string
+    type: string
+  }
+}) => {
+  const [isCopied, setIsCopied] = useState(false)
+
+  return (
+    <Table.tr>
+      <Table.td
+        className="font-mono text-xs !p-2 cursor-pointer hover:text-scale-1200 transition flex items-center space-x-2"
+        onClick={() =>
+          copyToClipboard(field.path, () => {
+            setIsCopied(true)
+            setTimeout(() => setIsCopied(false), 3000)
+          })
+        }
+      >
+        <span>{field.path}</span>
+        {isCopied ? (
+          <Tooltip.Root delayDuration={0}>
+            <Tooltip.Trigger>
+              <IconCheck size={14} strokeWidth={3} className="text-brand-900" />
+            </Tooltip.Trigger>
+            <Tooltip.Portal>
+              <Tooltip.Content side="bottom">
+                <Tooltip.Arrow className="radix-tooltip-arrow" />
+                <div
+                  className={[
+                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                    'border border-scale-200',
+                  ].join(' ')}
+                >
+                  <span className="text-xs text-scale-1200">Copied</span>
+                </div>
+              </Tooltip.Content>
+            </Tooltip.Portal>
+          </Tooltip.Root>
+        ) : (
+          <Tooltip.Root delayDuration={0}>
+            <Tooltip.Trigger>
+              <IconClipboard size="tiny" strokeWidth={1.5} />
+            </Tooltip.Trigger>
+            <Tooltip.Portal>
+              <Tooltip.Content side="bottom">
+                <Tooltip.Arrow className="radix-tooltip-arrow" />
+                <div
+                  className={[
+                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                    'border border-scale-200',
+                  ].join(' ')}
+                >
+                  <span className="text-xs text-scale-1200">Copy value</span>
+                </div>
+              </Tooltip.Content>
+            </Tooltip.Portal>
+          </Tooltip.Root>
+        )}
+      </Table.td>
+      <Table.td className="font-mono text-xs !p-2">{field.type}</Table.td>
+    </Table.tr>
+  )
+}

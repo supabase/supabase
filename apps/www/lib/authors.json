@@ -299,5 +299,41 @@
     "position": "Engineering",
     "author_url": "https://github.com/chasers",
     "author_image_url": "https://github.com/chasers.png"
+  },
+  {
+    "author_id": "joshenlim",
+    "author": "Joshen Lim",
+    "username": "joshenlim",
+    "position": "Engineering",
+    "author_url": "https://github.com/joshenlim",
+    "author_image_url": "https://github.com/joshenlim.png"
+  },
+  {
+    "author_id": "laktek",
+    "author": "Lakshan Perera",
+    "position": "Engineering",
+    "author_url": "https://github.com/laktek",
+    "author_image_url": "https://github.com/laktek.png"
+  },
+  {
+    "author_id": "saltcod",
+    "author": "Terry Sutton",
+    "position": "Engineering",
+    "author_url": "https://github.com/saltcod",
+    "author_image_url": "https://github.com/saltcod.png"
+  },
+  {
+    "author_id": "daltjoh-aws",
+    "author": "John Dalton",
+    "position": "Product Management Leader @ AWS",
+    "author_url": "https://github.com/daltjoh-aws",
+    "author_image_url": "https://github.com/daltjoh-aws.png"
+  },
+  {
+    "author_id": "egor_romanov",
+    "author": "Egor Romanov",
+    "position": "Engineering",
+    "author_url": "https://github.com/egor-romanov",
+    "author_image_url": "https://github.com/egor-romanov.png"
   }
 ]

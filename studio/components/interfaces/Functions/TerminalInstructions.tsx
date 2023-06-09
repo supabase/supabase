@@ -26,12 +26,7 @@ const TerminalInstructions: FC<Props> = ({ closable = false, removeBorder = fals
     : '[YOUR ANON KEY]'
   const endpoint = settings?.autoApiService.app_config.endpoint ?? ''
 
-  const endpointSections = endpoint.split('.')
-  const functionsEndpoint = [
-    ...endpointSections.slice(0, 1),
-    'functions',
-    ...endpointSections.slice(1),
-  ].join('.')
+  const functionsEndpoint = `${endpoint}/functions/v1`
 
   // get the .co or .net TLD from the restUrl
   const restUrl = settings?.autoApiService.restUrl
@@ -64,7 +59,7 @@ const TerminalInstructions: FC<Props> = ({ closable = false, removeBorder = fals
       comment: 'Deploy your function',
     },
     {
-      command: `curl -L -X POST 'https://${projectRef}.functions.supabase.${restUrlTld}/hello-world' -H 'Authorization: Bearer ${
+      command: `curl -L -X POST 'https://${projectRef}.supabase.${restUrlTld}/functions/v1/hello-world' -H 'Authorization: Bearer ${
         anonKey ?? '[YOUR ANON KEY]'
       }' --data '{"name":"Functions"}'`,
       description: 'Invokes the hello-world function',

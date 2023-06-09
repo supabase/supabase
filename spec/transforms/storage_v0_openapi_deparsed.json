@@ -134,20 +134,24 @@
                     "anyOf": [
                       {
                         "type": "integer",
-                        "examples": [1000]
+                        "examples": [1000],
+                        "nullable": true,
+                        "minimum": 0
                       },
                       {
                         "type": "string",
-                        "examples": ["100MB"]
+                        "examples": ["100MB"],
+                        "nullable": true
                       }
                     ]
                   },
                   "allowed_mime_types": {
                     "type": "array",
+                    "nullable": true,
+                    "examples": [["image/png", "image/jpg"]],
                     "items": {
                       "type": "string"
-                    },
-                    "examples": [["image/png", "image/jpg"]]
+                    }
                   }
                 },
                 "required": ["name"]
@@ -250,7 +254,7 @@
                         "type": "boolean"
                       },
                       "file_size_limit": {
-                        "type": "integer"
+                        "type": ["null", "integer"]
                       },
                       "allowed_mime_types": {
                         "type": ["null", "array"],
@@ -439,7 +443,7 @@
                       "type": "boolean"
                     },
                     "file_size_limit": {
-                      "type": "integer"
+                      "type": ["null", "integer"]
                     },
                     "allowed_mime_types": {
                       "type": ["null", "array"],
@@ -513,16 +517,20 @@
                     "anyOf": [
                       {
                         "type": "integer",
-                        "examples": [1000]
+                        "examples": [1000],
+                        "nullable": true,
+                        "minimum": 0
                       },
                       {
                         "type": "string",
-                        "examples": ["100MB"]
+                        "examples": ["100MB"],
+                        "nullable": true
                       }
                     ]
                   },
                   "allowed_mime_types": {
                     "type": "array",
+                    "nullable": true,
                     "items": {
                       "type": "string",
                       "examples": [["image/png", "image/jpg"]]
@@ -834,6 +842,9 @@
                   "description": "Successful response",
                   "type": "object",
                   "properties": {
+                    "Id": {
+                      "type": "string"
+                    },
                     "Key": {
                       "type": "string",
                       "examples": ["avatars/folder/cat.png"]
@@ -911,6 +922,9 @@
                   "description": "Successful response",
                   "type": "object",
                   "properties": {
+                    "Id": {
+                      "type": "string"
+                    },
                     "Key": {
                       "type": "string",
                       "examples": ["avatars/folder/cat.png"]
@@ -1083,7 +1097,7 @@
                             "type": "boolean"
                           },
                           "file_size_limit": {
-                            "type": "integer"
+                            "type": ["null", "integer"]
                           },
                           "allowed_mime_types": {
                             "type": ["null", "array"],
@@ -1338,11 +1352,11 @@
         ],
         "responses": {
           "200": {
-            "description": "Succesful response",
+            "description": "Successful response",
             "content": {
               "application/json": {
                 "schema": {
-                  "description": "Succesful response",
+                  "description": "Successful response",
                   "type": "object",
                   "properties": {
                     "Key": {
@@ -1938,7 +1952,7 @@
                             "type": "boolean"
                           },
                           "file_size_limit": {
-                            "type": "integer"
+                            "type": ["null", "integer"]
                           },
                           "allowed_mime_types": {
                             "type": ["null", "array"],

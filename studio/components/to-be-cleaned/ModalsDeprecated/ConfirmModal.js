@@ -56,14 +56,13 @@ function ConfirmModal({
           </Button>
         </div>
       }
-      children={
-        description && (
-          <Modal.Content>
-            <p className="py-4 text-sm text-scale-1100">{description}</p>
-          </Modal.Content>
-        )
-      }
-    />
+    >
+      {description && (
+        <Modal.Content>
+          <p className="py-4 text-sm text-scale-1100">{description}</p>
+        </Modal.Content>
+      )}
+    </Modal>
   )
 }
 

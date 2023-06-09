@@ -130,8 +130,11 @@ const InviteMemberButton = ({
       >
         <Form validationSchema={schema} initialValues={initialValues} onSubmit={onInviteMember}>
           {({ values, isSubmitting, resetForm }: any) => {
-            // Catches 'roles' when its available and then adds a default value for role select
+            // [Alaister] although this "technically" is breaking the rules of React hooks
+            // it won't error because the hooks are always rendered in the same order
+            // eslint-disable-next-line react-hooks/rules-of-hooks
             useEffect(() => {
+              // Catches 'roles' when its available and then adds a default value for role select
               if (roles) {
                 resetForm({
                   values: {

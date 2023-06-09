@@ -89,7 +89,7 @@ const Invoices: FC<Props> = ({ projectRef }) => {
             <Table.th key="header-date">Date</Table.th>,
             <Table.th key="header-amount">Amount due</Table.th>,
             <Table.th key="header-invoice">Invoice number</Table.th>,
-            <Table.th key="header-invoice" className="flex items-center">
+            <Table.th key="header-status" className="flex items-center">
               Status
             </Table.th>,
             <Table.th key="header-download" className="text-right"></Table.th>,
@@ -131,7 +131,7 @@ const Invoices: FC<Props> = ({ projectRef }) => {
                         <div className="flex items-center justify-end space-x-2">
                           {[InvoiceStatus.UNCOLLECTIBLE, InvoiceStatus.OPEN].includes(x.status) && (
                             <Link href={`https://redirect.revops.supabase.com/pay-invoice/${x.id}`}>
-                              <a target="_blank">
+                              <a target="_blank" rel="noreferrer">
                                 <Button>Pay Now</Button>
                               </a>
                             </Link>

@@ -13,9 +13,16 @@ The Supabase CLI provides the tools you need to manage multiple environments.
 This guide shows you how to set up your local Supabase development environment that integrates with GitHub Actions to automatically
 test and release schema changes to staging and production Supabase projects.
 
+## Prerequisites
+
+Make sure you have these installed on your local machine:
+
+- [Docker Desktop](https://docs.docker.com/desktop/)
+- [Supabase CLI](/docs/guides/cli)
+- [Git](https://github.com/git-guides/install-git)
+
 To get started:
 
-- [Install the Supabase CLI](/docs/guides/cli)
 - Create a [Supabase project](https://app.supabase.com) or use an existing one
 - Initialize a local Git repository
 
@@ -202,7 +209,7 @@ Create the following files inside the `.github/workflows` directory:
 >
 <TabPanel id="ci" label="ci.yaml">
 
-```yaml title=.github/workflows/ci.yml
+```yaml .github/workflows/ci.yml
 name: CI
 
 on:
@@ -233,7 +240,7 @@ jobs:
 </TabPanel>
 <TabPanel id="staging" label="staging.yaml">
 
-```yaml title=.github/workflows/staging.yml
+```yaml .github/workflows/staging.yml
 name: Deploy Migrations to Staging
 
 on:
@@ -264,7 +271,7 @@ jobs:
 </TabPanel>
 <TabPanel id="production" label="production.yaml">
 
-```yaml title=.github/workflows/production.yml
+```yaml .github/workflows/production.yml
 name: Deploy Migrations to Production
 
 on:

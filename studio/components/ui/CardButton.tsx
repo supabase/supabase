@@ -113,13 +113,13 @@ const CardButton: FC<Props> = ({
   )
 
   if (onClick) {
-    return <ButtonContainer children={contents} />
+    return <ButtonContainer>{contents}</ButtonContainer>
   } else if (linkHref) {
-    return <LinkContainer children={contents} />
+    return <LinkContainer>{contents}</LinkContainer>
   } else if (url) {
-    return <UrlContainer children={contents} />
+    return <UrlContainer>{contents}</UrlContainer>
   } else {
-    return <NonLinkContainer children={contents} />
+    return <NonLinkContainer>{contents}</NonLinkContainer>
   }
 }
 

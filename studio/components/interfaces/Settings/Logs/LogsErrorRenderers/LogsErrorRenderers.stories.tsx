@@ -17,14 +17,16 @@ export const ErrorRenderers = () => (
     }}
   >
     {[
-      <DefaultErrorRenderer isCustomQuery={false} error="some string error" />,
+      <DefaultErrorRenderer key="one" isCustomQuery={false} error="some string error" />,
       <DefaultErrorRenderer
+        key="two"
         isCustomQuery={false}
         error={{
           error: { code: 123, errors: [], status: 'something', message: 'some logflare error' },
         }}
       />,
       <ResourcesExceededErrorRenderer
+        key="three"
         isCustomQuery
         error={{
           error: {
@@ -39,6 +41,7 @@ export const ErrorRenderers = () => (
       />,
 
       <ResourcesExceededErrorRenderer
+        key="four"
         isCustomQuery={false}
         error={{
           error: {

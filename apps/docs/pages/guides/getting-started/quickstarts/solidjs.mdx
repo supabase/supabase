@@ -87,21 +87,17 @@ export const meta = {
 
       ```jsx src/App.jsx
         import { createClient } from "@supabase/supabase-js";
-        import { createEffect, createSignal, For } from "solid-js";
+        import { createResource, For } from "solid-js";
 
         const supabase = createClient('https://<project>.supabase.co', '<your-anon-key>');
 
+        async function getCountries() {
+          const { data } = await supabase.from("countries").select();
+          return data;
+        }
+
         function App() {
-          const [countries, setCountries] = createSignal();
-
-          createEffect(() => {
-            getCountries();
-          });
-
-          async function getCountries() {
-            const { data } = await supabase.from("countries").select();
-            setCountries(data);
-          }
+          const [countries] = createResource(getCountries);
 
           return (
             <ul>

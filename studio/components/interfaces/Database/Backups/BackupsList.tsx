@@ -23,6 +23,8 @@ const BackupsList: FC<Props> = ({}) => {
     'queue_job.restore.prepare'
   )
 
+  const isPitrEnabled = backups?.configuration?.walg_enabled
+
   if (backups.isLoading) return <Loading />
   if (backups.error) return <BackupsError />
 
@@ -43,7 +45,11 @@ const BackupsList: FC<Props> = ({}) => {
   return (
     <div className="space-y-6">
       {!sortedBackups?.length && tierKey !== 'FREE' ? (
-        <BackupsEmpty />
+        !isPitrEnabled ? (
+          <BackupsEmpty />
+        ) : (
+          <></>
+        )
       ) : (
         <>
           {!canTriggerScheduledBackups && (

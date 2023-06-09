@@ -120,6 +120,7 @@ interface ICreateFunctionStore {
   formState: CreateFunctionFormState
   meta: any
   schemas: Dictionary<any>[]
+  isEditing: boolean
   onFormChange: (value: { key: string; value: any }) => void
   onFormArrayChange: (value: {
     operation: 'add' | 'delete' | 'update'
@@ -406,7 +407,7 @@ const CreateFunction: FC<CreateFunctionProps> = ({ func, visible, setVisible }) 
                 <SidePanel.Separator />
                 <SidePanel.Content>
                   <Panel>
-                    <div className={`space-y-8 rounded bg-bg-alt-light py-4 dark:bg-bg-alt-dark`}>
+                    <div className={`space-y-8 rounded bg-scale-200 py-4`}>
                       <div className={`px-6`}>
                         <Toggle
                           onChange={() => _localState.toggleAdvancedVisible()}
@@ -450,15 +451,14 @@ const CreateFunction: FC<CreateFunctionProps> = ({ func, visible, setVisible }) 
             setIsClosingPanel(false)
             setVisible(!visible)
           }}
-          children={
-            <Modal.Content>
-              <p className="py-4 text-sm text-scale-1100">
-                There are unsaved changes. Are you sure you want to close the panel? Your changes
-                will be lost.
-              </p>
-            </Modal.Content>
-          }
-        />
+        >
+          <Modal.Content>
+            <p className="py-4 text-sm text-scale-1100">
+              There are unsaved changes. Are you sure you want to close the panel? Your changes will
+              be lost.
+            </p>
+          </Modal.Content>
+        </ConfirmationModal>
       </SidePanel>
     </>
   )
@@ -740,9 +740,11 @@ const InputDefinition: FC = observer(({}) => {
         <p className="text-sm text-scale-1100">
           The language below should be written in `{_localState!.formState.language.value}`.
         </p>
-        <p className="text-sm text-scale-1100">
-          Change the language in the Advanced Settings below.
-        </p>
+        {!_localState?.isEditing && (
+          <p className="text-sm text-scale-1100">
+            Change the language in the Advanced Settings below.
+          </p>
+        )}
       </div>
       <div className="h-40 border dark:border-dark">
         <SqlEditor

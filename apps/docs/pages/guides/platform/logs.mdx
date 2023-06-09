@@ -4,23 +4,16 @@ import { logConstants } from 'shared-data'
 export const meta = {
   id: 'logs',
   title: 'Logging',
-  description: 'Getting started with Supabase Platform Log Browser',
+  description: 'Getting started with Supabase Log Browser',
 }
 
 The Supabase Platform includes a Logs Explorer that allows log tracing and debugging. Log retention is based on your [project's pricing plan](https://supabase.com/pricing).
-
-<Admonition type="note">
-
-These features are not currently available for self-hosting and local development.<br/>
-This is on the roadmap and you can follow the progress in the [Logflare repository](https://github.com/Logflare/logflare).
-
-</Admonition>
 
 ## Product Logs
 
 Supabase provides a logging interface specific to each product. You can use simple regular expressions for keywords and patterns to search log event messages. You can also export and download the log events matching your query as a spreadsheet.
 
-{/* <!-- To update the screenshots, ensure that at least one log line is selected to display the metadata. Can use meme.town as an example. --> */}
+{/* <!-- To update screenshots, ensure that at least one log line is selected to display the metadata. Can use meme.town as an example. --> */}
 
 <Tabs
   scrollable
@@ -118,6 +111,29 @@ To _permanently_ set a logging configuration (beyond a single session), execute 
 -- equivalent permanent config update.
 alter role postgres set pgaudit.log to 'function, write, ddl';
 ```
+
+To help with debugging, we recommend adjusting the log scope to only relevant statements as having too wide of a scope would result in a lot of noise in your Postgres logs.
+
+Note that in the above example, the role is set to `postgres`. To log user-traffic flowing through the [HTTP APIs](../../guides/database/api#rest-api-overview) powered by PostgREST, set your configuration values for the roles `anon` and `authenticated`. For traffic using the `service_role` key, set the configuration values for the role `service_role`.
+
+```sql
+-- for API-related logs
+alter role anon set pgaudit.log to 'write';
+alter role authenticated set pgaudit.log to 'write';
+
+-- for service role logs
+alter role service_role set pgaudit.log to 'write';
+```
+
+By default, the log level will be set to `log`. To view other levels, run the following:
+
+```sql
+-- adjust log level
+alter role postgres set pgaudit.log_level to 'info';
+alter role postgres set pgaudit.log_level to 'debug5';
+```
+
+Note that as per the pgAudit [log_level documentation](https://github.com/pgaudit/pgaudit/blob/master/README.md#pgauditlog_level), `error`, `fatal`, and `panic` are not allowed.
 
 To reset system-wide settings, execute the following, then perform a fast reboot:
 

@@ -47,11 +47,26 @@ export const LinkSvg = () => (
   <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
       d="M6.875 4.0013H4.20833C3.47195 4.0013 2.875 4.59826 2.875 5.33464V12.0013C2.875 12.7377 3.47195 13.3346 4.20833 13.3346H10.875C11.6114 13.3346 12.2083 12.7377 12.2083 12.0013V9.33464M9.54167 2.66797H13.5417M13.5417 2.66797V6.66797M13.5417 2.66797L6.875 9.33464"
-      // stroke="#A69DC9"
       stroke="#8F8F8F"
       strokeWidth="1"
       strokeLinecap="round"
       strokeLinejoin="round"
+    />
+  </svg>
+)
+export const ArrowTopRightSvg = () => (
+  <svg width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path
+      d="M3.44531 13.846L13.1152 4.17578"
+      stroke="#8F8F8F"
+      strokeMiterlimit="10"
+      strokeLinejoin="bevel"
+    />
+    <path
+      d="M3.44531 4.09375H13.1152V13.7637"
+      stroke="#8F8F8F"
+      strokeMiterlimit="10"
+      strokeLinejoin="bevel"
     />
   </svg>
 )
@@ -142,31 +157,60 @@ export const AccordionHeader = ({ date, day, title, shipped }: any) => {
     </div>
   )
 }
+export const MultistepSectionHeader = ({ title, blog }: any) => {
+  return (
+    <div className="flex flex-1 flex-col sm:flex-row py-8">
+      <div className="flex gap-4 w-full items-center justify-between md:justify-start">
+        {title && <span className="text-scale-1200 text-lg mt-3 sm:mt-0">{title}</span>}
+        {!!blog && (
+          <ChipLink href={blog} className="!w-auto !text-left !justify-between !flex-none">
+            Blog post
+            <div className="bg-[#313131] rounded-full hidden sm:inline-block p-1 ml-2">
+              <PencilSvg />
+            </div>
+          </ChipLink>
+        )}
+      </div>
+    </div>
+  )
+}
 
 export const ChipLink = ({
   href,
+  uiOnly,
   className,
   target,
   children,
 }: {
-  href: string
+  href?: string
   className?: string
+  uiOnly?: boolean
   target?: '_blank' | '_self' | '_parent' | '_top' | 'framename'
   children: any
-}) => (
-  <Link href={href}>
-    <a
-      target={target ?? '_self'}
-      rel="noopener"
+}) =>
+  uiOnly ? (
+    <span
       className={[
-        'flex justify-between w-full min-h-[43px] sm:w-auto items-center border border-slate-400 bg-gradient-to-r text-black dark:text-white from-[#46444480] to-[#19191980] hover:from-[#4e4e4e80] hover:to-[#19191980] backdrop-blur-sm rounded-full text-sm py-2 pl-3 pr-2',
+        'flex flex-auto justify-center sm:justify-between w-full text-center sm:text-left min-h-[43px] sm:w-auto items-center border border-[#232323] bg-gradient-to-r text-white from-[#46444490] to-[#19191980] hover:from-[#4e4e4e90] hover:to-[#19191980] backdrop-blur-xl rounded-full text-sm py-2 px-3 sm:pr-2',
         className,
       ].join(' ')}
     >
       {children}
-    </a>
-  </Link>
-)
+    </span>
+  ) : !!href ? (
+    <Link href={href}>
+      <a
+        target={target ?? '_self'}
+        rel="noopener"
+        className={[
+          'flex flex-auto justify-center sm:justify-between w-full text-center sm:text-left min-h-[43px] sm:w-auto items-center border border-[#232323] bg-gradient-to-r text-white from-[#46444490] to-[#19191980] hover:from-[#4e4e4e90] hover:to-[#19191980] backdrop-blur-xl rounded-full text-sm py-2 px-3 sm:pr-2',
+          className,
+        ].join(' ')}
+      >
+        {children}
+      </a>
+    </Link>
+  ) : null
 
 export const SectionButtons = ({
   blog,
@@ -175,6 +219,7 @@ export const SectionButtons = ({
   github,
   url,
   hackernews,
+  mobileGrid,
 }: {
   blog?: string
   docs?: string
@@ -182,13 +227,19 @@ export const SectionButtons = ({
   github?: string
   url?: string
   hackernews?: string
+  mobileGrid?: boolean
 }) => {
   return (
-    <div className="flex w-full md:w-auto justify-center gap-2 z-10">
+    <div
+      className={[
+        'flex w-full max-w-full md:w-auto justify-center gap-2 z-10',
+        mobileGrid && 'grid grid-cols-2 gap-2 sm:flex',
+      ].join(' ')}
+    >
       {!!blog && (
         <ChipLink href={blog}>
           Blog post
-          <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
+          <div className="bg-[#313131] rounded-full hidden sm:inline-block p-1 ml-2">
             <PencilSvg />
           </div>
         </ChipLink>
@@ -196,23 +247,23 @@ export const SectionButtons = ({
       {!!docs && (
         <ChipLink href={docs}>
           Docs
-          <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
+          <div className="bg-[#313131] rounded-full hidden sm:inline-block p-1 ml-2">
             <DocsSvg />
           </div>
         </ChipLink>
       )}
       {!!video && (
-        <ChipLink href={video}>
+        <ChipLink href={video} target="_blank">
           Video
-          <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
+          <div className="bg-[#313131] rounded-full hidden sm:inline-block p-1 ml-2">
             <PlaySvg />
           </div>
         </ChipLink>
       )}
       {!!github && (
         <ChipLink href={github} target="_blank">
-          View on Github
-          <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
+          Github
+          <div className="bg-[#313131] rounded-full hidden sm:inline-block p-1 ml-2">
             <GithubSvg />
           </div>
         </ChipLink>
@@ -220,15 +271,15 @@ export const SectionButtons = ({
       {!!url && (
         <ChipLink href={url}>
           Read
-          <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
+          <div className="bg-[#313131] rounded-full hidden sm:inline-block p-1 ml-2">
             <LinkSvg />
           </div>
         </ChipLink>
       )}
       {hackernews && (
         <ChipLink href={hackernews} target="_blank">
-          Read more
-          <div className="bg-[#eeeeee] dark:bg-[#313131] rounded-full inline-block p-1 ml-2">
+          Hackernews
+          <div className="bg-[#313131] rounded-full hidden sm:inline-block p-1 ml-2">
             <HackernewsSvg />
           </div>
         </ChipLink>
