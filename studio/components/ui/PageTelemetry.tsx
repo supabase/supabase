@@ -5,24 +5,6 @@ import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { FC, useEffect } from 'react'
 
-function sanitizePageViewRoute(_route?: string) {
-  // remove all fragments
-  const noFragments = _route?.split('#')[0]
-  // remove sensitive params
-  const paramsSplits = noFragments?.split('?')
-  const hasParams = paramsSplits && paramsSplits?.length > 1
-
-  if (hasParams) {
-    const urlParams = new URLSearchParams(paramsSplits[1])
-    const sensitiveKeys = [...urlParams.keys()].filter((x) => x.includes('token'))
-    const sensitiveParams = ['code', ...sensitiveKeys]
-    sensitiveParams.forEach((name) => urlParams.delete(name))
-    return `${paramsSplits[0]}?${urlParams?.toString()}`
-  }
-
-  return noFragments
-}
-
 const PageTelemetry: FC = ({ children }) => {
   const router = useRouter()
   const telemetryProps = useTelemetryProps()
@@ -53,11 +35,8 @@ const PageTelemetry: FC = ({ children }) => {
    *
    * @param route: the browser url
    * */
-  const handlePageTelemetry = async (_route?: string) => {
+  const handlePageTelemetry = async (route: string) => {
     if (IS_PLATFORM) {
-      // filter out sensitive query params
-      const route = sanitizePageViewRoute(_route)
-
       /**
        * Get referrer from browser
        */

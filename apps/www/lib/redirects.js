@@ -1032,6 +1032,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/blog/audit',
+    destination: '/blog/postgres-audit',
+  },
+  {
+    permanent: true,
     source: '/blog/2022/03/08/audit',
     destination: '/blog/postgres-audit',
   },
@@ -1794,6 +1799,26 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/reference/python',
+    destination: '/docs/reference/python/start',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/csharp',
+    destination: '/docs/reference/csharp/start',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/swift',
+    destination: '/docs/reference/swift/start',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/kotlin',
+    destination: '/docs/reference/kotlin/start',
+  },
+  {
+    permanent: true,
     source: '/docs/reference/cli',
     destination: '/docs/reference/cli/start',
   },
@@ -1970,5 +1995,30 @@ module.exports = [
     permanent: true,
     source: '/blog/how-supabase-accelerates-development-of-all-pull-together',
     destination: '/customers',
+  },
+  {
+    permanent: true,
+    source: '/blog/how-supabase-accelerates-development-of-all-pull-together',
+    destination: '/customers',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-helpers/nextjs-server-components',
+    destination: '/docs/guides/auth/auth-helpers/nextjs',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/getting-started/openai/vector-search',
+    destination: '/docs/guides/ai/examples/docs-search',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/functions/examples/huggingface-image-captioning',
+    destination: '/docs/guides/ai/examples/huggingface-image-captioning',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/functions/examples/openai',
+    destination: '/docs/guides/ai/examples/openai',
   },
 ]

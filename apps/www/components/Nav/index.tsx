@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
-import { Button, Badge, Announcement, AnnouncementCountdown, IconStar, IconChevronDown } from 'ui'
+import { Button, Badge, IconStar, IconChevronDown } from 'ui'
 import FlyOut from '~/components/UI/FlyOut'
 import Transition from 'lib/Transition'
 
@@ -197,9 +197,8 @@ const Nav = () => {
 
   return (
     <>
-      <Announcement>
-        <AnnouncementCountdown />
-      </Announcement>
+      {/* <Announcement>
+      </Announcement> */}
       <div className="sticky top-0 z-40 transform" style={{ transform: 'translate3d(0,0,999px)' }}>
         <div
           className={[
@@ -210,7 +209,7 @@ const Nav = () => {
         />
         <nav
           className={[
-            `border-scale-400 border-b backdrop-blur-sm transition-opacity`,
+            `border-scale-300 border-b backdrop-blur-sm transition-opacity`,
             showLaunchWeekNavMode && '!opacity-100 !border-[#e0d2f430]',
           ].join(' ')}
         >
@@ -332,14 +331,14 @@ const Nav = () => {
                   </Link>
                 ) : (
                   <>
-                    <Link href="https://app.supabase.com/">
+                    <Link href="https://supabase.com/dashboard">
                       <a>
                         <Button type="default" className="hidden lg:block">
                           Sign in
                         </Button>
                       </a>
                     </Link>
-                    <Link href="https://app.supabase.com/">
+                    <Link href="https://supabase.com/dashboard">
                       <a>
                         <Button className="hidden text-white lg:block">Start your project</Button>
                       </a>
@@ -396,7 +395,7 @@ const Nav = () => {
               {/* </div> */}
               <div className="mt-6 mb-12">
                 <div className="pt-2 pb-4 space-y-1">
-                  <Link href="https://app.supabase.com/">
+                  <Link href="https://supabase.com/dashboard">
                     <a className="block pl-3 pr-4 text-base font-medium text-scale-900 dark:text-white">
                       Sign in
                     </a>

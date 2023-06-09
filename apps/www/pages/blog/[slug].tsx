@@ -130,15 +130,21 @@ function BlogPostPage(props: any) {
     </div>
   )
 
+  const meta = {
+    title: props.blog.meta_title ?? props.blog.title,
+    description: props.blog.meat_description ?? props.blog.description,
+    url: `https://supabase.com/blog/${props.blog.slug}`,
+  }
+
   return (
     <>
       <NextSeo
-        title={props.blog.title}
-        description={props.blog.description}
+        title={meta.title}
+        description={meta.description}
         openGraph={{
-          title: props.blog.title,
-          description: props.blog.description,
-          url: `https://supabase.com/blog/${props.blog.slug}`,
+          title: meta.title,
+          description: meta.description,
+          url: meta.url,
           type: 'article',
           videos: props.blog.video && [
             {

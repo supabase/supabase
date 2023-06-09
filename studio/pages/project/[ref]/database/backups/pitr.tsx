@@ -1,6 +1,7 @@
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { Tabs } from 'ui'
+import clsx from 'clsx'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { NextPageWithLayout } from 'types'
@@ -19,23 +20,30 @@ const DatabasePhysicalBackups: NextPageWithLayout = () => {
   const ref = ui.selectedProject?.ref ?? 'default'
 
   return (
-    <div className="mx-auto max-w-4xl space-y-6 px-5 pt-12 pb-20">
-      <h3 className="text-xl text-scale-1200">Backups</h3>
+    <div
+      className={clsx(
+        'mx-auto flex flex-col px-5 pt-6 pb-14',
+        'lg:pt-8 lg:px-14 1xl:px-28 2xl:px-32 h-full'
+      )}
+    >
+      <div className="space-y-6">
+        <h3 className="text-xl text-scale-1200">Backups</h3>
 
-      <Tabs
-        type="underlined"
-        size="small"
-        activeId="pitr"
-        onChange={(id: any) => {
-          if (id === 'scheduled') router.push(`/project/${ref}/database/backups/scheduled`)
-        }}
-      >
-        <Tabs.Panel id="scheduled" label="Scheduled backups" />
-        <Tabs.Panel id="pitr" label="Point in Time" />
-      </Tabs>
+        <Tabs
+          type="underlined"
+          size="small"
+          activeId="pitr"
+          onChange={(id: any) => {
+            if (id === 'scheduled') router.push(`/project/${ref}/database/backups/scheduled`)
+          }}
+        >
+          <Tabs.Panel id="scheduled" label="Scheduled backups" />
+          <Tabs.Panel id="pitr" label="Point in Time" />
+        </Tabs>
 
-      <div className="space-y-8">
-        <PITR />
+        <div className="space-y-8">
+          <PITR />
+        </div>
       </div>
     </div>
   )

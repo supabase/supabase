@@ -61,17 +61,17 @@ git clone https://github.com/supabase-community/firebase-to-supabase.git
 
 You can customize the way your JSON file is written using a [custom hook](#custom-hooks). A common use for this is to "flatten" the JSON file, or to split nested data into separate, related database tables. For example, you could take a Firestore document that looks like this:
 
-```json title=Firestore%20document
+```json Firestore
 [{ "user": "mark", "score": 100, "items": ["hammer", "nail", "glue"] }]
 ```
 
 And split it into two files (one table for users and one table for items):
 
-```json title=Users%20table
+```json Users
 [{ "user": "mark", "score": 100 }]
 ```
 
-```json title=Items%20table
+```json Items
 [
   { "user": "mark", "item": "hammer" },
   { "user": "mark", "item": "nail" },
@@ -187,14 +187,14 @@ module.exports = (collectionName, doc, recordCounters, writeRecord) => {
 
 The result is two separate JSON files:
 
-```json title=users.json
+```json users.json
 [
   { "uid": "abc123", "name": "mark", "score": 100 },
   { "uid": "xyz789", "name": "chuck", "score": 9999999 }
 ]
 ```
 
-```json title=weapons.json
+```json weapons.json
 [
   { "uid": "abc123", "weapon": "toothpick" },
   { "uid": "abc123", "weapon": "needle" },
