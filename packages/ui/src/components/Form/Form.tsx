@@ -3,8 +3,7 @@ import { useFormik, FormikConfig } from 'formik'
 import { FormContextProvider } from './FormContext'
 
 // interface Props extends FormikProps<any>, Partial FormikConfig<any> {
-interface Props
-  extends Omit<FormikConfig<any>, 'validateOnMount' | 'validateOnChange'> {
+interface Props extends Omit<FormikConfig<any>, 'validateOnMount' | 'validateOnChange'> {
   children: any
   handleIsSubmitting?: any
   handleIsValidating?: any
@@ -69,8 +68,8 @@ export default function Form({ validate, ...props }: Props) {
         handleBlur={formik.handleBlur}
         touched={formik.touched}
         fieldLevelValidation={handleFieldLevelValidation}
-        // children={rest.children}
-        children={props.children({
+      >
+        {props.children({
           /** map of field names to specific error for that field */
           errors: formik.errors, // errors,
           // /** map of field names to whether the field has been touched */
@@ -89,8 +88,10 @@ export default function Form({ validate, ...props }: Props) {
           handleReset: formik.handleReset,
           /** Resets the form with custom values */
           resetForm: formik.resetForm,
+          /** Manually sets a fields value */
+          setFieldValue: formik.setFieldValue,
         })}
-      />
+      </FormContextProvider>
     </form>
   )
 }

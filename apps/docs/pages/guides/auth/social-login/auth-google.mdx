@@ -83,22 +83,6 @@ async function signInWithGoogle() {
 }
 ```
 
-Google OAuth2.0 doesn't return the `provider_refresh_token` by default. If you need the `provider_refresh_token` returned, you will need to add additional query parameters:
-
-```js
-async function signInWithGoogle() {
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: 'google',
-    options: {
-      queryParams: {
-        access_type: 'offline',
-        prompt: 'consent',
-      },
-    },
-  })
-}
-```
-
 You can view the full list of query parameters and their descriptions [here](https://developers.google.com/identity/protocols/oauth2/web-server#creatingclient).
 
 When your user signs out, call [signOut()](/docs/reference/javascript/auth-signout) to remove them from the browser session and any objects from localStorage:
@@ -109,9 +93,28 @@ async function signout() {
 }
 ```
 
+## Obtain the provider refresh token
+
+Google OAuth2.0 doesn't return the `provider_refresh_token` by default. If you need the `provider_refresh_token` returned, you will need to add additional query parameters:
+
+```js
+async function signInWithGoogle() {
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      queryParams: {
+        access_type: 'offline',
+        prompt: 'consent',
+        hd: 'domain.com', // google will also allow OAuth logins to be restricted to a specified domain using the 'hd' parameter
+      },
+    },
+  })
+}
+```
+
 ## Resources
 
-- [Supabase Account - Free Tier OK](https://supabase.com)
+- [Supabase Account - Free Plan OK](https://supabase.com)
 - [Supabase JS Client](https://github.com/supabase/supabase-js)
 - [Google Cloud Platform Console](https://console.cloud.google.com/home/dashboard)
 

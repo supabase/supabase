@@ -2,8 +2,8 @@ import { FC, ReactNode, useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 
-import { useStore, withAuth } from 'hooks'
-import BaseLayout from '../'
+import { useFlag, useStore, withAuth } from 'hooks'
+import ProjectLayout from '../'
 import Error from 'components/ui/Error'
 import ProductMenu from 'components/ui/ProductMenu'
 import { generateDatabaseMenu } from './DatabaseMenu.utils'
@@ -16,7 +16,9 @@ interface Props {
 
 const DatabaseLayout: FC<Props> = ({ title, children }) => {
   const { meta, ui, vault, backups } = useStore()
-  const { isLoading } = meta.schemas
+  const { isLoading: isSchemasLoading } = meta.schemas
+  const { isLoading: isVaultLoading } = vault
+
   const { isInitialized, error } = meta.tables
   const project = ui.selectedProject
 
@@ -25,7 +27,10 @@ const DatabaseLayout: FC<Props> = ({ title, children }) => {
 
   const vaultExtension = meta.extensions.byId('supabase_vault')
   const isVaultEnabled = vaultExtension !== undefined && vaultExtension.installed_version !== null
+  const foreignDataWrappersEnabled = useFlag('foreignDataWrappers')
+  const pgNetExtensionExists = meta.extensions.byId('pg_net') !== undefined
 
+  const isLoading = isSchemasLoading || (isVaultEnabled && isVaultLoading)
   const [loaded, setLoaded] = useState<boolean>(isInitialized)
 
   useEffect(() => {
@@ -61,22 +66,24 @@ const DatabaseLayout: FC<Props> = ({ title, children }) => {
 
   if (error) {
     return (
-      <BaseLayout>
+      <ProjectLayout>
         <Error error={error} />
-      </BaseLayout>
+      </ProjectLayout>
     )
   }
 
   return (
-    <BaseLayout
+    <ProjectLayout
       isLoading={!loaded}
       product="Database"
-      productMenu={<ProductMenu page={page} menu={generateDatabaseMenu(project)} />}
+      productMenu={
+        <ProductMenu page={page} menu={generateDatabaseMenu(project, foreignDataWrappersEnabled, pgNetExtensionExists)} />
+      }
     >
       <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">
         {children}
       </main>
-    </BaseLayout>
+    </ProjectLayout>
   )
 }
 

@@ -1,16 +1,23 @@
-<script>
-	import { page } from '$app/stores'
-	import Account from './Account.svelte'
-	import Auth from './Auth.svelte'
+<!-- src/routes/+page.svelte -->
+<script lang="ts">
+	import { Auth } from '@supabase/auth-ui-svelte'
+	import { ThemeSupa } from '@supabase/auth-ui-shared'
+
+	export let data
 </script>
 
 <svelte:head>
-	<title>Supabase + SvelteKit</title>
-	<meta name="description" content="SvelteKit using supabase-js v2" />
+	<title>User Management</title>
 </svelte:head>
 
-{#if !$page.data.session}
-	<Auth />
-{:else}
-	<Account session={$page.data.session} />
-{/if}
+<div class="row flex-center flex">
+	<div class="col-6 form-widget">
+		<Auth
+			supabaseClient={data.supabase}
+			view="magic_link"
+			redirectTo={`${data.url}/auth/callback`}
+			showLinks={false}
+			appearance={{ theme: ThemeSupa, style: { input: 'color: #fff' } }}
+		/>
+	</div>
+</div>

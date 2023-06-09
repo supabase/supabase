@@ -4,10 +4,10 @@ import { useRouter } from 'next/router'
 import { Button, IconCheckSquare, Loading } from 'ui'
 
 import { useStore } from 'hooks'
-import { auth } from 'lib/gotrue'
+import useProfile from 'hooks/misc/useProfile'
+import { useSignOut } from 'lib/auth'
 import { API_URL } from 'lib/constants'
 import { get, post, delete_ } from 'lib/common/fetch'
-import { useProfileQuery } from 'data/profile/profile-query'
 
 interface ITokenInfo {
   organization_name?: string | undefined
@@ -24,7 +24,8 @@ const JoinOrganizationPage = () => {
   const router = useRouter()
   const { slug, token, name } = router.query
   const { ui, app } = useStore()
-  const { data: profile } = useProfileQuery()
+  const { data: profile } = useProfile()
+  const signOut = useSignOut()
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState(false)
@@ -135,7 +136,7 @@ const JoinOrganizationPage = () => {
           <a
             className="cursor-pointer text-brand-900"
             onClick={async () => {
-              await auth.signOut()
+              await signOut()
               router.reload()
             }}
           >
@@ -181,7 +182,7 @@ const JoinOrganizationPage = () => {
       </div>
 
       <div
-        className={['border-t border-scale-400', isError ? 'bg-sand-100' : 'bg-transparent'].join(
+        className={['border-t border-scale-400', isError ? 'bg-scale-100' : 'bg-transparent'].join(
           ' '
         )}
       >

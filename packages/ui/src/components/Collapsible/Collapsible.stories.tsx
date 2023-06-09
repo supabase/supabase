@@ -1,9 +1,6 @@
-import React from 'react'
-// import { AutoForm } from 'uniforms'
-
-import { Collapsible } from '.'
-import { IconChevronUp } from '../..'
-import { Button } from '../Button'
+import { Collapsible } from './'
+import { IconChevronUp } from '../../components/Icon/icons/IconChevronUp'
+import { Button } from './../Button'
 
 export default {
   title: 'Displays/Collapsible',
@@ -13,14 +10,12 @@ export default {
 export const Default = (args: any) => {
   return (
     <>
-      hello all
       <Collapsible className="-space-y-px">
         <Collapsible.Trigger asChild>
           <button
             type="button"
             className="group text-scale-1200 flex justify-between items-center w-full bg-scale-300 rounded border border-scale-500 p-3"
           >
-            Hello
             <div className="flex gap-2 items-center">
               <IconChevronUp className="transition data-open-parent:rotate-0 data-closed-parent:rotate-180" />
               <Button
@@ -28,7 +23,7 @@ export const Default = (args: any) => {
                   e.stopPropagation()
                 }}
               >
-                Turn it on
+                Example button
               </Button>
             </div>
           </button>
@@ -44,7 +39,7 @@ export const Default = (args: any) => {
       </Collapsible>
       <Collapsible>
         <Collapsible.Trigger asChild>
-          <button type="button">Hello</button>
+          <button type="button">Click me to expand</button>
         </Collapsible.Trigger>
         <Collapsible.Content>
           <div>

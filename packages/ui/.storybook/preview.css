@@ -1,0 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import './../build/css/themes/dark.css';
+@import './../build/css/themes/light.css';
+@import './../build/css/themes/darker-dark.css';
+
+.dark,
+.light,
+.light .docs-story,
+.dark .docs-story {
+  @apply bg-body;
+}

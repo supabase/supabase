@@ -1,10 +1,8 @@
 import Link from 'next/link'
 import { observer } from 'mobx-react-lite'
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { useParams } from 'common'
-import { Badge, Button, IconCommand, IconSearch, useCommandMenu } from 'ui'
+import { Badge } from 'ui'
 
-import { detectOS } from 'lib/helpers'
 import { IS_PLATFORM, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import { useFlag, useStore } from 'hooks'
 import BreadcrumbsView from './BreadcrumbsView'
@@ -22,10 +20,6 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
   const { ui } = useStore()
   const { selectedOrganization, selectedProject } = ui
 
-  const os = detectOS()
-  const { setIsOpen } = useCommandMenu()
-  const showCmdkHelper = useFlag('dashboardCmdk')
-
   const { ref: projectRef } = useParams()
   const { project } = useProjectContext()
   const { data: isReadOnlyMode } = useProjectReadOnlyQuery({
@@ -42,20 +36,20 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
     ui.selectedProject?.subscription_tier === PRICING_TIER_PRODUCT_IDS.TEAM
 
   const showOverUsageBadge =
+    useFlag('overusageBadge') &&
     selectedProject?.subscription_tier !== undefined &&
     !projectHasNoLimits &&
-    resourcesExceededLimits.length > 0 &&
-    useFlag('overusageBadge')
+    resourcesExceededLimits.length > 0
 
   return (
     <div
       className={`flex h-12 max-h-12 items-center justify-between py-2 px-5 ${
-        headerBorder ? 'border-b dark:border-dark' : ''
+        headerBorder ? 'border-b border-scale-500' : ''
       }`}
     >
       <div className="-ml-2 flex items-center text-sm">
         {/* Organization is selected */}
-        {selectedOrganization ? (
+        {projectRef && selectedOrganization ? (
           <>
             {/* Org Dropdown */}
             <OrgDropdown />
@@ -97,7 +91,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
                   <div className="ml-2">
                     <Link href={`/project/${projectRef}/settings/billing/usage`}>
                       <a>
-                        <Badge color="red">Project has exceeded usage limits </Badge>
+                        <Badge color="red">Exceeding usage limits</Badge>
                       </a>
                     </Link>
                   </div>
@@ -119,37 +113,6 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
       </div>
       <div className="flex items-center space-x-2">
         {customHeaderComponents && customHeaderComponents}
-        {IS_PLATFORM && showCmdkHelper && (
-          <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger>
-              <div className="flex">
-                <Button
-                  type="default"
-                  icon={<IconSearch size={16} strokeWidth={1.5} className="text-scale-1200" />}
-                  onClick={() => setIsOpen(true)}
-                />
-              </div>
-            </Tooltip.Trigger>
-            <Tooltip.Portal>
-              <Tooltip.Content side="bottom">
-                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                <div
-                  className={[
-                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                    'border border-scale-200 flex items-center space-x-1',
-                  ].join(' ')}
-                >
-                  {os === 'macos' ? (
-                    <IconCommand size={11.5} strokeWidth={1.5} className="text-scale-1200" />
-                  ) : (
-                    <p className="text-xs">CTRL</p>
-                  )}
-                  <p className="text-xs">K</p>
-                </div>
-              </Tooltip.Content>
-            </Tooltip.Portal>
-          </Tooltip.Root>
-        )}
         {IS_PLATFORM && <HelpPopover />}
         {IS_PLATFORM && <FeedbackDropdown />}
         {IS_PLATFORM && <NotificationsPopover />}

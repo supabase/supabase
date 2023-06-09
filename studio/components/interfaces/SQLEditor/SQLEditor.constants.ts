@@ -880,7 +880,7 @@ GRANT ALL ON SCHEMA next_auth TO postgres;
 --
 CREATE TABLE IF NOT EXISTS next_auth.users
 (
-    id uuid NOT NULL DEFAULT uuid_generate_v4(),
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
     name text,
     email text,
     "emailVerified" timestamp with time zone,
@@ -908,7 +908,7 @@ $$;
 --
 CREATE TABLE IF NOT EXISTS  next_auth.sessions
 (
-    id uuid NOT NULL DEFAULT uuid_generate_v4(),
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
     expires timestamp with time zone NOT NULL,
     "sessionToken" text NOT NULL,
     "userId" uuid,
@@ -928,7 +928,7 @@ GRANT ALL ON TABLE next_auth.sessions TO service_role;
 --
 CREATE TABLE IF NOT EXISTS  next_auth.accounts
 (
-    id uuid NOT NULL DEFAULT uuid_generate_v4(),
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
     type text NOT NULL,
     provider text NOT NULL,
     "providerAccountId" text NOT NULL,
@@ -1157,6 +1157,23 @@ as $$
   from chain;
 $$;
 `.trim(),
+  },
+  {
+    id: 21,
+    type: 'template',
+    title: 'Replication status report',
+    description: 'See the status of your replication slots and replication lag.',
+    sql: `-- Replication status report
+
+SELECT
+  s.slot_name,
+  s.active,
+  COALESCE(r.state, 'N/A') as state,
+  COALESCE(r.client_addr, null) as replication_client_address,
+  GREATEST(0, ROUND((redo_lsn-restart_lsn)/1024/1024/1024, 2)) as replication_lag_gb
+FROM pg_control_checkpoint(), pg_replication_slots s
+LEFT JOIN pg_stat_replication r ON (r.pid = s.active_pid);
+`,
   },
 ]
 

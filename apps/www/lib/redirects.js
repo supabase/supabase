@@ -1032,6 +1032,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/blog/audit',
+    destination: '/blog/postgres-audit',
+  },
+  {
+    permanent: true,
     source: '/blog/2022/03/08/audit',
     destination: '/blog/postgres-audit',
   },
@@ -1498,6 +1503,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/oss',
+    destination: '/open-source',
+  },
+  {
+    permanent: true,
     source: '/docs/company/aup',
     destination: '/aup',
   },
@@ -1789,6 +1799,26 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/reference/python',
+    destination: '/docs/reference/python/start',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/csharp',
+    destination: '/docs/reference/csharp/start',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/swift',
+    destination: '/docs/reference/swift/start',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/kotlin',
+    destination: '/docs/reference/kotlin/start',
+  },
+  {
+    permanent: true,
     source: '/docs/reference/cli',
     destination: '/docs/reference/cli/start',
   },
@@ -1902,5 +1932,93 @@ module.exports = [
     permanent: true,
     source: '/docs/guides/integrations/dashibase',
     destination: '/docs',
+  },
+  {
+    permanent: true,
+    source: '/docs/support',
+    destination: '/support',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/cli/local-development',
+    destination: '/docs/guides/getting-started/local-development',
+  },
+
+  // old case studies moved to /customers
+
+  {
+    permanent: true,
+    source: '/blog/case-study-monitoro',
+    destination: '/customers',
+  },
+  {
+    permanent: true,
+    source: '/blog/case-study-tayfa',
+    destination: '/customers',
+  },
+  {
+    permanent: true,
+    source: '/blog/case-study-xendit',
+    destination: '/customers/xendit',
+  },
+  {
+    permanent: true,
+    source: '/blog/case-study-roboflow',
+    destination: '/customers',
+  },
+  {
+    permanent: true,
+    source: '/blog/toad-a-link-shortener-with-simple-apis-for-low-coders',
+    destination: '/customers',
+  },
+  {
+    permanent: true,
+    source: '/blog/epsilon3-self-hosting',
+    destination: '/customers/epsilon3',
+  },
+  {
+    permanent: true,
+    source: '/blog/spot-flutter-with-postgres',
+    destination: '/customers',
+  },
+  {
+    permanent: true,
+    source: '/blog/mobbin-supabase-200000-users',
+    destination: '/customers/mobbin',
+  },
+  {
+    permanent: true,
+    source: '/blog/replenysh-time-to-value-in-less-than-24-hours',
+    destination: '/customers/replenysh',
+  },
+  {
+    permanent: true,
+    source: '/blog/how-supabase-accelerates-development-of-all-pull-together',
+    destination: '/customers',
+  },
+  {
+    permanent: true,
+    source: '/blog/how-supabase-accelerates-development-of-all-pull-together',
+    destination: '/customers',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-helpers/nextjs-server-components',
+    destination: '/docs/guides/auth/auth-helpers/nextjs',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/getting-started/openai/vector-search',
+    destination: '/docs/guides/ai/examples/docs-search',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/functions/examples/huggingface-image-captioning',
+    destination: '/docs/guides/ai/examples/huggingface-image-captioning',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/functions/examples/openai',
+    destination: '/docs/guides/ai/examples/openai',
   },
 ]

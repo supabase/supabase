@@ -42,7 +42,6 @@ const StackedAreaChart: React.FC<Props> = ({
   styleMap = {},
   xAxisFormatAsDate = false,
 }) => {
-  if (!isLoading && (data === undefined || data === null)) return <EmptyState />
   const transformed = useMemo(() => {
     if (!data) return []
     const mapping = data.reduce((acc, datum) => {
@@ -62,6 +61,9 @@ const StackedAreaChart: React.FC<Props> = ({
     }))
     return flattened
   }, [JSON.stringify(data)])
+
+  if (!isLoading && (data === undefined || data === null)) return <EmptyState />
+
   const dataKeys = Object.keys(transformed[0] || {}).filter((k) => k !== xAxisKey && k !== yAxisKey)
 
   const formatToDate = (value: string | number | any) => {

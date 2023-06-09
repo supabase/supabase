@@ -7,7 +7,9 @@ import {
   IconAlertTriangle,
   IconBook,
   IconChevronRight,
+  IconGitHub,
   IconHash,
+  IconMessageSquare,
   IconSearch,
   useCommandMenu,
 } from 'ui'
@@ -27,6 +29,7 @@ const questions = [
 export enum PageType {
   Markdown = 'markdown',
   Reference = 'reference',
+  GithubDiscussion = 'github-discussions',
 }
 
 export interface PageSection {
@@ -44,6 +47,16 @@ export interface PageResult {
   path: string
   meta: PageMetadata
   sections: PageSection[]
+}
+
+const getDocsUrl = () => {
+  if (!process.env.NEXT_PUBLIC_SITE_URL || !process.env.NEXT_PUBLIC_LOCAL_SUPABASE) {
+    return 'https://supabase.com/docs'
+  }
+
+  const isLocal =
+    process.env.NEXT_PUBLIC_SITE_URL.includes('localhost') || process.env.NEXT_PUBLIC_LOCAL_SUPABASE
+  return isLocal ? 'http://localhost:3001/docs' : 'https://supabase.com/docs'
 }
 
 const DocsSearch = () => {
@@ -163,14 +176,11 @@ const DocsSearch = () => {
                 value={`${page.meta.title}-item-index-${i}`}
                 type="block-link"
                 onSelect={() => {
-                  // TODO: replace with Next.js router/Link when cross-project link logic solved
-                  window.location.assign(`/docs/${page.path}`)
+                  openLink(page.type, formatPageUrl(page))
                 }}
               >
                 <div className="grow flex gap-3 items-center">
-                  <IconContainer>
-                    <IconBook strokeWidth={1.5} className="!mr-0 !w-4 !h-4" />
-                  </IconContainer>
+                  <IconContainer>{getPageIcon(page)}</IconContainer>
                   <div className="flex flex-col gap-0">
                     <CommandLabel>
                       <TextHighlighter text={page.meta.title} query={search} />
@@ -190,21 +200,14 @@ const DocsSearch = () => {
                       forceMount
                       className="ml-3 mb-3"
                       onSelect={() => {
-                        // TODO: replace with Next.js router/Link when cross-project link logic solved
-                        window.location.assign(
-                          `/docs/${page.path}${page.type === PageType.Reference ? '/' : '#'}${
-                            section.slug
-                          }`
-                        )
+                        openLink(page.type, formatSectionUrl(page, section))
                       }}
                       key={`${page.meta.title}__${section.heading}-item-index-${i}`}
                       value={`${page.meta.title}__${section.heading}-item-index-${i}`}
                       type="block-link"
                     >
                       <div className="grow flex gap-3 items-center">
-                        <IconContainer>
-                          <IconHash strokeWidth={1.5} className="!mr-0 !w-4 !h-4" />
-                        </IconContainer>
+                        <IconContainer>{getPageSectionIcon(page)}</IconContainer>
                         <div className="flex flex-col gap-2">
                           <cite>
                             <TextHighlighter
@@ -281,3 +284,64 @@ const DocsSearch = () => {
 }
 
 export default DocsSearch
+
+export function formatPageUrl(page: PageResult) {
+  const docsUrl = getDocsUrl()
+  switch (page.type) {
+    case PageType.Markdown:
+    case PageType.Reference:
+      return `${docsUrl}${page.path}`
+    case PageType.GithubDiscussion:
+      return page.path
+    default:
+      throw new Error(`Unknown page type '${page.type}'`)
+  }
+}
+
+export function formatSectionUrl(page: PageResult, section: PageSection) {
+  switch (page.type) {
+    case PageType.Markdown:
+    case PageType.GithubDiscussion:
+      return `${formatPageUrl(page)}#${section.slug}`
+    case PageType.Reference:
+      return `${formatPageUrl(page)}/${section.slug}`
+    default:
+      throw new Error(`Unknown page type '${page.type}'`)
+  }
+}
+
+export function getPageIcon(page: PageResult) {
+  switch (page.type) {
+    case PageType.Markdown:
+    case PageType.Reference:
+      return <IconBook strokeWidth={1.5} className="!mr-0 !w-4 !h-4" />
+    case PageType.GithubDiscussion:
+      return <IconGitHub strokeWidth={1.5} className="!mr-0 !w-4 !h-4" />
+    default:
+      throw new Error(`Unknown page type '${page.type}'`)
+  }
+}
+
+export function getPageSectionIcon(page: PageResult) {
+  switch (page.type) {
+    case PageType.Markdown:
+    case PageType.Reference:
+      return <IconHash strokeWidth={1.5} className="!mr-0 !w-4 !h-4" />
+    case PageType.GithubDiscussion:
+      return <IconMessageSquare strokeWidth={1.5} className="!mr-0 !w-4 !h-4" />
+    default:
+      throw new Error(`Unknown page type '${page.type}'`)
+  }
+}
+
+export function openLink(pageType: PageType, link: string) {
+  switch (pageType) {
+    case PageType.Markdown:
+    case PageType.Reference:
+      return window.location.assign(link)
+    case PageType.GithubDiscussion:
+      return window.open(link, '_blank')
+    default:
+      throw new Error(`Unknown page type '${pageType}'`)
+  }
+}

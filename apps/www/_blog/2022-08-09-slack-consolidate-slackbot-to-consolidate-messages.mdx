@@ -192,15 +192,26 @@ Go to [SQL Editor](https://app.supabase.com/project/_/sql) and run insert comman
 Inserting a public channel named #support-channel to be monitored:
 
 ```sql
-INSERT INTO slack_channels(channel,channel_id,p_level,dest_channel, dest_channel_id, private)
-VALUES ('support-channel','C0000ABC02DE','Support msgs', 'all_them_messages','C0000ABC02DF',0);
+insert into slack_channels
+  (channel, channel_id, p_level, dest_channel, dest_channel_id, private)
+values
+  ('support-channel', 'C0000ABC02DE', 'Support msgs', 'all_them_messages', 'C0000ABC02DF', 0);
 ```
 
 Inserting a **private** channel named #support-enterprise to be monitored:
 
 ```sql
-INSERT INTO slack_channels(channel,channel_id,p_level,dest_channel, dest_channel_id, private)
-VALUES ('support-enterprise','C0000ABC02DC','Enterprise Support msgs', 'all_them_messages','C0000ABC02DF',1);
+insert into slack_channels
+  (channel, channel_id, p_level, dest_channel, dest_channel_id, private)
+values
+  (
+    'support-enterprise',
+    'C0000ABC02DC',
+    'Enterprise Support msgs',
+    'all_them_messages',
+    'C0000ABC02DF',
+    1
+  );
 ```
 
 Notes:
@@ -403,9 +414,9 @@ if __name__ == '__main__':
     main()
 ```
 
-Of course, we aren't doing proper Python example if we don't make a test notebook available:
+Of course, we aren't doing a proper Python example if we don't make a test notebook available:
 
-[![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mansueli/SlackConsolidate/blob/main/SlackConsolidate_bot.ipynb)
+[Open in Colab](https://colab.research.google.com/github/mansueli/SlackConsolidate/blob/main/SlackConsolidate_bot.ipynb)
 
 ## Conclusion
 

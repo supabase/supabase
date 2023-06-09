@@ -302,7 +302,7 @@ class StorageExplorerStore {
     const formattedName = this.sanitizeNameForDuplicateInColumn(folderName, autofix, columnIndex)
     if (formattedName === null) return
 
-    if (!/^[a-zA-Z0-9_-]*$/.test(formattedName)) {
+    if (!/^[a-zA-Z0-9_-\s]*$/.test(formattedName)) {
       return this.ui.setNotification({
         message: 'Folder name contains invalid special characters',
         category: 'error',
@@ -407,13 +407,15 @@ class StorageExplorerStore {
       })
     } else {
       // Need to generate signed URL, and might as well save it to cache as well
-      const signedUrl = await this.fetchFilePreview(file.name, expiresIn)
-
-      try {
-        let formattedUrl = new URL(signedUrl)
+      const signedUrlAsync = this.fetchFilePreview(file.name, expiresIn).then((signedUrl) => {
+        const formattedUrl = new URL(signedUrl)
         formattedUrl.searchParams.set('t', new Date().toISOString())
 
-        copyToClipboard(formattedUrl.toString(), () => {
+        return formattedUrl.toString()
+      })
+
+      try {
+        copyToClipboard(signedUrlAsync, () => {
           this.ui.setNotification({
             category: 'success',
             message: `Copied URL for ${file.name} to clipboard.`,
@@ -422,7 +424,7 @@ class StorageExplorerStore {
         })
         const fileCache = {
           id: file.id,
-          url: formattedUrl.toString(),
+          url: await signedUrlAsync,
           expiresIn: DEFAULT_EXPIRY,
           fetchedAt: Date.now(),
         }
@@ -925,6 +927,7 @@ class StorageExplorerStore {
     })
 
     const files = await this.getAllItemsAlongFolder(folder)
+
     this.ui.setNotification({
       id: toastId,
       category: 'loading',
@@ -1122,7 +1125,7 @@ class StorageExplorerStore {
 
   renameFile = async (file, newName, columnIndex) => {
     const originalName = file.name
-    if (originalName === newName) {
+    if (originalName === newName || newName.length === 0) {
       this.updateRowStatus(originalName, STORAGE_ROW_STATUS.READY, columnIndex)
     } else {
       this.updateRowStatus(originalName, STORAGE_ROW_STATUS.LOADING, columnIndex, newName)
@@ -1469,8 +1472,11 @@ class StorageExplorerStore {
       formattedPathToFolder = `${prefix}/${name}`
     }
 
+    // [Joshen] limit is set to 10k to optimize reduction of requests, we've done some experiments
+    // that prove that the time to fetch all files in a folder reduces as the batch size increases
+    // 10k however, is the hard limit at the API level.
     const options = {
-      limit: LIMIT,
+      limit: 10000,
       offset: OFFSET,
       sortBy: { column: this.sortBy, order: this.sortByOrder },
     }

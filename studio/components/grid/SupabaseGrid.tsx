@@ -168,7 +168,6 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>((props
         filter as string[]
       )
 
-      console.log('savedState:', savedState)
       if (savedState.sorts || savedState.filters) {
         setParams((prevParams) => {
           return {

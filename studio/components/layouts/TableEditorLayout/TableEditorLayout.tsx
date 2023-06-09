@@ -1,4 +1,4 @@
-import { PropsWithChildren, useEffect, useState } from 'react'
+import { PropsWithChildren, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { noop } from 'lodash'
 import { observer } from 'mobx-react-lite'
@@ -9,7 +9,7 @@ import { useParams } from 'common/hooks'
 import { Entity } from 'data/entity-types/entity-type-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { useIsTableLoaded, useTableEditorStateSnapshot } from 'state/table-editor'
-import ProjectLayout from '../ProjectLayout/ProjectLayout'
+import ProjectLayout from '../'
 import TableEditorMenu from './TableEditorMenu'
 import NoPermission from 'components/ui/NoPermission'
 import useEntityType from 'hooks/misc/useEntityType'
@@ -19,6 +19,7 @@ import useTableRowsPrefetchWrapper from './TableEditorLayout.utils'
 
 export interface TableEditorLayoutProps {
   selectedSchema?: string
+  selectedTable?: string
   onSelectSchema: (schema: string) => void
   onAddTable: () => void
   onEditTable: (table: Entity) => void
@@ -28,6 +29,7 @@ export interface TableEditorLayoutProps {
 
 const TableEditorLayout = ({
   selectedSchema,
+  selectedTable,
   onSelectSchema = noop,
   onAddTable = noop,
   onEditTable = noop,
@@ -123,6 +125,7 @@ const TableEditorLayout = ({
   return (
     <ProjectLayout
       product="Table editor"
+      selectedTable={selectedTable}
       productMenu={
         <TableEditorMenu
           selectedSchema={selectedSchema}

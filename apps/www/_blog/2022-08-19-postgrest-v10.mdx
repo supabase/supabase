@@ -39,6 +39,7 @@ The `text` format is used by default, which gives you the same output you’d ge
 
 For `supabase-js`, you can get the execution plan using the `explain()` transform. This works for every `supabase-js` method, including `rpc()`. Here’s an example for `select()`.
 
+{/* prettier-ignore */}
 ```jsx
 const { data, error } = await supabase
   .from('projects')
@@ -118,28 +119,28 @@ To avoid unnecessary JSON arrays in a query result, one-to-one relationships are
 
 ```sql
 -- A unique constraint on a foreign key
-create table country(
-  id serial primary key
-, name text
+create table country (
+  id serial primary key,
+  name text
 );
 
-create table capital(
-  id serial primary key
-, name text
-, country_id int unique
-, foreign key (country_id) references country(id)
+create table capital (
+  id serial primary key,
+  name text,
+  country_id int unique,
+  foreign key (country_id) references country (id)
 );
 
 -- or a primary key on a foreign key
-create table country(
-  id serial primary key
-, name text
+create table country (
+  id serial primary key,
+  name text
 );
 
-create table capital(
-  id serial primary key
-, name text
-, foreign key (id) references country(id)
+create table capital (
+  id serial primary key,
+  name text,
+  foreign key (id) references country (id)
 );
 ```
 
@@ -254,20 +255,20 @@ Detecting join tables for many-to-many relationships has been working for many r
 -- the primary key must include the foreign key columns
 -- of the many-to-many ends
 
-create table books(
-  id int primary key
-, name text
+create table books (
+  id int primary key,
+  name text
 );
 
-create table books_authors(
-  book_id int references books(id)
-, author_id int references authors(id)
-, primary key(book_id, author_id) -- this is now necessary
+create table books_authors (
+  book_id int references books (id),
+  author_id int references authors (id),
+  primary key (book_id, author_id) -- this is now necessary
 );
 
-create table authors(
-  id int primary key
-, name text
+create table authors (
+  id int primary key,
+  name text
 );
 ```
 

@@ -2,8 +2,8 @@ import { FC, ReactNode, useState, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 
+import ProjectLayout from '../'
 import { useStore, withAuth } from 'hooks'
-import BaseLayout from '../'
 import Error from 'components/ui/Error'
 import ProductMenu from 'components/ui/ProductMenu'
 import { generateAuthMenu } from './AuthLayout.utils'
@@ -40,14 +40,14 @@ const AuthLayout: FC<Props> = ({ title, children }) => {
 
   if (error) {
     return (
-      <BaseLayout>
+      <ProjectLayout>
         <Error error={error} />
-      </BaseLayout>
+      </ProjectLayout>
     )
   }
 
   return (
-    <BaseLayout
+    <ProjectLayout
       isLoading={!loaded}
       title={title || 'Authentication'}
       product="Authentication"
@@ -56,7 +56,7 @@ const AuthLayout: FC<Props> = ({ title, children }) => {
       <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">
         {children}
       </main>
-    </BaseLayout>
+    </ProjectLayout>
   )
 }
 

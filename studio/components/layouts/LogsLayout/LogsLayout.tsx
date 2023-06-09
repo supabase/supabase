@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useRouter } from 'next/router'
 import { checkPermissions, useStore, withAuth } from 'hooks'
-import BaseLayout from 'components/layouts'
+import ProjectLayout from '../'
 import NoPermission from 'components/ui/NoPermission'
 import { generateLogsMenu } from './LogsMenu.utils'
 import ProductMenu from 'components/ui/ProductMenu'
@@ -24,16 +24,16 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
 
   if (!canUseLogsExplorer) {
     return (
-      <BaseLayout>
+      <ProjectLayout>
         <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">
           <NoPermission isFullPage resourceText="access your project's logs explorer" />
         </main>
-      </BaseLayout>
+      </ProjectLayout>
     )
   }
 
   return (
-    <BaseLayout
+    <ProjectLayout
       title={title}
       product="Logs"
       productMenu={<ProductMenu page={page} menu={generateLogsMenu(project)} />}
@@ -41,7 +41,7 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
       <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">
         {children}
       </main>
-    </BaseLayout>
+    </ProjectLayout>
   )
 }
 

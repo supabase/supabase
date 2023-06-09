@@ -33,6 +33,7 @@ transforms:
       rest: '.appname == "rest"'
       realtime: '.appname == "realtime"'
       storage: '.appname == "storage"'
+      functions: '.appname == "functions"'
       db: '.appname == "db"'
   # Kong logs only include api requests
   kong_logs:
@@ -179,6 +180,16 @@ sinks:
     # lead to broken queries from studio. This works by the assumption that containers are started in the
     # following order: vector > db > logflare > kong
     uri: 'http://kong:8000/analytics/v1/api/logs?source_name=postgres.logs&api_key=your-super-secret-and-long-logflare-key'
+  logflare_functions:
+    type: 'http'
+    inputs:
+      - router.functions
+    encoding:
+      codec: 'json'
+    method: 'post'
+    request:
+      retry_max_duration_secs: 10
+    uri: 'http://analytics:4000/api/logs?source_name=deno-relay-logs&api_key=your-super-secret-and-long-logflare-key'
   logflare_storage:
     type: 'http'
     inputs:

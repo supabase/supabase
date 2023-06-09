@@ -1,4 +1,4 @@
-import { FC, createContext, useContext, useState } from 'react'
+import { createContext, useContext, useState } from 'react'
 import { useRouter } from 'next/router'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 import { uniqBy, map as lodashMap } from 'lodash'
@@ -24,19 +24,19 @@ class ChooseFunctionFormStore implements IChooseFunctionFormStore {
 
 const ChooseFunctionFormContext = createContext<IChooseFunctionFormStore | null>(null)
 
-type ChooseFunctionFormProps = {
+export interface ChooseFunctionFormProps {
   triggerFunctions: Dictionary<any>[]
   visible: boolean
   onChange: (id: number) => void
   setVisible: (value: boolean) => void
 }
 
-const ChooseFunctionForm: FC<ChooseFunctionFormProps> = ({
+const ChooseFunctionForm = ({
   triggerFunctions,
   visible,
   onChange,
   setVisible,
-}) => {
+}: ChooseFunctionFormProps) => {
   const _localState = useLocalObservable(() => new ChooseFunctionFormStore())
   _localState.triggerFunctions = triggerFunctions as any
 
@@ -55,25 +55,27 @@ const ChooseFunctionForm: FC<ChooseFunctionFormProps> = ({
       onCancel={() => setVisible(!visible)}
       className="hooks-sidepanel"
     >
-      {hasPublicSchemaFunctions ? (
-        <ChooseFunctionFormContext.Provider value={_localState}>
-          <div className="space-y-6">
-            <NoticeBox />
-            {_localState.functionSchemas.map((schema: string) => (
-              <SchemaFunctionGroup key={schema} schema={schema} selectFunction={selectFunction} />
-            ))}
-          </div>
-        </ChooseFunctionFormContext.Provider>
-      ) : (
-        <NoFunctionsState />
-      )}
+      <div className="py-6">
+        {hasPublicSchemaFunctions ? (
+          <ChooseFunctionFormContext.Provider value={_localState}>
+            <div className="space-y-6">
+              <NoticeBox />
+              {_localState.functionSchemas.map((schema: string) => (
+                <SchemaFunctionGroup key={schema} schema={schema} selectFunction={selectFunction} />
+              ))}
+            </div>
+          </ChooseFunctionFormContext.Provider>
+        ) : (
+          <NoFunctionsState />
+        )}
+      </div>
     </SidePanel>
   )
 }
 
 export default observer(ChooseFunctionForm)
 
-const NoticeBox: FC = ({}) => {
+const NoticeBox = ({}) => {
   const router = useRouter()
   const { ref } = router.query
   return (
@@ -84,7 +86,7 @@ const NoticeBox: FC = ({}) => {
         description={`You can make functions by using the Database Functions`}
         button={
           <Button
-            type="secondary"
+            type="default"
             onClick={() => {
               router.push(`/project/${ref}/database/functions`)
             }}
@@ -97,7 +99,7 @@ const NoticeBox: FC = ({}) => {
   )
 }
 
-const NoFunctionsState: FC = ({}) => {
+const NoFunctionsState = ({}) => {
   // for the empty 'no tables' state link
   const router = useRouter()
   const { ref } = router.query
@@ -117,12 +119,12 @@ const NoFunctionsState: FC = ({}) => {
   )
 }
 
-type SchemaFunctionGroupProps = {
+export interface SchemaFunctionGroupProps {
   schema: string
   selectFunction: (id: number) => void
 }
 
-const SchemaFunctionGroup: FC<SchemaFunctionGroupProps> = observer(({ schema, selectFunction }) => {
+const SchemaFunctionGroup = observer(({ schema, selectFunction }: SchemaFunctionGroupProps) => {
   const _pageState = useContext(ChooseFunctionFormContext)
   const _functions = _pageState!.triggerFunctions.filter((x) => x.schema == schema)
   return (
@@ -146,18 +148,18 @@ const SchemaFunctionGroup: FC<SchemaFunctionGroupProps> = observer(({ schema, se
   )
 })
 
-type FunctionProps = {
+export interface FunctionProps {
   id: number
   completeStatement: string
   name: string
   onClick: (id: number) => void
 }
 
-const Function: FC<FunctionProps> = ({ id, completeStatement, name, onClick }) => {
+const Function = ({ id, completeStatement, name, onClick }: FunctionProps) => {
   const [visible, setVisible] = useState(false)
   return (
     <div
-      className="cursor-pointer rounded p-3 px-6 hover:bg-bg-alt-light dark:hover:bg-bg-alt-dark"
+      className="cursor-pointer rounded p-3 px-6 hover:bg-scale-200 dark:hover:bg-scale-200"
       onClick={() => onClick(id)}
     >
       <div className="flex items-center justify-between space-x-3">
@@ -165,7 +167,7 @@ const Function: FC<FunctionProps> = ({ id, completeStatement, name, onClick }) =
           <div className="flex items-center justify-center rounded bg-scale-1200 p-1 text-scale-100 ">
             <IconTerminal strokeWidth={2} size={14} />
           </div>
-          <h5 className="mb-0">{name}</h5>
+          <p className="mb-0 text-sm">{name}</p>
         </div>
         <Button
           type="text"
@@ -174,7 +176,7 @@ const Function: FC<FunctionProps> = ({ id, completeStatement, name, onClick }) =
             setVisible(!visible)
           }}
           icon={
-            <IconChevronDown className={visible ? 'rotate-0 transform' : 'rotate-180 transform'} />
+            <IconChevronDown className={visible ? 'rotate-180 transform' : 'rotate-0 transform'} />
           }
         >
           {visible ? 'Hide definition' : 'View definition'}

@@ -5,11 +5,12 @@ import { observer } from 'mobx-react-lite'
 import { useStore, withAuth } from 'hooks'
 import { useParams } from 'common/hooks'
 import { AutoApiService, useProjectApiQuery } from 'data/config/project-api-query'
-import ProjectLayout from '../ProjectLayout/ProjectLayout'
+import ProjectLayout from '../'
 import StorageMenu from './StorageMenu'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import { formatPoliciesForStorage } from 'components/to-be-cleaned/Storage/Storage.utils'
 import DeleteBucketModal from 'components/to-be-cleaned/Storage/DeleteBucketModal'
+import { PROJECT_STATUS } from 'lib/constants'
 
 interface Props {
   title: string
@@ -19,7 +20,6 @@ interface Props {
 const StorageLayout: FC<Props> = ({ title, children }) => {
   const { ui, meta } = useStore()
   const { ref: projectRef } = useParams()
-
   const storageExplorerStore = useStorageStore()
   const {
     selectedBucketToEdit,
@@ -32,11 +32,15 @@ const StorageLayout: FC<Props> = ({ title, children }) => {
   const { data: settings, isLoading } = useProjectApiQuery({ projectRef })
   const apiService = settings?.autoApiService
 
+  const isPaused = ui.selectedProject?.status === PROJECT_STATUS.INACTIVE
+
   useEffect(() => {
     if (!isLoading && apiService) initializeStorageStore(apiService)
   }, [isLoading])
 
   const initializeStorageStore = async (apiService: AutoApiService) => {
+    if (isPaused) return
+
     if (apiService.endpoint) {
       storageExplorerStore.initStore(
         projectRef,

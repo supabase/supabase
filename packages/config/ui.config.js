@@ -6,7 +6,22 @@ const brandColors = require('./default-colors')
 
 const { default: flattenColorPalette } = require('tailwindcss/lib/util/flattenColorPalette')
 
-// console.log(Object.keys(radixUiColors))
+// exclude these colors from the included set from Radix
+const excludedRadixColors = [
+  'bronze',
+  'brown',
+  'cyan',
+  'grass',
+  'olive',
+  'mauve',
+  'mint',
+  'lime',
+  'plum',
+  'sage',
+  'sand',
+  'sky',
+  'teal',
+]
 
 // generates fixed scales
 // based on the root/light mode version
@@ -26,7 +41,11 @@ function radixColorKeys() {
 
   keys = filterItems(keys, 'Dark')
 
-  // console.log('radixColorKeys', keys)
+  // remove excluded colors
+  keys = keys.filter(
+    (key) => !excludedRadixColors.some((excludeColor) => key.startsWith(excludeColor))
+  )
+
   return keys
 }
 
@@ -41,11 +60,7 @@ function generateColorClasses() {
     // create empty obj for each color
     mappedColors[x] = {}
     // create empty obj for each fixed color
-    if (
-      fixedOptions.some(function (v) {
-        return x.indexOf(v) >= 0
-      })
-    ) {
+    if (fixedOptions.some((v) => x.indexOf(v) >= 0)) {
       mappedColors[`${x}-fixed`] = {}
     }
   })
@@ -55,12 +70,7 @@ function generateColorClasses() {
       const step = index + 1
       mappedColors[x][step * 100] = `var(--colors-${x}${step})`
 
-      if (
-        fixedOptions.some(function (v) {
-          return x.indexOf(v) >= 0
-        })
-      ) {
-        // console.log(x)
+      if (fixedOptions.some((v) => x.indexOf(v) >= 0)) {
         mappedColors[`${x}-fixed`][step * 100] = `var(--colors-fixed-${x}${step})`
       }
     }
@@ -71,13 +81,7 @@ function generateColorClasses() {
 
 const colorClasses = generateColorClasses()
 
-/*
- * generateCssVariables()
- *
- * generate the CSS variables for tailwind to use
- *
- */
-
+// generate the CSS variables for tailwind to use
 function generateCssVariables() {
   // potential options
   // { fixedOptions, brandColors }
@@ -85,7 +89,12 @@ function generateCssVariables() {
   let rootColors = {}
   let darkColors = {}
 
-  const radixArray = Object.values(radixUiColors)
+  const radixArray = Object.entries(radixUiColors)
+    .filter(
+      ([key, value]) => !excludedRadixColors.some((excludeColor) => key.startsWith(excludeColor))
+    )
+    .map(([, value]) => value)
+
   const brandArray = Object.values(brandColors)
 
   function generateColors(colors, index, colorSet) {
@@ -379,12 +388,12 @@ const uiConfig = {
             bordershadow: (value) => {
               return {
                 boxShadow: `
-                var(--colors-blackA1) 0px 0px 0px 0px, 
-                var(--colors-blackA1) 0px 0px 0px 0px, 
-                var(--colors-blackA8) 0px 1px 1px 0px, 
-                ${value} 0px 0px 0px 1px, 
-                var(--colors-blackA1) 0px 0px 0px 0px, 
-                var(--colors-blackA1) 0px 0px 0px 0px, 
+                var(--colors-blackA1) 0px 0px 0px 0px,
+                var(--colors-blackA1) 0px 0px 0px 0px,
+                var(--colors-blackA8) 0px 1px 1px 0px,
+                ${value} 0px 0px 0px 1px,
+                var(--colors-blackA1) 0px 0px 0px 0px,
+                var(--colors-blackA1) 0px 0px 0px 0px,
                 rgb(64 68 82 / 8%) 0px 2px 5px 0px;
                 `,
               }
