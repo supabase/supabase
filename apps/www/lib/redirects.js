@@ -2021,4 +2021,9 @@ module.exports = [
     source: '/docs/guides/functions/examples/openai',
     destination: '/docs/guides/ai/examples/openai',
   },
+  {
+    permanent: true,
+    source: '/docs/guides/realtime/rate-limits',
+    destination: '/docs/guides/realtime/quotas',
+  },
 ]
