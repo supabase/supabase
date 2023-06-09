@@ -204,7 +204,7 @@ const UsageSection = ({
                     </div>
                   </div>
 
-                  {attribute.additionalInfo?.(subscription, usage)}
+                  {attribute.additionalInfo?.(projectRef, subscription, usage)}
 
                   <div className="space-y-1">
                     <p>
