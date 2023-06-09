@@ -36,7 +36,7 @@ const Home: NextPageWithLayout = () => {
         <ProjectUpgradeFailedBanner />
       </div>
 
-      {project?.status === PROJECT_STATUS.INACTIVE && <ProjectPausedState project={project} />}
+      {project?.status === PROJECT_STATUS.INACTIVE && <ProjectPausedState />}
 
       <div className="mx-6">
         {IS_PLATFORM && project?.status !== PROJECT_STATUS.INACTIVE && <ProjectUsageSection />}

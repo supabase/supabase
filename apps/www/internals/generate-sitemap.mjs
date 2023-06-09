@@ -24,6 +24,8 @@ async function generate() {
     '!pages/*/index.tsx',
     '!pages/api',
     '!pages/404.js',
+    '.next/server/pages/partners/integrations/*.html',
+    '.next/server/pages/partners/experts/*.html',
   ])
 
   const blogUrl = 'blog'
@@ -37,7 +39,9 @@ async function generate() {
           .filter((page) => !page.includes('_document.tsx'))
           .map((page) => {
             const path = page
+              .replace('.next/server/pages', '')
               .replace('pages', '')
+              .replace('.html', '')
               // add a `/` for blog posts
               .replace('_blog', `/${blogUrl}`)
               .replace('_case-studies', `/${caseStudiesUrl}`)

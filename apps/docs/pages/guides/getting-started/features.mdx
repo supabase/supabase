@@ -44,7 +44,7 @@ Encrypt sensitive data and store secrets using our Postgres extension, Supabase 
 
 ### Database migrations
 
-Develop locally and push your changes to your production database using migrations. [Docs](/docs/guides/cli/local-development#database-migrations)
+Develop locally and push your changes to your production database using migrations. [Docs](/docs/guides/getting-started/local-development#database-migrations)
 
 <br />
 
@@ -115,6 +115,10 @@ Unofficial libraries [supported by the community](https://github.com/supabase-co
 
 Supabase Storage makes it simple to store and serve files. [Docs](/docs/guides/storage).
 
+### Resumable uploads
+
+Upload large files easily using resumable uploads. [Docs](/docs/guides/storage/uploads).
+
 ### Storage CDN
 
 Cache large files using the Supabase CDN. [Docs](/docs/guides/storage-cdn).
@@ -167,7 +171,8 @@ Both Postgres and the Supabase Platform are production-ready. Some tools we offe
 | Storage                    | S3 Backend             | `GA`    | ✅                                          |
 | Storage                    | CDN                    | `GA`    | 🚧 [Cloudflare](https://www.cloudflare.com) |
 | Storage                    | Smart CDN              | `beta`  | 🚧 [Cloudflare](https://www.cloudflare.com) |
-| Storage                    | Image Transformations  | `beta`  | ✅                                          |
+| Storage                    | Image Transformations  | `GA`    | ✅                                          |
+| Storage                    | Resumable Uploads      | `beta`  | ✅                                          |
 | Edge Functions             |                        | `beta`  | 🚧 [Deno Deploy](https://deno.com/deploy)   |
 | Auth                       | OAuth Providers        | `beta`  | ✅                                          |
 | Auth                       | Passwordless           | `beta`  | ✅                                          |

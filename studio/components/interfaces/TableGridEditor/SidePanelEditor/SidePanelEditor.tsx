@@ -410,13 +410,13 @@ const SidePanelEditor = ({
           queryClient.invalidateQueries(sqlKeys.query(project?.ref, ['foreign-key-constraints']))
           await Promise.all([
             queryClient.invalidateQueries(
-              sqlKeys.query(project?.ref, [selectedTable!.schema, selectedTable!.name])
+              sqlKeys.query(project?.ref, [selectedTableToEdit.schema, selectedTableToEdit.name])
             ),
             queryClient.invalidateQueries(
               sqlKeys.query(project?.ref, [
                 'table-definition',
-                selectedTable!.schema,
-                selectedTable!.name,
+                selectedTableToEdit.schema,
+                selectedTableToEdit.name,
               ])
             ),
             queryClient.invalidateQueries(entityTypeKeys.list(project?.ref)),
@@ -431,7 +431,7 @@ const SidePanelEditor = ({
       }
     } catch (error: any) {
       saveTableError = true
-      ui.setNotification({ id: toastId, category: 'error', message: error.message })
+      ui.setNotification({ error, id: toastId, category: 'error', message: error.message })
     }
 
     if (!saveTableError) {
@@ -452,42 +452,71 @@ const SidePanelEditor = ({
       category: 'loading',
       message: `Adding ${rowCount.toLocaleString()} rows to ${selectedTable.name}`,
     })
-    const { error }: any = await meta.insertRowsViaSpreadsheet(
-      file,
-      selectedTable,
-      selectedHeaders,
-      (progress: number) => {
-        ui.setNotification({
-          id: toastId,
-          progress,
-          category: 'loading',
-          message: `Adding ${rowCount.toLocaleString()} rows to ${selectedTable.name}`,
-        })
-      }
-    )
 
-    if (error) {
-      ui.setNotification({
-        error,
-        id: toastId,
-        category: 'error',
-        message: `Failed to import data: ${error.message}`,
-      })
-      resolve()
+    if (file && rowCount > 0) {
+      // CSV file upload
+      const { error }: any = await meta.insertRowsViaSpreadsheet(
+        file,
+        selectedTable,
+        selectedHeaders,
+        (progress: number) => {
+          ui.setNotification({
+            id: toastId,
+            progress,
+            category: 'loading',
+            message: `Adding ${rowCount.toLocaleString()} rows to ${selectedTable.name}`,
+          })
+        }
+      )
+      if (error) {
+        ui.setNotification({
+          error,
+          id: toastId,
+          category: 'error',
+          message: `Failed to import data: ${error.message}`,
+        })
+        return resolve()
+      }
     } else {
-      await Promise.all([
-        queryClient.invalidateQueries(
-          sqlKeys.query(project?.ref, [selectedTable!.schema, selectedTable!.name])
-        ),
-      ])
-      ui.setNotification({
-        id: toastId,
-        category: 'success',
-        message: `Successfully imported ${rowCount} rows of data into ${selectedTable.name}`,
-      })
-      resolve()
-      closePanel()
+      // Text paste
+      const { error } = await meta.insertTableRows(
+        selectedTable,
+        importContent.rows,
+        selectedHeaders,
+        (progress: number) => {
+          ui.setNotification({
+            id: toastId,
+            progress,
+            category: 'loading',
+            message: `Adding ${importContent.rows.length.toLocaleString()} rows to ${
+              selectedTable.name
+            }`,
+          })
+        }
+      )
+      if (error) {
+        ui.setNotification({
+          error,
+          id: toastId,
+          category: 'error',
+          message: `Failed to import data: ${error.message}`,
+        })
+        return resolve()
+      }
     }
+
+    await Promise.all([
+      queryClient.invalidateQueries(
+        sqlKeys.query(project?.ref, [selectedTable!.schema, selectedTable!.name])
+      ),
+    ])
+    ui.setNotification({
+      id: toastId,
+      category: 'success',
+      message: `Successfully imported ${rowCount} rows of data into ${selectedTable.name}`,
+    })
+    resolve()
+    closePanel()
   }
 
   const onClosePanel = () => {
@@ -562,15 +591,14 @@ const SidePanelEditor = ({
           setIsEdited(false)
           closePanel()
         }}
-        children={
-          <Modal.Content>
-            <p className="py-4 text-sm text-scale-1100">
-              There are unsaved changes. Are you sure you want to close the panel? Your changes will
-              be lost.
-            </p>
-          </Modal.Content>
-        }
-      />
+      >
+        <Modal.Content>
+          <p className="py-4 text-sm text-scale-1100">
+            There are unsaved changes. Are you sure you want to close the panel? Your changes will
+            be lost.
+          </p>
+        </Modal.Content>
+      </ConfirmationModal>
     </>
   )
 }

@@ -72,7 +72,7 @@ Click `Save` to create the new table.
 Now we want to make sure that only the `todos` owner, the user's `wallet_address`, can access their todos. The key component of the this RLS policy is the expression
 
 ```sql
-((jwt() ->> 'walletAddress'::text) = wallet_address)
+((auth.jwt() ->> 'walletAddress'::text) = wallet_address)
 ```
 
 This expression checks that the wallet address in the requesting JWT access token is the same as the `wallet_address` in the `todos` table.
@@ -97,7 +97,7 @@ Create a `.env.local` file and enter the following values
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY` => You can find this project API key under "Settings > API" in your Supabase project
 - `SUAPBASE_JWT_SECRET`=> You can find this secret under "Settings > API" in your Supabase project
 
-```txt
+```bash
 NEXT_PUBLIC_PICKET_PUBLISHABLE_KEY="YOUR_PICKET_PUBLISHABLE_KEY"
 PICKET_PROJECT_SECRET_KEY="YOUR_PICKET_PROJECT_SECRET_KEY"
 NEXT_PUBLIC_SUPABASE_URL="YOUR_SUPABASE_URL"

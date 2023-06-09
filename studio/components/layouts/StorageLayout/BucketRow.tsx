@@ -1,25 +1,26 @@
-import { Badge, Button, Dropdown, IconChevronDown, IconLoader, IconTrash } from 'ui'
+import clsx from 'clsx'
+import Link from 'next/link'
+import { noop } from 'lodash'
+import { Badge, Button, Dropdown, IconChevronDown, IconEdit2, IconLoader, IconTrash } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { checkPermissions } from 'hooks'
 import { STORAGE_ROW_STATUS } from 'components/to-be-cleaned/Storage/Storage.constants'
-import clsx from 'clsx'
-import Link from 'next/link'
 
 interface BucketRowProps {
   bucket: any
   projectRef?: string
   isSelected: boolean
   onSelectDeleteBucket: (bucket: any) => void
-  onSelectToggleBucketPublic: (bucket: any) => void
+  onSelectEditBucket: (bucket: any) => void
 }
 
 const BucketRow = ({
   bucket = {},
   projectRef = '',
   isSelected = false,
-  onSelectDeleteBucket = () => {},
-  onSelectToggleBucketPublic = () => {},
+  onSelectDeleteBucket = noop,
+  onSelectEditBucket = noop,
 }: BucketRowProps) => {
   const canUpdateBuckets = checkPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
 
@@ -54,14 +55,15 @@ const BucketRow = ({
             overlay={[
               <Dropdown.Item
                 key="toggle-private"
-                onClick={() => onSelectToggleBucketPublic(bucket)}
+                icon={<IconEdit2 size="tiny" />}
+                onClick={() => onSelectEditBucket(bucket)}
               >
-                {bucket.public ? 'Make private' : 'Make public'}
+                Edit bucket
               </Dropdown.Item>,
               <Dropdown.Separator key="bucket-separator" />,
               <Dropdown.Item
-                icon={<IconTrash size="tiny" />}
                 key="delete-bucket"
+                icon={<IconTrash size="tiny" />}
                 onClick={() => onSelectDeleteBucket(bucket)}
               >
                 Delete bucket
@@ -75,7 +77,9 @@ const BucketRow = ({
               style={{ padding: '3px' }}
             />
           </Dropdown>
-        ) : null}
+        ) : (
+          <div className="w-5" />
+        )}
       </div>
     </div>
   )

@@ -19,13 +19,10 @@ export interface TableDefinitionProps {
 const TableDefinition = ({ id }: TableDefinitionProps) => {
   const editorRef = useRef(null)
   const monacoRef = useRef(null)
-
-  const { ui } = useStore()
   const { isDarkMode } = useTheme()
-
   const entityType = useEntityType(id)
-
   const { project } = useProjectContext()
+
   const viewResult = useViewDefinitionQuery(
     {
       schema: entityType?.schema,

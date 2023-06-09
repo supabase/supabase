@@ -4,14 +4,12 @@ import { IconAlertTriangle } from '../Icon/icons/IconAlertTriangle'
 import { IconInfo } from '../Icon/icons/IconInfo'
 import { IconX } from '../Icon/icons/IconX'
 
-// @ts-ignore
-// import AlertStyles from './Alert.module.css'
 import styleHandler from '../../lib/theme/styleHandler'
 import { IconAlertOctagon } from '../Icon/icons/IconAlertOctagon'
 import { IconCheckCircle } from '../Icon/icons/IconCheckCircle'
 
-interface Props {
-  variant?: 'success' | 'danger' | 'warning' | 'info' | 'neutral'
+export interface AlertProps {
+  variant?: AlertVariant
   className?: string
   title: string | React.ReactNode
   withIcon?: boolean
@@ -21,7 +19,9 @@ interface Props {
   actions?: React.ReactNode
 }
 
-const icons: Record<'success' | 'danger' | 'warning' | 'info' | 'neutral', React.ReactElement> = {
+export type AlertVariant = 'success' | 'danger' | 'warning' | 'info' | 'neutral'
+
+const icons: Record<AlertVariant, React.ReactElement> = {
   danger: <IconAlertOctagon strokeWidth={1.5} size={18} />,
   success: <IconCheckCircle strokeWidth={1.5} size={18} />,
   warning: <IconAlertTriangle strokeWidth={1.5} size={18} />,
@@ -38,7 +38,7 @@ function Alert({
   children,
   icon,
   actions,
-}: Props) {
+}: AlertProps) {
   let __styles = styleHandler('alert')
 
   const [visible, setVisible] = useState(true)

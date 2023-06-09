@@ -1,28 +1,39 @@
-import { APP_NAME, DESCRIPTION } from 'lib/constants'
+import '../../../packages/ui/build/css/themes/light.css'
+import '../../../packages/ui/build/css/themes/dark.css'
+
+import '../styles/index.css'
+
+import { API_URL, APP_NAME, DESCRIPTION } from 'lib/constants'
 import { DefaultSeo } from 'next-seo'
 import { AppProps } from 'next/app'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import Meta from '~/components/Favicons'
 import '../styles/index.css'
-import { post } from './../lib/fetchWrapper'
-import { AuthProvider, ThemeProvider } from 'common'
+import { post } from '~/lib/fetchWrapper'
+import { AuthProvider, ThemeProvider, useTelemetryProps } from 'common'
 import Head from 'next/head'
+import 'config/code-hike.scss'
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter()
+  const telemetryProps = useTelemetryProps()
 
-  function telemetry(route: string) {
-    return post(`https://api.supabase.io/platform/telemetry/page`, {
+  function handlePageTelemetry(route: string) {
+    return post(`${API_URL}/telemetry/page`, {
       referrer: document.referrer,
       title: document.title,
       route,
+      ga: {
+        screen_resolution: telemetryProps?.screenResolution,
+        language: telemetryProps?.language,
+      },
     })
   }
 
   useEffect(() => {
     function handleRouteChange(url: string) {
-      telemetry(url)
+      handlePageTelemetry(url)
     }
 
     // Listen for page changes after a navigation or when the query changes
@@ -31,6 +42,15 @@ export default function MyApp({ Component, pageProps }: AppProps) {
       router.events.off('routeChangeComplete', handleRouteChange)
     }
   }, [router.events])
+
+  useEffect(() => {
+    /**
+     * Send page telemetry on first page load
+     */
+    if (router.isReady) {
+      handlePageTelemetry(router.asPath)
+    }
+  }, [router.isReady])
 
   const site_title = `The Open Source Firebase Alternative | ${APP_NAME}`
   const { basePath } = useRouter()

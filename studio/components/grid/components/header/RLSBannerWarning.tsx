@@ -12,7 +12,8 @@ export default function RLSBannerWarning() {
   const { meta } = useStore()
   const { ref: projectRef, id: tableID } = useParams()
 
-  const isAcknowledged = localStorage.getItem(`${RLS_ACKNOWLEDGED_KEY}-${tableID}`) === 'true'
+  const isAcknowledged =
+    localStorage?.getItem(`${RLS_ACKNOWLEDGED_KEY}-${tableID}`) === 'true' ?? false
 
   const [isOpen, setIsOpen] = useState(false)
 
@@ -57,12 +58,11 @@ export default function RLSBannerWarning() {
             size="medium"
             onSelectCancel={() => setIsOpen(false)}
             onSelectConfirm={handleDismissWarning}
-            children={
-              <Modal.Content>
-                <RLSDisableModalContent />
-              </Modal.Content>
-            }
-          />
+          >
+            <Modal.Content>
+              <RLSDisableModalContent />
+            </Modal.Content>
+          </ConfirmationModal>
         </div>
       ) : (
         <></>

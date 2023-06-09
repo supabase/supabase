@@ -152,21 +152,13 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>((props
   ])
 
   useEffect(() => {
-    if (!state.metaService) {
-      dispatch({
-        type: 'INIT_CLIENT',
-        payload: { onSqlQuery: props.onSqlQuery },
-      })
-      dispatch({
-        type: 'INIT_CALLBACK',
-        payload: { ...props },
-      })
-    }
-  }, [state.metaService])
+    dispatch({
+      type: 'INIT_CALLBACK',
+      payload: { ...props },
+    })
+  }, [])
 
   useEffect(() => {
-    if (!state.metaService) return
-
     const initializeData = async () => {
       const { savedState } = await initTable(
         props,
@@ -187,17 +179,12 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>((props
       }
     }
 
-    const refreshView =
-      typeof props.table === 'string' &&
-      state?.table?.name !== props.table &&
-      state?.table?.schema !== props.schema
-    const refreshTable =
-      typeof props.table !== 'string' && JSON.stringify(props.table) !== JSON.stringify(state.table)
+    const refreshTable = JSON.stringify(props.table) !== JSON.stringify(state.table)
 
-    if (!state.table || refreshView || refreshTable) {
+    if (!state.table || refreshTable) {
       initializeData()
     }
-  }, [state.metaService, state.table, props.table, props.schema])
+  }, [state.table, props.table, props.schema])
 
   return (
     <div className="sb-grid">

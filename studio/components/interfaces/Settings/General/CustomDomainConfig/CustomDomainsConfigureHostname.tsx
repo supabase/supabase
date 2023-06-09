@@ -57,6 +57,7 @@ const CustomDomainsConfigureHostname = () => {
       })
     } catch (error: any) {
       ui.setNotification({
+        error,
         category: 'error',
         message: error.message,
       })
@@ -91,7 +92,7 @@ const CustomDomainsConfigureHostname = () => {
                         "You need additional permissions to update your project's custom domain settings"
                       ) : (
                         <Link href="https://supabase.com/docs/guides/platform/custom-domains">
-                          <a target="_blank">
+                          <a target="_blank" rel="noreferrer">
                             <Button type="default" icon={<IconExternalLink />}>
                               Documentation
                             </Button>

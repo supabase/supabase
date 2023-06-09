@@ -1,12 +1,12 @@
 import { CommandGroup } from 'cmdk-supabase'
 import { useCommandMenu } from './CommandMenuProvider'
-import SearchOnlyItem from './SearchOnlyItem'
+import ChildItem from './ChildItem'
 
 const ThemeOptions = ({ isSubItem = false }) => {
   const { setIsOpen, actions } = useCommandMenu()
   return (
     <CommandGroup>
-      <SearchOnlyItem
+      <ChildItem
         isSubItem={isSubItem}
         onSelect={() => {
           actions.toggleTheme(true)
@@ -14,8 +14,8 @@ const ThemeOptions = ({ isSubItem = false }) => {
         }}
       >
         Change Theme to dark
-      </SearchOnlyItem>
-      <SearchOnlyItem
+      </ChildItem>
+      <ChildItem
         isSubItem={isSubItem}
         onSelect={() => {
           actions.toggleTheme(false)
@@ -23,7 +23,7 @@ const ThemeOptions = ({ isSubItem = false }) => {
         }}
       >
         Change Theme to light
-      </SearchOnlyItem>
+      </ChildItem>
     </CommandGroup>
   )
 }

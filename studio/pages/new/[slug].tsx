@@ -4,7 +4,17 @@ import { debounce, isUndefined, values } from 'lodash'
 import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import generator from 'generate-password'
-import { Button, Listbox, IconUsers, Input, Alert, IconHelpCircle, Toggle } from 'ui'
+import {
+  Button,
+  Listbox,
+  IconUsers,
+  Input,
+  Alert,
+  IconHelpCircle,
+  Toggle,
+  IconAlertCircle,
+  IconInfo,
+} from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { NextPageWithLayout } from 'types'
@@ -35,6 +45,7 @@ import {
   EmptyPaymentMethodWarning,
 } from 'components/interfaces/Organization/NewProject'
 import SpendCapModal from 'components/interfaces/Billing/SpendCapModal'
+import InformationBox from 'components/ui/InformationBox'
 
 const Wizard: NextPageWithLayout = () => {
   const router = useRouter()
@@ -63,7 +74,7 @@ const Wizard: NextPageWithLayout = () => {
 
   const organizations = values(toJS(app.organizations.list()))
   const currentOrg = organizations.find((o: any) => o.slug === slug)
-  const stripeCustomerId = currentOrg?.stripe_customer_id
+  const billedViaOrg = Boolean(currentOrg?.subscription_id)
 
   const availableRegions = getAvailableRegions()
   const isAdmin = checkPermissions(PermissionAction.CREATE, 'projects')
@@ -82,8 +93,7 @@ const Wizard: NextPageWithLayout = () => {
     projectName !== '' &&
     passwordStrengthScore >= DEFAULT_MINIMUM_PASSWORD_STRENGTH &&
     dbRegion !== '' &&
-    dbPricingTierKey !== '' &&
-    (isSelectFreeTier || (!isSelectFreeTier && !isEmptyPaymentMethod))
+    dbPricingTierKey !== ''
 
   const delayedCheckPasswordStrength = useRef(
     debounce((value) => checkPasswordStrength(value), 300)
@@ -112,14 +122,14 @@ const Wizard: NextPageWithLayout = () => {
     }
   }, [])
 
-  useEffect(() => {
-    async function getPaymentMethods(slug: string) {
-      const { data: paymentMethods, error } = await get(`${API_URL}/organizations/${slug}/payments`)
-      if (!error) {
-        setPaymentMethods(paymentMethods)
-      }
+  async function getPaymentMethods(slug: string) {
+    const { data: paymentMethods, error } = await get(`${API_URL}/organizations/${slug}/payments`)
+    if (!error) {
+      setPaymentMethods(paymentMethods)
     }
+  }
 
+  useEffect(() => {
     if (slug) {
       getPaymentMethods(slug as string)
     }
@@ -147,6 +157,12 @@ const Wizard: NextPageWithLayout = () => {
     setDbPricingTierKey(value)
   }
 
+  function onPaymentMethodAdded() {
+    if (slug) {
+      return getPaymentMethods(slug)
+    }
+  }
+
   async function checkPasswordStrength(value: any) {
     const { message, warning, strength } = await passwordStrength(value)
     setPasswordStrengthScore(strength)
@@ -162,13 +178,22 @@ const Wizard: NextPageWithLayout = () => {
     const data: Record<string, any> = {
       cloud_provider: PROVIDERS.AWS.id, // hardcoded for DB instances to be under AWS
       org_id: currentOrg?.id,
-      name: projectName,
+      name: projectName.trim(),
       db_pass: dbPass,
       db_region: dbRegion,
       db_pricing_tier_id: (PRICING_TIER_PRODUCT_IDS as any)[dbTier],
       kps_enabled: kpsEnabled,
     }
     if (postgresVersion) {
+      if (!postgresVersion.match(/1[2-9]\..*/)) {
+        setNewProjectLoading(false)
+        ui.setNotification({
+          category: 'error',
+          message: `Invalid Postgres version, should start with a number between 12-19, a dot and additional characters, i.e. 15.2 or 15.2.0-3`,
+        })
+        return
+      }
+
       data['custom_supabase_internal_requests'] = {
         ami: { search_tags: { 'tag:postgresVersion': postgresVersion } },
       }
@@ -276,6 +301,24 @@ const Wizard: NextPageWithLayout = () => {
                 </Listbox>
               )}
 
+              {billedViaOrg && (
+                <InformationBox
+                  icon={<IconInfo size="large" strokeWidth={1.5} />}
+                  defaultVisibility={true}
+                  hideCollapse
+                  title="Billed via organization"
+                  description={
+                    <div className="space-y-3">
+                      <p className="text-sm leading-normal">
+                        This is heavy Work-In-Progress and not customer facing yet, use with
+                        caution! This organization uses the new org level billing, instead of having
+                        individual subscriptions per project.
+                      </p>
+                    </div>
+                  }
+                />
+              )}
+
               {!isAdmin && <NotOrganizationOwnerWarning />}
             </Panel.Content>
 
@@ -310,6 +353,7 @@ const Wizard: NextPageWithLayout = () => {
                       id="custom-postgres-version"
                       layout="horizontal"
                       label="Postgres Version"
+                      autoComplete="off"
                       descriptionText={
                         <p>
                           Specify a custom version of Postgres (Defaults to the latest)
@@ -382,7 +426,7 @@ const Wizard: NextPageWithLayout = () => {
               </>
             )}
 
-            {isAdmin && (
+            {isAdmin && !billedViaOrg && (
               <Panel.Content>
                 <Listbox
                   label="Pricing Plan"
@@ -394,7 +438,12 @@ const Wizard: NextPageWithLayout = () => {
                   descriptionText={
                     <>
                       Select a plan that suits your needs.&nbsp;
-                      <a className="underline" target="_blank" href="https://supabase.com/pricing">
+                      <a
+                        className="underline"
+                        target="_blank"
+                        rel="noreferrer"
+                        href="https://supabase.com/pricing"
+                      >
                         More details
                       </a>
                       {!isSelectFreeTier && !isEmptyPaymentMethod && (
@@ -428,7 +477,7 @@ const Wizard: NextPageWithLayout = () => {
                 )}
 
                 {!isSelectFreeTier && isEmptyPaymentMethod && (
-                  <EmptyPaymentMethodWarning stripeCustomerId={stripeCustomerId} />
+                  <EmptyPaymentMethodWarning onPaymentMethodAdded={onPaymentMethodAdded} />
                 )}
               </Panel.Content>
             )}

@@ -1,31 +1,18 @@
 ---
 title: 'Supabase Logs: open source logging server'
+description: We're releasing Supabase Logs for both self-hosted users and CLI development.
 launchweek: 7
 tags:
   - launch-week
   - o11y
 date: '2023-04-10'
-to_depth: 3
+toc_depth: 3
 author: chasers,ziinc
 image: launch-week-7/day-1-supabase-logs-self-hosted/day-1-supabase-logs-self-hosted-og.jpg
 thumb: launch-week-7/day-1-supabase-logs-self-hosted/day-1-supabase-logs-self-hosted-thumb.jpg
 ---
 
 Today, we’re releasing Supabase Logs for both self-hosted users and CLI development.
-
-<div className="video-container">
-  <iframe
-    className="w-full"
-    width="560"
-    height="315"
-    src="https://www.youtube.com/embed/Ai2BjHV36Ng"
-    title="YouTube video player"
-    frameborder="0"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-    allowfullscreen
-  ></iframe>
-  _Whatch the video announcement_
-</div>
 
 ## Logflare Introduction
 
@@ -35,7 +22,16 @@ Logflare is a multi-node, highly available Elixir cluster, ingesting the log eve
 
 To expose log data to customers, we leverage Logflare Endpoints. This provides an HTTP integration into Supabase Studio, powering the log query UIs and most time-series charts. These charts live across the studio, such as the project home page and the new API reports.
 
-{/* <!--  add chart screenshot --> */}
+<div className="video-container">
+  <iframe
+    className="w-full"
+    src="https://www.youtube-nocookie.com/embed/Ai2BjHV36Ng"
+    title="YouTube video player"
+    frameborder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+    allowfullscreen
+  ></iframe>
+</div>
 
 ## Self-hosting Logflare
 
@@ -55,7 +51,7 @@ It currently supports a BigQuery backend, and we are actively working on support
 
 ## The Ingestion Pipeline
 
-Logflare receives Supabase log events via multiple methods. Services like Postgres use [Vector](vector.dev/) to clean and forward log events to the Logflare ingest API. Other services such as Realtime and Storage utilize [native Logflare integrations](https://github.com/Logflare/logflare#integrations) to send the log events directly. These then get processed and streamed into BigQuery.
+Logflare receives Supabase log events via multiple methods. Services like Postgres use [Vector](https://vector.dev/) to clean and forward log events to the Logflare ingest API. Other services such as Realtime and Storage utilize [native Logflare integrations](https://github.com/Logflare/logflare#integrations) to send the log events directly. These then get processed and streamed into BigQuery.
 
 ## The Querying Pipeline
 

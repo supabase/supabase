@@ -81,6 +81,16 @@ services:
         syslog-address: "tcp://localhost:${VECTOR_PORT}"
         tag: meta
 
+  functions:
+    depends_on:
+      analytics:
+        condition: service_healthy
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "tcp://localhost:${VECTOR_PORT}"
+        tag: functions
+
   analytics:
     container_name: supabase-analytics
     image: supabase/logflare:1.0.2

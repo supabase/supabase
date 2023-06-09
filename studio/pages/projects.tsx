@@ -38,7 +38,7 @@ const ProjectsPage: NextPageWithLayout = () => {
 
 ProjectsPage.getLayout = (page) => (
   <AccountLayout
-    title="Supabase"
+    title="Dashboard"
     breadcrumbs={[
       {
         key: `supabase-projects`,

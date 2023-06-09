@@ -222,30 +222,18 @@ export default {
       red: `bg-red-200 text-red-1100 border border-red-700`,
       crimson: `bg-crimson-200 text-crimson-1100 border border-crimson-700`,
       pink: `bg-pink-200 text-pink-1100 border border-pink-700`,
-      plum: `bg-plum-200 text-plum-1100 border border-plum-700`,
       purple: `bg-purple-200 text-purple-1100 border border-purple-700`,
       violet: `bg-violet-200 text-violet-1100 border border-violet-700`,
       indigo: `bg-indigo-200 text-indigo-1100 border border-indigo-700`,
       blue: `bg-blue-200 text-blue-1100 border border-blue-700`,
-      cyan: `bg-cyan-200 text-cyan-1100 border border-cyan-700`,
-      teal: `bg-teal-200 text-teal-1100 border border-teal-700`,
       green: `bg-green-200 text-green-1100 border border-green-700`,
       grass: `bg-grass-200 text-grass-1100 border border-grass-700`,
-      brown: `bg-brown-200 text-brown-1100 border border-brown-700`,
       orange: `bg-orange-200 text-orange-1100 border border-orange-700`,
-      sky: `bg-sky-200 text-sky-1100 border border-sky-700`,
-      mint: `bg-mint-200 text-mint-1100 border border-mint-700`,
-      lime: `bg-lime-200 text-lime-1100 border border-lime-700`,
       yellow: `bg-yellow-200 text-yellow-1100 border border-yellow-700`,
       amber: `bg-amber-200 text-amber-1100 border border-amber-700`,
       gold: `bg-gold-200 text-gold-1100 border border-gold-700`,
-      bronze: `bg-bronze-200 text-bronze-1100 border border-bronze-700`,
       gray: `bg-gray-200 text-gray-1100 border border-gray-700`,
-      mauve: `bg-mauve-200 text-mauve-1100 border border-mauve-700`,
       slate: `bg-slate-200 text-slate-1100 border border-slate-700`,
-      sage: `bg-sage-200 text-sage-1100 border border-sage-700`,
-      olive: `bg-olive-200 text-olive-1100 border border-olive-700`,
-      sand: `bg-sand-200 text-sand-1100 border border-sand-700`,
     },
   },
 
@@ -256,7 +244,7 @@ export default {
 
   alert: {
     base: `
-      relative rounded border py-4 px-6
+      relative rounded-md border py-4 px-6
       flex space-x-4 items-start
     `,
     header: 'block text-sm font-normal mb-1',
@@ -275,10 +263,10 @@ export default {
         description: `text-amber-1100`,
       },
       info: {
-        base: `bg-blue-200 dark:bg-blue-100 border-blue-700`,
-        icon: `text-blue-900`,
-        header: `text-blue-1200`,
-        description: `text-blue-1100`,
+        base: `bg-scale-400 border-scale-500 dark:bg-scale-100 dark:border-scale-300`,
+        icon: `text-scale-900`,
+        header: `text-scale-1200`,
+        description: `text-scale-1100`,
       },
       success: {
         base: `bg-brand-300 dark:bg-brand-100 border-brand-700`,
@@ -891,7 +879,7 @@ export default {
             horizontal: 'flex flex-row space-x-2',
           },
         },
-        group: `flex flex-row gap-3`,
+        group: `grid grid-cols-12 gap-3`,
         base: `
           transition
           border border-scale-700 hover:border-scale-900
@@ -1193,7 +1181,6 @@ export default {
     // root:
     trigger: `
       flex
-
       border-none
       rounded
       bg-transparent p-0
@@ -1213,8 +1200,8 @@ export default {
     `,
     content: `
       z-40
-      bg-scale-100 dark:bg-scale-300
-      border border-scale-300 dark:border-scale-500
+      bg
+      border
       rounded
       shadow-lg
       py-1.5
@@ -1238,25 +1225,25 @@ export default {
     item: `
       group
       relative
-      text-xs
-      text-scale-1100
+      text-sm
+      text-body-light
       px-4 py-1.5 flex items-center space-x-2
       cursor-pointer
-      focus:bg-scale-300 dark:focus:bg-scale-500
-      focus:text-scale-1200
+      focus:bg-selection
+      focus:text-body
       border-none
       focus:outline-none
     `,
+    disabled: `opacity-50 cursor-default`,
     label: `
-      text-scale-900
+      text-body-lighter
       px-4 flex items-center space-x-2 py-1.5
       text-xs
     `,
     separator: `
       w-full
-      h-px
       my-2
-      bg-scale-300 dark:bg-scale-500
+      border-t-[1px]
     `,
     misc: `
       px-4 py-1.5

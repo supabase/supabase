@@ -1,8 +1,7 @@
 import { uuidv4 } from 'lib/helpers'
 import { action, makeAutoObservable } from 'mobx'
-import { Project, Notification, User, Organization, ProjectBase, Permission } from 'types'
+import { Project, Notification, Organization, ProjectBase, Permission } from 'types'
 import { IRootStore } from './RootStore'
-import Telemetry, { GoogleAnalyticsProps } from 'lib/telemetry'
 
 export interface IUiStore {
   language: 'en-US'
@@ -12,14 +11,11 @@ export interface IUiStore {
   selectedOrganization?: Organization
   notification?: Notification
   permissions?: Permission[]
-  googleAnalyticsProps?: GoogleAnalyticsProps
   load: () => void
   setProjectRef: (ref?: string) => void
   setOrganizationSlug: (slug?: string) => void
   setNotification: (notification: Notification) => string
-  setProfile: (value: User) => void
   setPermissions: (permissions?: Permission[]) => void
-  setGaClientId: (clientId?: string) => void
 }
 export default class UiStore implements IUiStore {
   rootStore: IRootStore
@@ -84,14 +80,6 @@ export default class UiStore implements IUiStore {
     return undefined
   }
 
-  get googleAnalyticsProps() {
-    return {
-      screenResolution:
-        typeof window !== 'undefined' ? `${window.innerWidth}x${window.innerHeight}` : undefined,
-      language: this.language,
-    }
-  }
-
   load() {
     if (typeof window === 'undefined') return
   }
@@ -110,20 +98,7 @@ export default class UiStore implements IUiStore {
     return id
   }
 
-  setProfile(value: User) {
-    Telemetry.sendIdentify(value, this.googleAnalyticsProps)
-  }
-
   setPermissions(permissions?: any) {
     this.permissions = permissions
-  }
-
-  setGaClientId(clientId?: string) {
-    /**
-     * We need to access ga client_id from base.constructHeaders method
-     * in order to set custom header('ga_client_id).
-     * TODO: Do we have a better way than storing in local storage?
-     */
-    window.localStorage.setItem('ga_client_id', String(clientId))
   }
 }

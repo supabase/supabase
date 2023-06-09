@@ -99,7 +99,11 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
         </div>
 
         <Button type="default" icon={<IconExternalLink size={14} strokeWidth={1.5} />}>
-          <a target="_blank" href="https://supabase.com/docs/guides/platform/database-usage">
+          <a
+            target="_blank"
+            rel="noreferrer"
+            href="https://supabase.com/docs/guides/platform/database-usage"
+          >
             What is disk size?
           </a>
         </Button>
@@ -125,7 +129,7 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
                       {subscriptionTier === PRICING_TIER_PRODUCT_IDS.FREE ? (
                         <div>
                           <p>
-                            Your project is currently on the Free tier - upgrade to the Pro tier for
+                            Your project is currently on the Free plan - upgrade to the Pro plan for
                             a greatly increased quota and continue to scale.
                           </p>
                           <p className="mb-4">
@@ -209,7 +213,7 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
                         if (!isAvailableInPlan) {
                           usageElement = (
                             <div className="flex items-center justify-between">
-                              <span>Not included in {planName} tier</span>
+                              <span>Not included in {planName} plan</span>
                               {canUpdateSubscription && (
                                 <Button
                                   size="tiny"
@@ -412,6 +416,7 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
                         <Button type="danger" className="mt-3">
                           <a
                             target="_blank"
+                            rel="noreferrer"
                             href="https://supabase.com/docs/guides/platform/database-usage#database-storage-management"
                           >
                             Upgrade this project
@@ -425,6 +430,7 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
                         >
                           <a
                             target="_blank"
+                            rel="noreferrer"
                             href="https://supabase.com/docs/guides/platform/database-usage#database-storage-management"
                           >
                             Database storage management docs

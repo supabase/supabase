@@ -11,8 +11,7 @@ export const meta = {
 Supabase Storage offers the functionality to transform and resize images dynamically. Any image stored in your buckets can be transformed and optimized for fast delivery.
 
 <Admonition type="note">
-  Image Resizing is currently in beta and enabled for [Pro tier and
-  above](https://supabase.com/pricing).
+  Image Resizing is currently enabled for [Pro plan and above](https://supabase.com/pricing).
 </Admonition>
 
 <div className="video-container">
@@ -77,7 +76,7 @@ For instance, if you use Chrome when viewing a jpeg image and using transformati
 As a result, this will lower the bandwidth that you send to your users and your application will load much faster.
 
 <Admonition type="note">
-    We currently only support WebP. AVIF support will come in the near future
+  We currently only support WebP. AVIF support will come in the near future
 </Admonition>
 
 **Disabling automatic optimisation:**
@@ -87,11 +86,11 @@ this is also supported in the JavaScript SDK starting from v2.2.0
 
 ```ts
 await storage.from('bucket').download('image.jpeg', {
-      transform: {
-        width: 200,
-        height: 200,
-        format: 'origin',
-      },
+  transform: {
+    width: 200,
+    height: 200,
+    format: 'origin',
+  },
 })
 ```
 
@@ -105,7 +104,9 @@ To get started, create a `supabase-image-loader.js` file in your NextJS project 
 const projectId = '' // your supabase project id
 
 export default function supabaseLoader({ src, width, quality }) {
-  return `https://${projectId}.supabase.co/storage/v1/render/image/public/${src}?width=${width}&quality=${quality || 75}`
+  return `https://${projectId}.supabase.co/storage/v1/render/image/public/${src}?width=${width}&quality=${
+    quality || 75
+  }`
 }
 ```
 
@@ -193,11 +194,11 @@ Under the hood we use the awesome [Imgproxy](https://imgproxy.net/)
 Simply deploy an imgproxy container with the following configuration:
 
 ```yaml
-  imgproxy:
-    image: darthsim/imgproxy
-    environment:
-      - IMGPROXY_ENABLE_WEBP_DETECTION=true
-      - IMGPROXY_JPEG_PROGRESSIVE=true
+imgproxy:
+  image: darthsim/imgproxy
+  environment:
+    - IMGPROXY_ENABLE_WEBP_DETECTION=true
+    - IMGPROXY_JPEG_PROGRESSIVE=true
 ```
 
 Note: make sure that this service can only be reachable within an internal network and not exposed to the public internet

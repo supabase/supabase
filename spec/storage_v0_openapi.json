@@ -85,14 +85,15 @@
                   "public": { "type": "boolean", "examples": [false] },
                   "file_size_limit": {
                     "anyOf": [
-                      { "type": "integer", "examples": [1000] },
-                      { "type": "string", "examples": ["100MB"] }
+                      { "type": "integer", "examples": [1000], "nullable": true, "minimum": 0 },
+                      { "type": "string", "examples": ["100MB"], "nullable": true }
                     ]
                   },
                   "allowed_mime_types": {
                     "type": "array",
-                    "items": { "type": "string" },
-                    "examples": [["image/png", "image/jpg"]]
+                    "nullable": true,
+                    "examples": [["image/png", "image/jpg"]],
+                    "items": { "type": "string" }
                   }
                 },
                 "required": ["name"]
@@ -161,7 +162,7 @@
                       "name": { "type": "string" },
                       "owner": { "type": "string" },
                       "public": { "type": "boolean" },
-                      "file_size_limit": { "type": "integer" },
+                      "file_size_limit": { "type": ["null", "integer"] },
                       "allowed_mime_types": {
                         "type": ["null", "array"],
                         "items": { "type": "string" }
@@ -291,7 +292,7 @@
                     "name": { "type": "string" },
                     "owner": { "type": "string" },
                     "public": { "type": "boolean" },
-                    "file_size_limit": { "type": "integer" },
+                    "file_size_limit": { "type": ["null", "integer"] },
                     "allowed_mime_types": {
                       "type": ["null", "array"],
                       "items": { "type": "string" }
@@ -337,12 +338,13 @@
                   "public": { "type": "boolean", "examples": [false] },
                   "file_size_limit": {
                     "anyOf": [
-                      { "type": "integer", "examples": [1000] },
-                      { "type": "string", "examples": ["100MB"] }
+                      { "type": "integer", "examples": [1000], "nullable": true, "minimum": 0 },
+                      { "type": "string", "examples": ["100MB"], "nullable": true }
                     ]
                   },
                   "allowed_mime_types": {
                     "type": "array",
+                    "nullable": true,
                     "items": { "type": "string", "examples": [["image/png", "image/jpg"]] }
                   }
                 }
@@ -553,6 +555,7 @@
                   "description": "Successful response",
                   "type": "object",
                   "properties": {
+                    "Id": { "type": "string" },
                     "Key": { "type": "string", "examples": ["avatars/folder/cat.png"] }
                   },
                   "required": ["Key"]
@@ -605,6 +608,7 @@
                   "description": "Successful response",
                   "type": "object",
                   "properties": {
+                    "Id": { "type": "string" },
                     "Key": { "type": "string", "examples": ["avatars/folder/cat.png"] }
                   },
                   "required": ["Key"]
@@ -694,7 +698,7 @@
                           "name": { "type": "string" },
                           "owner": { "type": "string" },
                           "public": { "type": "boolean" },
-                          "file_size_limit": { "type": "integer" },
+                          "file_size_limit": { "type": ["null", "integer"] },
                           "allowed_mime_types": {
                             "type": ["null", "array"],
                             "items": { "type": "string" }
@@ -874,11 +878,11 @@
         ],
         "responses": {
           "200": {
-            "description": "Succesful response",
+            "description": "Successful response",
             "content": {
               "application/json": {
                 "schema": {
-                  "description": "Succesful response",
+                  "description": "Successful response",
                   "type": "object",
                   "properties": {
                     "Key": { "type": "string", "examples": ["avatars/folder/cat.png"] }
@@ -1241,7 +1245,7 @@
                           "name": { "type": "string" },
                           "owner": { "type": "string" },
                           "public": { "type": "boolean" },
-                          "file_size_limit": { "type": "integer" },
+                          "file_size_limit": { "type": ["null", "integer"] },
                           "allowed_mime_types": {
                             "type": ["null", "array"],
                             "items": { "type": "string" }

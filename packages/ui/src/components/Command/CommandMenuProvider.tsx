@@ -1,8 +1,11 @@
 import { useTheme, UseThemeProps } from 'common'
-import * as React from 'react'
+import dynamic from 'next/dynamic'
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
-import CommandMenu from './CommandMenu'
-import { ReactMarkdownOptions } from 'react-markdown/lib/react-markdown'
+
+// `CommandMenu` is heavy - code split to reduce app bundle size
+const CommandMenu = dynamic(() => import('./CommandMenu'), {
+  loading: () => <p>Loading...</p>,
+})
 
 export interface CommandMenuContextValue {
   isOpen: boolean
@@ -17,15 +20,21 @@ export interface CommandMenuContextValue {
   currentPage?: string
   site: 'studio' | 'docs'
 
-  // Project metadata for easy retrieval
+  /**
+   * Project metadata for easy retrieval
+   */
   project?: { ref?: string; apiKeys?: { anon?: string; service?: string } }
-
-  // to do: remove this prop
-  // this is a temporary hack as ReactMarkdown fails our jest tests if we import the package within this UI package
-  MarkdownHandler: (props: ReactMarkdownOptions) => JSX.Element // to do: remove this. although it breaks our jest tests
+  /**
+   * Any additional metadata that CMDK component can use in its AI prompts
+   */
+  metadata?: { definitions?: string; flags?: { [key: string]: string } }
+  /**
+   * Opt in flag to use additional metadata in AI prompts
+   */
+  isOptedInToAI: boolean
 
   // Optional callback to save a generated SQL output
-  onSaveGeneratedSQL?: (answer: string, resolve: any) => void
+  saveGeneratedSQL?: (answer: string, title: string) => Promise<void>
 }
 export const CommandMenuContext = createContext<CommandMenuContextValue | undefined>(undefined)
 export const useCommandMenu = () => {
@@ -45,11 +54,22 @@ export interface CommandMenuActions {
 export interface CommandMenuProviderProps {
   site: 'studio' | 'docs'
   projectRef?: string
+  /**
+   * Project's API keys, for easy access through CMDK
+   */
   apiKeys?: { anon?: string; service?: string }
-  // to do: remove this prop
-  // this is a temporary hack as ReactMarkdown fails our jest tests if we import the package within this UI package
-  MarkdownHandler: (props: ReactMarkdownOptions) => JSX.Element
-  onSaveGeneratedSQL?: (answer: string, resolve: any) => void
+  /**
+   * Opt in flag to use additional metadata in AI prompts
+   */
+  isOptedInToAI?: boolean
+  /**
+   * Any additional metadata that CMDK component can use in its AI prompts
+   */
+  metadata?: { definitions?: string; flags?: { [key: string]: string } }
+  /**
+   * Call back when save SQL snippet button is selected
+   */
+  saveGeneratedSQL?: (answer: string, title: string) => Promise<void>
 }
 
 const CommandMenuProvider = ({
@@ -57,13 +77,14 @@ const CommandMenuProvider = ({
   site,
   projectRef,
   apiKeys,
-  MarkdownHandler,
-  onSaveGeneratedSQL,
+  metadata,
+  isOptedInToAI = false,
+  saveGeneratedSQL,
 }: PropsWithChildren<CommandMenuProviderProps>) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const [search, setSearch] = React.useState('')
-  const [pages, setPages] = React.useState<string[]>([])
+  const [search, setSearch] = useState('')
+  const [pages, setPages] = useState<string[]>([])
   const { toggleTheme } = useTheme()
   const currentPage = pages[pages.length - 1]
 
@@ -87,8 +108,9 @@ const CommandMenuProvider = ({
         currentPage,
         site,
         project,
-        MarkdownHandler,
-        onSaveGeneratedSQL,
+        metadata,
+        isOptedInToAI,
+        saveGeneratedSQL,
       }}
     >
       {children}

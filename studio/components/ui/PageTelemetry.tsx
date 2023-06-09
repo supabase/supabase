@@ -1,4 +1,4 @@
-import { useStore } from 'hooks'
+import { useTelemetryProps } from 'common'
 import { post } from 'lib/common/fetch'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { observer } from 'mobx-react-lite'
@@ -7,7 +7,7 @@ import { FC, useEffect } from 'react'
 
 const PageTelemetry: FC = ({ children }) => {
   const router = useRouter()
-  const { ui } = useStore()
+  const telemetryProps = useTelemetryProps()
 
   useEffect(() => {
     function handleRouteChange(url: string) {
@@ -19,19 +19,23 @@ const PageTelemetry: FC = ({ children }) => {
     return () => {
       router.events.off('routeChangeComplete', handleRouteChange)
     }
-  }, [router.events])
+  }, [router])
 
   useEffect(() => {
-    /**
-     * Send page telemetry on first page load
-     * if the route is not ready. Don't need to send it will be picked up by router.event above
-     */
+    // Send page telemetry on first page load
+    // Waiting for router ready before sending page_view
+    // if not the path will be dynamic route instead of the browser url
     if (router.isReady) {
-      handlePageTelemetry(router.route)
+      handlePageTelemetry(router.asPath)
     }
-  }, [])
+  }, [router.isReady])
 
-  const handlePageTelemetry = async (route?: string) => {
+  /**
+   * send page_view event
+   *
+   * @param route: the browser url
+   * */
+  const handlePageTelemetry = async (route: string) => {
     if (IS_PLATFORM) {
       /**
        * Get referrer from browser
@@ -40,17 +44,14 @@ const PageTelemetry: FC = ({ children }) => {
 
       /**
        * Send page telemetry
-       *
-       * TODO: document.title is lagging behind routeChangeComplete
-       * that means the page title is the previous one instead of the new page title
        */
       post(`${API_URL}/telemetry/page`, {
         referrer: referrer,
         title: document.title,
         route,
         ga: {
-          screen_resolution: ui.googleAnalyticsProps?.screenResolution,
-          language: ui.googleAnalyticsProps?.language,
+          screen_resolution: telemetryProps?.screenResolution,
+          language: telemetryProps?.language,
         },
       })
     }

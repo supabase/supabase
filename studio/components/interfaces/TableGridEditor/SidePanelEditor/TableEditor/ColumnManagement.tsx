@@ -240,7 +240,8 @@ const ColumnManagement: FC<Props> = ({
                       ].join(' ')}
                     >
                       <span className="text-xs text-scale-1200">
-                        Can be either a value or a SQL expression
+                        Can either be a literal or an expression. When using an expression wrap your
+                        expression in brackets, e.g. (gen_random_uuid())
                       </span>
                     </div>
                   </Tooltip.Content>

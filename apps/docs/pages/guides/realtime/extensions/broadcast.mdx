@@ -23,10 +23,9 @@ const { createClient } = require('@supabase/supabase-js')
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY)
 
-supabase
-  .channel('test')
-  .on('broadcast', { event: 'supa' }, (payload) => console.log(payload))
-  .subscribe()
+const channel = supabase.channel('test')
+
+channel.on('broadcast', { event: 'supa' }, (payload) => console.log(payload)).subscribe()
 ```
 
 ## Send Messages
@@ -38,7 +37,9 @@ const { createClient } = require('@supabase/supabase-js')
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY)
 
-supabase.channel('test').subscribe((status) => {
+const channel = supabase.channel('test')
+
+channel.subscribe((status) => {
   if (status === 'SUBSCRIBED') {
     channel.send({
       type: 'broadcast',
@@ -59,15 +60,15 @@ You can also choose for a client to receive messages that it sent:
 
 ```js
 // Supabase client setup
-
-supabase
-  .channel('test', {
-    config: {
-      broadcast: {
-        self: true,
-      },
+const channel = supabase.channel('test', {
+  config: {
+    broadcast: {
+      self: true,
     },
-  })
+  },
+})
+
+channel
   .on('broadcast', { event: 'supa' }, (payload) => console.log(payload))
   .subscribe((status) => {
     if (status === 'SUBSCRIBED') {

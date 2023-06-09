@@ -24,6 +24,12 @@ const PROVIDER_EMAIL = {
       If disabled, only the new email is required to confirm.`,
       type: 'boolean',
     },
+    SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION: {
+      title: 'Secure password change',
+      description: `Users will need to be recently logged in to change their password.
+      If disabled, a user can change their password at any time.`,
+      type: 'boolean',
+    },
     MAILER_OTP_EXP: {
       title: 'Mailer OTP Expiration',
       type: 'number',

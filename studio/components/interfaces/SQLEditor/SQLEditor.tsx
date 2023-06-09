@@ -3,11 +3,10 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { useCallback, useRef } from 'react'
 import Split from 'react-split'
 import { getSqlEditorStateSnapshot, useSqlEditorStateSnapshot } from 'state/sql-editor'
-import MonacoEditor from './MonacoEditor'
-import UtilityPanel from './UtilityPanel/UtilityPanel'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
-
-export interface SQLEditorProps {}
+import useLatest from 'hooks/misc/useLatest'
+import MonacoEditor, { IStandaloneCodeEditor } from './MonacoEditor'
+import UtilityPanel from './UtilityPanel/UtilityPanel'
 
 const SQLEditor = () => {
   const { ref, id } = useParams()
@@ -23,8 +22,7 @@ const SQLEditor = () => {
     },
   })
 
-  const idRef = useRef(id)
-  idRef.current = id
+  const idRef = useLatest(id)
 
   const minSize = 44
   const snippet = id ? snap.snippets[id] : null
@@ -38,22 +36,26 @@ const SQLEditor = () => {
     if (id) snap.setSplitSizes(id, sizes)
   }, [])
 
-  const executeQuery = useCallback(
-    (overrideSql?: string) => {
-      // use the latest state
-      const state = getSqlEditorStateSnapshot()
-      const snippet = id && state.snippets[id]
+  const editorRef = useRef<IStandaloneCodeEditor | null>(null)
 
-      if (project && snippet && !isExecuting) {
-        execute?.({
-          projectRef: project.ref,
-          connectionString: project.connectionString,
-          sql: overrideSql ?? snippet.snippet.content.sql,
-        })
-      }
-    },
-    [isExecuting, project]
-  )
+  const executeQuery = useCallback(() => {
+    // use the latest state
+    const state = getSqlEditorStateSnapshot()
+    const snippet = idRef.current && state.snippets[idRef.current]
+
+    if (project && snippet && !isExecuting && editorRef.current !== null) {
+      const editor = editorRef.current
+      const selection = editor.getSelection()
+      const selectedValue = selection ? editor.getModel()?.getValueInRange(selection) : undefined
+      const overrideSql = selectedValue || editorRef.current?.getValue()
+
+      execute({
+        projectRef: project.ref,
+        connectionString: project.connectionString,
+        sql: overrideSql ?? snippet.snippet.content.sql,
+      })
+    }
+  }, [isExecuting, project])
 
   return (
     <div className="flex h-full flex-col">
@@ -72,7 +74,12 @@ const SQLEditor = () => {
           {isLoading ? (
             <div className="flex h-full w-full items-center justify-center">Loading...</div>
           ) : (
-            <MonacoEditor id={id!} isExecuting={isExecuting} executeQuery={executeQuery} />
+            <MonacoEditor
+              id={id}
+              editorRef={editorRef}
+              isExecuting={isExecuting}
+              executeQuery={executeQuery}
+            />
           )}
         </div>
 
@@ -80,7 +87,7 @@ const SQLEditor = () => {
           {isLoading ? (
             <div className="flex h-full w-full items-center justify-center">Loading...</div>
           ) : (
-            <UtilityPanel id={id!} isExecuting={isExecuting} executeQuery={executeQuery} />
+            <UtilityPanel id={id} isExecuting={isExecuting} executeQuery={executeQuery} />
           )}
         </div>
       </Split>

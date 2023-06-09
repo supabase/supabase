@@ -23,7 +23,7 @@ function ExampleCard(props: any) {
             <img
               src={props.author_img}
               alt={props.author + ' GitHub profile picture'}
-              className="border-scale-500 inline w-6 rounded-full"
+              className="border-scale-500 inline w-6 h-6 rounded-full"
             />
             <span className="text-scale-1200 ml-2 text-sm">{props.author}</span>
           </div>
@@ -53,10 +53,14 @@ function ExampleCard(props: any) {
             </a>
           </Link>
 
-          <div className="mt-3 flex items-center gap-2">
+          <div className="mt-3 flex items-stretch gap-2 h-[26px]">
             {props.vercel_deploy_url && (
               <a target="_blank" href={props.vercel_deploy_url}>
-                <img className="h-6" src="https://vercel.com/button" alt="vercel button" />
+                <img
+                  className="h-full w-auto"
+                  src="https://vercel.com/button"
+                  alt="vercel button"
+                />
               </a>
             )}
             {props.demo_url && (

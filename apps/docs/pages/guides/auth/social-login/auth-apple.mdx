@@ -1,4 +1,5 @@
 import Layout from '~/layouts/DefaultGuideLayout'
+import AppleSecretGenerator from '~/components/AppleSecretGenerator'
 
 export const meta = {
   id: 'auth-apple',
@@ -89,69 +90,15 @@ Now you'll need to download a `secret key` file from Apple that will be used to 
 - Save the downloaded file -- this contains your "secret key" that will be used to generate your `client_secret`.
 - Click `Done` at the top right.
 
-## Generate a `client_secret`
+## Generate a client secret
 
-The `secret key` you downloaded is used to create the `client_secret` string you'll need to authenticate your users.
+You need to configure a client secret when using Sign in with Apple for Web. This is a specially crafted [JWT signed with a secret key downloaded from Apple's Developer Center](https://developer.apple.com/documentation/signinwithapplerestapi/generate_and_validate_tokens).
 
-According to the [Apple Docs](https://developer.apple.com/documentation/signinwithapplerestapi/generate_and_validate_tokens) it needs to be a JWT
-token encrypted using the Elliptic Curve Digital Signature Algorithm (ECDSA) with the P-256 curve and the SHA-256 hash algorithm.
+<Admonition>
+  Use this tool to generate a new Apple client secret. No keys leave your browser!
+</Admonition>
 
-At this time, the easiest way to generate this JWT token is with [Ruby](https://www.ruby-lang.org/en/).
-If you don't have Ruby installed, you can [Download Ruby Here](https://www.ruby-lang.org/en/downloads).
-
-- Install Ruby (or check to make sure it's installed on your system).
-- Install [ruby-jwt](https://github.com/jwt/ruby-jwt).
-- From the command line, run: `sudo gem install jwt`.
-
-Create the script below using a text editor: `secret_gen.rb`
-
-```ruby
-require "jwt"
-
-key_file = "Path to the private key"
-team_id = "Your Team ID"
-client_id = "The Service ID of the service you created"
-key_id = "The Key ID of the private key"
-
-validity_period = 180 # In days. Max 180 (6 months) according to Apple docs.
-
-private_key = OpenSSL::PKey::EC.new IO.read key_file
-
-token = JWT.encode(
-	{
-		iss: team_id,
-		iat: Time.now.to_i,
-		exp: Time.now.to_i + 86400 * validity_period,
-		aud: "https://appleid.apple.com",
-		sub: client_id
-	},
-	private_key,
-	"ES256",
-	header_fields=
-	{
-		kid: key_id
-	}
-)
-puts token
-```
-
-1. Edit the `secret_gen.rb` file:
-
-- `key_file` = "Path to the private key you downloaded from Apple". It should look like this: `AuthKey_XXXXXXXXXX.p8`.
-- `team_id` = "Your Team ID". This is found at the top right of the Apple Developer site (next to your name).
-- `client_id` = "The Service ID of the service you created". This is the `Services ID` you created in the above step `Obtain a Services ID`. If you've lost this ID, you can find it in the Apple Developer Site:
-  - Go to `Certificates, Identifiers & Profiles`.
-  - Click `Identifiers` at the left.
-  - At the top right drop-down, select `Services IDs`.
-  - Find your Identifier in the list (i.e. app.com.acme.roadrunner).
-- `key_id` = "The Key ID of the private key". This can be found in the name of your downloaded secret file (For a file named `AuthKey_XXXXXXXXXX.p8` your key_id is `XXXXXXXXXX`). If you've lost this ID, you can find it in the Apple Developer Site:
-  - Go to `Certificates, Identifiers & Profiles`.
-  - Click `Keys` at the left.
-  - Click on your newly-created key in the list.
-  - Look under `Key ID` to find your key_id.
-
-2. From the command line, run: `ruby secret_gen.rb > client_secret.txt`.
-3. Your `client_secret` is now stored in this `client_secret.txt` file.
+<AppleSecretGenerator />
 
 ## Add your OAuth credentials to Supabase
 
@@ -180,8 +127,6 @@ async function signout() {
 ## Resources
 
 - [Apple Developer Account](https://developer.apple.com).
-- [Ruby](https://www.ruby-lang.org/en/) Docs.
-- [ruby-jwt](https://github.com/jwt/ruby-jwt) library.
 - Thanks to [Janak Amarasena](https://medium.com/@janakda) who did all the heavy lifting in [How to configure Sign In with Apple](https://medium.com/identity-beyond-borders/how-to-configure-sign-in-with-apple-77c61e336003).
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />

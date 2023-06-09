@@ -56,9 +56,9 @@ export async function getStaticProps({ params }: any) {
       relatedPosts,
       blog: {
         slug: `${params.slug}`,
-        content: mdxSource,
         source: content,
         ...data,
+        content: mdxSource,
         toc: toc(content, { maxdepth: data.toc_depth ? data.toc_depth : 2 }),
       },
     },
@@ -68,7 +68,7 @@ export async function getStaticProps({ params }: any) {
 function BlogPostPage(props: any) {
   const content = props.blog.content
   const authorArray = props.blog.author.split(',')
-  // useActiveAnchors('h2, h3, h4')
+  useActiveAnchors('h2, h3, h4', '.prose-toc a')
   const isLaunchWeek7 = props.blog.launchweek === 7
 
   const author = []
@@ -130,15 +130,21 @@ function BlogPostPage(props: any) {
     </div>
   )
 
+  const meta = {
+    title: props.blog.meta_title ?? props.blog.title,
+    description: props.blog.meat_description ?? props.blog.description,
+    url: `https://supabase.com/blog/${props.blog.slug}`,
+  }
+
   return (
     <>
       <NextSeo
-        title={props.blog.title}
-        description={props.blog.description}
+        title={meta.title}
+        description={meta.description}
         openGraph={{
-          title: props.blog.title,
-          description: props.blog.description,
-          url: `https://supabase.com/blog/${props.blog.slug}`,
+          title: meta.title,
+          description: meta.description,
+          url: meta.url,
           type: 'article',
           videos: props.blog.video && [
             {
@@ -208,7 +214,7 @@ function BlogPostPage(props: any) {
                       {author.map((author: any, i: number) => {
                         return (
                           <div className="mr-4 w-max" key={i}>
-                            <Link href={author.author_url}>
+                            <Link href={author.author_url} target="_blank">
                               <a className="cursor-pointer">
                                 <div className="flex items-center gap-3">
                                   {author.author_image_url && (

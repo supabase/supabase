@@ -18,10 +18,9 @@ export async function deleteDatabaseTrigger({
   connectionString,
 }: DatabaseTriggerDeleteVariables) {
   if (!projectRef) throw new Error('projectRef is required')
-  if (!connectionString) throw new Error('connectionString is required')
 
   let headers = new Headers()
-  headers.set('x-connection-encrypted', connectionString)
+  if (connectionString) headers.set('x-connection-encrypted', connectionString)
 
   const response = (await delete_(`${API_URL}/pg-meta/${projectRef}/triggers?id=${id}`, undefined, {
     headers: Object.fromEntries(headers),

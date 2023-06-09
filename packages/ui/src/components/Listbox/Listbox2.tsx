@@ -102,6 +102,9 @@ function Listbox({
     function handleResize() {
       // Set window width/height to state
 
+      // [Joshen] Note this causes some style conflicts if there are multiple listboxes
+      // rendered on the same page. All listbox option widths will be that of the latest
+      // listbox component that got rendered, rather than following its parent
       document.documentElement.style.setProperty(
         '--width-listbox',
         `${optionsWidth ? optionsWidth : triggerRef.current?.offsetWidth}px`

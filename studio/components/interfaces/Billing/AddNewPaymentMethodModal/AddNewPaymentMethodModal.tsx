@@ -9,16 +9,18 @@ import { useIsHCaptchaLoaded } from 'stores/hcaptcha-loaded-store'
 import { post } from 'lib/common/fetch'
 import { API_URL, STRIPE_PUBLIC_KEY } from 'lib/constants'
 import AddPaymentMethodForm from './AddPaymentMethodForm'
+import { useTheme } from 'common'
 
 interface Props {
   visible: boolean
   returnUrl: string
   onCancel: () => void
+  onConfirm: () => void
 }
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
-const AddNewPaymentMethodModal: FC<Props> = ({ visible, returnUrl, onCancel }) => {
+const AddNewPaymentMethodModal: FC<Props> = ({ visible, returnUrl, onCancel, onConfirm }) => {
   const { ui } = useStore()
   const [intent, setIntent] = useState<any>()
 
@@ -77,14 +79,21 @@ const AddNewPaymentMethodModal: FC<Props> = ({ visible, returnUrl, onCancel }) =
     }
   }
 
+  const { isDarkMode } = useTheme()
+
   const options = {
     clientSecret: intent ? intent.client_secret : '',
-    appearance: { theme: 'night', labels: 'floating' },
+    appearance: { theme: isDarkMode ? 'night' : 'flat', labels: 'floating' },
   } as any
 
   const onLocalCancel = () => {
     setIntent(undefined)
     return onCancel()
+  }
+
+  const onLocalConfirm = () => {
+    setIntent(undefined)
+    return onConfirm()
   }
 
   return (
@@ -114,7 +123,11 @@ const AddNewPaymentMethodModal: FC<Props> = ({ visible, returnUrl, onCancel }) =
       >
         <div className="py-4 space-y-4">
           <Elements stripe={stripePromise} options={options}>
-            <AddPaymentMethodForm returnUrl={returnUrl} onCancel={onLocalCancel} />
+            <AddPaymentMethodForm
+              returnUrl={returnUrl}
+              onCancel={onLocalCancel}
+              onConfirm={onLocalConfirm}
+            />
           </Elements>
         </div>
       </Modal>

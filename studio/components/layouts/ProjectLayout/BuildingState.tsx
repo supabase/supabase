@@ -84,6 +84,7 @@ const BuildingState: FC<Props> = ({ project }) => {
                         <a
                           className="mb-0 text-brand-900 transition-colors hover:text-brand-1200"
                           target="_blank"
+                          rel="noreferrer"
                         >
                           documentation
                         </a>

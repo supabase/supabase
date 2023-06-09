@@ -4,6 +4,7 @@ export const meta = {
   id: 'functions',
   title: 'Edge Functions',
   description: 'Globally distributed TypeScript functions.',
+  subtitle: 'Globally distributed TypeScript functions.',
   sidebar_label: 'Overview',
   hide_table_of_contents: true,
 }
@@ -44,6 +45,12 @@ export const examples = [
     name: 'With supabase-js',
     description: 'Use the Supabase client inside your Edge Function.',
     href: '/guides/functions/auth',
+  },
+  {
+    name: 'Type-Safe SQL with Kysely',
+    description:
+      'Combining Kysely with Deno Postgres gives you a convenient developer experience for interacting directly with your Postgres database.',
+    href: '/guides/functions/kysely-postgres',
   },
   {
     name: 'With CORS headers',
@@ -94,7 +101,7 @@ export const examples = [
   {
     name: 'Connect to Postgres',
     description: `Connecting to Postgres from Edge Functions.`,
-    href: '/guides/functions/examples/connect-to-postgres',
+    href: '/guides/functions/connect-to-postgres',
   },
   {
     name: 'Github Actions',
@@ -107,9 +114,14 @@ export const examples = [
     href: 'https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/oak-server',
   },
   {
+    name: 'Hugging Face',
+    description: `Access 100,000+ Machine Learning models.`,
+    href: '/guides/ai/examples/huggingface-image-captioning',
+  },
+  {
     name: 'OpenAI',
     description: `Using OpenAI in Edge Functions.`,
-    href: '/guides/functions/examples/openai',
+    href: '/guides/ai/examples/openai',
   },
   {
     name: 'Stripe Webhooks',
@@ -153,7 +165,7 @@ export const examples = [
   },
   {
     name: 'Rate Limiting',
-    description: `Rate Limiting Egde Functions with Upstash Redis.`,
+    description: `Rate Limiting Edge Functions with Upstash Redis.`,
     href: '/guides/functions/examples/rate-limiting',
   },
 ]

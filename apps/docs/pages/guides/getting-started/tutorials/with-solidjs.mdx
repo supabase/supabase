@@ -38,7 +38,7 @@ npm install @supabase/supabase-js
 And finally we want to save the environment variables in a `.env`.
 All we need are the API URL and the `anon` key that you copied [earlier](#get-the-api-keys).
 
-```bash title=.env
+```bash .env
 VITE_SUPABASE_URL=YOUR_SUPABASE_URL
 VITE_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
 ```
@@ -46,7 +46,7 @@ VITE_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
 Now that we have the API credentials in place, let's create a helper file to initialize the Supabase client. These variables will be exposed
 on the browser, and that's completely fine since we have [Row Level Security](/docs/guides/auth#row-level-security) enabled on our Database.
 
-```js title=src/supabaseClient.jsx
+```js src/supabaseClient.jsx
 import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
@@ -62,7 +62,7 @@ You can find the full contents of this file [here](https://raw.githubusercontent
 
 Let's set up a SolidJS component to manage logins and sign ups. We'll use Magic Links, so users can sign in with their email without using passwords.
 
-```jsx title=src/Auth.tsx
+```jsx src/Auth.tsx
 import { createSignal } from 'solid-js'
 import { supabase } from './supabaseClient'
 
@@ -122,13 +122,13 @@ After a user is signed in we can allow them to edit their profile details and ma
 
 Let's create a new component for that called `Account.tsx`.
 
-```jsx title=src/Account.tsx
+```tsx src/Account.tsx
 import { AuthSession } from '@supabase/supabase-js'
 import { Component, createEffect, createSignal } from 'solid-js'
 import { supabase } from './supabaseClient'
 
 interface Props {
-  session: AuthSession;
+  session: AuthSession
 }
 
 const Account: Component<Props> = ({ session }) => {
@@ -241,7 +241,7 @@ export default Account
 
 Now that we have all the components in place, let's update `App.tsx`:
 
-```jsx title=src/App.tsx
+```jsx src/App.tsx
 import { Component, createEffect, createSignal } from 'solid-js'
 import { supabase } from './supabaseClient'
 import { AuthSession } from '@supabase/supabase-js'
@@ -289,7 +289,7 @@ Every Supabase project is configured with [Storage](/docs/guides/storage) for ma
 
 Let's create an avatar for the user so that they can upload a profile photo. We can start by creating a new component:
 
-```jsx title=src/Avatar.tsx
+```jsx src/Avatar.tsx
 import { Component, createEffect, createSignal, JSX } from 'solid-js'
 import { supabase } from './supabaseClient'
 
@@ -392,7 +392,7 @@ export default Avatar
 
 And then we can add the widget to the Account page:
 
-```jsx title=src/Account.tsx
+```jsx src/Account.tsx
 // Import the new component
 import Avatar from './Avatar'
 

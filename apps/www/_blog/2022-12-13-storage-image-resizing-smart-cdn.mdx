@@ -6,6 +6,7 @@ image: lw6-storage/Image-resizing.jpg
 thumb: lw6-storage/Image-resizing.jpg
 tags:
   - launch-week
+  - storage
 date: '2022-12-13'
 toc_depth: 3
 video: https://www.youtube.com/v/NpEl20iuOtg
@@ -16,9 +17,9 @@ Today we're introducing three new features for Supabase Storage: Image resizing,
 
 These features are designed to work together to deliver a next-gen image resizing system. Let's explore how it works.
 
-<div className="bg-gray-300 rounded-lg p-6 italic">
+<div className="bg-gray-300 rounded-lg px-6 py-2 italic">
 
-Image Resizing is in Beta. While in Beta, it is only enabled for Pro-tier and Enterprise customers.
+🆕 What is new in Storage: [Supabase Storage v3: Resumable Uploads with support for 50GB files](https://supabase.com/blog/storage-v3-resumable-uploads)
 
 </div>
 
@@ -83,9 +84,15 @@ Behind the scenes, we've provided a few small niceties:
 - **Sane defaults:** default mode maintains aspect ratio and the resize mode is `cover`
 - **Standardization**: resize modes mirror the [object-fit](https://developer.mozilla.org/en-US/docs/Web/CSS/object-fit) property of CSS. We support the contain, cover and fill modes.
 
+<div className="bg-gray-300 rounded-lg p-6 italic">
+
+Image Resizing is in Beta. While in Beta, it is only enabled for Pro-plan and Enterprise customers.
+
+</div>
+
 ## Smart CDN
 
-Resizing images can get expensive, so before this release we knew we needed a better caching system. We already provide a “basic” CDN for all projects (including Free-tier), so the important update here is some smarter cache invalidation whenever there are changes.
+Resizing images can get expensive, so before this release we knew we needed a better caching system. We already provide a “basic” CDN for all projects (including Free-plan), so the important update here is some smarter cache invalidation whenever there are changes.
 
 ![Caching is hard](/images/blog/launch-week-6/day-2-storage-resize/caching.png)
 
@@ -173,7 +180,7 @@ The green line here shows the number of cache hits to our CDN. As you can see, w
 
 ## Availability and Pricing
 
-Image Resizing is in Beta. While in Beta, it is only enabled for Pro-tier and Enterprise customers.
+Image Resizing is in Beta. While in Beta, it is only enabled for Pro-plan and Enterprise customers.
 
 When choosing a pricing model there were a few options that competitors offered:
 
