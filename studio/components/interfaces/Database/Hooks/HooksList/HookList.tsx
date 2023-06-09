@@ -38,7 +38,7 @@ const HookList: FC<Props> = ({
   const restUrlTld = new URL(restUrl as string).hostname.split('.').pop()
 
   const filteredHooks = (hooks ?? []).filter(
-    (x: any) => includes(x.name.toLowerCase(), filterString.toLowerCase()) && x.schema === schema
+    (x: any) => includes(x.name.toLowerCase(), filterString.toLowerCase()) && x.schema === schema && x.function_args.length >= 2
   )
   const canUpdateWebhook = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'triggers')
 

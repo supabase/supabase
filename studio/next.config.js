@@ -4,7 +4,7 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 })
 
 // this is required to use shared packages in the packages directory
-const withTM = require('next-transpile-modules')(['ui', 'common'])
+const withTM = require('next-transpile-modules')(['ui', 'common', 'shared-data'])
 
 // Required for nextjs standalone build
 const path = require('path')

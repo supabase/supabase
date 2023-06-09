@@ -48,10 +48,8 @@ const TeamUpgrade = ({
   const { app, ui } = useStore()
   const router = useRouter()
 
-  // Team tier is enabled when the flag is turned on OR the user is already on the team tier (manually assigned by us)
-  const userIsOnTeamTier =
-    currentSubscription?.tier?.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.TEAM
-  const teamTierEnabled = useFlag('teamTier') || userIsOnTeamTier
+  // Team tier is enabled when the user is already on the team tier (manually assigned by us)
+  const teamTierEnabled = currentSubscription?.tier?.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.TEAM
 
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const captchaRef = useRef<HCaptcha>(null)

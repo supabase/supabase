@@ -218,7 +218,7 @@ const ProjectLinksEmptyState = () => (
       You haven't created a Supabase project yet. Get started by creating a new Supabase project,
       then close this window and retry adding integration.
     </p>
-    <Link href="https://app.supabase.com">
+    <Link href="https://supabase.com/dashboard">
       <a className="text-brand-900">
         Start a new Supabase project<span aria-hidden="true"> &rarr;</span>
       </a>
@@ -280,8 +280,8 @@ const IntegrationProject: FC = observer(() => {
         </Select>
       </div>
       <div
-        className="w-full rounded-sm border border-border-secondary-light
-      bg-panel-header-light dark:border-border-secondary-dark dark:bg-panel-header-dark"
+        className="w-full rounded-sm border border-scale-700
+      bg-panel-header-light dark:bg-panel-header-dark"
       >
         <div className="flex items-center justify-between p-6">
           <h4 className="my-auto mr-8 text-lg capitalize">{name}</h4>
