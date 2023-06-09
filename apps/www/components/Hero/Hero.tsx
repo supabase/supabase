@@ -25,7 +25,8 @@ const Hero = () => {
     if (!canvas) return
 
     const spline = new Application(canvas as any)
-    spline.load('https://prod.spline.design/EVQrv4Zsx5JT2pDe/scene.splinecode').then(() => {
+    // spline.load('https://prod.spline.design/EVQrv4Zsx5JT2pDe/scene.splinecode').then(() => {
+    spline.load('https://prod.spline.design/0Txq7YaSsBK2XeDK/scene.splinecode').then(() => {
       // const obj = spline.findObjectById('ab3a4cd0-90a8-47c7-b2c7-b0ee1e0bb8a6')
       spline.setZoom(2)
     })
@@ -50,8 +51,12 @@ const Hero = () => {
                     id="canvas3d"
                   ></canvas>
                   <div className="absolute w-full h-full z-50 pointer-events-none inset-0 bg-gradient-to-t from-[#06060a] via-transparent to-transparent" />
-                  <div className="absolute w-full h-full z-10 inset-0 bg-[#06060a] top-[130%]" />
+                  <div className="absolute w-full h-full z-50 inset-0 bg-[#06060a] top-[100%]" />
                   {/* <SBLogoVisual className="mx-auto absolute z-10 w-[50vw] max-w-[531px] h-full lg:h-[500px] max-h-[500px] bottom-[-50px] left-0 right-0" /> */}
+                  <img
+                    src="/images/index/synth-grid.svg"
+                    className="absolute mx-auto top-0 left-0 right-0 z-0 w-screen max-w-[800px] aspect-square opacity-10"
+                  />
                 </div>
                 <div className="relative z-30">
                   <h1 className="text-scale-1200 text-4xl sm:text-5xl sm:leading-none lg:text-7xl">
@@ -89,14 +94,18 @@ const Hero = () => {
           </div>
         </div>
       </SectionContainer>
-      <div className="absolute pointer-events-none z-0 w-2/3 lg:w-full max-w-5xl h-[150px] lg:h-[300px] top-0 left-0 right-0 mx-auto ![perspective:1200px] sm:![perspective:1200px] md:![perspective:1200px] lg:![perspective:1200px]">
+      {/* <div className="absolute pointer-events-none z-0 w-2/3 lg:w-full max-w-5xl h-[150px] lg:h-[300px] top-0 left-0 right-0 mx-auto ![perspective:1200px] sm:![perspective:1200px] md:![perspective:1200px] lg:![perspective:1200px]">
         <div
           className="absolute inset-0 w-full h-full top-0 mx-auto left-0 right-0 bg-gradient-to-r from-[#03C9B1] to-[#7D0CED] blur-[150px] lg:blur-[300px]"
           style={{
             transform: 'rotateX(-45deg)',
           }}
         />
-      </div>
+      </div> */}
+      <img
+        src="/images/index/gradient-bg.png"
+        className="absolute mx-auto top-0 left-0 right-0 z-0 w-screen aspect-[2.5/1] pointer-events-none opacity-100"
+      />
       <div className="relative z-30 w-1/2 container mx-auto h-px bg-gradient-to-r from-transparent via-scale-600 to-transparent" />
     </div>
   )
