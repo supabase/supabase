@@ -34,7 +34,7 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: <String, WidgetBuilder>{
-        // Splash page is needed to ensure that the authentication and proper loading of pages work
+        // Splash page is needed to ensure that authentication and page loading works correctly
         '/': (_) => const SplashPage(),
         '/login': (_) => const LoginPage(),
         '/account': (_) => const AccountPage(),
