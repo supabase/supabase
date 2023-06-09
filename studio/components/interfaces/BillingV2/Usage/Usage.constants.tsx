@@ -243,6 +243,12 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         description:
           "Count of messages going through Realtime.\nUsage example: If you do a database change and 5 clients listen to that change via Realtime, that's 5 messages. If you broadcast a message and 4 clients listen to that, that's 5 messages (1 message sent, 4 received).\nBilling is based on the total amount of messages throughout your billing period.",
         chartDescription: 'The data refreshes every 24 hours.',
+        links: [
+          {
+            name: 'Realtime Rate Limits',
+            url: 'https://supabase.com/docs/guides/realtime/rate-limits',
+          },
+        ],
       },
       {
         anchor: 'realtimePeakConnection',
@@ -254,6 +260,12 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         description:
           'Total number of successful connections. Connections attempts are not counted towards usage.\nBilling is based on the maximum amount of concurrent peak connections throughout your billing period.',
         chartDescription: 'The data refreshes every 24 hours.',
+        links: [
+          {
+            name: 'Realtime Rate Limits',
+            url: 'https://supabase.com/docs/guides/realtime/rate-limits',
+          },
+        ],
       },
     ],
   },
