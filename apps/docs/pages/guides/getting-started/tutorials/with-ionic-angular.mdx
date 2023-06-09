@@ -41,7 +41,7 @@ And finally we want to save the environment variables in the `environment.ts` fi
 All we need are the API URL and the `anon` key that you copied [earlier](#get-the-api-keys).
 These variables will be exposed on the browser, and that's completely fine since we have [Row Level Security](/docs/guides/auth#row-level-security) enabled on our Database.
 
-```ts title=environment.ts
+```ts environment.ts
 export const environment = {
   production: false,
   supabaseUrl: 'YOUR_SUPABASE_URL',
@@ -51,7 +51,7 @@ export const environment = {
 
 Now that we have the API credentials in place, let's create a **SupabaseService** with `ionic g s supabase` to initialize the Supabase client and implement functions to communicate with the Supabase API.
 
-```ts title=src/app/supabase.service.ts
+```ts src/app/supabase.service.ts
 import { Injectable } from '@angular/core'
 import { LoadingController, ToastController } from '@ionic/angular'
 import { AuthChangeEvent, createClient, Session, SupabaseClient } from '@supabase/supabase-js'
@@ -139,7 +139,7 @@ Create an **LoginPage** with `ionic g page login` Ionic CLI command.
 
 > This guide will show the template inline, but the example app will have templateUrls
 
-```ts title=src/app/login/login.page.ts
+```ts src/app/login/login.page.ts
 import { Component, OnInit } from '@angular/core'
 import { SupabaseService } from '../supabase.service'
 
@@ -198,7 +198,7 @@ export class LoginPage implements OnInit {
 After a user is signed in we can allow them to edit their profile details and manage their account.
 Create an **AccountComponent** with `ionic g page account` Ionic CLI command.
 
-```ts title=src/app/account.component.ts
+```ts src/app/account.component.ts
 import { Component, OnInit } from '@angular/core'
 import { Router } from '@angular/router'
 import { Profile, SupabaseService } from '../supabase.service'
@@ -292,7 +292,7 @@ export class AccountPage implements OnInit {
 
 Now that we have all the components in place, let's update **AppComponent**:
 
-```ts title=src/app/app.component.ts
+```ts src/app/app.component.ts
 import { Component } from '@angular/core'
 import { Router } from '@angular/router'
 import { SupabaseService } from './supabase.service'
@@ -320,7 +320,7 @@ export class AppComponent {
 
 Then update the **AppRoutingModule**
 
-```ts title=src/app/app.ts"
+```ts src/app/app.ts"
 import { NgModule } from '@angular/core'
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router'
 
@@ -376,7 +376,7 @@ Ionic PWA elements is a companion package that will polyfill certain browser API
 
 With those packages installed we can update our `main.ts` to include an additional bootstapping call for the Ionic PWA Elements.
 
-```ts title=src/main.ts
+```ts src/main.ts
 import { enableProdMode } from '@angular/core'
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic'
 
@@ -400,7 +400,7 @@ Then create an **AvatarComponent** with this Ionic CLI command:
  ionic g component avatar --module=/src/app/account/account.module.ts --create-module
 ```
 
-```ts title=src/app/avatar.component.ts
+```ts src/app/avatar.component.ts
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core'
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser'
 import { SupabaseService } from '../supabase.service'
@@ -503,7 +503,7 @@ export class AvatarComponent implements OnInit {
 
 And then we can add the widget on top of the **AccountComponent** html template:
 
-```ts title=src/app/account.component.ts
+```ts src/app/account.component.ts
 template: `
 <ion-header>
   <ion-toolbar>

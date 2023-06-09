@@ -37,7 +37,7 @@ const AccountLayout: FC<Props> = ({ children, title, breadcrumbs }) => {
     .map((organization) => ({
       isActive:
         router.pathname.startsWith('/org/') && ui.selectedOrganization?.slug === organization.slug,
-      label: organization.name,
+      label: organization.name + (organization.subscription_id ? ' (V2)' : ''),
       href: `/org/${organization.slug}/general`,
       key: organization.slug,
     }))

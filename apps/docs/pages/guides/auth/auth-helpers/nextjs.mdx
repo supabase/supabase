@@ -10,6 +10,15 @@ export const meta = {
 
 The [Next.js Auth Helpers package](https://github.com/supabase/auth-helpers) configures Supabase Auth to store the user's `session` in a `cookie`, rather than `localStorage`. This makes it available across the client and server of the App Router - [Client Components](/docs/guides/auth/auth-helpers/nextjs#client-components), [Server Components](/docs/guides/auth/auth-helpers/nextjs#server-components), [Server Actions](/docs/guides/auth/auth-helpers/nextjs#server-actions), [Route Handlers](/docs/guides/auth/auth-helpers/nextjs#route-handlers) and [Middleware](/docs/guides/auth/auth-helpers/nextjs#middleware). The `session` is automatically sent along with any requests to Supabase.
 
+<div className="video-container">
+  <iframe
+    src="https://www.youtube-nocookie.com/embed/MVYhyGZGLuo"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
+
 > Note: If you are using the `pages` directory, check out [Auth Helpers in Next.js Pages Directory](/docs/guides/auth/auth-helpers/nextjs-pages).
 
 ## Configuration
@@ -43,7 +52,7 @@ yarn add @supabase/auth-helpers-nextjs
 
 Retrieve your project's URL and anon key from your [API settings](https://app.supabase.com/project/_/settings/api), and create a `.env.local` file with the following environment variables:
 
-```bash title=".env.local"
+```bash .env.local
 NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
 ```
@@ -62,7 +71,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
 
 Create a new `middleware.js` file in the root of your project and populate with the following:
 
-```jsx title="middleware.js"
+```jsx middleware.js
 import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
 import { NextResponse } from 'next/server'
 
@@ -80,7 +89,7 @@ export async function middleware(req) {
 
 Create a new `middleware.ts` file in the root of your project and populate with the following:
 
-```tsx title="middleware.ts"
+```tsx middleware.ts
 import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
 import { NextResponse } from 'next/server'
 
@@ -116,7 +125,7 @@ The `Code Exchange` route is required for the [server-side auth flow](https://su
 
 Create a new file at `app/auth/callback/route.js` and populate with the following:
 
-```jsx title="app/auth/callback.route.js"
+```jsx app/auth/callback/route.js
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
@@ -141,7 +150,7 @@ export async function GET(request) {
 
 Create a new file at `app/auth/callback/route.ts` and populate with the following:
 
-```tsx title="app/auth/callback.route.ts"
+```tsx app/auth/callback/route.ts
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
@@ -170,6 +179,15 @@ export async function GET(request: NextRequest) {
 
 ## Authentication
 
+<div className="video-container">
+  <iframe
+    src="https://www.youtube-nocookie.com/embed/11zi7sUJFoU"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
+
 Authentication can be initiated [client](/docs/guides/auth/auth-helpers/nextjs#client-side) or [server-side](/docs/guides/auth/auth-helpers/nextjs#server-side). All of the [supabase-js authentication strategies](/docs/reference/javascript/auth-api) are supported with the Auth Helpers client.
 
 > Note: The authentication flow requires the [Code Exchange Route](/docs/guides/auth/auth-helpers/nextjs#code-exchange-route) to exchange a `code` for the user's `session`.
@@ -186,7 +204,7 @@ Client Components can be used to trigger the authentication process from event h
 >
 <TabPanel id="js" label="JavaScript">
 
-```jsx title="app/login.js"
+```jsx app/login.js
 'use client'
 
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
@@ -244,7 +262,7 @@ export default function Login() {
 
 <TabPanel id="ts" label="TypeScript">
 
-```tsx title="app/login.ts"
+```tsx app/login.ts
 'use client'
 
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
@@ -319,7 +337,7 @@ The combination of [Server Components](https://nextjs.org/docs/getting-started/r
 >
 <TabPanel id="js" label="JavaScript">
 
-```jsx title="app/login.js"
+```jsx app/login.js
 import { createServerActionClient } from '@supabase/auth-helpers-nextjs'
 import { revalidatePath } from 'next/cache'
 import { cookies } from 'next/headers'
@@ -379,7 +397,7 @@ export default async function Login() {
 
 <TabPanel id="ts" label="TypeScript">
 
-```tsx title="app/login.ts"
+```tsx app/login.ts
 import { createServerActionClient } from '@supabase/auth-helpers-nextjs'
 import { revalidatePath } from 'next/cache'
 import { cookies } from 'next/headers'
@@ -446,6 +464,15 @@ export default async function Login() {
 
 ### Client Component
 
+<div className="video-container">
+  <iframe
+    src="https://www.youtube-nocookie.com/embed/f4yAnVgcJqI"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
+
 [Client Components](https://nextjs.org/docs/getting-started/react-essentials#client-components) allow the use of client-side hooks - such as `useEffect` and `useState`. They can be used to request data from Supabase client-side, and [subscribe to realtime events](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs/app/realtime-posts.tsx).
 
 <Tabs
@@ -456,7 +483,7 @@ export default async function Login() {
 >
 <TabPanel id="js" label="JavaScript">
 
-```jsx title="app/client/page.jsx"
+```jsx app/client/page.jsx
 'use client'
 
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
@@ -483,7 +510,7 @@ export default function Home() {
 
 <TabPanel id="ts" label="TypeScript">
 
-```jsx title="app/new-post.tsx"
+```jsx app/new-post.tsx
 "use client";
 
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
@@ -521,7 +548,24 @@ export default function Home() {
 
 > check out [this repo](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs) for more examples, including [realtime subscriptions](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs/app/realtime-posts.tsx).
 
+#### Singleton
+
+The `createClientComponentClient` function implements a [Singleton pattern](https://en.wikipedia.org/wiki/Singleton_pattern) to simplify instantiating Supabase clients. If you need multiple Supabase instances across Client Components - for example, when using multiple schemas - you can pass an additional configuration option for `{ isSingleton: false }` to get a new client every time this function is called.
+
+```jsx
+const supabase = createClientComponentClient({ isSingleton: false })
+```
+
 ### Server Component
+
+<div className="video-container">
+  <iframe
+    src="https://www.youtube-nocookie.com/embed/SUS1t6Kq7-8"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
 
 [Server Components](https://nextjs.org/docs/getting-started/react-essentials#server-components) allow for asynchronous data to be fetched server-side.
 
@@ -535,7 +579,7 @@ export default function Home() {
 >
 <TabPanel id="js" label="JavaScript">
 
-```jsx title="app/page.jsx"
+```jsx app/page.jsx
 import { cookies } from 'next/headers'
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 
@@ -550,7 +594,7 @@ export default async function Home() {
 
 <TabPanel id="ts" label="TypeScript">
 
-```tsx title="app/page.tsx"
+```tsx app/page.tsx
 import { cookies } from 'next/headers'
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 
@@ -572,6 +616,15 @@ export default async function ServerComponent() {
 
 ### Server Action
 
+<div className="video-container">
+  <iframe
+    src="https://www.youtube-nocookie.com/embed/B5TUzTKO9CE"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
+
 [Server Actions](https://nextjs.org/docs/app/building-your-application/data-fetching/server-actions) allow mutations to be performed server-side.
 
 > Note: Server Actions are currently in `alpha` so may change without notice.
@@ -584,7 +637,7 @@ export default async function ServerComponent() {
 >
 <TabPanel id="js" label="JavaScript">
 
-```jsx title="app/new-post.jsx"
+```jsx app/new-post.jsx
 import { cookies } from 'next/headers'
 import { createServerActionClient } from '@supabase/auth-helpers-nextjs'
 import { revalidatePath } from 'next/cache'
@@ -611,7 +664,7 @@ export default async function NewTodo() {
 
 <TabPanel id="ts" label="TypeScript">
 
-```tsx title="app/new-post.tsx"
+```tsx app/new-post.tsx
 import { cookies } from 'next/headers'
 import { createServerActionClient } from '@supabase/auth-helpers-nextjs'
 import { revalidatePath } from 'next/cache'
@@ -643,6 +696,15 @@ export default async function NewTodo() {
 
 ### Route Handler
 
+<div className="video-container">
+  <iframe
+    src="https://www.youtube-nocookie.com/embed/3kK-40z0DHI"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
+
 [Route Handlers](https://nextjs.org/docs/app/building-your-application/routing/router-handlers) replace API Routes and allow for logic to be performed server-side. They can respond to `GET`, `POST`, `PUT`, `PATCH`, `DELETE`, `HEAD`, and `OPTIONS` requests.
 
 <Tabs
@@ -653,7 +715,7 @@ export default async function NewTodo() {
 >
 <TabPanel id="js" label="JavaScript">
 
-```jsx title="app/api/todos/route.jsx"
+```jsx app/api/todos/route.jsx
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
@@ -670,7 +732,7 @@ export async function POST(request) {
 
 <TabPanel id="ts" label="TypeScript">
 
-```tsx title="app/api/todos/route.tsx"
+```tsx app/api/todos/route.tsx
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
@@ -696,8 +758,9 @@ See [refreshing session example](/docs/guides/auth/auth-helpers/nextjs#refresh-s
 
 ## More examples
 
-- [Full App Router repo](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs)
-- [Realtime](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs/app/realtime-posts.tsx)
+- [Cookie-based Auth and the Next.js 13 App Router (free course)](https://youtube.com/playlist?list=PL5S4mPUpp4OtMhpnp93EFSo42iQ40XjbF)
+- [Full App Router example](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs)
+- [Realtime Subscriptions](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs/app/realtime-posts.tsx)
 - [Protected Routes](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs/app/[id]/page.tsx)
 - [Conditional Rendering in Client Components with SSR](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs/app/login-form.tsx)
 
@@ -736,7 +799,7 @@ With v0.7.x of the Next.js Auth Helpers a new naming convention has been impleme
 
 #### createClientComponentClient returns singleton
 
-You no longer need to implement logic to ensure there is only a single instance of the Supabase Client shared across all Client Components - this is now handled by the `createClientComponentClient` function. Call it as many times as you want!
+You no longer need to implement logic to ensure there is only a single instance of the Supabase Client shared across all Client Components - this is now the default and handled by the `createClientComponentClient` function. Call it as many times as you want!
 
 ```jsx
 "use client";
@@ -748,6 +811,8 @@ export default function() {
   return ...
 }
 ```
+
+For an example of creating multiple Supabase clients, check [Singleton section](/docs/guides/auth/auth-helpers/nextjs#singleton) above.
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

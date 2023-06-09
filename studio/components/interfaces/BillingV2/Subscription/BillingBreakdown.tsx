@@ -42,10 +42,10 @@ const BillingBreakdown = ({}: BillingBreakdownProps) => {
   const currentPlan = subscription?.plan
   const isUsageBillingEnabled = subscription?.usage_billing_enabled
   const [usageFees, fixedFees] = partition(upcomingInvoice?.lines ?? [], (item) => item.usage_based)
-  const totalUsageFees = usageFees.reduce((a, b) => a + b.amount, 0)
+  const totalUsageFees = Number(usageFees.reduce((a, b) => a + b.amount, 0).toFixed(2))
 
   const hasExceededAnyLimits =
-    !isUsageBillingEnabled &&
+    isUsageBillingEnabled === false &&
     Object.values(usage ?? {})
       .map((metric) => {
         if (typeof metric !== 'object') return false
@@ -77,13 +77,14 @@ const BillingBreakdown = ({}: BillingBreakdownProps) => {
           {isUsageBillingEnabled ? (
             <p className="text-sm text-scale-1000">
               Your plan includes a limited amount of included usage. If the usage on your project
-              exceeds these quotas, your subscription will be charged for the extra usage.
+              exceeds these quotas, your subscription will be charged for the overage. It may take
+              up to 24 hours for usage stats to update.
             </p>
           ) : (
             <p className="text-sm text-scale-1000">
               Your plan includes a limited amount of included usage. If the usage on your project
               exceeds these quotas, you may experience restrictions, as you are currently not billed
-              for overusage.
+              for overage. It may take up to 24 hours for usage stats to update.
             </p>
           )}
 
@@ -96,7 +97,7 @@ const BillingBreakdown = ({}: BillingBreakdownProps) => {
                 <Button
                   key="upgrade-button"
                   type="default"
-                  className="ml-4"
+                  className="ml-8"
                   onClick={() =>
                     snap.setPanelKey(
                       currentPlan?.id === 'free' ? 'subscriptionPlan' : 'costControl'
@@ -110,7 +111,7 @@ const BillingBreakdown = ({}: BillingBreakdownProps) => {
               Your project can become unresponsive or enter read only mode.{' '}
               {currentPlan?.id === 'free'
                 ? 'Please upgrade to the Pro plan to ensure that your project remains available.'
-                : 'Please disable spend caps to ensure that your project remains available.'}
+                : 'Please disable spend cap to ensure that your project remains available.'}
             </Alert>
           )}
 
@@ -149,8 +150,8 @@ const BillingBreakdown = ({}: BillingBreakdownProps) => {
                   <div
                     key={metric.key}
                     className={clsx(
-                      'col-span-6 space-y-4 py-4 border-scale-400',
-                      i % 2 === 0 ? 'border-r pr-4' : 'pl-4',
+                      'col-span-12 md:col-span-6 space-y-4 py-4 border-scale-400',
+                      i % 2 === 0 ? 'md:border-r md:pr-4' : 'md:pl-4',
                       i < BILLING_BREAKDOWN_METRICS.length - 2 && 'border-b'
                     )}
                   >
@@ -174,12 +175,10 @@ const BillingBreakdown = ({}: BillingBreakdownProps) => {
                           <IconAlertTriangle size={14} strokeWidth={2} className="text-red-900" />
                           <p className="text-sm text-red-900">Exceeded limit</p>
                         </div>
-                      ) : isApproachingLimit ? (
+                      ) : isApproachingLimit && !isUsageBillingEnabled ? (
                         <div className="flex items-center space-x-2 min-w-[115px]">
                           <IconAlertTriangle size={14} strokeWidth={2} className="text-amber-900" />
-                          <p className="text-sm text-amber-900">
-                            Reaching {isUsageBillingEnabled ? 'limit' : 'quota'}
-                          </p>
+                          <p className="text-sm text-amber-900">Reaching limit</p>
                         </div>
                       ) : null}
                     </div>
@@ -200,6 +199,7 @@ const BillingBreakdown = ({}: BillingBreakdownProps) => {
                             ? 'bg-amber-900'
                             : 'bg-scale-1100'
                         }
+                        bgClass="bg-gray-300 dark:bg-gray-600"
                         labelBottom={usageLabel}
                         labelBottomClass="!text-scale-1000"
                         labelTop={hasLimit ? percentageLabel : undefined}

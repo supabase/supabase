@@ -3,5 +3,13 @@ import TeamSettings from './TeamSettings/TeamSettings'
 import BillingSettings from './BillingSettings/BillingSettings'
 import InvoicesSettings from './InvoicesSettings/InvoicesSettings'
 import IntegrationSettings from './IntegrationSettings/IntegrationSettings'
+import NewOrgForm from './NewOrg/NewOrgForm'
 
-export { GeneralSettings, TeamSettings, BillingSettings, InvoicesSettings, IntegrationSettings }
+export {
+  GeneralSettings,
+  TeamSettings,
+  BillingSettings,
+  InvoicesSettings,
+  NewOrgForm,
+  IntegrationSettings,
+}
