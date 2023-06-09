@@ -70,7 +70,7 @@ The Disk Storage Size can also be manually expanded in [Database settings page](
 <Admonition type="info">
 You may want to import a lot of data into your database which requires multiple disk expansions; for example, uploading more than 1.5x the current size of your database storage will put your database into [read-only mode](#read-only-mode). If so, it is highly recommended you increase the Disk Storage Size manually on the [Database settings page](https://app.supabase.com/project/_/settings/database).
   
-Please note that there are provider restrictions that allow disk expansions only once every 6 hours as it happens with auto-scaling. This means that you can only expand your disks once every 6 hours due to these limitations.
+Due to provider restrictions, disk expansions can occur only once every six hours. During the six-hour window, the disk cannot be resized again.
 </Admonition>
 
 ### Free Plan Behavior
