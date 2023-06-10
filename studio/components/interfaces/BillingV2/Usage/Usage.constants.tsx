@@ -170,7 +170,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         chartPrefix: 'Max ',
         unit: 'bytes',
         description:
-          'Sum of all objects in your storage buckets.\nBilling is based on the average size in GB throughout your billing period.',
+          'Sum of all objects in your storage buckets.\nBilling is based on the average daily size in GB throughout your billing period.',
         chartDescription: 'The data refreshes every 24 hours.',
       },
       {
@@ -220,7 +220,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         name: 'Storage Image Transformations',
         unit: 'absolute',
         description:
-          'We count all images that were transformed in the billing period, ignoring any transformations.\nUsage example: You transform one image with four different size transformations and another image with just a single transformations. It counts as two, as only two images were transformed.\nBilling is based on the count of (origin) images that used transformations throughout the billing period. Resets every billing cycle.',
+          'We count all images that were transformed in the billing period, ignoring any transformations.\nUsage example: You transform one image with four different size transformations and another image with just a single transformation. It counts as two, as only two images were transformed.\nBilling is based on the count of (origin) images that used transformations throughout the billing period. Resets every billing cycle.',
         chartDescription:
           'The data refreshes every 24 hours.\nThe data points are relative to the beginning of your billing period.',
       },
