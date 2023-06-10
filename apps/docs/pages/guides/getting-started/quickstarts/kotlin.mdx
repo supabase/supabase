@@ -188,26 +188,50 @@ export const meta = {
   <StepHikeCompact.Step step={8}>
 
     <StepHikeCompact.Details title="Query data from the app">
-      
+      Usually, we will put the code of interacting with data source in repository. Create a repository:
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
       ```kotlin
-      suspend fun getProducts(): ProductDto {
-        val result = client.postgrest["products"]
-            .select().decodeList<ProductDto>()
-        // Handle result data for next step
-        return result
+      interface ProductRepository {
+        fun getProducts(): List<ProductDto>
+      }
+
+      class ProductRepositoryImpl @Inject constructor(
+            private val postgrest: Postgrest,
+        ) : ProductRepository {
+          override suspend fun getProducts(): List<ProductDto> {
+            val result = client.postgrest["products"]
+                .select().decodeList<ProductDto>()
+            // Handle result data for next step
+            return result
+          }
       }
       ```
     </StepHikeCompact.Code>
 
   </StepHikeCompact.Step>
 
-  <StepHikeCompact.Step step={9}>
-    <StepHikeCompact.Details title="Get data from ViewModel inside a coroutine scope">
-     
+   <StepHikeCompact.Step step={9}>
+    <StepHikeCompact.Details title="Create a module to provide repository">
+    For dependency injection, we will use Hilt. Learn more here [Dependency injection with Hilt](https://developer.android.com/training/dependency-injection/hilt-android).
+    </StepHikeCompact.Details>
+    <StepHikeCompact.Code>
+      ```kotlin
+      InstallIn(SingletonComponent::class)
+      @Module
+      abstract class RepositoryModule {
+          @Binds
+          abstract fun bindProductRepository(impl: ProductRepositoryImpl): ProductRepository
+      }
+      ```
+    </StepHikeCompact.Code>
 
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={10}>
+    <StepHikeCompact.Details title="Get data from ViewModel inside a coroutine scope">
+    To use repository in ViewModel, use `@Inject` annotation.
     </StepHikeCompact.Details>
     <StepHikeCompact.Code>
       ```kotlin
@@ -246,7 +270,7 @@ export const meta = {
 
   </StepHikeCompact.Step>
 
-    <StepHikeCompact.Step step={10}>
+    <StepHikeCompact.Step step={11}>
     <StepHikeCompact.Details title="Observe data in Composable">
     </StepHikeCompact.Details>
     <StepHikeCompact.Code>
@@ -284,7 +308,7 @@ export const meta = {
 
   </StepHikeCompact.Step>
 
-  <StepHikeCompact.Step step={11}>
+  <StepHikeCompact.Step step={12}>
     <StepHikeCompact.Details title="Start the app">
 
     </StepHikeCompact.Details>
