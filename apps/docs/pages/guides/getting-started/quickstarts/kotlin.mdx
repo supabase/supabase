@@ -56,7 +56,7 @@ export const meta = {
 
     <StepHikeCompact.Details title="Install the Supabase client library">
     Setup Supabase libraries requires some others libraries from ktor, so make sure all dependencies are added.
-    Replace place holder of the dependency versions `$supabase_version` and `$ktor_version` with latest versions as below
+    Replace the dependency version placeholders `$supabase_version` and `$ktor_version` with the latest versions as shown below.
     <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}> 
       <a href="https://github.com/supabase-community/supabase-kt/releases" style={{ marginRight: '8px' }}> 
           <img src="https://img.shields.io/github/release/supabase-community/supabase-kt?label=supabase-kt stable" alt="latest stable supabase-kt version"/> 
@@ -215,31 +215,31 @@ export const meta = {
         private val productRepository: ProductRepository
       ) : ViewModel() {
 
-      private val _productList = MutableStateFlow<List<Product>?>(listOf())
-      val productList: Flow<List<Product>?> = _productList
+        private val _productList = MutableStateFlow<List<Product>?>(listOf())
+        val productList: Flow<List<Product>?> = _productList
 
-      init {
-          getProducts()
-      }
+        init {
+            getProducts()
+        }
 
-      fun getProducts() {
-          viewModelScope.launch {
-              val products = productRepository.getProducts()
-              _productList.emit(products?.map { it -> it.asDomainModel() })
-          }
-      }
+        fun getProducts() {
+            viewModelScope.launch {
+                val products = productRepository.getProducts()
+                _productList.emit(products?.map { it -> it.asDomainModel() })
+            }
+        }
 
-      private fun ProductDto.asDomainModel(): Product {
-        return Product(
-            productId = this.productId,
-            name = this.name,
-            price = this.price,
-            image = this.image,
-            description = this.description,
-            category = this.category,
-            nutrition = this.nutrition,
-            _id = this._id 
-        )
+        private fun ProductDto.asDomainModel(): Product {
+          return Product(
+              productId = this.productId,
+              name = this.name,
+              price = this.price,
+              image = this.image,
+              description = this.description,
+              category = this.category,
+              nutrition = this.nutrition,
+              _id = this._id 
+          )
       }
       ```
     </StepHikeCompact.Code>
