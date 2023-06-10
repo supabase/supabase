@@ -44,6 +44,22 @@ To guard against this:
 
   The user should be brought to a page on your site where they can confirm the action by clicking a button.
   The button should contain the actual confirmation link which can be obtained from parsing the `confirmation_url={{ .ConfirmationURL }}` query parameter in the URL.
+  
+- Redirect users to a `password setup page`. When a user has clicked the link from the email invite, the user will be marked as `approved/confirmed`.
+  For example, you can simply add the redirect url in your email template:
+  ```html
+  <a
+    href="{{ .SiteURL }}/confirm-signup?confirmation_url={{ .ConfirmationURL }}/password-setup"
+    >Confirm your signup
+  </a>
+  ```
+
+    The flow will be: 
+    - User clicks the link from the email invite
+    - User will be redirected to the `password set up` page. For example: `https://example.com/auth/password-setup`.
+    - User will be able to set up their password and login to the app. You can use the `supabase.auth.updateUser` from `supabase js` to update the user's password.
+
+
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
