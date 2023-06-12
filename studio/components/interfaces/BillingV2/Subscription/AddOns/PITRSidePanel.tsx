@@ -179,7 +179,7 @@ const PITRSidePanel = () => {
                   withIcon
                   variant="info"
                   className="mb-4"
-                  title="Changing your compute size is only available on the Pro plan"
+                  title="Changing your Point-In-Time-Recovery is only available on the Pro plan"
                   actions={
                     <Button type="default" onClick={() => snap.setPanelKey('subscriptionPlan')}>
                       View available plans
