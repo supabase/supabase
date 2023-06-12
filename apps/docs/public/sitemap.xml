@@ -781,7 +781,7 @@
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/realtime/rate-limits</loc>
+    <loc>https://supabase.com/docs/guides/realtime/quotas</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
