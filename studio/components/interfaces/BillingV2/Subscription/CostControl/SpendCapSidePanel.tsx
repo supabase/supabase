@@ -9,7 +9,7 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { Alert, Button, Collapsible, IconChevronRight, IconExternalLink, SidePanel } from 'ui'
-import { USAGE_COSTS } from './CostControl.constants'
+import { BILLING_BREAKDOWN_METRICS } from '../Subscription.constants'
 
 const SPEND_CAP_OPTIONS: {
   name: string
@@ -52,11 +52,13 @@ const SpendCapSidePanel = () => {
   const isTurningOnCap = !isSpendCapOn && selectedOption === 'on'
   const hasChanges = selectedOption !== (isSpendCapOn ? 'on' : 'off')
 
+  const largeNumberFormatter = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 })
+
   useEffect(() => {
     if (visible && subscription !== undefined) {
       setSelectedOption(isSpendCapOn ? 'on' : 'off')
     }
-  }, [visible, isLoading])
+  }, [visible, isLoading, subscription, isSpendCapOn])
 
   const onConfirm = async () => {
     if (!projectRef) return console.error('Project ref is required')
@@ -82,6 +84,10 @@ const SpendCapSidePanel = () => {
       setIsSubmitting(false)
     }
   }
+
+  const billingMetricCategories = Array.from(
+    new Set(BILLING_BREAKDOWN_METRICS.map((it) => it.category))
+  )
 
   return (
     <SidePanel
@@ -137,27 +143,44 @@ const SpendCapSidePanel = () => {
                     </Table.th>
                   </>
                 }
-                body={USAGE_COSTS.map((category) => {
+                body={billingMetricCategories.map((category) => {
+                  const categoryItems = BILLING_BREAKDOWN_METRICS.filter(
+                    (it) => it.category === category
+                  )
+
                   return (
                     <>
-                      <Table.tr key={category.category}>
+                      <Table.tr key={category}>
                         <Table.td>
-                          <p className="text-xs text-scale-1200">{category.category}</p>
+                          <p className="text-xs text-scale-1200">{category}</p>
                         </Table.td>
                         <Table.td>{null}</Table.td>
                       </Table.tr>
-                      {category.items.map((item) => (
-                        <Table.tr key={item.name}>
-                          <Table.td>
-                            <p className="text-xs pl-4">{item.name}</p>
-                          </Table.td>
-                          <Table.td>
-                            <p className="text-xs">
-                              ${item.unit_amount} per {item.unit}
-                            </p>
-                          </Table.td>
-                        </Table.tr>
-                      ))}
+                      {categoryItems.map((item) => {
+                        const costs = subscription?.usage_fees?.find(
+                          (it) => it.metric === item.metric
+                        )
+
+                        if (!costs) return null
+
+                        return (
+                          <Table.tr key={item.name}>
+                            <Table.td>
+                              <p className="text-xs pl-4">{item.name}</p>
+                            </Table.td>
+                            <Table.td>
+                              {costs.pricingStrategy === 'UNIT' ? (
+                                <p className="text-xs">${costs.pricingOptions.perUnitPrice} per {item.unitName}</p>
+                              ) : costs.pricingStrategy === 'PACKAGE' ? (
+                                <p className="text-xs">
+                                  ${costs.pricingOptions.packagePrice} per{' '}
+                                  {largeNumberFormatter.format(costs.pricingOptions.packageSize!)}
+                                </p>
+                              ) : null}
+                            </Table.td>
+                          </Table.tr>
+                        )
+                      })}
                     </>
                   )
                 })}
@@ -246,7 +269,7 @@ const SpendCapSidePanel = () => {
               <p className="text-sm">
                 {selectedOption === 'on'
                   ? 'Upon clicking confirm, spend cap will be enabled for your project and you will no longer be charged any extra for usage.'
-                  : 'Upon clicking confirm, spend cap will be disabled for your project and you will be charged for any usage above the included quota'}
+                  : 'Upon clicking confirm, spend cap will be disabled for your project and you will be charged for any usage beyong the included quota.'}
               </p>
             </>
           )}
