@@ -12,9 +12,11 @@ import SBLogoVisual from './SBLogoVisual'
 import { Application } from '@splinetool/runtime'
 import { useEffect } from 'react'
 import InteractiveShimmerCard from '../InteractiveShimmerCard'
+import { useBreakpoint } from 'common'
 
 const Hero = () => {
   const router = useRouter()
+  const isSm = useBreakpoint()
   const telemetryProps = useTelemetryProps()
   const sendTelemetryEvent = async (event: TelemetryEvent) => {
     await Telemetry.sendEvent(event, telemetryProps, router)
@@ -47,7 +49,7 @@ const Hero = () => {
                     styles['hero-text'],
                   ].join(' ')}
                 >
-                  <div className="relative w-screen min-h-[200px] -mb-[50px] lg:-mb-[150px] z-10 h-[200px] lg:min-h-[350px] lg:h-[45vh]">
+                  <div className="relative w-screen min-h-[200px] -mb-[50px] lg:-mb-[150px] z-10 h-[200px] lg:h-[350px] 2xl:h-[450px]">
                     {/* <canvas
                       className="relative z-20 w-[500px] h-[500px] bottom-[-40px] lg:bottom-[-60px]"
                       id="canvas3d"
@@ -55,7 +57,9 @@ const Hero = () => {
                     <div
                       className="absolute w-full h-full z-50 pointer-events-none inset-0"
                       style={{
-                        background: `radial-gradient(50% 80% at 50% 20%, transparent, #0A0B0F)`,
+                        background: isSm
+                          ? `radial-gradient(50% 50% at 50% 50%, transparent, #0A0B0F)`
+                          : `radial-gradient(50% 80% at 50% 20%, transparent, #0A0B0F)`,
                       }}
                     />
                     <div className="absolute w-full h-[200%] z-50 inset-0 bg-[#0A0B0F] top-[100%]" />
@@ -134,7 +138,7 @@ const Hero = () => {
       </div>
       <img
         src="/images/index/gradient-bg.png"
-        className="absolute mx-auto top-0 left-0 right-0 z-0 w-screen aspect-[2.5/1] pointer-events-none opacity-100"
+        className="absolute mx-auto top-0 left-' right-0 z-0 w-screen aspect-[1.3/1] lg:aspect-[2.5/1] pointer-events-none opacity-100"
       />
     </>
   )
