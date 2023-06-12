@@ -41,6 +41,7 @@ const schemas = [
       { path: 'metadata.request.headers.cf_ipcountry', type: 'string' },
       { path: 'metadata.request.headers.cf_ray', type: 'string' },
       { path: 'metadata.request.headers.host', type: 'string' },
+      { path: 'metadata.request.headers.referer', type: 'string' },
       { path: 'metadata.request.headers.x_client_info', type: 'string' },
       { path: 'metadata.request.headers.x_forwarded_proto', type: 'string' },
       { path: 'metadata.request.headers.x_real_ip', type: 'string' },
