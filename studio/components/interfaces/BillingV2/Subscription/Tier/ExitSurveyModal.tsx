@@ -93,8 +93,6 @@ const ExitSurveyModal = ({ visible, onClose }: ExitSurveyModalProps) => {
         category: 'error',
         message: `Failed to cancel subscription: ${error.message}`,
       })
-    } finally {
-      setIsSubmitting(false)
     }
 
     try {
@@ -124,6 +122,7 @@ const ExitSurveyModal = ({ visible, onClose }: ExitSurveyModalProps) => {
         router.push(`/project/${projectRef}`)
       }
       onClose(true)
+      window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
     }
   }
 

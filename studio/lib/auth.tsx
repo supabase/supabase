@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/router'
-import { PropsWithChildren, useCallback, useEffect } from 'react'
+import { PropsWithChildren, useCallback, useEffect, useRef } from 'react'
 
 import {
   AuthContext as AuthContextInternal,
@@ -13,6 +13,7 @@ import { useStore } from 'hooks'
 import Telemetry from 'lib/telemetry'
 import { GOTRUE_ERRORS, IS_PLATFORM } from './constants'
 import { clearLocalStorage } from './local-storage'
+import { useProfileCreateMutation } from 'data/profile/profile-create-mutation'
 
 export const AuthContext = AuthContextInternal
 
@@ -54,6 +55,22 @@ export const AuthProvider = ({ children }: PropsWithChildren<{}>) => {
     return subscription.unsubscribe
   }, [])
 
+  const { mutate: createProfile } = useProfileCreateMutation({
+    onSuccess() {
+      Telemetry.sendEvent(
+        { category: 'conversion', action: 'sign_up', label: '' },
+        telemetryProps,
+        router
+      )
+    },
+    onError(err) {
+      ui.setNotification({
+        category: 'error',
+        message: 'Failed to create your profile. Please refresh to try again.',
+      })
+    },
+  })
+
   // Track telemetry for the current user
   useProfileQuery({
     onSuccess(profile) {
@@ -65,9 +82,12 @@ export const AuthProvider = ({ children }: PropsWithChildren<{}>) => {
       // creation of the default org). Hence why calling org load here
       app.organizations.load()
     },
-    // Never rerun the query
-    staleTime: Infinity,
-    cacheTime: Infinity,
+    onError(err) {
+      // if the user does not yet exist, create a profile for them
+      if (typeof err === 'object' && err !== null && 'code' in err && (err as any).code === 404) {
+        createProfile()
+      }
+    },
   })
 
   return <AuthProviderInternal alwaysLoggedIn={!IS_PLATFORM}>{children}</AuthProviderInternal>
