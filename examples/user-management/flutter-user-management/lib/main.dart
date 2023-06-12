@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:supabase_quickstart/pages/account_page.dart';
 import 'package:supabase_quickstart/pages/login_page.dart';
-import 'package:supabase_quickstart/pages/splash_page.dart';
 
 Future<void> main() async {
   await Supabase.initialize(
@@ -34,13 +33,29 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      initialRoute: '/',
-      routes: <String, WidgetBuilder>{
-        // Splash page is needed to ensure that authentication and page loading works correctly
-        '/': (_) => const SplashPage(),
-        '/login': (_) => const LoginPage(),
-        '/account': (_) => const AccountPage(),
-      },
+      home: StreamBuilder<AuthState>(
+        stream: supabase.auth.onAuthStateChange,
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            final error = snapshot.error;
+            late String errorMessage;
+            if (error is AuthException) {
+              errorMessage = error.message;
+            } else {
+              errorMessage = 'Unexpected error occured.';
+            }
+            return Center(child: Text(errorMessage));
+          } else if (!snapshot.hasData) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          final session = snapshot.data!.session;
+          if (session == null) {
+            return const LoginPage();
+          } else {
+            return const AccountPage();
+          }
+        },
+      ),
     );
   }
 }

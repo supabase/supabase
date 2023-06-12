@@ -14,15 +14,13 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   bool _isLoading = false;
-  bool _redirecting = false;
-  late final TextEditingController _emailController;
-  late final StreamSubscription<AuthState> _authStateSubscription;
+  late final TextEditingController _emailController = TextEditingController();
 
   Future<void> _signIn() async {
-    setState(() {
-      _isLoading = true;
-    });
     try {
+      setState(() {
+        _isLoading = true;
+      });
       await supabase.auth.signInWithOtp(
         email: _emailController.text.trim(),
         emailRedirectTo:
@@ -30,7 +28,7 @@ class _LoginPageState extends State<LoginPage> {
       );
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Check your email for login link!')),
+          const SnackBar(content: Text('Check your email for a login link!')),
         );
         _emailController.clear();
       }
@@ -44,31 +42,18 @@ class _LoginPageState extends State<LoginPage> {
         content: const Text('Unexpected error occurred'),
         backgroundColor: Theme.of(context).colorScheme.error,
       );
-    }
-
-    setState(() {
-      _isLoading = false;
-    });
-  }
-
-  @override
-  void initState() {
-    _emailController = TextEditingController();
-    _authStateSubscription = supabase.auth.onAuthStateChange.listen((data) {
-      if (_redirecting) return;
-      final session = data.session;
-      if (session != null) {
-        _redirecting = true;
-        Navigator.of(context).pushReplacementNamed('/account');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
       }
-    });
-    super.initState();
+    }
   }
 
   @override
   void dispose() {
     _emailController.dispose();
-    _authStateSubscription.cancel();
     super.dispose();
   }
 

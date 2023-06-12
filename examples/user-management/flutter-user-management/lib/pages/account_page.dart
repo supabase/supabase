@@ -13,6 +13,7 @@ class AccountPage extends StatefulWidget {
 class _AccountPageState extends State<AccountPage> {
   final _usernameController = TextEditingController();
   final _websiteController = TextEditingController();
+
   String? _avatarUrl;
   var _loading = false;
 
@@ -26,9 +27,9 @@ class _AccountPageState extends State<AccountPage> {
       final userId = supabase.auth.currentUser!.id;
       final data = await supabase
           .from('profiles')
-          .select()
+          .select<Map<String, dynamic>>()
           .eq('id', userId)
-          .single() as Map;
+          .single();
       _usernameController.text = (data['username'] ?? '') as String;
       _websiteController.text = (data['website'] ?? '') as String;
       _avatarUrl = (data['avatar_url'] ?? '') as String;
@@ -42,11 +43,13 @@ class _AccountPageState extends State<AccountPage> {
         content: const Text('Unexpected error occurred'),
         backgroundColor: Theme.of(context).colorScheme.error,
       );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _loading = false;
+        });
+      }
     }
-
-    setState(() {
-      _loading = false;
-    });
   }
 
   /// Called when user taps `Update` button
@@ -80,10 +83,13 @@ class _AccountPageState extends State<AccountPage> {
         content: const Text('Unexpected error occurred'),
         backgroundColor: Theme.of(context).colorScheme.error,
       );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _loading = false;
+        });
+      }
     }
-    setState(() {
-      _loading = false;
-    });
   }
 
   Future<void> _signOut() async {
@@ -99,9 +105,6 @@ class _AccountPageState extends State<AccountPage> {
         content: const Text('Unexpected error occurred'),
         backgroundColor: Theme.of(context).colorScheme.error,
       );
-    }
-    if (mounted) {
-      Navigator.of(context).pushReplacementNamed('/');
     }
   }
 
@@ -174,7 +177,7 @@ class _AccountPageState extends State<AccountPage> {
           ),
           const SizedBox(height: 18),
           ElevatedButton(
-            onPressed: _updateProfile,
+            onPressed: _loading ? null : _updateProfile,
             child: Text(_loading ? 'Saving...' : 'Update'),
           ),
           const SizedBox(height: 18),
