@@ -14,10 +14,11 @@ import { USAGE_APPROACHING_THRESHOLD } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 import { partition } from 'lodash'
 import { useState } from 'react'
-import { Alert, Button, Collapsible, IconAlertTriangle, IconChevronRight } from 'ui'
+import { Alert, Button, Collapsible, IconAlertTriangle, IconChevronRight, IconInfo } from 'ui'
 import { BILLING_BREAKDOWN_METRICS } from './Subscription.constants'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import Link from 'next/link'
+import * as Tooltip from '@radix-ui/react-tooltip'
 
 export interface BillingBreakdownProps {}
 
@@ -43,6 +44,8 @@ const BillingBreakdown = ({}: BillingBreakdownProps) => {
   const isUsageBillingEnabled = subscription?.usage_billing_enabled
   const [usageFees, fixedFees] = partition(upcomingInvoice?.lines ?? [], (item) => item.usage_based)
   const totalUsageFees = Number(usageFees.reduce((a, b) => a + b.amount, 0).toFixed(2))
+
+  const largeNumberFormatter = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 })
 
   const hasExceededAnyLimits =
     isUsageBillingEnabled === false &&
@@ -76,15 +79,15 @@ const BillingBreakdown = ({}: BillingBreakdownProps) => {
           <p className="text-sm">Included usage summary</p>
           {isUsageBillingEnabled ? (
             <p className="text-sm text-scale-1000">
-              Your plan includes a limited amount of included usage. If the usage on your project
-              exceeds these quotas, your subscription will be charged for the overage. It may take
-              up to 24 hours for usage stats to update.
+              Your plan includes a limited amount of usage. If the usage on your project exceeds
+              these quotas, your subscription will be charged for the overage. It may take up to 24
+              hours for usage stats to update.
             </p>
           ) : (
             <p className="text-sm text-scale-1000">
-              Your plan includes a limited amount of included usage. If the usage on your project
-              exceeds these quotas, you may experience restrictions, as you are currently not billed
-              for overage. It may take up to 24 hours for usage stats to update.
+              Your plan includes a limited amount of usage. If the usage on your project exceeds
+              these quotas, you may experience restrictions, as you are currently not billed for
+              overage. It may take up to 24 hours for usage stats to update.
             </p>
           )}
 
@@ -146,6 +149,10 @@ const BillingBreakdown = ({}: BillingBreakdownProps) => {
                 const isApproachingLimit = hasLimit && usageRatio >= USAGE_APPROACHING_THRESHOLD
                 const isExceededLimit = hasLimit && usageRatio >= 1
 
+                const usageFee = subscription?.usage_fees?.find(
+                  (item) => item.metric === metric.metric
+                )
+
                 return (
                   <div
                     key={metric.key}
@@ -170,6 +177,63 @@ const BillingBreakdown = ({}: BillingBreakdownProps) => {
                           </div>
                         </a>
                       </Link>
+                      {isUsageBillingEnabled && usageFee && (
+                        <Tooltip.Root delayDuration={0}>
+                          <Tooltip.Trigger>
+                            <div className="flex items-center">
+                              <IconInfo
+                                size={14}
+                                strokeWidth={2}
+                                className="hover:text-scale-1000"
+                              />
+                            </div>
+                          </Tooltip.Trigger>
+                          <Tooltip.Portal>
+                            <Tooltip.Content side="bottom">
+                              <Tooltip.Arrow className="radix-tooltip-arrow" />
+                              <div
+                                className={[
+                                  'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                                  'border border-scale-200',
+                                ].join(' ')}
+                              >
+                                <div className="text-xs text-scale-1200">
+                                  {usageFee.pricingStrategy === 'UNIT' ? (
+                                    <div>
+                                      <p>
+                                        {largeNumberFormatter.format(
+                                          usageFee.pricingOptions.freeUnits
+                                        )}{' '}
+                                        {metric.unitName} included
+                                      </p>
+                                      <p>
+                                        then ${usageFee.pricingOptions.perUnitPrice} per{' '}
+                                        {metric.unitName}
+                                      </p>
+                                    </div>
+                                  ) : usageFee.pricingStrategy === 'PACKAGE' ? (
+                                    <div>
+                                      <p>
+                                        {largeNumberFormatter.format(
+                                          usageFee.pricingOptions.freeUnits
+                                        )}{' '}
+                                        included
+                                      </p>
+
+                                      <p>
+                                        then ${usageFee.pricingOptions.packagePrice} per{' '}
+                                        {largeNumberFormatter.format(
+                                          usageFee.pricingOptions.packageSize!
+                                        )}
+                                      </p>
+                                    </div>
+                                  ) : null}
+                                </div>
+                              </div>
+                            </Tooltip.Content>
+                          </Tooltip.Portal>
+                        </Tooltip.Root>
+                      )}
                       {isExceededLimit && !isUsageBillingEnabled ? (
                         <div className="flex items-center space-x-2 min-w-[115px]">
                           <IconAlertTriangle size={14} strokeWidth={2} className="text-red-900" />
@@ -195,7 +259,7 @@ const BillingBreakdown = ({}: BillingBreakdownProps) => {
                             ? 'bg-scale-1100'
                             : isExceededLimit && !isUsageBillingEnabled
                             ? 'bg-red-900'
-                            : isApproachingLimit
+                            : isApproachingLimit && !isUsageBillingEnabled
                             ? 'bg-amber-900'
                             : 'bg-scale-1100'
                         }

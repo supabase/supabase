@@ -83,17 +83,17 @@ const SubscriptionPaymentMethod = ({ subscription }: SubscriptionTierProps) => {
                     src={`${BASE_PATH}/img/payment-methods/${subscription.payment_method_card_details?.brand
                       .replace(' ', '-')
                       .toLowerCase()}.png`}
-                    width="32"
+                    width="24"
                   />
                 ) : (
                   <IconCreditCard />
                 )}
-                <span>
+                <span className="text-sm">
                   **** **** ****{' '}
                   {subscription?.payment_method_card_details?.last_4_digits || '****'}
                 </span>
               </div>
-              <div className="flex flex-row space-x-3 text-scale-1000">
+              <div className="flex flex-row space-x-3 text-scale-1000 text-sm">
                 <span>
                   Expires {subscription?.payment_method_card_details?.expiry_month || '-'}/
                   {subscription?.payment_method_card_details?.expiry_year?.toString()?.slice(-2) ||
@@ -106,9 +106,11 @@ const SubscriptionPaymentMethod = ({ subscription }: SubscriptionTierProps) => {
           {subscription?.payment_method_type === 'invoice' && (
             <>
               <div className="flex space-x-3">
-                <div >
+                <div>
                   <p className="text-scale-1100">Payment via invoice</p>
-                  <p className="text-sm text-scale-1000">You get a monthly invoice and payment link via email.</p>
+                  <p className="text-sm text-scale-1000">
+                    You get a monthly invoice and payment link via email.
+                  </p>
                 </div>
               </div>
             </>
@@ -160,8 +162,8 @@ const SubscriptionPaymentMethod = ({ subscription }: SubscriptionTierProps) => {
         <Modal.Content>
           <div className="py-6 space-y-2">
             <p className="text-sm">
-              Upon clicking confirm, your next and future invoices will be deducted from the
-              selected payment method. There are no immediate charges.
+              Upon clicking confirm, all future charges will be deducted from the selected payment
+              method. There are no immediate charges.
             </p>
             <div className="!mt-6">
               <PaymentMethodSelection
