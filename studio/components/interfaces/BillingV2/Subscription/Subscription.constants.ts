@@ -86,7 +86,7 @@ export const BILLING_BREAKDOWN_METRICS = [
   },
   {
     key: 'func_invocations',
-    name: 'Edge function invocations',
+    name: 'Edge Function invocations',
     units: 'absolute',
     anchor: 'funcInvocations',
     metric: 'FUNCTION_INVOCATIONS',
@@ -95,7 +95,7 @@ export const BILLING_BREAKDOWN_METRICS = [
   },
   {
     key: 'func_count',
-    name: 'Edge functions',
+    name: 'Edge Functions',
     units: 'absolute',
     anchor: 'funcCount',
     metric: 'FUNCTION_COUNT',

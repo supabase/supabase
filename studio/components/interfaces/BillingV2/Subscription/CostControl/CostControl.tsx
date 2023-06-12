@@ -32,7 +32,7 @@ const CostControl = ({}: CostControlProps) => {
           <div className="sticky top-16">
             <div className="space-y-6">
               <div>
-                <p className="text-base">Cost control</p>
+                <p className="text-base">Cost Control</p>
                 <p className="text-sm text-scale-1000">
                   Control whether to usage beyond your plans included quota
                 </p>
@@ -70,8 +70,13 @@ const CostControl = ({}: CostControlProps) => {
                 } plan`}
               >
                 {currentPlan?.name || ''} plan requires you to have spend cap off at all times. Your
-                project will never become unresponsive. Only when your included usage is exceeded
-                will you be charged for any additional usage
+                project will never become unresponsive. Only when your{' '}
+                <Link href="#breakdown">
+                  <a className="text-sm text-green-900 transition hover:text-green-1000">
+                    included usage
+                  </a>
+                </Link>{' '}
+                is exceeded will you be charged for any additional usage.
               </Alert>
             ) : (
               <p className="text-sm text-scale-1000">
