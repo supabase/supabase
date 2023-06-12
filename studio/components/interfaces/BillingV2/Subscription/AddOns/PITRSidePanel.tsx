@@ -186,7 +186,7 @@ const PITRSidePanel = () => {
                     </Button>
                   }
                 >
-                  Upgrade your project's plan to change the compute size of your project
+                  Upgrade your plan to change the compute size of your project
                 </Alert>
               ) : subscriptionCompute === undefined ? (
                 <Alert

@@ -170,7 +170,9 @@ const SpendCapSidePanel = () => {
                             </Table.td>
                             <Table.td>
                               {costs.pricingStrategy === 'UNIT' ? (
-                                <p className="text-xs">${costs.pricingOptions.perUnitPrice} per {item.unitName}</p>
+                                <p className="text-xs">
+                                  ${costs.pricingOptions.perUnitPrice} per {item.unitName}
+                                </p>
                               ) : costs.pricingStrategy === 'PACKAGE' ? (
                                 <p className="text-xs">
                                   ${costs.pricingOptions.packagePrice} per{' '}
@@ -199,7 +201,7 @@ const SpendCapSidePanel = () => {
                 </Button>
               }
             >
-              Upgrade your project's plan to disable the spend cap
+              Upgrade your plan to disable the spend cap
             </Alert>
           )}
 

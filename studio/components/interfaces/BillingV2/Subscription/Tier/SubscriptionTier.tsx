@@ -110,7 +110,7 @@ const SubscriptionTier = ({}: SubscriptionTierProps) => {
                     </div>,
                   ]}
                 >
-                  Please contact us if you'd like to change your project's plan
+                  Please contact us if you'd like to change your plan.
                 </Alert>
               ))}
             {!subscription?.usage_billing_enabled && (
@@ -129,7 +129,7 @@ const SubscriptionTier = ({}: SubscriptionTierProps) => {
                     </span>
                   ) : (
                     <span>
-                      You can change the Cost control settings if you plan on exceeding the included
+                      You can change the Cost Control settings if you plan on exceeding the included
                       usage quotas.
                     </span>
                   )}
