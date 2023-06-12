@@ -43,9 +43,13 @@ export const PRICING_TIER_FREE_KEY = 'FREE'
 export const PRICING_TIER_DEFAULT_KEY = 'FREE'
 
 export const PROVIDERS = {
+  FLY: {
+    id: 'FLY',
+    name: 'Fly.io',
+  },
   AWS: {
     id: 'AWS',
-    name: 'aws',
+    name: 'AWS',
     DEFAULT_SSH_KEY: 'supabase-app-instance',
     regions: {
       EAST_US: 'us-east-1', // North Virginia
