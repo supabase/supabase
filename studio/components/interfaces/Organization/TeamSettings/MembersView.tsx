@@ -6,7 +6,6 @@ import { Badge, Button, Loading, Listbox, IconUser, Modal, IconAlertCircle, Icon
 
 import { Member } from 'types'
 import { useStore } from 'hooks'
-import useProfile from 'hooks/misc/useProfile'
 import { useParams } from 'common/hooks'
 
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
@@ -18,6 +17,7 @@ import { isInviteExpired, getUserDisplayName } from '../Organization.utils'
 import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
 import { useOrganizationDetailQuery } from 'data/organizations/organization-detail-query'
 import { useOrganizationMemberUpdateMutation } from 'data/organizations/organization-member-update-mutation'
+import { useProfileQuery } from 'data/profile/profile-query'
 
 interface SelectedMember extends Member {
   oldRoleId: number
@@ -32,7 +32,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
   const { ui } = useStore()
   const { slug } = useParams()
 
-  const { data: profile } = useProfile()
+  const { data: profile } = useProfileQuery()
   const { data: detailData, isLoading: isLoadingOrgDetails } = useOrganizationDetailQuery({ slug })
   const { data: rolesData, isLoading: isLoadingRoles } = useOrganizationRolesQuery({ slug })
   const { mutate: updateOrganizationMember, isLoading } = useOrganizationMemberUpdateMutation({
