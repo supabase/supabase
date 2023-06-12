@@ -15,7 +15,7 @@ class _AccountPageState extends State<AccountPage> {
   final _websiteController = TextEditingController();
 
   String? _avatarUrl;
-  var _loading = false;
+  var _loading = true;
 
   /// Called once a user id is received within `onAuthenticated()`
   Future<void> _getProfile() async {
@@ -105,6 +105,10 @@ class _AccountPageState extends State<AccountPage> {
         content: const Text('Unexpected error occurred'),
         backgroundColor: Theme.of(context).colorScheme.error,
       );
+    } finally {
+      if (mounted) {
+        Navigator.of(context).pushReplacementNamed('/login');
+      }
     }
   }
 
@@ -158,32 +162,34 @@ class _AccountPageState extends State<AccountPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Profile')),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 12),
-        children: [
-          Avatar(
-            imageUrl: _avatarUrl,
-            onUpload: _onUpload,
-          ),
-          const SizedBox(height: 18),
-          TextFormField(
-            controller: _usernameController,
-            decoration: const InputDecoration(labelText: 'User Name'),
-          ),
-          const SizedBox(height: 18),
-          TextFormField(
-            controller: _websiteController,
-            decoration: const InputDecoration(labelText: 'Website'),
-          ),
-          const SizedBox(height: 18),
-          ElevatedButton(
-            onPressed: _loading ? null : _updateProfile,
-            child: Text(_loading ? 'Saving...' : 'Update'),
-          ),
-          const SizedBox(height: 18),
-          TextButton(onPressed: _signOut, child: const Text('Sign Out')),
-        ],
-      ),
+      body: _loading
+          ? const Center(child: CircularProgressIndicator())
+          : ListView(
+              padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 12),
+              children: [
+                Avatar(
+                  imageUrl: _avatarUrl,
+                  onUpload: _onUpload,
+                ),
+                const SizedBox(height: 18),
+                TextFormField(
+                  controller: _usernameController,
+                  decoration: const InputDecoration(labelText: 'User Name'),
+                ),
+                const SizedBox(height: 18),
+                TextFormField(
+                  controller: _websiteController,
+                  decoration: const InputDecoration(labelText: 'Website'),
+                ),
+                const SizedBox(height: 18),
+                ElevatedButton(
+                  onPressed: _loading ? null : _updateProfile,
+                  child: Text(_loading ? 'Saving...' : 'Update'),
+                ),
+                const SizedBox(height: 18),
+                TextButton(onPressed: _signOut, child: const Text('Sign Out')),
+              ],
+            ),
     );
   }
 }
