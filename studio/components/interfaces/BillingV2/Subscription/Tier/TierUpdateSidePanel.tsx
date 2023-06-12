@@ -83,6 +83,7 @@ const TierUpdateSidePanel = () => {
       })
       setSelectedTier(undefined)
       onClose()
+      window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
     } catch (error: any) {
       ui.setNotification({
         error,
@@ -107,7 +108,7 @@ const TierUpdateSidePanel = () => {
             <Link href="https://supabase.com/pricing">
               <a target="_blank" rel="noreferrer">
                 <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                  More information
+                  Pricing
                 </Button>
               </a>
             </Link>
