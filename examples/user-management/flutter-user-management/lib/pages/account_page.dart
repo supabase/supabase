@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:supabase_quickstart/components/avatar.dart';
-import 'package:supabase_quickstart/constants.dart';
+import 'package:supabase_quickstart/main.dart';
 
 class AccountPage extends StatefulWidget {
   const AccountPage({super.key});
@@ -33,9 +33,15 @@ class _AccountPageState extends State<AccountPage> {
       _websiteController.text = (data['website'] ?? '') as String;
       _avatarUrl = (data['avatar_url'] ?? '') as String;
     } on PostgrestException catch (error) {
-      context.showErrorSnackBar(message: error.message);
+      SnackBar(
+        content: Text(error.message),
+        backgroundColor: Theme.of(context).colorScheme.error,
+      );
     } catch (error) {
-      context.showErrorSnackBar(message: 'Unexpected exception occurred');
+      SnackBar(
+        content: const Text('Unexpected error occurred'),
+        backgroundColor: Theme.of(context).colorScheme.error,
+      );
     }
 
     setState(() {
@@ -60,12 +66,20 @@ class _AccountPageState extends State<AccountPage> {
     try {
       await supabase.from('profiles').upsert(updates);
       if (mounted) {
-        context.showSnackBar(message: 'Successfully updated profile!');
+        const SnackBar(
+          content: Text('Successfully updated profile!'),
+        );
       }
     } on PostgrestException catch (error) {
-      context.showErrorSnackBar(message: error.message);
+      SnackBar(
+        content: Text(error.message),
+        backgroundColor: Theme.of(context).colorScheme.error,
+      );
     } catch (error) {
-      context.showErrorSnackBar(message: 'Unexpeted error occurred');
+      SnackBar(
+        content: const Text('Unexpected error occurred'),
+        backgroundColor: Theme.of(context).colorScheme.error,
+      );
     }
     setState(() {
       _loading = false;
@@ -76,9 +90,15 @@ class _AccountPageState extends State<AccountPage> {
     try {
       await supabase.auth.signOut();
     } on AuthException catch (error) {
-      context.showErrorSnackBar(message: error.message);
+      SnackBar(
+        content: Text(error.message),
+        backgroundColor: Theme.of(context).colorScheme.error,
+      );
     } catch (error) {
-      context.showErrorSnackBar(message: 'Unexpected error occurred');
+      SnackBar(
+        content: const Text('Unexpected error occurred'),
+        backgroundColor: Theme.of(context).colorScheme.error,
+      );
     }
     if (mounted) {
       Navigator.of(context).pushReplacementNamed('/');
@@ -94,12 +114,20 @@ class _AccountPageState extends State<AccountPage> {
         'avatar_url': imageUrl,
       });
       if (mounted) {
-        context.showSnackBar(message: 'Updated your profile image!');
+        const SnackBar(
+          content: Text('Updated your profile image!'),
+        );
       }
     } on PostgrestException catch (error) {
-      context.showErrorSnackBar(message: error.message);
+      SnackBar(
+        content: Text(error.message),
+        backgroundColor: Theme.of(context).colorScheme.error,
+      );
     } catch (error) {
-      context.showErrorSnackBar(message: 'Unexpected error has occurred');
+      SnackBar(
+        content: const Text('Unexpected error occurred'),
+        backgroundColor: Theme.of(context).colorScheme.error,
+      );
     }
     if (!mounted) {
       return;
