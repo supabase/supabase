@@ -4,6 +4,12 @@
   animation: animateText 1s cubic-bezier(0.25, 0.25, 0, 1) 0.1s both;
 }
 
+.hero-video {
+  opacity: 0;
+  transform: translate3d(0, 10px, 0);
+  animation: animateText 3s cubic-bezier(0.25, 0.25, 0, 1) 0.4s both;
+}
+
 @keyframes animateText {
   to {
     opacity: 1;

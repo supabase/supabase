@@ -60,7 +60,10 @@ const Hero = () => {
                     />
                     <div className="absolute w-full h-[200%] z-50 inset-0 bg-[#0A0B0F] top-[100%]" />
                     <InteractiveShimmerCard
-                      outerClassName="z-30 rounded-md lg:rounded-xl w-[80vw] max-w-xl lg:max-w-3xl 2xl:max-w-4xl mx-auto mt-20 lg:mt-28"
+                      outerClassName={[
+                        'z-30 rounded-md lg:rounded-xl w-[80vw] max-w-xl lg:max-w-3xl 2xl:max-w-4xl mx-auto mt-20 lg:mt-28',
+                        styles['hero-video'],
+                      ].join(' ')}
                       innerClassName=""
                     >
                       <div className="absolute w-full h-full z-50 inset-[1px] bg-[#0A0B0F80]" />
