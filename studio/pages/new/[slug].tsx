@@ -59,6 +59,7 @@ const Wizard: NextPageWithLayout = () => {
 
   const [projectName, setProjectName] = useState('')
   const [postgresVersion, setPostgresVersion] = useState('')
+  const [cloudProvider, setCloudProvider] = useState(PROVIDERS.AWS.id)
   const [dbPass, setDbPass] = useState('')
   const [dbRegion, setDbRegion] = useState(REGIONS_DEFAULT)
   const [dbPricingTierKey, setDbPricingTierKey] = useState(PRICING_TIER_DEFAULT_KEY)
@@ -76,7 +77,7 @@ const Wizard: NextPageWithLayout = () => {
   const currentOrg = organizations.find((o: any) => o.slug === slug)
   const billedViaOrg = Boolean(currentOrg?.subscription_id)
 
-  const availableRegions = getAvailableRegions()
+  const [availableRegions, setAvailableRegions] = useState(getAwsAvailableRegions())
   const isAdmin = checkPermissions(PermissionAction.CREATE, 'projects')
   const isInvalidSlug = isUndefined(currentOrg)
   const isEmptyOrganizations = organizations.length <= 0 && app.organizations.isInitialized
@@ -84,7 +85,12 @@ const Wizard: NextPageWithLayout = () => {
   const isSelectFreeTier = dbPricingTierKey === PRICING_TIER_FREE_KEY
   const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
 
-  const showCustomVersionInput = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
+  const showNonProdFields = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
+  if (showNonProdFields) {
+    setCloudProvider(PROVIDERS.FLY.id)
+    setAvailableRegions({ SOUTHEAST_ASIA: 'Singapore' })
+    setDbRegion('Singapore')
+  }
 
   const canCreateProject =
     isAdmin && (!isSelectFreeTier || (isSelectFreeTier && !hasMembersExceedingFreeTierLimit))
@@ -153,6 +159,17 @@ const Wizard: NextPageWithLayout = () => {
     setDbRegion(value)
   }
 
+  function onCloudProviderChange(value: string) {
+    setCloudProvider(value)
+    if (value === PROVIDERS.AWS.id) {
+      setAvailableRegions(getAwsAvailableRegions())
+      setDbRegion(REGIONS_DEFAULT)
+    } else {
+      setAvailableRegions({ SOUTHEAST_ASIA: 'Singapore' })
+      setDbRegion('Singapore')
+    }
+  }
+
   function onDbPricingPlanChange(value: string) {
     setDbPricingTierKey(value)
   }
@@ -176,7 +193,7 @@ const Wizard: NextPageWithLayout = () => {
     const dbTier = dbPricingTierKey === 'PRO' && !isSpendCapEnabled ? 'PAYG' : dbPricingTierKey
 
     const data: Record<string, any> = {
-      cloud_provider: PROVIDERS.AWS.id, // hardcoded for DB instances to be under AWS
+      cloud_provider: cloudProvider,
       org_id: currentOrg?.id,
       name: projectName.trim(),
       db_pass: dbPass,
@@ -225,7 +242,7 @@ const Wizard: NextPageWithLayout = () => {
   }
 
   // [Fran] Enforce APSE1 region on staging
-  function getAvailableRegions() {
+  function getAwsAvailableRegions() {
     return process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
       ? pluckObjectFields(REGIONS, ['SOUTHEAST_ASIA'])
       : REGIONS
@@ -342,7 +359,7 @@ const Wizard: NextPageWithLayout = () => {
                   />
                 </Panel.Content>
 
-                {showCustomVersionInput && (
+                {showNonProdFields && (
                   <Panel.Content
                     className={[
                       'border-t border-b',
@@ -366,6 +383,35 @@ const Wizard: NextPageWithLayout = () => {
                       value={postgresVersion}
                       onChange={(event: any) => setPostgresVersion(event.target.value)}
                     />
+                  </Panel.Content>
+                )}
+
+                {showNonProdFields && (
+                  <Panel.Content
+                    className={[
+                      'border-t border-b',
+                      'border-panel-border-interior-light dark:border-panel-border-interior-dark',
+                    ].join(' ')}
+                  >
+                    <Listbox
+                      layout="horizontal"
+                      label="Cloud Provider"
+                      type="select"
+                      value={cloudProvider}
+                      // @ts-ignore
+                      onChange={(value: string) => onCloudProviderChange(value)}
+                      descriptionText="Cloud Provider (only for staging/local)"
+                    >
+                      {Object.values(PROVIDERS).map((providerObj) => {
+                        const label = providerObj['name']
+                        const value = providerObj['id']
+                        return (
+                          <Listbox.Option key={value} label={label} value={value}>
+                            <span className="text-scale-1200">{label}</span>
+                          </Listbox.Option>
+                        )
+                      })}
+                    </Listbox>
                   </Panel.Content>
                 )}
 
