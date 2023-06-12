@@ -11,6 +11,7 @@ import Particles from './Particles'
 import SBLogoVisual from './SBLogoVisual'
 import { Application } from '@splinetool/runtime'
 import { useEffect } from 'react'
+import InteractiveShimmerCard from '../InteractiveShimmerCard'
 
 const Hero = () => {
   const router = useRouter()
@@ -46,14 +47,36 @@ const Hero = () => {
                     styles['hero-text'],
                   ].join(' ')}
                 >
-                  <div className="relative w-screen min-h-[250px] -mb-[50px] lg:-mb-[150px] z-10 h-[200px] lg:min-h-[450px] lg:h-[45vh]">
-                    <Particles />
-                    <canvas
+                  <div className="relative w-screen min-h-[200px] -mb-[50px] lg:-mb-[150px] z-10 h-[200px] lg:min-h-[350px] lg:h-[45vh]">
+                    {/* <canvas
                       className="relative z-20 w-[500px] h-[500px] bottom-[-40px] lg:bottom-[-60px]"
                       id="canvas3d"
-                    ></canvas>
-                    <div className="absolute w-full h-full z-50 pointer-events-none inset-0 bg-gradient-to-t from-[#0A0B0F] via-transparent to-transparent" />
-                    <div className="absolute w-full h-full z-50 inset-0 bg-[#0A0B0F] top-[100%]" />
+                    ></canvas> */}
+                    <div
+                      className="absolute w-full h-full z-50 pointer-events-none inset-0"
+                      style={{
+                        background: `radial-gradient(50% 80% at 50% 20%, transparent, #0A0B0F)`,
+                      }}
+                    />
+                    <div className="absolute w-full h-[200%] z-50 inset-0 bg-[#0A0B0F] top-[100%]" />
+                    <InteractiveShimmerCard
+                      outerClassName="z-30 rounded-md lg:rounded-xl w-[80vw] max-w-xl lg:max-w-3xl 2xl:max-w-4xl mx-auto mt-20 lg:mt-28"
+                      innerClassName=""
+                    >
+                      <div className="absolute w-full h-full z-50 inset-[1px] bg-[#0A0B0F80]" />
+                      <video
+                        className="relative z-0"
+                        height="100%"
+                        width="100%"
+                        loop
+                        muted
+                        autoPlay
+                      >
+                        <source src="/images/index/dashboard-hero.mp4" type="video/mp4" />
+                      </video>
+                    </InteractiveShimmerCard>
+                    <Particles />
+                    {/* <div className="absolute w-full h-full z-50 pointer-events-none inset-0 bg-gradient-to-t from-[#0A0B0F] via-transparent to-transparent" /> */}
                     {/* <SBLogoVisual className="mx-auto absolute z-10 w-[50vw] max-w-[531px] h-full lg:h-[500px] max-h-[500px] bottom-[-50px] left-0 right-0" /> */}
                     {/* <img
                       src="/images/index/synth-grid.svg"
