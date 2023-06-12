@@ -259,7 +259,7 @@ const BillingBreakdown = ({}: BillingBreakdownProps) => {
                             ? 'bg-scale-1100'
                             : isExceededLimit && !isUsageBillingEnabled
                             ? 'bg-red-900'
-                            : isApproachingLimit
+                            : isApproachingLimit && !isUsageBillingEnabled
                             ? 'bg-amber-900'
                             : 'bg-scale-1100'
                         }
