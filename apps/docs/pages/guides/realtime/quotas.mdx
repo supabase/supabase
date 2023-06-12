@@ -9,14 +9,16 @@ export const meta = {
 
 ## Quotas by Plan Tier
 
-|                          | Free | Pro |  PAYG  |  Team  | Enterprise  |
-|--------------------------|------|-----|--------|--------|-------------|
-| Concurrent clients       | 200  | 500 | 10,000 | 10,000 |   10,000    |
-| Messages per second      | 100  | 500 | 2,500  | 2,500  |    2,500    |
-| Channel joins per second | 100  | 500 | 2,500  | 2,500  |    2,500    |
-| Channels per client      | 100  | 100 |  100   |  100   |     100     |
+<Admonition type="note">
+  Upgrade your plan to increase your quotas. Without a spend cap, or on an Enterprise plan, some quotas are still in place to protect budgets. All quotas are configurable per project. [Contact support](https://app.supabase.com/support/new) if you need your quotas increased. Our cluster supports millions of concurrent connections and message throughput for production workloads.
+</Admonition>
 
-You can increase your quotas by upgrading your plan and lifting spend caps. There are still sensible quotas in place when you lift spend caps or upgrade to Enterprise to protect budgets.
+|                          | Free | Pro |  Pro (no spend cap)  |  Team  | Enterprise |
+|--------------------------|------|-----|----------------------|--------|------------|
+| Concurrent clients       | 200  | 500 | 10,000               | 10,000 | 10,000     |
+| Messages per second      | 100  | 500 | 2,500                | 2,500  | 2,500      |
+| Channel joins per second | 100  | 500 | 2,500                | 2,500  | 2,500      |
+| Channels per client      | 100  | 100 | 100                  | 100    | 100        |
 
 You can customize your quotas by [contacting support](https://app.supabase.com/support/new).
 
