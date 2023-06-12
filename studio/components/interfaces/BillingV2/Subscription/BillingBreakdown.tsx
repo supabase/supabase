@@ -234,17 +234,53 @@ const BillingBreakdown = ({}: BillingBreakdownProps) => {
                           </Tooltip.Portal>
                         </Tooltip.Root>
                       )}
-                      {isExceededLimit && !isUsageBillingEnabled ? (
-                        <div className="flex items-center space-x-2 min-w-[115px]">
-                          <IconAlertTriangle size={14} strokeWidth={2} className="text-red-900" />
-                          <p className="text-sm text-red-900">Exceeded limit</p>
-                        </div>
-                      ) : isApproachingLimit && !isUsageBillingEnabled ? (
-                        <div className="flex items-center space-x-2 min-w-[115px]">
-                          <IconAlertTriangle size={14} strokeWidth={2} className="text-amber-900" />
-                          <p className="text-sm text-amber-900">Reaching limit</p>
-                        </div>
-                      ) : null}
+                      {isUsageBillingEnabled === false &&
+                        usageRatio >= USAGE_APPROACHING_THRESHOLD && (
+                          <Tooltip.Root delayDuration={0}>
+                            <Tooltip.Trigger asChild>
+                              {isExceededLimit && !isUsageBillingEnabled ? (
+                                <div className="flex items-center space-x-2 min-w-[115px] cursor-help">
+                                  <IconAlertTriangle
+                                    size={14}
+                                    strokeWidth={2}
+                                    className="text-red-900"
+                                  />
+                                  <p className="text-sm text-red-900">Exceeded limit</p>
+                                </div>
+                              ) : isApproachingLimit && !isUsageBillingEnabled ? (
+                                <div className="flex items-center space-x-2 min-w-[115px] cursor-help">
+                                  <IconAlertTriangle
+                                    size={14}
+                                    strokeWidth={2}
+                                    className="text-amber-900"
+                                  />
+                                  <p className="text-sm text-amber-900">Approaching limit</p>
+                                </div>
+                              ) : null}
+                            </Tooltip.Trigger>
+
+                            <Tooltip.Portal>
+                              <Tooltip.Content side="bottom">
+                                <Tooltip.Arrow className="radix-tooltip-arrow" />
+                                <div
+                                  className={[
+                                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                                    'border border-scale-200',
+                                  ].join(' ')}
+                                >
+                                  <p className="text-xs text-scale-1200">
+                                    Exceeding your plans included usage will lead to restrictions to
+                                    your project.
+                                  </p>
+                                  <p className="text-xs text-scale-1200">
+                                    Upgrade to a usage-based plan or disable the spend cap to avoid
+                                    restrictions.
+                                  </p>
+                                </div>
+                              </Tooltip.Content>
+                            </Tooltip.Portal>
+                          </Tooltip.Root>
+                        )}
                     </div>
                     {usageMeta.available_in_plan ? (
                       <SparkBar
@@ -272,7 +308,7 @@ const BillingBreakdown = ({}: BillingBreakdownProps) => {
                             ? ''
                             : isExceededLimit && !isUsageBillingEnabled
                             ? '!text-red-900'
-                            : isApproachingLimit
+                            : isApproachingLimit && !isUsageBillingEnabled
                             ? '!text-amber-900'
                             : ''
                         }
