@@ -179,14 +179,14 @@ const PITRSidePanel = () => {
                   withIcon
                   variant="info"
                   className="mb-4"
-                  title="Changing your compute size is only available on the Pro plan"
+                  title="Changing your Point-In-Time-Recovery is only available on the Pro plan"
                   actions={
                     <Button type="default" onClick={() => snap.setPanelKey('subscriptionPlan')}>
                       View available plans
                     </Button>
                   }
                 >
-                  Upgrade your project's plan to change the compute size of your project
+                  Upgrade your plan to change the compute size of your project
                 </Alert>
               ) : subscriptionCompute === undefined ? (
                 <Alert

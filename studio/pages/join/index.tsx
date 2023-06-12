@@ -4,10 +4,10 @@ import { useRouter } from 'next/router'
 import { Button, IconCheckSquare, Loading } from 'ui'
 
 import { useStore } from 'hooks'
-import useProfile from 'hooks/misc/useProfile'
 import { useSignOut } from 'lib/auth'
 import { API_URL } from 'lib/constants'
 import { get, post, delete_ } from 'lib/common/fetch'
+import { useProfileQuery } from 'data/profile/profile-query'
 
 interface ITokenInfo {
   organization_name?: string | undefined
@@ -24,7 +24,7 @@ const JoinOrganizationPage = () => {
   const router = useRouter()
   const { slug, token, name } = router.query
   const { ui, app } = useStore()
-  const { data: profile } = useProfile()
+  const { data: profile } = useProfileQuery()
   const signOut = useSignOut()
 
   const [isSubmitting, setIsSubmitting] = useState(false)
