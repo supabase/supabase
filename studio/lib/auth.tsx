@@ -55,23 +55,8 @@ export const AuthProvider = ({ children }: PropsWithChildren<{}>) => {
     return subscription.unsubscribe
   }, [])
 
-  const notificationIdRef = useRef<string | undefined>()
   const { mutate: createProfile } = useProfileCreateMutation({
-    onMutate() {
-      notificationIdRef.current = ui.setNotification({
-        category: 'loading',
-        message: 'Creating your profile...',
-      })
-    },
     onSuccess() {
-      ui.setNotification({
-        category: 'success',
-        message: 'Profile created successfully!',
-        id: notificationIdRef.current,
-      })
-
-      notificationIdRef.current = undefined
-
       Telemetry.sendEvent(
         { category: 'conversion', action: 'sign_up', label: '' },
         telemetryProps,
@@ -82,10 +67,7 @@ export const AuthProvider = ({ children }: PropsWithChildren<{}>) => {
       ui.setNotification({
         category: 'error',
         message: 'Failed to create your profile. Please refresh to try again.',
-        id: notificationIdRef.current,
       })
-
-      notificationIdRef.current = undefined
     },
   })
 
