@@ -65,7 +65,7 @@ const AddOns = ({}: AddOnsProps) => {
                   <Link href="https://supabase.com/docs/guides/platform/compute-add-ons">
                     <a target="_blank" rel="noreferrer">
                       <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
-                        <p className="text-sm">About compute add-ons</p>
+                        <p className="text-sm">Compute add-ons</p>
                         <IconExternalLink size={16} strokeWidth={1.5} />
                       </div>
                     </a>
@@ -75,7 +75,7 @@ const AddOns = ({}: AddOnsProps) => {
                   <Link href="https://supabase.com/docs/guides/platform/backups#point-in-time-recovery">
                     <a target="_blank" rel="noreferrer">
                       <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
-                        <p className="text-sm">About PITR backups</p>
+                        <p className="text-sm">PITR backups</p>
                         <IconExternalLink size={16} strokeWidth={1.5} />
                       </div>
                     </a>
@@ -85,7 +85,17 @@ const AddOns = ({}: AddOnsProps) => {
                   <Link href="https://supabase.com/docs/guides/platform/custom-domains">
                     <a target="_blank" rel="noreferrer">
                       <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
-                        <p className="text-sm">About custom domains</p>
+                        <p className="text-sm">Custom domains</p>
+                        <IconExternalLink size={16} strokeWidth={1.5} />
+                      </div>
+                    </a>
+                  </Link>
+                </div>
+                <div>
+                  <Link href="https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pooler">
+                    <a target="_blank" rel="noreferrer">
+                      <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
+                        <p className="text-sm">Connection Pooler</p>
                         <IconExternalLink size={16} strokeWidth={1.5} />
                       </div>
                     </a>
