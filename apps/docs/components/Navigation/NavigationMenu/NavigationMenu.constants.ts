@@ -804,11 +804,11 @@ export const realtime: NavMenuConstant = {
       name: 'Features',
       url: undefined,
       items: [
-        { name: 'Broadcast', url: '/guides/realtime/extensions/broadcast' },
-        { name: 'Presence', url: '/guides/realtime/extensions/presence' },
+        { name: 'Broadcast', url: '/guides/realtime/broadcast' },
+        { name: 'Presence', url: '/guides/realtime/presence' },
         {
           name: 'Postgres Changes',
-          url: '/guides/realtime/extensions/postgres-changes',
+          url: '/guides/realtime/postgres-changes',
         },
       ],
     },
