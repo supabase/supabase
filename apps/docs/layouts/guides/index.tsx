@@ -12,6 +12,7 @@ import GuidesTableOfContents from '~/components/GuidesTableOfContents'
 import useHash from '~/hooks/useHash'
 import { LayoutMainContent } from '../DefaultLayout'
 import ExpandableVideo from 'ui/src/components/ExpandableVideo/ExpandableVideo'
+import Footer from '~/components/Navigation/Footer'
 
 interface Props {
   meta: {
@@ -106,14 +107,16 @@ const Layout: FC<Props> = (props) => {
           },
         }}
       />
-      <LayoutMainContent className="pb-0">
-        <div className={['grid grid-cols-12 relative gap-4'].join(' ')}>
+      <LayoutMainContent className="pb-0 h-full">
+        <div className={['grid grid-cols-12 relative gap-4 h-full'].join(' ')}>
           <div
             className={[
               'relative',
               !props.hideToc ? 'col-span-12 md:col-span-9' : 'col-span-12',
               'transition-all ease-out',
               'duration-100',
+              'h-full',
+              'overflow-y-auto',
             ].join(' ')}
           >
             {props.meta.breadcrumb && (
@@ -123,7 +126,7 @@ const Layout: FC<Props> = (props) => {
               ref={articleRef}
               className={`${
                 props.meta?.hide_table_of_contents || !hasTableOfContents ? '' : ''
-              } prose dark:prose-dark max-w-none`}
+              } prose dark:prose-dark max-w-none h-full overflow-y-auto px-10 py-16`}
             >
               <h1 className="mb-0">{props.meta.title}</h1>
               {props.meta.subtitle && (
@@ -146,6 +149,8 @@ const Layout: FC<Props> = (props) => {
                   </div>
                 </div>
               )}
+
+              <Footer />
             </article>
           </div>
           {!props.hideToc && hasTableOfContents && !props.meta?.hide_table_of_contents && (
@@ -158,17 +163,15 @@ const Layout: FC<Props> = (props) => {
                 'duration-100',
               ].join(' ')}
             >
-              <div className="border-l">
-                {props.meta?.tocVideo && !!tocVideoPreview && (
-                  <div className="relative mb-6 pl-5">
-                    <ExpandableVideo imgUrl={tocVideoPreview} videoId={props.meta.tocVideo} />
-                  </div>
-                )}
-                <span className="block font-mono text-xs uppercase text-scale-1200 px-5 mb-6">
-                  On this page
-                </span>
-                <GuidesTableOfContents list={tocList} />
-              </div>
+              {props.meta?.tocVideo && !!tocVideoPreview && (
+                <div className="relative mb-6 pl-5">
+                  <ExpandableVideo imgUrl={tocVideoPreview} videoId={props.meta.tocVideo} />
+                </div>
+              )}
+              <span className="block font-mono text-xs uppercase text-scale-1200 px-5 mb-6">
+                On this page
+              </span>
+              <GuidesTableOfContents list={tocList} />
             </div>
           )}
         </div>

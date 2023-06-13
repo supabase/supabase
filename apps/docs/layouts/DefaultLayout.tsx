@@ -83,7 +83,7 @@ const Layout: FC<Props> = (props: Props) => {
 }
 
 export const LayoutMainContent: FC<{ className?: string }> = ({ className, children }) => (
-  <div className={['max-w-7xl px-5 mx-auto py-16', className].join(' ')}>{children}</div>
+  <div className={['max-w-7xl mx-auto', className].join(' ')}>{children}</div>
 )
 
 export default Layout

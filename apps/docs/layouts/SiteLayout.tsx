@@ -242,7 +242,7 @@ const Container = memo(function Container(props) {
       id="docs-content-container"
       className={[
         // 'overflow-x-auto',
-        'w-full h-screen transition-all ease-out',
+        'w-full transition-all ease-out',
         'absolute lg:relative',
         mobileMenuOpen
           ? '!w-auto ml-[75%] sm:ml-[50%] md:ml-[33%] overflow-hidden'
@@ -251,7 +251,7 @@ const Container = memo(function Container(props) {
         'lg:ml-0',
       ].join(' ')}
     >
-      <div className="flex flex-col relative">{props.children}</div>
+      <div className="flex flex-col relative h-screen">{props.children}</div>
     </div>
   )
 })
@@ -329,7 +329,7 @@ const SiteLayout = ({ children }: PropsWithChildren<{}>) => {
         <div className="flex flex-row h-screen">
           <NavContainer />
           <Container>
-            <div className={['lg:sticky top-0 z-10 overflow-hidden'].join(' ')}>
+            <div className={['z-10'].join(' ')}>
               <TopNavBarRef />
             </div>
             <div
@@ -343,10 +343,7 @@ const SiteLayout = ({ children }: PropsWithChildren<{}>) => {
                 <MobileHeader />
               </div>
             </div>
-            <div className="grow">
-              {children}
-              <Footer />
-            </div>
+            <div className="grow overflow-y-auto">{children}</div>
             <MobileMenuBackdrop />
           </Container>
         </div>
