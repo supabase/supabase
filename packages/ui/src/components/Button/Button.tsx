@@ -151,7 +151,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ asChild = false, size = 'tiny', type = 'primary', children, ...props }, ref) => {
     const Comp = asChild ? Slot : 'button'
 
-    const { className, disabled, loading, icon, iconLeft, iconRight } = props
+    const { className, disabled, loading, icon, iconLeft, iconRight, block } = props
 
     const showIcon = loading || icon
 
@@ -163,7 +163,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         type={props.htmlType}
         {...props}
-        className={cn(buttonVariants({ type, size, disabled }), className)}
+        className={cn(buttonVariants({ type, size, disabled, block }), className)}
       >
         {asChild ? (
           React.isValidElement(children) ? (
