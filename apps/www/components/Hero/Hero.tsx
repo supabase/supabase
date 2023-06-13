@@ -42,55 +42,26 @@ const Hero = () => {
         <SectionContainer className="pb-12 !pt-0 mt-0 md:pb-16 lg:pb-20">
           <div className="relative">
             <div className="mx-auto">
-              <div className="mx-auto max-w-2xl lg:col-span-6 lg:flex lg:items-center justify-center text-center">
+              <div className="mx-auto max-w-3xl lg:col-span-6 lg:flex lg:items-center justify-center text-center">
                 <div
                   className={[
-                    'appear-first h-auto flex flex-col items-center justify-center sm:mx-auto md:w-3/4 lg:mx-0 lg:w-full gap-4 lg:gap-8',
+                    'appear-first h-auto flex flex-col items-center justify-center py-20 sm:mx-auto md:w-3/4 lg:mx-0 lg:w-full gap-4 lg:gap-8',
                     styles['hero-text'],
                   ].join(' ')}
                 >
-                  <div className="relative w-screen min-h-[200px] -mb-[50px] lg:-mb-[150px] z-10 h-[200px] lg:h-[350px] 2xl:h-[450px]">
-                    {/* <canvas
-                      className="relative z-20 w-[500px] h-[500px] bottom-[-40px] lg:bottom-[-60px]"
-                      id="canvas3d"
-                    ></canvas> */}
-                    <div
+                  <div className="relative w-screen h-[150px] lg:h-[250px] -mb-[50px] lg:-mb-[150px] z-10">
+                    {/* <div
                       className="absolute w-full h-full z-50 pointer-events-none inset-0"
                       style={{
                         background: isSm
                           ? `radial-gradient(50% 50% at 50% 50%, transparent, #0A0B0F)`
                           : `radial-gradient(50% 80% at 50% 20%, transparent, #0A0B0F)`,
                       }}
-                    />
-                    <div className="absolute w-full h-[200%] z-50 inset-0 bg-[#0A0B0F] top-[100%]" />
-                    <InteractiveShimmerCard
-                      outerClassName={[
-                        'z-30 rounded-md lg:rounded-xl w-[80vw] max-w-xl lg:max-w-3xl 2xl:max-w-4xl mx-auto mt-20 lg:mt-28',
-                        styles['hero-video'],
-                      ].join(' ')}
-                      innerClassName=""
-                    >
-                      <div className="absolute w-full h-full z-50 inset-[1px] bg-[#0A0B0F80]" />
-                      <video
-                        className="relative z-0"
-                        height="100%"
-                        width="100%"
-                        loop
-                        muted
-                        autoPlay
-                      >
-                        <source src="/images/index/dashboard-hero.mp4" type="video/mp4" />
-                      </video>
-                    </InteractiveShimmerCard>
-                    <Particles />
-                    {/* <div className="absolute w-full h-full z-50 pointer-events-none inset-0 bg-gradient-to-t from-[#0A0B0F] via-transparent to-transparent" /> */}
-                    {/* <SBLogoVisual className="mx-auto absolute z-10 w-[50vw] max-w-[531px] h-full lg:h-[500px] max-h-[500px] bottom-[-50px] left-0 right-0" /> */}
-                    {/* <img
-                      src="/images/index/synth-grid.svg"
-                      className="absolute mx-auto top-0 left-0 right-0 z-0 w-screen max-w-[800px] aspect-square opacity-10"
                     /> */}
+                    <div className="absolute w-full h-[200%] z-50 inset-0 bg-[#0A0B0F] top-[100%]" />
+                    <Particles />
                   </div>
-                  <div className="relative z-30">
+                  <div className="relative max-w-2xl z-30">
                     <h1 className="text-scale-1200 text-4xl sm:text-5xl sm:leading-none lg:text-7xl">
                       <span className="block text-[#F4FFFA00] bg-clip-text bg-gradient-to-b from-scale-1200 to-scale-1200 dark:to-scale-1100">
                         Build in a weekend

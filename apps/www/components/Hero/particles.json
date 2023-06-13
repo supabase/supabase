@@ -302,10 +302,10 @@
       "density": {
         "enable": true,
         "width": 1920,
-        "height": 1080
+        "height": 380
       },
       "limit": 0,
-      "value": 300
+      "value": 200
     },
     "opacity": {
       "random": {
