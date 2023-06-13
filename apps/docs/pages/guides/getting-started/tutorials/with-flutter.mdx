@@ -53,34 +53,14 @@ First, add `io.supabase.flutterquickstart://login-callback/` as a new [redirect 
 
 That is it on Supabase's end and the rest are platform specific settings:
 
-For Android, edit the `android/app/src/main/AndroidManifest.xml` file.
-
-Add an intent-filter to enable deep linking:
-
-```xml android/app/src/main/AndroidManifest.xml
-<manifest ...>
-  <!-- ... other tags -->
-  <application ...>
-    <activity ...>
-      <!-- ... other tags -->
-
-      <!-- Add this intent-filter for Deep Links -->
-      <intent-filter>
-        <action android:name="android.intent.action.VIEW" />
-        <category android:name="android.intent.category.DEFAULT" />
-        <category android:name="android.intent.category.BROWSABLE" />
-        <!-- Accepts URIs that begin with YOUR_SCHEME://YOUR_HOST -->
-        <data
-          android:scheme="io.supabase.flutterquickstart"
-          android:host="login-callback" />
-      </intent-filter>
-
-    </activity>
-  </application>
-</manifest>
-```
-
-For iOS, edit the ios/Runner/Info.plist file.
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="ios"
+>
+<TabPanel id="ios" label="iOS">
+Edit the `ios/Runner/Info.plist` file.
 
 Add CFBundleURLTypes to enable deep linking:
 
@@ -106,10 +86,39 @@ Add CFBundleURLTypes to enable deep linking:
 </dict>
 </plist>
 ```
+</TabPanel>
+<TabPanel id="android" label="Android">
+Edit the `android/app/src/main/AndroidManifest.xml` file.
 
-For web:
+Add an intent-filter to enable deep linking:
 
+```xml android/app/src/main/AndroidManifest.xml
+<manifest ...>
+  <!-- ... other tags -->
+  <application ...>
+    <activity ...>
+      <!-- ... other tags -->
+
+      <!-- Add this intent-filter for Deep Links -->
+      <intent-filter>
+        <action android:name="android.intent.action.VIEW" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+        <!-- Accepts URIs that begin with YOUR_SCHEME://YOUR_HOST -->
+        <data
+          android:scheme="io.supabase.flutterquickstart"
+          android:host="login-callback" />
+      </intent-filter>
+
+    </activity>
+  </application>
+</manifest>
+```
+</TabPanel>
+<TabPanel id="web" label="Web">
 There are no additional configurations.
+</TabPanel>
+</Tabs>
 
 ### Main function
 
