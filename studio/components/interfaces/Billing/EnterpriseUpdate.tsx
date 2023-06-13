@@ -27,6 +27,8 @@ import {
 import { PaymentMethod, SubscriptionPreview } from './Billing.types'
 import { formSubscriptionUpdatePayload, getCurrentAddons } from './Billing.utils'
 import SupportPlan from './AddOns/SupportPlan'
+import { subscriptionKeys } from 'data/subscriptions/keys'
+import { useQueryClient } from '@tanstack/react-query'
 
 interface Props {
   products: { tiers: any[]; addons: SubscriptionAddon[] }
@@ -45,6 +47,7 @@ const EnterpriseUpdate: FC<Props> = ({
 }) => {
   const { app, ui } = useStore()
   const router = useRouter()
+  const queryClient = useQueryClient()
 
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const captchaRef = useRef<HCaptcha>(null)
@@ -195,6 +198,12 @@ const EnterpriseUpdate: FC<Props> = ({
       } else {
         setIsSuccessful(true)
       }
+
+      await Promise.all([
+        queryClient.invalidateQueries(subscriptionKeys.subscriptionV2(projectRef)),
+        queryClient.invalidateQueries(subscriptionKeys.subscription(projectRef)),
+        queryClient.invalidateQueries(subscriptionKeys.addons(projectRef)),
+      ])
     }
     setIsSubmitting(false)
   }
