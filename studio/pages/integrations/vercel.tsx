@@ -14,13 +14,13 @@ import { Button } from 'ui'
 
 const VercelIntegration: NextPageWithLayout = () => {
   const { ui } = useStore()
-  const { code, configurationId } = useParams()
+  const { code, configurationId, next } = useParams()
   const [selectedOrg, setSelectedOrg] = useState<Organization | null>(null)
-  const [hasInstalled, setHasInstalled] = useState(true)
+  const [organizationIntegrationId, setOrganizationIntegrationId] = useState<string | null>(null)
 
   const { mutate, isLoading } = useVercelIntegrationCreateMutation({
-    onSuccess() {
-      setHasInstalled(true)
+    onSuccess({ id }) {
+      setOrganizationIntegrationId(id)
     },
   })
 
@@ -45,12 +45,14 @@ const VercelIntegration: NextPageWithLayout = () => {
     })
   }
 
-  const { data: supabaseProjectsData } = useProjectsQuery({ enabled: hasInstalled })
+  const { data: supabaseProjectsData } = useProjectsQuery({
+    enabled: organizationIntegrationId !== null,
+  })
   const supabaseProjects = useMemo(
     () =>
       supabaseProjectsData
         ?.filter((project) => project.organization_id === selectedOrg?.id)
-        .map((project) => ({ id: project.ref, name: project.name })) ?? EMPTY_ARR,
+        .map((project) => ({ id: project.id.toString(), name: project.name })) ?? EMPTY_ARR,
     [selectedOrg?.id, supabaseProjectsData]
   )
 
@@ -59,7 +61,7 @@ const VercelIntegration: NextPageWithLayout = () => {
       orgId: selectedOrg?.id,
       orgSlug: selectedOrg?.slug,
     },
-    { enabled: hasInstalled }
+    { enabled: organizationIntegrationId !== null }
   )
   const vercelProjects = useMemo(
     () =>
@@ -74,7 +76,7 @@ const VercelIntegration: NextPageWithLayout = () => {
     <div className="flex flex-col gap-4">
       <h1>Vercel Integration</h1>
 
-      {!hasInstalled ? (
+      {organizationIntegrationId === null ? (
         <>
           <OrganizationPicker onSelectedOrgChange={setSelectedOrg} />
 
@@ -84,7 +86,16 @@ const VercelIntegration: NextPageWithLayout = () => {
         </>
       ) : (
         <>
-          <ProjectLinker foreignProjects={vercelProjects} supabaseProjects={supabaseProjects} />
+          <ProjectLinker
+            organizationIntegrationId={organizationIntegrationId}
+            foreignProjects={vercelProjects}
+            supabaseProjects={supabaseProjects}
+            onCreateConnections={() => {
+              if (next) {
+                window.location.href = next
+              }
+            }}
+          />
         </>
       )}
     </div>
