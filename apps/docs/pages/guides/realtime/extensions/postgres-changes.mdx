@@ -333,7 +333,7 @@ const channel = supabase
 You may choose to sign your own tokens to customize claims that can be checked in your RLS policies.
 In order for this to work you must pass `apikey` in both Realtime's `headers` and `params` when creating the client.
 
-The `apikey` in `headers` must be either the `anon` or `service_role` token that Supabase provides for every project.
+The `apikey` in `params` must be either the `anon` or `service_role` token that Supabase provides for every project.
 You can find these tokens under [Project API keys](https://app.supabase.com/project/_/settings/api) in your project's dashboard.
 This will authenticate your request in the API gateway.
 
@@ -342,7 +342,7 @@ This will authenticate your request in the API gateway.
   row-level security.
 </Admonition>
 
-The `apikey` in `params` can be your custom token signed with the JWT secret of your Supabase project.
+The `apikey` in `headers` can be your custom token signed with the JWT secret of your Supabase project.
 This is forwarded to the Realtime server and it will verify your custom token and use its claims to authorize database changes
 when RLS is enabled.
 
@@ -352,10 +352,10 @@ const { createClient } = require('@supabase/supabase-js')
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY, {
   realtime: {
     headers: {
-      apikey: 'supabase-signed-token',
+      apikey: `Bearer ${your_custom_token}`,
     },
     params: {
-      apikey: 'your-custom-token',
+      apikey: process.env.SUPABASE_KEY,
     },
   },
 })

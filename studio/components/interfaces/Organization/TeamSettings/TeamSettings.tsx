@@ -4,7 +4,6 @@ import { Button, Input, IconSearch } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 
 import { useStore } from 'hooks'
-import useProfile from 'hooks/misc/useProfile'
 import { useParams } from 'common/hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
@@ -14,12 +13,13 @@ import { getRolesManagementPermissions, hasMultipleOwners } from './TeamSettings
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 import { useOrganizationDetailQuery } from 'data/organizations/organization-detail-query'
 import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
+import { useProfileQuery } from 'data/profile/profile-query'
 
 const TeamSettings = () => {
   const { ui } = useStore()
   const { slug } = useParams()
 
-  const { data: profile } = useProfile()
+  const { data: profile } = useProfileQuery()
   const isOwner = ui.selectedOrganization?.is_owner
 
   const { data: detailData } = useOrganizationDetailQuery({ slug })

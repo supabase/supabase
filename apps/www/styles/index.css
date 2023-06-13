@@ -148,7 +148,7 @@ h6:not(.overwrite) {
 }
 
 ::selection {
-  background-color: #6ee7b7;
+  background-color: #6ee7b7 !important;
   color: #333 !important;
 }
 

@@ -27,7 +27,7 @@
       {
         "title": "Database size",
         "tooltips": {
-          "main": "Billing is based on the average database size in GB throughout the billing period."
+          "main": "Billing is based on the average daily database size in GB throughout the billing period."
         },
         "plans": {
           "free": "500 MB",
@@ -79,7 +79,7 @@
       {
         "title": "Database egress",
         "tooltips": {
-          "main": "Billing is based on the total sum of outgoing traffic of your database in GB throughout your billing period. Only download operations are counted towards the limit"
+          "main": "Billing is based on the total sum of outgoing traffic of your database in GB throughout your billing period."
         },
         "plans": {
           "free": "2GB",
@@ -107,7 +107,7 @@
       {
         "title": "MAUs",
         "tooltips": {
-          "main": "Distinct users requesting your API throughout the billing period."
+          "main": "Users who log in or refresh their token count towards MAU.\nBilling is based on the sum of distinct users requesting your API throughout the billing period. Resets every billing cycle."
         },
         "plans": {
           "free": "50,000",
@@ -199,7 +199,7 @@
       {
         "title": "Storage",
         "tooltips": {
-          "main": "The sum of all objects' size in your storage buckets."
+          "main": "The sum of all objects' size in your storage buckets.\nBilling is based on the average daily size in GB throughout your billing period."
         },
         "plans": {
           "free": "1 GB",
@@ -211,7 +211,7 @@
       {
         "title": "Storage egress",
         "tooltips": {
-          "main": "Total sum of outgoing traffic (egress) from your storage buckets, only download operations are counted."
+          "main": "All requests to view and download your storage items go through our CDN. We sum up all outgoing traffic (egress) for storage related requests through our CDN. We do not differentiate between cache and no cache hits.\nBilling is based on the total amount of egress in GB throughout your billing period."
         },
         "plans": {
           "free": "2 GB",
@@ -242,7 +242,7 @@
       {
         "title": "Image Transformations",
         "tooltips": {
-          "main": "Distinct count of all images that were transformed in the billing period, ignoring any transformations."
+          "main": "We count all images that were transformed in the billing period, ignoring any transformations.\nUsage example: You transform one image with four different size transformations and another image with just a single transformation. It counts as two, as only two images were transformed.\nBilling is based on the count of (origin) images that used transformations throughout the billing period. Resets every billing cycle."
         },
         "plans": {
           "free": false,
@@ -309,7 +309,7 @@
       {
         "title": "Concurrent Peak Connections",
         "tooltips": {
-          "main": "We only charge for successful connections - not connection attempts!"
+          "main": "Total number of successful connections. Connections attempts are not counted towards usage.\nBilling is based on the maximum amount of concurrent peak connections throughout your billing period."
         },
         "plans": {
           "free": "200",
@@ -321,7 +321,7 @@
       {
         "title": "Messages Per Month",
         "tooltips": {
-          "main": "Billing is based on the total sum of Realtime messages throughout your billing period."
+          "main": "Count of messages going through Realtime.\nUsage example: If you do a database change and 5 clients listen to that change via Realtime, that's 5 messages. If you broadcast a message and 4 clients listen to that, that's 5 messages (1 message sent, 4 received).\nBilling is based on the total amount of messages throughout your billing period."
         },
         "plans": {
           "free": "2 Million",
