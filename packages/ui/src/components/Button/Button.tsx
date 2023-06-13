@@ -148,15 +148,28 @@ export interface ButtonProps
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ asChild = false, size = 'tiny', type = 'primary', children, ...props }, ref) => {
+  (
+    {
+      asChild = false,
+      size = 'tiny',
+      type = 'primary',
+      children,
+      loading,
+      block,
+      icon,
+      iconRight,
+      iconLeft,
+      ...props
+    },
+    ref
+  ) => {
     const Comp = asChild ? Slot : 'button'
-
-    const { className, disabled, loading, icon, iconLeft, iconRight, block } = props
-
+    const { className, disabled } = props
     const showIcon = loading || icon
-
     // decrecating 'showIcon' for rightIcon
     const _iconLeft: React.ReactNode = icon ?? iconLeft
+    // if loading, button is disabled
+    props.disabled = loading ? true : props.disabled
 
     return (
       <Comp
