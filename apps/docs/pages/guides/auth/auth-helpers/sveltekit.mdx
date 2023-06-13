@@ -363,6 +363,7 @@ We can access the supabase instance in our `+page.svelte` file through the data 
 ```svelte src/routes/auth/+page.svelte
 <!-- // src/routes/auth/+page.svelte -->
 <script>
+  export let data
   let { supabase } = data
   $: ({ supabase } = data)
 
