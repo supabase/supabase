@@ -9,9 +9,12 @@ Future<void> main() async {
     // TODO: Replace credentials with your own
     url: 'YOUR_SUPABASE_URL',
     anonKey: 'YOUR_SUPABASE_ANON_KEY',
+    authFlowType: AuthFlowType.pkce,
   );
   runApp(MyApp());
 }
+
+final supabase = Supabase.instance.client;
 
 class MyApp extends StatelessWidget {
   @override

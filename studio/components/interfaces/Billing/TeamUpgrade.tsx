@@ -27,6 +27,8 @@ import {
 } from './AddOns/AddOns.utils'
 import SupportPlan from './AddOns/SupportPlan'
 import HCaptcha from '@hcaptcha/react-hcaptcha'
+import { subscriptionKeys } from 'data/subscriptions/keys'
+import { useQueryClient } from '@tanstack/react-query'
 
 // Do not allow compute size changes for af-south-1
 
@@ -49,10 +51,12 @@ const TeamUpgrade = ({
   const router = useRouter()
 
   // Team tier is enabled when the user is already on the team tier (manually assigned by us)
-  const teamTierEnabled = currentSubscription?.tier?.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.TEAM
+  const teamTierEnabled =
+    currentSubscription?.tier?.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.TEAM
 
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const captchaRef = useRef<HCaptcha>(null)
+  const queryClient = useQueryClient()
 
   const { addons } = products
   const computeSizes = formatComputeSizes(addons)
@@ -202,6 +206,12 @@ const TeamUpgrade = ({
       } else {
         setIsSuccessful(true)
       }
+
+      await Promise.all([
+        queryClient.invalidateQueries(subscriptionKeys.subscriptionV2(projectRef)),
+        queryClient.invalidateQueries(subscriptionKeys.subscription(projectRef)),
+        queryClient.invalidateQueries(subscriptionKeys.addons(projectRef)),
+      ])
     }
     setIsSubmitting(false)
   }
