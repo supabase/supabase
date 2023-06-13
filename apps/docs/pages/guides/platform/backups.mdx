@@ -1,9 +1,18 @@
 import Layout from '~/layouts/DefaultGuideLayout'
+import Admonition from '~/components/Admonition'
 
 export const meta = {
   title: 'Database Backups',
   description: 'Learn about the available backup methods for your Supabase project.',
 }
+
+export const mutuallyExclusiveNote = (
+  <Admonition type="note">
+    Daily Backups and PITR are mutually exclusive. If your project opts into using PITR, Daily
+    Backups will no longer be taken. They're also unnecessary, as PITR supports a superset of
+    functionality, in terms of the granular recovery that can be performed.
+  </Admonition>
+)
 
 Database backups are an integral part of any disaster recovery plan. Disasters come in many shapes and sizes. It could be as simple as accidentally deleting a table column, the database crashing, or even a natural calamity wiping out the underlying hardware a database is running on. The risks and impact brought by these scenarios can never be fully eliminated, but only minimized or even mitigated. Having database backups is a form of insurance policy. They are essentially snapshots of the database at various points in time. When disaster strikes, database backups allow the project to be brought back to any of these points in time, therefore averting the crisis.
 
@@ -11,7 +20,7 @@ Database backups are an integral part of any disaster recovery plan. Disasters c
 
 When deciding how often a database should be backed up, the key business metric Recovery Point Objective (RPO) should be considered. RPO is the threshold for how much data, measured in time, a business could lose when disaster strikes. This amount is fully dependent on a business and its underlying requirements. A low RPO would mean that database backups would have to be taken at an increased cadence throughout the day. Each Supabase project has access to two forms of backups, Daily Backups and Point-in-Time Recovery (PITR). The agreed upon RPO would be a deciding factor in choosing which solution best fits a project.
 
-Daily Backups and PITR are mutually exclusive. If your project opts into using PITR, Daily Backups will no longer be taken. They're also unnecessary, as PITR supports a superset of functionality, in terms of the granular recovery that can be performed.
+{mutuallyExclusiveNote}
 
 <Admonition type="note">
 
@@ -56,6 +65,8 @@ Point-in-Time Recovery (PITR) allows a project to be backed up at much shorter i
 This feature is available to all Enterprise plan projects. Pro plan projects can enable PITR as an add-on.
 
 </Admonition>
+
+{mutuallyExclusiveNote}
 
 ### Backup Process [#pitr-backup-process]
 
