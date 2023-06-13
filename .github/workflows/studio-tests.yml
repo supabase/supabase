@@ -20,7 +20,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [16.x]
+        node-version: [18.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
@@ -36,6 +36,6 @@ jobs:
       - name: Run tests
         env:
           # Default is 2 GB, increase to have less frequent OOM errors
-          NODE_OPTIONS: "--max_old_space_size=3072"
+          NODE_OPTIONS: '--max_old_space_size=3072'
         run: npm run test:studio
         working-directory: ./

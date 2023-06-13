@@ -19,7 +19,6 @@ import { CLIENT_LIBRARIES } from 'common/constants'
 
 import { Project } from 'types'
 import { useStore, useFlag } from 'hooks'
-import useProfile from 'hooks/misc/useProfile'
 import { post, get } from 'lib/common/fetch'
 import { detectBrowser } from 'lib/helpers'
 import { API_URL, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
@@ -31,6 +30,7 @@ import InformationBox from 'components/ui/InformationBox'
 import { formatMessage, uploadAttachments } from './SupportForm.utils'
 import { CATEGORY_OPTIONS, SEVERITY_OPTIONS, SERVICE_OPTIONS } from './Support.constants'
 import DisabledStateForFreeTier from './DisabledStateForFreeTier'
+import { useProfileQuery } from 'data/profile/profile-query'
 
 const MAX_ATTACHMENTS = 5
 
@@ -76,7 +76,7 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
     }
   }, [uploadedFiles])
 
-  const { data: profile } = useProfile()
+  const { data: profile } = useProfileQuery()
   const respondToEmail = profile?.primary_email ?? 'your email'
 
   if (!isInitialized) {

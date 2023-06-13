@@ -198,7 +198,7 @@ const CustomDomainSidePanel = () => {
                 </Button>
               }
             >
-              Upgrade your project's plan to add a custom domain to your project
+              Upgrade your plan to add a custom domain to your project
             </Alert>
           )}
         </div>
