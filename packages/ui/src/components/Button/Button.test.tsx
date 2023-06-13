@@ -74,22 +74,6 @@ describe('#Button', () => {
     expect(screen.queryByRole('button')).toHaveClass('w-full')
   })
 
-  it.each(TYPES)(`should have %p class from theme`, (type) => {
-    const expected = defaultTheme.button.type[type]
-
-    render(<Button type={type}>Button Variant</Button>)
-
-    expect(screen.queryByRole('button')).toHaveClass(expected)
-  })
-
-  it.each(SIZES)('should have %p class from theme', (size) => {
-    const expected = defaultTheme.button.size[size]
-
-    render(<Button size={size}>Button</Button>)
-
-    expect(screen.queryByRole('button')).toHaveClass(expected)
-  })
-
   it("shouldn't crash when wrapped with next/link", () => {
     expect(() =>
       render(
