@@ -2026,4 +2026,14 @@ module.exports = [
     source: '/docs/guides/realtime/rate-limits',
     destination: '/docs/guides/realtime/quotas',
   },
+  {
+    permanent: true,
+    source: '/docs/guides/realtime/channels',
+    destination: '/docs/guides/realtime/concepts#channels',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/realtime/extensions',
+    destination: '/docs/guides/realtime/concepts',
+  },
 ]
