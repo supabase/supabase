@@ -2036,4 +2036,19 @@ module.exports = [
     source: '/docs/guides/realtime/extensions',
     destination: '/docs/guides/realtime/concepts',
   },
+  {
+    permanent: true,
+    source: '/docs/guides/realtime/extensions/broadcast',
+    destination: '/docs/guides/realtime/broadcast',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/realtime/extensions/presence',
+    destination: '/docs/guides/realtime/presence',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/realtime/extensions/postgres-changes',
+    destination: '/docs/guides/realtime/postgres-changes',
+  },
 ]
