@@ -324,8 +324,8 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         chartDescription: 'The data refreshes every 24 hours.',
         links: [
           {
-            name: 'Realtime Rate Limits',
-            url: 'https://supabase.com/docs/guides/realtime/rate-limits',
+            name: 'Realtime Quotas',
+            url: 'https://supabase.com/docs/guides/realtime/quotas',
           },
         ],
       },
@@ -341,8 +341,8 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         chartDescription: 'The data refreshes every 24 hours.',
         links: [
           {
-            name: 'Realtime Rate Limits',
-            url: 'https://supabase.com/docs/guides/realtime/rate-limits',
+            name: 'Realtime Quotas',
+            url: 'https://supabase.com/docs/guides/realtime/quotas',
           },
         ],
       },
