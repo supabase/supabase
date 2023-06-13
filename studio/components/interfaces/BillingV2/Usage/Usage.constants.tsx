@@ -156,7 +156,6 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
 
           const isApproachingLimit = hasLimit && usageRatio >= USAGE_APPROACHING_THRESHOLD
           const isExceededLimit = hasLimit && usageRatio >= 1
-          console.log({ usageMeta, isApproachingLimit, isExceededLimit })
 
           return subscription?.plan?.id !== 'free' ? (
             <div>
@@ -177,10 +176,10 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
                 </Link>
               </div>
               <p className="text-sm text-scale-1000 mt-3">
-                Your disk storage expands automatically when the database reaches 90% of the disk
-                size. The disk is expanded to be 50% larger. Auto-scaling can only take place once
-                every 6 hours. If you reach 95% of the disk space, your project will enter read-only
-                mode. You can also{' '}
+                If you reach 95% of the disk space, your project will enter read-only mode. Your
+                disk storage expands automatically when the database reaches 90% of the disk size.
+                The disk is expanded to be 50% larger. Auto-scaling can only take place once every 6
+                hours. You can also{' '}
                 <Link passHref href={`/project/${ref}/settings/database#diskManagement`}>
                   <a className="text-brand-900 transition hover:text-brand-1000">preprovision</a>
                 </Link>{' '}
