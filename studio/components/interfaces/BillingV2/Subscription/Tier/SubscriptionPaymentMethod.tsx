@@ -14,9 +14,10 @@ import { BASE_PATH } from 'lib/constants'
 
 export interface SubscriptionTierProps {
   subscription: ProjectSubscriptionResponse
+  onSubscriptionUpdated: () => void
 }
 
-const SubscriptionPaymentMethod = ({ subscription }: SubscriptionTierProps) => {
+const SubscriptionPaymentMethod = ({ subscription, onSubscriptionUpdated }: SubscriptionTierProps) => {
   const { ref: projectRef } = useParams()
   const { ui } = useStore()
 
@@ -54,6 +55,8 @@ const SubscriptionPaymentMethod = ({ subscription }: SubscriptionTierProps) => {
           category: 'success',
           message: `Successfully updated payment method!`,
         })
+
+        onSubscriptionUpdated()
       } catch (error: any) {
         ui.setNotification({
           error,

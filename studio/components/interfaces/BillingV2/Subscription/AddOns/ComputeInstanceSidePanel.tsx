@@ -58,10 +58,14 @@ const ComputeInstanceSidePanel = () => {
 
   const isFreePlan = subscription?.plan.id === 'free'
   const subscriptionCompute = selectedAddons.find((addon) => addon.type === 'compute_instance')
+  const pitrAddon = selectedAddons.find((addon) => addon.type === 'pitr')
   const availableOptions =
     availableAddons.find((addon) => addon.type === 'compute_instance')?.variants ?? []
   const selectedCompute = availableOptions.find((option) => option.identifier === selectedOption)
   const hasChanges = selectedOption !== (subscriptionCompute?.variant.identifier ?? 'ci_micro')
+
+  const blockMicroDowngradeDueToPitr =
+    pitrAddon !== undefined && selectedOption === 'ci_micro' && hasChanges
 
   useEffect(() => {
     if (visible) {
@@ -115,7 +119,7 @@ const ComputeInstanceSidePanel = () => {
         onCancel={onClose}
         onConfirm={() => setShowConfirmationModal(true)}
         loading={isLoading}
-        disabled={isFreePlan || isLoading || !hasChanges}
+        disabled={isFreePlan || isLoading || !hasChanges || blockMicroDowngradeDueToPitr}
         tooltip={isFreePlan ? 'Unable to update compute instance on a free plan' : undefined}
         header={
           <div className="flex items-center justify-between">
@@ -225,7 +229,10 @@ const ComputeInstanceSidePanel = () => {
                             <p className="text-scale-1200 text-sm">
                               ${option.price.toLocaleString()}
                             </p>
-                            <p className="text-scale-1000 translate-y-[1px]"> / month</p>
+                            <p className="text-scale-1000 translate-y-[1px]">
+                              {' '}
+                              / {option.price_interval === 'monthly' ? 'month' : 'hour'}
+                            </p>
                           </div>
                         </div>
                       </div>
@@ -261,7 +268,7 @@ const ComputeInstanceSidePanel = () => {
                 </p>
               ))}
 
-            {hasChanges && (
+            {hasChanges && !blockMicroDowngradeDueToPitr && (
               <Alert
                 withIcon
                 variant="info"
@@ -269,6 +276,26 @@ const ComputeInstanceSidePanel = () => {
               >
                 It will take up to 2 minutes for changes to take place, in which your project will
                 be unavailable during that time.
+              </Alert>
+            )}
+
+            {blockMicroDowngradeDueToPitr && (
+              <Alert
+                withIcon
+                variant="info"
+                className="mb-4"
+                title="Disable PITR before downgrading to Micro Compute"
+                actions={
+                  <Button type="default" onClick={() => snap.setPanelKey('pitr')}>
+                    Change PITR
+                  </Button>
+                }
+              >
+                <p>
+                  You currently have PITR enabled. The minimum compute instance size for using PITR
+                  is the Small Compute.
+                </p>
+                <p>You need to disable PITR before downgrading to Micro Compute.</p>
               </Alert>
             )}
           </div>
