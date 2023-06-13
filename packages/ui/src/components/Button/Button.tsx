@@ -11,6 +11,7 @@ import { sizes } from './../../lib/commonCva'
 export type ButtonVariantProps = VariantProps<typeof buttonVariants>
 const buttonVariants = cva(
   `relative 
+  flex iems-center justify-center
   cursor-pointer 
   inline-flex 
   items-center 
@@ -149,7 +150,7 @@ export interface ButtonProps
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ asChild = false, size = 'small', type = 'primary', ...props }, ref) => {
+  ({ asChild = false, size = 'small', type = 'primary', children, ...props }, ref) => {
     const Comp = asChild ? Slot : 'button'
 
     const { className, disabled, loading, icon, iconLeft, iconRight } = props
@@ -159,21 +160,6 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     // decrecating 'showIcon' for rightIcon
     const _iconLeft: React.ReactNode = icon ?? iconLeft
 
-    const buttonContent = (
-      <>
-        {showIcon &&
-          (loading ? (
-            <IconLoader size={size} className={cn(loadingVariants({ loading }))} />
-          ) : _iconLeft ? (
-            <IconContext.Provider value={{ contextSize: size }}>{_iconLeft}</IconContext.Provider>
-          ) : null)}
-        {props.children && <span className={'truncate'}>{props.children}</span>}
-        {iconRight && !loading && (
-          <IconContext.Provider value={{ contextSize: size }}>{iconRight}</IconContext.Provider>
-        )}
-      </>
-    )
-
     return (
       <Comp
         className={cn(buttonVariants({ type, size, disabled }), className)}
@@ -181,7 +167,45 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         type={props.htmlType}
         {...props}
       >
-        {buttonContent}
+        {asChild ? (
+          React.isValidElement(children) ? (
+            React.cloneElement(
+              children,
+              undefined,
+              showIcon &&
+                (loading ? (
+                  <IconLoader size={size} className={cn(loadingVariants({ loading }))} />
+                ) : _iconLeft ? (
+                  <IconContext.Provider value={{ contextSize: size }}>
+                    {_iconLeft}
+                  </IconContext.Provider>
+                ) : null),
+              children.props.children && (
+                <span className={'truncate'}>{children.props.children}</span>
+              ),
+              iconRight && !loading && (
+                <IconContext.Provider value={{ contextSize: size }}>
+                  {iconRight}
+                </IconContext.Provider>
+              )
+            )
+          ) : null
+        ) : (
+          <>
+            {showIcon &&
+              (loading ? (
+                <IconLoader size={size} className={cn(loadingVariants({ loading }))} />
+              ) : _iconLeft ? (
+                <IconContext.Provider value={{ contextSize: size }}>
+                  {_iconLeft}
+                </IconContext.Provider>
+              ) : null)}{' '}
+            {children && <span className={'truncate'}>{children}</span>}{' '}
+            {iconRight && !loading && (
+              <IconContext.Provider value={{ contextSize: size }}>{iconRight}</IconContext.Provider>
+            )}
+          </>
+        )}
       </Comp>
     )
   }
