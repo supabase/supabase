@@ -1,159 +1,192 @@
-import React, { forwardRef } from 'react'
-import { IconContext } from './../Icon/IconContext'
-import { IconLoader } from './../Icon/icons/IconLoader'
+import * as React from 'react'
+import { Slot } from '@radix-ui/react-slot'
+import { VariantProps, cva } from 'class-variance-authority'
 
-import styleHandler from '../../lib/theme/styleHandler'
+import { IconContext } from '../../Icon/IconContext'
+import { IconLoader } from '../../Icon/icons/IconLoader'
 
-export interface ButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
-  block?: boolean
-  className?: string
-  children?: React.ReactNode
-  disabled?: boolean
-  onClick?: React.MouseEventHandler<HTMLButtonElement>
+import { cn } from '../../lib/utils'
+import { sizes } from '../../lib/commonCva'
+
+export type ButtonVariantProps = VariantProps<typeof buttonVariants>
+const buttonVariants = cva(
+  `relative 
+  cursor-pointer 
+  inline-flex 
+  items-center 
+  space-x-2 
+  text-center 
+  font-regular 
+  ease-out 
+  duration-200 
+  rounded  
+  outline-none 
+  transition-all 
+  outline-0 
+  focus-visible:outline-4 
+  focus-visible:outline-offset-1`,
+  {
+    variants: {
+      type: {
+        primary: `
+            bg-brand-fixed-1100 hover:bg-brand-fixed-1000
+            text-white
+            bordershadow-brand-fixed-1000 hover:bordershadow-brand-fixed-900 dark:bordershadow-brand-fixed-1000 dark:hover:bordershadow-brand-fixed-1000
+            focus-visible:outline-brand-600
+            shadow-sm`,
+        secondary: `
+            bg-scale-1200
+            text-scale-100 hover:text-scale-800
+            focus-visible:text-scale-600
+            bordershadow-scale-1100 hover:bordershadow-scale-900
+            focus-visible:outline-scale-700
+            shadow-sm`,
+        default: `
+            text-scale-1200
+            bg-scale-100 hover:bg-scale-300
+            bordershadow-scale-600 hover:bordershadow-scale-700
+            dark:bordershadow-scale-700 hover:dark:bordershadow-scale-800
+            dark:bg-scale-500 dark:hover:bg-scale-600
+            focus-visible:outline-brand-600
+            shadow-sm`,
+        alternative: `
+            text-brand-1100
+            bg-brand-200 hover:bg-brand-400
+            bordershadow-brand-600 hover:bordershadow-brand-800
+            dark:bordershadow-brand-700 hover:dark:bordershadow-brand-800
+            focus-visible:border-brand-800
+            focus-visible:outline-brand-600
+            shadow-sm`,
+        outline: `
+            text-scale-1200
+            bg-transparent
+            bordershadow-scale-600 hover:bordershadow-scale-700
+            dark:bordershadow-scale-800 hover:dark:bordershadow-scale-900
+            focus-visible:outline-scale-700`,
+        dashed: `
+            text-scale-1200
+            border
+            border-dashed
+            border-scale-700 hover:border-scale-900
+            bg-transparent
+            focus-visible:outline-scale-700
+            shadow-sm`,
+        link: `
+            text-brand-1100
+            border
+            border-transparent
+            hover:bg-brand-400
+            border-opacity-0
+            bg-opacity-0 dark:bg-opacity-0
+            shadow-none
+            focus-visible:outline-scale-700`,
+        text: `
+            text-scale-1200
+            hover:bg-scale-500
+            shadow-none
+            focus-visible:outline-scale-700`,
+        danger: `
+            text-red-1100
+            bg-red-200
+            bordershadow-red-700 hover:bordershadow-red-900
+            hover:bg-red-900
+            hover:text-lo-contrast
+            focus-visible:outline-red-700
+            shadow-sm`,
+        warning: `
+            text-amber-1100
+            bg-amber-200
+            bordershadow-amber-700 hover:bordershadow-amber-900
+            hover:bg-amber-900
+            hover:text-hi-contrast
+            focus-visible:outline-amber-700
+            shadow-sm`,
+      },
+      block: {
+        true: 'w-full flex items-center justify-center',
+      },
+      size: {
+        ...sizes,
+      },
+      overlay: {
+        base: `absolute inset-0 bg-scale-200 opacity-50`,
+        container: `fixed inset-0 transition-opacity`,
+      },
+      disabled: {
+        true: 'opacity-50 cursor-not-allowed pointer-events-none',
+      },
+      defaultVariants: {
+        //   variant: 'default',
+        //   size: 'default',
+      },
+    },
+  }
+)
+
+export type LoadingVariantProps = VariantProps<typeof loadingVariants>
+const loadingVariants = cva('', {
+  variants: {
+    loading: {
+      default: '',
+      true: `animate-spin`,
+    },
+  },
+})
+
+export interface ButtonProps
+  // omit `type` as we use it to change type of button
+  // replaced with `htmlType`
+  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'type'>,
+    // omit 'disabled' as it is included in HTMLButtonElement
+    Omit<ButtonVariantProps, 'disabled'>,
+    LoadingVariantProps {
+  asChild?: boolean
+  type?: ButtonVariantProps['type']
+  htmlType?: React.ButtonHTMLAttributes<HTMLButtonElement>['type']
   icon?: React.ReactNode
+  iconLeft?: React.ReactNode
   iconRight?: React.ReactNode
-  loading?: boolean
-  loadingCentered?: boolean
-  shadow?: boolean
-  size?: ButtonSize
-  style?: React.CSSProperties
-  type?: ButtonType
-  danger?: boolean
-  htmlType?: 'button' | 'submit' | 'reset'
-  ref?: any
-  ariaSelected?: boolean
-  ariaControls?: string
-  tabIndex?: 0 | -1
-  role?: string
-  textAlign?: 'left' | 'center' | 'right'
-  as?: keyof JSX.IntrinsicElements
-  form?: string
 }
 
-export type ButtonSize = 'tiny' | 'small' | 'medium' | 'large' | 'xlarge'
-export type ButtonType =
-  | 'primary'
-  | 'default'
-  | 'secondary'
-  | 'alternative'
-  | 'outline'
-  | 'dashed'
-  | 'link'
-  | 'text'
-  | 'danger'
-  | 'warning'
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ asChild = false, size = 'small', type = 'primary', ...props }, ref) => {
+    const Comp = asChild ? Slot : 'button'
 
-interface CustomButtonProps extends React.HTMLAttributes<HTMLButtonElement> {}
+    const { className, disabled, loading, icon, iconLeft, iconRight } = props
 
-export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  (
-    {
-      block,
-      className,
-      children,
-      danger,
-      disabled = false,
-      onClick,
-      icon,
-      iconRight,
-      loading = false,
-      loadingCentered = false,
-      shadow = true,
-      size = 'tiny',
-      style,
-      type = 'primary',
-      htmlType = 'button',
-      ariaSelected,
-      ariaControls,
-      tabIndex,
-      role,
-      as,
-      textAlign = 'center',
-      ...props
-    }: ButtonProps,
-    ref
-  ) => {
-    let __styles = styleHandler('button')
-
-    // styles
     const showIcon = loading || icon
 
-    let classes = [__styles.base]
-    let containerClasses = [__styles.container]
-
-    classes.push(__styles.type[type])
-
-    if (block) {
-      containerClasses.push(__styles.block)
-      classes.push(__styles.block)
-    }
-
-    if (shadow && type !== 'link' && type !== 'text') {
-      classes.push(__styles.shadow)
-    }
-
-    if (size) {
-      classes.push(__styles.size[size])
-    }
-
-    if (className) {
-      classes.push(className)
-    }
-
-    if (disabled) {
-      classes.push(__styles.disabled)
-    }
-
-    const iconLoaderClasses = [__styles.loading]
-
-    // custom button tag
-    const CustomButton = ({ ...props }) => {
-      const Tag = as as keyof JSX.IntrinsicElements
-      return <Tag {...props} />
-    }
+    // decrecating 'showIcon' for rightIcon
+    const _iconLeft: React.ReactNode = icon ?? iconLeft
 
     const buttonContent = (
       <>
         {showIcon &&
           (loading ? (
-            <IconLoader size={size} className={iconLoaderClasses.join(' ')} />
-          ) : icon ? (
-            <IconContext.Provider value={{ contextSize: size }}>{icon}</IconContext.Provider>
+            <IconLoader size={size} className={cn(loadingVariants({ loading }))} />
+          ) : _iconLeft ? (
+            <IconContext.Provider value={{ contextSize: size }}>{_iconLeft}</IconContext.Provider>
           ) : null)}
-        {children && <span className={__styles.label}>{children}</span>}
+        {props.children && <span className={'truncate'}>{props.children}</span>}
         {iconRight && !loading && (
           <IconContext.Provider value={{ contextSize: size }}>{iconRight}</IconContext.Provider>
         )}
       </>
     )
 
-    if (as) {
-      return (
-        <CustomButton {...props} className={classes.join(' ')} onClick={onClick} style={style}>
-          {buttonContent}
-        </CustomButton>
-      )
-    } else {
-      return (
-        // <span ref={containerRef} className={containerClasses.join(' ')}>
-        <button
-          {...props}
-          ref={ref}
-          className={classes.join(' ')}
-          disabled={loading || (disabled && true)}
-          onClick={onClick}
-          style={style}
-          type={htmlType}
-          aria-selected={ariaSelected}
-          aria-controls={ariaControls}
-          tabIndex={tabIndex}
-          role={role}
-          form={props.form}
-        >
-          {buttonContent}
-        </button>
-        // </span>
-      )
-    }
+    return (
+      <Comp
+        className={cn(buttonVariants({ type, size, disabled }), className)}
+        ref={ref}
+        type={props.htmlType}
+        {...props}
+      >
+        {buttonContent}
+      </Comp>
+    )
   }
 )
+
+Button.displayName = 'Button'
+
+export { Button, buttonVariants }
