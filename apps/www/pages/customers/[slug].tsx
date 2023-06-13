@@ -5,8 +5,7 @@ import { MDXRemote } from 'next-mdx-remote'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { IconChevronLeft, IconChevronsLeft } from '~/../../packages/ui'
+import { IconChevronLeft } from '~/../../packages/ui'
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
 import mdxComponents from '~/lib/mdx/mdxComponents'
@@ -59,13 +58,14 @@ export async function getStaticProps({ params }: any) {
 
 function CaseStudyPage(props: any) {
   const content = props.blog.content
-  const { basePath } = useRouter()
 
   const meta = {
     title: props.blog.meta_title ?? `${props.blog.name} | Supabase Customer Stories`,
     description: props.blog.meta_description ?? props.blog.description,
-    image: props.blog.og_image ?? `${basePath}/images/customers/og/customer-stories.jpg`,
-    url: `https://supabase.io/customers/${props.blog.slug}`,
+    image:
+      `https://supabase.com${props.blog.og_image}` ??
+      `https://supabase.com/images/customers/og/customer-stories.jpg`,
+    url: `https://supabase.com/customers/${props.blog.slug}`,
   }
 
   return (
@@ -86,6 +86,7 @@ function CaseStudyPage(props: any) {
           images: [
             {
               url: meta.image,
+              alt: `${meta.title} thumbnail`,
             },
           ],
         }}
