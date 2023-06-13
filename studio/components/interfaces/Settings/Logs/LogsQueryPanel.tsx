@@ -70,8 +70,8 @@ const LogsQueryPanel = ({
                   </Dropdown.Item>
                 ))}
             >
-              <Button as="span" type="default" iconRight={<IconChevronDown />}>
-                Insert source
+              <Button asChild type="default" iconRight={<IconChevronDown />}>
+                <span>Insert source</span>
               </Button>
             </Dropdown>
 
@@ -86,8 +86,8 @@ const LogsQueryPanel = ({
                   </Dropdown.Item>
                 ))}
             >
-              <Button as="span" type="default" iconRight={<IconChevronDown />}>
-                Templates
+              <Button asChild type="default" iconRight={<IconChevronDown />}>
+                <span>Templates</span>
               </Button>
             </Dropdown>
             <DatePickers

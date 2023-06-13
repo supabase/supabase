@@ -192,8 +192,8 @@ const PaymentMethods: FC<Props> = ({
                           <>
                             {isDefault ? (
                               <Tooltip.Root delayDuration={0}>
-                                <Tooltip.Trigger>
-                                  <Button disabled as="span" type="outline" icon={<IconX />} />
+                                <Tooltip.Trigger asChild>
+                                  <Button disabled type="outline" icon={<IconX />} />
                                 </Tooltip.Trigger>
                                 <Tooltip.Portal>
                                   <Tooltip.Content side="bottom">
