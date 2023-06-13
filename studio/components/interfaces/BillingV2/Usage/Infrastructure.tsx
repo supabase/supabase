@@ -199,7 +199,7 @@ const Infrastructure = ({
                       <span className={attribute.key === 'ram_usage' ? 'lowercase' : ''}>
                         {attribute.name}
                       </span>{' '}
-                      per {interval === '1d' ? 'day' : 'hour'}
+                      utilization per {interval === '1d' ? 'day' : 'hour'}
                     </p>
                   )}
                 </div>

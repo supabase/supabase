@@ -1,5 +1,5 @@
 name: supabase_quickstart
-description: Sample app on how to get started with Supabase on Flutter. 
+description: Sample app on how to get started with Supabase on Flutter.
 
 publish_to: 'none'
 
@@ -13,7 +13,7 @@ dependencies:
     sdk: flutter
 
   image_picker: ^0.8.4
-  supabase_flutter: ^1.2.0
+  supabase_flutter: ^1.10.3
 
 dev_dependencies:
   flutter_test:
