@@ -5,12 +5,13 @@ import { MDXRemote } from 'next-mdx-remote'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Link from 'next/link'
-import { IconChevronLeft } from '~/../../packages/ui'
+import { IconChevronLeft } from 'ui'
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
 import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
+import { SITE_ORIGIN } from '~/lib/constants'
 
 // table of contents extractor
 const toc = require('markdown-toc')
@@ -63,9 +64,9 @@ function CaseStudyPage(props: any) {
     title: props.blog.meta_title ?? `${props.blog.name} | Supabase Customer Stories`,
     description: props.blog.meta_description ?? props.blog.description,
     image:
-      `https://supabase.com${props.blog.og_image}` ??
-      `https://supabase.com/images/customers/og/customer-stories.jpg`,
-    url: `https://supabase.com/customers/${props.blog.slug}`,
+      `${SITE_ORIGIN}${props.blog.og_image}` ??
+      `${SITE_ORIGIN}/images/customers/og/customer-stories.jpg`,
+    url: `${SITE_ORIGIN}/customers/${props.blog.slug}`,
   }
 
   return (
