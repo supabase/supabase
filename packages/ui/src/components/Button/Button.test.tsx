@@ -1,11 +1,11 @@
-import React from 'react'
-import { render, screen, fireEvent } from '@testing-library/react'
-import { Button, ButtonSize, ButtonType } from './Button'
-import defaultTheme from '../../lib/theme/defaultTheme'
+import { fireEvent, render, screen } from '@testing-library/react'
 import Link from 'next/link'
+import React from 'react'
+import defaultTheme from '../../lib/theme/defaultTheme'
+import { Button } from './Button'
 
-const SIZES: ButtonSize[] = ['tiny', 'small', 'medium', 'large', 'xlarge']
-const TYPES: ButtonType[] = [
+const SIZES = ['tiny', 'small', 'medium', 'large', 'xlarge'] as const
+const TYPES = [
   'primary',
   'default',
   'secondary',
@@ -16,7 +16,7 @@ const TYPES: ButtonType[] = [
   'text',
   'danger',
   'warning',
-]
+] as const
 
 describe('#Button', () => {
   it('should render button correctly', () => {
