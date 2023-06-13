@@ -104,7 +104,7 @@ const WrappersDisabledState = () => {
                 </div>
               </div>
               <div className="flex items-center space-x-2 my-1 ml-[1px]">
-                <Link href="https://supabase.com/docs/guides/database/wrappers">
+                <Link href="https://supabase.com/docs/guides/database/extensions/wrappers">
                   <a target="_blank" rel="noreferrer">
                     <Button type="default" icon={<IconExternalLink />}>
                       About Wrappers
@@ -115,7 +115,7 @@ const WrappersDisabledState = () => {
             </div>
           ) : (
             <div className="flex items-center space-x-2">
-              <Link href="https://supabase.com/docs/guides/database/wrappers">
+              <Link href="https://supabase.com/docs/guides/database/extensions/wrappers">
                 <a target="_blank" rel="noreferrer">
                   <Button type="default" icon={<IconExternalLink />}>
                     About Wrappers

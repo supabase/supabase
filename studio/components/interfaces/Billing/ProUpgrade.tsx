@@ -30,6 +30,8 @@ import BackButton from 'components/ui/BackButton'
 import SupportPlan from './AddOns/SupportPlan'
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import SpendCapModal from './SpendCapModal'
+import { useQueryClient } from '@tanstack/react-query'
+import { subscriptionKeys } from 'data/subscriptions/keys'
 
 // Do not allow compute size changes for af-south-1
 
@@ -52,6 +54,7 @@ const ProUpgrade: FC<Props> = ({
 }) => {
   const { app, ui } = useStore()
   const router = useRouter()
+  const queryClient = useQueryClient()
 
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const captchaRef = useRef<HCaptcha>(null)
@@ -212,6 +215,12 @@ const ProUpgrade: FC<Props> = ({
       } else {
         setIsSuccessful(true)
       }
+
+      await Promise.all([
+        queryClient.invalidateQueries(subscriptionKeys.subscriptionV2(projectRef)),
+        queryClient.invalidateQueries(subscriptionKeys.subscription(projectRef)),
+        queryClient.invalidateQueries(subscriptionKeys.addons(projectRef)),
+      ])
     }
     setIsSubmitting(false)
   }
