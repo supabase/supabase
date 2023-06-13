@@ -18,49 +18,51 @@ const buttonVariants = cva(
   font-regular 
   ease-out 
   duration-200 
-  rounded  
+  rounded-md
   outline-none 
   transition-all 
   outline-0 
   focus-visible:outline-4 
-  focus-visible:outline-offset-1`,
+  focus-visible:outline-offset-1
+  border
+  `,
   {
     variants: {
       type: {
         primary: `
             bg-brand-fixed-1100 hover:bg-brand-fixed-1000
             text-white
-            bordershadow-brand-fixed-1000 hover:bordershadow-brand-fixed-900 dark:bordershadow-brand-fixed-1000 dark:hover:bordershadow-brand-fixed-1000
+            border-brand-fixed-1000 hover:border-brand-fixed-900 dark:border-brand-fixed-1000 dark:hover:border-brand-fixed-1000
             focus-visible:outline-brand-600
             shadow-sm`,
         secondary: `
             bg-scale-1200
             text-scale-100 hover:text-scale-800
             focus-visible:text-scale-600
-            bordershadow-scale-1100 hover:bordershadow-scale-900
+            border-scale-1100 hover:border-scale-900
             focus-visible:outline-scale-700
             shadow-sm`,
         default: `
             text-scale-1200
             bg-scale-100 hover:bg-scale-300
-            bordershadow-scale-600 hover:bordershadow-scale-700
-            dark:bordershadow-scale-700 hover:dark:bordershadow-scale-800
+            border-scale-600 hover:border-scale-700
+            dark:border-scale-700 hover:dark:border-scale-800
             dark:bg-scale-500 dark:hover:bg-scale-600
             focus-visible:outline-brand-600
             shadow-sm`,
         alternative: `
             text-brand-1100
             bg-brand-200 hover:bg-brand-400
-            bordershadow-brand-600 hover:bordershadow-brand-800
-            dark:bordershadow-brand-700 hover:dark:bordershadow-brand-800
+            border-brand-600 hover:border-brand-800
+            dark:border-brand-700 hover:dark:border-brand-800
             focus-visible:border-brand-800
             focus-visible:outline-brand-600
             shadow-sm`,
         outline: `
             text-scale-1200
             bg-transparent
-            bordershadow-scale-600 hover:bordershadow-scale-700
-            dark:bordershadow-scale-800 hover:dark:bordershadow-scale-900
+            border-scale-600 hover:border-scale-700
+            dark:border-scale-800 hover:dark:border-scale-900
             focus-visible:outline-scale-700`,
         dashed: `
             text-scale-1200
@@ -87,7 +89,7 @@ const buttonVariants = cva(
         danger: `
             text-red-1100
             bg-red-200
-            bordershadow-red-700 hover:bordershadow-red-900
+            border-red-700 hover:border-red-900
             hover:bg-red-900
             hover:text-lo-contrast
             focus-visible:outline-red-700
@@ -95,7 +97,7 @@ const buttonVariants = cva(
         warning: `
             text-amber-1100
             bg-amber-200
-            bordershadow-amber-700 hover:bordershadow-amber-900
+            border-amber-700 hover:border-amber-900
             hover:bg-amber-900
             hover:text-hi-contrast
             focus-visible:outline-amber-700
