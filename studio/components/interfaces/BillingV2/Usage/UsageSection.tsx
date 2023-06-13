@@ -148,7 +148,7 @@ const UsageSection = ({
                         barClass={clsx(
                           usageRatio >= 1
                             ? usageBasedBilling
-                              ? 'bg-amber-900'
+                              ? 'bg-scale-1100'
                               : 'bg-red-900'
                             : usageBasedBilling === false &&
                               usageRatio >= USAGE_APPROACHING_THRESHOLD
