@@ -17,7 +17,7 @@
 
 ## Getting started
 
-Thank you for expressing your interest in [Supabase](https://supabase.com) and your willingness to contribute! 
+Thank you for expressing your interest in [Supabase](https://supabase.com) and your willingness to contribute!
 
 To ensure a positive and inclusive environment, we kindly request you to read our [code of conduct](https://github.com/supabase/.github/blob/main/CODE_OF_CONDUCT.md). Additionally, we encourage you to explore the existing [issues](https://github.com/supabase/supabase/issues) to see how you can make a meaningful impact. This document will guide you through the process of setting up your development environment, enabling you to successfully build and test [Supabase](https://supabase.com).
 
@@ -26,8 +26,8 @@ To ensure a positive and inclusive environment, we kindly request you to read ou
 You will need to install and configure the following dependencies on your machine to build [Supabase](https://supabase.com):
 
 - [Git](http://git-scm.com/)
-- [Node.js v16.x (LTS)](http://nodejs.org)
-- [npm](https://www.npmjs.com/) version 8.x.x or [Yarn](https://yarnpkg.com/)
+- [Node.js v18.x (LTS)](http://nodejs.org)
+- [npm](https://www.npmjs.com/) version 8.x.x
 
 ## Local development
 

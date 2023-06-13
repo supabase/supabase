@@ -53,7 +53,7 @@ Every Supabase project comes with PgBouncer for connection pooling. A connection
 
 ## Choosing a connection method
 
-- The Serverless APIs provide programmatic access and have built-in connection pooling. You can use these for all browser and application interactions. We recommend using these wherever possible.
+- The Serverless APIs provide programmatic access and have [built-in connection pooling](https://postgrest.org/en/stable/references/connection_pool.html). You can use these for all browser and application interactions. We recommend using these wherever possible.
 - A "direct connection" is Postgres' native connection system. You should use this for tools which are always alive - usually installed on a long-running server, like Node.js, Ruby, Python, etc.
 - A "connection pooler" is a tool which keeps connections "alive". You should use this for serverless functions and tools which disconnect from the database frequently, like Prisma, Drizzle, Kysely, etc.
 

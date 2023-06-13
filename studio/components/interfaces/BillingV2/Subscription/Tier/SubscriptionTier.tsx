@@ -44,7 +44,8 @@ const SubscriptionTier = ({}: SubscriptionTierProps) => {
                 <a>
                   <span className="text-sm text-green-900 transition hover:text-green-1000">
                     organization settings
-                  </span>.
+                  </span>
+                  .
                 </a>
               </Link>
             </div>
@@ -109,16 +110,29 @@ const SubscriptionTier = ({}: SubscriptionTierProps) => {
                     </div>,
                   ]}
                 >
-                  Please contact us if you'd like to change your project's plan
+                  Please contact us if you'd like to change your plan.
                 </Alert>
               ))}
             {!subscription?.usage_billing_enabled && (
               <Alert withIcon variant="info" title="This project is limited by the included usage">
                 <p className="text-sm text-scale-1000">
-                  When this project exceeds its included usage quotas, it may become unresponsive.{' '}
-                  {currentPlan?.id === 'free'
-                    ? 'If you wish to exceed the included usage, you should upgrade to a paid plan.'
-                    : 'You can change the Cost Control settings if you plan on exceeding the included usage quotas.'}
+                  When this project exceeds its{' '}
+                  <Link href="#breakdown">
+                    <a className="text-sm text-green-900 transition hover:text-green-1000">
+                      included usage quotas
+                    </a>
+                  </Link>
+                  , it may become unresponsive.{' '}
+                  {currentPlan?.id === 'free' ? (
+                    <span>
+                      If you wish to exceed the included usage, you should upgrade to a paid plan.
+                    </span>
+                  ) : (
+                    <span>
+                      You can change the Cost Control settings if you plan on exceeding the included
+                      usage quotas.
+                    </span>
+                  )}
                 </p>
               </Alert>
             )}

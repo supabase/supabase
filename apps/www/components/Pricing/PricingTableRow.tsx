@@ -89,7 +89,7 @@ export const PricingTableRowDesktop = (props: any) => {
           </Fragment>
         )
       })}
-      <ReactTooltip effect={'solid'} className="!max-w-[320px]" />
+      <ReactTooltip effect={'solid'} className="!max-w-[320px] whitespace-pre-line" />
     </>
   )
 }
@@ -144,7 +144,7 @@ export const PricingTableRowMobile = (props: any) => {
           })}
         </tbody>
       </table>
-      <ReactTooltip effect={'solid'} className="!max-w-[320px]" />
+      <ReactTooltip effect={'solid'} className="!max-w-[320px] whitespace-pre-line" />
     </>
   )
 }

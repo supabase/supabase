@@ -6,8 +6,8 @@ import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
 import Panel from 'components/ui/Panel'
 import { Profile as ProfileType } from 'data/profile/types'
 import { useProfileUpdateMutation } from 'data/profile/profile-update-mutation'
+import { useProfileQuery } from 'data/profile/profile-query'
 import { useStore } from 'hooks'
-import useProfile from 'hooks/misc/useProfile'
 import { useSession } from 'lib/auth'
 import Link from 'next/link'
 import { NextPageWithLayout } from 'types'
@@ -41,7 +41,7 @@ const ProfileCard = observer(() => {
   const { ui } = useStore()
   const { mutateAsync } = useProfileUpdateMutation()
 
-  const { data: profile } = useProfile()
+  const { data: profile } = useProfileQuery()
   // TODO: ^ handle loading state
 
   const updateUser = async (model: any) => {

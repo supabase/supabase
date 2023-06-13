@@ -219,13 +219,13 @@ For example, the following JSON structure configures attribute mapping for the `
 }
 ```
 
-When creating or updating an identity provider with the [Supabase CLI](/docs/guides/cli) you can include this JSON as a file with the `--attribute-mapping /path/to/attribute/mapping.json` flag.
+When creating or updating an identity provider with the [Supabase CLI](/docs/guides/cli) you can include this JSON as a file with the `--attribute-mapping-file /path/to/attribute/mapping.json` flag.
 
 For example, to change the attribute mappings to an existing provider you can use:
 
 ```bash
 supabase sso update <provider-uuid> --project-ref <your-project> \
-  --attribute-mapping /path/to/attribute/mapping.json
+  --attribute-mapping-file /path/to/attribute/mapping.json
 ```
 
 Given a SAML 2.0 assertion that includes these attributes:
@@ -270,6 +270,12 @@ Supabase Auth does not require specifying attribute mappings if you only need ac
 At this time it is not possible to have users without an email address, so SAML assertions without one will be rejected.
 
 Most SAML 2.0 identity providers use Lightweight Directory Access Protocol (LDAP) attribute names. However, due to their variability and complexity operators of identity providers are able to customize both the `Name` and attribute value that is sent to Supabase Auth in an assertion. Please refer to the identity provider's documentation and contact the operator for details on what attributes are mapped for your project.
+
+**Accessing the stored attributes**
+
+The stored attributes, once mapped, show up in the access token (a JWT) of the user. If you need to look these values up in the database, you can find them in the `auth.identities` table under the `identity_data` JSON column. Identities created for SSO providers have `sso:<uuid-of-provider>` in the `provider` column, while `id` contains the unique NameID of the user account.
+
+Furthermore, you can find the same identity data under `raw_app_meta_data` inside `auth.users`.
 
 ### Remove a connection
 
