@@ -2,11 +2,11 @@ import * as React from 'react'
 import { Slot } from '@radix-ui/react-slot'
 import { VariantProps, cva } from 'class-variance-authority'
 
-import { IconContext } from '../../Icon/IconContext'
-import { IconLoader } from '../../Icon/icons/IconLoader'
+import { IconContext } from './../Icon/IconContext'
+import { IconLoader } from './../Icon/icons/IconLoader'
 
-import { cn } from '../../lib/utils'
-import { sizes } from '../../lib/commonCva'
+import { cn } from './../../lib/utils'
+import { sizes } from './../../lib/commonCva'
 
 export type ButtonVariantProps = VariantProps<typeof buttonVariants>
 const buttonVariants = cva(
