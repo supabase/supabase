@@ -170,8 +170,8 @@ const TableEditorMenu = ({
             <Tooltip.Root delayDuration={0}>
               <Tooltip.Trigger className="w-full">
                 <Button
+                  asChild
                   block
-                  as="span"
                   disabled={!canCreateTables}
                   size="tiny"
                   icon={
@@ -183,7 +183,7 @@ const TableEditorMenu = ({
                   style={{ justifyContent: 'start' }}
                   onClick={onAddTable}
                 >
-                  New table
+                  <span>New table</span>
                 </Button>
               </Tooltip.Trigger>
               {!canCreateTables && (

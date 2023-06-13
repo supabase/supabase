@@ -350,14 +350,14 @@ const Reports = () => {
 
           {canUpdateReport ? (
             <Dropdown side="bottom" align="end" overlay={<MetricOptions />}>
-              <Button as="span" type="default" iconRight={<IconSettings />}>
-                Add / Remove charts
+              <Button asChild type="default" iconRight={<IconSettings />}>
+                <span>Add / Remove charts</span>
               </Button>
             </Dropdown>
           ) : (
             <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger>
-                <Button disabled as="span" type="default" iconRight={<IconSettings />}>
+              <Tooltip.Trigger asChild>
+                <Button disabled type="default" iconRight={<IconSettings />}>
                   Add / Remove charts
                 </Button>
               </Tooltip.Trigger>
@@ -385,8 +385,10 @@ const Reports = () => {
         <div className="flex min-h-full items-center justify-center rounded border-2 border-dashed p-16 dark:border-dark">
           {canUpdateReport ? (
             <Dropdown side="bottom" align="center" overlay={<MetricOptions />}>
-              <Button as="span" type="default" iconRight={<IconPlus />}>
-                {config.layout.length <= 0 ? 'Add your first chart' : 'Add another chart'}
+              <Button asChild type="default" iconRight={<IconPlus />}>
+                <span>
+                  {config.layout.length <= 0 ? 'Add your first chart' : 'Add another chart'}
+                </span>
               </Button>
             </Dropdown>
           ) : (

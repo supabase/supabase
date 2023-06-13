@@ -170,7 +170,9 @@ const SecretRow: FC<Props> = ({ secret, onSelectEdit, onSelectRemove }) => {
             </>
           }
         >
-          <Button as="span" type="text" className="px-1" icon={<IconMoreVertical />} />
+          <Button asChild type="text" className="px-1" icon={<IconMoreVertical />}>
+            <span></span>
+          </Button>
         </Dropdown>
       </div>
     </div>

@@ -38,12 +38,12 @@ const FeedbackDropdown = () => {
       }
     >
       <Button
-        as="span"
+        asChild
         onClick={onOpen}
         type="default"
         icon={<IconMessageCircle size={16} strokeWidth={1.5} className="text-scale-900" />}
       >
-        <span className="hidden md:block">Feedback</span>
+        <span className="hidden md:flex">Feedback</span>
       </Button>
     </Popover>
   )

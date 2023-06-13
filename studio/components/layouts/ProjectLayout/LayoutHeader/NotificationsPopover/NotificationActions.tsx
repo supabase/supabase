@@ -89,12 +89,12 @@ const NotificationActions: FC<Props> = ({
         )
       })}
       {changelogLink && (
-        <Link href={changelogLink}>
-          <a target="_blank" rel="noreferrer">
-            <Button as="span" type="default" icon={<IconExternalLink size={12} strokeWidth={2} />}>
+        <Link href={changelogLink} passHref>
+          <Button asChild type="default" icon={<IconExternalLink size={12} strokeWidth={2} />}>
+            <a target="_blank" rel="noreferrer">
               More info
-            </Button>
-          </a>
+            </a>
+          </Button>
         </Link>
       )}
     </div>
