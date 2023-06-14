@@ -793,6 +793,10 @@ export const realtime: NavMenuConstant = {
       url: '/guides/realtime',
     },
     {
+      name: 'Concepts',
+      url: '/guides/realtime/concepts',
+    },
+    {
       name: 'Quickstart',
       url: '/guides/realtime/quickstart',
     },
@@ -800,18 +804,11 @@ export const realtime: NavMenuConstant = {
       name: 'Features',
       url: undefined,
       items: [
-        { name: 'Channels', url: '/guides/realtime/channels' },
+        { name: 'Broadcast', url: '/guides/realtime/broadcast' },
+        { name: 'Presence', url: '/guides/realtime/presence' },
         {
-          name: 'Extensions',
-          url: '/guides/realtime/extensions',
-          items: [
-            { name: 'Broadcast', url: '/guides/realtime/extensions/broadcast' },
-            { name: 'Presence', url: '/guides/realtime/extensions/presence' },
-            {
-              name: 'Postgres Changes',
-              url: '/guides/realtime/extensions/postgres-changes',
-            },
-          ],
+          name: 'Postgres Changes',
+          url: '/guides/realtime/postgres-changes',
         },
       ],
     },
