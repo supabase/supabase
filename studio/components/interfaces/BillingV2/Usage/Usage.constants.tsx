@@ -61,6 +61,10 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
             url: 'https://supabase.com/docs/guides/platform/compute-add-ons',
           },
           { name: 'High CPU Usage', url: 'https://supabase.com/docs/guides/platform/exhaust-cpu' },
+          {
+            name: 'Metrics',
+            url: 'https://supabase.com/docs/guides/platform/metrics',
+          },
         ],
       },
       {
@@ -69,12 +73,17 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         attribute: 'ram_usage',
         name: 'Memory',
         unit: 'percentage',
-        description: 'Memory usage of your server',
+        description:
+          'Memory usage of your server.\nYou might observe elevated memory usage, even with little to no load. Besides Postgres, a wide range of services is running under the hood resulting in an elevated base memory usage.',
         chartDescription: '',
         links: [
           {
             name: 'Compute Add-Ons',
             url: 'https://supabase.com/docs/guides/platform/compute-add-ons',
+          },
+          {
+            name: 'Metrics',
+            url: 'https://supabase.com/docs/guides/platform/metrics',
           },
         ],
       },
@@ -88,6 +97,10 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
           {
             name: 'Disk Throughput and IOPS',
             url: 'https://supabase.com/docs/guides/platform/compute-add-ons#disk-throughput-and-iops',
+          },
+          {
+            name: 'Metrics',
+            url: 'https://supabase.com/docs/guides/platform/metrics',
           },
         ],
         description:
