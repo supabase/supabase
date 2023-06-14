@@ -207,7 +207,7 @@ const Infrastructure = ({
                 {attribute.key === 'ram_usage' && (
                   <div className="text-sm text-scale-1000">
                     <p>
-                      Your compute instance has {currentComputeInstanceSpecs.memoryGb} GB memory.
+                      Your compute instance has {currentComputeInstanceSpecs.memoryGb} GB of memory.
                     </p>
                     {currentComputeInstanceSpecs.memoryGb === 1 && (
                       <p>
