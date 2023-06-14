@@ -19,7 +19,7 @@ const SubscriptionTier = ({}: SubscriptionTierProps) => {
   const orgSlug = ui.selectedOrganization?.slug ?? ''
   const snap = useSubscriptionPageStateSnapshot()
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
-  const { data: subscription, isLoading } = useProjectSubscriptionV2Query({ projectRef })
+  const { data: subscription, isLoading, refetch } = useProjectSubscriptionV2Query({ projectRef })
 
   const currentPlan = subscription?.plan
   const tierName = currentPlan?.name || 'Unknown'
@@ -149,7 +149,12 @@ const SubscriptionTier = ({}: SubscriptionTierProps) => {
               labelTop={`${daysToCycleEnd} Days left`}
             />
 
-            {subscription && <SubscriptionPaymentMethod subscription={subscription} />}
+            {subscription && (
+              <SubscriptionPaymentMethod
+                subscription={subscription}
+                onSubscriptionUpdated={() => refetch()}
+              />
+            )}
           </div>
         )}
       </div>
