@@ -131,9 +131,9 @@ The `getSession` function must be called for any Server Component routes that us
 
 ### Managing sign-in with Code Exchange
 
-If you are using the [server-side auth flow](/docs/guides/auth/server-side-rendering) to sign users into your application, `Code Exchange` is used. It exchanges an auth `code` for the user's `session`, which is set as a cookie for future requests made to Supabase.
+The Next.js Auth Helpers are configured to use the [server-side auth flow](/docs/guides/auth/server-side-rendering) to sign users into your application. This requires you to setup a `Code Exchange` route, to exchange an auth `code` for the user's `session`, which is set as a cookie for future requests made to Supabase.
 
-To make this work with Next.js, we create a callback route handler that performs this exchange:
+To make this work with Next.js, we create a callback Route Handler that performs this exchange:
 
 <Tabs
   scrollable
@@ -216,7 +216,7 @@ Authentication can be initiated [client](/docs/guides/auth/auth-helpers/nextjs#c
 
 <Admonition type="note">
 
-The authentication flow requires the [Code Exchange Route](/docs/guides/auth/auth-helpers/nextjs#code-exchange-route) to exchange a `code` for the user's `session`.
+The authentication flow requires the [Code Exchange Route](/docs/guides/auth/auth-helpers/nextjs#managing-sign-in-with-code-exchange) to exchange a `code` for the user's `session`.
 
 </Admonition>
 
@@ -504,13 +504,13 @@ TypeScript types can be [generated with the Supabase CLI](/docs/reference/javasc
 
 There are 5 ways to access the Supabase client with the Next.js Auth Helpers:
 
-- [Client](/docs/guides/auth/auth-helpers/nextjs#client-component) — `createClientComponentClient` in client components
-- [Server](/docs/guides/auth/auth-helpers/nextjs#server-components) — `createServerComponentClient` in server components
-- [Server actions](/docs/guides/auth/auth-helpers/nextjs#server-actions) — `createServerActionClient` in Server Actions
-- [Route Handlers](/docs/guides/auth/auth-helpers/nextjs#route-handler) — `createRouteHandlerClient` in Route Handlers
+- [Client Components](/docs/guides/auth/auth-helpers/nextjs#client-components) — `createClientComponentClient` in Client Components
+- [Server Components](/docs/guides/auth/auth-helpers/nextjs#server-components) — `createServerComponentClient` in Server Components
+- [Server Actions](/docs/guides/auth/auth-helpers/nextjs#server-actions) — `createServerActionClient` in Server Actions
+- [Route Handlers](/docs/guides/auth/auth-helpers/nextjs#route-handlers) — `createRouteHandlerClient` in Route Handlers
 - [Middleware](/docs/guides/auth/auth-helpers/nextjs#middleware) — `createMiddlewareClient` in Middleware
 
-While this may seem like a lot of options, it allows for the Supabase client to be easily instantiated in the correct context. All you need to change is the context in the middle `create[Client|Server|ServerAction|RouteHandler|Middleware]Client` and the Auth Helpers will take care of the rest.
+This allows for the Supabase client to be easily instantiated in the correct context. All you need to change is the context in the middle `create[ClientComponent|ServerComponent|ServerAction|RouteHandler|Middleware]Client` and the Auth Helpers will take care of the rest.
 
 ### Client Components
 
@@ -625,7 +625,7 @@ const supabase = createClientComponentClient({ isSingleton: false })
 
 <Admonition type="note">
 
-In order to use Supabase in Server Components, you need to have implemented the [Middleware](/docs/guides/auth/auth-helpers/nextjs#refresh-session-with-middleware) steps above.
+In order to use Supabase in Server Components, you need to have implemented the [Middleware](/docs/guides/auth/auth-helpers/nextjs#managing-session-with-middleware) steps above.
 
 </Admonition>
 
@@ -832,7 +832,7 @@ TypeScript types can be [generated with the Supabase CLI](/docs/reference/javasc
 
 ### Middleware
 
-See [refreshing session example](/docs/guides/auth/auth-helpers/nextjs#refresh-session-with-middleware) above.
+See [refreshing session example](/docs/guides/auth/auth-helpers/nextjs#managing-session-with-middleware) above.
 
 ## More examples
 
@@ -850,11 +850,11 @@ See [refreshing session example](/docs/guides/auth/auth-helpers/nextjs#refresh-s
 
 PKCE is the new server-side auth flow implemented by the Next.js Auth Helpers. It requires a new Route Handler for `/auth/callback` that exchanges an auth `code` for the user's `session`.
 
-Check the [Code Exchange Route steps](/docs/guides/auth/auth-helpers/nextjs#code-exchange-route) above to implement this Route Handler.
+Check the [Code Exchange Route steps](/docs/guides/auth/auth-helpers/nextjs#managing-sign-in-with-code-exchange) above to implement this Route Handler.
 
 #### Authentication
 
-For authentication methods that have a `redirectTo` or `emailRedirectTo`, this must be set to this new code exchange route handler - `/auth/callback`. This is an example with the `signUp` function:
+For authentication methods that have a `redirectTo` or `emailRedirectTo`, this must be set to this new code exchange Route Handler - `/auth/callback`. This is an example with the `signUp` function:
 
 ```jsx
 supabase.auth.signUp({
