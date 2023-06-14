@@ -1,4 +1,4 @@
-import { IconGitCommit } from 'ui'
+import { IconGitCommit, IconTwitter, IconRss } from 'ui'
 import dayjs from 'dayjs'
 import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
 import { NextSeo } from 'next-seo'
@@ -73,7 +73,17 @@ function ChangelogPage(props: any) {
           {/* Title and description */}
           <div className="py-10">
             <h1 className="h1">Changelog</h1>
-            <p className="text-scale-900 text-lg">New updates and product improvements</p>
+            <p className="text-scale-900 text-lg mb-1">New updates and product improvements</p>
+            <div className="flex items-center space-x-2 mb-4 text-sm text-scale-900">
+              <p>Subscribe to updates →</p>
+              <a className="hover:text-scale-1200" href="https://twitter.com/supabase">
+                <IconTwitter size={16} />
+              </a>
+              <a className="hover:text-scale-1200" href="https://supabase.com/rss.xml">
+                <IconRss size={16} />
+              </a>
+            </div>
+            <div className="w-full h-[1px] bg-scale-400"></div>
           </div>
 
           {/* Content */}
@@ -85,10 +95,7 @@ function ChangelogPage(props: any) {
                   key={i}
                   className="border-scale-400 grid border-l pb-10 lg:grid-cols-12 lg:gap-8"
                 >
-                  <div
-                    className="col-span-12 mb-8 self-start lg:sticky lg:top-0 lg:col-span-4 lg:-mt-32 lg:pt-32
-                "
-                  >
+                  <div className="col-span-12 mb-8 self-start lg:sticky lg:top-0 lg:col-span-4">
                     <div className="flex w-full items-baseline gap-6">
                       <div className="bg-scale-100 dark:bg-scale-500 border-scale-400 dark:border-scale-600 text-scale-900 -ml-2.5 flex h-5 w-5 items-center justify-center rounded border drop-shadow-sm">
                         <IconGitCommit size={14} strokeWidth={1.5} />
