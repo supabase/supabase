@@ -11,11 +11,13 @@ export interface IUiStore {
   selectedOrganization?: Organization
   notification?: Notification
   permissions?: Permission[]
+  showGitHubRepoSelectionPanel: boolean
   load: () => void
   setProjectRef: (ref?: string) => void
   setOrganizationSlug: (slug?: string) => void
   setNotification: (notification: Notification) => string
   setPermissions: (permissions?: Permission[]) => void
+  setShowGitHubRepoSelectionPanel: (visible?: boolean) => void
 }
 export default class UiStore implements IUiStore {
   rootStore: IRootStore
@@ -24,6 +26,7 @@ export default class UiStore implements IUiStore {
   selectedOrganizationSlug?: string
   notification?: Notification
   permissions?: Permission[] = []
+  showGitHubRepoSelectionPanel: boolean = false
 
   constructor(rootStore: IRootStore) {
     this.rootStore = rootStore
@@ -100,5 +103,9 @@ export default class UiStore implements IUiStore {
 
   setPermissions(permissions?: any) {
     this.permissions = permissions
+  }
+
+  setShowGitHubRepoSelectionPanel(visible: boolean) {
+    this.showGitHubRepoSelectionPanel = visible
   }
 }

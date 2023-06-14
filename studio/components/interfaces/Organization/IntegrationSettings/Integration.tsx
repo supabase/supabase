@@ -1,14 +1,28 @@
+import {
+  EmptyIntegrationConnection,
+  IntegrationConnection,
+  IntegrationConnectionHeader,
+  IntegrationInstallation,
+} from 'components/interfaces/Integrations/IntegrationPanels'
+import { Markdown } from 'components/interfaces/Markdown'
+import {
+  ScaffoldContainer,
+  ScaffoldSection,
+  ScaffoldSectionContent,
+  ScaffoldSectionDetail,
+} from 'components/layouts/Scaffold'
 import { Integration as TIntegration } from 'data/integrations/integrations-query'
-import dayjs from 'dayjs'
+import { useStore } from 'hooks'
 import { pluralize } from 'lib/helpers'
 import { EMPTY_ARR } from 'lib/void'
 import { useMemo } from 'react'
-import { Button, IconArrowRight } from 'ui'
+
 export interface IntegrationProps {
   title: string
   orgName?: string
   description?: string
   note?: string
+  detail?: string
   integrations?: TIntegration[]
 }
 
@@ -17,8 +31,11 @@ const Integration = ({
   orgName,
   description,
   note,
+  detail,
   integrations = EMPTY_ARR,
 }: IntegrationProps) => {
+  const { ui } = useStore()
+
   const projectConnections = useMemo(
     () => integrations.flatMap((integration) => integration.connections),
     [integrations]
@@ -26,81 +43,80 @@ const Integration = ({
 
   return (
     <>
-      <div>
-        <h2 className="text-2xl text-scale-1200">{title}</h2>
-      </div>
+      <ScaffoldContainer>
+        <ScaffoldSection>
+          <ScaffoldSectionDetail>
+            {detail && <Markdown content={detail} />}
+            <img
+              className="border rounded-lg shadow w-48 mt-6 border-body"
+              src={`/img/integrations/covers/${title.toLowerCase()}-cover.png?v=3`}
+              alt="cover"
+            />
+          </ScaffoldSectionDetail>
+          <ScaffoldSectionContent>
+            <div>
+              <Markdown content={`${description}`} />
+            </div>
+            <div className="flex flex-col gap-12">
+              {integrations.length > 0 &&
+                integrations.map((integration, i) => {
+                  return (
+                    <div key={i}>
+                      <IntegrationInstallation
+                        title={title}
+                        key={i}
+                        orgName={orgName}
+                        connection={integration}
+                      />
+                      {integration.connections.length > 0 ? (
+                        <>
+                          <IntegrationConnectionHeader
+                            title={`${integration.connections.length} project
+                        ${pluralize(integration.connections.length, 'connection')}`}
+                            name={
+                              integration.type +
+                              ' • ' +
+                              (integration.metadata?.gitHubConnectionOwner ??
+                                integration.metadata?.vercelTeam)
+                            }
+                          />
 
-      <div className="flex flex-col gap-8">
-        {description !== undefined && (
-          <div className="flex flex-col gap-1">
-            <h3>How does the {title} integration work?</h3>
-            <p className="text-scale-900 text-sm">{description}</p>
-          </div>
-        )}
-
-        {integrations.length > 0 && (
-          <ul className="flex flex-col gap-2">
-            {integrations.map((connection) => (
-              <li
-                key={connection.id}
-                className="flex justify-between items-center px-6 py-4 rounded-lg border border-scale-500 bg-panel-body-light dark:bg-panel-body-dark"
-              >
-                <div className="flex flex-col gap-1">
-                  <span className="text-scale-1200 font-medium">
-                    {title} integration connection | {orgName}
-                  </span>
-                  <span className="text-scale-900 text-sm">Added by {connection.createdBy}</span>
-                </div>
-
-                <div>
-                  <Button type="outline">Manage</Button>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
-
-        <hr className="h-px bg-scale-500" role="separator" />
-
-        {projectConnections.length > 0 && (
-          <div className="flex flex-col gap-4">
-            <h4>
-              {projectConnections.length} project{' '}
-              {pluralize(projectConnections.length, 'connection')}
-            </h4>
-
-            <ul className="flex flex-col gap-2">
-              {projectConnections.map((connection) => (
-                <li
-                  key={connection.id}
-                  className="flex justify-between items-center px-6 py-4 rounded-lg border border-scale-500 bg-panel-body-light dark:bg-panel-body-dark"
-                >
-                  <div className="flex flex-col gap-1">
-                    <div className="flex gap-2">
-                      <span>{connection.from.name}</span>
-                      <IconArrowRight />
-                      <span>{connection.to.name}</span>
+                          <ul className="flex flex-col">
+                            {integration.connections.map((connection, i) => (
+                              <IntegrationConnection
+                                key={i}
+                                connection={connection}
+                                type={integration.type}
+                              />
+                            ))}
+                          </ul>
+                        </>
+                      ) : (
+                        <IntegrationConnectionHeader
+                          title={`${integration.connections.length} project
+                        ${pluralize(integration.connections.length, 'connection')}`}
+                          name={
+                            integration.type +
+                            ' • ' +
+                            (integration.metadata?.gitHubConnectionOwner ??
+                              integration.metadata?.vercelTeam)
+                          }
+                        />
+                      )}
+                      <EmptyIntegrationConnection
+                        onClick={() => ui.setShowGitHubRepoSelectionPanel(true)}
+                      >
+                        Add new project connection
+                      </EmptyIntegrationConnection>
                     </div>
+                  )
+                })}
+            </div>
 
-                    <span className="text-scale-900 text-sm">
-                      Connected {dayjs(connection.createdAt).fromNow()}
-                    </span>
-                  </div>
-
-                  <div>
-                    <Button type="outline">Disconnect</Button>
-                  </div>
-                </li>
-              ))}
-            </ul>
-
-            <Button type="outline" className="self-start">
-              Add new project connection
-            </Button>
-            {note !== undefined && <p className="text-scale-900 text-sm">{note}</p>}
-          </div>
-        )}
-      </div>
+            <Markdown content={`${note}`} className="text-scale-900" />
+          </ScaffoldSectionContent>
+        </ScaffoldSection>
+      </ScaffoldContainer>
     </>
   )
 }
