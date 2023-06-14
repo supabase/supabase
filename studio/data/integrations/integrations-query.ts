@@ -24,6 +24,10 @@ export type Integration = {
   createdBy: string
   createdAt: string
   connections: IntegrationProjectConnection[]
+  metadata?: {
+    vercelTeam?: string
+    gitHubConnectionOwner?: string
+  }
 }
 
 export type IntegrationsResponse = Integration[]
@@ -37,17 +41,71 @@ export async function getIntegrations({ orgSlug }: IntegrationsVariables, signal
     {
       id: '1',
       type: 'VERCEL',
-      createdBy: 'Alaister',
+      createdBy: 'alaister@supabase.io',
       createdAt: '2023-06-05T06:56:25.565Z',
+      metadata: {
+        vercelTeam: 'alaister-team',
+      },
       connections: [
         {
-          id: '1.1',
-          createdAt: '2023-06-05T06:56:25.565Z',
-          from: {
-            name: 'supabase-vercel',
-          },
+          id: '1.0',
+          createdAt: '2023-06-05T01:56:25.565Z',
           to: {
-            name: 'alaister',
+            name: 'www prod',
+          },
+          from: {
+            name: 'alaister project prod',
+          },
+        },
+        {
+          id: '1.1',
+          createdAt: '2023-06-14T06:56:25.565Z',
+          to: {
+            name: 'www staging',
+          },
+          from: {
+            name: 'alaister project staging',
+          },
+        },
+        {
+          id: '1.1',
+          createdAt: '2023-06-02T21:56:25.565Z',
+          to: {
+            name: 'bees knees',
+          },
+          from: {
+            name: 'jonny bee project',
+          },
+        },
+      ],
+    },
+    {
+      id: '1.5',
+      type: 'VERCEL',
+      createdBy: 'alaister@supabase.io',
+      createdAt: '2023-06-05T06:56:25.565Z',
+      metadata: {
+        vercelTeam: 'alaister-team',
+      },
+      connections: [],
+    },
+    {
+      id: '2',
+      type: 'GITHUB',
+      createdBy: 'Alaister',
+      createdAt: '2023-06-05T06:56:25.565Z',
+      metadata: {
+        gitHubConnectionOwner: 'alaister',
+      },
+      connections: [
+        {
+          id: '1.2',
+          createdAt: '2023-06-05T06:56:25.565Z',
+          to: {
+            name: 'supabase/supabase',
+          },
+          from: {
+            name: 'alaister project',
           },
         },
       ],
