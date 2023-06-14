@@ -40,6 +40,14 @@ export const getReturnToPath = (fallback = '/projects') => {
   const searchParams = new URLSearchParams(location.search)
   let returnTo = searchParams.get('returnTo') ?? fallback
 
+  /**
+   * remove base path value ("/dashboard") from returnTo
+   */
+  returnTo =
+    returnTo && process.env.NEXT_PUBLIC_BASE_PATH
+      ? returnTo.replace(process.env.NEXT_PUBLIC_BASE_PATH, '')
+      : returnTo
+
   searchParams.delete('returnTo')
 
   const remainingSearchParams = searchParams.toString()
