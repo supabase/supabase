@@ -30,10 +30,17 @@ const BillingUpdateFree: NextPageWithLayout = () => {
   }, [projectRef])
 
   useEffect(() => {
-    if (isEnterprise) {
+    if (subscription?.tier?.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.ENTERPRISE) {
+      // no self-serve downgrade from Enterprise
       router.push(`/project/${projectRef}/settings/billing/update/enterprise`)
+    } else if (subscription?.tier?.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.TEAM) {
+      // no self-serve downgrade from Team
+      router.push(`/project/${projectRef}/settings/billing/update/team`)
+    } else if (subscription?.tier?.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.FREE) {
+      // Downgrade from free to free is not possible, so let's redirect
+      router.push(`/project/${projectRef}/settings/billing/update`)
     }
-  }, [subscription])
+  }, [subscription, projectRef, router])
 
   const getStripeProducts = async () => {
     try {

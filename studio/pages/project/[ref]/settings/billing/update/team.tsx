@@ -50,10 +50,22 @@ const BillingUpdateTeam: NextPageWithLayout = () => {
   }, [orgSlug])
 
   useEffect(() => {
-    if (isEnterprise) {
+    if (subscription?.tier?.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.ENTERPRISE) {
       router.push(`/project/${projectRef}/settings/billing/update/enterprise`)
+    } else if (
+      subscription &&
+      [PRICING_TIER_PRODUCT_IDS.PAYG, PRICING_TIER_PRODUCT_IDS.PRO].includes(
+        subscription.tier.supabase_prod_id
+      )
+    ) {
+      router.push(`/project/${projectRef}/settings/billing/update/pro`)
+    } else if (
+      subscription &&
+      subscription.tier.supabase_prod_id !== PRICING_TIER_PRODUCT_IDS.TEAM
+    ) {
+      router.push(`/project/${projectRef}/settings/billing/update`)
     }
-  }, [subscription])
+  }, [subscription, projectRef, router])
 
   const getStripeProducts = async () => {
     try {
