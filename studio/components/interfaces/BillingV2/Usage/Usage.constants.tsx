@@ -76,6 +76,11 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
             name: 'Compute Add-Ons',
             url: 'https://supabase.com/docs/guides/platform/compute-add-ons',
           },
+          { name: 'High RAM Usage', url: 'https://supabase.com/docs/guides/platform/exhaust-ram' },
+          {
+            name: 'Metrics',
+            url: 'https://supabase.com/docs/guides/platform/metrics',
+          },
         ],
       },
       {
