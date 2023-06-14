@@ -1,4 +1,4 @@
-import { Button } from './'
+import { Button, ButtonProps } from './'
 import { IconPackage } from './../Icon/icons/IconPackage'
 import { IconChevronRight } from './../Icon/icons/IconChevronRight'
 
@@ -7,20 +7,20 @@ export default {
   component: Button,
 }
 
-export const Neutral = (args: any) => <Button {...args}>Button text</Button>
-export const Success = (args: any) => <Button {...args}>Button text</Button>
+export const Neutral = (args: ButtonProps) => <Button {...args}>Button text</Button>
+export const Success = (args: ButtonProps) => <Button {...args}>Button text</Button>
 
-export const withStyles = (args: any) => <Button {...args}>Button text</Button>
-export const withIcon = (args: any) => <Button {...args}>Button text</Button>
-export const withIconRight = (args: any) => <Button {...args}>Button text</Button>
-export const withBlock = (args: any) => <Button {...args}>Button text</Button>
-export const withOnlyIcon = (args: any) => <Button {...args} />
-export const withOnlyLoading = (args: any) => <Button {...args} />
-export const withLoadingCentered = (args: any) => (
+export const withStyles = (args: ButtonProps) => <Button {...args}>Button text</Button>
+export const withIcon = (args: ButtonProps) => <Button {...args}>Button text</Button>
+export const withIconRight = (args: ButtonProps) => <Button {...args}>Button text</Button>
+export const withBlock = (args: ButtonProps) => <Button {...args}>Button text</Button>
+export const withOnlyIcon = (args: ButtonProps) => <Button {...args} />
+export const withOnlyLoading = (args: ButtonProps) => <Button {...args} />
+export const withLoadingCentered = (args: ButtonProps) => (
   <Button {...args}>Loading icon is centered</Button>
 )
 
-export const allButtons = (args: any) => (
+export const allButtons = (args: ButtonProps) => (
   <>
     <div className="flex flex-col space-y-4">
       <div className="flex space-x-4">
@@ -188,7 +188,7 @@ export const allButtons = (args: any) => (
   </>
 )
 
-export const withCustomTag = (args: any) => <Button {...args}>Button text</Button>
+export const withCustomTag = (args: ButtonProps) => <Button {...args}>Button text</Button>
 
 const icon = <IconPackage />
 

@@ -1,27 +1,24 @@
 import React, { useState, useCallback } from 'react'
-// import { AutoForm } from 'uniforms'
 
 import { InputNumber } from '.'
-import { IconPackage } from './../../index'
-import { Button } from '../Button'
-import { Space } from '../Space'
+import { Props } from './InputNumber'
+import { IconPackage } from './../Icon/icons/IconPackage'
 
 export default {
   title: 'Data Input/InputNumber',
   component: InputNumber,
 }
 
-export const Default = (args: any) => <InputNumber {...args} />
+export const Default = (args: Props) => <InputNumber {...args} />
 
-export const ErrorState = (args: any) => <InputNumber {...args} />
+export const ErrorState = (args: Props) => <InputNumber {...args} />
 
-export const WithIcon = (args: any) => <InputNumber {...args} />
+export const WithIcon = (args: Props) => <InputNumber {...args} />
 
-export const Controlled = (props: any) => {
-  const [state, setState] = useState(() => undefined)
+export const Controlled = (props: Props) => {
+  const [state, setState] = useState('')
 
   const onChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    // console.log({ e, value: e.currentTarget.value })
     setState(e.currentTarget.value)
   }, [])
 

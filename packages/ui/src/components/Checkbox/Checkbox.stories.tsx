@@ -1,13 +1,14 @@
 import { Checkbox } from '.'
+import { InputProps, GroupProps } from './Checkbox'
 
 export default {
   title: 'Data Input/Checkbox',
   component: Checkbox,
 }
 
-export const Default = (args: any) => <Checkbox {...args} />
+export const Default = (args: InputProps) => <Checkbox {...args} />
 
-export const withGroup = (args: any) => (
+export const withGroup = (args: GroupProps) => (
   <Checkbox.Group {...args}>
     <Checkbox
       id="checkbox1"
@@ -30,7 +31,7 @@ export const withGroup = (args: any) => (
   </Checkbox.Group>
 )
 
-export const withGroupHorizontal = (args: any) => (
+export const withGroupHorizontal = (args: GroupProps) => (
   <Checkbox.Group {...args}>
     <Checkbox
       id="checkbox1"
@@ -53,7 +54,7 @@ export const withGroupHorizontal = (args: any) => (
   </Checkbox.Group>
 )
 
-export const size = (args: any) => (
+export const size = (args: GroupProps) => (
   <Checkbox.Group {...args}>
     <Checkbox
       id="checkbox1"
@@ -76,7 +77,7 @@ export const size = (args: any) => (
   </Checkbox.Group>
 )
 
-export const withBeforeAndAfterLabels = (args: any) => <Checkbox.Group {...args} />
+export const withBeforeAndAfterLabels = (args: GroupProps) => <Checkbox.Group {...args} />
 
 Default.args = {
   label: 'This is the label',

@@ -14,6 +14,11 @@ module.exports = {
     '../src/components/Collapsible/Collapsible.stories.tsx',
     '../src/components/ContextMenu/ContextMenu.stories.tsx',
     '../src/components/Dropdown/Dropdown.stories.tsx',
+    '../src/components/Badge/Badge.stories.tsx',
+    '../src/components/Card/Card.stories.tsx',
+    '../src/components/Input/Input.stories.tsx',
+    '../src/components/InputNumber/InputNumber.stories.tsx',
+    '../src/components/Icon/Icon.stories.tsx',
   ],
   addons: [
     // '@storybook/addon-links',

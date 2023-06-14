@@ -20,7 +20,7 @@ export interface Props
   descriptionText?: string | React.ReactNode | undefined
   disabled?: boolean
   error?: string
-  icon?: any
+  icon?: React.ReactNode
   inputRef?: React.LegacyRef<HTMLInputElement>
   label?: string | React.ReactNode
   afterLabel?: string
@@ -87,7 +87,6 @@ function Input({
   }
 
   function onInputChange(e: React.ChangeEvent<HTMLInputElement>) {
-    // console.log('input event', e)
     if (onChange) onChange(e)
     // update form
     if (formContextOnChange) formContextOnChange(e)
@@ -98,10 +97,6 @@ function Input({
   useEffect(() => {
     if (validation) fieldLevelValidation(id, validation(value))
   }, [])
-
-  // useEffect(() => {
-  //   error = touched && touched[id] ? error : undefined
-  // }, [errors, touched])
 
   function _onCopy(value: any) {
     navigator.clipboard.writeText(value)?.then(
@@ -190,7 +185,7 @@ export interface TextAreaProps
   extends Omit<React.InputHTMLAttributes<HTMLTextAreaElement>, 'size' | 'onCopy'> {
   descriptionText?: string
   error?: string
-  icon?: any
+  icon?: React.ReactNode
   label?: string | React.ReactNode
   afterLabel?: string
   beforeLabel?: string

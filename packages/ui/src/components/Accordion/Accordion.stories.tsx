@@ -182,18 +182,3 @@ export const LeftAlignedChevron = (args: AccordionProps) => (
     </Accordion.Item>
   </Accordion>
 )
-
-// export const withDefaultActive = Multiple.bind({})
-// withDefaultActive.args = {
-//   defaultActiveId: [1],
-// }
-
-// export const withIconLeft = Multiple.bind({})
-// withIconLeft.args = {
-//   iconPosition: 'left',
-// }
-
-// export const withCustomIcon = Multiple.bind({})
-// withCustomIcon.args = {
-//   icon: <IconArrowUp />,
-// }

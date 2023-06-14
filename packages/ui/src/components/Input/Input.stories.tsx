@@ -1,45 +1,42 @@
-import React from 'react'
-// import { AutoForm } from 'uniforms'
-
 import { Input } from '.'
-import { IconPackage } from './../../index'
+import { Props, TextAreaProps } from './Input'
+import { IconPackage } from './../Icon/icons/IconPackage'
 import { Button } from '../Button'
-import { Space } from '../Space'
 
 export default {
   title: 'Data Input/Input',
   component: Input,
 }
 
-export const Default = (args: any) => <Input {...args} />
+export const Default = (args: Props) => <Input {...args} />
 
-export const ErrorState = (args: any) => <Input {...args} />
+export const ErrorState = (args: Props) => <Input {...args} />
 
-export const withIcon = (args: any) => <Input {...args} />
+export const withIcon = (args: Props) => <Input {...args} />
 
-export const withOption = (args: any) => <Input {...args} />
+export const withOption = (args: Props) => <Input {...args} />
 
-export const withDescription = (args: any) => <Input {...args} />
+export const withDescription = (args: Props) => <Input {...args} />
 
-export const withCustomStyle = (args: any) => <Input {...args} />
+export const withCustomStyle = (args: Props) => <Input {...args} />
 
-export const textArea = (args: any) => <Input.TextArea {...args} />
+export const textArea = (args: TextAreaProps) => <Input.TextArea {...args} />
 
-export const textAreaWithCopy = (args: any) => <Input.TextArea {...args} />
+export const textAreaWithCopy = (args: TextAreaProps) => <Input.TextArea {...args} />
 
-export const textAreaWithLimit = (args: any) => <Input.TextArea {...args} />
+export const textAreaWithLimit = (args: TextAreaProps) => <Input.TextArea {...args} />
 
-export const withRevealAndCopy = (args: any) => <Input {...args} />
+export const withRevealAndCopy = (args: Props) => <Input {...args} />
 
-export const withCustomActions = (args: any) => <Input {...args} />
+export const withCustomActions = (args: Props) => <Input {...args} />
 
-export const withBeforeAndAfterLabel = (args: any) => <Input {...args} />
+export const withBeforeAndAfterLabel = (args: Props) => <Input {...args} />
 
-export const size = (args: any) => <Input {...args} />
+export const size = (args: Props) => <Input {...args} />
 
-export const borderless = (args: any) => <Input {...args} />
+export const borderless = (args: Props) => <Input {...args} />
 
-export const date = (args: any) => <Input {...args} step="12" />
+export const date = (args: Props) => <Input {...args} step="12" />
 
 const icon: any = <IconPackage />
 

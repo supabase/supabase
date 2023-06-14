@@ -4,7 +4,6 @@ import styleHandler from '../../lib/theme/styleHandler'
 
 import * as RadixAccordion from '@radix-ui/react-accordion'
 import { IconChevronDown } from '../Icon/icons/IconChevronDown'
-import { IconChevronUp } from '../Icon/icons/IconChevronUp'
 
 type Type = 'default' | 'bordered'
 type Size = 'tiny' | 'small' | 'medium' | 'large' | 'xlarge'
@@ -65,11 +64,6 @@ function Accordion({
 
   function handleOnChange(e: string | string[]) {
     if (onChange) onChange(e)
-    const value = e == typeof String ? e.split(' ') : e
-    // setCurrentItems(e)
-    // console.log('about to change state')
-    // currentItems = e
-    // console.log('currentItems', currentItems)
   }
 
   return (

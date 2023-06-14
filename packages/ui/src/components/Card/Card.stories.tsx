@@ -1,15 +1,15 @@
 import React from 'react'
 import Typography from '../Typography'
-// import { AutoForm } from 'uniforms'
 
 import { Card } from './'
+import { CardProps } from './Card'
 
 export default {
   title: 'Displays/Card',
   component: Card,
 }
 
-export const Default = (args: any) => (
+export const Default = (args: CardProps) => (
   <Card {...args}>
     <Typography.Title level={5}>Card content</Typography.Title>
     <Typography.Title level={5}>Card content</Typography.Title>
@@ -17,20 +17,20 @@ export const Default = (args: any) => (
   </Card>
 )
 
-export const withCover = (args: any) => (
+export const withCover = (args: CardProps) => (
   <Card {...args}>
     <Typography.Text type="secondary">Sub title here</Typography.Text>
     <Typography.Title level={3}>To Do List with Vue.JS</Typography.Title>
   </Card>
 )
 
-export const withMeta = (args: any) => (
+export const withMeta = (args: CardProps) => (
   <Card {...args}>
     <Card.Meta title={'To Do List with Vue.JS'} description={'To Do List with Vue.JS'}/>
   </Card>
 )
 
-export const withHover = (args: any) => (
+export const withHover = (args: CardProps) => (
   <Card {...args}>
     <Card.Meta title={'To Do List with Vue.JS'} description={'To Do List with Vue.JS'}/>
   </Card>
@@ -45,7 +45,7 @@ withCover.args = {
   cover: (
     <img
       className="h-64 w-full object-cover"
-      src={'https://supabase.io/new/images/case-study-monitoro.jpg'}
+      src={'https://supabase.com/images/og/og-image.jpg'}
       alt={'title'}
     />
   ),

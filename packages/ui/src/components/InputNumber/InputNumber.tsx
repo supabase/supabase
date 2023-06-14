@@ -1,8 +1,6 @@
 import React, { useEffect } from 'react'
 import { FormLayout } from '../../lib/Layout/FormLayout'
 import InputErrorIcon from '../../lib/Layout/InputErrorIcon'
-// import { IconChevronDown } from '../Icon/icons/IconChevronDown'
-// import { IconChevronUp } from '../Icon/icons/IconChevronUp'
 import InputIconContainer from '../../lib/Layout/InputIconContainer'
 
 import { useFormContext } from '../Form/FormContext'
@@ -79,63 +77,13 @@ function InputNumber({
     if (validation) fieldLevelValidation(id, validation(value))
   }, [])
 
-  // const inputClasses = [InputNumberStyles['sbui-inputnumber']]
   let inputClasses = [__styles.base]
-
-  // const iconUpClasses = [
-  //   InputNumberStyles['sbui-inputnumber-button'],
-  //   InputNumberStyles['sbui-inputnumber-button-up'],
-  // ]
-
-  // const inputRefCurrent = inputRef
-  //   ? inputRef
-  //   : React.createRef<HTMLInputElement>()
-
-  // const iconDownClasses = [
-  //   InputNumberStyles['sbui-inputnumber-button'],
-  //   InputNumberStyles['sbui-inputnumber-button-down'],
-  // ]
-
-  // const iconNavClasses = [InputNumberStyles['sbui-inputnumber-nav']]
-
-  // if (size) {
-  // inputClasses.push(InputNumberStyles[`sbui-inputnumber--${size}`])
-  // iconNavClasses.push(InputNumberStyles[`sbui-inputnumber-nav--${size}`])
-  // }
 
   if (error) inputClasses.push(__styles.variants.error)
   if (!error) inputClasses.push(__styles.variants.standard)
   if (icon) inputClasses.push(__styles.with_icon)
   if (size) inputClasses.push(__styles.size[size])
   if (props.disabled) inputClasses.push(__styles.disabled)
-  // if (borderless)
-  //   inputClasses.push(InputNumberStyles['sbui-inputnumber--borderless'])
-
-  // const onClickChevronUp = () => {
-  //   inputRefCurrent.current?.stepUp()
-  //   if (onChange) {
-  //     inputRefCurrent.current?.dispatchEvent(
-  //       new InputEvent('change', {
-  //         view: window,
-  //         bubbles: true,
-  //         cancelable: false,
-  //       })
-  //     )
-  //   }
-  // }
-
-  // const onClickChevronDown = () => {
-  //   inputRefCurrent.current?.stepDown()
-  //   if (onChange) {
-  //     inputRefCurrent.current?.dispatchEvent(
-  //       new InputEvent('change', {
-  //         view: window,
-  //         bubbles: true,
-  //         cancelable: false,
-  //       })
-  //     )
-  //   }
-  // }
 
   return (
     <div className={props.className}>
@@ -163,22 +111,6 @@ function InputNumber({
             className={inputClasses.join(' ')}
             {...props}
           />
-          {/* <div className={iconNavClasses.join(' ')}>
-            <IconChevronUp
-              className={iconUpClasses.join(' ')}
-              onClick={onClickChevronUp}
-              onMouseDown={(e: React.MouseEvent) => {
-                e.preventDefault()
-              }}
-            />
-            <IconChevronDown
-              className={iconDownClasses.join(' ')}
-              onClick={onClickChevronDown}
-              onMouseDown={(e: React.MouseEvent) => {
-                e.preventDefault()
-              }}
-            />
-          </div> */}
           {icon && <InputIconContainer icon={icon} />}
           {error || actions ? (
             <div className={__styles.actions_container}>

@@ -20,7 +20,7 @@ export interface ButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
   type?: ButtonType
   danger?: boolean
   htmlType?: 'button' | 'submit' | 'reset'
-  ref?: any
+  ref?: React.Ref<HTMLButtonElement>
   ariaSelected?: boolean
   ariaControls?: string
   tabIndex?: 0 | -1
@@ -135,7 +135,6 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       )
     } else {
       return (
-        // <span ref={containerRef} className={containerClasses.join(' ')}>
         <button
           {...props}
           ref={ref}
@@ -152,7 +151,6 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         >
           {buttonContent}
         </button>
-        // </span>
       )
     }
   }

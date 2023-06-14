@@ -212,7 +212,7 @@ export default {
   badge: {
     base: 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-opacity-10',
     size: {
-      large: 'px-3 py-0.5 rounded-full text-sm',
+      large: 'px-3 py-0.5 rounded-full !text-sm',
     },
     dot: '-ml-0.5 mr-1.5 h-2 w-2 rounded-full',
     color: {

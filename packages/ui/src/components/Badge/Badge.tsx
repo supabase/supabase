@@ -1,7 +1,7 @@
 import { AvailableColors } from '../../lib/constants'
 import styleHandler from '../../lib/theme/styleHandler'
 
-interface Props {
+export interface Props {
   color?: AvailableColors
   children: string | React.ReactNode
   size?: 'large' | 'small'

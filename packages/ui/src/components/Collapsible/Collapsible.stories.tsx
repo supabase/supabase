@@ -7,7 +7,7 @@ export default {
   component: Collapsible,
 }
 
-export const Default = (args: any) => {
+export const Default = () => {
   return (
     <>
       <Collapsible className="-space-y-px">
@@ -39,7 +39,7 @@ export const Default = (args: any) => {
       </Collapsible>
       <Collapsible>
         <Collapsible.Trigger asChild>
-          <button type="button">Click me to expand</button>
+          <button className='dark:text-white' type="button">Click me to expand</button>
         </Collapsible.Trigger>
         <Collapsible.Content>
           <div>
@@ -52,11 +52,4 @@ export const Default = (args: any) => {
       </Collapsible>
     </>
   )
-}
-
-Default.args = {
-  placeholder: 'Type text here ...',
-  disabled: false,
-  label: 'Name',
-  layout: 'vertical',
 }

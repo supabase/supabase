@@ -1,10 +1,6 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { FormLayout } from '../../lib/Layout/FormLayout'
 import { CheckboxContext } from './CheckboxContext'
-// @ts-ignore
-import CheckboxStyles from './Checkbox.module.css'
-
-import defaultTheme from '../../lib/theme/defaultTheme'
 
 import { useFormContext } from '../Form/FormContext'
 import styleHandler from '../../lib/theme/styleHandler'
@@ -17,7 +13,7 @@ export interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElem
   size?: 'tiny' | 'small' | 'medium' | 'large' | 'xlarge'
 }
 
-interface GroupProps {
+export interface GroupProps {
   id?: string
   layout?: 'horizontal' | 'vertical'
   error?: any

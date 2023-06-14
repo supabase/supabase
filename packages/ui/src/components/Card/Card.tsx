@@ -1,11 +1,9 @@
 import React from 'react'
 import Typography from '../Typography'
-// @ts-ignore
-import CardStyles from './Card.module.css'
 
 import styleHandler from '../../lib/theme/styleHandler'
 
-interface CardProps {
+export interface CardProps {
   children?: React.ReactNode
   className?: string
   cover?: React.ReactNode
