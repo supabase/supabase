@@ -86,11 +86,6 @@ const Wizard: NextPageWithLayout = () => {
   const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
 
   const showNonProdFields = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
-  if (showNonProdFields) {
-    setCloudProvider(PROVIDERS.FLY.id)
-    setAvailableRegions({ SOUTHEAST_ASIA: 'Singapore' })
-    setDbRegion('Singapore')
-  }
 
   const canCreateProject =
     isAdmin && (!isSelectFreeTier || (isSelectFreeTier && !hasMembersExceedingFreeTierLimit))
