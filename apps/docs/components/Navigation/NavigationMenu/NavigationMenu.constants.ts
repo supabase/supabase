@@ -1056,6 +1056,10 @@ export const platform: NavMenuConstant = {
           name: 'High CPU Usage',
           url: '/guides/platform/exhaust-cpu',
         },
+        {
+          name: 'High RAM Usage',
+          url: '/guides/platform/exhaust-ram',
+        },
       ],
     },
   ],
