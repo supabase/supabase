@@ -171,3 +171,20 @@ const getDatesFromFileName = (filename: string) => {
     day,
   }
 }
+
+// Updates data/Announcements.json with latest 2 blog posts
+export const updateAnnouncements = () => {
+  const posts = getSortedPosts('_blog', 2)
+  const announcements = posts.map((post: any) => {
+    return {
+      url: post.url,
+      title: post.title,
+      description: post.description,
+      image: post.image,
+    }
+  })
+  const data = JSON.stringify(announcements)
+  fs.writeFileSync('data/Announcements.json', data)
+
+  return announcements
+}

@@ -1,5 +1,5 @@
 import dynamic from 'next/dynamic'
-import { getSortedPosts } from '~/lib/posts'
+import { getSortedPosts, updateAnnouncements } from '~/lib/posts'
 import PostTypes from '~/types/post'
 import Layout from '~/components/Layouts/Default'
 import Hero from '~/components/Hero/Hero'
@@ -36,6 +36,7 @@ const Index = ({ customerStories }: Props) => {
 
 export async function getStaticProps() {
   const customerStories = getSortedPosts('_customers', 3)
+  updateAnnouncements()
 
   return {
     props: {
