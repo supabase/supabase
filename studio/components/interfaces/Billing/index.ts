@@ -1,6 +1,4 @@
-import PAYGUsage from './PAYGUsage/PAYGUsage'
 import Subscription from './Subscription/Subscription'
-
 import PlanSelection from './PlanSelection/PlanSelection'
 import ProUpgrade from './ProUpgrade'
 import ExitSurvey from './ExitSurvey/ExitSurvey'
@@ -15,7 +13,6 @@ import Invoices from './Invoices'
 
 export * from './Subscription/Subscription.types'
 export {
-  PAYGUsage,
   Subscription,
   PlanSelection,
   ProUpgrade,

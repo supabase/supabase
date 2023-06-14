@@ -37,6 +37,21 @@ const BillingUpdatePro: NextPageWithLayout = () => {
   }, [])
 
   useEffect(() => {
+    if (
+      subscription &&
+      ![PRICING_TIER_PRODUCT_IDS.PAYG, PRICING_TIER_PRODUCT_IDS.PRO].includes(
+        subscription.tier.supabase_prod_id
+      )
+    ) {
+      if (subscription.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.ENTERPRISE) {
+        router.push(`/project/${projectRef}/settings/billing/update/enterprise`)
+      } else if (subscription.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.TEAM) {
+        router.push(`/project/${projectRef}/settings/billing/update/team`)
+      }
+    }
+  }, [subscription, projectRef, router])
+
+  useEffect(() => {
     if (projectRef) {
       getStripeProducts()
       getSubscription()
