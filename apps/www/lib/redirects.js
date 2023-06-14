@@ -1897,21 +1897,6 @@ module.exports = [
     source: '/docs/guides/resources/postgres/which-version-of-postgres',
     destination: '/docs/guides/database/postgres/which-version-of-postgres',
   },
-  {
-    permanent: true,
-    source: '/docs/guides/realtime/broadcast',
-    destination: '/docs/guides/realtime/extensions/broadcast',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/realtime/presence',
-    destination: '/docs/guides/realtime/extensions/presence',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/realtime/postgres-changes',
-    destination: '/docs/guides/realtime/extensions/postgres-changes',
-  },
   // Serverless APIs
   {
     permanent: true,
