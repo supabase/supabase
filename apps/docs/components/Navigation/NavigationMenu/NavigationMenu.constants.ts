@@ -809,18 +809,14 @@ export const realtime: NavMenuConstant = {
       url: '/guides/realtime/concepts',
     },
     {
-      name: 'Quickstart',
-      url: '/guides/realtime/quickstart',
-    },
-    {
-      name: 'Features',
+      name: 'Quickstarts',
       url: undefined,
       items: [
-        { name: 'Broadcast', url: '/guides/realtime/broadcast' },
-        { name: 'Presence', url: '/guides/realtime/presence' },
+        { name: 'Broadcast', url: '/guides/realtime/quickstarts/broadcast' },
+        { name: 'Presence', url: '/guides/realtime/quickstarts/presence' },
         {
           name: 'Postgres Changes',
-          url: '/guides/realtime/postgres-changes',
+          url: '/guides/realtime/quickstarts/postgres-changes',
         },
       ],
     },
