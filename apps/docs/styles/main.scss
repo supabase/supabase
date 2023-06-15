@@ -278,3 +278,7 @@ div[role='tablist'] {
   position: relative !important;
   height: unset !important;
 }
+
+.last-step:last-child > div > div {
+  @apply bg-transparent;
+}
