@@ -53,6 +53,7 @@ const Wizard: NextPageWithLayout = () => {
   const { app, ui } = useStore()
 
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
+  const cloudProviderEnabled = useFlag('enableFlyCloudProvider')
   const kpsEnabled = useFlag('initWithKps')
   const { data: membersExceededLimit, isLoading: isLoadingFreeProjectLimitCheck } =
     useFreeProjectLimitCheckQuery({ slug })
@@ -388,33 +389,34 @@ const Wizard: NextPageWithLayout = () => {
                   </Panel.Content>
                 )}
 
-                {showNonProdFields && (
-                  <Panel.Content
-                    className={[
-                      'border-b',
-                      'border-panel-border-interior-light dark:border-panel-border-interior-dark',
-                    ].join(' ')}
-                  >
-                    <Listbox
-                      layout="horizontal"
-                      label="Cloud Provider"
-                      type="select"
-                      value={cloudProvider}
-                      onChange={(value) => onCloudProviderChange(value)}
-                      descriptionText="Cloud Provider (only for staging/local)"
+                {showNonProdFields &&
+                  cloudProviderEnabled(
+                    <Panel.Content
+                      className={[
+                        'border-b',
+                        'border-panel-border-interior-light dark:border-panel-border-interior-dark',
+                      ].join(' ')}
                     >
-                      {Object.values(PROVIDERS).map((providerObj) => {
-                        const label = providerObj['name']
-                        const value = providerObj['id']
-                        return (
-                          <Listbox.Option key={value} label={label} value={value}>
-                            <span className="text-scale-1200">{label}</span>
-                          </Listbox.Option>
-                        )
-                      })}
-                    </Listbox>
-                  </Panel.Content>
-                )}
+                      <Listbox
+                        layout="horizontal"
+                        label="Cloud Provider"
+                        type="select"
+                        value={cloudProvider}
+                        onChange={(value) => onCloudProviderChange(value)}
+                        descriptionText="Cloud Provider (only for staging/local)"
+                      >
+                        {Object.values(PROVIDERS).map((providerObj) => {
+                          const label = providerObj['name']
+                          const value = providerObj['id']
+                          return (
+                            <Listbox.Option key={value} label={label} value={value}>
+                              <span className="text-scale-1200">{label}</span>
+                            </Listbox.Option>
+                          )
+                        })}
+                      </Listbox>
+                    </Panel.Content>
+                  )}
 
                 <Panel.Content className="border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
                   <Input
