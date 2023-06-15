@@ -7,7 +7,7 @@ import Image from 'next/image'
 import { useRouter } from 'next/router'
 import React from 'react'
 import { Project } from 'types'
-import { Button, IconArrowRight, IconGitHub, IconSquare } from 'ui'
+import { Badge, Button, IconArrowRight, IconGitHub, IconSquare } from 'ui'
 import { cn } from 'ui/src/utils/cn'
 
 const ICON_STROKE_WIDTH = 2
@@ -53,6 +53,14 @@ const HandleIcon = ({ type }: { type: HandleIconType }) => {
   }
 }
 
+const Avatar = ({ src }: { src: string }) => {
+  return (
+    <div className="relative border shadow-lg w-8 h-8 rounded-full overflow-hidden">
+      <Image src={src} width={30} height={30} layout="fill" alt="avatar" className="relative" />
+    </div>
+  )
+}
+
 const IntegrationInstallation = React.forwardRef<HTMLLIElement, IntegrationInstallationProps>(
   ({ className, title, connection, ...props }, ref) => {
     const IntegrationIconBlock = () => {
@@ -70,17 +78,26 @@ const IntegrationInstallation = React.forwardRef<HTMLLIElement, IntegrationInsta
       >
         <div className="flex gap-6 items-center">
           <div className="flex gap-3 items-center">
-            <span className="relative flex h-3 w-3">
+            {/* <span className="relative flex h-3 w-3">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-1100 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-3 w-3 bg-brand-900"></span>
-            </span>
-            <IntegrationIconBlock />
+            </span> */}
+            <div className="flex -space-x-1">
+              <IntegrationIconBlock />
+              <Avatar src={connection.metadata.account.avatar} />
+            </div>
           </div>
           <div className="flex flex-col gap-0">
-            <span className="text-scale-1200 font-medium">
-              {title} integration connection •{' '}
-              {connection.metadata?.vercelTeam || connection.metadata?.gitHubConnectionOwner}
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-scale-1200 font-medium">
+                {/* {title} integration connection •{' '} */}
+                {connection.metadata?.account.name || connection.metadata?.gitHubConnectionOwner}
+              </span>
+
+              <Badge color="scale" className="capitalize">
+                {connection.metadata.account.plan}
+              </Badge>
+            </div>
             <div className="flex gap-3 items-center">
               <span className="text-scale-900 text-sm">
                 Created {dayjs(connection.created_at).fromNow()}
@@ -133,7 +150,6 @@ const IntegrationConnection = React.forwardRef<HTMLLIElement, IntegrationConnect
                   alt={`icon`}
                 />
               )}
-
               <span>{connection.metadata.name}</span>
             </div>
 

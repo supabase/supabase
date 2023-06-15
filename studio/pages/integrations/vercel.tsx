@@ -89,9 +89,9 @@ const VercelIntegration: NextPageWithLayout = () => {
             foreignProjects={vercelProjects}
             supabaseProjects={supabaseProjects}
             onCreateConnections={() => {
-              // if (next) {
-              //   window.location.href = next
-              // }
+              if (next) {
+                window.location.href = next
+              }
             }}
           />
         </>

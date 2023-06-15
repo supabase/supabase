@@ -16,6 +16,15 @@ const IntegrationSettings = () => {
   const vercelIntegrations = data?.filter((integration) => integration.integration.id === 1) // vercel
   const githubIntegrations = data?.filter((integration) => integration.integration.id === 2) // github
 
+  vercelIntegrations?.map((x) => {
+    let data: any = { ...x }
+    data['metadata']['account'][
+      'avatar'
+    ] = `https://vercel.com/api/www/avatar/${data.metadata.account.avatar}?w=48`
+
+    return data
+  })
+
   return (
     <>
       <Integration
