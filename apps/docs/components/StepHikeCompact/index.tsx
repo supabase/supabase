@@ -4,7 +4,6 @@ import React, { FC } from 'react'
 interface IStep {
   title: string
   step: number | string
-  lastStep?: boolean
 }
 
 interface IStepHikeCompactSubcomponents {
@@ -28,7 +27,7 @@ const StepHikeCompact: FC<IStepHikeCompact> & IStepHikeCompactSubcomponents = ({
   return <div className="py-8">{children}</div>
 }
 
-const Step: FC<IStep> = ({ children, title, step, lastStep }) => {
+const Step: FC<IStep> = ({ children, title, step }) => {
   return (
     <div className="relative pb-8">
       <div
@@ -40,17 +39,15 @@ const Step: FC<IStep> = ({ children, title, step, lastStep }) => {
           h-full
         "
       >
-        {lastStep ? null : (
-          <div
-            className="
-            absolute
-            w-full
-            h-full
-            py-1
-            bg-scale-400
-          "
-          ></div>
-        )}
+        <div
+          className="
+          absolute
+          w-full
+          h-full
+          py-1
+          bg-scale-400
+        "
+        ></div>
       </div>
       <div
         className="
