@@ -6,17 +6,21 @@ export type VercelIntegrationCreateVariables = {
   code: string
   configurationId: string
   orgId: number
+  metadata: { [key: string]: string }
 }
 
 export async function createVercelIntegration({
   code,
   configurationId,
   orgId,
+  metadata,
 }: VercelIntegrationCreateVariables) {
+  console.log('payload', { code, configurationId, orgId, metadata })
   const response = await post(`${API_URL}/integrations/vercel`, {
     code,
-    configurationId,
-    orgId,
+    configuration_id: configurationId,
+    organization_id: orgId,
+    metadata,
   })
   if (response.error) {
     throw response.error
@@ -34,6 +38,7 @@ export const useVercelIntegrationCreateMutation = ({
   UseMutationOptions<VercelIntegrationCreateData, unknown, VercelIntegrationCreateVariables>,
   'mutationFn'
 > = {}) => {
+  console.log('mutating')
   return useMutation<VercelIntegrationCreateData, unknown, VercelIntegrationCreateVariables>(
     (vars) => createVercelIntegration(vars),
     {

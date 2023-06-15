@@ -12,6 +12,12 @@ export type VercelProjectsVariables = {
 export type VercelProjectsResponse = {
   id: string
   name: string
+  metadata: {
+    id: string
+    name: string
+    framework: string
+    link: string
+  }
 }
 
 export async function getVercelProjects({ orgId }: VercelProjectsVariables, signal?: AbortSignal) {
@@ -19,7 +25,7 @@ export async function getVercelProjects({ orgId }: VercelProjectsVariables, sign
     throw new Error('orgId is required')
   }
 
-  const response = await get(`${API_URL}/integrations/vercel/projects?orgId=${orgId}`, {
+  const response = await get(`${API_URL}/integrations/vercel/projects/${orgId}`, {
     signal,
   })
   if (response.error) {

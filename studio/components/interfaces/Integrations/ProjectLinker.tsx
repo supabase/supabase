@@ -1,6 +1,8 @@
 import { databaseIcon, vercelIcon } from 'components/to-be-cleaned/ListIcons'
 import { useIntegrationConnectionsCreateMutation } from 'data/integrations/integration-connections-create-mutation'
+import { VercelProjectsResponse } from 'data/integrations/integrations-vercel-projects-query'
 import { useState } from 'react'
+import { TRUE } from 'sass'
 import { Button, IconArrowRight, IconPlus, IconX, Listbox } from 'ui'
 
 interface Project {
@@ -8,14 +10,18 @@ interface Project {
   name: string
 }
 
+// to do: move this somewhere
+const INTEGRATION_INTERNAL_ID = 1
+
 export interface ProjectLinkerProps {
   organizationIntegrationId: string
-  foreignProjects: Project[]
+  foreignProjects: VercelProjectsResponse[]
   supabaseProjects: Project[]
   onCreateConnections?: () => void
 }
 
 const UNDEFINED_SELECT_VALUE = 'undefined'
+const UNDEFINED_METADATA_VALUE = {}
 
 const ProjectLinker = ({
   organizationIntegrationId,
@@ -24,12 +30,28 @@ const ProjectLinker = ({
   onCreateConnections: _onCreateConnections,
 }: ProjectLinkerProps) => {
   const [connections, setConnections] = useState([
-    { foreignProjectId: UNDEFINED_SELECT_VALUE, supabaseProjectId: UNDEFINED_SELECT_VALUE },
+    {
+      foreignProjectId: UNDEFINED_SELECT_VALUE,
+      supabaseProjectId: UNDEFINED_SELECT_VALUE,
+      integrationId: INTEGRATION_INTERNAL_ID,
+      metadata: UNDEFINED_METADATA_VALUE,
+    },
   ])
 
   function onSetForeignProjectId(idx: number, id: string) {
+    console.log(id)
+
+    console.log(foreignProjects)
     const newConnections = [...connections]
+    const projectDetails = foreignProjects.filter((x) => x.id === id)[0]
+    newConnections[idx].metadata = { ...projectDetails }
     newConnections[idx].foreignProjectId = id
+    newConnections[idx].supabaseConfig = {
+      projectEnvVars: {
+        write: true,
+      },
+    }
+
     setConnections(newConnections)
   }
 
@@ -42,7 +64,12 @@ const ProjectLinker = ({
   function addConnection() {
     setConnections([
       ...connections,
-      { foreignProjectId: UNDEFINED_SELECT_VALUE, supabaseProjectId: UNDEFINED_SELECT_VALUE },
+      {
+        foreignProjectId: UNDEFINED_SELECT_VALUE,
+        supabaseProjectId: UNDEFINED_SELECT_VALUE,
+        integrationId: INTEGRATION_INTERNAL_ID,
+        metadata: UNDEFINED_METADATA_VALUE,
+      },
     ])
   }
 
@@ -59,6 +86,7 @@ const ProjectLinker = ({
   })
 
   function onCreateConnections() {
+    console.log('connections', connections)
     createConnections({
       organizationIntegrationId,
       connections,
@@ -71,6 +99,7 @@ const ProjectLinker = ({
         {connections.map((connection, i) => (
           <ProjectLinkerItem
             key={i}
+            connections={connections}
             foreignProjects={foreignProjects}
             supabaseProjects={supabaseProjects}
             foreignProjectId={connection.foreignProjectId}
@@ -117,6 +146,7 @@ interface ProjectLinkerItemProps {
   setSupabaseProjectId: (id: string) => void
   removeConnection: () => void
   canRemove: boolean
+  connections: any[]
 }
 
 const ProjectLinkerItem = ({
@@ -134,30 +164,6 @@ const ProjectLinkerItem = ({
       <div className="relative flex w-full space-x-2">
         <div className="w-1/2 flex-grow">
           <Listbox
-            value={foreignProjectId ?? UNDEFINED_SELECT_VALUE}
-            onChange={setForeignProjectId}
-          >
-            <Listbox.Option value={UNDEFINED_SELECT_VALUE} label="Choose a project" disabled>
-              Choose a project
-            </Listbox.Option>
-
-            {foreignProjects.map((project) => (
-              <Listbox.Option
-                key={project.id}
-                value={project.id}
-                label={project.name}
-                addOnBefore={() => vercelIcon}
-              >
-                {project.name}
-              </Listbox.Option>
-            ))}
-          </Listbox>
-        </div>
-        <div className="flex flex-shrink items-center">
-          <IconArrowRight className="text-scale-1000" />
-        </div>
-        <div className="w-1/2 flex-grow">
-          <Listbox
             value={supabaseProjectId ?? UNDEFINED_SELECT_VALUE}
             onChange={setSupabaseProjectId}
           >
@@ -171,6 +177,45 @@ const ProjectLinkerItem = ({
                 value={project.id}
                 label={project.name}
                 addOnBefore={() => databaseIcon}
+              >
+                {project.name}
+              </Listbox.Option>
+            ))}
+          </Listbox>
+        </div>
+        <div className="flex flex-shrink items-center">
+          <IconArrowRight className="text-scale-1000" />
+        </div>
+        <div className="w-1/2 flex-grow">
+          <Listbox
+            value={foreignProjectId ?? UNDEFINED_SELECT_VALUE}
+            onChange={setForeignProjectId}
+          >
+            <Listbox.Option value={UNDEFINED_SELECT_VALUE} label="Choose a project" disabled>
+              Choose a project
+            </Listbox.Option>
+
+            {foreignProjects.map((project) => (
+              <Listbox.Option
+                key={project.id}
+                value={project.id}
+                label={project.name}
+                addOnBefore={() => {
+                  return (
+                    <>
+                      {!project?.framework ? (
+                        vercelIcon
+                      ) : (
+                        <img
+                          src={`/img/icons/frameworks/${project.framework}.svg`}
+                          width={21}
+                          height={21}
+                          alt={`icon`}
+                        />
+                      )}
+                    </>
+                  )
+                }}
               >
                 {project.name}
               </Listbox.Option>

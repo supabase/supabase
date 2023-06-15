@@ -13,8 +13,8 @@ const IntegrationSettings = () => {
 
   const org = ui.selectedOrganization
 
-  const vercelIntegrations = data?.filter((integration) => integration.type === 'VERCEL')
-  const githubIntegrations = data?.filter((integration) => integration.type === 'GITHUB')
+  const vercelIntegrations = data?.filter((integration) => integration.integration.id === 1) // vercel
+  const githubIntegrations = data?.filter((integration) => integration.integration.id === 2) // github
 
   return (
     <>
@@ -25,7 +25,6 @@ const IntegrationSettings = () => {
 ## Vercel Integration
 
 Connect your Vercel teams to your Supabase organization.
-
 `}
         description={`
 ### How does the Vercel integration work?

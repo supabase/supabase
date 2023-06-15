@@ -5,7 +5,7 @@ import ProjectLinker from 'components/interfaces/Integrations/ProjectLinker'
 import { WizardLayout } from 'components/layouts'
 import OrganizationPicker from 'components/ui/OrganizationPicker'
 import { useVercelIntegrationCreateMutation } from 'data/integrations/vercel-integration-create-mutation'
-import { useVercelProjectsQuery } from 'data/integrations/vercel-projects-query'
+import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useStore } from 'hooks'
 import { EMPTY_ARR } from 'lib/void'
@@ -38,10 +38,13 @@ const VercelIntegration: NextPageWithLayout = () => {
       return ui.setNotification({ category: 'error', message: 'Vercel Configuration ID missing' })
     }
 
+    const metadata = {}
+
     mutate({
       code,
       configurationId,
       orgId,
+      metadata,
     })
   }
 
@@ -63,14 +66,9 @@ const VercelIntegration: NextPageWithLayout = () => {
     },
     { enabled: organizationIntegrationId !== null }
   )
-  const vercelProjects = useMemo(
-    () =>
-      vercelProjectsData?.map((project) => ({
-        id: project.id,
-        name: project.name,
-      })) ?? EMPTY_ARR,
-    [vercelProjectsData]
-  )
+
+  console.log('vercelProjectsData', vercelProjectsData)
+  const vercelProjects = useMemo(() => vercelProjectsData ?? EMPTY_ARR, [vercelProjectsData])
 
   return (
     <div className="flex flex-col gap-4">
@@ -91,9 +89,9 @@ const VercelIntegration: NextPageWithLayout = () => {
             foreignProjects={vercelProjects}
             supabaseProjects={supabaseProjects}
             onCreateConnections={() => {
-              if (next) {
-                window.location.href = next
-              }
+              // if (next) {
+              //   window.location.href = next
+              // }
             }}
           />
         </>
