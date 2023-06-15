@@ -51,7 +51,7 @@ It is possible to upload more than 1_000_000 vectors to a single table if Memory
 
 ## Methodology
 
-We are using a lot from ANN-benchmarks methodology. You can read more about it [here](https://github.com/erikbern/ann-benchmarks). A Python test runner is responsible for uploading the data, creating the index, and running the queries. PgVector engine is implemented using [vecs](https://github.com/supabase/vecs), a Python client for pgvector.
+We follow techniques outlined in the [ANN Benchmarks](https://github.com/erikbern/ann-benchmarks) methodology. A Python test runner is responsible for uploading the data, creating the index, and running the queries. The pgvector engine is implemented using [vecs](https://github.com/supabase/vecs), a Python client for pgvector.
 
 <div>
   <img
