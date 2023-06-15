@@ -186,6 +186,17 @@ const DatabaseUsage: FC<any> = () => {
                   <ChartHandler
                     startDate={dateRange?.period_start?.date}
                     endDate={dateRange?.period_end?.date}
+                    attribute={'swap_usage'}
+                    label={'Swap usage'}
+                    interval={dateRange.interval}
+                    provider={'infra-monitoring'}
+                  />
+                )}
+
+                {dateRange && (
+                  <ChartHandler
+                    startDate={dateRange?.period_start?.date}
+                    endDate={dateRange?.period_end?.date}
                     attribute={'cpu_usage'}
                     label={'CPU usage'}
                     interval={dateRange.interval}

@@ -58,6 +58,12 @@ export const METRICS = [
     category: METRIC_CATEGORIES.INSTANCE,
   },
   {
+    key: 'swap_usage',
+    label: 'Swap % usage',
+    provider: 'infra-monitoring',
+    category: METRIC_CATEGORIES.INSTANCE,
+  },
+  {
     key: 'total_realtime_egress',
     label: 'Realtime Connection Egress',
     provider: 'daily-stats',
