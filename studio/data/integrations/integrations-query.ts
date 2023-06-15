@@ -254,7 +254,7 @@ export async function getIntegrations({ orgSlug }: IntegrationsVariables, signal
   //   },
   // ]
 
-  const response = await get(`${API_URL}/integrations`, {
+  const response = await get(`${API_URL}/integrations/${orgSlug}`, {
     signal,
   })
   if (response.error) {
