@@ -197,6 +197,9 @@ supabase migration new create_employees_table
     </StepHikeCompact.Code>
 
   </StepHikeCompact.Step>
+</StepHikeCompact>
+
+<StepHikeCompact>
 
   <StepHikeCompact.Step step={2}>
     <StepHikeCompact.Details title="Add the SQL to your migration file">
@@ -222,6 +225,12 @@ created_at timestamptz default now()
     </StepHikeCompact.Code>
 
   </StepHikeCompact.Step>
+</StepHikeCompact>
+
+
+
+
+<StepHikeCompact>
 
   <StepHikeCompact.Step step={3}>
     <StepHikeCompact.Details title="Apply your migration">
@@ -238,6 +247,9 @@ supabase db reset
     </StepHikeCompact.Code>
 
   </StepHikeCompact.Step>
+</StepHikeCompact>
+
+<StepHikeCompact>
 
   <StepHikeCompact.Step step={4}>
     <StepHikeCompact.Details title="Modify your employees table">
@@ -254,8 +266,13 @@ supabase db reset
     </StepHikeCompact.Code>
 
   </StepHikeCompact.Step>
+</StepHikeCompact>
 
-  <StepHikeCompact.Step step={5} lastStep>
+
+
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={5}>
     <StepHikeCompact.Details title="Add a new column to your table">
       This creates a new migration file: supabase/migrations/\<timestamp\>
         _add_department_to_employees_table.sql.
@@ -302,8 +319,12 @@ values
     </StepHikeCompact.Code>
 
   </StepHikeCompact.Step>
+</StepHikeCompact>
 
-  <StepHikeCompact.Step step={2} lastStep>
+
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={2}>
     <StepHikeCompact.Details title="Reset your database">
       Reset your database (apply current migrations), and populate with seed data
     </StepHikeCompact.Details>
