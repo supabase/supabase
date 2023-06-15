@@ -897,7 +897,7 @@ export const ai: NavMenuConstant = {
         { name: 'Managing indexes', url: '/guides/ai/managing-indexes' },
         { name: 'Vector columns', url: '/guides/ai/vector-columns' },
         { name: 'Engineering for scale', url: '/guides/ai/engineering-for-scale' },
-        { name: 'Choosing Instance Type', url: '/guides/ai/choosing-instance-type' },
+        { name: 'Choosing instance type', url: '/guides/ai/choosing-instance-type' },
       ],
     },
     {
