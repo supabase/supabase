@@ -164,6 +164,7 @@ function useKeyboardEvents({
 
             if (selection?.rangeCount === 1) {
               setSelectionRange(selection.getRangeAt(0))
+              selection.empty()
             }
           }
           return
