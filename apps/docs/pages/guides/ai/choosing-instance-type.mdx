@@ -43,6 +43,12 @@ The full number of vectors in `gist-960-angular` dataset - 1_000_000.
 - Lists set to `Number of vectors / 1000`
 - Probes set to `10`
 
+<Admonition type="note">
+
+It is possible to upload more than 1_000_000 vectors to a single table if Memory allows it (for example, 2XL instance and higher). But it will affect the performance of the queries: RPS will be lower, and latency will be higher. Scaling should be almost linear, but it is recommended to benchmark your workload to find the optimal number of vectors per table and per instance.
+
+</Admonition>
+
 ## Methodology
 
 We are using a lot from ANN-benchmarks methodology. You can read more about it [here](https://github.com/erikbern/ann-benchmarks). A Python test runner is responsible for uploading the data, creating the index, and running the queries. PgVector engine is implemented using [vecs](https://github.com/supabase/vecs), a Python client for pgvector.
