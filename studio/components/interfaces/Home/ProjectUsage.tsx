@@ -68,7 +68,6 @@ const ProjectUsage: FC<Props> = ({}) => {
     _type: 'rest' | 'realtime' | 'storage' | 'auth'
   ) => {
     const selected = dayjs(value?.timestamp).toISOString()
-    console.log('selected:', selected)
     router.push(`/project/${projectRef}/logs/edge-logs?ite=${encodeURIComponent(selected)}`)
   }
 
