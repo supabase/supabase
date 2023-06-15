@@ -13,7 +13,7 @@ By default, Supabase limits the maximum statement execution time to _3 seconds_ 
 The timeout values were picked as a reasonable default for the majority of use-cases, but can be modified using the [`alter role`](https://www.postgresql.org/docs/current/sql-alterrole.html) statement:
 
 ```sql
-alter role authenticated set statement_timeout = '15s';
+alter role authenticator set statement_timeout = '15s';
 ```
 
 You can also update the statement timeout for a session:
