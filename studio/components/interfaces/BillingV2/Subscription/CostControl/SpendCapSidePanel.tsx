@@ -3,13 +3,14 @@ import { useParams, useTheme } from 'common'
 import Table from 'components/to-be-cleaned/Table'
 import { useProjectSubscriptionUpdateMutation } from 'data/subscriptions/project-subscription-update-mutation'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
-import { useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
 import { BASE_PATH, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { Alert, Button, Collapsible, IconChevronRight, IconExternalLink, SidePanel } from 'ui'
 import { BILLING_BREAKDOWN_METRICS } from '../Subscription.constants'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 const SPEND_CAP_OPTIONS: {
   name: string
@@ -39,6 +40,8 @@ const SpendCapSidePanel = () => {
   const [showUsageCosts, setShowUsageCosts] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
   const [selectedOption, setSelectedOption] = useState<'on' | 'off'>()
+
+  const canUpdateSpendCap = checkPermissions(PermissionAction.BILLING_WRITE, 'stripe.subscriptions')
 
   const snap = useSubscriptionPageStateSnapshot()
   const visible = snap.panelKey === 'costControl'
@@ -93,7 +96,7 @@ const SpendCapSidePanel = () => {
     <SidePanel
       size="large"
       loading={isLoading || isSubmitting}
-      disabled={isFreePlan || isLoading || !hasChanges || isSubmitting}
+      disabled={isFreePlan || isLoading || !hasChanges || isSubmitting || !canUpdateSpendCap}
       visible={visible}
       onCancel={onClose}
       onConfirm={onConfirm}
@@ -109,6 +112,7 @@ const SpendCapSidePanel = () => {
           </Link>
         </div>
       }
+      tooltip={!canUpdateSpendCap ? 'You do not have permission to update spend cap' : undefined}
     >
       <SidePanel.Content>
         <div className="py-6 space-y-4">
