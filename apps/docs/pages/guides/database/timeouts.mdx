@@ -6,13 +6,14 @@ export const meta = {
   description: 'Timeouts and optimization',
 }
 
-By default, Supabase limits the maximum statement execution time to _3 seconds_ for users accessing the API using the anon key, and _8 seconds_ for authenticated users. Additionally, all users are subject to a global limit of _2 minutes_. This serves as a backstop against resource exhaustion due to either poorly written queries, or abusive usage.
+By default, Supabase limits the maximum statement execution time to _8 seconds_ for users accessing the API. Additionally, all users are subject to a global limit of _2 minutes_. This serves as a backstop against resource exhaustion due to either poorly written queries, or abusive usage.
 
 ### Changing the default timeout
 
 The timeout values were picked as a reasonable default for the majority of use-cases, but can be modified using the [`alter role`](https://www.postgresql.org/docs/current/sql-alterrole.html) statement:
 
 ```sql
+-- For API users
 alter role authenticator set statement_timeout = '15s';
 ```
 
