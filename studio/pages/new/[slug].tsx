@@ -4,17 +4,7 @@ import { debounce, isUndefined, values } from 'lodash'
 import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import generator from 'generate-password'
-import {
-  Button,
-  Listbox,
-  IconUsers,
-  Input,
-  Alert,
-  IconHelpCircle,
-  Toggle,
-  IconAlertCircle,
-  IconInfo,
-} from 'ui'
+import { Button, Listbox, IconUsers, Input, Alert, IconHelpCircle, Toggle, IconInfo } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { NextPageWithLayout } from 'types'
 import { passwordStrength, pluckObjectFields } from 'lib/helpers'
@@ -31,6 +21,7 @@ import {
   FLY_REGIONS,
   CloudProvider,
   Region,
+  DEFAULT_PROVIDER,
 } from 'lib/constants'
 import { useStore, useFlag, withAuth, checkPermissions } from 'hooks'
 import { useParams } from 'common/hooks'
@@ -60,7 +51,7 @@ const Wizard: NextPageWithLayout = () => {
 
   const [projectName, setProjectName] = useState('')
   const [postgresVersion, setPostgresVersion] = useState('')
-  const [cloudProvider, setCloudProvider] = useState<CloudProvider>(PROVIDERS.AWS.id)
+  const [cloudProvider, setCloudProvider] = useState<CloudProvider>(PROVIDERS[DEFAULT_PROVIDER].id)
 
   const [dbPass, setDbPass] = useState('')
   const [dbRegion, setDbRegion] = useState(PROVIDERS[cloudProvider].default_region)

@@ -53,6 +53,8 @@ export const PRICING_TIER_PRODUCT_IDS = {
 export const PRICING_TIER_FREE_KEY = 'FREE'
 export const PRICING_TIER_DEFAULT_KEY = 'FREE'
 
+export const DEFAULT_PROVIDER: CloudProvider = 'AWS'
+
 export const PROVIDERS = {
   FLY: {
     id: 'FLY',
