@@ -73,8 +73,8 @@ const HomePageCover = (props) => {
           </p>
         </div>
         <div className="flex flex-wrap md:grid md:grid-cols-4 2xl:grid-cols-7 gap-2 sm:gap-3">
-          {frameworks.map((framework) => (
-            <Link href={framework.href} passHref>
+          {frameworks.map((framework, i) => (
+            <Link key={i} href={framework.href} passHref>
               <a className="no-underline">
                 <IconPanel
                   iconSize={iconSize}
