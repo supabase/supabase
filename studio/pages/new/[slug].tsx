@@ -380,34 +380,33 @@ const Wizard: NextPageWithLayout = () => {
                   </Panel.Content>
                 )}
 
-                {showNonProdFields &&
-                  cloudProviderEnabled(
-                    <Panel.Content
-                      className={[
-                        'border-b',
-                        'border-panel-border-interior-light dark:border-panel-border-interior-dark',
-                      ].join(' ')}
+                {cloudProviderEnabled && showNonProdFields && (
+                  <Panel.Content
+                    className={[
+                      'border-b',
+                      'border-panel-border-interior-light dark:border-panel-border-interior-dark',
+                    ].join(' ')}
+                  >
+                    <Listbox
+                      layout="horizontal"
+                      label="Cloud Provider"
+                      type="select"
+                      value={cloudProvider}
+                      onChange={(value) => onCloudProviderChange(value)}
+                      descriptionText="Cloud Provider (only for staging/local)"
                     >
-                      <Listbox
-                        layout="horizontal"
-                        label="Cloud Provider"
-                        type="select"
-                        value={cloudProvider}
-                        onChange={(value) => onCloudProviderChange(value)}
-                        descriptionText="Cloud Provider (only for staging/local)"
-                      >
-                        {Object.values(PROVIDERS).map((providerObj) => {
-                          const label = providerObj['name']
-                          const value = providerObj['id']
-                          return (
-                            <Listbox.Option key={value} label={label} value={value}>
-                              <span className="text-scale-1200">{label}</span>
-                            </Listbox.Option>
-                          )
-                        })}
-                      </Listbox>
-                    </Panel.Content>
-                  )}
+                      {Object.values(PROVIDERS).map((providerObj) => {
+                        const label = providerObj['name']
+                        const value = providerObj['id']
+                        return (
+                          <Listbox.Option key={value} label={label} value={value}>
+                            <span className="text-scale-1200">{label}</span>
+                          </Listbox.Option>
+                        )
+                      })}
+                    </Listbox>
+                  </Panel.Content>
+                )}
 
                 <Panel.Content className="border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
                   <Input
