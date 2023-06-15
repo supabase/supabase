@@ -929,7 +929,7 @@ export default function IndexPage() {
                 >
                   {pricingFaq.map((faq, i) => {
                     return (
-                      <div className="border-b pb-3" key={i}>
+                      <div className="border-b py-2" key={i}>
                         <Accordion.Item
                           header={<span className="text-scale-1200">{faq.question}</span>}
                           id={`faq--${i.toString()}`}
