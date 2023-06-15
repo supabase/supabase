@@ -1,6 +1,6 @@
 import Panel from 'components/ui/Panel'
 import { ProjectSubscriptionResponse } from 'data/subscriptions/project-subscription-v2-query'
-import { Button, IconCreditCard, IconFileText, Modal } from 'ui'
+import { Button, IconCreditCard, Modal } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { useState } from 'react'
 import PaymentMethodSelection from './PaymentMethodSelection'
@@ -9,17 +9,26 @@ import {
   SubscriptionTier,
   updateSubscriptionTier,
 } from 'data/subscriptions/project-subscription-update-mutation'
-import { useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 export interface SubscriptionTierProps {
   subscription: ProjectSubscriptionResponse
   onSubscriptionUpdated: () => void
 }
 
-const SubscriptionPaymentMethod = ({ subscription, onSubscriptionUpdated }: SubscriptionTierProps) => {
+const SubscriptionPaymentMethod = ({
+  subscription,
+  onSubscriptionUpdated,
+}: SubscriptionTierProps) => {
   const { ref: projectRef } = useParams()
   const { ui } = useStore()
+
+  const canUpdatePaymentMethod = checkPermissions(
+    PermissionAction.BILLING_WRITE,
+    'stripe.subscriptions'
+  )
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showPaymentEditModal, setShowPaymentEditModal] = useState(false)
@@ -124,14 +133,14 @@ const SubscriptionPaymentMethod = ({ subscription, onSubscriptionUpdated }: Subs
               <div>
                 <Button
                   type="default"
-                  disabled={subscription?.payment_method_type !== 'card'}
+                  disabled={subscription?.payment_method_type !== 'card' || !canUpdatePaymentMethod}
                   onClick={() => setShowPaymentEditModal(true)}
                 >
                   Change
                 </Button>
               </div>
             </Tooltip.Trigger>
-            {subscription?.payment_method_type !== 'card' && (
+            {subscription?.payment_method_type !== 'card' ? (
               <Tooltip.Portal>
                 <Tooltip.Content side="bottom">
                   <Tooltip.Arrow className="radix-tooltip-arrow" />
@@ -147,7 +156,23 @@ const SubscriptionPaymentMethod = ({ subscription, onSubscriptionUpdated }: Subs
                   </div>
                 </Tooltip.Content>
               </Tooltip.Portal>
-            )}
+            ) : !canUpdatePaymentMethod ? (
+              <Tooltip.Portal>
+                <Tooltip.Content side="bottom">
+                  <Tooltip.Arrow className="radix-tooltip-arrow" />
+                  <div
+                    className={[
+                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                      'border border-scale-200',
+                    ].join(' ')}
+                  >
+                    <span className="text-xs text-scale-1200">
+                      You do not have permission to change the payment method
+                    </span>
+                  </div>
+                </Tooltip.Content>
+              </Tooltip.Portal>
+            ) : null}
           </Tooltip.Root>
         </Panel.Content>
       </Panel>
