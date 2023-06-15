@@ -19,14 +19,14 @@ Table partitioning is a technique that allows you to divide a large table into s
 
 Each partition contains a subset of the data based on a specified criteria, such as a range of values or a specific condition. Partitioning can significantly improve query performance and simplify data management for large datasets.
 
-## **Benefits of Table Partitioning**
+## Benefits of Table Partitioning
 
 - **Improved query performance:** allows queries to target specific partitions, reducing the amount of data scanned and improving query execution time.
 - **Scalability:** With partitioning, you can add or remove partitions as your data grows or changes, enabling better scalability and flexibility.
 - **Efficient data management:** simplifies tasks such as data loading, archiving, and deletion by operating on smaller partitions instead of the entire table.
 - **Enhanced maintenance operations:** can optimize vacuuming and indexing, leading to faster maintenance tasks.
 
-## **Partitioning Methods**
+## Partitioning Methods
 
 Postgres supports various partitioning methods based on how you want to partition your data. The commonly used methods are:
 
@@ -34,7 +34,7 @@ Postgres supports various partitioning methods based on how you want to partitio
 2. **List Partitioning**: Data is divided into partitions based on a specified list of values. For instance, you can partition a customer table by region, where each partition contains customers from a specific region (e.g., one partition for customers in the US, another for customers in Europe).
 3. **Hash Partitioning**: Data is distributed across partitions using a hash function. This method provides a way to evenly distribute data among partitions, which can be useful for load balancing. However, it doesn't allow direct querying based on specific values.
 
-## **Creating Partitioned Tables**
+## Creating Partitioned Tables
 
 Let's consider an example of range partitioning for a sales table based on the order date. We'll create monthly partitions to store data for each month:
 
@@ -63,14 +63,14 @@ create table sales_2000_02
 
 To create a partitioned table you append `partition by range (<column_name>)` to the table creation statement. The column that you are partitioning with _must_ be included in any unique index, which is the reason why we specify a composite primary key here (`primary key (order_date, id)`).
 
-## **Querying Partitioned Tables**
+## Querying Partitioned Tables
 
 To query a partitioned table, you have two options:
 
 1. Querying the parent table
 2. Querying specific partitions
 
-### **Querying the parent table**
+### Querying the parent table
 
 When you query the parent table, Postgres automatically routes the query to the relevant partitions based on the conditions specified in the query. This allows you to retrieve data from all partitions simultaneously.
 
@@ -84,7 +84,7 @@ where order_date >= '2000-01-01' and order_date < '2000-03-01';
 
 This query will retrieve data from both the `sales_2000_01` and `sales_2000_02` partitions.
 
-### **Querying specific partitions**
+### Querying specific partitions
 
 If you only need to retrieve data from a specific partition, you can directly query that partition instead of the parent table. This approach is useful when you want to target a specific range or condition within a partition.
 
@@ -97,17 +97,17 @@ This query will retrieve data only from the `sales_2000_02` partition.
 
 ## When to partition your tables
 
-There is no real threshold to determine when you should use partitions. Partitions introduce complexity, and complexity should be avoided until it’s needed. A few guidelines:
+There is no real threshold to determine when you should use partitions. Partitions introduce complexity, and complexity should be avoided until it's needed. A few guidelines:
 
 - If you are considering performance, avoid partitions until you see performance degradation on non-partitioned tables.
-- If you are using partitions as a management tool, it’s fine to create the partitions any time.
-- If you don’t know how you should partition your data, then it’s probably too early.
+- If you are using partitions as a management tool, it's fine to create the partitions any time.
+- If you don't know how you should partition your data, then it's probably too early.
 
 ## Examples
 
 Here are simple examples for each of the partitioning types in Postgres.
 
-### \***\*Range Partitioning\*\***
+### Range Partitioning
 
 Let's consider a range partitioning example for a table that stores sales data based on the order date. We'll create monthly partitions to store data for each month.
 
@@ -163,7 +163,7 @@ create table customers_asia
   for values in ('INDIA', 'CHINA', 'JAPAN');
 ```
 
-### \***\*Hash Partitioning\*\***
+### Hash Partitioning
 
 You can use hash partitioning to evenly distribute data.
 
