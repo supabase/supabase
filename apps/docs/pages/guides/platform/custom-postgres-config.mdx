@@ -46,7 +46,7 @@ To get started:
 The `postgres config` command of the CLI can be used for setting configuration parameters:
 
 ```bash
-$ supabase --experimental --project-ref <project-ref> postgres config update --config max_parallel_workers:6 --config shared_buffers:250MB
+$ supabase --experimental --project-ref <project-ref> postgres-config update --config max_parallel_workers=6 --config shared_buffers=250MB
 - Custom Postgres Config -
 Config                  |Value    |
 shared_buffers          |250MB    |
@@ -57,7 +57,7 @@ max_parallel_workers    |6        |
 By default, the CLI will merge any provided config overrides with any existing ones. The `--replace-existing-overrides` flag can be used to instead force all existing overrides to be replaced with the ones being provided:
 
 ```bash
-$ supabase --experimental --project-ref <project-ref> postgres config update --config max_parallel_workers:3 --replace-existing-overrides
+$ supabase --experimental --project-ref <project-ref> postgres-config update --config max_parallel_workers=3 --replace-existing-overrides
 
 - Custom Postgres Config -
 Config                  |Value    |
