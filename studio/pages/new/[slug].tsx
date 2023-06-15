@@ -16,25 +16,25 @@ import {
   IconInfo,
 } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-
 import { NextPageWithLayout } from 'types'
 import { passwordStrength, pluckObjectFields } from 'lib/helpers'
 import { get, post } from 'lib/common/fetch'
 import {
   API_URL,
   PROVIDERS,
-  REGIONS,
-  REGIONS_DEFAULT,
   DEFAULT_MINIMUM_PASSWORD_STRENGTH,
   PRICING_TIER_LABELS,
   PRICING_TIER_DEFAULT_KEY,
   PRICING_TIER_FREE_KEY,
   PRICING_TIER_PRODUCT_IDS,
+  AWS_REGIONS,
+  FLY_REGIONS,
+  CloudProvider,
+  Region,
 } from 'lib/constants'
 import { useStore, useFlag, withAuth, checkPermissions } from 'hooks'
 import { useParams } from 'common/hooks'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
-
 import { WizardLayoutWithoutAuth } from 'components/layouts'
 import Panel from 'components/ui/Panel'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
@@ -59,9 +59,10 @@ const Wizard: NextPageWithLayout = () => {
 
   const [projectName, setProjectName] = useState('')
   const [postgresVersion, setPostgresVersion] = useState('')
-  const [cloudProvider, setCloudProvider] = useState(PROVIDERS.AWS.id)
+  const [cloudProvider, setCloudProvider] = useState<CloudProvider>(PROVIDERS.AWS.id)
+
   const [dbPass, setDbPass] = useState('')
-  const [dbRegion, setDbRegion] = useState(REGIONS_DEFAULT)
+  const [dbRegion, setDbRegion] = useState(PROVIDERS[cloudProvider].default_region)
   const [dbPricingTierKey, setDbPricingTierKey] = useState(PRICING_TIER_DEFAULT_KEY)
   const [newProjectedLoading, setNewProjectLoading] = useState(false)
   const [passwordStrengthMessage, setPasswordStrengthMessage] = useState('')
@@ -77,7 +78,10 @@ const Wizard: NextPageWithLayout = () => {
   const currentOrg = organizations.find((o: any) => o.slug === slug)
   const billedViaOrg = Boolean(currentOrg?.subscription_id)
 
-  const [availableRegions, setAvailableRegions] = useState(getAwsAvailableRegions())
+  const [availableRegions, setAvailableRegions] = useState(
+    getAvailableRegions(PROVIDERS[cloudProvider].id)
+  )
+
   const isAdmin = checkPermissions(PermissionAction.CREATE, 'projects')
   const isInvalidSlug = isUndefined(currentOrg)
   const isEmptyOrganizations = organizations.length <= 0 && app.organizations.isInitialized
@@ -93,7 +97,7 @@ const Wizard: NextPageWithLayout = () => {
   const canSubmit =
     projectName !== '' &&
     passwordStrengthScore >= DEFAULT_MINIMUM_PASSWORD_STRENGTH &&
-    dbRegion !== '' &&
+    dbRegion !== undefined &&
     dbPricingTierKey !== ''
 
   const delayedCheckPasswordStrength = useRef(
@@ -150,18 +154,14 @@ const Wizard: NextPageWithLayout = () => {
     } else delayedCheckPasswordStrength(value)
   }
 
-  function onDbRegionChange(value: string) {
-    setDbRegion(value)
-  }
-
-  function onCloudProviderChange(value: string) {
-    setCloudProvider(value)
-    if (value === PROVIDERS.AWS.id) {
-      setAvailableRegions(getAwsAvailableRegions())
-      setDbRegion(REGIONS_DEFAULT)
+  function onCloudProviderChange(cloudProviderId: CloudProvider) {
+    setCloudProvider(cloudProviderId)
+    if (cloudProviderId === PROVIDERS.AWS.id) {
+      setAvailableRegions(getAvailableRegions(PROVIDERS['AWS'].id))
+      setDbRegion(PROVIDERS['AWS'].default_region)
     } else {
-      setAvailableRegions({ SOUTHEAST_ASIA: 'Singapore' })
-      setDbRegion('Singapore')
+      setAvailableRegions(getAvailableRegions(PROVIDERS['FLY'].id))
+      setDbRegion(PROVIDERS['FLY'].default_region)
     }
   }
 
@@ -237,10 +237,17 @@ const Wizard: NextPageWithLayout = () => {
   }
 
   // [Fran] Enforce APSE1 region on staging
-  function getAwsAvailableRegions() {
-    return process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
-      ? pluckObjectFields(REGIONS, ['SOUTHEAST_ASIA'])
-      : REGIONS
+  function getAvailableRegions(cloudProvider: CloudProvider): Region {
+    if (cloudProvider === 'AWS') {
+      return process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
+        ? pluckObjectFields(AWS_REGIONS, ['SOUTHEAST_ASIA'])
+        : AWS_REGIONS
+      // to do - may need to pluck regions for staging for FLY also
+    } else if (cloudProvider === 'FLY') {
+      return FLY_REGIONS
+    }
+
+    throw new Error('Invalid cloud provider')
   }
 
   return (
@@ -338,7 +345,7 @@ const Wizard: NextPageWithLayout = () => {
               <>
                 <Panel.Content
                   className={[
-                    'border-t border-b',
+                    'border-b',
                     'border-panel-border-interior-light dark:border-panel-border-interior-dark',
                   ].join(' ')}
                 >
@@ -357,7 +364,7 @@ const Wizard: NextPageWithLayout = () => {
                 {showNonProdFields && (
                   <Panel.Content
                     className={[
-                      'border-t border-b',
+                      'border-b',
                       'border-panel-border-interior-light dark:border-panel-border-interior-dark',
                     ].join(' ')}
                   >
@@ -384,7 +391,7 @@ const Wizard: NextPageWithLayout = () => {
                 {showNonProdFields && (
                   <Panel.Content
                     className={[
-                      'border-t border-b',
+                      'border-b',
                       'border-panel-border-interior-light dark:border-panel-border-interior-dark',
                     ].join(' ')}
                   >
@@ -393,8 +400,7 @@ const Wizard: NextPageWithLayout = () => {
                       label="Cloud Provider"
                       type="select"
                       value={cloudProvider}
-                      // @ts-ignore
-                      onChange={(value: string) => onCloudProviderChange(value)}
+                      onChange={(value) => onCloudProviderChange(value)}
                       descriptionText="Cloud Provider (only for staging/local)"
                     >
                       {Object.values(PROVIDERS).map((providerObj) => {
@@ -439,7 +445,7 @@ const Wizard: NextPageWithLayout = () => {
                     type="select"
                     value={dbRegion}
                     // @ts-ignore
-                    onChange={(value: string) => onDbRegionChange(value)}
+                    onChange={(value) => setDbRegion(value)}
                     descriptionText="Select a region close to your users for the best performance."
                   >
                     {Object.keys(availableRegions).map((option: string, i) => {
@@ -449,8 +455,9 @@ const Wizard: NextPageWithLayout = () => {
                           key={option}
                           label={label}
                           value={label}
-                          addOnBefore={({ active, selected }: any) => (
+                          addOnBefore={() => (
                             <img
+                              alt="region icon"
                               className="w-5 rounded-sm"
                               src={`${router.basePath}/img/regions/${
                                 Object.keys(availableRegions)[i]
