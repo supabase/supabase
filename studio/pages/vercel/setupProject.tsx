@@ -176,10 +176,6 @@ const CreateProject = observer(() => {
     } else delayedCheckPasswordStrength(value)
   }
 
-  function onDbRegionChange(value: string) {
-    setDbRegion(value)
-  }
-
   async function checkPasswordStrength(value: string) {
     const { message, strength } = await passwordStrength(value)
     setPasswordStrengthScore(strength)
