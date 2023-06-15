@@ -83,7 +83,7 @@ const HomePageCover = (props) => {
                   icon={framework.icon}
                 />
               </a>
-          </Link>
+            </Link>
           ))}
         </div>
       </div>
