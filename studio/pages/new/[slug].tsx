@@ -446,7 +446,6 @@ const Wizard: NextPageWithLayout = () => {
                     label="Region"
                     type="select"
                     value={dbRegion}
-                    // @ts-ignore
                     onChange={(value) => setDbRegion(value)}
                     descriptionText="Select a region close to your users for the best performance."
                   >
@@ -482,9 +481,7 @@ const Wizard: NextPageWithLayout = () => {
                   label="Pricing Plan"
                   layout="horizontal"
                   value={dbPricingTierKey}
-                  // @ts-ignore
                   onChange={onDbPricingPlanChange}
-                  // @ts-ignore
                   descriptionText={
                     <>
                       Select a plan that suits your needs.&nbsp;
