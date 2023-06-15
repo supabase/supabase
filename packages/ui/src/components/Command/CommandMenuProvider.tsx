@@ -1,6 +1,8 @@
 import { useTheme, UseThemeProps } from 'common'
 import dynamic from 'next/dynamic'
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
+import FloatingCommand from './FloatingCommand'
+import InlinePortal from './InlinePortal'
 
 // `CommandMenu` is heavy - code split to reduce app bundle size
 const CommandMenu = dynamic(() => import('./CommandMenu'), {
@@ -85,13 +87,22 @@ const CommandMenuProvider = ({
   const [isLoading, setIsLoading] = useState(false)
   const [search, setSearch] = useState('')
   const [pages, setPages] = useState<string[]>([])
+  const [selectionRange, setSelectionRange] = useState<Range>()
   const { toggleTheme } = useTheme()
   const currentPage = pages[pages.length - 1]
 
   const actions: CommandMenuActions = { toggleTheme }
   const project = projectRef !== undefined ? { ref: projectRef, apiKeys } : undefined
 
-  useKeyboardEvents({ setIsOpen, currentPage, setSearch, setPages })
+  useKeyboardEvents({
+    setIsOpen,
+    currentPage,
+    setSearch,
+    setPages,
+    setSelectionRange,
+  })
+
+  const floatingCommandContainer = globalThis.document?.getElementById('docs-content')
 
   return (
     <CommandMenuContext.Provider
@@ -115,6 +126,11 @@ const CommandMenuProvider = ({
     >
       {children}
       <CommandMenu projectRef={projectRef} />
+      {floatingCommandContainer && selectionRange && (
+        <InlinePortal parentElement={floatingCommandContainer} selectionRange={selectionRange}>
+          <FloatingCommand />
+        </InlinePortal>
+      )}
     </CommandMenuContext.Provider>
   )
 }
@@ -123,10 +139,12 @@ function useKeyboardEvents({
   currentPage,
   setSearch,
   setPages,
+  setSelectionRange,
 }: {
   setIsOpen: (isOpen: boolean) => void
   setSearch: React.Dispatch<React.SetStateAction<string>>
   setPages: React.Dispatch<React.SetStateAction<string[]>>
+  setSelectionRange: React.Dispatch<React.SetStateAction<Range | undefined>>
   currentPage?: string
 }) {
   useEffect(() => {
@@ -139,6 +157,15 @@ function useKeyboardEvents({
           setSearch('')
           // if NOT on homepage, return to last page
           setPages((pages) => pages.slice(0, -1))
+          return
+        case 'i':
+          if (event.metaKey || event.ctrlKey) {
+            const selection = window.getSelection()
+
+            if (selection?.rangeCount === 1) {
+              setSelectionRange(selection.getRangeAt(0))
+            }
+          }
           return
         case 'k':
         case '/':

@@ -251,7 +251,9 @@ const Container = memo(function Container(props) {
         'lg:ml-0',
       ].join(' ')}
     >
-      <div className="flex flex-col relative">{props.children}</div>
+      <div id="docs-content" className="flex flex-col relative">
+        {props.children}
+      </div>
     </div>
   )
 })
