@@ -1,38 +1,34 @@
+import { useParams } from 'common'
+import { Markdown } from 'components/interfaces/Markdown'
 import { Integration, IntegrationProjectConnection } from 'data/integrations/integrations-query'
 import dayjs from 'dayjs'
+import { useStore } from 'hooks'
+import Image from 'next/image'
+import { useRouter } from 'next/router'
 import React from 'react'
-import {
-  Button,
-  IconArrowRight,
-  IconCloudLightning,
-  IconGitHub,
-  IconSquare,
-  IconTriangle,
-} from 'ui'
+import { Project } from 'types'
+import { Button, IconArrowRight, IconGitHub, IconSquare } from 'ui'
 import { cn } from 'ui/src/utils/cn'
-
-var relativeTime = require('dayjs/plugin/relativeTime')
-dayjs.extend(relativeTime)
 
 const ICON_STROKE_WIDTH = 2
 const ICON_SIZE = 14
 export interface IntegrationInstallationProps extends React.HTMLAttributes<HTMLLIElement> {
   title: string
-  orgName: string
+  // orgName: string
   connection: Integration
 }
 
-type HandleIconType = Integration['type'] | 'SUPABASE'
+type HandleIconType = Integration['integration']['name'] | 'Supabase'
 
 const HandleIcon = ({ type }: { type: HandleIconType }) => {
   switch (type) {
-    case 'GITHUB':
+    case 'GitHub':
       return <IconGitHub strokeWidth={ICON_STROKE_WIDTH} size={ICON_SIZE} />
       break
-    case 'NETLIFY':
+    case 'Netlify':
       return <IconSquare strokeWidth={ICON_STROKE_WIDTH} size={ICON_SIZE} />
       break
-    case 'VERCEL':
+    case 'Vercel':
       return (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -46,14 +42,8 @@ const HandleIcon = ({ type }: { type: HandleIconType }) => {
 
       // <IconTriangle strokeWidth={ICON_STROKE_WIDTH} size={ICON_SIZE} />
       break
-    case 'SUPABASE':
-      return (
-        <img
-          src="/img/supabase-logo.svg"
-          alt="Supabase"
-          className="mx-auto w-3.5 cursor-pointer rounded"
-        ></img>
-      )
+    case 'Supabase':
+      return <img src="/img/supabase-logo.svg" alt="Supabase" className="w-3.5"></img>
       // <IconCloudLightning strokeWidth={ICON_STROKE_WIDTH} size={ICON_SIZE} />
       break
 
@@ -64,11 +54,11 @@ const HandleIcon = ({ type }: { type: HandleIconType }) => {
 }
 
 const IntegrationInstallation = React.forwardRef<HTMLLIElement, IntegrationInstallationProps>(
-  ({ className, title, orgName, connection, ...props }, ref) => {
+  ({ className, title, connection, ...props }, ref) => {
     const IntegrationIconBlock = () => {
       return (
         <div className="bg-scale-100 w-8 h-8 rounded flex items-center justify-center">
-          <HandleIcon type={connection.type} />
+          <HandleIcon type={connection.integration.name} />
         </div>
       )
     }
@@ -93,9 +83,11 @@ const IntegrationInstallation = React.forwardRef<HTMLLIElement, IntegrationInsta
             </span>
             <div className="flex gap-3 items-center">
               <span className="text-scale-900 text-sm">
-                Created {dayjs(connection.createdAt).fromNow()}
+                Created {dayjs(connection.created_at).fromNow()}
               </span>
-              <span className="text-scale-900 text-sm">Added by {connection.createdBy}</span>
+              <span className="text-scale-900 text-sm">
+                Added by {connection?.added_by?.primary_email}
+              </span>
             </div>
           </div>
         </div>
@@ -108,36 +100,51 @@ const IntegrationInstallation = React.forwardRef<HTMLLIElement, IntegrationInsta
 
 export interface IntegrationConnectionProps extends React.HTMLAttributes<HTMLLIElement> {
   connection: IntegrationProjectConnection
-  type: Integration['type']
+  type: Integration['integration']['name']
 }
 
 const IntegrationConnection = React.forwardRef<HTMLLIElement, IntegrationConnectionProps>(
   ({ className, connection, type, ...props }, ref) => {
+    const { app } = useStore()
+
+    const { projects } = app
+
     return (
       <li
         ref={ref}
         key={connection.id}
         {...props}
-        className={cn(
-          'ml-6 pl-8 pb-2 border-l',
-          // 'last:border-l-transparent',
-          'relative'
-        )}
+        className={cn('ml-6 pl-8 pb-2 border-l', 'relative')}
       >
         <div className="absolute w-8 rounded-bl-full border-b border-l h-10 -left-px"></div>
         <div className="bg border shadow-sm flex justify-between items-center px-8 py-4 rounded-lg">
           <div className="flex flex-col gap-1">
             <div className="flex gap-2 items-center">
-              <HandleIcon type={'SUPABASE'} />
-              <span>{connection.from.name}</span>
+              <HandleIcon type={'Supabase'} />
+              <span>{projects.byId(connection.project_ref)?.name}</span>
               <IconArrowRight size={14} className="text-scale-900" strokeWidth={1.5} />
-              <HandleIcon type={type} />
-              <span>{connection.to.name}</span>
+              {!connection.metadata.framework ? (
+                <HandleIcon type={type} />
+              ) : (
+                <img
+                  src={`/img/icons/frameworks/${connection.metadata.framework}.svg`}
+                  width={21}
+                  height={21}
+                  alt={`icon`}
+                />
+              )}
+
+              <span>{connection.metadata.name}</span>
             </div>
 
-            <span className="text-scale-900 text-sm">
-              Connected {dayjs(connection.createdAt).fromNow()}
-            </span>
+            <div className="flex gap-3 items-center">
+              <span className="text-scale-900 text-sm">
+                Connected {dayjs(connection?.created_at).fromNow()}
+              </span>
+              <span className="text-scale-900 text-sm">
+                Added by {connection?.added_by?.primary_email}
+              </span>
+            </div>
           </div>
 
           <div>
@@ -151,6 +158,9 @@ const IntegrationConnection = React.forwardRef<HTMLLIElement, IntegrationConnect
 
 const IntegrationConnectionOption = React.forwardRef<HTMLLIElement, IntegrationConnectionProps>(
   ({ className, connection, type, ...props }, ref) => {
+    const { app } = useStore()
+
+    const { projects } = app
     return (
       <li
         ref={ref}
@@ -160,15 +170,15 @@ const IntegrationConnectionOption = React.forwardRef<HTMLLIElement, IntegrationC
       >
         <div className="flex flex-col gap-1">
           <div className="flex gap-2 items-center">
-            <HandleIcon type={'SUPABASE'} />
-            <span>{connection.from.name}</span>
+            <HandleIcon type={'Supabase'} />
+            <span>{projects.byId(connection.project_ref)?.name}</span>
             <IconArrowRight size={14} className="text-scale-900" strokeWidth={1.5} />
             <HandleIcon type={type} />
-            <span>{connection.to.name}</span>
+            <span>{connection.metadata.name}</span>
           </div>
 
           <span className="text-scale-900 text-sm">
-            Connected {dayjs(connection.createdAt).fromNow()}
+            Connected {dayjs(connection.created_at).fromNow()}
           </span>
         </div>
 
@@ -183,7 +193,12 @@ const EmptyIntegrationConnection = React.forwardRef<
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => {
   return (
-    <div ref={ref} {...props} className={cn('mt-0 ml-14', className)}>
+    <div
+      ref={ref}
+      {...props}
+      className={cn('ml-6 pl-8 pb-2 border-l', 'last:border-l-transparent', 'relative', className)}
+    >
+      <div className="absolute w-8 rounded-bl-full border-b border-l h-10 -left-px"></div>
       <div
         {...props}
         ref={ref}
@@ -191,8 +206,7 @@ const EmptyIntegrationConnection = React.forwardRef<
           'w-full',
           'border border-dashed',
           '',
-          'flex h-20 px-10 rounded-lg justify-center items-center',
-          className
+          'flex h-20 px-10 rounded-lg justify-center items-center'
         )}
       >
         <Button type="default">Add new project connection</Button>
@@ -203,16 +217,18 @@ const EmptyIntegrationConnection = React.forwardRef<
 
 interface IntegrationConnectionHeader extends React.HTMLAttributes<HTMLDivElement> {
   name?: string
+  markdown?: string
 }
 
 const IntegrationConnectionHeader = React.forwardRef<HTMLDivElement, IntegrationConnectionHeader>(
-  ({ className, name, ...props }, ref) => {
+  ({ className, name, markdown = '', ...props }, ref) => {
     return (
-      <div {...props} ref={ref} className={cn('border-l ml-6 pl-8 pt-6 pb-2', className)}>
-        <h3>{props.title}</h3>
+      <div {...props} ref={ref} className={cn('border-l ml-6 pl-8 pt-6 pb-3', className)}>
+        {/* <h3>{props.title}</h3>
         <p className="text-scale-1100 text-sm">
           Repository connections for <span className="capitalize">{name?.toLowerCase()}</span>
-        </p>
+        </p> */}
+        <Markdown content={markdown} className="" />
       </div>
     )
   }
@@ -228,6 +244,6 @@ export {
   EmptyIntegrationConnection,
   IntegrationConnection,
   IntegrationConnectionHeader,
-  IntegrationInstallation,
   IntegrationConnectionOption,
+  IntegrationInstallation,
 }

@@ -176,7 +176,7 @@ const nextConfig = {
     ]
   },
   images: {
-    domains: ['github.com'],
+    domains: ['github.com', 'api-frameworks.vercel.sh'],
   },
   // Ref: https://nextjs.org/docs/advanced-features/output-file-tracing#caveats
   experimental: {

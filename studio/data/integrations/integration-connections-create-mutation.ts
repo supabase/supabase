@@ -7,6 +7,8 @@ export type IntegrationConnectionsCreateVariables = {
   connections: {
     foreignProjectId: string
     supabaseProjectId: string
+    integrationId: number
+    metadata: any
   }[]
 }
 

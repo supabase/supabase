@@ -12,10 +12,10 @@ import {
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
 import { Integration as TIntegration } from 'data/integrations/integrations-query'
-import { useStore } from 'hooks'
 import { pluralize } from 'lib/helpers'
 import { EMPTY_ARR } from 'lib/void'
 import { useMemo } from 'react'
+import { useGithubConnectionConfigPanelSnapshot } from 'state/github-connection-config-panel'
 
 export interface IntegrationProps {
   title: string
@@ -34,12 +34,20 @@ const Integration = ({
   detail,
   integrations = EMPTY_ARR,
 }: IntegrationProps) => {
-  const { ui } = useStore()
+  const githubConnectionConfigPanelShotshot = useGithubConnectionConfigPanelSnapshot()
 
-  const projectConnections = useMemo(
-    () => integrations.flatMap((integration) => integration.connections),
-    [integrations]
-  )
+  const ConnectionHeading = ({ integration }: { integration: TIntegration }) => {
+    return (
+      <IntegrationConnectionHeader
+        markdown={`### ${integration.connections.length} project ${pluralize(
+          integration.connections.length,
+          'connection'
+        )}
+Repository connections for ${title?.toLowerCase()}
+      `}
+      />
+    )
+  }
 
   return (
     <>
@@ -54,9 +62,7 @@ const Integration = ({
             />
           </ScaffoldSectionDetail>
           <ScaffoldSectionContent>
-            <div>
-              <Markdown content={`${description}`} />
-            </div>
+            <Markdown content={`${description}`} />
             <div className="flex flex-col gap-12">
               {integrations.length > 0 &&
                 integrations.map((integration, i) => {
@@ -65,46 +71,28 @@ const Integration = ({
                       <IntegrationInstallation
                         title={title}
                         key={i}
-                        orgName={orgName}
+                        // orgName={orgName}
                         connection={integration}
                       />
                       {integration.connections.length > 0 ? (
                         <>
-                          <IntegrationConnectionHeader
-                            title={`${integration.connections.length} project
-                        ${pluralize(integration.connections.length, 'connection')}`}
-                            name={
-                              integration.type +
-                              ' • ' +
-                              (integration.metadata?.gitHubConnectionOwner ??
-                                integration.metadata?.vercelTeam)
-                            }
-                          />
+                          <ConnectionHeading integration={integration} />
 
                           <ul className="flex flex-col">
                             {integration.connections.map((connection, i) => (
                               <IntegrationConnection
                                 key={i}
                                 connection={connection}
-                                type={integration.type}
+                                type={integration.integration.name}
                               />
                             ))}
                           </ul>
                         </>
                       ) : (
-                        <IntegrationConnectionHeader
-                          title={`${integration.connections.length} project
-                        ${pluralize(integration.connections.length, 'connection')}`}
-                          name={
-                            integration.type +
-                            ' • ' +
-                            (integration.metadata?.gitHubConnectionOwner ??
-                              integration.metadata?.vercelTeam)
-                          }
-                        />
+                        <ConnectionHeading integration={integration} />
                       )}
                       <EmptyIntegrationConnection
-                        onClick={() => ui.setShowGitHubRepoSelectionPanel(true)}
+                        onClick={() => githubConnectionConfigPanelShotshot.setVisible(true)}
                       >
                         Add new project connection
                       </EmptyIntegrationConnection>
@@ -112,7 +100,6 @@ const Integration = ({
                   )
                 })}
             </div>
-
             <Markdown content={`${note}`} className="text-scale-900" />
           </ScaffoldSectionContent>
         </ScaffoldSection>
