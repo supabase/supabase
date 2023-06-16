@@ -44,7 +44,7 @@ export const getReturnToPath = (fallback = '/projects') => {
    * remove base path value ("/dashboard") from returnTo
    */
   returnTo =
-    returnTo && process.env.NEXT_PUBLIC_BASE_PATH
+    returnTo && process?.env?.NEXT_PUBLIC_BASE_PATH
       ? returnTo.replace(process.env.NEXT_PUBLIC_BASE_PATH, '')
       : returnTo
 
