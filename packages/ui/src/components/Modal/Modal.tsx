@@ -162,6 +162,7 @@ const Modal = ({
             className={[__styles.base, __styles.size[size], className].join(' ')}
             onInteractOutside={props.onInteractOutside}
             onEscapeKeyDown={props.onEscapeKeyDown}
+            onPointerDownOutside={(e) => e.preventDefault()}
           >
             {header && <div className={__styles.header}>{header}</div>}
             {/* <div
