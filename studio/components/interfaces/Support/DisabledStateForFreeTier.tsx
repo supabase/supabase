@@ -20,7 +20,7 @@ const DisabledStateForFreeTier: FC<Props> = ({ projectRef, category }) => {
           <div className="space-y-4 mb-1">
             <p>Upgrade your project to the Pro plan for support in this area</p>
             <div className="flex items-center space-x-2">
-              <Link href={`/project/${projectRef}/settings/billing/update`}>
+              <Link href={`/project/${projectRef}/settings/billing/subscription?panel=subscriptionPlan`}>
                 <a>
                   <Button>Upgrade project</Button>
                 </a>
