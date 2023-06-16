@@ -251,6 +251,8 @@ const uiConfig = ui({
             'figure.quote-figure p:last-child': {
               marginBottom: '0 !important',
             },
+            'blockquote p:first-of-type::before': { content: 'none' },
+            'blockquote p:first-of-type::after': { content: 'none' },
           },
         },
 
