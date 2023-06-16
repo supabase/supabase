@@ -46,8 +46,8 @@ export const METRICS = [
     category: METRIC_CATEGORIES.INSTANCE,
   },
   {
-    key: 'disk_io_budget',
-    label: 'Daily Disk IO Budget % Remaining',
+    key: 'disk_io_consumption',
+    label: 'Disk IO % Consumed',
     provider: 'infra-monitoring',
     category: METRIC_CATEGORIES.INSTANCE,
   },
