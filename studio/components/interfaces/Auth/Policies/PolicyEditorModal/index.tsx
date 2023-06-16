@@ -114,7 +114,13 @@ const PolicyEditorModal: FC<Props> = ({
     const { name, definition, check, command } = policyFormFields
 
     if (name.length === 0) {
-      return ui.setNotification({ category: 'error', message: 'Do give your policy a name' })
+      return (
+          ui.setNotification({
+            category: 'error',
+            message: 'Do give your policy a name',
+            duration: 4000,
+          })
+      )
     }
     if (!command) {
       return ui.setNotification({
