@@ -151,7 +151,7 @@ const DatabaseUsage: FC<any> = () => {
               <div className="mb-4 flex items-center space-x-3">
                 <DateRangePicker
                   loading={false}
-                  value={'3h'}
+                  value={'7d'}
                   options={TIME_PERIODS_INFRA}
                   currentBillingPeriodStart={undefined}
                   onChange={setDateRange}
