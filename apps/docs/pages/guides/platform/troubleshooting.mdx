@@ -31,7 +31,7 @@ Some common solutions for this issue are:
 - [Using fewer Postgres connections](../platform/performance#configuring-clients-to-use-fewer-connections) can reduce the amount of resources needed on the project.
 - [Restarting](https://app.supabase.com/project/_/settings/general) the database. This only temporarily solves the issue by terminating any ongoing workloads that might be tying up your compute resources.
 
-If your [Daily Disk IO budget](../platform/compute-add-ons#disk-throughput-and-iops) has been drained, you will need to either wait for it to be replenished the next day, or upgrade to a larger compute add-on to increase the budget available to your project.
+If your [Disk IO budget](../platform/compute-add-ons#disk-io) has been drained, you will need to either wait for it to be replenished the next day, or upgrade to a larger compute add-on to increase the budget available to your project.
 
 ## Unable to connect to your Supabase Project
 
