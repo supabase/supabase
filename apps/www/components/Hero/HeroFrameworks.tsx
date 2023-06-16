@@ -33,12 +33,6 @@ const frameworks = [
     gaEvent: 'www_hp_hero_frameworks_flutter',
   },
   {
-    name: 'Fresh',
-    icon: '/images/logos/frameworks/fresh.svg',
-    docs: '/docs/guides/getting-started/quickstarts/fresh',
-    gaEvent: 'www_hp_hero_frameworks_fresh',
-  },
-  {
     name: 'Svelte',
     icon: '/images/logos/frameworks/svelte.svg',
     docs: '/docs/guides/getting-started/quickstarts/sveltekit',
