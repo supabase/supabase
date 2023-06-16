@@ -746,6 +746,7 @@ export const functions: NavMenuConstant = {
           name: 'Connecting directly to Postgres',
           url: '/guides/functions/connect-to-postgres',
         },
+        { name: 'Troubleshooting', url: '/guides/functions/troubleshooting' },
       ],
     },
     {
