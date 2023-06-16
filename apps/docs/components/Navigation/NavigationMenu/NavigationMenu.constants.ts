@@ -215,6 +215,7 @@ export const gettingstarted: NavMenuConstant = {
         { name: 'NuxtJS', url: '/guides/getting-started/quickstarts/nuxtjs' },
         { name: 'RedwoodJS', url: '/guides/getting-started/quickstarts/redwoodjs' },
         { name: 'Flutter', url: '/guides/getting-started/quickstarts/flutter' },
+        { name: 'Fresh', url: '/guides/getting-started/quickstarts/fresh' },
         { name: 'SvelteKit', url: '/guides/getting-started/quickstarts/sveltekit' },
         { name: 'SolidJS', url: '/guides/getting-started/quickstarts/solidjs' },
         { name: 'Vue', url: '/guides/getting-started/quickstarts/vue' },

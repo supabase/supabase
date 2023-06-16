@@ -213,6 +213,10 @@
       "url": "https://supabase.com/docs/guides/getting-started/quickstarts/flutter"
     },
     {
+      "label": "Fresh",
+      "url": "https://supabase.com/docs/guides/getting-started/quickstarts/fresh"
+    },
+    {
       "label": "SvelteKit",
       "url": "https://supabase.com/docs/guides/getting-started/quickstarts/sveltekit"
     },
