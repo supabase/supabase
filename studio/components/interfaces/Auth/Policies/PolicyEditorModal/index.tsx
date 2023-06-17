@@ -172,8 +172,6 @@ const PolicyEditorModal: FC<Props> = ({
     isDirty ? setIsClosingPolicyEditorModal(true) : onSelectCancel()
   }
 
-  console.log('form data', policyFormFields)
-
   return (
     <Modal
       size={view === POLICY_MODAL_VIEWS.SELECTION ? 'medium' : 'xxlarge'}
@@ -207,8 +205,8 @@ const PolicyEditorModal: FC<Props> = ({
         >
           <Modal.Content>
             <p className="py-4 text-sm text-scale-1100">
-              There are unsaved changes. Are you sure you want to close the panel? Your changes will
-              be lost.
+              There are unsaved changes. Are you sure you want to close the editor? Your changes
+              will be lost.
             </p>
           </Modal.Content>
         </ConfirmationModal>
