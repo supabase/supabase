@@ -87,8 +87,8 @@ const Developers = () => {
             ))}
           </ul>
           <div className="pt-4">
-          <TextLink url="/blog" label="Explore more" />
-        </div>
+            <TextLink url="/blog" label="Explore more" />
+          </div>
         </div>
       </div>
     </div>
