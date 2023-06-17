@@ -23,6 +23,7 @@ import {
   PostgresPolicyUpdatePayload,
 } from '../Policies.types'
 import { PolicyTemplate } from '../PolicyTemplates/PolicyTemplates.constants'
+import ConfirmationModal from 'components/ui/ConfirmationModal'
 
 interface Props {
   visible: boolean
@@ -65,11 +66,12 @@ const PolicyEditorModal: FC<Props> = ({
   // Mainly to decide which view to show when back from templates
   const [previousView, setPreviousView] = useState('')
   const [view, setView] = useState(POLICY_MODAL_VIEWS.EDITOR)
-
   const [policyFormFields, setPolicyFormFields] = useState<PolicyFormField>(
     initializedPolicyFormFields
   )
   const [policyStatementForReview, setPolicyStatementForReview] = useState<any>('')
+  const [isDirty, setIsDirty] = useState(false)
+  const [isClosingPolicyEditorModal, setIsClosingPolicyEditorModal] = useState(false)
 
   useEffect(() => {
     if (visible) {
@@ -106,6 +108,7 @@ const PolicyEditorModal: FC<Props> = ({
   }
 
   const onUpdatePolicyFormFields = (field: Partial<PolicyFormField>) => {
+    setIsDirty(true)
     if (field.name && field.name.length > 63) return
     setPolicyFormFields({ ...policyFormFields, ...field })
   }
@@ -165,6 +168,12 @@ const PolicyEditorModal: FC<Props> = ({
     hasError ? onViewEditor() : onSaveSuccess()
   }
 
+  const isClosingPolicyEditor = () => {
+    isDirty ? setIsClosingPolicyEditorModal(true) : onSelectCancel()
+  }
+
+  console.log('form data', policyFormFields)
+
   return (
     <Modal
       size={view === POLICY_MODAL_VIEWS.SELECTION ? 'medium' : 'xxlarge'}
@@ -182,9 +191,27 @@ const PolicyEditorModal: FC<Props> = ({
           onSelectBackFromTemplates={onSelectBackFromTemplates}
         />,
       ]}
-      onCancel={onSelectCancel}
+      onCancel={isClosingPolicyEditor}
     >
       <div className="">
+        <ConfirmationModal
+          visible={isClosingPolicyEditorModal}
+          header="Confirm to close"
+          buttonLabel="Confirm"
+          onSelectCancel={() => setIsClosingPolicyEditorModal(false)}
+          onSelectConfirm={() => {
+            onSelectCancel()
+            setIsClosingPolicyEditorModal(false)
+            setIsDirty(false)
+          }}
+        >
+          <Modal.Content>
+            <p className="py-4 text-sm text-scale-1100">
+              There are unsaved changes. Are you sure you want to close the panel? Your changes will
+              be lost.
+            </p>
+          </Modal.Content>
+        </ConfirmationModal>
         {view === POLICY_MODAL_VIEWS.SELECTION ? (
           <PolicySelection
             description="Write rules with PostgreSQL's policies to fit your unique business needs."
