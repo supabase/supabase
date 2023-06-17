@@ -12,6 +12,7 @@ import {
 import { checkPermissions, useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import Link from 'next/link'
 
 export interface SubscriptionTierProps {
   subscription: ProjectSubscriptionResponse
@@ -24,6 +25,8 @@ const SubscriptionPaymentMethod = ({
 }: SubscriptionTierProps) => {
   const { ref: projectRef } = useParams()
   const { ui } = useStore()
+
+  const currentOrgSlug = ui.selectedOrganization?.slug
 
   const canUpdatePaymentMethod = checkPermissions(
     PermissionAction.BILLING_WRITE,
@@ -191,7 +194,17 @@ const SubscriptionPaymentMethod = ({
           <div className="py-6 space-y-2">
             <p className="text-sm">
               Upon clicking confirm, all future charges will be deducted from the selected payment
-              method. There are no immediate charges.
+              method. There are no immediate charges. Changing the payment method for this project
+              does not affect the payment method for other projects.
+            </p>
+            <p className="text-sm text-scale-1000">
+              To remove unused or expired payment methods, head to your{' '}
+              <Link href={`/org/${currentOrgSlug || '_'}/billing`} passHref>
+                <a target="_blank" className="text-green-900 transition hover:text-green-1000">
+                  org billing settings
+                </a>
+              </Link>
+              .
             </p>
             <div className="!mt-6">
               <PaymentMethodSelection
