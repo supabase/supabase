@@ -27,7 +27,7 @@
 
 Za punu dokumentaciju, posetite [supabase.com/docs](https://supabase.com/docs)
 
-Da vidite kako možete doprineti razvoju, posetite [Getting Started](../DEVELOPERS.md)
+Da vidite kako možete doprineti razvoju, posetite [Getting Started](/DEVELOPERS.md)
 
 ## Zajednica & Podrška
 

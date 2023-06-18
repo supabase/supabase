@@ -27,7 +27,7 @@
 
 সম্পূর্ণ ডকুমেন্টেশনের জন্য, দেখুন [supabase.com/docs](https://supabase.com/docs)
 
-কিভাবে কন্ট্রিবিউট করতে হয় তা দেখতে, পরিদর্শন করুন [Getting Started](../DEVELOPERS.md)
+কিভাবে কন্ট্রিবিউট করতে হয় তা দেখতে, পরিদর্শন করুন [Getting Started](/DEVELOPERS.md)
 
 ## কমিউনিটি ও সাপোর্ট
 
