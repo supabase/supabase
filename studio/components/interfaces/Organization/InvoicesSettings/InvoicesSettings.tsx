@@ -107,7 +107,7 @@ const InvoicesSettings = () => {
           body={
             invoices.length === 0 ? (
               <Table.tr>
-                <Table.td colSpan={5} className="p-3 py-12 text-center">
+                <Table.td colSpan={6} className="p-3 py-12 text-center">
                   <p className="text-scale-1000">
                     {loading ? 'Checking for invoices' : 'No invoices for this organization yet'}
                   </p>
