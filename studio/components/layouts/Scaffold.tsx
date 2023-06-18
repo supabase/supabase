@@ -1,7 +1,7 @@
 import React from 'react'
 import { cn } from 'ui/src/utils/cn'
 
-const maxWdithClasses = 'mx-auto w-full max-w-[1600px]'
+const maxWidthClasses = 'mx-auto w-full max-w-[1600px]'
 const paddingClasses = 'px-6 lg:px-14 xl:px-28 2xl:px-32'
 
 // lg: pt - 8
@@ -23,7 +23,7 @@ const ScaffoldTitle = React.forwardRef<
 
 const ScaffoldContainer = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => {
-    return <div ref={ref} {...props} className={cn(maxWdithClasses, paddingClasses, className)} />
+    return <div ref={ref} {...props} className={cn(maxWidthClasses, paddingClasses, className)} />
   }
 )
 
