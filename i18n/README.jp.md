@@ -27,7 +27,7 @@
 
 詳しいドキュメントは[supabase.com/docs](https://supabase.com/docs)をご覧ください。
 
-コントリビュート方法は[Getting Started](/DEVELOPERS.md)をご覧ください。
+コントリビュート方法は[Getting Started](../DEVELOPERS.md)をご覧ください。
 
 ## コミュニティとサポート
 
