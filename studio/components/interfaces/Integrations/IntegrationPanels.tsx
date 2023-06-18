@@ -1,12 +1,11 @@
-import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
 import { Integration, IntegrationProjectConnection } from 'data/integrations/integrations-query'
 import dayjs from 'dayjs'
 import { useStore } from 'hooks'
 import Image from 'next/image'
-import { useRouter } from 'next/router'
+
 import React from 'react'
-import { Project } from 'types'
+
 import { Badge, Button, IconArrowRight, IconGitHub, IconSquare } from 'ui'
 import { cn } from 'ui/src/utils/cn'
 
@@ -14,7 +13,6 @@ const ICON_STROKE_WIDTH = 2
 const ICON_SIZE = 14
 export interface IntegrationInstallationProps extends React.HTMLAttributes<HTMLLIElement> {
   title: string
-  // orgName: string
   connection: Integration
 }
 
@@ -40,11 +38,9 @@ const HandleIcon = ({ type }: { type: HandleIconType }) => {
         </svg>
       )
 
-      // <IconTriangle strokeWidth={ICON_STROKE_WIDTH} size={ICON_SIZE} />
       break
     case 'Supabase':
       return <img src="/img/supabase-logo.svg" alt="Supabase" className="w-3.5"></img>
-      // <IconCloudLightning strokeWidth={ICON_STROKE_WIDTH} size={ICON_SIZE} />
       break
 
     default:
@@ -118,10 +114,11 @@ const IntegrationInstallation = React.forwardRef<HTMLLIElement, IntegrationInsta
 export interface IntegrationConnectionProps extends React.HTMLAttributes<HTMLLIElement> {
   connection: IntegrationProjectConnection
   type: Integration['integration']['name']
+  actions: React.ReactNode
 }
 
 const IntegrationConnection = React.forwardRef<HTMLLIElement, IntegrationConnectionProps>(
-  ({ className, connection, type, ...props }, ref) => {
+  ({ className, connection, type, actions, ...props }, ref) => {
     const { app } = useStore()
 
     const { projects } = app
@@ -163,9 +160,7 @@ const IntegrationConnection = React.forwardRef<HTMLLIElement, IntegrationConnect
             </div>
           </div>
 
-          <div>
-            <Button type="default">Disconnect</Button>
-          </div>
+          <div>{actions}</div>
         </div>
       </li>
     )
@@ -216,8 +211,6 @@ const EmptyIntegrationConnection = React.forwardRef<
     >
       <div className="absolute w-8 rounded-bl-full border-b border-l h-10 -left-px"></div>
       <div
-        {...props}
-        ref={ref}
         className={cn(
           'w-full',
           'border border-dashed',
@@ -240,10 +233,6 @@ const IntegrationConnectionHeader = React.forwardRef<HTMLDivElement, Integration
   ({ className, name, markdown = '', ...props }, ref) => {
     return (
       <div {...props} ref={ref} className={cn('border-l ml-6 pl-8 pt-6 pb-3', className)}>
-        {/* <h3>{props.title}</h3>
-        <p className="text-scale-1100 text-sm">
-          Repository connections for <span className="capitalize">{name?.toLowerCase()}</span>
-        </p> */}
         <Markdown content={markdown} className="" />
       </div>
     )

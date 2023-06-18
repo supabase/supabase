@@ -3,8 +3,10 @@ import { ScaffoldDivider } from 'components/layouts/Scaffold'
 import { useIntegrationsQuery } from 'data/integrations/integrations-query'
 import { useStore } from 'hooks'
 import { observer } from 'mobx-react-lite'
-import GitHubRepoSelection from './GitHubRepoSelection'
+import GitHubRepoSelection from './SidePanelGitHubRepoSelection'
 import Integration from './Integration'
+import SidePanelGitHubRepoSelection from './SidePanelGitHubRepoSelection'
+import SidePanelVercelProjectLinker from './SidePanelVercelProjectLinker'
 
 const IntegrationSettings = () => {
   const { ui } = useStore()
@@ -68,7 +70,8 @@ You can change the scope of the access for Supabase by configuring here.
 `}
         integrations={githubIntegrations}
       />
-      <GitHubRepoSelection />
+      {/* <SidePanelGitHubRepoSelection /> */}
+      <SidePanelVercelProjectLinker />
     </>
   )
 }

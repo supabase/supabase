@@ -2,8 +2,7 @@ import { databaseIcon, vercelIcon } from 'components/to-be-cleaned/ListIcons'
 import { useIntegrationConnectionsCreateMutation } from 'data/integrations/integration-connections-create-mutation'
 import { VercelProjectsResponse } from 'data/integrations/integrations-vercel-projects-query'
 import { useState } from 'react'
-import { TRUE } from 'sass'
-import { Button, IconArrowRight, IconPlus, IconX, Listbox } from 'ui'
+import { Button, IconArrowRight, IconPlus, IconX, Listbox, Select } from 'ui'
 
 interface Project {
   id: string
@@ -18,6 +17,7 @@ export interface ProjectLinkerProps {
   foreignProjects: VercelProjectsResponse[]
   supabaseProjects: Project[]
   onCreateConnections?: () => void
+  installedConnections?: any[]
 }
 
 const UNDEFINED_SELECT_VALUE = 'undefined'
@@ -28,20 +28,34 @@ const ProjectLinker = ({
   foreignProjects,
   supabaseProjects,
   onCreateConnections: _onCreateConnections,
+  installedConnections,
 }: ProjectLinkerProps) => {
-  const [connections, setConnections] = useState([
-    {
-      foreignProjectId: UNDEFINED_SELECT_VALUE,
-      supabaseProjectId: UNDEFINED_SELECT_VALUE,
-      integrationId: INTEGRATION_INTERNAL_ID,
-      metadata: UNDEFINED_METADATA_VALUE,
-    },
-  ])
+  const [connections, setConnections] = useState(
+    installedConnections && installedConnections.length > 0
+      ? installedConnections?.map((connection) => {
+          return {
+            foreignProjectId: connection?.foreign_project_id,
+            supabaseProjectId: connection?.supabase_project_id,
+            integrationId: INTEGRATION_INTERNAL_ID,
+            metadata: UNDEFINED_METADATA_VALUE,
+          }
+        })
+      : [
+          {
+            foreignProjectId: UNDEFINED_SELECT_VALUE,
+            supabaseProjectId: UNDEFINED_SELECT_VALUE,
+            integrationId: INTEGRATION_INTERNAL_ID,
+            metadata: UNDEFINED_METADATA_VALUE,
+          },
+        ]
+  )
+
+  console.log('installedConnections', installedConnections)
+  console.log('connections', connections)
+  console.log('foreignProjects', foreignProjects)
+  console.log('supabaseProjects', supabaseProjects)
 
   function onSetForeignProjectId(idx: number, id: string) {
-    console.log(id)
-
-    console.log(foreignProjects)
     const newConnections = [...connections]
     const projectDetails = foreignProjects.filter((x) => x.id === id)[0]
     newConnections[idx].metadata = { ...projectDetails }
@@ -86,12 +100,13 @@ const ProjectLinker = ({
   })
 
   function onCreateConnections() {
-    console.log('connections', connections)
     createConnections({
       organizationIntegrationId,
       connections,
     })
   }
+
+  console.log(connections)
 
   return (
     <div className="flex flex-col gap-4">
@@ -159,29 +174,27 @@ const ProjectLinkerItem = ({
   removeConnection,
   canRemove,
 }: ProjectLinkerItemProps) => {
+  console.log(supabaseProjectId)
   return (
     <li className="py-2">
       <div className="relative flex w-full space-x-2">
         <div className="w-1/2 flex-grow">
-          <Listbox
-            value={supabaseProjectId ?? UNDEFINED_SELECT_VALUE}
-            onChange={setSupabaseProjectId}
-          >
-            <Listbox.Option value={UNDEFINED_SELECT_VALUE} label="Choose a project" disabled>
+          <Select value={supabaseProjectId} onChange={(e) => setSupabaseProjectId(e.target.value)}>
+            <Select.Option value={UNDEFINED_SELECT_VALUE} label="Choose a project" disabled>
               Choose a project
-            </Listbox.Option>
+            </Select.Option>
 
             {supabaseProjects.map((project) => (
-              <Listbox.Option
+              <Select.Option
                 key={project.id}
                 value={project.id}
-                label={project.name}
-                addOnBefore={() => databaseIcon}
+                // label={project.name}
+                // addOnBefore={() => databaseIcon}
               >
                 {project.name}
-              </Listbox.Option>
+              </Select.Option>
             ))}
-          </Listbox>
+          </Select>
         </div>
         <div className="flex flex-shrink items-center">
           <IconArrowRight className="text-scale-1000" />

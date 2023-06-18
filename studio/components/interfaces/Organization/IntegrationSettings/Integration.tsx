@@ -1,3 +1,4 @@
+import { useParams } from 'common'
 import {
   EmptyIntegrationConnection,
   IntegrationConnection,
@@ -11,11 +12,17 @@ import {
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
-import { Integration as TIntegration } from 'data/integrations/integrations-query'
+import { useIntegrationConnectionsCreateMutation } from 'data/integrations/integration-connections-create-mutation'
+import {
+  Integration as TIntegration,
+  useIntegrationsQuery,
+} from 'data/integrations/integrations-query'
+import { useIntegrationsVercelInstalledConnectionDeleteMutation } from 'data/integrations/integrations-vercel-installed-connection-delete-mutation'
 import { pluralize } from 'lib/helpers'
 import { EMPTY_ARR } from 'lib/void'
 import { useMemo } from 'react'
 import { useGithubConnectionConfigPanelSnapshot } from 'state/github-connection-config-panel'
+import { Button, Dropdown, IconChevronDown, IconRefreshCcw, IconTrash } from 'ui'
 
 export interface IntegrationProps {
   title: string
@@ -35,6 +42,11 @@ const Integration = ({
   integrations = EMPTY_ARR,
 }: IntegrationProps) => {
   const githubConnectionConfigPanelShotshot = useGithubConnectionConfigPanelSnapshot()
+  const deleteMutation = useIntegrationsVercelInstalledConnectionDeleteMutation({
+    onSuccess: (data, variables, context) => {
+      // Handle the success case
+    },
+  })
 
   const ConnectionHeading = ({ integration }: { integration: TIntegration }) => {
     return (
@@ -47,6 +59,16 @@ Repository connections for ${title?.toLowerCase()}
       `}
       />
     )
+  }
+
+  // Call the mutation when needed
+  const handleDelete = (organizationIntegrationId: string, projectIntegrationId: string) => {
+    const variables = {
+      organization_integration_id: organizationIntegrationId,
+      id: projectIntegrationId,
+    }
+
+    deleteMutation.mutate(variables)
   }
 
   return (
@@ -84,6 +106,42 @@ Repository connections for ${title?.toLowerCase()}
                                 key={i}
                                 connection={connection}
                                 type={integration.integration.name}
+                                actions={
+                                  <Dropdown
+                                    side="bottom"
+                                    align="end"
+                                    size="large"
+                                    overlay={
+                                      <>
+                                        <Dropdown.Item
+                                          icon={
+                                            <div>
+                                              <IconRefreshCcw size={14} />
+                                            </div>
+                                          }
+                                        >
+                                          <div>Refresh Enviroment Variables</div>
+                                          <div className="text-scale-900 text-xs">
+                                            Reapply env vars in vercel.
+                                          </div>
+                                        </Dropdown.Item>
+                                        <Dropdown.Separator />
+                                        <Dropdown.Item
+                                          icon={<IconTrash size={14} />}
+                                          onSelect={() =>
+                                            handleDelete(integration.id, connection.id)
+                                          }
+                                        >
+                                          Delete
+                                        </Dropdown.Item>
+                                      </>
+                                    }
+                                  >
+                                    <Button asChild iconRight={<IconChevronDown />} type="default">
+                                      <span>Manage</span>
+                                    </Button>
+                                  </Dropdown>
+                                }
                               />
                             ))}
                           </ul>
