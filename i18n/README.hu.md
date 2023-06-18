@@ -27,7 +27,7 @@
 
 A teljes dokumentációért látogasson el [supabase.com/docs](https://supabase.com/docs)
 
-A Contribute-hoz való hozzájáruláshoz látogasson el a [Getting Started](./DEVELOPERS.md) oldalra
+A Contribute-hoz való hozzájáruláshoz látogasson el a [Getting Started](/DEVELOPERS.md) oldalra
 
 ## Közösség és támogatás
 

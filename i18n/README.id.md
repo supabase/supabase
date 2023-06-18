@@ -27,7 +27,7 @@
 
 Untuk dokumentasi lengkap, kunjungi [supabase.com/docs](https://supabase.com/docs)
 
-Untuk melihat bagaimana cara berkontribusi, kunjungi [Memulai](./DEVELOPERS.md)
+Untuk melihat bagaimana cara berkontribusi, kunjungi [Memulai](/DEVELOPERS.md)
 
 ## Komunitas &amp; Dukungan
 

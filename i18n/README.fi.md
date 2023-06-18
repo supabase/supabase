@@ -27,7 +27,7 @@
 
 Täydellinen dokumentaatio löytyy osoitteesta [supabase.com/docs](https://supabase.com/docs)
 
-Jos haluat nähdä, miten osallistuminen tapahtuu, käy osoitteessa [Getting Started](./DEVELOPERS.md)
+Jos haluat nähdä, miten osallistuminen tapahtuu, käy osoitteessa [Getting Started](/DEVELOPERS.md)
 
 ## Yhteisö ja tuki
 

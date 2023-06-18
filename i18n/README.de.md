@@ -27,7 +27,7 @@
 
 Die vollständige Dokumentation finden Sie unter [supabase.com/docs](https://supabase.com/docs)
 
-Wie Sie einen Beitrag leisten können, erfahren Sie unter [Erste Schritte](./DEVELOPERS.md)
+Wie Sie einen Beitrag leisten können, erfahren Sie unter [Erste Schritte](/DEVELOPERS.md)
 
 ## Gemeinschaft &amp; Unterstützung
 
