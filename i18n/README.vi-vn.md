@@ -27,7 +27,7 @@
 
 Để có tài liệu đầy đủ, hãy truy cập [supabase.com/docs](https://supabase.com/docs)
 
-Để biết cách Đóng góp, hãy truy cập [Bắt đầu](/DEVELOPERS.md)
+Để biết cách Đóng góp, hãy truy cập [Bắt đầu](../DEVELOPERS.md)
 
 ## Hỗ trợ & Cộng đồng
 

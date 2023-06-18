@@ -27,7 +27,7 @@
 
 Belgelerin tamamı için [supabase.com/docs](https://supabase.com/docs) adresini ziyaret edin
 
-Nasıl Katkıda bulunacağınızı görmek için [Başlarken](/DEVELOPERS.md) adresini ziyaret edin
+Nasıl Katkıda bulunacağınızı görmek için [Başlarken](../DEVELOPERS.md) adresini ziyaret edin
 
 ## Topluluk ve Destek
 

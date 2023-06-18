@@ -27,7 +27,7 @@
 
 Para consultar la documentación completa, visite [supabase.com/docs](https://supabase.com/docs)
 
-Para ver cómo contribuir, visite [Getting Started](/DEVELOPERS.md)
+Para ver cómo contribuir, visite [Getting Started](../DEVELOPERS.md)
 
 ## Comunidad y soporte
 

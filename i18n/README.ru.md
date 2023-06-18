@@ -27,7 +27,7 @@
 
 Для получения полной документации посетите [supabase.com/docs](https://supabase.com/docs)
 
-Чтобы узнать, как внести вклад, посетите [Getting Started](/DEVELOPERS.md)
+Чтобы узнать, как внести вклад, посетите [Getting Started](../DEVELOPERS.md)
 
 ## Сообщество и поддержка
 
