@@ -27,7 +27,7 @@
 
 Pentru documentația completă, vizitați [supabase.com/docs](https://supabase.com/docs)
 
-Pentru a vedea cum să contribui, vizitați [Getting Started](./DEVELOPERS.md)
+Pentru a vedea cum să contribui, vizitați [Getting Started](/DEVELOPERS.md)
 
 ## Comunitate și asistență
 

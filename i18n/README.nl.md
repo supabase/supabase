@@ -27,7 +27,7 @@
 
 Voor volledige documentatie, bezoek [supabase.com/docs](https://supabase.com/docs)
 
-Om te zien hoe u kunt bijdragen, bezoek [Aan de slag](./DEVELOPERS.md)
+Om te zien hoe u kunt bijdragen, bezoek [Aan de slag](/DEVELOPERS.md)
 
 ## Gemeenschap en ondersteuning
 
