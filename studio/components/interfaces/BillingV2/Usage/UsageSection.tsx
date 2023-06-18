@@ -14,7 +14,7 @@ import Link from 'next/link'
 import SparkBar from 'components/ui/SparkBar'
 import clsx from 'clsx'
 import { ProjectSubscriptionResponse } from 'data/subscriptions/project-subscription-v2-query'
-import { ChartYFormatterCompactNumber, getUpgradeUrl } from './Usage.utils'
+import { ChartTooltipValueFormatter, ChartYFormatterCompactNumber, getUpgradeUrl } from './Usage.utils'
 import { formatBytes } from 'lib/helpers'
 import UsageBarChart from './UsageBarChart'
 import Panel from 'components/ui/Panel'
@@ -229,6 +229,7 @@ const UsageSection = ({
                       data={chartData}
                       yLeftMargin={chartMeta[attribute.key].margin}
                       yFormatter={(value) => ChartYFormatterCompactNumber(value, attribute.unit)}
+                      tooltipFormatter={(value) => ChartTooltipValueFormatter(value, attribute.unit)}
                     />
                   ) : (
                     <Panel>
