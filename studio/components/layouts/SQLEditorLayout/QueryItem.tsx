@@ -148,7 +148,9 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
           </span>
         </Dropdown>
       ) : (
-        <Button as="span" type="text" style={{ padding: '3px' }} />
+        <Button asChild disabled type="text" style={{ padding: '3px' }}>
+          <span></span>
+        </Button>
       )}
       <RenameQueryModal
         snippet={tabInfo}

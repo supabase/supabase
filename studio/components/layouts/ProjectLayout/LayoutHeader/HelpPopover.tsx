@@ -59,7 +59,7 @@ const HelpPopover: FC<Props> = () => {
               </Link>
             </div>
             <p className="text-sm text-scale-900">
-              Expected response time is based on your billing tier. Pro and Pay as You Go plans are
+              Expected response time is based on your billing plan. Pro and Pay as You Go plans are
               prioritized.
             </p>
           </div>
@@ -128,11 +128,11 @@ const HelpPopover: FC<Props> = () => {
       }
     >
       <Button
-        as="span"
+        asChild
         type="default"
         icon={<IconHelpCircle size={16} strokeWidth={1.5} className="text-scale-900" />}
       >
-        Help
+        <span>Help</span>
       </Button>
     </Popover>
   )
