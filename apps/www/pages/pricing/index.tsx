@@ -770,7 +770,7 @@ export default function IndexPage() {
 
                     {plans.map((plan) => (
                       <td className="h-full px-6 py-2 align-top" key={`price-${plan.name}`}>
-                        <div className="relative table h-full w-full">
+                        <div className="relative h-full w-full">
                           <div className="flex flex-col justify-between h-full">
                             <>
                               <span
