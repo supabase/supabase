@@ -149,7 +149,7 @@ const ColumnManagement: FC<Props> = ({
                   <Button type="default" icon={<IconEdit />} onClick={onSelectImportData}>
                     Edit content
                   </Button>
-                  <Button danger type="outline" icon={<IconTrash />} onClick={onClearImportContent}>
+                  <Button type="danger" icon={<IconTrash />} onClick={onClearImportContent}>
                     Remove content
                   </Button>
                 </div>

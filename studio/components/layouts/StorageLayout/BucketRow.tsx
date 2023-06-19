@@ -71,11 +71,13 @@ const BucketRow = ({
             ]}
           >
             <Button
-              as="span"
+              asChild
               type="text"
               icon={<IconChevronDown size="tiny" strokeWidth={2} className="text-scale-1100" />}
               style={{ padding: '3px' }}
-            />
+            >
+              <span></span>
+            </Button>
           </Dropdown>
         ) : (
           <div className="w-5" />

@@ -29,7 +29,7 @@ const ClientLibrary: FC<Props> = ({ language, releaseState, officialSupport, doc
               : 'This library is community supported'}
           </p>
         </div>
-        <div className="space-x-1">
+        <div className="flex gap-2">
           {docsUrl && (
             <a href={docsUrl} target="_blank" rel="noreferrer">
               <Button icon={<IconBookOpen />} type="default">

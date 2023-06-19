@@ -28,11 +28,11 @@ const PITRNotice = ({}) => {
           </span>
           <Tooltip.Root delayDuration={0}>
             <Tooltip.Trigger>
-              <Button disabled={canUpdateSubscription} as="span" type="default">
-                <Link href={`/project/${projectRef}/settings/billing/update/pro`}>
+              <Link href={`/project/${projectRef}/settings/billing/update/pro`} passHref>
+                <Button disabled={canUpdateSubscription} type="default" asChild>
                   <a>Increase retention period</a>
-                </Link>
-              </Button>
+                </Button>
+              </Link>
             </Tooltip.Trigger>
             {!canUpdateSubscription && (
               <Tooltip.Portal>
