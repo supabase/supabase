@@ -26,7 +26,7 @@ const Infrastructure = ({}: InfrastructureProps) => {
   const { ref } = useParams()
   const { project } = useProjectContext()
   const { data: subscription } = useProjectSubscriptionV2Query({ projectRef: ref })
-  const isFreeProject = subscription?.plan.id === 'free'
+  const isFreeProject = subscription?.plan?.id === 'free'
 
   const {
     data,
