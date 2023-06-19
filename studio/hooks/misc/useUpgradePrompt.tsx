@@ -1,15 +1,14 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'common/hooks'
 import { maybeShowUpgradePrompt } from 'components/interfaces/Settings/Logs'
-import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
+import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 
 export const useUpgradePrompt = (from: string) => {
   const { ref: projectRef } = useParams()
-  const { data: subscription } = useProjectSubscriptionQuery({ projectRef })
-  const tier = subscription?.tier
+  const { data: subscription } = useProjectSubscriptionV2Query({ projectRef })
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false)
 
-  const shouldShowUpgradePrompt = maybeShowUpgradePrompt(from, tier?.key)
+  const shouldShowUpgradePrompt = maybeShowUpgradePrompt(from, subscription?.plan?.id)
 
   useEffect(() => {
     if (shouldShowUpgradePrompt) {

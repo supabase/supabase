@@ -139,15 +139,15 @@ const SubscriptionTier = ({}: SubscriptionTierProps) => {
                   </Link>
                   , it may become unresponsive.{' '}
                   {currentPlan?.id === 'free' ? (
-                    <span>
+                    <p className="pr-4">
                       If you wish to exceed the included usage, you should upgrade to a paid plan.
-                    </span>
+                    </p>
                   ) : (
-                    <span>
+                    <p className="pr-4">
                       You currently have Spend Cap enabled - when you exceed your plan's limit, you
                       will experience restrictions. To scale seamlessly and pay for over-usage, you
                       can adjust your Cost Control settings.
-                    </span>
+                    </p>
                   )}
                 </p>
               </Alert>
