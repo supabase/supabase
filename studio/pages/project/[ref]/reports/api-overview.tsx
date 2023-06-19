@@ -18,18 +18,18 @@ import { useState, useEffect } from 'react'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import { DatePickerToFrom, LogsEndpointParams } from 'components/interfaces/Settings/Logs'
 import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
-import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
 import { useParams } from 'common'
 import { isEqual } from 'lodash'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
+import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 
 export const ApiReport: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()
   const report = useApiReport()
 
-  const { data: subscription } = useProjectSubscriptionQuery({ projectRef })
-  const tier = subscription?.tier
+  const { data: subscription } = useProjectSubscriptionV2Query({ projectRef })
+  const plan = subscription?.plan
 
   const handleDatepickerChange = ({ from, to }: DatePickerToFrom) => {
     report.mergeParams({
@@ -51,7 +51,7 @@ export const ApiReport: NextPageWithLayout = () => {
           filters={report.filters}
           datepickerHelpers={REPORTS_DATEPICKER_HELPERS.map((helper, index) => ({
             ...helper,
-            disabled: (index > 0 && tier?.key === 'FREE') || (index > 1 && tier?.key !== 'PRO'),
+            disabled: (index > 0 && plan?.id === 'free') || (index > 1 && plan?.id !== 'pro'),
           }))}
         />
         <div className="h-2 w-full">

@@ -1,10 +1,8 @@
 import { observer } from 'mobx-react-lite'
-import { FC, useEffect } from 'react'
+import { FC } from 'react'
 
 import { SettingsLayout } from 'components/layouts'
-import LoadingUI from 'components/ui/Loading'
 import { useStore } from 'hooks'
-import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
 import { NextPageWithLayout, Project } from 'types'
 
 import { Invoices } from 'components/interfaces/Billing'
@@ -37,28 +35,8 @@ const Settings: FC<SettingsProps> = ({ project }) => {
   const { ui } = useStore()
   const orgSlug = ui.selectedOrganization?.slug ?? ''
 
-  const { data: subscription, error } = useProjectSubscriptionQuery({
-    projectRef: ui.selectedProject?.ref,
-  })
-
-  useEffect(() => {
-    if (error) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to get project subscription: ${(error as any)?.message ?? 'unknown'}`,
-      })
-    }
-  }, [error])
-
-  if (!subscription) {
-    return <LoadingUI />
-  }
-
   return (
     <div className="container max-w-4xl p-4 space-y-8">
-      {/* [Joshen TODO] Temporarily hidden until usage endpoint is sorted out */}
-      {/* {projectTier !== undefined && <OveragesBanner tier={projectTier} />} */}
-
       <div className="space-y-2">
         <h4 className="text-lg">Invoices</h4>
 
