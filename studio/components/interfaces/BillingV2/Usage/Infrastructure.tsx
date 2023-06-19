@@ -240,7 +240,8 @@ const Infrastructure = ({
                   unit={attribute.unit}
                   attribute={attribute.attribute}
                   data={chartData}
-                  yFormatter={(value) => `${value}%`}
+                  yFormatter={(value) => `${Math.round(Number(value))}%`}
+                  tooltipFormatter={(value) => `${value}%`}
                   yLimit={100}
                 />
               ) : (
