@@ -27,7 +27,7 @@
 
 Du kan finde den fulde dokumentation på [supabase.com/docs](https://supabase.com/docs)
 
-For at se, hvordan man bidrager, besøg [Getting Started](./DEVELOPERS.md)
+For at se, hvordan man bidrager, besøg [Getting Started](../DEVELOPERS.md)
 
 ## Fællesskab og support
 
