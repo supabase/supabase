@@ -201,7 +201,7 @@ const SubscriptionPaymentMethod = ({
               To remove unused or expired payment methods, head to your{' '}
               <Link href={`/org/${currentOrgSlug || '_'}/billing`} passHref>
                 <a target="_blank" className="text-green-900 transition hover:text-green-1000">
-                  org billing settings
+                  organization's billing settings
                 </a>
               </Link>
               .
