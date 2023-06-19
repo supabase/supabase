@@ -163,7 +163,7 @@ const SpendCapSidePanel = () => {
                       </Table.tr>
                       {usageItems.map((item: any) => {
                         return (
-                          <Table.tr key={item.name}>
+                          <Table.tr key={item.title}>
                             <Table.td>
                               <p className="text-xs pl-4">{item.title}</p>
                             </Table.td>
