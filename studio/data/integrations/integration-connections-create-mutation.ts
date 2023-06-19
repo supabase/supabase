@@ -17,7 +17,7 @@ export async function createIntegrationConnections({
   connections,
 }: IntegrationConnectionsCreateVariables) {
   const response = await post(`${API_URL}/integrations/vercel/connections`, {
-    organizationIntegrationId,
+    organization_integration_id: organizationIntegrationId,
     connections,
   })
   if (response.error) {
