@@ -131,8 +131,8 @@ const MemberActions: FC<Props> = ({ member, roles }) => {
     return (
       <div className="flex items-center justify-end">
         <Tooltip.Root delayDuration={0}>
-          <Tooltip.Trigger>
-            <Button as="span" type="text" icon={<IconMoreHorizontal />} />
+          <Tooltip.Trigger asChild>
+            <Button type="text" icon={<IconMoreHorizontal />} />
           </Tooltip.Trigger>
           <Tooltip.Portal>
             <Tooltip.Content side="bottom">
@@ -198,12 +198,14 @@ const MemberActions: FC<Props> = ({ member, roles }) => {
         }
       >
         <Button
-          as="span"
+          asChild
           type="text"
           disabled={isLoading}
           loading={isLoading}
           icon={<IconMoreHorizontal />}
-        />
+        >
+          <span></span>
+        </Button>
       </Dropdown>
     </div>
   )
