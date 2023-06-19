@@ -53,7 +53,7 @@ const VercelIntegration: NextPageWithLayout = () => {
       orgId,
       metadata,
       source,
-      teamId,
+      teamId: teamId,
     })
   }
 
@@ -72,6 +72,7 @@ const VercelIntegration: NextPageWithLayout = () => {
     {
       orgId: selectedOrg?.id,
       orgSlug: selectedOrg?.slug,
+      organization_integration_id: organizationIntegrationId,
     },
     { enabled: organizationIntegrationId !== null }
   )
