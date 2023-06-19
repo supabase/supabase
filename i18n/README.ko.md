@@ -27,7 +27,7 @@
 
 전체 문서는 [supabase.com/docs](https://supabase.com/docs)에서 확인하실 수 있습니다
 
-기여 방법을 확인하려면 [시작하기](./DEVELOPERS.md)를 방문하세요
+기여 방법을 확인하려면 [시작하기](../DEVELOPERS.md)를 방문하세요
 
 ## 커뮤니티 및 지원
 
