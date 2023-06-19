@@ -6,7 +6,7 @@ import { useOrganizationPaymentMethodsQuery } from 'data/organizations/organizat
 import { checkPermissions, useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import { getURL } from 'lib/helpers'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Button, IconAlertCircle, IconCreditCard, IconLoader, IconPlus, Listbox } from 'ui'
 import AddNewPaymentMethodModal from './AddNewPaymentMethodModal'
 
@@ -30,7 +30,7 @@ const PaymentMethodSelection = ({
     isSuccess: loadedPaymentMethods,
     refetch: refetchPaymentMethods,
   } = useOrganizationPaymentMethodsQuery({ slug })
-  const paymentMethods = data ?? []
+  const paymentMethods = useMemo(() => data ?? [], [data])
 
   const { data: customerProfile, isSuccess: loadedCustomerProfile } =
     useOrganizationCustomerProfileQuery({ slug })
@@ -42,16 +42,29 @@ const PaymentMethodSelection = ({
 
   useEffect(() => {
     if (loadedPaymentMethods && loadedCustomerProfile && paymentMethods.length > 0) {
-      const defaultPaymentMethod = paymentMethods.find(
-        (method) => method.id === customerProfile.invoice_settings.default_payment_method
+      const selectedPaymentMethodExists = paymentMethods.some(
+        (it) => it.id === selectedPaymentMethod
       )
-      if (defaultPaymentMethod !== undefined) {
-        onSelectPaymentMethod(defaultPaymentMethod.id)
-      } else {
-        onSelectPaymentMethod(paymentMethods[0].id)
+
+      if (!selectedPaymentMethod || !selectedPaymentMethodExists) {
+        const defaultPaymentMethod = paymentMethods.find(
+          (method) => method.id === customerProfile.invoice_settings.default_payment_method
+        )
+        if (defaultPaymentMethod !== undefined) {
+          onSelectPaymentMethod(defaultPaymentMethod.id)
+        } else {
+          onSelectPaymentMethod(paymentMethods[0].id)
+        }
       }
     }
-  }, [loadedPaymentMethods, loadedCustomerProfile])
+  }, [
+    loadedPaymentMethods,
+    loadedCustomerProfile,
+    selectedPaymentMethod,
+    customerProfile,
+    paymentMethods,
+    onSelectPaymentMethod,
+  ])
 
   return (
     <>
@@ -112,6 +125,7 @@ const PaymentMethodSelection = ({
                   addOnBefore={() => {
                     return (
                       <img
+                        alt="Credit Card Brand"
                         src={`${BASE_PATH}/img/payment-methods/${method.card.brand
                           .replace(' ', '-')
                           .toLowerCase()}.png`}
@@ -148,8 +162,13 @@ const PaymentMethodSelection = ({
             message: 'Successfully added new payment method',
           })
           const { data } = await refetchPaymentMethods()
-          if (!selectedPaymentMethod && data?.length) {
-            onSelectPaymentMethod(data[0].id)
+          if (data?.length) {
+            // Preselect the card that was just added
+            const mostRecentPaymentMethod = data.reduce(
+              (prev, current) => (prev.created > current.created ? prev : current),
+              data[0]
+            )
+            onSelectPaymentMethod(mostRecentPaymentMethod.id)
           }
         }}
       />
