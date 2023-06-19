@@ -115,36 +115,30 @@ const TopNavBarRef: FC = () => {
               Dashboard
             </a>
           </Button>
-          <ul className="flex items-center">
-            <Link
-              href="https://github.com/supabase/supabase"
-              target="_blank"
-              rel="noreferrer noopener"
-            >
-              <a className="px-2.5 py-1" target="_blank">
-                <IconGitHub size={16} />
-              </a>
-            </Link>
-          </ul>
-          <ul className="flex items-center">
-            <li className="px-4">
-              <div className="cursor-pointer" onClick={() => toggleTheme()}>
-                {isDarkMode ? (
-                  <IconMoon
-                    size={16}
-                    strokeWidth={1}
-                    className="text-scale-1100 hover:text-scale-1200 transition"
-                  />
-                ) : (
-                  <IconSun
-                    size={16}
-                    strokeWidth={1}
-                    className="text-scale-1100 hover:text-scale-1200 transition"
-                  />
-                )}
-              </div>
-            </li>
-          </ul>
+          <Link
+            href="https://github.com/supabase/supabase"
+            target="_blank"
+            rel="noreferrer noopener"
+          >
+            <a className="px-2.5 py-1" target="_blank">
+              <IconGitHub size={16} className="text-scale-1100 hover:text-scale-1200 transition" />
+            </a>
+          </Link>
+          <div className="cursor-pointer px-2.5 py-1" onClick={() => toggleTheme()}>
+            {isDarkMode ? (
+              <IconMoon
+                size={16}
+                strokeWidth={1}
+                className="text-scale-1100 hover:text-scale-1200 transition"
+              />
+            ) : (
+              <IconSun
+                size={16}
+                strokeWidth={1}
+                className="text-scale-1100 hover:text-scale-1200 transition"
+              />
+            )}
+          </div>
         </div>
       </div>
     </nav>
