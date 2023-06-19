@@ -7,6 +7,10 @@ export type VercelIntegrationCreateVariables = {
   configurationId: string
   orgId: number
   metadata: { [key: string]: string }
+  source: string
+  // teamId is only present when a team is being installed
+  // personal accounts (hobby) will not have this value defined
+  teamId?: string
 }
 
 export async function createVercelIntegration({
@@ -14,13 +18,17 @@ export async function createVercelIntegration({
   configurationId,
   orgId,
   metadata,
+  source,
+  teamId,
 }: VercelIntegrationCreateVariables) {
-  console.log('payload', { code, configurationId, orgId, metadata })
+  console.log('payload', { code, configurationId, orgId, metadata, source, teamId })
   const response = await post(`${API_URL}/integrations/vercel`, {
     code,
     configuration_id: configurationId,
     organization_id: orgId,
     metadata,
+    source,
+    teamId,
   })
   if (response.error) {
     throw response.error

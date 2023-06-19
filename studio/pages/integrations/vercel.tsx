@@ -14,7 +14,7 @@ import { Button } from 'ui'
 
 const VercelIntegration: NextPageWithLayout = () => {
   const { ui } = useStore()
-  const { code, configurationId, next } = useParams()
+  const { code, configurationId, next, teamId, source } = useParams()
   const [selectedOrg, setSelectedOrg] = useState<Organization | null>(null)
   const [organizationIntegrationId, setOrganizationIntegrationId] = useState<string | null>(null)
 
@@ -38,6 +38,13 @@ const VercelIntegration: NextPageWithLayout = () => {
       return ui.setNotification({ category: 'error', message: 'Vercel Configuration ID missing' })
     }
 
+    if (!source) {
+      return ui.setNotification({
+        category: 'error',
+        message: 'Vercel Configuration source missing',
+      })
+    }
+
     const metadata = {}
 
     mutate({
@@ -45,6 +52,8 @@ const VercelIntegration: NextPageWithLayout = () => {
       configurationId,
       orgId,
       metadata,
+      source,
+      teamId,
     })
   }
 
