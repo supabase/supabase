@@ -25,7 +25,7 @@ export async function getVercelProjects({ orgId }: VercelProjectsVariables, sign
     throw new Error('orgId is required')
   }
 
-  const response = await get(`${API_URL}/integrations/vercel/projects/${orgId}`, {
+  const response = await get(`${API_URL}/integrations/vercel/connections/${orgId}`, {
     signal,
   })
   if (response.error) {

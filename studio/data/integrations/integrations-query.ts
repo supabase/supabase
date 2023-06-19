@@ -7,20 +7,15 @@ type metadata = {
   metadata: {
     id: string
     supabaseConfig: {
-      // branching: {
-      //   prodBranch: string
-      // }
       projectEnvVars: {
         write: boolean
       }
-      // supabaseDeploymentConfig: {
-      //   functions: {
-      //     deploy: false
-      //   }
-      // }
     }
     link?:
       | {
+          /**
+           * GitHub link
+           */
           org?: string
           repo?: string
           repoId?: number
@@ -39,6 +34,9 @@ type metadata = {
           productionBranch?: string
         }
       | {
+          /**
+           * GitLab link
+           */
           projectId?: string
           projectName?: string
           projectNameWithNamespace?: string
@@ -59,6 +57,9 @@ type metadata = {
           productionBranch?: string
         }
       | {
+          /**
+           * Bitbucket link
+           */
           name?: string
           slug?: string
           owner?: string
@@ -138,7 +139,7 @@ export type IntegrationProjectConnection = {
 }
 
 export type IntegrationsVariables = {
-  orgSlug?: string
+  orgId?: number
 }
 
 export type IntegrationProjectConnectionPayload = {
@@ -174,87 +175,12 @@ export type Integration = {
 
 export type IntegrationsResponse = Integration[]
 
-export async function getIntegrations({ orgSlug }: IntegrationsVariables, signal?: AbortSignal) {
-  if (!orgSlug) {
-    throw new Error('orgSlug is required')
+export async function getIntegrations({ orgId }: IntegrationsVariables, signal?: AbortSignal) {
+  if (!orgId) {
+    throw new Error('orgId is required')
   }
 
-  // const response: IntegrationsResponse = [
-  //   {
-  //     id: '1',
-  //     type: 'VERCEL',
-  //     createdBy: 'alaister@supabase.io',
-  //     createdAt: '2023-06-05T06:56:25.565Z',
-  //     metadata: {
-  //       vercelTeam: 'alaister-team',
-  //     },
-  //     connections: [
-  //       {
-  //         id: '1.0',
-  //         createdAt: '2023-06-05T01:56:25.565Z',
-  //         to: {
-  //           name: 'www prod',
-  //         },
-  //         from: {
-  //           name: 'alaister project prod',
-  //         },
-  //       },
-  //       {
-  //         id: '1.1',
-  //         createdAt: '2023-06-14T06:56:25.565Z',
-  //         to: {
-  //           name: 'www staging',
-  //         },
-  //         from: {
-  //           name: 'alaister project staging',
-  //         },
-  //       },
-  //       {
-  //         id: '1.1',
-  //         createdAt: '2023-06-02T21:56:25.565Z',
-  //         to: {
-  //           name: 'bees knees',
-  //         },
-  //         from: {
-  //           name: 'jonny bee project',
-  //         },
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     id: '2',
-  //     type: 'VERCEL',
-  //     createdBy: 'alaister@supabase.io',
-  //     createdAt: '2023-06-05T06:56:25.565Z',
-  //     metadata: {
-  //       vercelTeam: 'alaister-team',
-  //     },
-  //     connections: [],
-  //   },
-  //   {
-  //     id: '3',
-  //     type: 'GITHUB',
-  //     createdBy: 'Alaister',
-  //     createdAt: '2023-06-05T06:56:25.565Z',
-  //     metadata: {
-  //       gitHubConnectionOwner: 'alaister',
-  //     },
-  //     connections: [
-  //       {
-  //         id: '1.2',
-  //         createdAt: '2023-06-05T06:56:25.565Z',
-  //         to: {
-  //           name: 'supabase/supabase',
-  //         },
-  //         from: {
-  //           name: 'alaister project',
-  //         },
-  //       },
-  //     ],
-  //   },
-  // ]
-
-  const response = await get(`${API_URL}/integrations/${orgSlug}`, {
+  const response = await get(`${API_URL}/integrations/${orgId}`, {
     signal,
   })
   if (response.error) {
@@ -264,24 +190,6 @@ export async function getIntegrations({ orgSlug }: IntegrationsVariables, signal
   return response as IntegrationsResponse
 }
 
-// export async function getProjectIntegrationConnections(
-//   { orgSlug }: IntegrationsVariables,
-//   signal?: AbortSignal
-// ) {
-//   if (!orgSlug) {
-//     throw new Error('orgSlug is required')
-//   }
-
-//   const response = await get(`${API_URL}/integrations`, {
-//     signal,
-//   })
-//   if (response.error) {
-//     throw response.error
-//   }
-
-//   return response as IntegrationsResponse
-// }
-
 export type IntegrationsData = Awaited<ReturnType<typeof getIntegrations>>
 export type ProjectIntegrationConnectionsData = Awaited<
   ReturnType<typeof getProjectIntegrationConnections>
@@ -289,11 +197,11 @@ export type ProjectIntegrationConnectionsData = Awaited<
 export type IntegrationsError = unknown
 
 export const useIntegrationsQuery = <TData = IntegrationsData>(
-  { orgSlug }: IntegrationsVariables,
+  { orgId }: IntegrationsVariables,
   { enabled = true, ...options }: UseQueryOptions<IntegrationsData, IntegrationsError, TData> = {}
 ) =>
   useQuery<IntegrationsData, IntegrationsError, TData>(
-    integrationKeys.list(orgSlug),
-    ({ signal }) => getIntegrations({ orgSlug }, signal),
-    { enabled: enabled && typeof orgSlug !== 'undefined', ...options }
+    integrationKeys.list(orgId),
+    ({ signal }) => getIntegrations({ orgId }, signal),
+    { enabled: enabled && typeof orgId !== 'undefined', ...options }
   )

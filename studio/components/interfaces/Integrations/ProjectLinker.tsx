@@ -34,16 +34,16 @@ const ProjectLinker = ({
     installedConnections && installedConnections.length > 0
       ? installedConnections?.map((connection) => {
           return {
-            foreignProjectId: connection?.foreign_project_id,
-            supabaseProjectId: connection?.supabase_project_id,
+            foreign_project_id: connection?.foreign_project_id,
+            supabase_project_id: connection?.supabase_project_id,
             integrationId: INTEGRATION_INTERNAL_ID,
             metadata: UNDEFINED_METADATA_VALUE,
           }
         })
       : [
           {
-            foreignProjectId: UNDEFINED_SELECT_VALUE,
-            supabaseProjectId: UNDEFINED_SELECT_VALUE,
+            foreign_project_id: UNDEFINED_SELECT_VALUE,
+            supabase_project_id: UNDEFINED_SELECT_VALUE,
             integrationId: INTEGRATION_INTERNAL_ID,
             metadata: UNDEFINED_METADATA_VALUE,
           },
@@ -59,7 +59,7 @@ const ProjectLinker = ({
     const newConnections = [...connections]
     const projectDetails = foreignProjects.filter((x) => x.id === id)[0]
     newConnections[idx].metadata = { ...projectDetails }
-    newConnections[idx].foreignProjectId = id
+    newConnections[idx].foreign_project_id = id
     newConnections[idx].supabaseConfig = {
       projectEnvVars: {
         write: true,
@@ -71,7 +71,7 @@ const ProjectLinker = ({
 
   function onSetSupabaseProjectId(idx: number, id: string) {
     const newConnections = [...connections]
-    newConnections[idx].supabaseProjectId = id
+    newConnections[idx].supabase_project_id = id
     setConnections(newConnections)
   }
 
@@ -79,8 +79,8 @@ const ProjectLinker = ({
     setConnections([
       ...connections,
       {
-        foreignProjectId: UNDEFINED_SELECT_VALUE,
-        supabaseProjectId: UNDEFINED_SELECT_VALUE,
+        foreign_project_id: UNDEFINED_SELECT_VALUE,
+        supabase_project_id: UNDEFINED_SELECT_VALUE,
         integrationId: INTEGRATION_INTERNAL_ID,
         metadata: UNDEFINED_METADATA_VALUE,
       },
@@ -117,9 +117,9 @@ const ProjectLinker = ({
             connections={connections}
             foreignProjects={foreignProjects}
             supabaseProjects={supabaseProjects}
-            foreignProjectId={connection.foreignProjectId}
+            foreignProjectId={connection.foreign_project_id}
             setForeignProjectId={(id) => onSetForeignProjectId(i, id)}
-            supabaseProjectId={connection.supabaseProjectId}
+            supabaseProjectId={connection.supabase_project_id}
             setSupabaseProjectId={(id) => onSetSupabaseProjectId(i, id)}
             removeConnection={() => removeConnection(i)}
             canRemove={connections.length > 1}

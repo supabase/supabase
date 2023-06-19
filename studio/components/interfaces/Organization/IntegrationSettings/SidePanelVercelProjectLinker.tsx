@@ -16,8 +16,8 @@ import { useVercelProjectConnectionsQuery } from 'data/integrations/integrations
 
 const SidePanelVercelProjectLinker = () => {
   const { ui } = useStore()
-  const { slug } = useParams()
-  const { data } = useIntegrationsQuery({ orgSlug: slug })
+
+  const { data } = useIntegrationsQuery({ orgId: ui.selectedOrganization?.id })
 
   const vercelIntegrations = data?.filter((integration) => integration.integration.id === 1) // vercel
 

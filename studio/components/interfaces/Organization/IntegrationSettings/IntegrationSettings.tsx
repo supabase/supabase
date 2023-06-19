@@ -11,7 +11,7 @@ import SidePanelVercelProjectLinker from './SidePanelVercelProjectLinker'
 const IntegrationSettings = () => {
   const { ui } = useStore()
   const { slug } = useParams()
-  const { data } = useIntegrationsQuery({ orgSlug: slug })
+  const { data } = useIntegrationsQuery({ orgId: ui.selectedOrganization?.id })
 
   const org = ui.selectedOrganization
 
@@ -71,7 +71,7 @@ You can change the scope of the access for Supabase by configuring here.
         integrations={githubIntegrations}
       />
       {/* <SidePanelGitHubRepoSelection /> */}
-      <SidePanelVercelProjectLinker />
+      {/* <SidePanelVercelProjectLinker /> */}
     </>
   )
 }
