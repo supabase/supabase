@@ -4,9 +4,8 @@ import { Button, Input, IconSearch } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 
 import { useStore } from 'hooks'
-import useProfile from 'hooks/misc/useProfile'
 import { useParams } from 'common/hooks'
-import { post } from 'lib/common/fetch'
+import { delete_ } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import InviteMemberButton from './InviteMemberButton'
 import MembersView from './MembersView'
@@ -14,12 +13,13 @@ import { getRolesManagementPermissions, hasMultipleOwners } from './TeamSettings
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 import { useOrganizationDetailQuery } from 'data/organizations/organization-detail-query'
 import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
+import { useProfileQuery } from 'data/profile/profile-query'
 
 const TeamSettings = () => {
   const { ui } = useStore()
   const { slug } = useParams()
 
-  const { data: profile } = useProfile()
+  const { data: profile } = useProfileQuery()
   const isOwner = ui.selectedOrganization?.is_owner
 
   const { data: detailData } = useOrganizationDetailQuery({ slug })
@@ -43,7 +43,9 @@ const TeamSettings = () => {
         title: 'Are you sure?',
         message: 'Are you sure you want to leave this team? This is permanent.',
         onAsyncConfirm: async () => {
-          const response = await post(`${API_URL}/organizations/${slug}/members/leave`, {})
+          const response = await delete_(
+            `${API_URL}/organizations/${slug}/members/${profile!.gotrue_id}`
+          )
           if (response.error) {
             throw response.error
           } else {

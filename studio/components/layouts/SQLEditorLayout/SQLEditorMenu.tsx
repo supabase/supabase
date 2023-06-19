@@ -15,7 +15,6 @@ import {
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { checkPermissions, useFlag, useStore } from 'hooks'
-import useProfile from 'hooks/misc/useProfile'
 import { IS_PLATFORM } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 
@@ -23,6 +22,7 @@ import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
 import { useParams } from 'common'
 import { useSnippets, useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { SqlSnippet, useSqlSnippetsQuery } from 'data/content/sql-snippets-query'
+import { useProfileQuery } from 'data/profile/profile-query'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import QueryItem from './QueryItem'
 import { createSqlSnippetSkeleton } from 'components/interfaces/SQLEditor/SQLEditor.utils'
@@ -33,7 +33,7 @@ const SideBarContent = observer(() => {
   const { ui } = useStore()
   const { ref, id } = useParams()
   const router = useRouter()
-  const { data: profile } = useProfile()
+  const { data: profile } = useProfileQuery()
   const [filterString, setFilterString] = useState('')
   const { setPages, setIsOpen } = useCommandMenu()
   const showCmdkHelper = useFlag('dashboardCmdk')

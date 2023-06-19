@@ -3,8 +3,17 @@ import { FC } from 'react'
 import { isUndefined } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
-import { Button, Dropdown, IconHome, IconSettings, IconUser } from 'ui'
-
+import {
+  Button,
+  Dropdown,
+  IconHome,
+  IconSettings,
+  IconUser,
+  IconSearch,
+  useCommandMenu,
+  IconCommand,
+} from 'ui'
+import * as Tooltip from '@radix-ui/react-tooltip'
 import { useFlag, useStore } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import {
@@ -15,6 +24,7 @@ import {
 import NavigationIconButton from './NavigationIconButton'
 import { useParams } from 'common/hooks'
 import { useTheme } from 'common'
+import { detectOS } from 'lib/helpers'
 
 interface Props {}
 
@@ -31,7 +41,9 @@ const NavigationBar: FC<Props> = ({}) => {
   const toolRoutes = generateToolRoutes(projectRef, projectBaseInfo)
   const productRoutes = generateProductRoutes(projectRef, projectBaseInfo)
   const otherRoutes = generateOtherRoutes(projectRef, projectBaseInfo)
-
+  const showCmdkHelper = useFlag('dashboardCmdk')
+  const os = detectOS()
+  const { setIsOpen } = useCommandMenu()
   return (
     <div
       style={{ height: ongoingIncident ? 'calc(100vh - 44px)' : '100vh' }}
@@ -85,7 +97,36 @@ const NavigationBar: FC<Props> = ({}) => {
           />
         ))}
       </ul>
-      <ul className="flex flex-col space-y-2">
+      <ul className="flex flex-col space-y-4 items-center">
+        {IS_PLATFORM && showCmdkHelper && (
+          <Tooltip.Root delayDuration={0}>
+            <Tooltip.Trigger asChild>
+              <Button type="text" size="tiny" onClick={() => setIsOpen(true)}>
+                <div className="py-1">
+                  <IconSearch size={18} strokeWidth={2} />
+                </div>
+              </Button>
+            </Tooltip.Trigger>
+            <Tooltip.Portal>
+              <Tooltip.Content side="right">
+                <Tooltip.Arrow className="radix-tooltip-arrow" />
+                <div
+                  className={[
+                    'rounded  py-1 px-2 leading-none shadow',
+                    'border border-scale-200 flex items-center space-x-1',
+                  ].join(' ')}
+                >
+                  {os === 'macos' ? (
+                    <IconCommand size={11.5} strokeWidth={1.5} className="text-scale-1200" />
+                  ) : (
+                    <p className="text-xs">CTRL</p>
+                  )}
+                  <p className="text-xs">K</p>
+                </div>
+              </Tooltip.Content>
+            </Tooltip.Portal>
+          </Tooltip.Root>
+        )}
         <Dropdown
           side="right"
           align="start"
@@ -115,10 +156,10 @@ const NavigationBar: FC<Props> = ({}) => {
             </>
           }
         >
-          <Button as="span" type="text" size="tiny">
-            <div className="py-1">
+          <Button asChild type="text" size="tiny">
+            <span className="py-1">
               <IconUser size={18} strokeWidth={2} />
-            </div>
+            </span>
           </Button>
         </Dropdown>
       </ul>

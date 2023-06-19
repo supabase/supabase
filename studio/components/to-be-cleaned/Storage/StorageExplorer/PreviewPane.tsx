@@ -252,7 +252,6 @@ const PreviewPane = () => {
                 <Button
                   type="outline"
                   disabled={!canUpdateFiles}
-                  shadow={false}
                   size="tiny"
                   icon={<IconTrash2 size={16} strokeWidth={2} />}
                   onClick={() => setSelectedItemsToDelete([file])}

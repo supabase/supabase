@@ -105,25 +105,15 @@ const TopNavBarRef: FC = () => {
           </SearchButton>
         </div>
         <div className="hidden lg:flex grow items-center justify-end gap-3">
-          <Button
-            type="text"
-            as="a"
-            // @ts-ignore
-            href="https://supabase.com"
-            target="_blank"
-            rel="noreferrer noopener"
-          >
-            Supabase.com
+          <Button type="text" asChild>
+            <a href="https://supabase.com" target="_blank" rel="noreferrer noopener">
+              Supabase.com
+            </a>
           </Button>
-          <Button
-            type="text"
-            as="a"
-            // @ts-ignore
-            href="https://supabase.com/dashboard"
-            target="_blank"
-            rel="noreferrer noopener"
-          >
-            Dashboard
+          <Button type="text" asChild>
+            <a href="https://supabase.com/dashboard" target="_blank" rel="noreferrer noopener">
+              Dashboard
+            </a>
           </Button>
           <ul className="flex items-center">
             <Link
