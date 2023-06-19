@@ -71,7 +71,7 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
   })
 
   return (
-    <div>
+    <div id="diskManagement">
       <FormHeader title="Disk management" />
       {projectSubscriptionData?.tier.supabase_prod_id != 'tier_free' ? (
         <div className="flex flex-col gap-3">
