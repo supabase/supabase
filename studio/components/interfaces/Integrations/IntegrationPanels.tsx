@@ -91,7 +91,7 @@ const IntegrationInstallation = React.forwardRef<HTMLLIElement, IntegrationInsta
               </span>
 
               <Badge color="scale" className="capitalize">
-                {connection.metadata.account.plan}
+                {connection.metadata.account.type}
               </Badge>
             </div>
             <div className="flex gap-3 items-center">
