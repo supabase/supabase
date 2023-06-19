@@ -7,7 +7,7 @@ import { useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import Panel from 'components/ui/Panel'
 import { useElements, useStripe, PaymentElement } from '@stripe/react-stripe-js'
-import { PaymentMethod } from 'components/interfaces/Billing/Billing.types'
+import type { PaymentMethod } from '@stripe/stripe-js'
 import { getURL } from 'lib/helpers'
 import InformationBox from 'components/ui/InformationBox'
 
@@ -291,7 +291,7 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
           </Panel.Content>
 
           <Panel.Content>
-            {paymentMethod ? (
+            {paymentMethod && paymentMethod.card ? (
               <div key={paymentMethod.id} className="flex items-center justify-between">
                 <div className="flex items-center space-x-8">
                   <img
