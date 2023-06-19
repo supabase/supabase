@@ -16,17 +16,17 @@ import {
 import ProjectUpgradeAlert from './ProjectUpgradeAlert'
 import PauseProjectButton from './PauseProjectButton'
 import RestartServerButton from './RestartServerButton'
-import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
 import { useProjectUpgradeEligibilityQuery } from 'data/config/project-upgrade-eligibility-query'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 
 interface InfrastructureProps {}
 
 const Infrastructure = ({}: InfrastructureProps) => {
   const { ref } = useParams()
   const { project } = useProjectContext()
-  const { data: subscription } = useProjectSubscriptionQuery({ projectRef: ref })
-  const isFreeProject = subscription?.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.FREE
+  const { data: subscription } = useProjectSubscriptionV2Query({ projectRef: ref })
+  const isFreeProject = subscription?.plan?.id === 'free'
 
   const {
     data,

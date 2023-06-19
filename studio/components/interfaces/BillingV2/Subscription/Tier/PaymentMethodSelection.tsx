@@ -139,7 +139,7 @@ const PaymentMethodSelection = ({
 
       <AddNewPaymentMethodModal
         visible={showAddNewPaymentMethodModal}
-        returnUrl={`${getURL()}/project/${projectRef}/settings/billing/update/pro`}
+        returnUrl={`${getURL()}/project/${projectRef}/settings/billing/subscription?panel=subscriptionPlan`}
         onCancel={() => setShowAddNewPaymentMethodModal(false)}
         onConfirm={async () => {
           setShowAddNewPaymentMethodModal(false)

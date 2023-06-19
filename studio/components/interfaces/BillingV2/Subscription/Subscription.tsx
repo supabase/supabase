@@ -22,11 +22,6 @@ const Subscription = ({}: SubscriptionProps) => {
 
   if (panel && typeof panel === 'string' && allowedValues.includes(panel)) {
     snap.setPanelKey(panel as SUBSCRIPTION_PANEL_KEYS)
-
-    const url = new URL(window.location.href)
-    url.searchParams.delete('panel')
-
-    router.push(url.toString())
   }
 
   return (

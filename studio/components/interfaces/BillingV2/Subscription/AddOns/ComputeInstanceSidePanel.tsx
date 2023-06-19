@@ -59,7 +59,7 @@ const ComputeInstanceSidePanel = () => {
   const selectedAddons = addons?.selected_addons ?? []
   const availableAddons = addons?.available_addons ?? []
 
-  const isFreePlan = subscription?.plan.id === 'free'
+  const isFreePlan = subscription?.plan?.id === 'free'
   const subscriptionCompute = selectedAddons.find((addon) => addon.type === 'compute_instance')
   const pitrAddon = selectedAddons.find((addon) => addon.type === 'pitr')
   const availableOptions =

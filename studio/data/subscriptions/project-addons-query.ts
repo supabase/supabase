@@ -17,19 +17,18 @@ export type ProjectAddonVariant = {
   price_description: string
   price_interval: 'monthly' | 'hourly'
   price_type: 'fixed' | 'usage'
+  meta?: ProjectAddonVariantMeta
 }
 
-export interface ProjectAvailableAddonVariant extends ProjectAddonVariant {
-  meta?: {
-    cpu_cores?: number
-    cpu_dedicated?: boolean
-    baseline_disk_io_mbs?: number
-    max_disk_io_mbs?: number
-    memory_gb?: number
-    connections_direct?: number
-    connections_pooler?: number
-    backup_duration_days?: number
-  }
+export interface ProjectAddonVariantMeta {
+  cpu_cores?: number
+  cpu_dedicated?: boolean
+  baseline_disk_io_mbs?: number
+  max_disk_io_mbs?: number
+  memory_gb?: number
+  connections_direct?: number
+  connections_pooler?: number
+  backup_duration_days?: number
 }
 
 export type ProjectSelectedAddon = {
@@ -43,7 +42,7 @@ export type ProjectAddonsResponse = {
   available_addons: {
     name: string
     type: ProjectAddonType
-    variants: ProjectAvailableAddonVariant[]
+    variants: ProjectAddonVariant[]
   }[]
 }
 

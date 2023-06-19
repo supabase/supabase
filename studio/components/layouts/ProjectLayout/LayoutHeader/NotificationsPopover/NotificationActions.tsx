@@ -33,7 +33,7 @@ const NotificationActions: FC<Props> = ({
   const router = useRouter()
 
   const onSelectUpgradeProject = () => {
-    return router.push(`/project/${project.ref}/settings/billing/update/pro`)
+    return router.push(`/project/${project.ref}/settings/billing/subscription?panel=subscriptionPlan`)
   }
 
   const renderActionButton = (action: Action) => {
