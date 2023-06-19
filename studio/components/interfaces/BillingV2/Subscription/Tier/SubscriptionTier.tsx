@@ -19,7 +19,7 @@ const SubscriptionTier = ({}: SubscriptionTierProps) => {
   const orgSlug = ui.selectedOrganization?.slug ?? ''
   const snap = useSubscriptionPageStateSnapshot()
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
-  const { data: subscription, isLoading } = useProjectSubscriptionV2Query({ projectRef })
+  const { data: subscription, isLoading, refetch } = useProjectSubscriptionV2Query({ projectRef })
 
   const currentPlan = subscription?.plan
   const tierName = currentPlan?.name || 'Unknown'
@@ -44,7 +44,8 @@ const SubscriptionTier = ({}: SubscriptionTierProps) => {
                 <a>
                   <span className="text-sm text-green-900 transition hover:text-green-1000">
                     organization settings
-                  </span>.
+                  </span>
+                  .
                 </a>
               </Link>
             </div>
@@ -109,16 +110,45 @@ const SubscriptionTier = ({}: SubscriptionTierProps) => {
                     </div>,
                   ]}
                 >
-                  Please contact us if you'd like to change your project's plan
+                  Please contact us if you'd like to change your plan.
                 </Alert>
               ))}
             {!subscription?.usage_billing_enabled && (
-              <Alert withIcon variant="info" title="This project is limited by the included usage">
+              <Alert
+                withIcon
+                variant="info"
+                title="This project is limited by the included usage"
+                actions={
+                  currentPlan?.id === 'free' ? (
+                    <Button type="default" onClick={() => snap.setPanelKey('subscriptionPlan')}>
+                      Uprade Plan
+                    </Button>
+                  ) : (
+                    <Button type="default" onClick={() => snap.setPanelKey('costControl')}>
+                      Adjust Spend Cap
+                    </Button>
+                  )
+                }
+              >
                 <p className="text-sm text-scale-1000">
-                  When this project exceeds its included usage quotas, it may become unresponsive.{' '}
-                  {currentPlan?.id === 'free'
-                    ? 'If you wish to exceed the included usage, you should upgrade to a paid plan.'
-                    : 'You can change the Cost Control settings if you plan on exceeding the included usage quotas.'}
+                  When this project exceeds its{' '}
+                  <Link href="#breakdown">
+                    <a className="text-sm text-green-900 transition hover:text-green-1000">
+                      included usage quotas
+                    </a>
+                  </Link>
+                  , it may become unresponsive.{' '}
+                  {currentPlan?.id === 'free' ? (
+                    <span>
+                      If you wish to exceed the included usage, you should upgrade to a paid plan.
+                    </span>
+                  ) : (
+                    <span>
+                      You currently have Spend Cap enabled - when you exceed your plan's limit, you
+                      will experience restrictions. To scale seamlessly and pay for over-usage, you
+                      can adjust your Cost Control settings.
+                    </span>
+                  )}
                 </p>
               </Alert>
             )}
@@ -135,7 +165,12 @@ const SubscriptionTier = ({}: SubscriptionTierProps) => {
               labelTop={`${daysToCycleEnd} Days left`}
             />
 
-            {subscription && <SubscriptionPaymentMethod subscription={subscription} />}
+            {subscription && (
+              <SubscriptionPaymentMethod
+                subscription={subscription}
+                onSubscriptionUpdated={() => refetch()}
+              />
+            )}
           </div>
         )}
       </div>

@@ -1804,6 +1804,26 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/reference/python',
+    destination: '/docs/reference/python/start',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/csharp',
+    destination: '/docs/reference/csharp/start',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/swift',
+    destination: '/docs/reference/swift/start',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/kotlin',
+    destination: '/docs/reference/kotlin/start',
+  },
+  {
+    permanent: true,
     source: '/docs/reference/cli',
     destination: '/docs/reference/cli/start',
   },
@@ -1881,21 +1901,6 @@ module.exports = [
     permanent: true,
     source: '/docs/guides/resources/postgres/which-version-of-postgres',
     destination: '/docs/guides/database/postgres/which-version-of-postgres',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/realtime/broadcast',
-    destination: '/docs/guides/realtime/extensions/broadcast',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/realtime/presence',
-    destination: '/docs/guides/realtime/extensions/presence',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/realtime/postgres-changes',
-    destination: '/docs/guides/realtime/extensions/postgres-changes',
   },
   // Serverless APIs
   {
@@ -2005,5 +2010,35 @@ module.exports = [
     permanent: true,
     source: '/docs/guides/functions/examples/openai',
     destination: '/docs/guides/ai/examples/openai',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/realtime/rate-limits',
+    destination: '/docs/guides/realtime/quotas',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/realtime/channels',
+    destination: '/docs/guides/realtime/concepts#channels',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/realtime/extensions',
+    destination: '/docs/guides/realtime/concepts',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/realtime/extensions/broadcast',
+    destination: '/docs/guides/realtime/broadcast',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/realtime/extensions/presence',
+    destination: '/docs/guides/realtime/presence',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/realtime/extensions/postgres-changes',
+    destination: '/docs/guides/realtime/postgres-changes',
   },
 ]

@@ -1,6 +1,6 @@
 import Panel from 'components/ui/Panel'
 import { ProjectSubscriptionResponse } from 'data/subscriptions/project-subscription-v2-query'
-import { Button, IconCreditCard, IconFileText, Modal } from 'ui'
+import { Button, IconCreditCard, Modal } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { useState } from 'react'
 import PaymentMethodSelection from './PaymentMethodSelection'
@@ -9,16 +9,26 @@ import {
   SubscriptionTier,
   updateSubscriptionTier,
 } from 'data/subscriptions/project-subscription-update-mutation'
-import { useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 export interface SubscriptionTierProps {
   subscription: ProjectSubscriptionResponse
+  onSubscriptionUpdated: () => void
 }
 
-const SubscriptionPaymentMethod = ({ subscription }: SubscriptionTierProps) => {
+const SubscriptionPaymentMethod = ({
+  subscription,
+  onSubscriptionUpdated,
+}: SubscriptionTierProps) => {
   const { ref: projectRef } = useParams()
   const { ui } = useStore()
+
+  const canUpdatePaymentMethod = checkPermissions(
+    PermissionAction.BILLING_WRITE,
+    'stripe.subscriptions'
+  )
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showPaymentEditModal, setShowPaymentEditModal] = useState(false)
@@ -54,6 +64,8 @@ const SubscriptionPaymentMethod = ({ subscription }: SubscriptionTierProps) => {
           category: 'success',
           message: `Successfully updated payment method!`,
         })
+
+        onSubscriptionUpdated()
       } catch (error: any) {
         ui.setNotification({
           error,
@@ -83,17 +95,17 @@ const SubscriptionPaymentMethod = ({ subscription }: SubscriptionTierProps) => {
                     src={`${BASE_PATH}/img/payment-methods/${subscription.payment_method_card_details?.brand
                       .replace(' ', '-')
                       .toLowerCase()}.png`}
-                    width="32"
+                    width="24"
                   />
                 ) : (
                   <IconCreditCard />
                 )}
-                <span>
+                <span className="text-sm">
                   **** **** ****{' '}
                   {subscription?.payment_method_card_details?.last_4_digits || '****'}
                 </span>
               </div>
-              <div className="flex flex-row space-x-3 text-scale-1000">
+              <div className="flex flex-row space-x-3 text-scale-1000 text-sm">
                 <span>
                   Expires {subscription?.payment_method_card_details?.expiry_month || '-'}/
                   {subscription?.payment_method_card_details?.expiry_year?.toString()?.slice(-2) ||
@@ -106,9 +118,11 @@ const SubscriptionPaymentMethod = ({ subscription }: SubscriptionTierProps) => {
           {subscription?.payment_method_type === 'invoice' && (
             <>
               <div className="flex space-x-3">
-                <div >
+                <div>
                   <p className="text-scale-1100">Payment via invoice</p>
-                  <p className="text-sm text-scale-1000">You get a monthly invoice and payment link via email.</p>
+                  <p className="text-sm text-scale-1000">
+                    You get a monthly invoice and payment link via email.
+                  </p>
                 </div>
               </div>
             </>
@@ -119,14 +133,14 @@ const SubscriptionPaymentMethod = ({ subscription }: SubscriptionTierProps) => {
               <div>
                 <Button
                   type="default"
-                  disabled={subscription?.payment_method_type !== 'card'}
+                  disabled={subscription?.payment_method_type !== 'card' || !canUpdatePaymentMethod}
                   onClick={() => setShowPaymentEditModal(true)}
                 >
                   Change
                 </Button>
               </div>
             </Tooltip.Trigger>
-            {subscription?.payment_method_type !== 'card' && (
+            {subscription?.payment_method_type !== 'card' ? (
               <Tooltip.Portal>
                 <Tooltip.Content side="bottom">
                   <Tooltip.Arrow className="radix-tooltip-arrow" />
@@ -142,7 +156,23 @@ const SubscriptionPaymentMethod = ({ subscription }: SubscriptionTierProps) => {
                   </div>
                 </Tooltip.Content>
               </Tooltip.Portal>
-            )}
+            ) : !canUpdatePaymentMethod ? (
+              <Tooltip.Portal>
+                <Tooltip.Content side="bottom">
+                  <Tooltip.Arrow className="radix-tooltip-arrow" />
+                  <div
+                    className={[
+                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                      'border border-scale-200',
+                    ].join(' ')}
+                  >
+                    <span className="text-xs text-scale-1200">
+                      You do not have permission to change the payment method
+                    </span>
+                  </div>
+                </Tooltip.Content>
+              </Tooltip.Portal>
+            ) : null}
           </Tooltip.Root>
         </Panel.Content>
       </Panel>
@@ -160,8 +190,8 @@ const SubscriptionPaymentMethod = ({ subscription }: SubscriptionTierProps) => {
         <Modal.Content>
           <div className="py-6 space-y-2">
             <p className="text-sm">
-              Upon clicking confirm, your next and future invoices will be deducted from the
-              selected payment method. There are no immediate charges.
+              Upon clicking confirm, all future charges will be deducted from the selected payment
+              method. There are no immediate charges.
             </p>
             <div className="!mt-6">
               <PaymentMethodSelection

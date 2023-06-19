@@ -3,13 +3,14 @@ import { useParams, useTheme } from 'common'
 import Table from 'components/to-be-cleaned/Table'
 import { useProjectSubscriptionUpdateMutation } from 'data/subscriptions/project-subscription-update-mutation'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
-import { useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
 import { BASE_PATH, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { Alert, Button, Collapsible, IconChevronRight, IconExternalLink, SidePanel } from 'ui'
-import { USAGE_COSTS } from './CostControl.constants'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { pricing } from 'shared-data/pricing'
 
 const SPEND_CAP_OPTIONS: {
   name: string
@@ -40,6 +41,8 @@ const SpendCapSidePanel = () => {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
   const [selectedOption, setSelectedOption] = useState<'on' | 'off'>()
 
+  const canUpdateSpendCap = checkPermissions(PermissionAction.BILLING_WRITE, 'stripe.subscriptions')
+
   const snap = useSubscriptionPageStateSnapshot()
   const visible = snap.panelKey === 'costControl'
   const onClose = () => snap.setPanelKey(undefined)
@@ -56,7 +59,7 @@ const SpendCapSidePanel = () => {
     if (visible && subscription !== undefined) {
       setSelectedOption(isSpendCapOn ? 'on' : 'off')
     }
-  }, [visible, isLoading])
+  }, [visible, isLoading, subscription, isSpendCapOn])
 
   const onConfirm = async () => {
     if (!projectRef) return console.error('Project ref is required')
@@ -83,11 +86,19 @@ const SpendCapSidePanel = () => {
     }
   }
 
+  const billingMetricCategories: (keyof typeof pricing)[] = [
+    'database',
+    'auth',
+    'storage',
+    'realtime',
+    'edge_functions',
+  ]
+
   return (
     <SidePanel
       size="large"
       loading={isLoading || isSubmitting}
-      disabled={isFreePlan || isLoading || !hasChanges || isSubmitting}
+      disabled={isFreePlan || isLoading || !hasChanges || isSubmitting || !canUpdateSpendCap}
       visible={visible}
       onCancel={onClose}
       onConfirm={onConfirm}
@@ -103,6 +114,7 @@ const SpendCapSidePanel = () => {
           </Link>
         </div>
       }
+      tooltip={!canUpdateSpendCap ? 'You do not have permission to update spend cap' : undefined}
     >
       <SidePanel.Content>
         <div className="py-6 space-y-4">
@@ -137,27 +149,32 @@ const SpendCapSidePanel = () => {
                     </Table.th>
                   </>
                 }
-                body={USAGE_COSTS.map((category) => {
+                body={billingMetricCategories.map((categoryId) => {
+                  const category = pricing[categoryId]
+                  const usageItems = category.features.filter((it: any) => it.usage_based)
+
                   return (
                     <>
-                      <Table.tr key={category.category}>
+                      <Table.tr key={categoryId}>
                         <Table.td>
-                          <p className="text-xs text-scale-1200">{category.category}</p>
+                          <p className="text-xs text-scale-1200">{category.title}</p>
                         </Table.td>
                         <Table.td>{null}</Table.td>
                       </Table.tr>
-                      {category.items.map((item) => (
-                        <Table.tr key={item.name}>
-                          <Table.td>
-                            <p className="text-xs pl-4">{item.name}</p>
-                          </Table.td>
-                          <Table.td>
-                            <p className="text-xs">
-                              ${item.unit_amount} per {item.unit}
-                            </p>
-                          </Table.td>
-                        </Table.tr>
-                      ))}
+                      {usageItems.map((item: any) => {
+                        return (
+                          <Table.tr key={item.name}>
+                            <Table.td>
+                              <p className="text-xs pl-4">{item.title}</p>
+                            </Table.td>
+                            <Table.td>
+                              <p className="text-xs pl-4">
+                                {item.plans[subscription?.plan?.id || 'pro']}
+                              </p>
+                            </Table.td>
+                          </Table.tr>
+                        )
+                      })}
                     </>
                   )
                 })}
@@ -176,7 +193,7 @@ const SpendCapSidePanel = () => {
                 </Button>
               }
             >
-              Upgrade your project's plan to disable the spend cap
+              Upgrade your plan to disable the spend cap
             </Alert>
           )}
 
@@ -246,7 +263,7 @@ const SpendCapSidePanel = () => {
               <p className="text-sm">
                 {selectedOption === 'on'
                   ? 'Upon clicking confirm, spend cap will be enabled for your project and you will no longer be charged any extra for usage.'
-                  : 'Upon clicking confirm, spend cap will be disabled for your project and you will be charged for any usage above the included quota'}
+                  : 'Upon clicking confirm, spend cap will be disabled for your project and you will be charged for any usage beyong the included quota.'}
               </p>
             </>
           )}

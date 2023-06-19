@@ -1,10 +1,11 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import clsx from 'clsx'
 import { useParams, useTheme } from 'common'
 import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-remove-mutation'
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
-import { useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
@@ -39,6 +40,8 @@ const PITRSidePanel = () => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState<'on' | 'off'>('off')
   const [selectedOption, setSelectedOption] = useState<string>('pitr_0')
+
+  const canUpdatePitr = checkPermissions(PermissionAction.BILLING_WRITE, 'stripe.subscriptions')
 
   const snap = useSubscriptionPageStateSnapshot()
   const visible = snap.panelKey === 'pitr'
@@ -109,8 +112,14 @@ const PITRSidePanel = () => {
       onCancel={onClose}
       onConfirm={onConfirm}
       loading={isLoading || isSubmitting}
-      disabled={isFreePlan || isLoading || !hasChanges || isSubmitting}
-      tooltip={isFreePlan ? 'Unable to enable point in time recovery on a free plan' : undefined}
+      disabled={isFreePlan || isLoading || !hasChanges || isSubmitting || !canUpdatePitr}
+      tooltip={
+        isFreePlan
+          ? 'Unable to enable point in time recovery on a free plan'
+          : !canUpdatePitr
+          ? 'You do not have permission to update PITR'
+          : undefined
+      }
       header={
         <div className="flex items-center justify-between">
           <h4>Point in Time Recovery</h4>
@@ -179,14 +188,14 @@ const PITRSidePanel = () => {
                   withIcon
                   variant="info"
                   className="mb-4"
-                  title="Changing your compute size is only available on the Pro plan"
+                  title="Changing your Point-In-Time-Recovery is only available on the Pro plan"
                   actions={
                     <Button type="default" onClick={() => snap.setPanelKey('subscriptionPlan')}>
                       View available plans
                     </Button>
                   }
                 >
-                  Upgrade your project's plan to change the compute size of your project
+                  Upgrade your plan to change the compute size of your project
                 </Alert>
               ) : subscriptionCompute === undefined ? (
                 <Alert

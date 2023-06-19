@@ -47,7 +47,7 @@ const Infrastructure = ({
 
     if (diffInHours <= 48) {
       interval = '1h'
-      dateFormat = 'HH a'
+      dateFormat = 'h a'
     }
   }
 
@@ -199,15 +199,23 @@ const Infrastructure = ({
                       <span className={attribute.key === 'ram_usage' ? 'lowercase' : ''}>
                         {attribute.name}
                       </span>{' '}
-                      per {interval === '1d' ? 'day' : 'hour'}
+                      utilization per {interval === '1d' ? 'day' : 'hour'}
                     </p>
                   )}
                 </div>
 
                 {attribute.key === 'ram_usage' && (
-                  <p className="text-sm text-scale-1000">
-                    Your compute instance has {currentComputeInstanceSpecs.memoryGb} GB memory.
-                  </p>
+                  <div className="text-sm text-scale-1000">
+                    <p>
+                      Your compute instance has {currentComputeInstanceSpecs.memoryGb} GB of memory.
+                    </p>
+                    {currentComputeInstanceSpecs.memoryGb === 1 && (
+                      <p>
+                        As your project is running on the smallest compute instance, it is not
+                        unusual for your project to have a base memory usage of ~50%.
+                      </p>
+                    )}
+                  </div>
                 )}
 
                 {attribute.key === 'cpu_usage' && (

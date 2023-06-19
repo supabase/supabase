@@ -18,7 +18,7 @@ const ProjectBilling: NextPageWithLayout = () => {
   return (
     <div className="relative">
       {enableSubscriptionV2 && (
-        <div className="absolute top-[1.9rem] right-16 xl:right-32 flex items-center space-x-3">
+        <div className="absolute top-[1.9rem] right-16 xl:right-32 flex items-center space-x-3 z-10">
           <Toggle
             size="tiny"
             checked={showNewSubscriptionUI}

@@ -37,7 +37,7 @@ const UseCasesSection = ({ title, paragraph, useCases }: Props) => {
         </div>
         <div
           ref={ref}
-          className="mx-auto w-full max-w-5xl grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3"
+          className="relative mx-auto w-full max-w-5xl grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3"
         >
           {useCases.map((useCase, i) => {
             return <UseCase useCase={useCase} isInView={isInView} index={i} key={useCase.title} />
@@ -61,7 +61,7 @@ const UseCase = ({
   const animate = getAnimation({ delay: index * 0.1 })
 
   return (
-    <m.div initial={initial} animate={isInView ? animate : initial} className="flex w-full h-full">
+    <m.div initial={initial} animate={isInView ? animate : initial} className="flex">
       <InteractiveShimmerCard
         outerClassName="w-full"
         innerClassName="p-4 md:p-8 h-full !bg-scale-200"

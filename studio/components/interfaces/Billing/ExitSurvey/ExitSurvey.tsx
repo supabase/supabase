@@ -13,6 +13,8 @@ import { SubscriptionPreview } from '../Billing.types'
 import { StripeSubscription } from 'components/interfaces/Billing'
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { CANCELLATION_REASONS } from 'components/interfaces/BillingV2/Billing.constants'
+import { subscriptionKeys } from 'data/subscriptions/keys'
+import { useQueryClient } from '@tanstack/react-query'
 
 interface ExitSurveyProps {
   freeTier: any
@@ -23,6 +25,8 @@ interface ExitSurveyProps {
 const ExitSurvey = ({ freeTier, subscription, onSelectBack }: ExitSurveyProps) => {
   const router = useRouter()
   const { app, ui } = useStore()
+  const queryClient = useQueryClient()
+
   const projectId = ui.selectedProject?.id ?? -1
   const projectRef = ui.selectedProject?.ref
 
@@ -165,6 +169,12 @@ const ExitSurvey = ({ freeTier, subscription, onSelectBack }: ExitSurveyProps) =
         } else {
           setIsSuccessful(true)
         }
+
+        await Promise.all([
+          queryClient.invalidateQueries(subscriptionKeys.subscriptionV2(projectRef)),
+          queryClient.invalidateQueries(subscriptionKeys.subscription(projectRef)),
+          queryClient.invalidateQueries(subscriptionKeys.addons(projectRef)),
+        ])
       }
       const feedbackRes = await post(`${API_URL}/feedback/downgrade`, {
         projectRef,

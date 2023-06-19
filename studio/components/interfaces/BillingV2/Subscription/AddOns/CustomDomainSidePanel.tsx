@@ -1,10 +1,11 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import clsx from 'clsx'
 import { useParams } from 'common'
 import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-remove-mutation'
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
-import { useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
@@ -16,6 +17,11 @@ const CustomDomainSidePanel = () => {
 
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
   const [selectedOption, setSelectedOption] = useState<string>('cd_none')
+
+  const canUpdateCustomDomain = checkPermissions(
+    PermissionAction.BILLING_WRITE,
+    'stripe.subscriptions'
+  )
 
   const snap = useSubscriptionPageStateSnapshot()
   const visible = snap.panelKey === 'customDomain'
@@ -85,8 +91,14 @@ const CustomDomainSidePanel = () => {
       onCancel={onClose}
       onConfirm={onConfirm}
       loading={isLoading || isSubmitting}
-      disabled={isFreePlan || isLoading || !hasChanges || isSubmitting}
-      tooltip={isFreePlan ? 'Unable to enable custom domain on a free plan' : undefined}
+      disabled={isFreePlan || isLoading || !hasChanges || isSubmitting || !canUpdateCustomDomain}
+      tooltip={
+        isFreePlan
+          ? 'Unable to enable custom domain on a free plan'
+          : !canUpdateCustomDomain
+          ? 'You do not have permission to update custom domain'
+          : undefined
+      }
       header={
         <div className="flex items-center justify-between">
           <h4>Custom domains</h4>
@@ -198,7 +210,7 @@ const CustomDomainSidePanel = () => {
                 </Button>
               }
             >
-              Upgrade your project's plan to add a custom domain to your project
+              Upgrade your plan to add a custom domain to your project
             </Alert>
           )}
         </div>
