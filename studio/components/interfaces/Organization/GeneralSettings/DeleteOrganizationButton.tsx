@@ -109,14 +109,7 @@ const DeleteOrganizationButton = observer(() => {
               </Modal.Content>
               <Modal.Separator />
               <Modal.Content>
-                <Button
-                  block
-                  danger
-                  size="small"
-                  type="danger"
-                  htmlType="submit"
-                  loading={isSubmitting}
-                >
+                <Button block size="small" type="danger" htmlType="submit" loading={isSubmitting}>
                   I understand, delete this organization
                 </Button>
               </Modal.Content>

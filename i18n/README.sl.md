@@ -27,7 +27,7 @@
 
 Za celotno dokumentacijo obiščite [supabase.com/docs](https://supabase.com/docs)
 
-Če si želite ogledati, kako prispevati, obiščite [Getting Started](./DEVELOPERS.md)
+Če si želite ogledati, kako prispevati, obiščite [Getting Started](../DEVELOPERS.md)
 
 ## Skupnost in podpora
 

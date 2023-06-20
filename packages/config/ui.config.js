@@ -382,27 +382,6 @@ const uiConfig = {
             values: flattenColorPalette(theme('backgroundColor')),
             type: 'color',
           }
-        ),
-        matchUtilities(
-          {
-            bordershadow: (value) => {
-              return {
-                boxShadow: `
-                var(--colors-blackA1) 0px 0px 0px 0px,
-                var(--colors-blackA1) 0px 0px 0px 0px,
-                var(--colors-blackA8) 0px 1px 1px 0px,
-                ${value} 0px 0px 0px 1px,
-                var(--colors-blackA1) 0px 0px 0px 0px,
-                var(--colors-blackA1) 0px 0px 0px 0px,
-                rgb(64 68 82 / 8%) 0px 2px 5px 0px;
-                `,
-              }
-            },
-          },
-          {
-            values: flattenColorPalette(theme('backgroundColor')),
-            type: 'color',
-          }
         )
     },
     require('tailwindcss-radix')(),

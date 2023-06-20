@@ -212,6 +212,7 @@ export const gettingstarted: NavMenuConstant = {
       items: [
         { name: 'React', url: '/guides/getting-started/quickstarts/reactjs' },
         { name: 'NextJS', url: '/guides/getting-started/quickstarts/nextjs' },
+        { name: 'NuxtJS', url: '/guides/getting-started/quickstarts/nuxtjs' },
         { name: 'RedwoodJS', url: '/guides/getting-started/quickstarts/redwoodjs' },
         { name: 'Flutter', url: '/guides/getting-started/quickstarts/flutter' },
         { name: 'SvelteKit', url: '/guides/getting-started/quickstarts/sveltekit' },
@@ -534,6 +535,7 @@ export const database: NavMenuConstant = {
         { name: 'Implementing Full Text Search', url: '/guides/database/full-text-search' },
         { name: 'Implementing Cascade Deletes', url: '/guides/database/postgres/cascade-deletes' },
         { name: 'Implementing column encryption', url: '/guides/database/column-encryption' },
+        { name: 'Partitioning your tables', url: '/guides/database/partitions' },
         { name: 'Testing your database', url: '/guides/database/testing' },
         { name: 'Managing Timeouts', url: '/guides/database/timeouts' },
         { name: 'Managing Passwords', url: '/guides/database/managing-passwords' },
@@ -745,6 +747,7 @@ export const functions: NavMenuConstant = {
           name: 'Connecting directly to Postgres',
           url: '/guides/functions/connect-to-postgres',
         },
+        { name: 'Troubleshooting', url: '/guides/functions/troubleshooting' },
       ],
     },
     {
@@ -755,6 +758,7 @@ export const functions: NavMenuConstant = {
         { name: 'Browserless.io', url: '/guides/functions/examples/screenshots' },
         { name: 'Hugging Face', url: '/guides/ai/examples/huggingface-image-captioning' },
         { name: 'OpenAI API', url: '/guides/ai/examples/openai' },
+        { name: 'Sending Emails with Resend', url: '/guides/functions/examples/send-emails' },
         { name: 'Upstash Redis', url: '/guides/functions/examples/upstash-redis' },
         { name: 'Type-Safe SQL with Kysely', url: '/guides/functions/kysely-postgres' },
       ],
@@ -896,6 +900,7 @@ export const ai: NavMenuConstant = {
         { name: 'Managing indexes', url: '/guides/ai/managing-indexes' },
         { name: 'Vector columns', url: '/guides/ai/vector-columns' },
         { name: 'Engineering for scale', url: '/guides/ai/engineering-for-scale' },
+        { name: 'Choosing instance type', url: '/guides/ai/choosing-instance-type' },
       ],
     },
     {
@@ -994,6 +999,7 @@ export const platform: NavMenuConstant = {
       url: undefined,
       items: [
         { name: 'Access Control', url: '/guides/platform/access-control' },
+        { name: 'Custom Postgres Config', url: '/guides/platform/custom-postgres-config' },
         { name: 'Database Size', url: '/guides/platform/database-size' },
         { name: 'HTTP Status Codes', url: '/guides/platform/http-status-codes' },
         { name: 'Logging', url: '/guides/platform/logs' },
@@ -1055,6 +1061,10 @@ export const platform: NavMenuConstant = {
         {
           name: 'High CPU Usage',
           url: '/guides/platform/exhaust-cpu',
+        },
+        {
+          name: 'High RAM Usage',
+          url: '/guides/platform/exhaust-ram',
         },
       ],
     },
@@ -1208,6 +1218,7 @@ export const integrations: NavMenuConstant = {
       url: undefined,
       items: [
         { name: 'Appsmith', url: '/guides/integrations/appsmith' },
+        { name: 'Bracket', url: '/guides/integrations/bracket' },
         { name: 'DhiWise', url: '/guides/integrations/dhiwise' },
         { name: 'Directus', url: '/guides/integrations/directus' },
         { name: 'Draftbit', url: '/guides/integrations/draftbit' },

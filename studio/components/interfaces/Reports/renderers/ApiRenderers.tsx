@@ -171,11 +171,13 @@ const RouteTdContent = (datum: RouteTdContentProps) => (
   <Collapsible>
     <Collapsible.Trigger asChild>
       <div className="flex gap-2">
-        <Button as="span" type="text" className=" !py-0 !p-1" title="Show more route details">
-          <IconChevronRight
-            size={14}
-            className="transition data-open-parent:rotate-90 data-closed-parent:rotate-0"
-          />
+        <Button asChild type="text" className=" !py-0 !p-1" title="Show more route details">
+          <span>
+            <IconChevronRight
+              size={14}
+              className="transition data-open-parent:rotate-90 data-closed-parent:rotate-0"
+            />
+          </span>
         </Button>
         <TextFormatter className="w-10 h-4 text-center rounded bg-scale-500" value={datum.method} />
         {datum.status_code && (

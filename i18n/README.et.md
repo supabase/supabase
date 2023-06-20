@@ -27,7 +27,7 @@
 
 Täieliku dokumentatsiooni saamiseks külastage [supabase.com/docs](https://supabase.com/docs)
 
-Et näha, kuidas panustada, külastage [Getting Started](./DEVELOPERS.md)
+Et näha, kuidas panustada, külastage [Getting Started](../DEVELOPERS.md)
 
 ## Kogukond ja tugi
 

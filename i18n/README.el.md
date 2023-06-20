@@ -27,7 +27,7 @@
 
 Για πλήρη τεκμηρίωση, επισκεφθείτε τη διεύθυνση [supabase.com/docs](https://supabase.com/docs)
 
-Για να δείτε πώς μπορείτε να συνεισφέρετε, επισκεφθείτε το [Getting Started](./DEVELOPERS.md)
+Για να δείτε πώς μπορείτε να συνεισφέρετε, επισκεφθείτε το [Getting Started](../DEVELOPERS.md)
 
 ## Κοινότητα &amp; Υποστήριξη
 

@@ -114,7 +114,22 @@ const SubscriptionTier = ({}: SubscriptionTierProps) => {
                 </Alert>
               ))}
             {!subscription?.usage_billing_enabled && (
-              <Alert withIcon variant="info" title="This project is limited by the included usage">
+              <Alert
+                withIcon
+                variant="info"
+                title="This project is limited by the included usage"
+                actions={
+                  currentPlan?.id === 'free' ? (
+                    <Button type="default" onClick={() => snap.setPanelKey('subscriptionPlan')}>
+                      Uprade Plan
+                    </Button>
+                  ) : (
+                    <Button type="default" onClick={() => snap.setPanelKey('costControl')}>
+                      Adjust Spend Cap
+                    </Button>
+                  )
+                }
+              >
                 <p className="text-sm text-scale-1000">
                   When this project exceeds its{' '}
                   <Link href="#breakdown">
@@ -124,14 +139,15 @@ const SubscriptionTier = ({}: SubscriptionTierProps) => {
                   </Link>
                   , it may become unresponsive.{' '}
                   {currentPlan?.id === 'free' ? (
-                    <span>
+                    <p className="pr-4">
                       If you wish to exceed the included usage, you should upgrade to a paid plan.
-                    </span>
+                    </p>
                   ) : (
-                    <span>
-                      You can change the Cost Control settings if you plan on exceeding the included
-                      usage quotas.
-                    </span>
+                    <p className="pr-4">
+                      You currently have Spend Cap enabled - when you exceed your plan's limit, you
+                      will experience restrictions. To scale seamlessly and pay for over-usage, you
+                      can adjust your Cost Control settings.
+                    </p>
                   )}
                 </p>
               </Alert>

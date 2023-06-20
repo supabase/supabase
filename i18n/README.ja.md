@@ -27,7 +27,7 @@
 
 完全なドキュメントは、[supabase.com/docs](https://supabase.com/docs)を参照してください。
 
-貢献の仕方については、[Getting Started](./DEVELOPERS.md) を参照してください。
+貢献の仕方については、[Getting Started](../DEVELOPERS.md) を参照してください。
 
 ## コミュニティとサポート
 

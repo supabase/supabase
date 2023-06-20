@@ -81,12 +81,12 @@ const LogsFilterPopover: React.FC<Props> = ({
       side="bottom"
     >
       <Button
-        as="span"
+        asChild
         type={checkIsActive() ? 'secondary' : 'default'}
         onClick={handleToggle}
         className={buttonClassName}
       >
-        {options.label}
+        <span>{options.label}</span>
       </Button>
     </Popover>
   )
