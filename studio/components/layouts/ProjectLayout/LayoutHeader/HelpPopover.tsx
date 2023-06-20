@@ -28,7 +28,7 @@ const HelpPopover: FC<Props> = () => {
       side="bottom"
       sideOffset={8}
       overlay={
-        <div className="my-4 w-96 space-y-4">
+        <div className="my-4 w-[400px] space-y-4">
           <div className="my-5 space-y-4 px-5">
             <h5 className="text-scale-1200">Need help with your project?</h5>
             <p className="text-sm text-scale-900">
