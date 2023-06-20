@@ -119,7 +119,7 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
   }
 
   return (
-    <div className="group sql-snippet-queryitem-dropdown">
+    <div className="group [div&>button[data-state='open']>span]:text-scale-900">
       {IS_PLATFORM ? (
         <Dropdown
           side="bottom"
@@ -138,7 +138,7 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
         >
           <span
             className={clsx(
-              'p-0.5 rounded-md ',
+              'p-0.5 rounded-md',
               isActive
                 ? 'text-scale-1100 hover:bg-scale-800'
                 : 'text-scale-300 dark:text-scale-200 hover:bg-scale-500 group-hover:text-scale-1100'
