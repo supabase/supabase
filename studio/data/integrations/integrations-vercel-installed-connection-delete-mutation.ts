@@ -1,9 +1,14 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { delete_ } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { UserContent } from 'types'
+import { integrationKeys } from './keys'
 
-type DeleteVariables = { organization_integration_id: string; id: string }
+type DeleteVariables = {
+  organization_integration_id: string
+  id: string
+  orgId: number | undefined
+}
 
 export async function deleteConnection(
   { organization_integration_id, id }: DeleteVariables,
@@ -29,10 +34,14 @@ export const useIntegrationsVercelInstalledConnectionDeleteMutation = ({
   onSuccess,
   ...options
 }: Omit<UseMutationOptions<DeleteContentData, unknown, DeleteVariables>, 'mutationFn'> = {}) => {
+  const queryClient = useQueryClient()
   return useMutation<DeleteContentData, unknown, DeleteVariables>(
     (args) => deleteConnection(args),
     {
       async onSuccess(data, variables, context) {
+        console.log('variables in mutate delete onSuccess', variables)
+        await Promise.all([queryClient.invalidateQueries(integrationKeys.list(variables.orgId))])
+
         await onSuccess?.(data, variables, context)
       },
       ...options,
