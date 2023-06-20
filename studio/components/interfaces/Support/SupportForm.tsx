@@ -353,7 +353,7 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
                         Enhanced SLAs for support are available on our Enterprise Plan.
                       </p>
                       <div className="flex items-center space-x-2">
-                        <Link href={`/project/${values.projectRef}/settings/billing/update`}>
+                        <Link href={`/project/${values.projectRef}/settings/billing/subscription?panel=subscriptionPlan`}>
                           <a>
                             <Button>Upgrade project</Button>
                           </a>
@@ -580,10 +580,9 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
                       </div>
                     </div>
                     <div className="px-6">
-                      <div className="flex justify-end">
-                        <p className="block text-sm text-scale-1000 mt-0 mb-2">
-                          We will contact you at {respondToEmail}.
-                        </p>
+                      <div className="flex items-center space-x-1 justify-end block text-sm mt-0 mb-2">
+                        <p className="text-scale-1000">We will contact you at</p>
+                        <p className="text-scale-1200 font-medium">{respondToEmail}</p>
                       </div>
                       <div className="flex justify-end">
                         <Button

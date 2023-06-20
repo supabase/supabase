@@ -1,10 +1,11 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import clsx from 'clsx'
 import { useParams, useTheme } from 'common'
 import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-remove-mutation'
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
-import { useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
 import { BASE_PATH, PROJECT_STATUS } from 'lib/constants'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -43,6 +44,8 @@ const ComputeInstanceSidePanel = () => {
   const [selectedCategory, setSelectedCategory] = useState<'micro' | 'optimized'>('micro')
   const [selectedOption, setSelectedOption] = useState<string>('ci_micro')
 
+  const canUpdateCompute = checkPermissions(PermissionAction.BILLING_WRITE, 'stripe.subscriptions')
+
   const snap = useSubscriptionPageStateSnapshot()
   const visible = snap.panelKey === 'computeInstance'
   const onClose = () => snap.setPanelKey(undefined)
@@ -56,7 +59,7 @@ const ComputeInstanceSidePanel = () => {
   const selectedAddons = addons?.selected_addons ?? []
   const availableAddons = addons?.available_addons ?? []
 
-  const isFreePlan = subscription?.plan.id === 'free'
+  const isFreePlan = subscription?.plan?.id === 'free'
   const subscriptionCompute = selectedAddons.find((addon) => addon.type === 'compute_instance')
   const pitrAddon = selectedAddons.find((addon) => addon.type === 'pitr')
   const availableOptions =
@@ -119,8 +122,20 @@ const ComputeInstanceSidePanel = () => {
         onCancel={onClose}
         onConfirm={() => setShowConfirmationModal(true)}
         loading={isLoading}
-        disabled={isFreePlan || isLoading || !hasChanges || blockMicroDowngradeDueToPitr}
-        tooltip={isFreePlan ? 'Unable to update compute instance on a free plan' : undefined}
+        disabled={
+          isFreePlan ||
+          isLoading ||
+          !hasChanges ||
+          blockMicroDowngradeDueToPitr ||
+          !canUpdateCompute
+        }
+        tooltip={
+          isFreePlan
+            ? 'Unable to update compute instance on a free plan'
+            : !canUpdateCompute
+            ? 'You do not have permission to update compute instance'
+            : undefined
+        }
         header={
           <div className="flex items-center justify-between">
             <h4>Change project compute size</h4>

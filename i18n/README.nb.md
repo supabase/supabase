@@ -27,7 +27,7 @@ supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/a
 
 For fullstendig dokumentasjon, besøk [supabase.com/docs](https://supabase.com/docs)
 
-For å se hvordan du kan bidra, gå til [Getting Started](./DEVELOPERS.md)
+For å se hvordan du kan bidra, gå til [Getting Started](../DEVELOPERS.md)
 
 ## Fellesskap og støtte
 

@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { FC, useState, useEffect } from 'react'
+import { FC, useEffect, useMemo, useState } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import {
@@ -110,6 +110,11 @@ const EdgeFunctionDetails: FC<Props> = () => {
     }
   }
 
+  const hasImportMap = useMemo(
+    () => selectedFunction?.import_map || selectedFunction?.import_map_path,
+    [selectedFunction]
+  )
+
   return (
     <>
       <div className="space-y-4 pb-16">
@@ -192,18 +197,16 @@ const EdgeFunctionDetails: FC<Props> = () => {
                           <p className="text-sm">
                             Import maps are{' '}
                             <span
-                              className={clsx(
-                                selectedFunction?.import_map ? 'text-brand-900' : 'text-amber-900'
-                              )}
+                              className={clsx(hasImportMap ? 'text-brand-900' : 'text-amber-900')}
                             >
-                              {selectedFunction?.import_map ? 'allowed' : 'disallowed'}
+                              {hasImportMap ? 'used' : 'not used'}
                             </span>{' '}
                             for this function
                           </p>
                         </div>
                         <p className="text-sm text-scale-1000">
-                          Import maps allow the use of bare specifiers without having to install the
-                          Node.js package locally
+                          Import maps allow the use of bare specifiers in functions instead of
+                          explicit import URLs
                         </p>
                         <div className="!mt-4">
                           <Link href="https://supabase.com/docs/guides/functions/import-maps">

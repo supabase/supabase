@@ -27,7 +27,7 @@
 
 Pełna dokumentacja znajduje się na stronie [supabase.com/docs](https://supabase.com/docs)
 
-Aby zobaczyć, jak wnieść swój wkład, odwiedź [Getting Started](./DEVELOPERS.md)
+Aby zobaczyć, jak wnieść swój wkład, odwiedź [Getting Started](../DEVELOPERS.md)
 
 ## Społeczność i wsparcie
 

@@ -27,7 +27,7 @@
 
 Úplnou dokumentaci naleznete na adrese [supabase.com/docs](https://supabase.com/docs)
 
-Chcete-li zjistit, jak přispívat, navštivte stránku [Začínáme](./DEVELOPERS.md)
+Chcete-li zjistit, jak přispívat, navštivte stránku [Začínáme](../DEVELOPERS.md)
 
 ## Komunita a podpora
 
