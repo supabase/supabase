@@ -51,7 +51,7 @@ cd supabase-nextjs
 Then install the Supabase client library: [supabase-js](https://github.com/supabase/supabase-js)
 
 ```bash
-npm install @supabase/supabase-js
+npm install @supabase/supabase-js encoding
 ```
 
 And finally we want to save the environment variables in a `.env.local`.
@@ -191,12 +191,22 @@ Create an `AuthForm` client side component with the `Auth` component rendered wi
 
 ```jsx app/auth-form.jsx
 'use client'
+import { useState, useEffect } from 'react'
 import { Auth } from '@supabase/auth-ui-react'
 import { ThemeSupa } from '@supabase/auth-ui-shared'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 
 export default function AuthForm() {
   const supabase = createClientComponentClient()
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
+  if (!isMounted) {
+    return null
+  }
 
   return (
     <Auth
@@ -217,6 +227,7 @@ export default function AuthForm() {
 
 ```jsx app/auth-form.tsx
 'use client'
+import { useState, useEffect } from 'react'
 import { Auth } from '@supabase/auth-ui-react'
 import { ThemeSupa } from '@supabase/auth-ui-shared'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
@@ -224,6 +235,15 @@ import { Database } from './database.types'
 
 export default function AuthForm() {
   const supabase = createClientComponentClient<Database>()
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
+  if (!isMounted) {
+    return null
+  }
 
   return (
     <Auth
@@ -417,6 +437,7 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 export default function AccountForm({ session }) {
   const supabase = createClientComponentClient()
   const [loading, setLoading] = useState(true)
+  const [isMounted, setIsMounted] = useState(false)
   const [fullname, setFullname] = useState(null)
   const [username, setUsername] = useState(null)
   const [website, setWebsite] = useState(null)
@@ -477,6 +498,14 @@ export default function AccountForm({ session }) {
     } finally {
       setLoading(false)
     }
+  }
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
+  if (!isMounted) {
+    return null
   }
 
   return (
@@ -547,6 +576,7 @@ import { Session, createClientComponentClient } from '@supabase/auth-helpers-nex
 export default function AccountForm({ session }: { session: Session | null }) {
   const supabase = createClientComponentClient<Database>()
   const [loading, setLoading] = useState(true)
+  const [isMounted, setIsMounted] = useState(false)
   const [fullname, setFullname] = useState<string | null>(null)
   const [username, setUsername] = useState<string | null>(null)
   const [website, setWebsite] = useState<string | null>(null)
@@ -612,6 +642,14 @@ export default function AccountForm({ session }: { session: Session | null }) {
     } finally {
       setLoading(false)
     }
+  }
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
+  if (!isMounted) {
+    return null
   }
 
   return (
