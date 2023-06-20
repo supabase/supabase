@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { FC, useEffect, useRef, useState } from 'react'
 
+import { getProjectDetail } from 'data/projects/project-detail-query'
 import { useStore } from 'hooks'
 import { getWithTimeout } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
@@ -10,7 +11,7 @@ import { useProjectContext } from './ProjectContext'
 interface Props {}
 
 const RestoringState: FC<Props> = ({}) => {
-  const { app, ui, meta } = useStore()
+  const { meta } = useStore()
   const { project } = useProjectContext()
   const checkServerInterval = useRef<number>()
 
@@ -42,8 +43,13 @@ const RestoringState: FC<Props> = ({}) => {
   }
 
   const onConfirm = async () => {
+    if (!project) return
+
     setLoading(true)
-    await app.projects.fetchDetail(project?.ref ?? '', (project) => meta.setProjectDetails(project))
+    const projectDetail = await getProjectDetail({ ref: project?.ref })
+    if (projectDetail) {
+      meta.setProjectDetails(projectDetail)
+    }
   }
 
   return (

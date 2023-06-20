@@ -4,11 +4,11 @@ import { ComponentType, useEffect } from 'react'
 
 import { useParams } from 'common/hooks'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
-import { useStore } from 'hooks'
+import { useSelectedProject, useStore } from 'hooks'
 import { useAuth } from 'lib/auth'
 import { IS_PLATFORM } from 'lib/constants'
-import { getReturnToPath, STORAGE_KEY } from 'lib/gotrue'
-import { isNextPageWithLayout, NextPageWithLayout } from 'types'
+import { STORAGE_KEY, getReturnToPath } from 'lib/gotrue'
+import { NextPageWithLayout, isNextPageWithLayout } from 'types'
 import Error500 from '../../pages/500'
 
 const PLATFORM_ONLY_PAGES = [
@@ -70,14 +70,12 @@ export function withAuth<T>(
       }
     }, [isRedirecting, redirectTo])
 
+    const selectedProject = useSelectedProject()
     useEffect(() => {
-      if (router.isReady) {
-        if (ref) {
-          rootStore.setProjectRef(ref)
-        }
-        rootStore.setOrganizationSlug(slug)
+      if (selectedProject) {
+        rootStore.setProject(selectedProject)
       }
-    }, [isLoading, router.isReady, ref, slug])
+    }, [selectedProject])
 
     if (!isLoading && !isRedirecting && !isLoggedIn) {
       return <Error500 />

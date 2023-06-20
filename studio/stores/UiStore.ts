@@ -6,12 +6,12 @@ import { IRootStore } from './RootStore'
 export interface IUiStore {
   language: 'en-US'
   selectedProjectRef?: string
-  selectedProject?: Project
-  selectedProjectBaseInfo?: ProjectBase
-  selectedOrganization?: Organization
+  // selectedProject?: Project
+  // selectedProjectBaseInfo?: ProjectBase
+  // selectedOrganization?: Organization
   notification?: Notification
   permissions?: Permission[]
-  load: () => void
+  // load: () => void
   setProjectRef: (ref?: string) => void
   setOrganizationSlug: (slug?: string) => void
   setNotification: (notification: Notification) => string
@@ -40,49 +40,49 @@ export default class UiStore implements IUiStore {
    *
    * @returns Project or undefined
    */
-  get selectedProject() {
-    if (this.selectedProjectRef) {
-      const found = this.rootStore.app.projects.find(
-        (x: Project) => x.ref === this.selectedProjectRef
-      )
-      // Self-hosted project details has connectionString set to empty string
-      return found?.connectionString !== undefined ? found : undefined
-    }
-    return undefined
-  }
+  // get selectedProject() {
+  //   if (this.selectedProjectRef) {
+  //     const found = this.rootStore.app.projects.find(
+  //       (x: Project) => x.ref === this.selectedProjectRef
+  //     )
+  //     // Self-hosted project details has connectionString set to empty string
+  //     return found?.connectionString !== undefined ? found : undefined
+  //   }
+  //   return undefined
+  // }
 
   /**
    * Get selected project base info.
    *
    * @return ProjectBase or undefined
    */
-  get selectedProjectBaseInfo(): ProjectBase | undefined {
-    if (this.selectedProjectRef) {
-      return this.rootStore.app.projects.find((x: Project) => x.ref == this.selectedProjectRef)
-    }
-    return undefined
-  }
+  // get selectedProjectBaseInfo(): ProjectBase | undefined {
+  //   if (this.selectedProjectRef) {
+  //     return this.rootStore.app.projects.find((x: Project) => x.ref == this.selectedProjectRef)
+  //   }
+  //   return undefined
+  // }
 
-  get selectedOrganization() {
-    if (this.selectedOrganizationSlug) {
-      const found = this.rootStore.app.organizations.find(
-        (x: Organization) => x.slug == this.selectedOrganizationSlug
-      )
-      return found
-    }
-    if (this.selectedProjectRef) {
-      const organizationId = this.selectedProject?.organization_id
-      const found = this.rootStore.app.organizations.find(
-        (x: Organization) => x.id == organizationId
-      )
-      return found
-    }
-    return undefined
-  }
+  // get selectedOrganization() {
+  //   if (this.selectedOrganizationSlug) {
+  //     const found = this.rootStore.app.organizations.find(
+  //       (x: Organization) => x.slug == this.selectedOrganizationSlug
+  //     )
+  //     return found
+  //   }
+  //   if (this.selectedProjectRef) {
+  //     const organizationId = this.selectedProject?.organization_id
+  //     const found = this.rootStore.app.organizations.find(
+  //       (x: Organization) => x.id == organizationId
+  //     )
+  //     return found
+  //   }
+  //   return undefined
+  // }
 
-  load() {
-    if (typeof window === 'undefined') return
-  }
+  // load() {
+  //   if (typeof window === 'undefined') return
+  // }
 
   setProjectRef(ref?: string) {
     this.selectedProjectRef = ref

@@ -1,7 +1,6 @@
 import { CLIENT_LIBRARIES } from 'common/constants'
 import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { ChangeEvent, FC, useEffect, useRef, useState } from 'react'
 import {
   Button,
@@ -17,6 +16,7 @@ import {
   Listbox,
 } from 'ui'
 
+import { useParams } from 'common'
 import Divider from 'components/ui/Divider'
 import InformationBox from 'components/ui/InformationBox'
 import Connecting from 'components/ui/Loading'
@@ -24,10 +24,11 @@ import MultiSelect from 'components/ui/MultiSelect'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProfileQuery } from 'data/profile/profile-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
+import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 import { useFlag, useStore } from 'hooks'
 import useLatest from 'hooks/misc/useLatest'
 import { get, post } from 'lib/common/fetch'
-import { API_URL, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
+import { API_URL } from 'lib/constants'
 import { detectBrowser } from 'lib/helpers'
 import { Project } from 'types'
 import DisabledStateForFreeTier from './DisabledStateForFreeTier'
@@ -41,9 +42,8 @@ interface Props {
 }
 
 const SupportForm: FC<Props> = ({ setSentCategory }) => {
-  const { ui, app } = useStore()
-  const router = useRouter()
-  const { ref, subject, category, message } = router.query
+  const { ui } = useStore()
+  const { ref, subject, category, message } = useParams()
 
   const uploadButtonRef = useRef()
   const enableFreeSupport = useFlag('enableFreeSupport')
@@ -56,19 +56,14 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
   const organizationsRef = useLatest(organizations)
 
   const { data: allProjects, isSuccess: isProjectsSuccess } = useProjectsQuery()
+  const { data: subscription, isLoading: isLoadingSubscription } = useProjectSubscriptionV2Query({
+    projectRef: ref,
+  })
 
   const isInitialized = isOrganizationsSuccess && isProjectsSuccess
   const projectDefaults: Partial<Project>[] = [{ ref: 'no-project', name: 'No specific project' }]
 
   const projects = [...(allProjects ?? []), ...projectDefaults]
-
-  const planNames = {
-    [PRICING_TIER_PRODUCT_IDS.FREE]: 'Free',
-    [PRICING_TIER_PRODUCT_IDS.PRO]: 'Pro',
-    [PRICING_TIER_PRODUCT_IDS.PAYG]: 'Pro',
-    [PRICING_TIER_PRODUCT_IDS.TEAM]: 'Team',
-    [PRICING_TIER_PRODUCT_IDS.ENTERPRISE]: 'Enterprise',
-  }
 
   useEffect(() => {
     if (!uploadedFiles) return
@@ -213,9 +208,7 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
         )
 
         const selectedProject = projects.find((project) => project.ref === values.projectRef)
-        const isFreeProject =
-          (selectedProject?.subscription_tier ?? PRICING_TIER_PRODUCT_IDS.FREE) ===
-          PRICING_TIER_PRODUCT_IDS.FREE
+        const isFreeProject = (subscription?.plan.id ?? 'free') === 'free'
         const isDisabled =
           !enableFreeSupport &&
           isFreeProject &&
@@ -232,9 +225,6 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
             }
             resetForm({ values: updatedValues, initialValues: updatedValues })
           } else if (selectedProject) {
-            if (!selectedProject.subscription_tier) {
-              app.projects.fetchSubscriptionTier(selectedProject as Project)
-            }
             const organization = organizationsRef.current?.find(
               (org) => org.id === selectedProject.organization_id
             )
@@ -305,14 +295,12 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
                   })}
                 </Listbox>
               </div>
-              {selectedProject?.subscription_tier ? (
+              {subscription ? (
                 <p className="text-sm text-scale-1000 mt-2">
                   This project is on the{' '}
-                  <span className="text-scale-1100">
-                    {planNames[selectedProject?.subscription_tier]} plan
-                  </span>
+                  <span className="text-scale-1100">{subscription.plan.name} plan</span>
                 </p>
-              ) : selectedProject?.ref !== 'no-project' ? (
+              ) : isLoadingSubscription ? (
                 <div className="flex items-center space-x-2 mt-2">
                   <IconLoader size={14} className="animate-spin" />
                   <p className="text-sm text-scale-1000">Checking project's plan</p>
@@ -344,7 +332,7 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
               </div>
             )}
 
-            {selectedProject?.subscription_tier === PRICING_TIER_PRODUCT_IDS.FREE && (
+            {subscription?.plan.id === 'free' && (
               <div className="px-6">
                 <InformationBox
                   icon={<IconAlertCircle strokeWidth={2} />}
