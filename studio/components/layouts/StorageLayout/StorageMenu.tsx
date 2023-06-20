@@ -31,8 +31,8 @@ const StorageMenu = () => {
     | 'logs'
 
   const storageExplorerStore = useStorageStore()
-  const { data } = useBucketsQuery({ projectRef: ref })
-  const { loaded, openDeleteBucketModal } = storageExplorerStore || {}
+  const { data, isLoading } = useBucketsQuery({ projectRef: ref })
+  const { openDeleteBucketModal } = storageExplorerStore || {}
 
   const buckets = data ?? []
 
@@ -80,11 +80,11 @@ const StorageMenu = () => {
           <div className="">
             <div>
               <Menu.Group title="All buckets" />
-              {!loaded ? (
-                <div className="space-y-2">
+              {isLoading ? (
+                <div className="space-y-2 mx-2">
                   <ShimmeringLoader className="!py-2.5" />
-                  <ShimmeringLoader className="!py-2.5 w-3/4" />
-                  <ShimmeringLoader className="!py-2.5 w-1/2" />
+                  <ShimmeringLoader className="!py-2.5" />
+                  <ShimmeringLoader className="!py-2.5" />
                 </div>
               ) : (
                 <>
@@ -126,10 +126,7 @@ const StorageMenu = () => {
 
       <CreateBucketModal
         visible={showCreateBucketModal}
-        onClose={() => {
-          console.log('onClose')
-          setShowCreateBucketModal(false)
-        }}
+        onClose={() => setShowCreateBucketModal(false)}
       />
 
       <EditBucketModal
