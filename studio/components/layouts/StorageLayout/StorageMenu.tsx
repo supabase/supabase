@@ -14,6 +14,7 @@ import { StorageBucket } from 'components/interfaces/Storage/Storage.types'
 import EditBucketModal from 'components/interfaces/Storage/EditBucketModal'
 import CreateBucketModal from 'components/interfaces/Storage/CreateBucketModal'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { useBucketsQuery } from 'data/storage/buckets-query'
 
 interface Props {}
 
@@ -32,7 +33,10 @@ const StorageMenu: FC<Props> = () => {
     | 'logs'
 
   const storageExplorerStore = useStorageStore()
-  const { loaded, buckets, openDeleteBucketModal } = storageExplorerStore || {}
+  const { data } = useBucketsQuery({ projectRef: ref })
+  const { loaded, openDeleteBucketModal } = storageExplorerStore || {}
+
+  const buckets = data ?? []
 
   return (
     <>
