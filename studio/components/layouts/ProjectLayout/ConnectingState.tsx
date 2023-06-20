@@ -1,19 +1,19 @@
+import { useQueryClient } from '@tanstack/react-query'
 import Link from 'next/link'
 import { FC, useEffect, useRef, useState } from 'react'
-import { observer } from 'mobx-react-lite'
 import { Badge, Button, IconLoader, IconMonitor, IconServer, Modal } from 'ui'
 
-import { Project } from 'types'
-import { useStore } from 'hooks'
 import ShimmerLine from 'components/ui/ShimmerLine'
+import { invalidateProjectsQuery } from 'data/projects/projects-query'
 import pingPostgrest from 'lib/pingPostgrest'
+import { Project } from 'types'
 
 interface Props {
   project: Project
 }
 
 const ConnectingState: FC<Props> = ({ project }) => {
-  const { app } = useStore()
+  const queryClient = useQueryClient()
   const checkProjectConnectionIntervalRef = useRef<number>()
 
   const [showHelperButton, setShowHelperButton] = useState(false)
@@ -40,7 +40,7 @@ const ConnectingState: FC<Props> = ({ project }) => {
     const result = await pingPostgrest(project.ref, { kpsVersion: project.kpsVersion })
     if (result) {
       clearInterval(checkProjectConnectionIntervalRef.current)
-      app.onProjectPostgrestStatusUpdated(project.id, 'ONLINE')
+      await invalidateProjectsQuery(queryClient)
     }
   }
 
@@ -144,4 +144,4 @@ const ConnectingState: FC<Props> = ({ project }) => {
   )
 }
 
-export default observer(ConnectingState)
+export default ConnectingState
