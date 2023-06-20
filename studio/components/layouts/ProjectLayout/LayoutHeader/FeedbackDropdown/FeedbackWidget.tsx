@@ -176,13 +176,15 @@ const FeedbackWidget: FC<Props> = ({
                 ]}
               >
                 <Button
-                  as="span"
+                  asChild
                   type="default"
                   disabled={isSavingScreenshot}
                   loading={isSavingScreenshot}
                   className="px-2 py-1.5"
                   icon={<IconImage size={14} />}
-                />
+                >
+                  <span></span>
+                </Button>
               </Dropdown>
             )}
             <input

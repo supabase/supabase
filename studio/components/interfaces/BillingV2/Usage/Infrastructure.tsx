@@ -7,11 +7,10 @@ import { Alert, Button, IconBarChart2 } from 'ui'
 import SectionContent from './SectionContent'
 import SectionHeader from './SectionHeader'
 import { COMPUTE_INSTANCE_SPECS, USAGE_CATEGORIES } from './Usage.constants'
-import { getUpgradeUrlFromV2Subscription } from './Usage.utils'
+import { getUpgradeUrl } from './Usage.utils'
 import UsageBarChart from './UsageBarChart'
 import Panel from 'components/ui/Panel'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
-import { useFlag } from 'hooks'
 
 export interface InfrastructureProps {
   projectRef: string
@@ -26,12 +25,11 @@ const Infrastructure = ({
   endDate,
   currentBillingCycleSelected,
 }: InfrastructureProps) => {
-  const enableSubscriptionV2 = useFlag('subscriptionV2')
   const { data: subscription } = useProjectSubscriptionV2Query({ projectRef })
 
   const categoryMeta = USAGE_CATEGORIES.find((category) => category.key === 'infra')
 
-  const upgradeUrl = getUpgradeUrlFromV2Subscription(projectRef, subscription, enableSubscriptionV2)
+  const upgradeUrl = getUpgradeUrl(projectRef, subscription)
   const isFreeTier = subscription?.plan?.id === 'free'
   const currentComputeInstance = subscription?.addons.find((addon) =>
     addon.supabase_prod_id.includes('_instance_')
@@ -205,9 +203,17 @@ const Infrastructure = ({
                 </div>
 
                 {attribute.key === 'ram_usage' && (
-                  <p className="text-sm text-scale-1000">
-                    Your compute instance has {currentComputeInstanceSpecs.memoryGb} GB memory.
-                  </p>
+                  <div className="text-sm text-scale-1000">
+                    <p>
+                      Your compute instance has {currentComputeInstanceSpecs.memoryGb} GB of memory.
+                    </p>
+                    {currentComputeInstanceSpecs.memoryGb === 1 && (
+                      <p>
+                        As your project is running on the smallest compute instance, it is not
+                        unusual for your project to have a base memory usage of ~50%.
+                      </p>
+                    )}
+                  </div>
                 )}
 
                 {attribute.key === 'cpu_usage' && (
@@ -234,7 +240,8 @@ const Infrastructure = ({
                   unit={attribute.unit}
                   attribute={attribute.attribute}
                   data={chartData}
-                  yFormatter={(value) => `${value}%`}
+                  yFormatter={(value) => `${Math.round(Number(value))}%`}
+                  tooltipFormatter={(value) => `${value}%`}
                   yLimit={100}
                 />
               ) : (

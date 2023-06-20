@@ -48,13 +48,7 @@ const UpgradeToPro: FC<Props> = ({ icon, primaryText, projectRef, secondaryText 
           <Tooltip.Root delayDuration={0}>
             <Tooltip.Trigger>
               <Button type="primary" disabled={!canUpdateSubscription || projectUpdateDisabled}>
-                <Link
-                  href={
-                    isEnterprise
-                      ? `/project/${ref}/settings/billing/update/enterprise`
-                      : `/project/${ref}/settings/billing/update`
-                  }
-                >
+                <Link href={`/project/${ref}/settings/billing/subscription?panel=subscriptionPlan`}>
                   <a>
                     {tier === PRICING_TIER_PRODUCT_IDS.FREE
                       ? 'Upgrade to Pro'

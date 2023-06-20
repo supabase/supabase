@@ -75,13 +75,13 @@ const ProjectDropdown = () => {
         </>
       }
     >
-      <Button as="span" type="text" size="tiny" className="my-1">
-        {selectedProject.name}
+      <Button asChild type="text" size="tiny" className="my-1">
+        <span>{selectedProject.name}</span>
       </Button>
     </Dropdown>
   ) : (
-    <Button as="span" type="text" size="tiny">
-      {selectedProject.name}
+    <Button asChild type="text" size="tiny">
+      <span>{selectedProject.name}</span>
     </Button>
   )
 }

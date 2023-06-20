@@ -5,7 +5,7 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 
 import { useStore } from 'hooks'
 import { useParams } from 'common/hooks'
-import { post } from 'lib/common/fetch'
+import { delete_ } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import InviteMemberButton from './InviteMemberButton'
 import MembersView from './MembersView'
@@ -43,7 +43,9 @@ const TeamSettings = () => {
         title: 'Are you sure?',
         message: 'Are you sure you want to leave this team? This is permanent.',
         onAsyncConfirm: async () => {
-          const response = await post(`${API_URL}/organizations/${slug}/members/leave`, {})
+          const response = await delete_(
+            `${API_URL}/organizations/${slug}/members/${profile!.gotrue_id}`
+          )
           if (response.error) {
             throw response.error
           } else {

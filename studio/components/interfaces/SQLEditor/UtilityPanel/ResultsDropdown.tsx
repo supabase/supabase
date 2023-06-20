@@ -80,8 +80,8 @@ const ResultsDropdown = ({ id }: ResultsDropdownProps) => {
         </>
       }
     >
-      <Button as="span" type="text" iconRight={<IconChevronDown />}>
-        Results
+      <Button asChild type="text" iconRight={<IconChevronDown />}>
+        <span>Results</span>
       </Button>
       <CSVLink
         ref={csvRef}

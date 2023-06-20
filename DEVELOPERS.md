@@ -27,7 +27,7 @@ You will need to install and configure the following dependencies on your machin
 
 - [Git](http://git-scm.com/)
 - [Node.js v18.x (LTS)](http://nodejs.org)
-- [npm](https://www.npmjs.com/) version 8.x.x
+- [npm](https://www.npmjs.com/) version 9.x.x
 
 ## Local development
 

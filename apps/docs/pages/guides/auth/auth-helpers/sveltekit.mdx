@@ -199,7 +199,7 @@ declare global {
 
 ## Authentication
 
-Authentication can be initiated [client](/docs/guides/auth/auth-helpers/sveltekit#client-side) or [server-side](/docs/guides/auth/auth-helpers/sveltekit#server-side). All of the [supabase-js authentication strategies](http://localhost:3001/docs/reference/javascript/auth-api) are supported with the Auth Helpers client.
+Authentication can be initiated [client](/docs/guides/auth/auth-helpers/sveltekit#client-side) or [server-side](/docs/guides/auth/auth-helpers/sveltekit#server-side). All of the [supabase-js authentication strategies](/docs/reference/javascript/auth-api) are supported with the Auth Helpers client.
 
 <Admonition type="info">
 
@@ -363,6 +363,7 @@ We can access the supabase instance in our `+page.svelte` file through the data 
 ```svelte src/routes/auth/+page.svelte
 <!-- // src/routes/auth/+page.svelte -->
 <script>
+  export let data
   let { supabase } = data
   $: ({ supabase } = data)
 
