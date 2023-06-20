@@ -2,9 +2,9 @@ import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { ComponentType, useEffect } from 'react'
 
+import { useParams } from 'common/hooks'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useStore } from 'hooks'
-import { useParams } from 'common/hooks'
 import { useAuth } from 'lib/auth'
 import { IS_PLATFORM } from 'lib/constants'
 import { getReturnToPath, STORAGE_KEY } from 'lib/gotrue'
@@ -34,16 +34,11 @@ export function withAuth<T>(
     const rootStore = useStore()
     const { isLoading, session } = useAuth()
 
-    const { app, ui } = rootStore
+    const { ui } = rootStore
     const page = router.pathname.split('/').slice(3).join('/')
 
     const redirectTo = options?.redirectTo ?? defaultRedirectTo(ref)
     const redirectIfFound = options?.redirectIfFound
-
-    useEffect(() => {
-      if (!app.organizations.isInitialized) app.organizations.load()
-      if (!app.projects.isInitialized) app.projects.load()
-    }, [app.organizations.isInitialized, app.projects.isInitialized])
 
     usePermissionsQuery({
       enabled: IS_PLATFORM,

@@ -1,25 +1,25 @@
-import remarkGfm from 'remark-gfm'
-import ReactMarkdown from 'react-markdown'
-import { PropsWithChildren, useMemo } from 'react'
-import { useParams } from 'common'
-import { CommandMenuProvider, markdownComponents } from 'ui'
-import { observer } from 'mobx-react-lite'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
+import { PropsWithChildren, useMemo } from 'react'
+import { CommandMenuProvider } from 'ui'
 
-import { uuidv4 } from 'lib/helpers'
-import { checkPermissions, useFlag, useStore } from 'hooks'
-import { createSqlSnippetSkeleton } from '../SQLEditor/SQLEditor.utils'
-import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { codeBlock } from 'common-tags'
-import { SqlSnippet } from 'data/content/sql-snippets-query'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useProjectApiQuery } from 'data/config/project-api-query'
+import { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
 import { useProfileQuery } from 'data/profile/profile-query'
+import { checkPermissions, useFlag, useSelectedOrganization, useStore } from 'hooks'
+import { uuidv4 } from 'lib/helpers'
+import { useSqlEditorStateSnapshot } from 'state/sql-editor'
+import { createSqlSnippetSkeleton } from '../SQLEditor/SQLEditor.utils'
 
-const CommandMenuWrapper = observer(({ children }: PropsWithChildren<{}>) => {
+const CommandMenuWrapper = ({ children }: PropsWithChildren<{}>) => {
   const { ref } = useParams()
   const { ui } = useStore()
-  const { opt_in_tags } = ui.selectedOrganization ?? {}
+  const selectedOrganization = useSelectedOrganization()
+  const { project: selectedProject } = useProjectContext()
+  const opt_in_tags = selectedOrganization?.opt_in_tags
 
   const snap = useSqlEditorStateSnapshot()
   const allowCMDKDataOptIn = useFlag('dashboardCmdkDataOptIn')
@@ -39,8 +39,8 @@ const CommandMenuWrapper = observer(({ children }: PropsWithChildren<{}>) => {
 
   const { data } = useEntityDefinitionsQuery(
     {
-      projectRef: ui.selectedProject?.ref,
-      connectionString: ui.selectedProject?.connectionString,
+      projectRef: selectedProject?.ref,
+      connectionString: selectedProject?.connectionString,
     },
     { enabled: isOptedInToAI }
   )
@@ -105,6 +105,6 @@ const CommandMenuWrapper = observer(({ children }: PropsWithChildren<{}>) => {
       {children}
     </CommandMenuProvider>
   )
-})
+}
 
 export default CommandMenuWrapper

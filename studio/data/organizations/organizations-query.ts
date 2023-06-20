@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { QueryClient, useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { useCallback } from 'react'
@@ -7,11 +7,13 @@ import { organizationKeys } from './keys'
 
 export type OrganizationsResponse = Organization[]
 
-export async function getOrganizations(signal?: AbortSignal) {
+export async function getOrganizations(signal?: AbortSignal): Promise<OrganizationsResponse> {
   const data = await get(`${API_URL}/organizations`, { signal })
   if (data.error) throw data.error
 
-  return data as OrganizationsResponse
+  const sorted = (data as Organization[]).sort((a, b) => a.name.localeCompare(b.name))
+
+  return sorted
 }
 
 export type OrganizationsData = Awaited<ReturnType<typeof getOrganizations>>
@@ -34,4 +36,8 @@ export const useOrganizationsPrefetch = () => {
     () => client.prefetchQuery(organizationKeys.list(), ({ signal }) => getOrganizations(signal)),
     []
   )
+}
+
+export function invalidateOrganizationsQuery(client: QueryClient) {
+  return client.invalidateQueries(organizationKeys.list())
 }

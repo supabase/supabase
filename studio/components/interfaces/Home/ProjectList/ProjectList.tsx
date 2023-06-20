@@ -1,25 +1,28 @@
-import Link from 'next/link'
-import { FC } from 'react'
-import { Badge, Button, IconPlus } from 'ui'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { groupBy } from 'lodash'
 import { observer } from 'mobx-react-lite'
+import Link from 'next/link'
+import { Badge, Button, IconPlus } from 'ui'
 
-import { IS_PLATFORM } from 'lib/constants'
+import { useOverdueInvoicesQuery } from 'data/invoices/invoices-overdue-query'
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useProjectsQuery } from 'data/projects/projects-query'
 import { checkPermissions, useStore } from 'hooks'
-import { Organization, Project } from 'types'
+import { IS_PLATFORM } from 'lib/constants'
 import { makeRandomString } from 'lib/helpers'
 import ProjectCard from './ProjectCard'
 import ShimmeringCard from './ShimmeringCard'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useOverdueInvoicesQuery } from 'data/invoices/invoices-overdue-query'
 
-interface Props {
+export interface ProjectListProps {
   rewriteHref?: (projectRef: string) => string
 }
 
-const ProjectList: FC<Props> = ({ rewriteHref }) => {
-  const { app, ui } = useStore()
-  const { organizations, projects } = app
-  const { isLoading: isLoadingProjects } = projects
+const ProjectList = ({ rewriteHref }: ProjectListProps) => {
+  const { ui } = useStore()
+  const { data: organizations } = useOrganizationsQuery()
+  const { data: allProjects, isLoading: isLoadingProjects } = useProjectsQuery()
+
+  const projectsByOrg = groupBy(allProjects, 'organization_id')
 
   const { data: allOverdueInvoices } = useOverdueInvoicesQuery({ enabled: IS_PLATFORM })
 
@@ -27,12 +30,11 @@ const ProjectList: FC<Props> = ({ rewriteHref }) => {
 
   return (
     <>
-      {organizations.list().map((org: Organization) => {
+      {organizations?.map((org) => {
         const { id, name, slug, subscription_id } = org
-        const sortedProjects = projects.list(
-          ({ organization_id }: Project) => organization_id == id
-        )
-        const isEmpty = sortedProjects?.length == 0
+        const projects = projectsByOrg[id]
+
+        const isEmpty = !projects || projects.length === 0
         const canReadProjects = checkPermissions(PermissionAction.READ, 'projects', undefined, id)
 
         const overdueInvoices = (allOverdueInvoices || []).filter((it) => it.organization_id === id)
@@ -40,7 +42,10 @@ const ProjectList: FC<Props> = ({ rewriteHref }) => {
         return (
           <div className="space-y-3" key={makeRandomString(5)}>
             <div className="flex space-x-4 items-center">
-              <h4 className="text-lg flex items-center">{name}{subscription_id ? <Badge className='ml-3'>V2</Badge> : <></>}</h4>
+              <h4 className="text-lg flex items-center">
+                {name}
+                {subscription_id ? <Badge className="ml-3">V2</Badge> : <></>}
+              </h4>
 
               {!!overdueInvoices.length && (
                 <div>
@@ -65,7 +70,7 @@ const ProjectList: FC<Props> = ({ rewriteHref }) => {
                     <div className="space-y-1">
                       <p>You need additional permissions to view projects from this organization</p>
                       <p className="text-sm text-scale-1100">
-                        Contact your organization owner or adminstrator for assistance.
+                        Contact your organization owner or administrator for assistance.
                       </p>
                     </div>
                   </div>
@@ -86,7 +91,7 @@ const ProjectList: FC<Props> = ({ rewriteHref }) => {
                     </div>
                   </div>
                 ) : (
-                  sortedProjects?.map((project: Project) => (
+                  projects?.map((project) => (
                     <ProjectCard
                       key={makeRandomString(5)}
                       project={project}

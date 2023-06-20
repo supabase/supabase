@@ -1,24 +1,23 @@
-import React, { useEffect } from 'react'
-import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
+import { useEffect } from 'react'
 
-import { API_URL } from 'lib/constants'
-import { post } from 'lib/common/fetch'
-import { PROJECT_STATUS } from 'lib/constants'
-import { useFlag, useStore } from 'hooks'
+import { useParams } from 'common'
 import { StorageLayout } from 'components/layouts'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { StoragePolicies } from 'components/to-be-cleaned/Storage'
+import { useFlag, useStore } from 'hooks'
+import { post } from 'lib/common/fetch'
+import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import { NextPageWithLayout } from 'types'
 
 /**
  * PageLayout is used to setup layout - as usual it will requires inject global store
  */
 const PageLayout: NextPageWithLayout = () => {
-  const router = useRouter()
-  const { ref } = router.query
+  const { ref } = useParams()
 
-  const { ui, meta } = useStore()
-  const project = ui.selectedProject
+  const { meta } = useStore()
+  const { project } = useProjectContext()
 
   const kpsEnabled = useFlag('initWithKps')
 

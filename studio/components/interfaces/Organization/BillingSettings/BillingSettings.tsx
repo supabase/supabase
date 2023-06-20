@@ -1,25 +1,25 @@
-import { useState, useEffect } from 'react'
-import { observer } from 'mobx-react-lite'
+import { useEffect, useState } from 'react'
 
-import { Project } from 'types'
-import { useStore } from 'hooks'
 import { useParams } from 'common/hooks'
-import { API_URL } from 'lib/constants'
+import { useProjectsQuery } from 'data/projects/projects-query'
+import { useSelectedOrganization, useStore } from 'hooks'
 import { get } from 'lib/common/fetch'
-
-import ProjectsSummary from './ProjectsSummary'
+import { API_URL } from 'lib/constants'
+import BillingAddress from './BillingAddress/BillingAddress'
+import BillingEmail from './BillingEmail'
 import CreditBalance from './CreditBalance'
 import PaymentMethods from './PaymentMethods'
-import BillingAddress from './BillingAddress/BillingAddress'
+import ProjectsSummary from './ProjectsSummary'
 import TaxID from './TaxID/TaxID'
-import BillingEmail from './BillingEmail'
 
 const BillingSettings = () => {
-  const { app, ui } = useStore()
+  const { ui } = useStore()
   const { slug } = useParams()
 
-  const organization = ui.selectedOrganization
-  const projects = app.projects.list((x: Project) => x.organization_id == organization?.id) || []
+  const organization = useSelectedOrganization()
+  const { data: allProjects } = useProjectsQuery()
+  const projects =
+    allProjects?.filter((project) => project.organization_id == organization?.id) ?? []
 
   const [customer, setCustomer] = useState<any>(null)
   const [isLoadingCustomer, setIsLoadingCustomer] = useState(false)
@@ -38,12 +38,6 @@ const BillingSettings = () => {
     isCredit && customerBalance !== 0
       ? customerBalance.toString().replace('-', '')
       : customerBalance
-
-  useEffect(() => {
-    getCustomerProfile()
-    getPaymentMethods()
-    getTaxIds()
-  }, [slug])
 
   const getCustomerProfile = async () => {
     try {
@@ -93,6 +87,12 @@ const BillingSettings = () => {
     }
   }
 
+  useEffect(() => {
+    getCustomerProfile()
+    getPaymentMethods()
+    getTaxIds()
+  }, [slug])
+
   return (
     <article className="container my-4 max-w-4xl space-y-8">
       <div className="space-y-8">
@@ -124,4 +124,4 @@ const BillingSettings = () => {
   )
 }
 
-export default observer(BillingSettings)
+export default BillingSettings

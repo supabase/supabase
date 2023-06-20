@@ -1,36 +1,38 @@
+import { CLIENT_LIBRARIES } from 'common/constants'
+import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useEffect, useState, FC, ChangeEvent, useRef } from 'react'
-import { observer } from 'mobx-react-lite'
+import { ChangeEvent, FC, useEffect, useRef, useState } from 'react'
 import {
   Button,
+  Checkbox,
+  Form,
+  IconAlertCircle,
+  IconExternalLink,
+  IconLoader,
   IconMail,
   IconPlus,
   IconX,
   Input,
   Listbox,
-  Form,
-  IconLoader,
-  IconAlertCircle,
-  IconExternalLink,
-  Checkbox,
 } from 'ui'
-import { CLIENT_LIBRARIES } from 'common/constants'
-
-import { Project } from 'types'
-import { useStore, useFlag } from 'hooks'
-import { post, get } from 'lib/common/fetch'
-import { detectBrowser } from 'lib/helpers'
-import { API_URL, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 
 import Divider from 'components/ui/Divider'
+import InformationBox from 'components/ui/InformationBox'
 import Connecting from 'components/ui/Loading'
 import MultiSelect from 'components/ui/MultiSelect'
-import InformationBox from 'components/ui/InformationBox'
-import { formatMessage, uploadAttachments } from './SupportForm.utils'
-import { CATEGORY_OPTIONS, SEVERITY_OPTIONS, SERVICE_OPTIONS } from './Support.constants'
-import DisabledStateForFreeTier from './DisabledStateForFreeTier'
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProfileQuery } from 'data/profile/profile-query'
+import { useProjectsQuery } from 'data/projects/projects-query'
+import { useFlag, useStore } from 'hooks'
+import useLatest from 'hooks/misc/useLatest'
+import { get, post } from 'lib/common/fetch'
+import { API_URL, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
+import { detectBrowser } from 'lib/helpers'
+import { Project } from 'types'
+import DisabledStateForFreeTier from './DisabledStateForFreeTier'
+import { CATEGORY_OPTIONS, SERVICE_OPTIONS, SEVERITY_OPTIONS } from './Support.constants'
+import { formatMessage, uploadAttachments } from './SupportForm.utils'
 
 const MAX_ATTACHMENTS = 5
 
@@ -49,14 +51,16 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
   const [uploadedDataUrls, setUploadedDataUrls] = useState<string[]>([])
   const [selectedServices, setSelectedServices] = useState<string[]>([])
 
-  // Get all orgs and projects from global store
-  const sortedOrganizations = app.organizations.list()
-  const sortedProjects = app.projects.list()
+  const { data: organizations, isSuccess: isOrganizationsSuccess } = useOrganizationsQuery()
+  // for use in useEffect
+  const organizationsRef = useLatest(organizations)
 
-  const isInitialized = app.projects.isInitialized
+  const { data: allProjects, isSuccess: isProjectsSuccess } = useProjectsQuery()
+
+  const isInitialized = isOrganizationsSuccess && isProjectsSuccess
   const projectDefaults: Partial<Project>[] = [{ ref: 'no-project', name: 'No specific project' }]
 
-  const projects = [...sortedProjects, ...projectDefaults]
+  const projects = [...(allProjects ?? []), ...projectDefaults]
 
   const planNames = {
     [PRICING_TIER_PRODUCT_IDS.FREE]: 'Free',
@@ -87,7 +91,7 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
     )
   }
 
-  const selectedProject = sortedProjects.find((project) => project.ref === ref)
+  const selectedProject = projects.find((project) => project.ref === ref)
   const selectedCategory = CATEGORY_OPTIONS.find((option) => {
     if (option.value.toLowerCase() === ((category as string) ?? '').toLowerCase()) return option
   })
@@ -95,16 +99,16 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
   const initialProjectRef =
     selectedProject !== undefined
       ? selectedProject.ref
-      : sortedProjects.length > 0
-      ? sortedProjects[0].ref
+      : projects.length > 0
+      ? projects[0].ref
       : 'no-project'
   const initialOrganizationSlug =
     initialProjectRef !== 'no-project'
-      ? sortedOrganizations.find((org) => {
-          const project = sortedProjects.find((project) => project.ref === initialProjectRef)
+      ? organizations?.find((org) => {
+          const project = projects.find((project) => project.ref === initialProjectRef)
           return org.id === project?.organization_id
         })?.slug
-      : sortedOrganizations[0]?.slug
+      : organizations?.[0]?.slug
   const initialValues = {
     category: selectedCategory !== undefined ? selectedCategory.value : CATEGORY_OPTIONS[0].value,
     severity: 'Low',
@@ -222,13 +226,16 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
         // eslint-disable-next-line react-hooks/rules-of-hooks
         useEffect(() => {
           if (values.projectRef === 'no-project') {
-            const updatedValues = { ...values, organizationSlug: sortedOrganizations[0]?.slug }
+            const updatedValues = {
+              ...values,
+              organizationSlug: organizationsRef.current?.[0]?.slug,
+            }
             resetForm({ values: updatedValues, initialValues: updatedValues })
           } else if (selectedProject) {
             if (!selectedProject.subscription_tier) {
               app.projects.fetchSubscriptionTier(selectedProject as Project)
             }
-            const organization = sortedOrganizations.find(
+            const organization = organizationsRef.current?.find(
               (org) => org.id === selectedProject.organization_id
             )
             if (organization) {
@@ -269,9 +276,7 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
               <div className="grid grid-cols-2 gap-4">
                 <Listbox id="projectRef" layout="vertical" label="Which project is affected?">
                   {projects.map((option) => {
-                    const organization = sortedOrganizations.find(
-                      (x) => x.id === option.organization_id
-                    )
+                    const organization = organizations?.find((x) => x.id === option.organization_id)
                     return (
                       <Listbox.Option
                         key={`option-${option.ref}`}
@@ -317,14 +322,14 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
               )}
             </div>
 
-            {values.projectRef === 'no-project' && sortedOrganizations.length > 0 && (
+            {values.projectRef === 'no-project' && (organizations?.length ?? 0) > 0 && (
               <div className="px-6">
                 <Listbox
                   id="organizationSlug"
                   layout="vertical"
                   label="Which organization is affected?"
                 >
-                  {sortedOrganizations.map((option) => {
+                  {organizations?.map((option) => {
                     return (
                       <Listbox.Option
                         key={`option-${option.slug}`}
@@ -353,7 +358,9 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
                         Enhanced SLAs for support are available on our Enterprise Plan.
                       </p>
                       <div className="flex items-center space-x-2">
-                        <Link href={`/project/${values.projectRef}/settings/billing/subscription?panel=subscriptionPlan`}>
+                        <Link
+                          href={`/project/${values.projectRef}/settings/billing/subscription?panel=subscriptionPlan`}
+                        >
                           <a>
                             <Button>Upgrade project</Button>
                           </a>

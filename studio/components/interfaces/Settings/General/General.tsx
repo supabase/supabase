@@ -1,24 +1,28 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useQueryClient } from '@tanstack/react-query'
 import { FC } from 'react'
 import { Form, Input } from 'ui'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useStore, checkPermissions } from 'hooks'
-import { API_URL } from 'lib/constants'
-import { patch } from 'lib/common/fetch'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import {
+  FormActions,
   FormHeader,
   FormPanel,
-  FormActions,
   FormSection,
-  FormSectionLabel,
   FormSectionContent,
+  FormSectionLabel,
 } from 'components/ui/Forms'
+import { invalidateProjectsQuery } from 'data/projects/projects-query'
+import { checkPermissions, useStore } from 'hooks'
+import { patch } from 'lib/common/fetch'
+import { API_URL } from 'lib/constants'
 
 interface Props {}
 
 const General: FC<Props> = ({}) => {
-  const { app, ui } = useStore()
-  const project = ui.selectedProject
+  const queryClient = useQueryClient()
+  const { ui } = useStore()
+  const { project } = useProjectContext()
 
   const formId = 'project-general-settings'
   const initialValues = { name: project?.name ?? '', ref: project?.ref ?? '' }
@@ -37,7 +41,7 @@ const General: FC<Props> = ({}) => {
       const { name } = response
       resetForm({ values: { name }, initialValues: { name } })
 
-      app.onProjectUpdated(response)
+      await invalidateProjectsQuery(queryClient)
       ui.setNotification({
         category: 'success',
         message: 'Successfully saved settings',

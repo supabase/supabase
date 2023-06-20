@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/router'
-import { PropsWithChildren, useCallback, useEffect, useRef } from 'react'
+import { PropsWithChildren, useCallback, useEffect } from 'react'
 
 import {
   AuthContext as AuthContextInternal,
@@ -8,17 +8,19 @@ import {
   gotrueClient,
   useTelemetryProps,
 } from 'common'
+import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useProfileCreateMutation } from 'data/profile/profile-create-mutation'
 import { useProfileQuery } from 'data/profile/profile-query'
 import { useStore } from 'hooks'
 import Telemetry from 'lib/telemetry'
 import { GOTRUE_ERRORS, IS_PLATFORM } from './constants'
 import { clearLocalStorage } from './local-storage'
-import { useProfileCreateMutation } from 'data/profile/profile-create-mutation'
 
 export const AuthContext = AuthContextInternal
 
 export const AuthProvider = ({ children }: PropsWithChildren<{}>) => {
-  const { ui, app } = useStore()
+  const queryClient = useQueryClient()
+  const { ui } = useStore()
   const router = useRouter()
   const telemetryProps = useTelemetryProps()
 
@@ -56,12 +58,14 @@ export const AuthProvider = ({ children }: PropsWithChildren<{}>) => {
   }, [])
 
   const { mutate: createProfile } = useProfileCreateMutation({
-    onSuccess() {
+    async onSuccess() {
       Telemetry.sendEvent(
         { category: 'conversion', action: 'sign_up', label: '' },
         telemetryProps,
         router
       )
+
+      await invalidateOrganizationsQuery(queryClient)
     },
     onError(err) {
       ui.setNotification({
@@ -75,12 +79,6 @@ export const AuthProvider = ({ children }: PropsWithChildren<{}>) => {
   useProfileQuery({
     onSuccess(profile) {
       Telemetry.sendIdentify(profile, telemetryProps)
-
-      // [Joshen] Temp fix: For new users, the GET profile call also creates a default org
-      // But because the dashboard's logged in state is using gotrue as the source of truth
-      // the home page loads before the GET profile call completes (and consequently before the
-      // creation of the default org). Hence why calling org load here
-      app.organizations.load()
     },
     onError(err) {
       // if the user does not yet exist, create a profile for them
@@ -104,5 +102,5 @@ export function useSignOut() {
     await queryClient.resetQueries()
 
     return result
-  }, [])
+  }, [queryClient])
 }

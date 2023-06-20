@@ -20,23 +20,24 @@ import { useParams } from 'common/hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import { DATABASE_UPGRADE_MESSAGES } from './UpgradingState.constants'
 import { useProjectUpgradingStatusQuery } from 'data/config/project-upgrade-status-query'
+import { useProjectContext } from '../ProjectContext'
 
 const UpgradingState = () => {
   const { ref } = useParams()
-  const { app, ui, meta } = useStore()
+  const { app, meta } = useStore()
+  const { project } = useProjectContext()
   const [loading, setLoading] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
   const { data } = useProjectUpgradingStatusQuery(
     {
       projectRef: ref,
-      projectStatus: ui.selectedProject?.status,
+      projectStatus: project?.status,
     },
     {
       enabled: IS_PLATFORM,
     }
   )
 
-  const project = ui.selectedProject
   const { initiated_at, status, progress, target_version, error } =
     data?.databaseUpgradeStatus ?? {}
   const progressStage = Number((progress || '').split('_')[0])

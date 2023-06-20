@@ -1,26 +1,26 @@
-import { useState } from 'react'
-import { observer } from 'mobx-react-lite'
-import { Button, Input, IconSearch } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
+import { useState } from 'react'
+import { Button, IconSearch, Input } from 'ui'
 
-import { useStore } from 'hooks'
 import { useParams } from 'common/hooks'
+import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
+import { useOrganizationDetailQuery } from 'data/organizations/organization-detail-query'
+import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
+import { useProfileQuery } from 'data/profile/profile-query'
+import { useSelectedOrganization, useStore } from 'hooks'
 import { delete_ } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import InviteMemberButton from './InviteMemberButton'
 import MembersView from './MembersView'
 import { getRolesManagementPermissions, hasMultipleOwners } from './TeamSettings.utils'
-import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
-import { useOrganizationDetailQuery } from 'data/organizations/organization-detail-query'
-import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
-import { useProfileQuery } from 'data/profile/profile-query'
 
 const TeamSettings = () => {
   const { ui } = useStore()
   const { slug } = useParams()
 
   const { data: profile } = useProfileQuery()
-  const isOwner = ui.selectedOrganization?.is_owner
+  const selectedOrganization = useSelectedOrganization()
+  const isOwner = selectedOrganization?.is_owner
 
   const { data: detailData } = useOrganizationDetailQuery({ slug })
   const { data: rolesData } = useOrganizationRolesQuery({ slug })
@@ -128,4 +128,4 @@ const TeamSettings = () => {
   )
 }
 
-export default observer(TeamSettings)
+export default TeamSettings
