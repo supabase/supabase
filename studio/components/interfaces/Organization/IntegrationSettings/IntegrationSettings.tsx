@@ -20,9 +20,11 @@ const IntegrationSettings = () => {
 
   vercelIntegrations?.map((x) => {
     let data: any = { ...x }
-    data['metadata']['account'][
-      'avatar'
-    ] = `https://vercel.com/api/www/avatar/${data.metadata.account.avatar}?w=48`
+
+    const avatarSrc = data.metadata.account.avatar
+      ? `https://vercel.com/api/www/avatar/${data.metadata.account.avatar}?s=48`
+      : `https://vercel.com/api/www/avatar?teamId=${data.metadata.account.team_id}&s=48`
+    data['metadata']['account']['avatar'] = avatarSrc
 
     return data
   })

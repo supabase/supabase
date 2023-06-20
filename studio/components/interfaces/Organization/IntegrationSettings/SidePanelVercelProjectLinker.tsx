@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import ProjectLinker from 'components/interfaces/Integrations/ProjectLinker'
+import ProjectLinker from 'components/interfaces/Integrations/ProjectsLinker'
 import { Markdown } from 'components/interfaces/Markdown'
 import { useIntegrationsQuery } from 'data/integrations/integrations-query'
 import { useStore } from 'hooks'

@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 
 import { useParams } from 'common'
 import ProjectLinker from 'components/interfaces/Integrations/ProjectLinker'
-import { WizardLayout } from 'components/layouts'
+
 import OrganizationPicker from 'components/ui/OrganizationPicker'
 import { useVercelIntegrationCreateMutation } from 'data/integrations/vercel-integration-create-mutation'
 import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
@@ -10,7 +10,12 @@ import { useProjectsQuery } from 'data/projects/projects-query'
 import { useStore } from 'hooks'
 import { EMPTY_ARR } from 'lib/void'
 import { NextPageWithLayout, Organization } from 'types'
-import { Button } from 'ui'
+import { Alert, Button, IconBook, IconLifeBuoy, Input, LoadingLine, cn } from 'ui'
+import IntegrationWindowLayout from 'components/layouts/IntegrationWindowLayout'
+import { ScaffoldContainer, ScaffoldDivider, ScaffoldSection } from 'components/layouts/Scaffold'
+import { Markdown } from 'components/interfaces/Markdown'
+import { BASE_PATH } from 'lib/constants'
+import { ENV_VAR_RAW_KEYS } from 'components/interfaces/Integrations/Integrations-Vercel.constants'
 
 const VercelIntegration: NextPageWithLayout = () => {
   const { ui } = useStore()
@@ -81,35 +86,95 @@ const VercelIntegration: NextPageWithLayout = () => {
   const vercelProjects = useMemo(() => vercelProjectsData ?? EMPTY_ARR, [vercelProjectsData])
 
   return (
-    <div className="flex flex-col gap-4">
-      <h1>Vercel Integration</h1>
+    <>
+      <main className="overflow-auto flex flex-col h-full">
+        <LoadingLine loading={isLoading} />
+        {organizationIntegrationId === null && (
+          <>
+            <ScaffoldContainer className="max-w-md flex flex-col gap-6 grow py-8">
+              <h1 className="text-xl text-scale-1200">Install Integration</h1>
+              <>
+                <Markdown content={`Choose the Supabase Organization you wish to install to`} />
+                <OrganizationPicker onSelectedOrgChange={setSelectedOrg} />
+                <div className="flex flex-row w-full justify-end">
+                  <Button
+                    size="medium"
+                    className="self-end"
+                    disabled={isLoading}
+                    loading={isLoading}
+                    onClick={onInstall}
+                  >
+                    Install integration
+                  </Button>
+                </div>
+              </>
+            </ScaffoldContainer>
+            <ScaffoldContainer className="flex flex-col gap-6 py-3">
+              <Alert
+                withIcon
+                variant="info"
+                title="You can uninstall this Integration at any time."
+              >
+                <Markdown
+                  content={`You can remove this integration at any time either via Vercel or the Supabase dashboard.`}
+                />
+              </Alert>
+            </ScaffoldContainer>
+          </>
+        )}
 
-      {organizationIntegrationId === null ? (
-        <>
-          <OrganizationPicker onSelectedOrgChange={setSelectedOrg} />
+        {organizationIntegrationId !== null && (
+          <>
+            <ScaffoldContainer className="flex flex-col gap-6 grow py-8">
+              <header>
+                <h1 className="text-xl text-scale-1200">
+                  Link a Supabase project to a Vercel project
+                </h1>
+                <Markdown
+                  className="text-scale-900"
+                  content={`
+This Supabase integration manages your envioemnt variables automatically to provide the latest keys in the unlikely event that you will need to refresh your JWT token.
+`}
+                />
+              </header>
+              {/* <ProjectLinker
+              organizationIntegrationId={organizationIntegrationId}
+              foreignProjects={vercelProjects}
+              supabaseProjects={supabaseProjects}
+              onCreateConnections={() => {
+                if (next) {
+                  window.location.href = next
+                }
+              }}
+            /> */}
 
-          <Button className="self-end" disabled={isLoading} loading={isLoading} onClick={onInstall}>
-            Install
-          </Button>
-        </>
-      ) : (
-        <>
-          <ProjectLinker
-            organizationIntegrationId={organizationIntegrationId}
-            foreignProjects={vercelProjects}
-            supabaseProjects={supabaseProjects}
-            onCreateConnections={() => {
-              if (next) {
-                window.location.href = next
-              }
-            }}
-          />
-        </>
-      )}
-    </div>
+              <ProjectLinker
+                organizationIntegrationId={organizationIntegrationId}
+                foreignProjects={vercelProjects}
+                supabaseProjects={supabaseProjects}
+                onCreateConnections={() => {
+                  if (next) {
+                    window.location.href = next
+                  }
+                }}
+              />
+            </ScaffoldContainer>
+          </>
+        )}
+        <ScaffoldDivider />
+      </main>
+      <ScaffoldContainer className="bg-body flex flex-row gap-6 py-6 border-t">
+        <div className="flex items-center gap-2 text-xs text-scale-900">
+          <IconBook size={16} /> Docs
+        </div>
+        <div className="flex items-center gap-2 text-xs text-scale-900">
+          <IconLifeBuoy size={16} /> Support
+        </div>
+      </ScaffoldContainer>
+    </>
   )
 }
 
-VercelIntegration.getLayout = (page) => <WizardLayout>{page}</WizardLayout>
+VercelIntegration.getLayout = (page) => <IntegrationWindowLayout>{page}</IntegrationWindowLayout>
 
 export default VercelIntegration
