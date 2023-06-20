@@ -136,7 +136,7 @@ const Modal = ({
     </Space>
   )
 
-  function handleOpenChange(open: boolean) {
+  const handleOpenChange = React.useCallback((open: boolean) => {
     if (visible !== undefined && !open) {
       // controlled component behaviour
       onCancel()
@@ -144,7 +144,7 @@ const Modal = ({
       // un-controlled component behaviour
       setOpen(open)
     }
-  }
+  }, [(visible !== undefined && !open)])
 
   return (
     <Dialog.Root open={open} onOpenChange={handleOpenChange}>

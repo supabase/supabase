@@ -25,9 +25,9 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
     setIsDarkMode(!key || key === 'true')
   }, [])
 
-  const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode)
-  }
+  const toggleTheme = React.useCallback(() => {
+    setIsDarkMode((prevDarkMode) => !prevDarkMode)
+  }, [])
 
   return (
     <>

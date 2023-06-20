@@ -18,7 +18,7 @@ export const MonacoEditor: React.FC<MonacoEditorProps> = ({
   onChange,
   onMount,
 }) => {
-  function handleEditorOnMount(editor: any) {
+  const handleEditorOnMount = React.useCallback((editor: any) => {
     // add margin above first line
     editor.changeViewZones((accessor: any) => {
       accessor.addZone({
@@ -39,7 +39,7 @@ export const MonacoEditor: React.FC<MonacoEditorProps> = ({
     }, 0)
 
     if (onMount) onMount(editor)
-  }
+  }, [onMount])
 
   return (
     <Editor

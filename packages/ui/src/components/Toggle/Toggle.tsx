@@ -78,7 +78,7 @@ function Toggle({
     // @ts-ignore // issue with conflicting input/button tag being used
     if (onChange) onChange(!active)
 
-    setIntChecked(!intChecked)
+    setIntChecked((prevChecked) => !prevChecked)
 
     /*
      * Create change event for formik

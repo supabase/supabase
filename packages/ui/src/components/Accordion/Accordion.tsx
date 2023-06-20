@@ -122,7 +122,7 @@ export function Item({ children, className, header, id, disabled }: ItemProps) {
       className={__styles.variants[type].container}
       disabled={disabled}
       onClick={() => {
-        setOpen(!open)
+        setOpen((prevOpen) => !prevOpen)
       }}
     >
       <RadixAccordion.Trigger className={triggerClasses.join(' ')}>

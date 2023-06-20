@@ -151,10 +151,10 @@ interface RadioGroupProps {
 export function RadioGroup({ children, value: propsValue, onChange }: RadioGroupProps) {
   const [value, setValue] = useState(propsValue ? propsValue : '')
 
-  const handleChange = (e: string) => {
+  const handleChange = React.useCallback((e: string) => {
     if (onChange) onChange(e)
     setValue(e)
-  }
+  }, [onChange])
 
   return (
     <RadixContextMenu.RadioGroup value={value} onValueChange={handleChange}>

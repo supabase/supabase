@@ -48,7 +48,7 @@ function ExpandableVideo({ imgUrl, videoId, imgAltText }: ExpandableVideoProps) 
           // Only hide menu when clicking outside, not focusing outside
           // Prevents Firefox dropdown issue that immediately closes menu after opening
           if (e.type === 'dismissableLayer.pointerDownOutside') {
-            setExpandVideo(!expandVideo)
+            setExpandVideo((prevExpandVid) => !prevExpandVid)
           }
         }}
         size="xxlarge"

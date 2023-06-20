@@ -44,12 +44,12 @@ export const CodeBlock = ({
 
   const [copied, setCopied] = useState(false)
 
-  const handleCopy = () => {
+  const handleCopy = React.useCallback(() => {
     setCopied(true)
     setTimeout(() => {
       setCopied(false)
     }, 1000)
-  }
+  }, [])
 
   // Extract string when `children` has a single string node
   const childrenArray = Children.toArray(children)

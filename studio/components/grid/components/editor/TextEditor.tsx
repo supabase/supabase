@@ -81,7 +81,7 @@ export function TextEditor<TRow, TSummaryRow = unknown>({
         className={`${
           !!value && value.trim().length == 0 ? 'sb-grid-fill-container' : ''
         } sb-grid-text-editor__trigger`}
-        onClick={() => setIsPopoverOpen(!isPopoverOpen)}
+        onClick={() => setIsPopoverOpen((prevIsPopoverOpen) => !prevIsPopoverOpen)}
       >
         {value === null ? <NullValue /> : value === '' ? <EmptyValue /> : value}
       </div>

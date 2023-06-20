@@ -1,4 +1,4 @@
-import { memo } from 'react'
+import { memo, useMemo } from 'react'
 import { Button, Input, IconChevronDown, IconX } from 'ui'
 
 import { Filter, FilterOperator, SupaTable } from 'components/grid/types'
@@ -15,10 +15,14 @@ export interface FilterRowProps {
 
 const FilterRow = ({ table, filter, filterIdx, onChange, onDelete }: FilterRowProps) => {
   const column = table.columns.find((x) => x.name === filter.column)
-  const columnOptions =
-    table.columns?.map((x) => {
-      return { value: x.name, label: x.name, postLabel: x.dataType }
-    }) || []
+  const columnOptions = useMemo(() => {
+    return table.columns?.map((x) => ({
+      value: x.name,
+      label: x.name,
+      postLabel: x.dataType
+    })) || [];
+  }, [table.columns]);
+  
 
   const placeholder =
     column?.format === 'timestamptz'

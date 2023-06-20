@@ -41,7 +41,7 @@ const CodeEditor: FC<Props> = ({
     }
   }, [id])
 
-  const onMount = async (editor: any, monaco: any) => {
+  const onMount = React.useCallback(async (editor: any, monaco: any) => {
     alignEditor(editor)
     editor.addAction({
       id: 'supabase',
@@ -60,7 +60,7 @@ const CodeEditor: FC<Props> = ({
     await timeout(500)
     editor?.focus()
     editorRef.current = editor
-  }
+  }, [editorRef?.current, onInputRun])
 
   const optionsMerged = merge(
     {

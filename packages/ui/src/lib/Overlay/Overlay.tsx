@@ -49,7 +49,7 @@ function Overlay({
   if (overlayClassName) classes.push(overlayClassName)
 
   function onToggle() {
-    setVisibleState(!visibleState)
+    setVisibleState((prevVisibleState) => !prevVisibleState)
     if (onVisibleChange) onVisibleChange(visibleState)
   }
 
@@ -61,7 +61,7 @@ function Overlay({
   // detect clicks from outside
   useOnClickOutside(ref, () => {
     if (visibleState) {
-      setVisibleState(!visibleState)
+      setVisibleState((prevVisibleState) => !prevVisibleState)
     }
   })
 
