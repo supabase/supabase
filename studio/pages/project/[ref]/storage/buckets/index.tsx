@@ -1,18 +1,13 @@
-import React, { useEffect } from 'react'
-import { observer } from 'mobx-react-lite'
-
-import { API_URL } from 'lib/constants'
-import { useFlag, useStore } from 'hooks'
 import { useParams } from 'common/hooks'
-import { post } from 'lib/common/fetch'
-import { PROJECT_STATUS } from 'lib/constants'
 import { StorageLayout } from 'components/layouts'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
+import { useFlag, useStore } from 'hooks'
+import { post } from 'lib/common/fetch'
+import { API_URL, PROJECT_STATUS } from 'lib/constants'
+import { observer } from 'mobx-react-lite'
+import { useEffect } from 'react'
 import { NextPageWithLayout } from 'types'
 
-/**
- * PageLayout is used to setup layout - as usual it will requires inject global store
- */
 const PageLayout: NextPageWithLayout = ({}) => {
   const { ref } = useParams()
   const { ui } = useStore()

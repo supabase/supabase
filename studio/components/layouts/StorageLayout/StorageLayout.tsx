@@ -11,6 +11,7 @@ import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStor
 import { formatPoliciesForStorage } from 'components/to-be-cleaned/Storage/Storage.utils'
 import DeleteBucketModal from 'components/to-be-cleaned/Storage/DeleteBucketModal'
 import { PROJECT_STATUS } from 'lib/constants'
+import { useBucketsQuery } from 'data/storage/buckets-query'
 
 interface Props {
   title: string
@@ -21,13 +22,11 @@ const StorageLayout: FC<Props> = ({ title, children }) => {
   const { ui, meta } = useStore()
   const { ref: projectRef } = useParams()
   const storageExplorerStore = useStorageStore()
-  const {
-    selectedBucketToEdit,
-    closeDeleteBucketModal,
-    showDeleteBucketModal,
-    deleteBucket,
-    buckets,
-  } = storageExplorerStore || {}
+  const { selectedBucketToEdit, closeDeleteBucketModal, showDeleteBucketModal, deleteBucket } =
+    storageExplorerStore || {}
+
+  const { data } = useBucketsQuery({ projectRef })
+  const buckets = data ?? []
 
   const { data: settings, isLoading } = useProjectApiQuery({ projectRef })
   const apiService = settings?.autoApiService
