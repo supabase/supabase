@@ -758,6 +758,7 @@ export const functions: NavMenuConstant = {
         { name: 'Browserless.io', url: '/guides/functions/examples/screenshots' },
         { name: 'Hugging Face', url: '/guides/ai/examples/huggingface-image-captioning' },
         { name: 'OpenAI API', url: '/guides/ai/examples/openai' },
+        { name: 'Sending Emails with Resend', url: '/guides/functions/examples/send-emails' },
         { name: 'Upstash Redis', url: '/guides/functions/examples/upstash-redis' },
         { name: 'Type-Safe SQL with Kysely', url: '/guides/functions/kysely-postgres' },
       ],
