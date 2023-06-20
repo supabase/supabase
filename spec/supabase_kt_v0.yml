@@ -19,9 +19,9 @@ functions:
     title: 'Initializing'
     description: |
       Independently of which Supabase module you are using, you will need to initialize the main client first and install the module.
-      
+
       To create a new client, you can use the `createSupabaseClient` function.
-      
+
       When installing a module, you can pass a block to configure it.
 
     examples:
@@ -55,43 +55,45 @@ functions:
           ```
         description: |
           **Common:**
-          
+
           `alwaysAutoRefresh` - whether the GoTrue plugin should always auto refresh expired sessions automatically. Default: `true`
-          
+
           `autoLoadFromStorage` - whether the GoTrue plugin should automatically load the session from the session manager. Default: `true`
-          
+
+          `autoSaveToStorage` - whether the GoTrue plugin should automatically save the session to the session manager. Default: `true`	
+
           `flowType` - Which authentication flow to use. Currently available: FlowType.PKCE and FlowType.IMPLICIT. Default: `FlowType.IMPLICIT`
-          
+
           `codeVerifierCache` - Interface for saving and loading codes for the PKCE authentication flow. Default: `SettingsCodeVerifierCache`
-          
+
           `customUrl` - Custom url for the GoTrue API. Can be safely ignored when using Supabase. Default: `null`
-          
+
           `jwtToken` - Plugin specific JWT Token. Can be ignored when using the GoTrue plugin. Default: `null`
-          
+
           `retryDelay` - Duration after which the GoTrue plugin should retry a failed session refresh. Default: `10.seconds`
-          
+
           `sessionManager` - Interface for saving and loading the user session. Default: `SettingsSessionManager`
-          
+
           **Android & IOS:**
-          
+
           `scheme` - The scheme for the redirect url, when using deep linking. Default: `supabase`
-          
+
           `host` - The host for the redirect url, when using deep linking. Default: `login`
-          
+
           **Android:** 
-          
+
           `enableLifecycleCallbacks` - Whether to stop auto-refresh on focus loss, and resume it on focus again. Default: `true`
-          
+
           **Desktop:**
-          
+
           `httpPort`: The port the web server is running on, when logging in with OAuth. Default: `0` (random port).
-          
+
           `timeout`: The timeout for the web server, when logging in with OAuth. Default: `1.minutes`.
-          
+
           `htmlTitle`: The title of the redirect page, when logging in with OAuth. Default: `"Supabase Auth"`.
-          
+
           `htmlText`: The text of the redirect page, when logging in with OAuth. Default: `"Logged in. You may continue in your app."`.
-          
+
           `htmlIconUrl`: The icon of the redirect page, when logging in with OAuth. Default: `"https://supabase.com/brand-assets/supabase-logo-icon.png"`.
       - id: configure-postgrest
         name: Configure PostgREST module
@@ -109,11 +111,11 @@ functions:
           ```
         description: |
           `propertyConversionMethod` - The method to use to convert the property names to the column names when applying filters & using the update method. Default: `PropertyConversionMethod.CAMEL_CASE_TO_SNAKE_CASE`
-          
+
           `defaultSchema` - The default schema to use for database requests. Default: `public`
-          
+
           `customUrl` - Custom url for the PostgREST API. Can be safely ignored when using Supabase. Default: `null`
-          
+
           `jwtToken` - Plugin specific JWT Token. Can be ignored when using the GoTrue plugin. Default: `null`
       - id: configure-storage
         name: Configure Storage module
@@ -130,17 +132,17 @@ functions:
           ```
         description: |
           `transferTimeout` - the timeout for uploading and downloading files. Default: `120.seconds`
-          
+
           `resumable.cache` - Interface for storing resumable upload urls. Default: `ResumableCache.Disk`
-          
+
           `resumable.defaultChunkSize` - The default chunk size for resumable uploads. Supabase currently only supports a chunk size of 6MB, so be careful when changing this value. Default: `6MB`
-          
+
           `resumable.retryTimeout` - the timeout for retrying resumable uploads when uploading a chunk fails. Default: `5.seconds`
-          
+
           `resumable.onlyUpdateStateAfterChunk` - whether the upload state should only be updated after a chunk was uploaded successfully or also when the chunk is currently being uploaded. Default: `false`
-          
+
           `customUrl` - Custom url for the Storage API. Can be safely ignored when using Supabase. Default: `null`
-          
+
           `jwtToken` - Plugin specific JWT Token. Can be ignored when using the GoTrue plugin. Default: `null`
       - id: configure-realtime
         name: Configure Realtime module
@@ -157,17 +159,17 @@ functions:
           ```
         description: |
           `reconnectDelay` - The delay between reconnect attempts. Default: `7.seconds`
-          
+
           `heartbeatInterval` - The interval between heartbeat messages. Default: `15.seconds`
-          
+
           `disconnectOnSessionLoss` - Whether to disconnect from the websocket when the session is lost. Default: `true`
-          
+
           `secure` - Whether to use wss or ws. Defaults to [SupabaseClient.useHTTPS] when null
-          
+
           `websocketConfig` - Custom Ktor websocket config
-          
+
           `customUrl` - Custom url for the Realtime websocket. Can be safely ignored when using Supabase. Default: `null`
-          
+
           `jwtToken` - Plugin specific JWT Token. Can be ignored when using the GoTrue plugin. Default: `null`
       - id: configure-functions
         name: Configure Functions plugin
@@ -184,8 +186,8 @@ functions:
           ```
         description: |
           `customUrl` - Custom url for the Functions API. Can be safely ignored when using Supabase. Default: `null`
-          
-          `jwtToken` - Plugin specific JWT Token. Can be ignored when using the GoTrue plugin. Default: `null`   
+
+          `jwtToken` - Plugin specific JWT Token. Can be ignored when using the GoTrue plugin. Default: `null`
       - id: configure-graphql
         name: Configure GraphQL plugin
         code: |
@@ -203,11 +205,11 @@ functions:
           ```
         description: |
           `apolloConfiguration` - Custom configuration for the ApolloClient
-          
+
           `customUrl` - Custom url for the GraphQL API. Can be safely ignored when using Supabase. Default: `null`
-          
+
           `jwtToken` - Plugin specific JWT Token. Can be ignored when using the GoTrue plugin. Default: `null`
-          
+
           **You can access the created ApolloClient via `client.graphql.apolloClient`, which automatically adds the required headers depending on your session.**
 
   - id: select
@@ -347,7 +349,7 @@ functions:
     title: 'Modify data: update()'
     notes: |
       - `update()` should always be combined with a [filter](/docs/reference/kotlin/using-filters) block to avoid updating all records.
-      - When calling `insert` or `update`, you have to provide a [serializable value](/docs/reference/kotlin/installing#add-kotlinx-serialization-required-for-postgrest-and-realtime-serialization) in the function parameter.      
+      - When calling `insert` or `update`, you have to provide a [serializable value](/docs/reference/kotlin/installing#add-kotlinx-serialization-required-for-postgrest-and-realtime-serialization) in the function parameter.
     examples:
       - id: updating-your-data
         name: Updating your data
@@ -435,7 +437,7 @@ functions:
       - Primary keys should be included in the data payload in order for an update to work correctly.
       - Primary keys  must be natural, not surrogate. There are however, [workarounds](https://github.com/PostgREST/postgrest/issues/1118) for surrogate primary keys.
       - If you need to insert new data and update existing data at the same time, use [Postgres triggers](https://github.com/supabase/postgrest-js/issues/173#issuecomment-825124550).
-      - When calling `insert` or `update`, you have to provide a [serializable value](/docs/reference/kotlin/installing#add-kotlinx-serialization-required-for-postgrest-and-realtime-serialization) in the function parameter.      
+      - When calling `insert` or `update`, you have to provide a [serializable value](/docs/reference/kotlin/installing#add-kotlinx-serialization-required-for-postgrest-and-realtime-serialization) in the function parameter.
     examples:
       - id: upsert-your-data
         name: Upsert your data
@@ -505,8 +507,8 @@ functions:
 
       That's a fancy way of saying that you can put some logic into your database then call it from anywhere.
       It's especially useful when the logic rarely changes - like password resets and updates.
-      
-      - When calling `rpc` with parameters, you have to provide a [serializable value](/docs/reference/kotlin/installing#add-kotlinx-serialization-required-for-postgrest-and-realtime-serialization) in the function parameter.      
+
+      - When calling `rpc` with parameters, you have to provide a [serializable value](/docs/reference/kotlin/installing#add-kotlinx-serialization-required-for-postgrest-and-realtime-serialization) in the function parameter.
     examples:
       - id: call-a-stored-procedure
         name: Call a stored procedure
@@ -529,7 +531,7 @@ functions:
       Filters allow you to only return rows that match certain conditions.
 
       Filters can be used on `select()`, `update()`, and `delete()` queries.
-      
+
       You can use two different types for applying filters:
       ```kotlin
       eq("country_id", 1)
@@ -538,10 +540,10 @@ functions:
       ```kotlin
       City::countryId eq 1
       ```
-      
+
       As you can see on the property syntax: 
       the name of the `countryId` gets converted to `country_id`. 
-      
+
       By default, this is done by converting camel case to snake case, but you can customize this by changing the `PropertyConversionMethod` in the Postgrest Config
 
       If a database function returns a table response, you can also apply filters.
@@ -2040,11 +2042,11 @@ functions:
     $ref: '@supabase/gotrue-js.GoTrueClient.signUp'
     notes: |
       Creates a new user.
-      - By default, the user needs to verify their email address before logging in. To turn this off, disable **Confirm email** in [your project](https://app.supabase.com/project/_/auth/providers).
+      - By default, the user needs to verify their email address before logging in. To turn this off, disable **Confirm email** in [your project](https://supabase.com/dashboard/project/_/auth/providers).
       - **Confirm email** determines if users need to confirm their email address after signing up.
         - If **Confirm email** is enabled, the return value is null and you will be logged in instead.
         - If **Confirm email** is disabled, the return value is the user and you won't be logged in automatically.
-      - When the user confirms their email address, they are redirected to the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url) by default. You can modify your `SITE_URL` or add additional redirect URLs in [your project](https://app.supabase.com/project/_/auth/url-configuration).
+      - When the user confirms their email address, they are redirected to the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url) by default. You can modify your `SITE_URL` or add additional redirect URLs in [your project](https://supabase.com/dashboard/project/_/auth/url-configuration).
       - [supabase-kt](https://github.com/supabase-community/supabase-kt/) has default platform implementations: 
           - On JVM, you can currently only verify a sign up through the token. To send the token, rather than a redirect url, you have to change `{{ .ConfirmationURL }}` in your sign up email to `{{ .Token }}`
           - [deep links](https://developer.android.com/training/app-links/deep-linking) (Android), 
@@ -2052,7 +2054,7 @@ functions:
               - To enable deeplinking/url scheme support on Android/IOS set the `host` and the `scheme` in the GoTrue Config and call `client.handleDeeplinks(intent)` (Android) and `client.handleDeeplinks(url)` (IOS) on startup
           - the website origin (JS)
       - If signUpWith() is called for an existing confirmed user:
-        - If **Confirm email** is enabled in [your project](https://app.supabase.com/project/_/auth/providers), an obfuscated/fake user object is returned.
+        - If **Confirm email** is enabled in [your project](https://supabase.com/dashboard/project/_/auth/providers), an obfuscated/fake user object is returned.
         - If **Confirm email** is disabled, the error message, `User already registered` is returned.
     examples:
       - id: sign-up-phone
@@ -2074,7 +2076,7 @@ functions:
               phoneNumber = "+4912345679" 
               password = "example-password"
           }
-          ```   
+          ```
       - id: sign-up-with-additional-user-metadata
         name: Sign up with additional user metadata
         isSpotlight: false
@@ -2126,7 +2128,7 @@ functions:
               phoneNumber = "+4912345679" 
               password = "example-password"
           }
-          ```  
+          ```
       - id: sign-in-with-id-token
         name: Sign in with id token
         isSpotlight: false
@@ -2142,7 +2144,7 @@ functions:
                   //...
               }
           }
-          ```      
+          ```
   - id: sign-in-with-otp
     title: 'sendOtpTo()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signInWithOtp'
@@ -2161,7 +2163,7 @@ functions:
         - [url schemes](https://developer.apple.com/documentation/xcode/defining-a-custom-url-scheme-for-your-app) (IOS) 
             - To enable deeplinking/url scheme support on Android/IOS set the `host` and the `scheme` in the GoTrue Config and call `client.handleDeeplinks(intent)` (Android) and `client.handleDeeplinks(url)` (IOS) on startup
         - the website origin (JS)
-      - Magic links and OTPs share the same implementation. To send users a one-time code instead of a magic link, [modify the magic link email template](https://app.supabase.com/project/_/auth/templates) to include `{{ .Token }}` instead of `{{ .ConfirmationURL }}`.
+      - Magic links and OTPs share the same implementation. To send users a one-time code instead of a magic link, [modify the magic link email template](https://supabase.com/dashboard/project/_/auth/templates) to include `{{ .Token }}` instead of `{{ .ConfirmationURL }}`.
     examples:
       - id: sign-in-with-email
         name: Sign in with email
@@ -2172,7 +2174,7 @@ functions:
           client.gotrue.sendOtpTo(Email) {
               email = "example@email.com" 
           }
-          ```  
+          ```
       - id: sign-in-with-sms-otp
         name: Sign in with SMS OTP
         isSpotlight: false
@@ -2278,7 +2280,7 @@ functions:
             client.gotrue.loginWith(SSO.withProvider("21648a9d-8d5a-4555-a9d1-d6375dc14e92"))
             
             //the url was opened automatically, if you don't want that, provide a custom redirect url
-          ```        
+          ```
   - id: sign-out
     title: 'logout()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signOut'
@@ -2324,6 +2326,59 @@ functions:
           Available types are:
             - `OtpType.Phone.SMS`
             - `OtpType.Phone.PHONE_CHANGE`
+  - id: send-password-reauthentication
+    title: 'reauthenticate()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.reauthenticate'
+    notes: |
+      - This method is used together with `modifyUser()` when a user's password needs to be updated.
+      - This method will send a nonce to the user's email. If the user doesn't have a confirmed email address, the method will send the nonce to the user's confirmed phone number instead.
+    examples:
+      - id: send-reauthentication-nonce
+        name: Send reauthentication nonce
+        description: Sends a reauthentication nonce to the user's email or phone number.
+        isSpotlight: true
+        code: |
+          ```kotlin
+          client.gotrue.reauthenticate()
+          ```
+  - id: resend-email-or-phone-otps
+    title: 'resend()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.resend'
+    notes: |
+      - Resends a signup confirmation, email change or phone change email to the user.
+      - Passwordless sign-ins can be resent by calling the `sendOtpTo()` method again.
+      - Password recovery emails can be resent by calling the `sendRecoveryEmail()` method again.
+      - This method will only resend an email or phone OTP to the user if there was an initial signup, email change or phone change request being made.
+    examples:
+      - id: resend-email-signup-confirmation
+        name: Resend an email signup confirmation
+        description: Resends the email signup confirmation to the user
+        isSpotlight: true
+        code: |
+          ```kotlin
+          client.gotrue.resendEmail(OtpType.Email.SIGNUP, "example@email.com")
+          ```
+      - id: resend-phone-signup-confirmation
+        name: Resend a phone signup confirmation
+        description: Resends the phone signup confirmation email to the user
+        code: |
+          ```kotlin
+          client.gotrue.resendPhone(OtpType.Phone.SMS, "1234567890")
+          ```
+      - id: resend-email-change-email
+        name: Resend email change email
+        description: Resends the email change email to the user
+        code: |
+          ```kotlin
+          client.gotrue.resendEmail(OtpType.Email.EMAIL_CHANGE, "example@email.com")
+          ```
+      - id: resend-phone-change
+        name: Resend phone change OTP
+        description: Resends the phone change OTP to the user
+        code: |
+          ```kotlin
+          client.gotrue.resendPhone(OtpType.Phone.PHONE_CHANGE, "1234567890")
+          ```
   - id: get-session
     title: 'Get current session'
     $ref: '@supabase/gotrue-js.GoTrueClient.getSession'
@@ -2360,7 +2415,7 @@ functions:
         code: |
           ```kotlin
           val user = client.gotrue.retrieveUser("JWT")
-          ```    
+          ```
   - id: update-user
     title: 'modifyUser()'
     $ref: '@supabase/gotrue-js.GoTrueClient.updateUser'
@@ -2368,7 +2423,7 @@ functions:
       Modifies the user data.
       - In order to use the `modifyUser()` method, the user needs to be signed in first.
       - By default, email updates sends a confirmation link to both the user's current and new email.
-      To only send a confirmation link to the user's new email, disable **Secure email change** in your project's [email auth provider settings](https://app.supabase.com/project/_/auth/providers).
+      To only send a confirmation link to the user's new email, disable **Secure email change** in your project's [email auth provider settings](https://supabase.com/dashboard/project/_/auth/providers).
     examples:
       - id: update-the-email-for-an-authenticated-user
         name: Update the email for an authenticated user
@@ -2376,7 +2431,7 @@ functions:
         isSpotlight: false
         code: |
           ```kotlin
-          val user = client.gotrue.modifyUser(Email) {
+          val user = client.gotrue.modifyUser {
              email = "newEmail@email.com"
           }
           ```
@@ -2385,7 +2440,7 @@ functions:
         isSpotlight: false
         code: |
           ```kotlin
-          val user = client.gotrue.modifyUser(Email) {
+          val user = client.gotrue.modifyUser {
              password = "secretPassword"
           }
           ```
@@ -2394,9 +2449,11 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val user = client.gotrue.modifyUser(Email, buildJsonObject { 
-             put("name", "John")
-          })
+          val user = client.gotrue.modifyUser {
+             data {
+                put("name", "John")
+             }
+          }
           ```
   - id: set-session
     title: 'importSession()'
@@ -2420,7 +2477,7 @@ functions:
     $ref: '@supabase/gotrue-js.GoTrueClient.refreshSession'
     notes: |
       This method will refresh the session whether the current one is expired or not.
-      
+
       - This is done automatically, but can be disabled in the GoTrue config.
     examples:
       - id: refresh-current-session
@@ -2487,6 +2544,27 @@ functions:
           ```kotlin
           client.gotrue.sendRecoveryEmail(email = "example@email.com")
           ```
+  - id: exchange-code-for-session
+    title: 'exchangeCodeForSession()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.exchangeCodeForSession'
+    notes: |
+      - Used when `flowType` is set to `FlowType.PKCE` in the GoTrue configuration.
+    examples:
+      - id: exchange-auth-code
+        name: Exchange Auth Code
+        isSpotlight: true
+        code: |
+          ```kotlin
+          client.gotrue.exchangeCodeForSession("34e770dd-9ff9-416c-87fa-43b31d7ef225")
+          ```
+  - id: auth-mfa-api
+    title: 'Overview'
+    notes: |
+      This section contains methods commonly used for Multi-Factor Authentication (MFA) and are invoked behind the `supabase.gotrue.mfa` namespace. 
+
+      Currently, we only support time-based one-time password (TOTP) as the 2nd factor. We don't support recovery codes but we allow users to enroll more than 1 TOTP factor, with an upper limit of 10.
+
+      Having a 2nd TOTP factor for recovery frees the user of the burden of having to store their recovery codes somewhere. It also reduces the attack surface since multiple recovery codes are usually generated compared to just having 1 backup TOTP factor.
   - id: mfa-enroll
     title: 'Enroll a factor'
     $ref: '@supabase/gotrue-js.GoTrueMFAApi.enroll'
@@ -2516,14 +2594,14 @@ functions:
         code: |
           ```kotlin
           val verifiedFactors = client.gotrue.mfa.verifiedFactors
-          ```  
+          ```
       - id: retrieve-verified-factors
         name: Retrieve verified factors
         isSpotlight: true
         code: |
           ```kotlin
           val verifiedFactors = client.gotrue.mfa.retrieveFactorsForCurrentUser()
-          ```       
+          ```
   - id: mfa-challenge
     title: 'mfa.challenge()'
     $ref: '@supabase/gotrue-js.GoTrueMFAApi.challenge'
@@ -2604,16 +2682,16 @@ functions:
         code: |
           ```kotlin
           val (current, next) = client.gotrue.mfa.getAuthenticatorAssuranceLevel()
-          ```    
+          ```
       - id: aal-enabled
-        name: Check whether the user has atleast one verified factor
+        name: Check whether the user has at least one verified factor
         isSpotlight: true
         code: |
           ```kotlin
           val enabled = client.gotrue.mfa.isMfaEnabled
           //flow variant, automatically emitting new values on session changes
           val enabledFlow = client.gotrue.mfa.isMfaEnabledFlow
-          ``` 
+          ```
       - id: aal-enabled-for-current-session
         name: Check whether the user is logged in using AAL2
         isSpotlight: true
@@ -2622,7 +2700,7 @@ functions:
           val loggedInUsingMfa = client.gotrue.mfa.loggedInUsingMfa
           //flow variant, automatically emitting new values on session changes
           val loggedInUsingMfaFlow = client.gotrue.mfa.loggedInUsingMfaFlow
-          ```   
+          ```
   - id: admin-api
     title: 'Overview'
     notes: |
@@ -2721,7 +2799,7 @@ functions:
                   put("name", "John")
               }
           }
-          ```    
+          ```
       - id: auto-confirm-the-users-email
         name: Auto-confirm the user's email
         code: |
@@ -2928,12 +3006,12 @@ functions:
         code: |
           ```kotlin
           client.gotrue.admin.deleteFactor(uid = "id", factorId = "factor_id")
-          ```                       
+          ```
   - id: invoke
     title: 'invoke()'
     description: |
       Invokes a Supabase Function. See the [guide](/docs/guides/functions) for details on writing Functions.
-      - When invoking a function with parameters, you have to provide a [serializable value](/docs/reference/kotlin/installing#add-kotlinx-serialization-required-for-postgrest-and-realtime-serialization) in the function parameter.            
+      - When invoking a function with parameters, you have to provide a [serializable value](/docs/reference/kotlin/installing#add-kotlinx-serialization-required-for-postgrest-and-realtime-serialization) in the function parameter.
     notes: |
       - Requires an Authorization header.
     examples:
@@ -2958,7 +3036,7 @@ functions:
                 append(HttpHeaders.ContentType, "application/json")
             }
           )
-          ```    
+          ```
       - id: reuse-function
         name: Reuse function by saving it to a variable
         isSpotlight: true
@@ -2980,7 +3058,7 @@ functions:
           function(body) {
               set("Header", "Value")
           }
-          ```    
+          ```
   - id: subscribe
     description: |
       Subscribe to realtime changes in your database.
@@ -2991,7 +3069,7 @@ functions:
       - When using a method with a generic type like `track`, `broadcast` or `broadcastFlow`, you have to provide a [serializable class](/docs/reference/kotlin/installing#add-kotlinx-serialization-required-for-postgrest-and-realtime-serialization) as the type parameter.
     examples:
       - id: connect-to-realtime-client
-        name: Connect to Realtime 
+        name: Connect to Realtime
         isSpotlight: true
         code: |
           ```kotlin
@@ -3003,45 +3081,45 @@ functions:
           ```kotlin
           @Serializable
           data class Message(val content: String, val sender: String)
-          
+
           val channel = client.realtime.createChannel("channelId") {
               //optional config
           }
-          
+
           val broadcastFlow = channel.broadcastFlow<Message>(event = "message")
-      
+
           //in a new coroutine (or use Flow.onEach().launchIn(scope)):
           broadcastFlow.collect { //it: Message
               println(it)
           }
-          
+
           channel.join(blockUntilJoined = true)
-          
+
           channel.broadcast(event = "message", Message("I joined!", "John"))
-          ```   
+          ```
       - id: listen-to-presence-updates
         name: Listen to presence updates
-        code: | 
+        code: |
           ```kotlin
           @Serializable
           data class PresenceState(val username: String)
-          
+
           val connectedUsers = mutableSetOf<PresenceState>()
           val channel = client.realtime.createChannel("channelId") {
               //optional config
           }
-      
+
           val presenceChangeFlow = channel.presenceChangeFlow()
-          
+
           //in a new coroutine (or use Flow.onEach().launchIn(scope)):
           presenceChangeFlow.collect {
               connectedUsers += it.decodeJoinsAs<PresenceState>()
               connectedUsers -= it.decodeLeavesAs<PresenceState>()
           }
-          
+
           channel.join(blockUntilJoined = true)
           //send own state
-          channel.track(PresenceState(username = "John"))    
+          channel.track(PresenceState(username = "John"))
       - id: listen-to-all-database-changes
         name: Listen to all database changes
         code: |
@@ -3050,7 +3128,7 @@ functions:
               //optional config
           }
           val changeFlow = channel.postgresChangeFlow<PostgresAction>(schema = "public")
-          
+
           //in a new coroutine (or use Flow.onEach().launchIn(scope)):
           changeFlow.collect {
               when(it) {
@@ -3060,7 +3138,7 @@ functions:
                   is PostgresAction.Update -> println("Updated: ${it.oldRecord} with ${it.record}")
               }
           }
-          
+
           channel.join()
           ```
       - id: listen-to-a-specific-table
@@ -3073,7 +3151,7 @@ functions:
           val changeFlow = channel.postgresChangeFlow<PostgresAction>(schema = "public") {
               table = "users"
           }
-          
+
           //in a new coroutine (or use Flow.onEach().launchIn(scope)):
           changeFlow.collect {
               when(it) {
@@ -3083,7 +3161,7 @@ functions:
                   is PostgresAction.Update -> println("Updated: ${it.oldRecord} with ${it.record}")
               }
           }
-          
+
           channel.join()
           ```
       - id: listen-to-inserts
@@ -3096,12 +3174,12 @@ functions:
           val changeFlow = channel.postgresChangeFlow<PostgresAction.Insert>(schema = "public") {
               table = "users"
           }
-      
+
           //in a new coroutine (or use Flow.onEach().launchIn(scope)):
           changeFlow.collect {
               println(it.record)
           }
-      
+
           channel.join()
           ```
       - id: listen-to-updates
@@ -3121,13 +3199,13 @@ functions:
           val changeFlow = channel.postgresChangeFlow<PostgresAction.Update>(schema = "public") {
               table = "users"
           }
-      
+
           //in a new coroutine (or use Flow.onEach().launchIn(scope)):
           changeFlow.collect {
               println(it.record)
               println(it.oldRecord)
           }
-      
+
           channel.join()
           ```
       - id: listen-to-deletes
@@ -3147,12 +3225,12 @@ functions:
           val changeFlow = channel.postgresChangeFlow<PostgresAction.Delete>(schema = "public") {
               table = "users"
           }
-      
+
           //in a new coroutine (or use Flow.onEach().launchIn(scope)):
           changeFlow.collect {
               println(it.oldRecord)
           }
-      
+
           channel.join()
           ```
       - id: listening-to-row-level-changes
@@ -3167,12 +3245,12 @@ functions:
               table = "users"
               filter = "id.eq.1"
           }
-      
+
           //in a new coroutine:
           changeFlow.collect {
               println(it.oldRecord)
           }
-      
+
           channel.join()
           ```
 
@@ -3205,6 +3283,19 @@ functions:
           }
           //...
           channel.leave()
+          ```
+  - id: remove-all-channels
+    title: removeAllChannels()
+    $ref: '@supabase/supabase-js.index.SupabaseClient.removeAllChannels'
+    notes: |
+      - Removing channels is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes. Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
+    examples:
+      - id: remove-all-channels
+        name: Remove all channels
+        isSpotlight: true
+        code: |
+          ```js
+          client.realtime.removeAllChannels()
           ```
   - id: list-buckets
     title: listBuckets()
@@ -3257,6 +3348,26 @@ functions:
           client.storage.createBucket(name = "icons", id = "icons") {
               public = true
               fileSizeLimit = 5.megabytes
+          }
+          ```
+  - id: update-bucket
+    title: updateBucket()
+    $ref: '@supabase/storage-js.packages/StorageBucketApi.default.updateBucket'
+    notes: |
+      - RLS policy permissions required:
+        - `buckets` table permissions: `select` and `update`
+        - `objects` table permissions: none
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+    examples:
+      - id: update-bucket
+        name: Update bucket
+        isSpotlight: true
+        code: |
+          ```kotlin
+          client.storage.updateBucket("cards") {
+              public = false
+              fileSizeLimit = 20.megabytes
+              allowedMimeTypes(ContentType.Image.PNG, ContentType.Image.JPEG)
           }
           ```
 
@@ -3325,7 +3436,7 @@ functions:
                   is UploadStatus.Success -> println("Success")
               }
           }
-          ```    
+          ```
       - id: create-resumable-upload
         name: Create resumable upload
         isSpotlight: true
@@ -3342,10 +3453,10 @@ functions:
               size = dataSize,
               path = "icon.png"
           )                
-          ```   
+          ```
       - id: start-resumable-upload
         name: Start and resumable upload
-        isSpotlight: true    
+        isSpotlight: true
         code: |
           ```kotlin
           upload.startOrResumeUploading()
@@ -3361,7 +3472,7 @@ functions:
         code: |
           ```kotlin
           upload.cancel()
-          ```    
+          ```
         description: |
           This will also remove the upload url from the cache
       - id: listen-to-upload-state
@@ -3373,21 +3484,21 @@ functions:
               println("Paused: ${it.paused}")
               println("Is done: ${it.isDone}")
           }
-          ```    
+          ```
       - id: continue-previous-upload
         name: Continue previous uploads
         isSpotlight: true
         code: |
           ```kotlin
           val bucket = client.storage["avatars"]
-          
+
           //only on JVM/Android:
           bucket.resumable.continuePreviousFileUploads()
               .map { it.await() } //await all uploads. This just makes sure the uploads have an update-to-date url. You can also do this in parallel
               .forEach { upload ->
                   upload.startOrResumeUploading()
               }
-      
+
           //on other platforms you may have to continue uploads from the source (Probably better to write an extension function): 
           bucket.resumable.continuePreviousUploads { source, offset ->
               //create ByteReadChannel from source and seek to offset
@@ -3396,7 +3507,7 @@ functions:
               .forEach { upload ->
                   upload.startOrResumeUploading()
               }
-          ```          
+          ```
 
   - id: from-update
     title: from.update()
@@ -3435,7 +3546,22 @@ functions:
           val bucket = client.storage["avatars"]
           bucket.move("icon1.png", "icon2.png")
           ```
-
+  - id: from-copy
+    title: from.copy()
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.copy'
+    notes: |
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `insert` and `select`
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+    examples:
+      - id: copy-file
+        name: Copy file
+        isSpotlight: true
+        code: |
+          ```kotlin
+          client.storage["test"].copy(from = "avatar.png", to = "avatar2.png")
+          ```
   - id: from-create-signed-url
     title: from.createSignedUrl()
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.createSignedUrl'
@@ -3464,6 +3590,82 @@ functions:
               quality = 80
           }    
           ```
+  - id: from-create-signed-urls
+    title: from.createSignedUrls()
+    notes: |
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `select`
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+    examples:
+      - id: create-signed-urls
+        name: Create Signed URLs
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val urls = client.storage["avatars"].createSignedUrls(20.minutes, "avata1.jpg", "avatar2.jpg")
+          ```
+  - id: from-create-signed-upload-url
+    title: from.createSignedUploadUrl()
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.createSignedUploadUrl'
+    notes: |
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `insert`
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+    examples:
+      - id: create-signed-upload-url
+        name: Create Signed Upload URL
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val url = client.storage["avatars"].createSignedUploadUrl("avatar.png")
+          ```
+  - id: from-upload-to-signed-url
+    title: from.uploadToSignedUrl()
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.uploadToSignedUrl'
+    notes: |
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: none
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+    examples:
+      - id: upload-to-signed-url
+        name: Upload to a signed URL
+        isSpotlight: true
+        code: |
+          ```kotlin
+          client.storage["avatars"].uploadToSignedUrl(path = "avatar.jpg", token = "token-from-createSignedUploadUrl", data = bytes)
+          //or on JVM:
+          client.storage["avatars"].uploadToSignedUrl(path = "avatar.jpg", token = "token-from-createSignedUploadUrl", file = File("avatar.jpg"))
+          ```
+  - id: from-get-public-url
+    title: from.getPublicUrl()
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.getPublicUrl'
+    notes: |
+      - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/kotlin/storage-updatebucket) or by going to Storage on [app.supabase.com](https://supabase.com/dashboard), clicking the overflow menu on a bucket and choosing "Make public"
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: none
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+    examples:
+      - id: returns-the-url-for-an-asset-in-a-public-bucket
+        name: Returns the URL for an asset in a public bucket
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val url = client.storage["public-bucket"].publicUrl("folder/avatar1.png")
+          ```
+      - id: transform-asset-in-public-bucket
+        name: Returns the URL for an asset in a public bucket with transformations
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val url = client.storage["public-bucket"].publicRenderUrl("folder/avatar1.png") {
+              size(100, 100)
+          }
+          ```
+
   - id: from-download
     title: from.download()
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.download'
@@ -3492,7 +3694,7 @@ functions:
           val bytes = bucket.downloadPublic("test.png")
           //or on JVM:
           bucket.downloadPublicTo("test.png", File("test.png"))
-          ```    
+          ```
       - id: download-with-transformation
         name: Download file with transformation
         code: |
@@ -3509,9 +3711,9 @@ functions:
               fill()
               quality = 100
           }
-          ```  
+          ```
       - id: download-with-progress
-        name: Download file with progress 
+        name: Download file with progress
         code: |
           ```kotlin
           val bucket = client.storage["avatars"]
@@ -3530,7 +3732,7 @@ functions:
                   else -> {} //The ByteData status will never occur as we are writing directly to a file
               }
           }
-          ```       
+          ```
   - id: from-remove
     title: from.remove()
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.remove'

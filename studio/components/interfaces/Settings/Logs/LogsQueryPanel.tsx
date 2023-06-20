@@ -13,8 +13,8 @@ import DatePickers from './Logs.DatePickers'
 import Link from 'next/link'
 import React from 'react'
 import { checkPermissions } from 'hooks'
-import { useProfileQuery } from 'data/profile/profile-query'
 import { IS_PLATFORM } from 'lib/constants'
+import { useProfileQuery } from 'data/profile/profile-query'
 
 export interface LogsQueryPanelProps {
   templates?: LogTemplate[]
@@ -70,8 +70,8 @@ const LogsQueryPanel = ({
                   </Dropdown.Item>
                 ))}
             >
-              <Button as="span" type="default" iconRight={<IconChevronDown />}>
-                Insert source
+              <Button asChild type="default" iconRight={<IconChevronDown />}>
+                <span>Insert source</span>
               </Button>
             </Dropdown>
 
@@ -86,8 +86,8 @@ const LogsQueryPanel = ({
                   </Dropdown.Item>
                 ))}
             >
-              <Button as="span" type="default" iconRight={<IconChevronDown />}>
-                Templates
+              <Button asChild type="default" iconRight={<IconChevronDown />}>
+                <span>Templates</span>
               </Button>
             </Dropdown>
             <DatePickers

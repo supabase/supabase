@@ -9,6 +9,8 @@ import { BASE_PATH } from 'lib/constants'
 import { Provider } from './AuthProvidersForm.types'
 import { ProviderCollapsibleClasses } from './AuthProvidersForm.constants'
 import FormField from './FormField'
+import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
+import { useParams } from 'common'
 
 interface Props {
   provider: Provider
@@ -17,9 +19,11 @@ interface Props {
 const ProviderForm: FC<Props> = ({ provider }) => {
   const [open, setOpen] = useState(false)
   const { authConfig, ui } = useStore()
-
+  const { ref } = useParams()
   const doubleNegativeKeys = ['MAILER_AUTOCONFIRM', 'SMS_AUTOCONFIRM']
   const canUpdateConfig = checkPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
+
+  const { data: customDomainData } = useCustomDomainsQuery({ projectRef: ref })
 
   const generateInitialValues = () => {
     const initialValues: { [x: string]: string } = {}
@@ -153,7 +157,11 @@ const ProviderForm: FC<Props> = ({ provider }) => {
                         readOnly
                         disabled
                         label="Redirect URL"
-                        value={`https://${ui.selectedProjectRef}.supabase.co/auth/v1/callback`}
+                        value={
+                          customDomainData?.customDomain
+                            ? `https://${customDomainData.customDomain?.hostname}/auth/v1/callback`
+                            : `https://${ui.selectedProjectRef}.supabase.co/auth/v1/callback`
+                        }
                       />
                     </>
                   )}

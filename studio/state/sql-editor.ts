@@ -230,6 +230,8 @@ if (typeof window !== 'undefined') {
             content: { ...snippet.snippet.content, content_id: id },
             type: 'sql',
             id,
+            name: snippet.snippet.name,
+            description: snippet.snippet.description,
           })
 
           sqlEditorState.needsSaving.delete(id)

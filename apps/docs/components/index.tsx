@@ -16,12 +16,13 @@ import FunctionsExamples from './FunctionsExamples'
 import { Mermaid } from 'mdx-mermaid/lib/Mermaid'
 import RefSubLayout from '~/layouts/ref/RefSubLayout'
 import { Heading } from './CustomHTMLElements'
+import DatabaseSetup from './MDX/database_setup.mdx'
 import ProjectSetup from './MDX/project_setup.mdx'
 import QuickstartIntro from './MDX/quickstart_intro.mdx'
 import SocialProviderSettingsSupabase from './MDX/social_provider_settings_supabase.mdx'
 import SocialProviderSetup from './MDX/social_provider_setup.mdx'
 import StorageManagement from './MDX/storage_management.mdx'
-// import { CH } from '@code-hike/mdx/components'
+import { CH } from '@code-hike/mdx/components'
 import RefHeaderSection from './reference/RefHeaderSection'
 
 // Ref version specific
@@ -58,6 +59,7 @@ const components = {
   Admonition,
   Button,
   ButtonCard,
+  CH,
   CodeBlock,
   GlassPanel,
   Link,
@@ -66,6 +68,7 @@ const components = {
   FunctionsExamples,
   JwtGenerator,
   QuickstartIntro,
+  DatabaseSetup,
   ProjectSetup,
   SocialProviderSetup,
   SocialProviderSettingsSupabase,

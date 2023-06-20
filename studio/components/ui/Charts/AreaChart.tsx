@@ -47,12 +47,12 @@ const AreaChart: React.FC<AreaChartProps> = ({
   const resolvedHighlightedLabel =
     (focusDataIndex !== null &&
       data &&
-      data[focusDataIndex] &&
+      data[focusDataIndex] !== undefined &&
       day(data[focusDataIndex][xAxisKey]).format(customDateFormat)) ||
     highlightedLabel
 
   const resolvedHighlightedValue =
-    (focusDataIndex !== null ? data[focusDataIndex]?.[yAxisKey] : null) || highlightedValue
+    focusDataIndex !== null ? data[focusDataIndex]?.[yAxisKey] : highlightedValue
 
   return (
     <div className={['flex flex-col gap-3', className].join(' ')}>
@@ -97,7 +97,7 @@ const AreaChart: React.FC<AreaChartProps> = ({
             interval={data.length - 2}
             angle={0}
             // hide the tick
-            tick={{ fontSize: '0px' }}
+            tick={false}
             // color the axis
             axisLine={{ stroke: CHART_COLORS.AXIS }}
             tickLine={{ stroke: CHART_COLORS.AXIS }}

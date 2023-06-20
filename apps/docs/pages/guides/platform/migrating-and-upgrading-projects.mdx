@@ -31,7 +31,9 @@ Migrating projects can be achieved using the Supabase CLI. This is particularly 
 - Install [Postgres](https://www.postgresql.org/download/) so you can run `psql` and `pg_dump`.
 - Install [Supabase CLI](https://supabase.com/docs/guides/cli#installation).
 - Create a new [Supabase project](https://app.supabase.com).
-- Store the old project's database URL as `$OLD_DB_URL` and the new project's as `$NEW_DB_URL`.
+- Install [Docker Desktop](https://www.docker.com) for your platform.
+- Set environment variables for the old project's database URL as `$OLD_DB_URL` and the new project's as `$NEW_DB_URL`.
+  To find the database URL for a project, go to the project's dashboard page [Project Settings/Database](https://supabase.com/dashboard/project/_/settings/database) and look at `Connection string / URI`. For example, to set the `$OLD_DB_URL` you would run `export OLD_DB_URL=postgresql://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT-REF#].supabase.co:5432/postgres`.
 
 ### Backup your old database
 
@@ -49,7 +51,6 @@ In your new project:
 
 1. Enable [Database Webhooks](https://app.supabase.com/project/_/database/hooks) if you enabled them in your old project.
 2. Enable any [extensions](https://app.supabase.com/project/_/database/extensions) that were enabled in your old project.
-3. Create any [custom roles](https://app.supabase.com/project/_/database/roles) that were created in your old project.
 
 Then run the following command from your terminal:
 
@@ -57,10 +58,16 @@ Then run the following command from your terminal:
 psql \
   --single-transaction \
   --variable ON_ERROR_STOP=1 \
+  --file roles.sql \
   --file schema.sql \
   --file data.sql \
   --dbname "$NEW_DB_URL"
 ```
+
+Notes:
+
+- If you have created any [custom roles](https://app.supabase.com/project/_/database/roles) with `login` attribute, you have to manually set their passwords in the new project.
+- If you receive any permission errors when running `supabase db dump --db-url "$OLD_DB_URL" -f schema.sql`, you may need to edit the `schema.sql` file and change any lines saying `OWNER TO "supabase_admin"` to `OWNER TO "postgres"`.
 
 ### Enable publication on tables
 

@@ -25,14 +25,14 @@
 }
 
 body {
-  @apply bg-scale-200 dark:bg-[#1c1c1c] #{!important};
+  @apply bg-scale-200;
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 ::selection {
-  background-color: #6ee7b7;
+  background-color: #6ee7b7 !important;
   color: #333 !important;
 }
 
