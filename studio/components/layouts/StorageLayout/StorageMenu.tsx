@@ -1,4 +1,4 @@
-import { FC, useState } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
@@ -16,9 +16,7 @@ import CreateBucketModal from 'components/interfaces/Storage/CreateBucketModal'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useBucketsQuery } from 'data/storage/buckets-query'
 
-interface Props {}
-
-const StorageMenu: FC<Props> = () => {
+const StorageMenu = () => {
   const router = useRouter()
   const { ref, bucketId } = useParams()
   const [showCreateBucketModal, setShowCreateBucketModal] = useState(false)
@@ -128,7 +126,10 @@ const StorageMenu: FC<Props> = () => {
 
       <CreateBucketModal
         visible={showCreateBucketModal}
-        onClose={() => setShowCreateBucketModal(false)}
+        onClose={() => {
+          console.log('onClose')
+          setShowCreateBucketModal(false)
+        }}
       />
 
       <EditBucketModal

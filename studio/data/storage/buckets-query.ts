@@ -6,7 +6,7 @@ import { storageKeys } from './keys'
 
 export type BucketsVariables = { projectRef?: string }
 
-export type BucketsResponse = {
+export type Bucket = {
   id: string
   name: string
   owner: string
@@ -22,7 +22,7 @@ export async function getBuckets({ projectRef }: BucketsVariables, signal?: Abor
 
   const response = await get(`${API_URL}/storage/${projectRef}/buckets`, { signal })
   if (response.error) throw response.error
-  return response as BucketsResponse[]
+  return response as Bucket[]
 }
 
 export type BucketsData = Awaited<ReturnType<typeof getBuckets>>
