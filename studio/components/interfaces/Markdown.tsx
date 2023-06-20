@@ -1,6 +1,6 @@
 import { ReactMarkdownProps } from 'react-markdown/lib/complex-types'
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
-import { cn } from 'ui/src/utils/cn'
+import { cn } from 'ui'
 
 interface Props extends Omit<ReactMarkdownProps, 'children' | 'node'> {
   className?: string

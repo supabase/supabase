@@ -6,8 +6,7 @@ import Image from 'next/image'
 
 import React from 'react'
 
-import { Badge, Button, IconArrowRight, IconGitHub, IconSquare } from 'ui'
-import { cn } from 'ui/src/utils/cn'
+import { Badge, Button, IconArrowRight, IconGitHub, IconSquare, cn } from 'ui'
 
 const ICON_STROKE_WIDTH = 2
 const ICON_SIZE = 14
@@ -50,6 +49,7 @@ const HandleIcon = ({ type }: { type: HandleIconType }) => {
 }
 
 const Avatar = ({ src }: { src: string }) => {
+  console.log('src of avatar', src)
   return (
     <div className="relative border shadow-lg w-8 h-8 rounded-full overflow-hidden">
       <Image src={src} width={30} height={30} layout="fill" alt="avatar" className="relative" />
@@ -80,7 +80,7 @@ const IntegrationInstallation = React.forwardRef<HTMLLIElement, IntegrationInsta
             </span> */}
             <div className="flex -space-x-1">
               <IntegrationIconBlock />
-              <Avatar src={connection.metadata.account.avatar} />
+              <Avatar src={connection?.metadata?.account?.avatar} />
             </div>
           </div>
           <div className="flex flex-col gap-0">

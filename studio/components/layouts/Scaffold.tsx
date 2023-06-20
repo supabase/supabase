@@ -1,5 +1,5 @@
 import React from 'react'
-import { cn } from 'ui/src/utils/cn'
+import { cn } from 'ui'
 
 const maxWidthClasses = 'mx-auto w-full max-w-[1600px]'
 const paddingClasses = 'px-6 lg:px-14 xl:px-28 2xl:px-32'
