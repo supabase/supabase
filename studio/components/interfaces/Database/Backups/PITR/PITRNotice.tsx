@@ -4,14 +4,14 @@ import { FormPanel } from 'components/ui/Forms'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { checkPermissions } from 'hooks'
 import { useParams } from 'common/hooks'
-import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
 import { getPITRRetentionDuration } from './PITR.utils'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 
 const PITRNotice = ({}) => {
   const { ref: projectRef } = useParams()
-  const { data: subscription } = useProjectSubscriptionQuery({ projectRef })
-  const retentionPeriod = getPITRRetentionDuration(subscription?.addons ?? [])
+  const { data: addonsResponse } = useProjectAddonsQuery({ projectRef })
+  const retentionPeriod = getPITRRetentionDuration(addonsResponse?.selected_addons ?? [])
 
   const canUpdateSubscription = checkPermissions(
     PermissionAction.BILLING_WRITE,
@@ -28,11 +28,11 @@ const PITRNotice = ({}) => {
           </span>
           <Tooltip.Root delayDuration={0}>
             <Tooltip.Trigger>
-              <Button disabled={canUpdateSubscription} as="span" type="default">
-                <Link href={`/project/${projectRef}/settings/billing/update/pro`}>
+              <Link href={`/project/${projectRef}/settings/billing/subscription?panel=pitr`} passHref>
+                <Button disabled={canUpdateSubscription} type="default" asChild>
                   <a>Increase retention period</a>
-                </Link>
-              </Button>
+                </Button>
+              </Link>
             </Tooltip.Trigger>
             {!canUpdateSubscription && (
               <Tooltip.Portal>

@@ -4,8 +4,8 @@ import { FC, useEffect } from 'react'
 import { IconChevronRight, IconLoader } from 'ui'
 
 import { useStore } from 'hooks'
-import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
 import Panel from 'components/ui/Panel'
+import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 
 interface ProjectSummaryProps {
   project: any
@@ -17,10 +17,10 @@ const ProjectSummary: FC<ProjectSummaryProps> = ({ project }) => {
     data: subscription,
     isLoading: loading,
     error,
-  } = useProjectSubscriptionQuery({ projectRef: project.ref })
+  } = useProjectSubscriptionV2Query({ projectRef: project.ref })
 
-  const currentPeriodStart = subscription?.billing?.current_period_start ?? 0
-  const currentPeriodEnd = subscription?.billing?.current_period_end ?? 0
+  const currentPeriodStart = subscription?.current_period_start ?? 0
+  const currentPeriodEnd = subscription?.current_period_end ?? 0
 
   useEffect(() => {
     if (error) {
@@ -43,7 +43,7 @@ const ProjectSummary: FC<ProjectSummaryProps> = ({ project }) => {
       ) : (
         <>
           <div className="w-[20%]">
-            <p className="text-sm">{subscription?.tier.name ?? ''}</p>
+            <p className="text-sm">{subscription?.plan.name ?? ''}</p>
           </div>
           <div className="flex w-[40%] items-center space-x-2">
             <p className="text-sm">{dayjs.unix(currentPeriodStart).utc().format('MMM D, YYYY')}</p>

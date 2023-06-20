@@ -27,7 +27,7 @@
 
 Pilnu dokumentāciju skatīt [supabase.com/docs](https://supabase.com/docs)
 
-Lai uzzinātu, kā veikt iemaksas, apmeklējiet [Getting Started](./DEVELOPERS.md)
+Lai uzzinātu, kā veikt iemaksas, apmeklējiet [Getting Started](../DEVELOPERS.md)
 
 ## Kopiena un atbalsts
 

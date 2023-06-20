@@ -7,7 +7,7 @@ import type * as RadixDropdownTypes from '@radix-ui/react-dropdown-menu/'
 
 import styleHandler from '../../lib/theme/styleHandler'
 import { IconTarget } from '../Icon/icons/IconTarget'
-import { cn } from '../../utils/cn'
+import { cn } from './../../lib/utils'
 
 interface RootProps extends RadixDropdownTypes.DropdownMenuProps {
   open?: boolean

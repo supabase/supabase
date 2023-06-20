@@ -67,7 +67,7 @@ const ProjectUsage: FC<Props> = ({}) => {
     // TODO (ziinc): link to edge logs with correct filter applied
     _type: 'rest' | 'realtime' | 'storage' | 'auth'
   ) => {
-    const selected = dayjs(value.timestamp).toISOString()
+    const selected = dayjs(value?.timestamp).toISOString()
     router.push(`/project/${projectRef}/logs/edge-logs?ite=${encodeURIComponent(selected)}`)
   }
 
@@ -87,8 +87,8 @@ const ProjectUsage: FC<Props> = ({}) => {
             </Dropdown.RadioGroup>
           }
         >
-          <Button as="span" type="default" iconRight={<IconChevronDown />}>
-            {selectedInterval.label}
+          <Button asChild type="default" iconRight={<IconChevronDown />}>
+            <span>{selectedInterval.label}</span>
           </Button>
         </Dropdown>
         <span className="text-xs text-scale-1000">

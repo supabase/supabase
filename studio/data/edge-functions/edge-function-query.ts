@@ -19,6 +19,7 @@ export type EdgeFunctionResponse = {
   verify_jwt: boolean
   import_map: boolean
   version: number
+  import_map_path: string
 }
 
 export async function getEdgeFunction(

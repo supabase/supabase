@@ -82,7 +82,7 @@ const NotificationRow: FC<Props> = ({
           <div className="w-1/10 flex justify-end">
             <div>
               <Tooltip.Root delayDuration={0}>
-                <Tooltip.Trigger>
+                <Tooltip.Trigger asChild>
                   <Button
                     className="!px-1 group"
                     type="text"

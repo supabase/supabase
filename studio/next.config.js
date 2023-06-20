@@ -140,6 +140,31 @@ const nextConfig = {
         destination: '/org/:slug/general',
         permanent: true,
       },
+      {
+        source: '/project/:ref/settings/billing/update',
+        destination: '/project/:ref/settings/billing/subscription',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/settings/billing/update/free',
+        destination: '/project/:ref/settings/billing/subscription',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/settings/billing/update/pro',
+        destination: '/project/:ref/settings/billing/subscription',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/settings/billing/update/team',
+        destination: '/project/:ref/settings/billing/subscription',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/settings/billing/update/enterprise',
+        destination: '/project/:ref/settings/billing/subscription',
+        permanent: true,
+      },
     ]
   },
   async headers() {

@@ -67,13 +67,13 @@ const OrgDropdown = () => {
         </>
       }
     >
-      <Button as="span" type="text" size="tiny">
-        {selectedOrganization.name}
+      <Button asChild type="text" size="tiny">
+        <span>{selectedOrganization.name}</span>
       </Button>
     </Dropdown>
   ) : (
-    <Button as="span" type="text" size="tiny">
-      {selectedOrganization.name}
+    <Button asChild type="text" size="tiny">
+      <span>{selectedOrganization.name}</span>
     </Button>
   )
 }

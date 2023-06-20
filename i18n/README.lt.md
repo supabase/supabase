@@ -27,7 +27,7 @@
 
 Išsamios dokumentacijos rasite [supabase.com/docs](https://supabase.com/docs)
 
-Norėdami sužinoti, kaip prisidėti, apsilankykite [Getting Started](./DEVELOPERS.md)
+Norėdami sužinoti, kaip prisidėti, apsilankykite [Getting Started](../DEVELOPERS.md)
 
 ## Bendruomenė ir palaikymas
 

@@ -27,7 +27,7 @@
 
 पूर्ण प्रलेखन के लिए, [supabase.com/docs](https://supabase.com/docs) पर जाएँ
 
-योगदान करने के लिए, [गेट्टिंग स्टार्टेड](https://github.com/supabase/supabase/blob/master/DEVELOPERS.md) पेज पर जाएँ
+योगदान करने के लिए, [गेट्टिंग स्टार्टेड](../DEVELOPERS.md) पेज पर जाएँ
 
 ## सामुदायिक तथा सहयोग
 

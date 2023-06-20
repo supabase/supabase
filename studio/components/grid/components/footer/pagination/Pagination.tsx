@@ -184,11 +184,9 @@ const Pagination = ({ isLoading: isLoadingRows = false }: PaginationProps) => {
             side="top"
             align="start"
           >
-            <Button
-              as="span"
-              type="outline"
-              style={{ padding: '3px 10px' }}
-            >{`${state.rowsPerPage} rows`}</Button>
+            <Button asChild type="outline" style={{ padding: '3px 10px' }}>
+              <span>{`${state.rowsPerPage} rows`}</span>
+            </Button>
           </DropdownControl>
           <p className="text-sm text-scale-1100">{`${data.count.toLocaleString()} ${
             data.count === 0 || data.count > 1 ? `records` : 'record'

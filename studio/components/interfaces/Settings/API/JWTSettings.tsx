@@ -156,13 +156,8 @@ const JWTSettings: FC<Props> = ({}) => {
                             </Button>
                           ) : !canGenerateNewJWTSecret ? (
                             <Tooltip.Root delayDuration={0}>
-                              <Tooltip.Trigger>
-                                <Button
-                                  disabled
-                                  as="span"
-                                  type="default"
-                                  iconRight={<IconChevronDown />}
-                                >
+                              <Tooltip.Trigger asChild>
+                                <Button disabled type="default" iconRight={<IconChevronDown />}>
                                   Generate a new secret
                                 </Button>
                               </Tooltip.Trigger>
@@ -204,8 +199,8 @@ const JWTSettings: FC<Props> = ({}) => {
                                 </>
                               }
                             >
-                              <Button as="span" type="default" iconRight={<IconChevronDown />}>
-                                Generate a new secret
+                              <Button asChild type="default" iconRight={<IconChevronDown />}>
+                                <span>Generate a new secret</span>
                               </Button>
                             </Dropdown>
                           )}

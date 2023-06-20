@@ -4,6 +4,7 @@ import AnnouncementsData from 'data/Announcements.json'
 import { useRouter } from 'next/router'
 import Image from 'next/image'
 import Link from 'next/link'
+import { TextLink } from 'ui'
 
 type Props = {
   text: string
@@ -61,7 +62,7 @@ const Developers = () => {
       <div className="col-span-6">
         <div className="m-3 mx-6">
           <p className="p">Latest announcements</p>
-          <ul className="mt-6 space-y-3 pb-6">
+          <ul className="mt-6 space-y-3">
             {AnnouncementsData.map((announcement: any, idx: number) => (
               <li className="flow-root" key={`flyout_case_${idx}`}>
                 <Link href={announcement.url}>
@@ -85,6 +86,9 @@ const Developers = () => {
               </li>
             ))}
           </ul>
+          <div className="pt-4">
+            <TextLink url="/blog" label="Explore more" />
+          </div>
         </div>
       </div>
     </div>
