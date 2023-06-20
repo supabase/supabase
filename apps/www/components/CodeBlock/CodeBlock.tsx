@@ -17,6 +17,7 @@ export interface CodeBlockProps {
   className?: string
   children?: string
   size?: 'small' | 'medium' | 'large'
+  background?: string
 }
 
 function CodeBlock(props: CodeBlockProps) {
@@ -98,7 +99,7 @@ function CodeBlock(props: CodeBlockProps) {
             padding: '21px 24px',
             fontSize: large ? 18 : '0.875rem',
             lineHeight: large ? 1.6 : 1.4,
-            background: '#181818',
+            background: props.background ?? '#1A1A1A',
           }}
           showLineNumbers={props.showLineNumbers}
           lineNumberStyle={{
@@ -126,6 +127,7 @@ function CodeBlock(props: CodeBlockProps) {
                   )
                 }
                 onClick={() => handleCopy()}
+                aria-label="Copy"
               >
                 {/* {copied ? 'Copied' : 'Copy'} */}
               </Button>

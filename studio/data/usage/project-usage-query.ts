@@ -13,6 +13,9 @@ export interface UsageMetric {
   limit: number
   cost: number
   available_in_plan: boolean
+  // [Joshen] can we verify if this is still getting passed?
+  // Only for database and storage size
+  current?: number
 }
 
 export type ProjectUsageResponse = {

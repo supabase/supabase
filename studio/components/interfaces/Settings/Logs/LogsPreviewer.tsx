@@ -23,7 +23,7 @@ import LoadingOpacity from 'components/ui/LoadingOpacity'
 import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
 import UpgradePrompt from './UpgradePrompt'
 import { useParams } from 'common/hooks'
-import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
+import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 
 /**
  * Acts as a container component for the entire log display
@@ -52,15 +52,24 @@ export const LogsPreviewer: React.FC<Props> = ({
   const router = useRouter()
   const { s, ite, its } = useParams()
   const [showChart, setShowChart] = useState(true)
-  const { data: subscription } = useProjectSubscriptionQuery({ projectRef })
-  const tier = subscription?.tier
+  const { data: subscription } = useProjectSubscriptionV2Query({ projectRef })
 
   const table = !tableName ? LOGS_TABLES[queryType] : tableName
 
-  const [
-    { error, logData, params, newCount, filters, isLoading, eventChartData, isLoadingOlder },
-    { loadOlder, setFilters, refresh, setParams },
-  ] = useLogsPreview(projectRef as string, table, filterOverride)
+  const {
+    error,
+    logData,
+    params,
+    newCount,
+    filters,
+    isLoading,
+    eventChartData,
+    isLoadingOlder,
+    loadOlder,
+    setFilters,
+    refresh,
+    setParams,
+  } = useLogsPreview(projectRef as string, table, filterOverride)
 
   const { showUpgradePrompt, setShowUpgradePrompt } = useUpgradePrompt(
     params.iso_timestamp_start as string
@@ -80,12 +89,12 @@ export const LogsPreviewer: React.FC<Props> = ({
   // Show the prompt on page load based on query params
   useEffect(() => {
     if (its) {
-      const shouldShowUpgradePrompt = maybeShowUpgradePrompt(its as string, tier?.key)
+      const shouldShowUpgradePrompt = maybeShowUpgradePrompt(its as string, subscription?.plan?.id)
       if (shouldShowUpgradePrompt) {
         setShowUpgradePrompt(!showUpgradePrompt)
       }
     }
-  }, [its, tier])
+  }, [its, subscription])
 
   const onSelectTemplate = (template: LogTemplate) => {
     setFilters((prev: any) => ({ ...prev, search_query: template.searchString }))
@@ -129,7 +138,7 @@ export const LogsPreviewer: React.FC<Props> = ({
         },
       })
     } else if (event === 'datepicker-change') {
-      const shouldShowUpgradePrompt = maybeShowUpgradePrompt(from, tier?.key)
+      const shouldShowUpgradePrompt = maybeShowUpgradePrompt(from, subscription?.plan?.id)
 
       if (shouldShowUpgradePrompt) {
         setShowUpgradePrompt(!showUpgradePrompt)
@@ -234,7 +243,6 @@ export const LogsPreviewer: React.FC<Props> = ({
               <UpgradePrompt
                 show={showUpgradePrompt}
                 setShowUpgradePrompt={setShowUpgradePrompt}
-                subscription={subscription}
               />
             </div>
           </div>

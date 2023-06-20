@@ -3,6 +3,7 @@ import { useRouter } from 'next/router'
 import { toJS } from 'mobx'
 import { Button, Dropdown, IconPlus } from 'ui'
 import { observer } from 'mobx-react-lite'
+import { useFlag } from 'hooks'
 
 const OrganizationDropdown = ({ organizations }) => {
   const router = useRouter()
@@ -10,6 +11,8 @@ const OrganizationDropdown = ({ organizations }) => {
   const organizationList = Object.values(toJS(organizations.data)).sort((a, b) =>
     a.name.localeCompare(b.name)
   )
+
+  const orgCreationV2 = useFlag('orgcreationv2')
 
   return (
     <Dropdown
@@ -33,10 +36,20 @@ const OrganizationDropdown = ({ organizations }) => {
           <Dropdown.Item icon={<IconPlus size="tiny" />} onClick={() => router.push(`/new`)}>
             New organization
           </Dropdown.Item>
+          {orgCreationV2 && (
+            <Dropdown.Item
+              icon={<IconPlus size="tiny" />}
+              onClick={() => router.push(`/new-with-subscription`)}
+            >
+              New organization V2
+            </Dropdown.Item>
+          )}
         </>
       }
     >
-      <Button as="span">New project</Button>
+      <Button asChild>
+        <span>New project</span>
+      </Button>
     </Dropdown>
   )
 }

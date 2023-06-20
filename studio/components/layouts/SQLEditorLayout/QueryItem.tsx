@@ -130,14 +130,18 @@ const QueryItemActions = observer(({ tabInfo }: { tabInfo: SqlSnippet }) => {
           }
         >
           <Button
-            as="span"
+            asChild
             type="text"
             icon={<IconChevronDown size="tiny" strokeWidth={2} className="text-scale-1100" />}
             style={{ padding: '3px' }}
-          />
+          >
+            <span></span>
+          </Button>
         </Dropdown>
       ) : (
-        <Button as="span" type="text" style={{ padding: '3px' }} />
+        <Button asChild disabled type="text" style={{ padding: '3px' }}>
+          <span></span>
+        </Button>
       )}
       <RenameQueryModal
         snippet={tabInfo}

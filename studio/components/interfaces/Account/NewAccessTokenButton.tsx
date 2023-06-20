@@ -71,10 +71,13 @@ const NewAccessTokenButton = observer(({ onCreateToken }: NewAccessTokenButtonPr
               ]}
             >
               <Button
+                asChild
                 type="primary"
                 className="rounded-l-none px-[4px] py-[5px]"
                 icon={<IconChevronDown />}
-              />
+              >
+                <span></span>
+              </Button>
             </Dropdown>
           </div>
         </div>

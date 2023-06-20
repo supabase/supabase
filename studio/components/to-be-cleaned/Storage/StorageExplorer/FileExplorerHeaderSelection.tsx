@@ -17,7 +17,6 @@ const FileExplorerHeaderSelection = () => {
       <Button
         icon={<IconX size={16} strokeWidth={2} />}
         type="text"
-        shadow={false}
         onClick={() => clearSelectedItems()}
       />
       <div className="ml-4 flex items-center space-x-3">
@@ -28,7 +27,6 @@ const FileExplorerHeaderSelection = () => {
         <Button
           icon={<IconDownload size={16} strokeWidth={2} />}
           type="primary"
-          shadow={false}
           onClick={async () => {
             if (selectedItems.length === 1) {
               await downloadFile(selectedItems[0])
@@ -43,7 +41,6 @@ const FileExplorerHeaderSelection = () => {
         <Button
           icon={<IconTrash2 size={16} strokeWidth={2} />}
           type="primary"
-          shadow={false}
           onClick={() => setSelectedItemsToDelete(selectedItems)}
         >
           Delete
@@ -51,7 +48,6 @@ const FileExplorerHeaderSelection = () => {
         <Button
           icon={<IconMove size={16} strokeWidth={2} />}
           type="primary"
-          shadow={false}
           onClick={() => setSelectedItemsToMove(selectedItems)}
         >
           Move

@@ -34,11 +34,15 @@ export const getIdentity = (gotrueUser: User) => {
   }
 }
 
-// NOTE: do not use any imports in this function,
-// as it is used standalone in the documents head
+// NOTE: do not use any imports in this function as it is used standalone in the documents head
+// [Joshen] Potentially can remove after full move over to /dashboard
 export const getReturnToPath = (fallback = '/projects') => {
   const searchParams = new URLSearchParams(location.search)
-  let returnTo = searchParams.get('returnTo') ?? fallback
+
+  // [Joshen] Remove base path value ("/dashboard") from returnTo
+  // because we're having this in the document's head, we won't have access
+  // to process.env, hardcoding the value as a workaround
+  const returnTo = (searchParams.get('returnTo') ?? fallback).replace('/dashboard', '')
 
   searchParams.delete('returnTo')
 

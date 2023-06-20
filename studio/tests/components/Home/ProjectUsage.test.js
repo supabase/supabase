@@ -3,6 +3,7 @@ import { clickDropdown, render } from '../../helpers'
 import userEvent from '@testing-library/user-event'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { get } from 'lib/common/fetch'
+import useFillTimeseriesSorted from 'hooks/analytics/useFillTimeseriesSorted'
 
 // TODO: abstract out to global setup
 const ProjectUsage = jest.fn()
@@ -31,10 +32,10 @@ ProjectUsage.mockImplementation((props) => {
   )
 })
 
-jest.mock('data/subscriptions/project-subscription-query')
-import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
+jest.mock('data/subscriptions/project-subscription-v2-query')
+import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 
-useProjectSubscriptionQuery.mockReturnValue({
+useProjectSubscriptionV2Query.mockReturnValue({
   data: undefined,
 })
 
@@ -51,8 +52,12 @@ const MOCK_CHART_DATA = {
       total_rest_requests: 333,
       timestamp: new Date().toISOString(),
     },
-  ]
+  ],
 }
+
+// This hook is globally mocked, so you don't need to call `jest.mock` first - but the tests
+// for this component need this mock data returned
+useFillTimeseriesSorted.mockReturnValue(MOCK_CHART_DATA.result)
 
 test('mounts correctly', async () => {
   get.mockImplementation((url) => {

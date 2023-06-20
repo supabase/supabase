@@ -407,7 +407,7 @@ const CreateFunction: FC<CreateFunctionProps> = ({ func, visible, setVisible }) 
                 <SidePanel.Separator />
                 <SidePanel.Content>
                   <Panel>
-                    <div className={`space-y-8 rounded bg-bg-alt-light py-4 dark:bg-bg-alt-dark`}>
+                    <div className={`space-y-8 rounded bg-scale-200 py-4`}>
                       <div className={`px-6`}>
                         <Toggle
                           onChange={() => _localState.toggleAdvancedVisible()}
@@ -606,15 +606,7 @@ const InputArgument: FC<InputArgumentProps> = observer(({ idx, name, type, error
         ))}
       </Listbox>
       {!readonly && (
-        <div>
-          <Button
-            danger
-            type="default"
-            icon={<IconTrash size="tiny" />}
-            onClick={onDelete}
-            size="small"
-          />
-        </div>
+        <Button type="danger" icon={<IconTrash size="tiny" />} onClick={onDelete} size="small" />
       )}
     </div>
   )
@@ -718,15 +710,7 @@ const InputConfigParam: FC<InputConfigParamProps> = observer(({ idx, name, value
         size="small"
         error={error?.value}
       />
-      <div>
-        <Button
-          danger
-          type="default"
-          icon={<IconTrash size="tiny" />}
-          onClick={onDelete}
-          size="small"
-        />
-      </div>
+      <Button type="danger" icon={<IconTrash size="tiny" />} onClick={onDelete} size="small" />
     </div>
   )
 })

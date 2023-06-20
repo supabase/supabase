@@ -5,15 +5,15 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 
 import { useStore } from 'hooks'
 import { useParams } from 'common/hooks'
-import { post } from 'lib/common/fetch'
+import { delete_ } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { useProfileQuery } from 'data/profile/profile-query'
 import InviteMemberButton from './InviteMemberButton'
 import MembersView from './MembersView'
 import { getRolesManagementPermissions, hasMultipleOwners } from './TeamSettings.utils'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 import { useOrganizationDetailQuery } from 'data/organizations/organization-detail-query'
 import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
+import { useProfileQuery } from 'data/profile/profile-query'
 
 const TeamSettings = () => {
   const { ui } = useStore()
@@ -43,7 +43,9 @@ const TeamSettings = () => {
         title: 'Are you sure?',
         message: 'Are you sure you want to leave this team? This is permanent.',
         onAsyncConfirm: async () => {
-          const response = await post(`${API_URL}/organizations/${slug}/members/leave`, {})
+          const response = await delete_(
+            `${API_URL}/organizations/${slug}/members/${profile!.gotrue_id}`
+          )
           if (response.error) {
             throw response.error
           } else {

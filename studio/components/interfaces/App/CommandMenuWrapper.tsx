@@ -10,11 +10,11 @@ import { uuidv4 } from 'lib/helpers'
 import { checkPermissions, useFlag, useStore } from 'hooks'
 import { createSqlSnippetSkeleton } from '../SQLEditor/SQLEditor.utils'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { useProfileQuery } from 'data/profile/profile-query'
+import { codeBlock } from 'common-tags'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useProjectApiQuery } from 'data/config/project-api-query'
-import { codeBlock } from 'common-tags'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
+import { useProfileQuery } from 'data/profile/profile-query'
 
 const CommandMenuWrapper = observer(({ children }: PropsWithChildren<{}>) => {
   const { ref } = useParams()

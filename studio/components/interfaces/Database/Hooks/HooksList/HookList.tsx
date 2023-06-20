@@ -38,7 +38,10 @@ const HookList: FC<Props> = ({
   const restUrlTld = new URL(restUrl as string).hostname.split('.').pop()
 
   const filteredHooks = (hooks ?? []).filter(
-    (x: any) => includes(x.name.toLowerCase(), filterString.toLowerCase()) && x.schema === schema
+    (x: any) =>
+      includes(x.name.toLowerCase(), filterString.toLowerCase()) &&
+      x.schema === schema &&
+      x.function_args.length >= 2
   )
   const canUpdateWebhook = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'triggers')
 
@@ -99,12 +102,14 @@ const HookList: FC<Props> = ({
                       </>
                     }
                   >
-                    <Button as="span" type="default" icon={<IconMoreVertical />} className="px-1" />
+                    <Button asChild type="default" icon={<IconMoreVertical />} className="px-1">
+                      <span></span>
+                    </Button>
                   </Dropdown>
                 ) : (
                   <Tooltip.Root delayDuration={0}>
-                    <Tooltip.Trigger>
-                      <Button as="span" disabled type="default" icon={<IconMoreVertical />} />
+                    <Tooltip.Trigger asChild>
+                      <Button disabled type="default" icon={<IconMoreVertical />} />
                     </Tooltip.Trigger>
                     <Tooltip.Portal>
                       <Tooltip.Content side="left">
