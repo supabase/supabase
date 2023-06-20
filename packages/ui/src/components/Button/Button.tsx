@@ -85,7 +85,8 @@ const buttonVariants = cva(
             text-scale-1200
             hover:bg-scale-500
             shadow-none
-            focus-visible:outline-scale-700`,
+            focus-visible:outline-scale-700
+            border-transparent`,
         danger: `
             text-red-1100
             bg-red-200
