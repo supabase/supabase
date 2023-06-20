@@ -1,15 +1,15 @@
-import { useState, useEffect } from 'react'
-import { Button, Loading, IconFileText, IconDownload, IconChevronLeft, IconChevronRight } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
 
-import { checkPermissions, useStore } from 'hooks'
-import { API_URL } from 'lib/constants'
-import { get, head } from 'lib/common/fetch'
-import Table from 'components/to-be-cleaned/Table'
-import NoPermission from 'components/ui/NoPermission'
 import InvoiceStatusBadge from 'components/interfaces/Billing/InvoiceStatusBadge'
 import { Invoice, InvoiceStatus } from 'components/interfaces/Billing/Invoices.types'
+import Table from 'components/to-be-cleaned/Table'
+import NoPermission from 'components/ui/NoPermission'
+import { checkPermissions, useSelectedOrganization, useStore } from 'hooks'
+import { get, head } from 'lib/common/fetch'
+import { API_URL } from 'lib/constants'
+import { Button, IconChevronLeft, IconChevronRight, IconDownload, IconFileText, Loading } from 'ui'
 
 const PAGE_LIMIT = 10
 
@@ -23,7 +23,8 @@ const InvoicesSettings = () => {
   const [count, setCount] = useState(0)
   const [invoices, setInvoices] = useState<Invoice[]>([])
 
-  const { stripe_customer_id } = ui.selectedOrganization ?? {}
+  const selectedOrganization = useSelectedOrganization()
+  const { stripe_customer_id } = selectedOrganization ?? {}
   const offset = (page - 1) * PAGE_LIMIT
 
   const canReadInvoices = checkPermissions(PermissionAction.READ, 'invoices')

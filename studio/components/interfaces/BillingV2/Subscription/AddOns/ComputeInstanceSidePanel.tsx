@@ -1,15 +1,19 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useQueryClient } from '@tanstack/react-query'
 import clsx from 'clsx'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
+
 import { useParams, useTheme } from 'common'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { invalidateProjectsQuery } from 'data/projects/projects-query'
 import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-remove-mutation'
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 import { checkPermissions, useStore } from 'hooks'
-import { BASE_PATH, PROJECT_STATUS } from 'lib/constants'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { BASE_PATH } from 'lib/constants'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { Alert, Button, IconExternalLink, Modal, Radio, SidePanel } from 'ui'
 
@@ -34,10 +38,12 @@ const COMPUTE_CATEGORY_OPTIONS: {
 ]
 
 const ComputeInstanceSidePanel = () => {
-  const { ui, app } = useStore()
+  const queryClient = useQueryClient()
+  const { ui } = useStore()
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const { isDarkMode } = useTheme()
+  const { project: selectedProject } = useProjectContext()
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showConfirmationModal, setShowConfirmationModal] = useState(false)
@@ -55,7 +61,7 @@ const ComputeInstanceSidePanel = () => {
   const { mutateAsync: updateAddon } = useProjectAddonUpdateMutation()
   const { mutateAsync: removeAddon } = useProjectAddonRemoveMutation()
 
-  const projectId = ui.selectedProject?.id
+  const projectId = selectedProject?.id
   const selectedAddons = addons?.selected_addons ?? []
   const availableAddons = addons?.available_addons ?? []
 
@@ -100,7 +106,7 @@ const ComputeInstanceSidePanel = () => {
         category: 'success',
         message: `Successfully updated compute instance to ${selectedCompute?.name}. Your project is currently being restarted to update its instance`,
       })
-      app.onProjectStatusUpdated(projectId, PROJECT_STATUS.RESTORING)
+      await invalidateProjectsQuery(queryClient)
       onClose()
       router.push(`/project/${projectRef}`)
     } catch (error: any) {

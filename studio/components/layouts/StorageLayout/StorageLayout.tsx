@@ -1,16 +1,16 @@
-import { FC, ReactNode, useEffect } from 'react'
-import { find, filter, get as _get } from 'lodash'
+import { get as _get, filter, find } from 'lodash'
 import { observer } from 'mobx-react-lite'
+import { FC, ReactNode, useEffect } from 'react'
 
-import { useStore, withAuth } from 'hooks'
 import { useParams } from 'common/hooks'
+import DeleteBucketModal from 'components/to-be-cleaned/Storage/DeleteBucketModal'
+import { formatPoliciesForStorage } from 'components/to-be-cleaned/Storage/Storage.utils'
 import { AutoApiService, useProjectApiQuery } from 'data/config/project-api-query'
+import { useSelectedProject, useStore, withAuth } from 'hooks'
+import { PROJECT_STATUS } from 'lib/constants'
+import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import ProjectLayout from '../'
 import StorageMenu from './StorageMenu'
-import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
-import { formatPoliciesForStorage } from 'components/to-be-cleaned/Storage/Storage.utils'
-import DeleteBucketModal from 'components/to-be-cleaned/Storage/DeleteBucketModal'
-import { PROJECT_STATUS } from 'lib/constants'
 
 interface Props {
   title: string
@@ -19,6 +19,7 @@ interface Props {
 
 const StorageLayout: FC<Props> = ({ title, children }) => {
   const { ui, meta } = useStore()
+  const project = useSelectedProject()
   const { ref: projectRef } = useParams()
   const storageExplorerStore = useStorageStore()
   const {
@@ -32,7 +33,7 @@ const StorageLayout: FC<Props> = ({ title, children }) => {
   const { data: settings, isLoading } = useProjectApiQuery({ projectRef })
   const apiService = settings?.autoApiService
 
-  const isPaused = ui.selectedProject?.status === PROJECT_STATUS.INACTIVE
+  const isPaused = project?.status === PROJECT_STATUS.INACTIVE
 
   useEffect(() => {
     if (!isLoading && apiService) initializeStorageStore(apiService)

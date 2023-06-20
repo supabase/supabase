@@ -1,30 +1,29 @@
 import { useRouter } from 'next/router'
-import { observer } from 'mobx-react-lite'
+
+import { useParams } from 'common/hooks'
+import { TeamSettings } from 'components/interfaces/Organization'
+import { OrganizationLayout } from 'components/layouts'
+import Loading from 'components/ui/Loading'
+import { usePermissionsQuery } from 'data/permissions/permissions-query'
+import { useSelectedOrganization } from 'hooks'
+import { NextPageWithLayout } from 'types'
 import { Tabs } from 'ui'
 
-import { NextPageWithLayout } from 'types'
-import { useStore } from 'hooks'
-import { useParams } from 'common/hooks'
-import Loading from 'components/ui/Loading'
-import { OrganizationLayout } from 'components/layouts'
-import { TeamSettings } from 'components/interfaces/Organization'
-
 const OrgTeamSettings: NextPageWithLayout = () => {
-  const { ui } = useStore()
+  const { data: permissions } = usePermissionsQuery()
+  const selectedOrganization = useSelectedOrganization()
   const { slug } = useParams()
   const router = useRouter()
 
   return (
     <>
-      {ui.selectedOrganization === undefined && (ui?.permissions ?? []).length === 0 ? (
+      {selectedOrganization === undefined && (permissions ?? []).length === 0 ? (
         <Loading />
       ) : (
         <div className="p-4 pt-0">
           <div className="space-y-3">
             <section className="mt-4">
-              <h1 className="text-3xl">
-                {ui.selectedOrganization?.name ?? 'Organization'} settings
-              </h1>
+              <h1 className="text-3xl">{selectedOrganization?.name ?? 'Organization'} settings</h1>
             </section>
             <nav>
               <Tabs
@@ -53,4 +52,5 @@ const OrgTeamSettings: NextPageWithLayout = () => {
 }
 
 OrgTeamSettings.getLayout = (page) => <OrganizationLayout>{page}</OrganizationLayout>
-export default observer(OrgTeamSettings)
+
+export default OrgTeamSettings

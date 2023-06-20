@@ -1,22 +1,23 @@
+import dayjs from 'dayjs'
+import Link from 'next/link'
+
 import { useParams } from 'common'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import SparkBar from 'components/ui/SparkBar'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
-import dayjs from 'dayjs'
+import { useFlag, useSelectedOrganization } from 'hooks'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { Alert, Button, IconExternalLink } from 'ui'
-import TierUpdateSidePanel from './TierUpdateSidePanel'
-import Link from 'next/link'
-import { useFlag, useStore } from 'hooks'
 import ProjectUpdateDisabledTooltip from '../../ProjectUpdateDisabledTooltip'
 import SubscriptionPaymentMethod from './SubscriptionPaymentMethod'
+import TierUpdateSidePanel from './TierUpdateSidePanel'
 
 export interface SubscriptionTierProps {}
 
 const SubscriptionTier = ({}: SubscriptionTierProps) => {
   const { ref: projectRef } = useParams()
-  const { ui } = useStore()
-  const orgSlug = ui.selectedOrganization?.slug ?? ''
+  const selectedOrganization = useSelectedOrganization()
+  const orgSlug = selectedOrganization?.slug ?? ''
   const snap = useSubscriptionPageStateSnapshot()
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
   const { data: subscription, isLoading, refetch } = useProjectSubscriptionV2Query({ projectRef })

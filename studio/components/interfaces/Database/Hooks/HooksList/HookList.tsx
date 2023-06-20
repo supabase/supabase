@@ -1,17 +1,16 @@
-import Image from 'next/image'
-import { FC } from 'react'
-import { includes } from 'lodash'
-import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Badge, Button, Dropdown, IconMoreVertical, IconTrash, IconEdit3 } from 'ui'
+import { includes, noop } from 'lodash'
+import Image from 'next/image'
+import { FC } from 'react'
 
-import { checkPermissions, useStore } from 'hooks'
 import { useParams } from 'common/hooks'
-import { BASE_PATH } from 'lib/constants'
-import Table from 'components/to-be-cleaned/Table'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import Table from 'components/to-be-cleaned/Table'
 import { useDatabaseHooks } from 'data/database-triggers/database-triggers-query'
+import { checkPermissions } from 'hooks'
+import { BASE_PATH } from 'lib/constants'
+import { Badge, Button, Dropdown, IconEdit3, IconMoreVertical, IconTrash } from 'ui'
 
 interface Props {
   schema: string
@@ -20,13 +19,7 @@ interface Props {
   deleteHook: (hook: any) => void
 }
 
-const HookList: FC<Props> = ({
-  schema,
-  filterString,
-  editHook = () => {},
-  deleteHook = () => {},
-}) => {
-  const { ui } = useStore()
+const HookList: FC<Props> = ({ schema, filterString, editHook = noop, deleteHook = noop }) => {
   const { ref } = useParams()
   const { project } = useProjectContext()
   const { data: hooks } = useDatabaseHooks({
@@ -34,7 +27,7 @@ const HookList: FC<Props> = ({
     connectionString: project?.connectionString,
   })
 
-  const restUrl = ui.selectedProject?.restUrl
+  const restUrl = project?.restUrl
   const restUrlTld = new URL(restUrl as string).hostname.split('.').pop()
 
   const filteredHooks = (hooks ?? []).filter(
@@ -137,4 +130,4 @@ const HookList: FC<Props> = ({
   )
 }
 
-export default observer(HookList)
+export default HookList

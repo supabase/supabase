@@ -1,25 +1,30 @@
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useQueryClient } from '@tanstack/react-query'
 import Link from 'next/link'
 import { useState } from 'react'
-import * as Tooltip from '@radix-ui/react-tooltip'
-import { Modal, Button, IconPauseCircle } from 'ui'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useStore, useFlag } from 'hooks'
-import { post } from 'lib/common/fetch'
-import { API_URL, PROJECT_STATUS } from 'lib/constants'
+import { useParams } from 'common'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
-import { useParams } from 'common'
+import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
+import { checkPermissions, useFlag, useSelectedOrganization, useStore } from 'hooks'
+import { post } from 'lib/common/fetch'
+import { API_URL } from 'lib/constants'
+import { Button, IconPauseCircle, Modal } from 'ui'
+import { useProjectContext } from './ProjectContext'
 
 export interface ProjectPausedStateProps {
   product?: string
 }
 
 const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
-  const { ui, app } = useStore()
+  const queryClient = useQueryClient()
+  const { ui } = useStore()
   const { ref } = useParams()
-  const project = ui.selectedProject
-  const orgSlug = ui.selectedOrganization?.slug
+  const selectedOrganization = useSelectedOrganization()
+  const { project } = useProjectContext()
+  const orgSlug = selectedOrganization?.slug
 
   const kpsEnabled = useFlag('initWithKps')
   const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery({ slug: orgSlug })
@@ -53,7 +58,7 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
     }
 
     await post(`${API_URL}/projects/${project.ref}/restore`, { kps_enabled: kpsEnabled })
-    app.onProjectUpdated({ ...project, status: PROJECT_STATUS.RESTORING })
+    await invalidateOrganizationsQuery(queryClient)
     ui.setNotification({ category: 'success', message: 'Restoring project' })
   }
 
