@@ -1,7 +1,7 @@
 # This workflow will do a clean install of node dependencies, cache/restore them, build the source code and run tests across different versions of node
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
 
-name: Studio Unit Tests
+name: Studio Unit Tests & Build Check
 
 on:
   push:
@@ -15,13 +15,15 @@ on:
       - 'studio/**'
       - 'package-lock.json'
 jobs:
-  build:
+  check:
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
         node-version: [18.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+        cmd:
+          - npm run test:studio
+          - npm run build:studio
 
     steps:
       - uses: actions/checkout@v3
@@ -33,9 +35,9 @@ jobs:
       - name: Install deps
         run: npm ci
         working-directory: ./
-      - name: Run tests
+      - name: Run ${{ matrix.cmd }}
         env:
           # Default is 2 GB, increase to have less frequent OOM errors
           NODE_OPTIONS: '--max_old_space_size=3072'
-        run: npm run test:studio
+        run: ${{ matrix.cmd }}
         working-directory: ./
