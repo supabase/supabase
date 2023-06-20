@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 
 import { useParams } from 'common'
 import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
-import { useBucketDeleteMutation } from 'data/storage/bucket-delete-mutationl'
+import { useBucketDeleteMutation } from 'data/storage/bucket-delete-mutation'
 import { Bucket, useBucketsQuery } from 'data/storage/buckets-query'
 import { useStore } from 'hooks'
 import { formatPoliciesForStorage } from './Storage.utils'
