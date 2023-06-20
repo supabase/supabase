@@ -18,6 +18,7 @@ import {
   useIntegrationsQuery,
 } from 'data/integrations/integrations-query'
 import { useIntegrationsVercelInstalledConnectionDeleteMutation } from 'data/integrations/integrations-vercel-installed-connection-delete-mutation'
+import { useStore } from 'hooks'
 import { pluralize } from 'lib/helpers'
 import { EMPTY_ARR } from 'lib/void'
 import { useMemo } from 'react'
@@ -42,11 +43,11 @@ const Integration = ({
   integrations = EMPTY_ARR,
 }: IntegrationProps) => {
   const githubConnectionConfigPanelShotshot = useGithubConnectionConfigPanelSnapshot()
-  const deleteMutation = useIntegrationsVercelInstalledConnectionDeleteMutation({
-    onSuccess: (data, variables, context) => {
-      // Handle the success case
-    },
-  })
+
+  const { ui } = useStore()
+
+  const { mutate: deleteMutate, isLoading: isDeleteLoading } =
+    useIntegrationsVercelInstalledConnectionDeleteMutation()
 
   const ConnectionHeading = ({ integration }: { integration: TIntegration }) => {
     return (
@@ -66,9 +67,10 @@ Repository connections for ${title?.toLowerCase()}
     const variables = {
       organization_integration_id: organizationIntegrationId,
       id: projectIntegrationId,
+      orgId: ui.selectedOrganization?.id,
     }
 
-    deleteMutation.mutate(variables)
+    deleteMutate(variables)
   }
 
   return (
