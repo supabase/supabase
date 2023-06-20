@@ -16,16 +16,19 @@ const MigrationsPage: NextPageWithLayout = () => {
       {isError && <div>Error state...</div>}
       {isSuccess && (
         <div>
-          {data.result.map((migration) => (
-            <div key={migration.version}>
-              <div>{migration.version}</div>
-              <div>
-                {migration.statements?.map((statement, i) => (
-                  <div key={i}>{statement}</div>
-                ))}
+          {data.result.length <= 0 && <div>No migrations state...</div>}
+
+          {data.result.length > 0 &&
+            data.result.map((migration) => (
+              <div key={migration.version}>
+                <div>{migration.version}</div>
+                <div>
+                  {migration.statements?.map((statement, i) => (
+                    <div key={i}>{statement}</div>
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
         </div>
       )}
     </div>
