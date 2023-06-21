@@ -11,6 +11,7 @@ import SwiperCore, { Autoplay } from 'swiper'
 import 'swiper/swiper.min.css'
 import SectionContainer from '../Layouts/SectionContainer'
 import { useBreakpoint } from 'common'
+import { Button } from 'ui'
 
 SwiperCore.use([Autoplay])
 
@@ -78,7 +79,7 @@ const cards: CardInterface[] = [
   },
 ]
 
-const CommunitySlider = () => {
+const CommunitySlider = (props: any) => {
   const ref = useRef<any>(null)
   const isSm = useBreakpoint(768)
   const { basePath } = useRouter()
@@ -103,7 +104,7 @@ const CommunitySlider = () => {
   }, [ref.current, swiperInstance?.autoplay])
 
   const Card = (card: CardInterface) => (
-    <div className="dark:bg-scale-300 hover:border-scale-600 hover:dark:border-scale-700 border-scale-300 dark:border-scale-400 rounded-2xl border bg-white p-6 drop-shadow-sm flex flex-col gap-4">
+    <div className="hover:border-scale-600 hover:dark:border-scale-700 border-scale-300 dark:border-scale-400 rounded-2xl border bg-[var(--color-panel-bg)] p-6 drop-shadow-sm flex flex-col gap-4">
       <div className="flex items-center gap-2">
         <div className="h-10 w-10 overflow-hidden rounded-full border dark:border-gray-600">
           <Image src={card.avatar!} layout="responsive" width="64" height="64" alt={card.author} />
@@ -136,21 +137,41 @@ const CommunitySlider = () => {
   )
 
   return (
-    <div className="py-16 sm:py-18 md:py-24 bg-scale-100">
+    <div className="py-16 sm:py-18 md:py-24">
       <div className="relative h-[300px] w-screen mx-auto md:w-full -mb-32 z-0">
-        <Image
+        {/* <Image
           src="/images/product/vector/community/vector-community.svg"
           alt="vector graphic"
           layout="fill"
           objectFit={isSm ? 'cover' : 'contain'}
-        />
+        /> */}
       </div>
       <SectionContainer className="!py-0">
         <div className="col-span-12 text-center relative z-10">
-          <h3 className="text-3xl md:text-4xl heading-gradient">
-            Join a growing <br />
-            community of users
-          </h3>
+          <h3 className="text-3xl md:text-4xl heading-gradient mb-2">Trusted by all Developers</h3>
+          <p className="text-[var(--color-text-secondary)] text-sm">
+            Discover what our customers have to say about their Supabase experience
+          </p>
+          <div className="flex gap-2 justify-center mt-8">
+            {props.cta && (
+              <Link href={props.cta.link} as={props.cta.link}>
+                <a>
+                  <Button size="tiny" className="text-white">
+                    {props.cta.label ?? 'Start your project'}
+                  </Button>
+                </a>
+              </Link>
+            )}
+            {props.secondaryCta && (
+              <Link href={props.secondaryCta.link} as={props.secondaryCta.link}>
+                <a className="ml-2">
+                  <Button size="tiny" type="default">
+                    {props.secondaryCta.label ?? 'Documentation'}
+                  </Button>
+                </a>
+              </Link>
+            )}
+          </div>
         </div>
       </SectionContainer>
 

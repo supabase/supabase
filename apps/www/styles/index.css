@@ -3,12 +3,16 @@
 @tailwind utilities;
 
 :root {
-  --color-bg-darkest-hsl: 215, 60%, 3%;
-  --color-bg-darkest: hsl(var(--color-bg-darkest-hsl));
-  --color-panel-bg-hsl: 200, 30%, 5%;
-  --color-panel-bg: hsl(var(--color-panel-bg-hsl));
-  --color-text-secondary-hsl: 200, 12%, 62%;
-  --color-text-secondary: hsl(var(--color-text-secondary-hsl));
+  --color-base-100: 215, 60%, 3%;
+  --color-base-200: 215, 30%, 5%;
+  --color-base-300: 215, 30%, 7%;
+  --color-base-400: 215, 30%, 10%;
+  --color-base-800: 215, 12%, 65%;
+  --color-bg-darkest: hsl(var(--color-base-100));
+  --color-panel-bg: hsl(var(--color-base-200));
+  --color-text-secondary: hsl(var(--color-base-800));
+  --color-border-from: hsl(var(--color-base-400));
+  --color-border-to: hsla(var(--color-base-400), 0.5);
 }
 
 @import url(../pages/launch-week/launchWeek.css);

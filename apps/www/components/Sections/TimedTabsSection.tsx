@@ -130,9 +130,7 @@ const TimedTabsSection = ({
     <SectionContainer className="flex flex-col gap-8">
       <div className="flex flex-col lg:flex-row gap-8 xl:gap-10 justify-between">
         <div className="w-full lg:w-1/2 gap-2 flex flex-col">
-          <h2 className="text-3xl xl:text-4xl max-w-[280px] sm:max-w-xs xl:max-w-[360px] tracking-[-1px]">
-            {title}
-          </h2>
+          <h2 className="text-3xl xl:text-4xl tracking-[-1px]">{title}</h2>
           <p className="text-scale-900 mb-4 max-w-sm">{paragraph}</p>
           {cta && (
             <Link href={cta.link}>

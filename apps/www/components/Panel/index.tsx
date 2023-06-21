@@ -63,13 +63,13 @@ const Panel = ({
     <div
       ref={outerRef}
       className={[
-        'relative z-0 rounded-xl bg-scale-400 bg-gradient-to-b from-scale-300 to-scale-100 p-px transition-all shadow-md',
+        'relative z-0 rounded-xl bg-gradient-to-b from-[var(--color-border-from)] to-[var(--color-border-to)] p-px transition-all shadow-md',
         outerClassName,
       ].join(' ')}
     >
       <div
         className={[
-          'relative z-10 h-full rounded-xl bg-scale-200 dark:bg-[var(--color-panel-bg)] overflow-hidden transition-all text-scale-1100',
+          'relative z-10 h-full rounded-xl bg-[var(--color-panel-bg)] overflow-hidden transition-all text-scale-1100',
           innerClassName,
         ].join(' ')}
       >

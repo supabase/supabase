@@ -11,14 +11,10 @@ function TweetCard(props: TweetCard) {
   return (
     <div
       className="
-
-      dark:bg-scale-300 border-scale-300 dark:border-scale-400
-
-      rounded-2xl border bg-white p-6
-      drop-shadow-sm
-
-
-    "
+        dark:bg-[var(--color-panel-bg)] border-scale-300 dark:border-scale-400
+        rounded-2xl border bg-white p-6
+        drop-shadow-sm
+      "
     >
       <div className="relative">
         <div className="flex items-center gap-2">

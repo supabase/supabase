@@ -1,9 +1,10 @@
 import Link from 'next/link'
-import IntegrationsImage from '~/components/products/vector/IntegrationsImage'
-import OpenAIImage from '~/components/products/vector/OpenAIImage'
-import SecureAndScalableImg from '~/components/products/vector/SecureAndScalableImg'
-import PGvectorImg from '~/components/products/vector/PGvectorImg'
-import DeployGlobally from '~/components/products/vector/DeployGlobally'
+import IntegrationsImage from '~/components/Products/vector/IntegrationsImage'
+import OpenAIImage from '~/components/Products/vector/OpenAIImage'
+import SecureAndScalableImg from '~/components/Products/vector/SecureAndScalableImg'
+import PGvectorImg from '~/components/Products/vector/PGvectorImg'
+import DeployGlobally from '~/components/Products/vector/DeployGlobally'
+import solutions from '../Solutions'
 
 export default {
   heroSection: {
@@ -72,6 +73,9 @@ export default {
       "build your friends' genius idea",
       'manage your cloud',
     ],
+  },
+  productsSection: {
+    products: { ...solutions },
   },
   useCasesSection: {
     title: (
@@ -157,80 +161,57 @@ export default {
   APIsection: {
     title: (
       <>
-        <span className="heading-gradient">Simple yet</span>
+        <span className="heading-gradient">Instant APIs that </span>
         <br />
-        <span className="text-brand-900">powerful APIs</span>
+        <span className="heading-gradient">do the hard work for you</span>
       </>
     ),
-    paragraph: 'Easy-to-use client libraries for managing and querying vector stores in Postgres.',
+    paragraph:
+      'We introspect your database to provide APIs instantly. Stop building repetitive CRUD endpoints and focus on your product.',
     cta: {
       label: 'Explore documentation',
       link: '/docs/guides/ai/vecs-python-client',
     },
     tabs: [
       {
-        label: 'Store',
-        paragraph: 'Efficiently upsert millions of vectors with important metadata.',
-        colabUrl:
-          'https://colab.research.google.com/github/supabase/supabase/blob/master/examples/ai/vector_hello_world.ipynb',
+        label: 'Create User',
+        paragraph:
+          'Using Supabase client to create a new user with email and password for authentication.',
+        colabUrl: '',
         code: `
-docs = vx.create_collection(name="docs", dimension=3)
-
-# add records to the collection
-docs.upsert(
-    vectors=[
-        (
-         "vec0",           # the vector's identifier
-         [0.1, 0.2, 0.3],  # the vector. list or np.array
-         {"year": 1973}    # associated  metadata
-        ),
-        (
-         "vec1",
-         [0.7, 0.8, 0.9],
-         {"year": 2012}
-        )
-    ]
-)
         `,
       },
       {
-        label: 'Index',
+        label: 'Realtime Subscriptions',
         paragraph:
-          'Build indexes using Cosine distance, L2-Norm distance, or Max Inner Product for fast and efficient querying.',
-        colabUrl:
-          'https://colab.research.google.com/github/supabase/supabase/blob/master/examples/ai/vector_hello_world.ipynb',
+          'Using Supabase client to create a new user with email and password for authentication.',
+        colabUrl: '',
         code: `
-# get an existing collection
-docs = vx.get_collection(name="docs")
-
-# index the collection to be queried by cosine distance
-docs.create_index(measure=vecs.IndexMeasure.cosine_distance)
-
-# Available options for query measure are:
-#
-# vecs.IndexMeasure.cosine_distance
-# vecs.IndexMeasure.l2_distance
-# vecs.IndexMeasure.max_inner_product
-
-# or use the default (cosine_distance)
-docs.create_index()
-      `,
+        `,
       },
       {
-        label: 'Query',
-        paragraph: 'Efficient querying and filtering of results based on vector metadata.',
-        colabUrl:
-          'https://colab.research.google.com/github/supabase/supabase/blob/master/examples/ai/vector_hello_world.ipynb',
+        label: 'Read a Record',
+        paragraph:
+          'Using Supabase client to create a new user with email and password for authentication.',
+        colabUrl: '',
         code: `
-# get an existing collection
-docs = vx.get_collection(name="docs")
-
-# Query vectors with optional Metadata Filtering
-docs.query(
-    query_vector=[0.4,0.5,0.6],
-    filters={"year": {"$eq": 2012}}, # metadata filters
-)
-      `,
+        `,
+      },
+      {
+        label: 'Create a Record',
+        paragraph:
+          'Using Supabase client to create a new user with email and password for authentication.',
+        colabUrl: '',
+        code: `
+        `,
+      },
+      {
+        label: 'Update a Record',
+        paragraph:
+          'Using Supabase client to create a new user with email and password for authentication.',
+        colabUrl: '',
+        code: `
+        `,
       },
     ],
   },
@@ -288,6 +269,14 @@ docs.query(
         Supabase Vector
       </>
     ),
+    cta: {
+      label: 'Github Discussions',
+      link: 'https://github.com/supabase/supabase/discussions',
+    },
+    secondaryCta: {
+      label: 'Discord',
+      link: 'https://discord.supabase.com',
+    },
     customers: [
       {
         type: 'customer-story',

@@ -1,5 +1,5 @@
 import React from 'react'
-import SolutionsData from 'data/Solutions.json'
+import SolutionsData from 'data/Solutions'
 import CustomerStoriesData from 'data/CustomerStories.json'
 import { useRouter } from 'next/router'
 import ProductIcon from '../ProductIcon'
@@ -11,7 +11,7 @@ import TextLink from '../TextLink'
 const Product = () => {
   const { basePath } = useRouter()
 
-  const iconSections = Object.values(SolutionsData).map((solution) => {
+  const iconSections = Object.values(SolutionsData).map((solution: any) => {
     const { name, description, icon, label, url } = solution
 
     const content = (

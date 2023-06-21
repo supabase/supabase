@@ -8,13 +8,15 @@ import Hero from '~/components/Hero/Hero'
 import 'swiper/swiper.min.css'
 import pageData from '../data/home/pageData'
 
-// const Features = dynamic(() => import('~/components/Features/index'))
 const Highlights = dynamic(() => import('~/components/Highlights/index'))
 const UseSupabaseTo = dynamic(() => import('~/components/UseSupabaseTo'))
+const Products = dynamic(() => import('~/components/Products/index'))
 const BuiltExamples = dynamic(() => import('components/BuiltWithSupabase/index'))
+const TimedTabsSection = dynamic(() => import('~/components/Sections/TimedTabsSection'))
 const MadeForDevelopers = dynamic(() => import('components/MadeForDevelopers/index'))
 const AdminAccess = dynamic(() => import('components/AdminAccess/index'))
 const CTABanner = dynamic(() => import('components/CTABanner/index'))
+const CommunitySlider = dynamic(() => import('components/Sections/CommunitySlider'))
 const CustomerStories = dynamic(() => import('components/CustomerStories'))
 const TwitterSocialSection = dynamic(() => import('~/components/TwitterSocialSection'))
 
@@ -26,13 +28,14 @@ const Index = ({ customerStories }: Props) => {
       <Hero {...pageData.heroSection} />
       <Highlights {...pageData.highlightsSection} />
       <UseSupabaseTo {...pageData.useSupabaseTo} />
-      {/* <Features /> */}
-      {/* <BackedBy className="pt-8 sm:pb-18 pb-16 md:pb-24 lg:pb-24" /> */}
+      <Products {...pageData.productsSection} />
+      <TimedTabsSection {...pageData.APIsection} />
       {/* <TwitterSocialSection /> */}
       {/* <BuiltExamples /> */}
       {/* <MadeForDevelopers /> */}
       {/* <AdminAccess /> */}
       {/* <CustomerStories customerStories={customerStories} /> */}
+      <CommunitySlider {...pageData.quotesSection} />
       <CTABanner hasLogo />
     </Layout>
   )
