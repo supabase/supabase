@@ -1,17 +1,9 @@
 import clsx from 'clsx'
-import Link from 'next/link'
 import { useState } from 'react'
-import {
-  Button,
-  Collapsible,
-  IconExternalLink,
-  IconMaximize2,
-  IconMinimize2,
-  IconTerminal,
-} from 'ui'
+import { Collapsible, IconMaximize2, IconMinimize2, IconTerminal } from 'ui'
 
-import CommandRender from 'components/interfaces/Functions/CommandRender'
 import { useParams } from 'common'
+import CommandRender from 'components/interfaces/Functions/CommandRender'
 
 const MigrationsEmptyState = () => {
   const { ref } = useParams()
