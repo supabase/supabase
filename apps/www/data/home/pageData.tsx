@@ -56,9 +56,22 @@ export default {
       },
     ],
   },
-  integrations: {
-    title: 'Leverage the tools you love',
-    image: <IntegrationsImage />,
+  useSupabaseTo: {
+    strings: [
+      'build an MVP in a day',
+      'authenticate users',
+      'process a billion transactions',
+      'trigger webhooks',
+      'store all your media',
+      'build a realtime app',
+      'build the next AI tool',
+      'build the next Facebook',
+      'build the next MySpace',
+      'scale an e-commerce',
+      'collect payments',
+      "build your friends' genius idea",
+      'manage your cloud',
+    ],
   },
   useCasesSection: {
     title: (

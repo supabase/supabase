@@ -147,6 +147,16 @@ h6:not(.overwrite) {
   @apply text-scale-900 text-xs;
 }
 
+.stroke-text {
+  -webkit-text-fill-color: transparent; /* Will override color (regardless of order) */
+  -webkit-text-stroke-width: 1px;
+  -webkit-text-stroke-color: var(--colors-scale9);
+}
+
+.stroke-text.fill {
+  -webkit-text-fill-color: #1ae88f;
+}
+
 .sbui-border-fix select {
   @apply border-solid;
   border-width: 1px;

@@ -10,7 +10,7 @@ import pageData from '../data/home/pageData'
 
 // const Features = dynamic(() => import('~/components/Features/index'))
 const Highlights = dynamic(() => import('~/components/Highlights/index'))
-const BackedBy = dynamic(() => import('~/components/BackedBy'))
+const UseSupabaseTo = dynamic(() => import('~/components/UseSupabaseTo'))
 const BuiltExamples = dynamic(() => import('components/BuiltWithSupabase/index'))
 const MadeForDevelopers = dynamic(() => import('components/MadeForDevelopers/index'))
 const AdminAccess = dynamic(() => import('components/AdminAccess/index'))
@@ -25,6 +25,7 @@ const Index = ({ customerStories }: Props) => {
     <Layout>
       <Hero {...pageData.heroSection} />
       <Highlights {...pageData.highlightsSection} />
+      <UseSupabaseTo {...pageData.useSupabaseTo} />
       {/* <Features /> */}
       {/* <BackedBy className="pt-8 sm:pb-18 pb-16 md:pb-24 lg:pb-24" /> */}
       {/* <TwitterSocialSection /> */}

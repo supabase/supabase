@@ -83,7 +83,7 @@ const Hero = (props: Props) => {
             </div>
           </div>
         </SectionContainer>
-        <div className="relative z-30 w-1/2 container mx-auto h-px bg-gradient-to-r from-transparent via-scale-600 to-transparent" />
+        {/* <div className="relative z-30 w-1/2 container mx-auto h-px bg-gradient-to-r from-transparent via-scale-600 to-transparent" /> */}
       </div>
       {props.image && (
         <img
