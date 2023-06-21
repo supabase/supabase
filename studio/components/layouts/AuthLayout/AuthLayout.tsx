@@ -2,9 +2,10 @@ import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { FC, ReactNode, useEffect, useState } from 'react'
 
+import { useParams } from 'common'
 import Error from 'components/ui/Error'
 import ProductMenu from 'components/ui/ProductMenu'
-import { useSelectedProject, useStore, withAuth } from 'hooks'
+import { useStore, withAuth } from 'hooks'
 import ProjectLayout from '../'
 import { generateAuthMenu } from './AuthLayout.utils'
 
@@ -14,10 +15,9 @@ interface Props {
 }
 
 const AuthLayout: FC<Props> = ({ title, children }) => {
-  const { meta } = useStore()
+  const { ui, meta } = useStore()
   const { isInitialized, isLoading, error } = meta.tables
-  const selectedProject = useSelectedProject()
-  const projectRef = selectedProject?.ref ?? 'default'
+  const { ref: projectRef = 'default' } = useParams()
 
   const router = useRouter()
   const page = router.pathname.split('/')[4]
@@ -25,13 +25,13 @@ const AuthLayout: FC<Props> = ({ title, children }) => {
   const [loaded, setLoaded] = useState<boolean>(isInitialized)
 
   useEffect(() => {
-    if (selectedProject?.ref) {
+    if (ui.selectedProjectRef) {
       meta.policies.load()
       meta.tables.load()
       meta.roles.load()
       meta.schemas.load()
     }
-  }, [selectedProject?.ref])
+  }, [ui.selectedProjectRef])
 
   useEffect(() => {
     if (!isLoading && !loaded) {

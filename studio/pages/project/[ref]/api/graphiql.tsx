@@ -7,7 +7,6 @@ import { useParams } from 'common/hooks'
 import ExtensionCard from 'components/interfaces/Database/Extensions/ExtensionCard'
 import GraphiQL from 'components/interfaces/GraphQL/GraphiQL'
 import { DocsLayout } from 'components/layouts'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Connecting from 'components/ui/Loading/Loading'
 import { useSessionAccessTokenQuery } from 'data/auth/session-access-token-query'
 import { useProjectApiQuery } from 'data/config/project-api-query'
@@ -17,8 +16,7 @@ import { NextPageWithLayout } from 'types'
 
 const GraphiQLPage: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()
-  const { meta } = useStore()
-  const { project } = useProjectContext()
+  const { ui, meta } = useStore()
   const { isDarkMode } = useTheme()
   const theme = isDarkMode ? 'dark' : 'light'
 
@@ -34,12 +32,12 @@ const GraphiQLPage: NextPageWithLayout = () => {
     : undefined
 
   useEffect(() => {
-    if (project?.ref) {
+    if (ui.selectedProjectRef) {
       // Schemas may be needed when enabling the GraphQL extension
       meta.schemas.load()
       meta.extensions.load()
     }
-  }, [project?.ref])
+  }, [ui.selectedProjectRef])
 
   const graphqlUrl = `${API_URL}/projects/${projectRef}/api/graphql`
 

@@ -16,7 +16,7 @@ export const PageContext: any = createContext(null)
 
 const ApiSettings: NextPageWithLayout = () => {
   const { ref } = useParams()
-  const { meta } = useStore()
+  const { ui, meta } = useStore()
   const { project } = useProjectContext()
   const isActive = useIsProjectActive()
 
@@ -32,8 +32,10 @@ const ApiSettings: NextPageWithLayout = () => {
   if (meta) PageState.meta = meta
 
   useEffect(() => {
-    if (project?.ref) meta.schemas.load()
-  }, [project?.ref])
+    if (ui.selectedProjectRef) {
+      meta.schemas.load()
+    }
+  }, [ui.selectedProjectRef])
 
   return (
     <PageContext.Provider value={PageState}>
