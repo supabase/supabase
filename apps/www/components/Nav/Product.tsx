@@ -33,7 +33,7 @@ const Product = () => {
     return (
       url && (
         <Link href={url} key={name}>
-          <a className="hover:bg-scale-300 dark:hover:bg-scale-500 col-span-6 rounded p-3 transition">
+          <a className="hover:bg-[var(--color-panel-bg)] dark:hover:bg-[var(--color-panel-bg)] col-span-6 rounded p-3 transition">
             {content}
           </a>
         </Link>
@@ -57,7 +57,7 @@ const Product = () => {
               return (
                 <li className="flow-root" key={`flyout_case_${idx}`}>
                   <Link href={customer.url}>
-                    <a className="dark:hover:bg-dark-700 flex items-center rounded-lg border p-3 transition duration-150 ease-in-out hover:bg-gray-100">
+                    <a className="dark:hover:bg-[var(--color-panel-bg)] flex items-center rounded-lg border p-3 transition duration-150 ease-in-out hover:bg-[var(--color-panel-bg)]">
                       <div className="relative hidden mx-2 h-12 w-32 flex-shrink-0 overflow-auto rounded-md sm:block">
                         <Image
                           src={`${basePath}/${customer.imgUrl}`}

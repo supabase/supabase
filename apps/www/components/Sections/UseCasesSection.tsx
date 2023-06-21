@@ -2,7 +2,7 @@ import Link from 'next/link'
 import React, { ReactNode, useRef } from 'react'
 import { Button, IconArrowUpRight } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import InteractiveShimmerCard from '../InteractiveShimmerCard'
+import InteractiveShimmerCard from '../Panel'
 import { LazyMotion, domAnimation, m, useInView } from 'framer-motion'
 import { INITIAL_BOTTOM, getAnimation } from '~/lib/animations'
 

@@ -5,10 +5,11 @@ const CTABanner = (props: any) => {
   return (
     <div
       className={`
-        bg-scale-200 grid grid-cols-12 items-center gap-4 border-t py-32 text-center
+        bg-[var(--color-bg-darkest)] grid grid-cols-12 items-center gap-4 border-t py-32 text-center
         ${darkerBg ? 'dark:bg-dark-900' : ''} px-16
       `}
     >
+      {props.hasLogo && <div>logo</div>}
       <div className="col-span-12">
         <h2 className="h2">
           <span className="text-scale-900">Build in a weekend,</span>

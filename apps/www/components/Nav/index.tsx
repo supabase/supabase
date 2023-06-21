@@ -93,7 +93,7 @@ const Nav = () => {
     )
     return url ? (
       <Link href={url} key={`solution_${idx}`}>
-        <a className="flex flex-col justify-between p-3 my-2 -m-3 transition duration-150 ease-in-out rounded-lg dark:hover:bg-scale-600 hover:bg-gray-50">
+        <a className="flex flex-col justify-between p-3 my-2 -m-3 transition duration-150 ease-in-out rounded-lg dark:hover:bg-[var(--color-panel-bg)] hover:bg-[var(--color-panel-bg)]">
           {content}
         </a>
       </Link>
@@ -119,7 +119,7 @@ const Nav = () => {
     >
       <button
         className={[
-          'text-scale-900 focus:ring-brand-900 dark:bg-scale-200 dark:hover:bg-scale-300 inline-flex items-center justify-center rounded-md bg-gray-50 p-2 hover:bg-white focus:outline-none focus:ring-2 focus:ring-inset',
+          'text-scale-900 focus:ring-brand-900 dark:bg-[var(--color-bg-darkest)] dark:hover:bg-[var(--color-bg-darkest)] inline-flex items-center justify-center rounded-md bg-[var(--color-panel-bg)] p-2 hover:bg-white focus:outline-none focus:ring-2 focus:ring-inset',
           showLaunchWeekNavMode && '!bg-transparent border border-[#be9eea]',
         ].join(' ')}
         aria-expanded="false"
@@ -202,7 +202,7 @@ const Nav = () => {
       <div className="sticky top-0 z-40 transform" style={{ transform: 'translate3d(0,0,999px)' }}>
         <div
           className={[
-            'absolute inset-0 h-full w-full opacity-80 bg-scale-200',
+            'absolute inset-0 h-full w-full bg-[var(--color-bg-darkest)]',
             !showLaunchWeekNavMode && '!opacity-100 transition-opacity',
             showLaunchWeekNavMode && '!bg-transparent transition-all',
           ].join(' ')}
@@ -362,8 +362,8 @@ const Nav = () => {
           >
             <div
               className={[
-                'dark:bg-scale-300 fixed -inset-y-0 z-50 h-screen w-screen transform overflow-y-scroll bg-white p-4 md:p-8',
-                open && '!bg-scale-300',
+                'dark:bg-[var(--color-bg-darkest)] fixed -inset-y-0 z-50 h-screen w-screen transform overflow-y-scroll bg-white p-4 md:p-8',
+                open && '!bg-[var(--color-bg-darkest)]',
               ].join(' ')}
             >
               <div className="absolute items-center justify-between right-4 top-4">
@@ -371,7 +371,7 @@ const Nav = () => {
                   <button
                     onClick={() => setOpen(false)}
                     type="button"
-                    className="inline-flex items-center justify-center p-2 bg-white rounded-md text-scale-900 focus:ring-brand-900 dark:bg-scale-300 dark:hover:bg-scale-400 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset"
+                    className="inline-flex items-center justify-center p-2 bg-white rounded-md text-scale-900 focus:ring-brand-900 dark:bg-[var(--color-bg-darkest)] dark:hover:bg-[var(--color-bg-darkest)] hover:bg-[var(--color-panel-bg)] focus:outline-none focus:ring-2 focus:ring-inset"
                   >
                     <span className="sr-only">Close menu</span>
                     <svg
@@ -403,24 +403,24 @@ const Nav = () => {
                 </div>
                 <div className="pt-2 pb-4 space-y-1">
                   <Link href="/docs">
-                    <a className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white">
+                    <a className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-[var(--color-panel-bg)] hover:border-gray-300 hover:bg-[var(--color-panel-bg)] dark:text-white">
                       Developers
                     </a>
                   </Link>
                   <Link href="/company">
-                    <a className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white">
+                    <a className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-[var(--color-panel-bg)] hover:border-gray-300 hover:bg-[var(--color-panel-bg)] dark:text-white">
                       Company
                     </a>
                   </Link>
                   <Link href="/pricing">
-                    <a className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white">
+                    <a className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-[var(--color-panel-bg)] hover:border-gray-300 hover:bg-[var(--color-panel-bg)] dark:text-white">
                       Pricing
                     </a>
                   </Link>
                   <Link href="/docs">
                     <a
                       target="_blank"
-                      className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white"
+                      className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-[var(--color-panel-bg)] hover:border-gray-300 hover:bg-[var(--color-panel-bg)] dark:text-white"
                     >
                       Docs
                     </a>
@@ -428,7 +428,7 @@ const Nav = () => {
                   <Link href="https://github.com/supabase/supabase">
                     <a
                       target="_blank"
-                      className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white"
+                      className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-[var(--color-panel-bg)] hover:border-gray-300 hover:bg-[var(--color-panel-bg)] dark:text-white"
                     >
                       GitHub
                     </a>
@@ -436,7 +436,7 @@ const Nav = () => {
                   <Link href="/blog">
                     <a
                       target="_blank"
-                      className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white"
+                      className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-[var(--color-panel-bg)] hover:border-gray-300 hover:bg-[var(--color-panel-bg)] dark:text-white"
                     >
                       Blog
                     </a>

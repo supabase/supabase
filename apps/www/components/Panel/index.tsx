@@ -4,15 +4,17 @@ interface Props {
   outerClassName?: string
   innerClassName?: string
   hasActiveOnHover?: boolean
+  hasShimmer?: boolean
   hasInnerShimmer?: boolean
   shimmerFromColor?: string
   shimmerToColor?: string
 }
 
-const InteractiveShimmerCard = ({
+const Panel = ({
   outerClassName,
   innerClassName,
   hasActiveOnHover = false,
+  hasShimmer = false,
   hasInnerShimmer = false,
   shimmerFromColor,
   shimmerToColor,
@@ -22,7 +24,7 @@ const InteractiveShimmerCard = ({
   const innerRef = useRef(null)
 
   const handleGlow = (event: any) => {
-    if (!outerRef.current || !innerRef.current) return null
+    if (!hasShimmer || !outerRef.current || !innerRef.current) return null
     const outerElement = outerRef.current as HTMLDivElement
     const innerElement = innerRef.current as HTMLDivElement
     let x: any
@@ -61,21 +63,24 @@ const InteractiveShimmerCard = ({
     <div
       ref={outerRef}
       className={[
-        'relative rounded-xl bg-scale-400 from-scale-800 to-scale-800 p-px transition-all shadow-md',
+        'relative z-0 rounded-xl bg-scale-400 bg-gradient-to-b from-scale-300 to-scale-100 p-px transition-all shadow-md',
         outerClassName,
       ].join(' ')}
     >
       <div
         className={[
-          'relative h-full rounded-xl bg-scale-200 dark:bg-scale-300 overflow-hidden transition-all text-scale-1100',
+          'relative z-10 h-full rounded-xl bg-scale-200 dark:bg-[var(--color-panel-bg)] overflow-hidden transition-all text-scale-1100',
           innerClassName,
         ].join(' ')}
       >
-        <div className="relative z-10 w-full h-full">{children}</div>
-        <div ref={innerRef} className="absolute z-0 inset-0 w-full h-full" />
+        <div
+          ref={innerRef}
+          className="absolute z-10 inset-0 w-full h-full pointer-events-none opacity-20"
+        />
+        <div className="relative z-0 w-full h-full">{children}</div>
       </div>
     </div>
   )
 }
 
-export default InteractiveShimmerCard
+export default Panel

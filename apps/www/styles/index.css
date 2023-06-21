@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --color-bg-darkest-hsl: 215, 60%, 3%;
+  --color-bg-darkest: hsl(var(--color-bg-darkest-hsl));
+  --color-panel-bg-hsl: 200, 30%, 5%;
+  --color-panel-bg: hsl(var(--color-panel-bg-hsl));
+  --color-text-secondary-hsl: 200, 12%, 62%;
+  --color-text-secondary: hsl(var(--color-text-secondary-hsl));
+}
+
 @import url(../pages/launch-week/launchWeek.css);
 
 @font-face {
@@ -27,7 +36,7 @@ html {
 }
 
 body {
-  @apply bg-scale-200;
+  @apply bg-[var(--color-bg-darkest)];
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -160,7 +169,7 @@ h6:not(.overwrite) {
 }
 
 .section--bg {
-  @apply bg-scale-100 dark:bg-scale-200;
+  @apply bg-scale-100 dark:bg-[var(--color-bg-darkest)];
   position: relative;
   height: 100%;
   width: 100%;

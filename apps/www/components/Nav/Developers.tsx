@@ -20,7 +20,7 @@ const Developers = () => {
     const { text, description, url, icon } = link
 
     const content = (
-      <div className="dark:hover:bg-scale-500 -m-3 flex items-start rounded-lg p-3 transition duration-150 ease-in-out hover:bg-gray-50">
+      <div className="dark:hover:bg-[var(--color-panel-bg)] -m-3 flex items-start rounded-lg p-3 transition duration-150 ease-in-out hover:bg-[var(--color-panel-bg)]">
         {/* <!-- Heroicon name: support --> */}
         <svg
           className="stroke-scale-900 h-5 w-5 flex-shrink-0"
@@ -40,7 +40,7 @@ const Developers = () => {
     )
     return url ? (
       <Link href={url} key={text}>
-        <a className="dark:hover:bg-scale-500 col-span-6 rounded p-3 transition hover:bg-gray-50">
+        <a className="dark:hover:bg-[var(--color-panel-bg)] col-span-6 rounded p-3 transition hover:bg-[var(--color-panel-bg)]">
           {content}
         </a>
       </Link>
@@ -66,7 +66,7 @@ const Developers = () => {
             {AnnouncementsData.map((announcement: any, idx: number) => (
               <li className="flow-root" key={`flyout_case_${idx}`}>
                 <Link href={announcement.url}>
-                  <a className="dark:hover:bg-dark-700 flex items-center rounded-lg border p-3 transition duration-150 ease-in-out hover:bg-gray-100">
+                  <a className="dark:hover:bg-[var(--color-panel-bg)] flex items-center rounded-lg border p-3 transition duration-150 ease-in-out hover:bg-gray-100">
                     <div className="relative hidden h-20 w-32 flex-shrink-0 overflow-auto rounded-md sm:block">
                       <Image
                         src={`${basePath}${announcement.imgUrl}`}

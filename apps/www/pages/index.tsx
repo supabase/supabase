@@ -6,8 +6,10 @@ import Hero from '~/components/Hero/Hero'
 
 // Import Swiper styles if swiper used on page
 import 'swiper/swiper.min.css'
+import pageData from '../data/home/pageData'
 
-const Features = dynamic(() => import('~/components/Features/index'))
+// const Features = dynamic(() => import('~/components/Features/index'))
+const Highlights = dynamic(() => import('~/components/Highlights/index'))
 const BackedBy = dynamic(() => import('~/components/BackedBy'))
 const BuiltExamples = dynamic(() => import('components/BuiltWithSupabase/index'))
 const MadeForDevelopers = dynamic(() => import('components/MadeForDevelopers/index'))
@@ -21,15 +23,16 @@ type Props = { customerStories: PostTypes[] }
 const Index = ({ customerStories }: Props) => {
   return (
     <Layout>
-      <Hero />
-      <Features />
-      <BackedBy className="pt-8 sm:pb-18 pb-16 md:pb-24 lg:pb-24" />
-      <TwitterSocialSection />
-      <BuiltExamples />
-      <MadeForDevelopers />
-      <AdminAccess />
-      <CustomerStories customerStories={customerStories} />
-      <CTABanner />
+      <Hero {...pageData.heroSection} />
+      <Highlights {...pageData.highlightsSection} />
+      {/* <Features /> */}
+      {/* <BackedBy className="pt-8 sm:pb-18 pb-16 md:pb-24 lg:pb-24" /> */}
+      {/* <TwitterSocialSection /> */}
+      {/* <BuiltExamples /> */}
+      {/* <MadeForDevelopers /> */}
+      {/* <AdminAccess /> */}
+      {/* <CustomerStories customerStories={customerStories} /> */}
+      <CTABanner hasLogo />
     </Layout>
   )
 }
