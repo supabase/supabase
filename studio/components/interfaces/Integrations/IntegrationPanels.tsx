@@ -49,7 +49,6 @@ const HandleIcon = ({ type }: { type: HandleIconType }) => {
 }
 
 const Avatar = ({ src }: { src: string }) => {
-  console.log('src of avatar', src)
   return (
     <div className="relative border shadow-lg w-8 h-8 rounded-full overflow-hidden">
       <Image src={src} width={30} height={30} layout="fill" alt="avatar" className="relative" />

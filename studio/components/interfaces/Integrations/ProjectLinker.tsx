@@ -2,7 +2,9 @@ import { ENV_VAR_RAW_KEYS } from 'components/interfaces/Integrations/Integration
 import { Markdown } from 'components/interfaces/Markdown'
 import { vercelIcon } from 'components/to-be-cleaned/ListIcons'
 import { useIntegrationConnectionsCreateMutation } from 'data/integrations/integration-connections-create-mutation'
+import { Integration, IntegrationProjectConnection } from 'data/integrations/integrations-query'
 import { VercelProjectsResponse } from 'data/integrations/integrations-vercel-projects-query'
+import { useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import { useState } from 'react'
 import { Button, IconArrowRight, IconPlus, IconX, Input, Listbox, Select, cn } from 'ui'
@@ -20,7 +22,7 @@ export interface ProjectLinkerProps {
   foreignProjects: VercelProjectsResponse[]
   supabaseProjects: Project[]
   onCreateConnections?: () => void
-  installedConnections?: any[]
+  installedConnections: IntegrationProjectConnection[] | undefined
 }
 
 const UNDEFINED_SELECT_VALUE = 'undefined'
@@ -31,10 +33,12 @@ const ProjectLinker = ({
   foreignProjects,
   supabaseProjects,
   onCreateConnections: _onCreateConnections,
-  installedConnections,
+  installedConnections = [],
 }: ProjectLinkerProps) => {
-  const [supabaseProjectId, setSupabaseProjectId] = useState('')
-  const [vercelProjectId, setVercelProjectId] = useState('')
+  const { ui } = useStore()
+
+  const [supabaseProjectId, setSupabaseProjectId] = useState(UNDEFINED_SELECT_VALUE)
+  const [vercelProjectId, setVercelProjectId] = useState(UNDEFINED_SELECT_VALUE)
 
   // function addConnection() {
   //   setConnections([
@@ -53,6 +57,8 @@ const ProjectLinker = ({
   //   newConnections.splice(idx, 1)
   //   setConnections(newConnections)
   // }
+
+  // console.log('installed connections', installedConnections)
 
   const { mutate: createConnections, isLoading } = useIntegrationConnectionsCreateMutation({
     onSuccess() {
@@ -78,6 +84,7 @@ const ProjectLinker = ({
           },
         },
       },
+      orgId: ui.selectedOrganization?.id,
     })
   }
 
@@ -95,9 +102,22 @@ const ProjectLinker = ({
     )
   }
 
+  /**
+   * create a flat array of foreign project ids. ie, ["prj_MlkO6AiLG5ofS9ojKrkS3PhhlY3f", ..]
+   */
+  const flatInstalledConnectionsIds = installedConnections.map((x) => x.foreign_project_id)
+  /**
+   * check that vercel project is not already installed
+   */
+  const filteredForeignProjects: VercelProjectsResponse[] = foreignProjects.filter(
+    (foreignProject) => {
+      return !flatInstalledConnectionsIds.includes(foreignProject.id)
+    }
+  )
+
   return (
     <div className="flex flex-col gap-4">
-      <div className="relative border rounded-lg p-12 bg border-body">
+      <div className="relative border rounded-  lg p-12 bg border-body">
         <div
           className="absolute inset-0 bg-grid-white/5 [mask-image:linear-gradient(0deg,#fff,rgba(255,255,255,0.6))] dark:bg-grid-slate-700/25 dark:[mask-image:linear-gradient(0deg,rgba(255,255,255,0.1),rgba(255,255,255,0.5))]"
           style={{ backgroundPosition: '10px 10px' }}
@@ -160,31 +180,33 @@ const ProjectLinker = ({
               <Listbox.Option value={UNDEFINED_SELECT_VALUE} label="Choose a project" disabled>
                 Choose a Vercel project
               </Listbox.Option>
-              {foreignProjects.map((project) => (
-                <Listbox.Option
-                  key={project.id}
-                  value={project.id}
-                  label={project.name}
-                  addOnBefore={() => {
-                    return (
-                      <>
-                        {!project?.framework ? (
-                          vercelIcon
-                        ) : (
-                          <img
-                            src={`/img/icons/frameworks/${project.framework}.svg`}
-                            width={21}
-                            height={21}
-                            alt={`icon`}
-                          />
-                        )}
-                      </>
-                    )
-                  }}
-                >
-                  {project.name}
-                </Listbox.Option>
-              ))}
+              {filteredForeignProjects.map((project) => {
+                return (
+                  <Listbox.Option
+                    key={project.id}
+                    value={project.id}
+                    label={project.name}
+                    addOnBefore={() => {
+                      return (
+                        <>
+                          {!project?.framework ? (
+                            vercelIcon
+                          ) : (
+                            <img
+                              src={`/img/icons/frameworks/${project.framework}.svg`}
+                              width={21}
+                              height={21}
+                              alt={`icon`}
+                            />
+                          )}
+                        </>
+                      )
+                    }}
+                  >
+                    {project.name}
+                  </Listbox.Option>
+                )
+              })}
             </Listbox>
           </Panel>
         </div>

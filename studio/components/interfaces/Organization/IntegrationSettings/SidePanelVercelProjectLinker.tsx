@@ -1,37 +1,48 @@
-import { useParams } from 'common'
-import ProjectLinker from 'components/interfaces/Integrations/ProjectsLinker'
+import ProjectLinker from 'components/interfaces/Integrations/ProjectLinker'
 import { Markdown } from 'components/interfaces/Markdown'
 import { useIntegrationsQuery } from 'data/integrations/integrations-query'
+import { useVercelProjectConnectionsQuery } from 'data/integrations/integrations-vercel-installed-connections-query'
+import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
+import { useProjectsQuery } from 'data/projects/projects-query'
 import { useStore } from 'hooks'
+import { EMPTY_ARR } from 'lib/void'
 import { observer } from 'mobx-react-lite'
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { useGithubConnectionConfigPanelSnapshot } from 'state/github-connection-config-panel'
 import { SidePanel } from 'ui'
 
-import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
-import { useProjectsQuery } from 'data/projects/projects-query'
-import { EMPTY_ARR } from 'lib/void'
-import { Organization } from 'types'
-import { useVercelProjectConnectionsQuery } from 'data/integrations/integrations-vercel-installed-connections-query'
-
 const SidePanelVercelProjectLinker = () => {
   const { ui } = useStore()
-
-  const { data } = useIntegrationsQuery({ orgId: ui.selectedOrganization?.id })
-
-  const vercelIntegrations = data?.filter((integration) => integration.integration.id === 1) // vercel
-
   const selectedOrg = ui.selectedOrganization
 
-  const [organizationIntegrationId, setOrganizationIntegrationId] = useState<string>(
-    '880cb835-54b4-415b-8178-6f7920fdc40d'
+  const { data: integrationData } = useIntegrationsQuery({
+    orgId: ui.selectedOrganization?.id,
+  })
+  const vercelIntegrations = integrationData?.filter(
+    (integration) => integration.integration.name === 'Vercel'
+  ) // vercel
+
+  const snapshot = useGithubConnectionConfigPanelSnapshot()
+
+  /**
+   * Find the right integration
+   *
+   * we use the snapshot.organizationIntegrationId which should be set whenever this sidepanel is opened
+   */
+  const selectedIntegration = vercelIntegrations?.find(
+    (x) => x.id === snapshot.organizationIntegrationId
   )
 
-  const githubConnectionConfigPanelSnapshot = useGithubConnectionConfigPanelSnapshot()
+  const organizationIntegrationId = snapshot.organizationIntegrationId
+  const open = snapshot.open
 
+  /**
+   * Supabase projects available
+   */
   const { data: supabaseProjectsData } = useProjectsQuery({
     enabled: organizationIntegrationId !== null,
   })
+
   const supabaseProjects = useMemo(
     () =>
       supabaseProjectsData
@@ -47,30 +58,26 @@ const SidePanelVercelProjectLinker = () => {
     { enabled: organizationIntegrationId !== null }
   )
 
-  const vercelProjectConnections = useMemo(
-    () => vercelProjectConnectionsData ?? EMPTY_ARR,
-    [vercelProjectConnectionsData]
-  )
-
   const { data: vercelProjectsData } = useVercelProjectsQuery(
     {
       orgId: selectedOrg?.id,
       orgSlug: selectedOrg?.slug,
+      organization_integration_id: organizationIntegrationId,
     },
     { enabled: organizationIntegrationId !== null }
   )
 
-  console.log('vercelProjectsData', vercelProjectsData)
   const vercelProjects = useMemo(() => vercelProjectsData ?? EMPTY_ARR, [vercelProjectsData])
 
   return (
     <SidePanel
       header={'Add GitHub repository'}
       size="large"
-      visible={githubConnectionConfigPanelSnapshot.visible}
-      onCancel={() => githubConnectionConfigPanelSnapshot.setVisible(false)}
+      visible={open}
+      hideFooter
+      onCancel={() => snapshot.setOpen(false)}
     >
-      <div className="my-10 flex flex-col gap-6">
+      <div className="py-10 flex flex-col gap-6 bg-body h-full">
         <SidePanel.Content>
           <Markdown
             content={`
@@ -82,15 +89,13 @@ Check the details below before proceeding
         </SidePanel.Content>
         <SidePanel.Content className="flex flex-col gap-2">
           <ProjectLinker
-            organizationIntegrationId={'880cb835-54b4-415b-8178-6f7920fdc40d'}
+            organizationIntegrationId={selectedIntegration?.id}
             foreignProjects={vercelProjects}
             supabaseProjects={supabaseProjects}
             onCreateConnections={() => {
-              // if (next) {
-              //   window.location.href = next
-              // }
+              snapshot.setOpen(false)
             }}
-            installedConnections={vercelProjectConnections}
+            installedConnections={selectedIntegration?.connections}
           />
         </SidePanel.Content>
         <SidePanel.Content>

@@ -3,7 +3,123 @@ import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { integrationKeys } from './keys'
 
-type metadata = {
+export type VercelFramework =
+  | (
+      | 'blitzjs'
+      | 'nextjs'
+      | 'gatsby'
+      | 'remix'
+      | 'astro'
+      | 'hexo'
+      | 'eleventy'
+      | 'docusaurus-2'
+      | 'docusaurus'
+      | 'preact'
+      | 'solidstart'
+      | 'dojo'
+      | 'ember'
+      | 'vue'
+      | 'scully'
+      | 'ionic-angular'
+      | 'angular'
+      | 'polymer'
+      | 'svelte'
+      | 'sveltekit'
+      | 'sveltekit-1'
+      | 'ionic-react'
+      | 'create-react-app'
+      | 'gridsome'
+      | 'umijs'
+      | 'sapper'
+      | 'saber'
+      | 'stencil'
+      | 'nuxtjs'
+      | 'redwoodjs'
+      | 'hugo'
+      | 'jekyll'
+      | 'brunch'
+      | 'middleman'
+      | 'zola'
+      | 'hydrogen'
+      | 'vite'
+      | 'vitepress'
+      | 'vuepress'
+      | 'parcel'
+      | 'sanity'
+      | 'storybook'
+    )
+  | null
+
+export type VercelGitLink =
+  | {
+      /**
+       * GitHub link
+       */
+      org?: string
+      repo?: string
+      repoId?: number
+      type?: 'github'
+      createdAt?: number
+      deployHooks: {
+        createdAt?: number
+        id: string
+        name: string
+        ref: string
+        url: string
+      }[]
+      gitCredentialId?: string
+      updatedAt?: number
+      sourceless?: boolean
+      productionBranch?: string
+    }
+  | {
+      /**
+       * GitLab link
+       */
+      projectId?: string
+      projectName?: string
+      projectNameWithNamespace?: string
+      projectNamespace?: string
+      projectUrl?: string
+      type?: 'gitlab'
+      createdAt?: number
+      deployHooks: {
+        createdAt?: number
+        id: string
+        name: string
+        ref: string
+        url: string
+      }[]
+      gitCredentialId?: string
+      updatedAt?: number
+      sourceless?: boolean
+      productionBranch?: string
+    }
+  | {
+      /**
+       * Bitbucket link
+       */
+      name?: string
+      slug?: string
+      owner?: string
+      type?: 'bitbucket'
+      uuid?: string
+      workspaceUuid?: string
+      createdAt?: number
+      deployHooks: {
+        createdAt?: number
+        id: string
+        name: string
+        ref: string
+        url: string
+      }[]
+      gitCredentialId?: string
+      updatedAt?: number
+      sourceless?: boolean
+      productionBranch?: string
+    }
+
+type Imetadata = {
   metadata: {
     id: string
     supabaseConfig: {
@@ -11,121 +127,9 @@ type metadata = {
         write: boolean
       }
     }
-    link?:
-      | {
-          /**
-           * GitHub link
-           */
-          org?: string
-          repo?: string
-          repoId?: number
-          type?: 'github'
-          createdAt?: number
-          deployHooks: {
-            createdAt?: number
-            id: string
-            name: string
-            ref: string
-            url: string
-          }[]
-          gitCredentialId?: string
-          updatedAt?: number
-          sourceless?: boolean
-          productionBranch?: string
-        }
-      | {
-          /**
-           * GitLab link
-           */
-          projectId?: string
-          projectName?: string
-          projectNameWithNamespace?: string
-          projectNamespace?: string
-          projectUrl?: string
-          type?: 'gitlab'
-          createdAt?: number
-          deployHooks: {
-            createdAt?: number
-            id: string
-            name: string
-            ref: string
-            url: string
-          }[]
-          gitCredentialId?: string
-          updatedAt?: number
-          sourceless?: boolean
-          productionBranch?: string
-        }
-      | {
-          /**
-           * Bitbucket link
-           */
-          name?: string
-          slug?: string
-          owner?: string
-          type?: 'bitbucket'
-          uuid?: string
-          workspaceUuid?: string
-          createdAt?: number
-          deployHooks: {
-            createdAt?: number
-            id: string
-            name: string
-            ref: string
-            url: string
-          }[]
-          gitCredentialId?: string
-          updatedAt?: number
-          sourceless?: boolean
-          productionBranch?: string
-        }
+    link?: VercelGitLink
     name: string
-    framework:
-      | (
-          | 'blitzjs'
-          | 'nextjs'
-          | 'gatsby'
-          | 'remix'
-          | 'astro'
-          | 'hexo'
-          | 'eleventy'
-          | 'docusaurus-2'
-          | 'docusaurus'
-          | 'preact'
-          | 'solidstart'
-          | 'dojo'
-          | 'ember'
-          | 'vue'
-          | 'scully'
-          | 'ionic-angular'
-          | 'angular'
-          | 'polymer'
-          | 'svelte'
-          | 'sveltekit'
-          | 'sveltekit-1'
-          | 'ionic-react'
-          | 'create-react-app'
-          | 'gridsome'
-          | 'umijs'
-          | 'sapper'
-          | 'saber'
-          | 'stencil'
-          | 'nuxtjs'
-          | 'redwoodjs'
-          | 'hugo'
-          | 'jekyll'
-          | 'brunch'
-          | 'middleman'
-          | 'zola'
-          | 'hydrogen'
-          | 'vite'
-          | 'vitepress'
-          | 'vuepress'
-          | 'parcel'
-          | 'sanity'
-          | 'storybook'
-        )
-      | null
+    framework: VercelFramework
   }
 }
 export type IntegrationProjectConnection = {
@@ -134,8 +138,9 @@ export type IntegrationProjectConnection = {
   updated_at: string
   added_by: addedBy
   supabase_project_id: string
+  foreign_project_id: string
   organization_integration_id: string
-  metadata: metadata
+  metadata: Imetadata
 }
 
 export type IntegrationsVariables = {
@@ -146,7 +151,7 @@ export type IntegrationProjectConnectionPayload = {
   foreignProjectId: string
   supabaseProjectId: string
   integrationId: string
-  metadata: metadata
+  metadata: Imetadata
 }
 
 type userDetails = {
@@ -166,7 +171,7 @@ export type Integration = {
   added_by: addedBy
   created_at: string
   updated_at: string
-  connections: IntegrationProjectConnection[]
+  connections: IntegrationProjectConnection[] | []
   metadata?: {
     vercelTeam?: string
     gitHubConnectionOwner?: string
