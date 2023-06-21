@@ -4,14 +4,14 @@ import Editor, { EditorProps } from '@monaco-editor/react'
 import { timeout } from 'lib/helpers'
 import Connecting from '../Loading'
 import { alignEditor } from './CodeEditor.utils'
-import { merge } from 'lodash'
+import { merge, noop } from 'lodash'
 
 interface Props {
   id: string
   language: 'pgsql' | 'json' | 'html'
   defaultValue?: string
   isReadOnly?: boolean
-  onInputChange: (value?: string) => void
+  onInputChange?: (value?: string) => void
   onInputRun?: (value: string) => void
   hideLineNumbers?: boolean
   className?: string
@@ -26,8 +26,8 @@ const CodeEditor: FC<Props> = ({
   defaultValue,
   isReadOnly = false,
   hideLineNumbers = false,
-  onInputChange = () => {},
-  onInputRun = () => {},
+  onInputChange = noop,
+  onInputRun = noop,
   className,
   loading,
   options,
