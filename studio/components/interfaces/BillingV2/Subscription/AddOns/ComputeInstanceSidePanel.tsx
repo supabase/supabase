@@ -98,7 +98,9 @@ const ComputeInstanceSidePanel = () => {
       ui.setNotification({
         duration: 8000,
         category: 'success',
-        message: `Successfully updated compute instance to ${selectedCompute?.name}. Your project is currently being restarted to update its instance`,
+        message: `Successfully updated compute instance to ${
+          selectedCompute?.name || 'Micro'
+        }. Your project is currently being restarted to update its instance`,
       })
       app.onProjectStatusUpdated(projectId, PROJECT_STATUS.RESTORING)
       onClose()
