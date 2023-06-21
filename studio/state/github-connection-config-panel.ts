@@ -1,9 +1,13 @@
 import { proxy, snapshot, useSnapshot } from 'valtio'
 
 export const githubConnectionConfigPanelState = proxy({
-  visible: false as boolean,
-  setVisible: (visible: boolean) => {
-    githubConnectionConfigPanelState.visible = visible
+  open: false as boolean,
+  setOpen: (open: boolean) => {
+    githubConnectionConfigPanelState.open = open
+  },
+  organizationIntegrationId: '' as string,
+  setOrganizationIntegrationId: (organizationInterationId: string) => {
+    githubConnectionConfigPanelState.organizationIntegrationId = organizationInterationId
   },
 })
 

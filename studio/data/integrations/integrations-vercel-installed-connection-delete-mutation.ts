@@ -41,7 +41,6 @@ export const useIntegrationsVercelInstalledConnectionDeleteMutation = ({
       async onSuccess(data, variables, context) {
         console.log('variables in mutate delete onSuccess', variables)
         await Promise.all([queryClient.invalidateQueries(integrationKeys.list(variables.orgId))])
-
         await onSuccess?.(data, variables, context)
       },
       ...options,

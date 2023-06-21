@@ -3,6 +3,7 @@ import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { useCallback } from 'react'
 import { integrationKeys } from './keys'
+import { VercelFramework } from './integrations-query'
 
 export type VercelProjectsVariables = {
   orgId?: number
@@ -13,6 +14,7 @@ export type VercelProjectsVariables = {
 export type VercelProjectsResponse = {
   id: string
   name: string
+  framework: VercelFramework
   metadata: {
     id: string
     name: string

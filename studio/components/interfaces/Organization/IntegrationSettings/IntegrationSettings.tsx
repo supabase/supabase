@@ -72,8 +72,7 @@ You can change the scope of the access for Supabase by configuring here.
 `}
         integrations={githubIntegrations}
       />
-      {/* <SidePanelGitHubRepoSelection /> */}
-      {/* <SidePanelVercelProjectLinker /> */}
+      <SidePanelVercelProjectLinker />
     </>
   )
 }

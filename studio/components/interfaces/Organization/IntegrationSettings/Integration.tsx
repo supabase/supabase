@@ -1,4 +1,3 @@
-import { useParams } from 'common'
 import {
   EmptyIntegrationConnection,
   IntegrationConnection,
@@ -12,16 +11,11 @@ import {
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
-import { useIntegrationConnectionsCreateMutation } from 'data/integrations/integration-connections-create-mutation'
-import {
-  Integration as TIntegration,
-  useIntegrationsQuery,
-} from 'data/integrations/integrations-query'
+import { Integration as TIntegration } from 'data/integrations/integrations-query'
 import { useIntegrationsVercelInstalledConnectionDeleteMutation } from 'data/integrations/integrations-vercel-installed-connection-delete-mutation'
 import { useStore } from 'hooks'
 import { pluralize } from 'lib/helpers'
 import { EMPTY_ARR } from 'lib/void'
-import { useMemo } from 'react'
 import { useGithubConnectionConfigPanelSnapshot } from 'state/github-connection-config-panel'
 import { Button, Dropdown, IconChevronDown, IconRefreshCcw, IconTrash } from 'ui'
 
@@ -42,7 +36,7 @@ const Integration = ({
   detail,
   integrations = EMPTY_ARR,
 }: IntegrationProps) => {
-  const githubConnectionConfigPanelShotshot = useGithubConnectionConfigPanelSnapshot()
+  const snapshot = useGithubConnectionConfigPanelSnapshot()
 
   const { ui } = useStore()
 
@@ -90,6 +84,7 @@ Repository connections for ${title?.toLowerCase()}
             <div className="flex flex-col gap-12">
               {integrations.length > 0 &&
                 integrations.map((integration, i) => {
+                  console.log('integration.id', integration?.id)
                   return (
                     <div key={i}>
                       <IntegrationInstallation
@@ -152,7 +147,10 @@ Repository connections for ${title?.toLowerCase()}
                         <ConnectionHeading integration={integration} />
                       )}
                       <EmptyIntegrationConnection
-                        onClick={() => githubConnectionConfigPanelShotshot.setVisible(true)}
+                        onClick={() => {
+                          snapshot.setOrganizationIntegrationId(integration.id)
+                          snapshot.setOpen(true)
+                        }}
                       >
                         Add new project connection
                       </EmptyIntegrationConnection>
