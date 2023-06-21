@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 
 import Listbox from './Listbox2'
-import { IconBook, IconUser } from '../../index'
+import { IconUser } from '../Icon/icons/IconUser'
 import { Button } from '../Button'
 import Typography from '../Typography'
 
@@ -10,8 +10,6 @@ export default {
   component: Listbox,
 }
 
-const { Option } = Listbox
-
 const options = [
   { value: 'one', label: 'one' },
   { value: 'two', label: 'two' },
@@ -19,7 +17,7 @@ const options = [
   { value: 'four', label: 'four' },
 ]
 
-export const Default = (args: any) => (
+export const Default = () => (
   <Listbox label="Default listbox">
     {options.map((option) => {
       return (
@@ -27,9 +25,11 @@ export const Default = (args: any) => (
           label={option.label}
           value={option.value}
           children={({ active, selected }: any) => {
-            // console.log('selected', selected)
-            // console.log('active', active)
-            return <span>{option.label}</span>
+            const optionStyle = {
+              color: active ? 'green' : 'gray',
+              fontWeight: selected ? 'bold' : 'normal',
+            }
+            return <span style={optionStyle}>{option.label}</span>
           }}
         />
       )
@@ -37,7 +37,7 @@ export const Default = (args: any) => (
   </Listbox>
 )
 
-export const ListBoxDisabled = (args: any) => (
+export const ListBoxDisabled = () => (
   <Listbox label="Default listbox" disabled>
     <Listbox.Option label="Option 1" value="option-1">
       Option 1
@@ -51,7 +51,7 @@ export const ListBoxDisabled = (args: any) => (
   </Listbox>
 )
 
-export const WithDisabled = (args: any) => (
+export const WithDisabled = () => (
   <Listbox label="Default listbox">
     <Listbox.Option label="Option 1" value="option-1">
       Option 1
@@ -128,10 +128,9 @@ const people = [
   },
 ]
 
-export const People = (args: any) => (
+export const People = () => (
   <div className="overflow-hidden">
     <Listbox
-      // defaultValue={people[1].value}
       label="Choose a person"
       layout="horizontal"
       descriptionText="Choose a person for this role"
@@ -141,16 +140,14 @@ export const People = (args: any) => (
           <Listbox.Option
             value={person.value}
             label={person.label}
-            addOnBefore={({ active, selected }: any) => [
+            addOnBefore={() => [
               <img
                 src={person.avatar}
                 alt=""
                 className="h-6 w-6 rounded-full"
               />,
             ]}
-            children={({ active, selected }: any) => {
-              // console.log('selected', selected)
-              // console.log('active', active)
+            children={() => {
               return (
                 <span className={'font-normal block truncate'}>
                   {person.label}
@@ -171,7 +168,7 @@ People.args = {
   size: 'medium',
 }
 
-export const WithState = (args: any) => {
+export const WithState = () => {
   const [value, setValue] = useState('foo')
   return (
     <Listbox
@@ -190,14 +187,14 @@ export const WithState = (args: any) => {
             key={person.value}
             value={person.value}
             label={person.label}
-            addOnBefore={({ active, selected }: any) => [
+            addOnBefore={() => [
               <img
                 src={person.avatar}
                 alt=""
                 className="h-6 w-6 rounded-full"
               />,
             ]}
-            children={({ active, selected }: any) => {
+            children={() => {
               return (
                 <span className={'font-normal block truncate'}>
                   {person.label}
@@ -218,10 +215,9 @@ WithState.args = {
   size: 'medium',
 }
 
-export const WithIcon = (args: any) => (
+export const WithIcon = () => (
   <div className="overflow-hidden">
     <Listbox
-      // defaultValue={people[1].value}
       icon={<IconUser />}
       label="Choose a person"
       layout="horizontal"
@@ -232,16 +228,14 @@ export const WithIcon = (args: any) => (
           <Listbox.Option
             value={person.value}
             label={person.label}
-            addOnBefore={({ active, selected }: any) => [
+            addOnBefore={() => [
               <img
                 src={person.avatar}
                 alt=""
                 className="h-6 w-6 rounded-full"
               />,
             ]}
-            children={({ active, selected }: any) => {
-              // console.log('selected', selected)
-              // console.log('active', active)
+            children={() => {
               return (
                 <span className={'font-normal block truncate'}>
                   {person.label}
@@ -262,17 +256,7 @@ WithIcon.args = {
   size: 'medium',
 }
 
-// export const Default = (args: any) => (
-//   <Listbox {...args}>
-//     <Option value="javascript">JavaScript</Option>
-//     <Option value="typeScript">TypeScript</Option>
-//     <Option value="react">React</Option>
-//   </Listbox>
-// )
-
-// export const withCheckboxes = (args: any) => <Listbox {...args} />
-
-export const ErrorState = (args: any) => (
+export const ErrorState = () => (
   <Listbox
     label="Choose a person"
     descriptionText="Choose a person for this role"
@@ -283,7 +267,7 @@ export const ErrorState = (args: any) => (
         <Listbox.Option
           label={person.label}
           value={person.value}
-          addOnBefore={({ active, selected }: any) => [
+          addOnBefore={() => [
             <img src={person.avatar} alt="" className="h-6 w-6 rounded-full" />,
           ]}
         >
@@ -299,7 +283,7 @@ ErrorState.args = {
   descriptionText: 'Choose a person for this role',
 }
 
-export const ListBoxChildrenPropChange = (args: any) => {
+export const ListBoxChildrenPropChange = () => {
   const [countries, setCountries] = useState<any[]>([
     'England',
     'Wales',
@@ -347,7 +331,7 @@ ListBoxChildrenPropChange.args = {
   label: 'Choose a country',
 }
 
-export const ValueChange = (args: any) => {
+export const ValueChange = () => {
   const [countries, setCountries] = useState<any[]>([
     'England',
     'Wales',

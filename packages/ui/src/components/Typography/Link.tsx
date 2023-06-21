@@ -1,6 +1,5 @@
 import React from 'react'
-// @ts-ignore
-// import LinkStyles from './Link.module.css'
+import styleHandler from '../../lib/theme/styleHandler'
 
 interface Props {
   children?: React.ReactNode
@@ -12,18 +11,13 @@ interface Props {
 }
 
 function Link({ children, target = '_blank', href, className, onClick, style }: Props) {
-  // let classes = [
-  //   LinkStyles['sbui-typography'],
-  //   LinkStyles['sbui-typography-link'],
-  // ]
-  // if (className) {
-  //   classes.push(className)
-  // }
+  const __styles = styleHandler('link');
+  const classes = [className, __styles.base];
 
   return (
     <a
       onClick={onClick}
-      // className={classes.join(' ')}
+      className={classes.join(' ')}
       href={href}
       target={target}
       rel="noopener noreferrer"

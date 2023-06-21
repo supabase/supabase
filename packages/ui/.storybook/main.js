@@ -14,6 +14,12 @@ module.exports = {
     '../src/components/Collapsible/Collapsible.stories.tsx',
     '../src/components/ContextMenu/ContextMenu.stories.tsx',
     '../src/components/Dropdown/Dropdown.stories.tsx',
+    '../src/components/Listbox/SelectStyled.stories.tsx',
+    '../src/components/Menu/Menu.stories.tsx',
+    '../src/components/Popover/Popover.stories.tsx',
+    '../src/components/Select/Select.stories.tsx',
+    '../src/components/Tabs/Tabs.stories.tsx',
+    '../src/components/Typography/Typography.stories.tsx',
   ],
   addons: [
     // '@storybook/addon-links',

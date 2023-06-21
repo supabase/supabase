@@ -1,16 +1,17 @@
 import React from 'react'
 import { Button } from '../Button'
-import { IconMail } from '../../index'
 import Typography from '../Typography'
+import { IconMail } from './../Icon/icons/IconMail'
 
 import { Tabs } from './'
+import { TabsProps } from './Tabs'
 
 export default {
   title: 'Displays/Tabs',
   component: Tabs,
 }
 
-export const Default = (args: any) => (
+export const Default = () => (
   <Tabs defaultActiveId={'panel-1'}>
     <Tabs.Panel id="panel-1" label="1st tab">
       <Typography.Text>Content for the first panel</Typography.Text>
@@ -24,7 +25,7 @@ export const Default = (args: any) => (
   </Tabs>
 )
 
-export const Underlined = (args: any) => (
+export const Underlined = (args: TabsProps) => (
   <Tabs defaultActiveId={'panel-1'} {...args}>
     <Tabs.Panel id="panel-1" label="1st tab">
       <Typography.Text>Content for the first panel</Typography.Text>
@@ -38,7 +39,7 @@ export const Underlined = (args: any) => (
   </Tabs>
 )
 
-export const WithIcons = (args: any) => (
+export const WithIcons = (args: TabsProps) => (
   <Tabs defaultActiveId={'panel-1'} {...args}>
     <Tabs.Panel id="panel-1" label="1st tab" icon={<IconMail />}>
       <Typography.Text>Content for the first panel</Typography.Text>
@@ -52,7 +53,7 @@ export const WithIcons = (args: any) => (
   </Tabs>
 )
 
-export const LargeButtons = (args: any) => (
+export const LargeButtons = (args: TabsProps) => (
   <Tabs defaultActiveId={'panel-1'} {...args}>
     <Tabs.Panel id="panel-1" label="1st tab">
       <Typography.Text>Content for the first panel</Typography.Text>
@@ -66,7 +67,7 @@ export const LargeButtons = (args: any) => (
   </Tabs>
 )
 
-export const BlockTabs = (args: any) => (
+export const BlockTabs = (args: TabsProps) => (
   <Tabs defaultActiveId={'panel-1'} {...args}>
     <Tabs.Panel id="panel-1" label="1st tab">
       <Typography.Text>Content for the first panel</Typography.Text>
@@ -91,13 +92,13 @@ for (var i = 0; i < limit; i++) {
   )
 }
 
-export const Scroll = (args: any) => (
+export const Scroll = (args: TabsProps) => (
   <Tabs defaultActiveId={'panel-1'} {...args}>
     {infitniteSroll}
   </Tabs>
 )
 
-export const addOnBefore = (args: any) => (
+export const addOnBefore = (args: TabsProps) => (
   <Tabs defaultActiveId={'panel-1'} {...args}>
     <Tabs.Panel id="panel-1" label="1st tab">
       <Typography.Text>Content for the first panel</Typography.Text>
@@ -111,7 +112,7 @@ export const addOnBefore = (args: any) => (
   </Tabs>
 )
 
-export const addOnAfter = (args: any) => (
+export const addOnAfter = (args: TabsProps) => (
   <Tabs defaultActiveId={'panel-1'} {...args}>
     <Tabs.Panel id="panel-1" label="1st tab">
       <Typography.Text>Content for the first panel</Typography.Text>

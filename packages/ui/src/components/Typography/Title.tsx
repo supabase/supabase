@@ -1,29 +1,24 @@
-import React from 'react'
-// @ts-ignore
-// import TitleStyles from './Title.module.css'
+import React from 'react';
+import styleHandler from '../../lib/theme/styleHandler'
 
 interface Props {
-  className?: string
-  level?: 1 | 2 | 3 | 4 | 5
-  children: any
-  style?: React.CSSProperties
+  className?: string;
+  level?: 1 | 2 | 3 | 4 | 5;
+  children: React.ReactNode;
+  style?: React.CSSProperties;
 }
 
 function Title({ className, level = 1, children, style }: Props) {
-  // let classes = [TitleStyles['sbui-typography-title']]
-  // if (className) {
-  //   classes.push(className)
-  // }
-  const CustomTag: any = `h${level}`
+  const __styles = styleHandler('title');
+  const classes = [className, __styles.base, __styles.fontSize[`h${level}`]];
+
+  const CustomTag: any = `h${level}`;
 
   return (
-    <CustomTag
-      style={style}
-      // className={classes.join(' ')}
-    >
+    <CustomTag style={style} className={classes.join(' ')}>
       {children}
     </CustomTag>
-  )
+  );
 }
 
-export default Title
+export default Title;

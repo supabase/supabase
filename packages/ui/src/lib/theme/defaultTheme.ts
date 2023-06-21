@@ -1438,7 +1438,7 @@ export default {
       ...default__padding_and_text,
     },
     disabled: `opacity-50`,
-    actions_container: 'absolute inset-y-0 right-0 pl-3 pr-1 flex space-x-1 items-center',
+    actions_container: 'absolute inset-y-0 right-0 pl-3 pr-1 flex space-x-1 items-center mr-5',
     chevron_container: 'absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none',
     chevron: 'h-5 w-5 text-scale-600',
     option: `
@@ -1503,6 +1503,51 @@ export default {
       text-brand-900 animate-spin
       inset-0
       m-auto
+    `,
+  },
+
+  // Typography
+
+  typography: {
+    base: 'prose prose-sm lg:prose-lg text-base text-gray-400',
+  },
+
+  text: {
+    base: 'text-sm',
+    size: {
+      small: 'text-xs',
+    },
+    style: {
+      disabled: 'text-gray-500',
+      underline: 'underline',
+      strikethrough: 'line-through',
+    },
+    color: {
+      default: 'text-primary',
+      secondary: 'text-secondary',
+      success: 'text-success',
+      warning: 'text-warning',
+      danger: 'text-danger',
+    },
+  },
+
+  title: {
+    base: 'text-gray-900 dark:text-white',
+    fontSize: {
+      h1: 'text-5xl',
+      h2: 'text-4xl',
+      h3: 'text-2xl',
+      h4: 'text-lg',
+      h5: 'text-base',
+    },
+  },
+
+  link: {
+    base: `
+      text-sm
+      text-brand-700
+      dark:text-brand-700
+      cursor-pointer
     `,
   },
 }

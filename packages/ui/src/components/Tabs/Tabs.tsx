@@ -9,7 +9,7 @@ import { useRouter } from 'next/router'
 
 import styleHandler from '../../lib/theme/styleHandler'
 
-interface TabsProps {
+export interface TabsProps {
   type?: 'pills' | 'underlined' | 'cards' | 'rounded-pills'
   defaultActiveId?: string
   activeId?: string
@@ -26,7 +26,7 @@ interface TabsProps {
   children: PanelPropsProps[]
 }
 
-interface TabsSubComponents {
+export interface TabsSubComponents {
   Panel: React.FC<PanelProps>
 }
 

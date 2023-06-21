@@ -83,10 +83,10 @@
   /* @apply space-y-36; */
 }
 .sbui-space-y-40 {
-  /* @apply space-y-40; */
+  @apply space-y-40;
 }
 .sbui-space-y-44 {
-  /* @apply space-y-44; */
+  @apply space-y-44;
 }
 .sbui-space-y-48 {
   /* @apply space-y-48; */

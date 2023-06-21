@@ -117,13 +117,9 @@ interface MiscProps {
 
 export function Misc({ children }: MiscProps) {
   return (
-    <div
-    // className={MenuStyles['sbui-menu__misc']}
-    >
+    <div>
       <Typography.Text>
-        <span
-        // className={MenuStyles['sbui-menu__content']}
-        >
+        <span className='text-gray-600 dark:text-white'>
           {children}
         </span>
       </Typography.Text>

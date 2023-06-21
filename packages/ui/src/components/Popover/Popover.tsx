@@ -5,7 +5,7 @@ import type * as RadixPopoverTypes from '@radix-ui/react-popover/'
 import { IconX } from '../Icon/icons/IconX'
 import styleHandler from '../../lib/theme/styleHandler'
 
-interface RootProps {
+export interface RootProps {
   align?: RadixPopoverTypes.PopoverContentProps['align']
   ariaLabel?: string
   arrow?: boolean
@@ -58,7 +58,6 @@ function Popover({
       open={open}
     >
       <RadixPopover.Trigger
-        // className={DropdownStyles['sbui-popover__trigger']}
         className={__styles.trigger}
         aria-label={ariaLabel}
       >
@@ -75,7 +74,6 @@ function Popover({
         >
           {arrow && (
             <RadixPopover.Arrow
-              // className={DropdownStyles['sbui-popover__arrow']}
               offset={10}
             ></RadixPopover.Arrow>
           )}

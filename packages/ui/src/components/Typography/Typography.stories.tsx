@@ -1,13 +1,9 @@
 import React from 'react'
-// import { AutoForm } from 'uniforms'
-// @ts-ignore
-import MarkdownExample from './../../lib/MarkdownSample.md'
+import MarkdownSample from '../../lib/MarkdownSample.md'
 import ReactMarkdown from 'react-markdown'
 const gfm = require('remark-gfm')
 
 import Typography from '.'
-// @ts-ignore
-import { Space } from '../../index'
 
 const { Title, Text, Link } = Typography
 
@@ -18,18 +14,18 @@ export default {
 
 export const article = () => (
   <Typography tag="article">
-    <ReactMarkdown plugins={[gfm]} source={MarkdownExample} />
+    <ReactMarkdown className="prose" remarkPlugins={[gfm]} children={MarkdownSample} />
   </Typography>
 )
 
 export const Titles = () => (
-  <React.Fragment>
+  <div className="gap-y-5 flex flex-col">
     <Title level={1}>Hello world</Title>
     <Title level={2}>Hello world</Title>
     <Title level={3}>Hello world</Title>
     <Title level={4}>Hello world</Title>
     <Title level={5}>Hello world</Title>
-  </React.Fragment>
+  </div>
 )
 
 export const Texts = () => (

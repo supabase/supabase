@@ -1,12 +1,10 @@
 import React from 'react'
 
 import { Divider } from '../Divider'
-import { IconMail } from './../../index'
-import Typography from '../Typography'
+import { IconMail } from './../Icon/icons/IconMail'
 
 import { Menu } from './'
 import { Button } from '../Button'
-import { IconDatabase } from '../Icon/icons/IconDatabase'
 import { IconMenu } from '../Icon/icons/IconMenu'
 import { IconRefreshCcw } from '../Icon/icons/IconRefreshCcw'
 
@@ -17,7 +15,7 @@ export default {
 
 const SampleIcon = () => <IconMail size={14} strokeWidth={2} />
 
-export const Default = (args: any) => (
+export const Default = () => (
   <Menu type="text">
     <Menu.Item icon={<SampleIcon />}>Account settings</Menu.Item>
     <Divider />
@@ -26,7 +24,7 @@ export const Default = (args: any) => (
   </Menu>
 )
 
-export const withActiveState = (args: any) => (
+export const withActiveState = () => (
   <Menu type="text">
     <Menu.Item icon={<SampleIcon />}>Account settings</Menu.Item>
     <Divider />
@@ -37,7 +35,7 @@ export const withActiveState = (args: any) => (
   </Menu>
 )
 
-export const pills = (args: any) => (
+export const pills = () => (
   <Menu type="pills">
     <Menu.Item icon={<SampleIcon />}>Account settings</Menu.Item>
     <Divider />
@@ -48,7 +46,7 @@ export const pills = (args: any) => (
   </Menu>
 )
 
-export const border = (args: any) => (
+export const border = () => (
   <Menu type="border">
     <Menu.Item icon={<SampleIcon />}>Account settings</Menu.Item>
     <Divider />
