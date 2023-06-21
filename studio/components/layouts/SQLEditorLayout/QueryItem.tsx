@@ -65,7 +65,6 @@ interface QueryItemActionsProps {
 }
 
 const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps) => {
-  console.log('activeId', activeId)
   const { ui } = useStore()
   const { ref } = useParams()
   const router = useRouter()
