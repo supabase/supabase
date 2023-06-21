@@ -440,18 +440,6 @@ class StorageExplorerStore {
 
   /* Methods that involve the storage client library */
   /* Bucket CRUD */
-
-  createBucket = async (payload) => {
-    const res = await post(`${this.endpoint}/buckets`, payload)
-    if (res.error) {
-      this.ui.setNotification({ category: 'error', message: res.error.message })
-      return res
-    } else {
-      await this.fetchBuckets()
-      return res
-    }
-  }
-
   openBucket = async (bucket) => {
     const { id, name } = bucket
     const columnIndex = -1
@@ -459,59 +447,6 @@ class StorageExplorerStore {
       this.setSelectedBucket(bucket)
       await this.fetchFolderContents(id, name, columnIndex)
     }
-  }
-
-  fetchBuckets = async () => {
-    const res = await get(`${this.endpoint}/buckets`)
-    if (res.error) return this.ui.setNotification({ category: 'error', message: res.error.message })
-
-    const formattedBuckets = res.map((bucket) => {
-      return { ...bucket, type: STORAGE_ROW_TYPES.BUCKET, status: STORAGE_ROW_STATUS.READY }
-    })
-    this.buckets = formattedBuckets
-    return formattedBuckets
-  }
-
-  deleteBucket = async (bucket) => {
-    // Deleting a bucket requires the bucket to be empty first
-    // hence delete bucket and empty bucket are coupled tightly here
-    const { id, name: bucketName } = bucket
-
-    const emptyBucketRes = await post(`${this.endpoint}/buckets/${id}/empty`, {})
-    if (emptyBucketRes.error) {
-      this.ui.setNotification({ category: 'error', message: emptyBucketRes.error.message })
-      return false
-    }
-
-    const deleteBucketRes = await delete_(`${this.endpoint}/buckets/${id}`)
-    if (deleteBucketRes.error) {
-      this.ui.setNotification({ category: 'error', message: deleteBucketRes.error.message })
-      return false
-    }
-
-    await this.fetchBuckets()
-    if (bucketName === this.selectedBucket.name) {
-      this.setSelectedBucket({})
-      this.clearColumns()
-      this.clearOpenedFolders()
-    }
-    this.clearSelectedItemsToDelete()
-    this.closeDeleteBucketModal()
-    return true
-  }
-
-  editBucket = async (bucket, payload) => {
-    const res = await patch(`${this.endpoint}/buckets/${bucket.id}`, payload)
-    if (res.error) {
-      this.ui.setNotification({ category: 'error', message: res.error.message })
-      return res
-    }
-
-    this.openBucket({ ...bucket, ...payload })
-    this.fetchBuckets()
-    this.clearFilePreviewCache()
-
-    return res
   }
 
   /* Files CRUD */
