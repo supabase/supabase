@@ -60,6 +60,10 @@ const RefSectionHandler = (props: RefSectionHandlerProps) => {
   const pageTitle = getPageTitle()
   const section = props.sections.find((section) => section.slug === slug)
   const fullTitle = `${pageTitle}${section ? ` - ${section.title}` : ''}`
+  const path = router.asPath
+    .split('/')
+    .filter((segment) => segment !== 'crawlers')
+    .join('/')
 
   return (
     <>
@@ -72,7 +76,7 @@ const RefSectionHandler = (props: RefSectionHandlerProps) => {
           content={`https://supabase.com/docs/img/supabase-og-image.png`}
         />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link rel="canonical" href={`https://supabase.com${router.basePath}${router.asPath}`} />
+        <link rel="canonical" href={`https://supabase.com${router.basePath}${path}`} />
       </Head>
       {props.isOldVersion && <OldVersionAlert sections={props.sections} />}
       <RefSubLayout>
