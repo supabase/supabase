@@ -65,21 +65,19 @@ const ProjectLinker = ({
 
     createConnections({
       organizationIntegrationId,
-      connections: [
-        {
-          foreign_project_id: vercelProjectId,
-          supabase_project_id: supabaseProjectId,
-          integrationId: INTEGRATION_INTERNAL_ID,
-          metadata: {
-            ...projectDetails,
-            supabaseConfig: {
-              projectEnvVars: {
-                write: true,
-              },
+      connection: {
+        foreign_project_id: vercelProjectId,
+        supabase_project_id: supabaseProjectId,
+        integrationId: INTEGRATION_INTERNAL_ID,
+        metadata: {
+          ...projectDetails,
+          supabaseConfig: {
+            projectEnvVars: {
+              write: true,
             },
           },
         },
-      ],
+      },
     })
   }
 

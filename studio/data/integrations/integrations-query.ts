@@ -133,7 +133,7 @@ export type IntegrationProjectConnection = {
   created_at: string
   updated_at: string
   added_by: addedBy
-  project_ref: string
+  supabase_project_id: string
   organization_integration_id: string
   metadata: metadata
 }
