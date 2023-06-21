@@ -48,93 +48,94 @@ const Wrappers = () => {
           </div>
         </div>
 
-        {isLoading ? (
+        {isLoading && (
           <div className="space-y-2">
             <ShimmeringLoader />
             <ShimmeringLoader className="w-3/4" />
             <ShimmeringLoader className="w-1/2" />
           </div>
-        ) : (
-          <div>
-            {isError && (
-              <Alert
-                withIcon
-                variant="warning"
-                title="Failed to retrieve migration history for database"
-                actions={[
-                  <Link
-                    key="contact-support"
-                    href={`/support/new?ref=${project?.ref}&category=dashboard_bug&subject=Unable%20to%20view%20database%20migrations`}
-                  >
-                    <a>
-                      <Button type="default" className="ml-4">
-                        Contact support
-                      </Button>
-                    </a>
-                  </Link>,
-                ]}
-              >
-                <p className="mb-1">
-                  Try refreshing your browser, but if the issue persists, please reach out to us via
-                  support.
-                </p>
-                <p>Error: {(error as any)?.message ?? 'Unknown'}</p>
-              </Alert>
-            )}
-            {isSuccess && (
-              <div>
-                {data.result.length <= 0 && <MigrationsEmptyState />}
+        )}
 
-                {data.result.length > 0 && (
-                  <>
-                    <div className="w-80 mb-4">
-                      <Input
-                        size="small"
-                        placeholder="Search for a migration"
-                        value={search}
-                        onChange={(e: any) => setSearch(e.target.value)}
-                        icon={<IconSearch size="tiny" />}
-                      />
-                    </div>
-                    <Table
-                      head={[
-                        <Table.th key="version">Version</Table.th>,
-                        <Table.th key="buttons"></Table.th>,
-                      ]}
-                      body={
-                        migrations.length > 0 ? (
-                          migrations.map((migration) => (
-                            <Table.tr key={migration.version}>
-                              <Table.td>{migration.version}</Table.td>
-                              <Table.td align="right">
-                                <Button
-                                  type="default"
-                                  onClick={() => setSelectedMigration(migration)}
-                                >
-                                  View migration SQL
-                                </Button>
-                              </Table.td>
-                            </Table.tr>
-                          ))
-                        ) : (
-                          <Table.tr>
-                            <Table.td>
-                              <p className="text-sm text-scale-1200">No results found</p>
-                              <p className="text-sm text-scale-1100">
-                                Your search for "{search}" did not return any results
-                              </p>
+        <div>
+          {isError && (
+            <Alert
+              withIcon
+              variant="warning"
+              title="Failed to retrieve migration history for database"
+              actions={[
+                <Link
+                  key="contact-support"
+                  href={`/support/new?ref=${project?.ref}&category=dashboard_bug&subject=Unable%20to%20view%20database%20migrations`}
+                >
+                  <a>
+                    <Button type="default" className="ml-4">
+                      Contact support
+                    </Button>
+                  </a>
+                </Link>,
+              ]}
+            >
+              <p className="mb-1">
+                Try refreshing your browser, but if the issue persists, please reach out to us via
+                support.
+              </p>
+              <p>Error: {(error as any)?.message ?? 'Unknown'}</p>
+            </Alert>
+          )}
+          {isSuccess && (
+            <div>
+              {data.result.length <= 0 && <MigrationsEmptyState />}
+
+              {data.result.length > 0 && (
+                <>
+                  <div className="w-80 mb-4">
+                    <Input
+                      size="small"
+                      placeholder="Search for a migration"
+                      value={search}
+                      onChange={(e: any) => setSearch(e.target.value)}
+                      icon={<IconSearch size="tiny" />}
+                    />
+                  </div>
+                  <Table
+                    head={[
+                      <Table.th key="version">Version</Table.th>,
+                      <Table.th key="buttons"></Table.th>,
+                    ]}
+                    body={
+                      migrations.length > 0 ? (
+                        migrations.map((migration) => (
+                          <Table.tr key={migration.version}>
+                            <Table.td>{migration.version}</Table.td>
+                            <Table.td align="right">
+                              <Button
+                                type="default"
+                                onClick={() => setSelectedMigration(migration)}
+                              >
+                                View migration SQL
+                              </Button>
                             </Table.td>
                           </Table.tr>
-                        )
-                      }
-                    />
-                  </>
-                )}
-              </div>
-            )}
-          </div>
-        )}
+                        ))
+                      ) : (
+                        <Table.tr>
+                          <Table.td>
+                            <p className="text-sm text-scale-1200">No results found</p>
+                            <p className="text-sm text-scale-1100">
+                              Your search for "{search}" did not return any results
+                            </p>
+                          </Table.td>
+                        </Table.tr>
+                      )
+                    }
+                  />
+                </>
+              )}
+            </div>
+          )}
+        </div>
       </div>
+
       <SidePanel
         size="large"
         visible={selectedMigration !== undefined}
