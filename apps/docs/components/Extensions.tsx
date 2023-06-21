@@ -3,14 +3,14 @@ import React, { useState } from 'react'
 import { GlassPanel, IconLink, IconX, Input } from 'ui'
 import extensions from '../data/extensions.json'
 
-type extension = {
+type Extension = {
   name: string
   comment: string
   tags: string[]
   link?: string
 }
 
-function getUniqueTags(json: extension[]) {
+function getUniqueTags(json: Extension[]): string[] {
   const tags = []
   for (const item of json) {
     if (item.tags) {
@@ -21,12 +21,12 @@ function getUniqueTags(json: extension[]) {
 }
 
 export default function Extensions() {
-  const [searchTerm, setSearchTerm] = useState('')
-  const [filters, setFilters] = useState([])
+  const [searchTerm, setSearchTerm] = useState<string>('')
+  const [filters, setFilters] = useState<string[]>([])
 
   const tags = getUniqueTags(extensions)
 
-  function handleChecked(tag) {
+  function handleChecked(tag: string) {
     if (filters.includes(tag)) {
       setFilters(filters.filter((x) => x !== tag))
     } else {
@@ -98,8 +98,8 @@ export default function Extensions() {
                   passHref
                   href={`${
                     extension.link
-                      ? `/guides/database/extensions/${extension.name}`
-                      : '/guides/database/extensions#full-list-of-extensions'
+                      ? extension.link
+                      : `/guides/database/extensions/${extension.name}`
                   }`}
                 >
                   <a target={`${extension.link ? '_blank' : '_self'}`} className="no-underline">
