@@ -9,6 +9,7 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { DatabaseMigration, useMigrationsQuery } from 'data/database/migrations-query'
 import { Editor } from '@monaco-editor/react'
 import CodeEditor from 'components/ui/CodeEditor'
+import MigrationsEmptyState from './MigrationsEmptyState'
 
 const Wrappers = () => {
   const [search, setSearch] = useState('')
@@ -23,6 +24,8 @@ const Wrappers = () => {
     search.length === 0
       ? data?.result ?? []
       : data?.result.filter((migration) => migration.version.includes(search)) ?? []
+
+  console.log({ data })
 
   return (
     <>
@@ -80,51 +83,52 @@ const Wrappers = () => {
             )}
             {isSuccess && (
               <div>
-                <div className="w-80 mb-4">
-                  <Input
-                    size="small"
-                    placeholder="Search for a migration"
-                    value={search}
-                    onChange={(e: any) => setSearch(e.target.value)}
-                    icon={<IconSearch size="tiny" />}
-                  />
-                </div>
-
-                {data.result.length <= 0 && <div>No migrations state...</div>}
+                {data.result.length <= 0 && <MigrationsEmptyState />}
 
                 {data.result.length > 0 && (
-                  <Table
-                    head={[
-                      <Table.th key="version">Version</Table.th>,
-                      <Table.th key="buttons"></Table.th>,
-                    ]}
-                    body={
-                      migrations.length > 0 ? (
-                        migrations.map((migration) => (
-                          <Table.tr key={migration.version}>
-                            <Table.td>{migration.version}</Table.td>
-                            <Table.td align="right">
-                              <Button
-                                type="default"
-                                onClick={() => setSelectedMigration(migration)}
-                              >
-                                View migration SQL
-                              </Button>
+                  <>
+                    <div className="w-80 mb-4">
+                      <Input
+                        size="small"
+                        placeholder="Search for a migration"
+                        value={search}
+                        onChange={(e: any) => setSearch(e.target.value)}
+                        icon={<IconSearch size="tiny" />}
+                      />
+                    </div>
+                    <Table
+                      head={[
+                        <Table.th key="version">Version</Table.th>,
+                        <Table.th key="buttons"></Table.th>,
+                      ]}
+                      body={
+                        migrations.length > 0 ? (
+                          migrations.map((migration) => (
+                            <Table.tr key={migration.version}>
+                              <Table.td>{migration.version}</Table.td>
+                              <Table.td align="right">
+                                <Button
+                                  type="default"
+                                  onClick={() => setSelectedMigration(migration)}
+                                >
+                                  View migration SQL
+                                </Button>
+                              </Table.td>
+                            </Table.tr>
+                          ))
+                        ) : (
+                          <Table.tr>
+                            <Table.td>
+                              <p className="text-sm text-scale-1200">No results found</p>
+                              <p className="text-sm text-scale-1100">
+                                Your search for "{search}" did not return any results
+                              </p>
                             </Table.td>
                           </Table.tr>
-                        ))
-                      ) : (
-                        <Table.tr>
-                          <Table.td>
-                            <p className="text-sm text-scale-1200">No results found</p>
-                            <p className="text-sm text-scale-1100">
-                              Your search for "{search}" did not return any results
-                            </p>
-                          </Table.td>
-                        </Table.tr>
-                      )
-                    }
-                  />
+                        )
+                      }
+                    />
+                  </>
                 )}
               </div>
             )}
