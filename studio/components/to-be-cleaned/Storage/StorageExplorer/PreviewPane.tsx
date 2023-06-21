@@ -94,13 +94,17 @@ const PreviewFile = ({ mimeType, previewUrl }: { mimeType: string; previewUrl: s
   )
 }
 
-const PreviewPane = () => {
+export interface PreviewPaneProps {
+  onCopyUrl: (name: string, url: string) => void
+}
+
+const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
   const storageExplorerStore = useStorageStore()
   const {
+    getFileUrl,
     downloadFile,
     selectedBucket,
     selectedFilePreview: file,
-    copyFileURLToClipboard,
     closeFilePreview,
     setSelectedItemsToDelete,
     setSelectedFileCustomExpiry,
@@ -194,7 +198,7 @@ const PreviewPane = () => {
                 <Button
                   type="outline"
                   icon={<IconClipboard size={16} strokeWidth={2} />}
-                  onClick={async () => await copyFileURLToClipboard(file)}
+                  onClick={async () => onCopyUrl(file.name, await getFileUrl(file))}
                   disabled={file.isCorrupted}
                 >
                   Get URL
@@ -207,7 +211,7 @@ const PreviewPane = () => {
                     <Dropdown.Item
                       key="expires-one-week"
                       onClick={async () =>
-                        await copyFileURLToClipboard(file, URL_EXPIRY_DURATION.WEEK)
+                        onCopyUrl(file.name, await getFileUrl(file, URL_EXPIRY_DURATION.WEEK))
                       }
                     >
                       Expire in 1 week
@@ -215,7 +219,7 @@ const PreviewPane = () => {
                     <Dropdown.Item
                       key="expires-one-month"
                       onClick={async () =>
-                        await copyFileURLToClipboard(file, URL_EXPIRY_DURATION.MONTH)
+                        onCopyUrl(file.name, await getFileUrl(file, URL_EXPIRY_DURATION.MONTH))
                       }
                     >
                       Expire in 1 month
@@ -223,7 +227,7 @@ const PreviewPane = () => {
                     <Dropdown.Item
                       key="expires-one-year"
                       onClick={async () =>
-                        await copyFileURLToClipboard(file, URL_EXPIRY_DURATION.YEAR)
+                        onCopyUrl(file.name, await getFileUrl(file, URL_EXPIRY_DURATION.YEAR))
                       }
                     >
                       Expire in 1 year

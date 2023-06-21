@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { get, sum } from 'lodash'
+import { get, noop, sum } from 'lodash'
 import { Checkbox, IconUpload } from 'ui'
 import { Transition } from '@headlessui/react'
 import { useContextMenu } from 'react-contexify'
@@ -15,8 +15,9 @@ import {
 } from '../Storage.constants'
 import { formatBytes } from 'lib/helpers'
 import { BASE_PATH } from 'lib/constants'
+import { StorageColumn } from '../Storage.types'
 
-const DragOverOverlay = ({ isOpen, onDragLeave, onDrop, folderIsEmpty }) => {
+const DragOverOverlay = ({ isOpen, onDragLeave, onDrop, folderIsEmpty }: any) => {
   return (
     <Transition
       show={isOpen}
@@ -50,21 +51,37 @@ const DragOverOverlay = ({ isOpen, onDragLeave, onDrop, folderIsEmpty }) => {
   )
 }
 
+export interface FileExplorerColumnProps {
+  index: number
+  view: string
+  column: StorageColumn
+  fullWidth?: boolean
+  openedFolders?: any[]
+  selectedItems: any[]
+  selectedFilePreview: any
+  onFilesUpload: (event: any, index: number) => void
+  onSelectAllItemsInColumn: (index: number) => void
+  onSelectColumnEmptySpace: (index: number) => void
+  onColumnLoadMore: (index: number, column: StorageColumn) => void
+  onCopyUrl: (name: string, url: string) => void
+}
+
 const FileExplorerColumn = ({
   index = 0,
   view = STORAGE_VIEWS.COLUMNS,
-  column = {},
+  column,
   fullWidth = false,
   openedFolders = [],
   selectedItems = [],
   selectedFilePreview = {},
-  onFilesUpload = () => {},
-  onSelectAllItemsInColumn = () => {},
-  onSelectColumnEmptySpace = () => {},
-  onColumnLoadMore = () => {},
-}) => {
+  onFilesUpload = noop,
+  onSelectAllItemsInColumn = noop,
+  onSelectColumnEmptySpace = noop,
+  onColumnLoadMore = noop,
+  onCopyUrl = noop,
+}: FileExplorerColumnProps) => {
   const [isDraggedOver, setIsDraggedOver] = useState(false)
-  const fileExplorerColumnRef = useRef(null)
+  const fileExplorerColumnRef = useRef<any>(null)
 
   useEffect(() => {
     if (fileExplorerColumnRef) {
@@ -87,14 +104,14 @@ const FileExplorerColumn = ({
   const columnItemsSize = sum(columnItems.map((item) => get(item, ['metadata', 'size'], 0)))
 
   const { show } = useContextMenu()
-  const displayMenu = (event) => {
+  const displayMenu = (event: any) => {
     show(event, {
       id: CONTEXT_MENU_KEYS.STORAGE_COLUMN,
       props: { index },
     })
   }
 
-  const onDragOver = (event) => {
+  const onDragOver = (event: any) => {
     if (event) {
       event.stopPropagation()
       event.preventDefault()
@@ -104,7 +121,7 @@ const FileExplorerColumn = ({
     }
   }
 
-  const onDrop = (event) => {
+  const onDrop = (event: any) => {
     onDragOver(event)
     onFilesUpload(event, index)
   }
@@ -144,7 +161,7 @@ const FileExplorerColumn = ({
       {view === STORAGE_VIEWS.COLUMNS && (
         <div
           className={`sticky top-0 z-10 mb-0 flex items-center bg-table-header-light px-2.5 dark:bg-table-header-dark ${
-            haveSelectedItems > 0 ? 'h-10 py-3 opacity-100' : 'h-0 py-0 opacity-0'
+            haveSelectedItems ? 'h-10 py-3 opacity-100' : 'h-0 py-0 opacity-0'
           } transition-all duration-200`}
           onClick={(event) => event.stopPropagation()}
         >
@@ -202,15 +219,7 @@ const FileExplorerColumn = ({
           selectedItems,
           openedFolders,
           selectedFilePreview,
-          // onCheckItem,
-          // onRenameFile,
-          // onCopyFileURL,
-          // onDownloadFile,
-          // onRenameFolder,
-          // onCreateFolder,
-          // onSelectItemDelete,
-          // onSelectItemRename,
-          // onSelectItemMove,
+          onCopyUrl,
         }}
         ItemComponent={FileExplorerRow}
         getItemSize={(index) => (index !== 0 && index === columnItems.length ? 85 : 37)}
