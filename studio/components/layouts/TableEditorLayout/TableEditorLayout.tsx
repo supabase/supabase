@@ -37,7 +37,7 @@ const TableEditorLayout = ({
   onDuplicateTable = noop,
   children,
 }: PropsWithChildren<TableEditorLayoutProps>) => {
-  const { vault, meta } = useStore()
+  const { ui, vault, meta } = useStore()
   const selectedProject = useSelectedProject()
   const router = useRouter()
   const { ref, id: _id } = useParams()
@@ -50,14 +50,14 @@ const TableEditorLayout = ({
   const isVaultEnabled = vaultExtension !== undefined && vaultExtension.installed_version !== null
 
   useEffect(() => {
-    if (selectedProject?.ref) {
+    if (ui.selectedProjectRef) {
       meta.schemas.load()
       meta.types.load()
       meta.policies.load()
       meta.publications.load()
       meta.extensions.load()
     }
-  }, [selectedProject?.ref])
+  }, [ui.selectedProjectRef])
 
   const isLoaded = useIsTableLoaded(ref, id)
 

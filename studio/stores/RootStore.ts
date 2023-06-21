@@ -63,7 +63,6 @@ export class RootStore implements IRootStore {
    */
   setProject(project: Project) {
     if (this.selectedProjectRef === project.ref) return
-    this.selectedProjectRef = project.ref
 
     // reset ui projectRef in case of switching projects
     // this will show the loading screen instead of showing the previous project
@@ -76,6 +75,8 @@ export class RootStore implements IRootStore {
     this.backups.setProjectRef(project.ref)
     // ui set must come last
     this.ui.setProjectRef(project.ref)
+
+    this.selectedProjectRef = project.ref
 
     // fetch project detail when
     // - project not found yet. projectStore is loading

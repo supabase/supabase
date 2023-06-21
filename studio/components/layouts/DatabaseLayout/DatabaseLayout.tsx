@@ -15,7 +15,7 @@ interface Props {
 }
 
 const DatabaseLayout: FC<Props> = ({ title, children }) => {
-  const { meta, vault, backups } = useStore()
+  const { ui, meta, vault, backups } = useStore()
   const { isLoading: isSchemasLoading } = meta.schemas
   const { isLoading: isVaultLoading } = vault
 
@@ -34,7 +34,7 @@ const DatabaseLayout: FC<Props> = ({ title, children }) => {
   const [loaded, setLoaded] = useState<boolean>(isInitialized)
 
   useEffect(() => {
-    if (project?.ref) {
+    if (ui.selectedProjectRef) {
       // Eventually should only load the required stores based on the pages
       meta.schemas.load()
       meta.tables.load()
@@ -48,13 +48,13 @@ const DatabaseLayout: FC<Props> = ({ title, children }) => {
         backups.load()
       }
     }
-  }, [project?.ref])
+  }, [ui.selectedProjectRef])
 
   useEffect(() => {
     if (isVaultEnabled) {
       vault.load()
     }
-  }, [project?.ref, isVaultEnabled])
+  }, [ui.selectedProjectRef, isVaultEnabled])
 
   // Optimization required: load logic should be at the page level
   // e.g backups page is waiting for meta.tables to load finish when it doesnt even need that data
