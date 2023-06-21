@@ -4,21 +4,21 @@ import { API_URL } from 'lib/constants'
 
 export type IntegrationConnectionsCreateVariables = {
   organizationIntegrationId: string
-  connections: {
+  connection: {
     foreignProjectId: string
     supabaseProjectId: string
     integrationId: number
     metadata: any
-  }[]
+  }
 }
 
 export async function createIntegrationConnections({
   organizationIntegrationId,
-  connections,
+  connection,
 }: IntegrationConnectionsCreateVariables) {
   const response = await post(`${API_URL}/integrations/vercel/connections`, {
     organization_integration_id: organizationIntegrationId,
-    connections,
+    connection,
   })
   if (response.error) {
     throw response.error

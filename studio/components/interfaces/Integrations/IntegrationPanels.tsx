@@ -67,6 +67,8 @@ const IntegrationInstallation = React.forwardRef<HTMLLIElement, IntegrationInsta
       )
     }
 
+    console.log(connection)
+
     return (
       <li
         key={connection.id}
@@ -135,9 +137,9 @@ const IntegrationConnection = React.forwardRef<HTMLLIElement, IntegrationConnect
           <div className="flex flex-col gap-1">
             <div className="flex gap-2 items-center">
               <HandleIcon type={'Supabase'} />
-              <span>{projects.byId(connection.project_ref)?.name}</span>
+              <span>{projects.byId(connection.supabase_project_id)?.name}</span>
               <IconArrowRight size={14} className="text-scale-900" strokeWidth={1.5} />
-              {!connection.metadata.framework ? (
+              {!connection?.metadata?.framework ? (
                 <HandleIcon type={type} />
               ) : (
                 <img
@@ -147,7 +149,7 @@ const IntegrationConnection = React.forwardRef<HTMLLIElement, IntegrationConnect
                   alt={`icon`}
                 />
               )}
-              <span>{connection.metadata.name}</span>
+              <span>{connection.metadata?.name}</span>
             </div>
 
             <div className="flex gap-3 items-center">
