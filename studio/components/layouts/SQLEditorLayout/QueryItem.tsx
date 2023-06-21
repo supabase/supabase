@@ -45,7 +45,7 @@ const QueryItem = ({ tabInfo }: QueryItemProps) => {
       <Link href={`/project/${ref}/sql/${id}`}>
         <a className="py-1 px-3 w-full">
           <p
-            title={description}
+            title={description || name}
             className="text-sm text-scale-1100 group-hover:text-scale-1200 transition"
           >
             {name}
