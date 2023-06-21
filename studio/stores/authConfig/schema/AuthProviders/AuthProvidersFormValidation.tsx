@@ -112,6 +112,33 @@ const PROVIDER_PHONE = {
       },
     },
 
+    // Twilio Verify
+    SMS_TWILIO_VERIFY_ACCOUNT_SID: {
+      type: 'string',
+      title: 'Twilio Account Sid',
+      show: {
+        key: 'SMS_PROVIDER',
+        matches: 'twilio',
+      },
+    },
+    SMS_TWILIO_VERIFY_AUTH_TOKEN: {
+      type: 'string',
+      title: 'Twilio Auth Token',
+      isSecret: true,
+      show: {
+        key: 'SMS_PROVIDER',
+        matches: 'twilio',
+      },
+    },
+    SMS_TWILIO_VERIFY_MESSAGE_SERVICE_SID: {
+      type: 'string',
+      title: 'Twilio Message Service Sid',
+      show: {
+        key: 'SMS_PROVIDER',
+        matches: 'twilio',
+      },
+    },
+
     // Messagebird
     SMS_MESSAGEBIRD_ACCESS_KEY: {
       type: 'string',
@@ -224,6 +251,29 @@ const PROVIDER_PHONE = {
         return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'twilio'
       },
       then: (schema) => schema.required('Twilio Message Service SID is required'),
+      otherwise: (schema) => schema,
+    }),
+
+    // Twilio Verify
+    SMS_TWILIO_VERIFY_ACCOUNT_SID: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
+      is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
+        return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'twilio_verify'
+      },
+      then: (schema) => schema.required('Twilio Verify Account SID is required'),
+      otherwise: (schema) => schema,
+    }),
+    SMS_TWILIO_VERIFY_AUTH_TOKEN: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
+      is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
+        return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'twilio_verify'
+      },
+      then: (schema) => schema.required('Twilio Verify Auth Token is required'),
+      otherwise: (schema) => schema,
+    }),
+    SMS_TWILIO_VERIFY_MESSAGE_SERVICE_SID: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
+      is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
+        return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'twilio_verify'
+      },
+      then: (schema) => schema.required('Twilio Verify Service SID is required'),
       otherwise: (schema) => schema,
     }),
 
