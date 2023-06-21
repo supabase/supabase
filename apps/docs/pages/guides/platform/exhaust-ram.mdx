@@ -23,7 +23,7 @@ You may observe elevated memory usage even when your database has little to no l
 
 Every Supabase project runs in its own dedicated virtual machine. Your instance will have a different set of hardware provisioned depending on your [compute add-on](https://supabase.com/docs/guides/platform/compute-add-ons). Depending on your workload, your compute hardware may not be suitable and can result in high RAM usage.
 
-A good proxy for unhealthy memory usage is swap usage. If you run out of RAM, your system will offload memory to your disk's much slower swap partition. If your swap is above 40%, chances are high that your compute hardware is not suitable for your workload. Head over to your project's [Database Health](https://supabase.com/dashboard/project/_/reports/database) to see your swap usage.
+A good proxy for unhealthy memory usage is swap usage. If you run out of RAM, your system will offload memory to your disk's much slower swap partition. If your swap is above 70%, chances are high that your compute hardware is not suitable for your workload. Head over to your project's [Database Health](https://supabase.com/dashboard/project/_/reports/database) to see your swap usage.
 
 High RAM usage could come with a range of issues:
 
