@@ -59,7 +59,7 @@ const UseSupabaseTo = (props: Props) => {
               exit="exit"
               key={activeStringIdx}
               variants={textVariants}
-              className="stroke-text text-center text-transparent bg-clip-text bg-gradient-to-b from-white to-scale-300"
+              className="stroke-text text-center text-transparent bg-clip-text bg-gradient-to-b from-white to-scale-300 will-change-transform"
             >
               {props.strings[activeStringIdx]}
             </motion.span>
