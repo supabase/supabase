@@ -454,11 +454,7 @@ export default function AccountForm({ session }) {
     getProfile()
   }, [user, getProfile])
 
-  async function updateProfile({
-    username,
-    website,
-    avatar_url,
-  }) {
+  async function updateProfile({ username, website, avatar_url }) {
     try {
       setLoading(true)
 
