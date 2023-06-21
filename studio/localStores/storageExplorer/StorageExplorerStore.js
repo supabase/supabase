@@ -394,44 +394,26 @@ class StorageExplorerStore {
     this.selectedFilePreview = {}
   }
 
-  copyFileURLToClipboard = async (file, expiresIn = 0) => {
+  getFileUrl = async (file, expiresIn = 0) => {
     const filePreview = find(this.filePreviewCache, { id: file.id })
     if (filePreview !== undefined && expiresIn === 0) {
-      // Already generated signed URL
-      copyToClipboard(filePreview.url, () => {
-        this.ui.setNotification({
-          category: 'success',
-          message: `Copied URL for ${file.name} to clipboard.`,
-          duration: 4000,
-        })
-      })
+      return filePreview.url
     } else {
-      // Need to generate signed URL, and might as well save it to cache as well
       const signedUrl = await this.fetchFilePreview(file.name, expiresIn)
       const formattedUrl = new URL(signedUrl)
       formattedUrl.searchParams.set('t', new Date().toISOString())
+      const fileUrl = formattedUrl.toString()
 
-      try {
-        copyToClipboard(formattedUrl.toString(), () => {
-          this.ui.setNotification({
-            category: 'success',
-            message: `Copied URL for ${file.name} to clipboard.`,
-            duration: 4000,
-          })
-        })
-        const fileCache = {
-          id: file.id,
-          url: formattedUrl.toString(),
-          expiresIn: DEFAULT_EXPIRY,
-          fetchedAt: Date.now(),
-        }
-        this.addFileToPreviewCache(fileCache)
-      } catch (error) {
-        this.ui.setNotification({
-          category: 'error',
-          message: `Failed to copy URL: ${error}`,
-        })
+      // Also save it to cache
+      const fileCache = {
+        id: file.id,
+        url: fileUrl,
+        expiresIn: DEFAULT_EXPIRY,
+        fetchedAt: Date.now(),
       }
+      this.addFileToPreviewCache(fileCache)
+
+      return fileUrl
     }
   }
 

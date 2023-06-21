@@ -1,4 +1,3 @@
-import { FC } from 'react'
 import { observer } from 'mobx-react-lite'
 import { Menu, Item, Separator, Submenu } from 'react-contexify'
 import 'react-contexify/dist/ReactContexify.css'
@@ -8,21 +7,23 @@ import { IconClipboard, IconEdit, IconMove, IconDownload, IconTrash2, IconChevro
 import { checkPermissions } from 'hooks'
 import { URL_EXPIRY_DURATION } from '../Storage.constants'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
+import { noop } from 'lodash'
 
-interface Props {
+interface ItemContextMenuProps {
   id: string
+  onCopyUrl: (name: string, url: string) => void
 }
 
-const ItemContextMenu: FC<Props> = ({ id = '' }) => {
+const ItemContextMenu = ({ id = '', onCopyUrl = noop }: ItemContextMenuProps) => {
   const storageExplorerStore = useStorageStore()
   const {
+    getFileUrl,
     downloadFile,
     selectedBucket,
     setSelectedItemsToDelete,
     setSelectedItemToRename,
     setSelectedItemsToMove,
     setSelectedFileCustomExpiry,
-    copyFileURLToClipboard,
   } = storageExplorerStore
   const isPublic = selectedBucket.public
   const canUpdateFiles = checkPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
@@ -32,7 +33,7 @@ const ItemContextMenu: FC<Props> = ({ id = '' }) => {
     switch (event) {
       case 'copy':
         if (expiresIn !== undefined && expiresIn < 0) return setSelectedFileCustomExpiry(item)
-        else return await copyFileURLToClipboard(item, expiresIn)
+        else return onCopyUrl(item.name, await getFileUrl(item, expiresIn))
       case 'rename':
         return setSelectedItemToRename(item)
       case 'move':
