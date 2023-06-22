@@ -34,7 +34,7 @@ const CostControl = ({}: CostControlProps) => {
               <div>
                 <p className="text-base">Cost Control</p>
                 <p className="text-sm text-scale-1000">
-                  Control whether to usage beyond your plans included quota
+                  Control whether to use beyond your plans included quota
                 </p>
               </div>
               <div className="space-y-2">
