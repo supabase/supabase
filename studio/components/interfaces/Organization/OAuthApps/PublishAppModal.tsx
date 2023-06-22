@@ -167,6 +167,9 @@ const PublishAppModal = ({
         onSubmit={onSubmit}
       >
         {({ isSubmitting, resetForm }: { isSubmitting: boolean; resetForm: any }) => {
+          // [Joshen] although this "technically" is breaking the rules of React hooks
+          // it won't error because the hooks are always rendered in the same order
+          // eslint-disable-next-line react-hooks/rules-of-hooks
           useEffect(() => {
             if (visible && selectedApp !== undefined) {
               const values = { name: selectedApp.name, website: selectedApp.website }
