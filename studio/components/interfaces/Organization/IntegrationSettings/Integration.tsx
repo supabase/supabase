@@ -14,6 +14,7 @@ import {
 import { Integration as TIntegration } from 'data/integrations/integrations-query'
 import { useIntegrationsVercelInstalledConnectionDeleteMutation } from 'data/integrations/integrations-vercel-installed-connection-delete-mutation'
 import { useStore } from 'hooks'
+import { BASE_PATH } from 'lib/constants'
 import { pluralize } from 'lib/helpers'
 import { EMPTY_ARR } from 'lib/void'
 import { useGithubConnectionConfigPanelSnapshot } from 'state/github-connection-config-panel'
@@ -75,7 +76,7 @@ Repository connections for ${title?.toLowerCase()}
             {detail && <Markdown content={detail} />}
             <img
               className="border rounded-lg shadow w-48 mt-6 border-body"
-              src={`/img/integrations/covers/${title.toLowerCase()}-cover.png?v=3`}
+              src={`${BASE_PATH}/img/integrations/covers/${title.toLowerCase()}-cover.png?v=3`}
               alt="cover"
             />
           </ScaffoldSectionDetail>
