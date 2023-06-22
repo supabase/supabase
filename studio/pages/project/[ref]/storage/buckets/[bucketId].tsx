@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 
 import { useParams } from 'common'
 import { StorageLayout } from 'components/layouts'
+import StorageBucketsError from 'components/layouts/StorageLayout/StorageBucketsError'
 import { StorageExplorer } from 'components/to-be-cleaned/Storage'
 import { useBucketsQuery } from 'data/storage/buckets-query'
 import { useFlag, useStore } from 'hooks'
@@ -17,7 +18,7 @@ const PageLayout: NextPageWithLayout = () => {
   const { ui } = useStore()
   const project = ui.selectedProject
 
-  const { data, isSuccess } = useBucketsQuery({ projectRef: ref })
+  const { data, isSuccess, isError, error } = useBucketsQuery({ projectRef: ref })
   const buckets = data ?? []
 
   const kpsEnabled = useFlag('initWithKps')
@@ -34,6 +35,8 @@ const PageLayout: NextPageWithLayout = () => {
 
   return (
     <div className="storage-container flex flex-grow p-4">
+      {isError && <StorageBucketsError error={error as any} />}
+
       {isSuccess ? (
         !bucket ? (
           <div className="flex h-full w-full items-center justify-center">
