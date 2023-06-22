@@ -5,7 +5,7 @@ import { API_URL } from 'lib/constants'
 export type VercelIntegrationCreateVariables = {
   code: string
   configurationId: string
-  orgId: number
+  orgSlug: string
   metadata: { [key: string]: string }
   source: string
   // teamId is only present when a team is being installed
@@ -16,16 +16,16 @@ export type VercelIntegrationCreateVariables = {
 export async function createVercelIntegration({
   code,
   configurationId,
-  orgId,
+  orgSlug,
   metadata,
   source,
   teamId,
 }: VercelIntegrationCreateVariables) {
-  console.log('payload', { code, configurationId, orgId, metadata, source, teamId })
+  console.log('payload', { code, configurationId, orgSlug, metadata, source, teamId })
   const response = await post(`${API_URL}/integrations/vercel`, {
     code,
     configuration_id: configurationId,
-    organization_id: orgId,
+    organization_slug: orgSlug,
     metadata,
     source,
     teamId,

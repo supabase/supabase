@@ -30,8 +30,8 @@ const VercelIntegration: NextPageWithLayout = () => {
   })
 
   function onInstall() {
-    const orgId = selectedOrg?.id
-    if (!orgId) {
+    const orgSlug = selectedOrg?.slug
+    if (!orgSlug) {
       return ui.setNotification({ category: 'error', message: 'Please select an organization' })
     }
 
@@ -55,7 +55,7 @@ const VercelIntegration: NextPageWithLayout = () => {
     mutate({
       code,
       configurationId,
-      orgId,
+      orgSlug,
       metadata,
       source,
       teamId: teamId,
@@ -69,7 +69,8 @@ const VercelIntegration: NextPageWithLayout = () => {
     () =>
       supabaseProjectsData
         ?.filter((project) => project.organization_id === selectedOrg?.id)
-        .map((project) => ({ id: project.id.toString(), name: project.name })) ?? EMPTY_ARR,
+        .map((project) => ({ id: project.id.toString(), name: project.name, ref: project.ref })) ??
+      EMPTY_ARR,
     [selectedOrg?.id, supabaseProjectsData]
   )
 
