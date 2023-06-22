@@ -85,7 +85,8 @@ const buttonVariants = cva(
             text-scale-1200
             hover:bg-scale-500
             shadow-none
-            focus-visible:outline-scale-700`,
+            focus-visible:outline-scale-700
+            border-transparent`,
         danger: `
             text-red-1100
             bg-red-200
@@ -161,6 +162,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       icon,
       iconRight,
       iconLeft,
+      htmlType = 'button',
       ...props
     },
     ref
@@ -176,7 +178,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     return (
       <Comp
         ref={ref}
-        type={props.htmlType}
+        type={htmlType}
         {...props}
         className={cn(buttonVariants({ type, size, disabled, block }), className)}
       >
