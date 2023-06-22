@@ -12,9 +12,9 @@
 - [x] Hosted Postgres datubāze. [Dokumenti](https://supabase.com/docs/guides/database)
 - [x] Autentifikācija un autorizācija. [Dokumenti](https://supabase.com/docs/guides/auth)
 - [x] Automātiski ģenerēti API.
-  - [x] REST. [Dokumenti](https://supabase.com/docs/guides/database/api#rest-api)
-  - [x] GraphQL. [Dokumenti](https://supabase.com/docs/guides/database/api#graphql-api)
-  - [x] Reāllaika abonēšana. [Dokumenti](https://supabase.com/docs/guides/database/api#realtime-api)
+  - [x] REST. [Dokumenti](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL. [Dokumenti](https://supabase.com/docs/guides/api#graphql-api-overview)
+  - [x] Reāllaika abonēšana. [Dokumenti](https://supabase.com/docs/guides/api#realtime-api-overview)
 - [x] Funkcijas.
   - [x] Datubāzes funkcijas. [Dokumenti](https://supabase.com/docs/guides/database/functions)
   - [x] Edge funkcijas [Dokumenti](https://supabase.com/docs/guides/functions)
