@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import SectionContainer from './Layouts/SectionContainer'
 import InteractiveShimmerCard from './Panel'
 import { ReactNode, useEffect, useState } from 'react'
-import { DEFAULT_EASE, EASE_IN, EASE_OUT } from '../lib/animations'
+import { DEFAULT_EASE, EASE_IN, EASE_OUT } from '~/lib/animations'
 
 interface Props {
   strings: string[]

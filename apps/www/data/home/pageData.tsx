@@ -1,9 +1,10 @@
 import solutions from '../Solutions'
 import VideoWithHighlights from '../../components/VideoWithHighlights'
+import Image from 'next/image'
+import UseAnyStack from '../../components/Highlights/UseAnyStack'
 
 export default {
   heroSection: {
-    title: 'Supabase Vector',
     heading: (
       <>
         <span className="block text-[#F4FFFA00] bg-clip-text bg-gradient-to-b from-scale-1200 to-scale-1200 dark:to-scale-1100">
@@ -35,19 +36,41 @@ export default {
     highlights: [
       {
         title: 'Works with any stack',
-        className: 'col-span-full',
-        children: <div></div>,
+        outerClassName: 'col-span-full',
+        innerClassName: 'w-full aspect-[9/1]',
+        children: <UseAnyStack />,
       },
       {
         title: 'Postgres Database',
-        children: <div></div>,
+        paragraph: 'One of the worlds most scalable databases',
+        outerClassName: '',
+        innerClassName: 'w-full aspect-[1/2]',
+        children: (
+          <div className="absolute inset-0 w-full h-auto">
+            <Image
+              src="/images/index/highlights/pg-highlight.svg"
+              alt="Postgres stylized logo"
+              layout="fill"
+              objectFit="cover"
+              className="w-full h-auto"
+            />
+          </div>
+        ),
       },
       {
         title: 'Maximum flexibility',
+        paragraph:
+          'We use open source tools to increase portability and avoid lock-in, making it easy to migrate in and out.',
+        outerClassName: '!w-full !h-[400px]',
+        innerClassName: '!w-full ',
         children: <></>,
       },
       {
         title: 'Hosted infrastructure',
+        paragraph:
+          'Choose from many globally-distributed data centers or self-host on your own cloud.',
+        outerClassName: 'h-[200px]',
+        innerClassName: 'w-full h-[200px] ',
         children: '',
       },
     ],
@@ -368,12 +391,7 @@ export default {
     ],
   },
   quotesSection: {
-    title: (
-      <>
-        Customers building on <br className="hidden md:block" />
-        Supabase Vector
-      </>
-    ),
+    title: <></>,
     cta: {
       label: 'Github Discussions',
       link: 'https://github.com/supabase/supabase/discussions',
