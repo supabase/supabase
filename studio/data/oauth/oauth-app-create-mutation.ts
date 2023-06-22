@@ -11,6 +11,12 @@ export type OAuthAppCreateVariables = {
   redirect_uris: string[]
 }
 
+export type OAuthAppCreateResponse = {
+  id: string
+  client_id: string
+  client_secret: string
+}
+
 export async function createOAuthApp({
   slug,
   name,
@@ -29,7 +35,7 @@ export async function createOAuthApp({
     redirect_uris,
   })
   if (response.error) throw response.error
-  return response
+  return response as OAuthAppCreateResponse
 }
 
 type OAuthAppCreateData = Awaited<ReturnType<typeof createOAuthApp>>
