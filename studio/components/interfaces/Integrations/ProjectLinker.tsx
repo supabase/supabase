@@ -12,6 +12,7 @@ import { Button, IconArrowRight, IconPlus, IconX, Input, Listbox, Select, cn } f
 interface Project {
   id: string
   name: string
+  ref: string
 }
 
 // to do: move this somewhere
@@ -37,7 +38,7 @@ const ProjectLinker = ({
 }: ProjectLinkerProps) => {
   const { ui } = useStore()
 
-  const [supabaseProjectId, setSupabaseProjectId] = useState(UNDEFINED_SELECT_VALUE)
+  const [supabaseProjectRef, setSupabaseProjectRef] = useState(UNDEFINED_SELECT_VALUE)
   const [vercelProjectId, setVercelProjectId] = useState(UNDEFINED_SELECT_VALUE)
 
   // function addConnection() {
@@ -73,8 +74,8 @@ const ProjectLinker = ({
       organizationIntegrationId,
       connection: {
         foreign_project_id: vercelProjectId,
-        supabase_project_id: supabaseProjectId,
-        integrationId: INTEGRATION_INTERNAL_ID,
+        supabase_project_ref: supabaseProjectRef,
+        integration_id: INTEGRATION_INTERNAL_ID,
         metadata: {
           ...projectDetails,
           supabaseConfig: {
@@ -129,16 +130,16 @@ const ProjectLinker = ({
             </div>
             <Listbox
               className="w-full"
-              value={supabaseProjectId ?? UNDEFINED_SELECT_VALUE}
-              onChange={(e) => setSupabaseProjectId(e)}
+              value={supabaseProjectRef ?? UNDEFINED_SELECT_VALUE}
+              onChange={(e) => setSupabaseProjectRef(e)}
             >
               <Listbox.Option value={UNDEFINED_SELECT_VALUE} label="Choose a project" disabled>
-                Choose a Supabase project
+                Choose project
               </Listbox.Option>
               {supabaseProjects.map((project) => (
                 <Listbox.Option
                   key={project.id}
-                  value={project.id}
+                  value={project.ref}
                   label={project.name}
                   addOnBefore={() => {
                     return (
@@ -178,7 +179,7 @@ const ProjectLinker = ({
               onChange={(e) => setVercelProjectId(e)}
             >
               <Listbox.Option value={UNDEFINED_SELECT_VALUE} label="Choose a project" disabled>
-                Choose a Vercel project
+                Choose Vercel project
               </Listbox.Option>
               {filteredForeignProjects.map((project) => {
                 return (
@@ -193,7 +194,7 @@ const ProjectLinker = ({
                             vercelIcon
                           ) : (
                             <img
-                              src={`/img/icons/frameworks/${project.framework}.svg`}
+                              src={`${BASE_PATH}/img/icons/frameworks/${project.framework}.svg`}
                               width={21}
                               height={21}
                               alt={`icon`}

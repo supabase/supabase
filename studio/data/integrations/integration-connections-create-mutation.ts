@@ -6,9 +6,9 @@ import { integrationKeys } from './keys'
 export type IntegrationConnectionsCreateVariables = {
   organizationIntegrationId: string
   connection: {
-    foreignProjectId: string
-    supabaseProjectId: string
-    integrationId: number
+    foreign_project_id: string
+    supabase_project_ref: string
+    integration_id: number
     metadata: any
   }
   orgId: number | undefined

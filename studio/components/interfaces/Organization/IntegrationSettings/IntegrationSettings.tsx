@@ -1,17 +1,13 @@
-import { useParams } from 'common'
 import { ScaffoldDivider } from 'components/layouts/Scaffold'
 import { useIntegrationsQuery } from 'data/integrations/integrations-query'
 import { useStore } from 'hooks'
 import { observer } from 'mobx-react-lite'
-import GitHubRepoSelection from './SidePanelGitHubRepoSelection'
 import Integration from './Integration'
-import SidePanelGitHubRepoSelection from './SidePanelGitHubRepoSelection'
 import SidePanelVercelProjectLinker from './SidePanelVercelProjectLinker'
 
 const IntegrationSettings = () => {
   const { ui } = useStore()
-  const { slug } = useParams()
-  const { data } = useIntegrationsQuery({ orgId: ui.selectedOrganization?.id })
+  const { data } = useIntegrationsQuery({ orgSlug: ui.selectedOrganization?.slug })
 
   const org = ui.selectedOrganization
 

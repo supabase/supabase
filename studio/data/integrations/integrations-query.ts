@@ -144,7 +144,7 @@ export type IntegrationProjectConnection = {
 }
 
 export type IntegrationsVariables = {
-  orgId?: number
+  orgSlug?: string
 }
 
 export type IntegrationProjectConnectionPayload = {
@@ -180,12 +180,12 @@ export type Integration = {
 
 export type IntegrationsResponse = Integration[]
 
-export async function getIntegrations({ orgId }: IntegrationsVariables, signal?: AbortSignal) {
-  if (!orgId) {
-    throw new Error('orgId is required')
+export async function getIntegrations({ orgSlug }: IntegrationsVariables, signal?: AbortSignal) {
+  if (!orgSlug) {
+    throw new Error('orgSlug is required')
   }
 
-  const response = await get(`${API_URL}/integrations/${orgId}`, {
+  const response = await get(`${API_URL}/integrations/${orgSlug}`, {
     signal,
   })
   if (response.error) {
@@ -202,11 +202,11 @@ export type ProjectIntegrationConnectionsData = Awaited<
 export type IntegrationsError = unknown
 
 export const useIntegrationsQuery = <TData = IntegrationsData>(
-  { orgId }: IntegrationsVariables,
+  { orgSlug }: IntegrationsVariables,
   { enabled = true, ...options }: UseQueryOptions<IntegrationsData, IntegrationsError, TData> = {}
 ) =>
   useQuery<IntegrationsData, IntegrationsError, TData>(
-    integrationKeys.list(orgId),
-    ({ signal }) => getIntegrations({ orgId }, signal),
-    { enabled: enabled && typeof orgId !== 'undefined', ...options }
+    integrationKeys.list(orgSlug),
+    ({ signal }) => getIntegrations({ orgSlug }, signal),
+    { enabled: enabled && typeof orgSlug !== 'undefined', ...options }
   )
