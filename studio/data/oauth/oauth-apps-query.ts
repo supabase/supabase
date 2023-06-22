@@ -12,12 +12,13 @@ export type OAuthAppsVariables = {
 
 export type OAuthApp = {
   id: string
+  icon: string | null
   client_id: string
   client_secret_alias: string
   created_at: string
   name: string
   website: string
-  redirect_uris: string
+  redirect_uris: string[]
 }
 
 export async function getOAuthApps({ slug, type }: OAuthAppsVariables, signal?: AbortSignal) {

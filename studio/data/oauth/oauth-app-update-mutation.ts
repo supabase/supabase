@@ -8,7 +8,7 @@ export type OAuthAppUpdateVariables = {
   slug: string
   name: string
   website: string
-  icon?: string
+  icon?: string | null
   redirect_uris: string[]
 }
 
