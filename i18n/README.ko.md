@@ -12,9 +12,9 @@
 - [x] 호스팅된 Postgres 데이터베이스. [문서](https://supabase.com/docs/guides/database)
 - [x] 인증 및 권한 부여. [문서](https://supabase.com/docs/guides/auth)
 - [x] 자동 생성 API.
-  - [x] REST. [문서](https://supabase.com/docs/guides/database/api#rest-api)
-  - [x] GraphQL. [문서](https://supabase.com/docs/guides/database/api#graphql-api)
-  - [x] 실시간 구독. [문서](https://supabase.com/docs/guides/database/api#realtime-api)
+  - [x] REST. [문서](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL. [문서](https://supabase.com/docs/guides/api#graphql-api-overview)
+  - [x] 실시간 구독. [문서](https://supabase.com/docs/guides/api#realtime-api-overview)
 - [x] 함수.
   - [x] 데이터베이스 함수. [Docs](https://supabase.com/docs/guides/database/functions)
   - [x] 엣지 기능 [문서](https://supabase.com/docs/guides/functions)

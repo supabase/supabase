@@ -1,5 +1,5 @@
-import '../../../packages/ui/build/css/themes/light.css'
 import '../../../packages/ui/build/css/themes/dark.css'
+import '../../../packages/ui/build/css/themes/light.css'
 
 import 'config/code-hike.scss'
 import '../styles/main.scss?v=1.0.0'
@@ -13,6 +13,7 @@ import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState } from 'react'
 import { AppPropsWithLayout } from 'types'
 import { CommandMenuProvider } from 'ui'
+import { TabsProvider } from 'ui/src/components/Tabs'
 import Favicons from '~/components/Favicons'
 import SiteLayout from '~/layouts/SiteLayout'
 import { API_URL, IS_PLATFORM, LOCAL_SUPABASE } from '~/lib/constants'
@@ -150,9 +151,11 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
       <AuthContainer>
         <ThemeProvider>
           <CommandMenuProvider site="docs">
-            <SiteLayout>
-              <Component {...pageProps} />
-            </SiteLayout>
+            <TabsProvider>
+              <SiteLayout>
+                <Component {...pageProps} />
+              </SiteLayout>
+            </TabsProvider>
           </CommandMenuProvider>
         </ThemeProvider>
       </AuthContainer>
