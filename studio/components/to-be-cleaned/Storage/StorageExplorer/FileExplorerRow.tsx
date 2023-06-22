@@ -71,7 +71,7 @@ export const RowIcon = ({ view, status, fileType, mimeType }: any) => {
   return <IconFile size={16} strokeWidth={2} />
 }
 
-interface FileExplorerRowProps {
+export interface FileExplorerRowProps {
   index: number
   item: any
   view: string
@@ -79,6 +79,7 @@ interface FileExplorerRowProps {
   selectedItems: any[]
   openedFolders: any[]
   selectedFilePreview: any
+  onCopyUrl: (name: string, url: string) => void
 }
 
 const FileExplorerRow = ({
@@ -89,9 +90,11 @@ const FileExplorerRow = ({
   selectedItems = [],
   openedFolders = [],
   selectedFilePreview = {},
+  onCopyUrl,
 }: FileExplorerRowProps) => {
   const storageExplorerStore = useStorageStore()
   const {
+    getFileUrl,
     popColumnAtIndex,
     pushOpenedFolderAtIndex,
     popOpenedFoldersAtIndex,
@@ -107,7 +110,6 @@ const FileExplorerRow = ({
     fetchFolderContents,
     downloadFile,
     downloadFolder,
-    copyFileURLToClipboard,
     selectRangeItems,
   } = storageExplorerStore
 
@@ -188,7 +190,11 @@ const FileExplorerRow = ({
                       {
                         name: 'Get URL',
                         icon: <IconClipboard size="tiny" />,
-                        onClick: async () => await copyFileURLToClipboard(itemWithColumnIndex),
+                        onClick: async () =>
+                          onCopyUrl(
+                            itemWithColumnIndex.name,
+                            await getFileUrl(itemWithColumnIndex)
+                          ),
                       },
                     ]
                   : [
@@ -199,25 +205,25 @@ const FileExplorerRow = ({
                           {
                             name: 'Expire in 1 week',
                             onClick: async () =>
-                              await copyFileURLToClipboard(
-                                itemWithColumnIndex,
-                                URL_EXPIRY_DURATION.WEEK
+                              onCopyUrl(
+                                itemWithColumnIndex.name,
+                                await getFileUrl(itemWithColumnIndex, URL_EXPIRY_DURATION.WEEK)
                               ),
                           },
                           {
                             name: 'Expire in 1 month',
                             onClick: async () =>
-                              await copyFileURLToClipboard(
-                                itemWithColumnIndex,
-                                URL_EXPIRY_DURATION.MONTH
+                              onCopyUrl(
+                                itemWithColumnIndex.name,
+                                await getFileUrl(itemWithColumnIndex, URL_EXPIRY_DURATION.MONTH)
                               ),
                           },
                           {
                             name: 'Expire in 1 year',
                             onClick: async () =>
-                              await copyFileURLToClipboard(
-                                itemWithColumnIndex,
-                                URL_EXPIRY_DURATION.YEAR
+                              onCopyUrl(
+                                itemWithColumnIndex.name,
+                                await getFileUrl(itemWithColumnIndex, URL_EXPIRY_DURATION.YEAR)
                               ),
                           },
                           {

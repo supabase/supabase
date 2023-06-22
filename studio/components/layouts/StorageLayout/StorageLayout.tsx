@@ -30,7 +30,7 @@ const StorageLayout = ({ title, children }: StorageLayoutProps) => {
 
   useEffect(() => {
     if (!isLoading && apiService) initializeStorageStore(apiService)
-  }, [isLoading])
+  }, [isLoading, projectRef])
 
   const initializeStorageStore = async (apiService: AutoApiService) => {
     if (isPaused) return

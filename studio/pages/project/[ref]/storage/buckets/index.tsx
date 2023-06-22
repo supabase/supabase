@@ -1,11 +1,14 @@
+import { observer } from 'mobx-react-lite'
+import { useEffect } from 'react'
+
 import { useParams } from 'common/hooks'
 import { StorageLayout } from 'components/layouts'
+import StorageBucketsError from 'components/layouts/StorageLayout/StorageBucketsError'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
+import { useBucketsQuery } from 'data/storage/buckets-query'
 import { useFlag, useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
-import { observer } from 'mobx-react-lite'
-import { useEffect } from 'react'
 import { NextPageWithLayout } from 'types'
 
 const PageLayout: NextPageWithLayout = ({}) => {
@@ -14,6 +17,8 @@ const PageLayout: NextPageWithLayout = ({}) => {
   const project = ui.selectedProject
   const kpsEnabled = useFlag('initWithKps')
 
+  const { error, isError } = useBucketsQuery({ projectRef: ref })
+
   useEffect(() => {
     if (project && project.status === PROJECT_STATUS.INACTIVE) {
       post(`${API_URL}/projects/${ref}/restore`, { kps_enabled: kpsEnabled })
@@ -21,6 +26,8 @@ const PageLayout: NextPageWithLayout = ({}) => {
   }, [project])
 
   if (!project) return <div></div>
+
+  if (isError) <StorageBucketsError error={error as any} />
 
   return (
     <div className="storage-container flex flex-grow">
