@@ -757,7 +757,7 @@ const EXTERNAL_PROVIDER_GOOGLE = {
         }
       ),
     EXTERNAL_GOOGLE_CLIENT_ID: string().matches(
-      /^([a-z0-9-]+([.][a-z0-9-]+))?$/i,
+      /^([a-z0-9-]+([.][a-z0-9-]+)+)?$/i,
       'Invalid characters. Google OAuth Client IDs are usually a domain-name (e.g. 01234567890-abcdefghijklmnopqrstuvwxyz012345.apps.googleusercontent.com).'
     ),
     EXTERNAL_GOOGLE_ADDITIONAL_CLIENT_IDS: string()
