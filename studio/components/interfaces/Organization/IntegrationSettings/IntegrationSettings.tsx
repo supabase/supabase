@@ -11,8 +11,12 @@ const IntegrationSettings = () => {
 
   const org = ui.selectedOrganization
 
-  const vercelIntegrations = data?.filter((integration) => integration.integration.id === 1) // vercel
-  const githubIntegrations = data?.filter((integration) => integration.integration.id === 2) // github
+  const vercelIntegrations = data?.filter(
+    (integration) => integration.integration.name === 'Vercel'
+  ) // vercel
+  const githubIntegrations = data?.filter(
+    (integration) => integration.integration.name === 'GitHub'
+  ) // github
 
   vercelIntegrations?.map((x) => {
     let data: any = { ...x }
