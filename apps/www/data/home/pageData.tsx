@@ -1,10 +1,5 @@
-import Link from 'next/link'
-import IntegrationsImage from '~/components/Products/vector/IntegrationsImage'
-import OpenAIImage from '~/components/Products/vector/OpenAIImage'
-import SecureAndScalableImg from '~/components/Products/vector/SecureAndScalableImg'
-import PGvectorImg from '~/components/Products/vector/PGvectorImg'
-import DeployGlobally from '~/components/Products/vector/DeployGlobally'
 import solutions from '../Solutions'
+import VideoWithHighlights from '../../components/VideoWithHighlights'
 
 export default {
   heroSection: {
@@ -88,44 +83,44 @@ export default {
       {
         label: 'Table Editor',
         panel: () => (
-          <div className="relative w-full">
-            <div
-              className="absolute w-full h-full z-50 pointer-events-none inset-0"
-              style={{
-                background: `radial-gradient(75% 100% at 50% 0%, transparent, var(--color-bg-darkest))`,
-              }}
-            />
-            <video className="relative z-0" height="100%" width="100%" loop muted autoPlay>
-              <source src="/images/index/dashboard/table-editor-demo.mp4" type="video/mp4" />
-            </video>
-          </div>
+          <VideoWithHighlights
+            video={'/images/index/dashboard/table-editor-demo.mp4'}
+            highlights={[
+              'Full CRUD',
+              'Materialized Views',
+              'Row Level Security',
+              'Easy as a spreadsheet',
+            ]}
+          />
         ),
-        highlights: [
-          'Full CRUD',
-          'Materialized Views',
-          'Row Level Security',
-          'Easy as a spreadsheet',
-        ],
       },
       {
         label: 'SQL Editor',
-        panel: () => <div>SQL Editor</div>,
-        highlights: [
-          'Write and execute SQL',
-          'Save time using templates',
-          'Save and reuse queries',
-        ],
+        panel: () => (
+          <VideoWithHighlights
+            video={'/images/index/dashboard/table-editor-demo.mp4'}
+            highlights={[
+              'Write and execute SQL',
+              'Save time using templates',
+              'Save and reuse queries',
+            ]}
+          />
+        ),
       },
       {
         label: 'Auth Rules',
-        panel: () => <div>Auth Rules</div>,
-        highlights: [
-          'Email logins',
-          'Magic links',
-          'Third-party login',
-          'Custom access policies',
-          'Password recovery',
-        ],
+        panel: () => (
+          <VideoWithHighlights
+            video={'/images/index/dashboard/table-editor-demo.mp4'}
+            highlights={[
+              'Email logins',
+              'Magic links',
+              'Third-party login',
+              'Custom access policies',
+              'Password recovery',
+            ]}
+          />
+        ),
       },
     ],
   },

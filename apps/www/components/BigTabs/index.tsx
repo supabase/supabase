@@ -22,7 +22,7 @@ const BigTabs = (props: Props) => {
   return (
     <div className="flex flex-col items-center">
       <div
-        className="relative w-full col-span-full flex justify-center pb-8 lg:pb-16 gap-2"
+        className="relative w-full col-span-full flex justify-center pb-8 lg:pb-24 gap-2"
         role="tablist"
       >
         {props.tabs.map((tab, index) => (
@@ -41,7 +41,7 @@ const BigTabs = (props: Props) => {
           />
         </div>
       </div>
-      <div className="bg-[var(--color-bg-darkest)] w-full aspect-video">
+      <div className="w-full aspect-video">
         <AnimatePresence exitBeforeEnter>
           <motion.div
             key={props.tabs[activeTabIdx]?.label}
