@@ -39,6 +39,7 @@ const OrgInvoices: NextPageWithLayout = () => {
                 <Tabs.Panel id="team" label="Team" />
                 <Tabs.Panel id="billing" label="Billing" />
                 <Tabs.Panel id="invoices" label="Invoices" />
+                <Tabs.Panel id="apps" label="OAuth Apps" />
               </Tabs>
             </nav>
           </div>

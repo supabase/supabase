@@ -7,9 +7,9 @@ import { useStore } from 'hooks'
 import { useParams } from 'common/hooks'
 import Loading from 'components/ui/Loading'
 import { OrganizationLayout } from 'components/layouts'
-import { GeneralSettings } from 'components/interfaces/Organization'
+import { OAuthApps } from 'components/interfaces/Organization'
 
-const OrgGeneralSettings: NextPageWithLayout = () => {
+const OrgOAuthApps: NextPageWithLayout = () => {
   const { ui } = useStore()
   const { slug } = useParams()
   const router = useRouter()
@@ -30,9 +30,9 @@ const OrgGeneralSettings: NextPageWithLayout = () => {
               <Tabs
                 size="small"
                 type="underlined"
-                activeId="general"
+                activeId="apps"
                 onChange={(id: any) => {
-                  if (id !== 'general') router.push(`/org/${slug}/${id}`)
+                  if (id !== 'apps') router.push(`/org/${slug}/${id}`)
                 }}
               >
                 <Tabs.Panel id="general" label="General" />
@@ -45,7 +45,7 @@ const OrgGeneralSettings: NextPageWithLayout = () => {
           </div>
 
           <div className="mb-8">
-            <GeneralSettings />
+            <OAuthApps />
           </div>
         </div>
       )}
@@ -53,5 +53,5 @@ const OrgGeneralSettings: NextPageWithLayout = () => {
   )
 }
 
-OrgGeneralSettings.getLayout = (page) => <OrganizationLayout>{page}</OrganizationLayout>
-export default observer(OrgGeneralSettings)
+OrgOAuthApps.getLayout = (page) => <OrganizationLayout>{page}</OrganizationLayout>
+export default observer(OrgOAuthApps)
