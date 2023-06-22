@@ -31,12 +31,10 @@ const StorageMenu = () => {
     | 'logs'
 
   const storageExplorerStore = useStorageStore()
-  const { data, isLoading, isError } = useBucketsQuery({ projectRef: ref })
+  const { data, isLoading, isError, isSuccess } = useBucketsQuery({ projectRef: ref })
   const { openDeleteBucketModal } = storageExplorerStore || {}
 
   const buckets = data ?? []
-
-  console.log({ isError })
 
   return (
     <>
@@ -82,13 +80,24 @@ const StorageMenu = () => {
           <div className="">
             <div>
               <Menu.Group title="All buckets" />
-              {isLoading ? (
+
+              {isLoading && (
                 <div className="space-y-2 mx-2">
                   <ShimmeringLoader className="!py-2.5" />
                   <ShimmeringLoader className="!py-2.5" />
                   <ShimmeringLoader className="!py-2.5" />
                 </div>
-              ) : (
+              )}
+
+              {isError && (
+                <div className="px-2">
+                  <Alert variant="warning" title="Failed to fetch buckets">
+                    Please refresh to try again.
+                  </Alert>
+                </div>
+              )}
+
+              {isSuccess && (
                 <>
                   {buckets.length === 0 && (
                     <div className="px-2">
