@@ -98,18 +98,18 @@ const SideBarContent = observer(() => {
         {IS_PLATFORM && (
           <div className="my-4 mx-3 space-y-1 px-3">
             <div className="flex items-center">
-              {showCmdkHelper && (
-                <Dropdown
-                  align="start"
-                  side="bottom"
-                  sideOffset={3}
-                  className="max-w-[210px]"
-                  overlay={[
-                    <Dropdown.Item key="new-blank-query" onClick={() => handleNewQuery()}>
-                      <div className="space-y-1">
-                        <p className="block text-scale-1200">New blank query</p>
-                      </div>
-                    </Dropdown.Item>,
+              <Dropdown
+                align="start"
+                side="bottom"
+                sideOffset={3}
+                className="max-w-[210px] this-class-is-no-bueno"
+                overlay={[
+                  <Dropdown.Item key="new-blank-query" onClick={() => handleNewQuery()}>
+                    <div className="space-y-1">
+                      <p className="block text-scale-1200">New blank query</p>
+                    </div>
+                  </Dropdown.Item>,
+                  showCmdkHelper ? (
                     <Dropdown.Item
                       key="new-ai-query"
                       onClick={() => {
@@ -120,20 +120,20 @@ const SideBarContent = observer(() => {
                       <div className="space-y-1">
                         <p className="block text-scale-1200">New AI query</p>
                       </div>
-                    </Dropdown.Item>,
-                  ]}
+                    </Dropdown.Item>
+                  ) : null,
+                ]}
+              >
+                <Button
+                  block
+                  icon={<IconPlus />}
+                  type="primary"
+                  disabled={isLoading}
+                  style={{ justifyContent: 'start' }}
                 >
-                  <Button
-                    block
-                    icon={<IconPlus />}
-                    type="primary"
-                    disabled={isLoading}
-                    style={{ justifyContent: 'start' }}
-                  >
-                    New query
-                  </Button>
-                </Dropdown>
-              )}
+                  New query
+                </Button>
+              </Dropdown>
             </div>
             <Input
               size="tiny"
