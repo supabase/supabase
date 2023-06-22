@@ -60,10 +60,7 @@ const RefSectionHandler = (props: RefSectionHandlerProps) => {
   const pageTitle = getPageTitle()
   const section = props.sections.find((section) => section.slug === slug)
   const fullTitle = `${pageTitle}${section ? ` - ${section.title}` : ''}`
-  const path = router.asPath
-    .split('/')
-    .filter((segment) => segment !== 'crawlers')
-    .join('/')
+  const path = router.asPath.replace('/crawlers', '')
 
   return (
     <>
