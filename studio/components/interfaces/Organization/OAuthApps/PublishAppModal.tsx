@@ -2,7 +2,10 @@ import clsx from 'clsx'
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
 
 import { useParams } from 'common'
-import { useOAuthAppCreateMutation } from 'data/oauth/oauth-app-create-mutation'
+import {
+  OAuthAppCreateResponse,
+  useOAuthAppCreateMutation,
+} from 'data/oauth/oauth-app-create-mutation'
 import { useOAuthAppUpdateMutation } from 'data/oauth/oauth-app-update-mutation'
 import { OAuthApp } from 'data/oauth/oauth-apps-query'
 import { useStore } from 'hooks'
@@ -14,9 +17,15 @@ export interface PublishAppModalProps {
   visible: boolean
   selectedApp?: OAuthApp
   onClose: () => void
+  onCreateSuccess: (app: OAuthAppCreateResponse) => void
 }
 
-const PublishAppModal = ({ visible, selectedApp, onClose }: PublishAppModalProps) => {
+const PublishAppModal = ({
+  visible,
+  selectedApp,
+  onClose,
+  onCreateSuccess,
+}: PublishAppModalProps) => {
   const { ui } = useStore()
   const { slug } = useParams()
   const uploadButtonRef = useRef<any>()
@@ -96,12 +105,19 @@ const PublishAppModal = ({ visible, selectedApp, onClose }: PublishAppModalProps
     if (selectedApp === undefined) {
       // Create application
       try {
-        await createOAuthApp({ slug, name, website, redirect_uris, icon: uploadedIconUrl })
+        const res = await createOAuthApp({
+          slug,
+          name,
+          website,
+          redirect_uris,
+          icon: uploadedIconUrl,
+        })
         ui.setNotification({
           category: 'success',
           message: `Successfully created OAuth app "${name}"!`,
         })
         onClose()
+        onCreateSuccess(res)
       } catch (error: any) {
         setSubmitting(false)
         ui.setNotification({
@@ -163,7 +179,11 @@ const PublishAppModal = ({ visible, selectedApp, onClose }: PublishAppModalProps
               <Modal.Content>
                 <div className="py-4 flex items-start justify-between gap-10">
                   <div className="space-y-4 w-full">
-                    <Input id="name" label="Application name"></Input>
+                    <Input
+                      id="name"
+                      label="Application name"
+                      descriptionText={selectedApp?.id && `ID: ${selectedApp.id}`}
+                    ></Input>
                     <Input
                       id="website"
                       label="Website URL"
