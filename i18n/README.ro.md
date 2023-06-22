@@ -39,7 +39,7 @@ Pentru a vedea cum să contribui, vizitați [Getting Started](../DEVELOPERS.md)
 ## Status
 
 - [x] Alpha: Testăm Supabase cu un set închis de clienți
-- [x] Public Alpha: Oricine se poate înscrie la [app.supabase.com](https://app.supabase.com). Dar fiți blânzi cu noi, există câteva probleme
+- [x] Public Alpha: Oricine se poate înscrie la [supabase.com/dashboard](https://supabase.com/dashboard). Dar fiți blânzi cu noi, există câteva probleme
 - [x] Public Beta: Suficient de stabilă pentru majoritatea cazurilor de utilizare non-întreprindere
 - [ ] Public: Disponibilitate generală [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
 
@@ -55,7 +55,7 @@ Supabase este o combinație de instrumente open source. Construim caracteristici
 
 **Arhitectură**
 
-Supabase este o [platformă găzduită](https://app.supabase.com). Vă puteți înscrie și puteți începe să utilizați Supabase fără a instala nimic.
+Supabase este o [platformă găzduită](https://supabase.com/dashboard). Vă puteți înscrie și puteți începe să utilizați Supabase fără a instala nimic.
 Puteți, de asemenea, [auto-hosting](https://supabase.com/docs/guides/hosting/overview) și [dezvolta local](https://supabase.com/docs/guides/local-development).
 
 ![Arhitectură](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
