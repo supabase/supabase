@@ -101,7 +101,7 @@ function IntegrationPartnersPage(props: Props) {
           url: `https://supabase.com/partners`,
           images: [
             {
-              url: `https://supabase.com${router.basePath}/images/product/database/database-og.jpg`, // TODO
+              url: `https://supabase.com${router.basePath}/images/og/integrations.png`, // TODO
             },
           ],
         }}

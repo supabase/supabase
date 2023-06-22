@@ -15,6 +15,7 @@ test(`static elements`, async () => {
   await screen.findByText('Total Requests')
   await screen.findByText('Response Errors')
   await screen.findByText('Response Speed')
+  await screen.findByText('Network Traffic')
   await screen.findByText(/Last 24 hours/)
   await screen.findByText(/Custom/)
 })

@@ -129,5 +129,5 @@ packages/ui/tokens/**/*.json
 gcloud.json
 
 # sitemaps
-apps/www/public/*.xml
-apps/docs/public/*.xml
+# apps/www/public/*.xml
+# apps/docs/public/*.xml

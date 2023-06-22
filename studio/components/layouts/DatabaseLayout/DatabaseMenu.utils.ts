@@ -70,6 +70,12 @@ export const generateDatabaseMenu = (
               },
             ]
           : []),
+        {
+          name: 'Migrations',
+          key: 'migrations',
+          url: `/project/${ref}/database/migrations`,
+          items: [],
+        },
       ],
     },
   ]
