@@ -2,6 +2,7 @@ import { Markdown } from 'components/interfaces/Markdown'
 import { Integration, IntegrationProjectConnection } from 'data/integrations/integrations-query'
 import dayjs from 'dayjs'
 import { useStore } from 'hooks'
+import { BASE_PATH } from 'lib/constants'
 import Image from 'next/image'
 
 import React from 'react'
@@ -142,7 +143,7 @@ const IntegrationConnection = React.forwardRef<HTMLLIElement, IntegrationConnect
                 <HandleIcon type={type} />
               ) : (
                 <img
-                  src={`/img/icons/frameworks/${connection.metadata.framework}.svg`}
+                  src={`${BASE_PATH}/img/icons/frameworks/${connection.metadata.framework}.svg`}
                   width={21}
                   height={21}
                   alt={`icon`}
