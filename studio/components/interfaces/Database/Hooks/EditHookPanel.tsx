@@ -5,9 +5,8 @@ import { Button, SidePanel, Form, Input, Listbox, Checkbox, Radio, Badge, Modal 
 
 import { useStore } from 'hooks'
 import { useParams } from 'common/hooks'
-import { tryParseJson, uuidv4 } from 'lib/helpers'
+import { tryParseJson, uuidv4, isValidHttpUrl } from 'lib/helpers'
 import HTTPRequestFields from './HTTPRequestFields'
-import { isValidHttpUrl } from './Hooks.utils'
 import { AVAILABLE_WEBHOOK_TYPES, HOOK_EVENTS } from './Hooks.constants'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { FormSection, FormSectionLabel, FormSectionContent } from 'components/ui/Forms'
