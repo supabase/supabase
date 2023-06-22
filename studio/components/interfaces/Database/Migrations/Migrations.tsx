@@ -24,8 +24,6 @@ const Wrappers = () => {
       ? data?.result ?? []
       : data?.result.filter((migration) => migration.version.includes(search)) ?? []
 
-  console.log({ data })
-
   return (
     <>
       <div>
