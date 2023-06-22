@@ -6,9 +6,9 @@ export const meta = {
   description: 'Securing your Serverless API with Postgres Row Level Security.',
 }
 
-Supabase provides two default keys when you create a project: an `anon` key, and a `service_role` key. You can find both keys in the [API Settings](https://app.supabase.com/project/_/settings/api).
+Supabase provides two default keys when you create a project: an `anon` key, and a `service_role` key. You can find both keys in the [API Settings](https://supabase.com/dashboard/project/_/settings/api).
 
-The Serverless APIs are designed to work with Postgres Row Level Security (RLS). These keys both map to Postgres roles. You can find an `anon` user and a `service_role` user in the [Roles](http://app.supabase.com/project/_/database/roles) section of the dashboard.
+The Serverless APIs are designed to work with Postgres Row Level Security (RLS). These keys both map to Postgres roles. You can find an `anon` user and a `service_role` user in the [Roles](http://supabase.com/dashboard/project/_/database/roles) section of the dashboard.
 
 The keys are both long-lived JWTs. If you decode these keys, you will see that they contain the "role", an "issued date", and an "expiry date" ~10 years in the future.
 
