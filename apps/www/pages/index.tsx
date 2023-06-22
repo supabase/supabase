@@ -11,14 +11,13 @@ import pageData from '../data/home/pageData'
 const Highlights = dynamic(() => import('~/components/Highlights/index'))
 const UseSupabaseTo = dynamic(() => import('~/components/UseSupabaseTo'))
 const Products = dynamic(() => import('~/components/Products/index'))
-const BuiltExamples = dynamic(() => import('components/BuiltWithSupabase/index'))
+const ExampleAppsSection = dynamic(() => import('components/Sections/ExampleAppsSection'))
 const TimedTabsSection = dynamic(() => import('~/components/Sections/TimedTabsSection'))
-const MadeForDevelopers = dynamic(() => import('components/MadeForDevelopers/index'))
-const AdminAccess = dynamic(() => import('components/AdminAccess/index'))
-const CTABanner = dynamic(() => import('components/CTABanner/index'))
+const HomepageMetricsSection = dynamic(() => import('components/Sections/HomepageMetricsSection'))
+const DashboardFeatures = dynamic(() => import('components/DashboardFeatures/index'))
 const CommunitySlider = dynamic(() => import('components/Sections/CommunitySlider'))
-const CustomerStories = dynamic(() => import('components/CustomerStories'))
-const TwitterSocialSection = dynamic(() => import('~/components/TwitterSocialSection'))
+const EnterpriseCta = dynamic(() => import('~/components/Sections/EnterpriseCta'))
+const CTABanner = dynamic(() => import('components/CTABanner/index'))
 
 type Props = { customerStories: PostTypes[] }
 
@@ -28,14 +27,13 @@ const Index = ({ customerStories }: Props) => {
       <Hero {...pageData.heroSection} />
       <Highlights {...pageData.highlightsSection} />
       <UseSupabaseTo {...pageData.useSupabaseTo} />
+      <HomepageMetricsSection />
       <Products {...pageData.productsSection} />
+      <DashboardFeatures {...pageData.dashboardFeatures} />
       <TimedTabsSection {...pageData.APIsection} />
-      {/* <TwitterSocialSection /> */}
-      {/* <BuiltExamples /> */}
-      {/* <MadeForDevelopers /> */}
-      {/* <AdminAccess /> */}
-      {/* <CustomerStories customerStories={customerStories} /> */}
+      <ExampleAppsSection {...pageData.examplesSection} />
       <CommunitySlider {...pageData.quotesSection} />
+      <EnterpriseCta />
       <CTABanner hasLogo />
     </Layout>
   )

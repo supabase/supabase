@@ -199,7 +199,6 @@ const Products = (props: any) => {
           classname="col-span-full md:col-span-2"
         />
       </dl>
-      <BackedBy className="pt-8" layout="horizontal" />
     </SectionContainer>
   )
 }

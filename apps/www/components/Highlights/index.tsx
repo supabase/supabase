@@ -22,7 +22,7 @@ const Highlights = (props: Props) => {
   })
 
   return (
-    <SectionContainer className="space-y-16 pb-0">
+    <SectionContainer className="space-y-16 max-w-7xl pb-0">
       <dl className="grid grid-cols-1 gap-y-4 sm:grid-cols-2 md:grid-cols-2 md:gap-8 xl:grid-cols-3 lg:gap-x-8">
         {Panels}
       </dl>

@@ -9,7 +9,7 @@ const CTABanner = (props: any) => {
         ${darkerBg ? 'dark:bg-dark-900' : ''} px-16
       `}
     >
-      {props.hasLogo && <div>logo</div>}
+      {props.hasLogo && <div></div>}
       <div className="col-span-12">
         <h2 className="h2">
           <span className="text-scale-900">Build in a weekend,</span>

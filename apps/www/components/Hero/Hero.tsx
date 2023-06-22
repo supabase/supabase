@@ -32,7 +32,7 @@ const Hero = (props: Props) => {
   return (
     <>
       <div className="relative">
-        <SectionContainer className="">
+        <SectionContainer className="lg:!py-40">
           <div className="relative">
             <div className="mx-auto">
               <div className="mx-auto max-w-2xl lg:col-span-6 lg:flex lg:items-center justify-center text-center">
