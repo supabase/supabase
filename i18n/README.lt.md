@@ -12,9 +12,9 @@
 - [x] Prieglobos Postgres duomenų bazė. [Dokumentai](https://supabase.com/docs/guides/database)
 - [x] Autentiškumo nustatymas ir autorizavimas. [Dokumentai](https://supabase.com/docs/guides/auth)
 - [x] Automatiškai generuojamos API.
-  - [x] REST. [Dokumentai](https://supabase.com/docs/guides/database/api#rest-api)
-  - [x] GraphQL. [Dokumentai](https://supabase.com/docs/guides/database/api#graphql-api)
-  - [x] Realaus laiko prenumeratos. [Dokumentai](https://supabase.com/docs/guides/database/api#realtime-api)
+  - [x] REST. [Dokumentai](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL. [Dokumentai](https://supabase.com/docs/guides/api#graphql-api-overview)
+  - [x] Realaus laiko prenumeratos. [Dokumentai](https://supabase.com/docs/guides/api#realtime-api-overview)
 - [x] Funkcijos.
   - [x] Duomenų bazės funkcijos. [Dokumentai](https://supabase.com/docs/guides/database/functions)
   - [x] Kraštų funkcijos [Docs](https://supabase.com/docs/guides/functions)
