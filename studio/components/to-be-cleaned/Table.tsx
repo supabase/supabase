@@ -79,6 +79,7 @@ type TdProps = {
   colSpan?: number
   className?: string
   style?: React.CSSProperties
+  align?: 'left' | 'center' | 'right' | 'justify' | 'char' | undefined
 } & React.HTMLProps<HTMLTableCellElement>
 const Td: React.FC<TdProps> = ({ children, colSpan, className, style, ...rest }) => {
   return (
