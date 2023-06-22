@@ -21,6 +21,8 @@ export async function getBuckets({ projectRef }: BucketsVariables, signal?: Abor
   if (!projectRef) throw new Error('projectRef is required')
 
   const response = await get(`${API_URL}/storage/${projectRef}/buckets`, { signal })
+  throw new Error('test')
+
   if (response.error) throw response.error
   return response as Bucket[]
 }

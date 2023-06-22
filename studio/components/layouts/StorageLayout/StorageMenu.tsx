@@ -31,10 +31,12 @@ const StorageMenu = () => {
     | 'logs'
 
   const storageExplorerStore = useStorageStore()
-  const { data, isLoading } = useBucketsQuery({ projectRef: ref })
+  const { data, isLoading, isError } = useBucketsQuery({ projectRef: ref })
   const { openDeleteBucketModal } = storageExplorerStore || {}
 
   const buckets = data ?? []
+
+  console.log({ isError })
 
   return (
     <>

@@ -166,9 +166,10 @@ const StorageExplorer = observer(({ bucket }) => {
   }
 
   const onCopyUrl = (name, url) => {
-    const formattedUrl = customDomainData?.customDomain
-      ? url.replace(apiUrl, `https://${customDomainData.customDomain.hostname}`)
-      : url
+    const formattedUrl =
+      customDomainData?.customDomain.status === 'active'
+        ? url.replace(apiUrl, `https://${customDomainData.customDomain.hostname}`)
+        : url
     copyToClipboard(formattedUrl, () => {
       ui.setNotification({
         category: 'success',
