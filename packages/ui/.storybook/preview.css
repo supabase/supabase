@@ -2,16 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+@import './../build/css/source/global.css';
 @import './../build/css/themes/dark.css';
 @import './../build/css/themes/light.css';
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    /* --background: 0 0% 100%;
     --foreground: 240 10% 3.9%;
 
     --muted: 240 4.8% 95.9%;
@@ -30,7 +27,7 @@
     --primary-foreground: 0 0% 98%;
 
     --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
+    --secondary-foreground: 240 5.9% 10%; */
 
     --accent: 240 4.8% 95.9%;
     --accent-foreground: ;
@@ -44,7 +41,7 @@
   }
 
   .dark {
-    --background: 240 10% 3.9%;
+    /* --background: 240 10% 3.9%;
     --foreground: 0 0% 98%;
 
     --muted: 240 3.7% 15.9%;
@@ -63,7 +60,7 @@
     --primary-foreground: 240 5.9% 10%;
 
     --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
+    --secondary-foreground: 0 0% 98%; */
 
     --accent: 240 3.7% 15.9%;
     --accent-foreground: ;
@@ -109,7 +106,6 @@
   }
   body {
     @apply bg-background text-foreground;
-    @apply bg-body text-body;
     font-feature-settings: 'rlig' 1, 'calt' 1;
     font-family: 'Circular std';
   }

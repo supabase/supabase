@@ -52,8 +52,24 @@ StyleDictionary.registerTransform({
   type: 'value',
   matcher: (prop) => prop.type === 'color',
   transformer: (prop) => {
-    const color = Color(prop.original.value).hsl()
-    return color.string()
+    if (!prop.original.value) {
+      console.error(`No colorvalue detected for ${prop.name}.`)
+    }
+
+    if (prop.original.value === '#') {
+      console.error(`Only "#" as value for ${prop.name}. Must use a correct format like "#FFF"`)
+    }
+
+    const color = Color(prop?.original?.value)
+
+    if (!color) {
+      console.error('No color')
+    }
+
+    console.log(color)
+
+    const hsl = Color(prop?.original?.value).hsl()
+    return hsl.string()
   },
 })
 
@@ -134,7 +150,7 @@ function getStyleDictionaryConfig(
           'ts/color/css/hexrgba',
           'ts/color/modifiers',
           'name/cti/kebab',
-          // 'color/rgb',
+          'color/rgb',
         ],
         buildPath: 'build/css/',
         files: [
