@@ -13,7 +13,7 @@ import { delete_ } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import InviteMemberButton from './InviteMemberButton'
 import MembersView from './MembersView'
-import { getRolesManagementPermissions, hasMultipleOwners } from './TeamSettings.utils'
+import { hasMultipleOwners, useGetRolesManagementPermissions } from './TeamSettings.utils'
 
 const TeamSettings = () => {
   const { ui } = useStore()
@@ -30,10 +30,11 @@ const TeamSettings = () => {
   const members = detailData?.members ?? []
   const roles = rolesData?.roles ?? []
 
-  const { rolesAddable } =
-    selectedOrganization !== undefined
-      ? getRolesManagementPermissions(selectedOrganization?.id, roles, permissions ?? [])
-      : { rolesAddable: [] as number[] }
+  const { rolesAddable } = useGetRolesManagementPermissions(
+    selectedOrganization?.id,
+    roles,
+    permissions ?? []
+  )
 
   const [isLeaving, setIsLeaving] = useState(false)
   const [searchString, setSearchString] = useState('')
