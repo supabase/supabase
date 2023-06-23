@@ -13,7 +13,7 @@ import { useOrganizationDetailQuery } from 'data/organizations/organization-deta
 import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { IconSearch, IconUser, Input } from 'ui'
+import { Button, IconInfo, IconSearch, IconUser, Input } from 'ui'
 import LogDetailsPanel from './LogDetailsPanel'
 
 // [Joshen considerations]
@@ -72,6 +72,7 @@ const AuditLogs = () => {
                 <Table.th key="action">Action</Table.th>,
                 <Table.th key="target">Target</Table.th>,
                 <Table.th key="date">Date</Table.th>,
+                <Table.th key="actions"></Table.th>,
               ]}
               body={
                 sortedLogs?.map((log) => {
@@ -84,10 +85,15 @@ const AuditLogs = () => {
                     (org) => org.slug === log.permission_group.org_slug
                   )
 
+                  const hasStatusCode = log.action.metadata[0]?.status !== undefined
                   const userIcon =
-                    user?.invited_id || user?.username === user?.primary_email ? (
-                      <div className="flex p-2 border-2 rounded-full border-scale-700">
-                        <IconUser size={20} strokeWidth={2} />
+                    user === undefined ? (
+                      <div className="flex h-[40px] w-[40px] flex items-center justify-center border-2 rounded-full border-scale-700">
+                        <p>?</p>
+                      </div>
+                    ) : user?.invited_id || user?.username === user?.primary_email ? (
+                      <div className="flex h-[40px] w-[40px] flex items-center justify-center border-2 rounded-full border-scale-700">
+                        <IconUser size={18} strokeWidth={2} />
                       </div>
                     ) : (
                       <Image
@@ -110,15 +116,17 @@ const AuditLogs = () => {
                           {userIcon}
                           <div>
                             <p className="text-scale-1100">{user?.username ?? log.actor.id}</p>
-                            <p className="mt-0.5 text-xs text-scale-1000">{role?.name}</p>
+                            {role && <p className="mt-0.5 text-xs text-scale-1000">{role?.name}</p>}
                           </div>
                         </div>
                       </Table.td>
                       <Table.td>
                         <div className="flex items-center space-x-2">
-                          <p className="bg-scale-400 rounded px-1 flex items-center justify-center text-xs font-mono border">
-                            {log.action.metadata[0].status}
-                          </p>
+                          {hasStatusCode && (
+                            <p className="bg-scale-400 rounded px-1 flex items-center justify-center text-xs font-mono border">
+                              {log.action.metadata[0].status}
+                            </p>
+                          )}
                           <p className="max-w-[200px] truncate">{log.action.name}</p>
                         </div>
                       </Table.td>
@@ -131,6 +139,9 @@ const AuditLogs = () => {
                         </p>
                       </Table.td>
                       <Table.td>{dayjs(log.timestamp).format('DD MMM YYYY, HH:mm:ss')}</Table.td>
+                      <Table.td align="right">
+                        <Button type="default">View details</Button>
+                      </Table.td>
                     </Table.tr>
                   )
                 }) ?? []

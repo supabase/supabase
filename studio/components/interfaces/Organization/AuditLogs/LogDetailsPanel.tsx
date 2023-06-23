@@ -2,6 +2,8 @@ import { useParams } from 'common'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms'
 import { OrganizationAuditLog } from 'data/organizations/organization-audit-logs-query'
 import { useOrganizationDetailQuery } from 'data/organizations/organization-detail-query'
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useProjectsQuery } from 'data/projects/projects-query'
 import dayjs from 'dayjs'
 import { Button, Input, SidePanel } from 'ui'
 
@@ -11,7 +13,15 @@ export interface LogDetailsPanelProps {
 }
 
 const LogDetailsPanel = ({ selectedLog, onClose }: LogDetailsPanelProps) => {
-  console.log({ selectedLog })
+  const { data: projects } = useProjectsQuery()
+  const { data: organizations } = useOrganizationsQuery()
+
+  const project = projects?.find(
+    (project) => project.ref === selectedLog?.permission_group.project_ref
+  )
+  const organization = organizations?.find(
+    (org) => org.slug === selectedLog?.permission_group.org_slug
+  )
 
   return (
     <SidePanel
@@ -79,6 +89,7 @@ const LogDetailsPanel = ({ selectedLog, onClose }: LogDetailsPanelProps) => {
             label="Organization slug"
             disabled={(selectedLog?.permission_group.org_slug ?? '').length === 0}
             value={selectedLog?.permission_group.org_slug ?? 'None'}
+            descriptionText={organization?.name && `Organization: ${organization.name}`}
           />
           <Input
             readOnly
@@ -86,6 +97,7 @@ const LogDetailsPanel = ({ selectedLog, onClose }: LogDetailsPanelProps) => {
             label="Project reference"
             disabled={(selectedLog?.permission_group.project_ref ?? '').length === 0}
             value={selectedLog?.permission_group.project_ref ?? 'None'}
+            descriptionText={project?.name && `Project: ${project.name}`}
           />
         </FormSectionContent>
       </FormSection>
