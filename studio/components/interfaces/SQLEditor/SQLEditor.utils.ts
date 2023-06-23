@@ -34,3 +34,10 @@ export const createSqlSnippetSkeleton = ({
     },
   }
 }
+
+export const simplifyString = (inputString: string): string => {
+  const lines = inputString.split('\n')
+  const firstLine = lines[0].replace(/^--\s*/, '')
+
+  return firstLine
+}

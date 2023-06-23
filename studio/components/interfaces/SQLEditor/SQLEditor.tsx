@@ -8,11 +8,14 @@ import useLatest from 'hooks/misc/useLatest'
 import MonacoEditor, { IStandaloneCodeEditor } from './MonacoEditor'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
 import { useLocalStorage } from 'hooks'
+import { useStore } from 'hooks'
+import { simplifyString } from './SQLEditor.utils'
 
 const SQLEditor = () => {
   const { ref, id } = useParams()
   const { project } = useProjectContext()
   const snap = useSqlEditorStateSnapshot()
+  const { ui } = useStore()
 
   const [savedSplitSize, setSavedSplitSize] = useLocalStorage(
     'supabase_sql-editor-split-size',
@@ -57,6 +60,21 @@ const SQLEditor = () => {
       const selection = editor.getSelection()
       const selectedValue = selection ? editor.getModel()?.getValueInRange(selection) : undefined
       const overrideSql = selectedValue || editorRef.current?.getValue()
+
+      // if snippet has the default "Untitled query" name,
+      // rename it based on the SQL currently running
+      if (snippet.snippet.name === 'Untitled query') {
+        try {
+          snap.renameSnippet(idRef.current, simplifyString(snippet.snippet.content.sql), '')
+          return Promise.resolve()
+        } catch (error: any) {
+          ui.setNotification({
+            error,
+            category: 'error',
+            message: `Failed to rename query: ${error.message}`,
+          })
+        }
+      }
 
       execute({
         projectRef: project.ref,
