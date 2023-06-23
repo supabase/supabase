@@ -29,7 +29,7 @@ If you are using the `pages` directory, check out [Auth Helpers in Next.js Pages
 
 Use the `create-next-app` command and the `with-supabase` template to automate the configuration of cookie-based auth with the Next.js Auth Helpers.
 
-```sh
+```sh Terminal
 npx create-next-app -e with-supabase
 ```
 
@@ -54,7 +54,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
 
 Run the development server and navigate to http://localhost:3000.
 
-```bash
+```sh Terminal
 npm run dev
 ```
 
@@ -62,28 +62,9 @@ npm run dev
 
 ### Install Next.js Auth Helpers library
 
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="npm"
->
-
-<TabPanel id="npm" label="npm">
-
-```sh
-npm install @supabase/auth-helpers-nextjs
+```sh Terminal
+npm install @supabase/auth-helpers-nextjs @supabase/supabase-js
 ```
-
-</TabPanel>
-<TabPanel id="yarn" label="Yarn">
-
-```sh
-yarn add @supabase/auth-helpers-nextjs
-```
-
-</TabPanel>
-</Tabs>
 
 ### Declare Environment Variables
 
