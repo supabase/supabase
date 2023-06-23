@@ -47,7 +47,11 @@ const Footer = (props: Props) => {
             </Link>
             <div className="flex items-center gap-2 -ml-2">
               <Button type="text" asChild>
-                <a href="https://github.com/supabase/supabase" target="_blank" rel="noreferrer noopener">
+                <a
+                  href="https://github.com/supabase/supabase"
+                  target="_blank"
+                  rel="noreferrer noopener"
+                >
                   <svg
                     width="17"
                     height="17"
