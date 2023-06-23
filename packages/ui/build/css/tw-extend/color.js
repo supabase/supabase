@@ -1,166 +1,470 @@
 module.exports = {
-"theme-variables-brand": {
-  cssVariable: "var(--theme-variables-brand)",
-  value: "hsl(153.10000000000002, 60.2%, 52.7%)"
+"colors-black": {
+  cssVariable: "var(--colors-black)",
+  value: "#000000"
 },
-"theme-variables-background": {
-  cssVariable: "var(--theme-variables-background)",
-  value: "hsl(0, 0%, 13.7%)"
+"colors-white": {
+  cssVariable: "var(--colors-white)",
+  value: "#ffffff"
 },
-"theme-variables-background-body": {
-  cssVariable: "var(--theme-variables-background-body)",
-  value: "hsl(0, 0%, 11%)"
+"colors-Gray-Dark-1": {
+  cssVariable: "var(--colors-gray-dark-1)",
+  value: "#161616"
 },
-"theme-variables-background-body-alt": {
-  cssVariable: "var(--theme-variables-background-body-alt)",
-  value: "hsl(0, 0%, 8.6%)"
+"colors-Gray-Dark-2": {
+  cssVariable: "var(--colors-gray-dark-2)",
+  value: "#1c1c1c"
 },
-"theme-variables-warning": {
-  cssVariable: "var(--theme-variables-warning)",
-  value: "hsl(26.899999999999977, 93.8%, 56.1%)"
+"colors-Gray-Dark-3": {
+  cssVariable: "var(--colors-gray-dark-3)",
+  value: "#232323"
 },
-"theme-variables-danger": {
-  cssVariable: "var(--theme-variables-danger)",
-  value: "hsl(0, 100%, 64.7%)"
+"colors-Gray-Dark-4": {
+  cssVariable: "var(--colors-gray-dark-4)",
+  value: "#282828"
 },
-"theme-variables-success": {
-  cssVariable: "var(--theme-variables-success)",
-  value: "hsl(123.80000000000001, 100%, 66.3%)"
+"colors-Gray-Dark-5": {
+  cssVariable: "var(--colors-gray-dark-5)",
+  value: "#2e2e2e"
 },
-"theme-variables-text-body": {
-  cssVariable: "var(--theme-variables-text-body)",
-  value: "hsl(0, 0%, 92.9%)"
+"colors-Gray-Dark-6": {
+  cssVariable: "var(--colors-gray-dark-6)",
+  value: "#343434"
 },
-"backgroundColor-DEFAULT": {
-  cssVariable: "var(--background-color-default)",
-  value: "hsl(0, 0%, 13.7%)"
+"colors-Gray-Dark-7": {
+  cssVariable: "var(--colors-gray-dark-7)",
+  value: "#3e3e3e"
 },
-"backgroundColor-body": {
-  cssVariable: "var(--background-color-body)",
-  value: "hsl(0, 0%, 11%)"
+"colors-Gray-Dark-8": {
+  cssVariable: "var(--colors-gray-dark-8)",
+  value: "#505050"
 },
-"backgroundColor-body-alt": {
-  cssVariable: "var(--background-color-body-alt)",
-  value: "hsl(0, 0%, 8.6%)"
+"colors-Gray-Dark-9": {
+  cssVariable: "var(--colors-gray-dark-9)",
+  value: "#707070"
 },
-"backgroundColor-selection": {
-  cssVariable: "var(--background-color-selection)",
-  value: "hsl(91.8 0% 17.3%)"
+"colors-Gray-Dark-10": {
+  cssVariable: "var(--colors-gray-dark-10)",
+  value: "#7e7e7e"
 },
-"backgroundColor-control": {
-  cssVariable: "var(--background-color-control)",
-  value: "hsl(91.8 0% 10.4%)"
+"colors-Gray-Dark-11": {
+  cssVariable: "var(--colors-gray-dark-11)",
+  value: "#a0a0a0"
 },
-"backgroundColor-success-100": {
-  cssVariable: "var(--background-color-success-100)",
-  value: "hsl(121 43% 48.6%)"
+"colors-Gray-Dark-12": {
+  cssVariable: "var(--colors-gray-dark-12)",
+  value: "#ededed"
 },
-"backgroundColor-success-200": {
-  cssVariable: "var(--background-color-success-200)",
-  value: "hsl(119 37.3% 36.8%)"
+"colors-Gray-Dark-Alpha-1": {
+  cssVariable: "var(--colors-gray-dark-alpha-1)",
+  value: "#00000000"
 },
-"backgroundColor-success-300": {
-  cssVariable: "var(--background-color-success-300)",
-  value: "hsl(114 21.2% 16.6%)"
+"colors-Gray-Dark-Alpha-2": {
+  cssVariable: "var(--colors-gray-dark-alpha-2)",
+  value: "#ffffff08"
 },
-"backgroundColor-success-DEFAULT": {
-  cssVariable: "var(--background-color-success-default)",
-  value: "hsl(123.80000000000001, 100%, 66.3%)"
+"colors-Gray-Dark-Alpha-3": {
+  cssVariable: "var(--colors-gray-dark-alpha-3)",
+  value: "#ffffff0f"
 },
-"backgroundColor-warning-100": {
-  cssVariable: "var(--background-color-warning-100)",
-  value: "hsl(26.2 64.9% 41.4%)"
+"colors-Gray-Dark-Alpha-4": {
+  cssVariable: "var(--colors-gray-dark-alpha-4)",
+  value: "#ffffff14"
 },
-"backgroundColor-warning-200": {
-  cssVariable: "var(--background-color-warning-200)",
-  value: "hsl(25.7 57.5% 31.7%)"
+"colors-Gray-Dark-Alpha-5": {
+  cssVariable: "var(--colors-gray-dark-alpha-5)",
+  value: "#ffffff1a"
 },
-"backgroundColor-warning-300": {
-  cssVariable: "var(--background-color-warning-300)",
-  value: "hsl(24.5 32.6% 15.4%)"
+"colors-Gray-Dark-Alpha-6": {
+  cssVariable: "var(--colors-gray-dark-alpha-6)",
+  value: "#ffffff21"
 },
-"backgroundColor-warning-DEFAULT": {
-  cssVariable: "var(--background-color-warning-default)",
-  value: "hsl(26.899999999999977, 93.8%, 56.1%)"
+"colors-Gray-Dark-Alpha-7": {
+  cssVariable: "var(--colors-gray-dark-alpha-7)",
+  value: "#ffffff2b"
 },
-"backgroundColor-danger-100": {
-  cssVariable: "var(--background-color-danger-100)",
-  value: "hsl(2.07 50.9% 46.5%)"
+"colors-Gray-Dark-Alpha-8": {
+  cssVariable: "var(--colors-gray-dark-alpha-8)",
+  value: "#ffffff40"
 },
-"backgroundColor-danger-200": {
-  cssVariable: "var(--background-color-danger-200)",
-  value: "hsl(3.65 46.8% 35%)"
+"colors-Gray-Dark-Alpha-9": {
+  cssVariable: "var(--colors-gray-dark-alpha-9)",
+  value: "#ffffff63"
 },
-"backgroundColor-danger-300": {
-  cssVariable: "var(--background-color-danger-300)",
-  value: "hsl(6.9 29% 16.2%)"
+"colors-Gray-Dark-Alpha-10": {
+  cssVariable: "var(--colors-gray-dark-alpha-10)",
+  value: "#ffffff73"
 },
-"backgroundColor-danger-DEFAULT": {
-  cssVariable: "var(--background-color-danger-default)",
-  value: "hsl(0, 100%, 64.7%)"
+"colors-Gray-Dark-Alpha-11": {
+  cssVariable: "var(--colors-gray-dark-alpha-11)",
+  value: "#ffffff96"
 },
-"borderColor-DEFAULT": {
-  cssVariable: "var(--border-color-default)",
-  value: "hsl(91.8 0% 17.3%)"
+"colors-Gray-Dark-Alpha-12": {
+  cssVariable: "var(--colors-gray-dark-alpha-12)",
+  value: "#ffffffeb"
 },
-"borderColor-body": {
-  cssVariable: "var(--border-color-body)",
-  value: "hsl(91.8 0% 14.6%)"
+"colors-Gray-Light-1": {
+  cssVariable: "var(--colors-gray-light-1)",
+  value: "#fcfcfc"
 },
-"borderColor-body-alt": {
-  cssVariable: "var(--border-color-body-alt)",
-  value: "hsl(91.8 0% 12.2%)"
+"colors-Gray-Light-2": {
+  cssVariable: "var(--colors-gray-light-2)",
+  value: "#f8f8f8"
 },
-"borderColor-selection": {
-  cssVariable: "var(--border-color-selection)",
-  value: "hsl(91.8 0% 53.5%)"
+"colors-Gray-Light-3": {
+  cssVariable: "var(--colors-gray-light-3)",
+  value: "#f3f3f3"
 },
-"borderColor-control": {
-  cssVariable: "var(--border-color-control)",
-  value: "hsl(91.8 0% 20.8%)"
+"colors-Gray-Light-4": {
+  cssVariable: "var(--colors-gray-light-4)",
+  value: "#ededed"
 },
-"textColor-body-DEFAULT": {
-  cssVariable: "var(--text-color-body-default)",
-  value: "hsl(0, 0%, 92.9%)"
+"colors-Gray-Light-5": {
+  cssVariable: "var(--colors-gray-light-5)",
+  value: "#e8e8e8"
 },
-"textColor-body-light": {
-  cssVariable: "var(--text-color-body-light)",
-  value: "hsl(91.8 0% 62.5%)"
+"colors-Gray-Light-6": {
+  cssVariable: "var(--colors-gray-light-6)",
+  value: "#e2e2e2"
 },
-"textColor-body-lighter": {
-  cssVariable: "var(--text-color-body-lighter)",
-  value: "hsl(91.8 0% 43.5%)"
+"colors-Gray-Light-7": {
+  cssVariable: "var(--colors-gray-light-7)",
+  value: "#dbdbdb"
 },
-"textColor-body-lightest": {
-  cssVariable: "var(--text-color-body-lightest)",
-  value: "hsl(91.8 0% 30.2%)"
+"colors-Gray-Light-8": {
+  cssVariable: "var(--colors-gray-light-8)",
+  value: "#c7c7c7"
 },
-"textColor-success-DEFAULT": {
-  cssVariable: "var(--text-color-success-default)",
-  value: "hsl(123.80000000000001, 100%, 66.3%)"
+"colors-Gray-Light-9": {
+  cssVariable: "var(--colors-gray-light-9)",
+  value: "#8f8f8f"
 },
-"textColor-link-DEFAULT": {
-  cssVariable: "var(--text-color-link-default)",
-  value: "hsl(153.10000000000002, 60.2%, 52.7%)"
+"colors-Gray-Light-10": {
+  cssVariable: "var(--colors-gray-light-10)",
+  value: "#858585"
 },
-"textColor-warning-DEFAULT": {
-  cssVariable: "var(--text-color-warning-default)",
-  value: "hsl(26.899999999999977, 93.8%, 56.1%)"
+"colors-Gray-Light-11": {
+  cssVariable: "var(--colors-gray-light-11)",
+  value: "#6f6f6f"
 },
-"textColor-danger-DEFAULT": {
-  cssVariable: "var(--text-color-danger-default)",
-  value: "hsl(0, 100%, 64.7%)"
+"colors-Gray-Light-12": {
+  cssVariable: "var(--colors-gray-light-12)",
+  value: "#171717"
 },
-"textColor-disabled-DEFAULT": {
-  cssVariable: "var(--text-color-disabled-default)",
-  value: "hsl(0 0% 46.5%)"
+"colors-Gray-Light-Alpha-1": {
+  cssVariable: "var(--colors-gray-light-alpha-1)",
+  value: "#00000003"
 },
-"utility-mix-positive": {
-  cssVariable: "var(--utility-mix-positive)",
-  value: "hsl(0, 0%, 100%)"
+"colors-Gray-Light-Alpha-2": {
+  cssVariable: "var(--colors-gray-light-alpha-2)",
+  value: "#00000008"
 },
-"utility-mix-negative": {
-  cssVariable: "var(--utility-mix-negative)",
-  value: "hsl(0, 0%, 0%)"
+"colors-Gray-Light-Alpha-3": {
+  cssVariable: "var(--colors-gray-light-alpha-3)",
+  value: "#0000000d"
+},
+"colors-Gray-Light-Alpha-4": {
+  cssVariable: "var(--colors-gray-light-alpha-4)",
+  value: "#00000012"
+},
+"colors-Gray-Light-Alpha-5": {
+  cssVariable: "var(--colors-gray-light-alpha-5)",
+  value: "#00000017"
+},
+"colors-Gray-Light-Alpha-6": {
+  cssVariable: "var(--colors-gray-light-alpha-6)",
+  value: "#0000001c"
+},
+"colors-Gray-Light-Alpha-7": {
+  cssVariable: "var(--colors-gray-light-alpha-7)",
+  value: "#00000024"
+},
+"colors-Gray-Light-Alpha-8": {
+  cssVariable: "var(--colors-gray-light-alpha-8)",
+  value: "#00000038"
+},
+"colors-Gray-Light-Alpha-9": {
+  cssVariable: "var(--colors-gray-light-alpha-9)",
+  value: "#00000070"
+},
+"colors-Gray-Light-Alpha-10": {
+  cssVariable: "var(--colors-gray-light-alpha-10)",
+  value: "#0000007a"
+},
+"colors-Gray-Light-Alpha-11": {
+  cssVariable: "var(--colors-gray-light-alpha-11)",
+  value: "#0000008f"
+},
+"colors-Gray-Light-Alpha-12": {
+  cssVariable: "var(--colors-gray-light-alpha-12)",
+  value: "#000000e8"
+},
+"colors-Slate-Dark-1": {
+  cssVariable: "var(--colors-slate-dark-1)",
+  value: "#151718"
+},
+"colors-Slate-Dark-2": {
+  cssVariable: "var(--colors-slate-dark-2)",
+  value: "#1a1d1e"
+},
+"colors-Slate-Dark-3": {
+  cssVariable: "var(--colors-slate-dark-3)",
+  value: "#202425"
+},
+"colors-Slate-Dark-4": {
+  cssVariable: "var(--colors-slate-dark-4)",
+  value: "#26292b"
+},
+"colors-Slate-Dark-5": {
+  cssVariable: "var(--colors-slate-dark-5)",
+  value: "#2b2f31"
+},
+"colors-Slate-Dark-6": {
+  cssVariable: "var(--colors-slate-dark-6)",
+  value: "#313538"
+},
+"colors-Slate-Dark-7": {
+  cssVariable: "var(--colors-slate-dark-7)",
+  value: "#3a3f42"
+},
+"colors-Slate-Dark-8": {
+  cssVariable: "var(--colors-slate-dark-8)",
+  value: "#4c5155"
+},
+"colors-Slate-Dark-9": {
+  cssVariable: "var(--colors-slate-dark-9)",
+  value: "#697177"
+},
+"colors-Slate-Dark-10": {
+  cssVariable: "var(--colors-slate-dark-10)",
+  value: "#787f85"
+},
+"colors-Slate-Dark-11": {
+  cssVariable: "var(--colors-slate-dark-11)",
+  value: "#9ba1a6"
+},
+"colors-Slate-Dark-12": {
+  cssVariable: "var(--colors-slate-dark-12)",
+  value: "#ecedee"
+},
+"colors-Slate-Dark-Alpha-1": {
+  cssVariable: "var(--colors-slate-dark-alpha-1)",
+  value: "#00000000"
+},
+"colors-Slate-Dark-Alpha-2": {
+  cssVariable: "var(--colors-slate-dark-alpha-2)",
+  value: "#d5feff08"
+},
+"colors-Slate-Dark-Alpha-3": {
+  cssVariable: "var(--colors-slate-dark-alpha-3)",
+  value: "#d6fbfc0f"
+},
+"colors-Slate-Dark-Alpha-4": {
+  cssVariable: "var(--colors-slate-dark-alpha-4)",
+  value: "#e2f0fd14"
+},
+"colors-Slate-Dark-Alpha-5": {
+  cssVariable: "var(--colors-slate-dark-alpha-5)",
+  value: "#dff3fd1c"
+},
+"colors-Slate-Dark-Alpha-6": {
+  cssVariable: "var(--colors-slate-dark-alpha-6)",
+  value: "#dfeffe24"
+},
+"colors-Slate-Dark-Alpha-7": {
+  cssVariable: "var(--colors-slate-dark-alpha-7)",
+  value: "#e0f3ff2e"
+},
+"colors-Slate-Dark-Alpha-8": {
+  cssVariable: "var(--colors-slate-dark-alpha-8)",
+  value: "#e5f2fe42"
+},
+"colors-Slate-Dark-Alpha-9": {
+  cssVariable: "var(--colors-slate-dark-alpha-9)",
+  value: "#e1f1ff69"
+},
+"colors-Slate-Dark-Alpha-10": {
+  cssVariable: "var(--colors-slate-dark-alpha-10)",
+  value: "#e7f3ff78"
+},
+"colors-Slate-Dark-Alpha-11": {
+  cssVariable: "var(--colors-slate-dark-alpha-11)",
+  value: "#eff7ff9e"
+},
+"colors-Slate-Dark-Alpha-12": {
+  cssVariable: "var(--colors-slate-dark-alpha-12)",
+  value: "#fdfeffed"
+},
+"colors-Slate-Light-1": {
+  cssVariable: "var(--colors-slate-light-1)",
+  value: "#fbfcfd"
+},
+"colors-Slate-Light-2": {
+  cssVariable: "var(--colors-slate-light-2)",
+  value: "#f8f9fa"
+},
+"colors-Slate-Light-3": {
+  cssVariable: "var(--colors-slate-light-3)",
+  value: "#f1f3f5"
+},
+"colors-Slate-Light-4": {
+  cssVariable: "var(--colors-slate-light-4)",
+  value: "#eceef0"
+},
+"colors-Slate-Light-5": {
+  cssVariable: "var(--colors-slate-light-5)",
+  value: "#e6e8eb"
+},
+"colors-Slate-Light-6": {
+  cssVariable: "var(--colors-slate-light-6)",
+  value: "#dfe3e6"
+},
+"colors-Slate-Light-7": {
+  cssVariable: "var(--colors-slate-light-7)",
+  value: "#d7dbdf"
+},
+"colors-Slate-Light-8": {
+  cssVariable: "var(--colors-slate-light-8)",
+  value: "#c1c8cd"
+},
+"colors-Slate-Light-9": {
+  cssVariable: "var(--colors-slate-light-9)",
+  value: "#889096"
+},
+"colors-Slate-Light-10": {
+  cssVariable: "var(--colors-slate-light-10)",
+  value: "#7e868c"
+},
+"colors-Slate-Light-11": {
+  cssVariable: "var(--colors-slate-light-11)",
+  value: "#687076"
+},
+"colors-Slate-Light-12": {
+  cssVariable: "var(--colors-slate-light-12)",
+  value: "#11181c"
+},
+"colors-Slate-Light-Alpha-1": {
+  cssVariable: "var(--colors-slate-light-alpha-1)",
+  value: "#05448205"
+},
+"colors-Slate-Light-Alpha-2": {
+  cssVariable: "var(--colors-slate-light-alpha-2)",
+  value: "#05294d08"
+},
+"colors-Slate-Light-Alpha-3": {
+  cssVariable: "var(--colors-slate-light-alpha-3)",
+  value: "#0025490d"
+},
+"colors-Slate-Light-Alpha-4": {
+  cssVariable: "var(--colors-slate-light-alpha-4)",
+  value: "#021c3714"
+},
+"colors-Slate-Light-Alpha-5": {
+  cssVariable: "var(--colors-slate-light-alpha-5)",
+  value: "#0217351a"
+},
+"colors-Slate-Light-Alpha-6": {
+  cssVariable: "var(--colors-slate-light-alpha-6)",
+  value: "#01213921"
+},
+"colors-Slate-Light-Alpha-7": {
+  cssVariable: "var(--colors-slate-light-alpha-7)",
+  value: "#001a3329"
+},
+"colors-Slate-Light-Alpha-8": {
+  cssVariable: "var(--colors-slate-light-alpha-8)",
+  value: "#011e323d"
+},
+"colors-Slate-Light-Alpha-9": {
+  cssVariable: "var(--colors-slate-light-alpha-9)",
+  value: "#00111e78"
+},
+"colors-Slate-Light-Alpha-10": {
+  cssVariable: "var(--colors-slate-light-alpha-10)",
+  value: "#00101b82"
+},
+"colors-Slate-Light-Alpha-11": {
+  cssVariable: "var(--colors-slate-light-alpha-11)",
+  value: "#000e1896"
+},
+"colors-Slate-Light-Alpha-12": {
+  cssVariable: "var(--colors-slate-light-alpha-12)",
+  value: "#00080ced"
+},
+"variables-colors-brand-primary": {
+  cssVariable: "var(--variables-colors-brand-primary)",
+  value: "#3ecf8e"
+},
+"variables-colors-brand-accent": {
+  cssVariable: "var(--variables-colors-brand-accent)",
+  value: "#34b97d"
+},
+"foreground-DEFAULT": {
+  cssVariable: "var(--foreground-default)",
+  value: "#ededed"
+},
+"foreground-strong": {
+  cssVariable: "var(--foreground-strong)",
+  value: "#fff"
+},
+"foreground-muted": {
+  cssVariable: "var(--foreground-muted)",
+  value: "#fff"
+},
+"foreground-light": {
+  cssVariable: "var(--foreground-light)",
+  value: "#a0a0a0"
+},
+"foreground-lighter": {
+  cssVariable: "var(--foreground-lighter)",
+  value: "#7e7e7e"
+},
+"background-DEFAULT": {
+  cssVariable: "var(--background-default)",
+  value: "#1c1c1c"
+},
+"background-muted": {
+  cssVariable: "var(--background-muted)",
+  value: "#fff"
+},
+"background-secondary": {
+  cssVariable: "var(--background-secondary)",
+  value: "#"
+},
+"background-overlay": {
+  cssVariable: "var(--background-overlay)",
+  value: "#232323"
+},
+"background-selection": {
+  cssVariable: "var(--background-selection)",
+  value: "#343434"
+},
+"border-DEFAULT": {
+  cssVariable: "var(--border-default)",
+  value: "#282828"
+},
+"border-muted": {
+  cssVariable: "var(--border-muted)",
+  value: "#282828"
+},
+"border-secondary": {
+  cssVariable: "var(--border-secondary)",
+  value: "#282828"
+},
+"border-overlay": {
+  cssVariable: "var(--border-overlay)",
+  value: "#282828"
+},
+"destructive-200": {
+  cssVariable: "var(--destructive-200)",
+  value: "#fd7d7d"
+},
+"destructive-300": {
+  cssVariable: "var(--destructive-300)",
+  value: "#ffbfbf"
+},
+"destructive-DEFAULT": {
+  cssVariable: "var(--destructive-default)",
+  value: "red"
 }
 }
