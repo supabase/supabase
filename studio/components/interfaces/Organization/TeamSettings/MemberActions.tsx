@@ -5,7 +5,7 @@ import { FC } from 'react'
 import { Button, Dropdown, IconMoreHorizontal, IconTrash } from 'ui'
 
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
-import { checkPermissions, useStore } from 'hooks'
+import { checkPermissions, useSelectedOrganization, useStore } from 'hooks'
 import { useParams } from 'common/hooks'
 import { Member, Role } from 'types'
 
@@ -14,6 +14,7 @@ import { useOrganizationMemberInviteCreateMutation } from 'data/organizations/or
 import { useOrganizationMemberInviteDeleteMutation } from 'data/organizations/organization-member-invite-delete-mutation'
 import { isInviteExpired } from '../Organization.utils'
 import { getRolesManagementPermissions } from './TeamSettings.utils'
+import { usePermissionsQuery } from 'data/permissions/permissions-query'
 
 interface Props {
   member: Member
@@ -23,7 +24,12 @@ interface Props {
 const MemberActions: FC<Props> = ({ member, roles }) => {
   const { ui } = useStore()
   const { slug } = useParams()
-  const { rolesRemovable } = getRolesManagementPermissions(roles)
+  const selectedOrganization = useSelectedOrganization()
+  const { data: permissions } = usePermissionsQuery()
+  const { rolesRemovable } =
+    selectedOrganization !== undefined
+      ? getRolesManagementPermissions(selectedOrganization.id, roles, permissions ?? [])
+      : { rolesRemovable: [] as number[] }
 
   const isExpired = isInviteExpired(member?.invited_at ?? '')
   const isPendingInviteAcceptance = member.invited_id
