@@ -1,16 +1,16 @@
 /**
  * Do not edit directly
- * Generated on Fri, 23 Jun 2023 14:34:03 GMT
+ * Generated on Fri, 23 Jun 2023 18:42:16 GMT
  */
 
 .light {
-  --destructive-default: red;
-  --destructive-300: #ffbfbf;
-  --destructive-200: #fd7d7d;
-  --background-secondary: #;
-  --background-muted: #fff;
-  --foreground-muted: #fff;
-  --foreground-strong: #fff;
+  --destructive-default: 0deg 100% 50%;
+  --destructive-300: 0deg 100% 87.5%;
+  --destructive-200: 0deg 97% 74.1%;
+  --background-secondary: 0deg 0% 100%;
+  --background-muted: 0deg 0% 100%;
+  --foreground-muted: 0deg 0% 100%;
+  --foreground-strong: 0deg 0% 100%;
   --border-overlay: var(--colors-slate-light-4);
   --border-secondary: var(--colors-gray-dark-4);
   --border-muted: var(--colors-gray-dark-4);
