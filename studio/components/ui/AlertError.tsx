@@ -19,7 +19,7 @@ const AlertError = ({ ref, subject }: AlertErrorProps) => {
     <Alert
       withIcon
       variant="warning"
-      title="Failed to retrieve upcoming invoice details"
+      title={subject}
       actions={[
         <Link key="contact-support" href={href}>
           <a>
