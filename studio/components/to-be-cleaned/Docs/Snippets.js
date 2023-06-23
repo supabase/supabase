@@ -47,8 +47,8 @@ supabase: Client = create_client(url, key)
     dart: {
       language: 'dart',
       code: `
-final supabaseUrl = '${endpoint}'
-final supabaseKey = String.fromEnvironment('SUPABASE_KEY')
+const supabaseUrl = '${endpoint}';
+const supabaseKey = String.fromEnvironment('SUPABASE_KEY');
 
 Future<void> main() async {
   await Supabase.initialize(url: supabaseUrl, anonKey: supabaseKey);
