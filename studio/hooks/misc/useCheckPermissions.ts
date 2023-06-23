@@ -2,11 +2,57 @@ import jsonLogic from 'json-logic-js'
 
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { IS_PLATFORM } from 'lib/constants'
-import { useSelectedOrganization } from './useSelectedOrganization'
 import { Permission } from 'types'
+import { useSelectedOrganization } from './useSelectedOrganization'
 
 const toRegexpString = (actionOrResource: string) =>
   `^${actionOrResource.replace('.', '\\.').replace('%', '.*')}$`
+
+export function doPermissionsCheck(
+  permissions: Permission[] | undefined,
+  action: string,
+  resource: string,
+  data?: object,
+  organizationId?: number
+) {
+  return (permissions ?? [])
+    .filter(
+      (permission) =>
+        permission.organization_id === organizationId &&
+        permission.actions.some((act) => (action ? action.match(toRegexpString(act)) : null)) &&
+        permission.resources.some((res) => resource.match(toRegexpString(res)))
+    )
+    .some(
+      ({ condition }: { condition: jsonLogic.RulesLogic }) =>
+        condition === null || jsonLogic.apply(condition, { resource_name: resource, ...data })
+    )
+}
+
+export function useGetPermissions(
+  permissionsOverride?: Permission[],
+  organizationIdOverride?: number,
+  enabled = true
+) {
+  const permissionsResult = usePermissionsQuery({
+    enabled: permissionsOverride === undefined && enabled,
+  })
+
+  const permissions =
+    permissionsOverride === undefined ? permissionsResult.data : permissionsOverride
+
+  const organizationResult = useSelectedOrganization({
+    enabled: organizationIdOverride === undefined && enabled,
+  })
+
+  const organization =
+    organizationIdOverride === undefined ? organizationResult : { id: organizationIdOverride }
+  const organizationId = organization?.id
+
+  return {
+    permissions,
+    organizationId,
+  }
+}
 
 export function useCheckPermissions(
   action: string,
@@ -17,32 +63,14 @@ export function useCheckPermissions(
   organizationId?: number,
   permissions?: Permission[]
 ) {
-  const permissionsResult = usePermissionsQuery({
-    enabled: permissions === undefined,
-  })
-
-  const allPermissions = permissions === undefined ? permissionsResult.data : permissions
-
-  const organizationResult = useSelectedOrganization({
-    enabled: organizationId === undefined,
-  })
-
-  const organization = organizationId === undefined ? organizationResult : { id: organizationId }
-  const orgId = organization?.id
+  const { permissions: allPermissions, organizationId: orgId } = useGetPermissions(
+    permissions,
+    organizationId
+  )
 
   if (!IS_PLATFORM) return true
 
-  return (allPermissions ?? [])
-    .filter(
-      (permission) =>
-        permission.organization_id === orgId &&
-        permission.actions.some((act) => (action ? action.match(toRegexpString(act)) : null)) &&
-        permission.resources.some((res) => resource.match(toRegexpString(res)))
-    )
-    .some(
-      ({ condition }: { condition: jsonLogic.RulesLogic }) =>
-        condition === null || jsonLogic.apply(condition, { resource_name: resource, ...data })
-    )
+  return doPermissionsCheck(allPermissions, action, resource, data, orgId)
 }
 
 /**

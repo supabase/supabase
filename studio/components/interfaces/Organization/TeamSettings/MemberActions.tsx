@@ -2,19 +2,18 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { observer } from 'mobx-react-lite'
 import { FC } from 'react'
-import { Button, Dropdown, IconMoreHorizontal, IconTrash } from 'ui'
 
-import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
-import { checkPermissions, useSelectedOrganization, useStore } from 'hooks'
 import { useParams } from 'common/hooks'
-import { Member, Role } from 'types'
-
+import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 import { useOrganizationMemberDeleteMutation } from 'data/organizations/organization-member-delete-mutation'
 import { useOrganizationMemberInviteCreateMutation } from 'data/organizations/organization-member-invite-create-mutation'
 import { useOrganizationMemberInviteDeleteMutation } from 'data/organizations/organization-member-invite-delete-mutation'
-import { isInviteExpired } from '../Organization.utils'
-import { getRolesManagementPermissions } from './TeamSettings.utils'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
+import { checkPermissions, useSelectedOrganization, useStore } from 'hooks'
+import { Member, Role } from 'types'
+import { Button, Dropdown, IconMoreHorizontal, IconTrash } from 'ui'
+import { isInviteExpired } from '../Organization.utils'
+import { useGetRolesManagementPermissions } from './TeamSettings.utils'
 
 interface Props {
   member: Member
@@ -26,10 +25,11 @@ const MemberActions: FC<Props> = ({ member, roles }) => {
   const { slug } = useParams()
   const selectedOrganization = useSelectedOrganization()
   const { data: permissions } = usePermissionsQuery()
-  const { rolesRemovable } =
-    selectedOrganization !== undefined
-      ? getRolesManagementPermissions(selectedOrganization.id, roles, permissions ?? [])
-      : { rolesRemovable: [] as number[] }
+  const { rolesRemovable } = useGetRolesManagementPermissions(
+    selectedOrganization?.id,
+    roles,
+    permissions ?? []
+  )
 
   const isExpired = isInviteExpired(member?.invited_at ?? '')
   const isPendingInviteAcceptance = member.invited_id
