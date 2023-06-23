@@ -3,6 +3,7 @@ import jsonLogic from 'json-logic-js'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { IS_PLATFORM } from 'lib/constants'
 import { useSelectedOrganization } from './useSelectedOrganization'
+import { Permission } from 'types'
 
 const toRegexpString = (actionOrResource: string) =>
   `^${actionOrResource.replace('.', '\\.').replace('%', '.*')}$`
@@ -11,18 +12,20 @@ export function useCheckPermissions(
   action: string,
   resource: string,
   data?: object,
-  organizationId?: number
+  // [Joshen] Pass the variables if you want to avoid hooks in this
+  // e.g If you want to use useCheckPermissions in a loop like organization settings
+  organizationId?: number,
+  permissions?: Permission[]
 ) {
-  const { data: permissions } = usePermissionsQuery({
-    enabled: IS_PLATFORM,
-  })
-  const organization = useSelectedOrganization()
-
   if (!IS_PLATFORM) return true
 
-  const orgId = organizationId ?? organization?.id
+  const { data: allPermissions } =
+    permissions === undefined ? usePermissionsQuery() : { data: permissions }
+  const organization =
+    organizationId === undefined ? useSelectedOrganization() : { id: organizationId }
+  const orgId = organization?.id
 
-  return (permissions ?? [])
+  return (allPermissions ?? [])
     .filter(
       (permission) =>
         permission.organization_id === orgId &&

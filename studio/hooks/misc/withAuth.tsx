@@ -41,7 +41,6 @@ export function withAuth<T>(
     const redirectIfFound = options?.redirectIfFound
 
     usePermissionsQuery({
-      enabled: IS_PLATFORM,
       onSuccess(permissions) {
         ui.setPermissions(permissions)
       },
