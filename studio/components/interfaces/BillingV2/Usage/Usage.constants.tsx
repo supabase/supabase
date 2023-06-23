@@ -50,10 +50,10 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
       {
         anchor: 'cpu',
         key: 'cpu_usage',
-        attribute: 'cpu_usage',
+        attribute: 'avg_cpu_usage',
         name: 'CPU',
         unit: 'percentage',
-        description: 'CPU usage of your server',
+        description: 'Average CPU usage of your server',
         chartDescription: '',
         links: [
           {
