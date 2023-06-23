@@ -47,8 +47,8 @@ supabase: Client = create_client(url, key)
     dart: {
       language: 'dart',
       code: `
-final supabaseUrl = '${endpoint}'
-final supabaseKey = String.fromEnvironment('SUPABASE_KEY')
+const supabaseUrl = '${endpoint}';
+const supabaseKey = String.fromEnvironment('SUPABASE_KEY');
 
 Future<void> main() async {
   await Supabase.initialize(url: supabaseUrl, anonKey: supabaseKey);
@@ -162,7 +162,7 @@ const ${listenerName} = supabase.channel('custom-all-channel')
       code: `
 const ${listenerName} = supabase.channel('custom-insert-channel')
   .on(
-    'postgres_changes', 
+    'postgres_changes',
     { event: 'INSERT', schema: 'public', table: '${resourceId}' },
     (payload) => {
       console.log('Change received!', payload)
@@ -423,7 +423,7 @@ curl -X POST '${endpoint}/rest/v1/${resourceId}' \\
       code: `
 const { data, error } = await supabase
   .from('${resourceId}')
-  .insert([{ some_column: 'someValue' }], { upsert: true })
+  .upsert({ some_column: 'someValue' }).select()
 `,
     },
   }),

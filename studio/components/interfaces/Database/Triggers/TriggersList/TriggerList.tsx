@@ -75,12 +75,14 @@ const TriggerList: FC<Props> = ({ filterString, schema, editTrigger, deleteTrigg
                     </>
                   }
                 >
-                  <Button as="span" type="default" icon={<IconMoreVertical />} />
+                  <Button asChild type="default" icon={<IconMoreVertical />}>
+                    <span></span>
+                  </Button>
                 </Dropdown>
               ) : (
                 <Tooltip.Root delayDuration={0}>
-                  <Tooltip.Trigger>
-                    <Button as="span" disabled type="default" icon={<IconMoreVertical />} />
+                  <Tooltip.Trigger asChild>
+                    <Button disabled type="default" icon={<IconMoreVertical />} />
                   </Tooltip.Trigger>
                   <Tooltip.Portal>
                     <Tooltip.Content side="left">

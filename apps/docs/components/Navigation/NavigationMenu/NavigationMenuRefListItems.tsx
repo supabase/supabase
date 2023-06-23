@@ -1,7 +1,7 @@
 import * as Accordion from '@radix-ui/react-accordion'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { IconChevronLeft, IconChevronUp } from 'ui'
+import { IconChevronLeft, IconChevronUp, cn } from 'ui'
 import * as NavItems from './NavigationMenu.constants'
 
 import Image from 'next/image'
@@ -10,7 +10,6 @@ import RevVersionDropdown from '~/components/RefVersionDropdown'
 import { useMenuActiveRefId } from '~/hooks/useMenuState'
 
 import React, { Fragment } from 'react'
-import { cn } from 'ui/src/lib/utils/cn'
 import { ICommonItem, ICommonSection } from '~/components/reference/Reference.types'
 import HomeMenuIconPicker from './HomeMenuIconPicker'
 import { deepFilterSections } from './NavigationMenu.utils'
@@ -197,7 +196,7 @@ const NavigationMenuRefListItems = ({
         <HeaderLink title={menu.title} url={menu.url} id={id} />
         <RevVersionDropdown />
       </div>
-      <ul className="function-link-list flex flex-col gap-2">
+      <ul className="function-link-list flex flex-col gap-2 pb-5">
         {filteredSections.map((section) => {
           return (
             <Fragment key={section.title}>

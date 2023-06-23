@@ -4,7 +4,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { useStore, checkPermissions } from 'hooks'
 import { API_URL } from 'lib/constants'
-import { post } from 'lib/common/fetch'
+import { patch } from 'lib/common/fetch'
 import {
   FormHeader,
   FormPanel,
@@ -25,7 +25,7 @@ const General: FC<Props> = ({}) => {
   const canUpdateProject = checkPermissions(PermissionAction.UPDATE, 'projects')
 
   const onSubmit = async (values: any, { resetForm }: any) => {
-    const response = await post(`${API_URL}/projects/${project?.ref}/update`, {
+    const response = await patch(`${API_URL}/projects/${project?.ref}`, {
       name: values.name.trim(),
     })
     if (response.error) {

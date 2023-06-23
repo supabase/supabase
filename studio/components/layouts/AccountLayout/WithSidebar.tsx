@@ -211,10 +211,7 @@ const SidebarLinkItem: FC<SidebarLinkProps> = ({
   return (
     <Link href={href || ''}>
       <a className="block" target={isExternal ? '_blank' : '_self'}>
-        <button
-          className="group flex max-w-full cursor-pointer items-center space-x-2 border-scale-500 py-1 font-normal outline-none ring-scale-1200 focus-visible:z-10 focus-visible:ring-1 group-hover:border-scale-900"
-          onClick={onClick || (() => {})}
-        >
+        <span className="group flex max-w-full cursor-pointer items-center space-x-2 border-scale-500 py-1 font-normal outline-none ring-scale-1200 focus-visible:z-10 focus-visible:ring-1 group-hover:border-scale-900">
           {isExternal && (
             <span className="truncate text-sm text-scale-900 transition group-hover:text-scale-1100">
               <IconArrowUpRight size={'tiny'} />
@@ -226,7 +223,7 @@ const SidebarLinkItem: FC<SidebarLinkProps> = ({
           >
             {isSubitem ? <p>{label}</p> : label}
           </span>
-        </button>
+        </span>
       </a>
     </Link>
   )

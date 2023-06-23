@@ -1,12 +1,12 @@
 import { Filters, LogData, LogsEndpointParams, LogsTableName, SQL_FILTER_TEMPLATES } from '.'
 import dayjs, { Dayjs } from 'dayjs'
 import { get, isEqual } from 'lodash'
-import { StripeSubscription } from 'components/interfaces/Billing'
 import { useMonaco } from '@monaco-editor/react'
 import logConstants from 'shared-data/logConstants'
 import BackwardIterator from 'components/ui/CodeEditor/Providers/BackwardIterator'
 import uniqBy from 'lodash/uniqBy'
 import { useEffect } from 'react'
+import { PlanId } from 'data/subscriptions/project-subscription-v2-query'
 
 /**
  * Convert a micro timestamp from number/string to iso timestamp
@@ -150,6 +150,13 @@ export const genDefaultQuery = (table: LogsTableName, filters: Filters) => {
   limit 100
     `
 
+    case 'auth_logs':
+      return `select id, ${table}.timestamp, event_message, metadata.level, metadata.status, metadata.path, metadata.msg as msg, metadata.error from ${table}
+  cross join unnest(metadata) as metadata
+  ${where}
+  limit 100
+    `
+
     case 'function_edge_logs':
       return `select id, ${table}.timestamp, event_message, response.status_code, request.method, m.function_id, m.execution_time_ms, m.deployment_id, m.version from ${table}
   cross join unnest(metadata) as m
@@ -176,17 +183,14 @@ export const genSingleLogQuery = (table: LogsTableName, id: string) =>
 /**
  * Determine if we should show the user an upgrade prompt while browsing logs
  */
-export const maybeShowUpgradePrompt = (
-  from: string | null | undefined,
-  tierKey?: StripeSubscription['tier']['key']
-) => {
+export const maybeShowUpgradePrompt = (from: string | null | undefined, planId?: PlanId) => {
   const day = Math.abs(dayjs().diff(dayjs(from), 'day'))
 
   return (
-    (day > 1 && tierKey === 'FREE') ||
-    (day > 7 && tierKey === 'PRO') ||
-    (day > 28 && tierKey === 'TEAM') ||
-    (day > 90 && tierKey === 'ENTERPRISE')
+    (day > 1 && planId === 'free') ||
+    (day > 7 && planId === 'pro') ||
+    (day > 28 && planId === 'team') ||
+    (day > 90 && planId === 'enterprise')
   )
 }
 
@@ -379,8 +383,9 @@ export const fillTimeseries = (
   const maxDate = max ? dayjs.utc(max) : dayjs.utc(Math.max.apply(null, dates as number[]))
   const minDate = min ? dayjs.utc(min) : dayjs.utc(Math.min.apply(null, dates as number[]))
 
-  const truncationSample = timeseriesData.length > 0 ? timeseriesData[0][timestampKey] : min || max
-  const truncation = getTimestampTruncation(truncationSample)
+  // const truncationSample = timeseriesData.length > 0 ? timeseriesData[0][timestampKey] : min || max
+  const truncationSamples = timeseriesData.length > 0 ? dates : [minDate, maxDate]
+  const truncation = getTimestampTruncation(truncationSamples as Dayjs[])
 
   const newData = timeseriesData.map((datum) => {
     const iso = dayjs.utc(datum[timestampKey]).toISOString()
@@ -389,6 +394,12 @@ export const fillTimeseries = (
   })
 
   const diff = maxDate.diff(minDate, truncation as dayjs.UnitType)
+  // Intentional throwing of error here to be caught by Sentry, as this would indicate a bug since charts shouldn't be rendering more than 10k data points
+  if (diff > 10000) {
+    throw new Error(
+      'Data error, filling timeseries dynamically with more than 10k data points degrades performance.'
+    )
+  }
   for (let i = 0; i <= diff; i++) {
     const dateToMaybeAdd = minDate.add(i, truncation as dayjs.ManipulateType)
 
@@ -413,10 +424,30 @@ export const fillTimeseries = (
   return newData
 }
 
-export const getTimestampTruncation = (datetime: string): 'second' | 'minute' | 'hour' | 'day' => {
-  const values = ['second', 'minute', 'hour', 'day'].map((key) =>
-    dayjs(datetime).get(key as dayjs.UnitType)
+export const getTimestampTruncation = (samples: Dayjs[]): 'second' | 'minute' | 'hour' | 'day' => {
+  const truncationCounts = samples.reduce(
+    (acc, sample) => {
+      const truncation = _getTruncation(sample)
+      acc[truncation] += 1
+
+      return acc
+    },
+    {
+      second: 0,
+      minute: 0,
+      hour: 0,
+      day: 0,
+    }
   )
+
+  const mostLikelyTruncation = (
+    Object.keys(truncationCounts) as (keyof typeof truncationCounts)[]
+  ).reduce((a, b) => (truncationCounts[a] > truncationCounts[b] ? a : b))
+  return mostLikelyTruncation
+}
+
+const _getTruncation = (date: Dayjs) => {
+  const values = ['second', 'minute', 'hour'].map((key) => date.get(key as dayjs.UnitType))
   const zeroCount = values.reduce((acc, value) => {
     if (value === 0) {
       acc += 1

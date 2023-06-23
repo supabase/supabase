@@ -12,13 +12,14 @@
 - [x] Hosted Postgres Database. [Docs](https://supabase.com/docs/guides/database)
 - [x] Authentication and Authorization. [Docs](https://supabase.com/docs/guides/auth)
 - [x] Auto-generated APIs.
-  - [x] REST. [Docs](https://supabase.com/docs/guides/database/api#rest-api)
-  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/database/api#graphql-api)
-  - [x] Realtime subscriptions. [Docs](https://supabase.com/docs/guides/database/api#realtime-api)
+  - [x] REST. [Docs](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/api#graphql-api-overview)
+  - [x] Realtime subscriptions. [Docs](https://supabase.com/docs/guides/api#realtime-api-overview)
 - [x] Functions.
   - [x] Database Functions. [Docs](https://supabase.com/docs/guides/database/functions)
   - [x] Edge Functions [Docs](https://supabase.com/docs/guides/functions)
 - [x] File Storage. [Docs](https://supabase.com/docs/guides/storage)
+- [x] AI + Vector/Embeddings Toolkit. [Docs](https://supabase.com/docs/guides/ai)
 - [x] Dashboard
 
 ![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
@@ -79,6 +80,7 @@ Our approach for client libraries is modular. Each sub-library is a standalone i
     <th>Client</th>
     <th colspan="5">Feature-Clients (bundled in Supabase client)</th>
   </tr>
+  <!-- notranslate -->
   <tr>
     <th></th>
     <th>Supabase</th>
@@ -99,7 +101,9 @@ Our approach for client libraries is modular. Each sub-library is a standalone i
     <td><a href="https://github.com/supabase-community/storage-lang" target="_blank" rel="noopener noreferrer">storage-lang</a></td>
   </tr>
   END ROW -->
+  <!-- /notranslate -->
   <th colspan="7">⚡️ Official ⚡️</th>
+  <!-- notranslate -->
   <tr>
     <td>JavaScript (TypeScript)</td>
     <td><a href="https://github.com/supabase/supabase-js" target="_blank" rel="noopener noreferrer">supabase-js</a></td>
@@ -118,7 +122,9 @@ Our approach for client libraries is modular. Each sub-library is a standalone i
     <td><a href="https://github.com/supabase/storage-dart" target="_blank" rel="noopener noreferrer">storage-dart</a></td>
     <td><a href="https://github.com/supabase/functions-dart" target="_blank" rel="noopener noreferrer">functions-dart</a></td>
   </tr>
+  <!-- /notranslate -->
   <th colspan="7">💚 Community 💚</th>
+  <!-- notranslate -->
   <tr>
     <td>C#</td>
     <td><a href="https://github.com/supabase-community/supabase-csharp" target="_blank" rel="noopener noreferrer">supabase-csharp</a></td>
@@ -200,6 +206,7 @@ Our approach for client libraries is modular. Each sub-library is a standalone i
     <td><a href="https://github.com/supabase-community/storage-gdscript" target="_blank" rel="noopener noreferrer">storage-gdscript</a></td>
     <td><a href="https://github.com/supabase-community/functions-gdscript" target="_blank" rel="noopener noreferrer">functions-gdscript</a></td>
   </tr>
+  <!-- /notranslate -->
 </table>
 
 <!--- Remove this list if you're translating to another language, it's hard to keep updated across multiple files-->
@@ -212,23 +219,28 @@ Our approach for client libraries is modular. Each sub-library is a standalone i
 - [Bangla / বাংলা](/i18n/README.bn.md)
 - [Bulgarian / Български](/i18n/README.bg.md)
 - [Catalan / Català](/i18n/README.ca.md)
+- [Czech / čeština](/i18n/README.cs.md)
 - [Danish / Dansk](/i18n/README.da.md)
 - [Dutch / Nederlands](/i18n/README.nl.md)
 - [English](https://github.com/supabase/supabase)
+- [Estonian / eesti keel](/i18n/README.et.md)
 - [Finnish / Suomalainen](/i18n/README.fi.md)
 - [French / Français](/i18n/README.fr.md)
 - [German / Deutsch](/i18n/README.de.md)
-- [Greek / Ελληνικά](/i18n/README.gr.md)
+- [Greek / Ελληνικά](/i18n/README.el.md)
+- [Gujarati / ગુજરાતી](/i18n/README.gu.md)
 - [Hebrew / עברית](/i18n/README.he.md)
 - [Hindi / हिंदी](/i18n/README.hi.md)
 - [Hungarian / Magyar](/i18n/README.hu.md)
 - [Nepali / नेपाली](/i18n/README.ne.md)
 - [Indonesian / Bahasa Indonesia](/i18n/README.id.md)
-- [Italian / Italiano](/i18n/README.it.md)
-- [Japanese / 日本語](/i18n/README.jp.md)
+- [Italiano / Italian](/i18n/README.it.md)
+- [Japanese / 日本語](/i18n/README.ja.md)
 - [Korean / 한국어](/i18n/README.ko.md)
+- [Lithuanian / lietuvių](/i18n/README.lt.md)
+- [Latvian / latviski](/i18n/README.lv.md)
 - [Malay / Bahasa Malaysia](/i18n/README.ms.md)
-- [Norwegian (Bokmål) / Norsk (Bokmål)](/i18n/README.nb-no.md)
+- [Norwegian (Bokmål) / Norsk (Bokmål)](/i18n/README.nb.md)
 - [Persian / فارسی](/i18n/README.fa.md)
 - [Polish / Polski](/i18n/README.pl.md)
 - [Portuguese / Português](/i18n/README.pt.md)
@@ -237,6 +249,8 @@ Our approach for client libraries is modular. Each sub-library is a standalone i
 - [Russian / Pусский](/i18n/README.ru.md)
 - [Serbian / Srpski](/i18n/README.sr.md)
 - [Sinhala / සිංහල](/i18n/README.si.md)
+- [Slovak / slovenský](/i18n/README.sk.md)
+- [Slovenian / Slovenščina](/i18n/README.sl.md)
 - [Spanish / Español](/i18n/README.es.md)
 - [Simplified Chinese / 简体中文](/i18n/README.zh-cn.md)
 - [Swedish / Svenska](/i18n/README.sv.md)
@@ -246,9 +260,3 @@ Our approach for client libraries is modular. Each sub-library is a standalone i
 - [Ukrainian / Українська](/i18n/README.uk.md)
 - [Vietnamese / Tiếng Việt](/i18n/README.vi-vn.md)
 - [List of translations](/i18n/languages.md) <!--- Keep only this -->
-
----
-
-## Sponsors
-
-[![New Sponsor](https://user-images.githubusercontent.com/10214025/90518111-e74bbb00-e198-11ea-8f88-c9e3c1aa4b5b.png)](https://github.com/sponsors/supabase)

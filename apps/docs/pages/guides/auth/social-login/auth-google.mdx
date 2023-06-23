@@ -105,6 +105,7 @@ async function signInWithGoogle() {
       queryParams: {
         access_type: 'offline',
         prompt: 'consent',
+        hd: 'domain.com', // google will also allow OAuth logins to be restricted to a specified domain using the 'hd' parameter
       },
     },
   })
@@ -113,7 +114,7 @@ async function signInWithGoogle() {
 
 ## Resources
 
-- [Supabase Account - Free Tier OK](https://supabase.com)
+- [Supabase Account - Free Plan OK](https://supabase.com)
 - [Supabase JS Client](https://github.com/supabase/supabase-js)
 - [Google Cloud Platform Console](https://console.cloud.google.com/home/dashboard)
 

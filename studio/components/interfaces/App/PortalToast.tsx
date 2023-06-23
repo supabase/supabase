@@ -14,8 +14,7 @@ const PortalToast = () => (
     <Toaster
       position="top-right"
       toastOptions={{
-        className:
-          'bg-scale-200 text-typography-body-strong-light dark:text-typography-body-strong-dark border dark:border-dark !max-w-[380px]',
+        className: '!bg-scale-200 !text-scale-1200 border dark:border-dark !max-w-[380px]',
         style: {
           padding: '8px',
           paddingLeft: '16px',
