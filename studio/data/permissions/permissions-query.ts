@@ -27,7 +27,7 @@ export const usePermissionsQuery = <TData = PermissionsData>(
   useQuery<PermissionsData, PermissionsError, TData>(
     permissionKeys.list(),
     ({ signal }) => getPermissions(signal),
-    { enabled: IS_PLATFORM && options.enabled, ...options }
+    { ...options, enabled: IS_PLATFORM && options.enabled }
   )
 
 export const usePermissionsPrefetch = () => {
