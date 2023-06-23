@@ -1,5 +1,7 @@
 export const integrationKeys = {
-  list: (orgSlug: string | undefined) => ['organizations', orgSlug, 'integrations'] as const,
+  integrationsListWithOrg: (orgSlug: string | undefined) =>
+    ['organizations', orgSlug, 'integrations'] as const,
+  integrationsList: () => ['organizations', 'integrations'] as const,
   vercelProjectList: (organization_integration_id: string | undefined) =>
     ['organizations', organization_integration_id, 'vercel-projects'] as const,
   vercelConnectionsList: (organization_integration_id: string | undefined) =>

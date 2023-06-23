@@ -11,7 +11,7 @@ import {
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
-import { Integration as TIntegration } from 'data/integrations/integrations-query'
+import { Integration as TIntegration } from 'data/integrations/integrations-query-org-only'
 import { useIntegrationsVercelInstalledConnectionDeleteMutation } from 'data/integrations/integrations-vercel-installed-connection-delete-mutation'
 import { useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'

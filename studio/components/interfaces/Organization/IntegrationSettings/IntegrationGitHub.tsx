@@ -11,7 +11,7 @@ import {
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
-import { Integration as TIntegration } from 'data/integrations/integrations-query'
+import { Integration as TIntegration } from 'data/integrations/integrations-query-org-only'
 import { pluralize } from 'lib/helpers'
 import { EMPTY_ARR } from 'lib/void'
 import { useMemo } from 'react'

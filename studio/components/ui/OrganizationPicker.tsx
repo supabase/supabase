@@ -1,18 +1,40 @@
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useIntegrationsQuery } from 'data/integrations/integrations-query'
+import { IntegrationName } from 'data/integrations/integrations.types'
+import {
+  OrganizationsResponse,
+  useOrganizationsQuery,
+} from 'data/organizations/organizations-query'
+import { useStore } from 'hooks'
 import { useState } from 'react'
 import { Organization } from 'types'
-import { Listbox } from 'ui'
+import { Badge, IconHexagon, Listbox } from 'ui'
 
 export interface OrganizationPickerProps {
   label?: string
   onSelectedOrgChange?: (org: Organization) => void
+  integrationName: IntegrationName
 }
 
 const OrganizationPicker = ({
   label = 'Choose an organization',
   onSelectedOrgChange,
+  integrationName,
 }: OrganizationPickerProps) => {
+  const { ui } = useStore()
   const [selectedOrg, setSelectedOrg] = useState<Organization | null>(null)
+
+  /**
+   * array of integrations installed on all
+   */
+  const { data: integrationData, isLoading: integrationDataLoading } = useIntegrationsQuery({})
+  console.log('integrationData', integrationData)
+
+  /**
+   * filter integrations to match integrationName
+   */
+  const vercelIntegrationsInstalled = integrationData?.filter(
+    (integration) => integration.integration.name === 'Vercel'
+  )
 
   const { data, isLoading } = useOrganizationsQuery({
     onSuccess(organizations) {
@@ -33,7 +55,7 @@ const OrganizationPicker = ({
     }
   }
 
-  if (isLoading) {
+  if (isLoading || integrationDataLoading) {
     return (
       <Listbox label={label} value="loading" disabled>
         <Listbox.Option key="loading" value="loading" label="Loading...">
@@ -43,12 +65,51 @@ const OrganizationPicker = ({
     )
   }
 
+  /**
+   * Organization type with `installationInstalled` added
+   */
+  interface OrganizationsResponseWithInstalledData extends Organization {
+    installationInstalled?: boolean
+  }
+
+  /**
+   * A flat array of org slugs that have integration installed
+   */
+  const flatInstalledConnectionsIds =
+    integrationData && integrationData.length > 0
+      ? integrationData?.map((x) => x.organization.slug)
+      : []
+
+  /**
+   * Organizations with extra `installationInstalled` attribute
+   * Used to show label/badge and allow/disallow installing
+   */
+  const organizationsWithInstalledData: OrganizationsResponseWithInstalledData[] = data
+    ? data.map((org) => {
+        return {
+          ...org,
+          installationInstalled: !flatInstalledConnectionsIds.includes(org.slug) ? true : false,
+        }
+      })
+    : []
+
   return (
     <Listbox label={label} value={selectedOrg?.slug} onChange={_onSelectedOrgChange}>
-      {data?.map((org) => {
-        return (
-          <Listbox.Option key={org.id} value={org.slug} label={org.name}>
+      {organizationsWithInstalledData?.map((org) => {
+        const label = (
+          <div className="flex gap-3 items-center">
             {org.name}
+            {org.installationInstalled && <Badge color="scale">Integration Installed</Badge>}
+          </div>
+        )
+        return (
+          <Listbox.Option
+            key={org.id}
+            value={org.slug}
+            label={label}
+            addOnBefore={({ active, selected }: any) => <IconHexagon />}
+          >
+            {label}
           </Listbox.Option>
         )
       })}

@@ -8,10 +8,9 @@ export type IntegrationConnectionsCreateVariables = {
   connection: {
     foreign_project_id: string
     supabase_project_ref: string
-    integration_id: number
     metadata: any
   }
-  orgId: number | undefined
+  orgSlug: string | undefined
 }
 
 export async function createIntegrationConnections({
@@ -49,7 +48,13 @@ export const useIntegrationConnectionsCreateMutation = ({
     IntegrationConnectionsCreateVariables
   >((vars) => createIntegrationConnections(vars), {
     async onSuccess(data, variables, context) {
-      await Promise.all([queryClient.invalidateQueries(integrationKeys.list(variables.orgId))])
+      await Promise.all([
+        queryClient.invalidateQueries(integrationKeys.integrationsList()),
+        queryClient.invalidateQueries(integrationKeys.integrationsListWithOrg(variables.orgSlug)),
+        queryClient.invalidateQueries(
+          integrationKeys.vercelProjectList(variables.organizationIntegrationId)
+        ),
+      ])
       await onSuccess?.(data, variables, context)
     },
     ...options,

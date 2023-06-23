@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
-import { useIntegrationsQuery } from 'data/integrations/integrations-query'
+import { useIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
 import { useStore } from 'hooks'
 import { observer } from 'mobx-react-lite'
 import { useGithubConnectionConfigPanelSnapshot } from 'state/github-connection-config-panel'

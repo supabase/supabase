@@ -1,5 +1,5 @@
 import { ScaffoldDivider } from 'components/layouts/Scaffold'
-import { useIntegrationsQuery } from 'data/integrations/integrations-query'
+import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
 import { useStore } from 'hooks'
 import { observer } from 'mobx-react-lite'
 import Integration from './Integration'
@@ -7,7 +7,7 @@ import SidePanelVercelProjectLinker from './SidePanelVercelProjectLinker'
 
 const IntegrationSettings = () => {
   const { ui } = useStore()
-  const { data } = useIntegrationsQuery({ orgSlug: ui.selectedOrganization?.slug })
+  const { data } = useOrgIntegrationsQuery({ orgSlug: ui.selectedOrganization?.slug })
 
   const org = ui.selectedOrganization
 
