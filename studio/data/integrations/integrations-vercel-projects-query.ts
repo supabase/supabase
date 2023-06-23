@@ -3,12 +3,10 @@ import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { useCallback } from 'react'
 import { integrationKeys } from './keys'
-import { VercelFramework } from './integrations-query'
+import { VercelFramework } from './integrations.types'
 
 export type VercelProjectsVariables = {
-  orgId?: number
-  orgSlug?: string
-  organization_integration_id?: string
+  organization_integration_id: string | undefined
 }
 
 export type VercelProjectsResponse = {
@@ -24,11 +22,11 @@ export type VercelProjectsResponse = {
 }
 
 export async function getVercelProjects(
-  { orgId, organization_integration_id }: VercelProjectsVariables,
+  { organization_integration_id }: VercelProjectsVariables,
   signal?: AbortSignal
 ) {
   if (!organization_integration_id) {
-    throw new Error('orgId is required')
+    throw new Error('organization_integration_id is required')
   }
 
   const response = await get(
@@ -48,17 +46,17 @@ export type VercelProjectsData = Awaited<ReturnType<typeof getVercelProjects>>
 export type VercelProjectsError = unknown
 
 export const useVercelProjectsQuery = <TData = VercelProjectsData>(
-  { orgSlug, orgId, organization_integration_id }: VercelProjectsVariables,
+  { organization_integration_id }: VercelProjectsVariables,
   {
     enabled = true,
     ...options
   }: UseQueryOptions<VercelProjectsData, VercelProjectsError, TData> = {}
 ) =>
   useQuery<VercelProjectsData, VercelProjectsError, TData>(
-    integrationKeys.vercelProjectList(orgSlug),
-    ({ signal }) => getVercelProjects({ orgSlug, orgId, organization_integration_id }, signal),
+    integrationKeys.vercelProjectList(organization_integration_id),
+    ({ signal }) => getVercelProjects({ organization_integration_id }, signal),
     {
-      enabled: enabled && typeof orgSlug !== 'undefined' && typeof orgId !== 'undefined',
+      enabled: enabled && typeof organization_integration_id !== 'undefined',
       ...options,
     }
   )
@@ -76,17 +74,18 @@ export const useVercelProjectsQuery = <TData = VercelProjectsData>(
  * )
  */
 export const useVercelProjectsPrefetch = ({
-  orgSlug,
-  orgId,
+  // orgSlug,
+  // orgId,
   organization_integration_id,
 }: VercelProjectsVariables) => {
   const client = useQueryClient()
 
   return useCallback(() => {
-    if (orgSlug) {
-      client.prefetchQuery(integrationKeys.vercelProjectList(orgSlug), ({ signal }) =>
-        getVercelProjects({ orgSlug, orgId, organization_integration_id }, signal)
+    if (organization_integration_id) {
+      client.prefetchQuery(
+        integrationKeys.vercelProjectList(organization_integration_id),
+        ({ signal }) => getVercelProjects({ organization_integration_id }, signal)
       )
     }
-  }, [orgSlug])
+  }, [organization_integration_id])
 }

@@ -1,6 +1,7 @@
+import { useParams } from 'common'
 import ProjectLinker from 'components/interfaces/Integrations/ProjectLinker'
 import { Markdown } from 'components/interfaces/Markdown'
-import { useIntegrationsQuery } from 'data/integrations/integrations-query'
+import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
 import { useVercelProjectConnectionsQuery } from 'data/integrations/integrations-vercel-installed-connections-query'
 import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
@@ -13,10 +14,11 @@ import { SidePanel } from 'ui'
 
 const SidePanelVercelProjectLinker = () => {
   const { ui } = useStore()
+
   const selectedOrg = ui.selectedOrganization
 
-  const { data: integrationData } = useIntegrationsQuery({
-    orgId: ui.selectedOrganization?.id,
+  const { data: integrationData } = useOrgIntegrationsQuery({
+    orgSlug: ui.selectedOrganization?.slug,
   })
   const vercelIntegrations = integrationData?.filter(
     (integration) => integration.integration.name === 'Vercel'

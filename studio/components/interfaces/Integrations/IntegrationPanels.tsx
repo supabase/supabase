@@ -1,5 +1,8 @@
 import { Markdown } from 'components/interfaces/Markdown'
-import { Integration, IntegrationProjectConnection } from 'data/integrations/integrations-query'
+import {
+  Integration,
+  IntegrationProjectConnection,
+} from 'data/integrations/integrations-query-org-only'
 import dayjs from 'dayjs'
 import { useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'

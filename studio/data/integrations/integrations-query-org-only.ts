@@ -6,8 +6,11 @@ import { IntegrationsVariables, Integration } from './integrations.types'
 
 export type IntegrationsResponse = Integration[]
 
-export async function getIntegrations({}: {}, signal?: AbortSignal) {
-  const response = await get(`${API_URL}/integrations`, {
+export async function getIntegrations({ orgSlug }: IntegrationsVariables, signal?: AbortSignal) {
+  if (!orgSlug) {
+    throw new Error('orgSlug is required')
+  }
+  const response = await get(`${API_URL}/integrations/${orgSlug}?expand=true`, {
     signal,
   })
   if (response.error) {
@@ -21,12 +24,12 @@ export type IntegrationsData = Awaited<ReturnType<typeof getIntegrations>>
 export type ProjectIntegrationConnectionsData = Awaited<ReturnType<typeof getIntegrations>>
 export type IntegrationsError = unknown
 
-export const useIntegrationsQuery = <TData = IntegrationsData>(
-  {}: {},
+export const useOrgIntegrationsQuery = <TData = IntegrationsData>(
+  { orgSlug }: IntegrationsVariables,
   { enabled = true, ...options }: UseQueryOptions<IntegrationsData, IntegrationsError, TData> = {}
 ) =>
   useQuery<IntegrationsData, IntegrationsError, TData>(
-    integrationKeys.integrationsList(),
-    ({ signal }) => getIntegrations({}, signal),
-    { enabled: enabled, ...options }
+    integrationKeys.integrationsListWithOrg(orgSlug),
+    ({ signal }) => getIntegrations({ orgSlug }, signal),
+    { enabled: enabled && typeof orgSlug !== 'undefined', ...options }
   )

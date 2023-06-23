@@ -1,25 +1,36 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
 import ProjectLinker from 'components/interfaces/Integrations/ProjectLinker'
 
+import { Markdown } from 'components/interfaces/Markdown'
+import IntegrationWindowLayout from 'components/layouts/IntegrationWindowLayout'
+import { ScaffoldContainer, ScaffoldDivider } from 'components/layouts/Scaffold'
 import OrganizationPicker from 'components/ui/OrganizationPicker'
-import { useVercelIntegrationCreateMutation } from 'data/integrations/vercel-integration-create-mutation'
+import { useIntegrationsQuery } from 'data/integrations/integrations-query'
 import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
+import { useVercelIntegrationCreateMutation } from 'data/integrations/vercel-integration-create-mutation'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useStore } from 'hooks'
 import { EMPTY_ARR } from 'lib/void'
 import { NextPageWithLayout, Organization } from 'types'
-import { Alert, Button, IconBook, IconLifeBuoy, Input, LoadingLine, cn } from 'ui'
-import IntegrationWindowLayout from 'components/layouts/IntegrationWindowLayout'
-import { ScaffoldContainer, ScaffoldDivider, ScaffoldSection } from 'components/layouts/Scaffold'
-import { Markdown } from 'components/interfaces/Markdown'
-import { BASE_PATH } from 'lib/constants'
-import { ENV_VAR_RAW_KEYS } from 'components/interfaces/Integrations/Integrations-Vercel.constants'
+import { Alert, Button, IconBook, IconLifeBuoy, LoadingLine } from 'ui'
+import { useRouter } from 'next/router'
 
 const VercelIntegration: NextPageWithLayout = () => {
+  const router = useRouter()
+
+  useEffect(() => {
+    router.push({ pathname: '/integrations/vercel/install', query: router.query })
+  }, [router])
+
+  /**
+   *
+   * remove everything here
+   */
   const { ui } = useStore()
-  const { code, configurationId, next, teamId, source } = useParams()
+  const { code, configurationId, next, teamId, source, externalId } = useParams()
+  const params = useParams()
   const [selectedOrg, setSelectedOrg] = useState<Organization | null>(null)
   const [organizationIntegrationId, setOrganizationIntegrationId] = useState<string | null>(null)
 
@@ -28,6 +39,9 @@ const VercelIntegration: NextPageWithLayout = () => {
       setOrganizationIntegrationId(id)
     },
   })
+
+  console.log('params', params)
+  console.log('externalId', externalId)
 
   function onInstall() {
     const orgSlug = selectedOrg?.slug
@@ -65,6 +79,7 @@ const VercelIntegration: NextPageWithLayout = () => {
   const { data: supabaseProjectsData } = useProjectsQuery({
     enabled: organizationIntegrationId !== null,
   })
+
   const supabaseProjects = useMemo(
     () =>
       supabaseProjectsData

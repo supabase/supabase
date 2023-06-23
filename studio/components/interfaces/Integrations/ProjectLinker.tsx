@@ -2,12 +2,12 @@ import { ENV_VAR_RAW_KEYS } from 'components/interfaces/Integrations/Integration
 import { Markdown } from 'components/interfaces/Markdown'
 import { vercelIcon } from 'components/to-be-cleaned/ListIcons'
 import { useIntegrationConnectionsCreateMutation } from 'data/integrations/integration-connections-create-mutation'
-import { Integration, IntegrationProjectConnection } from 'data/integrations/integrations-query'
+import { IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { VercelProjectsResponse } from 'data/integrations/integrations-vercel-projects-query'
 import { useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import { useState } from 'react'
-import { Button, IconArrowRight, IconPlus, IconX, Input, Listbox, Select, cn } from 'ui'
+import { Button, Listbox, cn } from 'ui'
 
 interface Project {
   id: string
@@ -16,10 +16,10 @@ interface Project {
 }
 
 // to do: move this somewhere
-const INTEGRATION_INTERNAL_ID = 1
+// const INTEGRATION_INTERNAL_ID = 1
 
 export interface ProjectLinkerProps {
-  organizationIntegrationId: string
+  organizationIntegrationId: string | undefined
   foreignProjects: VercelProjectsResponse[]
   supabaseProjects: Project[]
   onCreateConnections?: () => void
@@ -27,7 +27,6 @@ export interface ProjectLinkerProps {
 }
 
 const UNDEFINED_SELECT_VALUE = 'undefined'
-const UNDEFINED_METADATA_VALUE = {}
 
 const ProjectLinker = ({
   organizationIntegrationId,
@@ -41,26 +40,6 @@ const ProjectLinker = ({
   const [supabaseProjectRef, setSupabaseProjectRef] = useState(UNDEFINED_SELECT_VALUE)
   const [vercelProjectId, setVercelProjectId] = useState(UNDEFINED_SELECT_VALUE)
 
-  // function addConnection() {
-  //   setConnections([
-  //     ...connections,
-  //     {
-  //       foreign_project_id: UNDEFINED_SELECT_VALUE,
-  //       supabase_project_id: UNDEFINED_SELECT_VALUE,
-  //       integrationId: INTEGRATION_INTERNAL_ID,
-  //       metadata: UNDEFINED_METADATA_VALUE,
-  //     },
-  //   ])
-  // }
-
-  // function removeConnection(idx: number) {
-  //   const newConnections = [...connections]
-  //   newConnections.splice(idx, 1)
-  //   setConnections(newConnections)
-  // }
-
-  // console.log('installed connections', installedConnections)
-
   const { mutate: createConnections, isLoading } = useIntegrationConnectionsCreateMutation({
     onSuccess() {
       _onCreateConnections?.()
@@ -70,12 +49,17 @@ const ProjectLinker = ({
   function onCreateConnections() {
     const projectDetails = foreignProjects.filter((x) => x.id === vercelProjectId)[0]
 
+    if (!organizationIntegrationId) {
+      console.error('No integration ID set')
+      return
+    }
+
     createConnections({
       organizationIntegrationId,
       connection: {
         foreign_project_id: vercelProjectId,
         supabase_project_ref: supabaseProjectRef,
-        integration_id: INTEGRATION_INTERNAL_ID,
+        // integration_id: INTEGRATION_INTERNAL_ID,
         metadata: {
           ...projectDetails,
           supabaseConfig: {
@@ -85,7 +69,7 @@ const ProjectLinker = ({
           },
         },
       },
-      orgId: ui.selectedOrganization?.id,
+      orgSlug: ui.selectedOrganization?.slug,
     })
   }
 
@@ -118,9 +102,9 @@ const ProjectLinker = ({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="relative border rounded-  lg p-12 bg border-body">
+      <div className="relative border rounded-lg p-12 bg shadow-inner">
         <div
-          className="absolute inset-0 bg-grid-white/5 [mask-image:linear-gradient(0deg,#fff,rgba(255,255,255,0.6))] dark:bg-grid-slate-700/25 dark:[mask-image:linear-gradient(0deg,rgba(255,255,255,0.1),rgba(255,255,255,0.5))]"
+          className="absolute inset-0 bg-grid-black/5 [mask-image:linear-gradient(0deg,#fff,rgba(255,255,255,0.6))] dark:bg-grid-white/5 dark:[mask-image:linear-gradient(0deg,rgba(255,255,255,0.1),rgba(255,255,255,0.5))]"
           style={{ backgroundPosition: '10px 10px' }}
         ></div>
         <div className="flex gap-0 w-full relative">
@@ -223,20 +207,6 @@ const ProjectLinker = ({
           Connect project
         </Button>
       </div>
-      {/* <div>
-        <p className="text-scale-900 text-sm mb-3">
-          The following enviroment variables will be added:
-        </p>
-        <p>
-          {ENV_VAR_RAW_KEYS.map((x, idx) => {
-            return (
-              <span key={idx} className="text-scale-1100 text-xs font-mono">
-                {x},{' '}
-              </span>
-            )
-          })}
-        </p>
-      </div> */}
       <Markdown
         content={`
 The following enviroment variables will be added:
