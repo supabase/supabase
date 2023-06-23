@@ -21,10 +21,10 @@ export type IntegrationsData = Awaited<ReturnType<typeof getIntegrations>>
 export type ProjectIntegrationConnectionsData = Awaited<ReturnType<typeof getIntegrations>>
 export type IntegrationsError = unknown
 
-export const useIntegrationsQuery = <TData = IntegrationsData>(
-  {}: {},
-  { enabled = true, ...options }: UseQueryOptions<IntegrationsData, IntegrationsError, TData> = {}
-) =>
+export const useIntegrationsQuery = <TData = IntegrationsData>({
+  enabled = true,
+  ...options
+}: UseQueryOptions<IntegrationsData, IntegrationsError, TData> = {}) =>
   useQuery<IntegrationsData, IntegrationsError, TData>(
     integrationKeys.integrationsList(),
     ({ signal }) => getIntegrations({}, signal),

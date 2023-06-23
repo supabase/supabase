@@ -1,3 +1,7 @@
+import { debounce } from 'lodash'
+import { useRouter } from 'next/router'
+import { ChangeEvent, useRef, useState } from 'react'
+
 import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
 import IntegrationWindowLayout from 'components/layouts/IntegrationWindowLayout'
@@ -8,20 +12,11 @@ import { useIntegrationsQuery } from 'data/integrations/integrations-query'
 import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
 import { Integration } from 'data/integrations/integrations.types'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useProjectCreateMutation } from 'data/projects/project-create-mutation'
 import generator from 'generate-password'
 import { useStore } from 'hooks'
-import { post } from 'lib/common/fetch'
-import {
-  API_URL,
-  AWS_REGIONS,
-  DEFAULT_MINIMUM_PASSWORD_STRENGTH,
-  PRICING_TIER_PRODUCT_IDS,
-  PROVIDERS,
-} from 'lib/constants'
+import { AWS_REGIONS, DEFAULT_MINIMUM_PASSWORD_STRENGTH, PROVIDERS } from 'lib/constants'
 import { passwordStrength } from 'lib/helpers'
-import { debounce } from 'lodash'
-import { useRouter } from 'next/router'
-import { ChangeEvent, useRef, useState } from 'react'
 import { NextPageWithLayout } from 'types'
 import { Alert, Button, IconBook, IconLifeBuoy, Input, Listbox, LoadingLine } from 'ui'
 
@@ -94,7 +89,7 @@ const CreateProject = ({ setLoading }: { setLoading: (e: boolean) => void }) => 
   /**
    * array of integrations installed
    */
-  const { data: integrationData, isLoading: integrationDataLoading } = useIntegrationsQuery({})
+  const { data: integrationData, isLoading: integrationDataLoading } = useIntegrationsQuery()
 
   /**
    * the vercel integration installed for organization chosen
@@ -151,19 +146,23 @@ const CreateProject = ({ setLoading }: { setLoading: (e: boolean) => void }) => 
     delayedCheckPasswordStrength(password)
   }
 
+  const { mutateAsync: createProject } = useProjectCreateMutation()
+
   async function createSupabaseProject(dbSql?: string) {
-    const data = {
-      cloud_provider: PROVIDERS.AWS.id, // hardcoded for DB instances to be under AWS
-      org_id: organization?.id,
-      name: projectName,
-      db_pass: dbPass,
-      db_region: dbRegion,
-      // db_sql: dbSql || '',
-      db_pricing_tier_id: PRICING_TIER_PRODUCT_IDS.FREE,
-      // auth_site_url: _store.selectedVercelProjectUrl,
-      vercel_configuration_id: configurationId,
+    if (!organization) {
+      throw new Error('No organization set')
     }
-    const project = await post(`${API_URL}/projects`, data)
+
+    const project = await createProject({
+      organizationId: organization.id,
+      name: projectName,
+      dbPass,
+      dbRegion,
+      configurationId,
+    })
+
+    console.log('raw project:', project)
+
     return { ...project, db_host: `db.${project.ref}.supabase.co`, db_password: dbPass }
   }
 
@@ -189,14 +188,14 @@ const CreateProject = ({ setLoading }: { setLoading: (e: boolean) => void }) => 
       const response = await createSupabaseProject()
       // dbSql
 
-      if (response.error) {
-        setLoading(false)
-        ui.setNotification({
-          category: 'error',
-          message: `Failed to create project: ${response.error.message}`,
-        })
-        return
-      }
+      // if (response.error) {
+      //   setLoading(false)
+      //   ui.setNotification({
+      //     category: 'error',
+      //     message: `Failed to create project: ${response.error.message}`,
+      //   })
+      //   return
+      // }
 
       const project = response
 
@@ -209,6 +208,7 @@ const CreateProject = ({ setLoading }: { setLoading: (e: boolean) => void }) => 
 
       // Introduce a wait of 10 seconds
       try {
+        console.log('waiting for 10 seconds')
         await new Promise((resolve) => setTimeout(resolve, 10000))
       } catch (error) {
         console.error('An error occurred during the delay:', error)
