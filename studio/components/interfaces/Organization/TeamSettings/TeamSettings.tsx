@@ -33,7 +33,7 @@ const TeamSettings = () => {
   const { rolesAddable } =
     selectedOrganization !== undefined
       ? getRolesManagementPermissions(selectedOrganization?.id, roles, permissions ?? [])
-      : { rolesAddable: [] }
+      : { rolesAddable: [] as number[] }
 
   const [isLeaving, setIsLeaving] = useState(false)
   const [searchString, setSearchString] = useState('')

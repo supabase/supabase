@@ -5,7 +5,7 @@ import { observer } from 'mobx-react-lite'
 import { Badge, Button, Loading, Listbox, IconUser, Modal, IconAlertCircle, IconLoader } from 'ui'
 
 import { Member } from 'types'
-import { useStore } from 'hooks'
+import { useSelectedOrganization, useStore } from 'hooks'
 import { useParams } from 'common/hooks'
 
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
@@ -18,6 +18,7 @@ import { useOrganizationRolesQuery } from 'data/organizations/organization-roles
 import { useOrganizationDetailQuery } from 'data/organizations/organization-detail-query'
 import { useOrganizationMemberUpdateMutation } from 'data/organizations/organization-member-update-mutation'
 import { useProfileQuery } from 'data/profile/profile-query'
+import { usePermissionsQuery } from 'data/permissions/permissions-query'
 
 interface SelectedMember extends Member {
   oldRoleId: number
@@ -31,8 +32,10 @@ export interface MembersViewProps {
 const MembersView = ({ searchString }: MembersViewProps) => {
   const { ui } = useStore()
   const { slug } = useParams()
+  const selectedOrganization = useSelectedOrganization()
 
   const { data: profile } = useProfileQuery()
+  const { data: permissions } = usePermissionsQuery()
   const { data: detailData, isLoading: isLoadingOrgDetails } = useOrganizationDetailQuery({ slug })
   const { data: rolesData, isLoading: isLoadingRoles } = useOrganizationRolesQuery({ slug })
   const { mutate: updateOrganizationMember, isLoading } = useOrganizationMemberUpdateMutation({
@@ -52,7 +55,10 @@ const MembersView = ({ searchString }: MembersViewProps) => {
 
   const roles = rolesData?.roles ?? []
   const members = detailData?.members ?? []
-  const { rolesAddable, rolesRemovable } = getRolesManagementPermissions(roles)
+  const { rolesAddable, rolesRemovable } =
+    selectedOrganization !== undefined
+      ? getRolesManagementPermissions(selectedOrganization.id, roles, permissions ?? [])
+      : { rolesAddable: [] as number[], rolesRemovable: [] as number[] }
 
   const [selectedMember, setSelectedMember] = useState<SelectedMember>()
   const [userRoleChangeModalVisible, setUserRoleChangeModalVisible] = useState(false)
