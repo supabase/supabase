@@ -12,7 +12,7 @@ import { useProfileQuery } from 'data/profile/profile-query'
 import { useStore } from 'hooks'
 import Telemetry from 'lib/telemetry'
 import { GOTRUE_ERRORS, IS_PLATFORM } from './constants'
-import { clearLocalStorage } from './local-storage'
+import { clearLocalStorage, resetSignInClicks } from './local-storage'
 import { useProfileCreateMutation } from 'data/profile/profile-create-mutation'
 
 export const AuthContext = AuthContextInternal
@@ -99,6 +99,8 @@ export function useSignOut() {
   const queryClient = useQueryClient()
 
   return useCallback(async () => {
+    resetSignInClicks()
+
     const result = await gotrueClient.signOut()
     clearLocalStorage()
     await queryClient.resetQueries()
