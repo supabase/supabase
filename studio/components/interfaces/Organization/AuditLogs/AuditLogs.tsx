@@ -57,7 +57,7 @@ const AuditLogs = () => {
           </div>
         )}
 
-        {isError && <AlertError subject="Unable to retrieve audit logs" />}
+        {isError && <AlertError subject="Failed to retrieve audit logs" />}
 
         {isSuccess && (
           <>
