@@ -17,12 +17,17 @@ export function useCheckPermissions(
   organizationId?: number,
   permissions?: Permission[]
 ) {
-  const { data: allPermissions } =
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    permissions === undefined ? usePermissionsQuery() : { data: permissions }
-  const organization =
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    organizationId === undefined ? useSelectedOrganization() : { id: organizationId }
+  const permissionsResult = usePermissionsQuery({
+    enabled: permissions === undefined,
+  })
+
+  const allPermissions = permissions === undefined ? permissionsResult.data : permissions
+
+  const organizationResult = useSelectedOrganization({
+    enabled: organizationId === undefined,
+  })
+
+  const organization = organizationId === undefined ? organizationResult : { id: organizationId }
   const orgId = organization?.id
 
   if (!IS_PLATFORM) return true
