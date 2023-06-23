@@ -40,8 +40,14 @@ export const METRIC_CATEGORIES = {
 
 export const METRICS = [
   {
-    key: 'cpu_usage',
-    label: 'CPU % usage',
+    key: 'avg_cpu_usage',
+    label: 'Average CPU % usage',
+    provider: 'infra-monitoring',
+    category: METRIC_CATEGORIES.INSTANCE,
+  },
+  {
+    key: 'max_cpu_usage',
+    label: 'Max CPU % usage',
     provider: 'infra-monitoring',
     category: METRIC_CATEGORIES.INSTANCE,
   },

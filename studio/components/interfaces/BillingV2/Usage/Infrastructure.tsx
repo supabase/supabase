@@ -60,7 +60,7 @@ const Infrastructure = ({
 
   const { data: cpuUsageData, isLoading: isLoadingCpuUsageData } = useInfraMonitoringQuery({
     projectRef,
-    attribute: 'cpu_usage',
+    attribute: 'avg_cpu_usage',
     interval,
     startDate,
     endDate,
@@ -91,7 +91,7 @@ const Infrastructure = ({
   )
 
   const chartMeta: { [key: string]: { data: DataPoint[]; isLoading: boolean } } = {
-    cpu_usage: {
+    avg_cpu_usage: {
       isLoading: isLoadingCpuUsageData,
       data: cpuUsageData?.data ?? [],
     },
