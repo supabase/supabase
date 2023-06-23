@@ -7,7 +7,6 @@ import { checkPermissions } from 'hooks'
 import { DatabaseLayout } from 'components/layouts'
 import { Wrappers } from 'components/interfaces/Database'
 import NoPermission from 'components/ui/NoPermission'
-import { FormsContainer } from 'components/ui/Forms'
 
 const DatabaseWrappers: NextPageWithLayout = () => {
   const canReadWrappers = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'tables')
@@ -20,7 +19,14 @@ const DatabaseWrappers: NextPageWithLayout = () => {
 
 DatabaseWrappers.getLayout = (page) => (
   <DatabaseLayout title="Wrappers">
-    <FormsContainer>{page}</FormsContainer>
+    <div
+      className={clsx(
+        'mx-auto flex flex-col px-5 pt-6 pb-14',
+        'lg:pt-8 lg:px-14 1xl:px-28 2xl:px-32 h-full'
+      )}
+    >
+      {page}
+    </div>
   </DatabaseLayout>
 )
 

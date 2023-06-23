@@ -89,7 +89,7 @@ const Invoices: FC<Props> = ({ projectRef }) => {
             <Table.th key="header-date">Date</Table.th>,
             <Table.th key="header-amount">Amount due</Table.th>,
             <Table.th key="header-invoice">Invoice number</Table.th>,
-            <Table.th key="header-invoice" className="flex items-center">
+            <Table.th key="header-status" className="flex items-center">
               Status
             </Table.th>,
             <Table.th key="header-download" className="text-right"></Table.th>,
@@ -97,7 +97,7 @@ const Invoices: FC<Props> = ({ projectRef }) => {
           body={
             invoices.length === 0 ? (
               <Table.tr>
-                <Table.td colSpan={5} className="p-3 py-12 text-center">
+                <Table.td colSpan={6} className="p-3 py-12 text-center">
                   <p className="text-scale-1000">
                     {loading ? 'Checking for invoices' : 'No invoices for this project yet'}
                   </p>

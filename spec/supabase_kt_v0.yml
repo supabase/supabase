@@ -60,6 +60,8 @@ functions:
 
           `autoLoadFromStorage` - whether the GoTrue plugin should automatically load the session from the session manager. Default: `true`
 
+          `autoSaveToStorage` - whether the GoTrue plugin should automatically save the session to the session manager. Default: `true`	
+
           `flowType` - Which authentication flow to use. Currently available: FlowType.PKCE and FlowType.IMPLICIT. Default: `FlowType.IMPLICIT`
 
           `codeVerifierCache` - Interface for saving and loading codes for the PKCE authentication flow. Default: `SettingsCodeVerifierCache`
@@ -2040,11 +2042,11 @@ functions:
     $ref: '@supabase/gotrue-js.GoTrueClient.signUp'
     notes: |
       Creates a new user.
-      - By default, the user needs to verify their email address before logging in. To turn this off, disable **Confirm email** in [your project](https://app.supabase.com/project/_/auth/providers).
+      - By default, the user needs to verify their email address before logging in. To turn this off, disable **Confirm email** in [your project](https://supabase.com/dashboard/project/_/auth/providers).
       - **Confirm email** determines if users need to confirm their email address after signing up.
         - If **Confirm email** is enabled, the return value is null and you will be logged in instead.
         - If **Confirm email** is disabled, the return value is the user and you won't be logged in automatically.
-      - When the user confirms their email address, they are redirected to the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url) by default. You can modify your `SITE_URL` or add additional redirect URLs in [your project](https://app.supabase.com/project/_/auth/url-configuration).
+      - When the user confirms their email address, they are redirected to the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url) by default. You can modify your `SITE_URL` or add additional redirect URLs in [your project](https://supabase.com/dashboard/project/_/auth/url-configuration).
       - [supabase-kt](https://github.com/supabase-community/supabase-kt/) has default platform implementations: 
           - On JVM, you can currently only verify a sign up through the token. To send the token, rather than a redirect url, you have to change `{{ .ConfirmationURL }}` in your sign up email to `{{ .Token }}`
           - [deep links](https://developer.android.com/training/app-links/deep-linking) (Android), 
@@ -2052,7 +2054,7 @@ functions:
               - To enable deeplinking/url scheme support on Android/IOS set the `host` and the `scheme` in the GoTrue Config and call `client.handleDeeplinks(intent)` (Android) and `client.handleDeeplinks(url)` (IOS) on startup
           - the website origin (JS)
       - If signUpWith() is called for an existing confirmed user:
-        - If **Confirm email** is enabled in [your project](https://app.supabase.com/project/_/auth/providers), an obfuscated/fake user object is returned.
+        - If **Confirm email** is enabled in [your project](https://supabase.com/dashboard/project/_/auth/providers), an obfuscated/fake user object is returned.
         - If **Confirm email** is disabled, the error message, `User already registered` is returned.
     examples:
       - id: sign-up-phone
@@ -2161,7 +2163,7 @@ functions:
         - [url schemes](https://developer.apple.com/documentation/xcode/defining-a-custom-url-scheme-for-your-app) (IOS) 
             - To enable deeplinking/url scheme support on Android/IOS set the `host` and the `scheme` in the GoTrue Config and call `client.handleDeeplinks(intent)` (Android) and `client.handleDeeplinks(url)` (IOS) on startup
         - the website origin (JS)
-      - Magic links and OTPs share the same implementation. To send users a one-time code instead of a magic link, [modify the magic link email template](https://app.supabase.com/project/_/auth/templates) to include `{{ .Token }}` instead of `{{ .ConfirmationURL }}`.
+      - Magic links and OTPs share the same implementation. To send users a one-time code instead of a magic link, [modify the magic link email template](https://supabase.com/dashboard/project/_/auth/templates) to include `{{ .Token }}` instead of `{{ .ConfirmationURL }}`.
     examples:
       - id: sign-in-with-email
         name: Sign in with email
@@ -2324,6 +2326,59 @@ functions:
           Available types are:
             - `OtpType.Phone.SMS`
             - `OtpType.Phone.PHONE_CHANGE`
+  - id: send-password-reauthentication
+    title: 'reauthenticate()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.reauthenticate'
+    notes: |
+      - This method is used together with `modifyUser()` when a user's password needs to be updated.
+      - This method will send a nonce to the user's email. If the user doesn't have a confirmed email address, the method will send the nonce to the user's confirmed phone number instead.
+    examples:
+      - id: send-reauthentication-nonce
+        name: Send reauthentication nonce
+        description: Sends a reauthentication nonce to the user's email or phone number.
+        isSpotlight: true
+        code: |
+          ```kotlin
+          client.gotrue.reauthenticate()
+          ```
+  - id: resend-email-or-phone-otps
+    title: 'resend()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.resend'
+    notes: |
+      - Resends a signup confirmation, email change or phone change email to the user.
+      - Passwordless sign-ins can be resent by calling the `sendOtpTo()` method again.
+      - Password recovery emails can be resent by calling the `sendRecoveryEmail()` method again.
+      - This method will only resend an email or phone OTP to the user if there was an initial signup, email change or phone change request being made.
+    examples:
+      - id: resend-email-signup-confirmation
+        name: Resend an email signup confirmation
+        description: Resends the email signup confirmation to the user
+        isSpotlight: true
+        code: |
+          ```kotlin
+          client.gotrue.resendEmail(OtpType.Email.SIGNUP, "example@email.com")
+          ```
+      - id: resend-phone-signup-confirmation
+        name: Resend a phone signup confirmation
+        description: Resends the phone signup confirmation email to the user
+        code: |
+          ```kotlin
+          client.gotrue.resendPhone(OtpType.Phone.SMS, "1234567890")
+          ```
+      - id: resend-email-change-email
+        name: Resend email change email
+        description: Resends the email change email to the user
+        code: |
+          ```kotlin
+          client.gotrue.resendEmail(OtpType.Email.EMAIL_CHANGE, "example@email.com")
+          ```
+      - id: resend-phone-change
+        name: Resend phone change OTP
+        description: Resends the phone change OTP to the user
+        code: |
+          ```kotlin
+          client.gotrue.resendPhone(OtpType.Phone.PHONE_CHANGE, "1234567890")
+          ```
   - id: get-session
     title: 'Get current session'
     $ref: '@supabase/gotrue-js.GoTrueClient.getSession'
@@ -2368,7 +2423,7 @@ functions:
       Modifies the user data.
       - In order to use the `modifyUser()` method, the user needs to be signed in first.
       - By default, email updates sends a confirmation link to both the user's current and new email.
-      To only send a confirmation link to the user's new email, disable **Secure email change** in your project's [email auth provider settings](https://app.supabase.com/project/_/auth/providers).
+      To only send a confirmation link to the user's new email, disable **Secure email change** in your project's [email auth provider settings](https://supabase.com/dashboard/project/_/auth/providers).
     examples:
       - id: update-the-email-for-an-authenticated-user
         name: Update the email for an authenticated user
@@ -2376,7 +2431,7 @@ functions:
         isSpotlight: false
         code: |
           ```kotlin
-          val user = client.gotrue.modifyUser(Email) {
+          val user = client.gotrue.modifyUser {
              email = "newEmail@email.com"
           }
           ```
@@ -2385,7 +2440,7 @@ functions:
         isSpotlight: false
         code: |
           ```kotlin
-          val user = client.gotrue.modifyUser(Email) {
+          val user = client.gotrue.modifyUser {
              password = "secretPassword"
           }
           ```
@@ -2394,9 +2449,11 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val user = client.gotrue.modifyUser(Email, buildJsonObject { 
-             put("name", "John")
-          })
+          val user = client.gotrue.modifyUser {
+             data {
+                put("name", "John")
+             }
+          }
           ```
   - id: set-session
     title: 'importSession()'
@@ -2487,6 +2544,27 @@ functions:
           ```kotlin
           client.gotrue.sendRecoveryEmail(email = "example@email.com")
           ```
+  - id: exchange-code-for-session
+    title: 'exchangeCodeForSession()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.exchangeCodeForSession'
+    notes: |
+      - Used when `flowType` is set to `FlowType.PKCE` in the GoTrue configuration.
+    examples:
+      - id: exchange-auth-code
+        name: Exchange Auth Code
+        isSpotlight: true
+        code: |
+          ```kotlin
+          client.gotrue.exchangeCodeForSession("34e770dd-9ff9-416c-87fa-43b31d7ef225")
+          ```
+  - id: auth-mfa-api
+    title: 'Overview'
+    notes: |
+      This section contains methods commonly used for Multi-Factor Authentication (MFA) and are invoked behind the `supabase.gotrue.mfa` namespace. 
+
+      Currently, we only support time-based one-time password (TOTP) as the 2nd factor. We don't support recovery codes but we allow users to enroll more than 1 TOTP factor, with an upper limit of 10.
+
+      Having a 2nd TOTP factor for recovery frees the user of the burden of having to store their recovery codes somewhere. It also reduces the attack surface since multiple recovery codes are usually generated compared to just having 1 backup TOTP factor.
   - id: mfa-enroll
     title: 'Enroll a factor'
     $ref: '@supabase/gotrue-js.GoTrueMFAApi.enroll'
@@ -3206,6 +3284,19 @@ functions:
           //...
           channel.leave()
           ```
+  - id: remove-all-channels
+    title: removeAllChannels()
+    $ref: '@supabase/supabase-js.index.SupabaseClient.removeAllChannels'
+    notes: |
+      - Removing channels is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes. Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
+    examples:
+      - id: remove-all-channels
+        name: Remove all channels
+        isSpotlight: true
+        code: |
+          ```js
+          client.realtime.removeAllChannels()
+          ```
   - id: list-buckets
     title: listBuckets()
     $ref: '@supabase/storage-js.packages/StorageBucketApi.default.listBuckets'
@@ -3257,6 +3348,26 @@ functions:
           client.storage.createBucket(name = "icons", id = "icons") {
               public = true
               fileSizeLimit = 5.megabytes
+          }
+          ```
+  - id: update-bucket
+    title: updateBucket()
+    $ref: '@supabase/storage-js.packages/StorageBucketApi.default.updateBucket'
+    notes: |
+      - RLS policy permissions required:
+        - `buckets` table permissions: `select` and `update`
+        - `objects` table permissions: none
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+    examples:
+      - id: update-bucket
+        name: Update bucket
+        isSpotlight: true
+        code: |
+          ```kotlin
+          client.storage.updateBucket("cards") {
+              public = false
+              fileSizeLimit = 20.megabytes
+              allowedMimeTypes(ContentType.Image.PNG, ContentType.Image.JPEG)
           }
           ```
 
@@ -3435,7 +3546,22 @@ functions:
           val bucket = client.storage["avatars"]
           bucket.move("icon1.png", "icon2.png")
           ```
-
+  - id: from-copy
+    title: from.copy()
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.copy'
+    notes: |
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `insert` and `select`
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+    examples:
+      - id: copy-file
+        name: Copy file
+        isSpotlight: true
+        code: |
+          ```kotlin
+          client.storage["test"].copy(from = "avatar.png", to = "avatar2.png")
+          ```
   - id: from-create-signed-url
     title: from.createSignedUrl()
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.createSignedUrl'
@@ -3464,6 +3590,82 @@ functions:
               quality = 80
           }    
           ```
+  - id: from-create-signed-urls
+    title: from.createSignedUrls()
+    notes: |
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `select`
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+    examples:
+      - id: create-signed-urls
+        name: Create Signed URLs
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val urls = client.storage["avatars"].createSignedUrls(20.minutes, "avata1.jpg", "avatar2.jpg")
+          ```
+  - id: from-create-signed-upload-url
+    title: from.createSignedUploadUrl()
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.createSignedUploadUrl'
+    notes: |
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `insert`
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+    examples:
+      - id: create-signed-upload-url
+        name: Create Signed Upload URL
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val url = client.storage["avatars"].createSignedUploadUrl("avatar.png")
+          ```
+  - id: from-upload-to-signed-url
+    title: from.uploadToSignedUrl()
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.uploadToSignedUrl'
+    notes: |
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: none
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+    examples:
+      - id: upload-to-signed-url
+        name: Upload to a signed URL
+        isSpotlight: true
+        code: |
+          ```kotlin
+          client.storage["avatars"].uploadToSignedUrl(path = "avatar.jpg", token = "token-from-createSignedUploadUrl", data = bytes)
+          //or on JVM:
+          client.storage["avatars"].uploadToSignedUrl(path = "avatar.jpg", token = "token-from-createSignedUploadUrl", file = File("avatar.jpg"))
+          ```
+  - id: from-get-public-url
+    title: from.getPublicUrl()
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.getPublicUrl'
+    notes: |
+      - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/kotlin/storage-updatebucket) or by going to Storage on [app.supabase.com](https://supabase.com/dashboard), clicking the overflow menu on a bucket and choosing "Make public"
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: none
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+    examples:
+      - id: returns-the-url-for-an-asset-in-a-public-bucket
+        name: Returns the URL for an asset in a public bucket
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val url = client.storage["public-bucket"].publicUrl("folder/avatar1.png")
+          ```
+      - id: transform-asset-in-public-bucket
+        name: Returns the URL for an asset in a public bucket with transformations
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val url = client.storage["public-bucket"].publicRenderUrl("folder/avatar1.png") {
+              size(100, 100)
+          }
+          ```
+
   - id: from-download
     title: from.download()
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.download'

@@ -11,8 +11,8 @@ export default {
 
 const content = (
   <span className="text-scale-900 text-sm">
-    SidePanel content is inserted here, if you need to insert anything into the
-    SidePanel you can do so via
+    SidePanel content is inserted here, if you need to insert anything into the SidePanel you can do
+    so via
     <span className="text-code">children</span>
   </span>
 )
@@ -66,9 +66,7 @@ export const customFooter = (args: any) => (
 export const triggerElement = (args: any) => (
   <>
     <SidePanel {...args}>
-      <span className="text-scale-900">
-        This was opened with a trigger element
-      </span>
+      <span className="text-scale-900">This was opened with a trigger element</span>
     </SidePanel>
   </>
 )
@@ -95,9 +93,7 @@ export const nestedSidepanels = (args: any) => {
           -translate-y-1/2"
       >
         <div>
-          <h4 className="text-scale-1200 text-base">
-            Shall we nest some components?
-          </h4>
+          <h4 className="text-scale-1200 text-base">Shall we nest some components?</h4>
           <p className="text-scale-1100 text-sm">yea sure, go on then.</p>
         </div>
         <Button type="secondary" onClick={() => setPanel1Visible(true)}>
@@ -252,7 +248,11 @@ triggerElement.args = {
   onConfirm: action('onConfirm'),
   title: 'This is the title of the SidePanel',
   description: 'And i am the description',
-  triggerElement: <Button as="span">Open</Button>,
+  triggerElement: (
+    <Button asChild>
+      <span>Open</span>
+    </Button>
+  ),
 }
 
 longContent.args = {

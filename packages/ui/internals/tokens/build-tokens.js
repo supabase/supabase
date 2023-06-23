@@ -181,7 +181,7 @@ themeFiles.map(function (filePath, i) {
   console.log('here', filePath ?? 'no file path', rootTheme)
   const SD = StyleDictionary.extend(
     getStyleDictionaryConfig(
-      // determine wether to include the root theme properties with each theme
+      // determine whether to include the root theme properties with each theme
       rootTheme ? [filePath] : ['tokens/themes/root.json', filePath],
       rootTheme ? 'dark' : fileName,
       'themes',

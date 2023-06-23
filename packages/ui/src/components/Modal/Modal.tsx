@@ -129,7 +129,7 @@ const Modal = ({
         onClick={onConfirm}
         disabled={loading}
         loading={loading}
-        danger={variant === 'danger'}
+        type={variant === 'danger' ? 'danger' : 'primary'}
       >
         {confirmText}
       </Button>

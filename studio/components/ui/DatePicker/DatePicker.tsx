@@ -222,23 +222,25 @@ function _DatePicker({
       }
     >
       <Button
+        asChild
         title={triggerButtonTitle}
         type={triggerButtonType}
-        as="span"
         icon={<IconCalendar />}
         className={triggerButtonClassName}
       >
-        {/* Custom */}
-        {appliedStartDate && appliedEndDate && appliedStartDate !== appliedEndDate ? (
-          <>
-            {format(new Date(appliedStartDate), 'dd MMM')} -{' '}
-            {format(new Date(appliedEndDate), 'dd MMM')}
-          </>
-        ) : appliedStartDate || appliedEndDate ? (
-          format(new Date((appliedStartDate || appliedEndDate)!), 'dd MMM')
-        ) : (
-          'Custom'
-        )}
+        <span>
+          {/* Custom */}
+          {appliedStartDate && appliedEndDate && appliedStartDate !== appliedEndDate ? (
+            <>
+              {format(new Date(appliedStartDate), 'dd MMM')} -{' '}
+              {format(new Date(appliedEndDate), 'dd MMM')}
+            </>
+          ) : appliedStartDate || appliedEndDate ? (
+            format(new Date((appliedStartDate || appliedEndDate)!), 'dd MMM')
+          ) : (
+            'Custom'
+          )}
+        </span>
       </Button>
     </Popover>
   )

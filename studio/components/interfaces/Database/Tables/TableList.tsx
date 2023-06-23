@@ -70,7 +70,7 @@ const TableList: FC<Props> = ({
     <>
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <div className="w-[230px]">
+          <div className="w-[260px]">
             <Listbox
               size="small"
               value={selectedSchema}
@@ -216,7 +216,7 @@ const TableList: FC<Props> = ({
                       style={{ paddingTop: 3, paddingBottom: 3 }}
                       onClick={() => onOpenTable(x)}
                     >
-                      {x.columns.length} columns
+                      {x.columns?.length} columns
                     </Button>
 
                     <Tooltip.Root delayDuration={0}>
