@@ -17,8 +17,9 @@ import generator from 'generate-password'
 import { useStore } from 'hooks'
 import { AWS_REGIONS, DEFAULT_MINIMUM_PASSWORD_STRENGTH, PROVIDERS } from 'lib/constants'
 import { passwordStrength } from 'lib/helpers'
-import { NextPageWithLayout } from 'types'
+import { NextPageWithLayout, ProjectBase } from 'types'
 import { Alert, Button, IconBook, IconLifeBuoy, Input, Listbox, LoadingLine } from 'ui'
+import { useProjectApiQuery } from 'data/config/project-api-query'
 
 const VercelIntegration: NextPageWithLayout = () => {
   const [loading, setLoading] = useState<boolean>(false)
@@ -33,7 +34,7 @@ const VercelIntegration: NextPageWithLayout = () => {
             <h1 className="text-xl text-scale-1200">New project</h1>
             <>
               <Markdown content={`Choose the Supabase Organization you wish to install to`} />
-              <CreateProject setLoading={(e: boolean) => setLoading(e)} />
+              <CreateProject loading={loading} setLoading={(e: boolean) => setLoading(e)} />
             </>
           </ScaffoldContainer>
           <ScaffoldContainer className="flex flex-col gap-6 py-3">
@@ -61,7 +62,13 @@ const VercelIntegration: NextPageWithLayout = () => {
 
 VercelIntegration.getLayout = (page) => <IntegrationWindowLayout>{page}</IntegrationWindowLayout>
 
-const CreateProject = ({ setLoading }: { setLoading: (e: boolean) => void }) => {
+const CreateProject = ({
+  loading,
+  setLoading,
+}: {
+  loading: boolean
+  setLoading: (e: boolean) => void
+}) => {
   const router = useRouter()
   const { ui } = useStore()
   const [projectName, setProjectName] = useState('')
@@ -148,27 +155,8 @@ const CreateProject = ({ setLoading }: { setLoading: (e: boolean) => void }) => 
 
   const { mutateAsync: createProject } = useProjectCreateMutation()
 
-  async function createSupabaseProject(dbSql?: string) {
-    if (!organization) {
-      throw new Error('No organization set')
-    }
-
-    const project = await createProject({
-      organizationId: organization.id,
-      name: projectName,
-      dbPass,
-      dbRegion,
-      configurationId,
-    })
-
-    console.log('raw project:', project)
-
-    return { ...project, db_host: `db.${project.ref}.supabase.co`, db_password: dbPass }
-  }
-
+  const [newProjectRef, setNewProjectRef] = useState<string | undefined>(undefined)
   async function onCreateProject() {
-    setLoading(true)
-
     if (!organizationIntegration) {
       console.error('No organizationIntegration set')
       return
@@ -184,69 +172,96 @@ const CreateProject = ({ setLoading }: { setLoading: (e: boolean) => void }) => 
       return
     }
 
+    setLoading(true)
+
     try {
-      const response = await createSupabaseProject()
-      // dbSql
-
-      // if (response.error) {
-      //   setLoading(false)
-      //   ui.setNotification({
-      //     category: 'error',
-      //     message: `Failed to create project: ${response.error.message}`,
-      //   })
-      //   return
-      // }
-
-      const project = response
-
-      console.log('vercelProjects before projectDetails', vercelProjects)
-      const projectDetails = vercelProjects?.find((x) => x.id === foreignProjectId)
-
-      console.log('projectDetails', projectDetails)
-      console.log(project)
-      console.log('supabase_project_ref', project.ref)
-
-      // Introduce a wait of 10 seconds
-      try {
-        console.log('waiting for 10 seconds')
-        await new Promise((resolve) => setTimeout(resolve, 10000))
-      } catch (error) {
-        console.error('An error occurred during the delay:', error)
+      if (!organization) {
+        throw new Error('No organization set')
       }
 
-      // Wrap the createConnections function call in a try-catch block
+      let project: ProjectBase
+
       try {
-        await createConnections({
-          organizationIntegrationId: organizationIntegration?.id,
-          connection: {
-            foreign_project_id: foreignProjectId,
-            supabase_project_ref: project.ref,
-            metadata: {
-              ...projectDetails,
-              supabaseConfig: {
-                projectEnvVars: {
-                  write: true,
-                },
-              },
-            },
-          },
-          orgSlug: ui.selectedOrganization?.slug,
+        project = await createProject({
+          organizationId: organization.id,
+          name: projectName,
+          dbPass,
+          dbRegion,
+          configurationId,
         })
-      } catch (error) {
-        console.error('An error occurred during createConnections:', error)
-      }
 
-      // const query = new URLSearchParams(_store.queryParams).toString()
-      // router.push(`/vercel/complete?${query}`)
-
-      if (next) {
-        window.location.href = next
+        setNewProjectRef(project.ref)
+      } catch (error: any) {
+        setLoading(false)
+        ui.setNotification({
+          category: 'error',
+          message: `Failed to create project: ${error.message}`,
+        })
+        return
       }
     } catch (error) {
       console.error('Error', error)
       setLoading(false)
     }
   }
+  const isInstallingRef = useRef(false)
+
+  // Wait for the new project to be created before creating the connection
+  useProjectApiQuery(
+    { projectRef: newProjectRef },
+    {
+      enabled: newProjectRef !== undefined,
+      // refetch until the project is created
+      refetchInterval: (data) => {
+        return (data?.autoApiService.service_api_keys.length ?? 0) > 0 ? false : 1000
+      },
+      async onSuccess(data) {
+        const isReady = data.autoApiService.service_api_keys.length > 0
+
+        if (
+          !isReady ||
+          !organizationIntegration ||
+          !foreignProjectId ||
+          !newProjectRef ||
+          isInstallingRef.current
+        ) {
+          return
+        }
+        isInstallingRef.current = true
+
+        const projectDetails = vercelProjects?.find((x) => x.id === foreignProjectId)
+
+        // Wrap the createConnections function call in a try-catch block
+        try {
+          await createConnections({
+            organizationIntegrationId: organizationIntegration?.id,
+            connection: {
+              foreign_project_id: foreignProjectId,
+              supabase_project_ref: newProjectRef,
+              metadata: {
+                ...projectDetails,
+                supabaseConfig: {
+                  projectEnvVars: {
+                    write: true,
+                  },
+                },
+              },
+            },
+            orgSlug: ui.selectedOrganization?.slug,
+          })
+        } catch (error) {
+          console.error('An error occurred during createConnections:', error)
+          return
+        }
+
+        setLoading(false)
+
+        if (next) {
+          window.location.href = next
+        }
+      },
+    }
+  )
 
   return (
     <div className="">
@@ -317,8 +332,8 @@ const CreateProject = ({ setLoading }: { setLoading: (e: boolean) => void }) => 
         <Button
           size="medium"
           className="self-end"
-          // disabled={isLoading}
-          // loading={isLoading}
+          disabled={loading}
+          loading={loading}
           onClick={onCreateProject}
         >
           Create Project
