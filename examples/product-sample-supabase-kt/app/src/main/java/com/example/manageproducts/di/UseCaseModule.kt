@@ -28,4 +28,10 @@ abstract class UseCaseModule {
 
     @Binds
     abstract fun bindUploadImageUseCaseImpl(impl: UploadImageUseCaseImpl): UploadImageUseCase
+
+    @Binds
+    abstract fun bindAuthenticateUseCase(impl: SignInUseCaseImpl): SignInUseCase
+
+    @Binds
+    abstract fun bindSignUpUseCase(impl: SignUpUseCaseImpl): SignUpUseCase
 }

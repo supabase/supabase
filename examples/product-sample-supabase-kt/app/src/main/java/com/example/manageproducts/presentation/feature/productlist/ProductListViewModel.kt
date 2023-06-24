@@ -2,9 +2,9 @@ package com.example.manageproducts.presentation.feature.productlist
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.manageproducts.data.network.dto.ProductDto
-import com.example.manageproducts.data.repository.ProductRepository
 import com.example.manageproducts.domain.model.Product
+import com.example.manageproducts.domain.usecase.DeleteProductUseCase
+import com.example.manageproducts.domain.usecase.GetProductsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,7 +13,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ProductListViewModel @Inject constructor(
-    private val productRepository: ProductRepository,
+    private val getProductsUseCase: GetProductsUseCase,
+    private val deleteProductUseCase: DeleteProductUseCase,
 ) : ViewModel(), ProductListContract {
 
     private val _productList = MutableStateFlow<List<Product>?>(listOf())
@@ -29,8 +30,14 @@ class ProductListViewModel @Inject constructor(
 
     override fun getProducts() {
         viewModelScope.launch {
-            val products = productRepository.getProducts()
-            _productList.emit(products?.map { it -> it.asDomainModel() })
+            when (val result = getProductsUseCase.execute(input = Unit)) {
+                is GetProductsUseCase.Output.Success -> {
+                    _productList.emit(result.data)
+                }
+                is GetProductsUseCase.Output.Failure -> {
+
+                }
+            }
         }
     }
 
@@ -39,19 +46,11 @@ class ProductListViewModel @Inject constructor(
             val newList = mutableListOf<Product>().apply { _productList.value?.let { addAll(it) } }
             newList.remove(product)
             _productList.emit(newList.toList())
+
             // Call api to remove
-            productRepository.deleteProduct(id = product.id)
+            deleteProductUseCase.execute(DeleteProductUseCase.Input(productId = product.id))
             // Then fetch again
             getProducts()
         }
-    }
-
-    private fun ProductDto.asDomainModel(): Product {
-        return Product(
-            id = this.id ?: "",
-            name = this.name,
-            price = this.price,
-            image = this.image ?: ""
-        )
     }
 }

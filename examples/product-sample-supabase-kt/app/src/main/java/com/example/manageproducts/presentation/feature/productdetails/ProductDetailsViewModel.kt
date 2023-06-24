@@ -3,8 +3,6 @@ package com.example.manageproducts.presentation.feature.productdetails
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.manageproducts.data.network.dto.ProductDto
-import com.example.manageproducts.data.repository.ProductRepository
 import com.example.manageproducts.domain.model.Product
 import com.example.manageproducts.domain.usecase.GetProductDetailsUseCase
 import com.example.manageproducts.domain.usecase.UpdateProductUseCase
@@ -18,7 +16,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ProductDetailsViewModel @Inject constructor(
-    private val productRepository: ProductRepository,
+    private val getProductDetailsUseCase: GetProductDetailsUseCase,
+    private val updateProductUseCase: UpdateProductUseCase,
+    private val uploadImageUseCase: UploadImageUseCase,
     savedStateHandle: SavedStateHandle,
 
     ) : ViewModel(), ProductDetailsContract {
@@ -43,10 +43,22 @@ class ProductDetailsViewModel @Inject constructor(
 
     private fun getProduct(productId: String) {
         viewModelScope.launch {
-           val result = productRepository.getProduct(productId).asDomainModel()
-            _product.emit(result)
-            _name.emit(result.name)
-            _price.emit(result.price)
+            val result = getProductDetailsUseCase.execute(
+                GetProductDetailsUseCase.Input(
+                    id = productId
+                )
+            )
+            when (result) {
+                is GetProductDetailsUseCase.Output.Success -> {
+                    _product.emit(result.data)
+                    _name.emit(result.data.name)
+                    _price.emit(result.data.price)
+                    _imageUrl.emit(result.data.image)
+                }
+                is GetProductDetailsUseCase.Output.Failure -> {
+
+                }
+            }
         }
     }
 
@@ -60,26 +72,27 @@ class ProductDetailsViewModel @Inject constructor(
 
     override fun onSaveProduct(image: ByteArray) {
         viewModelScope.launch {
-            productRepository.updateProduct(
-                id = _product.value?.id ?: "",
-                price = _price.value,
-                name = _name.value,
-                imageFile = image,
-                imageName = "image_${_product.value?.id}",
+            updateProductUseCase.execute(
+                UpdateProductUseCase.Input(
+                    id = _product.value?.id ?: "",
+                    price = _price.value,
+                    name = _name.value,
+                    imageFile = image,
+                    imageName = "image_${_product.value?.id}",
+                )
             )
+            if (image.isNotEmpty()) {
+//                uploadImageUseCase.execute(
+//                    UploadImageUseCase.Input(
+//                        "image_${_product.value?.id}",
+//                        imageByteArray = image
+//                    )
+//                )
+            }
         }
     }
 
     override fun onImageChange(url: String) {
         _imageUrl.value = url
-    }
-
-    private fun ProductDto.asDomainModel(): Product {
-        return Product(
-            id = this.id ?: "",
-            name = this.name,
-            price = this.price,
-            image = this.image ?: ""
-        )
     }
 }

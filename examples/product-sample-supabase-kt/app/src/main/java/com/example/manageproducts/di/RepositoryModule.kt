@@ -1,7 +1,9 @@
 package com.example.manageproducts.di
 
+import com.example.manageproducts.data.repository.AuthenticationRepository
 import com.example.manageproducts.data.repository.ImageRepository
 import com.example.manageproducts.data.repository.ProductRepository
+import com.example.manageproducts.data.repository.impl.AuthenticationRepositoryImpl
 import com.example.manageproducts.data.repository.impl.ImageRepositoryImpl
 import com.example.manageproducts.data.repository.impl.ProductRepositoryImpl
 import dagger.Binds
@@ -18,5 +20,8 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun bindImageRepository(impl: ImageRepositoryImpl): ImageRepository
+
+    @Binds
+    abstract fun bindAuthenticateRepository(impl: AuthenticationRepositoryImpl): AuthenticationRepository
 
 }

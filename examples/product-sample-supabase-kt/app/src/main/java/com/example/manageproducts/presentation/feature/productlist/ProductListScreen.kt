@@ -3,10 +3,7 @@ package com.example.manageproducts.presentation.feature.productlist
 import android.annotation.SuppressLint
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.*
@@ -18,7 +15,6 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import com.example.manageproducts.R
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -32,11 +28,14 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavController
+import com.example.manageproducts.R
+import com.example.manageproducts.presentation.navigation.AddProductDestination
+import com.example.manageproducts.presentation.navigation.AuthenticationDestination
+import com.example.manageproducts.presentation.navigation.ProductDetailsDestination
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
-import com.example.manageproducts.presentation.navigation.AddProductDestination
-import com.example.manageproducts.presentation.navigation.ProductDetailsDestination
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
 fun ProductListScreen(
@@ -46,6 +45,24 @@ fun ProductListScreen(
 ) {
     val isLoading by viewModel.isLoading.collectAsState(initial = false)
     val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = isLoading)
+    val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
+    // If `lifecycleOwner` changes, dispose and reset the effect
+    DisposableEffect(lifecycleOwner) {
+        // Create an observer that triggers our remembered callbacks
+        // for sending analytics events
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_START) {
+                viewModel.getProducts()
+            }
+        }
+        // Add the observer to the lifecycle
+        lifecycleOwner.lifecycle.addObserver(observer)
+
+        // When the effect leaves the Composition, remove the observer
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
     SwipeRefresh(state = swipeRefreshState, onRefresh = { viewModel.getProducts() }) {
         Scaffold(
             topBar = {
@@ -63,71 +80,80 @@ fun ProductListScreen(
                 AddProductButton(onClick = { navController.navigate(AddProductDestination.route) })
             }
         ) { padding ->
-            val productList = viewModel.productList.collectAsState(initial = listOf()).value
-            if (!productList.isNullOrEmpty()) {
-                LazyColumn(
-                    modifier = modifier.padding(padding),
-                    contentPadding = PaddingValues(5.dp)
-                ) {
-                    itemsIndexed(
-                        items = productList,
-                        key = { _, product -> product.name }) { _, item ->
-                        val state = rememberDismissState(
-                            confirmStateChange = {
-                                if (it == DismissValue.DismissedToStart) {
-                                    // Handle item removed
-                                    viewModel.removeItem(item)
-                                }
-                                true
-                            }
-                        )
-                        SwipeToDismiss(
-                            state = state,
-                            background = {
-                                val color by animateColorAsState(
-                                    targetValue = when (state.dismissDirection) {
-                                        DismissDirection.StartToEnd -> MaterialTheme.colorScheme.primary
-                                        DismissDirection.EndToStart -> MaterialTheme.colorScheme.primary.copy(
-                                            alpha = 0.2f
-                                        )
-                                        null -> Color.Transparent
-                                    }
-                                )
-                                Box(
-                                    modifier = modifier
-                                        .fillMaxSize()
-                                        .background(color = color)
-                                        .padding(16.dp),
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Filled.Delete,
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.primary,
-                                        modifier = modifier.align(Alignment.CenterEnd)
-                                    )
-                                }
-
-                            },
-                            dismissContent = {
-                                ProductListItem(
-                                    product = item,
-                                    modifier = modifier,
-                                    onClick = {
-                                        navController.navigate(
-                                            ProductDetailsDestination.createRouteWithParam(
-                                                item.id
-                                            )
-                                        )
-                                    },
-                                )
-                            },
-                            directions = setOf(DismissDirection.EndToStart),
-                        )
-                    }
+            Column(modifier = modifier.padding(paddingValues = padding)) {
+                androidx.compose.material3.Button(modifier = modifier.fillMaxWidth().padding(20.dp), onClick = {
+                    navController.navigate(AuthenticationDestination.route)
+                }) {
+                    Text("Authentication feature")
                 }
-            } else {
-                Text("Product list is empty!")
+
+                val productList = viewModel.productList.collectAsState(initial = listOf()).value
+                if (!productList.isNullOrEmpty()) {
+                    LazyColumn(
+                        modifier = modifier.padding(padding),
+                        contentPadding = PaddingValues(5.dp)
+                    ) {
+                        itemsIndexed(
+                            items = productList,
+                            key = { _, product -> product.name }) { _, item ->
+                            val state = rememberDismissState(
+                                confirmStateChange = {
+                                    if (it == DismissValue.DismissedToStart) {
+                                        // Handle item removed
+                                        viewModel.removeItem(item)
+                                    }
+                                    true
+                                }
+                            )
+                            SwipeToDismiss(
+                                state = state,
+                                background = {
+                                    val color by animateColorAsState(
+                                        targetValue = when (state.dismissDirection) {
+                                            DismissDirection.StartToEnd -> MaterialTheme.colorScheme.primary
+                                            DismissDirection.EndToStart -> MaterialTheme.colorScheme.primary.copy(
+                                                alpha = 0.2f
+                                            )
+                                            null -> Color.Transparent
+                                        }
+                                    )
+                                    Box(
+                                        modifier = modifier
+                                            .fillMaxSize()
+                                            .background(color = color)
+                                            .padding(16.dp),
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Filled.Delete,
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colorScheme.primary,
+                                            modifier = modifier.align(Alignment.CenterEnd)
+                                        )
+                                    }
+
+                                },
+                                dismissContent = {
+                                    ProductListItem(
+                                        product = item,
+                                        modifier = modifier,
+                                        onClick = {
+                                            navController.navigate(
+                                                ProductDetailsDestination.createRouteWithParam(
+                                                    item.id
+                                                )
+                                            )
+                                        },
+                                    )
+                                },
+                                directions = setOf(DismissDirection.EndToStart),
+                            )
+                        }
+                    }
+                } else {
+                    Text("Product list is empty!")
+                }
             }
+
 
         }
     }
