@@ -6,10 +6,10 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@ui/components/shadcn/form'
+} from '@ui/components/shadcn/ui/form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { Meta } from '@storybook/react'
-import { Button } from '@ui/components/shadcn/button'
+import { Button } from '@ui/components/shadcn/ui/button'
 import {
   Command,
   CommandEmpty,
@@ -17,7 +17,7 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from '@ui/components/shadcn/command'
+} from '@ui/components/shadcn/ui/command'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,7 +30,7 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from '@ui/components/shadcn/dropdown-menu'
+} from '@ui/components/shadcn/ui/dropdown-menu'
 import { Popover, PopoverContent, PopoverTrigger } from '@ui/components/shadcn/popover'
 import { toast } from '@ui/components/shadcn/use-toast'
 import { cn } from '@ui/lib/utils'
