@@ -31,7 +31,7 @@ module.exports = config({
         'flash-code-slow': 'flash-code 2s forwards',
       },
       colors: {
-        border: 'hsl(var(--border))',
+        border: 'hsl(var(--border-overlay))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
         background: 'hsl(var(--background-default))',
@@ -49,7 +49,7 @@ module.exports = config({
           foreground: 'hsl(var(--destructive-300))',
         },
         muted: {
-          DEFAULT: 'hsl(var(--background-muted))',
+          DEFAULT: 'hsl(var(--border-overlay))',
           foreground: 'hsl(var(--foreground-lighter))',
         },
         accent: {
@@ -57,8 +57,8 @@ module.exports = config({
           foreground: 'hsl(var(--accent-foreground))',
         },
         popover: {
-          DEFAULT: 'hsl(var(--border-overlay))',
-          foreground: 'hsl(var(--background-default))',
+          DEFAULT: 'hsl(var(--background-overlay))',
+          foreground: 'hsl(var(--foreground-default))',
         },
         card: {
           DEFAULT: 'hsl(var(--card))',

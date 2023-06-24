@@ -4,6 +4,16 @@ const deepMerge = require('deepmerge')
 const color = require('./../ui/build/css/tw-extend/color')
 
 /**
+ *
+ */
+const colorExtend = {}
+Object.values(color).map((x, i) => {
+  colorExtend[Object.keys(color)[i]] = x.cssVariable
+})
+
+console.log('colorExtend', colorExtend)
+
+/**
  * Generates Tailwind colors for the theme
  * adds <alpha-value> as part of the hsl value
  */
@@ -65,51 +75,15 @@ const uiConfig = ui({
      */
     textColor: (theme) => ({
       ...theme('colors'),
-      ...generateTwColorClasses('textColor', color),
-    }),
-    accentColor: (theme) => ({
-      ...theme('colors'),
-      ...generateTwColorClasses('accentColor', color),
+      ...generateTwColorClasses('foreground', color),
     }),
     backgroundColor: (theme) => ({
       ...theme('colors'),
-      ...generateTwColorClasses('backgroundColor', color),
+      ...generateTwColorClasses('background', color),
     }),
     borderColor: (theme) => ({
       ...theme('colors'),
-      ...generateTwColorClasses('borderColor', color),
-    }),
-    boxShadowColor: (theme) => ({
-      ...theme('colors'),
-      ...generateTwColorClasses('boxShadowColor', color),
-    }),
-    caretColor: (theme) => ({
-      ...theme('colors'),
-      ...generateTwColorClasses('caretColor', color),
-    }),
-    divideColor: (theme) => ({
-      ...theme('colors'),
-      ...generateTwColorClasses('divideColor', color),
-    }),
-    outlineColor: (theme) => ({
-      ...theme('colors'),
-      ...generateTwColorClasses('outlineColor', color),
-    }),
-    placeholderColor: (theme) => ({
-      ...theme('colors'),
-      ...generateTwColorClasses('placeholderColor', color),
-    }),
-    ringColor: (theme) => ({
-      ...theme('colors'),
-      ...generateTwColorClasses('ringColor', color),
-    }),
-    ringOffsetColor: (theme) => ({
-      ...theme('colors'),
-      ...generateTwColorClasses('ringOffsetColor', color),
-    }),
-    textDecorationColor: (theme) => ({
-      ...theme('colors'),
-      ...generateTwColorClasses('textDecorationColor', color),
+      ...generateTwColorClasses('border', color),
     }),
     extend: {
       typography: ({ theme }) => ({
@@ -340,6 +314,9 @@ const uiConfig = ui({
       fontFamily: {
         sans: ['Circular', 'custom-font', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'],
         mono: ['Office Code Pro', 'Source Code Pro', 'Menlo', 'monospace'],
+      },
+      color: {
+        ...colorExtend,
       },
     },
   },
