@@ -6,8 +6,6 @@ import com.example.manageproducts.data.repository.ProductRepository
 import com.example.manageproducts.domain.model.Product
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.storage.Storage
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class ProductRepositoryImpl @Inject constructor(
@@ -16,14 +14,11 @@ class ProductRepositoryImpl @Inject constructor(
 ) : ProductRepository {
     override suspend fun createProduct(product: Product): Boolean {
         return try {
-            withContext(Dispatchers.IO) {
-                val productDto = ProductDto(
-                    name = product.name,
-                    price = product.price,
-                )
-                postgrest["products"].insert(productDto)
-                true
-            }
+            val productDto = ProductDto(
+                name = product.name,
+                price = product.price,
+            )
+            postgrest["products"].insert(productDto)
             true
         } catch (e: java.lang.Exception) {
             throw e
@@ -31,27 +26,21 @@ class ProductRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getProducts(): List<ProductDto>? {
-        return withContext(Dispatchers.IO) {
-            val result = postgrest["products"]
-                .select().decodeList<ProductDto>()
-            result
-        }
+        val result = postgrest["products"]
+            .select().decodeList<ProductDto>()
+        return result
     }
 
 
     override suspend fun getProduct(id: String): ProductDto {
-        return withContext(Dispatchers.IO) {
-            postgrest["products"].select {
-                eq("id", id)
-            }.decodeSingle<ProductDto>()
-        }
+        return postgrest["products"].select {
+            eq("id", id)
+        }.decodeSingle<ProductDto>()
     }
 
     override suspend fun deleteProduct(id: String) {
-        return withContext(Dispatchers.IO) {
-            postgrest["products"].delete {
-                eq("id", id)
-            }
+        postgrest["products"].delete {
+            eq("id", id)
         }
     }
 
@@ -62,29 +51,26 @@ class ProductRepositoryImpl @Inject constructor(
         imageName: String,
         imageFile: ByteArray
     ) {
-        withContext(Dispatchers.IO) {
-
-            if (imageFile.isNotEmpty()) {
-                val imageUrl =
-                    storage["Product%20Image"].upload(
-                        path = "$imageName.png",
-                        data = imageFile,
-                        upsert = true
-                    )
-                postgrest["products"].update({
-                    set("name", name)
-                    set("price", price)
-                    set("image", buildImageUrl(imageFileName = imageUrl))
-                }) {
-                    eq("id", id)
-                }
-            } else {
-                postgrest["products"].update({
-                    set("name", name)
-                    set("price", price)
-                }) {
-                    eq("id", id)
-                }
+        if (imageFile.isNotEmpty()) {
+            val imageUrl =
+                storage["Product%20Image"].upload(
+                    path = "$imageName.png",
+                    data = imageFile,
+                    upsert = true
+                )
+            postgrest["products"].update({
+                set("name", name)
+                set("price", price)
+                set("image", buildImageUrl(imageFileName = imageUrl))
+            }) {
+                eq("id", id)
+            }
+        } else {
+            postgrest["products"].update({
+                set("name", name)
+                set("price", price)
+            }) {
+                eq("id", id)
             }
         }
     }
