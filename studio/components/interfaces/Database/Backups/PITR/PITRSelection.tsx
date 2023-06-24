@@ -145,9 +145,8 @@ const PITRSelection = ({}) => {
                     Cancel
                   </Button>
                   <Tooltip.Root delayDuration={0}>
-                    <Tooltip.Trigger>
+                    <Tooltip.Trigger asChild>
                       <Button
-                        as="span"
                         type="warning"
                         disabled={isSelectedOutOfRange || !selectedDate}
                         onClick={() => setShowConfirmation(true)}

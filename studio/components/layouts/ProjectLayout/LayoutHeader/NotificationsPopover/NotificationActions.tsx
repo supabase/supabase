@@ -33,7 +33,7 @@ const NotificationActions: FC<Props> = ({
   const router = useRouter()
 
   const onSelectUpgradeProject = () => {
-    return router.push(`/project/${project.ref}/settings/billing/update/pro`)
+    return router.push(`/project/${project.ref}/settings/billing/subscription?panel=subscriptionPlan`)
   }
 
   const renderActionButton = (action: Action) => {
@@ -89,12 +89,12 @@ const NotificationActions: FC<Props> = ({
         )
       })}
       {changelogLink && (
-        <Link href={changelogLink}>
-          <a target="_blank" rel="noreferrer">
-            <Button as="span" type="default" icon={<IconExternalLink size={12} strokeWidth={2} />}>
+        <Link href={changelogLink} passHref>
+          <Button asChild type="default" icon={<IconExternalLink size={12} strokeWidth={2} />}>
+            <a target="_blank" rel="noreferrer">
               More info
-            </Button>
-          </a>
+            </a>
+          </Button>
         </Link>
       )}
     </div>

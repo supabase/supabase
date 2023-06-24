@@ -12,9 +12,9 @@
 - [x] Hostet Postgres-database. [Dokumenter](https://supabase.com/docs/guides/database)
 - [x] Autentisering og autorisasjon. [Dokumenter](https://supabase.com/docs/guides/auth)
 - [x] Autogenererte API-er.
-  - [x] REST. [Dokumenter](https://supabase.com/docs/guides/database/api#rest-api)
-  - [x] GraphQL. [Dokumenter](https://supabase.com/docs/guides/database/api#graphql-api)
-  - [x] Sanntidsabonnementer. [Dokumenter](https://supabase.com/docs/guides/database/api#realtime-api)
+  - [x] REST. [Dokumenter](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL. [Dokumenter](https://supabase.com/docs/guides/api#graphql-api-overview)
+  - [x] Sanntidsabonnementer. [Dokumenter](https://supabase.com/docs/guides/api#realtime-api-overview)
 - [x] Funksjoner.
   - [x] Databasefunksjoner. [Dokumenter](https://supabase.com/docs/guides/database/functions)
   - [x] Edge-funksjoner [Dokumenter](https://supabase.com/docs/guides/functions)
@@ -27,7 +27,7 @@ supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/a
 
 For fullstendig dokumentasjon, besøk [supabase.com/docs](https://supabase.com/docs)
 
-For å se hvordan du kan bidra, gå til [Getting Started](./DEVELOPERS.md)
+For å se hvordan du kan bidra, gå til [Getting Started](../DEVELOPERS.md)
 
 ## Fellesskap og støtte
 

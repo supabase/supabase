@@ -129,7 +129,7 @@ const TierUpdateSidePanel = () => {
               const tierMeta = subscriptionsPlans.find((it) => it.id === plan.id)
               const price = planMeta?.price ?? 0
               const isDowngradeOption = planMeta?.change_type === 'downgrade'
-              const isCurrentPlan = planMeta?.is_current ?? false
+              const isCurrentPlan = planMeta?.id === subscription?.plan?.id
 
               if (plan.id === 'tier_enterprise') {
                 return <EnterpriseCard key={plan.id} plan={plan} isCurrentPlan={isCurrentPlan} />

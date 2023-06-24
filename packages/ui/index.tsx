@@ -67,6 +67,9 @@ export * from './src/components/Command'
 // banners
 export * from './src/layout/banners'
 
+// utilities
+export * from './src/lib/utils'
+
 // config
 
 // export { default as Config } from './../ui.config'

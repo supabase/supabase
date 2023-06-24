@@ -12,9 +12,9 @@
 - [x] hostovaná databáza Postgres. [Dokumenty](https://supabase.com/docs/guides/database)
 - [x] Autentifikácia a autorizácia. [Dokumenty](https://supabase.com/docs/guides/auth)
 - [x] Automaticky generované rozhrania API.
-  - [x] REST. [Dokumenty](https://supabase.com/docs/guides/database/api#rest-api)
-  - [x] GraphQL. [Dokumenty](https://supabase.com/docs/guides/database/api#graphql-api)
-  - [x] Odbery v reálnom čase. [Docs](https://supabase.com/docs/guides/database/api#realtime-api)
+  - [x] REST. [Dokumenty](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL. [Dokumenty](https://supabase.com/docs/guides/api#graphql-api-overview)
+  - [x] Odbery v reálnom čase. [Docs](https://supabase.com/docs/guides/api#realtime-api-overview)
 - [x] Funkcie.
   - [x] Databázové funkcie. [Docs](https://supabase.com/docs/guides/database/functions)
   - [x] Okrajové funkcie [Docs](https://supabase.com/docs/guides/functions)
@@ -27,7 +27,7 @@
 
 Úplnú dokumentáciu nájdete na stránke [supabase.com/docs](https://supabase.com/docs)
 
-Ak chcete zistiť, ako prispievať, navštívte stránku [Začíname](./DEVELOPERS.md)
+Ak chcete zistiť, ako prispievať, navštívte stránku [Začíname](../DEVELOPERS.md)
 
 ## Komunita a podpora
 

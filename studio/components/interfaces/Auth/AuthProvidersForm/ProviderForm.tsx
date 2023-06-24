@@ -158,7 +158,7 @@ const ProviderForm: FC<Props> = ({ provider }) => {
                         disabled
                         label="Redirect URL"
                         value={
-                          customDomainData?.customDomain
+                          customDomainData?.customDomain?.status === 'active'
                             ? `https://${customDomainData.customDomain?.hostname}/auth/v1/callback`
                             : `https://${ui.selectedProjectRef}.supabase.co/auth/v1/callback`
                         }

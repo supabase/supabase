@@ -12,9 +12,9 @@
 - [x] Hosted Postgres Database. [Docs](https://supabase.com/docs/guides/database)
 - [x] Autentifikation og autorisering. [Docs](https://supabase.com/docs/guides/auth)
 - [x] Automatisk genererede API'er.
-  - [x] REST. [Docs](https://supabase.com/docs/guides/database/api#rest-api)
-  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/database/api#graphql-api)
-  - [x] Realtidsabonnementer. [Docs](https://supabase.com/docs/guides/database/api#realtime-api)
+  - [x] REST. [Docs](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/api#graphql-api-overview)
+  - [x] Realtidsabonnementer. [Docs](https://supabase.com/docs/guides/api#realtime-api-overview)
 - [x] Funktioner.
   - [x] Databasefunktioner. [Docs](https://supabase.com/docs/guides/database/functions)
   - [x] Edge-funktioner [Docs](https://supabase.com/docs/guides/functions)
@@ -27,7 +27,7 @@
 
 Du kan finde den fulde dokumentation på [supabase.com/docs](https://supabase.com/docs)
 
-For at se, hvordan man bidrager, besøg [Getting Started](./DEVELOPERS.md)
+For at se, hvordan man bidrager, besøg [Getting Started](../DEVELOPERS.md)
 
 ## Fællesskab og support
 

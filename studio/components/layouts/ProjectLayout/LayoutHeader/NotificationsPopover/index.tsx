@@ -226,11 +226,13 @@ const NotificationsPopover: FC<Props> = () => {
           <Tooltip.Trigger asChild>
             <div className="relative flex">
               <Button
-                as="span"
+                asChild
                 id="notification-button"
                 type="default"
                 icon={<IconBell size={16} strokeWidth={1.5} className="text-scale-1200" />}
-              />
+              >
+                <span></span>
+              </Button>
               {hasNewNotifications && (
                 <div className="absolute -top-1 -right-1 z-50 flex h-3 w-3 items-center justify-center">
                   <div className="h-full w-full animate-ping rounded-full bg-green-800 opacity-60"></div>

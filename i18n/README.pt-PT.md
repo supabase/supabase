@@ -12,9 +12,9 @@
 - [x] Base de dados Postgres alojada. [Docs](https://supabase.com/docs/guides/database)
 - [x] Autenticação e autorização. [Docs](https://supabase.com/docs/guides/auth)
 - [x] APIs geradas automaticamente.
-  - [x] REST. [Docs](https://supabase.com/docs/guides/database/api#rest-api)
-  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/database/api#graphql-api)
-  - [x] Assinaturas em tempo real. [Docs](https://supabase.com/docs/guides/database/api#realtime-api)
+  - [x] REST. [Docs](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/api#graphql-api-overview)
+  - [x] Assinaturas em tempo real. [Docs](https://supabase.com/docs/guides/api#realtime-api-overview)
 - [x] Funções.
   - [x] Funções de base de dados. [Docs](https://supabase.com/docs/guides/database/functions)
   - [x] Funções de Borda [Docs](https://supabase.com/docs/guides/functions)
@@ -27,7 +27,7 @@
 
 Para documentação completa, visite [supabase.com/docs](https://supabase.com/docs)
 
-Para ver como contribuir, visite [Getting Started](./DEVELOPERS.md)
+Para ver como contribuir, visite [Getting Started](../DEVELOPERS.md)
 
 ## Comunidade & Suporte
 

@@ -100,10 +100,15 @@ const NavigationBar: FC<Props> = ({}) => {
       <ul className="flex flex-col space-y-4 items-center">
         {IS_PLATFORM && showCmdkHelper && (
           <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger>
-              <Button as="span" type="text" size="tiny" onClick={() => setIsOpen(true)}>
+            <Tooltip.Trigger asChild>
+              <Button
+                type="text"
+                size="tiny"
+                onClick={() => setIsOpen(true)}
+                className="border-none"
+              >
                 <div className="py-1">
-                  <IconSearch size={18} strokeWidth={2} />
+                  <IconSearch size={18} strokeWidth={2} className="text-scale-900" />
                 </div>
               </Button>
             </Tooltip.Trigger>
@@ -156,10 +161,10 @@ const NavigationBar: FC<Props> = ({}) => {
             </>
           }
         >
-          <Button as="span" type="text" size="tiny">
-            <div className="py-1">
-              <IconUser size={18} strokeWidth={2} />
-            </div>
+          <Button asChild type="text" size="tiny">
+            <span className="py-1 h-10 border-none">
+              <IconUser size={18} strokeWidth={2} className="text-scale-900" />
+            </span>
           </Button>
         </Dropdown>
       </ul>

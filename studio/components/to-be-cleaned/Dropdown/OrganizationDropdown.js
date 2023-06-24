@@ -47,7 +47,9 @@ const OrganizationDropdown = ({ organizations }) => {
         </>
       }
     >
-      <Button as="span">New project</Button>
+      <Button asChild>
+        <span>New project</span>
+      </Button>
     </Dropdown>
   )
 }
