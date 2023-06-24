@@ -409,9 +409,12 @@ export default function Avatar({ url, size = 150, onUpload }: Props) {
       }
 
       const formData = new FormData()
-      formData.append('file', photo)
+      formData.append('file', JSON.parse(JSON.stringify(photo)))
 
-      const fileExt = file.name.split('.').pop()
+      let fileExt = null;
+      if (file.name) {
+          fileExt = file.name.split('.').pop();
+      }
       const filePath = `${Math.random()}.${fileExt}`
 
       let { error } = await supabase.storage.from('avatars').upload(filePath, formData)
@@ -509,7 +512,7 @@ import Avatar from './Avatar'
 Now you will need to run the prebuild command to get the application working on your chosen platform.
 
 ```bash
-expo prebuild
+npx expo prebuild
 ```
 
 ### Storage management
