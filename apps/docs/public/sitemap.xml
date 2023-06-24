@@ -1603,6 +1603,12 @@
   </url>
 
   <url>
+    <loc>https://supabase.com/docs/guides/getting-started/tutorials/with-kotlin</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
     <loc>https://supabase.com/docs/guides/getting-started/tutorials/with-ionic-angular</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
