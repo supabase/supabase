@@ -12,9 +12,9 @@
 - [x] Barındırılan Postgres Veritabanı. [Dokümanlar](https://supabase.com/docs/guides/database)
 - [x] Kimlik Doğrulama ve Yetkilendirme. [Dokümanlar](https://supabase.com/docs/guides/auth)
 - [x] Otomatik oluşturulan API'ler.
-  - [x] REST. [Dokümanlar](https://supabase.com/docs/guides/database/api#rest-api)
-  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/database/api#graphql-api)
-  - [x] Gerçek zamanlı abonelikler. [Dokümanlar](https://supabase.com/docs/guides/database/api#realtime-api)
+  - [x] REST. [Dokümanlar](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/api#graphql-api-overview)
+  - [x] Gerçek zamanlı abonelikler. [Dokümanlar](https://supabase.com/docs/guides/api#realtime-api-overview)
 - [x] Fonksiyonlar.
   - [x] Veritabanı Fonksiyonları. [Dokümanlar](https://supabase.com/docs/guides/database/functions)
   - [x] Kenar İşlevleri [Dokümanlar](https://supabase.com/docs/guides/functions)
@@ -27,7 +27,7 @@
 
 Belgelerin tamamı için [supabase.com/docs](https://supabase.com/docs) adresini ziyaret edin
 
-Nasıl Katkıda bulunacağınızı görmek için [Başlarken](./DEVELOPERS.md) adresini ziyaret edin
+Nasıl Katkıda bulunacağınızı görmek için [Başlarken](../DEVELOPERS.md) adresini ziyaret edin
 
 ## Topluluk ve Destek
 

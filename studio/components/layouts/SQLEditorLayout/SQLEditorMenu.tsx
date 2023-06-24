@@ -11,6 +11,8 @@ import {
   Dropdown,
   IconChevronDown,
   useCommandMenu,
+  IconCode,
+  AiIcon,
 } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
@@ -96,24 +98,18 @@ const SideBarContent = observer(() => {
         {IS_PLATFORM && (
           <div className="my-4 mx-3 space-y-1 px-3">
             <div className="flex items-center">
-              <Button
-                className={showCmdkHelper ? 'rounded-r-none px-3' : undefined}
-                block
-                icon={<IconPlus />}
-                type="default"
-                disabled={isLoading}
-                style={{ justifyContent: 'start' }}
-                onClick={() => handleNewQuery()}
-              >
-                New query
-              </Button>
-              {showCmdkHelper && (
-                <Dropdown
-                  align="end"
-                  side="bottom"
-                  sideOffset={3}
-                  className="max-w-[210px]"
-                  overlay={[
+              <Dropdown
+                align="start"
+                side="bottom"
+                sideOffset={3}
+                className="max-w-[210px] this-class-is-no-bueno"
+                overlay={[
+                  <Dropdown.Item key="new-blank-query" onClick={() => handleNewQuery()}>
+                    <div className="space-y-1">
+                      <p className="block text-scale-1200">New blank query</p>
+                    </div>
+                  </Dropdown.Item>,
+                  showCmdkHelper ? (
                     <Dropdown.Item
                       key="new-ai-query"
                       onClick={() => {
@@ -123,21 +119,21 @@ const SideBarContent = observer(() => {
                     >
                       <div className="space-y-1">
                         <p className="block text-scale-1200">New AI query</p>
-                        <p className="block text-scale-1100">
-                          Generate a SQL query using Supabase AI
-                        </p>
                       </div>
-                    </Dropdown.Item>,
-                  ]}
+                    </Dropdown.Item>
+                  ) : null,
+                ]}
+              >
+                <Button
+                  block
+                  icon={<IconPlus />}
+                  type="primary"
+                  disabled={isLoading}
+                  style={{ justifyContent: 'start' }}
                 >
-                  <Button
-                    disabled={isLoading}
-                    type="default"
-                    className="rounded-l-none px-[4px] py-[5px]"
-                    icon={<IconChevronDown />}
-                  />
-                </Dropdown>
-              )}
+                  New query
+                </Button>
+              </Dropdown>
             </div>
             <Input
               size="tiny"

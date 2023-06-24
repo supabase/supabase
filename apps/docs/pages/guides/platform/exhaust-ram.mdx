@@ -23,6 +23,8 @@ You may observe elevated memory usage even when your database has little to no l
 
 Every Supabase project runs in its own dedicated virtual machine. Your instance will have a different set of hardware provisioned depending on your [compute add-on](https://supabase.com/docs/guides/platform/compute-add-ons). Depending on your workload, your compute hardware may not be suitable and can result in high RAM usage.
 
+A good proxy for unhealthy memory usage is swap usage. If you run out of RAM, your system will offload memory to your disk's much slower swap partition. If your swap is above 70%, chances are high that your compute hardware is not suitable for your workload. Head over to your project's [Database Health](https://supabase.com/dashboard/project/_/reports/database) to see your swap usage.
+
 High RAM usage could come with a range of issues:
 
 - degraded performance overall when your instance has to use swap memory
@@ -31,7 +33,7 @@ High RAM usage could come with a range of issues:
 
 ## Monitor your RAM
 
-To check your RAM usage on the Supabase Platform, head over to [Database health in the Reports section](https://app.supabase.com/project/_/reports/database).
+To check your RAM usage on the Supabase Platform, head over to [Database Health in the Reports section](https://supabase.com/dashboard/project/_/reports/database).
 
 It is also possible to monitor your resources and set up alerts using Prometheus/Grafana. With Grafana you will be able to see how much of your RAM is used for caching and you can track other metrics such as your Swap usage. Read the [Metrics Guide](https://supabase.com/docs/guides/platform/metrics) to learn more.
 
@@ -41,11 +43,11 @@ Everything you do with your Supabase project requires memory in some form. Hence
 
 - **Query performance:** Queries that take a long time to complete (>1 second) could be using your RAM inefficiently. Check our guide on [examining query performance](https://supabase.com/docs/guides/platform/performance#examining-query-performance).
 - **Too many connections:** Every connection to your database consumes memory. You can check the number of active connections under [Database Roles](https://supabase.com/dashboard/project/_/database/roles) after you select your project. Read our guide on [too many open connections](https://supabase.com/docs/guides/platform/troubleshooting#too-many-open-connections).
-- **Extensions:** Some extensions such as `timescaledb` or `pg_cron` can use a lot of memory. It can also add up when you have too many extensions running. You can manage your database extensions in the dashboard under [Extensions](https://app.supabase.com/project/_/database/extensions).
+- **Extensions:** Some extensions such as `timescaledb` or `pg_cron` can use a lot of memory. It can also add up when you have too many extensions running. You can manage your database extensions in the dashboard under [Extensions](https://supabase.com/dashboard/project/_/database/extensions).
 
 ## How to fix your memory issues
 
-1. **Upgrade your compute:** You can get a Compute Add-on for your project. See your [upgrade options](https://app.supabase.com/project/_/settings/billing/update/pro) by selecting your project.
+1. **Upgrade your compute:** You can get a Compute Add-on for your project. See your [upgrade options](https://supabase.com/dashboard/project/_/settings/billing/subscription?panel=computeInstance) by selecting your project.
 2. **Optimize performance:** Get more out of your instance's resources by optimizing your usage. Have a look at our [performance tuning guide](https://supabase.com/docs/guides/platform/performance#examining-query-performance) and our [production readiness guide](https://supabase.com/docs/guides/platform/going-into-prod#performance).
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />

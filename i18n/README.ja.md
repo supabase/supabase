@@ -12,9 +12,9 @@
 - [x] ホスティングされた Postgres データベースです。[ドックス](https://supabase.com/docs/guides/database)
 - [x] 認証と認可。[ドキュメント](https://supabase.com/docs/guides/auth)
 - [x] 自動生成される API。
-  - [x] REST。[ドキュメント](https://supabase.com/docs/guides/database/api#rest-api)
-  - [x] GraphQL。[Docs](https://supabase.com/docs/guides/database/api#graphql-api)
-  - [x] リアルタイムサブスクリプション。[ドキュメント](https://supabase.com/docs/guides/database/api#realtime-api)
+  - [x] REST。[ドキュメント](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL。[Docs](https://supabase.com/docs/guides/api#graphql-api-overview)
+  - [x] リアルタイムサブスクリプション。[ドキュメント](https://supabase.com/docs/guides/api#realtime-api-overview)
 - [x] 関数。
   - [x] データベースファンクション。[Docs](https://supabase.com/docs/guides/database/functions)
   - [x] エッジ機能 [Docs](https://supabase.com/docs/guides/functions)
@@ -27,7 +27,7 @@
 
 完全なドキュメントは、[supabase.com/docs](https://supabase.com/docs)を参照してください。
 
-貢献の仕方については、[Getting Started](./DEVELOPERS.md) を参照してください。
+貢献の仕方については、[Getting Started](../DEVELOPERS.md) を参照してください。
 
 ## コミュニティとサポート
 

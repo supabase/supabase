@@ -12,9 +12,9 @@
 - [x] Hostitud Postgres andmebaas. [Dokumendid](https://supabase.com/docs/guides/database)
 - [x] Autentimine ja autoriseerimine. [Dokumendid](https://supabase.com/docs/guides/auth)
 - [x] Automaatselt genereeritud APId.
-  - [x] REST. [Dokumendid](https://supabase.com/docs/guides/database/api#rest-api)
-  - [x] GraphQL. [Dokumendid](https://supabase.com/docs/guides/database/api#graphql-api)
-  - [x] Reaalajas toimivad tellimused. [Dokumendid](https://supabase.com/docs/guides/database/api#realtime-api)
+  - [x] REST. [Dokumendid](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL. [Dokumendid](https://supabase.com/docs/guides/api#graphql-api-overview)
+  - [x] Reaalajas toimivad tellimused. [Dokumendid](https://supabase.com/docs/guides/api#realtime-api-overview)
 - [x] Funktsioonid.
   - [x] Andmebaasi funktsioonid. [Dokumendid](https://supabase.com/docs/guides/database/functions)
   - [x] Edge Functions [Docs](https://supabase.com/docs/guides/functions)
@@ -27,7 +27,7 @@
 
 Täieliku dokumentatsiooni saamiseks külastage [supabase.com/docs](https://supabase.com/docs)
 
-Et näha, kuidas panustada, külastage [Getting Started](./DEVELOPERS.md)
+Et näha, kuidas panustada, külastage [Getting Started](../DEVELOPERS.md)
 
 ## Kogukond ja tugi
 

@@ -12,9 +12,9 @@
 - [x] Basis Data Postgres yang dihosting. [Dokumen](https://supabase.com/docs/guides/database)
 - [x] Otentikasi dan Otorisasi. [Dokumen](https://supabase.com/docs/guides/auth)
 - [x] API yang dibuat secara otomatis.
-  - [x] REST. [Documents](https://supabase.com/docs/guides/database/api#rest-api)
-  - [x] GraphQL. [Documents](https://supabase.com/docs/guides/database/api#graphql-api)
-  - [x] Langganan realtime. [Documents](https://supabase.com/docs/guides/database/api#realtime-api)
+  - [x] REST. [Documents](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL. [Documents](https://supabase.com/docs/guides/api#graphql-api-overview)
+  - [x] Langganan realtime. [Documents](https://supabase.com/docs/guides/api#realtime-api-overview)
 - [x] Fungsi-fungsi.
   - [x] Fungsi-fungsi Basis Data. [Documents](https://supabase.com/docs/guides/database/functions)
   - [x] Fungsi Tepi [Documents](https://supabase.com/docs/guides/functions)
@@ -27,7 +27,7 @@
 
 Untuk dokumentasi lengkap, kunjungi [supabase.com/docs](https://supabase.com/docs)
 
-Untuk melihat bagaimana cara berkontribusi, kunjungi [Memulai](./DEVELOPERS.md)
+Untuk melihat bagaimana cara berkontribusi, kunjungi [Memulai](../DEVELOPERS.md)
 
 ## Komunitas &amp; Dukungan
 

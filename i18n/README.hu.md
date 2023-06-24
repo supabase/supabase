@@ -12,9 +12,9 @@
 - [x] Hosted Postgres adatbázis. [Docs](https://supabase.com/docs/guides/database)
 - [x] Hitelesítés és engedélyezés. [Docs](https://supabase.com/docs/guides/auth)
 - [x] Automatikusan generált API-k.
-  - [x] REST. [Docs](https://supabase.com/docs/guides/database/api#rest-api)
-  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/database/api#graphql-api)
-  - [x] Valós idejű előfizetések. [Docs](https://supabase.com/docs/guides/database/api#realtime-api)
+  - [x] REST. [Docs](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/api#graphql-api-overview)
+  - [x] Valós idejű előfizetések. [Docs](https://supabase.com/docs/guides/api#realtime-api-overview)
 - [x] Funkciók.
   - [x] Database Functions. [Docs](https://supabase.com/docs/guides/database/functions)
   - [x] Edge Functions [Docs](https://supabase.com/docs/guides/functions)
@@ -27,7 +27,7 @@
 
 A teljes dokumentációért látogasson el [supabase.com/docs](https://supabase.com/docs)
 
-A Contribute-hoz való hozzájáruláshoz látogasson el a [Getting Started](./DEVELOPERS.md) oldalra
+A Contribute-hoz való hozzájáruláshoz látogasson el a [Getting Started](../DEVELOPERS.md) oldalra
 
 ## Közösség és támogatás
 

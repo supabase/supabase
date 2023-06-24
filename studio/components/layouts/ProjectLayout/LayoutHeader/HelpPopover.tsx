@@ -28,7 +28,7 @@ const HelpPopover: FC<Props> = () => {
       side="bottom"
       sideOffset={8}
       overlay={
-        <div className="my-4 w-96 space-y-4">
+        <div className="my-4 w-[400px] space-y-4">
           <div className="my-5 space-y-4 px-5">
             <h5 className="text-scale-1200">Need help with your project?</h5>
             <p className="text-sm text-scale-900">
@@ -128,11 +128,11 @@ const HelpPopover: FC<Props> = () => {
       }
     >
       <Button
-        as="span"
+        asChild
         type="default"
         icon={<IconHelpCircle size={16} strokeWidth={1.5} className="text-scale-900" />}
       >
-        Help
+        <span>Help</span>
       </Button>
     </Popover>
   )

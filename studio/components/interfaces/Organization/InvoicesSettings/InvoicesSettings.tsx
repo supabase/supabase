@@ -23,21 +23,22 @@ const InvoicesSettings = () => {
   const [count, setCount] = useState(0)
   const [invoices, setInvoices] = useState<Invoice[]>([])
 
-  const { stripe_customer_id } = ui.selectedOrganization ?? {}
+  const { stripe_customer_id, slug } = ui.selectedOrganization ?? {}
   const offset = (page - 1) * PAGE_LIMIT
 
   const canReadInvoices = checkPermissions(PermissionAction.READ, 'invoices')
 
   useEffect(() => {
-    if (!canReadInvoices) return
+    if (!canReadInvoices || !stripe_customer_id || !slug) return
 
     let cancel = false
     const page = 1
 
     const fetchInvoiceCount = async () => {
-      const res = await head(`${API_URL}/stripe/invoices?customer=${stripe_customer_id}`, [
-        'X-Total-Count',
-      ])
+      const res = await head(
+        `${API_URL}/stripe/invoices?customer=${stripe_customer_id}&slug=${slug}`,
+        ['X-Total-Count']
+      )
       if (!cancel) {
         if (res.error) {
           ui.setNotification({ category: 'error', message: res.error.message })
@@ -54,7 +55,7 @@ const InvoicesSettings = () => {
     return () => {
       cancel = true
     }
-  }, [stripe_customer_id])
+  }, [stripe_customer_id, slug])
 
   const fetchInvoices = async (page: number) => {
     setLoading(true)
@@ -62,7 +63,7 @@ const InvoicesSettings = () => {
 
     const offset = (page - 1) * PAGE_LIMIT
     const invoices = await get(
-      `${API_URL}/stripe/invoices?offset=${offset}&limit=${PAGE_LIMIT}&customer=${stripe_customer_id}`
+      `${API_URL}/stripe/invoices?offset=${offset}&limit=${PAGE_LIMIT}&customer=${stripe_customer_id}&slug=${slug}`
     )
 
     if (invoices.error) {

@@ -12,9 +12,9 @@
 - [x] 托管的 Postgres 数据库。[文档](https://supabase.com/docs/guides/database)
 - [x] 认证和授权。[文档](https://supabase.com/docs/guides/auth)
 - [x] 自动生成的 API。
-  - [x] REST.[文档](https://supabase.com/docs/guides/database/api#rest-api)
-  - [x] GraphQL。[文件](https://supabase.com/docs/guides/database/api#graphql-api)
-  - [x] 实时订阅。[文档](https://supabase.com/docs/guides/database/api#realtime-api)
+  - [x] REST.[文档](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL。[文件](https://supabase.com/docs/guides/api#graphql-api-overview)
+  - [x] 实时订阅。[文档](https://supabase.com/docs/guides/api#realtime-api-overview)
 - [x] 函数。
   - [x] 数据库函数。[文件](https://supabase.com/docs/guides/database/functions)
   - [x] 边缘功能 [文档](https://supabase.com/docs/guides/functions)
@@ -27,7 +27,7 @@
 
 有关完整的文档，请访问[supabase.com/docs](https://supabase.com/docs)
 
-要了解如何贡献，请访问[入门](./DEVELOPERS.md)
+要了解如何贡献，请访问[入门](../DEVELOPERS.md)
 
 ## 社区与支持
 

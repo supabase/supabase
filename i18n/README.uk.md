@@ -12,9 +12,9 @@
 - [x] Розміщена база даних Postgres. [Документи](https://supabase.com/docs/guides/database)
 - [x] Аутентифікація та авторизація. [Документи](https://supabase.com/docs/guides/auth)
 - [x] Автоматично згенеровані API.
-  - [x] REST. [Документи](https://supabase.com/docs/guides/database/api#rest-api)
-  - [x] GraphQL. [Документи](https://supabase.com/docs/guides/database/api#graphql-api)
-  - [x] Підписки в режимі реального часу. [Документи](https://supabase.com/docs/guides/database/api#realtime-api)
+  - [x] REST. [Документи](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL. [Документи](https://supabase.com/docs/guides/api#graphql-api-overview)
+  - [x] Підписки в режимі реального часу. [Документи](https://supabase.com/docs/guides/api#realtime-api-overview)
 - [x] Функції.
   - [x] Функції бази даних. [Документи](https://supabase.com/docs/guides/database/functions)
   - [x] Граничні функції [Документи](https://supabase.com/docs/guides/functions)
@@ -27,7 +27,7 @@
 
 Для отримання повної документації відвідайте [supabase.com/docs](https://supabase.com/docs)
 
-Щоб дізнатися, як зробити внесок, відвідайте [Getting Started](./DEVELOPERS.md)
+Щоб дізнатися, як зробити внесок, відвідайте [Getting Started](../DEVELOPERS.md)
 
 ## Спільнота та підтримка
 

@@ -12,9 +12,9 @@
 - [x] Baza de date Postgres găzduită. [Docs](https://supabase.com/docs/guides/database)
 - [x] Autentificare și autorizare. [Docs](https://supabase.com/docs/guides/auth)
 - [x] API-uri generate automat.
-  - [x] REST. [Docs](https://supabase.com/docs/guides/database/api#rest-api)
-  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/database/api#graphql-api)
-  - [x] Abonamente în timp real. [Docs](https://supabase.com/docs/guides/database/api#realtime-api)
+  - [x] REST. [Docs](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/api#graphql-api-overview)
+  - [x] Abonamente în timp real. [Docs](https://supabase.com/docs/guides/api#realtime-api-overview)
 - [x] Funcții.
   - [x] Funcții de baze de date. [Docs](https://supabase.com/docs/guides/database/functions)
   - [x] Funcții de margine. [Docs](https://supabase.com/docs/guides/functions)
@@ -27,7 +27,7 @@
 
 Pentru documentația completă, vizitați [supabase.com/docs](https://supabase.com/docs)
 
-Pentru a vedea cum să contribui, vizitați [Getting Started](./DEVELOPERS.md)
+Pentru a vedea cum să contribui, vizitați [Getting Started](../DEVELOPERS.md)
 
 ## Comunitate și asistență
 

@@ -12,9 +12,9 @@
 - [x] Gostovana podatkovna baza Postgres. [Dokumenti](https://supabase.com/docs/guides/database)
 - [x] Avtentikacija in avtorizacija. [Dokumenti](https://supabase.com/docs/guides/auth)
 - [x] Samodejno generirani API-ji.
-  - [x] REST. [Dokumenti](https://supabase.com/docs/guides/database/api#rest-api)
-  - [x] GraphQL. [Dokumenti](https://supabase.com/docs/guides/database/api#graphql-api)
-  - [x] Naročnine v realnem času. [Dokumenti](https://supabase.com/docs/guides/database/api#realtime-api)
+  - [x] REST. [Dokumenti](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL. [Dokumenti](https://supabase.com/docs/guides/api#graphql-api-overview)
+  - [x] Naročnine v realnem času. [Dokumenti](https://supabase.com/docs/guides/api#realtime-api-overview)
 - [x] Funkcije.
   - [x] Funkcije podatkovne zbirke. [Dokumenti](https://supabase.com/docs/guides/database/functions)
   - [x] Funkcije robov [Dokumenti](https://supabase.com/docs/guides/functions)
@@ -27,7 +27,7 @@
 
 Za celotno dokumentacijo obiščite [supabase.com/docs](https://supabase.com/docs)
 
-Če si želite ogledati, kako prispevati, obiščite [Getting Started](./DEVELOPERS.md)
+Če si želite ogledati, kako prispevati, obiščite [Getting Started](../DEVELOPERS.md)
 
 ## Skupnost in podpora
 
