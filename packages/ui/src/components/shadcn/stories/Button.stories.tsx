@@ -1,7 +1,7 @@
 import { Button } from '@ui/components/shadcn/ui/button'
 import { Meta } from '@storybook/react'
 import { ChevronRight, Loader2, Mail } from 'lucide-react'
-import Link from 'next/link'
+// import Link from 'next/link'
 
 const meta: Meta = {
   title: 'Button',
@@ -28,11 +28,11 @@ export const Ghost = () => <Button variant="ghost">Ghost</Button>
 
 Ghost.storyName = 'Ghost'
 
-export const LinkButton = () => (
-  <Link href="/">
-    <Button variant="link">Link</Button>
-  </Link>
-)
+// export const LinkButton = () => (
+//   <Link href="/">
+//     <Button variant="link">Link</Button>
+//   </Link>
+// )
 
 LinkButton.storyName = 'Link'
 
