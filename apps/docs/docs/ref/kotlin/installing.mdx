@@ -150,28 +150,28 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supab
 
                 ```kotlin
                 val commonMain by getting {
-                dependencies {
-                //supabase modules
-            }
-            }
+                    dependencies {
+                        //supabase modules
+                    }
+                }
                 val jvmMain by getting {
-                dependencies {
-                implementation("io.ktor:ktor-client-cio:KTOR_VERSION")
-            }
-            }
+                    dependencies {
+                        implementation("io.ktor:ktor-client-cio:KTOR_VERSION")
+                    }
+                }
                 val androidMain by getting {
-                dependsOn(jvmMain)
-            }
+                    dependsOn(jvmMain)
+                }
                 val jsMain by getting {
-                dependencies {
-                implementation("io.ktor:ktor-client-js:KTOR_VERSION")
-            }
-            }
+                    dependencies {
+                        implementation("io.ktor:ktor-client-js:KTOR_VERSION")
+                    }
+                }
                 val iosMain by getting {
-                dependencies {
-                implementation("io.ktor:ktor-client-darwin:KTOR_VERSION")
-            }
-            }
+                    dependencies {
+                        implementation("io.ktor:ktor-client-darwin:KTOR_VERSION")
+                    }
+                }
                 ```
 
             </TabPanel>
@@ -255,8 +255,8 @@ By default, [KotlinX Serialization](https://github.com/Kotlin/kotlinx.serializat
         </Tabs>
         ```kotlin
         val client = createSupabaseClient(supabaseUrl, supabaseKey) {
-        //Already the default serializer
-    }
+            //Already the default serializer
+        }
         ```
     </RefSubLayout.Examples>
 
@@ -301,8 +301,8 @@ By default, [KotlinX Serialization](https://github.com/Kotlin/kotlinx.serializat
         </Tabs>
         ```kotlin
         val client = createSupabaseClient(supabaseUrl, supabaseKey) {
-        defaultSerializer = MoshiSerializer()
-    }
+            defaultSerializer = MoshiSerializer()
+        }
         ```
 
     </RefSubLayout.Examples>
@@ -348,8 +348,8 @@ By default, [KotlinX Serialization](https://github.com/Kotlin/kotlinx.serializat
         </Tabs>
         ```kotlin
         val client = createSupabaseClient(supabaseUrl, supabaseKey) {
-        defaultSerializer = JacksonSerializer()
-    }
+            defaultSerializer = JacksonSerializer()
+        }
         ```
 
     </RefSubLayout.Examples>
@@ -366,21 +366,21 @@ By default, [KotlinX Serialization](https://github.com/Kotlin/kotlinx.serializat
         ```kotlin
         class CustomSerializer: SupabaseSerializer {
 
-        override fun <T : Any> encode(type: KType, value: T): String {
-        //encode value to string
-    }
+            override fun <T : Any> encode(type: KType, value: T): String {
+            //encode value to string
+            }
 
-        override fun <T : Any> decode(type: KType, value: String): T {
-        //decode value
-    }
+            override fun <T : Any> decode(type: KType, value: String): T {
+            //decode value
+            }
 
-    }
+        }
         ```
 
         ```kotlin
         val client = createSupabaseClient(supabaseUrl, supabaseKey) {
-        defaultSerializer = CustomSerializer()
-    }
+            defaultSerializer = CustomSerializer()
+        }
         ```
 
     </RefSubLayout.Examples>
