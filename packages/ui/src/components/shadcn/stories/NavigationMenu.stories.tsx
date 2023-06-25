@@ -1,7 +1,7 @@
 import { Meta } from '@storybook/react'
 import { Card } from '@ui/components/shadcn/ui/card'
 import * as React from 'react'
-import Link from 'next/link'
+// import Link from 'next/link'
 import { cn } from '@ui/lib/utils'
 import {
   NavigationMenu,
@@ -138,13 +138,6 @@ export function Default() {
                 ))}
               </ul>
             </NavigationMenuContent>
-          </NavigationMenuItem>
-          <NavigationMenuItem>
-            <Link href="/docs" legacyBehavior passHref>
-              <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                Documentation
-              </NavigationMenuLink>
-            </Link>
           </NavigationMenuItem>
         </NavigationMenuList>
       </NavigationMenu>

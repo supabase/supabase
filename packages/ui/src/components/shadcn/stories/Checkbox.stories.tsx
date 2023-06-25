@@ -12,7 +12,7 @@ import {
   FormMessage,
 } from '@ui/components/shadcn/ui/form'
 import { toast } from '@ui/components/shadcn/ui/use-toast'
-import Link from 'next/link'
+// import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 
@@ -113,7 +113,7 @@ export function CheckboxReactHookFormSingle() {
                 <FormLabel>Use different settings for my mobile devices</FormLabel>
                 <FormDescription>
                   You can manage your mobile notifications in the{' '}
-                  <Link href="/examples/forms">mobile settings</Link> page.
+                  <a href="/examples/forms">mobile settings</a> page.
                 </FormDescription>
               </div>
             </FormItem>

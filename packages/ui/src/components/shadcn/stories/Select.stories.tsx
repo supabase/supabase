@@ -21,7 +21,7 @@ import {
   SelectValue,
 } from '@ui/components/shadcn/ui/select'
 import { toast } from '@ui/components/shadcn/ui/use-toast'
-import Link from 'next/link'
+// import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { SelectSeparator } from '../select'
@@ -122,8 +122,7 @@ export function SelectForm() {
                 </SelectContent>
               </Select>
               <FormDescription>
-                You can manage email addresses in your{' '}
-                <Link href="/examples/forms">email settings</Link>.
+                You can manage email addresses in your <a href="/examples/forms">email settings</a>.
               </FormDescription>
               <FormMessage />
             </FormItem>
