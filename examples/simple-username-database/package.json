@@ -1,0 +1,16 @@
+{
+  "name": "supabase-test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.26.0",
+    "chalk": "^5.2.0",
+    "readline": "^1.3.0"
+  }
+}
