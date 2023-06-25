@@ -3,7 +3,7 @@
   "style": "default",
   "rsc": false,
   "tailwind": {
-    "config": "./../config/tailwind.config.js",
+    "config": "./../config/tailwind-shadcn.config.js",
     "css": ".storybook/shadcn.css",
     "baseColor": "gray",
     "cssVariables": true
