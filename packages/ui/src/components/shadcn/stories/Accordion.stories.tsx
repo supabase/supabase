@@ -1,4 +1,3 @@
-import { Button } from './../../Button'
 import {
   Accordion,
   AccordionContent,
@@ -9,13 +8,13 @@ import {
 
 import type { Meta, StoryObj } from '@storybook/react'
 
-const meta: Meta<typeof Button> = {
+const meta: Meta<typeof Accordion> = {
   /* 👇 The title prop is optional.
    * See https://storybook.js.org/docs/react/configure/overview#configure-story-loading
    * to learn how to generate automatic titles
    */
   title: 'shadcn/Accordian',
-  component: Button,
+  component: Accordion,
 }
 
 export const Neutral = (args: any) => (
@@ -41,7 +40,7 @@ export const Neutral = (args: any) => (
 
 export default meta
 
-type Story = StoryObj<typeof Button>
+type Story = StoryObj<typeof Accordion>
 
 /*
  *👇 Render functions are a framework specific feature to allow you control on how the component renders.
