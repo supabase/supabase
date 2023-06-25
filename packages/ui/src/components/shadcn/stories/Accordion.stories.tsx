@@ -20,27 +20,6 @@ const meta: Meta<typeof Button> = {
 
 export const Neutral = (args: any) => (
   <Accordion type="single" collapsible className="w-full">
-    <div
-      className="w-32 h-32 
-    bg-overlay 
-    text-light 
-    border 
-    border-overlay 
-    rounded-md p-3 shadow"
-    >
-      hello world
-    </div>
-
-    <div
-      className="
-      w-32 h-32 
-      bg-destructive 
-      text-lightest
-      rounded-md p-3 shadow"
-    >
-      hello world
-    </div>
-
     <AccordionItem value="item-1">
       <AccordionTrigger>Is it accessible?</AccordionTrigger>
       <AccordionContent>Yes. It adheres to the WAI-ARIA design pattern.</AccordionContent>
