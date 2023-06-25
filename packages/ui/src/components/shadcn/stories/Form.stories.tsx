@@ -29,7 +29,7 @@ const meta: Meta<typeof Form> = {
    * See https://storybook.js.org/docs/react/configure/overview#configure-story-loading
    * to learn how to generate automatic titles
    */
-  title: 'Shadcn/Form',
+  title: 'shadcn/Form',
   component: Form,
 }
 
@@ -173,7 +173,12 @@ export const CalendarExample = {
                     <Calendar
                       mode="single"
                       selected={field.value}
-                      onSelect={field.onChange}
+                      onSelect={(e) => {
+                        if (e) {
+                          // @mildtomato: guard in case returns undefined
+                          field.onChange
+                        }
+                      }}
                       disabled={(date) => date > new Date() || date < new Date('1900-01-01')}
                       initialFocus
                     />

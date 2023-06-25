@@ -14,7 +14,7 @@ const config: any = {
     '../src/components/Dropdown/Dropdown.stories.tsx',
     // '../src/components/Form/Form.stories.tsx',
 
-    '../src/components/shadcn/stories/**/*.tsx',
+    '../src/components/shadcn/stories/**/*.stories.tsx',
   ],
   addons: [
     'storybook-dark-mode',
