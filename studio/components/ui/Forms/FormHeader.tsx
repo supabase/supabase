@@ -1,8 +1,16 @@
 import ReactMarkdown from 'react-markdown'
 
-const FormHeader = ({ title, description }: { title: string; description?: string }) => {
+const FormHeader = ({
+  title,
+  description,
+  className,
+}: {
+  title: string
+  description?: string
+  className?: string
+}) => {
   return (
-    <div className="mb-6">
+    <div className={`mb-6 ${className}`}>
       <h3 className="text-scale-1200 mb-2 text-xl">
         <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
           {title}
