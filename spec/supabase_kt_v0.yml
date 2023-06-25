@@ -133,7 +133,7 @@ functions:
         description: |
           `transferTimeout` - the timeout for uploading and downloading files. Default: `120.seconds`
 
-          `resumable.cache` - Interface for storing resumable upload urls. Default: `ResumableCache.Disk`
+          `resumable.cache` - Interface for storing resumable upload urls. Default: `SettingsResumableCache`
 
           `resumable.defaultChunkSize` - The default chunk size for resumable uploads. Supabase currently only supports a chunk size of 6MB, so be careful when changing this value. Default: `6MB`
 
