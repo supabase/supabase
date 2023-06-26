@@ -19,7 +19,7 @@ interface TabProps {
 const Tab = ({ isActive, label, paragraph, onClick, progress, intervalDuration }: TabProps) => (
   <button
     onClick={onClick}
-    className={`text-left text-lg flex flex-col group gap-1 transition-all ${
+    className={`text-left text-sm lg:text-lg flex flex-col group gap-1 transition-all ${
       isActive ? 'flex-[2] text-scale-1200' : 'flex-[1] text-scale-1100'
     }`}
     aria-selected={isActive}
@@ -56,8 +56,10 @@ interface Tab {
   label: string
   paragraph?: string
   panel?: JSX.Element
-  colabUrl: string
+  colabUrl?: string
   code?: string
+  size?: 'small' | 'large'
+  lang: 'js' | 'py' | 'sql'
 }
 
 interface Props {
@@ -156,21 +158,31 @@ const TimedTabsSection = ({
             {tabs.map((tab, i) => (
               <SwiperSlide key={i}>
                 <>
-                  <OpenInColab
-                    colabUrl={tabs[activeTab].colabUrl}
-                    className="hidden md:flex absolute top-4 right-4"
-                  />
-                  <CodeBlock hideCopy key={i} lang="py" size="large" background="#1A1A1A">
+                  {!!tabs[activeTab]?.colabUrl && (
+                    <OpenInColab
+                      colabUrl={tabs[activeTab].colabUrl!}
+                      className="hidden md:flex absolute top-4 right-4"
+                    />
+                  )}
+                  <CodeBlock
+                    hideCopy={!!tabs[activeTab]?.colabUrl}
+                    key={i}
+                    lang={tab.lang}
+                    size={tab.size ?? 'large'}
+                    background="#1A1A1A"
+                  >
                     {tab.code}
                   </CodeBlock>
                 </>
               </SwiperSlide>
             ))}
           </Swiper>
-          <OpenInColab
-            colabUrl={tabs[activeTab]?.colabUrl}
-            className="flex md:hidden !relative !top-0 !right-0 mt-8 w-full justify-center"
-          />
+          {!!tabs[activeTab]?.colabUrl && (
+            <OpenInColab
+              colabUrl={tabs[activeTab]?.colabUrl!}
+              className="flex md:hidden !relative !top-0 !right-0 mt-8 w-full justify-center"
+            />
+          )}
         </div>
       </div>
       <div className="w-full col-span-full flex gap-4 lg:gap-8 xl:gap-10" role="tablist">
