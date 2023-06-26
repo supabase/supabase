@@ -142,7 +142,21 @@ const CustomDomainSidePanel = () => {
               type="large-cards"
               size="tiny"
               id="custom-domain"
-              onChange={(event: any) => setSelectedOption(event.target.value)}
+              onChange={(event: any) => {
+                setSelectedOption(event.target.value)
+                Telemetry.sendActivity(
+                  {
+                    activity: 'Option Selected',
+                    source: 'Dashboard',
+                    data: {
+                      title: 'Custom domains',
+                      section: 'Add ons',
+                      option: event.target.label,
+                    },
+                  },
+                  router
+                )
+              }}
             >
               <Radio
                 name="custom-domain"
