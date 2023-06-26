@@ -4,6 +4,7 @@ import { useState } from 'react'
 
 import { useParams } from 'common'
 import Table from 'components/to-be-cleaned/Table'
+import AlertError from 'components/ui/AlertError'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import {
   OrganizationAuditLog,
@@ -13,17 +14,22 @@ import { useOrganizationDetailQuery } from 'data/organizations/organization-deta
 import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { Button, IconSearch, IconUser, Input } from 'ui'
+import { Button, IconUser } from 'ui'
+import FilterPopover from './FilterPopover'
 import LogDetailsPanel from './LogDetailsPanel'
-import AlertError from 'components/ui/AlertError'
 
 // [Joshen considerations]
 // - Maybe fix the height of the table to the remaining height of the viewport, so that the search input is always visible
+// - We'll need pagination as well if the audit logs get too large, but that needs to be implemented on the API side first if possible
 
 const AuditLogs = () => {
   const { slug } = useParams()
-  const currentTime = dayjs()
+  const currentTime = dayjs().set('millisecond', 0)
   const [selectedLog, setSelectedLog] = useState<OrganizationAuditLog>()
+  const [filters, setFilters] = useState<{ users: string[]; projects: string[] }>({
+    users: [], // gotrue_id
+    projects: [], // project_ref
+  })
 
   const { data: projects } = useProjectsQuery()
   const { data: organizations } = useOrganizationsQuery()
@@ -42,9 +48,22 @@ const AuditLogs = () => {
 
   const members = detailData?.members ?? []
   const roles = rolesData?.roles ?? []
-  const sortedLogs = logs?.sort(
-    (a, b) => Number(new Date(b.timestamp)) - Number(new Date(a.timestamp))
-  )
+  const sortedLogs = logs
+    ?.sort((a, b) => Number(new Date(b.timestamp)) - Number(new Date(a.timestamp)))
+    ?.filter((log) => {
+      if (filters.users.length > 0) {
+        return filters.users.includes(log.actor.id)
+      } else {
+        return log
+      }
+    })
+    ?.filter((log) => {
+      if (filters.projects.length > 0) {
+        return filters.projects.includes(log.permission_group.project_ref || '')
+      } else {
+        return log
+      }
+    })
 
   return (
     <>
@@ -69,14 +88,26 @@ const AuditLogs = () => {
               </div>
             ) : (
               <>
-                <div className="flex items-center">
-                  <Input
-                    size="tiny"
-                    className="w-80"
-                    icon={<IconSearch size={14} strokeWidth={1.5} />}
-                    placeholder="Search audit logs"
+                <div className="flex items-center space-x-2">
+                  <p className="text-xs prose">Filter by</p>
+                  <FilterPopover
+                    name="Users"
+                    options={members ?? []}
+                    labelKey="username"
+                    valueKey="gotrue_id"
+                    activeOptions={filters.users}
+                    onSaveFilters={(values) => setFilters({ ...filters, users: values })}
+                  />
+                  <FilterPopover
+                    name="Projects"
+                    options={projects ?? []}
+                    labelKey="name"
+                    valueKey="ref"
+                    activeOptions={filters.projects}
+                    onSaveFilters={(values) => setFilters({ ...filters, projects: values })}
                   />
                 </div>
+
                 <Table
                   head={[
                     <Table.th key="user">User</Table.th>,
@@ -144,11 +175,21 @@ const AuditLogs = () => {
                             </div>
                           </Table.td>
                           <Table.td>
-                            <p className="text-scale-1100">
+                            <p className="text-scale-1100 truncate">
+                              {project?.name
+                                ? 'Project: '
+                                : organization?.name
+                                ? 'Organization: '
+                                : null}
                               {project?.name ?? organization?.name ?? 'Entity no longer exists'}
                             </p>
-                            <p className="text-scale-1000 text-xs mt-0.5">
-                              {log.permission_group.org_slug ?? log.permission_group.project_ref}
+                            <p className="text-scale-1000 text-xs mt-0.5 truncate">
+                              {log.permission_group.project_ref
+                                ? 'Ref: '
+                                : log.permission_group.org_slug
+                                ? 'Slug: '
+                                : null}
+                              {log.permission_group.project_ref ?? log.permission_group.org_slug}
                             </p>
                           </Table.td>
                           <Table.td>
