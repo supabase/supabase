@@ -63,14 +63,15 @@ export async function getInitialMigrationSQLFromGitHubRepo(
   }
 
   const seedFileUrl = supabaseFilesResponse.find((file) => file.name === 'seed.sql')?.download_url
-  const migrationFileDownloadUrlPromises = migrationFilesResponse
-    .sort((a, b) => {
-      // sort by name ascending
-      if (a.name < b.name) return -1
-      if (a.name > b.name) return 1
-      return 0
-    })
-    .map((file) => fetchGitHub<string>(file.download_url, false))
+  const sortedFiles = migrationFilesResponse.sort((a, b) => {
+    // sort by name ascending
+    if (a.name < b.name) return -1
+    if (a.name > b.name) return 1
+    return 0
+  })
+  const migrationFileDownloadUrlPromises = sortedFiles.map((file) =>
+    fetchGitHub<string>(file.download_url, false)
+  )
 
   const [seedFileResponse, ...migrationFileResponses] = await Promise.all([
     seedFileUrl ? fetchGitHub<string>(seedFileUrl, false) : Promise.resolve<string>(''),
@@ -83,5 +84,32 @@ export async function getInitialMigrationSQLFromGitHubRepo(
   const seed =
     typeof seedFileResponse === 'object' && 'error' in seedFileResponse ? '' : seedFileResponse
 
-  return `${migrations};${seed}`
+  const migrationsTableSql = /* SQL */ `
+    create schema if not exists supabase_migrations;
+    create table if not exists supabase_migrations.schema_migrations (
+      version text not null primary key,
+      statements text[],
+      name text
+    );
+    ${sortedFiles.map((file, i) => {
+      const migration = migrationFileResponses[i]
+      if (!migration || (typeof migration === 'object' && 'error' in migration)) return ''
+
+      const version = file.name.split('_')[0]
+      const statements = JSON.stringify(
+        migration
+          .split(';')
+          .map((statement) => statement.trim())
+          .filter(Boolean)
+      )
+
+      return /* SQL */ `
+        insert into supabase_migrations.schema_migrations (version, statements, name)
+        select '${version}', array_agg(jsonb_statements)::text[], '${file.name}'
+        from jsonb_array_elements_text($statements$${statements}$statements$::jsonb) as jsonb_statements;
+      `
+    })}
+  `
+
+  return `${migrations};${migrationsTableSql};${seed}`
 }
