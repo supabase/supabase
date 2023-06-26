@@ -2080,7 +2080,7 @@ functions:
         - If **Confirm email** is enabled, the return value is null and you will be logged in instead.
         - If **Confirm email** is disabled, the return value is the user and you won't be logged in automatically.
       - When the user confirms their email address, they are redirected to the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url) by default. You can modify your `SITE_URL` or add additional redirect URLs in [your project](https://supabase.com/dashboard/project/_/auth/url-configuration).
-      - To learn how to handle OTP links & OAuth refer to [initializing](docs/reference/kotlin/initializing)
+      - To learn how to handle OTP links & OAuth refer to [initializing](/docs/reference/kotlin/initializing)
       - If signUpWith() is called for an existing confirmed user:
         - If **Confirm email** is enabled in [your project](https://supabase.com/dashboard/project/_/auth/providers), an obfuscated/fake user object is returned.
         - If **Confirm email** is disabled, the error message, `User already registered` is returned.
@@ -2185,7 +2185,7 @@ functions:
       - If you're using phone, you can configure whether you want the user to receive a OTP.
       - The magic link's destination URL is determined by the [`SITE_URL`](/docs/reference/auth/config#site_url).
       - See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
-      - To learn how to handle OTP links & OAuth refer to [initializing](docs/reference/kotlin/initializing)
+      - To learn how to handle OTP links & OAuth refer to [initializing](/docs/reference/kotlin/initializing)
       - Magic links and OTPs share the same implementation. To send users a one-time code instead of a magic link, [modify the magic link email template](https://supabase.com/dashboard/project/_/auth/templates) to include `{{ .Token }}` instead of `{{ .ConfirmationURL }}`.
     examples:
       - id: sign-in-with-email
@@ -2214,7 +2214,7 @@ functions:
     notes: |
       - This method is used for signing in using a third-party provider.
       - Supabase supports many different [third-party providers](https://supabase.com/docs/guides/auth#providers).
-      - To learn how to handle OTP links & OAuth refer to [initializing](docs/reference/kotlin/initializing)
+      - To learn how to handle OTP links & OAuth refer to [initializing](/docs/reference/kotlin/initializing)
     examples:
       - id: sign-in-using-a-third-party-provider
         name: Sign in using a third-party provider
@@ -2267,7 +2267,7 @@ functions:
       - In case you need to use a different way to start the authentication flow with an identity provider, you can use the `SSO.withProviderId` function. For example:
           - Mapping specific user email addresses with an identity provider.
           - Using different hints to identity the identity provider to be used by the user, like a company-specific page, IP address or other tracking information.
-      - To learn how to handle OTP links & OAuth refer to [initializing](docs/reference/kotlin/initializing)
+      - To learn how to handle OTP links & OAuth refer to [initializing](/docs/reference/kotlin/initializing)
 
     examples:
       - id: sign-in-with-domain
