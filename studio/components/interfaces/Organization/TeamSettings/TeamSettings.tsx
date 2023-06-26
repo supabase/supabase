@@ -6,13 +6,14 @@ import { useParams } from 'common/hooks'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 import { useOrganizationDetailQuery } from 'data/organizations/organization-detail-query'
 import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
+import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useProfileQuery } from 'data/profile/profile-query'
 import { useSelectedOrganization, useStore } from 'hooks'
 import { delete_ } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import InviteMemberButton from './InviteMemberButton'
 import MembersView from './MembersView'
-import { getRolesManagementPermissions, hasMultipleOwners } from './TeamSettings.utils'
+import { hasMultipleOwners, useGetRolesManagementPermissions } from './TeamSettings.utils'
 
 const TeamSettings = () => {
   const { ui } = useStore()
@@ -22,13 +23,18 @@ const TeamSettings = () => {
   const selectedOrganization = useSelectedOrganization()
   const isOwner = selectedOrganization?.is_owner
 
+  const { data: permissions } = usePermissionsQuery()
   const { data: detailData } = useOrganizationDetailQuery({ slug })
   const { data: rolesData } = useOrganizationRolesQuery({ slug })
 
   const members = detailData?.members ?? []
   const roles = rolesData?.roles ?? []
 
-  const { rolesAddable } = getRolesManagementPermissions(roles)
+  const { rolesAddable } = useGetRolesManagementPermissions(
+    selectedOrganization?.id,
+    roles,
+    permissions ?? []
+  )
 
   const [isLeaving, setIsLeaving] = useState(false)
   const [searchString, setSearchString] = useState('')

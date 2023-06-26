@@ -4,9 +4,9 @@ import { useMemo } from 'react'
 
 import { useSelectedProject } from './useSelectedProject'
 
-export function useSelectedOrganization() {
+export function useSelectedOrganization({ enabled = true } = {}) {
   const { slug } = useParams()
-  const { data } = useOrganizationsQuery()
+  const { data } = useOrganizationsQuery({ enabled })
   const selectedProject = useSelectedProject()
 
   return useMemo(() => {
