@@ -15,9 +15,10 @@ import { useOrganizationDetailQuery } from 'data/organizations/organization-deta
 import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { Button, IconArrowDown, IconArrowUp, IconBarChart, IconUser } from 'ui'
+import { Alert, Button, IconArrowDown, IconArrowUp, IconBarChart, IconUser } from 'ui'
 import FilterPopover from './FilterPopover'
 import LogDetailsPanel from './LogDetailsPanel'
+import { DatePicker } from 'components/ui/DatePicker'
 
 // [Joshen considerations]
 // - Maybe fix the height of the table to the remaining height of the viewport, so that the search input is always visible
@@ -25,12 +26,16 @@ import LogDetailsPanel from './LogDetailsPanel'
 
 const AuditLogs = () => {
   const { slug } = useParams()
-  const currentTime = dayjs().set('millisecond', 0)
+  const currentTime = dayjs().utc().set('millisecond', 0)
   const [dateSortDesc, setDateSortDesc] = useState(true)
+  const [dateRange, setDateRange] = useState({
+    from: currentTime.subtract(1, 'day').toISOString(),
+    to: currentTime.toISOString(),
+  })
   const [selectedLog, setSelectedLog] = useState<OrganizationAuditLog>()
   const [filters, setFilters] = useState<{ users: string[]; projects: string[] }>({
-    users: [], // gotrue_id
-    projects: [], // project_ref
+    users: [], // gotrue_id[]
+    projects: [], // project_ref[]
   })
 
   const { data: projects } = useProjectsQuery()
@@ -44,8 +49,8 @@ const AuditLogs = () => {
     isError,
   } = useOrganizationAuditLogsQuery({
     slug,
-    iso_timestamp_start: currentTime.subtract(1, 'day').toISOString(),
-    iso_timestamp_end: currentTime.toISOString(),
+    iso_timestamp_start: dateRange.from,
+    iso_timestamp_end: dateRange.to,
   })
 
   const members = detailData?.members ?? []
@@ -82,6 +87,7 @@ const AuditLogs = () => {
           </div>
         )}
 
+        {/* [Joshen] We'll need to also handle then, if the selected date range is out, rather than blocking all actions */}
         {isError && <AlertError subject="Failed to retrieve audit logs" />}
 
         {isSuccess && (
@@ -111,6 +117,43 @@ const AuditLogs = () => {
                     valueKey="ref"
                     activeOptions={filters.projects}
                     onSaveFilters={(values) => setFilters({ ...filters, projects: values })}
+                  />
+                  <DatePicker
+                    hideTime
+                    hideClear
+                    triggerButtonType="dashed"
+                    triggerButtonTitle=""
+                    from={dateRange.from}
+                    to={dateRange.to}
+                    onChange={(value) => {
+                      if (value.from !== null && value.to !== null) {
+                        const current = dayjs().utc()
+                        const from = dayjs(value.from)
+                          .utc()
+                          .hour(current.hour())
+                          .minute(current.minute())
+                          .second(current.second())
+                          .toISOString()
+                        const to = dayjs(value.to)
+                          .utc()
+                          .hour(current.hour())
+                          .minute(current.minute())
+                          .second(current.second())
+                          .toISOString()
+                        setDateRange({ from, to })
+                      }
+                    }}
+                    renderFooter={({ to, from }) => {
+                      // If selected range is outside of retention policy
+                      if (true) {
+                        return (
+                          <Alert title="" variant="warning" className="mx-3 pl-2 pr-2 pt-1 pb-2">
+                            Selected range is outside of included retention policy, as such no data
+                            will be returned.
+                          </Alert>
+                        )
+                      }
+                    }}
                   />
                 </div>
 
