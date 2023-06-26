@@ -20,6 +20,16 @@ interface OrganizationsResponseWithInstalledData extends Organization {
   installationInstalled?: boolean
 }
 
+/**
+ * Variations of the Vercel integration flow.
+ * They require different UI and logic.
+ *
+ * Deploy Button - the flow that starts from the Deploy Button - https://vercel.com/docs/integrations#deploy-button
+ * Marketplace - the flow that starts from the Marketplace - https://vercel.com/integrations
+ *
+ */
+export type VercelIntegrationFlow = 'deploy-button' | 'marketing'
+
 const VercelIntegration: NextPageWithLayout = () => {
   const router = useRouter()
   const { ui } = useStore()
@@ -29,8 +39,12 @@ const VercelIntegration: NextPageWithLayout = () => {
 
   const snapshot = useVercelIntegrationInstallationState()
 
+  const flow: VercelIntegrationFlow = externalId ? 'marketing' : 'deploy-button'
+
   /**
-   * array of integrations installed on all
+   * Fetch the list of organization based integration installations for Vercel.
+   *
+   * Array of integrations installed on all
    */
   const { data: integrationData, isLoading: integrationDataLoading } = useIntegrationsQuery({})
 
@@ -45,16 +59,19 @@ const VercelIntegration: NextPageWithLayout = () => {
   })
 
   /**
-   * A flat array of org slugs that have integration installed
+   * Flat array of org slugs that have integration installed
+   *
    */
-  const flatInstalledConnectionsIds =
+  const flatInstalledConnectionsIds: string[] | [] =
     integrationData && integrationData.length > 0
       ? integrationData?.map((x) => x.organization.slug)
       : []
 
   /**
    * Organizations with extra `installationInstalled` attribute
+   *
    * Used to show label/badge and allow/disallow installing
+   *
    */
   const organizationsWithInstalledData: OrganizationsResponseWithInstalledData[] = data
     ? data.map((org) => {
@@ -71,9 +88,6 @@ const VercelIntegration: NextPageWithLayout = () => {
         setOrganizationIntegrationId(id)
       },
     })
-
-  //   console.log('params', params)
-  //   console.log('externalId', externalId)
 
   function onInstall() {
     const orgSlug = selectedOrg?.slug
@@ -109,7 +123,17 @@ const VercelIntegration: NextPageWithLayout = () => {
       })
     }
 
-    router.push({ pathname: `/integrations/vercel/${orgSlug}/new-project`, query: router.query })
+    if (externalId) {
+      router.push({
+        pathname: `/integrations/vercel/${orgSlug}/deploy-button/new-project`,
+        query: router.query,
+      })
+    } else {
+      router.push({
+        pathname: `/integrations/vercel/${orgSlug}/marketplace/choose-project`,
+        query: router.query,
+      })
+    }
   }
 
   const dataLoading = isLoadingVercelIntegrationCreateMutation || isLoadingOrganizationsQuery
@@ -150,7 +174,7 @@ const VercelIntegration: NextPageWithLayout = () => {
                 title="You can uninstall this Integration at any time."
               >
                 <Markdown
-                  content={`You can remove this integration at any time either via Vercel or the Supabase dashboard.`}
+                  content={`Remove this integration at any time either via Vercel or the Supabase dashboard.`}
                 />
               </Alert>
             </ScaffoldContainer>
