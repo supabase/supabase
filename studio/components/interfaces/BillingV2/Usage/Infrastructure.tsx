@@ -60,7 +60,7 @@ const Infrastructure = ({
 
   const { data: cpuUsageData, isLoading: isLoadingCpuUsageData } = useInfraMonitoringQuery({
     projectRef,
-    attribute: 'avg_cpu_usage',
+    attribute: 'max_cpu_usage',
     interval,
     startDate,
     endDate,
