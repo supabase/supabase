@@ -5,11 +5,10 @@ import { useTelemetryProps } from 'common/hooks/useTelemetryProps'
 import { useRouter } from 'next/router'
 import Image from 'next/image'
 import SectionContainer from '../Layouts/SectionContainer'
-import { motion } from 'framer-motion'
-import BackedBy from '../BackedBy'
-import { useBreakpoint, useTheme } from 'common'
+import { useBreakpoint } from 'common'
 import ProductCard from './ProductCard'
-// import DatabaseVisual from './DatabaseVisual'
+import DatabaseVisual from './DatabaseVisual'
+import { IconCheck } from 'ui'
 
 const opacityVariant = {
   default: { opacity: 1, filter: 'grayscale(1)', transition: { duration: 0.1 } },
@@ -59,31 +58,36 @@ const Products = (props: any) => {
     }
   }
   const isSm = useBreakpoint(640)
-  const { isDarkMode } = useTheme()
 
   return (
     <SectionContainer className="space-y-8 mt-0 lg:mt-0 !pt-0">
       <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-4 lg:gap-6 md:grid-cols-4">
         <ProductCard
+          alignLeft
           url={Solutions['database'].url}
+          icon={Solutions['database'].icon}
           title={Solutions['database'].name}
-          subtitle={
-            <>
-              Every project is a full Postgres database,
-              <br className="inline-block sm:hidden lg:inline-block" /> the world's most trusted
-              relational database.
-            </>
+          subtitle={Solutions['database'].description}
+          highlights={
+            <ul className="flex flex-col gap-1">
+              <li>
+                <IconCheck className="inline h-4 w-4" /> 100% portable
+              </li>
+              <li>
+                <IconCheck className="inline h-4 w-4" /> Built-in Auth with RLS
+              </li>
+              <li>
+                <IconCheck className="inline h-4 w-4" /> Easy to extend
+              </li>
+            </ul>
           }
           onClick={() => sendTelemetryEvent(name)}
-          image={
-            <motion.div className="absolute inset-0 z-0" variants={opacityVariant}>
-              {/* <DatabaseVisual isDarkMode={isDarkMode} /> */}
-            </motion.div>
-          }
+          image={<DatabaseVisual />}
           classname="col-span-full md:col-span-2"
         />
         <ProductCard
           url={Solutions['authentication'].url}
+          icon={Solutions['authentication'].icon}
           title={Solutions['authentication'].name}
           subtitle={
             <>
@@ -93,42 +97,43 @@ const Products = (props: any) => {
             </>
           }
           image={
-            <motion.div className="absolute inset-0 z-0" variants={opacityVariant}>
-              {/* <Image
-                src={isDarkMode ? '/images/index/auth-dark.jpg' : '/images/index/auth-light.jpg'}
-                alt="Supabase Authentication feature, hover image with glow"
+            <div className="absolute inset-0 z-0">
+              <Image
+                src="/images/index/products/database.svg"
+                alt="Supabase Edge Functions feature, hover image with glow"
                 layout="fill"
                 objectPosition="50% 50%"
                 objectFit="cover"
-              /> */}
-            </motion.div>
+                quality={95}
+              />
+            </div>
           }
           classname=""
           onClick={() => sendTelemetryEvent(name)}
         />
         <ProductCard
           url={Solutions['storage'].url}
+          icon={Solutions['storage'].icon}
           title={Solutions['storage'].name}
           subtitle={<>Store, organize, and serve large files, from videos to images.</>}
           image={
-            <motion.div className="absolute inset-0 z-0" variants={opacityVariant}>
-              {/* <Image
-                src={
-                  isDarkMode ? '/images/index/storage-dark.jpg' : '/images/index/storage-light.jpg'
-                }
-                alt="Supabase Storage feature, hover image with glow"
+            <div className="absolute inset-0 z-0">
+              <Image
+                src="/images/index/products/storage.svg"
+                alt="Supabase Edge Functions feature, hover image with glow"
                 layout="fill"
                 objectPosition="50% 50%"
                 objectFit="cover"
                 quality={95}
-              /> */}
-            </motion.div>
+              />
+            </div>
           }
           classname=""
           onClick={() => sendTelemetryEvent(name)}
         />
         <ProductCard
           url={Solutions['edge-functions'].url}
+          icon={Solutions['edge-functions'].icon}
           title={Solutions['edge-functions'].name}
           subtitle={
             <>
@@ -139,21 +144,22 @@ const Products = (props: any) => {
           }
           onClick={() => sendTelemetryEvent(name)}
           image={
-            <motion.div className="absolute inset-0 z-0" variants={opacityVariant}>
-              {/* <Image
-                src={isDarkMode ? '/images/index/edge-dark.jpg' : '/images/index/edge-light.jpg'}
+            <div className="absolute inset-0 z-0">
+              <Image
+                src="/images/index/products/edge-functions.svg"
                 alt="Supabase Edge Functions feature, hover image with glow"
                 layout="fill"
-                objectPosition={isSm ? 'bottom' : '50% 50%'}
-                objectFit={isSm ? 'contain' : 'cover'}
-                quality={90}
-              /> */}
-            </motion.div>
+                objectPosition="50% 50%"
+                objectFit="cover"
+                quality={95}
+              />
+            </div>
           }
-          classname="!col-span-1 "
+          classname="!col-span-1"
         />
         <ProductCard
           url={Solutions['realtime'].url}
+          icon={Solutions['realtime'].icon}
           title={Solutions['realtime'].name}
           subtitle={
             <>
@@ -163,38 +169,41 @@ const Products = (props: any) => {
             </>
           }
           image={
-            <motion.div className="absolute inset-0 z-0" variants={opacityVariant}>
-              {/* <Image
+            <div className="absolute inset-0 z-0">
+              <Image
+                src="/images/index/products/realtime-base.svg"
+                alt="Supabase Edge Functions feature, hover image with glow"
+                layout="fill"
+                objectPosition="50% 50%"
+                objectFit="cover"
+                quality={95}
+              />
+            </div>
+          }
+          classname="!col-span-1 md:h-[350px] lg:h-[390px]"
+        />
+        <ProductCard
+          alignLeft
+          url={Solutions['vector'].url}
+          icon={Solutions['vector'].icon}
+          title={Solutions['vector'].name}
+          subtitle={Solutions['vector'].description}
+          onClick={() => sendTelemetryEvent(name)}
+          image={
+            <div className="absolute inset-0 z-0">
+              <Image
                 src={
-                  isDarkMode
-                    ? '/images/index/realtime-dark.jpg'
-                    : '/images/index/realtime-light.jpg'
+                  isSm
+                    ? '/images/index/products/vector-centered.svg'
+                    : '/images/index/products/vector.svg'
                 }
                 alt="Supabase Edge Functions feature, hover image with glow"
                 layout="fill"
                 objectPosition="50% 50%"
                 objectFit="cover"
                 quality={95}
-              /> */}
-            </motion.div>
-          }
-          classname="!col-span-1 md:h-[350px] lg:h-[390px]"
-        />
-        <ProductCard
-          url={Solutions['vector'].url}
-          title={Solutions['vector'].name}
-          subtitle={
-            <>
-              Every project is a full Postgres database,
-              <br className="inline-block sm:hidden lg:inline-block" /> the world's most trusted
-              relational database.
-            </>
-          }
-          onClick={() => sendTelemetryEvent(name)}
-          image={
-            <motion.div className="absolute inset-0 z-0" variants={opacityVariant}>
-              {/* <DatabaseVisual isDarkMode={isDarkMode} /> */}
-            </motion.div>
+              />
+            </div>
           }
           classname="col-span-full md:col-span-2"
         />

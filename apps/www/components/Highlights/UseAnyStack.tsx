@@ -125,17 +125,16 @@ const UseAnyStack = () => {
               <a
                 key={framework.name}
                 className={[
-                  '',
+                  'transition-opacity group',
                   !!activeFramework && activeFramework.name !== framework.name && '!opacity-20',
                 ].join(' ')}
                 onClick={() => sendTelemetryEvent(framework.gaEvent)}
                 onMouseOver={() => setActiveFramework(framework)}
                 onMouseOut={() => setActiveFramework(null)}
               >
-                <div className="m-1 bg-[var(--color-bg-darkest)] h-20 w-20 flex transition-opacity items-center justify-center rounded-xl hover:shadow opacity-100">
+                <div className="m-1 bg-[var(--color-bg-darkest)] h-20 w-20 flex transition-opacity items-center justify-center rounded-xl group-hover:border border-brand-900 hover:shadow">
                   <Image
                     key={framework.name}
-                    className="opacity-100 hover:opacity-80 transition-opacity"
                     src={framework.icon}
                     alt={framework.name}
                     width={isXs ? 35 : 55}
