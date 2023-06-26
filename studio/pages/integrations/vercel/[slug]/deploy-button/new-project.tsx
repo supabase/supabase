@@ -7,6 +7,7 @@ import { Markdown } from 'components/interfaces/Markdown'
 import IntegrationWindowLayout from 'components/layouts/IntegrationWindowLayout'
 import { ScaffoldContainer, ScaffoldDivider } from 'components/layouts/Scaffold'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
+import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useIntegrationConnectionsCreateMutation } from 'data/integrations/integration-connections-create-mutation'
 import { useIntegrationsQuery } from 'data/integrations/integrations-query'
 import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
@@ -17,9 +18,9 @@ import generator from 'generate-password'
 import { useStore } from 'hooks'
 import { AWS_REGIONS, DEFAULT_MINIMUM_PASSWORD_STRENGTH, PROVIDERS } from 'lib/constants'
 import { passwordStrength } from 'lib/helpers'
+import { getInitialMigrationSQLFromGitHubRepo } from 'lib/integration-utils'
 import { NextPageWithLayout, ProjectBase } from 'types'
-import { Alert, Button, IconBook, IconLifeBuoy, Input, Listbox, LoadingLine } from 'ui'
-import { useProjectApiQuery } from 'data/config/project-api-query'
+import { Alert, Button, Checkbox, IconBook, IconLifeBuoy, Input, Listbox, LoadingLine } from 'ui'
 
 const VercelIntegration: NextPageWithLayout = () => {
   const [loading, setLoading] = useState<boolean>(false)
@@ -75,21 +76,25 @@ const CreateProject = ({
   const [dbPass, setDbPass] = useState('')
   const [passwordStrengthMessage, setPasswordStrengthMessage] = useState('')
   const [passwordStrengthScore, setPasswordStrengthScore] = useState(-1)
+  const [shouldRunMigrations, setShouldRunMigrations] = useState(true)
   const [dbRegion, setDbRegion] = useState(PROVIDERS.AWS.default_region)
   // const [loading, setLoading] = useState(false)
   const delayedCheckPasswordStrength = useRef(
     debounce((value: string) => checkPasswordStrength(value), 300)
   ).current
 
-  const { configurationId, next, currentProjectId: foreignProjectId } = useParams()
+  const {
+    slug,
+    configurationId,
+    next,
+    currentProjectId: foreignProjectId,
+    externalId,
+  } = useParams()
 
   const { mutateAsync: createConnections, isLoading: isLoadingCreateConnections } =
     useIntegrationConnectionsCreateMutation({})
 
   const { data: organizationData, isLoading: isLoadingOrganizationsQuery } = useOrganizationsQuery()
-  const { slug } = router.query
-
-  console.log('slug')
 
   const organization = organizationData?.find((x) => x.slug === slug)
 
@@ -114,8 +119,6 @@ const CreateProject = ({
     },
     { enabled: organizationIntegration !== undefined }
   )
-
-  console.log('vercelProjects near top', vercelProjects)
 
   const canSubmit =
     projectName != '' &&
@@ -179,6 +182,23 @@ const CreateProject = ({
         throw new Error('No organization set')
       }
 
+      let dbSql: string | undefined
+      if (shouldRunMigrations) {
+        const id = ui.setNotification({
+          category: 'info',
+          message: `Fetching initial migrations from GitHub repo`,
+        })
+
+        dbSql = (await getInitialMigrationSQLFromGitHubRepo(externalId)) ?? undefined
+
+        ui.setNotification({
+          id,
+          category: 'success',
+          message: `Done fetching initial migrations`,
+        })
+      }
+      console.log('dbSql:', dbSql)
+
       let project: ProjectBase
 
       try {
@@ -187,6 +207,7 @@ const CreateProject = ({
           name: projectName,
           dbPass,
           dbRegion,
+          dbSql,
           configurationId,
         })
 
@@ -297,7 +318,7 @@ const CreateProject = ({
           }
         />
       </div>
-      <div className="py-2 pb-4">
+      <div className="py-2">
         <div className="mt-1">
           <Listbox
             label="Region"
@@ -328,6 +349,15 @@ const CreateProject = ({
           </Listbox>
         </div>
       </div>
+      <div className="py-2 pb-4">
+        <Checkbox
+          name="shouldRunMigrations"
+          label="Run migrations & seed.sql"
+          description="If your repository has migrations under supabase/migrations, they will be run automatically."
+          checked={shouldRunMigrations}
+          onChange={(e) => setShouldRunMigrations(e.target.checked)}
+        />
+      </div>
       <div className="flex flex-row w-full justify-end">
         <Button
           size="medium"
@@ -339,9 +369,6 @@ const CreateProject = ({
           Create Project
         </Button>
       </div>
-      {/* <Button disabled={loading || !canSubmit} loading={loading} onClick={onCreateProject}>
-        Create project
-      </Button> */}
     </div>
   )
 }
