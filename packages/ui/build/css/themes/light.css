@@ -1,24 +1,26 @@
 /**
  * Do not edit directly
- * Generated on Fri, 23 Jun 2023 18:42:16 GMT
+ * Generated on Sun, 25 Jun 2023 18:14:29 GMT
  */
 
 .light {
   --destructive-default: 0deg 100% 50%;
+  --destructive-400: 0deg 100% 98.4%;
   --destructive-300: 0deg 100% 87.5%;
   --destructive-200: 0deg 97% 74.1%;
+  --background-alternative: 0deg 0% 100%;
   --background-secondary: 0deg 0% 100%;
   --background-muted: 0deg 0% 100%;
   --foreground-muted: 0deg 0% 100%;
   --foreground-strong: 0deg 0% 100%;
-  --border-overlay: var(--colors-slate-light-4);
-  --border-secondary: var(--colors-gray-dark-4);
-  --border-muted: var(--colors-gray-dark-4);
-  --border-default: var(--colors-gray-dark-4);
-  --background-selection: var(--colors-gray-light-4);
-  --background-overlay: var(--colors-slate-light-1);
-  --background-default: var(--colors-slate-light-1);
-  --foreground-lighter: var(--colors-slate-light-10);
-  --foreground-light: var(--colors-slate-light-11);
-  --foreground-default: var(--colors-slate-light-12);
+  --border-overlay: var(--colors-slate-light-500);
+  --border-secondary: var(--colors-gray-dark-400);
+  --border-muted: var(--colors-gray-dark-400);
+  --border-default: var(--colors-gray-dark-400);
+  --background-selection: var(--colors-gray-light-400);
+  --background-overlay: var(--colors-slate-light-100);
+  --background-default: var(--colors-slate-light-100);
+  --foreground-lighter: var(--colors-slate-light-1000);
+  --foreground-light: var(--colors-slate-light-1100);
+  --foreground-default: var(--colors-slate-light-1200);
 }

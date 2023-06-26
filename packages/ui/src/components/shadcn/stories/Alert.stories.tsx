@@ -1,5 +1,5 @@
 import { Alert, AlertDescription, AlertTitle } from '@ui/components/shadcn/ui/alert'
-import { AlertCircle, Terminal } from 'lucide-react'
+import { AlertCircle, Terminal, AlertTriangle } from 'lucide-react'
 import { Meta } from '@storybook/react'
 
 const meta: Meta<typeof Alert> = {
@@ -8,10 +8,14 @@ const meta: Meta<typeof Alert> = {
 }
 
 export const Default = () => (
-  <Alert>
-    <Terminal className="h-4 w-4" />
-    <AlertTitle>Heads up!</AlertTitle>
-    <AlertDescription>You can add components to your app using the cli.</AlertDescription>
+  <Alert className="flex gap-6">
+    <div className="bg-foreground rounded h-5 w-5 flex items-center justify-center">
+      <AlertTriangle className="h-3 w-3 text-background" strokeWidth={2} />
+    </div>
+    <div>
+      <AlertTitle>Heads up!</AlertTitle>
+      <AlertDescription>You can add components to your app using the cli.</AlertDescription>
+    </div>
   </Alert>
 )
 
