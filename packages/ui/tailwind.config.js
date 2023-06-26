@@ -32,13 +32,13 @@ module.exports = config({
       },
       colors: {
         border: 'hsl(var(--border-overlay))',
-        input: 'hsl(var(--input))',
+        input: 'hsl(var(--border-control))',
         ring: 'hsl(var(--ring))',
         background: 'hsl(var(--background-default))',
         foreground: 'hsl(var(--foreground-default))',
         primary: {
-          DEFAULT: 'hsl(var(--primary))',
-          foreground: 'hsl(var(--primary-foreground))',
+          DEFAULT: 'hsl(var(--foreground-default))',
+          foreground: 'hsl(var(--background-default))',
         },
         secondary: {
           DEFAULT: 'hsl(var(--secondary))',
@@ -46,22 +46,22 @@ module.exports = config({
         },
         destructive: {
           DEFAULT: 'hsl(var(--destructive-default))',
-          foreground: 'hsl(var(--destructive-300))',
+          foreground: 'hsl(var(--foreground-default))',
         },
         muted: {
           DEFAULT: 'hsl(var(--border-overlay))',
           foreground: 'hsl(var(--foreground-lighter))',
         },
         accent: {
-          DEFAULT: 'hsl(var(--accent))',
-          foreground: 'hsl(var(--accent-foreground))',
+          DEFAULT: 'hsl(var(--background-overlay))',
+          foreground: 'hsl(var(--foreground-lighter))',
         },
         popover: {
           DEFAULT: 'hsl(var(--background-overlay))',
           foreground: 'hsl(var(--foreground-default))',
         },
         card: {
-          DEFAULT: 'hsl(var(--card))',
+          DEFAULT: 'hsl(var(--background-overlay))',
           foreground: 'hsl(var(--foreground-default))',
         },
       },

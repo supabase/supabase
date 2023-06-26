@@ -1,24 +1,28 @@
 /**
  * Do not edit directly
- * Generated on Fri, 23 Jun 2023 18:42:16 GMT
+ * Generated on Sun, 25 Jun 2023 18:14:28 GMT
  */
 
 .dark {
-  --destructive-default: 0deg 100% 50%;
-  --destructive-300: 0deg 100% 87.5%;
+  --destructive-default: 358.1deg 75.1% 59%;
+  --destructive-400: 0deg 0% 8.6%;
+  --destructive-300: 0deg 40.8% 19.2%;
   --destructive-200: 0deg 97% 74.1%;
   --background-secondary: 0deg 0% 100%;
   --background-muted: 0deg 0% 100%;
   --foreground-muted: 0deg 0% 100%;
   --foreground-strong: 0deg 0% 100%;
-  --border-overlay: var(--colors-gray-dark-4);
-  --border-secondary: var(--colors-gray-dark-4);
-  --border-muted: var(--colors-gray-dark-4);
-  --border-default: var(--colors-gray-dark-4);
-  --background-selection: var(--colors-gray-dark-6);
-  --background-overlay: var(--colors-gray-dark-3);
-  --background-default: var(--colors-gray-dark-2);
-  --foreground-lighter: var(--colors-gray-dark-10);
-  --foreground-light: var(--colors-gray-dark-11);
-  --foreground-default: var(--colors-gray-dark-12);
+  --border-control: var(--colors-gray-dark-600);
+  --border-overlay: var(--colors-gray-dark-400);
+  --border-secondary: var(--colors-gray-dark-400);
+  --border-muted: var(--colors-gray-dark-400);
+  --border-default: var(--colors-gray-dark-400);
+  --background-alternative: var(--colors-gray-dark-100);
+  --background-control: var(--colors-gray-dark-300);
+  --background-selection: var(--colors-gray-dark-600);
+  --background-overlay: var(--colors-gray-dark-300);
+  --background-default: var(--colors-gray-dark-200);
+  --foreground-lighter: var(--colors-gray-dark-1000);
+  --foreground-light: var(--colors-gray-dark-1100);
+  --foreground-default: var(--colors-gray-dark-1200);
 }

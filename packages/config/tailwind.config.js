@@ -11,7 +11,11 @@ Object.values(color).map((x, i) => {
   colorExtend[Object.keys(color)[i]] = x.cssVariable
 })
 
-console.log('colorExtend', colorExtend)
+// console.log('colorExtend', colorExtend)
+
+// console.log('colorExtend', kebabToNested(colorExtend))
+
+// console.log('colorExtend', kebabToNested(colorExtend).colors.gray)
 
 /**
  * Generates Tailwind colors for the theme
@@ -45,15 +49,15 @@ function kebabToNested(obj) {
     const parts = key.split('-')
     let currentObj = result
     for (let i = 0; i < parts.length; i++) {
-      const part = parts[i]
+      const part = parts[i].toLowerCase() // convert key to lowercase
       if (!currentObj[part]) {
         currentObj[part] = {}
       }
       if (i === parts.length - 1) {
         if (typeof value === 'object') {
-          currentObj[part] = nestObject(value)
+          currentObj[part] = kebabToNested(value) // recursively convert nested objects
         } else {
-          currentObj[part] = value
+          currentObj[part] = value.toString().toLowerCase() // convert value to lowercase
         }
       } else {
         currentObj = currentObj[part]
@@ -316,7 +320,7 @@ const uiConfig = ui({
         mono: ['Office Code Pro', 'Source Code Pro', 'Menlo', 'monospace'],
       },
       color: {
-        ...colorExtend,
+        ...kebabToNested(colorExtend),
       },
     },
   },
