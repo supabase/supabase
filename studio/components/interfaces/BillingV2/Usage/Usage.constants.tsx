@@ -50,7 +50,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
       {
         anchor: 'cpu',
         key: 'cpu_usage',
-        attribute: 'avg_cpu_usage',
+        attribute: 'max_cpu_usage',
         name: 'CPU',
         unit: 'percentage',
         description: 'Max CPU usage of your server',
