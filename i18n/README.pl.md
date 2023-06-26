@@ -12,9 +12,9 @@
 - [x] hostowana baza danych Postgres [x]. [Dokumenty](https://supabase.com/docs/guides/database)
 - [x] uwierzytelnianie i autoryzacja [x]. [Dokumenty](https://supabase.com/docs/guides/auth)
 - [x] Automatycznie generowane interfejsy API.
-  - [x] REST. [Docs](https://supabase.com/docs/guides/database/api#rest-api)
-  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/database/api#graphql-api)
-  - [x] Subskrypcje w czasie rzeczywistym. [Docs](https://supabase.com/docs/guides/database/api#realtime-api)
+  - [x] REST. [Docs](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/api#graphql-api-overview)
+  - [x] Subskrypcje w czasie rzeczywistym. [Docs](https://supabase.com/docs/guides/api#realtime-api-overview)
 - [x] Funkcje.
   - [x] Funkcje bazy danych. [Docs](https://supabase.com/docs/guides/database/functions)
   - [x] Funkcje brzegowe [Docs](https://supabase.com/docs/guides/functions)

@@ -38,6 +38,7 @@ export const PRICING_TIER_LABELS = {
 }
 
 export const PRICING_TIER_LABELS_ORG = {
+  FREE: 'Free - $0/month',
   PRO: 'Pro - $25/month',
   TEAM: 'Team - $599/month',
 }
