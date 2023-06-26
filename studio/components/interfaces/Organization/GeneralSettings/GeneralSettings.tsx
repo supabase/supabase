@@ -19,6 +19,7 @@ import { checkPermissions, useFlag, useSelectedOrganization, useStore } from 'ho
 import { patch } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import OrganizationDeletePanel from './OrganizationDeletePanel'
+import OrganizationBillingMigrationPanel from './OrganizationBillingMigrationPanel'
 
 const GeneralSettings = () => {
   const queryClient = useQueryClient()
@@ -26,7 +27,7 @@ const GeneralSettings = () => {
   const { slug } = useParams()
   const [open, setOpen] = useState(false)
   const selectedOrganization = useSelectedOrganization()
-  const { name, opt_in_tags } = selectedOrganization ?? {}
+  const { name, opt_in_tags, subscription_id } = selectedOrganization ?? {}
 
   const formId = 'org-general-settings'
   const isOptedIntoAi = opt_in_tags?.includes('AI_SQL_GENERATOR_OPT_IN')
@@ -34,9 +35,11 @@ const GeneralSettings = () => {
 
   const showCMDK = useFlag('dashboardCmdk')
   const allowCMDKDataOptIn = useFlag('dashboardCmdkDataOptIn')
+  const orgBillingMigrationEnabled = useFlag('orgBillingMigration')
 
   const canUpdateOrganization = checkPermissions(PermissionAction.UPDATE, 'organizations')
   const canDeleteOrganization = checkPermissions(PermissionAction.UPDATE, 'organizations')
+  const canMigrateOrganization = checkPermissions(PermissionAction.UPDATE, 'organizations')
 
   const onUpdateOrganization = async (values: any, { setSubmitting, resetForm }: any) => {
     if (!canUpdateOrganization) {
@@ -189,6 +192,9 @@ const GeneralSettings = () => {
           )
         }}
       </Form>
+      {orgBillingMigrationEnabled && canMigrateOrganization && !subscription_id && (
+        <OrganizationBillingMigrationPanel />
+      )}
 
       {canDeleteOrganization && <OrganizationDeletePanel />}
     </div>
