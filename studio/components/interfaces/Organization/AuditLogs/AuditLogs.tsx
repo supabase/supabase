@@ -14,7 +14,7 @@ import { useOrganizationDetailQuery } from 'data/organizations/organization-deta
 import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { Button, IconUser } from 'ui'
+import { Button, IconArrowDown, IconArrowUp, IconBarChart, IconUser } from 'ui'
 import FilterPopover from './FilterPopover'
 import LogDetailsPanel from './LogDetailsPanel'
 
@@ -25,6 +25,7 @@ import LogDetailsPanel from './LogDetailsPanel'
 const AuditLogs = () => {
   const { slug } = useParams()
   const currentTime = dayjs().set('millisecond', 0)
+  const [dateSortDesc, setDateSortDesc] = useState(true)
   const [selectedLog, setSelectedLog] = useState<OrganizationAuditLog>()
   const [filters, setFilters] = useState<{ users: string[]; projects: string[] }>({
     users: [], // gotrue_id
@@ -49,7 +50,11 @@ const AuditLogs = () => {
   const members = detailData?.members ?? []
   const roles = rolesData?.roles ?? []
   const sortedLogs = logs
-    ?.sort((a, b) => Number(new Date(b.timestamp)) - Number(new Date(a.timestamp)))
+    ?.sort((a, b) =>
+      dateSortDesc
+        ? Number(new Date(b.timestamp)) - Number(new Date(a.timestamp))
+        : Number(new Date(a.timestamp)) - Number(new Date(b.timestamp))
+    )
     ?.filter((log) => {
       if (filters.users.length > 0) {
         return filters.users.includes(log.actor.id)
@@ -110,11 +115,33 @@ const AuditLogs = () => {
 
                 <Table
                   head={[
-                    <Table.th key="user">User</Table.th>,
-                    <Table.th key="action">Action</Table.th>,
-                    <Table.th key="target">Target</Table.th>,
-                    <Table.th key="date">Date</Table.th>,
-                    <Table.th key="actions"></Table.th>,
+                    <Table.th key="user" className="py-2">
+                      User
+                    </Table.th>,
+                    <Table.th key="action" className="py-2">
+                      Action
+                    </Table.th>,
+                    <Table.th key="target" className="py-2">
+                      Target
+                    </Table.th>,
+                    <Table.th key="date" className="py-2">
+                      <div className="flex items-center space-x-2">
+                        <p>Date</p>
+                        <Button
+                          type="text"
+                          className="px-1"
+                          icon={
+                            dateSortDesc ? (
+                              <IconArrowDown strokeWidth={1.5} size={14} />
+                            ) : (
+                              <IconArrowUp strokeWidth={1.5} size={14} />
+                            )
+                          }
+                          onClick={() => setDateSortDesc(!dateSortDesc)}
+                        />
+                      </div>
+                    </Table.th>,
+                    <Table.th key="actions" className="py-2"></Table.th>,
                   ]}
                   body={
                     sortedLogs?.map((log) => {
