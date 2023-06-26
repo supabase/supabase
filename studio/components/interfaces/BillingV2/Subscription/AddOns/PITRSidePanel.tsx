@@ -11,6 +11,8 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { Alert, Button, IconExternalLink, Radio, SidePanel } from 'ui'
+import Telemetry from 'lib/telemetry'
+import { useRouter } from 'next/router'
 
 const PITR_CATEGORY_OPTIONS: {
   id: 'off' | 'on'
@@ -34,6 +36,7 @@ const PITR_CATEGORY_OPTIONS: {
 
 const PITRSidePanel = () => {
   const { ui } = useStore()
+  const router = useRouter()
   const { ref: projectRef } = useParams()
   const { isDarkMode } = useTheme()
 
@@ -72,6 +75,17 @@ const PITRSidePanel = () => {
         setSelectedCategory('off')
         setSelectedOption('pitr_0')
       }
+      Telemetry.sendActivity(
+        {
+          activity: 'Side Panel Viewed',
+          source: 'Dashboard',
+          data: {
+            title: 'Point in Time Recovery',
+            section: 'Add ons',
+          },
+        },
+        router
+      )
     }
   }, [visible, isLoading])
 
@@ -152,6 +166,18 @@ const PITRSidePanel = () => {
                     onClick={() => {
                       setSelectedCategory(option.id)
                       if (option.id === 'off') setSelectedOption('pitr_0')
+                      Telemetry.sendActivity(
+                        {
+                          activity: 'Option Selected',
+                          source: 'Dashboard',
+                          data: {
+                            title: 'Point in Time Recovery',
+                            section: 'Add ons',
+                            option: option.name,
+                          },
+                        },
+                        router
+                      )
                     }}
                   >
                     <img

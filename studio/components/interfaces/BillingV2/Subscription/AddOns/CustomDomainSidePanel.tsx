@@ -10,9 +10,12 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { Alert, Button, IconExternalLink, Radio, SidePanel } from 'ui'
+import Telemetry from 'lib/telemetry'
+import { useRouter } from 'next/router'
 
 const CustomDomainSidePanel = () => {
   const { ui } = useStore()
+  const router = useRouter()
   const { ref: projectRef } = useParams()
 
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
@@ -51,6 +54,17 @@ const CustomDomainSidePanel = () => {
       } else {
         setSelectedOption('cd_none')
       }
+      Telemetry.sendActivity(
+        {
+          activity: 'Side Panel Viewed',
+          source: 'Dashboard',
+          data: {
+            title: 'Custom domains',
+            section: 'Add ons',
+          },
+        },
+        router
+      )
     }
   }, [visible, isLoading])
 
