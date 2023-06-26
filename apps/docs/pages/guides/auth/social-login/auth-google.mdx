@@ -72,8 +72,76 @@ When the user provides consent, Google issues an identity token (commonly abbrev
 If you are building a Flutter app, you can use [flutter_appauth](https://pub.dev/packages/flutter_appauth) package to sign a user into your Supabase project:
 
 ```dart
-final AuthResponse = await supabase.auth.signInWithGoogle();
-```
+import 'package:crypto/crypto.dart';
+import 'package:flutter_appauth/flutter_appauth.dart';
+
+// Generate a random string
+final rawNonce = generateRandomString();
+final hashedNonce = sha256.convert(utf8.encode(rawNonce)).toString();
+
+// Your registered Google client ID here. 
+// This will be different for iOS and Android
+const clientId = 'YOUR_GOODLE_CLIENT_ID';
+
+// bundle ID for iOS, package name for Android here
+final packageName = 'io.supabase.example';
+
+/// fixed for google login
+final redirectUrl = '$packageName:/google_auth';
+
+/// fixed for google login
+const discoveryUrl =
+    'https://accounts.google.com/.well-known/openid-configuration';
+
+final appAuth = FlutterAppAuth();
+
+// authorize the user by opening the concent page
+final result = await appAuth.authorize(
+  AuthorizationRequest(
+    clientId,
+    redirectUrl,
+    discoveryUrl: discoveryUrl,
+    nonce: hashedNonce,
+    scopes: [
+      'openid',
+      'email',
+    ],
+  ),
+);
+
+if (result == null) {
+  throw AuthException(
+      'Could not find AuthorizationResponse after authorizing');
+}
+
+// Request the access and id token to google
+final tokenResponse = await appAuth.token(
+  TokenRequest(
+    clientId,
+    redirectUrl,
+    authorizationCode: result.authorizationCode,
+    discoveryUrl: discoveryUrl,
+    codeVerifier: result.codeVerifier,
+    nonce: result.nonce,
+    scopes: [
+      'openid',
+      'email',
+    ],
+  ),
+);
+
+final idToken = tokenResponse?.idToken;
+
+if (idToken == null) {
+  throw AuthException('Could not find idToken from the token response');
+}
+
+await signInWithIdToken(
+  provider: Provider.google,
+  idToken: idToken,
+  accessToken: tokenResponse?.accessToken,
+  nonce: rawNonce,
+);```
 
 In the Supabase JavaScript library, which you can use with web-based native frameworks like React Native or Expo, you can invoke this functionality like so:
 
