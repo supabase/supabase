@@ -66,7 +66,8 @@ const TierUpdateSidePanel = () => {
           activity: 'Side Panel Viewed',
           source: 'Dashboard',
           data: {
-            side_panel_title: 'Change Subscription Plan',
+            title: 'Change Subscription Plan',
+            section: 'Subscription plan',
           },
         },
         router
@@ -205,7 +206,22 @@ const TierUpdateSidePanel = () => {
                                 !canUpdateSubscription
                               }
                               type={isDowngradeOption ? 'default' : 'primary'}
-                              onClick={() => setSelectedTier(plan.id as any)}
+                              onClick={() => {
+                                setSelectedTier(plan.id as any)
+                                Telemetry.sendActivity(
+                                  {
+                                    activity: 'Popup Viewed',
+                                    source: 'Dashboard',
+                                    data: {
+                                      title: isDowngradeOption
+                                        ? 'Downgrade'
+                                        : 'Upgrade' + ' to ' + plan.name,
+                                      section: 'Subscription plan',
+                                    },
+                                  },
+                                  router
+                                )
+                              }}
                             >
                               {isDowngradeOption ? 'Downgrade' : 'Upgrade'} to {plan.name}
                             </Button>
