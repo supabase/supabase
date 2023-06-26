@@ -12,7 +12,7 @@ Content sources for vectors can be extremely large. As you grow you should run y
 
 ## Simple workloads
 
-For small workloads it's typical to store your data in a single database.
+For small workloads, it's typical to store your data in a single database.
 
 If you've used [Vecs](/docs/guides/ai/vecs-python-client) to create 3 different collections, you can expose collections to your web or mobile application using [views](/docs/guides/database/tables#views):
 
@@ -93,9 +93,9 @@ docs.query(
 
 ### Accessing external collections using Wrappers
 
-Supabase supports [Foreign Data Wrappers](/blog/postgres-foreign-data-wrappers-rust). Wrappers allow you connect two databases together so that you can query them over the network.
+Supabase supports [Foreign Data Wrappers](/blog/postgres-foreign-data-wrappers-rust). Wrappers allow you to connect two databases together so that you can query them over the network.
 
-This involves 2 steps: connecting to your remote database from the primary, and creating a Foreign Table.
+This involves 2 steps: connecting to your remote database from the primary and creating a Foreign Table.
 
 #### Connecting your remote database
 
@@ -140,7 +140,7 @@ const { data, error } = await supabase
 
 ### Enterprise architecture
 
-This diagram provides an example architecture, allowing you to access the collections either with our client libraries or using Vecs. You can add as many secondary databases as you need, in this example we show one only:
+This diagram provides an example architecture that allows you to access the collections either with our client libraries or using Vecs. You can add as many secondary databases as you need (in this example we only show one):
 
 <div>
   <img
