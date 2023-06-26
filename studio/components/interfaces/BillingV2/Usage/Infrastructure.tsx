@@ -91,7 +91,7 @@ const Infrastructure = ({
   )
 
   const chartMeta: { [key: string]: { data: DataPoint[]; isLoading: boolean } } = {
-    avg_cpu_usage: {
+    max_cpu_usage: {
       isLoading: isLoadingCpuUsageData,
       data: cpuUsageData?.data ?? [],
     },
