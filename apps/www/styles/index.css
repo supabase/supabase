@@ -3,10 +3,11 @@
 @tailwind utilities;
 
 :root {
-  --color-base-100: 215, 60%, 3%;
+  --color-base-100: 215, 30%, 3%;
   --color-base-200: 215, 30%, 5%;
   --color-base-300: 215, 30%, 7%;
-  --color-base-400: 215, 30%, 10%;
+  --color-base-400: 215, 10%, 12%;
+  --color-base-500: 215, 10%, 45%;
   --color-base-800: 215, 12%, 65%;
   --color-bg-darkest: hsl(var(--color-base-100));
   --color-panel-bg: hsl(var(--color-base-200));

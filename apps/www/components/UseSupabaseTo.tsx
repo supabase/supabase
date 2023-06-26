@@ -40,10 +40,8 @@ const UseSupabaseTo = (props: Props) => {
       setActiveStringIdx((prevIndex) => (prevIndex >= props.strings.length - 1 ? 0 : prevIndex + 1))
     }, DELAY * 1000)
 
-    console.log('activeStringIdx', activeStringIdx)
     return () => {
       clearInterval(textInterval)
-      // setActiveStringIdx(0)
     }
   }, [activeStringIdx])
 

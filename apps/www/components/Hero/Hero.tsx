@@ -58,7 +58,10 @@ const Hero = (props: Props) => {
                   <div className="flex items-center gap-2">
                     {props.cta && (
                       <Link href={props.cta.link} as={props.cta.link}>
-                        <a onClick={() => sendTelemetryEvent(gaEvents['www_hp_hero_startProject'])}>
+                        <a
+                          onClick={() => sendTelemetryEvent(gaEvents['www_hp_hero_startProject'])}
+                          tabIndex={-1}
+                        >
                           <Button size="medium" className="text-white">
                             {props.cta.label ?? 'Start your project'}
                           </Button>
@@ -70,6 +73,7 @@ const Hero = (props: Props) => {
                         <a
                           onClick={() => sendTelemetryEvent(gaEvents['www_hp_hero_documentation'])}
                           className="ml-2"
+                          tabIndex={-1}
                         >
                           <Button size="medium" type="default" icon={<IconBookOpen />}>
                             {props.secondaryCta.label ?? 'Documentation'}

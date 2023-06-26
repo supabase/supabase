@@ -1,5 +1,5 @@
 import React, { ReactNode, useState } from 'react'
-import { AnimatePresence, motion, useAnimation } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 
 interface Tab {
   label: string
@@ -66,8 +66,8 @@ interface TabProps {
 const Tab = ({ label, isActive, onClick }: TabProps) => (
   <button
     onClick={onClick}
-    className={`text-left py-2 px-4 lg:py-4 lg:px-10 border rounded-xl bg-[var(--color-panel-bg)] text-lg opacity-80 transition-all ${
-      isActive ? 'opacity-100 border-white shadow-2xl' : 'opacity-80 shadow-none'
+    className={`text-left py-2 px-4 lg:py-4 lg:px-10 border rounded-xl bg-[var(--color-panel-bg)] hover:border-[hsl(var(--color-base-500))] text-lg opacity-80 transition-all ${
+      isActive ? 'opacity-100 !border-brand-900 shadow-2xl' : 'opacity-80 shadow-none'
     }`}
     aria-selected={isActive}
     role="tab"

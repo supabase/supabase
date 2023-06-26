@@ -29,8 +29,8 @@ const CTABanner = (props: any) => {
       <div className="relative z-10 flex flex-col items-center gap-4">
         {props.hasLogo && (
           <div className="relative w-screen -mb-[55px] -mt-32 z-0 h-[300px] lg:min-h-[250px] lg:h-[300px]">
-            <div className="absolute w-full h-full z-50 pointer-events-none inset-0 bg-gradient-to-t from-[#0A0B0F] via-transparent to-transparent" />
-            <div className="absolute w-full h-full z-50 inset-0 bg-[#0A0B0F] top-[100%]" />
+            <div className="absolute w-full h-full z-50 pointer-events-none inset-0 bg-gradient-to-t from-[var(--color-bg-darkest)] via-transparent to-transparent" />
+            <div className="absolute w-full h-full z-50 inset-0 bg-[var(--color-bg-darkest)] top-[100%]" />
             <canvas
               className="relative z-20 w-[400px] h-[400px] bottom-[-40px] lg:bottom-[-60px]"
               id="canvas3d"
@@ -51,15 +51,14 @@ const CTABanner = (props: any) => {
           </a>
         </div>
       </div>
-      {props.hasLogo && (
-        <div className="absolute z-0 mx-auto w-full max-w-2xl h-auto left-0 right-0 flex justify-center top-0 text-white">
-          <img
-            src="/images/index/soft-blur-grid-03.png"
-            alt="background decoration image with grid"
-            className="w-full h-auto"
-          />
-        </div>
-      )}
+
+      <div className="absolute z-0 mx-auto w-full h-auto lg:w-auto lg:h-full left-0 right-0 flex justify-center top-0 text-white opacity-50">
+        <img
+          src="/images/index/soft-blur-grid-03.png"
+          alt="background decoration image with grid"
+          className="w-full h-auto lg:w-auto lg:h-full"
+        />
+      </div>
     </div>
   )
 }

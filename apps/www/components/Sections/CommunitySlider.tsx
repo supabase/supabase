@@ -138,19 +138,21 @@ const CommunitySlider = (props: any) => {
 
   return (
     <div className="py-16 sm:py-18 md:py-24">
-      <div className="relative h-[300px] w-screen mx-auto md:w-full -mb-32 z-0">
-        {/* <Image
+      {/* <div className="relative h-[300px] w-screen mx-auto md:w-full -mb-32 z-0">
+        <Image
           src="/images/product/vector/community/vector-community.svg"
           alt="vector graphic"
           layout="fill"
           objectFit={isSm ? 'cover' : 'contain'}
-        /> */}
-      </div>
+        />
+      </div> */}
       <SectionContainer className="!py-0">
         <div className="col-span-12 text-center relative z-10">
-          <h3 className="text-3xl md:text-4xl heading-gradient mb-2">Trusted by all Developers</h3>
+          <h3 className="text-3xl md:text-4xl heading-gradient mb-2">
+            Customers building with Supabase
+          </h3>
           <p className="text-[var(--color-text-secondary)] text-sm">
-            Discover what our customers have to say about their Supabase experience
+            Discover what people have to say about their Supabase experience
           </p>
           <div className="flex gap-2 justify-center mt-8">
             {props.cta && (

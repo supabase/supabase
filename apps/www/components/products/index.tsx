@@ -1,23 +1,14 @@
-import Solutions from 'data/Solutions'
-import Telemetry from '~/lib/telemetry'
-import gaEvents from '~/lib/gaEvents'
-import { useTelemetryProps } from 'common/hooks/useTelemetryProps'
 import { useRouter } from 'next/router'
 import Image from 'next/image'
-import SectionContainer from '../Layouts/SectionContainer'
+import Telemetry from '~/lib/telemetry'
+import gaEvents from '~/lib/gaEvents'
+import { IconCheck } from 'ui'
 import { useBreakpoint } from 'common'
+import { useTelemetryProps } from 'common/hooks/useTelemetryProps'
+
+import SectionContainer from '~/components/Layouts/SectionContainer'
 import ProductCard from './ProductCard'
 import DatabaseVisual from './DatabaseVisual'
-import { IconCheck } from 'ui'
-
-const opacityVariant = {
-  default: { opacity: 1, filter: 'grayscale(1)', transition: { duration: 0.1 } },
-  hover: {
-    opacity: 1,
-    filter: 'grayscale(0)',
-    transition: { duration: 0.15 },
-  },
-}
 
 const Products = (props: any) => {
   const router = useRouter()
@@ -60,14 +51,14 @@ const Products = (props: any) => {
   const isSm = useBreakpoint(640)
 
   return (
-    <SectionContainer className="space-y-8 mt-0 lg:mt-0 !pt-0">
+    <SectionContainer className="space-y-8">
       <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-4 lg:gap-6 md:grid-cols-4">
         <ProductCard
           alignLeft
-          url={Solutions['database'].url}
-          icon={Solutions['database'].icon}
-          title={Solutions['database'].name}
-          subtitle={Solutions['database'].description}
+          url={props.products['database'].url}
+          icon={props.products['database'].icon}
+          title={props.products['database'].name}
+          subtitle={props.products['database'].description}
           highlights={
             <ul className="flex flex-col gap-1">
               <li>
@@ -86,9 +77,9 @@ const Products = (props: any) => {
           classname="col-span-full md:col-span-2"
         />
         <ProductCard
-          url={Solutions['authentication'].url}
-          icon={Solutions['authentication'].icon}
-          title={Solutions['authentication'].name}
+          url={props.products['authentication'].url}
+          icon={props.products['authentication'].icon}
+          title={props.products['authentication'].name}
           subtitle={
             <>
               Add user sign ups and logins,
@@ -99,7 +90,7 @@ const Products = (props: any) => {
           image={
             <div className="absolute inset-0 z-0">
               <Image
-                src="/images/index/products/database.svg"
+                src="/images/index/products/auth.svg"
                 alt="Supabase Edge Functions feature, hover image with glow"
                 layout="fill"
                 objectPosition="50% 50%"
@@ -112,9 +103,9 @@ const Products = (props: any) => {
           onClick={() => sendTelemetryEvent(name)}
         />
         <ProductCard
-          url={Solutions['storage'].url}
-          icon={Solutions['storage'].icon}
-          title={Solutions['storage'].name}
+          url={props.products['storage'].url}
+          icon={props.products['storage'].icon}
+          title={props.products['storage'].name}
           subtitle={<>Store, organize, and serve large files, from videos to images.</>}
           image={
             <div className="absolute inset-0 z-0">
@@ -132,9 +123,9 @@ const Products = (props: any) => {
           onClick={() => sendTelemetryEvent(name)}
         />
         <ProductCard
-          url={Solutions['edge-functions'].url}
-          icon={Solutions['edge-functions'].icon}
-          title={Solutions['edge-functions'].name}
+          url={props.products['edge-functions'].url}
+          icon={props.products['edge-functions'].icon}
+          title={props.products['edge-functions'].name}
           subtitle={
             <>
               Easily write custom code
@@ -158,9 +149,9 @@ const Products = (props: any) => {
           classname="!col-span-1"
         />
         <ProductCard
-          url={Solutions['realtime'].url}
-          icon={Solutions['realtime'].icon}
-          title={Solutions['realtime'].name}
+          url={props.products['realtime'].url}
+          icon={props.products['realtime'].icon}
+          title={props.products['realtime'].name}
           subtitle={
             <>
               Build multiplayer experiences
@@ -180,14 +171,27 @@ const Products = (props: any) => {
               />
             </div>
           }
-          classname="!col-span-1 md:h-[350px] lg:h-[390px]"
+          classname=""
         />
         <ProductCard
           alignLeft
-          url={Solutions['vector'].url}
-          icon={Solutions['vector'].icon}
-          title={Solutions['vector'].name}
-          subtitle={Solutions['vector'].description}
+          url={props.products['vector'].url}
+          icon={props.products['vector'].icon}
+          title={props.products['vector'].name}
+          subtitle={props.products['vector'].description}
+          highlights={
+            <ul className="flex flex-col gap-1">
+              <li>
+                <IconCheck className="inline h-4 w-4" /> Postgres + pgvector
+              </li>
+              <li>
+                <IconCheck className="inline h-4 w-4" /> Easily connect to any LLM
+              </li>
+              <li>
+                <IconCheck className="inline h-4 w-4" /> Secure and scalable
+              </li>
+            </ul>
+          }
           onClick={() => sendTelemetryEvent(name)}
           image={
             <div className="absolute inset-0 z-0">

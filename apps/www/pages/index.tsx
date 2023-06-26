@@ -11,10 +11,10 @@ import pageData from '../data/home/pageData'
 const Highlights = dynamic(() => import('~/components/Highlights/index'))
 const UseSupabaseTo = dynamic(() => import('~/components/UseSupabaseTo'))
 const Products = dynamic(() => import('~/components/Products/index'))
-const ExampleAppsSection = dynamic(() => import('components/Sections/ExampleAppsSection'))
 const TimedTabsSection = dynamic(() => import('~/components/Sections/TimedTabsSection'))
-const HomepageMetricsSection = dynamic(() => import('components/Sections/HomepageMetricsSection'))
+// const HomepageMetricsSection = dynamic(() => import('components/Sections/HomepageMetricsSection'))
 const DashboardFeatures = dynamic(() => import('components/DashboardFeatures/index'))
+const ExampleAppsSection = dynamic(() => import('components/Sections/ExampleAppsSection'))
 const CommunitySlider = dynamic(() => import('components/Sections/CommunitySlider'))
 const EnterpriseCta = dynamic(() => import('~/components/Sections/EnterpriseCta'))
 const CTABanner = dynamic(() => import('components/CTABanner/index'))
@@ -27,7 +27,7 @@ const Index = ({ customerStories }: Props) => {
       <Hero {...pageData.heroSection} />
       <Highlights {...pageData.highlightsSection} />
       <UseSupabaseTo {...pageData.useSupabaseTo} />
-      <HomepageMetricsSection />
+      {/* <HomepageMetricsSection /> */}
       <Products {...pageData.productsSection} />
       <DashboardFeatures {...pageData.dashboardFeatures} />
       <TimedTabsSection {...pageData.APIsection} />
