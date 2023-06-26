@@ -367,11 +367,11 @@ By default, [KotlinX Serialization](https://github.com/Kotlin/kotlinx.serializat
         class CustomSerializer: SupabaseSerializer {
 
             override fun <T : Any> encode(type: KType, value: T): String {
-            //encode value to string
+                //encode value to string
             }
 
             override fun <T : Any> decode(type: KType, value: String): T {
-            //decode value
+                //decode value
             }
 
         }
