@@ -197,7 +197,6 @@ const CreateProject = ({
           message: `Done fetching initial migrations`,
         })
       }
-      console.log('dbSql:', dbSql)
 
       let project: ProjectBase
 
