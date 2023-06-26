@@ -131,7 +131,7 @@ export const useIntegrationsQuery = <TData = IntegrationsData>(
   { enabled = true, ...options }: UseQueryOptions<IntegrationsData, IntegrationsError, TData> = {}
 ) =>
   useQuery<IntegrationsData, IntegrationsError, TData>(
-    integrationKeys.list(orgSlug),
+    integrationKeys.integrationsList(),
     ({ signal }) => getIntegrations({ orgSlug }, signal),
     { enabled: enabled && typeof orgSlug !== 'undefined', ...options }
   )

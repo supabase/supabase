@@ -106,6 +106,7 @@ const OrganizationPicker = ({
           <Listbox.Option
             key={org.id}
             value={org.slug}
+            // @ts-expect-error
             label={label}
             addOnBefore={({ active, selected }: any) => <IconHexagon />}
           >

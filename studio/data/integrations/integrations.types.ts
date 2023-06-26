@@ -115,24 +115,23 @@ export type VercelGitLink =
     }
 
 export type Imetadata = {
-  metadata: {
-    id: string
-    supabaseConfig: {
-      projectEnvVars: {
-        write: boolean
-      }
+  id: string
+  supabaseConfig: {
+    projectEnvVars: {
+      write: boolean
     }
-    link?: VercelGitLink
-    name: string
-    framework: VercelFramework
   }
+  link?: VercelGitLink
+  name: string
+  framework: VercelFramework
 }
+
 export type IntegrationProjectConnection = {
   id: string
-  created_at: string
+  inserted_at: string
   updated_at: string
   added_by: addedBy
-  supabase_project_id: string
+  supabase_project_ref: string
   foreign_project_id: string
   organization_integration_id: string
   metadata: Imetadata
@@ -158,14 +157,16 @@ type addedBy = userDetails
 type updatedBy = userDetails
 
 export type IntegrationName = 'Vercel' | 'Netlify' | 'GitHub'
+export type VercelAcccountType = 'team' | 'personal'
+export type VercelSource = 'marketplace' | 'deploy button'
+
 export type Integration = {
   id: string
   integration: {
-    id: string
-    name: 'Vercel' | 'Netlify' | 'GitHub'
+    name: IntegrationName
   }
   added_by: addedBy
-  created_at: string
+  inserted_at: string
   updated_at: string
   connections: IntegrationProjectConnection[] | []
   organization: {
@@ -174,5 +175,13 @@ export type Integration = {
   metadata?: {
     vercelTeam?: string
     gitHubConnectionOwner?: string
+    account: {
+      name: string
+      type: VercelAcccountType
+      avatar: string
+      source: VercelSource
+      owner_id: string
+    }
+    configuration_id: string
   }
 }
