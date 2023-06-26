@@ -249,7 +249,7 @@ functions:
     title: 'Fetch data: select()'
     notes: |
       Perform a SELECT query on the table or view.
-      - When calling a `decode` method, you have to provide a [serializable class](/docs/reference/kotlin/installing#add-kotlinx-serialization-required-for-postgrest-and-realtime-serialization) as the type parameter.
+      - When calling a `decode` method, you have to provide a [serializable class](/docs/reference/kotlin/installing#serialization) as the type parameter.
       - You can provide a `Columns` object to select specific columns.
       - You can provide a [filter](/docs/reference/kotlin/using-filters) block to filter the results
     examples:
@@ -345,7 +345,7 @@ functions:
     title: 'Create data: insert()'
     $ref: '@supabase/postgrest-js."lib/PostgrestQueryBuilder".PostgrestQueryBuilder.insert'
     notes: |
-      - When calling an `insert` method, you have to provide a [serializable value](/docs/reference/kotlin/installing#add-kotlinx-serialization-required-for-postgrest-and-realtime-serialization).
+      - When calling an `insert` method, you have to provide a [serializable value](/docs/reference/kotlin/installing#serialization).
       - By default, every time you run `insert()`, the client library will make a `select` to return the full record.
       This is convenient, but it can also cause problems if your policies are not configured to allow the `select` operation.
       If you are using Row Level Security and you are encountering problems, try setting the `returning` param to `Returning.MINIMAL`.
@@ -382,7 +382,7 @@ functions:
     title: 'Modify data: update()'
     notes: |
       - `update()` should always be combined with a [filter](/docs/reference/kotlin/using-filters) block to avoid updating all records.
-      - When calling `insert` or `update`, you have to provide a [serializable value](/docs/reference/kotlin/installing#add-kotlinx-serialization-required-for-postgrest-and-realtime-serialization) in the function parameter.
+      - When calling `insert` or `update`, you have to provide a [serializable value](/docs/reference/kotlin/installing#serialization) in the function parameter.
     examples:
       - id: updating-your-data
         name: Updating your data
@@ -470,7 +470,7 @@ functions:
       - Primary keys should be included in the data payload in order for an update to work correctly.
       - Primary keys  must be natural, not surrogate. There are however, [workarounds](https://github.com/PostgREST/postgrest/issues/1118) for surrogate primary keys.
       - If you need to insert new data and update existing data at the same time, use [Postgres triggers](https://github.com/supabase/postgrest-js/issues/173#issuecomment-825124550).
-      - When calling `insert` or `update`, you have to provide a [serializable value](/docs/reference/kotlin/installing#add-kotlinx-serialization-required-for-postgrest-and-realtime-serialization) in the function parameter.
+      - When calling `insert` or `update`, you have to provide a [serializable value](/docs/reference/kotlin/installing#serialization) in the function parameter.
     examples:
       - id: upsert-your-data
         name: Upsert your data
@@ -541,7 +541,7 @@ functions:
       That's a fancy way of saying that you can put some logic into your database then call it from anywhere.
       It's especially useful when the logic rarely changes - like password resets and updates.
 
-      - When calling `rpc` with parameters, you have to provide a [serializable value](/docs/reference/kotlin/installing#add-kotlinx-serialization-required-for-postgrest-and-realtime-serialization) in the function parameter.
+      - When calling `rpc` with parameters, you have to provide a [serializable value](/docs/reference/kotlin/installing#serialization) in the function parameter.
     examples:
       - id: call-a-stored-procedure
         name: Call a stored procedure
@@ -3024,7 +3024,7 @@ functions:
     title: 'invoke()'
     description: |
       Invokes a Supabase Function. See the [guide](/docs/guides/functions) for details on writing Functions.
-      - When invoking a function with parameters, you have to provide a [serializable value](/docs/reference/kotlin/installing#add-kotlinx-serialization-required-for-postgrest-and-realtime-serialization) in the function parameter.
+      - When invoking a function with parameters, you have to provide a [serializable value](/docs/reference/kotlin/installing#serialization) in the function parameter.
     notes: |
       - Requires an Authorization header.
     examples:
@@ -3079,7 +3079,7 @@ functions:
     notes: |
       - Realtime is disabled by default for new Projects for better database performance and security. You can turn it on by [managing replication](/docs/guides/database/api#managing-realtime).
       - If you want to receive the "previous" data for updates and deletes, you will need to set `REPLICA IDENTITY` to `FULL`, like this: `ALTER TABLE your_table REPLICA IDENTITY FULL;`
-      - When using a method with a generic type like `track`, `broadcast` or `broadcastFlow`, you have to provide a [serializable class](/docs/reference/kotlin/installing#add-kotlinx-serialization-required-for-postgrest-and-realtime-serialization) as the type parameter.
+      - When using a method with a generic type like `track`, `broadcast` or `broadcastFlow`, you have to provide a [serializable class](/docs/reference/kotlin/installing#serialization) as the type parameter.
     examples:
       - id: connect-to-realtime-client
         name: Connect to Realtime
