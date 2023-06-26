@@ -220,7 +220,21 @@ const SpendCapSidePanel = () => {
                   <div
                     key={option.value}
                     className={clsx('col-span-4 group space-y-1', isFreePlan && 'opacity-75')}
-                    onClick={() => !isFreePlan && setSelectedOption(option.value)}
+                    onClick={() => {
+                      !isFreePlan && setSelectedOption(option.value)
+                      Telemetry.sendActivity(
+                        {
+                          activity: 'Option Selected',
+                          source: 'Dashboard',
+                          data: {
+                            title: 'Spend cap',
+                            section: 'Cost Control',
+                            option: option.name,
+                          },
+                        },
+                        router
+                      )
+                    }}
                   >
                     <img
                       alt="Spend Cap"
