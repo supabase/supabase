@@ -9,6 +9,7 @@ export type ProjectCreateVariables = {
   organizationId: number
   dbPass: string
   dbRegion: string
+  dbSql?: string
   configurationId?: string
 }
 
@@ -17,6 +18,7 @@ export async function createProject({
   organizationId,
   dbPass,
   dbRegion,
+  dbSql,
   configurationId,
 }: ProjectCreateVariables) {
   const response = await post(`${API_URL}/projects`, {
@@ -25,7 +27,7 @@ export async function createProject({
     name,
     db_pass: dbPass,
     db_region: dbRegion,
-    // db_sql: dbSql || '',
+    db_sql: dbSql,
     db_pricing_tier_id: PRICING_TIER_PRODUCT_IDS.FREE,
     // auth_site_url: _store.selectedVercelProjectUrl,
     vercel_configuration_id: configurationId,

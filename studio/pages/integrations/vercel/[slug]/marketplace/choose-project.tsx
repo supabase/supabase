@@ -2,7 +2,6 @@ import { useMemo, useState } from 'react'
 
 import { useParams } from 'common'
 import ProjectLinker from 'components/interfaces/Integrations/ProjectLinker'
-
 import { Markdown } from 'components/interfaces/Markdown'
 import IntegrationWindowLayout from 'components/layouts/IntegrationWindowLayout'
 import { ScaffoldContainer, ScaffoldDivider } from 'components/layouts/Scaffold'
@@ -10,19 +9,14 @@ import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-or
 import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { useStore } from 'hooks'
 import { EMPTY_ARR } from 'lib/void'
-import { useRouter } from 'next/router'
 import { NextPageWithLayout, Organization } from 'types'
 import { IconBook, IconLifeBuoy, LoadingLine } from 'ui'
 
 const VercelIntegration: NextPageWithLayout = () => {
-  const router = useRouter()
-  const { configurationId, next, organizationSlug } = useParams()
+  const { slug, configurationId, next, organizationSlug } = useParams()
 
   const [loading, setLoading] = useState<boolean>(false)
-
-  const { slug } = router.query
 
   /**
    * Fetch the list of organization based integration installations for Vercel.
@@ -30,7 +24,7 @@ const VercelIntegration: NextPageWithLayout = () => {
    * Array of integrations installed on all
    */
   const { data: integrationData, isLoading: integrationDataLoading } = useOrgIntegrationsQuery({
-    orgSlug: slug?.toString(),
+    orgSlug: slug,
   })
 
   const { data, isLoading: isLoadingOrganizationsQuery } = useOrganizationsQuery({
