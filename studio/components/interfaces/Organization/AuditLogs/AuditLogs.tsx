@@ -1,6 +1,7 @@
 import dayjs from 'dayjs'
 import Image from 'next/image'
 import { useState } from 'react'
+import * as Tooltip from '@radix-ui/react-tooltip'
 
 import { useParams } from 'common'
 import Table from 'components/to-be-cleaned/Table'
@@ -127,18 +128,40 @@ const AuditLogs = () => {
                     <Table.th key="date" className="py-2">
                       <div className="flex items-center space-x-2">
                         <p>Date</p>
-                        <Button
-                          type="text"
-                          className="px-1"
-                          icon={
-                            dateSortDesc ? (
-                              <IconArrowDown strokeWidth={1.5} size={14} />
-                            ) : (
-                              <IconArrowUp strokeWidth={1.5} size={14} />
-                            )
-                          }
-                          onClick={() => setDateSortDesc(!dateSortDesc)}
-                        />
+
+                        <Tooltip.Root delayDuration={0}>
+                          <Tooltip.Trigger>
+                            <Button
+                              type="text"
+                              className="px-1"
+                              icon={
+                                dateSortDesc ? (
+                                  <IconArrowDown strokeWidth={1.5} size={14} />
+                                ) : (
+                                  <IconArrowUp strokeWidth={1.5} size={14} />
+                                )
+                              }
+                              onClick={() => setDateSortDesc(!dateSortDesc)}
+                            />
+                          </Tooltip.Trigger>
+                          <Tooltip.Portal>
+                            <Tooltip.Portal>
+                              <Tooltip.Content side="right">
+                                <Tooltip.Arrow className="radix-tooltip-arrow" />
+                                <div
+                                  className={[
+                                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                                    'border border-scale-200',
+                                  ].join(' ')}
+                                >
+                                  <span className="text-xs text-scale-1200">
+                                    {dateSortDesc ? 'Sort latest first' : 'Sort earliest first'}
+                                  </span>
+                                </div>
+                              </Tooltip.Content>
+                            </Tooltip.Portal>
+                          </Tooltip.Portal>
+                        </Tooltip.Root>
                       </div>
                     </Table.th>,
                     <Table.th key="actions" className="py-2"></Table.th>,
