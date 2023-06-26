@@ -1,26 +1,27 @@
 import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
-import { useIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
+// import { useIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
 import { useStore } from 'hooks'
 import { observer } from 'mobx-react-lite'
 import { useGithubConnectionConfigPanelSnapshot } from 'state/github-connection-config-panel'
 import { IconGitHub, IconSearch, Input, Select, SidePanel } from 'ui'
 
+// TO DO
+
 const GitHubRepoSelection = () => {
   const { ui } = useStore()
   const { slug } = useParams()
-  const { data } = useIntegrationsQuery({ orgSlug: slug })
+  // const { data } = useIntegrationsQuery({ orgSlug: slug })
 
   const githubConnectionConfigPanelSnapshot = useGithubConnectionConfigPanelSnapshot()
-
-  const githubIntegrations = data?.filter((integration) => integration.type === 'GITHUB')
 
   return (
     <SidePanel
       header={'Add GitHub repository'}
       size="large"
-      visible={githubConnectionConfigPanelSnapshot.visible}
-      onCancel={() => githubConnectionConfigPanelSnapshot.setVisible(false)}
+      visible={false}
+      // visible={githubConnectionConfigPanelSnapshot.visible}
+      // onCancel={() => githubConnectionConfigPanelSnapshot.setVisible(false)}
     >
       <div className="my-10 flex flex-col gap-6">
         <SidePanel.Content>

@@ -5,9 +5,9 @@ import { UserContent } from 'types'
 import { integrationKeys } from './keys'
 
 type DeleteVariables = {
-  organization_integration_id: string
   id: string
-  orgId: number | undefined
+  organization_integration_id: string
+  orgSlug: string | undefined
 }
 
 export async function deleteConnection(
@@ -40,7 +40,13 @@ export const useIntegrationsVercelInstalledConnectionDeleteMutation = ({
     {
       async onSuccess(data, variables, context) {
         console.log('variables in mutate delete onSuccess', variables)
-        await Promise.all([queryClient.invalidateQueries(integrationKeys.list(variables.orgId))])
+        await Promise.all([
+          queryClient.invalidateQueries(integrationKeys.integrationsList()),
+          queryClient.invalidateQueries(integrationKeys.integrationsListWithOrg(variables.orgSlug)),
+          queryClient.invalidateQueries(
+            integrationKeys.vercelProjectList(variables.organization_integration_id)
+          ),
+        ])
         await onSuccess?.(data, variables, context)
       },
       ...options,

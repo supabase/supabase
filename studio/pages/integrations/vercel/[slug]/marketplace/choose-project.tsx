@@ -6,29 +6,24 @@ import ProjectLinker from 'components/interfaces/Integrations/ProjectLinker'
 import { Markdown } from 'components/interfaces/Markdown'
 import IntegrationWindowLayout from 'components/layouts/IntegrationWindowLayout'
 import { ScaffoldContainer, ScaffoldDivider } from 'components/layouts/Scaffold'
+import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
 import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
-import { useVercelIntegrationCreateMutation } from 'data/integrations/vercel-integration-create-mutation'
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useStore } from 'hooks'
 import { EMPTY_ARR } from 'lib/void'
+import { useRouter } from 'next/router'
 import { NextPageWithLayout, Organization } from 'types'
 import { IconBook, IconLifeBuoy, LoadingLine } from 'ui'
-import { useIntegrationsQuery } from 'data/integrations/integrations-github-repos-query'
-import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
-import { useRouter } from 'next/router'
 
 const VercelIntegration: NextPageWithLayout = () => {
-  const { ui } = useStore()
   const router = useRouter()
-  const { code, configurationId, next, teamId, source, externalId } = useParams()
+  const { configurationId, next, organizationSlug } = useParams()
 
   const [loading, setLoading] = useState<boolean>(false)
-  const [selectedOrg, setSelectedOrg] = useState<Organization | null>(null)
-  // const [organizationIntegrationId, setOrganizationIntegrationId] = useState<string | undefined>(
-  //   undefined
-  // )
 
   const { slug } = router.query
+
   /**
    * Fetch the list of organization based integration installations for Vercel.
    *
@@ -38,35 +33,33 @@ const VercelIntegration: NextPageWithLayout = () => {
     orgSlug: slug?.toString(),
   })
 
-  console.log('integrationData', integrationData)
+  const { data, isLoading: isLoadingOrganizationsQuery } = useOrganizationsQuery({
+    enabled: slug !== undefined,
+  })
 
-  const organizationIntegrationId = integrationData?.find(
-    (x) => x.metadata?.configuration_id === configurationId
-  )?.id
+  const organization = data?.find((organization: Organization) => organization.slug === slug)
 
-  console.log('organizationIntegrationId', organizationIntegrationId)
+  const integration = integrationData?.find((x) => x.metadata?.configuration_id === configurationId)
 
   const { data: supabaseProjectsData } = useProjectsQuery({
-    enabled: organizationIntegrationId !== null,
+    enabled: integration?.id !== undefined,
   })
 
   const supabaseProjects = useMemo(
     () =>
       supabaseProjectsData
-        ?.filter((project) => project.organization_id === selectedOrg?.id)
+        ?.filter((project) => project.organization_id === organization?.id)
         .map((project) => ({ id: project.id.toString(), name: project.name, ref: project.ref })) ??
       EMPTY_ARR,
-    [selectedOrg?.id, supabaseProjectsData]
+    [organizationSlug, supabaseProjectsData]
   )
 
   const { data: vercelProjectsData } = useVercelProjectsQuery(
     {
-      organization_integration_id: organizationIntegrationId,
+      organization_integration_id: integration?.id,
     },
-    { enabled: organizationIntegrationId !== undefined }
+    { enabled: integration?.id !== undefined }
   )
-
-  console.log('vercelProjectsData', vercelProjectsData)
 
   const vercelProjects = useMemo(() => vercelProjectsData ?? EMPTY_ARR, [vercelProjectsData])
 
@@ -88,7 +81,7 @@ This Supabase integration manages your envioemnt variables automatically to prov
               />
             </header>
             <ProjectLinker
-              organizationIntegrationId={organizationIntegrationId}
+              organizationIntegrationId={integration?.id}
               foreignProjects={vercelProjects}
               supabaseProjects={supabaseProjects}
               onCreateConnections={() => {
@@ -96,6 +89,7 @@ This Supabase integration manages your envioemnt variables automatically to prov
                   window.location.href = next
                 }
               }}
+              installedConnections={integration?.connections}
             />
           </ScaffoldContainer>
         </>

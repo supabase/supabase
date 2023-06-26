@@ -48,15 +48,18 @@ const VercelIntegration: NextPageWithLayout = () => {
    */
   const { data: integrationData, isLoading: integrationDataLoading } = useIntegrationsQuery({})
 
-  const { data, isLoading: isLoadingOrganizationsQuery } = useOrganizationsQuery({
-    onSuccess(organizations) {
-      const firstOrg = organizations?.[0]
-      if (firstOrg && selectedOrg === null) {
-        setSelectedOrg(firstOrg)
-        snapshot.setSelectedOrganizationSlug(firstOrg.slug)
-      }
-    },
-  })
+  const { data: organizationsData, isLoading: isLoadingOrganizationsQuery } = useOrganizationsQuery(
+    {
+      onSuccess(organizations) {
+        const firstOrg = organizations?.[0]
+        if (firstOrg && selectedOrg === null) {
+          setSelectedOrg(firstOrg)
+          snapshot.setSelectedOrganizationSlug(firstOrg.slug)
+          router.query.organizationSlug = firstOrg.slug
+        }
+      },
+    }
+  )
 
   /**
    * Flat array of org slugs that have integration installed
@@ -67,14 +70,16 @@ const VercelIntegration: NextPageWithLayout = () => {
       ? integrationData?.map((x) => x.organization.slug)
       : []
 
+  console.log('flatInstalledConnectionsIds', flatInstalledConnectionsIds)
+
   /**
    * Organizations with extra `installationInstalled` attribute
    *
    * Used to show label/badge and allow/disallow installing
    *
    */
-  const organizationsWithInstalledData: OrganizationsResponseWithInstalledData[] = data
-    ? data.map((org) => {
+  const organizationsWithInstalledData: OrganizationsResponseWithInstalledData[] = organizationsData
+    ? organizationsData.map((org) => {
         return {
           ...org,
           installationInstalled: flatInstalledConnectionsIds.includes(org.slug) ? true : false,
@@ -91,6 +96,15 @@ const VercelIntegration: NextPageWithLayout = () => {
 
   function onInstall() {
     const orgSlug = selectedOrg?.slug
+
+    const isIntegrationInstalled = organizationsWithInstalledData.find(
+      (x) => x.slug === orgSlug && x.installationInstalled
+    )
+      ? true
+      : false
+
+    console.log('isIntegrationInstalled', isIntegrationInstalled)
+
     if (!orgSlug) {
       return ui.setNotification({ category: 'error', message: 'Please select an organization' })
     }
@@ -110,14 +124,15 @@ const VercelIntegration: NextPageWithLayout = () => {
       })
     }
 
-    const metadata = {}
-
-    if (!flatInstalledConnectionsIds.includes(orgSlug)) {
+    /**
+     * Only install if instgration hasn't already been installed
+     */
+    if (!isIntegrationInstalled) {
       mutate({
         code,
         configurationId,
         orgSlug,
-        metadata,
+        metadata: {},
         source,
         teamId: teamId,
       })
@@ -151,7 +166,10 @@ const VercelIntegration: NextPageWithLayout = () => {
                 <OrganizationPicker
                   integrationName="Vercel"
                   organizationsWithInstalledData={organizationsWithInstalledData}
-                  onSelectedOrgChange={setSelectedOrg}
+                  onSelectedOrgChange={(e) => {
+                    router.query.organizationSlug = e.slug
+                    setSelectedOrg(e)
+                  }}
                   dataLoading={dataLoading}
                 />
                 <div className="flex flex-row w-full justify-end">

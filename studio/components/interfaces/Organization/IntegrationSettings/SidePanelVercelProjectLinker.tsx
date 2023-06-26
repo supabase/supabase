@@ -1,6 +1,7 @@
 import { useParams } from 'common'
 import ProjectLinker from 'components/interfaces/Integrations/ProjectLinker'
 import { Markdown } from 'components/interfaces/Markdown'
+import { Project } from 'data/config/project-api-query'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
 import { useVercelProjectConnectionsQuery } from 'data/integrations/integrations-vercel-installed-connections-query'
 import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
@@ -49,7 +50,8 @@ const SidePanelVercelProjectLinker = () => {
     () =>
       supabaseProjectsData
         ?.filter((project) => project.organization_id === selectedOrg?.id)
-        .map((project) => ({ id: project.id.toString(), name: project.name })) ?? EMPTY_ARR,
+        .map((project) => ({ id: project.id.toString(), name: project.name, ref: project.ref })) ??
+      EMPTY_ARR,
     [selectedOrg?.id, supabaseProjectsData]
   )
 
@@ -62,8 +64,6 @@ const SidePanelVercelProjectLinker = () => {
 
   const { data: vercelProjectsData } = useVercelProjectsQuery(
     {
-      orgId: selectedOrg?.id,
-      orgSlug: selectedOrg?.slug,
       organization_integration_id: organizationIntegrationId,
     },
     { enabled: organizationIntegrationId !== null }

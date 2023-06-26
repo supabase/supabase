@@ -11,8 +11,9 @@ import {
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
-import { Integration as TIntegration } from 'data/integrations/integrations-query-org-only'
+import { Integration as TIntegration } from 'data/integrations/integrations.types'
 import { useIntegrationsVercelInstalledConnectionDeleteMutation } from 'data/integrations/integrations-vercel-installed-connection-delete-mutation'
+import { IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import { pluralize } from 'lib/helpers'
@@ -62,7 +63,7 @@ Repository connections for ${title?.toLowerCase()}
     const variables = {
       organization_integration_id: organizationIntegrationId,
       id: projectIntegrationId,
-      orgId: ui.selectedOrganization?.id,
+      orgSlug: ui.selectedOrganization?.slug,
     }
 
     deleteMutate(variables)
@@ -85,63 +86,63 @@ Repository connections for ${title?.toLowerCase()}
             <div className="flex flex-col gap-12">
               {integrations.length > 0 &&
                 integrations.map((integration, i) => {
-                  console.log('integration.id', integration?.id)
                   return (
                     <div key={i}>
-                      <IntegrationInstallation
-                        title={title}
-                        key={i}
-                        // orgName={orgName}
-                        connection={integration}
-                      />
+                      <IntegrationInstallation title={title} key={i} integration={integration} />
                       {integration.connections.length > 0 ? (
                         <>
                           <ConnectionHeading integration={integration} />
 
                           <ul className="flex flex-col">
-                            {integration.connections.map((connection, i) => (
-                              <IntegrationConnection
-                                key={i}
-                                connection={connection}
-                                type={integration.integration.name}
-                                actions={
-                                  <Dropdown
-                                    side="bottom"
-                                    align="end"
-                                    size="large"
-                                    overlay={
-                                      <>
-                                        <Dropdown.Item
-                                          icon={
-                                            <div>
-                                              <IconRefreshCcw size={14} />
+                            {integration.connections.map(
+                              (connection: IntegrationProjectConnection, i) => (
+                                <IntegrationConnection
+                                  key={i}
+                                  connection={connection}
+                                  type={integration.integration.name}
+                                  actions={
+                                    <Dropdown
+                                      side="bottom"
+                                      align="end"
+                                      size="large"
+                                      overlay={
+                                        <>
+                                          <Dropdown.Item
+                                            icon={
+                                              <div>
+                                                <IconRefreshCcw size={14} />
+                                              </div>
+                                            }
+                                          >
+                                            <div>Refresh Enviroment Variables</div>
+                                            <div className="text-scale-900 text-xs">
+                                              Reapply env vars in vercel.
                                             </div>
-                                          }
-                                        >
-                                          <div>Refresh Enviroment Variables</div>
-                                          <div className="text-scale-900 text-xs">
-                                            Reapply env vars in vercel.
-                                          </div>
-                                        </Dropdown.Item>
-                                        <Dropdown.Separator />
-                                        <Dropdown.Item
-                                          icon={<IconTrash size={14} />}
-                                          onSelect={() =>
-                                            handleDelete(integration.id, connection.id)
-                                          }
-                                        >
-                                          Delete
-                                        </Dropdown.Item>
-                                      </>
-                                    }
-                                  >
-                                    <Button asChild iconRight={<IconChevronDown />} type="default">
-                                      <span>Manage</span>
-                                    </Button>
-                                  </Dropdown>
-                                }
-                              />
-                            ))}
+                                          </Dropdown.Item>
+                                          <Dropdown.Separator />
+                                          <Dropdown.Item
+                                            icon={<IconTrash size={14} />}
+                                            onSelect={() =>
+                                              handleDelete(integration.id, connection.id)
+                                            }
+                                          >
+                                            Delete
+                                          </Dropdown.Item>
+                                        </>
+                                      }
+                                    >
+                                      <Button
+                                        asChild
+                                        iconRight={<IconChevronDown />}
+                                        type="default"
+                                      >
+                                        <span>Manage</span>
+                                      </Button>
+                                    </Dropdown>
+                                  }
+                                />
+                              )
+                            )}
                           </ul>
                         </>
                       ) : (
