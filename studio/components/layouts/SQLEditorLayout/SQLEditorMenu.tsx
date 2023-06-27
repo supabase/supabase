@@ -96,19 +96,20 @@ const SideBarContent = observer(() => {
     <div className="mt-6">
       <Menu type="pills">
         {IS_PLATFORM && (
-          <div className="my-4 mx-3 space-y-1 px-3">
-            <div className="flex items-center">
+          <div className="my-4 mx-3 space-y-2 px-3">
+            <div className="flex items-center mb-3 w-full justify-center min-w-[210px] ">
               <Dropdown
                 align="start"
                 side="bottom"
                 sideOffset={3}
-                className="max-w-[210px] this-class-is-no-bueno"
+                className="max-w-[210px]"
                 overlay={[
                   <Dropdown.Item key="new-blank-query" onClick={() => handleNewQuery()}>
                     <div className="space-y-1">
-                      <p className="block text-scale-1200">New blank query</p>
+                      <p className="block text-scale-1200 text-xs">New blank query</p>
                     </div>
                   </Dropdown.Item>,
+                  <div key={'divider'} className="my-1 border-t border-scale-400" />,
                   showCmdkHelper ? (
                     <Dropdown.Item
                       key="new-ai-query"
@@ -118,7 +119,7 @@ const SideBarContent = observer(() => {
                       }}
                     >
                       <div className="space-y-1">
-                        <p className="block text-scale-1200">New AI query</p>
+                        <p className="block text-scale-1200 text-xs">New AI query</p>
                       </div>
                     </Dropdown.Item>
                   ) : null,
@@ -127,7 +128,8 @@ const SideBarContent = observer(() => {
                 <Button
                   block
                   icon={<IconPlus />}
-                  type="primary"
+                  className="min-w-[208px]"
+                  type="outline"
                   disabled={isLoading}
                   style={{ justifyContent: 'start' }}
                 >

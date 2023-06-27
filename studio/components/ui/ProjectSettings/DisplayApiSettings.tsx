@@ -51,7 +51,6 @@ const DisplayApiSettings = () => {
                 Client Docs
               </Button>
             </a>
-            .
           </p>
         </div>
       }
