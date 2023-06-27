@@ -37,13 +37,7 @@ const InlinePortal = ({
       return
     }
 
-    const focusClasses = [
-      'underline',
-      'decoration-dotted',
-      'decoration-[var(--colors-purple11)]',
-      'relative',
-      'z-30',
-    ]
+    const focusClasses = ['relative', 'z-30']
 
     if (isOpen) {
       focusElement.classList.add(...focusClasses)
@@ -75,6 +69,8 @@ const InlinePortal = ({
     return null
   }
 
+  const marginTop = 10
+
   // Inject children into the parent positioned under the selected text
   return createPortal(
     <>
@@ -82,7 +78,11 @@ const InlinePortal = ({
         className="fixed top-0 left-0 w-full h-full z-20 bg-white dark:[background-color:rgb(0_0_0_/_var(--tw-bg-opacity))] bg-opacity-50 backdrop-blur-sm transition"
         onClick={() => setIsOpen(false)}
       />
-      <div tabIndex={0} style={{ top: top + height, left }} className="absolute z-30">
+      <div
+        tabIndex={0}
+        style={{ top: top + height + marginTop, left }}
+        className="absolute z-30 w-full max-w-3xl"
+      >
         {children}
       </div>
     </>,
