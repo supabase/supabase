@@ -51,8 +51,6 @@ import useAutoAuthRedirect from 'hooks/misc/useAutoAuthRedirect'
 
 import { TooltipProvider } from '@radix-ui/react-tooltip'
 import Favicons from 'components/head/Favicons'
-import { IS_PLATFORM } from 'lib/constants'
-import { createClient } from '@supabase/supabase-js'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
@@ -64,16 +62,6 @@ dart(Prism)
 function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   const queryClient = useRootQueryClient()
   const [rootStore] = useState(() => new RootStore())
-
-  // [Joshen] Some issues with using createBrowserSupabaseClient
-  const [supabase] = useState(() =>
-    IS_PLATFORM
-      ? createClient(
-          process.env.NEXT_PUBLIC_SUPABASE_URL as string,
-          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string
-        )
-      : undefined
-  )
 
   const getSavingState = () => rootStore.content.savingState
 
