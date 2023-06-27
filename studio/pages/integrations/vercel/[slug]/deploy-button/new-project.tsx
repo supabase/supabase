@@ -161,7 +161,11 @@ const CreateProject = ({
   const [newProjectRef, setNewProjectRef] = useState<string | undefined>(undefined)
   async function onCreateProject() {
     if (!organizationIntegration) {
-      console.error('No organizationIntegration set')
+      console.error('No organization installation details found')
+    }
+
+    if (!organizationIntegration?.id) {
+      console.error('No organization installation ID found')
       return
     }
 
