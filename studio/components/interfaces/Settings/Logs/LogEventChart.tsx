@@ -1,4 +1,5 @@
 import BarChart, { BarChartProps } from 'components/ui/Charts/BarChart'
+import { Datum } from 'components/ui/Charts/Charts.types'
 import { EventChartData, isUnixMicro, LogData, unixMicroToIsoTimestamp } from '.'
 
 export interface LogEventChartProps {
@@ -12,16 +13,11 @@ const LogEventChart = ({ data, onBarClick }: LogEventChartProps) => (
     size="tiny"
     yAxisKey="count"
     xAxisKey="timestamp"
-    data={data as unknown as BarChartProps['data']}
+    data={data}
     title="Logs / Time"
-    onBarClick={(v?: { activePayload?: { payload: any }[] }) => {
-      if (!v || !v?.activePayload?.[0]?.payload) return
-      const unixOrIsoTimestamp = v.activePayload[0].payload.timestamp
-      const isoTimestamp = isUnixMicro(unixOrIsoTimestamp)
-        ? unixMicroToIsoTimestamp(unixOrIsoTimestamp)
-        : unixOrIsoTimestamp
-      // 60s before
-      onBarClick(isoTimestamp)
+    onBarClick={(datum: Datum | EventChartData) => {
+      if (!datum.timestamp) return
+      onBarClick(datum.timestamp as string)
     }}
     customDateFormat="MMM D, HH:mm:s"
   />

@@ -1,3 +1,4 @@
+import { Datum } from 'components/ui/Charts/Charts.types'
 import React from 'react'
 
 interface Metadata {
@@ -49,9 +50,9 @@ export interface CountData {
   count: number
 }
 
-export interface EventChartData {
+export interface EventChartData extends Datum {
   count: number
-  timestamp: string | number
+  timestamp: string
 }
 
 type LFResponse<T> = {
