@@ -64,10 +64,37 @@ Unlike the OAuth flow which requires the use of a web browser, the native Sign i
 
 When the user provides consent, Apple issues an identity token (commonly abbreviated as ID token) that is then sent to your project's Supabase Auth server. When valid, a new user session is started by issuing an access and refresh token from Supabase Auth.
 
-If you are building an iOS or macOS app using Flutter, you can use `signInWithApple()` to quickly get the user's consent and sign them in to your Supabase project:
+If you are building an iOS or macOS app using Flutter, you can use [apple_sign_in](https://pub.dev/packages/sign_in_with_apple) package to quickly get the user's consent and sign them in to your Supabase project:
 
 ```dart
-final AuthResponse = await supabase.auth.signInWithApple();
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+import 'package:crypto/crypto.dart';
+
+Future<AuthResponse> signInWithApple() {
+
+  // Generate a random string
+  final rawNonce = _generateRandomString();
+  final hashedNonce = sha256.convert(utf8.encode(rawNonce)).toString();
+
+  final credential = await SignInWithApple.getAppleIDCredential(
+    scopes: [
+      AppleIDAuthorizationScopes.email,
+      AppleIDAuthorizationScopes.fullName,
+    ],
+    nonce: hashedNonce,
+  );
+
+  final idToken = credential.identityToken;
+  if (idToken == null) {
+    throw 'Could not find ID Token from generated credential.';
+  }
+
+  return signInWithIdToken(
+    provider: Provider.apple,
+    idToken: idToken,
+    nonce: rawNonce,
+  );
+}
 ```
 
 In the Supabase JavaScript library, which you can use with web-based native frameworks like React Native or Expo, you can invoke this functionality like so:
@@ -108,7 +135,7 @@ function signIn() {
   await supabase.auth.signInWithIdToken({
     provider: 'apple',
     token: data.id_token,
-    nonce: '<nonce used in AppleID.auth.init>'
+    nonce: '<nonce used in AppleID.auth.init>',
   })
 }
 ```
@@ -121,7 +148,7 @@ document.addEventListener('AppleIDSignInOnSuccess', async (event) => {
   await supabase.auth.signInWithIdToken({
     provider: 'apple',
     token: event.data.id_token,
-    nonce: '<value used in appleid-signin-nonce meta tag>'
+    nonce: '<value used in appleid-signin-nonce meta tag>',
   })
 })
 ```
