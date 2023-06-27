@@ -27,9 +27,6 @@ abstract class UseCaseModule {
     abstract fun bindUpdateProductUseCase(impl: UpdateProductUseCaseImpl): UpdateProductUseCase
 
     @Binds
-    abstract fun bindUploadImageUseCaseImpl(impl: UploadImageUseCaseImpl): UploadImageUseCase
-
-    @Binds
     abstract fun bindAuthenticateUseCase(impl: SignInUseCaseImpl): SignInUseCase
 
     @Binds
