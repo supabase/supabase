@@ -945,7 +945,7 @@ commands:
     title: supabase postgres-config update
     summary: Update Postgres database config
     description: |-
-      Overriding the default Postgres config could result in unstable database behaviour.
+      Overriding the default Postgres config could result in unstable database behavior.
       Custom configuration also overrides the optimizations generated based on the compute add-ons in use.
     tags: []
     links: []
