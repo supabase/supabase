@@ -7,10 +7,10 @@ import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmM
 import { useOrganizationDetailQuery } from 'data/organizations/organization-detail-query'
 import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
-import { useProfileQuery } from 'data/profile/profile-query'
 import { useSelectedOrganization, useStore } from 'hooks'
 import { delete_ } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
+import { useProfile } from 'lib/profile'
 import InviteMemberButton from './InviteMemberButton'
 import MembersView from './MembersView'
 import { hasMultipleOwners, useGetRolesManagementPermissions } from './TeamSettings.utils'
@@ -19,7 +19,7 @@ const TeamSettings = () => {
   const { ui } = useStore()
   const { slug } = useParams()
 
-  const { data: profile } = useProfileQuery()
+  const { profile } = useProfile()
   const selectedOrganization = useSelectedOrganization()
   const isOwner = selectedOrganization?.is_owner
 

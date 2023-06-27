@@ -10,8 +10,8 @@ import { useOrganizationDetailQuery } from 'data/organizations/organization-deta
 import { useOrganizationMemberUpdateMutation } from 'data/organizations/organization-member-update-mutation'
 import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
-import { useProfileQuery } from 'data/profile/profile-query'
 import { useSelectedOrganization, useStore } from 'hooks'
+import { useProfile } from 'lib/profile'
 import { Member } from 'types'
 import { Badge, Button, IconAlertCircle, IconLoader, IconUser, Listbox, Loading, Modal } from 'ui'
 import { getUserDisplayName, isInviteExpired } from '../Organization.utils'
@@ -33,7 +33,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
   const { slug } = useParams()
   const selectedOrganization = useSelectedOrganization()
 
-  const { data: profile } = useProfileQuery()
+  const { profile } = useProfile()
   const { data: permissions } = usePermissionsQuery()
   const { data: detailData, isLoading: isLoadingOrgDetails } = useOrganizationDetailQuery({ slug })
   const { data: rolesData, isLoading: isLoadingRoles } = useOrganizationRolesQuery({ slug })

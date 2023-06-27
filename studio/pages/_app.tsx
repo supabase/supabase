@@ -28,13 +28,14 @@ import Head from 'next/head'
 
 import { AppPropsWithLayout } from 'types'
 import { ThemeProvider } from 'common'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Hydrate, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { RootStore } from 'stores'
 import HCaptchaLoadedStore from 'stores/hcaptcha-loaded-store'
 import { StoreProvider } from 'hooks'
 import { AuthProvider } from 'lib/auth'
+import { ProfileProvider } from 'lib/profile'
 import { dart } from 'lib/constants/prism'
 import { useRootQueryClient } from 'data/query-client'
 
@@ -51,7 +52,6 @@ import useAutoAuthRedirect from 'hooks/misc/useAutoAuthRedirect'
 import { TooltipProvider } from '@radix-ui/react-tooltip'
 import Favicons from 'components/head/Favicons'
 import { IS_PLATFORM } from 'lib/constants'
-import { SessionContextProvider } from '@supabase/auth-helpers-react'
 import { createClient } from '@supabase/supabase-js'
 
 dayjs.extend(customParseFormat)
@@ -110,51 +110,39 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
 
   const getLayout = Component.getLayout ?? ((page) => page)
 
-  const AuthContainer = useMemo(
-    () => (props: any) => {
-      return IS_PLATFORM ? (
-        <SessionContextProvider supabaseClient={supabase as any}>
-          <AuthProvider>{props.children}</AuthProvider>
-        </SessionContextProvider>
-      ) : (
-        <AuthProvider>{props.children}</AuthProvider>
-      )
-    },
-    [supabase]
-  )
-  //
-
   return (
     <QueryClientProvider client={queryClient}>
       <Hydrate state={pageProps.dehydratedState}>
         <StoreProvider rootStore={rootStore}>
-          <AuthContainer>
-            <FlagProvider>
-              <Head>
-                <title>Supabase</title>
-                <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-              </Head>
-              <Favicons />
+          <AuthProvider>
+            <ProfileProvider>
+              <FlagProvider>
+                <Head>
+                  <title>Supabase</title>
+                  <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+                </Head>
+                <Favicons />
 
-              <PageTelemetry>
-                <TooltipProvider>
-                  <RouteValidationWrapper>
-                    <ThemeProvider>
-                      <CommandMenuWrapper>
-                        <AppBannerWrapper>
-                          {getLayout(<Component {...pageProps} />)}
-                        </AppBannerWrapper>
-                      </CommandMenuWrapper>
-                    </ThemeProvider>
-                  </RouteValidationWrapper>
-                </TooltipProvider>
-              </PageTelemetry>
+                <PageTelemetry>
+                  <TooltipProvider>
+                    <RouteValidationWrapper>
+                      <ThemeProvider>
+                        <CommandMenuWrapper>
+                          <AppBannerWrapper>
+                            {getLayout(<Component {...pageProps} />)}
+                          </AppBannerWrapper>
+                        </CommandMenuWrapper>
+                      </ThemeProvider>
+                    </RouteValidationWrapper>
+                  </TooltipProvider>
+                </PageTelemetry>
 
-              <HCaptchaLoadedStore />
-              <PortalToast />
-              <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />
-            </FlagProvider>
-          </AuthContainer>
+                <HCaptchaLoadedStore />
+                <PortalToast />
+                <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />
+              </FlagProvider>
+            </ProfileProvider>
+          </AuthProvider>
         </StoreProvider>
       </Hydrate>
     </QueryClientProvider>
