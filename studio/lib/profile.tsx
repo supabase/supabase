@@ -4,6 +4,7 @@ import { PropsWithChildren, createContext, useContext, useMemo } from 'react'
 
 import { useTelemetryProps } from 'common'
 import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
+import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useProfileCreateMutation } from 'data/profile/profile-create-mutation'
 import { useProfileQuery } from 'data/profile/profile-query'
 import { Profile } from 'data/profile/types'
@@ -26,7 +27,7 @@ export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
   const router = useRouter()
   const telemetryProps = useTelemetryProps()
 
-  const { mutate: createProfile, isLoading: isCreating } = useProfileCreateMutation({
+  const { mutate: createProfile, isLoading: isCreatingProfile } = useProfileCreateMutation({
     async onSuccess() {
       Telemetry.sendEvent(
         { category: 'conversion', action: 'sign_up', label: '' },
@@ -57,14 +58,16 @@ export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
     },
   })
 
+  const { isLoading: isLoadingPermissions } = usePermissionsQuery()
+
   const value = useMemo(() => {
-    const isLoading = isLoadingProfile || isCreating
+    const isLoading = isLoadingProfile || isCreatingProfile || isLoadingPermissions
 
     return {
       profile,
       isLoading,
     }
-  }, [isLoadingProfile, isCreating, profile])
+  }, [isLoadingProfile, isCreatingProfile, isLoadingPermissions, profile])
 
   return <ProfileContext.Provider value={value}>{children}</ProfileContext.Provider>
 }

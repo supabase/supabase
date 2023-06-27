@@ -1,6 +1,6 @@
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { Fragment, ReactNode } from 'react'
+import { Fragment, PropsWithChildren, ReactNode } from 'react'
 
 import { useParams } from 'common/hooks'
 import Connecting from 'components/ui/Loading'
@@ -24,7 +24,6 @@ export interface ProjectLayoutProps {
   productMenu?: ReactNode
   hideHeader?: boolean
   hideIconBar?: boolean
-  children: ReactNode
   selectedTable?: string
 }
 
@@ -37,7 +36,7 @@ const ProjectLayout = ({
   hideHeader = false,
   hideIconBar = false,
   selectedTable,
-}: ProjectLayoutProps) => {
+}: PropsWithChildren<ProjectLayoutProps>) => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const ongoingIncident = useFlag('ongoingIncident')
@@ -149,7 +148,9 @@ const ContentWrapper = ({ isLoading, children }: ContentWrapperProps) => {
   const isProjectUpgrading = selectedProject?.status === PROJECT_STATUS.UPGRADING
   const isProjectRestoring = selectedProject?.status === PROJECT_STATUS.RESTORING
   const isProjectBuilding = selectedProject?.status === PROJECT_STATUS.COMING_UP
-  const isProjectPausing = selectedProject?.status === PROJECT_STATUS.GOING_DOWN
+  const isProjectPausing =
+    selectedProject?.status === PROJECT_STATUS.GOING_DOWN ||
+    selectedProject?.status === PROJECT_STATUS.PAUSING
   const isProjectOffline = selectedProject?.postgrestStatus === 'OFFLINE'
 
   return (
@@ -185,7 +186,7 @@ export const ProjectLayoutNonBlocking = ({
   children,
   hideHeader = false,
   hideIconBar = false,
-}: ProjectLayoutProps) => {
+}: PropsWithChildren<ProjectLayoutProps>) => {
   const selectedProject = useSelectedProject()
   const router = useRouter()
   const { ref: projectRef } = useParams()
