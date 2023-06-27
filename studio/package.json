@@ -29,6 +29,8 @@
     "@sentry/nextjs": "^6.17.4",
     "@stripe/react-stripe-js": "^1.7.0",
     "@stripe/stripe-js": "^1.25.0",
+    "@supabase/auth-helpers-nextjs": "^0.5.6",
+    "@supabase/auth-helpers-react": "^0.3.1",
     "@supabase/react-data-grid": "^7.1.0-beta.7",
     "@supabase/shared-types": "^0.1.43",
     "@supabase/supabase-js": "^2.23.0",
