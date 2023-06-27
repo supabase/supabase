@@ -29,6 +29,11 @@ export type OrganizationAuditLog = {
   timestamp: string
 }
 
+export type OrganizationAuditLogsResponse = {
+  result: OrganizationAuditLog[]
+  retention_period: number
+}
+
 const MOCK_LOGS: OrganizationAuditLog[] = [
   {
     action: { name: 'Test', metadata: [{ method: 'Test', status: 200 }] },
@@ -89,14 +94,14 @@ export async function getOrganizationAuditLogs(
 ) {
   if (!slug) throw new Error('slug is required')
 
-  return MOCK_LOGS
+  // return { result: MOCK_LOGS, retention_period: 1 }
 
   const response = await get(
     `${API_URL}/organizations/${slug}/audit?iso_timestamp_start=${iso_timestamp_start}&iso_timestamp_end=${iso_timestamp_end}`,
     { signal }
   )
   if (response.error) throw response.error
-  return response.result as OrganizationAuditLog[]
+  return response as OrganizationAuditLogsResponse
 }
 
 export type OrganizationAuditLogsData = Awaited<ReturnType<typeof getOrganizationAuditLogs>>
