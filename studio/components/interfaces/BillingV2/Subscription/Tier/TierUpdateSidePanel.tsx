@@ -19,9 +19,12 @@ import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscr
 import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import * as Tooltip from '@radix-ui/react-tooltip'
+import Telemetry from 'lib/telemetry'
+import { useRouter } from 'next/router'
 
 const TierUpdateSidePanel = () => {
   const { ui } = useStore()
+  const router = useRouter()
   const slug = ui.selectedOrganization?.slug
   const { ref: projectRef } = useParams()
 
@@ -58,6 +61,17 @@ const TierUpdateSidePanel = () => {
   useEffect(() => {
     if (visible) {
       setSelectedTier(undefined)
+      Telemetry.sendActivity(
+        {
+          activity: 'Side Panel Viewed',
+          source: 'Dashboard',
+          data: {
+            title: 'Change Subscription Plan',
+            section: 'Subscription plan',
+          },
+        },
+        router
+      )
     }
   }, [visible])
 
@@ -192,7 +206,22 @@ const TierUpdateSidePanel = () => {
                                 !canUpdateSubscription
                               }
                               type={isDowngradeOption ? 'default' : 'primary'}
-                              onClick={() => setSelectedTier(plan.id as any)}
+                              onClick={() => {
+                                setSelectedTier(plan.id as any)
+                                Telemetry.sendActivity(
+                                  {
+                                    activity: 'Popup Viewed',
+                                    source: 'Dashboard',
+                                    data: {
+                                      title: isDowngradeOption
+                                        ? 'Downgrade'
+                                        : 'Upgrade' + ' to ' + plan.name,
+                                      section: 'Subscription plan',
+                                    },
+                                  },
+                                  router
+                                )
+                              }}
                             >
                               {isDowngradeOption ? 'Downgrade' : 'Upgrade'} to {plan.name}
                             </Button>
