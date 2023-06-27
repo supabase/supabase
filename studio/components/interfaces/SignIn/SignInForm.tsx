@@ -37,7 +37,7 @@ const SignInForm = () => {
 
     const signInClicks = incrementSignInClicks()
     if (signInClicks > 1) {
-      Sentry.captureMessage('Sign in without previous sing out detected')
+      Sentry.captureMessage('Sign in without previous sign out detected')
     }
 
     const { error } = await auth.signInWithPassword({
