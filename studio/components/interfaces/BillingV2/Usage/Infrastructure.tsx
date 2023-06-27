@@ -226,7 +226,7 @@ const Infrastructure = ({
                   </div>
                 )}
 
-                {attribute.key === 'cpu_usage' && (
+                {attribute.key === 'max_cpu_usage' && (
                   <p className="text-sm text-scale-1000">
                     Your compute instance has {currentComputeInstanceSpecs.cpu_cores} CPU cores.
                   </p>
