@@ -188,6 +188,7 @@ const PublishAppModal = ({
                 const values = { name: selectedApp.name, website: selectedApp.website }
                 resetForm({ values, initialValues: values })
               }
+              // eslint-disable-next-line react-hooks/exhaustive-deps
             }, [visible, selectedApp])
 
             return (
