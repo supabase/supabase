@@ -80,7 +80,6 @@ const FavoriteButton = ({ id }: FavoriteButtonProps) => {
         <Button
           type="text"
           size="tiny"
-          shadow={false}
           onClick={removeFavorite}
           icon={<IconHeart size="tiny" fill="#48bb78" />}
         />
@@ -88,7 +87,6 @@ const FavoriteButton = ({ id }: FavoriteButtonProps) => {
         <Button
           type="text"
           size="tiny"
-          shadow={false}
           onClick={addFavorite}
           icon={<IconHeart size="tiny" fill="gray" />}
         />

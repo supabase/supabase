@@ -88,7 +88,7 @@ export const meta = {
 
         <TextLink
           label="Explore more resources"
-          url="/docs/guides/resources"
+          url="/guides/resources"
           className="no-underline text-brand-900 text-sm"
         />
       </div>
@@ -198,7 +198,6 @@ export const products = [
     href: '/guides/database',
     description:
       'Supabase provides a full Postgres database for every project with Realtime functionality, database backups, extensions, and more.',
-    span: 'col-span-12 md:col-span-6',
   },
   {
     title: 'Auth',
@@ -207,7 +206,6 @@ export const products = [
     href: '/guides/auth',
     description:
       'Add and manage email and password, passwordless, OAuth, and mobile logins to your project through a suite of identity providers and APIs.',
-    span: 'col-span-12 md:col-span-6',
   },
   {
     title: 'Storage',
@@ -216,6 +214,13 @@ export const products = [
     href: '/guides/storage',
     description:
       'Store, organize, transform, and serve large files—fully integrated with your Postgres database with Row Level Security access policies.',
+  },
+  {
+    title: 'AI & Vectors',
+    icon: 'ai',
+    hasLightIcon: true,
+    href: '/guides/ai',
+    description: 'Use Supabase to store and search embedding vectors.',
   },
   {
     title: 'Realtime',

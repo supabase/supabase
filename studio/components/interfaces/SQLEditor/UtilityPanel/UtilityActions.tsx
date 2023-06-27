@@ -25,7 +25,6 @@ const UtilityActions = ({ id, isExecuting = false, executeQuery }: UtilityAction
         loading={isExecuting}
         type="default"
         size="tiny"
-        shadow={false}
         className="mx-2"
         iconRight={
           <div className="flex items-center space-x-1">

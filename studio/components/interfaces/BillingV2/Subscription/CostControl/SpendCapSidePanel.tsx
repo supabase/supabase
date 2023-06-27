@@ -1,36 +1,50 @@
 import clsx from 'clsx'
-import { useParams } from 'common'
+import { useParams, useTheme } from 'common'
 import Table from 'components/to-be-cleaned/Table'
 import { useProjectSubscriptionUpdateMutation } from 'data/subscriptions/project-subscription-update-mutation'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
-import { useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
 import { BASE_PATH, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { Alert, Button, Collapsible, IconChevronRight, IconExternalLink, SidePanel } from 'ui'
-import { USAGE_COSTS } from './CostControl.constants'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { pricing } from 'shared-data/pricing'
+import Telemetry from 'lib/telemetry'
+import { useRouter } from 'next/router'
 
-const SPEND_CAP_OPTIONS: { name: string; value: 'on' | 'off'; imageUrl: string }[] = [
+const SPEND_CAP_OPTIONS: {
+  name: string
+  value: 'on' | 'off'
+  imageUrl: string
+  imageUrlLight: string
+}[] = [
   {
     name: 'Spend cap enabled',
     value: 'on',
-    imageUrl: `${BASE_PATH}/img/spend-cap-on.svg`,
+    imageUrl: `${BASE_PATH}/img/spend-cap-on.png`,
+    imageUrlLight: `${BASE_PATH}/img/spend-cap-on--light.png`,
   },
   {
     name: 'Spend cap disabled',
     value: 'off',
-    imageUrl: `${BASE_PATH}/img/spend-cap-off.svg`,
+    imageUrl: `${BASE_PATH}/img/spend-cap-off.png`,
+    imageUrlLight: `${BASE_PATH}/img/spend-cap-off--light.png`,
   },
 ]
 
 const SpendCapSidePanel = () => {
   const { ui } = useStore()
+  const router = useRouter()
   const { ref: projectRef } = useParams()
+  const { isDarkMode } = useTheme()
 
   const [showUsageCosts, setShowUsageCosts] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
   const [selectedOption, setSelectedOption] = useState<'on' | 'off'>()
+
+  const canUpdateSpendCap = checkPermissions(PermissionAction.BILLING_WRITE, 'stripe.subscriptions')
 
   const snap = useSubscriptionPageStateSnapshot()
   const visible = snap.panelKey === 'costControl'
@@ -47,8 +61,19 @@ const SpendCapSidePanel = () => {
   useEffect(() => {
     if (visible && subscription !== undefined) {
       setSelectedOption(isSpendCapOn ? 'on' : 'off')
+      Telemetry.sendActivity(
+        {
+          activity: 'Side Panel Viewed',
+          source: 'Dashboard',
+          data: {
+            title: 'Spend cap',
+            section: 'Cost Control',
+          },
+        },
+        router
+      )
     }
-  }, [visible, isLoading])
+  }, [visible, isLoading, subscription, isSpendCapOn])
 
   const onConfirm = async () => {
     if (!projectRef) return console.error('Project ref is required')
@@ -75,11 +100,19 @@ const SpendCapSidePanel = () => {
     }
   }
 
+  const billingMetricCategories: (keyof typeof pricing)[] = [
+    'database',
+    'auth',
+    'storage',
+    'realtime',
+    'edge_functions',
+  ]
+
   return (
     <SidePanel
       size="large"
       loading={isLoading || isSubmitting}
-      disabled={isFreePlan || isLoading || !hasChanges || isSubmitting}
+      disabled={isFreePlan || isLoading || !hasChanges || isSubmitting || !canUpdateSpendCap}
       visible={visible}
       onCancel={onClose}
       onConfirm={onConfirm}
@@ -95,6 +128,7 @@ const SpendCapSidePanel = () => {
           </Link>
         </div>
       }
+      tooltip={!canUpdateSpendCap ? 'You do not have permission to update spend cap' : undefined}
     >
       <SidePanel.Content>
         <div className="py-6 space-y-4">
@@ -129,27 +163,32 @@ const SpendCapSidePanel = () => {
                     </Table.th>
                   </>
                 }
-                body={USAGE_COSTS.map((category) => {
+                body={billingMetricCategories.map((categoryId) => {
+                  const category = pricing[categoryId]
+                  const usageItems = category.features.filter((it: any) => it.usage_based)
+
                   return (
                     <>
-                      <Table.tr key={category.category}>
+                      <Table.tr key={categoryId}>
                         <Table.td>
-                          <p className="text-xs text-scale-1200">{category.category}</p>
+                          <p className="text-xs text-scale-1200">{category.title}</p>
                         </Table.td>
                         <Table.td>{null}</Table.td>
                       </Table.tr>
-                      {category.items.map((item) => (
-                        <Table.tr key={item.name}>
-                          <Table.td>
-                            <p className="text-xs pl-4">{item.name}</p>
-                          </Table.td>
-                          <Table.td>
-                            <p className="text-xs">
-                              ${item.unit_amount} per {item.unit}
-                            </p>
-                          </Table.td>
-                        </Table.tr>
-                      ))}
+                      {usageItems.map((item: any) => {
+                        return (
+                          <Table.tr key={item.title}>
+                            <Table.td>
+                              <p className="text-xs pl-4">{item.title}</p>
+                            </Table.td>
+                            <Table.td>
+                              <p className="text-xs pl-4">
+                                {item.plans[subscription?.plan?.id || 'pro']}
+                              </p>
+                            </Table.td>
+                          </Table.tr>
+                        )
+                      })}
                     </>
                   )
                 })}
@@ -168,12 +207,12 @@ const SpendCapSidePanel = () => {
                 </Button>
               }
             >
-              Upgrade your project's plan to disable the spend cap
+              Upgrade your plan to disable the spend cap
             </Alert>
           )}
 
           <div className="!mt-8 pb-4">
-            <div className="grid grid-cols-12 gap-3">
+            <div className="flex gap-3">
               {SPEND_CAP_OPTIONS.map((option) => {
                 const isSelected = selectedOption === option.value
 
@@ -181,17 +220,37 @@ const SpendCapSidePanel = () => {
                   <div
                     key={option.value}
                     className={clsx('col-span-4 group space-y-1', isFreePlan && 'opacity-75')}
-                    onClick={() => !isFreePlan && setSelectedOption(option.value)}
+                    onClick={() => {
+                      !isFreePlan && setSelectedOption(option.value)
+                      Telemetry.sendActivity(
+                        {
+                          activity: 'Option Selected',
+                          source: 'Dashboard',
+                          data: {
+                            title: 'Spend cap',
+                            section: 'Cost Control',
+                            option: option.name,
+                          },
+                        },
+                        router
+                      )
+                    }}
                   >
-                    <div
+                    <img
+                      alt="Spend Cap"
                       className={clsx(
-                        'relative rounded-xl transition border bg-no-repeat bg-center bg-cover',
-                        isSelected ? 'border-brand-900' : 'border-scale-800',
+                        'relative rounded-xl transition border bg-no-repeat bg-center bg-cover w-[160px] h-[96px]',
+                        isSelected
+                          ? 'border-scale-1200'
+                          : 'border-scale-900 opacity-50 group-hover:border-scale-1000 group-hover:opacity-100',
                         !isFreePlan && 'cursor-pointer',
                         !isFreePlan && !isSelected && 'group-hover:border-scale-1100'
                       )}
-                      style={{ aspectRatio: ' 160/96', backgroundImage: `url(${option.imageUrl})` }}
+                      width={160}
+                      height={96}
+                      src={isDarkMode ? option.imageUrl : option.imageUrlLight}
                     />
+
                     <p
                       className={clsx(
                         'text-sm transition',
@@ -232,7 +291,7 @@ const SpendCapSidePanel = () => {
               <p className="text-sm">
                 {selectedOption === 'on'
                   ? 'Upon clicking confirm, spend cap will be enabled for your project and you will no longer be charged any extra for usage.'
-                  : 'Upon clicking confirm, spend cap will be disabled for your project and you will be charged for any usage above the included quota'}
+                  : 'Upon clicking confirm, spend cap will be disabled for your project and you will be charged for any usage beyong the included quota.'}
               </p>
             </>
           )}

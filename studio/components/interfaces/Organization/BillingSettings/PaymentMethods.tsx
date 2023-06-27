@@ -165,6 +165,7 @@ const PaymentMethods: FC<Props> = ({
                       <div key={paymentMethod.id} className="flex items-center justify-between">
                         <div className="flex items-center space-x-8">
                           <img
+                            alt="Credit card brand"
                             src={`${BASE_PATH}/img/payment-methods/${paymentMethod.card.brand
                               .replace(' ', '-')
                               .toLowerCase()}.png`}
@@ -191,8 +192,8 @@ const PaymentMethods: FC<Props> = ({
                           <>
                             {isDefault ? (
                               <Tooltip.Root delayDuration={0}>
-                                <Tooltip.Trigger>
-                                  <Button disabled as="span" type="outline" icon={<IconX />} />
+                                <Tooltip.Trigger asChild>
+                                  <Button disabled type="outline" icon={<IconX />} />
                                 </Tooltip.Trigger>
                                 <Tooltip.Portal>
                                   <Tooltip.Content side="bottom">

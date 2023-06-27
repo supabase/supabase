@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { FC } from 'react'
-import { Button, IconPlus } from 'ui'
+import { Badge, Button, IconPlus } from 'ui'
 import { observer } from 'mobx-react-lite'
 
 import { IS_PLATFORM } from 'lib/constants'
@@ -28,7 +28,7 @@ const ProjectList: FC<Props> = ({ rewriteHref }) => {
   return (
     <>
       {organizations.list().map((org: Organization) => {
-        const { id, name, slug } = org
+        const { id, name, slug, subscription_id } = org
         const sortedProjects = projects.list(
           ({ organization_id }: Project) => organization_id == id
         )
@@ -40,7 +40,7 @@ const ProjectList: FC<Props> = ({ rewriteHref }) => {
         return (
           <div className="space-y-3" key={makeRandomString(5)}>
             <div className="flex space-x-4 items-center">
-              <h4 className="text-lg">{name}</h4>
+              <h4 className="text-lg flex items-center">{name}{subscription_id ? <Badge className='ml-3'>V2</Badge> : <></>}</h4>
 
               {!!overdueInvoices.length && (
                 <div>

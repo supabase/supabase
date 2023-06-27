@@ -127,3 +127,7 @@ packages/ui/tokens/**/*.json
 
 # For self-hosted logs: https://github.com/supabase/supabase/blob/86e3ab20abfdb9c3e666334d3d2f8efeef9ccf2c/docker/docker-compose-logging.yml#L101
 gcloud.json
+
+# sitemaps
+# apps/www/public/*.xml
+# apps/docs/public/*.xml

@@ -9,7 +9,7 @@ import { IconAlertOctagon } from '../Icon/icons/IconAlertOctagon'
 import { IconCheckCircle } from '../Icon/icons/IconCheckCircle'
 
 export interface AlertProps {
-  variant?: 'success' | 'danger' | 'warning' | 'info' | 'neutral'
+  variant?: AlertVariant
   className?: string
   title: string | React.ReactNode
   withIcon?: boolean
@@ -19,7 +19,9 @@ export interface AlertProps {
   actions?: React.ReactNode
 }
 
-const icons: Record<'success' | 'danger' | 'warning' | 'info' | 'neutral', React.ReactElement> = {
+export type AlertVariant = 'success' | 'danger' | 'warning' | 'info' | 'neutral'
+
+const icons: Record<AlertVariant, React.ReactElement> = {
   danger: <IconAlertOctagon strokeWidth={1.5} size={18} />,
   success: <IconCheckCircle strokeWidth={1.5} size={18} />,
   warning: <IconAlertTriangle strokeWidth={1.5} size={18} />,

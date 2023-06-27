@@ -5,7 +5,7 @@
       "For projects that need dedicated compute",
       "For scaling number of connections",
       "Additional CPU & RAM options",
-      "Additional Disk IO Bandwidth"
+      "Additional Disk Bandwidth"
     ],
     "rows": [
       {
@@ -15,10 +15,10 @@
           { "key": "cpu", "title": "CPU", "value": "2-core ARM" },
           { "key": "dedicated", "title": "Dedicated", "value": false },
           { "key": "memory", "title": "Memory", "value": "1 GB" },
-          { "key": "maxDiskIO", "title": "Disk IO Bandwidth up to", "value": "2,606 Mbps" },
+          { "key": "maxDiskIO", "title": "Max Disk Bandwidth", "value": "2,085 Mbps" },
           {
             "key": "baseDiskIO",
-            "title": "Baseline Disk IO Bandwidth",
+            "title": "Baseline Disk Bandwidth",
             "value": "87 Mbps"
           },
           {
@@ -40,10 +40,10 @@
           { "key": "cpu", "title": "CPU", "value": "2-core ARM" },
           { "key": "dedicated", "title": "Dedicated", "value": false },
           { "key": "memory", "title": "Memory", "value": "2 GB" },
-          { "key": "maxDiskIO", "title": "Maximum Disk IO Bandwidth", "value": "2,606 Mbps" },
+          { "key": "maxDiskIO", "title": "Max Disk Bandwidth", "value": "2,085 Mbps" },
           {
             "key": "baseDiskIO",
-            "title": "Baseline Disk IO Bandwidth",
+            "title": "Baseline Disk Bandwidth",
             "value": "174 Mbps"
           },
           {
@@ -65,10 +65,10 @@
           { "key": "cpu", "title": "CPU", "value": "2-core ARM" },
           { "key": "dedicated", "title": "Dedicated", "value": false },
           { "key": "memory", "title": "Memory", "value": "4 GB" },
-          { "key": "maxDiskIO", "title": "Maximum Disk IO Bandwidth", "value": "2,606 Mbps" },
+          { "key": "maxDiskIO", "title": "Max Disk Bandwidth", "value": "2,085 Mbps" },
           {
             "key": "baseDiskIO",
-            "title": "Baseline Disk IO Bandwidth",
+            "title": "Baseline Disk Bandwidth",
             "value": "347 Mbps"
           },
           {
@@ -90,10 +90,10 @@
           { "key": "cpu", "title": "CPU", "value": "2-core ARM" },
           { "key": "dedicated", "title": "Dedicated", "value": true },
           { "key": "memory", "title": "Memory", "value": "8 GB" },
-          { "key": "maxDiskIO", "title": "Maximum Disk IO Bandwidth", "value": "4,750 Mbps" },
+          { "key": "maxDiskIO", "title": "Max Disk Bandwidth", "value": "4,750 Mbps" },
           {
             "key": "baseDiskIO",
-            "title": "Baseline Disk IO Bandwidth",
+            "title": "Baseline Disk Bandwidth",
             "value": "630 Mbps"
           },
           {
@@ -115,10 +115,10 @@
           { "key": "cpu", "title": "CPU", "value": "4-core ARM" },
           { "key": "dedicated", "title": "Dedicated", "value": true },
           { "key": "memory", "title": "Memory", "value": "16 GB" },
-          { "key": "maxDiskIO", "title": "Maximum Disk IO Bandwidth", "value": "4,750 Mbps" },
+          { "key": "maxDiskIO", "title": "Max Disk Bandwidth", "value": "4,750 Mbps" },
           {
             "key": "baseDiskIO",
-            "title": "Baseline Disk IO Bandwidth",
+            "title": "Baseline Disk Bandwidth",
             "value": "1,188 Mbps"
           },
           {
@@ -140,10 +140,10 @@
           { "key": "cpu", "title": "CPU", "value": "8-core ARM" },
           { "key": "dedicated", "title": "Dedicated", "value": true },
           { "key": "memory", "title": "Memory", "value": "32 GB" },
-          { "key": "maxDiskIO", "title": "Maximum Disk IO Bandwidth", "value": "4,750 Mbps" },
+          { "key": "maxDiskIO", "title": "Max Disk Bandwidth", "value": "4,750 Mbps" },
           {
             "key": "baseDiskIO",
-            "title": "Baseline Disk IO Bandwidth",
+            "title": "Baseline Disk Bandwidth",
             "value": "2,375 Mbps"
           },
           {
@@ -165,10 +165,10 @@
           { "key": "cpu", "title": "CPU", "value": "16-core ARM" },
           { "key": "dedicated", "title": "Dedicated", "value": true },
           { "key": "memory", "title": "Memory", "value": "64 GB" },
-          { "key": "maxDiskIO", "title": "Maximum Disk IO Bandwidth", "value": "4,750 Mbps" },
+          { "key": "maxDiskIO", "title": "Max Disk Bandwidth", "value": "4,750 Mbps" },
           {
             "key": "baseDiskIO",
-            "title": "Baseline Disk IO Bandwidth",
+            "title": "Baseline Disk Bandwidth",
             "value": "4,750 Mbps"
           },
           {
@@ -190,10 +190,10 @@
           { "key": "cpu", "title": "CPU", "value": "32-core ARM" },
           { "key": "dedicated", "title": "Dedicated", "value": true },
           { "key": "memory", "title": "Memory", "value": "128 GB" },
-          { "key": "maxDiskIO", "title": "Maximum Disk IO Bandwidth", "value": "9,500 Mbps" },
+          { "key": "maxDiskIO", "title": "Max Disk Bandwidth", "value": "9,500 Mbps" },
           {
             "key": "baseDiskIO",
-            "title": "Baseline Disk IO Bandwidth",
+            "title": "Baseline Disk Bandwidth",
             "value": "9,500 Mbps"
           },
           {
@@ -217,12 +217,12 @@
           { "key": "memory", "title": "Memory", "value": "192 GB" },
           {
             "key": "maxDiskIO",
-            "title": "Maximum Disk IO Bandwidth",
+            "title": "Max Disk Bandwidth",
             "value": "14,250 Mbps"
           },
           {
             "key": "baseDiskIO",
-            "title": "Baseline Disk IO Bandwidth",
+            "title": "Baseline Disk Bandwidth",
             "value": "14,250 Mbps"
           },
           {
@@ -246,12 +246,12 @@
           { "key": "memory", "title": "Memory", "value": "256 GB" },
           {
             "key": "maxDiskIO",
-            "title": "Maximum Disk IO Bandwidth",
+            "title": "Max Disk Bandwidth",
             "value": "19,000 Mbps"
           },
           {
             "key": "baseDiskIO",
-            "title": "Baseline Disk IO Bandwidth",
+            "title": "Baseline Disk Bandwidth",
             "value": "19,000 Mbps"
           },
           {

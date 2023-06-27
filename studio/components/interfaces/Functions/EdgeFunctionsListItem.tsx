@@ -23,7 +23,7 @@ const EdgeFunctionsListItem: FC<Props> = ({ function: item }) => {
   // get the .co or .net TLD from the restUrl
   const restUrl = ui.selectedProject?.restUrl
   const restUrlTld = new URL(restUrl as string).hostname.split('.').pop()
-  const functionUrl = `https://${ref}.functions.supabase.${restUrlTld}/${item.slug}`
+  const functionUrl = `https://${ref}.supabase.${restUrlTld}/functions/v1/${item.slug}`
 
   return (
     <Table.tr

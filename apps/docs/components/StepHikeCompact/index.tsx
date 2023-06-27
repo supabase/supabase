@@ -29,7 +29,7 @@ const StepHikeCompact: FC<IStepHikeCompact> & IStepHikeCompactSubcomponents = ({
 
 const Step: FC<IStep> = ({ children, title, step }) => {
   return (
-    <div className="relative pb-8">
+    <div className="relative pb-8 [&_div]:[&_div]:last:bg-transparent">
       <div
         className="
           absolute

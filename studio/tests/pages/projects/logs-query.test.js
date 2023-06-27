@@ -7,7 +7,7 @@ import userEvent from '@testing-library/user-event'
 import { logDataFixture } from '../../fixtures'
 import { clickDropdown } from 'tests/helpers'
 import dayjs from 'dayjs'
-import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
+import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 jest.mock('common/hooks')
 import { useParams } from 'common/hooks'
 
@@ -220,13 +220,12 @@ test('field reference', async () => {
   await screen.findByText('metadata.request.cf.asOrganization')
 })
 
-describe.each(['FREE', 'PRO', 'TEAM', 'ENTERPRISE'])('upgrade modal for %s', (key) => {
+describe.each(['free', 'pro', 'team', 'enterprise'])('upgrade modal for %s', (key) => {
   beforeEach(() => {
-    useProjectSubscriptionQuery.mockReturnValue({
+    useProjectSubscriptionV2Query.mockReturnValue({
       data: {
-        tier: {
-          supabase_prod_id: `tier_${key.toLocaleLowerCase()}`,
-          key,
+        plan: {
+          id: key,
         },
       },
     })
@@ -254,8 +253,8 @@ describe.each(['FREE', 'PRO', 'TEAM', 'ENTERPRISE'])('upgrade modal for %s', (ke
       fireEvent.click(option)
     })
 
-    // only free tier will show modal
-    if (key === 'FREE') {
+    // only free plan will show modal
+    if (key === 'free') {
       await screen.findByText('Log retention') // assert modal title is present
     } else {
       await expect(screen.findByText('Log retention')).rejects.toThrow()
