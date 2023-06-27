@@ -161,9 +161,7 @@ const PublishAppModal = ({
         hideFooter
         visible={visible}
         header={
-          selectedApp !== undefined
-            ? 'Update OAutha application'
-            : 'Publish a new OAuth application'
+          selectedApp !== undefined ? 'Update OAuth application' : 'Publish a new OAuth application'
         }
         onCancel={() => onClose()}
       >
@@ -282,7 +280,7 @@ const PublishAppModal = ({
                   <Modal.Content>
                     <div className="mb-2 flex items-center justify-between">
                       <div>
-                        <p className="prose text-sm">Allowed URLs</p>
+                        <p className="prose text-sm">Authorization callback URLs</p>
                         <p className="text-sm text-scale-1000">
                           All URLs must use HTTPS, except for localhost
                         </p>
