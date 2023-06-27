@@ -11,11 +11,12 @@ import {
   Dropdown,
   IconChevronDown,
   useCommandMenu,
+  IconCode,
+  AiIcon,
 } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { checkPermissions, useFlag, useStore } from 'hooks'
-import useProfile from 'hooks/misc/useProfile'
 import { IS_PLATFORM } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 
@@ -23,6 +24,7 @@ import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
 import { useParams } from 'common'
 import { useSnippets, useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { SqlSnippet, useSqlSnippetsQuery } from 'data/content/sql-snippets-query'
+import { useProfileQuery } from 'data/profile/profile-query'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import QueryItem from './QueryItem'
 import { createSqlSnippetSkeleton } from 'components/interfaces/SQLEditor/SQLEditor.utils'
@@ -33,7 +35,7 @@ const SideBarContent = observer(() => {
   const { ui } = useStore()
   const { ref, id } = useParams()
   const router = useRouter()
-  const { data: profile } = useProfile()
+  const { data: profile } = useProfileQuery()
   const [filterString, setFilterString] = useState('')
   const { setPages, setIsOpen } = useCommandMenu()
   const showCmdkHelper = useFlag('dashboardCmdk')
@@ -96,24 +98,18 @@ const SideBarContent = observer(() => {
         {IS_PLATFORM && (
           <div className="my-4 mx-3 space-y-1 px-3">
             <div className="flex items-center">
-              <Button
-                className={showCmdkHelper ? 'rounded-r-none px-3' : undefined}
-                block
-                icon={<IconPlus />}
-                type="default"
-                disabled={isLoading}
-                style={{ justifyContent: 'start' }}
-                onClick={() => handleNewQuery()}
-              >
-                New query
-              </Button>
-              {showCmdkHelper && (
-                <Dropdown
-                  align="end"
-                  side="bottom"
-                  sideOffset={3}
-                  className="max-w-[210px]"
-                  overlay={[
+              <Dropdown
+                align="start"
+                side="bottom"
+                sideOffset={3}
+                className="max-w-[210px] this-class-is-no-bueno"
+                overlay={[
+                  <Dropdown.Item key="new-blank-query" onClick={() => handleNewQuery()}>
+                    <div className="space-y-1">
+                      <p className="block text-scale-1200">New blank query</p>
+                    </div>
+                  </Dropdown.Item>,
+                  showCmdkHelper ? (
                     <Dropdown.Item
                       key="new-ai-query"
                       onClick={() => {
@@ -123,21 +119,21 @@ const SideBarContent = observer(() => {
                     >
                       <div className="space-y-1">
                         <p className="block text-scale-1200">New AI query</p>
-                        <p className="block text-scale-1100">
-                          Generate a SQL query using Supabase AI
-                        </p>
                       </div>
-                    </Dropdown.Item>,
-                  ]}
+                    </Dropdown.Item>
+                  ) : null,
+                ]}
+              >
+                <Button
+                  block
+                  icon={<IconPlus />}
+                  type="primary"
+                  disabled={isLoading}
+                  style={{ justifyContent: 'start' }}
                 >
-                  <Button
-                    disabled={isLoading}
-                    type="default"
-                    className="rounded-l-none px-[4px] py-[5px]"
-                    icon={<IconChevronDown />}
-                  />
-                </Dropdown>
-              )}
+                  New query
+                </Button>
+              </Dropdown>
             </div>
             <Input
               size="tiny"

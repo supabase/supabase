@@ -269,6 +269,7 @@ async function handleSignInWithGoogle(response) {
   const { data, error } = await supabase.auth.signInWithIdToken({
     token: response.credential,
     nonce: 'NONCE', // must be the same one as provided in data-nonce (if any)
+
   })
 }
 ```

@@ -53,7 +53,45 @@ const sendIdentify = (user: User, gaProps?: TelemetryProps) => {
   })
 }
 
+const sendActivity = (
+  event: {
+    activity: string
+    source: string
+    projectRef?: string
+    orgId?: string
+    data?: object
+  },
+  router: NextRouter
+) => {
+  if (!IS_PLATFORM) return
+
+  const { activity, source, projectRef, orgId, data } = event
+
+  const properties = {
+    activity,
+    source,
+    page: {
+      path: router.route,
+      location: router.asPath,
+      referrer: document?.referrer || '',
+      title: document?.title || '',
+    },
+    ...(data && { data }),
+    // add if included, else estimate from path
+    ...(projectRef && { projectRef }),
+    ...(router.route.includes('/project/') &&
+      !projectRef && {
+        projectRef: router.asPath.split('/project/')[1].split('/')[0],
+      }),
+    ...(orgId && { orgId }),
+    ...(router.route.includes('/org/') &&
+      !orgId && { orgId: router.asPath.split('/org/')[1].split('/')[0] }),
+  }
+  return post(`${API_URL}/telemetry/activity`, properties)
+}
+
 export default {
   sendEvent,
   sendIdentify,
+  sendActivity,
 }

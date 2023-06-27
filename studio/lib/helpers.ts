@@ -160,14 +160,12 @@ export const snakeToCamel = (str: string) =>
  * Safari doesn't support write text into clipboard async, so if you need to load
  * text content async before coping, please use Promise<string> for the 1st arg.
  */
-export const copyToClipboard = (str: string | Promise<string>, callback = () => {}) => {
+export const copyToClipboard = async (str: string | Promise<string>, callback = () => {}) => {
   const focused = window.document.hasFocus()
   if (focused) {
-    if (window.ClipboardItem) {
-      const text = new ClipboardItem({
-        'text/plain': Promise.resolve(str).then((text) => new Blob([text], { type: 'text/plain' })),
-      })
-      window.navigator?.clipboard?.write([text]).then(callback)
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      const text = await Promise.resolve(str)
+      Promise.resolve(window.navigator?.clipboard?.writeText(text)).then(callback)
 
       return
     }

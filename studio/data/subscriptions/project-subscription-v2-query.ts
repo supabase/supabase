@@ -10,6 +10,8 @@ export type ProjectSubscriptionVariables = {
   projectRef?: string
 }
 
+export type PlanId = 'free' | 'pro' | 'team' | 'enterprise'
+
 export type ProjectSubscriptionResponse = {
   billing_cycle_anchor: number
   current_period_start: number
@@ -17,7 +19,7 @@ export type ProjectSubscriptionResponse = {
   next_invoice_at: number
   usage_billing_enabled: boolean
   plan: {
-    id: 'free' | 'pro' | 'team' | 'enterprise'
+    id: PlanId
     name: string
     price: number
   }
@@ -36,6 +38,14 @@ export type ProjectSubscriptionResponse = {
       freeUnits: number
     }
   }[]
+  payment_method_id?: string
+  payment_method_type: 'invoice' | 'card' | 'none'
+  payment_method_card_details?: {
+    last_4_digits: string
+    brand: string
+    expiry_month: number
+    expiry_year: number
+  }
 }
 
 export async function getProjectSubscription(
