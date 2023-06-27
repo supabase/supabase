@@ -122,8 +122,8 @@ const BarChart = ({
       </Container>
       {data && (
         <div className="text-scale-900 -mt-9 flex items-center justify-between text-xs">
-          <span>{dayjs(data[0][xAxisKey]).format(customDateFormat)}</span>
-          <span>{dayjs(data[data?.length - 1]?.[xAxisKey]).format(customDateFormat)}</span>
+          <span>{day(data[0][xAxisKey]).format(customDateFormat)}</span>
+          <span>{day(data[data?.length - 1]?.[xAxisKey]).format(customDateFormat)}</span>
         </div>
       )}
     </div>
