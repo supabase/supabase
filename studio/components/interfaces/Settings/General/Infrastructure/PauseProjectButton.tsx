@@ -7,7 +7,7 @@ import { FC, useState } from 'react'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
-import { invalidateProjectsQuery } from 'data/projects/projects-query'
+import { setProjectStatus } from 'data/projects/projects-query'
 import { checkPermissions, useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
@@ -54,7 +54,7 @@ const PauseProjectButton: FC<Props> = observer(({ projectRef, projectId }) => {
       })
       setLoading(false)
     } else {
-      await invalidateProjectsQuery(queryClient)
+      setProjectStatus(queryClient, projectRef, PROJECT_STATUS.GOING_DOWN)
 
       ui.setNotification({ category: 'success', message: 'Pausing project' })
       router.push(`/project/${projectRef}`)

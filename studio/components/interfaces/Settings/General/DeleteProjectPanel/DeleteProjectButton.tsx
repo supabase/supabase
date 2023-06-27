@@ -2,7 +2,7 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/router'
-import { FC, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button, Input } from 'ui'
 
 import { CANCELLATION_REASONS } from 'components/interfaces/BillingV2/Billing.constants'
@@ -13,11 +13,11 @@ import { checkPermissions, useStore } from 'hooks'
 import { delete_, post } from 'lib/common/fetch'
 import { API_URL, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 
-interface Props {
+export interface DeleteProjectButtonProps {
   type?: 'danger' | 'default'
 }
 
-const DeleteProjectButton: FC<Props> = ({ type = 'danger' }) => {
+const DeleteProjectButton = ({ type = 'danger' }: DeleteProjectButtonProps) => {
   const queryClient = useQueryClient()
   const router = useRouter()
   const { ui } = useStore()

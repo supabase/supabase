@@ -7,16 +7,16 @@ import { useEffect, useState } from 'react'
 
 import { useParams, useTheme } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { invalidateProjectsQuery } from 'data/projects/projects-query'
+import { setProjectStatus } from 'data/projects/projects-query'
 import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-remove-mutation'
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 import { checkPermissions, useStore } from 'hooks'
-import { BASE_PATH } from 'lib/constants'
+import { BASE_PATH, PROJECT_STATUS } from 'lib/constants'
+import Telemetry from 'lib/telemetry'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { Alert, Button, IconExternalLink, Modal, Radio, SidePanel } from 'ui'
-import Telemetry from 'lib/telemetry'
 
 const COMPUTE_CATEGORY_OPTIONS: {
   id: 'micro' | 'optimized'
@@ -120,7 +120,7 @@ const ComputeInstanceSidePanel = () => {
           selectedCompute?.name || 'Micro'
         }. Your project is currently being restarted to update its instance`,
       })
-      await invalidateProjectsQuery(queryClient)
+      setProjectStatus(queryClient, projectRef, PROJECT_STATUS.RESTORING)
       onClose()
       router.push(`/project/${projectRef}`)
     } catch (error: any) {

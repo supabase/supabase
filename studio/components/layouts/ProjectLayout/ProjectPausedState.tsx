@@ -7,10 +7,10 @@ import { useState } from 'react'
 import { useParams } from 'common'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
-import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
+import { setProjectStatus } from 'data/projects/projects-query'
 import { checkPermissions, useFlag, useSelectedOrganization, useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import { Button, IconPauseCircle, Modal } from 'ui'
 import { useProjectContext } from './ProjectContext'
 
@@ -58,7 +58,7 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
     }
 
     await post(`${API_URL}/projects/${project.ref}/restore`, { kps_enabled: kpsEnabled })
-    await invalidateOrganizationsQuery(queryClient)
+    setProjectStatus(queryClient, project.ref, PROJECT_STATUS.RESTORING)
     ui.setNotification({ category: 'success', message: 'Restoring project' })
   }
 

@@ -10,10 +10,10 @@ import { Alert, Button, IconChevronLeft, IconChevronRight, IconHelpCircle, Modal
 import { useParams } from 'common'
 import { FormHeader, FormPanel } from 'components/ui/Forms'
 import InformationBox from 'components/ui/InformationBox'
-import { invalidateProjectsQuery } from 'data/projects/projects-query'
+import { setProjectStatus } from 'data/projects/projects-query'
 import { useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import BackupsEmpty from '../BackupsEmpty'
 import { Timezone } from './PITR.types'
 import {
@@ -116,7 +116,7 @@ const PITRSelection = () => {
     } else {
       setTimeout(() => {
         setShowConfirmation(false)
-        invalidateProjectsQuery(queryClient)
+        setProjectStatus(queryClient, projectRef, PROJECT_STATUS.RESTORING)
         router.push(`/project/${projectRef}`)
       }, 3000)
     }

@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { FC, useState } from 'react'
+import { useState } from 'react'
 import {
   Alert,
   Button,
@@ -16,15 +16,13 @@ import {
 import { useParams } from 'common/hooks'
 import InformationBox from 'components/ui/InformationBox'
 import { useProjectUpgradeEligibilityQuery } from 'data/config/project-upgrade-eligibility-query'
-import { invalidateProjectsQuery } from 'data/projects/projects-query'
+import { setProjectStatus } from 'data/projects/projects-query'
 import { useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
-import { API_ADMIN_URL } from 'lib/constants'
+import { API_ADMIN_URL, PROJECT_STATUS } from 'lib/constants'
 import { BREAKING_CHANGES } from './ProjectUpgradeAlert.constants'
 
-interface Props {}
-
-const ProjectUpgradeAlert: FC<Props> = ({}) => {
+const ProjectUpgradeAlert = () => {
   const queryClient = useQueryClient()
   const router = useRouter()
   const { ui } = useStore()
@@ -41,6 +39,14 @@ const ProjectUpgradeAlert: FC<Props> = ({}) => {
   const onConfirmUpgrade = async (values: any, { setSubmitting }: any) => {
     setSubmitting(true)
 
+    if (!ref) {
+      ui.setNotification({
+        category: 'error',
+        message: 'Project ref not found',
+      })
+      return
+    }
+
     const res = await post(`${API_ADMIN_URL}/projects/${ref}/upgrade`, {
       target_version: values.version,
     })
@@ -52,7 +58,7 @@ const ProjectUpgradeAlert: FC<Props> = ({}) => {
       })
       setSubmitting(false)
     } else {
-      await invalidateProjectsQuery(queryClient)
+      setProjectStatus(queryClient, ref, PROJECT_STATUS.UPGRADING)
       ui.setNotification({ category: 'success', message: 'Upgrading project' })
       router.push(`/project/${ref}?upgradeInitiated=true`)
     }

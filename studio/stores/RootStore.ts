@@ -30,7 +30,6 @@ export interface IRootStore {
   selectedProjectRef?: string
 
   setProject: (project: Project) => void
-  // setOrganizationSlug: (value?: string) => void
 }
 export class RootStore implements IRootStore {
   app: IAppStore
@@ -77,23 +76,5 @@ export class RootStore implements IRootStore {
     this.ui.setProjectRef(project.ref)
 
     this.selectedProjectRef = project.ref
-
-    // fetch project detail when
-    // - project not found yet. projectStore is loading
-    // - connectionString is not available. projectStore loaded
-    // const found = this.app.projects.find((x: Project) => x.ref === value)
-    // if (found?.connectionString === undefined) {
-    //   this.app.projects.fetchDetail(value, (project) => {
-    //     setProjectRefs(project)
-    //   })
-    // } else {
-    //   setProjectRefs(found)
-    // }
   }
-
-  // setOrganizationSlug(value?: string) {
-  //   if (this.ui.selectedOrganization?.slug != value) {
-  //     this.ui.setOrganizationSlug(value)
-  //   }
-  // }
 }

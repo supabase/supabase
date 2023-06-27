@@ -5,10 +5,10 @@ import { useRouter } from 'next/router'
 import { FC, useState } from 'react'
 
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
-import { invalidateProjectsQuery } from 'data/projects/projects-query'
+import { setProjectStatus } from 'data/projects/projects-query'
 import { checkPermissions, useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import { Badge, Button, IconDownload } from 'ui'
 
 interface Props {
@@ -35,7 +35,7 @@ const BackupItem: FC<Props> = ({ projectRef, backup, index }) => {
     try {
       post(`${API_URL}/database/${projectRef}/backups/restore`, backup).then(() => {
         setTimeout(() => {
-          invalidateProjectsQuery(queryClient)
+          setProjectStatus(queryClient, projectRef, PROJECT_STATUS.RESTORING)
           ui.setNotification({
             category: 'success',
             message: `Restoring database back to ${dayjs(backup.inserted_at).format(

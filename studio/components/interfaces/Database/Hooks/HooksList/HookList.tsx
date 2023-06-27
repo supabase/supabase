@@ -2,7 +2,6 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { includes, noop } from 'lodash'
 import Image from 'next/image'
-import { FC } from 'react'
 
 import { useParams } from 'common/hooks'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -12,14 +11,14 @@ import { checkPermissions } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import { Badge, Button, Dropdown, IconEdit3, IconMoreVertical, IconTrash } from 'ui'
 
-interface Props {
+export interface HookListProps {
   schema: string
   filterString: string
   editHook: (hook: any) => void
   deleteHook: (hook: any) => void
 }
 
-const HookList: FC<Props> = ({ schema, filterString, editHook = noop, deleteHook = noop }) => {
+const HookList = ({ schema, filterString, editHook = noop, deleteHook = noop }: HookListProps) => {
   const { ref } = useParams()
   const { project } = useProjectContext()
   const { data: hooks } = useDatabaseHooks({

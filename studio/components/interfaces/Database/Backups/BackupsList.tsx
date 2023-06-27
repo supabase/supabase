@@ -1,6 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { observer } from 'mobx-react-lite'
-import { FC } from 'react'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import InformationBox from 'components/ui/InformationBox'
@@ -13,9 +12,7 @@ import BackupItem from './BackupItem'
 import BackupsEmpty from './BackupsEmpty'
 import BackupsError from './BackupsError'
 
-interface Props {}
-
-const BackupsList: FC<Props> = ({}) => {
+const BackupsList = () => {
   const { project: selectedProject } = useProjectContext()
   const { backups } = useStore()
   const projectRef = selectedProject?.ref || 'default'

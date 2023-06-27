@@ -1,6 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
-import { FC } from 'react'
 import { Form, Input } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -17,9 +16,7 @@ import { checkPermissions, useStore } from 'hooks'
 import { patch } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 
-interface Props {}
-
-const General: FC<Props> = ({}) => {
+const General = () => {
   const queryClient = useQueryClient()
   const { ui } = useStore()
   const { project } = useProjectContext()

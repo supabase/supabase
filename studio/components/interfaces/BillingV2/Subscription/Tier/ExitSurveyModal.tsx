@@ -5,12 +5,12 @@ import { useRouter } from 'next/router'
 import { useReducer, useRef, useState } from 'react'
 
 import { useParams } from 'common'
-import { invalidateProjectsQuery } from 'data/projects/projects-query'
+import { setProjectStatus } from 'data/projects/projects-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useProjectSubscriptionUpdateMutation } from 'data/subscriptions/project-subscription-update-mutation'
 import { useFlag, useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import { Button, Input, Modal } from 'ui'
 import { CANCELLATION_REASONS } from '../../Billing.constants'
 import ProjectUpdateDisabledTooltip from '../../ProjectUpdateDisabledTooltip'
@@ -120,7 +120,7 @@ const ExitSurveyModal = ({ visible, onClose }: ExitSurveyModalProps) => {
           : 'Successfully downgraded project to the free plan',
       })
       if (hasComputeInstance) {
-        await invalidateProjectsQuery(queryClient)
+        setProjectStatus(queryClient, projectRef, PROJECT_STATUS.RESTORING)
         router.push(`/project/${projectRef}`)
       }
       onClose(true)
