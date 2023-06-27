@@ -94,7 +94,7 @@ export async function getOrganizationAuditLogs(
 ) {
   if (!slug) throw new Error('slug is required')
 
-  // return { result: MOCK_LOGS, retention_period: 1 }
+  return { result: MOCK_LOGS, retention_period: 1 }
 
   const response = await get(
     `${API_URL}/organizations/${slug}/audit?iso_timestamp_start=${iso_timestamp_start}&iso_timestamp_end=${iso_timestamp_end}`,

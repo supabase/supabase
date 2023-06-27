@@ -151,6 +151,8 @@ const AuditLogs = () => {
                   )
                 }}
               />
+              <div className="h-[20px] border-r border-scale-700 !ml-4 !mr-2" />
+              <p className="prose text-xs">Viewing {sortedLogs.length} logs in total</p>
             </div>
 
             {logs.length === 0 ? (
