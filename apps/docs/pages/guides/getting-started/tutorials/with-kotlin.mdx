@@ -86,6 +86,7 @@ In build.gradle (app) file, add these dependencies then press Sync now. Replace 
 // Supabase setup
 implementation "io.github.jan-tennert.supabase:postgrest-kt-android:$supabase_version"
 implementation "io.github.jan-tennert.supabase:storage-kt:$supabase_version"
+implementation "io.github.jan-tennert.supabase:gotrue-kt:$supabase_version"
 implementation "io.ktor:ktor-client-android:$ktor_version"
 implementation "io.ktor:ktor-client-logging-jvm:$ktor_version"
 implementation "io.ktor:ktor-client-core:$ktor_version"
@@ -526,8 +527,8 @@ Create ProductDetailsViewModel.kt
 class ProductDetailsViewModel @Inject constructor(
     private val productRepository: ProductRepository,
     savedStateHandle: SavedStateHandle,
-
     ) : ViewModel() {
+        
     private val _product = MutableStateFlow<Product?>(null)
     val product: Flow<Product?> = _product
 
@@ -1023,7 +1024,6 @@ fun SignInScreen(
     navController: NavController,
     viewModel: SignInViewModel = hiltViewModel()
 ) {
-
     val snackBarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
     Scaffold(
