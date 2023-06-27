@@ -1,11 +1,12 @@
+import * as Tooltip from '@radix-ui/react-tooltip'
 import dayjs from 'dayjs'
 import Image from 'next/image'
 import { useState } from 'react'
-import * as Tooltip from '@radix-ui/react-tooltip'
 
 import { useParams } from 'common'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
+import { DatePicker } from 'components/ui/DatePicker'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import {
   OrganizationAuditLog,
@@ -15,14 +16,17 @@ import { useOrganizationDetailQuery } from 'data/organizations/organization-deta
 import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { Alert, Button, IconArrowDown, IconArrowUp, IconBarChart, IconUser } from 'ui'
+import { Alert, Button, IconArrowDown, IconArrowUp, IconUser } from 'ui'
 import FilterPopover from './FilterPopover'
 import LogDetailsPanel from './LogDetailsPanel'
-import { DatePicker } from 'components/ui/DatePicker'
 
 // [Joshen considerations]
 // - Maybe fix the height of the table to the remaining height of the viewport, so that the search input is always visible
 // - We'll need pagination as well if the audit logs get too large, but that needs to be implemented on the API side first if possible
+// - Need to update RQ's resource key, so that it can update with iso_timestamp_start/end changes, check Alaister OR LogsExplorer
+// - Need to update to show retention policy (KM will update endpoint)
+// - I've hidden time input in the date picker for now cause the time support in the component is a bit iffy, need to investigate
+//   - Maybe a rule to follow from here is just everytime we call dayjs, use UTC(), one TZ to rule them all
 
 const AuditLogs = () => {
   const { slug } = useParams()
@@ -42,12 +46,7 @@ const AuditLogs = () => {
   const { data: organizations } = useOrganizationsQuery()
   const { data: detailData } = useOrganizationDetailQuery({ slug })
   const { data: rolesData } = useOrganizationRolesQuery({ slug })
-  const {
-    data: logs,
-    isLoading,
-    isSuccess,
-    isError,
-  } = useOrganizationAuditLogsQuery({
+  const { data, isLoading, isSuccess, isError } = useOrganizationAuditLogsQuery({
     slug,
     iso_timestamp_start: dateRange.from,
     iso_timestamp_end: dateRange.to,
@@ -55,6 +54,9 @@ const AuditLogs = () => {
 
   const members = detailData?.members ?? []
   const roles = rolesData?.roles ?? []
+
+  const retentionPeriod = data?.retention_period ?? 0
+  const logs = data?.result ?? []
   const sortedLogs = logs
     ?.sort((a, b) =>
       dateSortDesc
@@ -125,6 +127,8 @@ const AuditLogs = () => {
                     triggerButtonTitle=""
                     from={dateRange.from}
                     to={dateRange.to}
+                    minDate={dayjs().subtract(retentionPeriod, 'days').toDate()}
+                    maxDate={dayjs().toDate()}
                     onChange={(value) => {
                       if (value.from !== null && value.to !== null) {
                         const current = dayjs().utc()
@@ -143,16 +147,19 @@ const AuditLogs = () => {
                         setDateRange({ from, to })
                       }
                     }}
-                    renderFooter={({ to, from }) => {
-                      // If selected range is outside of retention policy
-                      if (true) {
-                        return (
-                          <Alert title="" variant="warning" className="mx-3 pl-2 pr-2 pt-1 pb-2">
-                            Selected range is outside of included retention policy, as such no data
-                            will be returned.
-                          </Alert>
-                        )
-                      }
+                    renderFooter={() => {
+                      return (
+                        <Alert title="" variant="info" className="mx-3 pl-2 pr-2 pt-1 pb-2">
+                          Your organization has a log retention period of{' '}
+                          <span className="text-brand-900">
+                            {retentionPeriod} day
+                            {retentionPeriod > 1 ? 's' : ''}
+                          </span>
+                          . You may only view logs from{' '}
+                          {dayjs().subtract(retentionPeriod, 'days').format('DD MMM YYYY')} as the
+                          earliest date.
+                        </Alert>
+                      )
                     }}
                   />
                 </div>

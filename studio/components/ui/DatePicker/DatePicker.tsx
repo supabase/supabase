@@ -22,6 +22,8 @@ export interface DatePickerProps {
   triggerButtonType?: ButtonProps['type']
   triggerButtonClassName?: string
   triggerButtonTitle?: string
+  minDate?: Date
+  maxDate?: Date
   hideTime?: boolean
   hideClear?: boolean
   renderFooter?: (args: DatePickerToFrom) => React.ReactNode | void
@@ -40,6 +42,8 @@ function _DatePicker({
   triggerButtonType = 'default',
   triggerButtonClassName = '',
   triggerButtonTitle,
+  minDate,
+  maxDate,
   hideTime = false,
   hideClear = false,
   renderFooter = () => null,
@@ -167,6 +171,8 @@ function _DatePicker({
         <>
           <div className="px-3 py-4">
             <DatePicker
+              inline
+              selectsRange
               selected={startDate}
               onChange={(dates) => {
                 handleDatePickerChange(dates)
@@ -174,8 +180,8 @@ function _DatePicker({
               dateFormat="MMMM d, yyyy h:mm aa"
               startDate={startDate}
               endDate={endDate}
-              selectsRange
-              inline
+              minDate={minDate}
+              maxDate={maxDate}
               dayClassName={() => 'cursor-pointer'}
               renderCustomHeader={({
                 date,
