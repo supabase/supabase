@@ -211,7 +211,7 @@
     "items": [
       {
         "id": "supabase-inspect",
-        "title": "Inspect database status",
+        "title": "Inspect database statistics",
         "slug": "supabase-inspect",
         "type": "cli-command"
       },
@@ -385,7 +385,7 @@
       },
       {
         "id": "supabase-sso-show",
-        "title": "Show information for an identity providers",
+        "title": "Show information for an identity provider",
         "slug": "supabase-sso-show",
         "type": "cli-command"
       },
