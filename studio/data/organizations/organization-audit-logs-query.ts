@@ -114,9 +114,9 @@ export const useOrganizationAuditLogsQuery = <TData = OrganizationAuditLogsData>
     ...options
   }: UseQueryOptions<OrganizationAuditLogsData, OrganizationAuditLogsError, TData> = {}
 ) => {
-  const { slug } = vars
+  const { slug, iso_timestamp_start, iso_timestamp_end } = vars
   return useQuery<OrganizationAuditLogsData, OrganizationAuditLogsError, TData>(
-    organizationKeys.auditLogs(slug),
+    organizationKeys.auditLogs(slug, { iso_timestamp_start, iso_timestamp_end }),
     ({ signal }) => getOrganizationAuditLogs(vars, signal),
     {
       enabled: enabled && typeof slug !== 'undefined',
@@ -126,14 +126,16 @@ export const useOrganizationAuditLogsQuery = <TData = OrganizationAuditLogsData>
 }
 
 export const useOrganizationAuditLogsPrefetch = (vars: OrganizationAuditLogsVariables) => {
-  const { slug } = vars
+  const { slug, iso_timestamp_start, iso_timestamp_end } = vars
   const client = useQueryClient()
 
   return useCallback(() => {
     if (slug) {
-      client.prefetchQuery(organizationKeys.auditLogs(slug), ({ signal }) =>
-        getOrganizationAuditLogs(vars, signal)
+      client.prefetchQuery(
+        organizationKeys.auditLogs(slug, { iso_timestamp_start, iso_timestamp_end }),
+        ({ signal }) => getOrganizationAuditLogs(vars, signal)
       )
     }
-  }, [client, slug, vars])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [client, vars])
 }
