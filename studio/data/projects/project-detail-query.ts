@@ -26,6 +26,7 @@ export const useProjectDetailQuery = <TData = ProjectDetailData>(
     ({ signal }) => getProjectDetail({ ref }, signal),
     {
       enabled: enabled && typeof ref !== 'undefined',
+      staleTime: 30 * 1000, // 30 seconds
       ...options,
     }
   )

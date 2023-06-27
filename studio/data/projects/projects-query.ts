@@ -60,22 +60,30 @@ export function setProjectStatus(
   projectRef: Project['ref'],
   status: Project['status']
 ) {
-  client.setQueriesData<Project[] | undefined>(projectKeys.list(), (old) => {
-    if (!old) return old
+  client.setQueriesData<Project[] | undefined>(
+    projectKeys.list(),
+    (old) => {
+      if (!old) return old
 
-    return old.map((project) => {
-      if (project.ref === projectRef) {
-        return { ...project, status }
-      }
-      return project
-    })
-  })
+      return old.map((project) => {
+        if (project.ref === projectRef) {
+          return { ...project, status }
+        }
+        return project
+      })
+    },
+    { updatedAt: Date.now() }
+  )
 
-  client.setQueriesData<Project>(projectKeys.detail(projectRef), (old) => {
-    if (!old) return old
+  client.setQueriesData<Project>(
+    projectKeys.detail(projectRef),
+    (old) => {
+      if (!old) return old
 
-    return { ...old, status }
-  })
+      return { ...old, status }
+    },
+    { updatedAt: Date.now() }
+  )
 }
 
 export function setProjectPostgrestStatus(
@@ -83,9 +91,13 @@ export function setProjectPostgrestStatus(
   projectRef: Project['ref'],
   status: Project['postgrestStatus']
 ) {
-  client.setQueriesData<Project>(projectKeys.detail(projectRef), (old) => {
-    if (!old) return old
+  client.setQueriesData<Project>(
+    projectKeys.detail(projectRef),
+    (old) => {
+      if (!old) return old
 
-    return { ...old, postgrestStatus: status }
-  })
+      return { ...old, postgrestStatus: status }
+    },
+    { updatedAt: Date.now() }
+  )
 }
