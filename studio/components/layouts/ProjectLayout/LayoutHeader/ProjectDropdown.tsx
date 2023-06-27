@@ -14,16 +14,16 @@ import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 // is a unique project id/marker so we'll redirect the user to the
 // highest common route with just projectRef in the router queries.
 
-const sanitizeRoute = (route: string, routerQueries: ParsedUrlQuery) => {
+export const sanitizeRoute = (route: string, routerQueries: ParsedUrlQuery) => {
   const queryArray = Object.entries(routerQueries)
 
   if (queryArray.length > 1) {
-    // account for query string, if exists (example: /logs/explorer?q=select...)
-    const hasQueryString = queryArray.some(([key]) => key === 'q')
-
+    // [Joshen] Ideally we shouldn't use hard coded numbers, but temp workaround
+    // for storage bucket route since its longer
+    const isStorageBucketRoute = 'bucketId' in routerQueries
     return route
       .split('/')
-      .slice(0, hasQueryString ? 5 : 4)
+      .slice(0, isStorageBucketRoute ? 5 : 4)
       .join('/')
   } else {
     return route

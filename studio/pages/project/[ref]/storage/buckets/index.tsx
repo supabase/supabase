@@ -3,7 +3,9 @@ import { useEffect } from 'react'
 import { useParams } from 'common/hooks'
 import { StorageLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import StorageBucketsError from 'components/layouts/StorageLayout/StorageBucketsError'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
+import { useBucketsQuery } from 'data/storage/buckets-query'
 import { useFlag } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
@@ -17,13 +19,17 @@ const PageLayout: NextPageWithLayout = () => {
   const { project } = useProjectContext()
   const kpsEnabled = useFlag('initWithKps')
 
+  const { error, isError } = useBucketsQuery({ projectRef: ref })
+
   useEffect(() => {
     if (project && project.status === PROJECT_STATUS.INACTIVE) {
       post(`${API_URL}/projects/${ref}/restore`, { kps_enabled: kpsEnabled })
     }
-  }, [project])
+  }, [ref, project])
 
   if (!project) return <div></div>
+
+  if (isError) <StorageBucketsError error={error as any} />
 
   return (
     <div className="storage-container flex flex-grow">

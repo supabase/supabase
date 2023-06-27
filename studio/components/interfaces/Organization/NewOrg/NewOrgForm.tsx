@@ -52,7 +52,7 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
   const [newOrgLoading, setNewOrgLoading] = useState(false)
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>()
 
-  const [dbPricingTierKey, setDbPricingTierKey] = useState('PRO')
+  const [dbPricingTierKey, setDbPricingTierKey] = useState('FREE')
 
   function validateOrgName(name: any) {
     const value = name ? name.trim() : ''
@@ -75,7 +75,7 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
     setDbPricingTierKey(value)
   }
 
-  async function createOrg(paymentMethodId: string) {
+  async function createOrg(paymentMethodId?: string) {
     const response = await post(
       `${API_URL}/organizations`,
       {
@@ -121,7 +121,9 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
     }
     setNewOrgLoading(true)
 
-    if (!paymentMethod) {
+    if (dbPricingTierKey === 'FREE') {
+      await createOrg()
+    } else if (!paymentMethod) {
       const { error, setupIntent } = await stripe.confirmSetup({
         elements,
         redirect: 'if_required',
@@ -293,41 +295,43 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
             </Listbox>
           </Panel.Content>
 
-          <Panel.Content>
-            {paymentMethod?.card !== undefined ? (
-              <div key={paymentMethod.id} className="flex items-center justify-between">
-                <div className="flex items-center space-x-8">
-                  <img
-                    alt="Card"
-                    src={`${BASE_PATH}/img/payment-methods/${paymentMethod.card.brand
-                      .replace(' ', '-')
-                      .toLowerCase()}.png`}
-                    width="32"
-                  />
-                  <Input
-                    readOnly
-                    className="w-64"
-                    size="small"
-                    value={`•••• •••• •••• ${paymentMethod.card.last4}`}
-                  />
-                  <p className="text-sm tabular-nums">
-                    Expires: {paymentMethod.card.exp_month}/{paymentMethod.card.exp_year}
-                  </p>
+          {dbPricingTierKey !== 'FREE' && (
+            <Panel.Content>
+              {paymentMethod?.card !== undefined ? (
+                <div key={paymentMethod.id} className="flex items-center justify-between">
+                  <div className="flex items-center space-x-8">
+                    <img
+                      alt="Card"
+                      src={`${BASE_PATH}/img/payment-methods/${paymentMethod.card.brand
+                        .replace(' ', '-')
+                        .toLowerCase()}.png`}
+                      width="32"
+                    />
+                    <Input
+                      readOnly
+                      className="w-64"
+                      size="small"
+                      value={`•••• •••• •••• ${paymentMethod.card.last4}`}
+                    />
+                    <p className="text-sm tabular-nums">
+                      Expires: {paymentMethod.card.exp_month}/{paymentMethod.card.exp_year}
+                    </p>
+                  </div>
+                  <div>
+                    <Button
+                      type="outline"
+                      icon={<IconEdit2 />}
+                      onClick={() => resetPaymentMethod()}
+                      disabled={newOrgLoading}
+                      className="hover:border-gray-500"
+                    />
+                  </div>
                 </div>
-                <div>
-                  <Button
-                    type="outline"
-                    icon={<IconEdit2 />}
-                    onClick={() => resetPaymentMethod()}
-                    disabled={newOrgLoading}
-                    className="hover:border-gray-500"
-                  />
-                </div>
-              </div>
-            ) : (
-              <PaymentElement />
-            )}
-          </Panel.Content>
+              ) : (
+                <PaymentElement />
+              )}
+            </Panel.Content>
+          )}
         </Panel>
       </form>
     </>

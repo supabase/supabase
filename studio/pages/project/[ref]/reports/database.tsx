@@ -196,8 +196,19 @@ const DatabaseUsage = observer(() => {
                   <ChartHandler
                     startDate={dateRange?.period_start?.date}
                     endDate={dateRange?.period_end?.date}
-                    attribute={'cpu_usage'}
-                    label={'CPU usage'}
+                    attribute={'avg_cpu_usage'}
+                    label={'Average CPU usage'}
+                    interval={dateRange.interval}
+                    provider={'infra-monitoring'}
+                  />
+                )}
+
+                {dateRange && (
+                  <ChartHandler
+                    startDate={dateRange?.period_start?.date}
+                    endDate={dateRange?.period_end?.date}
+                    attribute={'max_cpu_usage'}
+                    label={'Max CPU usage'}
                     interval={dateRange.interval}
                     provider={'infra-monitoring'}
                   />

@@ -13,6 +13,8 @@ import { useProjectSubscriptionUpdateMutation } from 'data/subscriptions/project
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 import { checkPermissions, useSelectedOrganization, useStore } from 'hooks'
 import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
+import Telemetry from 'lib/telemetry'
+import { useRouter } from 'next/router'
 import { plans as subscriptionsPlans } from 'shared-data/plans'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { Alert, Button, IconCheck, IconExternalLink, Modal, SidePanel } from 'ui'
@@ -23,6 +25,7 @@ import PaymentMethodSelection from './PaymentMethodSelection'
 
 const TierUpdateSidePanel = () => {
   const { ui } = useStore()
+  const router = useRouter()
   const selectedOrganization = useSelectedOrganization()
   const slug = selectedOrganization?.slug
   const { ref: projectRef } = useParams()
@@ -60,6 +63,17 @@ const TierUpdateSidePanel = () => {
   useEffect(() => {
     if (visible) {
       setSelectedTier(undefined)
+      Telemetry.sendActivity(
+        {
+          activity: 'Side Panel Viewed',
+          source: 'Dashboard',
+          data: {
+            title: 'Change Subscription Plan',
+            section: 'Subscription plan',
+          },
+        },
+        router
+      )
     }
   }, [visible])
 
@@ -194,7 +208,22 @@ const TierUpdateSidePanel = () => {
                                 !canUpdateSubscription
                               }
                               type={isDowngradeOption ? 'default' : 'primary'}
-                              onClick={() => setSelectedTier(plan.id as any)}
+                              onClick={() => {
+                                setSelectedTier(plan.id as any)
+                                Telemetry.sendActivity(
+                                  {
+                                    activity: 'Popup Viewed',
+                                    source: 'Dashboard',
+                                    data: {
+                                      title: isDowngradeOption
+                                        ? 'Downgrade'
+                                        : 'Upgrade' + ' to ' + plan.name,
+                                      section: 'Subscription plan',
+                                    },
+                                  },
+                                  router
+                                )
+                              }}
                             >
                               {isDowngradeOption ? 'Downgrade' : 'Upgrade'} to {plan.name}
                             </Button>

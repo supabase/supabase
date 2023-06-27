@@ -122,7 +122,7 @@ const SubscriptionTier = ({}: SubscriptionTierProps) => {
                 actions={
                   currentPlan?.id === 'free' ? (
                     <Button type="default" onClick={() => snap.setPanelKey('subscriptionPlan')}>
-                      Uprade Plan
+                      Upgrade Plan
                     </Button>
                   ) : (
                     <Button type="default" onClick={() => snap.setPanelKey('costControl')}>

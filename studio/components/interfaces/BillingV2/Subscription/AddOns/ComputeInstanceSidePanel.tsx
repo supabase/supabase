@@ -16,6 +16,7 @@ import { checkPermissions, useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { Alert, Button, IconExternalLink, Modal, Radio, SidePanel } from 'ui'
+import Telemetry from 'lib/telemetry'
 
 const COMPUTE_CATEGORY_OPTIONS: {
   id: 'micro' | 'optimized'
@@ -85,6 +86,17 @@ const ComputeInstanceSidePanel = () => {
         setSelectedCategory('micro')
         setSelectedOption('ci_micro')
       }
+      Telemetry.sendActivity(
+        {
+          activity: 'Side Panel Viewed',
+          source: 'Dashboard',
+          data: {
+            title: 'Change project compute size',
+            section: 'Add ons',
+          },
+        },
+        router
+      )
     }
   }, [visible, isLoading])
 
@@ -104,7 +116,9 @@ const ComputeInstanceSidePanel = () => {
       ui.setNotification({
         duration: 8000,
         category: 'success',
-        message: `Successfully updated compute instance to ${selectedCompute?.name}. Your project is currently being restarted to update its instance`,
+        message: `Successfully updated compute instance to ${
+          selectedCompute?.name || 'Micro'
+        }. Your project is currently being restarted to update its instance`,
       })
       await invalidateProjectsQuery(queryClient)
       onClose()
@@ -173,6 +187,18 @@ const ComputeInstanceSidePanel = () => {
                       onClick={() => {
                         setSelectedCategory(option.id)
                         if (option.id === 'micro') setSelectedOption('ci_micro')
+                        Telemetry.sendActivity(
+                          {
+                            activity: 'Option Selected',
+                            source: 'Dashboard',
+                            data: {
+                              title: 'Change project compute size',
+                              section: 'Add ons',
+                              option: option.name,
+                            },
+                          },
+                          router
+                        )
                       }}
                     >
                       <img
