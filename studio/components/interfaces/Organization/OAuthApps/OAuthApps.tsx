@@ -40,8 +40,7 @@ const OAuthApps = () => {
             <div>
               <p>Published Apps</p>
               <p className="text-scale-1000 text-sm">
-                Build on top of the Supabase platform by having access to your organization's
-                settings and projects
+                Build integrations that extend Supabase's functionality
               </p>
             </div>
             <Button type="primary" onClick={() => setShowPublishModal(true)}>
