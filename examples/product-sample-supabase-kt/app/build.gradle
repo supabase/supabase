@@ -4,7 +4,7 @@ plugins {
     id 'com.google.dagger.hilt.android'
     id 'kotlin-kapt'
     id 'dagger.hilt.android.plugin'
-    id 'org.jetbrains.kotlin.plugin.serialization' version '1.6.21'
+    id 'org.jetbrains.kotlin.plugin.serialization' version '1.7.0'
 }
 
 android {
@@ -87,7 +87,7 @@ dependencies {
 
     implementation "com.google.dagger:hilt-android:$hilt_version"
     annotationProcessor "com.google.dagger:hilt-compiler:$hilt_version"
-    implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
+    implementation "androidx.hilt:hilt-navigation-compose:1.0.0"
 
     // For instrumentation tests
     androidTestImplementation  "com.google.dagger:hilt-android-testing:$hilt_version"
