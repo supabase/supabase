@@ -11,7 +11,7 @@ import { OAuthApp } from 'data/oauth/oauth-apps-query'
 import { useStore } from 'hooks'
 import { isValidHttpUrl, uuidv4 } from 'lib/helpers'
 import { Badge, Button, Dropdown, Form, IconEdit, IconUpload, Input, Modal } from 'ui'
-import { uploadAttachment } from './OAuthApps.utils'
+import { uploadAttachment } from 'lib/upload'
 import AuthorizeRequesterDetails from './AuthorizeRequesterDetails'
 
 export interface PublishAppModalProps {
@@ -102,7 +102,9 @@ const PublishAppModal = ({
 
     const { name, website } = values
     const uploadedIconUrl =
-      iconFile !== undefined ? await uploadAttachment(slug, iconFile) : iconUrl
+      iconFile !== undefined
+        ? await uploadAttachment('oauth-app-icons', `${slug}/${uuidv4()}.png`, iconFile)
+        : iconUrl
 
     if (selectedApp === undefined) {
       // Create application

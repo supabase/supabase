@@ -1,17 +1,15 @@
+import { useState } from 'react'
+
 import { useParams } from 'common'
 import Table from 'components/to-be-cleaned/Table'
-import { OAuthApp, useOAuthAppsQuery } from 'data/oauth/oauth-apps-query'
-import { useState } from 'react'
-import { Alert, Button, IconClipboard, IconEdit, IconTrash, IconX, Input } from 'ui'
-import PublishAppModal from './PublishAppModal'
-import DeleteAppModal from './DeleteAppModal'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import AlertError from 'components/ui/AlertError'
-import { copyToClipboard } from 'lib/helpers'
-import OAuthAppRow from './OAuthAppRow'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { OAuthAppCreateResponse } from 'data/oauth/oauth-app-create-mutation'
-
-// [Joshen] Just FYI need to relook at the copy writing at the end
+import { OAuthApp, useOAuthAppsQuery } from 'data/oauth/oauth-apps-query'
+import { Alert, Button, IconX, Input } from 'ui'
+import DeleteAppModal from './DeleteAppModal'
+import OAuthAppRow from './OAuthAppRow'
+import PublishAppModal from './PublishAppModal'
 
 const OAuthApps = () => {
   const { slug } = useParams()
