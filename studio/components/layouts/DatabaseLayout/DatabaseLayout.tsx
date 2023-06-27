@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
-import { FC, ReactNode, useEffect, useState } from 'react'
+import { PropsWithChildren, useEffect, useState } from 'react'
 
 import Error from 'components/ui/Error'
 import ProductMenu from 'components/ui/ProductMenu'
@@ -9,12 +9,11 @@ import { IS_PLATFORM } from 'lib/constants'
 import ProjectLayout from '../'
 import { generateDatabaseMenu } from './DatabaseMenu.utils'
 
-interface Props {
+export interface DatabaseLayoutProps {
   title?: string
-  children: ReactNode
 }
 
-const DatabaseLayout: FC<Props> = ({ title, children }) => {
+const DatabaseLayout = ({ title, children }: PropsWithChildren<DatabaseLayoutProps>) => {
   const { ui, meta, vault, backups } = useStore()
   const { isLoading: isSchemasLoading } = meta.schemas
   const { isLoading: isVaultLoading } = vault

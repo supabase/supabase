@@ -2,7 +2,7 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { Notification, NotificationStatus } from '@supabase/shared-types/out/notifications'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
-import { FC, useState } from 'react'
+import { useState } from 'react'
 
 import { notificationKeys } from 'data/notifications/keys'
 import { useProjectsQuery } from 'data/projects/projects-query'
@@ -14,7 +14,7 @@ import { Button, IconX } from 'ui'
 import NotificationActions from './NotificationActions'
 import { formatNotificationCTAText, formatNotificationText } from './NotificationRows.utils'
 
-interface Props {
+export interface NotificationRowProps {
   notification: Notification
   onSelectRestartProject: (project: Project, notification: Notification) => void
   onSelectApplyMigration: (project: Project, notification: Notification) => void
@@ -22,13 +22,13 @@ interface Props {
   onSelectFinalizeMigration: (project: Project, notification: Notification) => void
 }
 
-const NotificationRow: FC<Props> = ({
+const NotificationRow = ({
   notification,
   onSelectRestartProject,
   onSelectApplyMigration,
   onSelectRollbackMigration,
   onSelectFinalizeMigration,
-}) => {
+}: NotificationRowProps) => {
   const { ui } = useStore()
   const queryClient = useQueryClient()
   const [dismissing, setDismissing] = useState(false)

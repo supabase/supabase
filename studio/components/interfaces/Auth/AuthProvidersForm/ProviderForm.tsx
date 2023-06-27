@@ -1,6 +1,6 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { FC, useState } from 'react'
+import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { Alert, Button, Collapsible, Form, IconCheck, IconChevronUp, Input } from 'ui'
 
@@ -13,11 +13,11 @@ import { ProviderCollapsibleClasses } from './AuthProvidersForm.constants'
 import { Provider } from './AuthProvidersForm.types'
 import FormField from './FormField'
 
-interface Props {
+export interface ProviderFormProps {
   provider: Provider
 }
 
-const ProviderForm: FC<Props> = ({ provider }) => {
+const ProviderForm = ({ provider }: ProviderFormProps) => {
   const [open, setOpen] = useState(false)
   const { authConfig, ui } = useStore()
   const { project: selectedProject } = useProjectContext()

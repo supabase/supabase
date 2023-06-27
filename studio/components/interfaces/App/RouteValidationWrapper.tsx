@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
-import { FC, useEffect } from 'react'
+import { PropsWithChildren, useEffect } from 'react'
 
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
@@ -8,7 +8,7 @@ import { useStore } from 'hooks'
 import useLatest from 'hooks/misc/useLatest'
 
 // Ideally these could all be within a _middleware when we use Next 12
-const RouteValidationWrapper: FC = ({ children }) => {
+const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
   const { ui } = useStore()
 
   const router = useRouter()

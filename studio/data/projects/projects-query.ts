@@ -54,3 +54,38 @@ export function useAutoProjectsPrefetch() {
 export function invalidateProjectsQuery(client: QueryClient) {
   return client.invalidateQueries(projectKeys.list())
 }
+
+export function setProjectStatus(
+  client: QueryClient,
+  projectRef: Project['ref'],
+  status: Project['status']
+) {
+  client.setQueriesData<Project[] | undefined>(projectKeys.list(), (old) => {
+    if (!old) return old
+
+    return old.map((project) => {
+      if (project.ref === projectRef) {
+        return { ...project, status }
+      }
+      return project
+    })
+  })
+
+  client.setQueriesData<Project>(projectKeys.detail(projectRef), (old) => {
+    if (!old) return old
+
+    return { ...old, status }
+  })
+}
+
+export function setProjectPostgrestStatus(
+  client: QueryClient,
+  projectRef: Project['ref'],
+  status: Project['postgrestStatus']
+) {
+  client.setQueriesData<Project>(projectKeys.detail(projectRef), (old) => {
+    if (!old) return old
+
+    return { ...old, postgrestStatus: status }
+  })
+}

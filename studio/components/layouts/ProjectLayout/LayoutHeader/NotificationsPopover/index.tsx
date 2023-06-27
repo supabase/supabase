@@ -7,12 +7,12 @@ import {
 import { useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { useRouter } from 'next/router'
-import { FC, Fragment, useState } from 'react'
+import { Fragment, useState } from 'react'
 
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import { useNotificationsQuery } from 'data/notifications/notifications-query'
 import { getProjectDetail } from 'data/projects/project-detail-query'
-import { invalidateProjectsQuery } from 'data/projects/projects-query'
+import { invalidateProjectsQuery, setProjectPostgrestStatus } from 'data/projects/projects-query'
 import { useStore } from 'hooks'
 import { delete_, patch, post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
@@ -20,9 +20,7 @@ import { Project } from 'types'
 import { Alert, Button, IconArrowRight, IconBell, Popover } from 'ui'
 import NotificationRow from './NotificationRow'
 
-interface Props {}
-
-const NotificationsPopover: FC<Props> = () => {
+const NotificationsPopover = () => {
   const queryClient = useQueryClient()
   const router = useRouter()
   const { meta, ui } = useStore()
@@ -61,7 +59,7 @@ const NotificationsPopover: FC<Props> = () => {
 
     const { id } = targetNotification
 
-    const { id: projectId, ref, region } = projectToRestart
+    const { ref, region } = projectToRestart
     const serviceNamesByActionName: Record<string, string> = {
       [ActionType.PgBouncerRestart]: 'pgbouncer',
       [ActionType.SchedulePostgresRestart]: 'postgresql',
@@ -86,7 +84,7 @@ const NotificationsPopover: FC<Props> = () => {
         error,
       })
     } else {
-      await invalidateProjectsQuery(queryClient)
+      setProjectPostgrestStatus(queryClient, ref, 'OFFLINE')
       ui.setNotification({ category: 'success', message: `Restarting services` })
       router.push(`/project/${ref}`)
     }

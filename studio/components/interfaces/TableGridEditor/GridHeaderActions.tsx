@@ -2,25 +2,24 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import type { PostgresPolicy, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import Link from 'next/link'
-import { FC } from 'react'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useCheckPermissions, useStore } from 'hooks'
 import { Button, IconAlertCircle, IconCode, IconLock } from 'ui'
 
-interface Props {
+export interface GridHeaderActionsProps {
   table: PostgresTable
   apiPreviewPanelOpen: boolean
   setApiPreviewPanelOpen: (apiPreviewPanelOpen: boolean) => void
   refreshDocs: () => void
 }
 
-const GridHeaderActions: FC<Props> = ({
+const GridHeaderActions = ({
   table,
   apiPreviewPanelOpen,
   setApiPreviewPanelOpen,
   refreshDocs,
-}) => {
+}: GridHeaderActionsProps) => {
   const { meta } = useStore()
   const { project } = useProjectContext()
   const projectRef = project?.ref
@@ -28,7 +27,7 @@ const GridHeaderActions: FC<Props> = ({
 
   const canSqlWriteTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
   const canSqlWriteColumns = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
-  const isReadOnly = canSqlWriteTables && canSqlWriteColumns
+  const isReadOnly = !canSqlWriteTables && !canSqlWriteColumns
 
   function handlePreviewToggle() {
     setApiPreviewPanelOpen(!apiPreviewPanelOpen)

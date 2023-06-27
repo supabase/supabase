@@ -1,5 +1,5 @@
 import { useParams } from 'common/hooks'
-import { useSelectedProject } from 'hooks'
+import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { PROJECT_STATUS } from 'lib/constants'
 import { PropsWithChildren, createContext, useContext, useMemo } from 'react'
 import { Project } from 'types'
@@ -26,21 +26,14 @@ export const ProjectContextProvider = ({
   projectRef,
   children,
 }: PropsWithChildren<ProjectContextProviderProps>) => {
-  const selectedProject = useSelectedProject()
+  const { data: selectedProject, isLoading } = useProjectDetailQuery({ ref: projectRef })
 
   const value = useMemo<ProjectContextType>(() => {
-    if (selectedProject?.ref === projectRef) {
-      return {
-        project: selectedProject,
-        isLoading: false,
-      }
-    }
-
     return {
-      project: undefined,
-      isLoading: true,
+      project: selectedProject,
+      isLoading: isLoading,
     }
-  }, [selectedProject, projectRef])
+  }, [selectedProject, isLoading])
 
   return <ProjectContext.Provider value={value}>{children}</ProjectContext.Provider>
 }

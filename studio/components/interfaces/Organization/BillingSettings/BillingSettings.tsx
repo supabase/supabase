@@ -19,7 +19,7 @@ const BillingSettings = () => {
   const organization = useSelectedOrganization()
   const { data: allProjects } = useProjectsQuery()
   const projects =
-    allProjects?.filter((project) => project.organization_id == organization?.id) ?? []
+    allProjects?.filter((project) => project.organization_id === organization?.id) ?? []
 
   const [customer, setCustomer] = useState<any>(null)
   const [isLoadingCustomer, setIsLoadingCustomer] = useState(false)

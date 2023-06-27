@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
-import { FC, ReactNode, useEffect, useState } from 'react'
+import { PropsWithChildren, useEffect, useState } from 'react'
 
 import { useParams } from 'common'
 import Error from 'components/ui/Error'
@@ -9,12 +9,11 @@ import { useStore, withAuth } from 'hooks'
 import ProjectLayout from '../'
 import { generateAuthMenu } from './AuthLayout.utils'
 
-interface Props {
+export interface AuthLayoutProps {
   title?: string
-  children: ReactNode
 }
 
-const AuthLayout: FC<Props> = ({ title, children }) => {
+const AuthLayout = ({ title, children }: PropsWithChildren<AuthLayoutProps>) => {
   const { ui, meta } = useStore()
   const { isInitialized, isLoading, error } = meta.tables
   const { ref: projectRef = 'default' } = useParams()

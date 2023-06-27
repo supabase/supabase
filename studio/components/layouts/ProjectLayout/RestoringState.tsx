@@ -43,7 +43,7 @@ const RestoringState: FC<Props> = ({}) => {
   }
 
   const onConfirm = async () => {
-    if (!project) return
+    if (!project) return console.error('Project is required')
 
     setLoading(true)
     const projectDetail = await getProjectDetail({ ref: project?.ref })

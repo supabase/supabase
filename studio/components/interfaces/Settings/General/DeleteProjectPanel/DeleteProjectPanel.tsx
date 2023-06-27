@@ -1,14 +1,10 @@
-import { FC } from 'react'
-
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FormHeader } from 'components/ui/Forms'
 import Panel from 'components/ui/Panel'
 import { Alert } from 'ui'
 import DeleteProjectButton from './DeleteProjectButton'
 
-interface Props {}
-
-const DeleteProjectPanel: FC<Props> = ({}) => {
+const DeleteProjectPanel = () => {
   const { project } = useProjectContext()
 
   if (project === undefined) return null

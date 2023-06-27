@@ -12,11 +12,11 @@ import { getWithTimeout } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import { Project } from 'types'
 
-interface Props {
+export interface BuildingStateProps {
   project: Project
 }
 
-const BuildingState: FC<Props> = ({ project }) => {
+const BuildingState = ({ project }: BuildingStateProps) => {
   const queryClient = useQueryClient()
   const checkServerInterval = useRef<number>()
 

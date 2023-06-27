@@ -1,5 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Dictionary } from 'components/grid'
 import { isEqual } from 'lodash'
 import { useState } from 'react'
 import { Button, Form, Input, Listbox } from 'ui'
@@ -13,7 +12,7 @@ import { COUNTRIES } from './BillingAddress.constants'
 
 export interface BillingAddressProps {
   loading: boolean
-  address: Dictionary<any>
+  address: { [key: string]: any }
   onAddressUpdated: (address: any) => void
 }
 

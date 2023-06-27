@@ -13,9 +13,7 @@ import { API_URL } from 'lib/constants'
 import { pluckObjectFields } from 'lib/helpers'
 import { Input } from 'ui'
 
-interface Props {}
-
-const ConnectionPooling: FC<Props> = () => {
+const ConnectionPooling = () => {
   const { app } = useStore()
   const { project } = useProjectContext()
   const projectRef = project?.ref ?? 'default'

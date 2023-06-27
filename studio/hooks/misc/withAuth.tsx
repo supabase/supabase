@@ -30,7 +30,7 @@ export function withAuth<T>(
   const WithAuthHOC: ComponentType<T> = (props: any) => {
     const router = useRouter()
     const { basePath } = router
-    const { ref, slug } = useParams()
+    const { ref } = useParams()
     const rootStore = useStore()
     const { isLoading, session } = useAuth()
 
@@ -41,9 +41,6 @@ export function withAuth<T>(
     const redirectIfFound = options?.redirectIfFound
 
     usePermissionsQuery({
-      onSuccess(permissions) {
-        ui.setPermissions(permissions)
-      },
       onError(error: any) {
         ui.setNotification({
           error,
