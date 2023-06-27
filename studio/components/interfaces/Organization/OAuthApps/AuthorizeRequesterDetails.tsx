@@ -8,9 +8,9 @@ const AuthorizeRequesterDetails = ({ icon, name, domain }: AuthorizeRequesterDet
   return (
     <div className="flex space-x-4">
       <div>
-        <div className="rounded-md border border-scale-600 flex items-center">
+        <div className="flex items-center">
           <div
-            className="w-14 h-14 md:w-16 md:h-16 bg-center bg-no-repeat bg-cover flex items-center justify-center"
+            className="w-14 h-14 md:w-16 md:h-16 bg-center bg-no-repeat bg-cover flex items-center justify-center rounded-md border border-scale-600"
             style={{
               backgroundImage: icon !== null ? `url('${icon}')` : 'none',
             }}

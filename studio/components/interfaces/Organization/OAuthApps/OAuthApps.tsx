@@ -20,15 +20,29 @@ const OAuthApps = () => {
 
   const {
     data: publishedApps,
-    isLoading,
-    isSuccess,
-    isError,
+    isLoading: isLoadingPublishedApps,
+    isSuccess: isSuccessPublishedApps,
+    isError: isErrorPublishedApps,
   } = useOAuthAppsQuery({
     slug,
     type: 'published',
   })
 
   const sortedPublishedApps = publishedApps?.sort((a, b) => {
+    return Number(new Date(a.created_at)) - Number(new Date(b.created_at))
+  })
+
+  const {
+    data: authorizedApps,
+    isLoading: isLoadingAuthorizedApps,
+    isSuccess: isSuccessAuthorizedApps,
+    isError: isErrorAuthorizedApps,
+  } = useOAuthAppsQuery({
+    slug,
+    type: 'authorized',
+  })
+
+  const sortedAuthorizedApps = authorizedApps?.sort((a, b) => {
     return Number(new Date(a.created_at)) - Number(new Date(b.created_at))
   })
 
@@ -49,7 +63,7 @@ const OAuthApps = () => {
           </div>
 
           <div className="mt-4">
-            {isLoading && (
+            {isLoadingPublishedApps && (
               <div className="space-y-2">
                 <ShimmeringLoader />
                 <ShimmeringLoader className="w-3/4" />
@@ -57,7 +71,9 @@ const OAuthApps = () => {
               </div>
             )}
 
-            {isError && <AlertError subject="Unable to retrieve published OAuth apps" />}
+            {isErrorPublishedApps && (
+              <AlertError subject="Unable to retrieve published OAuth apps" />
+            )}
 
             {createdApp !== undefined && (
               <Alert withIcon variant="success" title="Successfully published a new application!">
@@ -100,7 +116,7 @@ const OAuthApps = () => {
               </Alert>
             )}
 
-            {isSuccess && (
+            {isSuccessPublishedApps && (
               <>
                 {(publishedApps?.length ?? 0) === 0 ? (
                   <div className="bg-scale-100 dark:bg-scale-300 border rounded p-4 flex items-center justify-between">
@@ -136,38 +152,36 @@ const OAuthApps = () => {
           </div>
         </div>
 
-        {/* <div>
+        <div>
           <p>Authorized Apps</p>
           <p className="text-scale-1000 text-sm">
             Applications that have access to your organization's settings and projects
           </p>
 
           <div className="mt-4">
-            {(authorizedApps?.length ?? 0) === 0 ? (
-              <div className="bg-scale-100 dark:bg-scale-300 border rounded p-4 flex items-center justify-between">
-                <p className="prose text-sm">You do not have any authorized applications yet</p>
+            {isLoadingAuthorizedApps && (
+              <div className="space-y-2">
+                <ShimmeringLoader />
+                <ShimmeringLoader className="w-3/4" />
+                <ShimmeringLoader className="w-1/2" />
               </div>
-            ) : (
-              <Table
-                className="mt-4"
-                head={[
-                  <Table.th key="name">Name</Table.th>,
-                  <Table.th key="clientId">Client ID</Table.th>,
-                  <Table.th key="clientSecret">Client Secret</Table.th>,
-                ]}
-                body={
-                  publishedApps?.map((app) => (
-                    <Table.tr key={app.id}>
-                      <Table.td>{app.name}</Table.td>
-                      <Table.td>{app.name}</Table.td>
-                      <Table.td>{app.name}</Table.td>
-                    </Table.tr>
-                  )) ?? []
-                }
-              />
+            )}
+
+            {isErrorAuthorizedApps && <AlertError subject="Unable to retrieve authorized apps" />}
+
+            {isSuccessAuthorizedApps && (
+              <>
+                {(authorizedApps.length ?? 0) === 0 ? (
+                  <div className="bg-scale-100 dark:bg-scale-300 border rounded p-4 flex items-center justify-between">
+                    <p className="prose text-sm">You do not have any authorized applications yet</p>
+                  </div>
+                ) : (
+                  <div></div>
+                )}
+              </>
             )}
           </div>
-        </div> */}
+        </div>
       </div>
 
       <PublishAppModal
