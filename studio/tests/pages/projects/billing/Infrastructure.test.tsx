@@ -6,8 +6,6 @@ beforeEach(() => {
   // reset mocks between tests
   ;(get as jest.Mock).mockReset()
   ;(get as jest.Mock).mockImplementation(async (_url: string) => {
-    console.log('url', _url)
-
     return [{ result: [] }]
   })
 })
