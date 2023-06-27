@@ -1933,6 +1933,11 @@ module.exports = [
 
   {
     permanent: true,
+    source: '/blog/tags/case-study',
+    destination: '/customers',
+  },
+  {
+    permanent: true,
     source: '/blog/case-study-monitoro',
     destination: '/customers',
   },
