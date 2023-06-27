@@ -8,13 +8,13 @@
   "workspaces": [
     "apps/www",
     "apps/docs",
-    "apps/new-docs",
     "studio",
     "tests",
     "packages/*"
   ],
   "scripts": {
     "build": "turbo run build",
+    "build:studio": "turbo run build --filter=studio",
     "dev": "turbo run dev --parallel",
     "dev:reference": "turbo run dev --filter=reference --parallel",
     "dev:studio": "turbo run dev --filter=studio --parallel",

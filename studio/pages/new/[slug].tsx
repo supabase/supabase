@@ -19,6 +19,7 @@ import Panel from 'components/ui/Panel'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions, useFlag, useStore, withAuth } from 'hooks'
 import { get, post } from 'lib/common/fetch'
 import {
@@ -71,6 +72,11 @@ const Wizard: NextPageWithLayout = () => {
   const currentOrg = organizations?.find((o: any) => o.slug === slug)
   const billedViaOrg = Boolean(currentOrg?.subscription_id)
 
+  const { data: orgSubscription } = useOrgSubscriptionQuery(
+    { orgSlug: slug },
+    { enabled: billedViaOrg }
+  )
+
   const [availableRegions, setAvailableRegions] = useState(
     getAvailableRegions(PROVIDERS[cloudProvider].id)
   )
@@ -84,8 +90,10 @@ const Wizard: NextPageWithLayout = () => {
 
   const showNonProdFields = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
 
-  const canCreateProject =
-    isAdmin && (!isSelectFreeTier || (isSelectFreeTier && !hasMembersExceedingFreeTierLimit))
+  const freePlanWithExceedingLimits =
+    (isSelectFreeTier || orgSubscription?.plan?.id === 'free') && hasMembersExceedingFreeTierLimit
+
+  const canCreateProject = isAdmin && !freePlanWithExceedingLimits
 
   const canSubmit =
     projectName !== '' &&
@@ -465,55 +473,57 @@ const Wizard: NextPageWithLayout = () => {
               </>
             )}
 
-            {isAdmin && !billedViaOrg && (
+            {isAdmin && (
               <Panel.Content>
-                <Listbox
-                  label="Pricing Plan"
-                  layout="horizontal"
-                  value={dbPricingTierKey}
-                  onChange={onDbPricingPlanChange}
-                  descriptionText={
-                    <>
-                      Select a plan that suits your needs.&nbsp;
-                      <a
-                        className="underline"
-                        target="_blank"
-                        rel="noreferrer"
-                        href="https://supabase.com/pricing"
-                      >
-                        More details
-                      </a>
-                      {!isSelectFreeTier && !isEmptyPaymentMethod && (
-                        <Alert
-                          title="Your payment method will be charged"
-                          variant="warning"
-                          withIcon
-                          className="mt-3"
+                {!billedViaOrg && (
+                  <Listbox
+                    label="Pricing Plan"
+                    layout="horizontal"
+                    value={dbPricingTierKey}
+                    onChange={onDbPricingPlanChange}
+                    descriptionText={
+                      <>
+                        Select a plan that suits your needs.&nbsp;
+                        <a
+                          className="underline"
+                          target="_blank"
+                          rel="noreferrer"
+                          href="https://supabase.com/pricing"
                         >
-                          <p>
-                            By creating a new Pro Project, there will be an immediate charge of $25
-                            once the project has been created.
-                          </p>
-                        </Alert>
-                      )}
-                    </>
-                  }
-                >
-                  {Object.entries(PRICING_TIER_LABELS).map(([k, v]) => {
-                    const label = `${v}${k === 'PRO' ? ' - $25/month' : ' - $0/month'}`
-                    return (
-                      <Listbox.Option key={k} label={label} value={k}>
-                        {label}
-                      </Listbox.Option>
-                    )
-                  })}
-                </Listbox>
+                          More details
+                        </a>
+                        {!isSelectFreeTier && !isEmptyPaymentMethod && (
+                          <Alert
+                            title="Your payment method will be charged"
+                            variant="warning"
+                            withIcon
+                            className="mt-3"
+                          >
+                            <p>
+                              By creating a new Pro Project, there will be an immediate charge of
+                              $25 once the project has been created.
+                            </p>
+                          </Alert>
+                        )}
+                      </>
+                    }
+                  >
+                    {Object.entries(PRICING_TIER_LABELS).map(([k, v]) => {
+                      const label = `${v}${k === 'PRO' ? ' - $25/month' : ' - $0/month'}`
+                      return (
+                        <Listbox.Option key={k} label={label} value={k}>
+                          {label}
+                        </Listbox.Option>
+                      )
+                    })}
+                  </Listbox>
+                )}
 
-                {isSelectFreeTier && hasMembersExceedingFreeTierLimit && (
+                {freePlanWithExceedingLimits && (
                   <FreeProjectLimitWarning membersExceededLimit={membersExceededLimit || []} />
                 )}
 
-                {!isSelectFreeTier && isEmptyPaymentMethod && (
+                {!billedViaOrg && !isSelectFreeTier && isEmptyPaymentMethod && (
                   <EmptyPaymentMethodWarning onPaymentMethodAdded={onPaymentMethodAdded} />
                 )}
               </Panel.Content>

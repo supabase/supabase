@@ -5,22 +5,20 @@ import { useEffect } from 'react'
 import { useParams } from 'common'
 import { StorageLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import StorageBucketsError from 'components/layouts/StorageLayout/StorageBucketsError'
 import { StorageExplorer } from 'components/to-be-cleaned/Storage'
+import { useBucketsQuery } from 'data/storage/buckets-query'
 import { useFlag } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
-import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import { NextPageWithLayout } from 'types'
 
-/**
- * PageLayout is used to setup layout - as usual it will requires inject global store
- */
 const PageLayout: NextPageWithLayout = () => {
   const { ref, bucketId } = useParams()
   const { project } = useProjectContext()
 
-  const storageStore = useStorageStore()
-  const { buckets, loaded } = storageStore
+  const { data, isSuccess, isError, error } = useBucketsQuery({ projectRef: ref })
+  const buckets = data ?? []
 
   const kpsEnabled = useFlag('initWithKps')
 
@@ -28,7 +26,7 @@ const PageLayout: NextPageWithLayout = () => {
     if (project && project.status === PROJECT_STATUS.INACTIVE) {
       post(`${API_URL}/projects/${ref}/restore`, { kps_enabled: kpsEnabled })
     }
-  }, [project])
+  }, [ref, project])
 
   if (!project) return <div></div>
 
@@ -36,7 +34,9 @@ const PageLayout: NextPageWithLayout = () => {
 
   return (
     <div className="storage-container flex flex-grow p-4">
-      {loaded ? (
+      {isError && <StorageBucketsError error={error as any} />}
+
+      {isSuccess ? (
         !bucket ? (
           <div className="flex h-full w-full items-center justify-center">
             <p className="text-sm text-scale-1100">Bucket {bucketId} cannot be found</p>

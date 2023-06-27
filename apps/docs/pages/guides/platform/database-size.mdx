@@ -44,9 +44,7 @@ Vacuum operations can temporarily increase resource utilization, which may adver
 </Admonition>
 
 Supabase projects have automatic vacuuming enabled, which ensures that these operations are performed regularly to keep the database healthy and performant.
-It is possible to [fine-tune](https://www.percona.com/blog/2018/08/10/tuning-autovacuum-in-postgresql-and-autovacuum-internals/)
-the [autovacuum parameters](https://www.enterprisedb.com/blog/postgresql-vacuum-and-analyze-best-practice-tips),
-or [manually initiate](https://www.postgresql.org/docs/current/sql-vacuum.html) vacuum operations.
+It is possible to [fine-tune](https://www.percona.com/blog/2018/08/10/tuning-autovacuum-in-postgresql-and-autovacuum-internals/) the [autovacuum parameters](https://www.enterprisedb.com/blog/postgresql-vacuum-and-analyze-best-practice-tips), or [manually initiate](https://www.postgresql.org/docs/current/sql-vacuum.html) vacuum operations.
 Running a manual vacuum after deleting large amounts of data from your DB could help reduce the database size reported by Postgres.
 
 ### Preoccupied Space
