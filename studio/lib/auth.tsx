@@ -8,9 +8,6 @@ import {
   gotrueClient,
   useTelemetryProps,
 } from 'common'
-import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useProfileCreateMutation } from 'data/profile/profile-create-mutation'
-import { useProfileQuery } from 'data/profile/profile-query'
 import { useStore } from 'hooks'
 import Telemetry from 'lib/telemetry'
 import { GOTRUE_ERRORS, IS_PLATFORM } from './constants'
@@ -56,37 +53,6 @@ export const AuthProvider = ({ children }: PropsWithChildren<{}>) => {
 
     return subscription.unsubscribe
   }, [])
-
-  const { mutate: createProfile } = useProfileCreateMutation({
-    async onSuccess() {
-      Telemetry.sendEvent(
-        { category: 'conversion', action: 'sign_up', label: '' },
-        telemetryProps,
-        router
-      )
-
-      await invalidateOrganizationsQuery(queryClient)
-    },
-    onError(err) {
-      ui.setNotification({
-        category: 'error',
-        message: 'Failed to create your profile. Please refresh to try again.',
-      })
-    },
-  })
-
-  // Track telemetry for the current user
-  useProfileQuery({
-    onSuccess(profile) {
-      Telemetry.sendIdentify(profile, telemetryProps)
-    },
-    onError(err) {
-      // if the user does not yet exist, create a profile for them
-      if (typeof err === 'object' && err !== null && 'code' in err && (err as any).code === 404) {
-        createProfile()
-      }
-    },
-  })
 
   return <AuthProviderInternal alwaysLoggedIn={!IS_PLATFORM}>{children}</AuthProviderInternal>
 }

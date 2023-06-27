@@ -3,24 +3,18 @@ import { AccountLayout } from 'components/layouts'
 import OrganizationDropdown from 'components/to-be-cleaned/Dropdown/OrganizationDropdown'
 import Connecting from 'components/ui/Loading/Loading'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useProfileQuery } from 'data/profile/profile-query'
 import { useAutoProjectsPrefetch } from 'data/projects/projects-query'
 import { IS_PLATFORM } from 'lib/constants'
+import { useProfile } from 'lib/profile'
 import { NextPageWithLayout } from 'types'
 
 const ProjectsPage: NextPageWithLayout = () => {
-  const {
-    data: organizations,
-    isLoading: _isLoading,
-    isSuccess: isOrganizationSuccess,
-  } = useOrganizationsQuery()
+  const { data: organizations, isLoading: isOrganizationLoading } = useOrganizationsQuery()
   useAutoProjectsPrefetch()
 
-  const { isSuccess: isProfileCreated, isLoading: isProfileLoading } = useProfileQuery()
+  const { isLoading: isProfileLoading } = useProfile()
 
-  // We'll continue the loading state if there's no organizations
-  // because we're waiting for the default organization to be created
-  const isLoading = _isLoading || isProfileLoading || !isOrganizationSuccess || !isProfileCreated
+  const isLoading = isOrganizationLoading || isProfileLoading
 
   return (
     <>

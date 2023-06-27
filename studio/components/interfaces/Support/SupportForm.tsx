@@ -1,7 +1,7 @@
 import { CLIENT_LIBRARIES } from 'common/constants'
 import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
-import { ChangeEvent, FC, useEffect, useRef, useState } from 'react'
+import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import {
   Button,
   Checkbox,
@@ -22,7 +22,6 @@ import InformationBox from 'components/ui/InformationBox'
 import Connecting from 'components/ui/Loading'
 import MultiSelect from 'components/ui/MultiSelect'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useProfileQuery } from 'data/profile/profile-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 import { useFlag, useStore } from 'hooks'
@@ -30,6 +29,7 @@ import useLatest from 'hooks/misc/useLatest'
 import { get, post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { detectBrowser } from 'lib/helpers'
+import { useProfile } from 'lib/profile'
 import { Project } from 'types'
 import DisabledStateForFreeTier from './DisabledStateForFreeTier'
 import { CATEGORY_OPTIONS, SERVICE_OPTIONS, SEVERITY_OPTIONS } from './Support.constants'
@@ -37,11 +37,11 @@ import { formatMessage, uploadAttachments } from './SupportForm.utils'
 
 const MAX_ATTACHMENTS = 5
 
-interface Props {
+export interface SupportFormProps {
   setSentCategory: (value: string) => void
 }
 
-const SupportForm: FC<Props> = ({ setSentCategory }) => {
+const SupportForm = ({ setSentCategory }: SupportFormProps) => {
   const { ui } = useStore()
   const { ref, subject, category, message } = useParams()
 
@@ -75,7 +75,7 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
     }
   }, [uploadedFiles])
 
-  const { data: profile } = useProfileQuery()
+  const { profile } = useProfile()
   const respondToEmail = profile?.primary_email ?? 'your email'
 
   if (!isInitialized) {

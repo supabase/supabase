@@ -8,9 +8,9 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
-import { useProfileQuery } from 'data/profile/profile-query'
 import { checkPermissions, useFlag, useSelectedOrganization, useStore } from 'hooks'
 import { uuidv4 } from 'lib/helpers'
+import { useProfile } from 'lib/profile'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { createSqlSnippetSkeleton } from '../SQLEditor/SQLEditor.utils'
 
@@ -25,7 +25,7 @@ const CommandMenuWrapper = ({ children }: PropsWithChildren<{}>) => {
   const allowCMDKDataOptIn = useFlag('dashboardCmdkDataOptIn')
   const isOptedInToAI = opt_in_tags?.includes('AI_SQL_GENERATOR_OPT_IN') ?? false
 
-  const { data: profile } = useProfileQuery()
+  const { profile } = useProfile()
   const { data: settings } = useProjectApiQuery({ projectRef: ref })
   const canCreateSQLSnippet = checkPermissions(PermissionAction.CREATE, 'user_content', {
     resource: { type: 'sql', owner_id: profile?.id },

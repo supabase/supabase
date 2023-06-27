@@ -8,10 +8,10 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import { createReport } from 'components/to-be-cleaned/Reports/Reports.utils'
 import Loading from 'components/ui/Loading'
-import { useProfileQuery } from 'data/profile/profile-query'
-import { checkPermissions, useFlag, useStore } from 'hooks'
+import { useCheckPermissions, useFlag, useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
+import { useProfile } from 'lib/profile'
 import { useProjectContentStore } from 'stores/projectContentStore'
 import { NextPageWithLayout } from 'types'
 
@@ -21,12 +21,12 @@ export const UserReportPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref } = useParams()
 
-  const { data: profile } = useProfileQuery()
+  const { profile } = useProfile()
   const { ui } = useStore()
   const { project } = useProjectContext()
 
   const contentStore = useProjectContentStore(ref)
-  const canCreateReport = checkPermissions(PermissionAction.CREATE, 'user_content', {
+  const canCreateReport = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
     resource: { type: 'report', owner_id: profile?.id },
     subject: { id: profile?.id },
   })

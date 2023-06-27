@@ -6,11 +6,11 @@ import { Button, IconCheckSquare, Loading } from 'ui'
 
 import { useParams } from 'common'
 import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useProfileQuery } from 'data/profile/profile-query'
 import { useStore } from 'hooks'
 import { useSignOut } from 'lib/auth'
 import { delete_, get, post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
+import { useProfile } from 'lib/profile'
 
 interface ITokenInfo {
   organization_name?: string | undefined
@@ -28,7 +28,7 @@ const JoinOrganizationPage = () => {
   const router = useRouter()
   const { slug, token, name } = useParams()
   const { ui } = useStore()
-  const { data: profile } = useProfileQuery()
+  const { profile } = useProfile()
   const signOut = useSignOut()
 
   const [isSubmitting, setIsSubmitting] = useState(false)
