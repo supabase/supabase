@@ -1,22 +1,23 @@
+import clsx from 'clsx'
 import Link from 'next/link'
+
+import { useParams } from 'common/hooks'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms'
+import { useProjectApiQuery } from 'data/config/project-api-query'
+import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
+import { uuidv4 } from 'lib/helpers'
 import {
   Button,
-  Listbox,
-  Input,
-  SidePanel,
-  IconTrash,
-  IconPlus,
   Dropdown,
   IconChevronDown,
+  IconPlus,
+  IconTrash,
+  Input,
+  Listbox,
+  SidePanel,
 } from 'ui'
-import { FormSection, FormSectionLabel, FormSectionContent } from 'components/ui/Forms'
 import { HTTPArgument } from './EditHookPanel'
-import { useStore } from 'hooks'
-import { useParams } from 'common/hooks'
-import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
-import clsx from 'clsx'
-import { uuidv4 } from 'lib/helpers'
-import { useProjectApiQuery } from 'data/config/project-api-query'
 
 interface HTTPRequestFieldsProps {
   type: 'http_request' | 'supabase_function'
@@ -43,7 +44,7 @@ const HTTPRequestFields = ({
   onUpdateParameter,
   onRemoveParameter,
 }: HTTPRequestFieldsProps) => {
-  const { ui } = useStore()
+  const { project: selectedProject } = useProjectContext()
   const { ref } = useParams()
   const { data: settings } = useProjectApiQuery({ projectRef: ref })
   const { data: functions } = useEdgeFunctionsQuery({ projectRef: ref })
@@ -100,7 +101,7 @@ const HTTPRequestFields = ({
           ) : type === 'supabase_function' && edgeFunctions.length > 0 ? (
             <Listbox id="http_url" name="http_url" label="Select which edge function to trigger">
               {edgeFunctions.map((fn) => {
-                const restUrl = ui.selectedProject?.restUrl
+                const restUrl = selectedProject?.restUrl
                 const restUrlTld = new URL(restUrl as string).hostname.split('.').pop()
                 const functionUrl = `https://${ref}.functions.supabase.${restUrlTld}/${fn.slug}`
 

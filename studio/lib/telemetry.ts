@@ -81,11 +81,11 @@ const sendActivity = (
     ...(projectRef && { projectRef }),
     ...(router.route.includes('/project/') &&
       !projectRef && {
-        projectRef: router.route.split('/project/')[1].split('/')[0],
+        projectRef: router.asPath.split('/project/')[1].split('/')[0],
       }),
     ...(orgId && { orgId }),
     ...(router.route.includes('/org/') &&
-      !orgId && { orgId: router.route.split('/org/')[1].split('/')[0] }),
+      !orgId && { orgId: router.asPath.split('/org/')[1].split('/')[0] }),
   }
   return post(`${API_URL}/telemetry/activity`, properties)
 }

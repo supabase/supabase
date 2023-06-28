@@ -253,3 +253,13 @@ export const detectOS = () => {
 export function pluralize(count: number, singular: string, plural?: string) {
   return count === 1 ? singular : plural || singular + 's'
 }
+
+export const isValidHttpUrl = (value: string) => {
+  let url: URL
+  try {
+    url = new URL(value)
+  } catch (_) {
+    return false
+  }
+  return url.protocol === 'http:' || url.protocol === 'https:'
+}

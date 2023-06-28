@@ -1,15 +1,12 @@
 import { ScaffoldDivider } from 'components/layouts/Scaffold'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
-import { useStore } from 'hooks'
-import { observer } from 'mobx-react-lite'
+import { useSelectedOrganization } from 'hooks'
 import Integration from './Integration'
 import SidePanelVercelProjectLinker from './SidePanelVercelProjectLinker'
 
 const IntegrationSettings = () => {
-  const { ui } = useStore()
-  const { data } = useOrgIntegrationsQuery({ orgSlug: ui.selectedOrganization?.slug })
-
-  const org = ui.selectedOrganization
+  const org = useSelectedOrganization()
+  const { data } = useOrgIntegrationsQuery({ orgSlug: org?.slug })
 
   const vercelIntegrations = data?.filter(
     (integration) => integration.integration.name === 'Vercel'
@@ -77,4 +74,4 @@ You can change the scope of the access for Supabase by configuring here.
   )
 }
 
-export default observer(IntegrationSettings)
+export default IntegrationSettings

@@ -11,10 +11,12 @@ import {
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
-import { Integration as TIntegration } from 'data/integrations/integrations.types'
 import { useIntegrationsVercelInstalledConnectionDeleteMutation } from 'data/integrations/integrations-vercel-installed-connection-delete-mutation'
-import { IntegrationProjectConnection } from 'data/integrations/integrations.types'
-import { useStore } from 'hooks'
+import {
+  IntegrationProjectConnection,
+  Integration as TIntegration,
+} from 'data/integrations/integrations.types'
+import { useSelectedOrganization } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import { pluralize } from 'lib/helpers'
 import { EMPTY_ARR } from 'lib/void'
@@ -40,7 +42,7 @@ const Integration = ({
 }: IntegrationProps) => {
   const snapshot = useGithubConnectionConfigPanelSnapshot()
 
-  const { ui } = useStore()
+  const selectedOrganization = useSelectedOrganization()
 
   const { mutate: deleteMutate, isLoading: isDeleteLoading } =
     useIntegrationsVercelInstalledConnectionDeleteMutation()
@@ -63,7 +65,7 @@ Repository connections for ${title?.toLowerCase()}
     const variables = {
       organization_integration_id: organizationIntegrationId,
       id: projectIntegrationId,
-      orgSlug: ui.selectedOrganization?.slug,
+      orgSlug: selectedOrganization?.slug,
     }
 
     deleteMutate(variables)

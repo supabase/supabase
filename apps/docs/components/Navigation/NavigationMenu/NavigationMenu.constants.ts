@@ -1062,6 +1062,10 @@ export const platform: NavMenuConstant = {
           url: '/guides/platform/troubleshooting',
         },
         {
+          name: 'High Disk IO Consumption',
+          url: '/guides/platform/exhaust-disk-io',
+        },
+        {
           name: 'High CPU Usage',
           url: '/guides/platform/exhaust-cpu',
         },

@@ -1,6 +1,5 @@
 import { useParams } from 'common'
-import { useStore } from 'hooks'
-import { observer } from 'mobx-react-lite'
+import { useFlag, useSelectedOrganization } from 'hooks'
 import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'
 import { Tabs } from 'ui'
@@ -8,19 +7,20 @@ import { AccountLayout } from './'
 import { ScaffoldContainer, ScaffoldDivider, ScaffoldHeader, ScaffoldTitle } from './Scaffold'
 
 const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
-  const { ui } = useStore()
+  const selectedOrganization = useSelectedOrganization()
   const router = useRouter()
   const { slug } = useParams()
   const id = router.asPath.split('/').at(-1)
+  const showOAuthApps = useFlag('oauthApps')
 
   return (
     <AccountLayout
-      title={ui.selectedOrganization?.name ?? 'Supabase'}
+      title={selectedOrganization?.name ?? 'Supabase'}
       breadcrumbs={[{ key: `org-settings`, label: 'Settings' }]}
     >
       <ScaffoldHeader>
         <ScaffoldContainer>
-          <ScaffoldTitle>{ui.selectedOrganization?.name ?? 'Organization'} settings</ScaffoldTitle>
+          <ScaffoldTitle>{selectedOrganization?.name ?? 'Organization'} settings</ScaffoldTitle>
         </ScaffoldContainer>
         <ScaffoldContainer>
           <nav>
@@ -38,6 +38,7 @@ const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
               <Tabs.Panel id="integrations" label="Integrations" className="!my-0" />
               <Tabs.Panel id="billing" label="Billing" className="!my-0" />
               <Tabs.Panel id="invoices" label="Invoices" className="!my-0" />
+              {showOAuthApps && <Tabs.Panel id="apps" label="OAuth Apps" className="!my-0" />}
             </Tabs>
           </nav>
         </ScaffoldContainer>
@@ -48,4 +49,4 @@ const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
   )
 }
 
-export default observer(OrganizationLayout)
+export default OrganizationLayout

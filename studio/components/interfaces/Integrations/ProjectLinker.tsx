@@ -1,12 +1,13 @@
+import { useState } from 'react'
+
 import { ENV_VAR_RAW_KEYS } from 'components/interfaces/Integrations/Integrations-Vercel.constants'
 import { Markdown } from 'components/interfaces/Markdown'
 import { vercelIcon } from 'components/to-be-cleaned/ListIcons'
 import { useIntegrationConnectionsCreateMutation } from 'data/integrations/integration-connections-create-mutation'
-import { IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { VercelProjectsResponse } from 'data/integrations/integrations-vercel-projects-query'
-import { useStore } from 'hooks'
+import { IntegrationProjectConnection } from 'data/integrations/integrations.types'
+import { useSelectedOrganization } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
-import { useState } from 'react'
 import { Button, Listbox, cn } from 'ui'
 
 interface Project {
@@ -35,7 +36,7 @@ const ProjectLinker = ({
   onCreateConnections: _onCreateConnections,
   installedConnections = [],
 }: ProjectLinkerProps) => {
-  const { ui } = useStore()
+  const selectedOrganization = useSelectedOrganization()
 
   const [supabaseProjectRef, setSupabaseProjectRef] = useState(UNDEFINED_SELECT_VALUE)
   const [vercelProjectId, setVercelProjectId] = useState(UNDEFINED_SELECT_VALUE)
@@ -69,7 +70,7 @@ const ProjectLinker = ({
           },
         },
       },
-      orgSlug: ui.selectedOrganization?.slug,
+      orgSlug: selectedOrganization?.slug,
     })
   }
 
