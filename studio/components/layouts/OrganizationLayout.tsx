@@ -12,6 +12,7 @@ const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
   const { slug } = useParams()
   const id = router.asPath.split('/').at(-1)
   const showOAuthApps = useFlag('oauthApps')
+  const showIntegrationsV2 = useFlag('integrationsV2')
 
   return (
     <AccountLayout
@@ -35,7 +36,9 @@ const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
             >
               <Tabs.Panel id="general" label="General" className="!my-0" />
               <Tabs.Panel id="team" label="Team" className="!my-0" />
-              <Tabs.Panel id="integrations" label="Integrations" className="!my-0" />
+              {showIntegrationsV2 && (
+                <Tabs.Panel id="integrations" label="Integrations" className="!my-0" />
+              )}
               <Tabs.Panel id="billing" label="Billing" className="!my-0" />
               <Tabs.Panel id="invoices" label="Invoices" className="!my-0" />
               {showOAuthApps && <Tabs.Panel id="apps" label="OAuth Apps" className="!my-0" />}
