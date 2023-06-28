@@ -40,7 +40,7 @@ const RevokeAppModal = ({ selectedApp, onClose }: RevokeAppModalProps) => {
       alignFooter="right"
       header={`Confirm to revoke ${selectedApp?.name}`}
       visible={selectedApp !== undefined}
-      loading={false} // [TO UPDATE]
+      loading={isDeleting}
       onCancel={onClose}
       onConfirm={onConfirmDelete}
     >
