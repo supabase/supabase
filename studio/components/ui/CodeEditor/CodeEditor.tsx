@@ -1,4 +1,4 @@
-import { FC, useEffect, useRef } from 'react'
+import { FC, useEffect, useRef, useCallback } from 'react'
 import Editor, { EditorProps } from '@monaco-editor/react'
 
 import { timeout } from 'lib/helpers'
@@ -41,7 +41,7 @@ const CodeEditor: FC<Props> = ({
     }
   }, [id])
 
-  const onMount = React.useCallback(async (editor: any, monaco: any) => {
+  const onMount = useCallback(async (editor: any, monaco: any) => {
     alignEditor(editor)
     editor.addAction({
       id: 'supabase',
@@ -60,7 +60,7 @@ const CodeEditor: FC<Props> = ({
     await timeout(500)
     editor?.focus()
     editorRef.current = editor
-  }, [editorRef?.current, onInputRun])
+  }, [onInputRun])
 
   const optionsMerged = merge(
     {

@@ -92,9 +92,6 @@ const Modal = ({
     setOpen(visible)
   }, [visible])
 
-  function stopPropagation(e: React.MouseEvent) {
-    e.stopPropagation()
-  }
 
   // let footerClasses = [ModalStyles['sbui-modal-footer']]
   if (footerBackground) {
@@ -144,7 +141,7 @@ const Modal = ({
       // un-controlled component behaviour
       setOpen(open)
     }
-  }, [(visible !== undefined && !open)])
+  }, [(visible !== undefined && !open), onCancel])
 
   return (
     <Dialog.Root open={open} onOpenChange={handleOpenChange}>
