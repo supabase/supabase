@@ -7,7 +7,7 @@ import { InvoicesSettings } from 'components/interfaces/Organization'
 import { OrganizationLayout } from 'components/layouts'
 import Loading from 'components/ui/Loading'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
-import { useSelectedOrganization } from 'hooks'
+import { useFlag, useSelectedOrganization } from 'hooks'
 import { NextPageWithLayout } from 'types'
 
 const OrgInvoices: NextPageWithLayout = () => {
@@ -15,6 +15,7 @@ const OrgInvoices: NextPageWithLayout = () => {
   const selectedOrganization = useSelectedOrganization()
   const { slug } = useParams()
   const router = useRouter()
+  const showOAuthApps = useFlag('oauthApps')
 
   return (
     <>
@@ -39,6 +40,7 @@ const OrgInvoices: NextPageWithLayout = () => {
                 <Tabs.Panel id="team" label="Team" />
                 <Tabs.Panel id="billing" label="Billing" />
                 <Tabs.Panel id="invoices" label="Invoices" />
+                {showOAuthApps && <Tabs.Panel id="apps" label="OAuth Apps" />}
               </Tabs>
             </nav>
           </div>

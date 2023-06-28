@@ -17,7 +17,7 @@ import { tryParseJson, uuidv4 } from 'lib/helpers'
 import { Button, Checkbox, Form, Input, Listbox, Modal, Radio, SidePanel } from 'ui'
 import HTTPRequestFields from './HTTPRequestFields'
 import { AVAILABLE_WEBHOOK_TYPES, HOOK_EVENTS } from './Hooks.constants'
-import { isValidHttpUrl } from './Hooks.utils'
+import { isValidHttpUrl } from 'lib/helpers'
 
 export interface EditHookPanelProps {
   visible: boolean
