@@ -7,7 +7,6 @@ import { ResponseError } from 'types'
 
 export type OAuthAppsVariables = {
   slug?: string
-  type?: 'published' | 'authorized'
 }
 
 export type OAuthApp = {
@@ -21,11 +20,10 @@ export type OAuthApp = {
   redirect_uris: string[]
 }
 
-export async function getOAuthApps({ slug, type }: OAuthAppsVariables, signal?: AbortSignal) {
+export async function getOAuthApps({ slug }: OAuthAppsVariables, signal?: AbortSignal) {
   if (!slug) throw new Error('Organization slug is required')
-  if (!type) throw new Error('App type is required')
 
-  const response = await get(`${API_ADMIN_URL}/organizations/${slug}/oauth/apps?type=${type}`, {
+  const response = await get(`${API_ADMIN_URL}/organizations/${slug}/oauth/apps?type=published`, {
     signal,
   })
   if (response.error) throw response.error
@@ -36,25 +34,25 @@ export type OAuthAppsData = Awaited<ReturnType<typeof getOAuthApps>>
 export type OAuthAppsError = ResponseError
 
 export const useOAuthAppsQuery = <TData = OAuthAppsData>(
-  { slug, type }: OAuthAppsVariables,
+  { slug }: OAuthAppsVariables,
   { enabled = true, ...options }: UseQueryOptions<OAuthAppsData, OAuthAppsError, TData> = {}
 ) =>
   useQuery<OAuthAppsData, OAuthAppsError, TData>(
-    oauthAppKeys.list(slug, type),
-    ({ signal }) => getOAuthApps({ slug, type }, signal),
+    oauthAppKeys.oauthApps(slug),
+    ({ signal }) => getOAuthApps({ slug }, signal),
     {
-      enabled: enabled && typeof slug !== 'undefined' && typeof type !== 'undefined',
+      enabled: enabled && typeof slug !== 'undefined',
       ...options,
     }
   )
 
-export const useOAuthAppsPrefetch = ({ slug, type }: OAuthAppsVariables) => {
+export const useOAuthAppsPrefetch = ({ slug }: OAuthAppsVariables) => {
   const client = useQueryClient()
 
   return useCallback(() => {
-    if (slug && type) {
-      client.prefetchQuery(oauthAppKeys.list(slug, type), ({ signal }) =>
-        getOAuthApps({ slug, type }, signal)
+    if (slug) {
+      client.prefetchQuery(oauthAppKeys.oauthApps(slug), ({ signal }) =>
+        getOAuthApps({ slug }, signal)
       )
     }
   }, [slug])

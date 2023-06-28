@@ -1,4 +1,4 @@
 export const oauthAppKeys = {
-  list: (slug: string | undefined, type: 'published' | 'authorized' | undefined) =>
-    ['oauth-apps', slug, type] as const,
+  oauthApps: (slug: string | undefined) => [slug, 'oauth-apps'] as const,
+  authorizedApps: (slug: string | undefined) => [slug, 'authorized-apps'] as const,
 }

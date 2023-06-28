@@ -10,6 +10,9 @@ import { Alert, Button, IconX, Input } from 'ui'
 import DeleteAppModal from './DeleteAppModal'
 import OAuthAppRow from './OAuthAppRow'
 import PublishAppModal from './PublishAppModal'
+import { AuthorizedApp, useAuthorizedAppsQuery } from 'data/oauth/authorized-apps-query'
+import AuthorizedAppRow from './AuthorizedAppRow'
+import RevokeAppModal from './RevokeAppModal'
 
 const OAuthApps = () => {
   const { slug } = useParams()
@@ -17,16 +20,14 @@ const OAuthApps = () => {
   const [showPublishModal, setShowPublishModal] = useState(false)
   const [selectedAppToUpdate, setSelectedAppToUpdate] = useState<OAuthApp>()
   const [selectedAppToDelete, setSelectedAppToDelete] = useState<OAuthApp>()
+  const [selectedAppToRevoke, setSelectedAppToRevoke] = useState<AuthorizedApp>()
 
   const {
     data: publishedApps,
     isLoading: isLoadingPublishedApps,
     isSuccess: isSuccessPublishedApps,
     isError: isErrorPublishedApps,
-  } = useOAuthAppsQuery({
-    slug,
-    type: 'published',
-  })
+  } = useOAuthAppsQuery({ slug })
 
   const sortedPublishedApps = publishedApps?.sort((a, b) => {
     return Number(new Date(a.created_at)) - Number(new Date(b.created_at))
@@ -37,13 +38,10 @@ const OAuthApps = () => {
     isLoading: isLoadingAuthorizedApps,
     isSuccess: isSuccessAuthorizedApps,
     isError: isErrorAuthorizedApps,
-  } = useOAuthAppsQuery({
-    slug,
-    type: 'authorized',
-  })
+  } = useAuthorizedAppsQuery({ slug })
 
   const sortedAuthorizedApps = authorizedApps?.sort((a, b) => {
-    return Number(new Date(a.created_at)) - Number(new Date(b.created_at))
+    return Number(new Date(a.authorized_at)) - Number(new Date(b.authorized_at))
   })
 
   return (
@@ -176,7 +174,24 @@ const OAuthApps = () => {
                     <p className="prose text-sm">You do not have any authorized applications yet</p>
                   </div>
                 ) : (
-                  <div></div>
+                  <Table
+                    className="mt-4"
+                    head={[
+                      <Table.th key="name">Name</Table.th>,
+                      <Table.th key="name">ID</Table.th>,
+                      <Table.th key="client-secret">Authorized at</Table.th>,
+                      <Table.th key="delete-action"></Table.th>,
+                    ]}
+                    body={
+                      sortedAuthorizedApps?.map((app) => (
+                        <AuthorizedAppRow
+                          key={app.id}
+                          app={app}
+                          onSelectRevoke={() => setSelectedAppToRevoke(app)}
+                        />
+                      )) ?? []
+                    }
+                  />
                 )}
               </>
             )}
@@ -196,6 +211,10 @@ const OAuthApps = () => {
       <DeleteAppModal
         selectedApp={selectedAppToDelete}
         onClose={() => setSelectedAppToDelete(undefined)}
+      />
+      <RevokeAppModal
+        selectedApp={selectedAppToRevoke}
+        onClose={() => setSelectedAppToRevoke(undefined)}
       />
     </>
   )
