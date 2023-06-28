@@ -4,5 +4,14 @@ import BillingSettings from './BillingSettings/BillingSettings'
 import InvoicesSettings from './InvoicesSettings/InvoicesSettings'
 import NewOrgForm from './NewOrg/NewOrgForm'
 import AuditLogs from './AuditLogs/AuditLogs'
+import OAuthApps from './OAuthApps/OAuthApps'
 
-export { GeneralSettings, TeamSettings, BillingSettings, InvoicesSettings, NewOrgForm, AuditLogs }
+export {
+  GeneralSettings,
+  TeamSettings,
+  BillingSettings,
+  InvoicesSettings,
+  NewOrgForm,
+  AuditLogs,
+  OAuthApps,
+}

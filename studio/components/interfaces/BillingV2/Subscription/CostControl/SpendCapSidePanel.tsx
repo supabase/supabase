@@ -11,6 +11,8 @@ import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { Alert, Button, Collapsible, IconChevronRight, IconExternalLink, SidePanel } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { pricing } from 'shared-data/pricing'
+import Telemetry from 'lib/telemetry'
+import { useRouter } from 'next/router'
 
 const SPEND_CAP_OPTIONS: {
   name: string
@@ -34,6 +36,7 @@ const SPEND_CAP_OPTIONS: {
 
 const SpendCapSidePanel = () => {
   const { ui } = useStore()
+  const router = useRouter()
   const { ref: projectRef } = useParams()
   const { isDarkMode } = useTheme()
 
@@ -58,6 +61,17 @@ const SpendCapSidePanel = () => {
   useEffect(() => {
     if (visible && subscription !== undefined) {
       setSelectedOption(isSpendCapOn ? 'on' : 'off')
+      Telemetry.sendActivity(
+        {
+          activity: 'Side Panel Viewed',
+          source: 'Dashboard',
+          data: {
+            title: 'Spend cap',
+            section: 'Cost Control',
+          },
+        },
+        router
+      )
     }
   }, [visible, isLoading, subscription, isSpendCapOn])
 
@@ -206,7 +220,21 @@ const SpendCapSidePanel = () => {
                   <div
                     key={option.value}
                     className={clsx('col-span-4 group space-y-1', isFreePlan && 'opacity-75')}
-                    onClick={() => !isFreePlan && setSelectedOption(option.value)}
+                    onClick={() => {
+                      !isFreePlan && setSelectedOption(option.value)
+                      Telemetry.sendActivity(
+                        {
+                          activity: 'Option Selected',
+                          source: 'Dashboard',
+                          data: {
+                            title: 'Spend cap',
+                            section: 'Cost Control',
+                            option: option.name,
+                          },
+                        },
+                        router
+                      )
+                    }}
                   >
                     <img
                       alt="Spend Cap"

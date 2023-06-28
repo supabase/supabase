@@ -1,29 +1,25 @@
 import Link from 'next/link'
-import { observer } from 'mobx-react-lite'
-import { IconAlertCircle } from 'ui'
 
-import { useStore } from 'hooks'
 import { useParams } from 'common/hooks'
-import { useProjectApiQuery } from 'data/config/project-api-query'
-import {
-  CustomDomainResponse,
-  useCustomDomainsQuery,
-} from 'data/custom-domains/custom-domains-query'
-import Panel from 'components/ui/Panel'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FormHeader } from 'components/ui/Forms'
+import Panel from 'components/ui/Panel'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
+import { useProjectApiQuery } from 'data/config/project-api-query'
+import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
+import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
+import { IconAlertCircle } from 'ui'
+import CustomDomainActivate from './CustomDomainActivate'
 import CustomDomainDelete from './CustomDomainDelete'
 import CustomDomainVerify from './CustomDomainVerify'
-import CustomDomainActivate from './CustomDomainActivate'
 import CustomDomainsConfigureHostname from './CustomDomainsConfigureHostname'
 import CustomDomainsShimmerLoader from './CustomDomainsShimmerLoader'
-import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 
 const CustomDomainConfig = () => {
-  const { ui } = useStore()
+  const { project } = useProjectContext()
   const { ref } = useParams()
 
-  const tier = ui.selectedProject?.subscription_tier
+  const tier = project?.subscription_tier
   const { isLoading: isSettingsLoading, data: settings } = useProjectApiQuery({
     projectRef: ref,
   })
@@ -103,4 +99,4 @@ const CustomDomainConfig = () => {
   )
 }
 
-export default observer(CustomDomainConfig)
+export default CustomDomainConfig
