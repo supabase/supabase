@@ -1,30 +1,31 @@
+import { useQueryClient } from '@tanstack/react-query'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { FC, useState } from 'react'
+import { useState } from 'react'
 import {
   Alert,
   Button,
   Form,
-  Modal,
-  IconPackage,
-  Listbox,
   IconAlertCircle,
   IconExternalLink,
+  IconPackage,
+  Listbox,
+  Modal,
 } from 'ui'
 
-import { useStore } from 'hooks'
 import { useParams } from 'common/hooks'
+import InformationBox from 'components/ui/InformationBox'
+import { useProjectUpgradeEligibilityQuery } from 'data/config/project-upgrade-eligibility-query'
+import { setProjectStatus } from 'data/projects/projects-query'
+import { useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_ADMIN_URL, PROJECT_STATUS } from 'lib/constants'
-import InformationBox from 'components/ui/InformationBox'
 import { BREAKING_CHANGES } from './ProjectUpgradeAlert.constants'
-import { useProjectUpgradeEligibilityQuery } from 'data/config/project-upgrade-eligibility-query'
 
-interface Props {}
-
-const ProjectUpgradeAlert: FC<Props> = ({}) => {
+const ProjectUpgradeAlert = () => {
+  const queryClient = useQueryClient()
   const router = useRouter()
-  const { app, ui } = useStore()
+  const { ui } = useStore()
   const { ref } = useParams()
   const [showUpgradeModal, setShowUpgradeModal] = useState(false)
 
@@ -38,6 +39,14 @@ const ProjectUpgradeAlert: FC<Props> = ({}) => {
   const onConfirmUpgrade = async (values: any, { setSubmitting }: any) => {
     setSubmitting(true)
 
+    if (!ref) {
+      ui.setNotification({
+        category: 'error',
+        message: 'Project ref not found',
+      })
+      return
+    }
+
     const res = await post(`${API_ADMIN_URL}/projects/${ref}/upgrade`, {
       target_version: values.version,
     })
@@ -49,12 +58,9 @@ const ProjectUpgradeAlert: FC<Props> = ({}) => {
       })
       setSubmitting(false)
     } else {
-      const projectId = ui.selectedProject?.id
-      if (projectId !== undefined) {
-        app.onProjectStatusUpdated(projectId, PROJECT_STATUS.UPGRADING)
-        ui.setNotification({ category: 'success', message: 'Upgrading project' })
-        router.push(`/project/${ref}?upgradeInitiated=true`)
-      }
+      setProjectStatus(queryClient, ref, PROJECT_STATUS.UPGRADING)
+      ui.setNotification({ category: 'success', message: 'Upgrading project' })
+      router.push(`/project/${ref}?upgradeInitiated=true`)
     }
   }
 

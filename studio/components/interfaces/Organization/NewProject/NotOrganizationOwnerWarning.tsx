@@ -13,7 +13,7 @@ const NotOrganizationOwnerWarning = () => {
         description={
           <div className="space-y-3">
             <p className="text-sm leading-normal">
-              Contact your organization owner or adminstrator to create a new project.
+              Contact your organization owner or administrator to create a new project.
             </p>
           </div>
         }
