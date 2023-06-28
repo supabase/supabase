@@ -1,20 +1,19 @@
-import { FC } from 'react'
-import { Badge, IconLoader, IconPauseCircle } from 'ui'
-
-import { Project } from 'types'
 import CardButton from 'components/ui/CardButton'
 import { PROJECT_STATUS } from 'lib/constants'
+import { Project } from 'types'
+import { Badge, IconLoader, IconPauseCircle } from 'ui'
 
-interface Props {
+export interface ProjectCardProps {
   project: Project
   rewriteHref?: string
 }
 
-const ProjectCard: FC<Props> = ({ project, rewriteHref }) => {
+const ProjectCard = ({ project, rewriteHref }: ProjectCardProps) => {
   const { name, ref: projectRef } = project
   const desc = `${project.cloud_provider} | ${project.region}`
 
-  const isPausing = project.status === PROJECT_STATUS.GOING_DOWN
+  const isPausing =
+    project.status === PROJECT_STATUS.GOING_DOWN || project.status === PROJECT_STATUS.PAUSING
   const isPaused = project.status === PROJECT_STATUS.INACTIVE
   const isRestoring = project.status === PROJECT_STATUS.RESTORING
 

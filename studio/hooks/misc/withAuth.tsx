@@ -2,13 +2,13 @@ import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { ComponentType, useEffect } from 'react'
 
-import { usePermissionsQuery } from 'data/permissions/permissions-query'
-import { useStore } from 'hooks'
 import { useParams } from 'common/hooks'
+import { usePermissionsQuery } from 'data/permissions/permissions-query'
+import { useSelectedProject, useStore } from 'hooks'
 import { useAuth } from 'lib/auth'
 import { IS_PLATFORM } from 'lib/constants'
-import { getReturnToPath, STORAGE_KEY } from 'lib/gotrue'
-import { isNextPageWithLayout, NextPageWithLayout } from 'types'
+import { STORAGE_KEY, getReturnToPath } from 'lib/gotrue'
+import { NextPageWithLayout, isNextPageWithLayout } from 'types'
 import Error500 from '../../pages/500'
 
 const PLATFORM_ONLY_PAGES = [
@@ -30,26 +30,17 @@ export function withAuth<T>(
   const WithAuthHOC: ComponentType<T> = (props: any) => {
     const router = useRouter()
     const { basePath } = router
-    const { ref, slug } = useParams()
+    const { ref } = useParams()
     const rootStore = useStore()
     const { isLoading, session } = useAuth()
 
-    const { app, ui } = rootStore
+    const { ui } = rootStore
     const page = router.pathname.split('/').slice(3).join('/')
 
     const redirectTo = options?.redirectTo ?? defaultRedirectTo(ref)
     const redirectIfFound = options?.redirectIfFound
 
-    useEffect(() => {
-      if (!app.organizations.isInitialized) app.organizations.load()
-      if (!app.projects.isInitialized) app.projects.load()
-    }, [app.organizations.isInitialized, app.projects.isInitialized])
-
     usePermissionsQuery({
-      enabled: IS_PLATFORM,
-      onSuccess(permissions) {
-        ui.setPermissions(permissions)
-      },
       onError(error: any) {
         ui.setNotification({
           error,
@@ -75,14 +66,12 @@ export function withAuth<T>(
       }
     }, [isRedirecting, redirectTo])
 
+    const selectedProject = useSelectedProject()
     useEffect(() => {
-      if (router.isReady) {
-        if (ref) {
-          rootStore.setProjectRef(ref)
-        }
-        rootStore.setOrganizationSlug(slug)
+      if (selectedProject) {
+        rootStore.setProject(selectedProject)
       }
-    }, [isLoading, router.isReady, ref, slug])
+    }, [selectedProject])
 
     if (!isLoading && !isRedirecting && !isLoggedIn) {
       return <Error500 />

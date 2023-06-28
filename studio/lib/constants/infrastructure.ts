@@ -38,6 +38,7 @@ export const PRICING_TIER_LABELS = {
 }
 
 export const PRICING_TIER_LABELS_ORG = {
+  FREE: 'Free - $0/month',
   PRO: 'Pro - $25/month',
   TEAM: 'Team - $599/month',
 }
@@ -53,7 +54,8 @@ export const PRICING_TIER_PRODUCT_IDS = {
 export const PRICING_TIER_FREE_KEY = 'FREE'
 export const PRICING_TIER_DEFAULT_KEY = 'FREE'
 
-export const DEFAULT_PROVIDER: CloudProvider = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod' ? 'FLY' : 'AWS'
+export const DEFAULT_PROVIDER: CloudProvider =
+  process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod' ? 'FLY' : 'AWS'
 
 export const PROVIDERS = {
   FLY: {
@@ -134,6 +136,7 @@ export const PROJECT_STATUS = {
   RESTORING: 'RESTORING',
   RESTORATION_FAILED: 'RESTORATION_FAILED',
   UPGRADING: 'UPGRADING',
+  PAUSING: 'PAUSING',
 }
 
 export const DEFAULT_MINIMUM_PASSWORD_STRENGTH = 4

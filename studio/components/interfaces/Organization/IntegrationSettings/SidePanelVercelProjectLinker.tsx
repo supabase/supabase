@@ -1,25 +1,20 @@
-import { useParams } from 'common'
 import ProjectLinker from 'components/interfaces/Integrations/ProjectLinker'
 import { Markdown } from 'components/interfaces/Markdown'
-import { Project } from 'data/config/project-api-query'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
 import { useVercelProjectConnectionsQuery } from 'data/integrations/integrations-vercel-installed-connections-query'
 import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { useStore } from 'hooks'
+import { useSelectedOrganization } from 'hooks'
 import { EMPTY_ARR } from 'lib/void'
-import { observer } from 'mobx-react-lite'
 import { useMemo } from 'react'
 import { useGithubConnectionConfigPanelSnapshot } from 'state/github-connection-config-panel'
 import { SidePanel } from 'ui'
 
 const SidePanelVercelProjectLinker = () => {
-  const { ui } = useStore()
-
-  const selectedOrg = ui.selectedOrganization
+  const selectedOrganization = useSelectedOrganization()
 
   const { data: integrationData } = useOrgIntegrationsQuery({
-    orgSlug: ui.selectedOrganization?.slug,
+    orgSlug: selectedOrganization?.slug,
   })
   const vercelIntegrations = integrationData?.filter(
     (integration) => integration.integration.name === 'Vercel'
@@ -49,10 +44,10 @@ const SidePanelVercelProjectLinker = () => {
   const supabaseProjects = useMemo(
     () =>
       supabaseProjectsData
-        ?.filter((project) => project.organization_id === selectedOrg?.id)
+        ?.filter((project) => project.organization_id === selectedOrganization?.id)
         .map((project) => ({ id: project.id.toString(), name: project.name, ref: project.ref })) ??
       EMPTY_ARR,
-    [selectedOrg?.id, supabaseProjectsData]
+    [selectedOrganization?.id, supabaseProjectsData]
   )
 
   const { data: vercelProjectConnectionsData } = useVercelProjectConnectionsQuery(
@@ -112,4 +107,4 @@ Check the details below before proceeding
   )
 }
 
-export default observer(SidePanelVercelProjectLinker)
+export default SidePanelVercelProjectLinker

@@ -1,12 +1,11 @@
-import { Markdown } from 'components/interfaces/Markdown'
-import { Integration, IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import dayjs from 'dayjs'
-import { useStore } from 'hooks'
-import { BASE_PATH } from 'lib/constants'
 import Image from 'next/image'
-
 import React from 'react'
 
+import { Markdown } from 'components/interfaces/Markdown'
+import { Integration, IntegrationProjectConnection } from 'data/integrations/integrations.types'
+import { useProjectsQuery } from 'data/projects/projects-query'
+import { BASE_PATH } from 'lib/constants'
 import { Badge, Button, IconArrowRight, IconGitHub, IconSquare, cn } from 'ui'
 
 const ICON_STROKE_WIDTH = 2
@@ -125,9 +124,8 @@ export interface IntegrationConnectionProps extends React.HTMLAttributes<HTMLLIE
 
 const IntegrationConnection = React.forwardRef<HTMLLIElement, IntegrationConnectionProps>(
   ({ className, connection, type, actions, ...props }, ref) => {
-    const { app } = useStore()
-
-    const { projects } = app
+    const { data: projects } = useProjectsQuery()
+    const project = projects?.find((project) => project.ref === connection.supabase_project_ref)
 
     return (
       <li
@@ -141,7 +139,7 @@ const IntegrationConnection = React.forwardRef<HTMLLIElement, IntegrationConnect
           <div className="flex flex-col gap-1">
             <div className="flex gap-2 items-center">
               <HandleIcon type={'Supabase'} />
-              <span>{projects.byId(connection.supabase_project_ref)?.name}</span>
+              <span>{project?.name}</span>
               <IconArrowRight size={14} className="text-scale-900" strokeWidth={1.5} />
               {!connection?.metadata?.framework ? (
                 <HandleIcon type={type} />
@@ -175,9 +173,9 @@ const IntegrationConnection = React.forwardRef<HTMLLIElement, IntegrationConnect
 
 const IntegrationConnectionOption = React.forwardRef<HTMLLIElement, IntegrationConnectionProps>(
   ({ className, connection, type, ...props }, ref) => {
-    const { app } = useStore()
+    const { data: projects } = useProjectsQuery()
+    const project = projects?.find((project) => project.ref === connection.supabase_project_ref)
 
-    const { projects } = app
     return (
       <li
         ref={ref}
@@ -188,7 +186,7 @@ const IntegrationConnectionOption = React.forwardRef<HTMLLIElement, IntegrationC
         <div className="flex flex-col gap-1">
           <div className="flex gap-2 items-center">
             <HandleIcon type={'Supabase'} />
-            <span>{projects.byId(connection.supabase_project_ref)?.name}</span>
+            <span>{project?.name}</span>
             <IconArrowRight size={14} className="text-scale-900" strokeWidth={1.5} />
             <HandleIcon type={type} />
             <span>{connection.metadata.name}</span>

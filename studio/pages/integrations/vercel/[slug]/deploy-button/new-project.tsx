@@ -15,7 +15,7 @@ import { Integration } from 'data/integrations/integrations.types'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectCreateMutation } from 'data/projects/project-create-mutation'
 import generator from 'generate-password'
-import { useStore } from 'hooks'
+import { useSelectedOrganization, useStore } from 'hooks'
 import { AWS_REGIONS, DEFAULT_MINIMUM_PASSWORD_STRENGTH, PROVIDERS } from 'lib/constants'
 import { passwordStrength } from 'lib/helpers'
 import { getInitialMigrationSQLFromGitHubRepo } from 'lib/integration-utils'
@@ -72,6 +72,7 @@ const CreateProject = ({
 }) => {
   const router = useRouter()
   const { ui } = useStore()
+  const selectedOrganization = useSelectedOrganization()
   const [projectName, setProjectName] = useState('')
   const [dbPass, setDbPass] = useState('')
   const [passwordStrengthMessage, setPasswordStrengthMessage] = useState('')
@@ -271,7 +272,7 @@ const CreateProject = ({
                 },
               },
             },
-            orgSlug: ui.selectedOrganization?.slug,
+            orgSlug: selectedOrganization?.slug,
           })
         } catch (error) {
           console.error('An error occurred during createConnections:', error)

@@ -1,17 +1,17 @@
-import { observer } from 'mobx-react-lite'
-
-import { NextPageWithLayout } from 'types'
-import { useStore } from 'hooks'
-import Loading from 'components/ui/Loading'
-import { OrganizationLayout } from 'components/layouts'
 import { InvoicesSettings } from 'components/interfaces/Organization'
+import { OrganizationLayout } from 'components/layouts'
+import Loading from 'components/ui/Loading'
+import { usePermissionsQuery } from 'data/permissions/permissions-query'
+import { useSelectedOrganization } from 'hooks'
+import { NextPageWithLayout } from 'types'
 
 const OrgInvoices: NextPageWithLayout = () => {
-  const { ui } = useStore()
+  const { data: permissions } = usePermissionsQuery()
+  const selectedOrganization = useSelectedOrganization()
 
   return (
     <>
-      {ui.selectedOrganization === undefined && (ui?.permissions ?? []).length === 0 ? (
+      {selectedOrganization === undefined && (permissions ?? []).length === 0 ? (
         <Loading />
       ) : (
         <InvoicesSettings />
@@ -22,4 +22,4 @@ const OrgInvoices: NextPageWithLayout = () => {
 
 OrgInvoices.getLayout = (page) => <OrganizationLayout>{page}</OrganizationLayout>
 
-export default observer(OrgInvoices)
+export default OrgInvoices
