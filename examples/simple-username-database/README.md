@@ -17,7 +17,7 @@ To get started with the project, follow these steps:
 
 1. Clone the repository from GitHub:
    ```
-   git clone https://github.com/preetsuthar17/supabase-gemo.git
+   git clone <repo/examples/link>
    ```
 2. Navigate to the project directory:
    ```
@@ -30,7 +30,7 @@ To get started with the project, follow these steps:
 
 ## Configuration
 
-Before running the project, you need to configure the Supabase URL and key in the `index.js` file. Open the `index.js` file and locate the following lines:
+Before running the project, you need to configure the Supabase URL and key in the `index.js file. Open the `index.js` file and locate the following lines:
 
 ```javascript
 const supabaseUrl = "{your_supabase_url}";
@@ -44,11 +44,11 @@ Once the project is set up, you can run it using the following command:
 
 ```shell
 node index.js
+```
 
 [![Demo Vid]()](https://github.com/preetsuthar17/supabase-demo/assets/75468116/b5e88f63-525c-4211-8c50-b46e198d4632)
 
-
-![image](https://github.com/preetsuthar17/supabase-demo/assets/75468116/12f5a4e2-8a42-4b65-80d5-ede9161d6c0c)
+<img src="./demo.png" alt="demo" > 
 
 
 When executed, the code will prompt you to enter your username. Please provide your username as instructed, and it will be saved in the Supabase database table named "usernames".
