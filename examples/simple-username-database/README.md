@@ -2,7 +2,7 @@
 
 # Supabase Project Documentation
 
-This documentation provides an overview of a JavaScript project that utilizes Supabase for the database. The project allows users to enter their username.It is an open-source project created by [preetsuthar17](https://github.com/preetsuthar17) and can be found on [GitHub](https://github.com/preetsuthar17).
+This documentation provides an overview of a JavaScript project that utilizes Supabase for the database. The project allows users to enter their username.
 
 ## Prerequisites
 > Setup your Supabase SQL before continuing this work.
