@@ -8,7 +8,13 @@ import { analyticsKeys } from './keys'
 
 export type InfraMonitoringVariables = {
   projectRef?: string
-  attribute: 'cpu_usage' | 'disk_io_budget' | 'ram_usage' | 'disk_io_consumption' | 'swap_usage'
+  attribute:
+    | 'max_cpu_usage'
+    | 'avg_cpu_usage'
+    | 'disk_io_budget'
+    | 'ram_usage'
+    | 'disk_io_consumption'
+    | 'swap_usage'
   startDate?: string
   endDate?: string
   interval?: '1m' | '5m' | '10m' | '30m' | '1h' | '1d'
