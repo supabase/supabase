@@ -3,17 +3,16 @@ import { observer } from 'mobx-react-lite'
 import { Tabs } from 'ui'
 
 import { NextPageWithLayout } from 'types'
-import { useFlag, useStore } from 'hooks'
+import { useStore } from 'hooks'
 import { useParams } from 'common/hooks'
 import Loading from 'components/ui/Loading'
 import { OrganizationLayout } from 'components/layouts'
-import { BillingSettings } from 'components/interfaces/Organization'
+import { OAuthApps } from 'components/interfaces/Organization'
 
-const OrgBillingSettings: NextPageWithLayout = () => {
+const OrgOAuthApps: NextPageWithLayout = () => {
   const { ui } = useStore()
   const { slug } = useParams()
   const router = useRouter()
-  const showOAuthApps = useFlag('oauthApps')
 
   return (
     <>
@@ -31,22 +30,22 @@ const OrgBillingSettings: NextPageWithLayout = () => {
               <Tabs
                 size="small"
                 type="underlined"
-                activeId="billing"
+                activeId="apps"
                 onChange={(id: any) => {
-                  if (id !== 'billing') router.push(`/org/${slug}/${id}`)
+                  if (id !== 'apps') router.push(`/org/${slug}/${id}`)
                 }}
               >
                 <Tabs.Panel id="general" label="General" />
                 <Tabs.Panel id="team" label="Team" />
                 <Tabs.Panel id="billing" label="Billing" />
                 <Tabs.Panel id="invoices" label="Invoices" />
-                {showOAuthApps && <Tabs.Panel id="apps" label="OAuth Apps" />}
+                <Tabs.Panel id="apps" label="OAuth Apps" />
               </Tabs>
             </nav>
           </div>
 
           <div className="mb-8">
-            <BillingSettings />
+            <OAuthApps />
           </div>
         </div>
       )}
@@ -54,5 +53,5 @@ const OrgBillingSettings: NextPageWithLayout = () => {
   )
 }
 
-OrgBillingSettings.getLayout = (page) => <OrganizationLayout>{page}</OrganizationLayout>
-export default observer(OrgBillingSettings)
+OrgOAuthApps.getLayout = (page) => <OrganizationLayout>{page}</OrganizationLayout>
+export default observer(OrgOAuthApps)
