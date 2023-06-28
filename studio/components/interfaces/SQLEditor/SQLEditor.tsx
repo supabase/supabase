@@ -1,13 +1,15 @@
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
+import { useLocalStorage } from 'hooks'
+import useLatest from 'hooks/misc/useLatest'
+import { detectOS } from 'lib/helpers'
 import { useCallback, useRef } from 'react'
 import Split from 'react-split'
 import { getSqlEditorStateSnapshot, useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
-import useLatest from 'hooks/misc/useLatest'
+import { AiIcon, IconCornerDownLeft, Input } from 'ui'
 import MonacoEditor, { IStandaloneCodeEditor } from './MonacoEditor'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
-import { useLocalStorage } from 'hooks'
 
 const SQLEditor = () => {
   const { ref, id } = useParams()
@@ -66,8 +68,41 @@ const SQLEditor = () => {
     }
   }, [isExecuting, project])
 
+  const os = detectOS()
+
   return (
     <div className="flex h-full flex-col">
+      <Input
+        size="xlarge"
+        icon={<AiIcon className="w-4 h-4 ml-1" />}
+        inputClassName="bg-transparent rounded-none focus:border-brand-900"
+        iconContainerClassName="transition text-scale-800 peer-focus/input:text-brand-900"
+        placeholder="Generate & edit SQL using Supabase AI..."
+        actions={
+          <div className="flex items-center space-x-1 mr-6">
+            {os === 'macos' ? (
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M3 5H7.76472L16.2353 19H21M16.2353 5H21"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="square"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            ) : (
+              <p className="text-xs text-scale-1100">ALT</p>
+            )}
+            <IconCornerDownLeft size={16} strokeWidth={1.5} />
+          </div>
+        }
+      />
       <Split
         style={{ height: '100%' }}
         direction="vertical"
@@ -91,7 +126,6 @@ const SQLEditor = () => {
             />
           )}
         </div>
-
         <div className="flex flex-col">
           {isLoading ? (
             <div className="flex h-full w-full items-center justify-center">Loading...</div>
