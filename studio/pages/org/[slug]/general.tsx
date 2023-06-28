@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite'
 import { Tabs } from 'ui'
 
 import { NextPageWithLayout } from 'types'
-import { useStore } from 'hooks'
+import { useFlag, useStore } from 'hooks'
 import { useParams } from 'common/hooks'
 import Loading from 'components/ui/Loading'
 import { OrganizationLayout } from 'components/layouts'
@@ -13,6 +13,7 @@ const OrgGeneralSettings: NextPageWithLayout = () => {
   const { ui } = useStore()
   const { slug } = useParams()
   const router = useRouter()
+  const showOAuthApps = useFlag('oauthApps')
 
   return (
     <>
@@ -39,6 +40,7 @@ const OrgGeneralSettings: NextPageWithLayout = () => {
                 <Tabs.Panel id="team" label="Team" />
                 <Tabs.Panel id="billing" label="Billing" />
                 <Tabs.Panel id="invoices" label="Invoices" />
+                {showOAuthApps && <Tabs.Panel id="apps" label="OAuth Apps" />}
               </Tabs>
             </nav>
           </div>
