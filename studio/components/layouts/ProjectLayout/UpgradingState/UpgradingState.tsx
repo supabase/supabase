@@ -1,42 +1,44 @@
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { DatabaseUpgradeStatus } from '@supabase/shared-types/out/events'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import { useState } from 'react'
-import * as Tooltip from '@radix-ui/react-tooltip'
 import {
   Button,
-  IconCircle,
-  IconCheckCircle,
-  IconSettings,
   IconAlertCircle,
-  IconLoader,
   IconCheck,
+  IconCheckCircle,
+  IconCircle,
+  IconLoader,
   IconMaximize2,
   IconMinimize2,
+  IconSettings,
 } from 'ui'
-import { DatabaseUpgradeStatus } from '@supabase/shared-types/out/events'
 
-import { useStore } from 'hooks'
 import { useParams } from 'common/hooks'
-import { IS_PLATFORM } from 'lib/constants'
-import { DATABASE_UPGRADE_MESSAGES } from './UpgradingState.constants'
 import { useProjectUpgradingStatusQuery } from 'data/config/project-upgrade-status-query'
+import { getProjectDetail } from 'data/projects/project-detail-query'
+import { useStore } from 'hooks'
+import { IS_PLATFORM } from 'lib/constants'
+import { useProjectContext } from '../ProjectContext'
+import { DATABASE_UPGRADE_MESSAGES } from './UpgradingState.constants'
 
 const UpgradingState = () => {
   const { ref } = useParams()
-  const { app, ui, meta } = useStore()
+  const { meta } = useStore()
+  const { project } = useProjectContext()
   const [loading, setLoading] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
   const { data } = useProjectUpgradingStatusQuery(
     {
       projectRef: ref,
-      projectStatus: ui.selectedProject?.status,
+      projectStatus: project?.status,
     },
     {
       enabled: IS_PLATFORM,
     }
   )
 
-  const project = ui.selectedProject
   const { initiated_at, status, progress, target_version, error } =
     data?.databaseUpgradeStatus ?? {}
   const progressStage = Number((progress || '').split('_')[0])
@@ -51,7 +53,11 @@ const UpgradingState = () => {
 
   const refetchProjectDetails = async () => {
     setLoading(true)
-    await app.projects.fetchDetail(project?.ref ?? '', (project) => meta.setProjectDetails(project))
+
+    const projectDetail = await getProjectDetail({ ref })
+    if (projectDetail) {
+      meta.setProjectDetails(projectDetail)
+    }
   }
 
   const subject = 'Upgrade%20failed%20for%20project'

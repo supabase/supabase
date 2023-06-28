@@ -1,15 +1,16 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe } from '@stripe/stripe-js'
+import { useCallback, useEffect, useState } from 'react'
+
+import { useTheme } from 'common'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useStore } from 'hooks'
+import { useSelectedOrganization, useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL, STRIPE_PUBLIC_KEY } from 'lib/constants'
-import { useCallback, useEffect, useState } from 'react'
 import { useIsHCaptchaLoaded } from 'stores/hcaptcha-loaded-store'
 import { Modal } from 'ui'
 import AddNewPaymentMethodForm from './AddNewPaymentMethodForm'
-import { useTheme } from 'common'
 
 // [Joshen] Directly brought over from old Billing folder, so we can deprecate that folder easily next time
 
@@ -66,10 +67,12 @@ const AddNewPaymentMethodModal = ({
     captchaRef?.resetCaptcha()
   }
 
+  const selectedOrganization = useSelectedOrganization()
+
   const setupIntent = async (hcaptchaToken: string | undefined) => {
     setIntent(undefined)
 
-    const orgSlug = ui.selectedOrganization?.slug ?? ''
+    const orgSlug = selectedOrganization?.slug ?? ''
     const intent = await post(`${API_URL}/organizations/${orgSlug}/payments/setup-intent`, {
       hcaptchaToken,
     })

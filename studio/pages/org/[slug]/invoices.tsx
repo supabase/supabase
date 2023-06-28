@@ -1,32 +1,33 @@
 import { useRouter } from 'next/router'
-import { observer } from 'mobx-react-lite'
 import { Tabs } from 'ui'
 
-import { NextPageWithLayout } from 'types'
-import { useFlag, useStore } from 'hooks'
 import { useParams } from 'common/hooks'
-import Loading from 'components/ui/Loading'
-import { OrganizationLayout } from 'components/layouts'
 import { InvoicesSettings } from 'components/interfaces/Organization'
+import { OrganizationLayout } from 'components/layouts'
+import Loading from 'components/ui/Loading'
+import { usePermissionsQuery } from 'data/permissions/permissions-query'
+import { useFlag, useSelectedOrganization } from 'hooks'
+import { NextPageWithLayout } from 'types'
 
 const OrgInvoices: NextPageWithLayout = () => {
-  const { ui } = useStore()
   const { slug } = useParams()
   const router = useRouter()
 
+  const { isLoading: isLoadingPermissions } = usePermissionsQuery()
+  const selectedOrganization = useSelectedOrganization()
+
+  const showOAuthApps = useFlag('oauthApps')
   const showAuditLogs = useFlag('auditLogs')
 
   return (
     <>
-      {ui.selectedOrganization === undefined && (ui?.permissions ?? []).length === 0 ? (
+      {selectedOrganization === undefined && isLoadingPermissions ? (
         <Loading />
       ) : (
         <div className="p-4 pt-0">
           <div className="space-y-3">
             <section className="mt-4">
-              <h1 className="text-3xl">
-                {ui.selectedOrganization?.name ?? 'Organization'} settings
-              </h1>
+              <h1 className="text-3xl">{selectedOrganization?.name ?? 'Organization'} settings</h1>
             </section>
             <nav>
               <Tabs
@@ -41,6 +42,7 @@ const OrgInvoices: NextPageWithLayout = () => {
                 <Tabs.Panel id="team" label="Team" />
                 <Tabs.Panel id="billing" label="Billing" />
                 <Tabs.Panel id="invoices" label="Invoices" />
+                {showOAuthApps && <Tabs.Panel id="apps" label="OAuth Apps" />}
                 {showAuditLogs && <Tabs.Panel id="audit" label="Audit Logs" />}
               </Tabs>
             </nav>
@@ -56,4 +58,4 @@ const OrgInvoices: NextPageWithLayout = () => {
 }
 
 OrgInvoices.getLayout = (page) => <OrganizationLayout>{page}</OrganizationLayout>
-export default observer(OrgInvoices)
+export default OrgInvoices

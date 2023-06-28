@@ -3,120 +3,288 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   id: 'auth-google',
   title: 'Login with Google',
-  description: 'Add Google OAuth to your Supabase project',
+  description: 'Use Sign in with Google on the web, in native apps or with Chrome extensions',
 }
 
-To enable Google Auth for your project, you need to set up a Google OAuth application and add the application credentials to your Supabase Dashboard.
+Supabase Auth supports Sign in with Google on the web, native Android applications and Chrome extensions.
 
 ## Overview
 
-Setting up Google logins for your application consists of 3 parts:
+To support Sign in with Google you need to configure the [Google provider in the Supabase dashboard](https://supabase.com/dashboard/project/_/auth/providers) for your project.
 
-- Create and configure a Google Project on the [Google Cloud Platform Console](https://console.cloud.google.com/home/dashboard)
-- Add your Google OAuth keys to your [Supabase Project](https://app.supabase.com)
-- Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js)
+There are three general ways to use Sign in with Google, depending on the application you're building:
 
-## Access your Google Cloud Platform account
+- Sign in on the web or in web-based apps
+  - Using an OAuth flow initiated by Supabase Auth using [Google Identity Authorization with OAuth 2.0 for Web Server Applications](https://developers.google.com/identity/protocols/oauth2/web-server).
+  - Using a [personalized sign-in button](https://developers.google.com/identity/gsi/web/guides/personalized-button) or [One Tap](https://developers.google.com/identity/gsi/web/guides/display-google-one-tap) and [automatic sign-in](https://developers.google.com/identity/gsi/web/guides/automatic-sign-in-sign-out) for users already logged in to their Google account.
+- Sign in in native Android apps and Chrome extensions
 
-- Go to [cloud.google.com](https://cloud.google.com).
-- Click on `Sign in` at the top right to log in.
+In some cases you're able to use the OAuth flow within web-based native apps such as with React Native, Expo or other similar frameworks. It is best practice to use native Sign in with Google capabilities whenever possible.
 
-![Google Developer Portal.](/docs/img/guides/auth-google/google-portal.png)
+Before you can use Sign in with Google, you need to obtain a [Google Cloud Platform](https://console.cloud.google.com/home/dashboard) account and have a project ready or create a new one.
 
-## Create a Google Cloud Platform Project
+## Using the OAuth flow for the web
 
-- Click on `Select a Project` at the top left.
-  - (Or, if a project is currently selected, click on the current project name at the top left.)
-- Click `New Project` at the top right.
-- Fill in your app information, then click `Create`.
-  - (This can take a few minutes.)
-- This should bring you to the dashboard for your new project.
+Sign in with Google's OAuth flow is designed for web or browser based sign in methods. It can be used in web-based apps as well as in websites, though sometimes it is worthwhile considering using One Tap login directly.
 
-## Create the OAuth Keys for your project
+Behind the scenes, Supabase Auth uses the [Google OAuth 2.0 APIs](https://developers.google.com/identity/openid-connect/openid-connect), which are OpenID Connect certified, to perform the authentication.
 
-From your project's dashboard screen:
+To initiate sign in, you can use the `signInWithOAuth()` method from the Supabase JavaScript library:
 
-- In the search bar at the top labeled `Search products and resources` type `OAuth`.
-- Click on `OAuth consent screen` from the list of results.
-- On the `OAuth consent screen` page select `External`.
-- Click `Create`.
-
-## Edit your app information
-
-- On the `Edit app registration` page fill out your app information.
-- Click `Save and continue` at the bottom.
-
-## Find your callback URL
-
-<SocialProviderSetup provider="Google" />
-
-## Create your Google credentials
-
-- Click `Credentials` at the left to go to the `Credentials` page on the Google Cloud Platform console.
-- Click `Create Credentials` near the top then select `OAuth client ID`
-- On the `Create OAuth client ID` page, select your application type. If you're not sure, choose `Web application`.
-- Fill in your app name.
-- At the bottom, under `Authorized redirect URIs` click `Add URI`.
-- Enter your callback URI under `Authorized redirect URIs` at the bottom.
-- Enter your callback URI in the `Valid OAuth Redirect URIs` box.
-- Click `Save Changes` at the bottom right.
-- Click `Create`.
-
-Copy your new OAuth credentials
-
-- A box will appear called `OAuth client created`.
-- Copy and save the values under `Your Client ID` and `Your Client Secret`.
-
-## Enter your Google credentials into your Supabase Project
-
-<SocialProviderSettingsSupabase provider="Google" />
-
-## Add login code to your client app
-
-When your user signs in, call [signInWithOAuth()](/docs/reference/javascript/auth-signinwithoauth) with `google` as the `provider`:
-
-```js
-async function signInWithGoogle() {
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: 'google',
-  })
-}
+```ts
+supabase.auth.signInWithOAuth({
+  provider: 'google',
+})
 ```
 
-You can view the full list of query parameters and their descriptions [here](https://developers.google.com/identity/protocols/oauth2/web-server#creatingclient).
+This call takes the user to Google's consent screen. When the flow ends, the user's profile information is exchanegd and validated with Supabase Auth before it redirects back to your web application with an access and refresh token representing the user's session.
 
-When your user signs out, call [signOut()](/docs/reference/javascript/auth-signout) to remove them from the browser session and any objects from localStorage:
+You can additionally extract the `provider_token` from the session (on initial login only) which is the OAuth 2.0 access token issued by Google that grants your application access to the Google services for the authenticated users. Please store this token in local storage, cookies or in your database or server.
 
-```js
-async function signout() {
-  const { error } = await supabase.auth.signOut()
-}
-```
+Google does not send out a refresh token by default, so you will need to pass parameters like these to `signInWithOAuth()` in order to extract the `provider_refresh_token`:
 
-## Obtain the provider refresh token
-
-Google OAuth2.0 doesn't return the `provider_refresh_token` by default. If you need the `provider_refresh_token` returned, you will need to add additional query parameters:
-
-```js
-async function signInWithGoogle() {
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: 'google',
-    options: {
-      queryParams: {
-        access_type: 'offline',
-        prompt: 'consent',
-        hd: 'domain.com', // google will also allow OAuth logins to be restricted to a specified domain using the 'hd' parameter
-      },
+```ts
+const { data, error } = await supabase.auth.signInWithOAuth({
+  provider: 'google',
+  options: {
+    queryParams: {
+      access_type: 'offline',
+      prompt: 'consent',
     },
+  },
+})
+```
+
+### Configuration
+
+To use the OAuth 2.0 flow, you will require the following information:
+
+1. Obtain OAuth credentials for your Google Cloud project in the [Credentials](https://console.developers.google.com/apis/credentials) page of the console. When creating a new credential, choose _Web application_. In _Authorized redirect URIs_ enter `https://<project-id>.supabase.co/auth/v1/callback`. This URL will be seen by your users, and you can customize it by configuring [custom domains](/docs/guides/platform/custom-domains).
+2. Configure the [OAuth Consent Screen](https://console.cloud.google.com/apis/credentials/consent). This information is shown to the user when giving consent to your app. Within _Authorized domains_ make sure you add your Supabase project's domain `<project-id>.supabase.co`. Configure the non-sensitive scopes by making sure the following ones are selected: `.../auth/userinfo.email`, `.../auth/userinfo.profile`, `openid`. If you're selecting other sensitive scopes, your app may require additional verification. In those cases, it's best to use [custom domains](/docs/guides/platform/custom-domains).
+3. Finally, add the client ID and secret from step 1 in the [Google provider on the Supabase Dashboard](https://supabase.com/dashboard/project/_/auth/providers).
+
+## Using native sign in
+
+Unlike the OAuth flow which requires the use of a web browser, the native Sign in with Google flow on Android uses the [operating system's built-in functionalities](https://developers.google.com/android/reference/com/google/android/gms/auth/api/identity/package-summary) to prompt the user for consent. Note that native sign-in has been rebranded as _One Tap sign-in on Android_ by Google, which you should not confuse with _One Tap sign in for web_, as mentioned below.
+
+When the user provides consent, Google issues an identity token (commonly abbreviated as ID token) that is then sent to your project's Supabase Auth server. When valid, a new user session is started by issuing an access and refresh token from Supabase Auth.
+
+If you are building a Flutter app, you can use [flutter_appauth](https://pub.dev/packages/flutter_appauth) package to sign a user into your Supabase project:
+
+````dart
+import 'package:crypto/crypto.dart';
+import 'package:flutter_appauth/flutter_appauth.dart';
+
+// Generate a random string
+final rawNonce = generateRandomString();
+final hashedNonce = sha256.convert(utf8.encode(rawNonce)).toString();
+
+// Your registered Google client ID here.
+// This will be different for iOS and Android
+const clientId = 'YOUR_GOODLE_CLIENT_ID';
+
+// bundle ID for iOS, package name for Android here
+final packageName = 'io.supabase.example';
+
+/// fixed for google login
+final redirectUrl = '$packageName:/google_auth';
+
+/// fixed for google login
+const discoveryUrl =
+    'https://accounts.google.com/.well-known/openid-configuration';
+
+final appAuth = FlutterAppAuth();
+
+// authorize the user by opening the concent page
+final result = await appAuth.authorize(
+  AuthorizationRequest(
+    clientId,
+    redirectUrl,
+    discoveryUrl: discoveryUrl,
+    nonce: hashedNonce,
+    scopes: [
+      'openid',
+      'email',
+    ],
+  ),
+);
+
+if (result == null) {
+  throw AuthException(
+      'Could not find AuthorizationResponse after authorizing');
+}
+
+// Request the access and id token to google
+final tokenResponse = await appAuth.token(
+  TokenRequest(
+    clientId,
+    redirectUrl,
+    authorizationCode: result.authorizationCode,
+    discoveryUrl: discoveryUrl,
+    codeVerifier: result.codeVerifier,
+    nonce: result.nonce,
+    scopes: [
+      'openid',
+      'email',
+    ],
+  ),
+);
+
+final idToken = tokenResponse?.idToken;
+
+if (idToken == null) {
+  throw AuthException('Could not find idToken from the token response');
+}
+
+await signInWithIdToken(
+  provider: Provider.google,
+  idToken: idToken,
+  accessToken: tokenResponse?.accessToken,
+  nonce: rawNonce,
+);```
+
+In the Supabase JavaScript library, which you can use with web-based native frameworks like React Native or Expo, you can invoke this functionality like so:
+
+```ts
+await supabase.auth.signInWithIdToken({
+  provider: 'google',
+  token: '<identity token received from the OS>',
+  access_token: '<access token received from the OS>'
+})
+````
+
+Please take a look at these open-source projects which may help you obtain an ID token directly from the OS:
+
+- [react-native-google-signin/google-signin](https://github.com/react-native-google-signin/google-signin).
+
+For apps written in Kotlin, please consult the [community maintained library](/docs/reference/kotlin/introduction).
+
+### Configuration
+
+1. Configure OAuth credentials for your Google Cloud project in the [Credentials](https://console.cloud.google.com/apis/credentials) page of the console. When creating a new OAuth client ID, choose _Android_ or _iOS_ depending on the mobile operating system your app is built for.
+
+- For Android, use the instructions on screen to provide the SHA-1 certificate fingerprint used to sign your Android app.
+- For iOS, use the instructions on screen to provide the app Bundle ID, and App Store ID and Team ID if the app is already published on the Apple AppStore.
+
+2. Configure the [OAuth Consent Screen](https://console.cloud.google.com/apis/credentials/consent). This information is shown to the user when giving consent to your app. In particular, make sure you have set up links to your app's privacy policy and terms of service.
+3. Finally, add the client ID from step 1 in the [Google provider on the Supabase Dashboard](https://supabase.com/dashboard/project/_/auth/providers), under _Authorized Client IDs_.
+
+Note that you do not have to configure the OAuth flow in the Supabase Dashboard in order to use native sign in.
+
+## Using native sign in for Chrome extensions
+
+Similar to the native sign in for Android, you can use the Chrome browser's [identity APIs](https://developer.chrome.com/docs/extensions/reference/identity/) to launch an authentication flow.
+
+First, you need to configure your `manifest.json` file like so:
+
+```json
+{
+  "permissions": ["identity"],
+  "oauth2": {
+    "client_id": "<client ID>",
+    "scopes": ["openid", "email", "profile"]
+  }
+}
+```
+
+Then you should call the [`chrome.identity.launchWebAuthFlow()`](https://developer.chrome.com/docs/extensions/reference/identity/#method-launchWebAuthFlow) function to trigger the sign in flow. On success, call the `supabase.auth.signInWithIdToken()` function to complete sign in with your Supabase project.
+
+```ts
+const manifest = chrome.runtime.getManifest()
+
+const url = new URL('https://accounts.google.com/o/oauth2/auth')
+
+url.searchParams.set('client_id', manifest.oauth2.client_id)
+url.searchParams.set('response_type', 'id_token')
+url.searchParams.set('access_type', 'offline')
+url.searchParams.set('redirect_uri', `https://${chrome.runtime.id}.chromiumapp.org`)
+url.searchParams.set('scope', manifest.oauth2.scopes.join(' '))
+
+chrome.identity.launchWebAuthFlow(
+  {
+    url: url.href,
+    interactive: true,
+  },
+  async (redirectedTo) => {
+    if (chrome.runtime.lastError) {
+      // auth was not successful
+    } else {
+      // auth was successful, extract the ID token from the redirectedTo URL
+      const url = new URL(redirectedTo)
+      const params = new URLSearchParams(url.hash)
+
+      const { data, error } = await supabase.auth.signInWithIdToken({
+        provider: 'google',
+        token: params.get('id_token'),
+      })
+    }
+  }
+)
+```
+
+### Configuration
+
+You will need to configure a client ID for your Chrome extension:
+
+1. Configure OAuth credentials for your Google Cloud project in the [Credentials](https://console.cloud.google.com/apis/credentials) page of the console. When creating a new OAuth client ID, choose _Chrome extension_ for the application type. For _Item ID_ provide the unique ID of your Chrome extension. You can get this by calling `chrome.runtime.id` within the extension, or from the Web Store URL of the extension. For example, the [Google Translate extension](https://chrome.google.com/webstore/detail/google-translate/aapbdbdomjkkjkaonfhkkikfgjllcleb) has the Web Store URL `https://chrome.google.com/webstore/detail/google-translate/aapbdbdomjkkjkaonfhkkikfgjllcleb` and the last part `aapbdbdomjkkjkaonfhkkikfgjllcleb` is its unique ID.
+2. Configure the [OAuth Consent Screen](https://console.cloud.google.com/apis/credentials/consent). This information is shown to the user when giving consent to your app.
+3. Finally, add the client ID from step 1 in the [Google provider on the Supabase Dashboard](https://supabase.com/dashboard/project/_/auth/providers), under _Authorized Client IDs_.
+
+Note that you do not have to configure the OAuth flow in the Supabase Dashboard to sign in with Google inside Chrome extensions.
+
+## Using personalized sign-in buttons, One Tap or automatic sign-in
+
+Most web apps and websites can utilize Google's [personalized sign-in buttons](https://developers.google.com/identity/gsi/web/guides/personalized-button), [One Tap](https://developers.google.com/identity/gsi/web/guides/features) or [automatic sign-in](https://developers.google.com/identity/gsi/web/guides/automatic-sign-in-sign-out) for the best user experience.
+
+Under the hood, these sign in methods end with an identity token being issued by [Sign in with Google for Web](https://developers.google.com/identity/gsi/web/guides/overview). You can then use the `supabase.auth.signInWithIdToken()` method to immediately issue an access and refresh tokens for the user, without needing to build any additional UIs or flows.
+
+To get started, you can use the [HTML Code Generator](https://developers.google.com/identity/gsi/web/tools/configurator) to customize the look, feel, features and behavior of the Sign in with Google button. Make sure you pick the _Swap to JavaScript callback_ option and name the function that will receive a [`CredentialResponse`](https://developers.google.com/identity/gsi/web/reference/js-reference#CredentialResponse) when sign in completes.
+
+For example, this HTML code shows a typical Sign in with Google button:
+
+```html
+<div
+  id="g_id_onload"
+  data-client_id="<client ID>"
+  data-context="signin"
+  data-ux_mode="popup"
+  data-callback="handleSignInWithGoogle"
+  data-nonce=""
+  data-auto_select="true"
+  data-itp_support="true"
+></div>
+
+<div
+  class="g_id_signin"
+  data-type="standard"
+  data-shape="pill"
+  data-theme="outline"
+  data-text="signin_with"
+  data-size="large"
+  data-logo_alignment="left"
+></div>
+```
+
+When the user signs in, the `handleSignInWithGoogle` function will be called:
+
+```ts
+async function handleSignInWithGoogle(response) {
+  const { data, error } = await supabase.auth.signInWithIdToken({
+    token: response.credential,
+    nonce: 'NONCE', // must be the same one as provided in data-nonce (if any)
   })
 }
 ```
 
-## Resources
+Use of nonce is recommended, though optional. Make sure each nonce is generated randomly and available both in the `data-nonce` attribute as well as in the `handleSignInWithGoogle` callback function; otherwise the ID token will not be accepted.
 
-- [Supabase Account - Free Plan OK](https://supabase.com)
-- [Supabase JS Client](https://github.com/supabase/supabase-js)
-- [Google Cloud Platform Console](https://console.cloud.google.com/home/dashboard)
+### Configuration
+
+1. Obtain OAuth credentials for your Google Cloud project in the [Credentials](https://console.developers.google.com/apis/credentials) page of the console. When creating a new credential, choose _Web application_. As you're using the Google sign in button, you should configure the _Authorized JavaScript origins_ and _Authorized redirect URIs_ to the website where the buttons appear. You should not use your Supabase project domain name. For this use case, the client secret provided is not needed and can be ignored.
+2. Configure the [OAuth Consent Screen](https://console.cloud.google.com/apis/credentials/consent). This information is shown to the user when giving consent to your app. In particular, make sure you have set up links to your app's privacy policy and terms of service.
+3. Finally, add the client ID from step 1 in the [Google provider on the Supabase Dashboard](https://supabase.com/dashboard/project/_/auth/providers) under _Authorized Client IDs_.
+
+Note that you do not have to configure the OAuth flow client ID and secret in the Supabae Dashboard when using this approach!
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
