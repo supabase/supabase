@@ -75,6 +75,11 @@ test('datepicker onChange will return ISO string of selected dates', async () =>
   userEvent.click(await screen.findByText('Apply'))
   expect(mockFn).toBeCalled()
   const call = mockFn.mock.calls[0][0]
-  expect(call.to).not.toMatch('T12')
-  expect(call.from).not.toMatch('T00')
+  if (Intl.DateTimeFormat().resolvedOptions().timeZone.toLowerCase() == 'etc/utc') {
+    expect(call.to).toMatch('T12')
+    expect(call.from).toMatch('T00')
+  } else {
+    expect(call.to).not.toMatch('T12')
+    expect(call.from).not.toMatch('T00')
+  }
 })
