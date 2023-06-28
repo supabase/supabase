@@ -3,7 +3,7 @@ import { useCallback, useRef } from 'react'
 
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { Project } from 'types'
+import { Project, ResponseError } from 'types'
 import { projectKeys } from './keys'
 
 export type ProjectsVariables = {
@@ -17,7 +17,7 @@ export async function getProjects(signal?: AbortSignal) {
 }
 
 export type ProjectsData = Awaited<ReturnType<typeof getProjects>>
-export type ProjectsError = unknown
+export type ProjectsError = ResponseError
 
 export const useProjectsQuery = <TData = ProjectsData>({
   enabled = true,

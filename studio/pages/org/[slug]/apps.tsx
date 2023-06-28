@@ -1,30 +1,30 @@
-import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
+import { useRouter } from 'next/router'
 import { Tabs } from 'ui'
 
-import { NextPageWithLayout } from 'types'
-import { useStore } from 'hooks'
 import { useParams } from 'common/hooks'
-import Loading from 'components/ui/Loading'
-import { OrganizationLayout } from 'components/layouts'
 import { OAuthApps } from 'components/interfaces/Organization'
+import { OrganizationLayout } from 'components/layouts'
+import Loading from 'components/ui/Loading'
+import { usePermissionsQuery } from 'data/permissions/permissions-query'
+import { useSelectedOrganization } from 'hooks'
+import { NextPageWithLayout } from 'types'
 
 const OrgOAuthApps: NextPageWithLayout = () => {
-  const { ui } = useStore()
   const { slug } = useParams()
   const router = useRouter()
+  const selectedOrganization = useSelectedOrganization()
+  const { isLoading: isLoadingPermissions } = usePermissionsQuery()
 
   return (
     <>
-      {ui.selectedOrganization === undefined && (ui?.permissions ?? []).length === 0 ? (
+      {selectedOrganization === undefined && isLoadingPermissions ? (
         <Loading />
       ) : (
         <div className="p-4 pt-0">
           <div className="space-y-3">
             <section className="mt-4">
-              <h1 className="text-3xl">
-                {ui.selectedOrganization?.name ?? 'Organization'} settings
-              </h1>
+              <h1 className="text-3xl">{selectedOrganization?.name ?? 'Organization'} settings</h1>
             </section>
             <nav>
               <Tabs

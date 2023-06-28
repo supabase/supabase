@@ -66,8 +66,16 @@ const OrganizationProjects = ({
   const isEmpty = !projects || projects.length === 0
   const canReadProjects = useCheckPermissions(PermissionAction.READ, 'projects', undefined, id)
 
-  const { isLoading: isLoadingProjects, isError: isErrorProjects } = useProjectsQuery()
-  const { isLoading: _isLoadingPermissions } = usePermissionsQuery()
+  const {
+    isLoading: isLoadingProjects,
+    isError: isErrorProjects,
+    error: projectsError,
+  } = useProjectsQuery()
+  const {
+    isLoading: _isLoadingPermissions,
+    isError: isErrorPermissions,
+    error: permissionsError,
+  } = usePermissionsQuery()
   const isLoadingPermissions = IS_PLATFORM ? _isLoadingPermissions : false
 
   return (
@@ -96,9 +104,19 @@ const OrganizationProjects = ({
         </ul>
       ) : (
         <ul className="mx-auto grid grid-cols-1 gap-4 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
-          {isErrorProjects ? (
+          {isErrorPermissions ? (
             <div className="col-span-3">
-              <AlertError subject={`Unable to retrieve projects under ${name}`} />
+              <AlertError
+                subject="Unable to retrieve permissions for your account"
+                error={permissionsError}
+              />
+            </div>
+          ) : isErrorProjects ? (
+            <div className="col-span-3">
+              <AlertError
+                subject={`Unable to retrieve projects under ${name}`}
+                error={projectsError}
+              />
             </div>
           ) : !canReadProjects ? (
             <div className="col-span-4 space-y-4 rounded-lg border-2 border-dashed border-gray-300 py-8 px-6 text-center">
