@@ -25,7 +25,11 @@ const SSLConfiguration = () => {
   const sslEnforcement = useFlag('sslEnforcement')
 
   const { data: projectSettings } = useProjectSettingsQuery({ projectRef: ref })
-  const { data: sslEnforcementConfiguration, isLoading } = useSSLEnforcementQuery({
+  const {
+    data: sslEnforcementConfiguration,
+    isLoading,
+    isSuccess,
+  } = useSSLEnforcementQuery({
     projectRef: ref,
   })
   const { mutateAsync: updateSSLEnforcement } = useSSLEnforcementUpdateMutation()
@@ -94,7 +98,7 @@ const SSLConfiguration = () => {
                     <p className="text-sm text-scale-1000">
                       Reject non-SSL connections to your database
                     </p>
-                    {!sslEnforcementConfiguration?.appliedSuccessfully && (
+                    {isSuccess && !sslEnforcementConfiguration?.appliedSuccessfully && (
                       <Alert
                         withIcon
                         variant="warning"
