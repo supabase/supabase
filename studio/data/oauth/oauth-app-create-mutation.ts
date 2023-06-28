@@ -54,7 +54,7 @@ export const useOAuthAppCreateMutation = ({
     {
       async onSuccess(data, variables, context) {
         const { slug } = variables
-        await queryClient.invalidateQueries(oauthAppKeys.list(slug, 'published'))
+        await queryClient.invalidateQueries(oauthAppKeys.oauthApps(slug))
         await onSuccess?.(data, variables, context)
       },
       ...options,
