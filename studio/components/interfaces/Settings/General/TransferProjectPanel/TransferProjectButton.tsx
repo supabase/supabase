@@ -2,6 +2,7 @@ import { FC, useEffect, useMemo, useState } from 'react'
 import {
   Alert,
   Button,
+  IconAlertCircle,
   IconLoader,
   IconShield,
   IconTool,
@@ -27,14 +28,10 @@ const TransferProjectButton: FC<{}> = () => {
   const projectOrgId = project?.organization_id
   const { data: allOrganizations } = useOrganizationsQuery()
 
-  const organizations = useMemo(
-    () =>
-      (allOrganizations || [])
-        .filter((it) => it.id !== projectOrgId)
-        // Only orgs with org-level subscription
-        .filter((it) => it.subscription_id),
-    [allOrganizations, projectOrgId]
-  )
+  const organizations = (allOrganizations || [])
+    .filter((it) => it.id !== projectOrgId)
+    // Only orgs with org-level subscription
+    .filter((it) => it.subscription_id)
 
   const [isOpen, setIsOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -143,7 +140,7 @@ const TransferProjectButton: FC<{}> = () => {
       >
         <div className="space-y-4 py-4 text-scale-1100">
           <Modal.Content>
-            <p className='text-sm'>
+            <p className="text-sm">
               To transfer projects, the owner must be a member of both the source and target
               organizations.
             </p>
@@ -189,29 +186,37 @@ const TransferProjectButton: FC<{}> = () => {
             </ul>
           </Modal.Content>
           <Modal.Content>
-            {organizations.length > 0 && (
+            {organizations && (
               <div className="mt-8 mx-4 border-t pt-4 space-y-2">
-                <Listbox
-                  label="Select Target Organization"
-                  layout="vertical"
-                  value={selectedOrg}
-                  onChange={(slug) => setSelectedOrg(slug)}
-                  placeholder="Select Organization"
-                >
-                  <Listbox.Option disabled key="no-results" label="Select Organization" value="">
-                    Select Organization
-                  </Listbox.Option>
-                  {organizations.map((x: any) => (
-                    <Listbox.Option
-                      key={x.id}
-                      label={x.name}
-                      value={x.slug}
-                      addOnBefore={() => <IconUsers />}
-                    >
-                      {x.name}
+                {organizations.length === 0 ? (
+                  <div className="flex items-center gap-2 bg-scale-400 p-3 text-sm">
+                    <IconAlertCircle /> You do not have any organizations with an organization-level
+                    subscription.
+                  </div>
+                ) : (
+                  <Listbox
+                    label="Select Target Organization"
+                    layout="vertical"
+                    value={selectedOrg}
+                    onChange={(slug) => setSelectedOrg(slug)}
+                    placeholder="Select Organization"
+                  >
+                    <Listbox.Option disabled key="no-results" label="Select Organization" value="">
+                      Select Organization
                     </Listbox.Option>
-                  ))}
-                </Listbox>
+                    {organizations.map((x: any) => (
+                      <Listbox.Option
+                        key={x.id}
+                        label={x.name}
+                        value={x.slug}
+                        addOnBefore={() => <IconUsers />}
+                      >
+                        {x.name}
+                      </Listbox.Option>
+                    ))}
+                  </Listbox>
+                )}
+
                 <p className="text-scale-1000 text-sm">
                   The target organization needs to use{' '}
                   <Link href="https://www.notion.so/supabase/Organization-Level-Billing-9c159d69375b4af095f0b67881276582?pvs=4">
@@ -219,7 +224,7 @@ const TransferProjectButton: FC<{}> = () => {
                       organization-level-billing
                     </a>
                   </Link>
-                  . If you're looking to migrate an organization to the new billing, head to your{' '}
+                  . To migrate an organization to the new billing, head to your{' '}
                   <Link href="/org/_/general">
                     <a target="_blank" rel="noreferrer" className="underline">
                       organizations settings
@@ -287,7 +292,12 @@ const TransferProjectButton: FC<{}> = () => {
                   </div>
                 )}
                 {transferPreviewData && transferPreviewData.warnings.length > 0 && (
-                  <Alert withIcon variant="warning" title="Warnings for project transfer" className='mt-3'>
+                  <Alert
+                    withIcon
+                    variant="warning"
+                    title="Warnings for project transfer"
+                    className="mt-3"
+                  >
                     <div className="space-y-1">
                       {transferPreviewData.warnings.map((warning) => (
                         <p key={warning.key}>{warning.message}</p>
