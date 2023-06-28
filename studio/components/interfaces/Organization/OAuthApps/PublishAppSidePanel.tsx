@@ -10,7 +10,7 @@ import { useOAuthAppUpdateMutation } from 'data/oauth/oauth-app-update-mutation'
 import { OAuthApp } from 'data/oauth/oauth-apps-query'
 import { useStore } from 'hooks'
 import { isValidHttpUrl, uuidv4 } from 'lib/helpers'
-import { Badge, Button, Dropdown, Form, IconEdit, IconUpload, Input, Modal } from 'ui'
+import { Badge, Button, Dropdown, Form, IconEdit, IconUpload, Input, Modal, SidePanel } from 'ui'
 import { uploadAttachment } from 'lib/upload'
 import AuthorizeRequesterDetails from './AuthorizeRequesterDetails'
 
@@ -157,8 +157,9 @@ const PublishAppModal = ({
 
   return (
     <>
-      <Modal
+      <SidePanel
         hideFooter
+        size="large"
         visible={visible}
         header={
           selectedApp !== undefined ? 'Update OAuth application' : 'Publish a new OAuth application'
@@ -167,6 +168,7 @@ const PublishAppModal = ({
       >
         <Form
           validateOnBlur
+          className="h-full"
           initialValues={{ name: '', website: '' }}
           validate={validate}
           onSubmit={onSubmit}
@@ -193,130 +195,134 @@ const PublishAppModal = ({
 
             return (
               <>
-                <div>
-                  <Modal.Content>
-                    <div className="py-4 flex items-start justify-between gap-10">
-                      <div className="space-y-4 w-full">
-                        <Input
-                          id="name"
-                          label="Application name"
-                          descriptionText={selectedApp?.id && `ID: ${selectedApp.id}`}
-                        />
-                        <Input
-                          id="website"
-                          label="Website URL"
-                          placeholder="https://my-website.com"
-                        />
-                      </div>
-                      <div>
-                        {iconUrl !== undefined ? (
-                          <div
-                            className={clsx(
-                              'shadow transition group relative',
-                              'bg-center bg-cover bg-no-repeat',
-                              'mt-4 mr-4 space-y-2 rounded-full h-[120px] w-[120px] flex flex-col items-center justify-center'
-                            )}
-                            style={{
-                              backgroundImage: iconUrl ? `url("${iconUrl}")` : 'none',
-                            }}
-                          >
-                            <div className="absolute bottom-1 right-1">
-                              <Dropdown
-                                size="tiny"
-                                align="end"
-                                side="bottom"
-                                overlay={[
-                                  <Dropdown.Item
-                                    key="upload"
-                                    onClick={() => {
-                                      if (uploadButtonRef.current)
-                                        (uploadButtonRef.current as any).click()
-                                    }}
-                                  >
-                                    Upload image
-                                  </Dropdown.Item>,
-                                  <Dropdown.Item
-                                    key="remove"
-                                    onClick={() => {
-                                      setIconFile(undefined)
-                                      setIconUrl(undefined)
-                                    }}
-                                  >
-                                    Remove image
-                                  </Dropdown.Item>,
-                                ]}
-                              >
-                                <Button type="default" icon={<IconEdit />} className="px-1" />
-                              </Dropdown>
+                <div className="h-full flex flex-col">
+                  <div className="flex-grow">
+                    <SidePanel.Content>
+                      <div className="py-4 flex items-start justify-between gap-10">
+                        <div className="space-y-4 w-full">
+                          <Input
+                            id="name"
+                            label="Application name"
+                            descriptionText={selectedApp?.id && `ID: ${selectedApp.id}`}
+                          />
+                          <Input
+                            id="website"
+                            label="Website URL"
+                            placeholder="https://my-website.com"
+                          />
+                        </div>
+                        <div>
+                          {iconUrl !== undefined ? (
+                            <div
+                              className={clsx(
+                                'shadow transition group relative',
+                                'bg-center bg-cover bg-no-repeat',
+                                'mt-4 mr-4 space-y-2 rounded-full h-[120px] w-[120px] flex flex-col items-center justify-center'
+                              )}
+                              style={{
+                                backgroundImage: iconUrl ? `url("${iconUrl}")` : 'none',
+                              }}
+                            >
+                              <div className="absolute bottom-1 right-1">
+                                <Dropdown
+                                  size="tiny"
+                                  align="end"
+                                  side="bottom"
+                                  overlay={[
+                                    <Dropdown.Item
+                                      key="upload"
+                                      onClick={() => {
+                                        if (uploadButtonRef.current)
+                                          (uploadButtonRef.current as any).click()
+                                      }}
+                                    >
+                                      Upload image
+                                    </Dropdown.Item>,
+                                    <Dropdown.Item
+                                      key="remove"
+                                      onClick={() => {
+                                        setIconFile(undefined)
+                                        setIconUrl(undefined)
+                                      }}
+                                    >
+                                      Remove image
+                                    </Dropdown.Item>,
+                                  ]}
+                                >
+                                  <Button type="default" icon={<IconEdit />} className="px-1" />
+                                </Dropdown>
+                              </div>
                             </div>
-                          </div>
-                        ) : (
-                          <div
-                            className={clsx(
-                              'border border-scale-700 transition opacity-75 hover:opacity-100',
-                              'mt-4 mr-4 space-y-2 rounded-full h-[120px] w-[120px] flex flex-col items-center justify-center cursor-pointer'
-                            )}
-                            onClick={() => {
-                              if (uploadButtonRef.current) (uploadButtonRef.current as any).click()
-                            }}
-                          >
-                            <IconUpload size={18} strokeWidth={1.5} className="text-scale-1200" />
-                            <p className="text-xs text-scale-1100">Upload logo</p>
-                          </div>
-                        )}
-                        <input
-                          multiple
-                          type="file"
-                          ref={uploadButtonRef}
-                          className="hidden"
-                          accept="image/png, image/jpeg"
-                          onChange={onFileUpload}
-                        />
+                          ) : (
+                            <div
+                              className={clsx(
+                                'border border-scale-700 transition opacity-75 hover:opacity-100',
+                                'mt-4 mr-4 space-y-2 rounded-full h-[120px] w-[120px] flex flex-col items-center justify-center cursor-pointer'
+                              )}
+                              onClick={() => {
+                                if (uploadButtonRef.current)
+                                  (uploadButtonRef.current as any).click()
+                              }}
+                            >
+                              <IconUpload size={18} strokeWidth={1.5} className="text-scale-1200" />
+                              <p className="text-xs text-scale-1100">Upload logo</p>
+                            </div>
+                          )}
+                          <input
+                            multiple
+                            type="file"
+                            ref={uploadButtonRef}
+                            className="hidden"
+                            accept="image/png, image/jpeg"
+                            onChange={onFileUpload}
+                          />
+                        </div>
                       </div>
-                    </div>
-                  </Modal.Content>
+                    </SidePanel.Content>
 
-                  <Modal.Separator />
+                    <SidePanel.Separator />
 
-                  <Modal.Content>
-                    <div className="mb-2 flex items-center justify-between">
-                      <div>
-                        <p className="prose text-sm">Authorization callback URLs</p>
-                        <p className="text-sm text-scale-1000">
-                          All URLs must use HTTPS, except for localhost
-                        </p>
+                    <SidePanel.Content className="py-4">
+                      <div className="mb-2 flex items-center justify-between">
+                        <div>
+                          <p className="prose text-sm">Authorization callback URLs</p>
+                          <p className="text-sm text-scale-1000">
+                            All URLs must use HTTPS, except for localhost
+                          </p>
+                        </div>
+                        <Button onClick={() => setUrls(urls.concat({ id: uuidv4(), value: '' }))}>
+                          Add URL
+                        </Button>
                       </div>
-                      <Button onClick={() => setUrls(urls.concat({ id: uuidv4(), value: '' }))}>
-                        Add URL
-                      </Button>
-                    </div>
-                    <div className="space-y-2 pb-2">
-                      {urls.map((url) => (
-                        <Input
-                          key={url.id}
-                          value={url.value}
-                          onChange={(event) => onUpdateUrl(url.id, event.target.value)}
-                          placeholder="e.g https://my-website.com"
-                          actions={[
-                            urls.length > 1 ? (
-                              <Button
-                                key="remove-url"
-                                type="default"
-                                onClick={() => removeUrl(url.id)}
-                              >
-                                Remove
-                              </Button>
-                            ) : null,
-                          ]}
-                        />
-                      ))}
-                      {errors.urls && <p className="text-red-900 text-sm">{errors.urls}</p>}
-                    </div>
-                  </Modal.Content>
+                      <div className="space-y-2 pb-2">
+                        {urls.map((url) => (
+                          <Input
+                            key={url.id}
+                            value={url.value}
+                            onChange={(event) => onUpdateUrl(url.id, event.target.value)}
+                            placeholder="e.g https://my-website.com"
+                            actions={[
+                              urls.length > 1 ? (
+                                <Button
+                                  key="remove-url"
+                                  type="default"
+                                  onClick={() => removeUrl(url.id)}
+                                >
+                                  Remove
+                                </Button>
+                              ) : null,
+                            ]}
+                          />
+                        ))}
+                        {errors.urls && <p className="text-red-900 text-sm">{errors.urls}</p>}
+                      </div>
+                    </SidePanel.Content>
+                    <SidePanel.Separator />
+                  </div>
 
-                  <Modal.Separator />
+                  <SidePanel.Separator />
 
-                  <Modal.Content>
+                  <SidePanel.Content>
                     <div className="pt-2 pb-3 flex items-center justify-between">
                       <Button
                         type="default"
@@ -334,7 +340,7 @@ const PublishAppModal = ({
                         </Button>
                       </div>
                     </div>
-                  </Modal.Content>
+                  </SidePanel.Content>
                 </div>
 
                 <Modal
@@ -383,7 +389,7 @@ const PublishAppModal = ({
             )
           }}
         </Form>
-      </Modal>
+      </SidePanel>
     </>
   )
 }
