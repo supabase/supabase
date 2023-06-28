@@ -1,4 +1,3 @@
-import ExtensionCard from 'components/interfaces/Database/Extensions/ExtensionCard'
 import { ClientLibrary, ExampleProject } from 'components/interfaces/Home'
 import { CLIENT_LIBRARIES, EXAMPLE_PROJECTS } from 'components/interfaces/Home/Home.constants'
 import ProjectUsageSection from 'components/interfaces/Home/ProjectUsageSection'
