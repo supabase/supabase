@@ -46,7 +46,8 @@ const DeleteAppModal = ({ selectedApp, onClose }: DeleteAppModalProps) => {
       <Modal.Content>
         <div className="py-4">
           <Alert withIcon variant="warning" title="This action cannot be undone">
-            Deleting this application will invalidate any access tokens authorized by users.
+            Deleting {selectedApp?.name} will invalidate any access tokens from this application
+            that were authorized by users.
           </Alert>
           <ul className="mt-4 space-y-5">
             <li className="flex gap-3 text-sm">
