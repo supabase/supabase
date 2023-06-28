@@ -12,6 +12,7 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { Alert, Button, IconExternalLink, Modal, Radio, SidePanel } from 'ui'
+import Telemetry from 'lib/telemetry'
 
 const COMPUTE_CATEGORY_OPTIONS: {
   id: 'micro' | 'optimized'
@@ -79,6 +80,17 @@ const ComputeInstanceSidePanel = () => {
         setSelectedCategory('micro')
         setSelectedOption('ci_micro')
       }
+      Telemetry.sendActivity(
+        {
+          activity: 'Side Panel Viewed',
+          source: 'Dashboard',
+          data: {
+            title: 'Change project compute size',
+            section: 'Add ons',
+          },
+        },
+        router
+      )
     }
   }, [visible, isLoading])
 
@@ -169,6 +181,18 @@ const ComputeInstanceSidePanel = () => {
                       onClick={() => {
                         setSelectedCategory(option.id)
                         if (option.id === 'micro') setSelectedOption('ci_micro')
+                        Telemetry.sendActivity(
+                          {
+                            activity: 'Option Selected',
+                            source: 'Dashboard',
+                            data: {
+                              title: 'Change project compute size',
+                              section: 'Add ons',
+                              option: option.name,
+                            },
+                          },
+                          router
+                        )
                       }}
                     >
                       <img

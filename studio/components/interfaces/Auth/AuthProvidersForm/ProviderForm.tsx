@@ -149,18 +149,20 @@ const ProviderForm: FC<Props> = ({ provider }) => {
                   )}
                   {provider.misc.requiresRedirect && (
                     <>
-                      <ReactMarkdown className="text-xs text-scale-900">
-                        {provider.misc.helper}
-                      </ReactMarkdown>
                       <Input
                         copy
                         readOnly
                         disabled
-                        label="Redirect URL"
+                        label="Callback URL (for OAuth)"
                         value={
                           customDomainData?.customDomain?.status === 'active'
                             ? `https://${customDomainData.customDomain?.hostname}/auth/v1/callback`
                             : `https://${ui.selectedProjectRef}.supabase.co/auth/v1/callback`
+                        }
+                        descriptionText={
+                          <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
+                            {provider.misc.helper}
+                          </ReactMarkdown>
                         }
                       />
                     </>
