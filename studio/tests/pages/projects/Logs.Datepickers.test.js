@@ -74,12 +74,8 @@ test('datepicker onChange will return ISO string of selected dates', async () =>
   userEvent.click(await screen.findByText('25'), { selector: '.react-datepicker__day' })
   userEvent.click(await screen.findByText('Apply'))
   expect(mockFn).toBeCalled()
+
   const call = mockFn.mock.calls[0][0]
-  if (Intl.DateTimeFormat().resolvedOptions().timeZone.toLowerCase() == 'etc/utc') {
-    expect(call.to).toMatch('T12')
-    expect(call.from).toMatch('T00')
-  } else {
-    expect(call.to).not.toMatch('T12')
-    expect(call.from).not.toMatch('T00')
-  }
+  expect(call.to).toMatch(dayjs().date(25).hour(12).utc().format('YYYY-MM-DDTHH'))
+  expect(call.from).toMatch(dayjs().date(24).hour(0).utc().format('YYYY-MM-DDTHH'))
 })
