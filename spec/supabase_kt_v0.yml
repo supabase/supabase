@@ -3330,7 +3330,7 @@ functions:
           isSpotlight: true
           code: |
             ```kotlin
-            val channels = client.realtime.subscriptions.entries()
+            val channels = client.realtime.subscriptions.entries
             ```
   - id: list-buckets
     title: listBuckets()
