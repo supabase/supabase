@@ -76,11 +76,13 @@ function useLogsPreview(
   } = useInfiniteQuery(
     ['projects', projectRef, 'logs', queryParamsKey],
     ({ signal, pageParam }) => {
+      const uri = `${API_URL}/projects/${projectRef}/analytics/endpoints/logs.all?${genQueryParams({
+        ...params,
+        // don't overwrite unless user has already clicked on load older
+        iso_timestamp_end: pageParam || params.iso_timestamp_end,
+      } as any)}`
       return get<Logs>(
-        `${API_URL}/projects/${projectRef}/analytics/endpoints/logs.all?${genQueryParams({
-          ...params,
-          iso_timestamp_end: pageParam,
-        } as any)}`,
+        uri,
         { signal }
       )
     },
