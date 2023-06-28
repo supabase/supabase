@@ -42,9 +42,8 @@ const supabaseKey = "{your_supabase_key}";
 
 Once the project is set up, you can run it using the following command:
 
-```
+```shell
 node index.js
-```
 
 [![Demo Vid]()](https://github.com/preetsuthar17/supabase-demo/assets/75468116/b5e88f63-525c-4211-8c50-b46e198d4632)
 
