@@ -475,3 +475,34 @@ describe.each(['free', 'pro', 'team', 'enterprise'])('upgrade modal for %s', (ke
     await screen.findByText('Log retention') // assert modal title is present
   })
 })
+
+test('datepicker onChange will set the query params for outbound api request', async () => {
+  useProjectSubscriptionV2Query.mockReturnValue({
+    data: {
+      plan: {
+        id: 'enterprise',
+      },
+    },
+  })
+  get.mockImplementation((url) => {
+    return { result: [] }
+  })
+  render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
+  // renders time locally
+  userEvent.click(await screen.findByText('Custom'))
+  // inputs with local time
+  const toHH = await screen.findByDisplayValue('23')
+  userEvent.clear(toHH)
+  userEvent.type(toHH, '12')
+
+  userEvent.click(await screen.findByText('24'), { selector: '.react-datepicker__day' })
+  userEvent.click(await screen.findByText('25'), { selector: '.react-datepicker__day' })
+  userEvent.click(await screen.findByText('Apply'))
+
+  await waitFor(() => {
+    expect(get).toHaveBeenCalledWith(
+      expect.stringMatching(/.+select.+event_message.+iso_timestamp_end=/),
+      expect.anything()
+    )
+  })
+})
