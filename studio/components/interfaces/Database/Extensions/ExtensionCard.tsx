@@ -1,7 +1,8 @@
 import { FC, useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Badge, IconLoader, Toggle } from 'ui'
+import { Badge, IconLoader, Toggle, IconExternalLink } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import Link from 'next/link'
 
 import { checkPermissions, useStore } from 'hooks'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
@@ -69,15 +70,29 @@ const ExtensionCard: FC<Props> = ({ extension }) => {
         <div
           className={[
             'border-panel-border-light bg-panel-header-light dark:bg-panel-header-dark',
-            'flex border-b p-4 px-6 dark:border-panel-border-dark',
+            'flex justify-between w-full border-b p-4 px-6 dark:border-panel-border-dark',
           ].join(' ')}
         >
-          <h3
-            title={extension.name}
-            className="m-0 h-5 flex-1 truncate text-base uppercase text-scale-1200"
+          <Link
+            href={
+              extension.link ||
+              `https://supabase.com/docs/guides/database/extensions/${extension.name}`
+            }
           >
-            {extension.name}
-          </h3>
+            <a className="max-w-[85%] cursor-default" target="_blank" rel="noreferrer">
+              <div className="flex flex-row items-center">
+                <h3
+                  title={extension.name}
+                  className="h-5 m-0 text-base uppercase truncate cursor-pointer text-scale-1200"
+                >
+                  {extension.name}
+                </h3>
+
+                <IconExternalLink className="ml-2.5 cursor-pointer" size={18} />
+              </div>
+            </a>
+          </Link>
+
           {loading ? (
             <IconLoader className="animate-spin" size={16} />
           ) : (
@@ -100,7 +115,7 @@ const ExtensionCard: FC<Props> = ({ extension }) => {
           </div>
           {isOn && extension.schema && (
             <div className="p-4 px-6">
-              <div className="flex flex-grow items-center space-x-2 text-sm text-scale-1100">
+              <div className="flex items-center flex-grow space-x-2 text-sm text-scale-1100">
                 <span>Schema:</span>
                 <Badge>{`${extension.schema}`}</Badge>
               </div>
