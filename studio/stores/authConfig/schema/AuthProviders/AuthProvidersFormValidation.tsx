@@ -77,6 +77,7 @@ const PROVIDER_PHONE = {
         { label: 'Messagebird', value: 'messagebird', icon: 'messagebird-icon.svg' },
         { label: 'Textlocal', value: 'textlocal', icon: 'textlocal-icon.png' },
         { label: 'Vonage', value: 'vonage', icon: 'vonage-icon.svg' },
+        { label: 'Twilio Verify', value: 'twilio-verify', icon: 'twilio-icon.svg' }
       ],
     },
     RATE_LIMIT_SMS_SENT: {
@@ -118,7 +119,7 @@ const PROVIDER_PHONE = {
       title: 'Twilio Account Sid',
       show: {
         key: 'SMS_PROVIDER',
-        matches: 'twilio',
+        matches: 'twilio-verify',
       },
     },
     SMS_TWILIO_VERIFY_AUTH_TOKEN: {
@@ -127,7 +128,7 @@ const PROVIDER_PHONE = {
       isSecret: true,
       show: {
         key: 'SMS_PROVIDER',
-        matches: 'twilio',
+        matches: 'twilio-verify',
       },
     },
     SMS_TWILIO_VERIFY_MESSAGE_SERVICE_SID: {
@@ -135,7 +136,7 @@ const PROVIDER_PHONE = {
       title: 'Twilio Message Service Sid',
       show: {
         key: 'SMS_PROVIDER',
-        matches: 'twilio',
+        matches: 'twilio-verify',
       },
     },
 
