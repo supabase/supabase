@@ -12,9 +12,9 @@
 - [x] Хоствана база данни Postgres. [Документи](https://supabase.com/docs/guides/database)
 - [x] Удостоверяване и оторизация. [Документи](https://supabase.com/docs/guides/auth)
 - [x] Автоматично генерирани API.
-  - [x] REST. [Документи](https://supabase.com/docs/guides/database/api#rest-api)
-  - [x] GraphQL. [Документи](https://supabase.com/docs/guides/database/api#graphql-api)
-  - [x] Абонаменти в реално време. [Документи](https://supabase.com/docs/guides/database/api#realtime-api)
+  - [x] REST. [Документи](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL. [Документи](https://supabase.com/docs/guides/api#graphql-api-overview)
+  - [x] Абонаменти в реално време. [Документи](https://supabase.com/docs/guides/api#realtime-api-overview)
 - [x] Функции.
   - [x] Функции за бази данни. [Docs](https://supabase.com/docs/guides/database/functions)
   - [x] Крайни функции [Docs](https://supabase.com/docs/guides/functions)

@@ -12,9 +12,9 @@
 - [x] হোস্ট করা পোস্টগ্রেস ডাটাবেস. [ডক্স](https://supabase.com/docs/guides/database)
 - [x] অথেনটিকেশন এবং অথরাইজড . [ডক্স](https://supabase.com/docs/guides/auth)
 - [x] স্বয়ংক্রিয়ভাবে তৈরি এপিআই.
-  - [x] রেস্ট. [ডক্স](https://supabase.com/docs/guides/database/api#rest-api)
-  - [x] রিয়েলটাইম সাবস্ক্রিপশন. [ডক্স](https://supabase.com/docs/guides/database/api#realtime-api)
-  - [x] গ্রাফকিউএল (বেটা). [ডক্স](https://supabase.com/docs/guides/database/api#graphql-api)
+  - [x] রেস্ট. [ডক্স](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] রিয়েলটাইম সাবস্ক্রিপশন. [ডক্স](https://supabase.com/docs/guides/api#realtime-api-overview)
+  - [x] গ্রাফকিউএল (বেটা). [ডক্স](https://supabase.com/docs/guides/api#graphql-api-overview)
 - [x] ফাংশনস.
   - [x] ডাটাবেস ফাংশনস. [ডক্স](https://supabase.com/docs/guides/database/functions)
   - [x] এজ ফাংশনস. [ডক্স](https://supabase.com/docs/guides/functions)
@@ -43,7 +43,7 @@
 - [x] পাবলিক বেটা: বেশিরভাগ নন-এন্টারপ্রাইজ ব্যবহারের ক্ষেত্রে যথেষ্ট স্থিতিশীল
 - [ ] পাবলিক: প্রোডাকশন রেডি
 
-আমরা বর্তমানে পাবলিক বেটাতে আছি। বড় আপডেটের বিজ্ঞপ্তি পেতে এই রিপুর "রিলিজ" দেখুন।
+আমরা বর্তমানে পাবলিক বিটাতে আছি। বড় আপডেটের বিজ্ঞপ্তি পেতে এই রেপোর "রিলিজ" দেখুন।
 
 <kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="এই রিপু দেখুন"/></kbd>
 
