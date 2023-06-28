@@ -1,46 +1,46 @@
-import Link from 'next/link'
-import { FC } from 'react'
+import * as Tooltip from '@radix-ui/react-tooltip'
 import { isUndefined } from 'lodash'
-import { observer } from 'mobx-react-lite'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { FC } from 'react'
+
+import { useTheme } from 'common'
+import { useParams } from 'common/hooks'
+import { useFlag } from 'hooks'
+import { IS_PLATFORM } from 'lib/constants'
+import { detectOS } from 'lib/helpers'
 import {
   Button,
   Dropdown,
+  IconCommand,
   IconHome,
+  IconSearch,
   IconSettings,
   IconUser,
-  IconSearch,
   useCommandMenu,
-  IconCommand,
 } from 'ui'
-import * as Tooltip from '@radix-ui/react-tooltip'
-import { useFlag, useStore } from 'hooks'
-import { IS_PLATFORM } from 'lib/constants'
+import { useProjectContext } from '../ProjectContext'
 import {
   generateOtherRoutes,
   generateProductRoutes,
   generateToolRoutes,
 } from './NavigationBar.utils'
 import NavigationIconButton from './NavigationIconButton'
-import { useParams } from 'common/hooks'
-import { useTheme } from 'common'
-import { detectOS } from 'lib/helpers'
 
 interface Props {}
 
 const NavigationBar: FC<Props> = ({}) => {
   const router = useRouter()
-  const { ui } = useStore()
   const { isDarkMode, toggleTheme } = useTheme()
   const { ref: projectRef } = useParams()
 
-  const projectBaseInfo = ui.selectedProjectBaseInfo
+  const { project } = useProjectContext()
   const ongoingIncident = useFlag('ongoingIncident')
 
   const activeRoute = router.pathname.split('/')[3]
-  const toolRoutes = generateToolRoutes(projectRef, projectBaseInfo)
-  const productRoutes = generateProductRoutes(projectRef, projectBaseInfo)
-  const otherRoutes = generateOtherRoutes(projectRef, projectBaseInfo)
+  const toolRoutes = generateToolRoutes(projectRef, project)
+  const productRoutes = generateProductRoutes(projectRef, project)
+  const otherRoutes = generateOtherRoutes(projectRef, project)
   const showCmdkHelper = useFlag('dashboardCmdk')
   const os = detectOS()
   const { setIsOpen } = useCommandMenu()
@@ -172,4 +172,4 @@ const NavigationBar: FC<Props> = ({}) => {
   )
 }
 
-export default observer(NavigationBar)
+export default NavigationBar
