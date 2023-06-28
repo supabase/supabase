@@ -447,6 +447,10 @@ module.exports = {
   cssVariable: "var(--background-alternative)",
   value: "hsl(0, 0%, 8.6%)"
 },
+"background-sputnik": {
+  cssVariable: "var(--background-sputnik)",
+  value: "hsl(107.89999999999998, 95.1%, 60.2%)"
+},
 "border-DEFAULT": {
   cssVariable: "var(--border-default)",
   value: "hsl(0, 0%, 15.7%)"
@@ -482,5 +486,21 @@ module.exports = {
 "destructive-DEFAULT": {
   cssVariable: "var(--destructive-default)",
   value: "hsl(358.1, 75.1%, 59%)"
+},
+"warning-200": {
+  cssVariable: "var(--warning-200)",
+  value: "hsl(38.80000000000001, 97.4%, 69.8%)"
+},
+"warning-300": {
+  cssVariable: "var(--warning-300)",
+  value: "hsl(36.30000000000001, 93.5%, 18%)"
+},
+"warning-400": {
+  cssVariable: "var(--warning-400)",
+  value: "hsl(0, 0%, 8.6%)"
+},
+"warning-DEFAULT": {
+  cssVariable: "var(--warning-default)",
+  value: "hsl(38.89999999999998, 100%, 57.1%)"
 }
 }

@@ -1,13 +1,18 @@
 /**
  * Do not edit directly
- * Generated on Sun, 25 Jun 2023 18:14:29 GMT
+ * Generated on Tue, 27 Jun 2023 13:59:53 GMT
  */
 
 .light {
+  --warning-default: 38.9deg 100% 57.1%;
+  --warning-400: 38.7deg 100% 93.9%;
+  --warning-300: 38.6deg 100% 89%;
+  --warning-200: 39deg 100% 75.3%;
   --destructive-default: 0deg 100% 50%;
   --destructive-400: 0deg 100% 98.4%;
   --destructive-300: 0deg 100% 87.5%;
   --destructive-200: 0deg 97% 74.1%;
+  --background-sputnik: 60deg 100% 50%;
   --background-alternative: 0deg 0% 100%;
   --background-secondary: 0deg 0% 100%;
   --background-muted: 0deg 0% 100%;

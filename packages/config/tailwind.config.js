@@ -6,14 +6,13 @@ const color = require('./../ui/build/css/tw-extend/color')
 /**
  *
  */
-const colorExtend = {}
+let colorExtend = {}
 Object.values(color).map((x, i) => {
-  colorExtend[Object.keys(color)[i]] = x.cssVariable
+  colorExtend[Object.keys(color)[i]] = `hsl(${x.cssVariable} / <alpha-value>)` // x.cssVariable
 })
 
-// console.log('colorExtend', colorExtend)
-
-// console.log('colorExtend', kebabToNested(colorExtend))
+console.log('colorExtend', colorExtend)
+console.log('colorExtend', kebabToNested(colorExtend))
 
 // console.log('colorExtend', kebabToNested(colorExtend).colors.gray)
 
@@ -49,7 +48,7 @@ function kebabToNested(obj) {
     const parts = key.split('-')
     let currentObj = result
     for (let i = 0; i < parts.length; i++) {
-      const part = parts[i].toLowerCase() // convert key to lowercase
+      const part = parts[i] === 'DEFAULT' ? parts[i] : parts[i].toLowerCase() // convert key to lowercase
       if (!currentObj[part]) {
         currentObj[part] = {}
       }
@@ -90,6 +89,9 @@ const uiConfig = ui({
       ...generateTwColorClasses('border', color),
     }),
     extend: {
+      colors: {
+        ...kebabToNested(colorExtend),
+      },
       typography: ({ theme }) => ({
         // Removal of backticks in code blocks for tailwind v3.0
         // https://github.com/tailwindlabs/tailwindcss-typography/issues/135
@@ -318,9 +320,6 @@ const uiConfig = ui({
       fontFamily: {
         sans: ['Circular', 'custom-font', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'],
         mono: ['Office Code Pro', 'Source Code Pro', 'Menlo', 'monospace'],
-      },
-      color: {
-        ...kebabToNested(colorExtend),
       },
     },
   },

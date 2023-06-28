@@ -290,6 +290,10 @@ const uiConfig = {
         ...colorClasses,
         'hi-contrast': `var(--colors-fixed-scale12)`,
         'lo-contrast': `var(--colors-fixed-scale1)`,
+        warning: {
+          default: 'red',
+          100: '#342355',
+        },
       },
     },
   },
