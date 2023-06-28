@@ -5,12 +5,11 @@ import { BASE_PATH } from 'lib/constants'
 interface Props {
   language: string
   officialSupport?: boolean
-  releaseState?: string
   docsUrl?: string
   gitUrl: string
 }
 
-const ClientLibrary: FC<Props> = ({ language, releaseState, officialSupport, docsUrl, gitUrl }) => {
+const ClientLibrary: FC<Props> = ({ language, officialSupport, docsUrl, gitUrl }) => {
   return (
     <div className="flex items-start space-x-6">
       <img
@@ -21,7 +20,7 @@ const ClientLibrary: FC<Props> = ({ language, releaseState, officialSupport, doc
       <div className="space-y-4">
         <div>
           <h5 className="flex items-center gap-2 text-base text-scale-1200">
-            {language} {releaseState && <Badge color="yellow">{`Public ${releaseState}`}</Badge>}
+            {language} {!officialSupport && <Badge color="green">Community</Badge>}
           </h5>
           <p className="text-sm text-scale-1000">
             {officialSupport
