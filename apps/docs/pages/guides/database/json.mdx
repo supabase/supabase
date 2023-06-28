@@ -244,7 +244,7 @@ create table customers (
 );
 
 alter table customers
-add constriant check_metadata check (
+add constraint check_metadata check (
   json_matches_schema(
     '{
         "type": "object",

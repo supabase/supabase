@@ -1,19 +1,20 @@
-import dayjs from 'dayjs'
-import { FC, useState } from 'react'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { Notification, NotificationStatus } from '@supabase/shared-types/out/notifications'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import dayjs from 'dayjs'
+import { useState } from 'react'
 
-import { useStore } from 'hooks'
 import { notificationKeys } from 'data/notifications/keys'
-import { Project } from 'types'
-import { formatNotificationCTAText, formatNotificationText } from './NotificationRows.utils'
-import NotificationActions from './NotificationActions'
-import { get, delete_ } from 'lib/common/fetch'
+import { useProjectsQuery } from 'data/projects/projects-query'
+import { useStore } from 'hooks'
+import { delete_, get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
+import { Project } from 'types'
 import { Button, IconX } from 'ui'
+import NotificationActions from './NotificationActions'
+import { formatNotificationCTAText, formatNotificationText } from './NotificationRows.utils'
 
-interface Props {
+export interface NotificationRowProps {
   notification: Notification
   onSelectRestartProject: (project: Project, notification: Notification) => void
   onSelectApplyMigration: (project: Project, notification: Notification) => void
@@ -21,17 +22,18 @@ interface Props {
   onSelectFinalizeMigration: (project: Project, notification: Notification) => void
 }
 
-const NotificationRow: FC<Props> = ({
+const NotificationRow = ({
   notification,
   onSelectRestartProject,
   onSelectApplyMigration,
   onSelectRollbackMigration,
   onSelectFinalizeMigration,
-}) => {
-  const { app, ui } = useStore()
+}: NotificationRowProps) => {
+  const { ui } = useStore()
   const queryClient = useQueryClient()
   const [dismissing, setDismissing] = useState(false)
-  const [project] = app.projects.list((project: Project) => project.id === notification.project_id)
+  const { data: projects } = useProjectsQuery()
+  const project = projects?.find((project) => project.id === notification.project_id)
 
   const insertedAt = dayjs(notification.inserted_at).format('DD MMM YYYY, HH:mma')
   const changelogLink = (notification.data as any).changelog_link
@@ -41,10 +43,11 @@ const NotificationRow: FC<Props> = ({
   // have been removed, double check with Qiao before removing.
   // Relevant PR: https://github.com/supabase/supabase/pull/9229
   const { data: ownerReassignStatus } = useQuery(
-    ['projects', project.ref, 'owner-reassign'],
-    ({ signal }) => get(`${API_URL}/database/${project.ref}/owner-reassign`, { signal }),
+    ['projects', project?.ref, 'owner-reassign'],
+    ({ signal }) => get(`${API_URL}/database/${project?.ref}/owner-reassign`, { signal }),
     {
-      enabled: (notification.data as any).upgrade_type === 'schema-migration',
+      enabled:
+        (notification.data as any).upgrade_type === 'schema-migration' && project !== undefined,
     }
   )
 
@@ -64,6 +67,8 @@ const NotificationRow: FC<Props> = ({
     }
     setDismissing(false)
   }
+
+  if (!project) return null
 
   return (
     <div className="flex py-2">

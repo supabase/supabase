@@ -1,30 +1,31 @@
-import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
+import { useRouter } from 'next/router'
 import { Tabs } from 'ui'
 
-import { NextPageWithLayout } from 'types'
-import { useStore } from 'hooks'
 import { useParams } from 'common/hooks'
-import Loading from 'components/ui/Loading'
-import { OrganizationLayout } from 'components/layouts'
 import { InvoicesSettings } from 'components/interfaces/Organization'
+import { OrganizationLayout } from 'components/layouts'
+import Loading from 'components/ui/Loading'
+import { usePermissionsQuery } from 'data/permissions/permissions-query'
+import { useFlag, useSelectedOrganization } from 'hooks'
+import { NextPageWithLayout } from 'types'
 
 const OrgInvoices: NextPageWithLayout = () => {
-  const { ui } = useStore()
+  const { data: permissions } = usePermissionsQuery()
+  const selectedOrganization = useSelectedOrganization()
   const { slug } = useParams()
   const router = useRouter()
+  const showOAuthApps = useFlag('oauthApps')
 
   return (
     <>
-      {ui.selectedOrganization === undefined && (ui?.permissions ?? []).length === 0 ? (
+      {selectedOrganization === undefined && (permissions ?? []).length === 0 ? (
         <Loading />
       ) : (
         <div className="p-4 pt-0">
           <div className="space-y-3">
             <section className="mt-4">
-              <h1 className="text-3xl">
-                {ui.selectedOrganization?.name ?? 'Organization'} settings
-              </h1>
+              <h1 className="text-3xl">{selectedOrganization?.name ?? 'Organization'} settings</h1>
             </section>
             <nav>
               <Tabs
@@ -39,6 +40,7 @@ const OrgInvoices: NextPageWithLayout = () => {
                 <Tabs.Panel id="team" label="Team" />
                 <Tabs.Panel id="billing" label="Billing" />
                 <Tabs.Panel id="invoices" label="Invoices" />
+                {showOAuthApps && <Tabs.Panel id="apps" label="OAuth Apps" />}
               </Tabs>
             </nav>
           </div>
