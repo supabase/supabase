@@ -47,8 +47,8 @@ const RevokeAppModal = ({ selectedApp, onClose }: RevokeAppModalProps) => {
       <Modal.Content>
         <div className="py-4">
           <Alert withIcon variant="warning" title="This action cannot be undone">
-            This application will no longer have access to your organization's settings and
-            projects.
+            {selectedApp?.name} application will no longer have access to your organization's
+            settings and projects.
           </Alert>
           <ul className="mt-4 space-y-5">
             <li className="flex gap-3 text-sm">
