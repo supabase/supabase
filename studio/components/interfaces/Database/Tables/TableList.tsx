@@ -18,9 +18,9 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { useStore, checkPermissions } from 'hooks'
 import Table from 'components/to-be-cleaned/Table'
-import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import type { PostgresTable, PostgresSchema } from '@supabase/postgres-meta'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 
 interface Props {
   selectedSchema: string
@@ -162,7 +162,23 @@ const TableList: FC<Props> = ({
           <ShimmeringLoader className="w-1/2" />
         </div>
       ) : tables.length === 0 ? (
-        <NoSearchResults />
+        <div className="flex h-full w-full items-center justify-center">
+          <ProductEmptyState
+            title="Tables"
+            ctaButtonLabel="Create a new table"
+            onClickCta={() => onAddTable()}
+            disabled={!canUpdateTables}
+            disabledMessage="You need additional permissions to create tables"
+          >
+            <p className="text-sm text-scale-1100">
+              Tables are the basic unit of data storage in Postgres. A table declaration is a
+              statement of the table's name, its columns, and each column's data type.
+            </p>
+            <p className="text-sm text-scale-1100">
+              They can be created, modified, and dropped using the SQL interface.
+            </p>
+          </ProductEmptyState>
+        </div>
       ) : (
         <div className="my-4 w-full">
           <Table
