@@ -1,5 +1,5 @@
 
-// one of the most simplest example of javascript using supabase datbase to take input from user and save it in database.
+// Simple JavaScript example to take a username input and save it in a Supabase database.
 
 const { createClient } = require("@supabase/supabase-js");
 const readline = require("readline");
