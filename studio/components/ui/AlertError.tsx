@@ -5,7 +5,7 @@ import { Alert, Button } from 'ui'
 export interface AlertErrorProps {
   ref?: string
   subject?: string
-  error?: ResponseError
+  error?: ResponseError | null
 }
 
 // [Joshen] To standardize the language for all error UIs

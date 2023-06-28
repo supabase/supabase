@@ -15,7 +15,7 @@ import { useProjectsQuery } from 'data/projects/projects-query'
 import { useCheckPermissions } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import { makeRandomString } from 'lib/helpers'
-import { Organization, Project } from 'types'
+import { Organization, Project, ResponseError } from 'types'
 import ProjectCard from './ProjectCard'
 import ShimmeringCard from './ShimmeringCard'
 
@@ -25,9 +25,20 @@ export interface ProjectListProps {
 
 const ProjectList = ({ rewriteHref }: ProjectListProps) => {
   const { data: organizations } = useOrganizationsQuery()
-  const { data: allProjects } = useProjectsQuery()
+  const {
+    data: allProjects,
+    isLoading: isLoadingProjects,
+    isError: isErrorProjects,
+    error: projectsError,
+  } = useProjectsQuery()
+  const {
+    isLoading: _isLoadingPermissions,
+    isError: isErrorPermissions,
+    error: permissionsError,
+  } = usePermissionsQuery()
   const { data: allOverdueInvoices } = useOverdueInvoicesQuery({ enabled: IS_PLATFORM })
   const projectsByOrg = groupBy(allProjects, 'organization_id')
+  const isLoadingPermissions = IS_PLATFORM ? _isLoadingPermissions : false
 
   return (
     <>
@@ -41,6 +52,12 @@ const ProjectList = ({ rewriteHref }: ProjectListProps) => {
               (it) => it.organization_id === organization.id
             )}
             rewriteHref={rewriteHref}
+            isLoadingPermissions={isLoadingPermissions}
+            isErrorPermissions={isErrorPermissions}
+            permissionsError={permissionsError}
+            isLoadingProjects={isLoadingProjects}
+            isErrorProjects={isErrorProjects}
+            projectsError={projectsError}
           />
         )
       })}
@@ -54,6 +71,12 @@ type OrganizationProjectsProps = {
   organization: Organization
   projects: Project[]
   overdueInvoices: OverdueInvoicesResponse[]
+  isLoadingPermissions: boolean
+  isErrorPermissions: boolean
+  permissionsError: ResponseError | null
+  isLoadingProjects: boolean
+  isErrorProjects: boolean
+  projectsError: ResponseError | null
   rewriteHref?: (projectRef: string) => string
 }
 
@@ -61,22 +84,16 @@ const OrganizationProjects = ({
   organization: { id, name, slug, subscription_id },
   projects,
   overdueInvoices,
+  isLoadingPermissions,
+  isErrorPermissions,
+  permissionsError,
+  isLoadingProjects,
+  isErrorProjects,
+  projectsError,
   rewriteHref,
 }: OrganizationProjectsProps) => {
   const isEmpty = !projects || projects.length === 0
   const canReadProjects = useCheckPermissions(PermissionAction.READ, 'projects', undefined, id)
-
-  const {
-    isLoading: isLoadingProjects,
-    isError: isErrorProjects,
-    error: projectsError,
-  } = useProjectsQuery()
-  const {
-    isLoading: _isLoadingPermissions,
-    isError: isErrorPermissions,
-    error: permissionsError,
-  } = usePermissionsQuery()
-  const isLoadingPermissions = IS_PLATFORM ? _isLoadingPermissions : false
 
   return (
     <div className="space-y-3" key={makeRandomString(5)}>
