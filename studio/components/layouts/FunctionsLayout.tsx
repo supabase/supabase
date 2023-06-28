@@ -63,7 +63,6 @@ const FunctionsLayout: FC<Props> = ({ title, children }) => {
                 </div>
                 <div className="flex items-center space-x-4">
                   <h1 className="text-2xl text-scale-1200">Edge Functions</h1>
-                  <p className="mt-1 text-scale-1000">Beta</p>
                 </div>
               </div>
             </div>
@@ -97,7 +96,6 @@ const FunctionsLayout: FC<Props> = ({ title, children }) => {
                         Edge Functions
                       </h1>
                     </Link>
-                    <p className="mt-1 text-scale-1000">Beta</p>
                     {name && (
                       <div className="mt-1.5 flex items-center space-x-4">
                         <span className="text-scale-1000">
