@@ -4,6 +4,7 @@ import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { Badge, Button, IconPlus } from 'ui'
 
+import AlertError from 'components/ui/AlertError'
 import {
   OverdueInvoicesResponse,
   useOverdueInvoicesQuery,
@@ -24,13 +25,9 @@ export interface ProjectListProps {
 
 const ProjectList = ({ rewriteHref }: ProjectListProps) => {
   const { data: organizations } = useOrganizationsQuery()
-  const { data: allProjects, isLoading: isLoadingProjects } = useProjectsQuery()
-  const { isLoading: _isLoadingPermissions } = usePermissionsQuery()
+  const { data: allProjects } = useProjectsQuery()
   const { data: allOverdueInvoices } = useOverdueInvoicesQuery({ enabled: IS_PLATFORM })
-
   const projectsByOrg = groupBy(allProjects, 'organization_id')
-
-  const isLoadingPermissions = IS_PLATFORM ? _isLoadingPermissions : false
 
   return (
     <>
@@ -43,8 +40,6 @@ const ProjectList = ({ rewriteHref }: ProjectListProps) => {
             overdueInvoices={(allOverdueInvoices ?? []).filter(
               (it) => it.organization_id === organization.id
             )}
-            isLoadingPermissions={isLoadingPermissions}
-            isLoadingProjects={isLoadingProjects}
             rewriteHref={rewriteHref}
           />
         )
@@ -59,8 +54,6 @@ type OrganizationProjectsProps = {
   organization: Organization
   projects: Project[]
   overdueInvoices: OverdueInvoicesResponse[]
-  isLoadingPermissions?: boolean
-  isLoadingProjects?: boolean
   rewriteHref?: (projectRef: string) => string
 }
 
@@ -68,12 +61,14 @@ const OrganizationProjects = ({
   organization: { id, name, slug, subscription_id },
   projects,
   overdueInvoices,
-  isLoadingPermissions,
-  isLoadingProjects,
   rewriteHref,
 }: OrganizationProjectsProps) => {
   const isEmpty = !projects || projects.length === 0
   const canReadProjects = useCheckPermissions(PermissionAction.READ, 'projects', undefined, id)
+
+  const { isLoading: isLoadingProjects, isError: isErrorProjects } = useProjectsQuery()
+  const { isLoading: _isLoadingPermissions } = usePermissionsQuery()
+  const isLoadingPermissions = IS_PLATFORM ? _isLoadingPermissions : false
 
   return (
     <div className="space-y-3" key={makeRandomString(5)}>
@@ -101,7 +96,11 @@ const OrganizationProjects = ({
         </ul>
       ) : (
         <ul className="mx-auto grid grid-cols-1 gap-4 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
-          {!canReadProjects ? (
+          {isErrorProjects ? (
+            <div className="col-span-3">
+              <AlertError subject={`Unable to retrieve projects under ${name}`} />
+            </div>
+          ) : !canReadProjects ? (
             <div className="col-span-4 space-y-4 rounded-lg border-2 border-dashed border-gray-300 py-8 px-6 text-center">
               <div className="space-y-1">
                 <p>You need additional permissions to view projects from this organization</p>
