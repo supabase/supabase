@@ -52,25 +52,13 @@ const RevokeAppModal = ({ selectedApp, onClose }: RevokeAppModalProps) => {
           </Alert>
           <ul className="mt-4 space-y-5">
             <li className="flex gap-3 text-sm">
-              <div>
-                <IconAlertOctagon />
-              </div>
-              <span>
-                This application will no longer have access to your organization's settings and
-                projects.
-              </span>
-            </li>
-
-            <li className="flex gap-3 text-sm">
               <IconLock w={14} className="flex-shrink-0" />
               <div>
                 <strong>Before you remove this app, consider:</strong>
                 <ul className="space-y-2 mt-2">
                   <li className="list-disc ml-4">
-                    Any applications which you may still require access
-                  </li>
-                  <li className="list-disc ml-4">
-                    Anyone will be able to modify, add or delete any row in this table.
+                    No users are currently using this application. The application will no longer
+                    have access to your organization after being revoked.
                   </li>
                 </ul>
               </div>
