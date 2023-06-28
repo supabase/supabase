@@ -46,7 +46,7 @@ const OAuthApps = () => {
 
   return (
     <>
-      <div className="container my-4 max-w-4xl space-y-8">
+      <div className="container my-4 max-w-5xl space-y-8">
         <div>
           <div className="flex items-center justify-between">
             <div>
@@ -124,6 +124,7 @@ const OAuthApps = () => {
                   <Table
                     className="mt-4"
                     head={[
+                      <Table.th key="icon" className="w-[30px]"></Table.th>,
                       <Table.th key="name">Name</Table.th>,
                       <Table.th key="client-id">Client ID</Table.th>,
                       <Table.th key="client-secret">Client Secret</Table.th>,
@@ -177,8 +178,9 @@ const OAuthApps = () => {
                   <Table
                     className="mt-4"
                     head={[
+                      <Table.th key="icon" className="w-[30px]"></Table.th>,
                       <Table.th key="name">Name</Table.th>,
-                      <Table.th key="name">ID</Table.th>,
+                      <Table.th key="id">ID</Table.th>,
                       <Table.th key="client-secret">Authorized at</Table.th>,
                       <Table.th key="delete-action"></Table.th>,
                     ]}
