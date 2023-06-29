@@ -2043,22 +2043,7 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/docs/guides/realtime/broadcast',
-    destination: '/docs/guides/realtime/quickstarts/broadcast',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/realtime/presence',
-    destination: '/docs/guides/realtime/quickstarts/presence',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/realtime/postgres-changes',
-    destination: '/docs/guides/realtime/quickstarts/postgres-changes',
-  },
-  {
-    permanent: true,
     source: '/docs/guides/realtime/quickstart',
-    destination: '/docs/guides/realtime/quickstarts/broadcast',
+    destination: '/docs/guides/realtime',
   },
 ]
