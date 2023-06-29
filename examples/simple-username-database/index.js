@@ -1,5 +1,5 @@
 
-// Simple JavaScript example to take a username input and save it in a Supabase database.
+// Simple JavaScript example to take a name input and save it in a Supabase database.
 
 const { createClient } = require("@supabase/supabase-js");
 const readline = require("readline");
@@ -39,13 +39,13 @@ const rl = readline.createInterface({
 async function main() {
   try {
     const name = await new Promise((resolve) => {
-      rl.question("Please enter your username: ", (answer) => {
+      rl.question("Please enter your name: ", (answer) => {
         resolve(answer);
       });
     });
 
     const { data, error } = await supabase
-      .from("usernames")
+      .from("name-reg")
       .insert({ name: name });
 
     if (error) {
