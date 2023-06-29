@@ -331,34 +331,37 @@ const channel = supabase
 ## Custom Tokens
 
 You may choose to sign your own tokens to customize claims that can be checked in your RLS policies.
-In order for this to work you must pass `apikey` in both Realtime's `headers` and `params` when creating the client.
 
-The `apikey` in `params` must be either the `anon` or `service_role` token that Supabase provides for every project.
-You can find these tokens under [Project API keys](https://supabase.com/dashboard/project/_/settings/api) in your project's dashboard.
-This will authenticate your request in the API gateway.
+Your project JWT secret is found with your [Project API keys](https://supabase.com/dashboard/project/_/settings/api) in your dashboard.
 
 <Admonition type="caution">
   Do not expose the `service_role` token on the client because the role is authorized to bypass
   row-level security.
 </Admonition>
 
-The `apikey` in `headers` can be your custom token signed with the JWT secret of your Supabase project.
-This is forwarded to the Realtime server and it will verify your custom token and use its claims to authorize database changes
-when RLS is enabled.
+To use your own JWT with Realtime make sure to set the token after instantiating the Supabase client and before connecting to a Channel.
 
 ```js
 const { createClient } = require('@supabase/supabase-js')
 
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY, {
-  realtime: {
-    headers: {
-      apikey: `Bearer ${your_custom_token}`,
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY, {})
+
+// Set your custom JWT here
+supabase.realtime.setAuth('your-custom-jwt')
+
+const channel = supabase
+  .channel('db-changes')
+  .on(
+    'postgres_changes',
+    {
+      event: '*',
+      schema: 'public',
+      table: 'messages',
+      filter: 'body=eq.bye',
     },
-    params: {
-      apikey: process.env.SUPABASE_KEY,
-    },
-  },
-})
+    (payload) => console.log(payload)
+  )
+  .subscribe()
 ```
 
 ### Refreshed Tokens

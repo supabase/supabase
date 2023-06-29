@@ -12,9 +12,9 @@
 - Database Postgres ospitato. [Documenti](https://supabase.com/docs/guides/database)
 - [x] Autenticazione e autorizzazione. [Documenti](https://supabase.com/docs/guides/auth)
 - [x] API generate automaticamente.
-  - [x] REST. [Documenti](https://supabase.com/docs/guides/database/api#rest-api)
-  - [x] GraphQL. [Documenti](https://supabase.com/docs/guides/database/api#graphql-api)
-  - [x] Sottoscrizioni in tempo reale. [Documenti](https://supabase.com/docs/guides/database/api#realtime-api)
+  - [x] REST. [Documenti](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL. [Documenti](https://supabase.com/docs/guides/api#graphql-api-overview)
+  - [x] Sottoscrizioni in tempo reale. [Documenti](https://supabase.com/docs/guides/api#realtime-api-overview)
 - [x] Funzioni.
   - [x] Funzioni di database. [Docs](https://supabase.com/docs/guides/database/functions)
   - [x] Funzioni Edge [Docs](https://supabase.com/docs/guides/functions)

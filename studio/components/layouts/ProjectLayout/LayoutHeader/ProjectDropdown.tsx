@@ -1,10 +1,10 @@
 import Link from 'next/link'
-import { observer } from 'mobx-react-lite'
-import { Button, Dropdown, IconPlus, Popover } from 'ui'
 import { useRouter } from 'next/router'
 import { ParsedUrlQuery } from 'querystring'
+import { Button, Dropdown, IconPlus, Popover } from 'ui'
 
-import { useStore } from 'hooks'
+import { useProjectsQuery } from 'data/projects/projects-query'
+import { useSelectedOrganization, useSelectedProject } from 'hooks'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 
 // [Fran] the idea is to let users change projects without losing the current page,
@@ -31,10 +31,10 @@ export const sanitizeRoute = (route: string, routerQueries: ParsedUrlQuery) => {
 }
 
 const ProjectDropdown = () => {
-  const { app, ui } = useStore()
-  const selectedOrganizationProjects = app.projects.list()
-  const selectedOrganizationSlug = ui.selectedOrganization?.slug
-  const selectedProject: any = ui.selectedProject
+  const selectedOrganization = useSelectedOrganization()
+  const selectedProject = useSelectedProject()
+  const { data: allProjects } = useProjectsQuery()
+  const selectedOrganizationSlug = selectedOrganization?.slug
   const router = useRouter()
   const sanitizedRoute = sanitizeRoute(router.route, router.query)
 
@@ -44,10 +44,10 @@ const ProjectDropdown = () => {
       align="start"
       overlay={
         <>
-          {selectedOrganizationProjects
-            .filter((x: any) => x.status !== PROJECT_STATUS.INACTIVE)
-            .sort((a: any, b: any) => a.name.localeCompare(b.name))
-            .map((x: any) => (
+          {allProjects
+            ?.filter((x) => x.status !== PROJECT_STATUS.INACTIVE)
+            .sort((a, b) => a.name.localeCompare(b.name))
+            .map((x) => (
               <Link
                 key={x.ref}
                 href={sanitizedRoute?.replace('[ref]', x.ref) ?? `/project/${x.ref}`}
@@ -56,7 +56,7 @@ const ProjectDropdown = () => {
                 <a className="block">
                   <Dropdown.Item
                     className={
-                      selectedProject.name === x.name
+                      selectedProject?.name === x.name
                         ? 'font-bold bg-slate-400 dark:bg-slate-500'
                         : ''
                     }
@@ -76,14 +76,14 @@ const ProjectDropdown = () => {
       }
     >
       <Button asChild type="text" size="tiny" className="my-1">
-        <span>{selectedProject.name}</span>
+        <span>{selectedProject?.name}</span>
       </Button>
     </Dropdown>
   ) : (
     <Button asChild type="text" size="tiny">
-      <span>{selectedProject.name}</span>
+      <span>{selectedProject?.name}</span>
     </Button>
   )
 }
 
-export default observer(ProjectDropdown)
+export default ProjectDropdown

@@ -35,8 +35,6 @@ export const StoreProvider: FC<StoreProvider> = ({ children, rootStore }) => {
   }, [isDarkMode, monaco])
 
   useEffect(() => {
-    ui.load()
-
     autorun(() => {
       if (ui.notification) {
         const { id, category, error, message, description, progress, duration } = ui.notification

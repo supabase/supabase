@@ -50,7 +50,7 @@ const OpenSource = () => {
           url: `https://supabase.com/${router.pathname}`,
           images: [
             {
-              url: `https://supabase.com/images/og/og-image.jpg`,
+              url: `https://supabase.com/images/og/og-image-v2.jpg`,
             },
           ],
         }}
@@ -94,7 +94,7 @@ const OpenSource = () => {
               </div>
               <div className="grid lg:grid-cols-2 gap-4">
                 {maintainers
-                  .filter((x) => activePill == 'All' || x.tags.includes(activePill))
+                  .filter((x) => activePill == 'All' || x.tags?.includes(activePill))
                   .sort((a, b) => a.handle.localeCompare(b.handle))
                   .map((x, idx) => (
                     <div className="" key={idx}>

@@ -1,12 +1,12 @@
-import React, { useEffect } from 'react'
-import { observer } from 'mobx-react-lite'
+import { useEffect } from 'react'
 
-import { API_URL, PROJECT_STATUS } from 'lib/constants'
-import { useFlag, useStore } from 'hooks'
 import { useParams } from 'common/hooks'
-import { post } from 'lib/common/fetch'
 import { SettingsLayout } from 'components/layouts'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { StorageSettings } from 'components/to-be-cleaned/Storage'
+import { useFlag } from 'hooks'
+import { post } from 'lib/common/fetch'
+import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import { NextPageWithLayout } from 'types'
 
 /**
@@ -14,9 +14,7 @@ import { NextPageWithLayout } from 'types'
  */
 const PageLayout: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()
-
-  const { ui } = useStore()
-  const project = ui.selectedProject
+  const { project } = useProjectContext()
 
   const kpsEnabled = useFlag('initWithKps')
 
@@ -37,4 +35,4 @@ const PageLayout: NextPageWithLayout = () => {
 
 PageLayout.getLayout = (page) => <SettingsLayout title="Settings">{page}</SettingsLayout>
 
-export default observer(PageLayout)
+export default PageLayout

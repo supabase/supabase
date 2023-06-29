@@ -26,7 +26,7 @@ export async function getStaticProps() {
   fs.writeFileSync('./public/rss.xml', rss)
 
   // generate a series of rss feeds for each author (for PlanetPG)
-  const planetPgPosts = allPostsData.filter((post: any) => post.tags.includes('planetpg'))
+  const planetPgPosts = allPostsData.filter((post: any) => post.tags?.includes('planetpg'))
   const planetPgAuthors = planetPgPosts.map((post: any) => post.author.split(','))
   const uniquePlanetPgAuthors = new Set([].concat(...planetPgAuthors))
 
@@ -73,7 +73,7 @@ function Blog(props: any) {
       category === 'all'
         ? shiftedBlogs
         : props.blogs.filter((post: any) => {
-            const found = post.tags.includes(category)
+            const found = post.tags?.includes(category)
             return found
           })
     )
@@ -99,7 +99,7 @@ function Blog(props: any) {
           url: `https://supabase.com/${router.pathname}`,
           images: [
             {
-              url: `https://supabase.com/images/og/og-image.jpg`,
+              url: `https://supabase.com/images/og/og-image-v2.jpg`,
             },
           ],
         }}
