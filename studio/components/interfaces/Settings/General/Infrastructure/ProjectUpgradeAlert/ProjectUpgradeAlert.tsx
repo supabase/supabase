@@ -9,6 +9,7 @@ import {
   IconPackage,
   Listbox,
   IconAlertCircle,
+  IconBookOpen,
   IconExternalLink,
 } from 'ui'
 
@@ -68,9 +69,16 @@ const ProjectUpgradeAlert: FC<Props> = ({}) => {
         <p className="mb-3">
           The latest version of Postgres ({latestPgVersion}) is available for your project.
         </p>
-        <Button size="tiny" type="primary" onClick={() => setShowUpgradeModal(true)}>
-          Upgrade project
-        </Button>
+        <div className="flex items-center gap-3">
+          <Button size="tiny" type="primary" onClick={() => setShowUpgradeModal(true)}>
+            Upgrade project
+          </Button>
+          <Link href="https://supabase.com/docs/guides/platform/project-upgrades">
+            <Button type="link" icon={<IconBookOpen size={14} strokeWidth={1.5} />}>
+              Documentation
+            </Button>
+          </Link>
+        </div>
       </Alert>
       <Modal
         hideFooter
@@ -156,17 +164,24 @@ const ProjectUpgradeAlert: FC<Props> = ({}) => {
                     </div>
                   </Modal.Content>
                 </div>
-                <div className="flex items-center space-x-2 justify-end px-4 py-4 border-t">
-                  <Button
-                    type="default"
-                    onClick={() => setShowUpgradeModal(false)}
-                    disabled={isSubmitting}
-                  >
-                    Cancel
-                  </Button>
-                  <Button htmlType="submit" disabled={isSubmitting} loading={isSubmitting}>
-                    Confirm upgrade
-                  </Button>
+                <div className="flex items-center space-x-2 justify-between px-4 py-4 border-t">
+                  <Link href="https://supabase.com/docs/guides/platform/project-upgrades">
+                    <Button type="link" icon={<IconBookOpen size={14} strokeWidth={1.5} />}>
+                      Documentation
+                    </Button>
+                  </Link>
+                  <div className="flex item-center gap-3">
+                    <Button
+                      type="default"
+                      onClick={() => setShowUpgradeModal(false)}
+                      disabled={isSubmitting}
+                    >
+                      Cancel
+                    </Button>
+                    <Button htmlType="submit" disabled={isSubmitting} loading={isSubmitting}>
+                      Confirm upgrade
+                    </Button>
+                  </div>
                 </div>
               </>
             )
