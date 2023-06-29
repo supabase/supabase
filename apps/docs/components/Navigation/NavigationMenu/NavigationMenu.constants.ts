@@ -1183,6 +1183,16 @@ export const integrations: NavMenuConstant = {
   items: [
     { name: 'Overview', url: '/guides/integrations/integrations' },
     {
+      name: 'OAuth Apps',
+      url: undefined,
+      items: [
+        {
+          name: 'Building an OAuth App (Beta)',
+          url: '/guides/integrations/oauth-apps/building-an-oauth-app',
+        },
+      ],
+    },
+    {
       name: 'Auth',
       url: undefined,
       items: [
