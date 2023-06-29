@@ -478,8 +478,7 @@ const channel = supabase
 
 ## Full `old` record
 
-By default, only `new` record changes are sent but if you want to receive the `old` record (previous values) whenever you `UPDATE` or `DELETE` a record,
-you can set the `replica identity` of your table to `full`:
+By default, only `new` record changes are sent but if you want to receive the `old` record (previous values) whenever you `UPDATE` or `DELETE` a record, you can set the `replica identity` of your table to `full`:
 
 ```sql
 alter table
