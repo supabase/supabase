@@ -131,27 +131,28 @@ const MigrateOrganizationBillingButton = observer(() => {
               <Modal.Content>
                 <div className="space-y-2">
                   <Alert title="About the migration" withIcon variant="info">
-                    <div className="text-sm">
-                      When migrating your organization to the new organization-level billing, you
-                      will only have a single subscription for all projects inside the organization,
-                      rather than an individual subscription per project. This process is
-                      irreversible. For a detailed breakdown of changes, see{' '}
-                      <Link href="https://www.notion.so/supabase/Organization-Level-Billing-9c159d69375b4af095f0b67881276582?pvs=4">
-                        <a target="_blank" rel="noreferrer" className="underline">
-                          Billing Migration Docs
-                        </a>
-                      </Link>
-                      .
-                    </div>
-                    <div className="text-sm mt-3">
-                      If you want to transfer a project to a different organization, head to your
-                      projects{' '}
-                      <Link href="/projects/_/settings/general">
-                        <a target="_blank" rel="noreferrer" className="underline">
-                          general settings
-                        </a>
-                      </Link>
-                      .
+                    <div className="text-sm space-y-2">
+                      <p>
+                        Migrating to new organization-level billing combines subscriptions for all
+                        projects in the organization into a single subscription. This cannot be
+                        reversed.{' '}
+                      </p>
+
+                      <p>
+                        For a detailed breakdown of changes, see{' '}
+                        <Link href="https://www.notion.so/supabase/Organization-Level-Billing-9c159d69375b4af095f0b67881276582?pvs=4">
+                          <a target="_blank" rel="noreferrer" className="underline">
+                            Billing Migration Docs
+                          </a>
+                        </Link>
+                        . To transfer projects to a different organization, visit{' '}
+                        <Link href="/projects/_/settings/general">
+                          <a target="_blank" rel="noreferrer" className="underline">
+                            General settings
+                          </a>
+                        </Link>
+                        .
+                      </p>
                     </div>
                   </Alert>
                 </div>
@@ -178,9 +179,9 @@ const MigrateOrganizationBillingButton = observer(() => {
                   })}
                 </Listbox>
 
-                <p className="text-sm text-scale-1000 mt-2">
-                  The pricing plan will apply to your entire organization. The included usage limits
-                  apply to your entire organizations. See{' '}
+                <p className="text-sm text-scale-1000 mt-4">
+                  The pricing plan, along with included usage limits will apply to your entire
+                  organization. See{' '}
                   <a
                     className="underline"
                     target="_blank"
@@ -189,11 +190,11 @@ const MigrateOrganizationBillingButton = observer(() => {
                   >
                     Pricing
                   </a>{' '}
-                  for more details. Please reach out to support if you're an Enterprise customer.
+                  for more details. Please contact support if you are an Enterprise customer.
                 </p>
 
                 {tier !== '' && tier !== 'FREE' && (
-                  <div className="mt-2 space-y-1">
+                  <div className="my-2 space-y-1 pb-4">
                     <p className="text-sm text-scale-1000">
                       Paid plans come with one compute instance included. Additional projects will
                       at least cost the compute instance hours used (min $7/month). See{' '}
@@ -206,32 +207,42 @@ const MigrateOrganizationBillingButton = observer(() => {
                     </p>
                   </div>
                 )}
-
+                <Modal.Separator />
                 {tier === 'PRO' && (
-                  <div className="mt-4">
-                    <Toggle
-                      id="isSpendCapEnabled"
-                      layout="horizontal"
-                      label={
-                        <div className="flex space-x-4">
-                          <span>Spend Cap</span>
-                          <IconHelpCircle
-                            size={16}
-                            strokeWidth={1.5}
-                            className="transition opacity-50 cursor-pointer hover:opacity-100"
-                            onClick={() => setShowSpendCapHelperModal(true)}
-                          />
-                        </div>
-                      }
-                      checked={isSpendCapEnabled}
-                      onChange={() => setIsSpendCapEnabled(!isSpendCapEnabled)}
-                    />
+                  <div className="mt-4 grid grid-cols-8 gap-8 ">
+                    <div className="space-y-2 col-span-5">
+                      <h4 className="flex items-center gap-4">
+                        Spend Cap{' '}
+                        <IconHelpCircle
+                          size={16}
+                          strokeWidth={1.5}
+                          className="transition opacity-50 cursor-pointer hover:opacity-100"
+                          onClick={() => setShowSpendCapHelperModal(true)}
+                        />
+                      </h4>
+                      <p className="text-sm text-scale-1000">
+                        When enabled, usage is limited to the plan's quota, with restrictions when
+                        limits are exceeded.{' '}
+                      </p>
+                      <p className="text-sm text-scale-1000">
+                        To scale beyond Pro limits without restrictions, disable the spend cap and
+                        pay for over-usage beyond the quota.
+                      </p>
+                    </div>
 
-                    <p className="text-sm text-scale-1000">
-                      When enabled, usage is limited to the plan's quota, with restrictions when
-                      limits are exceeded. To scale beyond Pro limits without restrictions, disable
-                      the spend cap and pay for over-usage beyond the quota.
-                    </p>
+                    <div className="col-span-3">
+                      <Toggle
+                        id="isSpendCapEnabled"
+                        layout="vertical"
+                        label={
+                          <div className="flex space-x-4">
+                            <span>Enable Spend Cap</span>
+                          </div>
+                        }
+                        checked={isSpendCapEnabled}
+                        onChange={() => setIsSpendCapEnabled(!isSpendCapEnabled)}
+                      />
+                    </div>
 
                     <SpendCapModal
                       visible={showSpendCapHelperModal}
