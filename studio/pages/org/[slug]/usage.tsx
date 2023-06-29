@@ -1,7 +1,6 @@
 import { useRouter } from 'next/router'
 
 import { useParams } from 'common/hooks'
-import { BillingSettings, BillingSettingsV2 } from 'components/interfaces/Organization'
 import { OrganizationLayout } from 'components/layouts'
 import Loading from 'components/ui/Loading'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
@@ -9,41 +8,36 @@ import { useFlag, useSelectedOrganization } from 'hooks'
 import { NextPageWithLayout } from 'types'
 import { Tabs } from 'ui'
 
-const OrgBillingSettings: NextPageWithLayout = () => {
+const OrgUsage: NextPageWithLayout = () => {
+  const { data: permissions } = usePermissionsQuery()
+  const selectedOrganization = useSelectedOrganization()
   const { slug } = useParams()
   const router = useRouter()
-
-  const selectedOrganization = useSelectedOrganization()
-  const { isLoading: isLoadingPermissions } = usePermissionsQuery()
-
   const showOAuthApps = useFlag('oauthApps')
-  const orgCreationV2 = useFlag('orgcreationv2')
-
-  const isOrgBilling = !!selectedOrganization?.subscription_id
 
   return (
     <>
-      {selectedOrganization === undefined && isLoadingPermissions ? (
+      {selectedOrganization === undefined && (permissions ?? []).length === 0 ? (
         <Loading />
       ) : (
-        <div>
-          <div className="space-y-3.5">
-            <section className="mt-4 px-4">
+        <div className="p-4 pt-0">
+          <div className="space-y-3">
+            <section className="mt-4">
               <h1 className="text-3xl">{selectedOrganization?.name ?? 'Organization'} settings</h1>
             </section>
             <nav>
               <Tabs
                 size="small"
                 type="underlined"
-                activeId="billing"
+                activeId="usage"
                 onChange={(id: any) => {
-                  if (id !== 'billing') router.push(`/org/${slug}/${id}`)
+                  if (id !== 'usage') router.push(`/org/${slug}/${id}`)
                 }}
               >
                 <Tabs.Panel id="general" label="General" />
                 <Tabs.Panel id="team" label="Team" />
-                <Tabs.Panel id="billing" label="Billing" className="!m-0" />
-                {orgCreationV2 && <Tabs.Panel id="usage" label="Usage" />}
+                <Tabs.Panel id="billing" label="Billing" />
+                <Tabs.Panel id="usage" label="Usage" />
                 <Tabs.Panel id="invoices" label="Invoices" />
                 {showOAuthApps && <Tabs.Panel id="apps" label="OAuth Apps" />}
               </Tabs>
@@ -51,13 +45,7 @@ const OrgBillingSettings: NextPageWithLayout = () => {
           </div>
 
           <div className="mb-8">
-            {isOrgBilling ? (
-              <BillingSettingsV2 />
-            ) : (
-              <div className="px-4">
-                <BillingSettings />
-              </div>
-            )}
+            <p>Billing V2</p>
           </div>
         </div>
       )}
@@ -65,6 +53,6 @@ const OrgBillingSettings: NextPageWithLayout = () => {
   )
 }
 
-OrgBillingSettings.getLayout = (page) => <OrganizationLayout>{page}</OrganizationLayout>
+OrgUsage.getLayout = (page) => <OrganizationLayout>{page}</OrganizationLayout>
 
-export default OrgBillingSettings
+export default OrgUsage
