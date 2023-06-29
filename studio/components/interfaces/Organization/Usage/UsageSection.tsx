@@ -35,6 +35,7 @@ interface UsageSectionProps {
   currentBillingCycleSelected: boolean
 }
 
+// [Joshen TODO] Needs to change to use org slug, and eventually call useOrganizationUsageQuery
 const UsageSection = ({
   projectRef,
   categoryKey,
