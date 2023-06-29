@@ -243,7 +243,7 @@ channelD.subscribe(async (status) => {
 })
 ```
 
-If the `ack` config is not set to `true` when creating the channel, the promise returned by call to `channelD.send` will resolve immediately.
+Use this to guarantee that the server has received the message before resolving `channelD.send`'s promise. If the `ack` config is not set to `true` when creating the channel, the promise returned by `channelD.send` will resolve immediately.
 
 ## Client-side rate limit
 
