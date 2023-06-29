@@ -225,9 +225,9 @@ const TransferProjectButton: FC<{}> = () => {
                     </a>
                   </Link>
                   . To migrate an organization to the new billing, head to your{' '}
-                  <Link href="/org/_/general">
+                  <Link href="/org/_/billing">
                     <a target="_blank" rel="noreferrer" className="underline">
-                      organizations settings
+                      organizations billing settings
                     </a>
                   </Link>
                   .
