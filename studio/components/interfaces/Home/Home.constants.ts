@@ -21,7 +21,7 @@ export const CLIENT_LIBRARIES = [
     gitUrl: 'https://github.com/supabase/supabase-py',
   },
   {
-    language: 'C-Sharp',
+    language: 'C#',
     officialSupport: false,
     releaseState: undefined,
     docsUrl: 'https://supabase.com/docs/reference/csharp/installing',
