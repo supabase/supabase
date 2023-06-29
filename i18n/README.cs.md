@@ -12,9 +12,9 @@
 - [x] hostovaná databáze Postgres. [Dokumenty](https://supabase.com/docs/guides/database)
 - [x] Ověřování a autorizace. [Dokumenty](https://supabase.com/docs/guides/auth)
 - [x] Automaticky generované rozhraní API.
-  - [x] REST. [Dokumenty](https://supabase.com/docs/guides/database/api#rest-api)
-  - [x] GraphQL. [Dokumenty](https://supabase.com/docs/guides/database/api#graphql-api)
-  - [x] Odběry v reálném čase. [Dokumenty](https://supabase.com/docs/guides/database/api#realtime-api)
+  - [x] REST. [Dokumenty](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL. [Dokumenty](https://supabase.com/docs/guides/api#graphql-api-overview)
+  - [x] Odběry v reálném čase. [Dokumenty](https://supabase.com/docs/guides/api#realtime-api-overview)
 - [x] Funkce.
   - [x] Databázové funkce. [Docs](https://supabase.com/docs/guides/database/functions)
   - [x] Okrajové funkce [Docs](https://supabase.com/docs/guides/functions)

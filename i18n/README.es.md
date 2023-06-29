@@ -12,9 +12,9 @@
 - Base de datos Postgres alojada. [Documentación](https://supabase.com/docs/guides/database)
 - [x] Autenticación y autorización. [Documentos](https://supabase.com/docs/guides/auth)
 - [x] API autogeneradas.
-  - [x] REST. [Docs](https://supabase.com/docs/guides/database/api#rest-api)
-  - [x] GraphQL. [Documentos](https://supabase.com/docs/guides/database/api#graphql-api)
-  - [x] Suscripciones en tiempo real. [Documentos](https://supabase.com/docs/guides/database/api#realtime-api)
+  - [x] REST. [Docs](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL. [Documentos](https://supabase.com/docs/guides/api#graphql-api-overview)
+  - [x] Suscripciones en tiempo real. [Documentos](https://supabase.com/docs/guides/api#realtime-api-overview)
 - [x] Funciones.
   - [x] Funciones de base de datos. [Docs](https://supabase.com/docs/guides/database/functions)
   - [x] Funciones de borde [Docs](https://supabase.com/docs/guides/functions)

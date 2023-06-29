@@ -1,13 +1,13 @@
-import { Button } from 'ui'
-import { observer } from 'mobx-react-lite'
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import Link from 'next/link'
 import { FC, ReactNode } from 'react'
-import * as Tooltip from '@radix-ui/react-tooltip'
 
-import { checkPermissions, useStore, useFlag } from 'hooks'
 import { useParams } from 'common/hooks'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { checkPermissions, useFlag } from 'hooks'
 import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { Button } from 'ui'
 
 interface Props {
   icon?: ReactNode
@@ -17,16 +17,15 @@ interface Props {
 }
 
 const UpgradeToPro: FC<Props> = ({ icon, primaryText, projectRef, secondaryText }) => {
-  const { ui } = useStore()
   const { ref } = useParams()
-  const tier = ui.selectedProject?.subscription_tier
+  const { project } = useProjectContext()
+  const tier = project?.subscription_tier
 
   const canUpdateSubscription = checkPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.subscriptions'
   )
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
-  const isEnterprise = tier === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
 
   return (
     <div
@@ -48,11 +47,11 @@ const UpgradeToPro: FC<Props> = ({ icon, primaryText, projectRef, secondaryText 
           <Tooltip.Root delayDuration={0}>
             <Tooltip.Trigger>
               <Button type="primary" disabled={!canUpdateSubscription || projectUpdateDisabled}>
-                <Link href={`/project/${ref}/settings/billing/subscription?panel=subscriptionPlan`}>
+                <Link href={`/project/${ref}/settings/billing/subscription?panel=${tier === PRICING_TIER_PRODUCT_IDS.FREE ? 'subscriptionPlan' : 'customDomain'}`}>
                   <a>
                     {tier === PRICING_TIER_PRODUCT_IDS.FREE
                       ? 'Upgrade to Pro'
-                      : 'Modify subscription'}
+                      : 'Enable Custom Domain'}
                   </a>
                 </Link>
               </Button>
@@ -93,4 +92,4 @@ const UpgradeToPro: FC<Props> = ({ icon, primaryText, projectRef, secondaryText 
   )
 }
 
-export default observer(UpgradeToPro)
+export default UpgradeToPro

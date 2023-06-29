@@ -12,9 +12,9 @@
 - [x] Base de données Postgres hébergée. [Docs](https://supabase.com/docs/guides/database)
 - [x] Authentification et autorisation. [Docs](https://supabase.com/docs/guides/auth)
 - [x] API générées automatiquement.
-  - [x] REST. [Docs](https://supabase.com/docs/guides/database/api#rest-api)
-  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/database/api#graphql-api)
-  - [x] Abonnements en temps réel. [Docs](https://supabase.com/docs/guides/database/api#realtime-api)
+  - [x] REST. [Docs](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/api#graphql-api-overview)
+  - [x] Abonnements en temps réel. [Docs](https://supabase.com/docs/guides/api#realtime-api-overview)
 - [x] Fonctions.
   - [x] Fonctions de base de données. [Docs](https://supabase.com/docs/guides/database/functions)
   - [x] Fonctions Edge [Docs](https://supabase.com/docs/guides/functions)

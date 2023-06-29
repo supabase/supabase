@@ -12,9 +12,9 @@
 - [x] Hosted Postgres Database. [Docs](https://supabase.com/docs/guides/database)
 - [x] Tunnistus ja valtuutus. [Docs](https://supabase.com/docs/guides/auth)
 - [x] Automaattisesti luodut API:t.
-  - [x] REST. [Asiakirjat](https://supabase.com/docs/guides/database/api#rest-api)
-  - [x] GraphQL. [Asiakirjat](https://supabase.com/docs/guides/database/api#graphql-api)
-  - [x] Reaaliaikaiset tilaukset. [Asiakirjat](https://supabase.com/docs/guides/database/api#realtime-api)
+  - [x] REST. [Asiakirjat](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL. [Asiakirjat](https://supabase.com/docs/guides/api#graphql-api-overview)
+  - [x] Reaaliaikaiset tilaukset. [Asiakirjat](https://supabase.com/docs/guides/api#realtime-api-overview)
 - [x] Funktiot.
   - [x] Tietokantafunktiot. [Docs](https://supabase.com/docs/guides/database/functions)
   - [x] Reunatoiminnot [Docs](https://supabase.com/docs/guides/functions)

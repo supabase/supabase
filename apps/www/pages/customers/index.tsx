@@ -50,7 +50,7 @@ function CustomerStoriesPage(props: any) {
       category === 'all'
         ? props.blogs
         : props.blogs.filter((post: any) => {
-            const found = post.tags.includes(category)
+            const found = post.tags?.includes(category)
             return found
           })
     )

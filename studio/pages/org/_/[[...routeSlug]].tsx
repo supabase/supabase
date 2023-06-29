@@ -1,13 +1,13 @@
+import { NextPage } from 'next'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { NextPage } from 'next'
-import { observer } from 'mobx-react-lite'
-import { Button, IconPlus } from 'ui'
 
-import { withAuth, useStore } from 'hooks'
-import { BASE_PATH } from 'lib/constants'
-import CardButton from 'components/ui/CardButton'
 import ShimmeringCard from 'components/interfaces/Home/ProjectList/ShimmeringCard'
+import CardButton from 'components/ui/CardButton'
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { withAuth } from 'hooks'
+import { BASE_PATH } from 'lib/constants'
+import { Button, IconPlus } from 'ui'
 
 const Header = () => {
   return (
@@ -29,12 +29,9 @@ const Header = () => {
 }
 
 const GenericOrganizationPage: NextPage = () => {
-  const { app } = useStore()
   const router = useRouter()
-  const { organizations } = app
-  const { isLoading } = organizations
 
-  const sortedOrganizations = organizations.list()
+  const { data: organizations, isLoading } = useOrganizationsQuery()
   const { routeSlug, ...queryParams } = router.query
   const queryString =
     Object.keys(queryParams).length > 0
@@ -71,7 +68,7 @@ const GenericOrganizationPage: NextPage = () => {
               <ShimmeringCard />
               <ShimmeringCard />
             </ul>
-          ) : sortedOrganizations.length === 0 ? (
+          ) : organizations?.length === 0 ? (
             <div className="col-span-4 space-y-4 rounded-lg border-2 border-dashed border-gray-300 p-6 text-center">
               <div className="space-y-1">
                 <p>You are not part of any organizations yet</p>
@@ -94,7 +91,7 @@ const GenericOrganizationPage: NextPage = () => {
                 'sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3',
               ].join(' `')}
             >
-              {sortedOrganizations.map((organization) => (
+              {organizations?.map((organization) => (
                 <li key={organization.slug} className="col-span-1">
                   <CardButton
                     linkHref={urlRewriterFactory(routeSlug)(organization.slug)}
@@ -121,4 +118,4 @@ const GenericOrganizationPage: NextPage = () => {
   )
 }
 
-export default withAuth(observer(GenericOrganizationPage))
+export default withAuth(GenericOrganizationPage)

@@ -13,6 +13,7 @@ import { API_URL, DEFAULT_MINIMUM_PASSWORD_STRENGTH } from 'lib/constants'
 
 import Panel from 'components/ui/Panel'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
+import { getProjectDetail } from 'data/projects/project-detail-query'
 
 const ResetDbPassword: FC<any> = ({ disabled = false }) => {
   const { ui, app, meta } = useStore()
@@ -65,7 +66,11 @@ const ResetDbPassword: FC<any> = ({ disabled = false }) => {
       setIsUpdatingPassword(true)
       const res = await patch(`${API_URL}/projects/${ref}/db-password`, { password })
       if (!res.error) {
-        await app.projects.fetchDetail(ref, (project) => meta.setProjectDetails(project))
+        const project = await getProjectDetail({ ref })
+        if (project) {
+          meta.setProjectDetails(project)
+        }
+
         ui.setNotification({ category: 'success', message: res.message })
         setShowResetDbPass(false)
       } else {

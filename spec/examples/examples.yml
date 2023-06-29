@@ -240,7 +240,7 @@ functions:
         js: |
           ```js
           const { data, error } = await supabase.auth.signInWithOAuth({
-            provider: 'github'
+            provider: 'github',
             options: {
               redirectTo: 'https://example.com/welcome'
             }
@@ -255,7 +255,7 @@ functions:
         js: |
           ```js
           const { data, error } = await supabase.auth.signInWithOAuth({
-            provider: 'github'
+            provider: 'github',
             options: {
               scopes: 'repo gist notifications'
             }
