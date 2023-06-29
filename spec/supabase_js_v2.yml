@@ -1271,6 +1271,74 @@ functions:
             "statusText": "OK"
           }
           ```
+      - id: filtering-with-inner-joins
+        name: Filtering with inner joins
+        code: |
+          ```ts
+            const { data, error } = await supabase
+              .from('messages')
+              .select('*, users!inner(*)')
+              .eq('users.username', 'Jane')
+          ```
+        sql: |
+          ```sql
+          -- Create the 'users' table
+          CREATE TABLE users (
+            id SERIAL PRIMARY KEY,
+            username TEXT
+          );
+
+          -- Create the 'messages' table
+          CREATE TABLE messages (
+            id SERIAL PRIMARY KEY,
+            text TEXT,
+            user_id INT REFERENCES users(id)
+          );
+
+          -- Insert sample data into the 'users' table
+          INSERT INTO users (username) VALUES
+            ('Jane'),
+            ('John');
+
+          -- Insert sample data into the 'messages' table
+          INSERT INTO messages (text, user_id) VALUES
+            ('Hi Jane, how are you?', 1),
+            ('I''m doing well, thanks for asking!', 1);
+
+          -- Perform the SQL query to filter messages with inner joins
+          SELECT messages.*, users.*
+          FROM messages
+          INNER JOIN users ON messages.user_id = users.id
+          WHERE users.username = 'Jane';
+
+         ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "text": "Hi Jane, how are you?",
+                "user_id": 1,
+                "username": "Jane"
+              },
+              {
+                "id": 2,
+                "text": "I'm doing well, thanks for asking!",
+                "user_id": 1,
+                "username": "Jane"
+              }
+            ]
+          }
+          ```
+
+
+
+        
+        description: If you want to filter a table based on a child table's values you can use the `!inner()` function. For example, if you wanted
+        to select all rows in a `message` table which belong to a user with the `username` "Jane"
+        
+
       - id: query-foreign-tables-through-a-join-table
         name: Query foreign tables through a join table
         code: |
