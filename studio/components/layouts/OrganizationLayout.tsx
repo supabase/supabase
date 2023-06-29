@@ -1,18 +1,13 @@
-import { useStore } from 'hooks'
-import { observer } from 'mobx-react-lite'
-import { FC, ReactNode } from 'react'
-import { AccountLayout } from './'
+import { useSelectedOrganization } from 'hooks'
+import { PropsWithChildren } from 'react'
+import AccountLayout from './AccountLayout/AccountLayout'
 
-interface Props {
-  children: ReactNode
-}
-
-const OrganizationLayout: FC<Props> = ({ children }) => {
-  const { ui } = useStore()
+const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
+  const selectedOrganization = useSelectedOrganization()
 
   return (
     <AccountLayout
-      title={ui.selectedOrganization?.name ?? 'Supabase'}
+      title={selectedOrganization?.name ?? 'Supabase'}
       breadcrumbs={[{ key: `org-settings`, label: 'Settings' }]}
     >
       {children}
@@ -20,4 +15,4 @@ const OrganizationLayout: FC<Props> = ({ children }) => {
   )
 }
 
-export default observer(OrganizationLayout)
+export default OrganizationLayout
