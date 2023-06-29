@@ -17,7 +17,7 @@ import dayjs from 'dayjs'
 export interface UsageBarChartProps {
   data: DataPoint[]
   name: string // Used within the tooltip
-  attribute: string
+  attributes: { name: string; color: string }[]
   unit: 'bytes' | 'absolute' | 'percentage'
   yLimit?: number
   yLeftMargin?: number
@@ -28,17 +28,16 @@ export interface UsageBarChartProps {
 const UsageBarChart = ({
   data,
   name,
-  attribute,
+  attributes,
   unit,
   yLimit,
   yLeftMargin = 10,
   yFormatter,
-  tooltipFormatter
+  tooltipFormatter,
 }: UsageBarChartProps) => {
   const yMin = 0 // We can consider passing this as a prop if there's a use case in the future
 
   const yDomain = [yMin, yLimit ?? 0]
-
 
   return (
     <div className="w-full h-[200px]">
@@ -65,9 +64,6 @@ const UsageBarChart = ({
 
                 return (
                   <div className="w-[170px] border bg-scale-300 rounded-md px-2 py-2">
-                    <p className="text-xs text-scale-1000">
-                      {attribute === 'disk_io_budget' ? `Remaining IO budget:` : `${name}:`}
-                    </p>
                     {dataPeriod.startOf('day').isAfter(dayjs().startOf('day')) ? (
                       <p className="text-scale-1000 text-lg">No data yet</p>
                     ) : (
@@ -83,11 +79,13 @@ const UsageBarChart = ({
               } else return null
             }}
           />
-          <Bar dataKey={attribute}>
-            {data.map((entry) => {
-              return <Cell key={`${entry.period_start}`} className="fill-scale-1200" />
-            })}
-          </Bar>
+          {attributes?.map((attr) => (
+            <Bar key={attr.name} dataKey={attr.name} stackId="a">
+              {data.map((entry) => {
+                return <Cell key={`${entry.period_start}`} className={attr.color} />
+              })}
+            </Bar>
+          ))}
         </ComposedChart>
       </ResponsiveContainer>
     </div>

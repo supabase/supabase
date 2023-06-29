@@ -16,7 +16,7 @@ export const USAGE_STATUS = {
 export interface CategoryAttribute {
   anchor: string
   key: string // Property from project usage
-  attribute: string // For querying against stats-daily / infra-monitoring
+  attributes: { name: string; color: string }[] // For querying against stats-daily / infra-monitoring
   name: string
   chartPrefix?: string
   unit: 'bytes' | 'absolute' | 'percentage'
@@ -42,6 +42,7 @@ export interface CategoryMeta {
   attributes: CategoryAttribute[]
 }
 
+// [Joshen] We need to update this
 export const USAGE_CATEGORIES: CategoryMeta[] = [
   {
     key: 'bandwidth',
@@ -51,7 +52,10 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
       {
         anchor: 'dbEgress',
         key: 'db_egress',
-        attribute: 'total_egress_modified',
+        attributes: [
+          { name: 'total_egress_modified', color: 'fill-green-1000' },
+          { name: 'total_storage_egress', color: 'fill-blue-1000' },
+        ],
         name: 'Total Egress',
         unit: 'bytes',
         description:
@@ -68,7 +72,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
       {
         anchor: 'dbSize',
         key: 'db_size',
-        attribute: 'total_db_size_bytes',
+        attributes: [{ name: 'total_db_size_bytes', color: 'fill-scale-1200' }],
         name: 'Database size',
         chartPrefix: 'Average ',
         unit: 'bytes',
@@ -150,7 +154,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
       {
         anchor: 'storageSize',
         key: 'storage_size',
-        attribute: 'total_storage_size_bytes',
+        attributes: [{ name: 'total_storage_size_bytes', color: 'fill-scale-1200' }],
         name: 'Storage Size',
         chartPrefix: 'Max ',
         unit: 'bytes',
@@ -167,7 +171,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
       {
         anchor: 'funcCount',
         key: 'func_count',
-        attribute: 'total_func_count',
+        attributes: [{ name: 'total_func_count', color: 'fill-scale-1200' }],
         name: 'Edge Function Count',
         chartPrefix: 'Max ',
         unit: 'absolute',
@@ -185,7 +189,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
       {
         anchor: 'mau',
         key: 'monthly_active_users',
-        attribute: 'total_auth_billing_period_mau',
+        attributes: [{ name: 'total_auth_billing_period_mau', color: 'fill-scale-1200' }],
         name: 'Monthly Active Users',
         unit: 'absolute',
         description:
@@ -202,7 +206,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
       {
         anchor: 'mauSso',
         key: 'monthly_active_sso_users',
-        attribute: 'total_auth_billing_period_sso_mau',
+        attributes: [{ name: 'total_auth_billing_period_sso_mau', color: 'fill-scale-1200' }],
         name: 'Monthly Active SSO Users',
         unit: 'absolute',
         description:
@@ -219,7 +223,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
       {
         anchor: 'storageImageTransformations',
         key: 'storage_image_render_count',
-        attribute: 'total_storage_image_render_count',
+        attributes: [{ name: 'total_storage_image_render_count', color: 'fill-scale-1200' }],
         name: 'Storage Image Transformations',
         unit: 'absolute',
         description:
@@ -236,7 +240,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
       {
         anchor: 'functionInvocations',
         key: 'func_invocations',
-        attribute: 'total_func_invocations',
+        attributes: [{ name: 'total_func_invocations', color: 'fill-scale-1200' }],
         name: 'Edge Function Invocations',
         unit: 'absolute',
         description:
@@ -252,7 +256,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
       {
         anchor: 'realtimeMessageCount',
         key: 'realtime_message_count',
-        attribute: 'total_realtime_message_count',
+        attributes: [{ name: 'total_realtime_message_count', color: 'fill-scale-1200' }],
         name: 'Realtime Message Count',
         unit: 'absolute',
         description:
@@ -268,7 +272,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
       {
         anchor: 'realtimePeakConnection',
         key: 'realtime_peak_connection',
-        attribute: 'total_realtime_peak_connection',
+        attributes: [{ name: 'total_realtime_peak_connection', color: 'fill-scale-1200' }],
         name: 'Realtime Peak Connections',
         chartPrefix: 'Max ',
         unit: 'absolute',

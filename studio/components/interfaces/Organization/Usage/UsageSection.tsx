@@ -1,28 +1,29 @@
+import * as Tooltip from '@radix-ui/react-tooltip'
+import clsx from 'clsx'
+import Link from 'next/link'
+
+import { USAGE_APPROACHING_THRESHOLD } from 'components/interfaces/BillingV2/Billing.constants'
+import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import SectionHeader from './SectionHeader'
-import { CategoryMetaKey, USAGE_CATEGORIES } from './Usage.constants'
+import SparkBar from 'components/ui/SparkBar'
+import { DataPoint } from 'data/analytics/constants'
+import { ProjectSubscriptionResponse } from 'data/subscriptions/project-subscription-v2-query'
 import {
   ProjectUsageResponse,
   UsageMetric,
   useProjectUsageQuery,
 } from 'data/usage/project-usage-query'
-import { DataPoint } from 'data/analytics/constants'
-import SectionContent from './SectionContent'
+import { formatBytes } from 'lib/helpers'
 import { Button, IconAlertTriangle, IconBarChart2 } from 'ui'
-import { USAGE_APPROACHING_THRESHOLD } from 'components/interfaces/BillingV2/Billing.constants'
-import Link from 'next/link'
-import SparkBar from 'components/ui/SparkBar'
-import clsx from 'clsx'
-import { ProjectSubscriptionResponse } from 'data/subscriptions/project-subscription-v2-query'
+import SectionContent from './SectionContent'
+import SectionHeader from './SectionHeader'
+import { CategoryMetaKey, USAGE_CATEGORIES } from './Usage.constants'
 import {
   ChartTooltipValueFormatter,
   ChartYFormatterCompactNumber,
   getUpgradeUrl,
 } from './Usage.utils'
-import { formatBytes } from 'lib/helpers'
 import UsageBarChart from './UsageBarChart'
-import Panel from 'components/ui/Panel'
-import * as Tooltip from '@radix-ui/react-tooltip'
 
 interface UsageSectionProps {
   projectRef: string
@@ -63,9 +64,12 @@ const UsageSection = ({
 
         const chartData = chartMeta[attribute.key]?.data ?? []
 
-        const notAllValuesZero = chartData.some(
-          (dataPoint) => Number(dataPoint[attribute.attribute]) !== 0
-        )
+        const notAllValuesZero =
+          attribute.attributes
+            ?.map((attr) => {
+              return chartData.some((dataPoint) => Number(dataPoint[attr.name]) !== 0)
+            })
+            .some((x) => !!x) ?? false
 
         return (
           <div id={attribute.anchor} key={attribute.key}>
@@ -229,7 +233,7 @@ const UsageSection = ({
                     <UsageBarChart
                       name={`${attribute.chartPrefix || ''}${attribute.name}`}
                       unit={attribute.unit}
-                      attribute={attribute.attribute}
+                      attributes={attribute.attributes}
                       data={chartData}
                       yLeftMargin={chartMeta[attribute.key].margin}
                       yFormatter={(value) => ChartYFormatterCompactNumber(value, attribute.unit)}
