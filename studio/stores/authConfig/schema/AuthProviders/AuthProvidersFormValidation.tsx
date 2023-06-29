@@ -784,6 +784,46 @@ const EXTERNAL_PROVIDER_GOOGLE = {
   },
 }
 
+const EXTERNAL_PROVIDER_KAKAO = {
+  $schema: JSON_SCHEMA_VERSION,
+  type: 'object',
+  title: 'Kakao',
+  properties: {
+    EXTERNAL_KAKAO_ENABLED: {
+      title: 'Kakao enabled',
+      type: 'boolean',
+    },
+    // [TODO] Update docs
+    EXTERNAL_KAKAO_CLIENT_ID: {
+      title: 'REST API Key',
+      type: 'string',
+    },
+    // [TODO] Update docs
+    EXTERNAL_KAKAO_SECRET: {
+      title: 'Client Secret Code',
+      type: 'string',
+      isSecret: true,
+    },
+  },
+  validationSchema: object().shape({
+    EXTERNAL_KAKAO_ENABLED: boolean().required(),
+    EXTERNAL_KAKAO_CLIENT_ID: string().when('EXTERNAL_KAKAO_ENABLED', {
+      is: true,
+      then: (schema) => schema.required('REST API Key is required'),
+      otherwise: (schema) => schema,
+    }),
+    EXTERNAL_KAKAO_SECRET: string().when('EXTERNAL_KAKAO_ENABLED', {
+      is: true,
+      then: (schema) => schema.required('Client Secret Code is required'),
+      otherwise: (schema) => schema,
+    }),
+  }),
+  misc: {
+    iconKey: 'kakao-icon',
+    requiresRedirect: true,
+  },
+}
+
 // [TODO]: clarify the EXTERNAL_KEYCLOAK_URL property
 const EXTERNAL_PROVIDER_KEYCLOAK = {
   $schema: JSON_SCHEMA_VERSION,
@@ -1183,6 +1223,7 @@ export const PROVIDERS_SCHEMAS = [
   EXTERNAL_PROVIDER_GITHUB,
   EXTERNAL_PROVIDER_GITLAB,
   EXTERNAL_PROVIDER_GOOGLE,
+  EXTERNAL_PROVIDER_KAKAO,
   EXTERNAL_PROVIDER_KEYCLOAK,
   EXTERNAL_PROVIDER_LINKEDIN,
   EXTERNAL_PROVIDER_NOTION,
