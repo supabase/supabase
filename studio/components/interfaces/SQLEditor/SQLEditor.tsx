@@ -7,11 +7,19 @@ import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import useLatest from 'hooks/misc/useLatest'
 import MonacoEditor, { IStandaloneCodeEditor } from './MonacoEditor'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
+import { useLocalStorage } from 'hooks'
 
 const SQLEditor = () => {
   const { ref, id } = useParams()
   const { project } = useProjectContext()
   const snap = useSqlEditorStateSnapshot()
+
+  const [savedSplitSize, setSavedSplitSize] = useLocalStorage(
+    'supabase_sql-editor-split-size',
+    `[50, 50]`
+  )
+
+  const splitSize = savedSplitSize ? JSON.parse(savedSplitSize) : undefined
 
   const { mutate: execute, isLoading: isExecuting } = useExecuteSqlMutation({
     onSuccess(data) {
@@ -34,6 +42,7 @@ const SQLEditor = () => {
   const onDragEnd = useCallback((sizes: number[]) => {
     const id = idRef.current
     if (id) snap.setSplitSizes(id, sizes)
+    setSavedSplitSize(JSON.stringify(sizes))
   }, [])
 
   const editorRef = useRef<IStandaloneCodeEditor | null>(null)
@@ -63,7 +72,7 @@ const SQLEditor = () => {
         style={{ height: '100%' }}
         direction="vertical"
         gutterSize={2}
-        sizes={(snippet?.splitSizes as number[] | undefined) ?? [50, 50]}
+        sizes={(splitSize ? splitSize : (snippet?.splitSizes as number[] | undefined)) ?? [50, 50]}
         minSize={minSize}
         snapOffset={snapOffset}
         expandToMin={true}

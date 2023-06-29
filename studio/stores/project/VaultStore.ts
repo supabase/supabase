@@ -133,7 +133,7 @@ export default class VaultStore implements IVaultStore {
   }
 
   async encryptColumn(column: PostgresColumn, keyId: string) {
-    const query = `security label for pgsodium on column "${column.table}"."${column.name}" is 'ENCRYPT WITH KEY ID ${keyId}';`
+    const query = `security label for pgsodium on column "${column.table}"."${column.name}" is 'ENCRYPT WITH KEY ID ${keyId} SECURITY INVOKER';`
     return await this.rootStore.meta.query(query)
   }
 

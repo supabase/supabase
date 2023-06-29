@@ -72,7 +72,7 @@ const LayoutComparison = ({ components, props }: Props) => {
             // to do: author urls should be internal in future
             // currently we have external links to github profiles
             authors: [props.blog.author_url],
-            tags: props.blog.tags.map((cat: string) => {
+            tags: props.blog.tags?.map((cat: string) => {
               return cat
             }),
           },
