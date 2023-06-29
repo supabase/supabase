@@ -22,11 +22,6 @@ const ClientLibrary: FC<Props> = ({ language, officialSupport, docsUrl, gitUrl }
           <h5 className="flex items-center gap-2 text-base text-scale-1200">
             {language} {!officialSupport && <Badge color="green">Community</Badge>}
           </h5>
-          <p className="text-sm text-scale-1000">
-            {officialSupport
-              ? 'This library is officially supported'
-              : 'This library is community supported'}
-          </p>
         </div>
         <div className="flex gap-2">
           {docsUrl && (
