@@ -7,6 +7,7 @@ import { useBreakpoint } from 'common'
 import { useTelemetryProps } from 'common/hooks/useTelemetryProps'
 
 import SectionContainer from '~/components/Layouts/SectionContainer'
+
 import ProductCard from './ProductCard'
 import DatabaseVisual from './DatabaseVisual'
 

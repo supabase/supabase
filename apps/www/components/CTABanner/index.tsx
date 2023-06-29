@@ -12,7 +12,8 @@ const CTABanner = (props: any) => {
 
     const spline = new Application(canvas as any)
     // spline.load('https://prod.spline.design/EVQrv4Zsx5JT2pDe/scene.splinecode').then(() => {
-    spline.load('https://prod.spline.design/0Txq7YaSsBK2XeDK/scene.splinecode').then(() => {
+    // spline.load('https://prod.spline.design/0Txq7YaSsBK2XeDK/scene.splinecode').then(() => {
+    spline.load('https://prod.spline.design/vbNccuimehENvbVd/scene.splinecode').then(() => {
       const obj = spline.findObjectById('ab3a4cd0-90a8-47c7-b2c7-b0ee1e0bb8a6')
       console.log(obj, spline)
       spline.setZoom(2.5)
@@ -52,9 +53,10 @@ const CTABanner = (props: any) => {
         </div>
       </div>
 
-      <div className="absolute z-0 mx-auto w-full h-auto lg:w-auto lg:h-full left-0 right-0 flex justify-center top-0 text-white opacity-50">
+      <div className="absolute z-0 mx-auto w-full h-auto lg:w-auto lg:h-full left-0 right-0 flex justify-center top-0 text-white opacity-100">
         <img
-          src="/images/index/soft-blur-grid-03.png"
+          // src="/images/index/soft-blur-grid-03.png"
+          src="/images/index/soft-blur-01.png"
           alt="background decoration image with grid"
           className="w-full h-auto lg:w-auto lg:h-full"
         />

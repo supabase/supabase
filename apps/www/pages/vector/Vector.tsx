@@ -16,7 +16,7 @@ const CenteredTitleImage = dynamic(() => import('~/components/Sections/CenteredT
 const CustomerQuotesSection = dynamic(() => import('~/components/Sections/CustomerQuotesSection'))
 const TimedTabsSection = dynamic(() => import('~/components/Sections/TimedTabsSection'))
 const ProductsCta = dynamic(() => import('~/components/Sections/ProductsCta'))
-const EnterpriseCta = dynamic(() => import('~/components/Sections/EnterpriseCta'))
+const EnterpriseCta = dynamic(() => import('~/components/Sections/VectorEnterpriseCta'))
 
 function VectorPage() {
   // base path for images

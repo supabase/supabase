@@ -38,7 +38,7 @@ const ProductCard = ({
           hasActiveOnHover
           outerClassName="relative w-full h-full group/2 shadow-lg p-0"
           innerClassName="relative overflow-hidden flex-1 flex flex-col items-center gap-5 lg:items-start justify-between
-                  w-full rounded-xl h-full"
+                  w-full rounded-xl h-full !bg-[hsl(190,60%,3%)]"
         >
           <m.div
             className={[
