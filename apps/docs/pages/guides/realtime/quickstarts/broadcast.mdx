@@ -193,7 +193,7 @@ There are additional Broadcast functionality that you can enable when creating a
 
 ### Self-send messages
 
-You can have a client send a message and then receive it by setting Broadcast's `self` config to `true`.
+You can have a client broadcast a message and then receive the same message by setting Broadcast's `self` config to `true`. Without this, broadcast messages are only sent to other clients.
 
 ```js
 const channelC = clientC.channel('room-2', {
