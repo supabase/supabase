@@ -207,14 +207,6 @@ Let's explore how to implement Realtime Postgres Changes so you can integrate it
     <StepHikeCompact.Code>
 
       ```js
-      /*
-        Channel name can be any string except 'realtime'.
-        Event name can can be one of:
-          - INSERT
-          - UPDATE
-          - DELETE
-          - *
-      */
       const channelC = client
         .channel('table-filter-changes')
         .on(
