@@ -1,45 +1,36 @@
-import Link from 'next/link'
-import { observer } from 'mobx-react-lite'
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { useParams } from 'common'
-import { Badge, Button, IconCommand, IconSearch, useCommandMenu } from 'ui'
+import Link from 'next/link'
+import { Badge } from 'ui'
 
-import { detectOS } from 'lib/helpers'
+import { getResourcesExceededLimits } from 'components/ui/OveragesBanner/OveragesBanner.utils'
+import { useProjectReadOnlyQuery } from 'data/config/project-read-only-query'
+import { useProjectUsageQuery } from 'data/usage/project-usage-query'
+import { useFlag, useSelectedOrganization, useSelectedProject } from 'hooks'
 import { IS_PLATFORM, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
-import { useFlag, useStore } from 'hooks'
 import BreadcrumbsView from './BreadcrumbsView'
-import OrgDropdown from './OrgDropdown'
-import ProjectDropdown from './ProjectDropdown'
 import FeedbackDropdown from './FeedbackDropdown'
 import HelpPopover from './HelpPopover'
 import NotificationsPopover from './NotificationsPopover'
-import { getResourcesExceededLimits } from 'components/ui/OveragesBanner/OveragesBanner.utils'
-import { useProjectUsageQuery } from 'data/usage/project-usage-query'
-import { useProjectReadOnlyQuery } from 'data/config/project-read-only-query'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import OrgDropdown from './OrgDropdown'
+import ProjectDropdown from './ProjectDropdown'
 
 const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder = true }: any) => {
-  const { ui } = useStore()
-  const { selectedOrganization, selectedProject } = ui
-
-  const os = detectOS()
-  const { setIsOpen } = useCommandMenu()
-  const showCmdkHelper = useFlag('dashboardCmdk')
+  const selectedOrganization = useSelectedOrganization()
+  const selectedProject = useSelectedProject()
 
   const { ref: projectRef } = useParams()
-  const { project } = useProjectContext()
   const { data: isReadOnlyMode } = useProjectReadOnlyQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
+    projectRef: selectedProject?.ref,
+    connectionString: selectedProject?.connectionString,
   })
 
   const { data: usage } = useProjectUsageQuery({ projectRef })
   const resourcesExceededLimits = getResourcesExceededLimits(usage)
 
   const projectHasNoLimits =
-    ui.selectedProject?.subscription_tier === PRICING_TIER_PRODUCT_IDS.PAYG ||
-    ui.selectedProject?.subscription_tier === PRICING_TIER_PRODUCT_IDS.ENTERPRISE ||
-    ui.selectedProject?.subscription_tier === PRICING_TIER_PRODUCT_IDS.TEAM
+    selectedProject?.subscription_tier === PRICING_TIER_PRODUCT_IDS.PAYG ||
+    selectedProject?.subscription_tier === PRICING_TIER_PRODUCT_IDS.ENTERPRISE ||
+    selectedProject?.subscription_tier === PRICING_TIER_PRODUCT_IDS.TEAM
 
   const showOverUsageBadge =
     useFlag('overusageBadge') &&
@@ -50,7 +41,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
   return (
     <div
       className={`flex h-12 max-h-12 items-center justify-between py-2 px-5 ${
-        headerBorder ? 'border-b dark:border-dark' : ''
+        headerBorder ? 'border-b border-scale-500' : ''
       }`}
     >
       <div className="-ml-2 flex items-center text-sm">
@@ -119,37 +110,6 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
       </div>
       <div className="flex items-center space-x-2">
         {customHeaderComponents && customHeaderComponents}
-        {IS_PLATFORM && showCmdkHelper && (
-          <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger>
-              <div className="flex">
-                <Button
-                  type="default"
-                  icon={<IconSearch size={16} strokeWidth={1.5} className="text-scale-1200" />}
-                  onClick={() => setIsOpen(true)}
-                />
-              </div>
-            </Tooltip.Trigger>
-            <Tooltip.Portal>
-              <Tooltip.Content side="bottom">
-                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                <div
-                  className={[
-                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                    'border border-scale-200 flex items-center space-x-1',
-                  ].join(' ')}
-                >
-                  {os === 'macos' ? (
-                    <IconCommand size={11.5} strokeWidth={1.5} className="text-scale-1200" />
-                  ) : (
-                    <p className="text-xs">CTRL</p>
-                  )}
-                  <p className="text-xs">K</p>
-                </div>
-              </Tooltip.Content>
-            </Tooltip.Portal>
-          </Tooltip.Root>
-        )}
         {IS_PLATFORM && <HelpPopover />}
         {IS_PLATFORM && <FeedbackDropdown />}
         {IS_PLATFORM && <NotificationsPopover />}
@@ -157,4 +117,4 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
     </div>
   )
 }
-export default observer(LayoutHeader)
+export default LayoutHeader

@@ -9,6 +9,7 @@ export interface Organization {
   is_owner?: boolean
   stripe_customer_id?: string
   opt_in_tags: string[]
+  subscription_id?: string
 }
 
 export interface ProjectBase {
@@ -78,12 +79,14 @@ export interface Permission {
   resources: string[]
 }
 
-export interface ResponseError {
-  message: string
-}
-
 export interface ResponseFailure {
   error: ResponseError
 }
 
 export type SupaResponse<T> = T & ResponseFailure
+
+export interface ResponseError {
+  code: number
+  message: string
+  requestId: string
+}

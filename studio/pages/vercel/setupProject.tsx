@@ -7,17 +7,15 @@ import { debounce } from 'lodash'
 import { Button, Input, Listbox } from 'ui'
 import { Dictionary } from 'components/grid'
 import generator from 'generate-password'
-
 import { useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { passwordStrength } from 'lib/helpers'
 import {
   PROVIDERS,
-  REGIONS,
-  REGIONS_DEFAULT,
   DEFAULT_MINIMUM_PASSWORD_STRENGTH,
   API_URL,
   PRICING_TIER_PRODUCT_IDS,
+  AWS_REGIONS,
 } from 'lib/constants'
 import { VERCEL_INTEGRATION_CONFIGS } from 'lib/vercelConfigs'
 import {
@@ -149,12 +147,11 @@ const CreateProject = observer(() => {
   const _store = useContext(PageContext)
   const router = useRouter()
   const { ui } = useStore()
-
   const [projectName, setProjectName] = useState('')
   const [dbPass, setDbPass] = useState('')
   const [passwordStrengthMessage, setPasswordStrengthMessage] = useState('')
   const [passwordStrengthScore, setPasswordStrengthScore] = useState(-1)
-  const [dbRegion, setDbRegion] = useState(REGIONS_DEFAULT)
+  const [dbRegion, setDbRegion] = useState(PROVIDERS.AWS.default_region)
   const [loading, setLoading] = useState(false)
   const delayedCheckPasswordStrength = useRef(
     debounce((value: string) => checkPasswordStrength(value), 300)
@@ -163,7 +160,7 @@ const CreateProject = observer(() => {
   const canSubmit =
     projectName != '' &&
     passwordStrengthScore >= DEFAULT_MINIMUM_PASSWORD_STRENGTH &&
-    dbRegion != ''
+    dbRegion != undefined
 
   function onProjectNameChange(e: ChangeEvent<HTMLInputElement>) {
     e.target.value = e.target.value.replace(/\./g, '')
@@ -177,10 +174,6 @@ const CreateProject = observer(() => {
       setPasswordStrengthScore(-1)
       setPasswordStrengthMessage('')
     } else delayedCheckPasswordStrength(value)
-  }
-
-  function onDbRegionChange(value: string) {
-    setDbRegion(value)
   }
 
   async function checkPasswordStrength(value: string) {
@@ -304,11 +297,11 @@ const CreateProject = observer(() => {
             label="Region"
             type="select"
             value={dbRegion}
-            onChange={onDbRegionChange}
+            onChange={(region) => setDbRegion(region)}
             descriptionText="Select a region close to your users for the best performance."
           >
-            {Object.keys(REGIONS).map((option: string, i) => {
-              const label = Object.values(REGIONS)[i]
+            {Object.keys(AWS_REGIONS).map((option: string, i) => {
+              const label = Object.values(AWS_REGIONS)[i]
               return (
                 <Listbox.Option
                   key={option}
@@ -316,8 +309,9 @@ const CreateProject = observer(() => {
                   value={label}
                   addOnBefore={({ active, selected }: any) => (
                     <img
+                      alt="region icon"
                       className="w-5 rounded-sm"
-                      src={`${router.basePath}/img/regions/${Object.keys(REGIONS)[i]}.svg`}
+                      src={`${router.basePath}/img/regions/${Object.keys(AWS_REGIONS)[i]}.svg`}
                     />
                   )}
                 >

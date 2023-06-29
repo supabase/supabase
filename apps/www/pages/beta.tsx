@@ -315,7 +315,7 @@ const Performance = () => {
                         color={
                           stat.name === 'Supabase'
                             ? 'bg-brand-900 dark:bg-brand-800'
-                            : 'bg-dark-300 dark:bg-dark-400'
+                            : 'bg-brand-300 dark:bg-brand-400'
                         }
                         finalPercentage={Math.ceil((stat.value / maxValue) * 100)}
                       />
@@ -689,17 +689,17 @@ const BetaPricing = () => (
           <p className="mb-10">We are committing to the following initiatives:</p>
           <ul className="mb-10 ml-6 list-decimal list-outside">
             <li className="mb-5">
-              All Alpha Users will receive credits equivalent of 2 years of base tier usage. These
+              All Alpha Users will receive credits equivalent of 2 years of base plan usage. These
               will automatically be credited to your account if you signed up prior to December
               2020.
             </li>
             <li className="mb-5">
-              All Beta Users (new users from December 2020) will receive 1 year of base tier usage
+              All Beta Users (new users from December 2020) will receive 1 year of base plan usage
               for free.
             </li>
             <li className="mb-5">
               University (and participating code school) Students will be eligible for 2 years of
-              base tier usage (Code Schools can contact{' '}
+              base plan usage (Code Schools can contact{' '}
               <a
                 href="mailto:rory@supabase.io"
                 target="_blank"
@@ -711,11 +711,11 @@ const BetaPricing = () => (
             </li>
             <li>
               Early stage startups participating in selected incubator programs can claim additional
-              credits which can be applied to products outside of the base tier.
+              credits which can be applied to products outside of the base plan.
             </li>
           </ul>
           <p>
-            The Supabase Base Tier is now called the Supabase Pro tier as per the{' '}
+            The Supabase Base plan is now called the Supabase Pro plan as per the{' '}
             <a href="https://supabase.com/pricing" className="text-brand-900 hover:text-brand-900">
               pricing page
             </a>
@@ -991,7 +991,7 @@ const Beta = (props: Props) => {
           },
           images: [
             {
-              url: 'https://supabase.com/og/og-image.jpg',
+              url: 'https://supabase.com/og/og-image-v2.jpg',
             },
           ],
         }}

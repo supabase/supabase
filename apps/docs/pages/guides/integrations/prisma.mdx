@@ -68,8 +68,7 @@ touch .env
 
 In the `.env` file, add a `DATABASE_URL` variable and add the connection string from **step 1**. The `.env` file should look like:
 
-```env
-# .env
+```bash .env
 DATABASE_URL="postgres://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT-REF].supabase.co:5432/postgres"
 ```
 
@@ -121,7 +120,7 @@ This will create a `prisma/migrations` folder inside your `prisma` directory and
 > **Note**: If you want to skip the process of creating a migration history, you can use the [`prisma db push`](https://www.prisma.io/docs/concepts/components/prisma-migrate/db-push) command instead of `prisma migrate dev`. However, we recommend using `prisma migrate dev` to evolve your database schema in development.
 > If you would like to get a conceptual overview of how Prisma Migrate works and which commands to use in what environment, refer to [this page in the Prisma documentation](https://www.prisma.io/docs/concepts/components/prisma-migrate/mental-model).
 
-If you go to your Supabase project, in the table editor, you should see that two tables have been created, a `Post`, `User`, and `_prisma_migrations` tables. The `_prisma_migrations` table is used to keep
+If you go to your Supabase project, in the table editor, you should see that two tables have been created, a `Post`, `User`, and `_prisma_migrations` tables. The `_prisma_migrations` table is used to keep track of the migration history and ensure that the database schema stays in sync with your Prisma schema.
 
 ![tables created in the UI](/docs/img/guides/integrations/prisma/7y4qq4wwvfrheti6r09u.png)
 
@@ -147,13 +146,12 @@ Append the `?pgbouncer=true` flag to the `DATABASE_URL` variable.
 
 Your `.env` file should resemble the following:
 
-```env
-# .env
+```bash .env
 # PostgreSQL connection string used for migrations
 DIRECT_URL="postgres://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT-REF].supabase.co:5432/postgres"
+
 # PostgreSQL connection string with pgBouncer config — used by Prisma Client
 DATABASE_URL="postgres://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT-REF].supabase.co:6543/postgres?pgbouncer=true"
-
 ```
 
 Update your Prisma schema by setting the `directUrl` in the datasource block:

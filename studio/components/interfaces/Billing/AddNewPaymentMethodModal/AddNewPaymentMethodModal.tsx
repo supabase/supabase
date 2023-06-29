@@ -1,13 +1,14 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
-import { loadStripe } from '@stripe/stripe-js'
 import { Elements } from '@stripe/react-stripe-js'
+import { loadStripe } from '@stripe/stripe-js'
 import { FC, useCallback, useEffect, useState } from 'react'
 
-import { Modal } from 'ui'
-import { useStore } from 'hooks'
-import { useIsHCaptchaLoaded } from 'stores/hcaptcha-loaded-store'
+import { useTheme } from 'common'
+import { useSelectedOrganization, useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL, STRIPE_PUBLIC_KEY } from 'lib/constants'
+import { useIsHCaptchaLoaded } from 'stores/hcaptcha-loaded-store'
+import { Modal } from 'ui'
 import AddPaymentMethodForm from './AddPaymentMethodForm'
 
 interface Props {
@@ -59,10 +60,12 @@ const AddNewPaymentMethodModal: FC<Props> = ({ visible, returnUrl, onCancel, onC
     captchaRef?.resetCaptcha()
   }
 
+  const selectedOrganization = useSelectedOrganization()
+
   const setupIntent = async (hcaptchaToken: string | undefined) => {
     setIntent(undefined)
 
-    const orgSlug = ui.selectedOrganization?.slug ?? ''
+    const orgSlug = selectedOrganization?.slug ?? ''
     const intent = await post(`${API_URL}/organizations/${orgSlug}/payments/setup-intent`, {
       hcaptchaToken,
     })
@@ -78,9 +81,11 @@ const AddNewPaymentMethodModal: FC<Props> = ({ visible, returnUrl, onCancel, onC
     }
   }
 
+  const { isDarkMode } = useTheme()
+
   const options = {
     clientSecret: intent ? intent.client_secret : '',
-    appearance: { theme: 'night', labels: 'floating' },
+    appearance: { theme: isDarkMode ? 'night' : 'flat', labels: 'floating' },
   } as any
 
   const onLocalCancel = () => {

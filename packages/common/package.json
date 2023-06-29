@@ -5,16 +5,16 @@
   "types": "./index.tsx",
   "license": "MIT",
   "dependencies": {
-    "@headlessui/react": "^1.5.0",
-    "@supabase/gotrue-js": "2.24.0",
+    "@headlessui/react": "^1.7.14",
+    "@supabase/gotrue-js": "^2.35.0",
     "@supabase/ui": "^0.37.0-alpha.50",
     "react-use": "^17.4.0"
   },
   "devDependencies": {
-    "@types/react": "^17.0.37",
+    "@types/react": "17.0.39",
     "@types/react-dom": "^17.0.11",
     "config": "*",
     "tsconfig": "*",
-    "typescript": "^4.5.3"
+    "typescript": "^5.0.4"
   }
 }

@@ -1,42 +1,36 @@
-import { FC, ReactNode, useEffect } from 'react'
-import { find, filter, get as _get } from 'lodash'
-import { observer } from 'mobx-react-lite'
+import { ReactNode, useEffect } from 'react'
 
-import { useStore, withAuth } from 'hooks'
 import { useParams } from 'common/hooks'
+import DeleteBucketModal from 'components/to-be-cleaned/Storage/DeleteBucketModal'
 import { AutoApiService, useProjectApiQuery } from 'data/config/project-api-query'
+import { useSelectedProject, useStore, withAuth } from 'hooks'
+import { PROJECT_STATUS } from 'lib/constants'
+import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import ProjectLayout from '../'
 import StorageMenu from './StorageMenu'
-import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
-import { formatPoliciesForStorage } from 'components/to-be-cleaned/Storage/Storage.utils'
-import DeleteBucketModal from 'components/to-be-cleaned/Storage/DeleteBucketModal'
-import { PROJECT_STATUS } from 'lib/constants'
 
-interface Props {
+export interface StorageLayoutProps {
   title: string
   children: ReactNode
 }
 
-const StorageLayout: FC<Props> = ({ title, children }) => {
-  const { ui, meta } = useStore()
+const StorageLayout = ({ title, children }: StorageLayoutProps) => {
+  const { ui } = useStore()
   const { ref: projectRef } = useParams()
+  const project = useSelectedProject()
+
   const storageExplorerStore = useStorageStore()
-  const {
-    selectedBucketToEdit,
-    closeDeleteBucketModal,
-    showDeleteBucketModal,
-    deleteBucket,
-    buckets,
-  } = storageExplorerStore || {}
+  const { selectedBucketToEdit, closeDeleteBucketModal, showDeleteBucketModal } =
+    storageExplorerStore || {}
 
   const { data: settings, isLoading } = useProjectApiQuery({ projectRef })
   const apiService = settings?.autoApiService
 
-  const isPaused = ui.selectedProject?.status === PROJECT_STATUS.INACTIVE
+  const isPaused = project?.status === PROJECT_STATUS.INACTIVE
 
   useEffect(() => {
     if (!isLoading && apiService) initializeStorageStore(apiService)
-  }, [isLoading])
+  }, [isLoading, projectRef])
 
   const initializeStorageStore = async (apiService: AutoApiService) => {
     if (isPaused) return
@@ -48,7 +42,6 @@ const StorageLayout: FC<Props> = ({ title, children }) => {
         apiService.serviceApiKey,
         apiService.protocol
       )
-      await storageExplorerStore.fetchBuckets()
     } else {
       ui.setNotification({
         category: 'error',
@@ -59,41 +52,16 @@ const StorageLayout: FC<Props> = ({ title, children }) => {
     storageExplorerStore.setLoaded(true)
   }
 
-  const onSelectDeleteBucket = async (bucket: any) => {
-    const res = await deleteBucket(bucket)
-    // Ideally this should be within deleteBucket as its a necessary side effect
-    // but we'll do so once we refactor to remove the StorageExplorerStore
-    if (res) {
-      const policies = meta.policies.list()
-      const storageObjectsPolicies = filter(policies, { table: 'objects' })
-      const formattedStorageObjectPolicies = formatPoliciesForStorage(
-        buckets,
-        storageObjectsPolicies
-      )
-      const bucketPolicies = _get(
-        find(formattedStorageObjectPolicies, { name: bucket.name }),
-        ['policies'],
-        []
-      )
-      await Promise.all(
-        bucketPolicies.map((policy: any) => {
-          meta.policies.del(policy.id)
-        })
-      )
-    }
-  }
-
   return (
     <ProjectLayout title={title || 'Storage'} product="Storage" productMenu={<StorageMenu />}>
       {children}
       <DeleteBucketModal
         visible={showDeleteBucketModal}
         bucket={selectedBucketToEdit}
-        onSelectCancel={closeDeleteBucketModal}
-        onSelectDelete={onSelectDeleteBucket}
+        onClose={closeDeleteBucketModal}
       />
     </ProjectLayout>
   )
 }
 
-export default withAuth(observer(StorageLayout))
+export default withAuth(StorageLayout)
