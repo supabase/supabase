@@ -1,3 +1,5 @@
+import { products } from 'shared-data'
+
 type HomeMenuIcon = {
   width?: number
   height?: number
@@ -50,7 +52,7 @@ export function IconMenuAuth({ width = 16, height = 16 }: HomeMenuIcon) {
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M3.494 9.975h5m-5 0v2h5v-2m-5 0v-2h5v2M10 5V3a2 2 0 1 0-4 0v2m6.473 0v9h-9V5h9Z"
+        d={products.authentication.icon[16]}
         stroke="currentColor"
         strokeMiterlimit="10"
         strokeLinejoin="bevel"
@@ -107,7 +109,7 @@ export function IconMenuDatabase({ width = 16, height = 16 }: HomeMenuIcon) {
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M3.502 6h8.996v4H3.502V6ZM3 10.002h10v4H3v-4ZM3 2h10v4H3V2Z"
+        d={products.database.icon[16]}
         stroke="currentColor"
         strokeMiterlimit="10"
         strokeLinejoin="bevel"
@@ -145,7 +147,7 @@ export function IconMenuEdgeFunctions({ width = 16, height = 16 }: HomeMenuIcon)
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M1.857 11.36a7 7 0 0 1 9.41-9.551M4.774 14.212a7 7 0 0 0 9.41-9.497m-8.812 7.845a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm9.296-9.13a2 2 0 1 1-4 0 2 2 0 0 1 4 0ZM12.5 8a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Z"
+        d={products.functions.icon[16]}
         stroke="currentColor"
         strokeMiterlimit="10"
         strokeLinejoin="bevel"
@@ -297,7 +299,7 @@ export function IconMenuRealtime({ width = 16, height = 16 }: HomeMenuIcon) {
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M5.362.984v2.35m-1.866.144L1.365 1.282m2.052 3.92H1.052m8.023 9.653L4.557 4.523 15 9.115l-4.748 1.182-1.177 4.558Z"
+        d={products.realtime.icon[16]}
         stroke="currentColor"
         strokeMiterlimit="10"
         strokeLinejoin="bevel"
@@ -354,7 +356,7 @@ export function IconMenuStorage({ width = 16, height = 16 }: HomeMenuIcon) {
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M13 7.616V5.6l-3.618-3.6H3v4.03m9.964-.447L9.38 2v3.584h3.584ZM1.974 6v8h12V7.509h-7.59l-1.533-1.51H1.974Z"
+        d={products.storage.icon[16]}
         stroke="currentColor"
         strokeMiterlimit="10"
         strokeLinejoin="bevel"
@@ -373,7 +375,7 @@ export function IconMenuAI({ width = 16, height = 16 }: HomeMenuIcon) {
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M7.99886 7.63216V14.4892M7.99886 7.63216L14.0488 4.11804M7.99886 7.63216L1.94922 4.11819M1.94922 4.11819V8.32332M1.94922 4.11819V4.08217L5.57319 1.97717M14.049 8.36007V4.08217L10.4251 1.97717M11.8165 12.4072L7.99913 14.6245L4.18177 12.4072"
+        d={products.vector.icon[16]}
         stroke="currentColor"
         strokeMiterlimit="10"
         strokeLinecap="round"
