@@ -15,6 +15,8 @@ import LW7BgGraphic from '~/components/LaunchWeek/LW7BgGraphic'
 import { useTheme } from 'common/Providers'
 import HeroCanvas from '../../components/LaunchWeek/8/HeroCanvas'
 import HeroR3F from '../../components/LaunchWeek/8/HeroR3F'
+import HeroR3FGPT from '../../components/LaunchWeek/8/HeroR3FGPT'
+import HeroGPTParticles from '../../components/LaunchWeek/8/HeroGPTParticles'
 
 const TicketContainer = dynamic(() => import('~/components/LaunchWeek/Ticket/TicketContainer'))
 const LW7Releases = dynamic(() => import('~/components/LaunchWeek/Releases/LW7/LW7Releases'))
@@ -122,25 +124,8 @@ export default function TicketHome({ users }: Props) {
           <div className="relative pt-16">
             <div className="relative z-10">
               <SectionContainer className="flex flex-col justify-around items-center min-h-[400px] lg:min-h-[600px] !py-4 md:!py-8 gap-2 md:gap-4 !px-2 !mx-auto">
-                <iframe
-                  src="https://codesandbox.io/embed/sparks-and-effects-forked-mf6yzf?fontsize=14&hidenavigation=1&theme=dark&view=preview"
-                  style={{
-                    width: '100%',
-                    height: '500px',
-                    border: 0,
-                    borderRadius: '4px',
-                    overflow: 'hidden',
-                  }}
-                  title="Sparks and effects (forked)"
-                  allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
-                  sandbox="allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"
-                ></iframe>
-
-                {/* <HeroR3F /> */}
-                {/* <HeroCanvas /> */}
-                {/* <LaunchWeekLogoHeader /> */}
+                <HeroR3FGPT />
               </SectionContainer>
-              {/* <LW7BgGraphic /> */}
             </div>
           </div>
 
