@@ -1,0 +1,43 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  id: 'authorizing-an-oauth-app',
+  title: 'Authorize an OAuth App (Beta)',
+  description: 'Authorize an OAuth App',
+}
+
+## Overview
+
+This guide steps through implementing **Sign-in with Supabase**. Once you've added OAuth2.0 support to your main application, you will receive an access and refresh token from your users that choose to **Sign in with Supabase** on your application.
+
+The access token returned will grant your application full access to the [Management API](https://supabase.com/docs/reference/api/introduction) on behalf of the user.
+
+## Implement the OAuth2.0 flow
+
+Once you've register your OAuth App, you can use the OAuth2.0 protocol to seek consent from Supabase users to access their organization or project.
+
+1. Call the [`GET /v1/oauth/authorize`](<https://api.supabase.com/api/v1#/oauth%20(beta)/authorize>) endpoint. This should redirect the user to a consent screen where they can select the organization that they want to grant access to.
+
+   > Note: `redirect_uri` and `state` combined must not be larger than 4kB. PKCE is strongly recommended for security reasons.
+
+2. Ensure that your application server has implemented the endpoint listed in the "Authorization callback URLs". After the user consents to your application receiving access, your application server will receive a `GET` request on the provided `redirect_uri` in the previous step. This `redirect_uri` will contain the following query parameters:
+
+   `code` : A unique authorization code you can exchange for a Supabase access and refresh token.
+
+   `state` : (Optional) The state you passed to the [`GET /v1/oauth/authorize`](<https://api.supabase.com/api/v1#/oauth%20(beta)/authorize>) endpoint previously.
+
+3. Extract these query parameters and exchange the `code` using the [`POST /v1/oauth/token`](<https://api.supabase.com/api/v1#/oauth%20(beta)/token>) endpoint.
+
+4. An access token and refresh token will be returned if the request is successful.
+
+## Refresh an access token
+
+You can use the [`POST /v1/oauth/token`](<https://api.supabase.com/api/v1#/oauth%20(beta)/token>) endpoint to refresh an access token using the refresh token returned at the end of the previous section.
+
+## Access the Management API using the access token
+
+Refer to [this section](http://localhost:3001/docs/reference/api/introduction#authentication) to learn more about authentication with the Management API.
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page
