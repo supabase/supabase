@@ -4,6 +4,7 @@ import BillingSettings from './BillingSettings/BillingSettings'
 import BillingSettingsV2 from './BillingSettings/BillingSettingsV2'
 import InvoicesSettings from './InvoicesSettings/InvoicesSettings'
 import NewOrgForm from './NewOrg/NewOrgForm'
+import Usage from './Usage/Usage'
 import OAuthApps from './OAuthApps/OAuthApps'
 
 export {
@@ -13,5 +14,6 @@ export {
   BillingSettingsV2,
   InvoicesSettings,
   NewOrgForm,
+  Usage,
   OAuthApps,
 }
