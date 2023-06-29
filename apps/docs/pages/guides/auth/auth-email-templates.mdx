@@ -22,7 +22,7 @@ The templating system provides the following variables for use:
 | `{{ .ConfirmationURL }}` | Contains the confirmation URL. For example, a signup confirmation URL would look like: `https://project-ref.supabase.co/auth/v1/verify?token={{ .TokenHash }}&type=signup&redirect_to=https://example.com/path` . |
 | `{{ .Token }}`           | Contains a 6-digit One-Time-Password (OTP) that can be used instead of the `{{. ConfirmationURL }}` .                                                                                                             |
 | `{{ .TokenHash }}`       | Contains a hashed version of the `{{ .Token }}`. This is useful for constructing your own email link in the email template.                                                                                       |
-| `{{ .SiteURL }}`         | Contains your application's Site URL. This can be configured in your project's [authentication settings](https://app.supabase.com/project/_/auth/url-configuration).                                                                                                           |
+| `{{ .SiteURL }}`         | Contains your application's Site URL. This can be configured in your project's [authentication settings](https://supabase.com/dashboard/project/_/auth/url-configuration).                                                                                                           |
 
 ## Limitations
 

@@ -31,7 +31,7 @@ npm install @supabase/supabase-js
 
 In [multiplayer.dev](https://multiplayer.dev), client's cursor positions are sent to other clients in the room. However, cursor positions will be randomly generated for this example.
 
-You need to get the public `anon` access token from your project's [API settings](https://app.supabase.com/project/_/settings/api). Then you can set up the Supabase client and start sending a client's cursor positions to other clients in channel `room1`:
+You need to get the public `anon` access token from your project's [API settings](https://supabase.com/dashboard/project/_/settings/api). Then you can set up the Supabase client and start sending a client's cursor positions to other clients in channel `room1`:
 
 ```js
 const { createClient } = require('@supabase/supabase-js')

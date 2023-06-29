@@ -39,7 +39,7 @@ Nasıl Katkıda bulunacağınızı görmek için [Başlarken](../DEVELOPERS.md) 
 ## Durum
 
 - [Alfa: Supabase'i kapalı bir müşteri grubuyla test ediyoruz
-- [Halka Açık Alfa: Herkes [app.supabase.com](https://app.supabase.com) adresinden kaydolabilir. Ama bize karşı sakin olun, birkaç karışıklık var
+- [Halka Açık Alfa: Herkes [supabase.com/dashboard](https://supabase.com/dashboard) adresinden kaydolabilir. Ama bize karşı sakin olun, birkaç karışıklık var
 - [x] Genel Beta: Kurumsal olmayan kullanım durumlarının çoğu için yeterince kararlı
 - [ ] Genel: Genel Kullanılabilirlik [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
 
@@ -55,7 +55,7 @@ Supabase açık kaynak araçlarının bir birleşimidir. Firebase'in özellikler
 
 **Mimari**
 
-Supabase [barındırılan bir platformdur](https://app.supabase.com). Supabase'e kaydolabilir ve hiçbir şey yüklemeden kullanmaya başlayabilirsiniz.
+Supabase [barındırılan bir platformdur](https://supabase.com/dashboard). Supabase'e kaydolabilir ve hiçbir şey yüklemeden kullanmaya başlayabilirsiniz.
 Ayrıca [self-host](https://supabase.com/docs/guides/hosting/overview) ve [yerel olarak geliştirebilirsiniz](https://supabase.com/docs/guides/local-development).
 
 ![Mimarlık](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
