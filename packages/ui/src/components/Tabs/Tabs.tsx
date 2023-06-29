@@ -54,6 +54,9 @@ const Tabs: React.FC<TabsProps> & TabsSubComponents = ({
     children = [children]
   }
 
+  // Exclude children that are just conditional elements
+  children = children.filter((it) => it)
+
   const tabIds = children.map((tab) => tab.props.id)
 
   const { groupActiveId, setGroupActiveId } = useTabGroup(tabIds)
