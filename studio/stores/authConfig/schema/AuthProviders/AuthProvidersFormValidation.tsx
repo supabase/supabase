@@ -215,17 +215,29 @@ const PROVIDER_PHONE = {
       type: 'number',
       description: 'Duration before an SMS OTP expires',
       units: 'seconds',
+      show: {
+        key: 'SMS_PROVIDER',
+        matches: ['twilio', 'messagebird', 'textlocal', 'vonage']
+      }
     },
     SMS_OTP_LENGTH: {
       title: 'SMS OTP Length',
       type: 'number',
       description: 'Number of digits in OTP',
       units: 'digits',
+      show: {
+        key: 'SMS_PROVIDER',
+        matches: ['twilio', 'messagebird', 'textlocal', 'vonage']
+      }
     },
     SMS_TEMPLATE: {
       title: 'SMS Message',
       type: 'string',
       description: 'To format the OTP code use `{{ .Code }}`',
+      show: {
+        key: 'SMS_PROVIDER',
+        matches: ['twilio', 'messagebird', 'textlocal', 'vonage']
+      }
     },
   },
   validationSchema: object().shape({
