@@ -6,6 +6,7 @@ export const meta = {
   subtitle: "Get up and running with Realtime's Presence feature",
   breadcrumb: 'Realtime Presence Quickstart',
 }
+
 Presence can be used to share state between clients. Each client maintains their own piece of state within the shared state.
 
 Presence utilizes an in-memory conflict-free replicated data type (CRDT) to track and synchronize shared state in an eventually consistent manner. It computes the difference between existing state and new state changes and sends the necessary updates to clients via Broadcast.
@@ -266,8 +267,8 @@ Learn more by visiting the [Quotas](/docs/guides/realtime/quotas) section.
 
 ## More Realtime Quickstarts
 
-- [Broadcast Quickstart](/docs/guides/realtime/quickstarts/broadcast)
-- [Postgres Changes Quickstart](/docs/guides/realtime/quickstarts/postgres-changes)
+- [Broadcast Quickstart](/docs/guides/realtime/broadcast)
+- [Postgres Changes Quickstart](/docs/guides/realtime/postgres-changes)
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

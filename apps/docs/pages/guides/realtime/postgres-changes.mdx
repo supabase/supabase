@@ -1,9 +1,10 @@
 import Layout from '~/layouts/DefaultGuideLayout'
+import StepHikeCompact from '~/components/StepHikeCompact'
 
 export const meta = {
-  id: 'postgres-changes',
   title: 'Postgres Changes',
-  description: "Getting started with Realtime's Postgres Changes feature",
+  subtitle: "Get up and running with Realtime's Postgres Changes feature",
+  breadcrumb: 'Realtime Postgres Changes Quickstart',
 }
 
 Realtime's Postgres Changes feature listens for database changes and sends them to clients. Clients are required to subscribe with a JWT dictating which changes they are allowed to receive based on the database's [Row Level Security](/docs/guides/auth/row-level-security).
@@ -226,7 +227,7 @@ Let's explore how to implement Realtime Postgres Changes so you can integrate it
 
     <StepHikeCompact.Details title="More filters">
 
-    Check out the [full list of available filters](/docs/guides/realtime/quickstarts/postgres-changes#available-filters).
+    Check out the [full list of available filters](/docs/guides/realtime/postgres-changes#available-filters).
 
     </StepHikeCompact.Details>
 
@@ -531,8 +532,8 @@ supabase.realtime.setAuth('fresh-token')
 
 ## More Realtime Quickstarts
 
-- [Broadcast Quickstart](/docs/guides/realtime/quickstarts/broadcast)
-- [Presence Quickstart](/docs/guides/realtime/quickstarts/presence)
+- [Broadcast Quickstart](/docs/guides/realtime/broadcast)
+- [Presence Quickstart](/docs/guides/realtime/presence)
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
