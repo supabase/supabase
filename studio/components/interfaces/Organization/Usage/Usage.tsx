@@ -1,3 +1,4 @@
+import clsx from 'clsx'
 import dayjs from 'dayjs'
 import { useMemo, useState } from 'react'
 
@@ -8,12 +9,11 @@ import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants'
 import SizeAndCounts from './SizeAndCounts'
 import Activity from './Activity'
+import { IconLoader } from 'ui'
 
 const Usage = () => {
   const { slug } = useParams()
   const [dateRange, setDateRange] = useState<any>()
-
-  const selectedProjectRef = 'kojplftaeiavuneadgix'
 
   const {
     data: subscription,
@@ -21,6 +21,10 @@ const Usage = () => {
     isError,
     isSuccess,
   } = useOrgSubscriptionQuery({ orgSlug: slug })
+
+  const selectedProjectRef = 'kojplftaeiavuneadgix'
+  const billingCycleStart = dayjs.unix(subscription?.current_period_start ?? 0).utc()
+  const billingCycleEnd = dayjs.unix(subscription?.current_period_end ?? 0).utc()
 
   const currentBillingCycleSelected = useMemo(() => {
     // Selected by default
@@ -61,16 +65,33 @@ const Usage = () => {
 
   return (
     <>
-      <DateRangePicker
-        id="billingCycle"
-        name="billingCycle"
-        onChange={setDateRange}
-        value={TIME_PERIODS_BILLING[0].key}
-        options={[...TIME_PERIODS_BILLING, ...TIME_PERIODS_REPORTS]}
-        loading={isLoadingSubscription}
-        currentBillingPeriodStart={subscription?.current_period_start}
-        className="!w-[200px]"
-      />
+      <div className="flex items-center space-x-4 px-4 py-4 border-b">
+        {!isLoadingSubscription && (
+          <DateRangePicker
+            id="billingCycle"
+            name="billingCycle"
+            onChange={setDateRange}
+            value={TIME_PERIODS_BILLING[0].key}
+            options={[...TIME_PERIODS_BILLING, ...TIME_PERIODS_REPORTS]}
+            loading={isLoadingSubscription}
+            currentBillingPeriodStart={subscription?.current_period_start}
+            className="!w-[200px]"
+          />
+        )}
+
+        {isLoadingSubscription ? (
+          <IconLoader className="animate-spin" size={14} />
+        ) : subscription !== undefined ? (
+          <div className="flex flex-col xl:flex-row xl:gap-3">
+            <p className={clsx('text-sm transition', isLoadingSubscription && 'opacity-50')}>
+              Organization is on the {subscription.plan.name} plan
+            </p>
+            <p className="text-sm text-scale-1000">
+              {billingCycleStart.format('DD MMM YYYY')} - {billingCycleEnd.format('DD MMM YYYY')}
+            </p>
+          </div>
+        ) : null}
+      </div>
       <Bandwidth
         projectRef={selectedProjectRef}
         subscription={subscription}
