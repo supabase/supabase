@@ -146,7 +146,12 @@ Let's explore how to implement Realtime Postgres Changes so you can integrate it
   <StepHikeCompact.Step step={6}>
     <StepHikeCompact.Details title="Listen to changes by schema">
 
-    Listen to all changes in the `public` schema.
+    Listen to changes on all tables in the `public` schema by setting the `schema` property to 'public' and event name to `*`. The event name can be one of:
+      - `INSERT`
+      - `UPDATE`
+      - `DELETE`
+      - `*`
+    The channel name can be any string except 'realtime'.
 
     </StepHikeCompact.Details>
 
