@@ -26,6 +26,7 @@ export const CLIENT_LIBRARIES = [
     releaseState: undefined,
     docsUrl: 'https://supabase.com/docs/reference/csharp/installing',
     gitUrl: 'https://github.com/supabase-community/supabase-csharp',
+    altIconName: 'c-sharp',
   },
   {
     language: 'Swift',
