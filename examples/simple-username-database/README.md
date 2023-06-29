@@ -2,14 +2,14 @@
 
 # Supabase Project Documentation
 
-This documentation provides an overview of a JavaScript project that utilizes Supabase for the database. The project allows users to enter their username.
+This documentation provides an overview of a JavaScript project that utilizes Supabase for the database. The project allows users to enter their names and save them in the database.
 
 ## Prerequisites
-> Setup your Supabase SQL before continuing this work.
+> Set up your Supabase SQL before continuing this work.
 >For more information about using Supabase, refer to the official Supabase documentation: [Supabase Documentation](https://supabase.io/docs).
 
 
-Before running the project, please make sure you have Node.js installed on your machine. If you don't have Node.js, you can download and install it from the official website: [Node.js Website](https://nodejs.org).
+Before running the project, please ensure you have Node.js installed on your machine. If you don't have Node.js, you can download and install it from the official website: [Node.js Website](https://nodejs.org).
 
 ## Installation
 
@@ -30,20 +30,29 @@ To get started with the project, follow these steps:
 
 ## Configuration
 
-### Creating table in database
+### Creating a table in the database
 
-1. Go to the Supabase dashboard and log in yourself.
+1. Go to the Supabase dashboard and login yourself.
 
-2. Go to SQL editor
 
-3. Create a new blank query and paste the below code in there,
+3. Go to SQL editor
+<img src="./table-generation-1.png" alt="SQL editor"/>
+
+4. Create a new blank query and paste the below code in there,
 
 ```SQL
-CREATE TABLE usernames (
+CREATE TABLE name-reg (
   id SERIAL PRIMARY KEY,
   name TEXT
 );
 ```
+
+5. After pasting code run the code.
+<img src="./table-generation-2.png" alt="run query"/>
+
+This will successfully generate a table in SQL, you can continue other steps now.
+
+Head over to code now.
 
 Before running the project, you need to configure the Supabase URL and key in the `index.js file. Open the `index.js` file and locate the following lines:
 
@@ -68,7 +77,7 @@ node index.js
 <img src="./demo.png" alt="demo" > 
 
 
-When executed, the code will prompt you to enter your username. Please provide your username as instructed, and it will be saved in the Supabase database table named "usernames".
+When executed, the code will prompt you to enter your Name. Please provide your name as instructed, and it will be saved in the Supabase database table named "name-reg".
 
 
 ## Contribution Guide
