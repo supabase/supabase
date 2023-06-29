@@ -5,6 +5,7 @@ export const LOCAL_STORAGE_KEYS_ALLOWLIST = [
   'theme',
   'supabaseDarkMode',
   'supabase.dashboard.sign_in_clicks',
+  'supabase.dashboard.auth.debug',
 ]
 
 export function clearLocalStorage() {
