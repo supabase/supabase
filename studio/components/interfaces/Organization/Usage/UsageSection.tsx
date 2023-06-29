@@ -67,7 +67,7 @@ const UsageSection = ({
         const notAllValuesZero =
           attribute.attributes
             ?.map((attr) => {
-              return chartData.some((dataPoint) => Number(dataPoint[attr.name]) !== 0)
+              return chartData.some((dataPoint) => Number(dataPoint[attr.key]) !== 0)
             })
             .some((x) => !!x) ?? false
 
