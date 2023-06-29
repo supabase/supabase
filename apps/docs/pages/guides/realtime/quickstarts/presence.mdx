@@ -230,7 +230,7 @@ Let's explore how to implement Realtime Presence so you can integrate it into yo
 
 ## Presence Key
 
-By default, Presence will generate an `UUIDv1` key on the server to uniquely track a client channel's state but you may pass Presence a custom key when creating the channel.
+By default, Presence will generate a unique `UUIDv1` key on the server to track a client channel's state. If you prefer, you can provide a custom key when creating the channel. This key should be unique among clients.
 
 ```js
 import { createClient } from '@supabase/supabase-js'
