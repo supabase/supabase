@@ -16,7 +16,11 @@ const NavigationIconButton: FC<Props> = ({ route, isActive = false }) => {
       <Tooltip.Trigger>
         <ConditionalWrap
           condition={route.link !== undefined}
-          wrap={(children) => <Link href={route.link!}>{children}</Link>}
+          wrap={(children) => (
+            <Link href={route.link!}>
+              <a>{children}</a>
+            </Link>
+          )}
         >
           <span
             className={[

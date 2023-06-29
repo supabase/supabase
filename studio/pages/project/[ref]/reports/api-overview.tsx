@@ -13,6 +13,7 @@ import {
   ErrorCountsChartRenderer,
   ResponseSpeedChartRenderer,
   TopApiRoutesRenderer,
+  NetworkTrafficRenderer,
 } from 'components/interfaces/Reports/renderers/ApiRenderers'
 import { useState, useEffect } from 'react'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
@@ -88,6 +89,15 @@ export const ApiReport: NextPageWithLayout = () => {
         appendProps={{ data: report.data.topSlowRoutes || [] }}
         append={TopApiRoutesRenderer}
       />
+
+      <ReportWidget
+        isLoading={report.isLoading}
+        params={report.params.networkTraffic}
+        title="Network Traffic"
+        tooltip="Ingress and egress of requests and responses respectively"
+        data={report.data.networkTraffic || []}
+        renderer={NetworkTrafficRenderer}
+      />
     </ReportPadding>
   )
 }
@@ -106,6 +116,7 @@ const useApiReport = () => {
   const topErrorRoutes = queryHooks.topErrorRoutes()
   const responseSpeed = queryHooks.responseSpeed()
   const topSlowRoutes = queryHooks.topSlowRoutes()
+  const networkTraffic = queryHooks.networkTraffic()
   const activeHooks = [
     totalRequests,
     topRoutes,
@@ -113,6 +124,7 @@ const useApiReport = () => {
     topErrorRoutes,
     responseSpeed,
     topSlowRoutes,
+    networkTraffic,
   ]
   const [filters, setFilters] = useState<ReportFilterItem[]>([])
   const addFilter = (filter: ReportFilterItem) => {
@@ -161,17 +173,21 @@ const useApiReport = () => {
     if (topSlowRoutes.changeQuery) {
       topSlowRoutes.changeQuery(PRESET_CONFIG.api.queries.topSlowRoutes.sql(filters))
     }
+
+    if (networkTraffic.changeQuery) {
+      networkTraffic.changeQuery(PRESET_CONFIG.api.queries.networkTraffic.sql(filters))
+    }
   }, [JSON.stringify(filters)])
 
   const handleRefresh = async () => {
-    activeHooks.forEach(hook => hook.runQuery())
+    activeHooks.forEach((hook) => hook.runQuery())
   }
   const handleSetParams = (params: Partial<LogsEndpointParams>) => {
-    activeHooks.forEach(hook => {
+    activeHooks.forEach((hook) => {
       hook.setParams?.((prev: LogsEndpointParams) => ({ ...prev, ...params }))
     })
   }
-  const isLoading = activeHooks.some(hook => hook.isLoading)
+  const isLoading = activeHooks.some((hook) => hook.isLoading)
   return {
     data: {
       totalRequests: totalRequests.logData,
@@ -180,6 +196,7 @@ const useApiReport = () => {
       topRoutes: topRoutes.logData,
       topErrorRoutes: topErrorRoutes.logData,
       topSlowRoutes: topSlowRoutes.logData,
+      networkTraffic: networkTraffic.logData,
     },
     params: {
       totalRequests: totalRequests.params,
@@ -188,6 +205,7 @@ const useApiReport = () => {
       topRoutes: topRoutes.params,
       topErrorRoutes: topErrorRoutes.params,
       topSlowRoutes: topSlowRoutes.params,
+      networkTraffic: networkTraffic.params,
     },
     mergeParams: handleSetParams,
     filters,

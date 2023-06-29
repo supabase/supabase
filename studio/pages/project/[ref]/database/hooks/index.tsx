@@ -1,26 +1,27 @@
-import clsx from 'clsx'
-import { IconLoader } from 'ui'
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/router'
-import { observer } from 'mobx-react-lite'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import clsx from 'clsx'
+import { observer } from 'mobx-react-lite'
+import { useEffect, useState } from 'react'
 
-import { NextPageWithLayout } from 'types'
-import { checkPermissions, useStore } from 'hooks'
-import { API_URL } from 'lib/constants'
-import { post } from 'lib/common/fetch'
-import { DatabaseLayout } from 'components/layouts'
-import NoPermission from 'components/ui/NoPermission'
-import HooksList from 'components/interfaces/Database/Hooks/HooksList/HooksList'
+import { useParams } from 'common'
 import DeleteHookModal from 'components/interfaces/Database/Hooks/DeleteHookModal'
 import EditHookPanel from 'components/interfaces/Database/Hooks/EditHookPanel'
+import HooksList from 'components/interfaces/Database/Hooks/HooksList/HooksList'
+import { DatabaseLayout } from 'components/layouts'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
+import NoPermission from 'components/ui/NoPermission'
+import { checkPermissions, useStore } from 'hooks'
+import { post } from 'lib/common/fetch'
+import { API_URL } from 'lib/constants'
+import { NextPageWithLayout } from 'types'
+import { IconLoader } from 'ui'
 
 const HooksPage: NextPageWithLayout = () => {
   const { meta, ui } = useStore()
+  const { project } = useProjectContext()
 
-  const router = useRouter()
-  const { ref } = router.query
+  const { ref } = useParams()
   const schemas = meta.schemas.list()
   const { isLoading: isLoadingSchemas } = meta.schemas
 
@@ -33,8 +34,8 @@ const HooksPage: NextPageWithLayout = () => {
   const canCreateWebhooks = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'triggers')
 
   useEffect(() => {
-    if (ui.selectedProject?.ref) meta.hooks.load()
-  }, [ui.selectedProject?.ref])
+    if (project?.ref) meta.hooks.load()
+  }, [project?.ref])
 
   const enableHooksForProject = async () => {
     const res = await post(`${API_URL}/database/${ref}/hook-enable`, {})

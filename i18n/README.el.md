@@ -12,9 +12,9 @@
 - [x] Hosted Postgres Database. [Docs](https://supabase.com/docs/guides/database)
 - [x] Αυθεντικοποίηση και εξουσιοδότηση. [Έγγραφα](https://supabase.com/docs/guides/auth)
 - [x] Αυτόματα παραγόμενα APIs.
-  - [x] REST. [Έγγραφα](https://supabase.com/docs/guides/database/api#rest-api)
-  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/database/api#graphql-api)
-  - [x] Συνδρομές σε πραγματικό χρόνο. [Έγγραφα](https://supabase.com/docs/guides/database/api#realtime-api)
+  - [x] REST. [Έγγραφα](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/api#graphql-api-overview)
+  - [x] Συνδρομές σε πραγματικό χρόνο. [Έγγραφα](https://supabase.com/docs/guides/api#realtime-api-overview)
 - [x] Συναρτήσεις.
   - [x] Συναρτήσεις βάσης δεδομένων. [Docs](https://supabase.com/docs/guides/database/functions)
   - [x] Edge Functions [Docs](https://supabase.com/docs/guides/functions)
