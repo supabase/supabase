@@ -91,7 +91,7 @@ Let's explore how to implement Realtime Presence so you can integrate it into yo
 
       Listen to the `sync`, `join`, and `leave` events triggered whenever any client joins or leaves the channel or changes their slice of state.
 
-      Once `clientA` successfully tracks its state, it will trigger its own `sync` and `join` event handlers.
+      To begin tracking state, `clientA` calls `channelA.track()`, passing in the desired state to share. Once `clientA` successfully tracks its state, it will automatically trigger its own `sync` and `join` event handlers.
 
     </StepHikeCompact.Details>
 
