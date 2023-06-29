@@ -39,7 +39,7 @@
 ## ステータス
 
 - [x] アルファ：Supabase をクローズドな顧客セットでテストしています。
-- [x] Public Alpha：誰でも [app.supabase.com](https://app.supabase.com) でサインアップすることができます。しかし、いくつかの問題がありますので、ご容赦ください。
+- [x] Public Alpha：誰でも [supabase.com/dashboard](https://supabase.com/dashboard) でサインアップすることができます。しかし、いくつかの問題がありますので、ご容赦ください。
 - [x] パブリックベータ版：企業以外のほとんどのユースケースで十分に安定している。
 - [ ] パブリック：一般公開 [[ステータス](https://supabase.com/docs/guides/getting-started/features#feature-status)]。
 
@@ -55,7 +55,7 @@ Supabase は、オープンソースツールの組み合わせです。私た�
 
 **アーキテクチャー**
 
-Supabase は[hosted platform](https://app.supabase.com)です。サインアップすれば、何もインストールすることなく Supabase を使い始めることができます。
+Supabase は[hosted platform](https://supabase.com/dashboard)です。サインアップすれば、何もインストールすることなく Supabase を使い始めることができます。
 また、[セルフホスト](https://supabase.com/docs/guides/hosting/overview)や[ローカル開発](https://supabase.com/docs/guides/local-development)も可能です。
 
 ![アーキテクチャ](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)

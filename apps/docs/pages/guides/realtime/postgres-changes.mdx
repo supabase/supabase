@@ -27,7 +27,7 @@ select
 
 ## Replication Setup
 
-You can do this in the [Replication](https://app.supabase.com/project/_/database/replication) section in the Dashboard or with the [SQL editor](https://app.supabase.com/project/_/sql):
+You can do this in the [Replication](https://supabase.com/dashboard/project/_/database/replication) section in the Dashboard or with the [SQL editor](https://supabase.com/dashboard/project/_/sql):
 
 ```sql
 begin;
@@ -332,7 +332,7 @@ const channel = supabase
 
 You may choose to sign your own tokens to customize claims that can be checked in your RLS policies.
 
-Your project JWT secret is found with your [Project API keys](https://app.supabase.com/project/_/settings/api) in your dashboard.
+Your project JWT secret is found with your [Project API keys](https://supabase.com/dashboard/project/_/settings/api) in your dashboard.
 
 <Admonition type="caution">
   Do not expose the `service_role` token on the client because the role is authorized to bypass
