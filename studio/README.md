@@ -1,7 +1,5 @@
 # Supabase Studio
 
-temp
-
 A dashboard for managing your self-hosted Supabase project, and used on our [hosted platform](https://supabase.com/dashboard). Built with:
 
 - [Next.js](https://nextjs.org/)
