@@ -5,6 +5,12 @@ import { ProjectSubscriptionResponse } from 'data/subscriptions/project-subscrip
 import { ProjectUsageData } from 'data/usage/project-usage-query'
 import { Alert, Badge, Button, IconExternalLink } from 'ui'
 
+export const COLOR_MAP = {
+  white: { bar: 'fill-scale-1200', marker: 'bg-scale-1200' },
+  green: { bar: 'fill-green-1000', marker: 'bg-green-1000' },
+  blue: { bar: 'fill-blue-1000', marker: 'bg-blue-1000' },
+}
+
 export const Y_DOMAIN_CEILING_MULTIPLIER = 4 / 3
 
 export const USAGE_STATUS = {
@@ -13,10 +19,15 @@ export const USAGE_STATUS = {
   EXCEEDED: 'EXCEEDED',
 }
 
+export interface Attribute {
+  key: string
+  name?: string
+  color: 'white' | 'blue' | 'green'
+}
 export interface CategoryAttribute {
   anchor: string
   key: string // Property from project usage
-  attributes: { key: string; name?: string; color: 'white' | 'blue' | 'green' }[] // For querying against stats-daily / infra-monitoring, maybe can type the color
+  attributes: Attribute[] // For querying against stats-daily / infra-monitoring
   name: string
   chartPrefix?: string
   unit: 'bytes' | 'absolute' | 'percentage'
@@ -42,7 +53,7 @@ export interface CategoryMeta {
   attributes: CategoryAttribute[]
 }
 
-// [Joshen] We need to update this
+// [Joshen TODO] We need to update this
 export const USAGE_CATEGORIES: CategoryMeta[] = [
   {
     key: 'bandwidth',

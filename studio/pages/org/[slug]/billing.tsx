@@ -17,8 +17,6 @@ const OrgBillingSettings: NextPageWithLayout = () => {
   const { isLoading: isLoadingPermissions } = usePermissionsQuery()
 
   const showOAuthApps = useFlag('oauthApps')
-  const orgCreationV2 = useFlag('orgcreationv2')
-
   const isOrgBilling = !!selectedOrganization?.subscription_id
 
   return (
@@ -43,7 +41,7 @@ const OrgBillingSettings: NextPageWithLayout = () => {
                 <Tabs.Panel id="general" label="General" />
                 <Tabs.Panel id="team" label="Team" />
                 <Tabs.Panel id="billing" label="Billing" className="!m-0" />
-                {orgCreationV2 && <Tabs.Panel id="usage" label="Usage" />}
+                {isOrgBilling && <Tabs.Panel id="usage" label="Usage" />}
                 <Tabs.Panel id="invoices" label="Invoices" />
                 {showOAuthApps && <Tabs.Panel id="apps" label="OAuth Apps" />}
               </Tabs>
