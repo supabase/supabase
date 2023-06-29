@@ -10,8 +10,8 @@ const MOCK_DATA = [
     loopId: '1',
     period_start: '2023-06-29T07:05:12Z',
     periodStartFormatted: '29 Jun 2023',
-    total_storage_egress: (1.5 * GB).toString(),
-    total_egress_modified: (1 * GB).toString(),
+    total_storage_egress: (1.53 * GB).toString(),
+    total_egress_modified: (1.12 * GB).toString(),
   },
   {
     id: '2',
