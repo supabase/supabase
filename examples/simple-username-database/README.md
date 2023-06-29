@@ -30,6 +30,21 @@ To get started with the project, follow these steps:
 
 ## Configuration
 
+### Creating table in database
+
+1. Go to the Supabase dashboard and log in yourself.
+
+2. Go to SQL editor
+
+3. Create a new blank query and paste the below code in there,
+
+```SQL
+CREATE TABLE usernames (
+  id SERIAL PRIMARY KEY,
+  name TEXT
+);
+```
+
 Before running the project, you need to configure the Supabase URL and key in the `index.js file. Open the `index.js` file and locate the following lines:
 
 ```javascript
