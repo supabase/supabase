@@ -246,7 +246,7 @@ const channelC = supabase.channel('test', {
 
 ## Client-Side Rate Limit
 
-There is a default client-side rate limit that enables you to send 10 messages per second, or one message every 100 milliseconds. You can customize this when creating the client:
+By default the client will rate limit itself at 10 messages per second (1 message every 100 milliseconds). You can customize this when creating the client:
 
 ```js
 import { createClient } from '@supabase/supabase-js'
