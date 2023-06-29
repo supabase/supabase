@@ -24,7 +24,7 @@ export enum PRODUCT_SHORTNAMES {
   VECTOR = 'vector',
 }
 
-// icon can be 18px or 24px
+// icon can be 16px, 18px or 24px
 interface Icon {
   '16': string
   '18': string
