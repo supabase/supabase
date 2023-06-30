@@ -92,12 +92,14 @@
   {
     "name": "hypopg",
     "comment": "Hypothetical indexes for PostgreSQL",
-    "tags": ["Admin", "Index"]
+    "tags": ["Admin", "Index"],
+    "link": "/guides/database/extensions/hypopg"
   },
   {
     "name": "http",
     "comment": "HTTP client for PostgreSQL, allows web page retrieval inside the database.",
-    "tags": ["Utility"]
+    "tags": ["Utility"],
+    "link": "/guides/database/extensions/http"
   },
   {
     "name": "insert_username",
@@ -144,7 +146,8 @@
   {
     "name": "pg_cron",
     "comment": "Job scheduler for PostgreSQL",
-    "tags": ["Utility"]
+    "tags": ["Utility"],
+    "link": "/guides/database/extensions/pg_cron"
   },
   {
     "name": "pg_freespacemap",
@@ -155,22 +158,26 @@
   {
     "name": "pg_graphql",
     "comment": "pg_graphql: GraphQL support",
-    "tags": ["Utility"]
+    "tags": ["Utility"],
+    "link": "/guides/database/extensions/pg_graphql"
   },
   {
     "name": "pg_hashids",
     "comment": "pg_hashids",
-    "tags": ["Utility"]
+    "tags": ["Utility"],
+    "link": "/guides/database/extensions/pg_hashids"
   },
   {
     "name": "pg_jsonschema",
     "comment": "pg_jsonschema",
-    "tags": ["Utility"]
+    "tags": ["Utility"],
+    "link": "/guides/database/extensions/pg_jsonschema"
   },
   {
     "name": "pg_net",
     "comment": "Async HTTP",
-    "tags": ["Utility", "Notifications"]
+    "tags": ["Utility", "Notifications"],
+    "link": "/guides/database/extensions/pg_net"
   },
   {
     "name": "pg_prewarm",
@@ -181,12 +188,14 @@
   {
     "name": "pg_stat_monitor",
     "comment": "The pg_stat_monitor is a PostgreSQL Query Performance Monitoring tool, based on PostgreSQL contrib module pg_stat_statements. pg_stat_monitor provides aggregated statistics, client information, plan details including plan, and histogram information.",
-    "tags": ["Utility"]
+    "tags": ["Utility"],
+    "link": "/guides/database/extensions/pg_stat_monitor"
   },
   {
     "name": "pg_stat_statements",
     "comment": "track execution statistics of all SQL statements executed",
-    "tags": ["Admin", "Utility"]
+    "tags": ["Admin", "Utility"],
+    "link": "/guides/database/extensions/pg_stat_statements"
   },
   {
     "name": "pg_surgery",
@@ -203,7 +212,8 @@
   {
     "name": "pgaudit",
     "comment": "provides auditing functionality",
-    "tags": ["Audit", "Utility"]
+    "tags": ["Audit", "Utility"],
+    "link": "/guides/database/extensions/pgaudit"
   },
   {
     "name": "pg_walinspect",
@@ -220,12 +230,14 @@
   {
     "name": "pgjwt",
     "comment": "JSON Web Token API for Postgresql",
-    "tags": ["Utility", "Cryptography"]
+    "tags": ["Utility", "Cryptography"],
+    "link": "/guides/database/extensions/pgjwt"
   },
   {
     "name": "pgroonga",
     "comment": "Super fast and all languages supported full text search index based on Groonga",
-    "tags": ["Search"]
+    "tags": ["Search"],
+    "link": "/guides/database/extensions/pgroonga"
   },
   {
     "name": "pgroonga_database",
@@ -236,7 +248,8 @@
   {
     "name": "pgrouting",
     "comment": "pgRouting Extension",
-    "tags": ["Geo", "Utility"]
+    "tags": ["Geo", "Utility"],
+    "link": "/guides/database/extensions/pgrouting"
   },
   {
     "name": "pgrowlocks",
@@ -247,7 +260,8 @@
   {
     "name": "pgsodium",
     "comment": "Postgres extension for libsodium functions",
-    "tags": ["Utility", "Cryptography"]
+    "tags": ["Utility", "Cryptography"],
+    "link": "/guides/database/extensions/pgsodium"
   },
   {
     "name": "pgstattuple",
@@ -258,7 +272,8 @@
   {
     "name": "pgtap",
     "comment": "Unit testing for PostgreSQL",
-    "tags": ["Utility", "Testing"]
+    "tags": ["Utility", "Testing"],
+    "link": "/guides/database/extensions/pgtap"
   },
   {
     "name": "plcoffee",
@@ -287,17 +302,20 @@
   {
     "name": "plpgsql_check",
     "comment": "extended check for plpgsql functions",
-    "tags": ["Utility", "Testing"]
+    "tags": ["Utility", "Testing"],
+    "link": "/guides/database/extensions/plpgsql_check"
   },
   {
     "name": "plv8",
     "comment": "PL/JavaScript (v8) trusted procedural language",
-    "tags": ["Language"]
+    "tags": ["Language"],
+    "link": "/guides/database/extensions/plv8"
   },
   {
     "name": "postgis",
     "comment": "PostGIS geometry and geography spatial types and functions",
-    "tags": ["Geo"]
+    "tags": ["Geo"],
+    "link": "/guides/database/extensions/postgis"
   },
   {
     "name": "postgres_fdw",
@@ -314,7 +332,8 @@
   {
     "name": "rum",
     "comment": "GIN-like index for text search",
-    "tags": ["Index", "Search"]
+    "tags": ["Index", "Search"],
+    "link": "/guides/database/extensions/rum"
   },
   {
     "name": "seg",
@@ -349,7 +368,8 @@
   {
     "name": "timescaledb",
     "comment": "Enables scalable inserts and complex queries for time-series data",
-    "tags": ["Time Series", "Data Type", "Utility"]
+    "tags": ["Time Series", "Data Type", "Utility"],
+    "link": "/guides/database/extensions/timescaledb"
   },
   {
     "name": "tsm_system_rows",
@@ -372,21 +392,25 @@
   {
     "name": "uuid-ossp",
     "comment": "generate universally unique identifiers (UUIDs)",
-    "tags": ["Utility", "Data Type"]
+    "tags": ["Utility", "Data Type"],
+    "link": "/guides/database/extensions/uuid-ossp"
   },
   {
     "name": "pgvector",
     "comment": "vector data type with similarity search",
-    "tags": ["AI", "Data Type", "Search"]
+    "tags": ["AI", "Data Type", "Search"],
+    "link": "/guides/database/extensions/pgvector"
   },
   {
     "name": "pg_repack",
     "comment": "Optimize physical storage and remove bloat from tables and indexes",
-    "tags": ["Admin", "Utility"]
+    "tags": ["Admin", "Utility"],
+    "link": "/guides/database/extensions/pg_repack"
   },
   {
     "name": "wrappers",
     "comment": "Foreign data wrappers developed by Supabase",
-    "tags": ["Admin", "Utility"]
+    "tags": ["Admin", "Utility"],
+    "link": "/guides/database/extensions/wrappers"
   }
 ]
