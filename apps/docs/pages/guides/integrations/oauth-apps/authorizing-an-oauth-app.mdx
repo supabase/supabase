@@ -12,9 +12,9 @@ This guide steps through implementing **Sign-in with Supabase**. Once you've add
 
 The access token returned will grant your application full access to the [Management API](https://supabase.com/docs/reference/api/introduction) on behalf of the user.
 
-## Implement the OAuth2.0 flow
+## Implement the OAuth 2.0 flow
 
-Once you've register your OAuth App, you can use the OAuth2.0 protocol to seek consent from Supabase users to access their organization or project.
+Once you've published your OAuth App on Supabase, you can use the OAuth 2.0 protocol to seek consent from Supabase users to access their organization or project.
 
 1. Call the [`GET /v1/oauth/authorize`](<https://api.supabase.com/api/v1#/oauth%20(beta)/authorize>) endpoint. This should redirect the user to a consent screen where they can select the organization that they want to grant access to.
 
