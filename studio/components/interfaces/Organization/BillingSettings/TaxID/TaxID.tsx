@@ -5,7 +5,7 @@ import { Button, IconPlus, IconX, Input, Listbox } from 'ui'
 
 import NoPermission from 'components/ui/NoPermission'
 import Panel from 'components/ui/Panel'
-import { checkPermissions, useSelectedOrganization, useStore } from 'hooks'
+import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
 import { delete_, post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
@@ -51,8 +51,8 @@ const TaxID = ({ loading, taxIds, onTaxIdsUpdated }: TaxIDProps) => {
   }, [taxIds])
 
   const hasChanges = !isEqual(taxIdValues, formattedTaxIds)
-  const canReadTaxIds = checkPermissions(PermissionAction.BILLING_READ, 'stripe.tax_ids')
-  const canUpdateTaxIds = checkPermissions(PermissionAction.BILLING_WRITE, 'stripe.tax_ids')
+  const canReadTaxIds = useCheckPermissions(PermissionAction.BILLING_READ, 'stripe.tax_ids')
+  const canUpdateTaxIds = useCheckPermissions(PermissionAction.BILLING_WRITE, 'stripe.tax_ids')
 
   const onUpdateTaxId = (id: string, key: string, value: string) => {
     const updatedTaxIds = taxIdValues.map((taxId: any) => {

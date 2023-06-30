@@ -7,7 +7,7 @@ import { Alert, Button, Collapsible, Form, IconCheck, IconChevronUp, Input } fro
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
-import { checkPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import { ProviderCollapsibleClasses } from './AuthProvidersForm.constants'
 import { Provider } from './AuthProvidersForm.types'
@@ -23,7 +23,7 @@ const ProviderForm = ({ provider }: ProviderFormProps) => {
   const { project: selectedProject } = useProjectContext()
   const { ref } = useParams()
   const doubleNegativeKeys = ['MAILER_AUTOCONFIRM', 'SMS_AUTOCONFIRM']
-  const canUpdateConfig = checkPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
+  const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef: ref })
 

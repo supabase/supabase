@@ -20,7 +20,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import type { PostgresSchema } from '@supabase/postgres-meta'
 
 import { useParams } from 'common/hooks'
-import { checkPermissions, useStore, useLocalStorage } from 'hooks'
+import { useCheckPermissions, useStore, useLocalStorage } from 'hooks'
 import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
 import { Entity } from 'data/entity-types/entity-type-query'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
@@ -85,7 +85,7 @@ const TableEditorMenu = ({
   const schemas: PostgresSchema[] = meta.schemas.list()
 
   const schema = schemas.find((schema) => schema.name === selectedSchema)
-  const canCreateTables = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
+  const canCreateTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
   const isLoadingTableMetadata = id ? !meta.tables.byId(id) : true
 

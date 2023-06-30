@@ -12,7 +12,7 @@ import {
   FormSectionLabel,
 } from 'components/ui/Forms'
 import { invalidateProjectsQuery } from 'data/projects/projects-query'
-import { checkPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import { patch } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 
@@ -23,7 +23,7 @@ const General = () => {
 
   const formId = 'project-general-settings'
   const initialValues = { name: project?.name ?? '', ref: project?.ref ?? '' }
-  const canUpdateProject = checkPermissions(PermissionAction.UPDATE, 'projects')
+  const canUpdateProject = useCheckPermissions(PermissionAction.UPDATE, 'projects')
 
   const onSubmit = async (values: any, { resetForm }: any) => {
     const response = await patch(`${API_URL}/projects/${project?.ref}`, {
