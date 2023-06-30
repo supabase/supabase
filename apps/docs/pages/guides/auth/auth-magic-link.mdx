@@ -22,6 +22,12 @@ Setting up Magic Link logins for your Supabase application.
 
 ## Add login code to your client app
 
+<Admonition type="caution">
+
+When making use of Magic Links with [the PKCE Flow](https://supabase.com/blog/supabase-auth-sso-pkce#introducing-pkce) do bear in mind that links can only be used in the same browser that they are sent from. Consequently, a magic link sent from Chrome on Desktop will be invalid if used on a Mobile Device.
+
+</Admonition>
+
 <Tabs
   scrollable
   size="small"
