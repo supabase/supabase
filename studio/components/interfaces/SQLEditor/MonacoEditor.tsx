@@ -1,8 +1,10 @@
 import Editor, { Monaco, OnMount } from '@monaco-editor/react'
 import { timeout } from 'lib/helpers'
-import { MutableRefObject, useEffect, useRef, useState } from 'react'
-import { createPortal } from 'react-dom'
+import { Selection, editor } from 'monaco-editor'
+import { MutableRefObject, useRef, useState } from 'react'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
+import AskAIWidget from './AskAIWidget'
+import InlineWidget from './InlineWidget'
 
 export type IStandaloneCodeEditor = Parameters<OnMount>[0]
 
@@ -21,23 +23,23 @@ const MonacoEditor = ({ id, editorRef, isExecuting, executeQuery }: MonacoEditor
   const executeQueryRef = useRef(executeQuery)
   executeQueryRef.current = executeQuery
 
-  const [domNode, setDomNode] = useState<HTMLElement>()
-
-  useEffect(() => {
-    if (!editorRef.current || !monacoRef.current) return
-
-    const model = editorRef.current.getModel()
-    if (model !== null) {
-      monacoRef.current.editor.setModelMarkers(model, 'owner', [])
-    }
-  }, [])
+  const [editor, setEditor] = useState<editor.IStandaloneCodeEditor>()
+  const [isAiWidgetOpen, setIsAiWidgetOpen] = useState(false)
+  const [aiWidgetSelection, setAiWidgetSelection] = useState<Selection>()
 
   const handleEditorOnMount: OnMount = async (editor, monaco) => {
     editorRef.current = editor
     monacoRef.current = monaco
 
+    setEditor(editor)
+
+    const model = editorRef.current.getModel()
+    if (model !== null) {
+      monacoRef.current.editor.setModelMarkers(model, 'owner', [])
+    }
+
     editor.addAction({
-      id: 'supabase',
+      id: 'run-query',
       label: 'Run Query',
       keybindings: [monaco.KeyMod.CtrlCmd + monaco.KeyCode.Enter],
       contextMenuGroupId: 'operation',
@@ -47,62 +49,28 @@ const MonacoEditor = ({ id, editorRef, isExecuting, executeQuery }: MonacoEditor
       },
     })
 
-    const domNode = document.createElement('div')
+    editor.addAction({
+      id: 'ask-ai',
+      label: 'Ask AI',
+      keybindings: [monaco.KeyMod.Alt + monaco.KeyCode.Enter],
+      contextMenuGroupId: 'operation',
+      contextMenuOrder: 0,
+      run: () => {
+        const selection = editor.getSelection()
 
-    let viewZoneTop = 0
-    let viewZoneHeight = 0
+        if (selection) {
+          setAiWidgetSelection(selection)
+          setIsAiWidgetOpen(true)
+        }
+      },
+    })
 
-    setDomNode(domNode)
-
-    function layoutOverlayWidget() {
-      const layoutInfo = editorRef.current?.getLayoutInfo()
-
-      if (!layoutInfo) {
-        return
-      }
-
-      console.log({ layoutInfo })
-
-      domNode.style.left = `${layoutInfo.contentLeft}px`
-      domNode.style.top = `${viewZoneTop}px`
-      domNode.style.width = `${layoutInfo.width}px`
-      domNode.style.height = `${viewZoneHeight}px`
-    }
-
+    // add margin above first line
     editorRef.current.changeViewZones((accessor) => {
-      // add margin above first line
       accessor.addZone({
         afterLineNumber: 0,
         heightInPx: 4,
         domNode: document.createElement('div'),
-      })
-
-      accessor.addZone({
-        afterLineNumber: 1,
-        heightInLines: 4,
-        domNode: document.createElement('div'),
-        onDomNodeTop: (top) => {
-          console.log({ top })
-          viewZoneTop = top
-          layoutOverlayWidget()
-        },
-        onComputedHeight: (height) => {
-          console.log({ height })
-          viewZoneHeight = height
-          layoutOverlayWidget()
-        },
-      })
-
-      editorRef.current?.addOverlayWidget({
-        getId: function () {
-          return 'my.inline.widget'
-        },
-        getDomNode: function () {
-          return domNode
-        },
-        getPosition: function () {
-          return null
-        },
       })
     })
 
@@ -135,7 +103,16 @@ const MonacoEditor = ({ id, editorRef, isExecuting, executeQuery }: MonacoEditor
           fixedOverflowWidgets: true,
         }}
       />
-      {domNode && createPortal(<>My inline widget</>, domNode)}
+      {editor && isAiWidgetOpen && aiWidgetSelection && (
+        <InlineWidget
+          editor={editor}
+          id="ask-ai"
+          afterLineNumber={aiWidgetSelection.endLineNumber}
+          heightInLines={6}
+        >
+          <AskAIWidget />
+        </InlineWidget>
+      )}
     </>
   )
 }
