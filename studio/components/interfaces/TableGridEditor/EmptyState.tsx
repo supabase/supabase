@@ -1,7 +1,7 @@
 import { FC } from 'react'
 import { observer } from 'mobx-react-lite'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { checkPermissions, useLocalStorage, useStore } from 'hooks'
+import { useCheckPermissions, useLocalStorage, useStore } from 'hooks'
 import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -15,7 +15,7 @@ const EmptyState: FC<Props> = ({ selectedSchema, onAddTable }) => {
   const { meta } = useStore()
   const isProtectedSchema = meta.excludedSchemas.includes(selectedSchema)
   const canCreateTables =
-    !isProtectedSchema && checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
+    useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables') && !isProtectedSchema
 
   const [sort] = useLocalStorage<'alphabetical' | 'grouped-alphabetical'>(
     'table-editor-sort',

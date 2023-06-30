@@ -8,7 +8,7 @@ import { FC, useState } from 'react'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import { setProjectStatus } from 'data/projects/projects-query'
-import { checkPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import { Button, IconPause } from 'ui'
@@ -30,7 +30,7 @@ const PauseProjectButton: FC<Props> = observer(({ projectRef, projectId }) => {
   const closeModal = () => setIsModalOpen(false)
 
   const isPaused = project?.status === PROJECT_STATUS.INACTIVE
-  const canPauseProject = checkPermissions(
+  const canPauseProject = useCheckPermissions(
     PermissionAction.INFRA_EXECUTE,
     'queue_jobs.projects.pause'
   )

@@ -72,8 +72,3 @@ export function useCheckPermissions(
 
   return doPermissionsCheck(allPermissions, action, resource, data, orgId)
 }
-
-/**
- * @deprecated use useCheckPermissions instead
- */
-export const checkPermissions = useCheckPermissions

@@ -15,7 +15,7 @@ import {
   FormSectionLabel,
 } from 'components/ui/Forms'
 import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
-import { checkPermissions, useFlag, useSelectedOrganization, useStore } from 'hooks'
+import { useCheckPermissions, useFlag, useSelectedOrganization, useStore } from 'hooks'
 import { patch } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import OrganizationDeletePanel from './OrganizationDeletePanel'
@@ -35,9 +35,8 @@ const GeneralSettings = () => {
   const showCMDK = useFlag('dashboardCmdk')
   const allowCMDKDataOptIn = useFlag('dashboardCmdkDataOptIn')
 
-  const canUpdateOrganization = checkPermissions(PermissionAction.UPDATE, 'organizations')
-  const canDeleteOrganization = checkPermissions(PermissionAction.UPDATE, 'organizations')
-
+  const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
+  const canDeleteOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
   const onUpdateOrganization = async (values: any, { setSubmitting, resetForm }: any) => {
     if (!canUpdateOrganization) {
       return ui.setNotification({
