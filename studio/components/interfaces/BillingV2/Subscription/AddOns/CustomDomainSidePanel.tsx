@@ -5,7 +5,7 @@ import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
-import { checkPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
@@ -21,7 +21,7 @@ const CustomDomainSidePanel = () => {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
   const [selectedOption, setSelectedOption] = useState<string>('cd_none')
 
-  const canUpdateCustomDomain = checkPermissions(
+  const canUpdateCustomDomain = useCheckPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.subscriptions'
   )

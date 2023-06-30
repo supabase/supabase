@@ -6,7 +6,7 @@ import Panel from 'components/ui/Panel'
 import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mutation'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 import { useProjectUsageQuery } from 'data/usage/project-usage-query'
-import { checkPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { Alert, Button, Form, InputNumber, Modal } from 'ui'
@@ -20,7 +20,7 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
   const { ui } = useStore()
   const { ref: projectRef } = useParams()
 
-  const canUpdateDiskSizeConfig = checkPermissions(PermissionAction.UPDATE, 'projects')
+  const canUpdateDiskSizeConfig = useCheckPermissions(PermissionAction.UPDATE, 'projects')
 
   const [showResetDbPass, setShowResetDbPass] = useState<boolean>(false)
   const [isUpdatingDiskSize, setIsUpdatingDiskSize] = useState<boolean>(false)

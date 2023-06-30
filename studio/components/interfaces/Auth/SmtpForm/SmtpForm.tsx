@@ -12,7 +12,7 @@ import {
   FormSectionContent,
   FormSectionLabel,
 } from 'components/ui/Forms'
-import { useStore, checkPermissions } from 'hooks'
+import { useStore, useCheckPermissions } from 'hooks'
 import { urlRegex } from './../Auth.constants'
 import { defaultDisabledSmtpFormValues } from './SmtpForm.constants'
 import { generateFormValues, isSmtpEnabled } from './SmtpForm.utils'
@@ -26,7 +26,7 @@ const SmtpForm = () => {
 
   const formId = 'auth-config-smtp-form'
   const initialValues = generateFormValues(authConfig.config)
-  const canUpdateConfig = checkPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
+  const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
   useEffect(() => {
     if (isLoaded && isSmtpEnabled(config)) {

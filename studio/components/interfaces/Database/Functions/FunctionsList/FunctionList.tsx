@@ -7,7 +7,7 @@ import { FC } from 'react'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Table from 'components/to-be-cleaned/Table'
-import { checkPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import { Button, Dropdown, IconEdit3, IconFileText, IconMoreVertical, IconTrash } from 'ui'
 
 interface Props {
@@ -34,7 +34,10 @@ const FunctionList: FC<Props> = ({
   const isApiDocumentAvailable = schema == 'public'
   const projectRef = selectedProject?.ref
 
-  const canUpdateFunctions = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'functions')
+  const canUpdateFunctions = useCheckPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'functions'
+  )
 
   function onEdit(func: any) {
     editFunction(func)

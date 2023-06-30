@@ -1,6 +1,6 @@
 import { FC } from 'react'
 import { Button, Dropdown, IconKey } from 'ui'
-import { checkPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { showApiKey } from 'components/interfaces/Docs/Docs.types'
@@ -24,7 +24,7 @@ const LangSelector: FC<Props> = ({
   apiKey,
   autoApiService,
 }) => {
-  const canReadServiceKey = checkPermissions(
+  const canReadServiceKey = useCheckPermissions(
     PermissionAction.READ,
     'service_api_keys.service_role_key'
   )

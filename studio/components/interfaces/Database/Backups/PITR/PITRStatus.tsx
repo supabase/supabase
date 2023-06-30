@@ -4,7 +4,7 @@ import { observer } from 'mobx-react-lite'
 import { Button, IconAlertCircle } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 
-import { checkPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import { Timezone } from './PITR.types'
 import { FormPanel } from 'components/ui/Forms'
 import TimezoneSelection from './TimezoneSelection'
@@ -31,7 +31,7 @@ const PITRStatus: FC<Props> = ({ selectedTimezone, onUpdateTimezone, onSetConfig
     .tz(selectedTimezone?.utc[0])
     .format('DD MMM YYYY, HH:mm:ss')
 
-  const canTriggerPhysicalBackup = checkPermissions(
+  const canTriggerPhysicalBackup = useCheckPermissions(
     PermissionAction.INFRA_EXECUTE,
     'queue_job.walg.prepare_restore'
   )

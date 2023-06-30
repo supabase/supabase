@@ -5,7 +5,7 @@ import { FC, Fragment, useState, useEffect } from 'react'
 import { IconSearch, Input, Button, Listbox, IconLoader, IconExternalLink, IconX } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useStore, checkPermissions } from 'hooks'
+import { useStore, useCheckPermissions } from 'hooks'
 import { useParams } from 'common/hooks'
 import SecretRow from './SecretRow'
 import EditSecretModal from './EditSecretModal'
@@ -25,7 +25,7 @@ const SecretsManagement: FC<Props> = ({}) => {
   const [selectedSecretToEdit, setSelectedSecretToEdit] = useState<any>()
   const [selectedSecretToRemove, setSelectedSecretToRemove] = useState<any>()
 
-  const canManageSecrets = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
+  const canManageSecrets = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
   useEffect(() => {
     if (search !== undefined) setSearchValue(search)

@@ -7,7 +7,7 @@ import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
 import Divider from 'components/ui/Divider'
 import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { checkPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import { patch } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { pluckObjectFields } from 'lib/helpers'
@@ -123,7 +123,7 @@ interface ConfigProps {
 export const PgbouncerConfig: FC<ConfigProps> = ({ projectRef, bouncerInfo, connectionInfo }) => {
   const { ui } = useStore()
 
-  const canUpdateConnectionPoolingConfiguration = checkPermissions(
+  const canUpdateConnectionPoolingConfiguration = useCheckPermissions(
     PermissionAction.UPDATE,
     'projects'
   )

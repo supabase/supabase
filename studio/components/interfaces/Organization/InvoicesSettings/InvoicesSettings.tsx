@@ -6,7 +6,7 @@ import InvoiceStatusBadge from 'components/interfaces/Billing/InvoiceStatusBadge
 import { Invoice, InvoiceStatus } from 'components/interfaces/Billing/Invoices.types'
 import Table from 'components/to-be-cleaned/Table'
 import NoPermission from 'components/ui/NoPermission'
-import { checkPermissions, useSelectedOrganization, useStore } from 'hooks'
+import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
 import { get, head } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { Button, IconChevronLeft, IconChevronRight, IconDownload, IconFileText, Loading } from 'ui'
@@ -27,7 +27,7 @@ const InvoicesSettings = () => {
   const { stripe_customer_id, slug } = selectedOrganization ?? {}
   const offset = (page - 1) * PAGE_LIMIT
 
-  const canReadInvoices = checkPermissions(PermissionAction.READ, 'invoices')
+  const canReadInvoices = useCheckPermissions(PermissionAction.READ, 'invoices')
 
   useEffect(() => {
     if (!canReadInvoices || !stripe_customer_id || !slug) return
