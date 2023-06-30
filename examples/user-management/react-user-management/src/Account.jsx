@@ -51,6 +51,8 @@ export default function Account({ session }) {
 
     if (error) {
       alert(error.message)
+    } else {
+      setAvatarUrl(avatarUrl)
     }
     setLoading(false)
   }
