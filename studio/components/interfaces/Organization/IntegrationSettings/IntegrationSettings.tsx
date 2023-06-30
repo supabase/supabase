@@ -55,17 +55,19 @@ You can change the scope of the access for Supabase by configuring here.
         detail={`
 ## GitHub Connections
 
-Conect any of your GitHub repositories to a project.
+Connect any of your GitHub repositories to a project.
 `}
         description={`
-### How do GitHub connections work?
+GitHub connections are coming soon.
 
-Supabase will keep the right environment variables up to date in each of the projects you assign to a Supabase project. 
-You can also link multiple Vercel Projects to the same Supabase project.
+### How will GitHub connections work?
+
+You will be able to connect a GitHub repository to a Supabase project. 
+The GitHub app will watch for changes in your repository such as file changes, branch changes as well as pull request activity.
+
+These connections will be part of a GitHub workflow that is currently in deveopment.
 `}
         note={`
-Your Vercel connection has access to 7 Vercel Projects. 
-You can change the scope of the access for Supabase by configuring here.
 `}
         integrations={githubIntegrations}
       />
