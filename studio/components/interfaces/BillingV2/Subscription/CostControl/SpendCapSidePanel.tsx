@@ -3,7 +3,7 @@ import { useParams, useTheme } from 'common'
 import Table from 'components/to-be-cleaned/Table'
 import { useProjectSubscriptionUpdateMutation } from 'data/subscriptions/project-subscription-update-mutation'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
-import { checkPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import { BASE_PATH, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
@@ -44,7 +44,10 @@ const SpendCapSidePanel = () => {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
   const [selectedOption, setSelectedOption] = useState<'on' | 'off'>()
 
-  const canUpdateSpendCap = checkPermissions(PermissionAction.BILLING_WRITE, 'stripe.subscriptions')
+  const canUpdateSpendCap = useCheckPermissions(
+    PermissionAction.BILLING_WRITE,
+    'stripe.subscriptions'
+  )
 
   const snap = useSubscriptionPageStateSnapshot()
   const visible = snap.panelKey === 'costControl'

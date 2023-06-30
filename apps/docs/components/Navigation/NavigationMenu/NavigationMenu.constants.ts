@@ -809,10 +809,6 @@ export const realtime: NavMenuConstant = {
       url: '/guides/realtime/concepts',
     },
     {
-      name: 'Quickstart',
-      url: '/guides/realtime/quickstart',
-    },
-    {
       name: 'Features',
       url: undefined,
       items: [

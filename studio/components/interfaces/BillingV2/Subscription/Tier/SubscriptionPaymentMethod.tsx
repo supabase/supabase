@@ -9,7 +9,7 @@ import {
   updateSubscriptionTier,
 } from 'data/subscriptions/project-subscription-update-mutation'
 import { ProjectSubscriptionResponse } from 'data/subscriptions/project-subscription-v2-query'
-import { checkPermissions, useSelectedOrganization, useStore } from 'hooks'
+import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import Link from 'next/link'
 import { Button, IconCreditCard, Modal } from 'ui'
@@ -30,7 +30,7 @@ const SubscriptionPaymentMethod = ({
   const selectedOrganization = useSelectedOrganization()
   const currentOrgSlug = selectedOrganization?.slug
 
-  const canUpdatePaymentMethod = checkPermissions(
+  const canUpdatePaymentMethod = useCheckPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.subscriptions'
   )
