@@ -7,7 +7,7 @@ triggers. Note that it is not sufficient to delete the objects from the
 `storage.objects` table because that would orphan and leak the actual storage objects in
 the S3 backend. Instead, invoke the storage API within Postgres via the `http` extension.
 
-Enable the [http extension for the `extensions` schema](https://app.supabase.com/project/_/database/extensions) in the Dashboard.
+Enable the [http extension for the `extensions` schema](https://supabase.com/dashboard/project/_/database/extensions) in the Dashboard.
 Then, define the following SQL functions in the SQL Editor to delete
 storage objects via the API:
 

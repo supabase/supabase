@@ -25,7 +25,7 @@ We'll cover:
 What you'll need:
 
 - A Twilio account (sign up here: https://www.twilio.com/try-twilio)
-- A Supabase project (create one here: https://app.supabase.com)
+- A Supabase project (create one here: https://supabase.com/dashboard)
 - A mobile phone capable of receiving SMS
 
 ## Video
@@ -68,7 +68,7 @@ You should now be able to see all three values you'll need to get started:
 
 ![All the credentials you'll need](/docs/img/guides/auth-twilio/6.png)
 
-Now go to the Auth > Settings page in the Supabase dashboard (https://app.supabase.com/project/YOUR-PROJECT-REF/auth/settings).
+Now go to the Auth > Settings page in the Supabase dashboard (https://supabase.com/dashboard/project/YOUR-PROJECT-REF/auth/settings).
 
 You should see an option to enable Phone Signup:
 
@@ -86,7 +86,7 @@ Now the backend should be setup, we can proceed to add our client-side code!
 
 The SMS message sent to a phone containing an OTP code can be customized. This is useful if you need to mention a brand name or display a website address.
 
-Go to Auth > Templates page in the Supabase dashboard (https://app.supabase.com/project/YOUR-PROJECT-REF/auth/templates).
+Go to Auth > Templates page in the Supabase dashboard (https://supabase.com/dashboard/project/YOUR-PROJECT-REF/auth/templates).
 
 Use the variable `.Code` in the template to display the OTP code. Here's an example in the SMS template.
 
@@ -350,7 +350,7 @@ let { data, error } = await supabase.auth.verifyOtp({
 ## Resources
 
 - [Twilio Signup](https://www.twilio.com/try-twilio)
-- [Supabase Dashboard](https://app.supabase.com)
+- [Supabase Dashboard](https://supabase.com/dashboard)
 - [Supabase Row Level Security](/docs/guides/auth#row-level-security)
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />

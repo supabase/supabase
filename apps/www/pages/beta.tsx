@@ -991,7 +991,7 @@ const Beta = (props: Props) => {
           },
           images: [
             {
-              url: 'https://supabase.com/og/og-image.jpg',
+              url: 'https://supabase.com/og/og-image-v2.jpg',
             },
           ],
         }}

@@ -43,7 +43,7 @@ The PostgreSQL utility [pg_dumpall](https://www.postgresql.org/docs/current/app-
 
 ![Scheduled backups dashboard](/docs/img/backups-daily-dashboard.png)
 
-You can access daily backups in the [Scheduled backups](https://app.supabase.com/project/_/database/backups/scheduled) settings in the Dashboard. Pro plan projects can access the last 7 days' worth of daily backups while Enterprise plan projects can access up to 30 days' worth of daily backups. Users can restore their project to any one of the backups or download them as a zipped SQL file.
+You can access daily backups in the [Scheduled backups](https://supabase.com/dashboard/project/_/database/backups/scheduled) settings in the Dashboard. Pro plan projects can access the last 7 days' worth of daily backups while Enterprise plan projects can access up to 30 days' worth of daily backups. Users can restore their project to any one of the backups or download them as a zipped SQL file.
 
 ### Restoration Process [#daily-backups-restoration-process]
 
@@ -77,7 +77,7 @@ By default, WAL files are backed up at two minute intervals. If these files cros
 
 ![PITR dashboard](/docs/img/backups-pitr-dashboard.png)
 
-You can access PITR in the [Point in Time](https://app.supabase.com/project/_/database/backups/pitr) settings in the Dashboard. The recovery period of a project is indicated by the earliest and latest points of recoveries displayed in your preferred timezone. If need be, the maximum amount of this recovery period can be modified accordingly.
+You can access PITR in the [Point in Time](https://supabase.com/dashboard/project/_/database/backups/pitr) settings in the Dashboard. The recovery period of a project is indicated by the earliest and latest points of recoveries displayed in your preferred timezone. If need be, the maximum amount of this recovery period can be modified accordingly.
 
 Note that the latest restore point of the project could be significantly far from the current time. This occurs when there has not been any recent activity in the database, and therefore no WAL file backups have been made recently. This is perfectly fine as the state of the database at the latest point of recovery would still be indicative of the state of the database at the current time given that no transactions have been made in between.
 
