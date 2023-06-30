@@ -88,7 +88,7 @@ const ExtensionCard: FC<Props> = ({ extension }) => {
                   {extension.name}
                 </h3>
 
-                <IconExternalLink className="ml-2.5 cursor-pointer" size={18} />
+                <IconExternalLink className="ml-2.5 cursor-pointer" size={14} />
               </div>
             </a>
           </Link>
