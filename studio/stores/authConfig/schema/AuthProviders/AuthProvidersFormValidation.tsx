@@ -96,7 +96,7 @@ const PROVIDER_PHONE = {
       title: 'Twilio Account Sid',
       show: {
         key: 'SMS_PROVIDER',
-        matches: 'twilio',
+        matches: ['twilio'],
       },
     },
     SMS_TWILIO_AUTH_TOKEN: {
@@ -105,7 +105,7 @@ const PROVIDER_PHONE = {
       isSecret: true,
       show: {
         key: 'SMS_PROVIDER',
-        matches: 'twilio',
+        matches: ['twilio'],
       },
     },
     SMS_TWILIO_MESSAGE_SERVICE_SID: {
@@ -113,7 +113,7 @@ const PROVIDER_PHONE = {
       title: 'Twilio Message Service Sid',
       show: {
         key: 'SMS_PROVIDER',
-        matches: 'twilio',
+        matches: ['twilio'],
       },
     },
 
@@ -150,7 +150,7 @@ const PROVIDER_PHONE = {
       title: 'Messagebird Access Key',
       show: {
         key: 'SMS_PROVIDER',
-        matches: 'messagebird',
+        matches: ['messagebird'],
       },
     },
     SMS_MESSAGEBIRD_ORIGINATOR: {
@@ -158,7 +158,7 @@ const PROVIDER_PHONE = {
       title: 'Messagebird Originator',
       show: {
         key: 'SMS_PROVIDER',
-        matches: 'messagebird',
+        matches: ['messagebird'],
       },
     },
 
@@ -168,7 +168,7 @@ const PROVIDER_PHONE = {
       title: 'Textlocal API Key',
       show: {
         key: 'SMS_PROVIDER',
-        matches: 'textlocal',
+        matches: ['textlocal'],
       },
     },
     SMS_TEXTLOCAL_SENDER: {
@@ -176,7 +176,7 @@ const PROVIDER_PHONE = {
       title: 'Textlocal Sender',
       show: {
         key: 'SMS_PROVIDER',
-        matches: 'textlocal',
+        matches: ['textlocal'],
       },
     },
 
@@ -186,7 +186,7 @@ const PROVIDER_PHONE = {
       title: 'Vonage API Key',
       show: {
         key: 'SMS_PROVIDER',
-        matches: 'vonage',
+        matches: ['vonage'],
       },
     },
     SMS_VONAGE_API_SECRET: {
@@ -194,7 +194,7 @@ const PROVIDER_PHONE = {
       title: 'Vonage API Secret',
       show: {
         key: 'SMS_PROVIDER',
-        matches: 'vonage',
+        matches: ['vonage'],
       },
     },
     // [TODO] verify what this is?
@@ -203,7 +203,7 @@ const PROVIDER_PHONE = {
       title: 'Vonage From',
       show: {
         key: 'SMS_PROVIDER',
-        matches: 'vonage',
+        matches: ['vonage'],
       },
     },
 
