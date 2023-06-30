@@ -4,12 +4,16 @@ import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useLocalStorage } from 'hooks'
 import useLatest from 'hooks/misc/useLatest'
 import { detectOS } from 'lib/helpers'
+import dynamic from 'next/dynamic'
 import { useCallback, useRef } from 'react'
 import Split from 'react-split'
 import { getSqlEditorStateSnapshot, useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { AiIcon, IconCornerDownLeft, Input } from 'ui'
-import MonacoEditor, { IStandaloneCodeEditor } from './MonacoEditor'
+import type { IStandaloneCodeEditor } from './MonacoEditor'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
+
+// Load the monaco editor client-side only (does not behave well server-side)
+const MonacoEditor = dynamic(() => import('./MonacoEditor'), { ssr: false })
 
 const SQLEditor = () => {
   const { ref, id } = useParams()
