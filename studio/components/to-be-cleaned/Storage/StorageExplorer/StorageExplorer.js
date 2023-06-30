@@ -1,17 +1,22 @@
-import { useEffect, useState, useRef } from 'react'
+import { compact, get, isEmpty, uniqBy } from 'lodash'
 import { observer } from 'mobx-react-lite'
-import { compact, isEmpty, uniqBy, get } from 'lodash'
+import { useEffect, useRef, useState } from 'react'
 
+import { useParams } from 'common'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import { STORAGE_ROW_TYPES } from '../Storage.constants'
-
+import ConfirmDeleteModal from './ConfirmDeleteModal'
+import CustomExpiryModal from './CustomExpiryModal'
 import FileExplorer from './FileExplorer'
 import FileExplorerHeader from './FileExplorerHeader'
 import FileExplorerHeaderSelection from './FileExplorerHeaderSelection'
-import ConfirmDeleteModal from './ConfirmDeleteModal'
 import MoveItemsModal from './MoveItemsModal'
 import PreviewPane from './PreviewPane'
-import CustomExpiryModal from './CustomExpiryModal'
+import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
+import { useProjectSettingsQuery } from 'data/config/project-settings-query'
+import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
+import { copyToClipboard } from 'lib/helpers'
+import { useStore } from 'hooks'
 
 const StorageExplorer = observer(({ bucket }) => {
   const storageExplorerStore = useStorageStore()
@@ -43,6 +48,16 @@ const StorageExplorer = observer(({ bucket }) => {
   } = storageExplorerStore
 
   const storageExplorerRef = useRef(null)
+
+  const { ui } = useStore()
+  const { ref } = useParams()
+  const { data: customDomainData } = useCustomDomainsQuery({ projectRef: ref })
+  const { data: projectSettings } = useProjectSettingsQuery({ projectRef: ref })
+  const apiService = (projectSettings?.services ?? []).find(
+    (x) => x.app.id == DEFAULT_PROJECT_API_SERVICE_ID
+  )
+  const apiConfig = apiService?.app_config
+  const apiUrl = `${apiConfig?.protocol ?? 'https'}://${apiConfig?.endpoint ?? '-'}`
 
   // This state exists outside of the header because FileExplorerColumn needs to listen to these as well
   // I'm keeping them outside of the mobx store as I feel that the store should contain persistent data
@@ -150,6 +165,20 @@ const StorageExplorer = observer(({ bucket }) => {
     clearSelectedItems()
   }
 
+  const onCopyUrl = (name, url) => {
+    const formattedUrl =
+      customDomainData?.customDomain?.status === 'active'
+        ? url.replace(apiUrl, `https://${customDomainData.customDomain.hostname}`)
+        : url
+    copyToClipboard(formattedUrl, () => {
+      ui.setNotification({
+        category: 'success',
+        message: `Copied URL for ${name} to clipboard.`,
+        duration: 4000,
+      })
+    })
+  }
+
   return (
     <div
       ref={storageExplorerRef}
@@ -180,8 +209,9 @@ const StorageExplorer = observer(({ bucket }) => {
           onColumnLoadMore={(index, column) =>
             fetchMoreFolderContents(index, column, itemSearchString)
           }
+          onCopyUrl={onCopyUrl}
         />
-        <PreviewPane />
+        <PreviewPane onCopyUrl={onCopyUrl} />
       </div>
       <ConfirmDeleteModal
         visible={selectedItemsToDelete.length > 0}
@@ -196,7 +226,7 @@ const StorageExplorer = observer(({ bucket }) => {
         onSelectCancel={clearSelectedItemsToMove}
         onSelectMove={onMoveSelectedFiles}
       />
-      <CustomExpiryModal />
+      <CustomExpiryModal onCopyUrl={onCopyUrl} />
     </div>
   )
 })

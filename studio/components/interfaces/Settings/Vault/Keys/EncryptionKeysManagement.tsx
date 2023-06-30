@@ -18,7 +18,7 @@ import {
   IconExternalLink,
 } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useStore, checkPermissions } from 'hooks'
+import { useStore, useCheckPermissions } from 'hooks'
 import { useParams } from 'common/hooks'
 import Divider from 'components/ui/Divider'
 
@@ -36,7 +36,7 @@ const EncryptionKeysManagement: FC<Props> = ({}) => {
   const [selectedKeyToRemove, setSelectedKeyToRemove] = useState<any>()
   const [isDeletingKey, setIsDeletingKey] = useState(false)
 
-  const canManageKeys = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
+  const canManageKeys = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
   useEffect(() => {
     if (id !== undefined) setSearchValue(id)

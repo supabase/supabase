@@ -343,7 +343,7 @@
           },
           {
             "id": "single",
-            "title": "Retrieve the query as one row",
+            "title": "Retrieve one row of data",
             "slug": "single",
             "product": "database",
             "parent": "modifiers",
@@ -351,7 +351,7 @@
           },
           {
             "id": "maybe-single",
-            "title": "Retrieve the query as 0-1 rows",
+            "title": "Retrieve zero or one row of data",
             "slug": "maybesingle",
             "product": "database",
             "parent": "modifiers",
@@ -359,7 +359,7 @@
           },
           {
             "id": "csv",
-            "title": "Retrieve the query as a CSV string",
+            "title": "Retrieve as a CSV",
             "slug": "db-csv",
             "product": "database",
             "parent": "modifiers",
@@ -715,11 +715,11 @@
   },
   {
     "type": "category",
-    "title": "Functions",
+    "title": "Edge Functions",
     "items": [
       {
         "id": "invoke",
-        "title": "Invoke a function",
+        "title": "Invokes a Supabase Edge Function.",
         "slug": "functions-invoke",
         "product": "functions",
         "type": "function"

@@ -12,9 +12,9 @@
 - [x] Hostitud Postgres andmebaas. [Dokumendid](https://supabase.com/docs/guides/database)
 - [x] Autentimine ja autoriseerimine. [Dokumendid](https://supabase.com/docs/guides/auth)
 - [x] Automaatselt genereeritud APId.
-  - [x] REST. [Dokumendid](https://supabase.com/docs/guides/database/api#rest-api)
-  - [x] GraphQL. [Dokumendid](https://supabase.com/docs/guides/database/api#graphql-api)
-  - [x] Reaalajas toimivad tellimused. [Dokumendid](https://supabase.com/docs/guides/database/api#realtime-api)
+  - [x] REST. [Dokumendid](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL. [Dokumendid](https://supabase.com/docs/guides/api#graphql-api-overview)
+  - [x] Reaalajas toimivad tellimused. [Dokumendid](https://supabase.com/docs/guides/api#realtime-api-overview)
 - [x] Funktsioonid.
   - [x] Andmebaasi funktsioonid. [Dokumendid](https://supabase.com/docs/guides/database/functions)
   - [x] Edge Functions [Docs](https://supabase.com/docs/guides/functions)
@@ -39,7 +39,7 @@ Et näha, kuidas panustada, külastage [Getting Started](../DEVELOPERS.md)
 ## Staatus
 
 - [x] Alpha: Me testime Supabase'i suletud kliendikogumiga
-- [x] Avalik Alpha: Igaüks saab registreeruda aadressil [app.supabase.com](https://app.supabase.com). Kuid olge meiega ettevaatlikud, seal on mõned veidrused
+- [x] Avalik Alpha: Igaüks saab registreeruda aadressil [supabase.com/dashboard](https://supabase.com/dashboard). Kuid olge meiega ettevaatlikud, seal on mõned veidrused
 - [x] Avalik beeta: Piisavalt stabiilne enamiku mitte-ettevõtluskasutuse jaoks
 - [ ] Avalik: Üldine kättesaadavus [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
 
@@ -55,7 +55,7 @@ Supabase on avatud lähtekoodiga tööriistade kombinatsioon. Me ehitame Firebas
 
 **Arhitektuur**
 
-Supabase on [hostitud platvorm](https://app.supabase.com). Võite registreeruda ja alustada Supabase'i kasutamist ilma midagi installimata.
+Supabase on [hostitud platvorm](https://supabase.com/dashboard). Võite registreeruda ja alustada Supabase'i kasutamist ilma midagi installimata.
 Võite ka [ise hostida](https://supabase.com/docs/guides/hosting/overview) ja [arendada lokaalselt](https://supabase.com/docs/guides/local-development).
 
 ![Arhitektuur](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)

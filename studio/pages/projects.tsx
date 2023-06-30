@@ -1,28 +1,48 @@
 import ProjectList from 'components/interfaces/Home/ProjectList'
 import { AccountLayout } from 'components/layouts'
 import OrganizationDropdown from 'components/to-be-cleaned/Dropdown/OrganizationDropdown'
+import AlertError from 'components/ui/AlertError'
 import Connecting from 'components/ui/Loading/Loading'
-import { useStore } from 'hooks'
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useAutoProjectsPrefetch } from 'data/projects/projects-query'
 import { IS_PLATFORM } from 'lib/constants'
-import { observer } from 'mobx-react-lite'
+import { useProfile } from 'lib/profile'
 import { NextPageWithLayout } from 'types'
 
 const ProjectsPage: NextPageWithLayout = () => {
-  const { app } = useStore()
+  const {
+    data: organizations,
+    isLoading: isOrganizationLoading,
+    isError,
+    isSuccess,
+  } = useOrganizationsQuery()
+  useAutoProjectsPrefetch()
+
+  const { isLoading: isProfileLoading } = useProfile()
+
+  const isLoading = isOrganizationLoading || isProfileLoading
 
   return (
     <>
-      {!app.organizations.isInitialized ? (
+      {isLoading && (
         <div className="flex h-full items-center justify-center space-x-2">
           <Connecting />
         </div>
-      ) : (
+      )}
+
+      {isError && (
+        <div className="py-4 px-5">
+          <AlertError subject="Unable to retrieve organizations" />
+        </div>
+      )}
+
+      {isSuccess && (
         <div className="py-4 px-5">
           {IS_PLATFORM && (
             <div className="my-2">
               <div className="flex">
                 <div className="">
-                  <OrganizationDropdown organizations={app.organizations} />
+                  <OrganizationDropdown organizations={organizations} />
                 </div>
               </div>
             </div>
@@ -50,4 +70,4 @@ ProjectsPage.getLayout = (page) => (
   </AccountLayout>
 )
 
-export default observer(ProjectsPage)
+export default ProjectsPage

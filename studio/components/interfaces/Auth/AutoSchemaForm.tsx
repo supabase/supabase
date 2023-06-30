@@ -4,7 +4,7 @@ import { boolean, number, object, string } from 'yup'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Button, Form, Input, IconEye, IconEyeOff, InputNumber, Toggle, Radio } from 'ui'
 
-import { useStore, checkPermissions } from 'hooks'
+import { useStore, useCheckPermissions } from 'hooks'
 import {
   FormActions,
   FormHeader,
@@ -20,7 +20,7 @@ const AutoSchemaForm = observer(() => {
 
   const formId = 'auth-config-general-form'
   const [hidden, setHidden] = useState(true)
-  const canUpdateConfig = checkPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
+  const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
   const INITIAL_VALUES = {
     DISABLE_SIGNUP: !authConfig.config.DISABLE_SIGNUP,
@@ -31,7 +31,7 @@ const AutoSchemaForm = observer(() => {
     SECURITY_CAPTCHA_ENABLED: authConfig.config.SECURITY_CAPTCHA_ENABLED || false,
     SECURITY_CAPTCHA_SECRET: authConfig.config.SECURITY_CAPTCHA_SECRET || '',
     SECURITY_CAPTCHA_PROVIDER: authConfig.config.SECURITY_CAPTCHA_PROVIDER || 'hcaptcha',
-    MAX_ENROLLED_FACTORS: authConfig.config.MAX_ENROLLED_FACTORS,
+    MFA_MAX_ENROLLED_FACTORS: authConfig.config.MFA_MAX_ENROLLED_FACTORS || 10,
   }
 
   const schema = object({
@@ -55,7 +55,7 @@ const AutoSchemaForm = observer(() => {
         .oneOf(['hcaptcha', 'turnstile'])
         .required('Captcha provider must be either hcaptcha or turnstile'),
     }),
-    MAX_ENROLLED_FACTORS: number()
+    MFA_MAX_ENROLLED_FACTORS: number()
       .min(0, 'Must be be a value more than 0')
       .max(30, 'Must be a value less than 30'),
   })
@@ -215,7 +215,7 @@ const AutoSchemaForm = observer(() => {
               >
                 <FormSectionContent loading={!isLoaded}>
                   <InputNumber
-                    id="MAX_ENROLLED_FACTORS"
+                    id="MFA_MAX_ENROLLED_FACTORS"
                     size="small"
                     label="Maximum number of enrolled factors"
                     disabled={!canUpdateConfig}

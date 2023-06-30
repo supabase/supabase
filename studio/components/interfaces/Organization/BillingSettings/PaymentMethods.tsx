@@ -1,28 +1,28 @@
-import { FC, useState } from 'react'
-import {
-  Dropdown,
-  IconPlus,
-  IconCreditCard,
-  Button,
-  Input,
-  Badge,
-  Modal,
-  Alert,
-  IconMoreHorizontal,
-  IconX,
-} from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useState } from 'react'
+import {
+  Alert,
+  Badge,
+  Button,
+  Dropdown,
+  IconCreditCard,
+  IconMoreHorizontal,
+  IconPlus,
+  IconX,
+  Input,
+  Modal,
+} from 'ui'
 
-import { checkPermissions, useStore } from 'hooks'
-import { delete_, patch } from 'lib/common/fetch'
-import { getURL } from 'lib/helpers'
-import { API_URL, BASE_PATH } from 'lib/constants'
-import Panel from 'components/ui/Panel'
 import { AddNewPaymentMethodModal } from 'components/interfaces/Billing'
 import NoPermission from 'components/ui/NoPermission'
+import Panel from 'components/ui/Panel'
+import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
+import { delete_, patch } from 'lib/common/fetch'
+import { API_URL, BASE_PATH } from 'lib/constants'
+import { getURL } from 'lib/helpers'
 
-interface Props {
+export interface PaymentMethodsProps {
   loading: boolean
   defaultPaymentMethod: string
   paymentMethods: any[]
@@ -31,27 +31,28 @@ interface Props {
   onPaymentMethodAdded: () => void
 }
 
-const PaymentMethods: FC<Props> = ({
+const PaymentMethods = ({
   loading,
   defaultPaymentMethod,
   paymentMethods,
   onDefaultMethodUpdated,
   onPaymentMethodsDeleted,
   onPaymentMethodAdded,
-}) => {
+}: PaymentMethodsProps) => {
   const { ui } = useStore()
-  const orgSlug = ui.selectedOrganization?.slug ?? ''
+  const selectedOrganization = useSelectedOrganization()
+  const orgSlug = selectedOrganization?.slug ?? ''
 
   const [selectedMethodForDefault, setSelectedMethodForDefault] = useState<any>()
   const [selectedMethodToDelete, setSelectedMethodToDelete] = useState<any>()
   const [showAddPaymentMethodModal, setShowAddPaymentMethodModal] = useState(false)
   const [isUpdatingPaymentMethod, setIsUpdatingPaymentMethod] = useState(false)
 
-  const canReadPaymentMethods = checkPermissions(
+  const canReadPaymentMethods = useCheckPermissions(
     PermissionAction.BILLING_READ,
     'stripe.payment_methods'
   )
-  const canUpdatePaymentMethods = checkPermissions(
+  const canUpdatePaymentMethods = useCheckPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.payment_methods'
   )

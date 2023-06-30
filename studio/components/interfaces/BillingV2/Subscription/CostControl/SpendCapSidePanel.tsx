@@ -3,7 +3,7 @@ import { useParams, useTheme } from 'common'
 import Table from 'components/to-be-cleaned/Table'
 import { useProjectSubscriptionUpdateMutation } from 'data/subscriptions/project-subscription-update-mutation'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
-import { checkPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import { BASE_PATH, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
@@ -11,6 +11,8 @@ import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { Alert, Button, Collapsible, IconChevronRight, IconExternalLink, SidePanel } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { pricing } from 'shared-data/pricing'
+import Telemetry from 'lib/telemetry'
+import { useRouter } from 'next/router'
 
 const SPEND_CAP_OPTIONS: {
   name: string
@@ -34,6 +36,7 @@ const SPEND_CAP_OPTIONS: {
 
 const SpendCapSidePanel = () => {
   const { ui } = useStore()
+  const router = useRouter()
   const { ref: projectRef } = useParams()
   const { isDarkMode } = useTheme()
 
@@ -41,7 +44,10 @@ const SpendCapSidePanel = () => {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
   const [selectedOption, setSelectedOption] = useState<'on' | 'off'>()
 
-  const canUpdateSpendCap = checkPermissions(PermissionAction.BILLING_WRITE, 'stripe.subscriptions')
+  const canUpdateSpendCap = useCheckPermissions(
+    PermissionAction.BILLING_WRITE,
+    'stripe.subscriptions'
+  )
 
   const snap = useSubscriptionPageStateSnapshot()
   const visible = snap.panelKey === 'costControl'
@@ -58,6 +64,17 @@ const SpendCapSidePanel = () => {
   useEffect(() => {
     if (visible && subscription !== undefined) {
       setSelectedOption(isSpendCapOn ? 'on' : 'off')
+      Telemetry.sendActivity(
+        {
+          activity: 'Side Panel Viewed',
+          source: 'Dashboard',
+          data: {
+            title: 'Spend cap',
+            section: 'Cost Control',
+          },
+        },
+        router
+      )
     }
   }, [visible, isLoading, subscription, isSpendCapOn])
 
@@ -206,7 +223,21 @@ const SpendCapSidePanel = () => {
                   <div
                     key={option.value}
                     className={clsx('col-span-4 group space-y-1', isFreePlan && 'opacity-75')}
-                    onClick={() => !isFreePlan && setSelectedOption(option.value)}
+                    onClick={() => {
+                      !isFreePlan && setSelectedOption(option.value)
+                      Telemetry.sendActivity(
+                        {
+                          activity: 'Option Selected',
+                          source: 'Dashboard',
+                          data: {
+                            title: 'Spend cap',
+                            section: 'Cost Control',
+                            option: option.name,
+                          },
+                        },
+                        router
+                      )
+                    }}
                   >
                     <img
                       alt="Spend Cap"

@@ -1,23 +1,26 @@
-import { useState, useContext } from 'react'
-import { useRouter } from 'next/router'
-import { observer } from 'mobx-react-lite'
-import { Button, Form, Modal, Input } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useQueryClient } from '@tanstack/react-query'
+import { useRouter } from 'next/router'
+import { useState } from 'react'
+import { Button, Form, Input, Modal } from 'ui'
 
-import { useStore, checkPermissions } from 'hooks'
+import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
 import { delete_ } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 
-const DeleteOrganizationButton = observer(() => {
+const DeleteOrganizationButton = () => {
   const router = useRouter()
-  const { app, ui } = useStore()
+  const queryClient = useQueryClient()
+  const { ui } = useStore()
 
-  const { slug: orgSlug, name: orgName } = ui.selectedOrganization || {}
+  const selectedOrganization = useSelectedOrganization()
+  const { slug: orgSlug, name: orgName } = selectedOrganization ?? {}
 
   const [isOpen, setIsOpen] = useState(false)
   const [value, setValue] = useState('')
 
-  const canDeleteOrganization = checkPermissions(PermissionAction.UPDATE, 'organizations')
+  const canDeleteOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
 
   const onValidate = (values: any) => {
     const errors: any = {}
@@ -47,7 +50,7 @@ const DeleteOrganizationButton = observer(() => {
       })
       setSubmitting(false)
     } else {
-      app.onOrgDeleted(ui.selectedOrganization)
+      invalidateOrganizationsQuery(queryClient)
       setSubmitting(false)
       router.push('/')
       ui.setNotification({
@@ -119,6 +122,6 @@ const DeleteOrganizationButton = observer(() => {
       </Modal>
     </>
   )
-})
+}
 
 export default DeleteOrganizationButton

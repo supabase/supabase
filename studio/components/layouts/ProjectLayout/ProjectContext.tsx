@@ -1,8 +1,7 @@
 import { useParams } from 'common/hooks'
-import { useStore } from 'hooks'
+import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { PROJECT_STATUS } from 'lib/constants'
-import { observer } from 'mobx-react-lite'
-import { createContext, PropsWithChildren, useContext, useMemo } from 'react'
+import { PropsWithChildren, createContext, useContext, useMemo } from 'react'
 import { Project } from 'types'
 
 type ProjectContextType = {
@@ -23,29 +22,21 @@ type ProjectContextProviderProps = {
   projectRef: string | undefined
 }
 
-export const ProjectContextProvider = observer(
-  ({ projectRef, children }: PropsWithChildren<ProjectContextProviderProps>) => {
-    // TODO(alaister): This will eventually be replaced with a react-query query
-    // once we remove mobx
-    const { ui } = useStore()
+export const ProjectContextProvider = ({
+  projectRef,
+  children,
+}: PropsWithChildren<ProjectContextProviderProps>) => {
+  const { data: selectedProject, isLoading } = useProjectDetailQuery({ ref: projectRef })
 
-    const value = useMemo<ProjectContextType>(() => {
-      if (ui.selectedProject?.ref === projectRef) {
-        return {
-          project: ui.selectedProject,
-          isLoading: false,
-        }
-      }
+  const value = useMemo<ProjectContextType>(() => {
+    return {
+      project: selectedProject,
+      isLoading: isLoading,
+    }
+  }, [selectedProject, isLoading])
 
-      return {
-        project: undefined,
-        isLoading: true,
-      }
-    }, [ui.selectedProject?.ref, projectRef])
-
-    return <ProjectContext.Provider value={value}>{children}</ProjectContext.Provider>
-  }
-)
+  return <ProjectContext.Provider value={value}>{children}</ProjectContext.Provider>
+}
 
 export const ProjectContextFromParamsProvider = ({ children }: PropsWithChildren<{}>) => {
   const { ref: projectRef } = useParams()
