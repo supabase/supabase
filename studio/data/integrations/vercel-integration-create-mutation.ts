@@ -22,7 +22,6 @@ export async function createVercelIntegration({
   source,
   teamId,
 }: VercelIntegrationCreateVariables) {
-  console.log('payload', { code, configurationId, orgSlug, metadata, source, teamId })
   const response = await post(`${API_URL}/integrations/vercel`, {
     code,
     configuration_id: configurationId,
@@ -53,7 +52,6 @@ export const useVercelIntegrationCreateMutation = ({
     (vars) => createVercelIntegration(vars),
     {
       async onSuccess(data, variables, context) {
-        console.log('data', data, variables)
         await Promise.all([
           queryClient.invalidateQueries(integrationKeys.integrationsList()),
           queryClient.invalidateQueries(integrationKeys.integrationsListWithOrg(variables.orgSlug)),
