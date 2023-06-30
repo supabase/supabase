@@ -65,6 +65,20 @@ const ScaffoldSectionContent = React.forwardRef<
   )
 })
 
+// For older layouts
+const ScaffoldContainerLegacy = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => {
+  return (
+    <div
+      ref={ref}
+      {...props}
+      className={cn(maxWidthClasses, paddingClasses, 'my-8 flex flex-col gap-4', className)}
+    />
+  )
+})
+
 ScaffoldHeader.displayName = 'ScaffoldHeader'
 ScaffoldTitle.displayName = 'ScaffoldTitle'
 ScaffoldContainer.displayName = 'ScaffoldContainer'
@@ -72,6 +86,7 @@ ScaffoldDivider.displayName = 'ScaffoldDivider'
 ScaffoldSection.displayName = 'ScaffoldSection'
 ScaffoldSectionDetail.displayName = 'ScaffoldSectionDetail'
 ScaffoldSectionContent.displayName = 'ScaffoldSectionContent'
+ScaffoldContainerLegacy.displayName = 'ScaffoldContainerLegacy'
 
 export {
   ScaffoldHeader,
@@ -81,4 +96,5 @@ export {
   ScaffoldSection,
   ScaffoldSectionDetail,
   ScaffoldSectionContent,
+  ScaffoldContainerLegacy,
 }
