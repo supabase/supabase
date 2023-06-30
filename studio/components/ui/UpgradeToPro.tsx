@@ -48,14 +48,12 @@ const UpgradeToPro: FC<Props> = ({ icon, primaryText, projectRef, secondaryText 
             <Tooltip.Trigger>
               <Button type="primary" disabled={!canUpdateSubscription || projectUpdateDisabled}>
                 <Link
-                  href={`/project/${ref}/settings/billing/subscription?panel=${
-                    tier === PRICING_TIER_PRODUCT_IDS.FREE ? 'subscriptionPlan' : 'customDomain'
+                  href={`/project/${ref}/settings/billing/subscription${
+                    tier === PRICING_TIER_PRODUCT_IDS.FREE ? '?panel=subscriptionPlan' : ''
                   }`}
                 >
                   <a>
-                    {tier === PRICING_TIER_PRODUCT_IDS.FREE
-                      ? 'Upgrade to Pro'
-                      : 'Enable Custom Domain'}
+                    {tier === PRICING_TIER_PRODUCT_IDS.FREE ? 'Upgrade to Pro' : 'Enable Addon'}
                   </a>
                 </Link>
               </Button>
