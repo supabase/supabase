@@ -18,7 +18,7 @@ export interface IntegrationInstallationProps extends React.RefAttributes<HTMLLI
 
 type HandleIconType = Integration['integration']['name'] | 'Supabase'
 
-const HandleIcon = ({ type }: { type: HandleIconType }) => {
+const HandleIcon = ({ type, className }: { type: HandleIconType; className?: string }) => {
   switch (type) {
     case 'GitHub':
       return <IconGitHub strokeWidth={ICON_STROKE_WIDTH} size={ICON_SIZE} />
@@ -30,9 +30,9 @@ const HandleIcon = ({ type }: { type: HandleIconType }) => {
       return (
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          fill="var(--colors-scale12)"
+          fill="white"
           viewBox="0 0 512 512"
-          className="w-3.5"
+          className={cn('w-3.5', className)}
         >
           <path fill-rule="evenodd" d="M256,48,496,464H16Z" />
         </svg>
@@ -68,7 +68,7 @@ const IntegrationInstallation = React.forwardRef<HTMLLIElement, IntegrationInsta
   ({ title, integration, ...props }, ref) => {
     const IntegrationIconBlock = () => {
       return (
-        <div className="bg-scale-100 w-8 h-8 rounded flex items-center justify-center">
+        <div className="bg-black text-white w-8 h-8 rounded flex items-center justify-center">
           <HandleIcon type={integration.integration.name} />
         </div>
       )
@@ -99,7 +99,7 @@ const IntegrationInstallation = React.forwardRef<HTMLLIElement, IntegrationInsta
                 {integration.metadata?.account.type}
               </Badge>
             </div>
-            <div className="flex gap-3 items-center">
+            <div className="flex flex-col gap-0">
               <span className="text-scale-900 text-sm">
                 Created {dayjs(integration.inserted_at).fromNow()}
               </span>
@@ -142,7 +142,9 @@ const IntegrationConnection = React.forwardRef<HTMLLIElement, IntegrationConnect
               <span>{project?.name}</span>
               <IconArrowRight size={14} className="text-scale-900" strokeWidth={1.5} />
               {!connection?.metadata?.framework ? (
-                <HandleIcon type={type} />
+                <div className="bg-black text-white w-4 h-4 rounded flex items-center justify-center">
+                  <HandleIcon type={'Vercel'} className={'!w-2.5'} />
+                </div>
               ) : (
                 <img
                   src={`${BASE_PATH}/img/icons/frameworks/${connection.metadata.framework}.svg`}
@@ -154,7 +156,7 @@ const IntegrationConnection = React.forwardRef<HTMLLIElement, IntegrationConnect
               <span>{connection.metadata?.name}</span>
             </div>
 
-            <div className="flex gap-3 items-center">
+            <div className="flex flex-col gap-0">
               <span className="text-scale-900 text-sm">
                 Connected {dayjs(connection?.inserted_at).fromNow()}
               </span>
