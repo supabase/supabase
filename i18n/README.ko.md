@@ -39,7 +39,7 @@
 ## 상태
 
 - [x] 알파: 비공개 고객들을 대상으로 Supabase를 테스트 중입니다
-- [x] 공개 알파: 누구나 [app.supabase.com](https://app.supabase.com)에서 가입할 수 있습니다. 하지만 몇 가지 불편한 점이 있습니다
+- [x] 공개 알파: 누구나 [supabase.com/dashboard](https://supabase.com/dashboard)에서 가입할 수 있습니다. 하지만 몇 가지 불편한 점이 있습니다
 - [x] 공개 베타: 대부분의 비기업용 사용 사례에 충분히 안정적입니다
 - [ ] 공개: 일반 사용 가능 [[상태](https://supabase.com/docs/guides/getting-started/features#feature-status)]
 
@@ -55,7 +55,7 @@ Supabase는 오픈 소스 도구의 조합입니다. 저희는 엔터프라이�
 
 **아키텍처**
 
-Supabase는 [호스팅 플랫폼](https://app.supabase.com)입니다. 가입만 하면 아무것도 설치하지 않고 Supabase를 사용할 수 있습니다.
+Supabase는 [호스팅 플랫폼](https://supabase.com/dashboard)입니다. 가입만 하면 아무것도 설치하지 않고 Supabase를 사용할 수 있습니다.
 자체 호스팅](https://supabase.com/docs/guides/hosting/overview) 및 [로컬 개발](https://supabase.com/docs/guides/local-development)도 가능합니다.
 
 아키텍처](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)

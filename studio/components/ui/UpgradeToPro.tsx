@@ -26,7 +26,6 @@ const UpgradeToPro: FC<Props> = ({ icon, primaryText, projectRef, secondaryText 
     'stripe.subscriptions'
   )
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
-  const isEnterprise = tier === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
 
   return (
     <div
@@ -48,11 +47,11 @@ const UpgradeToPro: FC<Props> = ({ icon, primaryText, projectRef, secondaryText 
           <Tooltip.Root delayDuration={0}>
             <Tooltip.Trigger>
               <Button type="primary" disabled={!canUpdateSubscription || projectUpdateDisabled}>
-                <Link href={`/project/${ref}/settings/billing/subscription?panel=subscriptionPlan`}>
+                <Link href={`/project/${ref}/settings/billing/subscription?panel=${tier === PRICING_TIER_PRODUCT_IDS.FREE ? 'subscriptionPlan' : 'customDomain'}`}>
                   <a>
                     {tier === PRICING_TIER_PRODUCT_IDS.FREE
                       ? 'Upgrade to Pro'
-                      : 'Modify subscription'}
+                      : 'Enable Custom Domain'}
                   </a>
                 </Link>
               </Button>

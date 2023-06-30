@@ -39,7 +39,7 @@ Wie Sie einen Beitrag leisten können, erfahren Sie unter [Erste Schritte](../DE
 ## Status
 
 - [x] Alpha: Wir testen Supabase mit einer geschlossenen Gruppe von Kunden
-- [x] Öffentliche Alpha: Jeder kann sich unter [app.supabase.com](https://app.supabase.com) anmelden. Aber seien Sie nachsichtig mit uns, es gibt noch ein paar Macken
+- [x] Öffentliche Alpha: Jeder kann sich unter [supabase.com/dashboard](https://supabase.com/dashboard) anmelden. Aber seien Sie nachsichtig mit uns, es gibt noch ein paar Macken
 - [x] Öffentliche Beta: Stabil genug für die meisten nicht-unternehmerischen Anwendungsfälle
 - [Öffentlich: Allgemeine Verfügbarkeit [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
 
@@ -55,7 +55,7 @@ Supabase ist eine Kombination aus Open-Source-Tools. Wir entwickeln die Funktion
 
 **Architektur**
 
-Supabase ist eine [gehostete Plattform](https://app.supabase.com). Sie können sich anmelden und Supabase verwenden, ohne etwas zu installieren.
+Supabase ist eine [gehostete Plattform](https://supabase.com/dashboard). Sie können sich anmelden und Supabase verwenden, ohne etwas zu installieren.
 Sie können auch [selbst hosten](https://supabase.com/docs/guides/hosting/overview) und [lokal entwickeln](https://supabase.com/docs/guides/local-development).
 
 ![Architektur](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
