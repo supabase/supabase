@@ -707,7 +707,7 @@ functions:
   - id: invoke
     title: 'invoke()'
     description: |
-      Invokes a Supabase Function.
+      Invokes a Supabase Edge Function.
     $ref: '@supabase/functions-js.FunctionsClient.invoke'
     notes: |
       - Requires an Authorization header.
@@ -736,7 +736,7 @@ functions:
       - id: passing-custom-headers
         name: Passing custom headers.
         description: |
-          You can pass custom headers to your function. Note: supabase-js automatically passes the `Authorization` header with the signed in user's JWT.
+          You can pass custom headers to your Edge Function. Note: supabase-js automatically passes the `Authorization` header with the signed in user's JWT.
         isSpotlight: true
         code: |
           ```js
