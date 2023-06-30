@@ -62,6 +62,7 @@
     "markdown-table": "=2.0.0",
     "mobx": "^6.3.2",
     "mobx-react-lite": "^3.2.0",
+    "monaco-editor": "0.33.0",
     "next": "^12.3.2",
     "next-transpile-modules": "^9.0.0",
     "openapi-types": "^12.0.2",
