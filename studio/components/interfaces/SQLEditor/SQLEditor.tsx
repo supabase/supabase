@@ -95,9 +95,9 @@ const SQLEditor = () => {
                 <path
                   d="M3 5H7.76472L16.2353 19H21M16.2353 5H21"
                   stroke="currentColor"
-                  stroke-width="1.5"
-                  stroke-linecap="square"
-                  stroke-linejoin="round"
+                  strokeWidth="1.5"
+                  strokeLinecap="square"
+                  strokeLinejoin="round"
                 />
               </svg>
             ) : (
