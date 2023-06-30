@@ -110,19 +110,6 @@ Repository connections for ${title?.toLowerCase()}
                                       overlay={
                                         <>
                                           <Dropdown.Item
-                                            icon={
-                                              <div>
-                                                <IconRefreshCcw size={14} />
-                                              </div>
-                                            }
-                                          >
-                                            <div>Refresh Enviroment Variables</div>
-                                            <div className="text-scale-900 text-xs">
-                                              Reapply env vars in vercel.
-                                            </div>
-                                          </Dropdown.Item>
-                                          <Dropdown.Separator />
-                                          <Dropdown.Item
                                             icon={<IconTrash size={14} />}
                                             onSelect={() =>
                                               handleDelete(integration.id, connection.id)

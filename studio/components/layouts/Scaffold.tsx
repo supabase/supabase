@@ -65,6 +65,29 @@ const ScaffoldSectionContent = React.forwardRef<
   )
 })
 
+// Table and filters
+const ScaffoldFilterAndContent = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => {
+  return <div ref={ref} {...props} className={cn('flex flex-col gap-3 items-center', className)} />
+})
+
+// Actions Group
+const ScaffoldActionsContainer = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => {
+  return <div ref={ref} {...props} className={cn('flex w-full items-center', className)} />
+})
+
+// Actions Group
+const ScaffoldActionsGroup = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  ({ className, ...props }, ref) => {
+    return <div ref={ref} {...props} className={cn('flex flex-row gap-3', className)} />
+  }
+)
+
 // For older layouts
 const ScaffoldContainerLegacy = React.forwardRef<
   HTMLDivElement,
@@ -74,7 +97,7 @@ const ScaffoldContainerLegacy = React.forwardRef<
     <div
       ref={ref}
       {...props}
-      className={cn(maxWidthClasses, paddingClasses, 'my-8 flex flex-col gap-4', className)}
+      className={cn(maxWidthClasses, paddingClasses, 'my-8 flex flex-col gap-8', className)}
     />
   )
 })
@@ -86,6 +109,9 @@ ScaffoldDivider.displayName = 'ScaffoldDivider'
 ScaffoldSection.displayName = 'ScaffoldSection'
 ScaffoldSectionDetail.displayName = 'ScaffoldSectionDetail'
 ScaffoldSectionContent.displayName = 'ScaffoldSectionContent'
+ScaffoldFilterAndContent.displayName = 'ScaffoldFilterAndContent'
+ScaffoldActionsContainer.displayName = 'ScaffoldActionsContainer'
+ScaffoldActionsGroup.displayName = 'ScaffoldActionsGroup'
 ScaffoldContainerLegacy.displayName = 'ScaffoldContainerLegacy'
 
 export {
@@ -96,5 +122,8 @@ export {
   ScaffoldSection,
   ScaffoldSectionDetail,
   ScaffoldSectionContent,
+  ScaffoldFilterAndContent,
+  ScaffoldActionsContainer,
+  ScaffoldActionsGroup,
   ScaffoldContainerLegacy,
 }

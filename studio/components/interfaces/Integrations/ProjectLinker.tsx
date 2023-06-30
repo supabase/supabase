@@ -210,7 +210,7 @@ const ProjectLinker = ({
       </div>
       <Markdown
         content={`
-The following enviroment variables will be added:
+The following environment variables will be added:
 
 ${ENV_VAR_RAW_KEYS.map((x, idx) => {
   return `
