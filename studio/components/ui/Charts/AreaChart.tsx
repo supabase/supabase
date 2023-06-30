@@ -24,7 +24,7 @@ export interface AreaChartProps<D = Datum> extends CommonChartProps<D> {
   displayDateInUtc?: boolean
 }
 
-const AreaChart: React.FC<AreaChartProps> = ({
+const AreaChart = ({
   data,
   yAxisKey,
   xAxisKey,
@@ -36,8 +36,9 @@ const AreaChart: React.FC<AreaChartProps> = ({
   displayDateInUtc,
   minimalHeader,
   className = '',
+  valuePrecision,
   size = 'normal',
-}) => {
+}: AreaChartProps) => {
   const { Container } = useChartSize(size)
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
 
@@ -62,7 +63,7 @@ const AreaChart: React.FC<AreaChartProps> = ({
         customDateFormat={customDateFormat}
         highlightedValue={
           typeof resolvedHighlightedValue === 'number'
-            ? numberFormatter(resolvedHighlightedValue)
+            ? numberFormatter(resolvedHighlightedValue, valuePrecision)
             : resolvedHighlightedValue
         }
         highlightedLabel={resolvedHighlightedLabel}

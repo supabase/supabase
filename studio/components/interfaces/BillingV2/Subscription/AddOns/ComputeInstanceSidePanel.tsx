@@ -1,15 +1,20 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useQueryClient } from '@tanstack/react-query'
 import clsx from 'clsx'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
+
 import { useParams, useTheme } from 'common'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { setProjectStatus } from 'data/projects/projects-query'
 import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-remove-mutation'
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
-import { checkPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import { BASE_PATH, PROJECT_STATUS } from 'lib/constants'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import Telemetry from 'lib/telemetry'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { Alert, Button, IconExternalLink, Modal, Radio, SidePanel } from 'ui'
 
@@ -34,17 +39,22 @@ const COMPUTE_CATEGORY_OPTIONS: {
 ]
 
 const ComputeInstanceSidePanel = () => {
-  const { ui, app } = useStore()
+  const queryClient = useQueryClient()
+  const { ui } = useStore()
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const { isDarkMode } = useTheme()
+  const { project: selectedProject } = useProjectContext()
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showConfirmationModal, setShowConfirmationModal] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState<'micro' | 'optimized'>('micro')
   const [selectedOption, setSelectedOption] = useState<string>('ci_micro')
 
-  const canUpdateCompute = checkPermissions(PermissionAction.BILLING_WRITE, 'stripe.subscriptions')
+  const canUpdateCompute = useCheckPermissions(
+    PermissionAction.BILLING_WRITE,
+    'stripe.subscriptions'
+  )
 
   const snap = useSubscriptionPageStateSnapshot()
   const visible = snap.panelKey === 'computeInstance'
@@ -55,7 +65,7 @@ const ComputeInstanceSidePanel = () => {
   const { mutateAsync: updateAddon } = useProjectAddonUpdateMutation()
   const { mutateAsync: removeAddon } = useProjectAddonRemoveMutation()
 
-  const projectId = ui.selectedProject?.id
+  const projectId = selectedProject?.id
   const selectedAddons = addons?.selected_addons ?? []
   const availableAddons = addons?.available_addons ?? []
 
@@ -79,6 +89,17 @@ const ComputeInstanceSidePanel = () => {
         setSelectedCategory('micro')
         setSelectedOption('ci_micro')
       }
+      Telemetry.sendActivity(
+        {
+          activity: 'Side Panel Viewed',
+          source: 'Dashboard',
+          data: {
+            title: 'Change project compute size',
+            section: 'Add ons',
+          },
+        },
+        router
+      )
     }
   }, [visible, isLoading])
 
@@ -102,7 +123,7 @@ const ComputeInstanceSidePanel = () => {
           selectedCompute?.name || 'Micro'
         }. Your project is currently being restarted to update its instance`,
       })
-      app.onProjectStatusUpdated(projectId, PROJECT_STATUS.RESTORING)
+      setProjectStatus(queryClient, projectRef, PROJECT_STATUS.RESTORING)
       onClose()
       router.push(`/project/${projectRef}`)
     } catch (error: any) {
@@ -169,6 +190,18 @@ const ComputeInstanceSidePanel = () => {
                       onClick={() => {
                         setSelectedCategory(option.id)
                         if (option.id === 'micro') setSelectedOption('ci_micro')
+                        Telemetry.sendActivity(
+                          {
+                            activity: 'Option Selected',
+                            source: 'Dashboard',
+                            data: {
+                              title: 'Change project compute size',
+                              section: 'Add ons',
+                              option: option.name,
+                            },
+                          },
+                          router
+                        )
                       }}
                     >
                       <img

@@ -1,14 +1,14 @@
-import { FC } from 'react'
 import { Form, Modal, Input, Button } from 'ui'
 import { observer } from 'mobx-react-lite'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 
-interface Props {}
+export interface CustomExpiryModalProps {
+  onCopyUrl: (name: string, url: string) => void
+}
 
-const CustomExpiryModal: FC<Props> = () => {
+const CustomExpiryModal = ({ onCopyUrl }: CustomExpiryModalProps) => {
   const storageExplorerStore = useStorageStore()
-  const { selectedFileCustomExpiry, setSelectedFileCustomExpiry, copyFileURLToClipboard } =
-    storageExplorerStore
+  const { getFileUrl, selectedFileCustomExpiry, setSelectedFileCustomExpiry } = storageExplorerStore
 
   const visible = selectedFileCustomExpiry !== undefined
   const onClose = () => setSelectedFileCustomExpiry(undefined)
@@ -28,7 +28,10 @@ const CustomExpiryModal: FC<Props> = () => {
         initialValues={{ expiresIn: '' }}
         onSubmit={async (values: any, { setSubmitting }: any) => {
           setSubmitting(true)
-          await copyFileURLToClipboard(selectedFileCustomExpiry, values.expiresIn)
+          onCopyUrl(
+            selectedFileCustomExpiry.name,
+            await getFileUrl(selectedFileCustomExpiry, values.expiresIn)
+          )
           setSubmitting(false)
           onClose()
         }}

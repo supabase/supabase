@@ -12,9 +12,9 @@
 - [x] Хоствана база данни Postgres. [Документи](https://supabase.com/docs/guides/database)
 - [x] Удостоверяване и оторизация. [Документи](https://supabase.com/docs/guides/auth)
 - [x] Автоматично генерирани API.
-  - [x] REST. [Документи](https://supabase.com/docs/guides/database/api#rest-api)
-  - [x] GraphQL. [Документи](https://supabase.com/docs/guides/database/api#graphql-api)
-  - [x] Абонаменти в реално време. [Документи](https://supabase.com/docs/guides/database/api#realtime-api)
+  - [x] REST. [Документи](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL. [Документи](https://supabase.com/docs/guides/api#graphql-api-overview)
+  - [x] Абонаменти в реално време. [Документи](https://supabase.com/docs/guides/api#realtime-api-overview)
 - [x] Функции.
   - [x] Функции за бази данни. [Docs](https://supabase.com/docs/guides/database/functions)
   - [x] Крайни функции [Docs](https://supabase.com/docs/guides/functions)
@@ -39,7 +39,7 @@
 ## Статус
 
 - [x] Алфа: Тестваме Supabase със затворен набор от клиенти
-- [x] Публична алфа: Всеки може да се регистрира на адрес [app.supabase.com](https://app.supabase.com). Но не се притеснявайте от нас, има няколко проблема
+- [x] Публична алфа: Всеки може да се регистрира на адрес [supabase.com/dashboard](https://supabase.com/dashboard). Но не се притеснявайте от нас, има няколко проблема
 - [x] Публична бета версия: Достатъчно стабилна за повечето случаи на използване извън предприятията
 - [ ] Публична: Обща наличност [[статус](https://supabase.com/docs/guides/getting-started/features#feature-status)]
 
@@ -55,7 +55,7 @@ Supabase е комбинация от инструменти с отворен �
 
 **Архитектура**
 
-Supabase е [хоствана платформа](https://app.supabase.com). Можете да се регистрирате и да започнете да използвате Supabase, без да инсталирате нищо.
+Supabase е [хоствана платформа](https://supabase.com/dashboard). Можете да се регистрирате и да започнете да използвате Supabase, без да инсталирате нищо.
 Можете също така да [самостоятелно хоствате](https://supabase.com/docs/guides/hosting/overview) и [да разработвате локално](https://supabase.com/docs/guides/local-development).
 
 ![Архитектура](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)

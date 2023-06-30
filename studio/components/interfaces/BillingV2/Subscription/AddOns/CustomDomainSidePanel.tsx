@@ -5,20 +5,23 @@ import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
-import { checkPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { Alert, Button, IconExternalLink, Radio, SidePanel } from 'ui'
+import Telemetry from 'lib/telemetry'
+import { useRouter } from 'next/router'
 
 const CustomDomainSidePanel = () => {
   const { ui } = useStore()
+  const router = useRouter()
   const { ref: projectRef } = useParams()
 
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
   const [selectedOption, setSelectedOption] = useState<string>('cd_none')
 
-  const canUpdateCustomDomain = checkPermissions(
+  const canUpdateCustomDomain = useCheckPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.subscriptions'
   )
@@ -51,6 +54,17 @@ const CustomDomainSidePanel = () => {
       } else {
         setSelectedOption('cd_none')
       }
+      Telemetry.sendActivity(
+        {
+          activity: 'Side Panel Viewed',
+          source: 'Dashboard',
+          data: {
+            title: 'Custom domains',
+            section: 'Add ons',
+          },
+        },
+        router
+      )
     }
   }, [visible, isLoading])
 
@@ -128,7 +142,21 @@ const CustomDomainSidePanel = () => {
               type="large-cards"
               size="tiny"
               id="custom-domain"
-              onChange={(event: any) => setSelectedOption(event.target.value)}
+              onChange={(event: any) => {
+                setSelectedOption(event.target.value)
+                Telemetry.sendActivity(
+                  {
+                    activity: 'Option Selected',
+                    source: 'Dashboard',
+                    data: {
+                      title: 'Custom domains',
+                      section: 'Add ons',
+                      option: event.target.label,
+                    },
+                  },
+                  router
+                )
+              }}
             >
               <Radio
                 name="custom-domain"

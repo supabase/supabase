@@ -210,8 +210,8 @@ export const gettingstarted: NavMenuConstant = {
     {
       name: 'Framework Quickstarts',
       items: [
+        { name: 'Next.js', url: '/guides/getting-started/quickstarts/nextjs' },
         { name: 'React', url: '/guides/getting-started/quickstarts/reactjs' },
-        { name: 'NextJS', url: '/guides/getting-started/quickstarts/nextjs' },
         { name: 'NuxtJS', url: '/guides/getting-started/quickstarts/nuxtjs' },
         { name: 'RedwoodJS', url: '/guides/getting-started/quickstarts/redwoodjs' },
         { name: 'Flutter', url: '/guides/getting-started/quickstarts/flutter' },
@@ -224,7 +224,7 @@ export const gettingstarted: NavMenuConstant = {
       name: 'Web app tutorials',
       items: [
         {
-          name: 'NextJS',
+          name: 'Next.js',
           url: '/guides/getting-started/tutorials/with-nextjs',
         },
         {
@@ -350,6 +350,11 @@ export const SocialLoginItems = [
     url: '/guides/auth/social-login/auth-discord',
   },
   {
+    name: 'Kakao',
+    icon: '/docs/img/icons/kakao-icon',
+    url: '/guides/auth/social-login/auth-kakao',
+  },
+  {
     name: 'Keycloak',
     icon: '/docs/img/icons/keycloak-icon',
     url: '/guides/auth/social-login/auth-keycloak',
@@ -424,7 +429,10 @@ export const auth = {
     },
     {
       name: 'Quickstarts',
-      items: [{ name: 'Auth with React', url: '/guides/auth/quickstarts/react', items: [] }],
+      items: [
+        { name: 'Next.js', url: '/guides/auth/quickstarts/nextjs', items: [] },
+        { name: 'React', url: '/guides/auth/quickstarts/react', items: [] },
+      ],
     },
     {
       name: 'Authentication',
@@ -801,10 +809,6 @@ export const realtime: NavMenuConstant = {
       url: '/guides/realtime/concepts',
     },
     {
-      name: 'Quickstart',
-      url: '/guides/realtime/quickstart',
-    },
-    {
       name: 'Features',
       url: undefined,
       items: [
@@ -1057,6 +1061,10 @@ export const platform: NavMenuConstant = {
         {
           name: 'HTTP and Project Issues',
           url: '/guides/platform/troubleshooting',
+        },
+        {
+          name: 'High Disk IO Consumption',
+          url: '/guides/platform/exhaust-disk-io',
         },
         {
           name: 'High CPU Usage',

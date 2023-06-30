@@ -1,24 +1,29 @@
-import { useEffect } from 'react'
-import { Form, Input } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useStore, checkPermissions } from 'hooks'
+import { useQueryClient } from '@tanstack/react-query'
+import { useEffect } from 'react'
+
 import { useParams } from 'common/hooks'
-import { API_URL } from 'lib/constants'
-import { patch } from 'lib/common/fetch'
 import { FormActions, FormPanel, FormSection, FormSectionContent } from 'components/ui/Forms'
+import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
+import { patch } from 'lib/common/fetch'
+import { API_URL } from 'lib/constants'
+import { Form, Input } from 'ui'
 
 const BillingEmail = () => {
-  const { app, ui } = useStore()
+  const queryClient = useQueryClient()
+  const { ui } = useStore()
   const { slug } = useParams()
-  const { name, billing_email } = ui.selectedOrganization ?? {}
+  const selectedOrganization = useSelectedOrganization()
+  const { name, billing_email } = selectedOrganization ?? {}
 
   const formId = 'org-billing-email'
   const initialValues = {
     billing_email: billing_email ?? '',
   }
 
-  const canUpdateOrganization = checkPermissions(PermissionAction.UPDATE, 'organizations')
-  const canReadBillingEmail = checkPermissions(PermissionAction.READ, 'organizations')
+  const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
+  const canReadBillingEmail = useCheckPermissions(PermissionAction.READ, 'organizations')
 
   const onUpdateOrganization = async (values: any, { setSubmitting, resetForm }: any) => {
     if (!canUpdateOrganization) {
@@ -45,7 +50,7 @@ const BillingEmail = () => {
         initialValues: { billing_email },
       })
 
-      app.onOrgUpdated(response)
+      invalidateOrganizationsQuery(queryClient)
       ui.setNotification({
         category: 'success',
         message: 'Successfully saved settings',

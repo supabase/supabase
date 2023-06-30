@@ -1,10 +1,9 @@
-import { observer } from 'mobx-react-lite'
 import { ReactNode, useEffect } from 'react'
 
 import { useParams } from 'common/hooks'
 import DeleteBucketModal from 'components/to-be-cleaned/Storage/DeleteBucketModal'
 import { AutoApiService, useProjectApiQuery } from 'data/config/project-api-query'
-import { useStore, withAuth } from 'hooks'
+import { useSelectedProject, useStore, withAuth } from 'hooks'
 import { PROJECT_STATUS } from 'lib/constants'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import ProjectLayout from '../'
@@ -18,6 +17,7 @@ export interface StorageLayoutProps {
 const StorageLayout = ({ title, children }: StorageLayoutProps) => {
   const { ui } = useStore()
   const { ref: projectRef } = useParams()
+  const project = useSelectedProject()
 
   const storageExplorerStore = useStorageStore()
   const { selectedBucketToEdit, closeDeleteBucketModal, showDeleteBucketModal } =
@@ -26,11 +26,11 @@ const StorageLayout = ({ title, children }: StorageLayoutProps) => {
   const { data: settings, isLoading } = useProjectApiQuery({ projectRef })
   const apiService = settings?.autoApiService
 
-  const isPaused = ui.selectedProject?.status === PROJECT_STATUS.INACTIVE
+  const isPaused = project?.status === PROJECT_STATUS.INACTIVE
 
   useEffect(() => {
     if (!isLoading && apiService) initializeStorageStore(apiService)
-  }, [isLoading])
+  }, [isLoading, projectRef])
 
   const initializeStorageStore = async (apiService: AutoApiService) => {
     if (isPaused) return
@@ -64,4 +64,4 @@ const StorageLayout = ({ title, children }: StorageLayoutProps) => {
   )
 }
 
-export default withAuth(observer(StorageLayout))
+export default withAuth(StorageLayout)
