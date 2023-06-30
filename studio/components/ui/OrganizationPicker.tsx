@@ -1,10 +1,6 @@
 import { useIntegrationsQuery } from 'data/integrations/integrations-query'
 import { IntegrationName } from 'data/integrations/integrations.types'
-import {
-  OrganizationsResponse,
-  useOrganizationsQuery,
-} from 'data/organizations/organizations-query'
-import { useStore } from 'hooks'
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useState } from 'react'
 import { Organization } from 'types'
 import { Badge, IconHexagon, Listbox } from 'ui'
@@ -20,14 +16,12 @@ const OrganizationPicker = ({
   onSelectedOrgChange,
   integrationName,
 }: OrganizationPickerProps) => {
-  const { ui } = useStore()
   const [selectedOrg, setSelectedOrg] = useState<Organization | null>(null)
 
   /**
    * array of integrations installed on all
    */
-  const { data: integrationData, isLoading: integrationDataLoading } = useIntegrationsQuery({})
-  console.log('integrationData', integrationData)
+  const { data: integrationData, isLoading: integrationDataLoading } = useIntegrationsQuery()
 
   /**
    * filter integrations to match integrationName
