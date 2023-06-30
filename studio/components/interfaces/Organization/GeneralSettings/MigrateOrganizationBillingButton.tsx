@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite'
 import { Button, Form, Modal, Listbox, Loading, Alert, IconHelpCircle, Toggle } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useStore, checkPermissions, useSelectedOrganization } from 'hooks'
+import { useStore, useCheckPermissions, useSelectedOrganization } from 'hooks'
 import { PRICING_TIER_LABELS_ORG } from 'lib/constants'
 import { useOrganizationBillingMigrationMutation } from 'data/organizations/organization-migrate-billing-mutation'
 import { useOrganizationBillingMigrationPreview } from 'data/organizations/organization-migrate-billing-preview-query'
@@ -62,7 +62,7 @@ const MigrateOrganizationBillingButton = observer(() => {
     }
   }, [isOpen])
 
-  const canMigrateOrganization = checkPermissions(PermissionAction.UPDATE, 'organizations')
+  const canMigrateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
 
   const toggle = () => {
     setIsOpen(!isOpen)

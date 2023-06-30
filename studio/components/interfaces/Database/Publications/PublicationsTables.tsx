@@ -4,7 +4,7 @@ import { Button, Input, IconChevronLeft, IconSearch, IconAlertCircle } from 'ui'
 import type { PostgresPublication } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import PublicationsTableItem from './PublicationsTableItem'
 import Table from 'components/to-be-cleaned/Table'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
@@ -19,7 +19,7 @@ const PublicationsTables: FC<Props> = ({ selectedPublication, onSelectBack }) =>
   const { meta } = useStore()
   const [filterString, setFilterString] = useState<string>('')
 
-  const canUpdatePublications = checkPermissions(
+  const canUpdatePublications = useCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'publications'
   )

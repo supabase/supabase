@@ -4,7 +4,7 @@ import { Badge, Toggle } from 'ui'
 import type { PostgresPublication, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import Table from 'components/to-be-cleaned/Table'
 
 interface Props {
@@ -21,7 +21,7 @@ const PublicationsTableItem: FC<Props> = ({ table, selectedPublication }) => {
     selectedPublication.tables?.find((x: any) => x.id == table.id) != undefined
   )
 
-  const canUpdatePublications = checkPermissions(
+  const canUpdatePublications = useCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'publications'
   )

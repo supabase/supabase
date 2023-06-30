@@ -9,7 +9,7 @@ import { CANCELLATION_REASONS } from 'components/interfaces/BillingV2/Billing.co
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
 import { invalidateProjectsQuery } from 'data/projects/projects-query'
-import { checkPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import { delete_, post } from 'lib/common/fetch'
 import { API_URL, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 
@@ -39,7 +39,7 @@ const DeleteProjectButton = ({ type = 'danger' }: DeleteProjectButtonProps) => {
     }
   }, [isOpen])
 
-  const canDeleteProject = checkPermissions(PermissionAction.UPDATE, 'projects')
+  const canDeleteProject = useCheckPermissions(PermissionAction.UPDATE, 'projects')
 
   const toggle = () => {
     if (loading) return

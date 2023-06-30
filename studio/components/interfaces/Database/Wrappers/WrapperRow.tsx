@@ -6,7 +6,7 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Collapsible, IconChevronUp, Button, IconExternalLink, IconTrash, IconEdit } from 'ui'
 
-import { useStore, checkPermissions } from 'hooks'
+import { useStore, useCheckPermissions } from 'hooks'
 import { useParams } from 'common/hooks'
 import { WrapperMeta } from './Wrappers.types'
 import { FDW } from 'data/fdw/fdws-query'
@@ -27,7 +27,7 @@ const WrapperRow: FC<Props> = ({ wrappers = [], wrapperMeta, isOpen, onOpen }) =
   const { project } = useProjectContext()
   const { mutateAsync: deleteFDW } = useFDWDeleteMutation()
 
-  const canManageWrappers = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'wrappers')
+  const canManageWrappers = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'wrappers')
 
   const onDeleteWrapper = (wrapper: any) => {
     confirmAlert({
