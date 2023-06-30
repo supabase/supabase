@@ -60,7 +60,7 @@ const { data, error } = await supabase
   },
   {
     lang: 'js',
-    title: 'Invoke function',
+    title: 'Invoke Edge Function',
     description: 'Invoke a Supabase Function',
     code: `import { createClient } from '@supabase/supabase-js'
     
