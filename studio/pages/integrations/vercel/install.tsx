@@ -70,8 +70,6 @@ const VercelIntegration: NextPageWithLayout = () => {
       ? integrationData?.map((x) => x.organization.slug)
       : []
 
-  console.log('flatInstalledConnectionsIds', flatInstalledConnectionsIds)
-
   /**
    * Organizations with extra `installationInstalled` attribute
    *
@@ -90,20 +88,36 @@ const VercelIntegration: NextPageWithLayout = () => {
   const { mutate, isLoading: isLoadingVercelIntegrationCreateMutation } =
     useVercelIntegrationCreateMutation({
       onSuccess({ id }) {
+        const orgSlug = selectedOrg?.slug
+
         setOrganizationIntegrationId(id)
+
+        if (externalId) {
+          router.push({
+            pathname: `/integrations/vercel/${orgSlug}/deploy-button/new-project`,
+            query: router.query,
+          })
+        } else {
+          router.push({
+            pathname: `/integrations/vercel/${orgSlug}/marketplace/choose-project`,
+            query: router.query,
+          })
+        }
+      },
+      onError(error: any) {
+        ui.setNotification({
+          category: 'error',
+          message: `Creating Vercel integration failed: ${error.message}`,
+        })
       },
     })
 
   function onInstall() {
     const orgSlug = selectedOrg?.slug
 
-    const isIntegrationInstalled = organizationsWithInstalledData.find(
+    const isIntegrationInstalled = organizationsWithInstalledData.some(
       (x) => x.slug === orgSlug && x.installationInstalled
     )
-      ? true
-      : false
-
-    console.log('isIntegrationInstalled', isIntegrationInstalled)
 
     if (!orgSlug) {
       return ui.setNotification({ category: 'error', message: 'Please select an organization' })
@@ -135,18 +149,6 @@ const VercelIntegration: NextPageWithLayout = () => {
         metadata: {},
         source,
         teamId: teamId,
-      })
-    }
-
-    if (externalId) {
-      router.push({
-        pathname: `/integrations/vercel/${orgSlug}/deploy-button/new-project`,
-        query: router.query,
-      })
-    } else {
-      router.push({
-        pathname: `/integrations/vercel/${orgSlug}/marketplace/choose-project`,
-        query: router.query,
       })
     }
   }
