@@ -3,12 +3,12 @@ import Link from 'next/link'
 
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms'
+import SparkBar from 'components/ui/SparkBar'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useFlag } from 'hooks'
 import { Alert, Button, IconExternalLink } from 'ui'
-import ProjectUpdateDisabledTooltip from '../ProjectUpdateDisabledTooltip'
-import SparkBar from 'components/ui/SparkBar'
+import ProjectUpdateDisabledTooltip from '../../BillingSettings/ProjectUpdateDisabledTooltip'
 
 const Subscription = () => {
   const { slug } = useParams()
@@ -32,37 +32,31 @@ const Subscription = () => {
   const canChangeTier =
     !projectUpdateDisabled && !['team', 'enterprise'].includes(currentPlan?.id ?? '')
 
-  console.log({ subscription })
-
   return (
-    <div id="plan" className="grid grid-cols-12 gap-6">
-      <div className="col-span-12 lg:col-span-5 space-y-6">
-        <div className="sticky space-y-6 top-16">
-          <p className="text-base">Subscription plan</p>
-          <div className="space-y-2">
-            <p className="text-sm text-scale-1100">More information</p>
-            <div>
-              <Link href="https://supabase.com/pricing">
-                <a target="_blank" rel="noreferrer">
-                  <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
-                    <p className="text-sm">Pricing</p>
-                    <IconExternalLink size={16} strokeWidth={1.5} />
-                  </div>
-                </a>
-              </Link>
+    <FormSection
+      id="plan"
+      header={
+        <FormSectionLabel>
+          <div className="sticky space-y-6 top-16">
+            <p className="text-base">Subscription Plan</p>
+            <div className="space-y-2">
+              <p className="text-sm text-scale-1100">More information</p>
+              <div>
+                <Link href="https://supabase.com/pricing">
+                  <a target="_blank" rel="noreferrer">
+                    <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
+                      <p className="text-sm">Pricing</p>
+                      <IconExternalLink size={16} strokeWidth={1.5} />
+                    </div>
+                  </a>
+                </Link>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
-      <div className="col-span-12 lg:col-span-7">
-        {isLoading && (
-          <div className="space-y-2">
-            <ShimmeringLoader />
-            <ShimmeringLoader className="w-3/4" />
-            <ShimmeringLoader className="w-1/2" />
-          </div>
-        )}
-
+        </FormSectionLabel>
+      }
+    >
+      <FormSectionContent loading={isLoading}>
         {isError && <AlertError subject="Failed to retrieve subscription" error={error} />}
 
         {isSuccess && (
@@ -166,8 +160,8 @@ const Subscription = () => {
             />
           </div>
         )}
-      </div>
-    </div>
+      </FormSectionContent>
+    </FormSection>
   )
 }
 
