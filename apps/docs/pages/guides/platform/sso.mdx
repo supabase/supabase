@@ -5,6 +5,11 @@ export const meta = {
   description: 'General information about enabling single sign-on (SSO) for your organization',
 }
 
+<Admonition>
+  Looking for docs on how to add Single Sign-On support in your Supabase project? Head on over to
+  [Single Sign-On with SAML 2.0 for Projects](/docs/guides/auth/sso/auth-sso-saml).
+</Admonition>
+
 Supabase offers single sign-on (SSO) as a login option to provide additional
 account security for your team. This allows company administrators to enforce
 the use of an identity provider when logging into Supabase. SSO
@@ -20,7 +25,13 @@ organization.
 
 </Admonition>
 
-## Understanding setup and implications
+## Setup and limitations
+
+Supabase supports practically all identity providers that support the SAML 2.0 SSO protocol. We've prepared these guides for commonly used identity providers to help you get started. If you use a different provider, our support stands ready to support you.
+
+- [Google Workspaces (formerly GSuite)](/docs/guides/platform/sso/gsuite)
+- [Azure Active Directory](/docs/guides/platform/sso/azure)
+- [Okta](/docs/guides/platform/sso/okta)
 
 Accounts signing in with SSO have certain limitations.
 The following sections outline the limitations when SSO is enabled or disabled for your team.
