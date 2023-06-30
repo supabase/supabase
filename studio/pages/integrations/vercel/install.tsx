@@ -46,7 +46,7 @@ const VercelIntegration: NextPageWithLayout = () => {
    *
    * Array of integrations installed on all
    */
-  const { data: integrationData, isLoading: integrationDataLoading } = useIntegrationsQuery({})
+  const { data: integrationData, isLoading: integrationDataLoading } = useIntegrationsQuery()
 
   const { data: organizationsData, isLoading: isLoadingOrganizationsQuery } = useOrganizationsQuery(
     {

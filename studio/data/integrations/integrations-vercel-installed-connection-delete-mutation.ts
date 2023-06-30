@@ -46,6 +46,9 @@ export const useIntegrationsVercelInstalledConnectionDeleteMutation = ({
           queryClient.invalidateQueries(
             integrationKeys.vercelProjectList(variables.organization_integration_id)
           ),
+          queryClient.invalidateQueries(
+            integrationKeys.vercelConnectionsList(variables.organization_integration_id)
+          ),
         ])
         await onSuccess?.(data, variables, context)
       },

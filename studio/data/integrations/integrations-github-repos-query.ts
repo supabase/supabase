@@ -126,12 +126,12 @@ export async function getIntegrations({ orgSlug }: IntegrationsVariables, signal
 export type IntegrationsData = Awaited<ReturnType<typeof getIntegrations>>
 export type IntegrationsError = unknown
 
-export const useIntegrationsQuery = <TData = IntegrationsData>(
+export const useIntegrationsGitHubReposQuery = <TData = IntegrationsData>(
   { orgSlug }: IntegrationsVariables,
   { enabled = true, ...options }: UseQueryOptions<IntegrationsData, IntegrationsError, TData> = {}
 ) =>
   useQuery<IntegrationsData, IntegrationsError, TData>(
-    integrationKeys.integrationsList(),
+    integrationKeys.integrationsList(), // TODO: make a unique key for github repos
     ({ signal }) => getIntegrations({ orgSlug }, signal),
     { enabled: enabled && typeof orgSlug !== 'undefined', ...options }
   )

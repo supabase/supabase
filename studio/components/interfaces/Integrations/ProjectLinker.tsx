@@ -16,9 +16,6 @@ interface Project {
   ref: string
 }
 
-// to do: move this somewhere
-// const INTEGRATION_INTERNAL_ID = 1
-
 export interface ProjectLinkerProps {
   organizationIntegrationId: string | undefined
   foreignProjects: VercelProjectsResponse[]
@@ -60,7 +57,6 @@ const ProjectLinker = ({
       connection: {
         foreign_project_id: vercelProjectId,
         supabase_project_ref: supabaseProjectRef,
-        // integration_id: INTEGRATION_INTERNAL_ID,
         metadata: {
           ...projectDetails,
           supabaseConfig: {
@@ -88,16 +84,13 @@ const ProjectLinker = ({
     )
   }
 
-  /**
-   * create a flat array of foreign project ids. ie, ["prj_MlkO6AiLG5ofS9ojKrkS3PhhlY3f", ..]
-   */
-  const flatInstalledConnectionsIds = installedConnections.map((x) => x.foreign_project_id)
-  /**
-   * check that vercel project is not already installed
-   */
+  // create a flat array of foreign project ids. ie, ["prj_MlkO6AiLG5ofS9ojKrkS3PhhlY3f", ..]
+  const flatInstalledConnectionsIds = new Set(installedConnections.map((x) => x.foreign_project_id))
+
+  // check that vercel project is not already installed
   const filteredForeignProjects: VercelProjectsResponse[] = foreignProjects.filter(
     (foreignProject) => {
-      return !flatInstalledConnectionsIds.includes(foreignProject.id)
+      return !flatInstalledConnectionsIds.has(foreignProject.id)
     }
   )
 
