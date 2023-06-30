@@ -13,6 +13,7 @@ import PaymentMethods from './PaymentMethods'
 import ProjectsSummary from './ProjectsSummary'
 import TaxID from './TaxID/TaxID'
 import OrganizationBillingMigrationPanel from '../GeneralSettings/OrganizationBillingMigrationPanel'
+import { ScaffoldContainer, ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
 
 const BillingSettings = () => {
   const { ui } = useStore()
@@ -101,36 +102,34 @@ const BillingSettings = () => {
   }, [slug])
 
   return (
-    <article className="container my-4 max-w-4xl space-y-8">
-      <div className="space-y-8">
-        {orgBillingMigrationEnabled && canMigrateOrganization && !subscription_id && (
-          <OrganizationBillingMigrationPanel />
-        )}
-        <ProjectsSummary projects={projects} />
-        <CreditBalance balance={balance} isCredit={isCredit} isDebt={isDebt} />
-        <PaymentMethods
-          loading={isLoadingCustomer || isLoadingPaymentMethods}
-          defaultPaymentMethod={defaultPaymentMethod}
-          paymentMethods={paymentMethods || []}
-          onDefaultMethodUpdated={setCustomer}
-          onPaymentMethodsDeleted={() => getPaymentMethods()}
-          onPaymentMethodAdded={() => getPaymentMethods()}
-        />
+    <ScaffoldContainerLegacy>
+      {orgBillingMigrationEnabled && canMigrateOrganization && !subscription_id && (
+        <OrganizationBillingMigrationPanel />
+      )}
+      <ProjectsSummary projects={projects} />
+      <CreditBalance balance={balance} isCredit={isCredit} isDebt={isDebt} />
+      <PaymentMethods
+        loading={isLoadingCustomer || isLoadingPaymentMethods}
+        defaultPaymentMethod={defaultPaymentMethod}
+        paymentMethods={paymentMethods || []}
+        onDefaultMethodUpdated={setCustomer}
+        onPaymentMethodsDeleted={() => getPaymentMethods()}
+        onPaymentMethodAdded={() => getPaymentMethods()}
+      />
 
-        <BillingEmail />
+      <BillingEmail />
 
-        <BillingAddress
-          loading={isLoadingCustomer}
-          address={customer?.address ?? {}}
-          onAddressUpdated={(address: any) => setCustomer({ ...customer, address })}
-        />
-        <TaxID
-          loading={isLoadingTaxIds}
-          taxIds={taxIds || []}
-          onTaxIdsUpdated={(ids: any) => setTaxIds(ids)}
-        />
-      </div>
-    </article>
+      <BillingAddress
+        loading={isLoadingCustomer}
+        address={customer?.address ?? {}}
+        onAddressUpdated={(address: any) => setCustomer({ ...customer, address })}
+      />
+      <TaxID
+        loading={isLoadingTaxIds}
+        taxIds={taxIds || []}
+        onTaxIdsUpdated={(ids: any) => setTaxIds(ids)}
+      />
+    </ScaffoldContainerLegacy>
   )
 }
 

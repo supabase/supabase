@@ -14,6 +14,7 @@ import { useProfile } from 'lib/profile'
 import InviteMemberButton from './InviteMemberButton'
 import MembersView from './MembersView'
 import { hasMultipleOwners, useGetRolesManagementPermissions } from './TeamSettings.utils'
+import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
 
 const TeamSettings = () => {
   const { ui } = useStore()
@@ -70,8 +71,8 @@ const TeamSettings = () => {
   }
 
   return (
-    <>
-      <div className="container my-4 max-w-4xl space-y-8">
+    <ScaffoldContainerLegacy>
+      <div className="flex flex-col gap-3">
         <div className="flex justify-between">
           <Input
             icon={<IconSearch size="tiny" />}
@@ -126,11 +127,9 @@ const TeamSettings = () => {
             </div>
           </div>
         </div>
-      </div>
-      <div className="container my-4 max-w-4xl space-y-8">
         <MembersView searchString={searchString} />
       </div>
-    </>
+    </ScaffoldContainerLegacy>
   )
 }
 
