@@ -34,6 +34,8 @@ Once you've register your OAuth App, you can use the OAuth2.0 protocol to seek c
 
 You can use the [`POST /v1/oauth/token`](<https://api.supabase.com/api/v1#/oauth%20(beta)/token>) endpoint to refresh an access token using the refresh token returned at the end of the previous section.
 
+If the user has revoked access to your application, you will not be able to refresh a token. Furthermore, access tokens will stop working. Make sure you handle HTTP Unauthorized errors when calling any Supabase API.
+
 ## Access the Management API using the access token
 
 Refer to [this section](http://localhost:3001/docs/reference/api/introduction#authentication) to learn more about authentication with the Management API.
