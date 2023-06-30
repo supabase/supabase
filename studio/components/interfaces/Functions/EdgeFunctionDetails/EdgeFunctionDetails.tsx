@@ -17,7 +17,7 @@ import {
   IconExternalLink,
 } from 'ui'
 
-import { useStore, checkPermissions } from 'hooks'
+import { useStore, useCheckPermissions } from 'hooks'
 import { useParams } from 'common/hooks'
 import Panel from 'components/ui/Panel'
 import CommandRender from '../CommandRender'
@@ -51,7 +51,7 @@ const EdgeFunctionDetails: FC<Props> = () => {
   const { mutateAsync: deleteEdgeFunction, isLoading: isDeleting } = useEdgeFunctionDeleteMutation()
 
   const formId = 'edge-function-update-form'
-  const canUpdateEdgeFunction = checkPermissions(PermissionAction.FUNCTIONS_WRITE, '*')
+  const canUpdateEdgeFunction = useCheckPermissions(PermissionAction.FUNCTIONS_WRITE, '*')
 
   // Get the API service
   const apiService = settings?.autoApiService

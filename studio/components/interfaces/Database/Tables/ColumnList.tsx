@@ -5,7 +5,7 @@ import { Input, Button, IconSearch, IconPlus, IconChevronLeft, IconEdit3, IconTr
 import type { PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useStore, checkPermissions } from 'hooks'
+import { useStore, useCheckPermissions } from 'hooks'
 import Table from 'components/to-be-cleaned/Table'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 
@@ -32,7 +32,7 @@ const ColumnList: FC<Props> = ({
       : selectedTable.columns?.filter((column: any) => column.name.includes(filterString))) ?? []
 
   const isLocked = meta.excludedSchemas.includes(selectedTable.schema ?? '')
-  const canUpdateColumns = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
+  const canUpdateColumns = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
 
   return (
     <>

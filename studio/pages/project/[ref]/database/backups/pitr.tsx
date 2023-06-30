@@ -11,7 +11,7 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import Loading from 'components/ui/Loading'
 import NoPermission from 'components/ui/NoPermission'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
-import { checkPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import { NextPageWithLayout } from 'types'
 
@@ -63,7 +63,7 @@ const PITR = observer(() => {
   const tier = project?.subscription_tier
   const isEnabled = configuration.walg_enabled
 
-  const canReadPhysicalBackups = checkPermissions(PermissionAction.READ, 'physical_backups')
+  const canReadPhysicalBackups = useCheckPermissions(PermissionAction.READ, 'physical_backups')
   if (!canReadPhysicalBackups) return <NoPermission resourceText="view PITR backups" />
 
   if (isLoading) return <Loading />

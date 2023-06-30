@@ -8,7 +8,7 @@ import { Button, Dropdown, IconChevronDown } from 'ui'
 
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import { setProjectPostgrestStatus } from 'data/projects/projects-query'
-import { checkPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { Project } from 'types'
@@ -27,7 +27,7 @@ const RestartServerButton = ({ project }: RestartServerButtonProps) => {
   const projectRef = project.ref
   const projectRegion = project.region
 
-  const canRestartProject = checkPermissions(PermissionAction.INFRA_EXECUTE, 'reboot')
+  const canRestartProject = useCheckPermissions(PermissionAction.INFRA_EXECUTE, 'reboot')
 
   const requestProjectRestart = async () => {
     if (!canRestartProject) {

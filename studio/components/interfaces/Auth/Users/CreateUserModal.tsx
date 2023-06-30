@@ -5,7 +5,7 @@ import { Button, Checkbox, Form, IconLock, IconMail, Input, Loading, Modal } fro
 
 import { useUserCreateMutation } from 'data/auth/user-create-mutation'
 import { useProjectApiQuery } from 'data/config/project-api-query'
-import { checkPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import { PageContext } from 'pages/project/[ref]/auth/users'
 
 export type CreateUserModalProps = {
@@ -21,7 +21,7 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
   const { data, isLoading, isSuccess } = useProjectApiQuery({ projectRef }, { enabled: visible })
 
   const handleToggle = () => setVisible(!visible)
-  const canCreateUsers = checkPermissions(PermissionAction.AUTH_EXECUTE, 'create_user')
+  const canCreateUsers = useCheckPermissions(PermissionAction.AUTH_EXECUTE, 'create_user')
 
   const validate = (values: any) => {
     const errors: any = {}

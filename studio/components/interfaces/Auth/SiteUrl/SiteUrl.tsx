@@ -12,7 +12,7 @@ import {
   FormSectionContent,
   FormSectionLabel,
 } from 'components/ui/Forms'
-import { checkPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 
 const SiteUrl = observer(() => {
   const { authConfig, ui } = useStore()
@@ -21,7 +21,7 @@ const SiteUrl = observer(() => {
   const formId = 'auth-config-general-form'
   const [hidden, setHidden] = useState(true)
 
-  const canUpdateConfig = checkPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
+  const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
   const INITIAL_VALUES = {
     DISABLE_SIGNUP: !authConfig.config.DISABLE_SIGNUP,

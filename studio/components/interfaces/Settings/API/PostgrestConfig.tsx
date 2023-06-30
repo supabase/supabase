@@ -4,7 +4,7 @@ import { observer } from 'mobx-react-lite'
 import { Input, Form, IconAlertCircle, InputNumber } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import { useParams } from 'common/hooks'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 import { useProjectPostgrestConfigUpdateMutation } from 'data/config/project-postgrest-config-update-mutation'
@@ -37,7 +37,7 @@ const PostgrestConfig: FC<Props> = ({}) => {
     db_extra_search_path: '',
   }
 
-  const canUpdatePostgrestConfig = checkPermissions(
+  const canUpdatePostgrestConfig = useCheckPermissions(
     PermissionAction.UPDATE,
     'custom_config_postgrest'
   )

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 
 import { useParams } from 'common/hooks'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { checkPermissions, useFlag, useSelectedOrganization, useStore } from 'hooks'
+import { useCheckPermissions, useFlag, useSelectedOrganization, useStore } from 'hooks'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
@@ -42,7 +42,7 @@ const BillingSettings = () => {
       : customerBalance
 
   const orgBillingMigrationEnabled = useFlag('orgBillingMigration')
-  const canMigrateOrganization = checkPermissions(PermissionAction.UPDATE, 'organizations')
+  const canMigrateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
   const selectedOrganization = useSelectedOrganization()
   const { subscription_id } = selectedOrganization ?? {}
 

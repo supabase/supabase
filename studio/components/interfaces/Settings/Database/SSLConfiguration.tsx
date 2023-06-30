@@ -4,7 +4,7 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { Button, IconDownload, Toggle, IconLoader, Alert, IconExternalLink } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useStore, useFlag } from 'hooks'
+import { useCheckPermissions, useStore, useFlag } from 'hooks'
 import { useParams } from 'common/hooks'
 import {
   FormHeader,
@@ -34,7 +34,7 @@ const SSLConfiguration = () => {
   })
   const { mutateAsync: updateSSLEnforcement } = useSSLEnforcementUpdateMutation()
 
-  const canUpdateSSLEnforcement = checkPermissions(PermissionAction.UPDATE, 'projects')
+  const canUpdateSSLEnforcement = useCheckPermissions(PermissionAction.UPDATE, 'projects')
 
   const hasAccessToSSLEnforcement = !sslEnforcementConfiguration?.isNotAllowed
   const env = process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod' ? 'prod' : 'staging'
