@@ -14,7 +14,8 @@ interface Props {
 const FormField: FC<Props> = ({ name, properties, formValues, disabled = false }) => {
   const [hidden, setHidden] = useState(!!properties.isSecret)
 
-  if (properties.show && !properties.show.matches.includes(formValues[properties.show.key])) return null
+  if (properties.show && !properties.show.matches.includes(formValues[properties.show.key]))
+    return null
 
   switch (properties.type) {
     case 'string':
@@ -28,35 +29,35 @@ const FormField: FC<Props> = ({ name, properties, formValues, disabled = false }
           type={hidden ? 'password' : 'text'}
           label={properties.title}
           labelOptional={
-          properties.descriptionOptional ? (
-            <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
-              {properties.descriptionOptional}
-            </ReactMarkdown>
-          ) : null
+            properties.descriptionOptional ? (
+              <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
+                {properties.descriptionOptional}
+              </ReactMarkdown>
+            ) : null
           }
           descriptionText={
-          properties.description ? (
-            <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
-              {properties.description}
-            </ReactMarkdown>
-          ) : null
+            properties.description ? (
+              <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
+                {properties.description}
+              </ReactMarkdown>
+            ) : null
           }
           actions={
-          !!properties.isSecret ? (
-            <Button
-              icon={hidden ? <IconEye /> : <IconEyeOff />}
-              type="default"
-              onClick={() => setHidden(!hidden)}
-            />
-          ) : (
-            <span className="mr-3 text-scale-900">
-              {properties.units ? (
-                <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
-                  {properties.units}
-                </ReactMarkdown>
-              ) : null}
-            </span>
-          )
+            !!properties.isSecret ? (
+              <Button
+                icon={hidden ? <IconEye /> : <IconEyeOff />}
+                type="default"
+                onClick={() => setHidden(!hidden)}
+              />
+            ) : (
+              <span className="mr-3 text-scale-900">
+                {properties.units ? (
+                  <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
+                    {properties.units}
+                  </ReactMarkdown>
+                ) : null}
+              </span>
+            )
           }
         />
       )
