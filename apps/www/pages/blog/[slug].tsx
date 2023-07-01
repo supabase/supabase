@@ -83,8 +83,6 @@ export const getStaticProps: GetStaticProps<BlogPostPageProps, Params> = async (
     (post) => post.slug !== filePath
   ) as unknown as (BlogData & Post)[]
 
-  console.log({ relatedPosts })
-
   const allPosts = getSortedPosts('_blog')
 
   const currentIndex = allPosts
