@@ -113,19 +113,19 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
     MAILER_SUBJECTS_MAGIC_LINK: 'Your Magic Link',
     MAILER_TEMPLATES_INVITE: null,
     MAILER_TEMPLATES_INVITE_CONTENT:
-    '<h2>You have been invited</h2>\n\n<p>You have been invited to create a user on {{ .SiteURL }}. Follow this link to accept the invite:</p>\n<p><a href="{{ .ConfirmationURL }}">Accept the invite</a></p>',
+      '<h2>You have been invited</h2>\n\n<p>You have been invited to create a user on {{ .SiteURL }}. Follow this link to accept the invite:</p>\n<p><a href="{{ .ConfirmationURL }}">Accept the invite</a></p>',
     MAILER_TEMPLATES_CONFIRMATION: null,
     MAILER_TEMPLATES_CONFIRMATION_CONTENT:
-    '<h2>Confirm your email</h2>\n\n<p>Follow this link to confirm your email:</p>\n\n<p><a href="{{ .ConfirmationURL }}">Confirm your email address</a></p>',
+      '<h2>Confirm your email</h2>\n\n<p>Follow this link to confirm your email:</p>\n\n<p><a href="{{ .ConfirmationURL }}">Confirm your email address</a></p>',
     MAILER_TEMPLATES_RECOVERY: null,
     MAILER_TEMPLATES_RECOVERY_CONTENT:
-    '<h2>Reset Password</h2>\n\n<p>Follow this link to reset the password for your user:</p>\n<p><a href="{{ .ConfirmationURL }}">Reset Password</a></p>',
+      '<h2>Reset Password</h2>\n\n<p>Follow this link to reset the password for your user:</p>\n<p><a href="{{ .ConfirmationURL }}">Reset Password</a></p>',
     MAILER_TEMPLATES_EMAIL_CHANGE: null,
     MAILER_TEMPLATES_EMAIL_CHANGE_CONTENT:
-    '<h2>Confirm Change of Email</h2>\n\n<p>Follow this link to confirm the update of your email from {{ .Email }} to {{ .NewEmail }}:</p>\n<p><a href="{{ .ConfirmationURL }}">Change Email</a></p>',
+      '<h2>Confirm Change of Email</h2>\n\n<p>Follow this link to confirm the update of your email from {{ .Email }} to {{ .NewEmail }}:</p>\n<p><a href="{{ .ConfirmationURL }}">Change Email</a></p>',
     MAILER_TEMPLATES_MAGIC_LINK: null,
     MAILER_TEMPLATES_MAGIC_LINK_CONTENT:
-    '<h2>Magic Link</h2>\n\n<p>Follow this link to login:</p>\n<p><a href="{{ .ConfirmationURL }}">Log In</a></p>',
+      '<h2>Magic Link</h2>\n\n<p>Follow this link to login:</p>\n<p><a href="{{ .ConfirmationURL }}">Log In</a></p>',
     PASSWORD_MIN_LENGTH: 6,
     SMTP_SENDER_NAME: null,
     SMS_AUTOCONFIRM: false,
