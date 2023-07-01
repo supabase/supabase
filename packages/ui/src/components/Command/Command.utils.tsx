@@ -408,14 +408,38 @@ export function useAutoInputFocus() {
 
   // Focus the input when typing from anywhere
   React.useEffect(() => {
-    function onKeyDown() {
-      input?.focus()
+    function isModifierNotShift(event: KeyboardEvent) {
+      return event.key.length !== 1 && event.key !== 'Shift'
+    }
+
+    // Keep track of whether the modifier key (except shift) is pressed
+    let modifierPressed = false
+
+    function onKeyDown(event: KeyboardEvent) {
+      // If the user is typing a modifier key, don't focus the input and set the modifierPressed flag
+      if (isModifierNotShift(event)) {
+        modifierPressed = true
+      } else {
+        if (!modifierPressed) {
+          // Focus the input if no modifier key is pressed (other than shift)
+          input?.focus()
+        }
+      }
+    }
+    function onKeyUp(event: KeyboardEvent) {
+      console.log('keyup')
+      if (isModifierNotShift(event)) {
+        // Reset the modifierPressed flag when the modifier key is released
+        modifierPressed = false
+      }
     }
 
     window.addEventListener('keydown', onKeyDown)
+    window.addEventListener('keyup', onKeyUp)
 
     return () => {
       window.removeEventListener('keydown', onKeyDown)
+      window.removeEventListener('keyup', onKeyUp)
     }
   }, [input])
 
