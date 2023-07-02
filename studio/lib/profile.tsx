@@ -62,6 +62,7 @@ export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
 
   const value = useMemo(() => {
     const isLoading = isLoadingProfile || isCreatingProfile || isLoadingPermissions
+    console.log({ isLoadingProfile, isCreatingProfile, isLoadingPermissions })
 
     return {
       profile,
