@@ -41,9 +41,9 @@ To get started with the project, follow these steps:
 4. Create a new blank query and paste the below code in there,
 
 ```SQL
-CREATE TABLE To-Do (
+CREATE TABLE todoreg (
   id SERIAL PRIMARY KEY,
-  name TEXT
+  todo TEXT
 );
 ```
 
