@@ -39,28 +39,28 @@ const rl = readline.createInterface({
 async function main() {
   try {
     const name = await new Promise((resolve) => {
-      rl.question("Please enter your name: ", (answer) => {
+      rl.question(" New To-Do ", (answer) => {
         resolve(answer);
       });
     });
 
     const { data, error } = await supabase
-      .from("name-reg")
-      .insert({ name: name });
+      .from("To-Do-reg")
+      .insert({ todo: todo });
 
     if (error) {
       throw error;
     }
 
-    console.log("Inserted name:", name);
+    console.log("Inserted To-do:", todo);
     import("chalk").then((chalk) => {
       console.log(
-        chalk.default.blue("Thank you! your entry has been done successfully!")
+        chalk.default.blue("To-Do Added!")
       );
     });
   } catch (error) {
     import("chalk").then((chalk) => {
-      console.error(chalk.default.red("Error inserting name:", error.message));
+      console.error(chalk.default.red("Error adding To-Do:", error.message));
     });
   } finally {
     rl.close();

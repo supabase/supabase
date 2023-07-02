@@ -2,7 +2,7 @@
 
 # Supabase Project Documentation
 
-This documentation provides an overview of a JavaScript project that utilizes Supabase for the database. The project allows users to enter their names and save them in the database.
+This documentation provides an overview of a JavaScript project that utilizes Supabase for the database. The project allows users to enter their Todo and save them in the database.
 
 ## Prerequisites
 > Set up your Supabase SQL before continuing this work.
@@ -41,7 +41,7 @@ To get started with the project, follow these steps:
 4. Create a new blank query and paste the below code in there,
 
 ```SQL
-CREATE TABLE name-reg (
+CREATE TABLE To-Do (
   id SERIAL PRIMARY KEY,
   name TEXT
 );
