@@ -58,7 +58,7 @@ export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
     },
   })
 
-  const { isLoading: isLoadingPermissions } = usePermissionsQuery()
+  const { isInitialLoading: isLoadingPermissions } = usePermissionsQuery()
 
   const value = useMemo(() => {
     const isLoading = isLoadingProfile || isCreatingProfile || isLoadingPermissions
