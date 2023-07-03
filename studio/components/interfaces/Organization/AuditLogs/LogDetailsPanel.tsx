@@ -1,11 +1,9 @@
-import { useParams } from 'common'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms'
 import { OrganizationAuditLog } from 'data/organizations/organization-audit-logs-query'
-import { useOrganizationDetailQuery } from 'data/organizations/organization-detail-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import dayjs from 'dayjs'
-import { Button, Input, SidePanel } from 'ui'
+import { Input, SidePanel } from 'ui'
 
 export interface LogDetailsPanelProps {
   selectedLog?: OrganizationAuditLog
@@ -17,16 +15,16 @@ const LogDetailsPanel = ({ selectedLog, onClose }: LogDetailsPanelProps) => {
   const { data: organizations } = useOrganizationsQuery()
 
   const project = projects?.find(
-    (project) => project.ref === selectedLog?.permission_group.project_ref
+    (project) => project.ref === selectedLog?.target.metadata.project_ref
   )
   const organization = organizations?.find(
-    (org) => org.slug === selectedLog?.permission_group.org_slug
+    (org) => org.slug === selectedLog?.target.metadata.org_slug
   )
 
   return (
     <SidePanel
       size="large"
-      header={`"${selectedLog?.action.name}" on ${dayjs(selectedLog?.timestamp).format(
+      header={`"${selectedLog?.action.name}" on ${dayjs(selectedLog?.occurred_at).format(
         'DD MMM YYYY, HH:mm:ss'
       )}`}
       visible={selectedLog !== undefined}
@@ -38,15 +36,9 @@ const LogDetailsPanel = ({ selectedLog, onClose }: LogDetailsPanelProps) => {
           <Input
             readOnly
             size="small"
-            label="Description"
-            value={selectedLog?.target.description}
-          />
-          <Input
-            readOnly
-            size="small"
-            label="Timestamp"
-            value={selectedLog?.timestamp}
-            descriptionText={dayjs(selectedLog?.timestamp).format('DD MMM YYYY, HH:mm:ss (ZZ)')}
+            label="Occurred at"
+            value={selectedLog?.occurred_at}
+            descriptionText={dayjs(selectedLog?.occurred_at).format('DD MMM YYYY, HH:mm:ss (ZZ)')}
           />
         </FormSectionContent>
       </FormSection>
@@ -60,7 +52,9 @@ const LogDetailsPanel = ({ selectedLog, onClose }: LogDetailsPanelProps) => {
             readOnly
             size="small"
             label="Metadata"
-            value={JSON.stringify(selectedLog?.actor.metadata)}
+            rows={5}
+            className="input-mono input-xs"
+            value={JSON.stringify(selectedLog?.actor.metadata, null, 2)}
           />
         </FormSectionContent>
       </FormSection>
@@ -74,30 +68,25 @@ const LogDetailsPanel = ({ selectedLog, onClose }: LogDetailsPanelProps) => {
             readOnly
             size="small"
             label="Metadata"
-            value={JSON.stringify(selectedLog?.action.metadata)}
+            rows={5}
+            className="input-mono input-xs"
+            value={JSON.stringify(selectedLog?.action.metadata, null, 2)}
           />
         </FormSectionContent>
       </FormSection>
 
       <SidePanel.Separator />
 
-      <FormSection header={<FormSectionLabel>Permission Group</FormSectionLabel>}>
+      <FormSection header={<FormSectionLabel>Target</FormSectionLabel>}>
         <FormSectionContent loading={false}>
-          <Input
+          <Input readOnly size="small" label="Name" value={selectedLog?.target.description} />
+          <Input.TextArea
             readOnly
             size="small"
-            label="Organization slug"
-            disabled={(selectedLog?.permission_group.org_slug ?? '').length === 0}
-            value={selectedLog?.permission_group.org_slug ?? 'None'}
-            descriptionText={organization?.name && `Organization: ${organization.name}`}
-          />
-          <Input
-            readOnly
-            size="small"
-            label="Project reference"
-            disabled={(selectedLog?.permission_group.project_ref ?? '').length === 0}
-            value={selectedLog?.permission_group.project_ref ?? 'None'}
-            descriptionText={project?.name && `Project: ${project.name}`}
+            label="Metadata"
+            rows={5}
+            className="input-mono input-xs"
+            value={JSON.stringify(selectedLog?.target.metadata, null, 2)}
           />
         </FormSectionContent>
       </FormSection>
