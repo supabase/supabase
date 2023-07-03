@@ -3,6 +3,7 @@ import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { useCallback } from 'react'
 import { organizationKeys } from './keys'
+import { ResponseError } from 'types'
 
 export type OrganizationCustomerProfileVariables = {
   slug?: string
@@ -40,7 +41,7 @@ export async function getOrganizationCustomerProfile(
 export type OrganizationCustomerProfileData = Awaited<
   ReturnType<typeof getOrganizationCustomerProfile>
 >
-export type OrganizationCustomerProfileError = unknown
+export type OrganizationCustomerProfileError = ResponseError
 
 export const useOrganizationCustomerProfileQuery = <TData = OrganizationCustomerProfileData>(
   { slug }: OrganizationCustomerProfileVariables,
