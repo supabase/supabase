@@ -6,12 +6,13 @@ import Link from 'next/link'
 import { Alert, Button, IconBarChart2 } from 'ui'
 import SectionContent from './SectionContent'
 import SectionHeader from './SectionHeader'
-import { COMPUTE_INSTANCE_SPECS, USAGE_CATEGORIES } from './Usage.constants'
-import { getUpgradeUrlFromV2Subscription } from './Usage.utils'
+import { USAGE_CATEGORIES } from './Usage.constants'
+import { getUpgradeUrl } from './Usage.utils'
 import UsageBarChart from './UsageBarChart'
 import Panel from 'components/ui/Panel'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
-import { useFlag } from 'hooks'
+import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
+import { getAddons } from '../Subscription/Subscription.utils'
 
 export interface InfrastructureProps {
   projectRef: string
@@ -26,18 +27,24 @@ const Infrastructure = ({
   endDate,
   currentBillingCycleSelected,
 }: InfrastructureProps) => {
-  const enableSubscriptionV2 = useFlag('subscriptionV2')
   const { data: subscription } = useProjectSubscriptionV2Query({ projectRef })
 
   const categoryMeta = USAGE_CATEGORIES.find((category) => category.key === 'infra')
 
-  const upgradeUrl = getUpgradeUrlFromV2Subscription(projectRef, subscription, enableSubscriptionV2)
+  const upgradeUrl = getUpgradeUrl(projectRef, subscription)
   const isFreeTier = subscription?.plan?.id === 'free'
-  const currentComputeInstance = subscription?.addons.find((addon) =>
-    addon.supabase_prod_id.includes('_instance_')
-  )
-  const currentComputeInstanceSpecs =
-    COMPUTE_INSTANCE_SPECS[currentComputeInstance?.supabase_prod_id ?? 'addon_instance_micro']
+
+  const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef })
+  const selectedAddons = addons?.selected_addons ?? []
+
+  const { computeInstance } = getAddons(selectedAddons)
+  const currentComputeInstanceSpecs = computeInstance?.variant?.meta ?? {
+    baseline_disk_io_mbs: 87,
+    max_disk_io_mbs: 2085,
+    cpu_cores: 2,
+    cpu_dedicated: true,
+    memory_gb: 1,
+  }
 
   // Switch to hourly interval, if the timeframe is <48 hours
   let interval: '1d' | '1h' = '1d'
@@ -53,7 +60,7 @@ const Infrastructure = ({
 
   const { data: cpuUsageData, isLoading: isLoadingCpuUsageData } = useInfraMonitoringQuery({
     projectRef,
-    attribute: 'cpu_usage',
+    attribute: 'max_cpu_usage',
     interval,
     startDate,
     endDate,
@@ -84,7 +91,7 @@ const Infrastructure = ({
   )
 
   const chartMeta: { [key: string]: { data: DataPoint[]; isLoading: boolean } } = {
-    cpu_usage: {
+    max_cpu_usage: {
       isLoading: isLoadingCpuUsageData,
       data: cpuUsageData?.data ?? [],
     },
@@ -146,18 +153,18 @@ const Infrastructure = ({
                   <div className="space-y-1">
                     <p>Disk IO Bandwidth</p>
 
-                    {currentComputeInstanceSpecs.maxBandwidth ===
-                    currentComputeInstanceSpecs.baseBandwidth ? (
+                    {currentComputeInstanceSpecs.baseline_disk_io_mbs ===
+                    currentComputeInstanceSpecs.max_disk_io_mbs ? (
                       <p className="text-sm text-scale-1000">
-                        Your current compute can has a baseline and maximum disk throughput of
-                        {currentComputeInstanceSpecs.maxBandwidth.toLocaleString()} Mbps.
+                        Your current compute can has a baseline and maximum disk throughput of{' '}
+                        {currentComputeInstanceSpecs.max_disk_io_mbs?.toLocaleString()} Mbps.
                       </p>
                     ) : (
                       <p className="text-sm text-scale-1000">
                         Your current compute can burst up to{' '}
-                        {currentComputeInstanceSpecs.maxBandwidth.toLocaleString()} Mbps for 30
+                        {currentComputeInstanceSpecs.max_disk_io_mbs?.toLocaleString()} Mbps for 30
                         minutes a day and reverts to the baseline performance of{' '}
-                        {currentComputeInstanceSpecs.baseBandwidth.toLocaleString()} Mbps.
+                        {currentComputeInstanceSpecs.baseline_disk_io_mbs?.toLocaleString()} Mbps.
                       </p>
                     )}
                   </div>
@@ -165,22 +172,22 @@ const Infrastructure = ({
                     <p className="text-sm mb-2">Overview</p>
                     <div className="flex items-center justify-between border-b py-1">
                       <p className="text-xs text-scale-1000">Current compute instance</p>
-                      <p className="text-xs">{currentComputeInstance?.name ?? 'Micro'}</p>
+                      <p className="text-xs">{computeInstance?.variant?.name ?? 'Micro'}</p>
                     </div>
                     <div className="flex items-center justify-between border-b py-1">
                       <p className="text-xs text-scale-1000">Maximum IO Bandwidth (burst limit)</p>
                       <p className="text-xs">
-                        {currentComputeInstanceSpecs.maxBandwidth.toLocaleString()} Mbps
+                        {currentComputeInstanceSpecs.max_disk_io_mbs?.toLocaleString()} Mbps
                       </p>
                     </div>
                     <div className="flex items-center justify-between border-b py-1">
                       <p className="text-xs text-scale-1000">Baseline IO Bandwidth</p>
                       <p className="text-xs">
-                        {currentComputeInstanceSpecs.baseBandwidth.toLocaleString()} Mbps
+                        {currentComputeInstanceSpecs.baseline_disk_io_mbs?.toLocaleString()} Mbps
                       </p>
                     </div>
-                    {currentComputeInstanceSpecs.maxBandwidth !==
-                      currentComputeInstanceSpecs.baseBandwidth && (
+                    {currentComputeInstanceSpecs.max_disk_io_mbs !==
+                      currentComputeInstanceSpecs?.baseline_disk_io_mbs && (
                       <div className="flex items-center justify-between py-1">
                         <p className="text-xs text-scale-1000">Daily burst time limit</p>
                         <p className="text-xs">30 mins</p>
@@ -207,9 +214,10 @@ const Infrastructure = ({
                 {attribute.key === 'ram_usage' && (
                   <div className="text-sm text-scale-1000">
                     <p>
-                      Your compute instance has {currentComputeInstanceSpecs.memoryGb} GB of memory.
+                      Your compute instance has {currentComputeInstanceSpecs.memory_gb} GB of
+                      memory.
                     </p>
-                    {currentComputeInstanceSpecs.memoryGb === 1 && (
+                    {currentComputeInstanceSpecs.memory_gb === 1 && (
                       <p>
                         As your project is running on the smallest compute instance, it is not
                         unusual for your project to have a base memory usage of ~50%.
@@ -218,9 +226,9 @@ const Infrastructure = ({
                   </div>
                 )}
 
-                {attribute.key === 'cpu_usage' && (
+                {attribute.key === 'max_cpu_usage' && (
                   <p className="text-sm text-scale-1000">
-                    Your compute instance has {currentComputeInstanceSpecs.cpuCores} CPU cores.
+                    Your compute instance has {currentComputeInstanceSpecs.cpu_cores} CPU cores.
                   </p>
                 )}
 
@@ -242,7 +250,8 @@ const Infrastructure = ({
                   unit={attribute.unit}
                   attribute={attribute.attribute}
                   data={chartData}
-                  yFormatter={(value) => `${value}%`}
+                  yFormatter={(value) => `${Math.round(Number(value))}%`}
+                  tooltipFormatter={(value) => `${value}%`}
                   yLimit={100}
                 />
               ) : (

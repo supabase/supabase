@@ -64,7 +64,7 @@ You can enable third-party providers with the click of a button by navigating to
 
 ### Redirect URLs and wildcards
 
-When using third-party providers, the [Supabase client library](/docs/reference/javascript/auth-signinwithoauth#sign-in-using-a-third-party-provider-with-redirect) redirects the user to the provider. When the third-party provider successfully authenticates the user, the provider redirects the user to the Supabase Auth callback URL where they are further redirected to the URL specified in the `redirectTo` parameter. This parameter defaults to the [`SITE_URL`](/docs/reference/auth/config#site_url). You can modify the `SITE_URL` or add additional [redirect URLs](https://app.supabase.com/project/_/auth/url-configuration).
+When using third-party providers, the [Supabase client library](/docs/reference/javascript/auth-signinwithoauth#sign-in-using-a-third-party-provider-with-redirect) redirects the user to the provider. When the third-party provider successfully authenticates the user, the provider redirects the user to the Supabase Auth callback URL where they are further redirected to the URL specified in the `redirectTo` parameter. This parameter defaults to the [`SITE_URL`](/docs/reference/auth/config#site_url). You can modify the `SITE_URL` or add additional [redirect URLs](https://supabase.com/dashboard/project/_/auth/url-configuration).
 
 You can use wildcard match patterns to support preview URLs from providers like Netlify and Vercel. See the [full list of supported patterns](https://pkg.go.dev/github.com/gobwas/glob#Compile). Use [this tool](https://www.digitalocean.com/community/tools/glob?comments=true&glob=http%3A%2F%2Flocalhost%3A3000%2F%2A%2A&matches=false&tests=http%3A%2F%2Flocalhost%3A3000&tests=http%3A%2F%2Flocalhost%3A3000%2F&tests=http%3A%2F%2Flocalhost%3A3000%2F%3Ftest%3Dtest&tests=http%3A%2F%2Flocalhost%3A3000%2Ftest-test%3Ftest%3Dtest&tests=http%3A%2F%2Flocalhost%3A3000%2Ftest%2Ftest%3Ftest%3Dtest) to test your patterns.
 
@@ -91,20 +91,20 @@ const getURL = () => {
   let url =
     process?.env?.NEXT_PUBLIC_SITE_URL ?? // Set this to your site URL in production env.
     process?.env?.NEXT_PUBLIC_VERCEL_URL ?? // Automatically set by Vercel.
-    'http://localhost:3000/';
+    'http://localhost:3000/'
   // Make sure to include `https://` when not localhost.
-  url = url.includes('http') ? url : `https://${url}`;
-  // Make sure to including trailing `/`.
-  url = url.charAt(url.length - 1) === '/' ? url : `${url}/`;
-  return url;
-};
+  url = url.includes('http') ? url : `https://${url}`
+  // Make sure to include a trailing `/`.
+  url = url.charAt(url.length - 1) === '/' ? url : `${url}/`
+  return url
+}
 
 const { data, error } = await supabase.auth.signInWithOAuth({
-  provider: 'github'
+  provider: 'github',
   options: {
-    redirectTo: getURL()
-  }
-}
+    redirectTo: getURL(),
+  },
+})
 ```
 
 #### Mobile deep linking URIs

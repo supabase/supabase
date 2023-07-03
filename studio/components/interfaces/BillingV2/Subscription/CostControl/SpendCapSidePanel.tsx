@@ -3,13 +3,16 @@ import { useParams, useTheme } from 'common'
 import Table from 'components/to-be-cleaned/Table'
 import { useProjectSubscriptionUpdateMutation } from 'data/subscriptions/project-subscription-update-mutation'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
-import { useStore } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import { BASE_PATH, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { Alert, Button, Collapsible, IconChevronRight, IconExternalLink, SidePanel } from 'ui'
-import { BILLING_BREAKDOWN_METRICS } from '../Subscription.constants'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { pricing } from 'shared-data/pricing'
+import Telemetry from 'lib/telemetry'
+import { useRouter } from 'next/router'
 
 const SPEND_CAP_OPTIONS: {
   name: string
@@ -33,12 +36,18 @@ const SPEND_CAP_OPTIONS: {
 
 const SpendCapSidePanel = () => {
   const { ui } = useStore()
+  const router = useRouter()
   const { ref: projectRef } = useParams()
   const { isDarkMode } = useTheme()
 
   const [showUsageCosts, setShowUsageCosts] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
   const [selectedOption, setSelectedOption] = useState<'on' | 'off'>()
+
+  const canUpdateSpendCap = useCheckPermissions(
+    PermissionAction.BILLING_WRITE,
+    'stripe.subscriptions'
+  )
 
   const snap = useSubscriptionPageStateSnapshot()
   const visible = snap.panelKey === 'costControl'
@@ -52,11 +61,20 @@ const SpendCapSidePanel = () => {
   const isTurningOnCap = !isSpendCapOn && selectedOption === 'on'
   const hasChanges = selectedOption !== (isSpendCapOn ? 'on' : 'off')
 
-  const largeNumberFormatter = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 })
-
   useEffect(() => {
     if (visible && subscription !== undefined) {
       setSelectedOption(isSpendCapOn ? 'on' : 'off')
+      Telemetry.sendActivity(
+        {
+          activity: 'Side Panel Viewed',
+          source: 'Dashboard',
+          data: {
+            title: 'Spend cap',
+            section: 'Cost Control',
+          },
+        },
+        router
+      )
     }
   }, [visible, isLoading, subscription, isSpendCapOn])
 
@@ -85,15 +103,19 @@ const SpendCapSidePanel = () => {
     }
   }
 
-  const billingMetricCategories = Array.from(
-    new Set(BILLING_BREAKDOWN_METRICS.map((it) => it.category))
-  )
+  const billingMetricCategories: (keyof typeof pricing)[] = [
+    'database',
+    'auth',
+    'storage',
+    'realtime',
+    'edge_functions',
+  ]
 
   return (
     <SidePanel
       size="large"
       loading={isLoading || isSubmitting}
-      disabled={isFreePlan || isLoading || !hasChanges || isSubmitting}
+      disabled={isFreePlan || isLoading || !hasChanges || isSubmitting || !canUpdateSpendCap}
       visible={visible}
       onCancel={onClose}
       onConfirm={onConfirm}
@@ -109,6 +131,7 @@ const SpendCapSidePanel = () => {
           </Link>
         </div>
       }
+      tooltip={!canUpdateSpendCap ? 'You do not have permission to update spend cap' : undefined}
     >
       <SidePanel.Content>
         <div className="py-6 space-y-4">
@@ -143,42 +166,28 @@ const SpendCapSidePanel = () => {
                     </Table.th>
                   </>
                 }
-                body={billingMetricCategories.map((category) => {
-                  const categoryItems = BILLING_BREAKDOWN_METRICS.filter(
-                    (it) => it.category === category
-                  )
+                body={billingMetricCategories.map((categoryId) => {
+                  const category = pricing[categoryId]
+                  const usageItems = category.features.filter((it: any) => it.usage_based)
 
                   return (
                     <>
-                      <Table.tr key={category}>
+                      <Table.tr key={categoryId}>
                         <Table.td>
-                          <p className="text-xs text-scale-1200">{category}</p>
+                          <p className="text-xs text-scale-1200">{category.title}</p>
                         </Table.td>
                         <Table.td>{null}</Table.td>
                       </Table.tr>
-                      {categoryItems.map((item) => {
-                        const costs = subscription?.usage_fees?.find(
-                          (it) => it.metric === item.metric
-                        )
-
-                        if (!costs) return null
-
+                      {usageItems.map((item: any) => {
                         return (
-                          <Table.tr key={item.name}>
+                          <Table.tr key={item.title}>
                             <Table.td>
-                              <p className="text-xs pl-4">{item.name}</p>
+                              <p className="text-xs pl-4">{item.title}</p>
                             </Table.td>
                             <Table.td>
-                              {costs.pricingStrategy === 'UNIT' ? (
-                                <p className="text-xs">
-                                  ${costs.pricingOptions.perUnitPrice} per {item.unitName}
-                                </p>
-                              ) : costs.pricingStrategy === 'PACKAGE' ? (
-                                <p className="text-xs">
-                                  ${costs.pricingOptions.packagePrice} per{' '}
-                                  {largeNumberFormatter.format(costs.pricingOptions.packageSize!)}
-                                </p>
-                              ) : null}
+                              <p className="text-xs pl-4">
+                                {item.plans[subscription?.plan?.id || 'pro']}
+                              </p>
                             </Table.td>
                           </Table.tr>
                         )
@@ -214,7 +223,21 @@ const SpendCapSidePanel = () => {
                   <div
                     key={option.value}
                     className={clsx('col-span-4 group space-y-1', isFreePlan && 'opacity-75')}
-                    onClick={() => !isFreePlan && setSelectedOption(option.value)}
+                    onClick={() => {
+                      !isFreePlan && setSelectedOption(option.value)
+                      Telemetry.sendActivity(
+                        {
+                          activity: 'Option Selected',
+                          source: 'Dashboard',
+                          data: {
+                            title: 'Spend cap',
+                            section: 'Cost Control',
+                            option: option.name,
+                          },
+                        },
+                        router
+                      )
+                    }}
                   >
                     <img
                       alt="Spend Cap"

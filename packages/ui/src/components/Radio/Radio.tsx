@@ -7,7 +7,7 @@ import { useFormContext } from '../Form/FormContext'
 import defaultTheme from '../../lib/theme/defaultTheme'
 import styleHandler from '../../lib/theme/styleHandler'
 
-import randomIdGenerator from './../../utils/randomIdGenerator'
+import randomIdGenerator from './../../lib/utils/randomIdGenerator'
 
 interface GroupProps {
   allowedValues?: any

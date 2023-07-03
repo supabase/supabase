@@ -1,5 +1,5 @@
-import '../../../packages/ui/build/css/themes/light.css'
 import '../../../packages/ui/build/css/themes/dark.css'
+import '../../../packages/ui/build/css/themes/light.css'
 
 import 'config/code-hike.scss'
 import '../styles/main.scss?v=1.0.0'
@@ -13,6 +13,7 @@ import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState } from 'react'
 import { AppPropsWithLayout } from 'types'
 import { CommandMenuProvider } from 'ui'
+import { TabsProvider } from 'ui/src/components/Tabs'
 import Favicons from '~/components/Favicons'
 import SiteLayout from '~/layouts/SiteLayout'
 import { API_URL, IS_PLATFORM, LOCAL_SUPABASE } from '~/lib/constants'
@@ -68,6 +69,42 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
     }
   }, [router, handlePageTelemetry])
 
+  /**
+   * Save/restore scroll position when reloading or navigating back/forward.
+   *
+   * Required since scroll happens within a sub-container, not the page root.
+   */
+  useEffect(() => {
+    const storageKey = 'scroll-position'
+
+    const container = document.getElementById('docs-content-container')
+    if (!container) {
+      return
+    }
+
+    const previousScroll = Number(sessionStorage.getItem(storageKey))
+    const [entry] = window.performance.getEntriesByType('navigation')
+
+    // Only restore scroll position on reload and back/forward events
+    if (
+      previousScroll &&
+      entry &&
+      isPerformanceNavigationTiming(entry) &&
+      ['reload', 'back_forward'].includes(entry.type)
+    ) {
+      container.scrollTop = previousScroll
+    }
+
+    const handler = () => {
+      // Scroll stored in session storage, so only persisted per tab
+      sessionStorage.setItem(storageKey, container.scrollTop.toString())
+    }
+
+    window.addEventListener('beforeunload', handler)
+
+    return () => window.removeEventListener('beforeunload', handler)
+  }, [router])
+
   useEffect(() => {
     /**
      * Send page telemetry on first page load
@@ -114,14 +151,26 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
       <AuthContainer>
         <ThemeProvider>
           <CommandMenuProvider site="docs">
-            <SiteLayout>
-              <Component {...pageProps} />
-            </SiteLayout>
+            <TabsProvider>
+              <SiteLayout>
+                <Component {...pageProps} />
+              </SiteLayout>
+            </TabsProvider>
           </CommandMenuProvider>
         </ThemeProvider>
       </AuthContainer>
     </>
   )
+}
+
+/**
+ * Type guard that checks if a performance entry is a
+ * `PerformanceNavigationTiming`.
+ */
+function isPerformanceNavigationTiming(
+  entry: PerformanceEntry
+): entry is PerformanceNavigationTiming {
+  return entry.entryType === 'navigation'
 }
 
 export default MyApp

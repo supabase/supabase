@@ -7,7 +7,7 @@ function ProductIcon({ icon, color }: ProductIcon) {
   return (
     <div
       className={[
-        'inline-flex h-8 w-8 items-center justify-center rounded-md',
+        'inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md',
         !color || color === 'black' ? 'bg-scale-1200 text-scale-100' : '',
         color && color === 'green' ? 'bg-brand-800 dark:bg-brand-600 text-brand-100' : '',
       ].join(' ')}

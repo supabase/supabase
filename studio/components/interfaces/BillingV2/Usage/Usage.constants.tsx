@@ -49,11 +49,11 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
     attributes: [
       {
         anchor: 'cpu',
-        key: 'cpu_usage',
-        attribute: 'cpu_usage',
+        key: 'max_cpu_usage',
+        attribute: 'max_cpu_usage',
         name: 'CPU',
         unit: 'percentage',
-        description: 'CPU usage of your server',
+        description: 'Max CPU usage of your server',
         chartDescription: '',
         links: [
           {
@@ -362,69 +362,3 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
     ],
   },
 ]
-
-// [Joshen] Ideally live in common package for www as well
-export const COMPUTE_INSTANCE_SPECS: {
-  [key: string]: { maxBandwidth: number; baseBandwidth: number; memoryGb: number; cpuCores: number }
-} = {
-  addon_instance_micro: {
-    memoryGb: 1,
-    cpuCores: 2,
-    maxBandwidth: 2085,
-    baseBandwidth: 87,
-  },
-  addon_instance_small: {
-    memoryGb: 2,
-    cpuCores: 2,
-    maxBandwidth: 2085,
-    baseBandwidth: 174,
-  },
-  addon_instance_medium: {
-    memoryGb: 4,
-    cpuCores: 2,
-    maxBandwidth: 2085,
-    baseBandwidth: 347,
-  },
-  addon_instance_large: {
-    memoryGb: 8,
-    cpuCores: 2,
-    maxBandwidth: 4750,
-    baseBandwidth: 630,
-  },
-  addon_instance_xlarge: {
-    memoryGb: 16,
-    cpuCores: 4,
-    maxBandwidth: 4750,
-    baseBandwidth: 1188,
-  },
-  addon_instance_xxlarge: {
-    memoryGb: 32,
-    cpuCores: 8,
-    maxBandwidth: 4750,
-    baseBandwidth: 2375,
-  },
-  addon_instance_4xlarge: {
-    memoryGb: 64,
-    cpuCores: 16,
-    maxBandwidth: 4750,
-    baseBandwidth: 4750,
-  },
-  addon_instance_8xlarge: {
-    memoryGb: 128,
-    cpuCores: 32,
-    maxBandwidth: 9500,
-    baseBandwidth: 9500,
-  },
-  addon_instance_12xlarge: {
-    memoryGb: 192,
-    cpuCores: 48,
-    maxBandwidth: 14250,
-    baseBandwidth: 14250,
-  },
-  addon_instance_16xlarge: {
-    memoryGb: 256,
-    cpuCores: 64,
-    maxBandwidth: 19000,
-    baseBandwidth: 19000,
-  },
-}

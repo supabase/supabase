@@ -95,12 +95,14 @@ const ColumnMenu: React.FC<ColumnMenuProps> = ({ column, isEncrypted }) => {
     <>
       <Dropdown align="end" side="bottom" overlay={renderMenu()}>
         <Button
-          as={'span'}
+          asChild
           className="opacity-50"
           type="text"
           icon={<IconChevronDown />}
           style={{ padding: '3px' }}
-        />
+        >
+          <span></span>
+        </Button>
       </Dropdown>
     </>
   )

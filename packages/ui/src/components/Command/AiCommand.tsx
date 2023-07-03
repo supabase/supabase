@@ -30,7 +30,7 @@ import { AiWarning } from './Command.alerts'
 import { useCommandMenu } from './CommandMenuProvider'
 
 import ReactMarkdown from 'react-markdown'
-import { cn } from './../../utils/cn'
+import { cn } from './../../lib/utils'
 import remarkGfm from 'remark-gfm'
 
 const questions = [

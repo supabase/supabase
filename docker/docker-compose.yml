@@ -9,7 +9,7 @@ version: "3.8"
 services:
   studio:
     container_name: supabase-studio
-    image: supabase/studio:20230330-99fed3d
+    image: supabase/studio:20230621-7a24ddd
     restart: unless-stopped
     healthcheck:
       test:
@@ -57,7 +57,7 @@ services:
 
   auth:
     container_name: supabase-auth
-    image: supabase/gotrue:v2.60.7
+    image: supabase/gotrue:v2.62.1
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -130,7 +130,7 @@ services:
 
   realtime:
     container_name: realtime-dev.supabase-realtime
-    image: supabase/realtime:v2.5.1
+    image: supabase/realtime:v2.10.1
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -168,7 +168,7 @@ services:
 
   storage:
     container_name: supabase-storage
-    image: supabase/storage-api:v0.28.2
+    image: supabase/storage-api:v0.40.4
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -211,7 +211,7 @@ services:
 
   imgproxy:
     container_name: supabase-imgproxy
-    image: darthsim/imgproxy:v3.13
+    image: darthsim/imgproxy:v3.8.0
     healthcheck:
       test: [ "CMD", "imgproxy", "health" ]
       timeout: 5s
@@ -227,7 +227,7 @@ services:
 
   meta:
     container_name: supabase-meta
-    image: supabase/postgres-meta:v0.60.7
+    image: supabase/postgres-meta:v0.66.3
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -243,7 +243,7 @@ services:
 
   functions:
     container_name: supabase-edge-functions
-    image: supabase/edge-runtime:v1.2.12
+    image: supabase/edge-runtime:v1.5.2
     restart: unless-stopped
     environment:
       JWT_SECRET: ${JWT_SECRET}
@@ -263,7 +263,7 @@ services:
   # Comment out everything below this point if you are using an external Postgres database
   db:
     container_name: supabase-db
-    image: supabase/postgres:15.1.0.54-rc0
+    image: supabase/postgres:15.1.0.90
     healthcheck:
       test: pg_isready -U postgres -h localhost
       interval: 5s

@@ -50,13 +50,7 @@ const ConfirmDeleteModal: FC<Props> = ({
           <Button type="default" disabled={deleting} onClick={onSelectCancel}>
             Cancel
           </Button>
-          <Button
-            type="primary"
-            danger
-            disabled={deleting}
-            loading={deleting}
-            onClick={onConfirmDelete}
-          >
+          <Button type="danger" disabled={deleting} loading={deleting} onClick={onConfirmDelete}>
             {deleting ? 'Deleting' : 'Delete'}
           </Button>
         </div>
