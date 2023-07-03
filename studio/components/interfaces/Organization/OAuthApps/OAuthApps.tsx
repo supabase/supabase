@@ -98,7 +98,6 @@ const OAuthApps = () => {
                     copy
                     readOnly
                     size="small"
-                    // layout="horizontal"
                     label="Client ID"
                     className="max-w-xl input-mono"
                     value={createdApp.client_id}
@@ -108,7 +107,6 @@ const OAuthApps = () => {
                     copy
                     readOnly
                     size="small"
-                    // layout="horizontal"
                     label="Client secret"
                     className="max-w-xl input-mono"
                     value={createdApp.client_secret}
