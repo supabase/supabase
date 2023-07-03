@@ -7,8 +7,8 @@ import { organizationKeys } from './keys'
 export type OrganizationAuditLog = {
   action: {
     metadata: {
-      method: string
-      status: number
+      method?: string
+      status?: number
     }[]
     name: string
   }
@@ -16,70 +16,23 @@ export type OrganizationAuditLog = {
     id: string
     type: 'user' | string
     metadata: {
-      email: string
+      email?: string
     }[]
-  }
-  permission_group: {
-    org_slug: string
-    project_ref: string | null
   }
   target: {
     description: string
+    metadata: {
+      org_slug?: string
+      project_ref?: string
+    }
   }
-  timestamp: string
+  occurred_at: string
 }
 
 export type OrganizationAuditLogsResponse = {
   result: OrganizationAuditLog[]
   retention_period: number
 }
-
-const MOCK_LOGS: OrganizationAuditLog[] = [
-  {
-    action: { name: 'Test', metadata: [{ method: 'Test', status: 200 }] },
-    actor: {
-      id: '88687b48-6496-478b-a9e5-f0d626605a3b',
-      type: 'user',
-      metadata: [{ email: 'joshenlimek@gmail.com' }],
-    },
-    permission_group: { org_slug: 'sfplxoawkrhwbgwzikum', project_ref: null },
-    target: { description: 'Test description' },
-    timestamp: new Date('2023-06-05 08:30:23').toISOString(),
-  },
-  {
-    action: { name: 'Test', metadata: [{ method: 'Test', status: 200 }] },
-    actor: {
-      id: '88687b48-6496-478b-a9e5-f0d626605a3b',
-      type: 'user',
-      metadata: [{ email: 'joshenlimek@gmail.com' }],
-    },
-    permission_group: { org_slug: 'sfplxoawkrhwbgwzikum', project_ref: null },
-    target: { description: 'Test description' },
-    timestamp: new Date('2023-06-05 08:20:23').toISOString(),
-  },
-  {
-    action: { name: 'Test', metadata: [{ method: 'Test', status: 200 }] },
-    actor: {
-      id: '88687b48-6496-478b-a9e5-f0d626605a3b',
-      type: 'user',
-      metadata: [{ email: 'joshenlimek@gmail.com' }],
-    },
-    permission_group: { org_slug: 'sfplxoawkrhwbgwzikum', project_ref: null },
-    target: { description: 'Test description' },
-    timestamp: new Date('2023-06-05 08:10:23').toISOString(),
-  },
-  {
-    action: { name: 'Test', metadata: [{ method: 'Test', status: 200 }] },
-    actor: {
-      id: '88687b48-6496-478b-a9e5-f0d626605a3b',
-      type: 'user',
-      metadata: [{ email: 'joshenlimek@gmail.com' }],
-    },
-    permission_group: { org_slug: 'sfplxoawkrhwbgwzikum', project_ref: 'uipodoqangxyoawfsfer' },
-    target: { description: 'Test description' },
-    timestamp: new Date('2023-06-05 08:00:23').toISOString(),
-  },
-]
 
 export type OrganizationAuditLogsVariables = {
   slug?: string

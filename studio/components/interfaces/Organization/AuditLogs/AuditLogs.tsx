@@ -59,8 +59,8 @@ const AuditLogs = () => {
   const sortedLogs = logs
     ?.sort((a, b) =>
       dateSortDesc
-        ? Number(new Date(b.timestamp)) - Number(new Date(a.timestamp))
-        : Number(new Date(a.timestamp)) - Number(new Date(b.timestamp))
+        ? Number(new Date(b.occurred_at)) - Number(new Date(a.occurred_at))
+        : Number(new Date(a.occurred_at)) - Number(new Date(b.occurred_at))
     )
     ?.filter((log) => {
       if (filters.users.length > 0) {
@@ -71,7 +71,7 @@ const AuditLogs = () => {
     })
     ?.filter((log) => {
       if (filters.projects.length > 0) {
-        return filters.projects.includes(log.permission_group.project_ref || '')
+        return filters.projects.includes(log.target.metadata.project_ref || '')
       } else {
         return log
       }
@@ -225,10 +225,10 @@ const AuditLogs = () => {
                       const user = members.find((member) => member.gotrue_id === log.actor.id)
                       const role = roles.find((role) => user?.role_ids?.[0] === role.id)
                       const project = projects?.find(
-                        (project) => project.ref === log.permission_group.project_ref
+                        (project) => project.ref === log.target.metadata.project_ref
                       )
                       const organization = organizations?.find(
-                        (org) => org.slug === log.permission_group.org_slug
+                        (org) => org.slug === log.target.metadata.org_slug
                       )
 
                       const hasStatusCode = log.action.metadata[0]?.status !== undefined
@@ -253,17 +253,22 @@ const AuditLogs = () => {
 
                       return (
                         <Table.tr
-                          key={log.timestamp}
+                          key={log.occurred_at}
                           onClick={() => setSelectedLog(log)}
                           className="cursor-pointer hover:!bg-scale-100 transition duration-100"
                         >
                           <Table.td>
                             <div className="flex items-center space-x-4">
-                              {userIcon}
+                              <div>{userIcon}</div>
                               <div>
-                                <p className="text-scale-1100">{user?.username ?? log.actor.id}</p>
+                                <p className="text-scale-1100">{user?.username ?? 'Unknown'}</p>
                                 {role && (
                                   <p className="mt-0.5 text-xs text-scale-1000">{role?.name}</p>
+                                )}
+                                {user === undefined && role === undefined && (
+                                  <p className="mt-0.5 text-xs text-scale-1000">
+                                    ID: {log.actor.id}
+                                  </p>
                                 )}
                               </div>
                             </div>
@@ -288,16 +293,16 @@ const AuditLogs = () => {
                               {project?.name ?? organization?.name ?? 'Entity no longer exists'}
                             </p>
                             <p className="text-scale-1000 text-xs mt-0.5 truncate">
-                              {log.permission_group.project_ref
+                              {log.target.metadata.project_ref
                                 ? 'Ref: '
-                                : log.permission_group.org_slug
+                                : log.target.metadata.org_slug
                                 ? 'Slug: '
                                 : null}
-                              {log.permission_group.project_ref ?? log.permission_group.org_slug}
+                              {log.target.metadata.project_ref ?? log.target.metadata.org_slug}
                             </p>
                           </Table.td>
                           <Table.td>
-                            {dayjs(log.timestamp).format('DD MMM YYYY, HH:mm:ss')}
+                            {dayjs(log.occurred_at).format('DD MMM YYYY, HH:mm:ss')}
                           </Table.td>
                           <Table.td align="right">
                             <Button type="default">View details</Button>
