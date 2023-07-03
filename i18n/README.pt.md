@@ -32,7 +32,7 @@ Para ver a documentação completa, visite [supabase.com/docs](https://supabase.
 ## Status
 
 - [x] Alpha: estamos a testar o Supabase com um grupo fechado de clientes
-- [x] Alpha Público: Qualquer pessoa pode se inscrever em [app.supabase.com](https://app.supabase.com). Mas vai com calma, ainda existem alguns problemas.
+- [x] Alpha Público: Qualquer pessoa pode se inscrever em [supabase.com/dashboard](https://supabase.com/dashboard). Mas vai com calma, ainda existem alguns problemas.
 - [x] Beta público: estável o suficiente para a maioria dos casos de uso não empresarial
 - [ ] Público: pronto para produção
 
@@ -48,7 +48,7 @@ Supabase é uma combinação de ferramentas de código aberto. Estamos a constru
 
 **Arquitetura atual**
 
-Supabase é uma [plataforma hospedada](https://app.supabase.com). Podes-te inscrever e começar a usar o Supabase sem instalar nada. Ainda estamos a criar a experiência de desenvolvimento local - esse é nosso foco atual, juntamente com a estabilidade da plataforma.
+Supabase é uma [plataforma hospedada](https://supabase.com/dashboard). Podes-te inscrever e começar a usar o Supabase sem instalar nada. Ainda estamos a criar a experiência de desenvolvimento local - esse é nosso foco atual, juntamente com a estabilidade da plataforma.
 
 ![Arquitetura](https://user-images.githubusercontent.com/70828596/187547862-ffa9d058-0c3a-4851-a3e7-92ccfca4b596.png)
 

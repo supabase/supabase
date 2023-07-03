@@ -1,4 +1,4 @@
-import { FC, useState } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
@@ -6,7 +6,7 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { Button, Menu, Alert, IconEdit } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks'
 import { useParams } from 'common/hooks'
 import BucketRow from './BucketRow'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
@@ -14,15 +14,14 @@ import { StorageBucket } from 'components/interfaces/Storage/Storage.types'
 import EditBucketModal from 'components/interfaces/Storage/EditBucketModal'
 import CreateBucketModal from 'components/interfaces/Storage/CreateBucketModal'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { useBucketsQuery } from 'data/storage/buckets-query'
 
-interface Props {}
-
-const StorageMenu: FC<Props> = () => {
+const StorageMenu = () => {
   const router = useRouter()
   const { ref, bucketId } = useParams()
   const [showCreateBucketModal, setShowCreateBucketModal] = useState(false)
   const [selectedBucketToEdit, setSelectedBucketToEdit] = useState<StorageBucket>()
-  const canCreateBuckets = checkPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
+  const canCreateBuckets = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
 
   const page = router.pathname.split('/')[4] as
     | undefined
@@ -32,7 +31,10 @@ const StorageMenu: FC<Props> = () => {
     | 'logs'
 
   const storageExplorerStore = useStorageStore()
-  const { loaded, buckets, openDeleteBucketModal } = storageExplorerStore || {}
+  const { data, isLoading, isError, isSuccess } = useBucketsQuery({ projectRef: ref })
+  const { openDeleteBucketModal } = storageExplorerStore || {}
+
+  const buckets = data ?? []
 
   return (
     <>
@@ -78,13 +80,24 @@ const StorageMenu: FC<Props> = () => {
           <div className="">
             <div>
               <Menu.Group title="All buckets" />
-              {!loaded ? (
-                <div className="space-y-2">
+
+              {isLoading && (
+                <div className="space-y-2 mx-2">
                   <ShimmeringLoader className="!py-2.5" />
-                  <ShimmeringLoader className="!py-2.5 w-3/4" />
-                  <ShimmeringLoader className="!py-2.5 w-1/2" />
+                  <ShimmeringLoader className="!py-2.5" />
+                  <ShimmeringLoader className="!py-2.5" />
                 </div>
-              ) : (
+              )}
+
+              {isError && (
+                <div className="px-2">
+                  <Alert variant="warning" title="Failed to fetch buckets">
+                    Please refresh to try again.
+                  </Alert>
+                </div>
+              )}
+
+              {isSuccess && (
                 <>
                   {buckets.length === 0 && (
                     <div className="px-2">

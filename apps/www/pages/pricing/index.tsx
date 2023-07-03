@@ -8,7 +8,7 @@ import ReactMarkdown from 'react-markdown'
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
 import { PricingTableRowDesktop, PricingTableRowMobile } from '~/components/Pricing/PricingTableRow'
-import pricing from 'shared-data/Pricing.json'
+import { pricing } from 'shared-data/pricing'
 import pricingFaq from '~/data/PricingFAQ.json'
 import { useTheme } from 'common/Providers'
 import ComputePricingModal from '~/components/Pricing/ComputePricingModal'
@@ -140,7 +140,7 @@ export default function IndexPage() {
           url: `https://supabase.com/${router.pathname}`,
           images: [
             {
-              url: `https://supabase.com/images/og/og-image.jpg`,
+              url: `https://supabase.com/images/og/og-image-v2.jpg`,
             },
           ],
         }}
@@ -522,7 +522,7 @@ export default function IndexPage() {
                     sectionId="realtime"
                   />
                   <PricingTableRowMobile
-                    category={pricing['edge-functions']}
+                    category={pricing['edge_functions']}
                     plan={'free'}
                     icon={Solutions['edge-functions'].icon}
                     sectionId="edge-functions"
@@ -578,7 +578,7 @@ export default function IndexPage() {
                     icon={Solutions['realtime'].icon}
                   />
                   <PricingTableRowMobile
-                    category={pricing['edge-functions']}
+                    category={pricing['edge_functions']}
                     plan={'pro'}
                     icon={Solutions['edge-functions'].icon}
                   />
@@ -630,7 +630,7 @@ export default function IndexPage() {
                     icon={Solutions['realtime'].icon}
                   />
                   <PricingTableRowMobile
-                    category={pricing['edge-functions']}
+                    category={pricing['edge_functions']}
                     plan={'team'}
                     icon={Solutions['edge-functions'].icon}
                   />
@@ -684,7 +684,7 @@ export default function IndexPage() {
                     icon={Solutions['realtime'].icon}
                   />
                   <PricingTableRowMobile
-                    category={pricing['edge-functions']}
+                    category={pricing['edge_functions']}
                     plan={'enterprise'}
                     icon={Solutions['edge-functions'].icon}
                   />
@@ -770,7 +770,7 @@ export default function IndexPage() {
 
                     {plans.map((plan) => (
                       <td className="h-full px-6 py-2 align-top" key={`price-${plan.name}`}>
-                        <div className="relative table h-full w-full">
+                        <div className="relative h-full w-full">
                           <div className="flex flex-col justify-between h-full">
                             <>
                               <span
@@ -837,7 +837,7 @@ export default function IndexPage() {
                     sectionId="realtime"
                   />
                   <PricingTableRowDesktop
-                    category={pricing['edge-functions']}
+                    category={pricing['edge_functions']}
                     icon={Solutions['edge-functions'].icon}
                     sectionId="edge-functions"
                   />
@@ -929,7 +929,7 @@ export default function IndexPage() {
                 >
                   {pricingFaq.map((faq, i) => {
                     return (
-                      <div className="border-b pb-3" key={i}>
+                      <div className="border-b py-2" key={i}>
                         <Accordion.Item
                           header={<span className="text-scale-1200">{faq.question}</span>}
                           id={`faq--${i.toString()}`}

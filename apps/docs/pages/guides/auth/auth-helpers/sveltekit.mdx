@@ -16,15 +16,15 @@ This submodule provides convenience helpers for implementing user authentication
 This library supports Node.js `^16.15.0`.
 
 ```sh Terminal
-npm install @supabase/auth-helpers-sveltekit
+npm install @supabase/auth-helpers-sveltekit @supabase/supabase-js
 ```
 
 ### Declare Environment Variables
 
-Retrieve your project's URL and anon key from your [API settings](https://app.supabase.com/project/_/settings/api), and create a `.env.local` file with the following environment variables:
+Retrieve your project's URL and anon key from your [API settings](https://supabase.com/dashboard/project/_/settings/api), and create a `.env.local` file with the following environment variables:
 
 ```bash .env.local
-# Find these in your Supabase project settings https://app.supabase.com/project/_/settings/api
+# Find these in your Supabase project settings https://supabase.com/dashboard/project/_/settings/api
 PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 ```
@@ -199,7 +199,7 @@ declare global {
 
 ## Authentication
 
-Authentication can be initiated [client](/docs/guides/auth/auth-helpers/sveltekit#client-side) or [server-side](/docs/guides/auth/auth-helpers/sveltekit#server-side). All of the [supabase-js authentication strategies](http://localhost:3001/docs/reference/javascript/auth-api) are supported with the Auth Helpers client.
+Authentication can be initiated [client](/docs/guides/auth/auth-helpers/sveltekit#client-side) or [server-side](/docs/guides/auth/auth-helpers/sveltekit#server-side). All of the [supabase-js authentication strategies](/docs/reference/javascript/auth-api) are supported with the Auth Helpers client.
 
 <Admonition type="info">
 

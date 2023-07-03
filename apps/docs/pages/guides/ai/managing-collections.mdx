@@ -7,7 +7,7 @@ export const meta = {
   sidebar_label: 'Managing collections',
 }
 
-A collection is an group of vector records managed by the `vecs` Python library. Records can be added to or updated in a collection. Collections can be queried at any time, but should be indexed for scalable query performance.
+A collection is a group of vector records managed by the `vecs` Python library. Records can be added to or updated in a collection. Collections can be queried at any time, but should be indexed for scalable query performance.
 
 Supabase provides a [Python client](/docs/guides/ai/vecs-python-client) called `vecs` for managing unstructured vector stores in Postgres. If you come from a data science background, this unstructured data approach will feel familiar. If you are more interested in a structured data approach, see [Vector columns](/docs/guides/ai/vector-columns) or read our guide on [Structured & Unstructured Embeddings](/docs/guides/ai/structured-unstructured-embeddings).
 
@@ -32,7 +32,7 @@ vx = vecs.create_client(DB_CONNECTION)
 
 ### Create collection
 
-You can create a collection to store vectors specifying the collections name and the number of dimensions in the vectors you intend to store.
+You can create a collection to store vectors specifying the collection's name and the number of dimensions in the vectors you intend to store.
 
 ```python
 docs = vx.create_collection(name="docs", dimension=3)
@@ -75,7 +75,7 @@ docs.upsert(
 Collections can be queried immediately after being created.
 However, for good performance, the collection should be indexed after records have been upserted.
 
-Indexes should be created **after** the collection has been populated with records. Building an index on an empty collection will result in significantly reduced recall. Once the index has been created you can still upsert new documents into the collection but you should rebuild the index if the size of the collection more than doubles.
+Indexes should be created **after** the collection has been populated with records. Building an index on an empty collection will significantly reduce recall. Once the index has been created you can still upsert new documents into the collection but you should rebuild the index if the size of the collection more than doubles.
 
 Only one index may exist per-collection. By default, creating an index will replace any existing index.
 

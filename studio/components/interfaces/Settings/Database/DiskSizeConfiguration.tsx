@@ -3,10 +3,10 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common/hooks'
 import { FormHeader } from 'components/ui/Forms'
 import Panel from 'components/ui/Panel'
-import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
 import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mutation'
+import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 import { useProjectUsageQuery } from 'data/usage/project-usage-query'
-import { checkPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { Alert, Button, Form, InputNumber, Modal } from 'ui'
@@ -20,13 +20,13 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
   const { ui } = useStore()
   const { ref: projectRef } = useParams()
 
-  const canUpdateDiskSizeConfig = checkPermissions(PermissionAction.UPDATE, 'projects')
+  const canUpdateDiskSizeConfig = useCheckPermissions(PermissionAction.UPDATE, 'projects')
 
   const [showResetDbPass, setShowResetDbPass] = useState<boolean>(false)
   const [isUpdatingDiskSize, setIsUpdatingDiskSize] = useState<boolean>(false)
 
   const { data: projectUsage } = useProjectUsageQuery({ projectRef })
-  const { data: projectSubscriptionData } = useProjectSubscriptionQuery({ projectRef })
+  const { data: projectSubscriptionData } = useProjectSubscriptionV2Query({ projectRef })
   const { mutateAsync: updateProjectUsage } = useProjectDiskResizeMutation()
 
   useEffect(() => {
@@ -73,7 +73,7 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
   return (
     <div id="diskManagement">
       <FormHeader title="Disk management" />
-      {projectSubscriptionData?.tier.supabase_prod_id != 'tier_free' ? (
+      {projectSubscriptionData?.plan.id !== 'free' ? (
         <div className="flex flex-col gap-3">
           <Panel className="!m-0">
             <Panel.Content>

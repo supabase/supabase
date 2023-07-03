@@ -23,7 +23,7 @@ import {
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { uuidv4 } from 'lib/helpers'
-import { useStore, checkPermissions } from 'hooks'
+import { useStore, useCheckPermissions } from 'hooks'
 import { useParams } from 'common/hooks'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
 import { useJwtSecretUpdateMutation } from 'data/config/jwt-secret-update-mutation'
@@ -48,8 +48,8 @@ const JWTSettings: FC<Props> = ({}) => {
   const [isSubmittingJwtSecretUpdateRequest, setIsSubmittingJwtSecretUpdateRequest] =
     useState<boolean>(false)
 
-  const canReadJWTSecret = checkPermissions(PermissionAction.READ, 'field.jwt_secret')
-  const canGenerateNewJWTSecret = checkPermissions(
+  const canReadJWTSecret = useCheckPermissions(PermissionAction.READ, 'field.jwt_secret')
+  const canGenerateNewJWTSecret = useCheckPermissions(
     PermissionAction.INFRA_EXECUTE,
     'queue_job.projects.update_jwt'
   )
@@ -156,13 +156,8 @@ const JWTSettings: FC<Props> = ({}) => {
                             </Button>
                           ) : !canGenerateNewJWTSecret ? (
                             <Tooltip.Root delayDuration={0}>
-                              <Tooltip.Trigger>
-                                <Button
-                                  disabled
-                                  as="span"
-                                  type="default"
-                                  iconRight={<IconChevronDown />}
-                                >
+                              <Tooltip.Trigger asChild>
+                                <Button disabled type="default" iconRight={<IconChevronDown />}>
                                   Generate a new secret
                                 </Button>
                               </Tooltip.Trigger>
@@ -204,8 +199,8 @@ const JWTSettings: FC<Props> = ({}) => {
                                 </>
                               }
                             >
-                              <Button as="span" type="default" iconRight={<IconChevronDown />}>
-                                Generate a new secret
+                              <Button asChild type="default" iconRight={<IconChevronDown />}>
+                                <span>Generate a new secret</span>
                               </Button>
                             </Dropdown>
                           )}

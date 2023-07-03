@@ -12,9 +12,9 @@
 - [x] Hosted Postgres-databas. [Docs](https://supabase.com/docs/guides/database)
 - [x] Autentisering och auktorisering. [Docs](https://supabase.com/docs/guides/auth)
 - [x] Automatiskt genererade API:er.
-  - [x] REST. [Docs](https://supabase.com/docs/guides/database/api#rest-api)
-  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/database/api#graphql-api)
-  - [x] Prenumerationer i realtid. [Dokument](https://supabase.com/docs/guides/database/api#realtime-api)
+  - [x] REST. [Docs](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/api#graphql-api-overview)
+  - [x] Prenumerationer i realtid. [Dokument](https://supabase.com/docs/guides/api#realtime-api-overview)
 - [x] Funktioner.
   - [x] Databasfunktioner. [Dokument](https://supabase.com/docs/guides/database/functions)
   - [x] Edge-funktioner [Docs](https://supabase.com/docs/guides/functions)
@@ -27,7 +27,7 @@
 
 Fullständig dokumentation finns på [supabase.com/docs](https://supabase.com/docs)
 
-För att se hur man bidrar, besök [Getting Started](./DEVELOPERS.md)
+För att se hur man bidrar, besök [Getting Started](../DEVELOPERS.md)
 
 ## Gemenskap och stöd
 
@@ -39,7 +39,7 @@ För att se hur man bidrar, besök [Getting Started](./DEVELOPERS.md)
 ## Status
 
 - [Alpha: Vi testar Supabase med en sluten grupp av kunder
-- [x] Public Alpha: Vem som helst kan registrera sig på [app.supabase.com](https://app.supabase.com). Men var försiktig med oss, det finns några problem
+- [x] Public Alpha: Vem som helst kan registrera sig på [supabase.com/dashboard](https://supabase.com/dashboard). Men var försiktig med oss, det finns några problem
 - [x] Public Beta: Stabil nog för de flesta användningsområden som inte är företag
 - [ ] Public: Allmän tillgänglighet [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]]
 
@@ -55,7 +55,7 @@ Supabase är en kombination av verktyg med öppen källkod. Vi bygger funktioner
 
 **Arkitektur**
 
-Supabase är en [värdplattform](https://app.supabase.com). Du kan registrera dig och börja använda Supabase utan att installera något.
+Supabase är en [värdplattform](https://supabase.com/dashboard). Du kan registrera dig och börja använda Supabase utan att installera något.
 Du kan också [självhosta](https://supabase.com/docs/guides/hosting/overview) och [utveckla lokalt](https://supabase.com/docs/guides/local-development).
 
 ![Arkitektur](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)

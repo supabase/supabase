@@ -7,6 +7,7 @@ import { useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL, BASE_PATH } from 'lib/constants'
 import { passwordSchema } from 'lib/schemas'
+import { resetSignInClicks } from 'lib/local-storage'
 import PasswordConditionsHelper from './PasswordConditionsHelper'
 
 const signUpSchema = passwordSchema.shape({
@@ -32,6 +33,8 @@ const SignUpForm = () => {
       const captchaResponse = await captchaRef.current?.execute({ async: true })
       token = captchaResponse?.response ?? null
     }
+
+    resetSignInClicks()
 
     const response = await post(`${API_URL}/signup`, {
       email,

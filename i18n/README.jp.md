@@ -12,9 +12,9 @@
 - [x] ホスティングされた Postgres データベース [Docs](https://supabase.com/docs/guides/database)
 - [x] 認証・認可 [Docs](https://supabase.com/docs/guides/auth)
 - [x] API を自動生成
-  - [x] REST [Docs](https://supabase.com/docs/guides/database/api#rest-api)
-  - [x] リアルタイムサブスクリプション [Docs](https://supabase.com/docs/guides/database/api#realtime-api)
-  - [x] GraphQL (Beta) [Docs](https://supabase.com/docs/guides/database/api#graphql-api)
+  - [x] REST [Docs](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] リアルタイムサブスクリプション [Docs](https://supabase.com/docs/guides/api#realtime-api-overview)
+  - [x] GraphQL (Beta) [Docs](https://supabase.com/docs/guides/api#graphql-api-overview)
 - [x] 関数
   - [x] データベース関数 [Docs](https://supabase.com/docs/guides/database/functions)
   - [x] Edge Functions [Docs](https://supabase.com/docs/guides/functions)
@@ -39,7 +39,7 @@
 ## ステータス
 
 - [x] Alpha: 限られたユーザーで Supabase をテストしています。
-- [x] Public Alpha: 誰でも[app.supabase.com](https://app.supabase.com)から登録ができます。ただし、バグなどがある可能性がありますので、ご容赦ください。
+- [x] Public Alpha: 誰でも[supabase.com/dashboard](https://supabase.com/dashboard)から登録ができます。ただし、バグなどがある可能性がありますので、ご容赦ください。
 - [x] Public Beta: 企業以外のほとんどのユースケースに耐えうる十分な安定性を確保。
 - [ ] Public: 実用的な用途に対応
 
@@ -55,7 +55,7 @@ Supabase は、オープンソースのツールを組み合わせてできて�
 
 **現在のアーキテクチャ**
 
-Supabase は[ホスティングされたプラットフォーム](https://app.supabase.com)です。登録するだけで、何もインストールせずに使い始めることができます。
+Supabase は[ホスティングされたプラットフォーム](https://supabase.com/dashboard)です。登録するだけで、何もインストールせずに使い始めることができます。
 さらに、 [セルフホスティング](https://supabase.com/docs/guides/hosting/overview) や [ローカル開発](https://supabase.com/docs/guides/local-development)も可能です。
 
 ![アーキテクチャー](https://user-images.githubusercontent.com/70828596/187547862-ffa9d058-0c3a-4851-a3e7-92ccfca4b596.png)

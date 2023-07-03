@@ -8,7 +8,7 @@ import { createClient } from '@supabase/supabase-js'
 import { useStore } from 'hooks'
 import { copyToClipboard } from 'lib/helpers'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
-import { get, patch, post, delete_ } from 'lib/common/fetch'
+import { post, delete_ } from 'lib/common/fetch'
 import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
 import {
   STORAGE_VIEWS,
@@ -394,64 +394,31 @@ class StorageExplorerStore {
     this.selectedFilePreview = {}
   }
 
-  copyFileURLToClipboard = async (file, expiresIn = 0) => {
+  getFileUrl = async (file, expiresIn = 0) => {
     const filePreview = find(this.filePreviewCache, { id: file.id })
     if (filePreview !== undefined && expiresIn === 0) {
-      // Already generated signed URL
-      copyToClipboard(filePreview.url, () => {
-        this.ui.setNotification({
-          category: 'success',
-          message: `Copied URL for ${file.name} to clipboard.`,
-          duration: 4000,
-        })
-      })
+      return filePreview.url
     } else {
-      // Need to generate signed URL, and might as well save it to cache as well
-      const signedUrlAsync = this.fetchFilePreview(file.name, expiresIn).then((signedUrl) => {
-        const formattedUrl = new URL(signedUrl)
-        formattedUrl.searchParams.set('t', new Date().toISOString())
+      const signedUrl = await this.fetchFilePreview(file.name, expiresIn)
+      const formattedUrl = new URL(signedUrl)
+      formattedUrl.searchParams.set('t', new Date().toISOString())
+      const fileUrl = formattedUrl.toString()
 
-        return formattedUrl.toString()
-      })
-
-      try {
-        copyToClipboard(signedUrlAsync, () => {
-          this.ui.setNotification({
-            category: 'success',
-            message: `Copied URL for ${file.name} to clipboard.`,
-            duration: 4000,
-          })
-        })
-        const fileCache = {
-          id: file.id,
-          url: await signedUrlAsync,
-          expiresIn: DEFAULT_EXPIRY,
-          fetchedAt: Date.now(),
-        }
-        this.addFileToPreviewCache(fileCache)
-      } catch (error) {
-        this.ui.setNotification({
-          category: 'error',
-          message: `Failed to copy URL: ${error}`,
-        })
+      // Also save it to cache
+      const fileCache = {
+        id: file.id,
+        url: fileUrl,
+        expiresIn: DEFAULT_EXPIRY,
+        fetchedAt: Date.now(),
       }
+      this.addFileToPreviewCache(fileCache)
+
+      return fileUrl
     }
   }
 
   /* Methods that involve the storage client library */
   /* Bucket CRUD */
-
-  createBucket = async (payload) => {
-    const res = await post(`${this.endpoint}/buckets`, payload)
-    if (res.error) {
-      this.ui.setNotification({ category: 'error', message: res.error.message })
-      return res
-    } else {
-      await this.fetchBuckets()
-      return res
-    }
-  }
-
   openBucket = async (bucket) => {
     const { id, name } = bucket
     const columnIndex = -1
@@ -459,59 +426,6 @@ class StorageExplorerStore {
       this.setSelectedBucket(bucket)
       await this.fetchFolderContents(id, name, columnIndex)
     }
-  }
-
-  fetchBuckets = async () => {
-    const res = await get(`${this.endpoint}/buckets`)
-    if (res.error) return this.ui.setNotification({ category: 'error', message: res.error.message })
-
-    const formattedBuckets = res.map((bucket) => {
-      return { ...bucket, type: STORAGE_ROW_TYPES.BUCKET, status: STORAGE_ROW_STATUS.READY }
-    })
-    this.buckets = formattedBuckets
-    return formattedBuckets
-  }
-
-  deleteBucket = async (bucket) => {
-    // Deleting a bucket requires the bucket to be empty first
-    // hence delete bucket and empty bucket are coupled tightly here
-    const { id, name: bucketName } = bucket
-
-    const emptyBucketRes = await post(`${this.endpoint}/buckets/${id}/empty`, {})
-    if (emptyBucketRes.error) {
-      this.ui.setNotification({ category: 'error', message: emptyBucketRes.error.message })
-      return false
-    }
-
-    const deleteBucketRes = await delete_(`${this.endpoint}/buckets/${id}`)
-    if (deleteBucketRes.error) {
-      this.ui.setNotification({ category: 'error', message: deleteBucketRes.error.message })
-      return false
-    }
-
-    await this.fetchBuckets()
-    if (bucketName === this.selectedBucket.name) {
-      this.setSelectedBucket({})
-      this.clearColumns()
-      this.clearOpenedFolders()
-    }
-    this.clearSelectedItemsToDelete()
-    this.closeDeleteBucketModal()
-    return true
-  }
-
-  editBucket = async (bucket, payload) => {
-    const res = await patch(`${this.endpoint}/buckets/${bucket.id}`, payload)
-    if (res.error) {
-      this.ui.setNotification({ category: 'error', message: res.error.message })
-      return res
-    }
-
-    this.openBucket({ ...bucket, ...payload })
-    this.fetchBuckets()
-    this.clearFilePreviewCache()
-
-    return res
   }
 
   /* Files CRUD */

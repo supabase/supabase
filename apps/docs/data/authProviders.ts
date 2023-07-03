@@ -90,6 +90,16 @@ const authProviders = [
     authType: 'social',
   },
   {
+    name: 'Kakao',
+    logo: '/docs/img/icons/kakao-icon',
+    href: '/guides/auth/social-login/auth-kakao',
+    official: true,
+    supporter: 'Supabase',
+    platform: true,
+    selfHosted: true,
+    authType: 'social',
+  },
+  {
     name: 'Keycloak',
     logo: '/docs/img/icons/keycloak-icon',
     href: '/guides/auth/social-login/auth-keycloak',

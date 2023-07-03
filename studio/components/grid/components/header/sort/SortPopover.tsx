@@ -29,7 +29,7 @@ const SortPopover = ({ table, sorts, setParams }: SortPopoverProps) => {
       overlay={<SortOverlay table={table} sorts={sorts} setParams={setParams} />}
     >
       <Button
-        as="span"
+        asChild
         type={(sorts || []).length > 0 ? 'link' : 'text'}
         icon={
           <div className="text-scale-1000">
@@ -37,7 +37,7 @@ const SortPopover = ({ table, sorts, setParams }: SortPopoverProps) => {
           </div>
         }
       >
-        {btnText}
+        <span>{btnText}</span>
       </Button>
     </Popover>
   )
@@ -135,12 +135,12 @@ const SortOverlay = ({ table, sorts: sortsFromUrl, setParams }: SortOverlayProps
             align="start"
           >
             <Button
-              as="span"
+              asChild
               type="text"
               iconRight={<IconChevronDown />}
               className="sb-grid-dropdown__item-trigger"
             >
-              {`Pick ${sorts.length > 1 ? 'another' : 'a'} column to sort by`}
+              <span>{`Pick ${sorts.length > 1 ? 'another' : 'a'} column to sort by`}</span>
             </Button>
           </DropdownControl>
         ) : (

@@ -12,9 +12,9 @@
 - [x] 托管的 Postgres 数据库。[文档](https://supabase.com/docs/guides/database)
 - [x] 认证和授权。[文档](https://supabase.com/docs/guides/auth)
 - [x] 自动生成的 API。
-  - [x] REST.[文档](https://supabase.com/docs/guides/database/api#rest-api)
-  - [x] GraphQL。[文件](https://supabase.com/docs/guides/database/api#graphql-api)
-  - [x] 实时订阅。[文档](https://supabase.com/docs/guides/database/api#realtime-api)
+  - [x] REST.[文档](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL。[文件](https://supabase.com/docs/guides/api#graphql-api-overview)
+  - [x] 实时订阅。[文档](https://supabase.com/docs/guides/api#realtime-api-overview)
 - [x] 函数。
   - [x] 数据库函数。[文件](https://supabase.com/docs/guides/database/functions)
   - [x] 边缘功能 [文档](https://supabase.com/docs/guides/functions)
@@ -27,7 +27,7 @@
 
 有关完整的文档，请访问[supabase.com/docs](https://supabase.com/docs)
 
-要了解如何贡献，请访问[入门](./DEVELOPERS.md)
+要了解如何贡献，请访问[入门](../DEVELOPERS.md)
 
 ## 社区与支持
 
@@ -39,7 +39,7 @@
 ## 状态
 
 - [x] 阿尔法：我们正在与一组封闭的客户测试 Supabase。
-- [x] 公开阿尔法：任何人都可以在[app.supabase.com](https://app.supabase.com)上注册。但请对我们宽容一些，有一些小问题。
+- [x] 公开阿尔法：任何人都可以在[supabase.com/dashboard](https://supabase.com/dashboard)上注册。但请对我们宽容一些，有一些小问题。
 - [x] 公开测试版：足够稳定，适合大多数非企业使用的情况。
 - [] 公开：普遍可用 [状态](https://supabase.com/docs/guides/getting-started/features#feature-status)
 
@@ -55,7 +55,7 @@ Supabase 是一个开源工具的组合。我们正在使用企业级的开源�
 
 **架构**
 
-Supabase 是一个[托管平台](https://app.supabase.com)。你可以注册并开始使用 Supabase，无需安装任何东西。
+Supabase 是一个[托管平台](https://supabase.com/dashboard)。你可以注册并开始使用 Supabase，无需安装任何东西。
 你也可以[自我托管](https://supabase.com/docs/guides/hosting/overview)和[本地开发](https://supabase.com/docs/guides/local-development)。
 
 ![架构](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)

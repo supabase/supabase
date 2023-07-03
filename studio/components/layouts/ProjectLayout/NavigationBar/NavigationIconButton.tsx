@@ -16,9 +16,13 @@ const NavigationIconButton: FC<Props> = ({ route, isActive = false }) => {
       <Tooltip.Trigger>
         <ConditionalWrap
           condition={route.link !== undefined}
-          wrap={(children) => <Link href={route.link!}>{children}</Link>}
+          wrap={(children) => (
+            <Link href={route.link!}>
+              <a>{children}</a>
+            </Link>
+          )}
         >
-          <a
+          <span
             className={[
               'transition-colors duration-200',
               'flex items-center justify-center h-10 w-10 rounded', // Layout
@@ -28,7 +32,7 @@ const NavigationIconButton: FC<Props> = ({ route, isActive = false }) => {
             ].join(' ')}
           >
             {route.icon}
-          </a>
+          </span>
         </ConditionalWrap>
       </Tooltip.Trigger>
       <Tooltip.Portal>

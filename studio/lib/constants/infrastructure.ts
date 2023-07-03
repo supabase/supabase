@@ -1,7 +1,11 @@
+export type CloudProvider = 'FLY' | 'AWS'
+export type Region = typeof AWS_REGIONS | typeof FLY_REGIONS
+
 // Alias regions remain as the starting point for project creation
 // they are immediately translated to their respective cloud regions
 // and are afterward never referred to
-export const REGIONS = {
+
+export const AWS_REGIONS = {
   WEST_US: 'West US (North California)',
   EAST_US: 'East US (North Virginia)',
   CENTRAL_CANADA: 'Canada (Central)',
@@ -16,10 +20,17 @@ export const REGIONS = {
   OCEANIA: 'Oceania (Sydney)',
   SOUTH_AMERICA: 'South America (São Paulo)',
   // SOUTH_AFRICA: 'South Africa (Cape Town)',
-}
+} as const
 
-export const REGIONS_DEFAULT =
-  process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod' ? REGIONS.SOUTHEAST_ASIA : REGIONS.EAST_US
+export const FLY_REGIONS = {
+  SOUTHEAST_ASIA: 'Singapore',
+} as const
+
+export const AWS_REGIONS_DEFAULT =
+  process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod' ? AWS_REGIONS.SOUTHEAST_ASIA : AWS_REGIONS.WEST_US
+
+// TO DO, change default to US region for prod
+export const FLY_REGIONS_DEFAULT = FLY_REGIONS.SOUTHEAST_ASIA
 
 export const PRICING_TIER_LABELS = {
   FREE: 'Free',
@@ -27,6 +38,7 @@ export const PRICING_TIER_LABELS = {
 }
 
 export const PRICING_TIER_LABELS_ORG = {
+  FREE: 'Free - $0/month',
   PRO: 'Pro - $25/month',
   TEAM: 'Team - $599/month',
 }
@@ -42,27 +54,38 @@ export const PRICING_TIER_PRODUCT_IDS = {
 export const PRICING_TIER_FREE_KEY = 'FREE'
 export const PRICING_TIER_DEFAULT_KEY = 'FREE'
 
+export const DEFAULT_PROVIDER: CloudProvider =
+  process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod' ? 'FLY' : 'AWS'
+
 export const PROVIDERS = {
+  FLY: {
+    id: 'FLY',
+    name: 'Fly.io',
+    default_region: FLY_REGIONS_DEFAULT,
+    regions: { ...FLY_REGIONS },
+  },
   AWS: {
     id: 'AWS',
-    name: 'aws',
+    name: 'AWS',
     DEFAULT_SSH_KEY: 'supabase-app-instance',
-    regions: {
-      EAST_US: 'us-east-1', // North Virginia
-      // 'North EU': 'eu-north-1', // Stockholm
-      WEST_US: 'us-west-1', // North California
-      SOUTHEAST_ASIA: 'ap-southeast-1', // Singapore
-      NORTHEAST_ASIA: 'ap-northeast-1', // Tokyo
-      NORTHEAST_ASIA_2: 'ap-northeast-2', //Seoul
-      OCEANIA: 'ap-southeast-2', // Sydney
-      WEST_EU: 'eu-west-1', // Ireland
-      WEST_EU_2: 'eu-west-2', // London
-      CENTRAL_EU: 'eu-central-1', // Frankfurt
-      CENTRAL_CANADA: 'ca-central-1', // Central Canada
-      SOUTH_ASIA: 'ap-south-1', // Mumbai
-      SOUTH_AMERICA: 'sa-east-1', // Sao Paulo
-      // SOUTH_AFRICA: 'af-south-1', // Cape Town
-    },
+    default_region: AWS_REGIONS_DEFAULT,
+    regions: { ...AWS_REGIONS },
+    // regions: {
+    //   EAST_US: 'us-east-1', // North Virginia
+    //   // 'North EU': 'eu-north-1', // Stockholm
+    //   WEST_US: 'us-west-1', // North California
+    //   SOUTHEAST_ASIA: 'ap-southeast-1', // Singapore
+    //   NORTHEAST_ASIA: 'ap-northeast-1', // Tokyo
+    //   NORTHEAST_ASIA_2: 'ap-northeast-2', //Seoul
+    //   OCEANIA: 'ap-southeast-2', // Sydney
+    //   WEST_EU: 'eu-west-1', // Ireland
+    //   WEST_EU_2: 'eu-west-2', // London
+    //   CENTRAL_EU: 'eu-central-1', // Frankfurt
+    //   CENTRAL_CANADA: 'ca-central-1', // Central Canada
+    //   SOUTH_ASIA: 'ap-south-1', // Mumbai
+    //   SOUTH_AMERICA: 'sa-east-1', // Sao Paulo
+    //   // SOUTH_AFRICA: 'af-south-1', // Cape Town
+    // },
     sizes: {
       nano: {
         x86_64: 't3.nano',
@@ -81,7 +104,7 @@ export const PROVIDERS = {
       },
     },
   },
-}
+} as const
 
 // @todo ini update for prod
 export const AWS_SUPPORTED_AZ = {
@@ -113,13 +136,7 @@ export const PROJECT_STATUS = {
   RESTORING: 'RESTORING',
   RESTORATION_FAILED: 'RESTORATION_FAILED',
   UPGRADING: 'UPGRADING',
-}
-
-export const STRIPE_PRODUCT_IDS: { [x: string]: string } = {
-  FREE: process?.env?.NEXT_PUBLIC_STRIPE_FREE_TIER_ID || 'prod_Ip4vqwv3EJ7Mi0',
-  PRO: process?.env?.NEXT_PUBLIC_STRIPE_PRO_TIER_ID || 'prod_IsRLOp58Z7V4XN',
-  PAYG: process?.env?.NEXT_PUBLIC_STRIPE_PAYG_TIER_ID || 'prod_JlTbw91xcM6NY4',
-  TEAM: process?.env?.NEXT_PUBLIC_STRIPE_TEAM_TIER_ID || 'prod_MeUrsWN6pj0oXM',
+  PAUSING: 'PAUSING',
 }
 
 export const DEFAULT_MINIMUM_PASSWORD_STRENGTH = 4
