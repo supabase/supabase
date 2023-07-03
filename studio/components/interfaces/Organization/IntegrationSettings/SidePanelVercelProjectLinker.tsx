@@ -50,13 +50,6 @@ const SidePanelVercelProjectLinker = () => {
     [selectedOrganization?.id, supabaseProjectsData]
   )
 
-  const { data: vercelProjectConnectionsData } = useVercelProjectConnectionsQuery(
-    {
-      organization_integration_id: organizationIntegrationId,
-    },
-    { enabled: organizationIntegrationId !== null }
-  )
-
   const { data: vercelProjectsData } = useVercelProjectsQuery(
     {
       organization_integration_id: organizationIntegrationId,
