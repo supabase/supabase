@@ -41,7 +41,7 @@ const OrgGeneralSettings: NextPageWithLayout = () => {
                 <Tabs.Panel id="general" label="General" />
                 <Tabs.Panel id="team" label="Team" />
                 <Tabs.Panel id="billing" label="Billing" />
-                <Tabs.Panel id="invoices" label="Invoices" />\
+                <Tabs.Panel id="invoices" label="Invoices" />
                 {showOAuthApps && <Tabs.Panel id="apps" label="OAuth Apps" />}
                 {showAuditLogs && <Tabs.Panel id="audit" label="Audit Logs" />}
               </Tabs>
