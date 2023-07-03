@@ -5,9 +5,9 @@ export const githubConnectionConfigPanelState = proxy({
   setOpen: (open: boolean) => {
     githubConnectionConfigPanelState.open = open
   },
-  organizationIntegrationId: '' as string,
-  setOrganizationIntegrationId: (organizationInterationId: string) => {
-    githubConnectionConfigPanelState.organizationIntegrationId = organizationInterationId
+  organizationIntegrationId: undefined as string | undefined,
+  setOrganizationIntegrationId: (organizationIntegrationId: string) => {
+    githubConnectionConfigPanelState.organizationIntegrationId = organizationIntegrationId
   },
 })
 
