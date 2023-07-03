@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { Button, Form, Input, Modal } from 'ui'
 
 import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
-import { checkPermissions, useSelectedOrganization, useStore } from 'hooks'
+import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
 import { delete_ } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 
@@ -20,7 +20,7 @@ const DeleteOrganizationButton = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [value, setValue] = useState('')
 
-  const canDeleteOrganization = checkPermissions(PermissionAction.UPDATE, 'organizations')
+  const canDeleteOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
 
   const onValidate = (values: any) => {
     const errors: any = {}

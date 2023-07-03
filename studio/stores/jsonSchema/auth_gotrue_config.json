@@ -17,6 +17,7 @@
     "EXTERNAL_GITHUB_ENABLED",
     "EXTERNAL_GITLAB_ENABLED",
     "EXTERNAL_GOOGLE_ENABLED",
+    "EXTERNAL_KAKAO_ENABLED",
     "EXTERNAL_KEYCLOAK_ENABLED",
     "EXTERNAL_LINKEDIN_ENABLED",
     "EXTERNAL_NOTION_ENABLED",
@@ -194,6 +195,18 @@
     },
     "EXTERNAL_GOOGLE_SECRET": {
       "title": "Google secret",
+      "type": "string"
+    },
+    "EXTERNAL_KAKAO_ENABLED": {
+      "title": "Kakao enabled",
+      "type": "boolean"
+    },
+    "EXTERNAL_KAKAO_CLIENT_ID": {
+      "title": "Kakao client ID",
+      "type": "string"
+    },
+    "EXTERNAL_KAKAO_SECRET": {
+      "title": "Kakao secret",
       "type": "string"
     },
     "EXTERNAL_KEYCLOAK_ENABLED": {

@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite'
 import { useContext } from 'react'
 import { Button, Form, IconMail, Input, Modal } from 'ui'
 
-import { checkPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { PageContext } from 'pages/project/[ref]/auth/users'
@@ -18,7 +18,7 @@ const InviteUserModal = ({ visible, setVisible }: InviteUserModalProps) => {
   const PageState: any = useContext(PageContext)
 
   const handleToggle = () => setVisible(!visible)
-  const canInviteUsers = checkPermissions(PermissionAction.AUTH_EXECUTE, 'invite_user')
+  const canInviteUsers = useCheckPermissions(PermissionAction.AUTH_EXECUTE, 'invite_user')
 
   const validate = (values: any) => {
     const errors: any = {}

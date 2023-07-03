@@ -5,7 +5,7 @@ import { Button, Form, Input, Listbox } from 'ui'
 
 import NoPermission from 'components/ui/NoPermission'
 import Panel from 'components/ui/Panel'
-import { checkPermissions, useSelectedOrganization, useStore } from 'hooks'
+import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
 import { patch } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { COUNTRIES } from './BillingAddress.constants'
@@ -22,8 +22,11 @@ const BillingAddress = ({ loading, address, onAddressUpdated }: BillingAddressPr
   const orgSlug = selectedOrganization?.slug ?? ''
   const { city, country, line1, line2, postal_code, state } = address
 
-  const canReadBillingAddress = checkPermissions(PermissionAction.BILLING_READ, 'stripe.customer')
-  const canUpdateBillingAddress = checkPermissions(
+  const canReadBillingAddress = useCheckPermissions(
+    PermissionAction.BILLING_READ,
+    'stripe.customer'
+  )
+  const canUpdateBillingAddress = useCheckPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.customer'
   )

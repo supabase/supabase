@@ -9,7 +9,7 @@ import { useOrganizationMemberDeleteMutation } from 'data/organizations/organiza
 import { useOrganizationMemberInviteCreateMutation } from 'data/organizations/organization-member-invite-create-mutation'
 import { useOrganizationMemberInviteDeleteMutation } from 'data/organizations/organization-member-invite-delete-mutation'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
-import { checkPermissions, useSelectedOrganization, useStore } from 'hooks'
+import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
 import { Member, Role } from 'types'
 import { Button, Dropdown, IconMoreHorizontal, IconTrash } from 'ui'
 import { isInviteExpired } from '../Organization.utils'
@@ -36,10 +36,10 @@ const MemberActions: FC<Props> = ({ member, roles }) => {
 
   const roleId = member.role_ids?.[0] ?? -1
   const canRemoveMember = rolesRemovable.includes((member?.role_ids ?? [-1])[0])
-  const canResendInvite = checkPermissions(PermissionAction.CREATE, 'user_invites', {
+  const canResendInvite = useCheckPermissions(PermissionAction.CREATE, 'user_invites', {
     resource: { role_id: roleId },
   })
-  const canRevokeInvite = checkPermissions(PermissionAction.DELETE, 'user_invites', {
+  const canRevokeInvite = useCheckPermissions(PermissionAction.DELETE, 'user_invites', {
     resource: { role_id: roleId },
   })
 
