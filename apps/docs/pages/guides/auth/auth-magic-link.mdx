@@ -17,10 +17,16 @@ Setting up Magic Link logins for your Supabase application.
 
 ## Add Magic Link into your Supabase Project
 
-1. For [Site URL](https://app.supabase.com/project/_/auth/url-configuration), enter the final (hosted) URL of your app.
-1. For [Auth Providers](https://app.supabase.com/project/_/auth/providers), **enable email provider**.
+1. For [Site URL](https://supabase.com/dashboard/project/_/auth/url-configuration), enter the final (hosted) URL of your app.
+1. For [Auth Providers](https://supabase.com/dashboard/project/_/auth/providers), **enable email provider**.
 
 ## Add login code to your client app
+
+<Admonition type="caution">
+
+When making use of Magic Links with [the PKCE Flow](https://supabase.com/blog/supabase-auth-sso-pkce#introducing-pkce) do bear in mind that links can only be used in the same browser that they are sent from. Consequently, a magic link sent from Chrome on Desktop will be invalid if used on a Mobile Device.
+
+</Admonition>
 
 <Tabs
   scrollable

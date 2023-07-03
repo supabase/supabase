@@ -1,31 +1,33 @@
-import { FC, useState } from 'react'
-import { useRouter } from 'next/router'
-import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useQueryClient } from '@tanstack/react-query'
+import { observer } from 'mobx-react-lite'
+import { useRouter } from 'next/router'
+import { useState } from 'react'
 import { Button, Dropdown, IconChevronDown } from 'ui'
 
-import { Project } from 'types'
-import { useStore, checkPermissions } from 'hooks'
+import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
+import { setProjectPostgrestStatus } from 'data/projects/projects-query'
+import { useCheckPermissions, useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
+import { Project } from 'types'
 
-interface Props {
+export interface RestartServerButtonProps {
   project: Project
 }
 
-const RestartServerButton: FC<Props> = ({ project }) => {
-  const { ui, app } = useStore()
+const RestartServerButton = ({ project }: RestartServerButtonProps) => {
+  const queryClient = useQueryClient()
+  const { ui } = useStore()
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [serviceToRestart, setServiceToRestart] = useState<'project' | 'database'>()
 
-  const projectId = project.id
   const projectRef = project.ref
   const projectRegion = project.region
 
-  const canRestartProject = checkPermissions(PermissionAction.INFRA_EXECUTE, 'reboot')
+  const canRestartProject = useCheckPermissions(PermissionAction.INFRA_EXECUTE, 'reboot')
 
   const requestProjectRestart = async () => {
     if (!canRestartProject) {
@@ -69,7 +71,7 @@ const RestartServerButton: FC<Props> = ({ project }) => {
   }
 
   const onRestartSuccess = () => {
-    app.onProjectPostgrestStatusUpdated(projectId, 'OFFLINE')
+    setProjectPostgrestStatus(queryClient, projectRef, 'OFFLINE')
     ui.setNotification({ category: 'success', message: 'Restarting server' })
     router.push(`/project/${projectRef}`)
     setLoading(false)

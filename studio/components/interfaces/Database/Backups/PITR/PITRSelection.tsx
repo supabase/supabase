@@ -1,35 +1,37 @@
-import dayjs from 'dayjs'
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { useQueryClient } from '@tanstack/react-query'
 import { format } from 'date-fns'
+import dayjs from 'dayjs'
+import { useRouter } from 'next/router'
 import { useState } from 'react'
 import DatePicker from 'react-datepicker'
-import { Button, Modal, IconChevronLeft, IconChevronRight, IconHelpCircle, Alert } from 'ui'
-import * as Tooltip from '@radix-ui/react-tooltip'
+import { Alert, Button, IconChevronLeft, IconChevronRight, IconHelpCircle, Modal } from 'ui'
 
 import { useParams } from 'common'
+import { FormHeader, FormPanel } from 'components/ui/Forms'
+import InformationBox from 'components/ui/InformationBox'
+import { setProjectStatus } from 'data/projects/projects-query'
 import { useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
-import { FormHeader, FormPanel } from 'components/ui/Forms'
-import InformationBox from 'components/ui/InformationBox'
-import TimeInput from './TimeInput'
-import TimezoneSelection from './TimezoneSelection'
+import BackupsEmpty from '../BackupsEmpty'
 import { Timezone } from './PITR.types'
-import PITRStatus from './PITRStatus'
 import {
   constrainDateToRange,
   formatNumberToTwoDigits,
   getClientTimezone,
   getDatesBetweenRange,
 } from './PITR.utils'
-import { useRouter } from 'next/router'
-import BackupsEmpty from '../BackupsEmpty'
+import PITRStatus from './PITRStatus'
+import TimeInput from './TimeInput'
+import TimezoneSelection from './TimezoneSelection'
 
-const PITRSelection = ({}) => {
+const PITRSelection = () => {
+  const queryClient = useQueryClient()
   const router = useRouter()
   const { ref } = useParams()
 
-  const { app, ui, backups } = useStore()
-  const projectId = ui.selectedProject?.id ?? -1
+  const { ui, backups } = useStore()
 
   const [selectedTimezone, setSelectedTimezone] = useState<Timezone>(getClientTimezone())
 
@@ -114,7 +116,7 @@ const PITRSelection = ({}) => {
     } else {
       setTimeout(() => {
         setShowConfirmation(false)
-        app.onProjectStatusUpdated(projectId, PROJECT_STATUS.RESTORING)
+        setProjectStatus(queryClient, projectRef, PROJECT_STATUS.RESTORING)
         router.push(`/project/${projectRef}`)
       }, 3000)
     }
@@ -147,7 +149,6 @@ const PITRSelection = ({}) => {
                   <Tooltip.Root delayDuration={0}>
                     <Tooltip.Trigger asChild>
                       <Button
-                        asChild
                         type="warning"
                         disabled={isSelectedOutOfRange || !selectedDate}
                         onClick={() => setShowConfirmation(true)}

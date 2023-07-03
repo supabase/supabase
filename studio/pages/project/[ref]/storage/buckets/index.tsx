@@ -1,26 +1,35 @@
+import { useEffect } from 'react'
+
 import { useParams } from 'common/hooks'
 import { StorageLayout } from 'components/layouts'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import StorageBucketsError from 'components/layouts/StorageLayout/StorageBucketsError'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
-import { useFlag, useStore } from 'hooks'
+import { useBucketsQuery } from 'data/storage/buckets-query'
+import { useFlag } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
-import { observer } from 'mobx-react-lite'
-import { useEffect } from 'react'
 import { NextPageWithLayout } from 'types'
 
-const PageLayout: NextPageWithLayout = ({}) => {
+/**
+ * PageLayout is used to setup layout - as usual it will requires inject global store
+ */
+const PageLayout: NextPageWithLayout = () => {
   const { ref } = useParams()
-  const { ui } = useStore()
-  const project = ui.selectedProject
+  const { project } = useProjectContext()
   const kpsEnabled = useFlag('initWithKps')
+
+  const { error, isError } = useBucketsQuery({ projectRef: ref })
 
   useEffect(() => {
     if (project && project.status === PROJECT_STATUS.INACTIVE) {
       post(`${API_URL}/projects/${ref}/restore`, { kps_enabled: kpsEnabled })
     }
-  }, [project])
+  }, [ref, project])
 
   if (!project) return <div></div>
+
+  if (isError) <StorageBucketsError error={error as any} />
 
   return (
     <div className="storage-container flex flex-grow">
@@ -42,4 +51,4 @@ const PageLayout: NextPageWithLayout = ({}) => {
 
 PageLayout.getLayout = (page) => <StorageLayout title="Buckets">{page}</StorageLayout>
 
-export default observer(PageLayout)
+export default PageLayout

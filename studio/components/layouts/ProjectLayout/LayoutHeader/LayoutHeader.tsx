@@ -1,39 +1,36 @@
-import Link from 'next/link'
-import { observer } from 'mobx-react-lite'
 import { useParams } from 'common'
+import Link from 'next/link'
 import { Badge } from 'ui'
 
+import { getResourcesExceededLimits } from 'components/ui/OveragesBanner/OveragesBanner.utils'
+import { useProjectReadOnlyQuery } from 'data/config/project-read-only-query'
+import { useProjectUsageQuery } from 'data/usage/project-usage-query'
+import { useFlag, useSelectedOrganization, useSelectedProject } from 'hooks'
 import { IS_PLATFORM, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
-import { useFlag, useStore } from 'hooks'
 import BreadcrumbsView from './BreadcrumbsView'
-import OrgDropdown from './OrgDropdown'
-import ProjectDropdown from './ProjectDropdown'
 import FeedbackDropdown from './FeedbackDropdown'
 import HelpPopover from './HelpPopover'
 import NotificationsPopover from './NotificationsPopover'
-import { getResourcesExceededLimits } from 'components/ui/OveragesBanner/OveragesBanner.utils'
-import { useProjectUsageQuery } from 'data/usage/project-usage-query'
-import { useProjectReadOnlyQuery } from 'data/config/project-read-only-query'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import OrgDropdown from './OrgDropdown'
+import ProjectDropdown from './ProjectDropdown'
 
 const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder = true }: any) => {
-  const { ui } = useStore()
-  const { selectedOrganization, selectedProject } = ui
+  const selectedOrganization = useSelectedOrganization()
+  const selectedProject = useSelectedProject()
 
   const { ref: projectRef } = useParams()
-  const { project } = useProjectContext()
   const { data: isReadOnlyMode } = useProjectReadOnlyQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
+    projectRef: selectedProject?.ref,
+    connectionString: selectedProject?.connectionString,
   })
 
   const { data: usage } = useProjectUsageQuery({ projectRef })
   const resourcesExceededLimits = getResourcesExceededLimits(usage)
 
   const projectHasNoLimits =
-    ui.selectedProject?.subscription_tier === PRICING_TIER_PRODUCT_IDS.PAYG ||
-    ui.selectedProject?.subscription_tier === PRICING_TIER_PRODUCT_IDS.ENTERPRISE ||
-    ui.selectedProject?.subscription_tier === PRICING_TIER_PRODUCT_IDS.TEAM
+    selectedProject?.subscription_tier === PRICING_TIER_PRODUCT_IDS.PAYG ||
+    selectedProject?.subscription_tier === PRICING_TIER_PRODUCT_IDS.ENTERPRISE ||
+    selectedProject?.subscription_tier === PRICING_TIER_PRODUCT_IDS.TEAM
 
   const showOverUsageBadge =
     useFlag('overusageBadge') &&
@@ -120,4 +117,4 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
     </div>
   )
 }
-export default observer(LayoutHeader)
+export default LayoutHeader

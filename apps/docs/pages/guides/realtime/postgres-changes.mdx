@@ -1,9 +1,10 @@
 import Layout from '~/layouts/DefaultGuideLayout'
+import StepHikeCompact from '~/components/StepHikeCompact'
 
 export const meta = {
-  id: 'postgres-changes',
   title: 'Postgres Changes',
-  description: "Getting started with Realtime's Postgres Changes feature",
+  subtitle: "Get up and running with Realtime's Postgres Changes feature",
+  breadcrumb: 'Realtime Postgres Changes Quickstart',
 }
 
 Realtime's Postgres Changes feature listens for database changes and sends them to clients. Clients are required to subscribe with a JWT dictating which changes they are allowed to receive based on the database's [Row Level Security](/docs/guides/auth/row-level-security).
@@ -12,108 +13,249 @@ Anyone with access to a valid JWT signed with the project's JWT secret is able t
 
 Clients can choose to receive `INSERT`, `UPDATE`, `DELETE`, or `*` (all) changes for all changes in a schema, a table in a schema, or a column's value in a table. Your clients should only listen to tables in the `public` schema and you must first enable the tables you want your clients to listen to.
 
-Postgres Changes works out of the box for tables in the `public` schema. You can listen to tables in your private schemas by granting table `SELECT` permissions to the database role found in your access token. You can run a query similar to the following:
+## Quick start
 
-```sql
-grant
-select
-  on "private_schema"."table" to authenticated;
-```
+Let's explore how to implement Realtime Postgres Changes so you can integrate it into your use case.
 
-<Admonition type="caution">
-  We strongly encourage you to enable RLS and create policies for tables in private schemas.
-  Otherwise, any role you grant access to will have unfettered read access to the table.
-</Admonition>
+<StepHikeCompact>
 
-## Replication Setup
+  <StepHikeCompact.Step step={1}>
+    <StepHikeCompact.Details title="Set up a Supabase project with a 'todos' table">
 
-You can do this in the [Replication](https://app.supabase.com/project/_/database/replication) section in the Dashboard or with the [SQL editor](https://app.supabase.com/project/_/sql):
+    [Create a new project](https://app.supabase.com) in the Supabase Dashboard.
 
-```sql
-begin;
+    After your project is ready, create a table in your Supabase database. You can do this with either the Table interface or the [SQL Editor](https://app.supabase.com/project/_/sql).
 
--- remove the supabase_realtime publication
-drop
-  publication if exists supabase_realtime;
+    </StepHikeCompact.Details>
 
--- re-create the supabase_realtime publication with no tables
-create publication supabase_realtime;
+    <StepHikeCompact.Code>
 
-commit;
+      <Tabs
+        scrollable
+        size="small"
+        type="underlined"
+        defaultActiveId="sql"
+      >
+      <TabPanel id="sql" label="SQL">
 
--- add a table to the publication
-alter
-  publication supabase_realtime add table messages;
-```
+      ```sql
+      -- Create a table called "todos"
+      -- with a column to store tasks.
+      create table todos (
+        id serial primary key,
+        task text
+      );
+      ```
 
-### Full `old` Record
+      </TabPanel>
+      <TabPanel id="dashboard" label="Dashboard">
 
-By default, only `new` record changes are sent but if you want to receive the `old` record (previous values) whenever you `UPDATE` or `DELETE` a record,
-you can set the `replica identity` of your table to `full`:
+      <video width="99%" muted playsInline controls={true}>
+        <source
+          src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/docs/api/api-create-table-sm.mp4"
+          type="video/mp4"
+        />
+      </video>
 
-```sql
-alter table
-  messages replica identity full;
-```
+      </TabPanel>
+      </Tabs>
 
-<Admonition type="caution">
+    </StepHikeCompact.Code>
 
-RLS policies are not applied to `DELETE` statements. When RLS is enabled and `replica identity` is set to `full` on a table, the `old` record contains only the primary key(s).
+  </StepHikeCompact.Step>
 
-</Admonition>
+  <StepHikeCompact.Step step={2}>
 
-## Schema Changes
+    <StepHikeCompact.Details title="Allow anonymous access">
 
-To listen to all changes in the `public` schema:
+    In this example we'll turn on [Row Level Security](/docs/guides/auth/row-level-security) for this table and allow anonymous access. In production, be sure to secure your application with the appropriate permissions.
 
-```js
-const { createClient } = require('@supabase/supabase-js')
+    </StepHikeCompact.Details>
 
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY)
+    <StepHikeCompact.Code>
 
-/*
-  Channel name can be any string.
-  Event name can can be one of:
-    - INSERT
-    - UPDATE
-    - DELETE
-    - *
-*/
-const channel = supabase
-  .channel('schema-db-changes')
-  .on(
-    'postgres_changes',
-    {
-      event: '*',
-      schema: 'public',
-    },
-    (payload) => console.log(payload)
-  )
-  .subscribe()
-```
+      ```sql
+      -- Turn on security
+      alter table "todos"
+      enable row level security;
 
-## Table Changes
+      -- Allow anonymous access
+      create policy "Allow anonymous access"
+        on todos
+        for select
+        to anon
+        using (true);
+      ```
 
-To listen to changes on a table in the `public` schema:
+    </StepHikeCompact.Code>
 
-```js
-// Supabase client setup
+  </StepHikeCompact.Step>
 
-const channel = supabase
-  .channel('table-db-changes')
-  .on(
-    'postgres_changes',
-    {
-      event: 'INSERT',
-      schema: 'public',
-      table: 'messages',
-    },
-    (payload) => console.log(payload)
-  )
-  .subscribe()
-```
+  <StepHikeCompact.Step step={3}>
+  
+    <StepHikeCompact.Details title="Enable Postgres replication">
 
-## Filter Changes
+      Go to your project's [Replication settings](https://supabase.com/dashboard/project/_/database/replication), and under `supabase_realtime`, toggle on the tables you want to listen to.
+
+    </StepHikeCompact.Details>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={4}>
+  
+    <StepHikeCompact.Details title="Install the client">
+
+      Install the Supabase JavaScript client.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```bash
+        npm install @supabase/supabase-js
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={5}>
+  
+    <StepHikeCompact.Details title="Create the client">
+
+      This client will be used to listen to Postgres changes.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```js
+        import {
+          createClient
+        } from '@supabase/supabase-js'
+
+        const client = createClient(
+          'https://<project>.supabase.co',
+          '<your-anon-key>'
+        )
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={6}>
+    <StepHikeCompact.Details title="Listen to changes by schema">
+
+    Listen to changes on all tables in the `public` schema by setting the `schema` property to 'public' and event name to `*`. The event name can be one of:
+      - `INSERT`
+      - `UPDATE`
+      - `DELETE`
+      - `*`
+
+    The channel name can be any string except 'realtime'.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```js
+        const channelA = client
+          .channel('schema-db-changes')
+          .on(
+            'postgres_changes',
+            {
+              event: '*',
+              schema: 'public',
+            },
+            (payload) => console.log(payload)
+          )
+          .subscribe()
+      ```
+
+    </StepHikeCompact.Code>
+
+    <StepHikeCompact.Details title="Listen to changes by table">
+
+    Listen to just inserts in the `todos` table by setting the `table` property to 'todos' and event name to `INSERT`.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```js
+      const channelB = client
+        .channel('table-db-changes')
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'todos',
+          },
+          (payload) => console.log(payload)
+        )
+        .subscribe()
+      ```
+
+    </StepHikeCompact.Code>
+
+    <StepHikeCompact.Details title="Listen to changes by filter">
+
+    Listen to changes in the `todos` table when a column's value equals a specified value. In this example, we only listen to inserts on `todos` where the row `id` is 1.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```js
+      const channelC = client
+        .channel('table-filter-changes')
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'todos',
+            filter: 'id=eq.1',
+          },
+          (payload) => console.log(payload)
+        )
+        .subscribe()
+      ```
+
+    </StepHikeCompact.Code>
+
+    <StepHikeCompact.Details title="More filters">
+
+    Check out the [full list of available filters](/docs/guides/realtime/postgres-changes#available-filters).
+
+    </StepHikeCompact.Details>
+
+  </StepHikeCompact.Step>
+
+    <StepHikeCompact.Step step={7}>
+    <StepHikeCompact.Details title="Insert dummy data">
+
+    Now we can add some data to our table which will trigger `channelA`, `channelB`, and `channelC` event handlers.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```sql
+      insert into todos (task)
+      values
+        ('Change!');
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+</StepHikeCompact>
+
+## Available filters
 
 Realtime offers filters so you can specify the data your client receives at a more granular level.
 
@@ -122,8 +264,6 @@ Realtime offers filters so you can specify the data your client receives at a mo
 To listen to changes when a column's value in a table equals a client-specified value:
 
 ```js
-// Supabase client setup
-
 const channel = supabase
   .channel('changes')
   .on(
@@ -146,8 +286,6 @@ const channel = supabase
 To listen to changes when a column's value in a table does not equal a client-specified value:
 
 ```js
-// Supabase client setup
-
 const channel = supabase
   .channel('changes')
   .on(
@@ -170,8 +308,6 @@ const channel = supabase
 To listen to changes when a column's value in a table is less than a client-specified value:
 
 ```js
-// Supabase client setup
-
 const channel = supabase
   .channel('changes')
   .on(
@@ -196,8 +332,6 @@ const channel = supabase
 To listen to changes when a column's value in a table is less than or equal to a client-specified value:
 
 ```js
-// Supabase client setup
-
 const channel = supabase
   .channel('changes')
   .on(
@@ -222,8 +356,6 @@ const channel = supabase
 To listen to changes when a column's value in a table is greater than a client-specified value:
 
 ```js
-// Supabase client setup
-
 const channel = supabase
   .channel('changes')
   .on(
@@ -249,8 +381,6 @@ const channel = supabase
 To listen to changes when a column's value in a table is greater than or equal to a client-specified value:
 
 ```js
-// Supabase client setup
-
 const channel = supabase
   .channel('changes')
   .on(
@@ -276,8 +406,6 @@ const channel = supabase
 To listen to changes when a column's value in a table equals any client-specified values:
 
 ```js
-// Supabase client setup
-
 const channel = supabase
   .channel('changes')
   .on(
@@ -297,13 +425,11 @@ const channel = supabase
   This filter uses Postgres' `= ANY`. Realtime allows a maximum of 100 values for this filter.
 </Admonition>
 
-## Combination Changes
+## Combination changes
 
 To listen to different events and schema/tables/filters combinations with the same channel:
 
 ```js
-// Supabase client setup
-
 const channel = supabase
   .channel('db-changes')
   .on(
@@ -328,40 +454,72 @@ const channel = supabase
   .subscribe()
 ```
 
-## Custom Tokens
+## Full `old` record
+
+By default, only `new` record changes are sent but if you want to receive the `old` record (previous values) whenever you `UPDATE` or `DELETE` a record, you can set the `replica identity` of your table to `full`:
+
+```sql
+alter table
+  messages replica identity full;
+```
+
+<Admonition type="caution">
+
+RLS policies are not applied to `DELETE` statements. When RLS is enabled and `replica identity` is set to `full` on a table, the `old` record contains only the primary key(s).
+
+</Admonition>
+
+## Private schemas
+
+Postgres Changes works out of the box for tables in the `public` schema. You can listen to tables in your private schemas by granting table `SELECT` permissions to the database role found in your access token. You can run a query similar to the following:
+
+```sql
+grant select on "non_private_schema"."some_table" to authenticated;
+```
+
+<Admonition type="caution">
+
+We strongly encourage you to enable RLS and create policies for tables in private schemas. Otherwise, any role you grant access to will have unfettered read access to the table.
+
+</Admonition>
+
+## Custom tokens
 
 You may choose to sign your own tokens to customize claims that can be checked in your RLS policies.
-In order for this to work you must pass `apikey` in both Realtime's `headers` and `params` when creating the client.
 
-The `apikey` in `params` must be either the `anon` or `service_role` token that Supabase provides for every project.
-You can find these tokens under [Project API keys](https://app.supabase.com/project/_/settings/api) in your project's dashboard.
-This will authenticate your request in the API gateway.
+Your project JWT secret is found with your [Project API keys](https://app.supabase.com/project/_/settings/api) in your dashboard.
 
 <Admonition type="caution">
   Do not expose the `service_role` token on the client because the role is authorized to bypass
   row-level security.
 </Admonition>
 
-The `apikey` in `headers` can be your custom token signed with the JWT secret of your Supabase project.
-This is forwarded to the Realtime server and it will verify your custom token and use its claims to authorize database changes
-when RLS is enabled.
+To use your own JWT with Realtime make sure to set the token after instantiating the Supabase client and before connecting to a Channel.
 
 ```js
 const { createClient } = require('@supabase/supabase-js')
 
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY, {
-  realtime: {
-    headers: {
-      apikey: `Bearer ${your_custom_token}`,
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY, {})
+
+// Set your custom JWT here
+supabase.realtime.setAuth('your-custom-jwt')
+
+const channel = supabase
+  .channel('db-changes')
+  .on(
+    'postgres_changes',
+    {
+      event: '*',
+      schema: 'public',
+      table: 'messages',
+      filter: 'body=eq.bye',
     },
-    params: {
-      apikey: process.env.SUPABASE_KEY,
-    },
-  },
-})
+    (payload) => console.log(payload)
+  )
+  .subscribe()
 ```
 
-### Refreshed Tokens
+### Refreshed tokens
 
 You will need to refresh tokens on your own, but once generated, you can pass them to Realtime.
 
@@ -372,6 +530,11 @@ For example, if you're using the `supabase-js` `v2` client then you can pass you
 
 supabase.realtime.setAuth('fresh-token')
 ```
+
+## More Realtime Quickstarts
+
+- [Broadcast Quickstart](/docs/guides/realtime/broadcast)
+- [Presence Quickstart](/docs/guides/realtime/presence)
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

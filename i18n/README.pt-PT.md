@@ -12,9 +12,9 @@
 - [x] Base de dados Postgres alojada. [Docs](https://supabase.com/docs/guides/database)
 - [x] Autenticação e autorização. [Docs](https://supabase.com/docs/guides/auth)
 - [x] APIs geradas automaticamente.
-  - [x] REST. [Docs](https://supabase.com/docs/guides/database/api#rest-api)
-  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/database/api#graphql-api)
-  - [x] Assinaturas em tempo real. [Docs](https://supabase.com/docs/guides/database/api#realtime-api)
+  - [x] REST. [Docs](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/api#graphql-api-overview)
+  - [x] Assinaturas em tempo real. [Docs](https://supabase.com/docs/guides/api#realtime-api-overview)
 - [x] Funções.
   - [x] Funções de base de dados. [Docs](https://supabase.com/docs/guides/database/functions)
   - [x] Funções de Borda [Docs](https://supabase.com/docs/guides/functions)
@@ -39,7 +39,7 @@ Para ver como contribuir, visite [Getting Started](../DEVELOPERS.md)
 ## Status
 
 - [x] Alfa: Estamos a testar o Supabase com um conjunto fechado de clientes
-- [x] Alfa Público: Qualquer pessoa pode inscrever-se em [app.supabase.com](https://app.supabase.com). Mas vá com calma, ainda há alguns problemas
+- [x] Alfa Público: Qualquer pessoa pode inscrever-se em [supabase.com/dashboard](https://supabase.com/dashboard). Mas vá com calma, ainda há alguns problemas
 - [x] Beta Público: Estável o suficiente para a maioria dos casos de uso não empresarial
 - [ ] Público: Disponibilidade geral [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
 
@@ -55,7 +55,7 @@ O Supabase é uma combinação de ferramentas de código aberto. Estamos a const
 
 **Arquitectura**
 
-Supabase é uma [plataforma alojada](https://app.supabase.com). Pode registar-se e começar a usar o Supabase sem instalar nada.
+Supabase é uma [plataforma alojada](https://supabase.com/dashboard). Pode registar-se e começar a usar o Supabase sem instalar nada.
 Pode também [auto-hospedar](https://supabase.com/docs/guides/hosting/overview) e [desenvolver localmente](https://supabase.com/docs/guides/local-development).
 
 ![Arquitectura](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
