@@ -21,7 +21,7 @@ const BlogFilters = ({ blogs, setBlogs, setCategory, allTags, handleBlogs }: Pro
   const [isTagsMenuOpen, setIsTagsMenuOpen] = useState<boolean>(false)
   const ref = useRef<any>(null)
   const router = useRouter()
-  const primaryTags = ['launch-week', 'AI', 'auth', 'database', 'release-notes']
+  const primaryTags = ['launch-week', 'AI', 'auth', 'release-notes']
 
   useEffect(() => {
     if (!!searchTag) {
@@ -62,7 +62,7 @@ const BlogFilters = ({ blogs, setBlogs, setCategory, allTags, handleBlogs }: Pro
   }
 
   return (
-    <div className="flex flex-wrap items-center gap-2">
+    <div className="flex flex-col lg:flex-row lg:items-center gap-2">
       <Input
         icon={<IconSearch size="tiny" />}
         size="small"
@@ -74,68 +74,70 @@ const BlogFilters = ({ blogs, setBlogs, setCategory, allTags, handleBlogs }: Pro
         onChange={handleSearchChange}
         className="w-full lg:w-[300px]"
       />
-      <Button
-        type={!searchTag && !activeTag ? 'alternative' : 'default'}
-        onClick={() => {
-          setSearchTag('')
-          setCategory('all')
-        }}
-      >
-        View All
-      </Button>
-      {allTags
-        .filter((tag: string) => primaryTags.includes(tag))
-        .sort((a: string, b: string) => (a.toLowerCase() > b.toLowerCase() ? 1 : -1))
-        .map((tag: string) => (
-          <Button
-            key={tag}
-            type={tag === activeTag ? 'alternative' : 'default'}
-            onClick={() => setCategory(tag)}
-          >
-            {startCase(tag.replaceAll('-', ' '))}
-          </Button>
-        ))}
-      {activeTag && !primaryTags.includes(activeTag) && (
-        <Button type="alternative">{startCase(activeTag!.replaceAll('-', ' '))}</Button>
-      )}
-      <Popover
-        open={isTagsMenuOpen}
-        side="bottom"
-        align="start"
-        overlay={
-          <div ref={ref} className="w-[80vw] max-w-lg p-4 lg:p-0">
-            <div className="p-4 lg:p-6 flex flex-wrap gap-2 md:gap-2">
-              {allTags
-                .filter((tag: string) => tag !== 'all')
-                .sort((a: string, b: string) => (a.toLowerCase() > b.toLowerCase() ? 1 : -1))
-                .map((tag: string) => (
-                  <Button
-                    key={tag}
-                    type={tag === activeTag ? 'alternative' : 'default'}
-                    onClick={() => {
-                      setSearchTag('')
-                      setCategory(tag)
-                    }}
-                  >
-                    {startCase(tag.replaceAll('-', ' '))}
-                  </Button>
-                ))}
-            </div>
-          </div>
-        }
-      >
+      <div className="flex flex-wrap items-center gap-2">
         <Button
-          type={isTagsMenuOpen ? 'default' : 'text'}
-          onClick={() => setIsTagsMenuOpen(true)}
-          disabled={isTagsMenuOpen}
-          className={[
-            'text-scale-800 hover:text-scale-1200',
-            isTagsMenuOpen && 'text-scale-1200',
-          ].join(' ')}
+          type={!searchTag && !activeTag ? 'alternative' : 'default'}
+          onClick={() => {
+            setSearchTag('')
+            setCategory('all')
+          }}
         >
-          Show more
+          View All
         </Button>
-      </Popover>
+        {allTags
+          .filter((tag: string) => primaryTags.includes(tag))
+          .sort((a: string, b: string) => (a.toLowerCase() > b.toLowerCase() ? 1 : -1))
+          .map((tag: string) => (
+            <Button
+              key={tag}
+              type={tag === activeTag ? 'alternative' : 'default'}
+              onClick={() => setCategory(tag)}
+            >
+              {startCase(tag.replaceAll('-', ' '))}
+            </Button>
+          ))}
+        {activeTag && !primaryTags.includes(activeTag) && (
+          <Button type="alternative">{startCase(activeTag!.replaceAll('-', ' '))}</Button>
+        )}
+        <Popover
+          open={isTagsMenuOpen}
+          side="bottom"
+          align="start"
+          overlay={
+            <div ref={ref} className="w-[80vw] max-w-lg p-4 lg:p-0">
+              <div className="p-4 lg:p-6 flex flex-wrap gap-2 md:gap-2">
+                {allTags
+                  .filter((tag: string) => tag !== 'all')
+                  .sort((a: string, b: string) => (a.toLowerCase() > b.toLowerCase() ? 1 : -1))
+                  .map((tag: string) => (
+                    <Button
+                      key={tag}
+                      type={tag === activeTag ? 'alternative' : 'default'}
+                      onClick={() => {
+                        setSearchTag('')
+                        setCategory(tag)
+                      }}
+                    >
+                      {startCase(tag.replaceAll('-', ' '))}
+                    </Button>
+                  ))}
+              </div>
+            </div>
+          }
+        >
+          <Button
+            type={isTagsMenuOpen ? 'default' : 'text'}
+            onClick={() => setIsTagsMenuOpen(true)}
+            disabled={isTagsMenuOpen}
+            className={[
+              'text-scale-800 hover:text-scale-1200 block md:inline',
+              isTagsMenuOpen && 'text-scale-1200',
+            ].join(' ')}
+          >
+            Show more
+          </Button>
+        </Popover>
+      </div>
     </div>
   )
 }
