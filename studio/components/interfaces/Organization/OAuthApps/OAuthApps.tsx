@@ -13,6 +13,7 @@ import PublishAppModal from './PublishAppSidePanel'
 import { AuthorizedApp, useAuthorizedAppsQuery } from 'data/oauth/authorized-apps-query'
 import AuthorizedAppRow from './AuthorizedAppRow'
 import RevokeAppModal from './RevokeAppModal'
+import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
 
 // [Joshen] Note on nav UX
 // Kang Ming mentioned that it might be better to split Published Apps and Authorized Apps into 2 separate tabs
@@ -51,7 +52,7 @@ const OAuthApps = () => {
 
   return (
     <>
-      <div className="container my-4 max-w-5xl space-y-8">
+      <ScaffoldContainerLegacy>
         <div>
           <div className="flex items-center justify-between">
             <div>
@@ -65,95 +66,93 @@ const OAuthApps = () => {
             </Button>
           </div>
 
-          <div className="mt-4">
-            {isLoadingPublishedApps && (
-              <div className="space-y-2">
-                <ShimmeringLoader />
-                <ShimmeringLoader className="w-3/4" />
-                <ShimmeringLoader className="w-1/2" />
+          {isLoadingPublishedApps && (
+            <div className="space-y-2">
+              <ShimmeringLoader />
+              <ShimmeringLoader className="w-3/4" />
+              <ShimmeringLoader className="w-1/2" />
+            </div>
+          )}
+
+          {isErrorPublishedApps && (
+            <AlertError className="mt-4" subject="Unable to retrieve published OAuth apps" />
+          )}
+
+          {createdApp !== undefined && (
+            <Alert withIcon variant="success" title="Successfully published a new application!">
+              <div className="absolute top-4 right-4">
+                <Button
+                  type="text"
+                  icon={<IconX size={18} />}
+                  className="px-1"
+                  onClick={() => setCreatedApp(undefined)}
+                />
               </div>
-            )}
-
-            {isErrorPublishedApps && (
-              <AlertError subject="Unable to retrieve published OAuth apps" />
-            )}
-
-            {createdApp !== undefined && (
-              <Alert withIcon variant="success" title="Successfully published a new application!">
-                <div className="absolute top-4 right-4">
-                  <Button
-                    type="text"
-                    icon={<IconX size={18} />}
-                    className="px-1"
-                    onClick={() => setCreatedApp(undefined)}
+              <div className="w-full space-y-4">
+                <p className="text-sm">
+                  Ensure that you store the client secret securely - you will not be able to see it
+                  again.
+                </p>
+                <div className="space-y-4">
+                  <Input
+                    copy
+                    readOnly
+                    size="small"
+                    // layout="horizontal"
+                    label="Client ID"
+                    className="max-w-xl input-mono"
+                    value={createdApp.client_id}
+                    onChange={() => {}}
+                  />
+                  <Input
+                    copy
+                    readOnly
+                    size="small"
+                    // layout="horizontal"
+                    label="Client secret"
+                    className="max-w-xl input-mono"
+                    value={createdApp.client_secret}
+                    onChange={() => {}}
                   />
                 </div>
-                <div className="w-full space-y-4">
-                  <p className="text-sm">
-                    Ensure that you store the client secret securely - you will not be able to see
-                    it again.
-                  </p>
-                  <div className="space-y-4">
-                    <Input
-                      copy
-                      readOnly
-                      size="small"
-                      // layout="horizontal"
-                      label="Client ID"
-                      className="max-w-xl input-mono"
-                      value={createdApp.client_id}
-                      onChange={() => {}}
-                    />
-                    <Input
-                      copy
-                      readOnly
-                      size="small"
-                      // layout="horizontal"
-                      label="Client secret"
-                      className="max-w-xl input-mono"
-                      value={createdApp.client_secret}
-                      onChange={() => {}}
-                    />
-                  </div>
-                </div>
-              </Alert>
-            )}
+              </div>
+            </Alert>
+          )}
 
-            {isSuccessPublishedApps && (
-              <>
-                {(publishedApps?.length ?? 0) === 0 ? (
-                  <div className="bg-scale-100 dark:bg-scale-300 border rounded p-4 flex items-center justify-between">
-                    <p className="prose text-sm">You do not have any published applications yet</p>
-                  </div>
-                ) : (
-                  <Table
-                    className="mt-4"
-                    head={[
-                      <Table.th key="icon" className="w-[30px]"></Table.th>,
-                      <Table.th key="name">Name</Table.th>,
-                      <Table.th key="client-id">Client ID</Table.th>,
-                      <Table.th key="client-secret">Client Secret</Table.th>,
-                      <Table.th key="client-secret">Created at</Table.th>,
-                      <Table.th key="delete-action"></Table.th>,
-                    ]}
-                    body={
-                      sortedPublishedApps?.map((app) => (
-                        <OAuthAppRow
-                          key={app.id}
-                          app={app}
-                          onSelectEdit={() => {
-                            setShowPublishModal(true)
-                            setSelectedAppToUpdate(app)
-                          }}
-                          onSelectDelete={() => setSelectedAppToDelete(app)}
-                        />
-                      )) ?? []
-                    }
-                  />
-                )}
-              </>
-            )}
-          </div>
+          {isSuccessPublishedApps && (
+            <>
+              {(publishedApps?.length ?? 0) === 0 ? (
+                <div className="bg-scale-100 dark:bg-scale-300 border rounded p-4 flex items-center justify-between mt-4">
+                  <p className="prose text-sm">You do not have any published applications yet</p>
+                </div>
+              ) : (
+                <Table
+                  className="mt-4"
+                  head={[
+                    <Table.th key="icon" className="w-[30px]"></Table.th>,
+                    <Table.th key="name">Name</Table.th>,
+                    <Table.th key="client-id">Client ID</Table.th>,
+                    <Table.th key="client-secret">Client Secret</Table.th>,
+                    <Table.th key="client-secret">Created at</Table.th>,
+                    <Table.th key="delete-action"></Table.th>,
+                  ]}
+                  body={
+                    sortedPublishedApps?.map((app) => (
+                      <OAuthAppRow
+                        key={app.id}
+                        app={app}
+                        onSelectEdit={() => {
+                          setShowPublishModal(true)
+                          setSelectedAppToUpdate(app)
+                        }}
+                        onSelectDelete={() => setSelectedAppToDelete(app)}
+                      />
+                    )) ?? []
+                  }
+                />
+              )}
+            </>
+          )}
         </div>
 
         <div>
@@ -204,7 +203,7 @@ const OAuthApps = () => {
             )}
           </div>
         </div>
-      </div>
+      </ScaffoldContainerLegacy>
 
       <PublishAppModal
         visible={showPublishModal}
