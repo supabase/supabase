@@ -4,6 +4,7 @@ import Listbox from './Listbox2'
 import { IconUser } from '../Icon/icons/IconUser'
 import { Button } from '../Button'
 import Typography from '../Typography'
+import classNames from 'classnames'
 
 export default {
   title: 'Data Input/Listbox',
@@ -25,11 +26,7 @@ export const Default = () => (
           label={option.label}
           value={option.value}
           children={({ active, selected }: any) => {
-            const optionStyle = {
-              color: active ? 'green' : 'gray',
-              fontWeight: selected ? 'bold' : 'normal',
-            }
-            return <span style={optionStyle}>{option.label}</span>
+            return <span className={classNames({'text-green-900': active, 'font-bold': selected})}>{option.label}</span>
           }}
         />
       )
