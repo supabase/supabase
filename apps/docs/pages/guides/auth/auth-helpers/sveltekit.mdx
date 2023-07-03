@@ -261,6 +261,7 @@ To utilize Supabase in shared load functions and within pages, it is essential t
 // src/routes/+layout.js
 import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public'
 import { createSupabaseLoadClient } from '@supabase/auth-helpers-sveltekit'
+import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public';
 
 export const load = async ({ fetch, data, depends }) => {
   depends('supabase:auth')
