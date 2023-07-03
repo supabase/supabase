@@ -157,7 +157,7 @@ type addedBy = userDetails
 type updatedBy = userDetails
 
 export type IntegrationName = 'Vercel' | 'Netlify' | 'GitHub'
-export type VercelAcccountType = 'team' | 'personal'
+export type VercelAccountType = 'Team' | 'Personal'
 export type VercelSource = 'marketplace' | 'deploy button'
 
 export type Integration = {
@@ -177,7 +177,7 @@ export type Integration = {
     gitHubConnectionOwner?: string
     account: {
       name: string
-      type: VercelAcccountType
+      type: VercelAccountType
       avatar: string
       source: VercelSource
       owner_id: string

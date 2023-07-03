@@ -2,6 +2,7 @@ import { ScaffoldDivider } from 'components/layouts/Scaffold'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
 import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
 import { useSelectedOrganization } from 'hooks'
+import { getVercelConfigurationUrl } from 'lib/integration-utils'
 import Integration from './Integration'
 import SidePanelVercelProjectLinker from './SidePanelVercelProjectLinker'
 
@@ -54,10 +55,12 @@ Supabase will keep the right environment variables up to date in each of the pro
 You can also link multiple Vercel Projects to the same Supabase project.
 `}
         note={
-          vercelProjectCount > 0
+          vercelProjectCount > 0 && vercelIntegration !== undefined
             ? `
 Your Vercel connection has access to ${vercelProjectCount} Vercel Projects. 
-You can change the scope of the access for Supabase by configuring [here](https://vercel.com/dashboard/integrations/${vercelIntegration?.metadata?.configuration_id}).
+You can change the scope of the access for Supabase by configuring [here](${getVercelConfigurationUrl(
+                vercelIntegration
+              )}).
 `
             : undefined
         }
