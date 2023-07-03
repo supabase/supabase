@@ -26,7 +26,8 @@ import {
 import UsageBarChart from './UsageBarChart'
 
 interface UsageSectionProps {
-  projectRef: string
+  orgSlug: string
+  projectRef?: string // [Joshen TODO] remove
   categoryKey: CategoryMetaKey
   subscription: ProjectSubscriptionResponse | undefined
   chartMeta: {
@@ -37,6 +38,7 @@ interface UsageSectionProps {
 
 // [Joshen TODO] Needs to change to use org slug, and eventually call useOrganizationUsageQuery
 const UsageSection = ({
+  orgSlug,
   projectRef,
   categoryKey,
   chartMeta,
@@ -51,7 +53,7 @@ const UsageSection = ({
   const usageBasedBilling = subscription?.usage_billing_enabled
   const exceededLimitStyle = !usageBasedBilling ? 'text-red-900' : 'text-amber-900'
 
-  const upgradeUrl = getUpgradeUrl(projectRef, subscription)
+  const upgradeUrl = getUpgradeUrl(projectRef ?? '', subscription)
 
   return (
     <>
@@ -211,7 +213,7 @@ const UsageSection = ({
                     </div>
                   </div>
 
-                  {attribute.additionalInfo?.(projectRef, subscription, usage)}
+                  {attribute.additionalInfo?.(projectRef ?? '', subscription, usage)}
 
                   <div className="space-y-1">
                     <p>

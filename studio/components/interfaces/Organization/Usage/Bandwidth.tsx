@@ -2,6 +2,7 @@ import { DataPoint } from 'data/analytics/constants'
 import { useDailyStatsQuery } from 'data/analytics/daily-stats-query'
 import { ProjectSubscriptionResponse } from 'data/subscriptions/project-subscription-v2-query'
 import UsageSection from './UsageSection'
+import { PricingMetric, useOrgDailyStatsQuery } from 'data/analytics/org-daily-stats-query'
 
 const GB = 1073741824
 const MOCK_DATA = [
@@ -88,7 +89,8 @@ const MOCK_DATA = [
 ]
 
 export interface BandwidthProps {
-  projectRef: string
+  orgSlug: string
+  projectRef: string // [Joshen TODO] Remove
   startDate: string | undefined
   endDate: string | undefined
   subscription: ProjectSubscriptionResponse | undefined
@@ -97,15 +99,16 @@ export interface BandwidthProps {
 
 // [Joshen TODO] Needs to take in org slug and eventually use daily stats org query
 const Bandwidth = ({
+  orgSlug,
   projectRef,
   subscription,
   startDate,
   endDate,
   currentBillingCycleSelected,
 }: BandwidthProps) => {
-  // const { data: dbEgressData, isLoading: isLoadingDbEgressData } = useDailyStatsQuery({
-  //   projectRef,
-  //   attribute: 'total_egress_modified',
+  // const { data: dbEgressData, isLoading: isLoadingDbEgressData } = useOrgDailyStatsQuery({
+  //   orgSlug,
+  //   metric: PricingMetric.EGRESS,
   //   interval: '1d',
   //   startDate,
   //   endDate,
@@ -124,6 +127,7 @@ const Bandwidth = ({
 
   return (
     <UsageSection
+      orgSlug={orgSlug}
       projectRef={projectRef}
       categoryKey="bandwidth"
       chartMeta={chartMeta}
