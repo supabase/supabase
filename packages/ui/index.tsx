@@ -371,3 +371,6 @@ export * from './src/components/Icon/icons/IconZapOff'
 export * from './src/components/Icon/icons/IconZap'
 export * from './src/components/Icon/icons/IconZoomIn'
 export * from './src/components/Icon/icons/IconZoomOut'
+
+// Export hooks
+export * from './src/lib/Hooks'

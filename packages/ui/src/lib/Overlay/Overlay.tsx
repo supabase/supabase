@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 //@ts-ignore
-import { useOnClickOutside } from './../../lib/Hooks'
+import { useOnClickOutside } from 'ui'
 import { DropdownContext } from './OverlayContext'
 import { AnimationTailwindClasses } from '../../types'
 // @ts-ignore
@@ -12,13 +12,7 @@ interface Props {
   visible?: boolean
   overlay?: React.ReactNode
   children?: React.ReactNode
-  placement?:
-    | 'bottomLeft'
-    | 'bottomRight'
-    | 'bottomCenter'
-    | 'topLeft'
-    | 'topRight'
-    | 'topCenter'
+  placement?: 'bottomLeft' | 'bottomRight' | 'bottomCenter' | 'topLeft' | 'topRight' | 'topCenter'
   onVisibleChange?: any
   disabled?: boolean
   triggerElement?: any
@@ -71,9 +65,7 @@ function Overlay({
 
   return (
     <div ref={ref} className={OverlayStyles['sbui-overlay']}>
-      {placement === 'bottomRight' ||
-      placement === 'bottomLeft' ||
-      placement === 'bottomCenter' ? (
+      {placement === 'bottomRight' || placement === 'bottomLeft' || placement === 'bottomCenter' ? (
         <TriggerElement />
       ) : null}
       <Transition
@@ -91,9 +83,7 @@ function Overlay({
           </DropdownContext.Provider>
         </div>
       </Transition>
-      {placement === 'topRight' ||
-      placement === 'topLeft' ||
-      placement === 'topCenter' ? (
+      {placement === 'topRight' || placement === 'topLeft' || placement === 'topCenter' ? (
         <TriggerElement />
       ) : null}
     </div>

@@ -1,9 +1,10 @@
 import fs from 'fs'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { useRouter } from 'next/router'
 import Image from 'next/image'
 import Link from 'next/link'
+import { startCase } from 'lodash'
 
 import { NextSeo } from 'next-seo'
 import { generateRss } from '~/lib/rss'
@@ -11,10 +12,11 @@ import { getSortedPosts, getAllCategories } from '~/lib/posts'
 import authors from 'lib/authors.json'
 
 import DefaultLayout from '~/components/Layouts/Default'
-import { Tabs } from 'ui'
+import { Button, Popover, useOnClickOutside } from 'ui'
 import PostTypes from '~/types/post'
 import BlogListItem from '~/components/Blog/BlogListItem'
 import { useParams } from '~/hooks/useParams'
+import { PlusSmIcon } from '@heroicons/react/outline'
 
 export async function getStaticProps() {
   const allPostsData = getSortedPosts('_blog', undefined, undefined, '** BLOG PAGE **')
@@ -50,9 +52,11 @@ export async function getStaticProps() {
 }
 
 function Blog(props: any) {
-  const tag = useParams()?.tag
-  const [category, setCategory] = useState('all')
+  const activeTag = useParams()?.tag
+  const [category, setCategory] = useState<string>('all')
   const [blogs, setBlogs] = useState(props.blogs)
+  const [isTagsMenuOpen, setIsTagsMenuOpen] = useState<boolean>(false)
+  const ref = useRef<any>(null)
 
   const router = useRouter()
 
@@ -80,13 +84,22 @@ function Blog(props: any) {
   }, [category])
 
   useEffect(() => {
-    if (router.isReady && tag && tag !== 'all') {
-      setCategory(tag)
+    setIsTagsMenuOpen(false)
+    if (router.isReady && activeTag && activeTag !== 'all') {
+      setCategory(activeTag)
     }
-  }, [tag, router.isReady])
+  }, [activeTag, router.isReady])
 
   const meta_title = 'Supabase Blog: Open Source Firebase alternative Blog'
   const meta_description = 'Get all your Supabase News on the Supabase blog.'
+
+  const primaryTags = ['launch-week', 'AI', 'auth', 'database', 'release-notes']
+
+  useOnClickOutside(ref, () => {
+    if (isTagsMenuOpen) {
+      setIsTagsMenuOpen(!isTagsMenuOpen)
+    }
+  })
 
   return (
     <>
@@ -126,20 +139,63 @@ function Blog(props: any) {
         <div className="border-scale-600 border-t">
           <div className="container mx-auto mt-16 px-8 sm:px-16 xl:px-20">
             <div className="mx-auto ">
-              <div className="grid grid-cols-12">
-                <div className="col-span-12 lg:col-span-12">
-                  <Tabs
-                    scrollable
-                    size="medium"
-                    onChange={setCategory}
-                    defaultActiveId={'all'}
-                    activeId={category}
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  type={!activeTag ? 'primary' : 'default'}
+                  onClick={() => setCategory('all')}
+                >
+                  View All
+                </Button>
+                {props.categories
+                  .filter((tag: string) => primaryTags.includes(tag))
+                  .sort((a: string, b: string) => (a.toLowerCase() > b.toLowerCase() ? 1 : -1))
+                  .map((tag: string) => (
+                    <Button
+                      key={tag}
+                      type={tag === activeTag ? 'primary' : 'default'}
+                      onClick={() => setCategory(tag)}
+                    >
+                      {startCase(tag.replaceAll('-', ' '))}
+                    </Button>
+                  ))}
+                <Popover
+                  open={isTagsMenuOpen}
+                  side="bottom"
+                  align="start"
+                  overlay={
+                    <div ref={ref} className="w-[80vw] max-w-lg p-4 lg:p-0">
+                      <div className="p-4 lg:p-6 flex flex-wrap gap-2 md:gap-2">
+                        {props.categories
+                          .filter((tag: string) => tag !== 'all')
+                          .sort((a: string, b: string) =>
+                            a.toLowerCase() > b.toLowerCase() ? 1 : -1
+                          )
+                          .map((tag: string) => (
+                            <Button
+                              key={tag}
+                              type={tag === activeTag ? 'primary' : 'default'}
+                              onClick={() => setCategory(tag)}
+                            >
+                              {startCase(tag.replaceAll('-', ' '))}
+                            </Button>
+                          ))}
+                      </div>
+                    </div>
+                  }
+                >
+                  <Button
+                    type={isTagsMenuOpen ? 'default' : 'text'}
+                    onClick={() => setIsTagsMenuOpen(true)}
+                    disabled={isTagsMenuOpen}
+                    className={[
+                      'text-scale-800 hover:text-scale-1200',
+                      isTagsMenuOpen && 'text-scale-1200',
+                    ].join(' ')}
+                    iconRight={<PlusSmIcon className="w-3" />}
                   >
-                    {props.categories.map((tag: string) => (
-                      <Tabs.Panel id={tag} key={tag} label={tag} />
-                    ))}
-                  </Tabs>
-                </div>
+                    Show more
+                  </Button>
+                </Popover>
               </div>
             </div>
 
