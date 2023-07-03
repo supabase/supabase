@@ -35,7 +35,6 @@ const PaymentMethods = () => {
   } = useOrganizationPaymentMethodsQuery({ slug })
   const sortedPaymentMethods =
     paymentMethods?.sort((a, b) => (a.id === subscription?.payment_method_id ? -1 : 0)) ?? []
-  console.log({ sortedPaymentMethods })
 
   const canReadPaymentMethods = useCheckPermissions(
     PermissionAction.BILLING_READ,
