@@ -22,6 +22,7 @@ export interface ProjectLinkerProps {
   supabaseProjects: Project[]
   onCreateConnections?: () => void
   installedConnections: IntegrationProjectConnection[] | undefined
+  setLoading?: (x: boolean) => void
 }
 
 const UNDEFINED_SELECT_VALUE = 'undefined'
@@ -32,6 +33,7 @@ const ProjectLinker = ({
   supabaseProjects,
   onCreateConnections: _onCreateConnections,
   installedConnections = [],
+  setLoading,
 }: ProjectLinkerProps) => {
   const selectedOrganization = useSelectedOrganization()
 
@@ -41,6 +43,7 @@ const ProjectLinker = ({
   const { mutate: createConnections, isLoading } = useIntegrationConnectionsCreateMutation({
     onSuccess() {
       _onCreateConnections?.()
+      if (setLoading) setLoading(false)
     },
   })
 
@@ -51,6 +54,8 @@ const ProjectLinker = ({
       console.error('No integration ID set')
       return
     }
+
+    if (setLoading) setLoading(true)
 
     createConnections({
       organizationIntegrationId,
