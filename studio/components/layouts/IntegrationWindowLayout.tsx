@@ -6,6 +6,7 @@ import { observer } from 'mobx-react-lite'
 import { BASE_PATH } from 'lib/constants'
 import React from 'react'
 import { ScaffoldContainer } from './Scaffold'
+import { useParams } from 'common'
 
 const IntegrationWindowLayout: FC<any> = ({ organization, project, children }) => {
   const ongoingIncident = useFlag('ongoingIncident')
@@ -27,6 +28,12 @@ export const IntegrationWindowLayoutWithoutAuth = observer(IntegrationWindowLayo
 
 const Header: FC<any> = ({ organization, project }) => {
   let stepNumber = organization ? 1 : project ? 2 : 0
+  const { externalId } = useParams()
+
+  const title = externalId
+    ? 'Supabase + Vercel Deploy Button'
+    : 'Supabase + Vercel Integration Marketplace Connector'
+
   return (
     <div className="bg">
       <ScaffoldContainer className={cn('py-3 border-b', INTEGRATION_LAYOUT_MAX_WIDTH)}>
@@ -37,7 +44,6 @@ const Header: FC<any> = ({ organization, project }) => {
             </div>
             <IconX className="text-scale-800" strokeWidth={2} size={16} />
             <div className="bg-black shadow rounded p-1 w-8 h-8 flex justify-center items-center">
-              {/* <img src="/img/icons/vercel.svg" style={{ height: 21 }} alt="integration icon" /> */}
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="white"
@@ -48,8 +54,8 @@ const Header: FC<any> = ({ organization, project }) => {
               </svg>
             </div>
           </div>
-          <span className="text-sm" title="Supabase + Vercel Integration Marketplace Connector">
-            Supabase + Vercel Integration Marketplace Connector
+          <span className="text-sm" title={title}>
+            {title}
           </span>
         </div>
       </ScaffoldContainer>

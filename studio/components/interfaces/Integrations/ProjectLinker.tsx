@@ -103,7 +103,7 @@ const ProjectLinker = ({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="relative border rounded-lg p-12 bg shadow-inner">
+      <div className="relative border rounded-lg p-12 bg shadow">
         <div
           className="absolute inset-0 bg-grid-black/5 [mask-image:linear-gradient(0deg,#fff,rgba(255,255,255,0.6))] dark:bg-grid-white/5 dark:[mask-image:linear-gradient(0deg,rgba(255,255,255,0.1),rgba(255,255,255,0.5))]"
           style={{ backgroundPosition: '10px 10px' }}
@@ -151,7 +151,7 @@ const ProjectLinker = ({
               {/* <img src="/img/icons/vercel.svg" style={{ height: 21 }} alt="integration icon" /> */}
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                fill="var(--colors-scale12)"
+                fill="white"
                 viewBox="0 0 512 512"
                 className="w-6"
               >
@@ -215,7 +215,7 @@ The following environment variables will be added:
 ${ENV_VAR_RAW_KEYS.map((x, idx) => {
   return `
   \n
-  - \`${x}\` - ${(<span>This is the URL for the Project</span>)}
+  - \`${x}\`
 `
 })}
 `}
