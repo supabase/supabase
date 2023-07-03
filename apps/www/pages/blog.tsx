@@ -1,10 +1,9 @@
 import fs from 'fs'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { useRouter } from 'next/router'
 import Image from 'next/image'
 import Link from 'next/link'
-import { startCase } from 'lodash'
 
 import { NextSeo } from 'next-seo'
 import { generateRss } from '~/lib/rss'
@@ -12,10 +11,9 @@ import { getSortedPosts, getAllCategories } from '~/lib/posts'
 import authors from 'lib/authors.json'
 
 import DefaultLayout from '~/components/Layouts/Default'
-import { Button, IconSearch, Input, Popover, useOnClickOutside } from 'ui'
 import PostTypes from '~/types/post'
 import BlogListItem from '~/components/Blog/BlogListItem'
-import { useParams } from '~/hooks/useParams'
+import BlogFilters from '~/components/Blog/BlogFilters'
 
 export async function getStaticProps() {
   const allPostsData = getSortedPosts('_blog', undefined, undefined, '** BLOG PAGE **')
@@ -51,12 +49,8 @@ export async function getStaticProps() {
 }
 
 function Blog(props: any) {
-  const activeTag = useParams()?.tag
-  const [searchTag, setSearchTag] = useState<string>('')
-  const [category, setCategory] = useState<string>('all')
   const [blogs, setBlogs] = useState(props.blogs)
-  const [isTagsMenuOpen, setIsTagsMenuOpen] = useState<boolean>(false)
-  const ref = useRef<any>(null)
+  const [category, setCategory] = useState<string>('all')
   const router = useRouter()
 
   const meta_title = 'Supabase Blog: Open Source Firebase alternative Blog'
@@ -88,46 +82,6 @@ function Blog(props: any) {
           })
     )
   }
-
-  useEffect(() => {
-    if (!!searchTag) {
-      setBlogs(handleSearchByText)
-    } else {
-      handleBlogs()
-    }
-  }, [searchTag])
-
-  const handleSearchChange = (event: any) => {
-    activeTag && setCategory('all')
-    setSearchTag(event.target.value)
-  }
-
-  const handleSearchByText = useCallback(() => {
-    if (!searchTag) return
-    const matches = props.blogs.filter((post: any) => {
-      const found =
-        post.tags?.join(' ').replaceAll('-', ' ').includes(searchTag.toLowerCase()) ||
-        post.title?.toLowerCase().includes(searchTag.toLowerCase()) ||
-        post.author?.includes(searchTag.toLowerCase())
-      return found
-    })
-    return matches
-  }, [searchTag])
-
-  useEffect(() => {
-    setIsTagsMenuOpen(false)
-    if (router.isReady && activeTag && activeTag !== 'all') {
-      setCategory(activeTag)
-    }
-  }, [activeTag, router.isReady])
-
-  useOnClickOutside(ref, () => {
-    if (isTagsMenuOpen) {
-      setIsTagsMenuOpen(!isTagsMenuOpen)
-    }
-  })
-
-  const primaryTags = ['launch-week', 'AI', 'auth', 'database', 'release-notes']
 
   return (
     <>
@@ -166,85 +120,13 @@ function Blog(props: any) {
 
         <div className="border-scale-600 border-t">
           <div className="container mx-auto mt-16 px-8 sm:px-16 xl:px-20">
-            <div className="mx-auto ">
-              <div className="flex flex-wrap items-center gap-2">
-                <Input
-                  icon={<IconSearch size="tiny" />}
-                  size="small"
-                  layout="vertical"
-                  autoComplete="off"
-                  type="text"
-                  placeholder="Search by keyword"
-                  value={searchTag}
-                  onChange={handleSearchChange}
-                  className="w-full lg:w-[300px]"
-                />
-                <Button
-                  type={!searchTag && !activeTag ? 'primary' : 'default'}
-                  onClick={() => {
-                    setSearchTag('')
-                    setCategory('all')
-                  }}
-                >
-                  View All
-                </Button>
-                {props.categories
-                  .filter((tag: string) => primaryTags.includes(tag))
-                  .sort((a: string, b: string) => (a.toLowerCase() > b.toLowerCase() ? 1 : -1))
-                  .map((tag: string) => (
-                    <Button
-                      key={tag}
-                      type={tag === activeTag ? 'primary' : 'default'}
-                      onClick={() => setCategory(tag)}
-                    >
-                      {startCase(tag.replaceAll('-', ' '))}
-                    </Button>
-                  ))}
-                {activeTag && !primaryTags.includes(activeTag) && (
-                  <Button type="primary">{startCase(activeTag!.replaceAll('-', ' '))}</Button>
-                )}
-                <Popover
-                  open={isTagsMenuOpen}
-                  side="bottom"
-                  align="start"
-                  overlay={
-                    <div ref={ref} className="w-[80vw] max-w-lg p-4 lg:p-0">
-                      <div className="p-4 lg:p-6 flex flex-wrap gap-2 md:gap-2">
-                        {props.categories
-                          .filter((tag: string) => tag !== 'all')
-                          .sort((a: string, b: string) =>
-                            a.toLowerCase() > b.toLowerCase() ? 1 : -1
-                          )
-                          .map((tag: string) => (
-                            <Button
-                              key={tag}
-                              type={tag === activeTag ? 'primary' : 'default'}
-                              onClick={() => {
-                                setSearchTag('')
-                                setCategory(tag)
-                              }}
-                            >
-                              {startCase(tag.replaceAll('-', ' '))}
-                            </Button>
-                          ))}
-                      </div>
-                    </div>
-                  }
-                >
-                  <Button
-                    type={isTagsMenuOpen ? 'default' : 'text'}
-                    onClick={() => setIsTagsMenuOpen(true)}
-                    disabled={isTagsMenuOpen}
-                    className={[
-                      'text-scale-800 hover:text-scale-1200',
-                      isTagsMenuOpen && 'text-scale-1200',
-                    ].join(' ')}
-                  >
-                    Show more
-                  </Button>
-                </Popover>
-              </div>
-            </div>
+            <BlogFilters
+              blogs={blogs}
+              setBlogs={setBlogs}
+              setCategory={setCategory}
+              allTags={props.categories}
+              handleBlogs={handleBlogs}
+            />
 
             <ol className="grid grid-cols-12 py-16 lg:gap-16">
               {blogs?.map((blog: PostTypes, idx: number) => (
@@ -256,7 +138,7 @@ function Blog(props: any) {
                 </div>
               ))}
             </ol>
-          </div>{' '}
+          </div>
         </div>
       </DefaultLayout>
     </>
