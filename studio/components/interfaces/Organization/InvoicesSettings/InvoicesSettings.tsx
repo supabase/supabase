@@ -10,6 +10,7 @@ import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
 import { get, head } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { Button, IconChevronLeft, IconChevronRight, IconDownload, IconFileText, Loading } from 'ui'
+import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
 
 const PAGE_LIMIT = 10
 
@@ -93,7 +94,7 @@ const InvoicesSettings = () => {
   }
 
   return (
-    <div className="container my-4 max-w-4xl space-y-1">
+    <ScaffoldContainerLegacy>
       <Loading active={loading}>
         <Table
           head={[
@@ -185,7 +186,7 @@ const InvoicesSettings = () => {
           }
         />
       </Loading>
-    </div>
+    </ScaffoldContainerLegacy>
   )
 }
 
