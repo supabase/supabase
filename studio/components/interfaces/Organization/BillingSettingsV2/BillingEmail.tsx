@@ -4,12 +4,11 @@ import { useEffect } from 'react'
 
 import { useParams } from 'common'
 import {
-  FormActions,
-  FormPanel,
-  FormSection,
-  FormSectionContent,
-  FormSectionLabel,
-} from 'components/ui/Forms'
+  ScaffoldSection,
+  ScaffoldSectionContent,
+  ScaffoldSectionDetail,
+} from 'components/layouts/Scaffold'
+import { FormActions, FormPanel, FormSection, FormSectionContent } from 'components/ui/Forms'
 import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
 import { patch } from 'lib/common/fetch'
@@ -61,22 +60,18 @@ const BillingEmail = () => {
   }
 
   return (
-    <FormSection
-      id="email-correspondence"
-      header={
-        <FormSectionLabel>
-          <div className="sticky space-y-6 top-16">
-            <div>
-              <p className="text-base">Email Recipient</p>
-              <p className="text-sm text-scale-1000">
-                All billing correspondence will go to this email
-              </p>
-            </div>
+    <ScaffoldSection>
+      <ScaffoldSectionDetail>
+        <div className="sticky space-y-6 top-16">
+          <div>
+            <p className="text-base">Email Recipient</p>
+            <p className="text-sm text-scale-1000">
+              All billing correspondence will go to this email
+            </p>
           </div>
-        </FormSectionLabel>
-      }
-    >
-      <FormSectionContent loading={false}>
+        </div>
+      </ScaffoldSectionDetail>
+      <ScaffoldSectionContent>
         <Form id={formId} initialValues={initialValues} onSubmit={onUpdateOrganizationEmail}>
           {({ isSubmitting, handleReset, values, initialValues, resetForm }: any) => {
             const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
@@ -87,6 +82,7 @@ const BillingEmail = () => {
             useEffect(() => {
               const values = { billing_email: billing_email ?? '' }
               resetForm({ values, initialValues: values })
+              // eslint-disable-next-line react-hooks/exhaustive-deps
             }, [slug])
 
             return (
@@ -122,8 +118,8 @@ const BillingEmail = () => {
             )
           }}
         </Form>
-      </FormSectionContent>
-    </FormSection>
+      </ScaffoldSectionContent>
+    </ScaffoldSection>
   )
 }
 

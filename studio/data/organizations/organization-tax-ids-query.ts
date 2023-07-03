@@ -3,6 +3,7 @@ import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { useCallback } from 'react'
 import { organizationKeys } from './keys'
+import { ResponseError } from 'types'
 
 export type OrganizationTaxIDsVariables = {
   slug?: string
@@ -37,7 +38,7 @@ export async function getOrganizationTaxIDs(
 }
 
 export type OrganizationTaxIDsData = Awaited<ReturnType<typeof getOrganizationTaxIDs>>
-export type OrganizationTaxIDsError = unknown
+export type OrganizationTaxIDsError = ResponseError
 
 export const useOrganizationTaxIDsQuery = <TData = OrganizationTaxIDsData>(
   { slug }: OrganizationTaxIDsVariables,
