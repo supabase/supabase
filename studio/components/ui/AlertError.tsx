@@ -6,11 +6,12 @@ export interface AlertErrorProps {
   ref?: string
   subject?: string
   error?: ResponseError | null
+  className?: string
 }
 
 // [Joshen] To standardize the language for all error UIs
 
-const AlertError = ({ ref, subject, error }: AlertErrorProps) => {
+const AlertError = ({ ref, subject, error, className }: AlertErrorProps) => {
   const subjectString = subject?.replace(/ /g, '%20')
   let href = `/support/new?category=dashboard_bug`
 
@@ -21,6 +22,7 @@ const AlertError = ({ ref, subject, error }: AlertErrorProps) => {
   return (
     <Alert
       withIcon
+      className={className}
       variant="warning"
       title={subject}
       actions={[
