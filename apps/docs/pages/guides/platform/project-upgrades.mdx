@@ -6,7 +6,7 @@ export const meta = {
   description: 'Upgrading your Supabase project to the latest platform version.',
 }
 
-Supabase projects use the latest software versions of our platform when they're created. Supabase upgrades all projects hosted on our platform with new software builds, if the builds do not involve breaking changes, and if they can be rolled out with minimal disruption. For upgrades involving breaking changes, or requiring extended downtime, projects can be upgraded on-demand through the Supabase dashboard.
+Supabase projects use the latest software versions of our platform when they're created. Supabase automatically upgrades all projects hosted on our platform if the updates do not involve breaking changes and if they can be rolled out with minimal disruption. For upgrades involving breaking changes or requiring extended downtime, projects can be upgraded on-demand through the Supabase dashboard.
 
 ## Upgrading a Supabase project
 
@@ -21,8 +21,8 @@ TODO (darora): instructions here
 
 ### Estimating downtime requirements
 
-Postgres version upgrades, especially when they involve major version upgrades, can require extended maintenance windows. They also tend to grow as a function of the database size. 
-Furthermore, after the upgrade has been completed, you'll also want to ensure that your client applications and services are not running into any issues or errors, which should also be budgeted for as part of the maintenance window.
+Postgres version upgrades can require extended maintenance windows, especially when they are a major version upgrade. The maintenance window also tends to increase relative to the database size. 
+After the upgrade has completed, you'll also want to ensure that your client applications and services are not running into any issues or errors. This should also be budgeted as part of the maintenance window.
 
 As a rule of thumb, we recommend allocating an hour's maintenance window for upgrades for small (< 10GB) databases. For databases in the range of 10-100GB, we recommend between two to three hours. For larger databases, we recommend trying out the upgrade in a staging environment, with representative data (both in shape and size) to arrive at a more accurate estimate.
 
