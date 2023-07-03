@@ -1,20 +1,21 @@
-import GeneralSettings from './GeneralSettings/GeneralSettings'
-import TeamSettings from './TeamSettings/TeamSettings'
 import BillingSettings from './BillingSettings/BillingSettings'
+import BillingSettingsV2 from './BillingSettingsV2/BillingSettings'
+import GeneralSettings from './GeneralSettings/GeneralSettings'
+import IntegrationSettings from './IntegrationSettings/IntegrationSettings'
 import InvoicesSettings from './InvoicesSettings/InvoicesSettings'
 import NewOrgForm from './NewOrg/NewOrgForm'
 import Usage from './Usage/Usage'
 import OAuthApps from './OAuthApps/OAuthApps'
-
-import BillingSettingsV2 from './BillingSettingsV2/BillingSettings'
+import TeamSettings from './TeamSettings/TeamSettings'
 
 export {
-  GeneralSettings,
-  TeamSettings,
   BillingSettings,
   BillingSettingsV2,
+  GeneralSettings,
+  IntegrationSettings,
   InvoicesSettings,
   NewOrgForm,
-  Usage,
   OAuthApps,
+  TeamSettings,
+  Usage,
 }
