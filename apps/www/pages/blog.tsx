@@ -1,5 +1,5 @@
 import fs from 'fs'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { useRouter } from 'next/router'
 import Image from 'next/image'
@@ -12,11 +12,10 @@ import { getSortedPosts, getAllCategories } from '~/lib/posts'
 import authors from 'lib/authors.json'
 
 import DefaultLayout from '~/components/Layouts/Default'
-import { Button, Popover, useOnClickOutside } from 'ui'
+import { Button, IconSearch, Input, Popover, useOnClickOutside } from 'ui'
 import PostTypes from '~/types/post'
 import BlogListItem from '~/components/Blog/BlogListItem'
 import { useParams } from '~/hooks/useParams'
-import { PlusSmIcon } from '@heroicons/react/outline'
 
 export async function getStaticProps() {
   const allPostsData = getSortedPosts('_blog', undefined, undefined, '** BLOG PAGE **')
@@ -53,14 +52,21 @@ export async function getStaticProps() {
 
 function Blog(props: any) {
   const activeTag = useParams()?.tag
+  const [searchTag, setSearchTag] = useState<string>('')
   const [category, setCategory] = useState<string>('all')
   const [blogs, setBlogs] = useState(props.blogs)
   const [isTagsMenuOpen, setIsTagsMenuOpen] = useState<boolean>(false)
   const ref = useRef<any>(null)
-
   const router = useRouter()
 
+  const meta_title = 'Supabase Blog: Open Source Firebase alternative Blog'
+  const meta_description = 'Get all your Supabase News on the Supabase blog.'
+
   useEffect(() => {
+    handleBlogs()
+  }, [category])
+
+  const handleBlogs = () => {
     // construct an array of blog posts
     // not inluding the first blog post
     const shiftedBlogs = [...props.blogs]
@@ -81,7 +87,32 @@ function Blog(props: any) {
             return found
           })
     )
-  }, [category])
+  }
+
+  useEffect(() => {
+    if (!!searchTag) {
+      setBlogs(handleSearchByText)
+    } else {
+      handleBlogs()
+    }
+  }, [searchTag])
+
+  const handleSearchChange = (event: any) => {
+    activeTag && setCategory('all')
+    setSearchTag(event.target.value)
+  }
+
+  const handleSearchByText = useCallback(() => {
+    if (!searchTag) return
+    const matches = props.blogs.filter((post: any) => {
+      const found =
+        post.tags?.join(' ').replaceAll('-', ' ').includes(searchTag.toLowerCase()) ||
+        post.title?.toLowerCase().includes(searchTag.toLowerCase()) ||
+        post.author?.includes(searchTag.toLowerCase())
+      return found
+    })
+    return matches
+  }, [searchTag])
 
   useEffect(() => {
     setIsTagsMenuOpen(false)
@@ -90,16 +121,13 @@ function Blog(props: any) {
     }
   }, [activeTag, router.isReady])
 
-  const meta_title = 'Supabase Blog: Open Source Firebase alternative Blog'
-  const meta_description = 'Get all your Supabase News on the Supabase blog.'
-
-  const primaryTags = ['launch-week', 'AI', 'auth', 'database', 'release-notes']
-
   useOnClickOutside(ref, () => {
     if (isTagsMenuOpen) {
       setIsTagsMenuOpen(!isTagsMenuOpen)
     }
   })
+
+  const primaryTags = ['launch-week', 'AI', 'auth', 'database', 'release-notes']
 
   return (
     <>
@@ -139,10 +167,24 @@ function Blog(props: any) {
         <div className="border-scale-600 border-t">
           <div className="container mx-auto mt-16 px-8 sm:px-16 xl:px-20">
             <div className="mx-auto ">
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap items-center gap-2">
+                <Input
+                  icon={<IconSearch size="tiny" />}
+                  size="small"
+                  layout="vertical"
+                  autoComplete="off"
+                  type="text"
+                  placeholder="Search by keyword"
+                  value={searchTag}
+                  onChange={handleSearchChange}
+                  className="w-full lg:w-[300px]"
+                />
                 <Button
-                  type={!activeTag ? 'primary' : 'default'}
-                  onClick={() => setCategory('all')}
+                  type={!searchTag && !activeTag ? 'primary' : 'default'}
+                  onClick={() => {
+                    setSearchTag('')
+                    setCategory('all')
+                  }}
                 >
                   View All
                 </Button>
@@ -158,6 +200,9 @@ function Blog(props: any) {
                       {startCase(tag.replaceAll('-', ' '))}
                     </Button>
                   ))}
+                {activeTag && !primaryTags.includes(activeTag) && (
+                  <Button type="primary">{startCase(activeTag!.replaceAll('-', ' '))}</Button>
+                )}
                 <Popover
                   open={isTagsMenuOpen}
                   side="bottom"
@@ -174,7 +219,10 @@ function Blog(props: any) {
                             <Button
                               key={tag}
                               type={tag === activeTag ? 'primary' : 'default'}
-                              onClick={() => setCategory(tag)}
+                              onClick={() => {
+                                setSearchTag('')
+                                setCategory(tag)
+                              }}
                             >
                               {startCase(tag.replaceAll('-', ' '))}
                             </Button>
@@ -191,7 +239,6 @@ function Blog(props: any) {
                       'text-scale-800 hover:text-scale-1200',
                       isTagsMenuOpen && 'text-scale-1200',
                     ].join(' ')}
-                    iconRight={<PlusSmIcon className="w-3" />}
                   >
                     Show more
                   </Button>
@@ -200,7 +247,7 @@ function Blog(props: any) {
             </div>
 
             <ol className="grid grid-cols-12 py-16 lg:gap-16">
-              {blogs.map((blog: PostTypes, idx: number) => (
+              {blogs?.map((blog: PostTypes, idx: number) => (
                 <div
                   className="col-span-12 mb-16 md:col-span-12 lg:col-span-6 xl:col-span-4"
                   key={idx}
