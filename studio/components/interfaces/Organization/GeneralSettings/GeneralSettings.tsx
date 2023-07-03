@@ -19,6 +19,7 @@ import { useCheckPermissions, useFlag, useSelectedOrganization, useStore } from 
 import { patch } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import OrganizationDeletePanel from './OrganizationDeletePanel'
+import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
 
 const GeneralSettings = () => {
   const queryClient = useQueryClient()
@@ -69,7 +70,7 @@ const GeneralSettings = () => {
   }
 
   return (
-    <div className="container my-4 max-w-4xl space-y-8">
+    <ScaffoldContainerLegacy>
       <Form id={formId} initialValues={initialValues} onSubmit={onUpdateOrganization}>
         {({ isSubmitting, handleReset, values, initialValues, resetForm }: any) => {
           const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
@@ -190,7 +191,7 @@ const GeneralSettings = () => {
       </Form>
 
       {canDeleteOrganization && <OrganizationDeletePanel />}
-    </div>
+    </ScaffoldContainerLegacy>
   )
 }
 
