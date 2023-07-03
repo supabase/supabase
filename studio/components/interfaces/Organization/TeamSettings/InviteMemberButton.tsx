@@ -11,6 +11,7 @@ import { Member, Role } from 'types'
 import { Button, Form, IconMail, Input, Listbox, Modal } from 'ui'
 
 export interface InviteMemberButtonProps {
+  orgId: number
   userId: number
   members: Member[]
   roles: Role[]
@@ -18,6 +19,7 @@ export interface InviteMemberButtonProps {
 }
 
 const InviteMemberButton = ({
+  orgId,
   userId,
   members = [],
   roles = [],
@@ -31,9 +33,15 @@ const InviteMemberButton = ({
   const { permissions: allPermissions } = useGetPermissions()
 
   const canInviteMembers = roles.some(({ id: role_id }) =>
-    doPermissionsCheck(allPermissions, PermissionAction.CREATE, 'user_invites', {
-      resource: { role_id },
-    })
+    doPermissionsCheck(
+      allPermissions,
+      PermissionAction.CREATE,
+      'user_invites',
+      {
+        resource: { role_id },
+      },
+      orgId
+    )
   )
 
   const initialValues = { email: '', role: '' }
