@@ -75,7 +75,7 @@ const BlogFilters = ({ blogs, setBlogs, setCategory, allTags, handleBlogs }: Pro
         className="w-full lg:w-[300px]"
       />
       <Button
-        type={!searchTag && !activeTag ? 'primary' : 'default'}
+        type={!searchTag && !activeTag ? 'alternative' : 'default'}
         onClick={() => {
           setSearchTag('')
           setCategory('all')
@@ -89,14 +89,14 @@ const BlogFilters = ({ blogs, setBlogs, setCategory, allTags, handleBlogs }: Pro
         .map((tag: string) => (
           <Button
             key={tag}
-            type={tag === activeTag ? 'primary' : 'default'}
+            type={tag === activeTag ? 'alternative' : 'default'}
             onClick={() => setCategory(tag)}
           >
             {startCase(tag.replaceAll('-', ' '))}
           </Button>
         ))}
       {activeTag && !primaryTags.includes(activeTag) && (
-        <Button type="primary">{startCase(activeTag!.replaceAll('-', ' '))}</Button>
+        <Button type="alternative">{startCase(activeTag!.replaceAll('-', ' '))}</Button>
       )}
       <Popover
         open={isTagsMenuOpen}
@@ -111,7 +111,7 @@ const BlogFilters = ({ blogs, setBlogs, setCategory, allTags, handleBlogs }: Pro
                 .map((tag: string) => (
                   <Button
                     key={tag}
-                    type={tag === activeTag ? 'primary' : 'default'}
+                    type={tag === activeTag ? 'alternative' : 'default'}
                     onClick={() => {
                       setSearchTag('')
                       setCategory(tag)

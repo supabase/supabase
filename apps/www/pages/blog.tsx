@@ -129,14 +129,18 @@ function Blog(props: any) {
             />
 
             <ol className="grid grid-cols-12 py-16 lg:gap-16">
-              {blogs?.map((blog: PostTypes, idx: number) => (
-                <div
-                  className="col-span-12 mb-16 md:col-span-12 lg:col-span-6 xl:col-span-4"
-                  key={idx}
-                >
-                  <BlogListItem post={blog} />
-                </div>
-              ))}
+              {blogs?.length ? (
+                blogs?.map((blog: PostTypes, idx: number) => (
+                  <div
+                    className="col-span-12 mb-16 md:col-span-12 lg:col-span-6 xl:col-span-4"
+                    key={idx}
+                  >
+                    <BlogListItem post={blog} />
+                  </div>
+                ))
+              ) : (
+                <p className="text-sm text-scale-800 col-span-full">No results</p>
+              )}
             </ol>
           </div>
         </div>
