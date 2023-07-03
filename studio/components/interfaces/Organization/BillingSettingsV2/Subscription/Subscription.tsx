@@ -9,6 +9,7 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useFlag } from 'hooks'
 import { Alert, Button, IconExternalLink } from 'ui'
 import ProjectUpdateDisabledTooltip from '../../BillingSettings/ProjectUpdateDisabledTooltip'
+import SubscriptionPaymentMethod from './SubscriptionPaymentMethod'
 
 const Subscription = () => {
   const { slug } = useParams()
@@ -158,6 +159,10 @@ const Subscription = () => {
               labelBottomClass="!text-scale-1000 pb-1"
               labelTop={`${daysToCycleEnd} Days left`}
             />
+
+            {subscription !== undefined && (
+              <SubscriptionPaymentMethod subscription={subscription} />
+            )}
           </div>
         )}
       </FormSectionContent>
