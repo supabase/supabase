@@ -1,9 +1,9 @@
 import { ScaffoldDivider } from 'components/layouts/Scaffold'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
+import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
 import { useSelectedOrganization } from 'hooks'
 import Integration from './Integration'
 import SidePanelVercelProjectLinker from './SidePanelVercelProjectLinker'
-import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
 
 const IntegrationSettings = () => {
   const org = useSelectedOrganization()
