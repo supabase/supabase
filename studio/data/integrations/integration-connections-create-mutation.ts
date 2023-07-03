@@ -54,6 +54,9 @@ export const useIntegrationConnectionsCreateMutation = ({
         queryClient.invalidateQueries(
           integrationKeys.vercelProjectList(variables.organizationIntegrationId)
         ),
+        queryClient.invalidateQueries(
+          integrationKeys.vercelConnectionsList(variables.organizationIntegrationId)
+        ),
       ])
       await onSuccess?.(data, variables, context)
     },
