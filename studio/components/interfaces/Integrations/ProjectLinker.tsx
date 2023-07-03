@@ -43,10 +43,9 @@ const ProjectLinker = ({
   const { mutate: createConnections, isLoading } = useIntegrationConnectionsCreateMutation({
     onSuccess() {
       _onCreateConnections?.()
-      if (setLoading) setLoading(false)
     },
 
-    onError() {
+    onSettled() {
       if (setLoading) setLoading(false)
     },
   })
