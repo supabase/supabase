@@ -369,7 +369,7 @@ The last step is deploying these changes to a live Supabase project.
 
 ## Deploy your project
 
-You've been developing your project locally, making changes to your tables via migrations. It's time to deploy your project to the Supabase Platform and start scaling up to millions of users! Head over to [Supabase](https://app.supabase.com) and create a new project to deploy to.
+You've been developing your project locally, making changes to your tables via migrations. It's time to deploy your project to the Supabase Platform and start scaling up to millions of users! Head over to [Supabase](https://supabase.com/dashboard) and create a new project to deploy to.
 
 ### Link your project
 
@@ -377,7 +377,7 @@ Associate your project with your remote project using [`supabase link`](/docs/re
 
 ```bash
 supabase link --project-ref <project-id>
-# You can get <project-id> from your project's dashboard URL: https://app.supabase.com/project/<project-id>
+# You can get <project-id> from your project's dashboard URL: https://supabase.com/dashboard/project/<project-id>
 
 supabase db remote commit
 # Capture any changes that you have made to your remote database before you went through the steps above
@@ -401,7 +401,7 @@ Deploy any local database migrations using [`db push`](/docs/reference/cli/usage
 supabase db push
 ```
 
-Visiting your live project on [Supabase](https://app.supabase.com), you'll see a new `employees` table, complete with the `department` column you added in the second migration above.
+Visiting your live project on [Supabase](https://supabase.com/dashboard), you'll see a new `employees` table, complete with the `department` column you added in the second migration above.
 
 ### Deploy Edge Functions
 

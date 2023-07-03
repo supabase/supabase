@@ -6,7 +6,7 @@ import { FC, useState } from 'react'
 
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 import { setProjectStatus } from 'data/projects/projects-query'
-import { checkPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import { Badge, Button, IconDownload } from 'ui'
@@ -25,7 +25,7 @@ const BackupItem: FC<Props> = ({ projectRef, backup, index }) => {
   const [isDownloading, setDownloading] = useState<boolean>(false)
   const [isRestoring, setRestoring] = useState<boolean>(false)
 
-  const canTriggerScheduledBackups = checkPermissions(
+  const canTriggerScheduledBackups = useCheckPermissions(
     PermissionAction.INFRA_EXECUTE,
     'queue_job.restore.prepare'
   )

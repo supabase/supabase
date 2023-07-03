@@ -5,7 +5,7 @@ import { FC, ReactNode } from 'react'
 
 import { useParams } from 'common/hooks'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { checkPermissions, useFlag } from 'hooks'
+import { useCheckPermissions, useFlag } from 'hooks'
 import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import { Button } from 'ui'
 
@@ -21,12 +21,11 @@ const UpgradeToPro: FC<Props> = ({ icon, primaryText, projectRef, secondaryText 
   const { project } = useProjectContext()
   const tier = project?.subscription_tier
 
-  const canUpdateSubscription = checkPermissions(
+  const canUpdateSubscription = useCheckPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.subscriptions'
   )
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
-  const isEnterprise = tier === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
 
   return (
     <div
@@ -48,11 +47,13 @@ const UpgradeToPro: FC<Props> = ({ icon, primaryText, projectRef, secondaryText 
           <Tooltip.Root delayDuration={0}>
             <Tooltip.Trigger>
               <Button type="primary" disabled={!canUpdateSubscription || projectUpdateDisabled}>
-                <Link href={`/project/${ref}/settings/billing/subscription?panel=subscriptionPlan`}>
+                <Link
+                  href={`/project/${ref}/settings/billing/subscription${
+                    tier === PRICING_TIER_PRODUCT_IDS.FREE ? '?panel=subscriptionPlan' : ''
+                  }`}
+                >
                   <a>
-                    {tier === PRICING_TIER_PRODUCT_IDS.FREE
-                      ? 'Upgrade to Pro'
-                      : 'Modify subscription'}
+                    {tier === PRICING_TIER_PRODUCT_IDS.FREE ? 'Upgrade to Pro' : 'Enable Addon'}
                   </a>
                 </Link>
               </Button>

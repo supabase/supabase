@@ -27,10 +27,10 @@ Example:
 
 ## Retrieve your Supabase Host [#retrieve-supabase-host]
 
-1. If you're new to Supabase, [create a project](https://app.supabase.com).
-1. Go to the [Database settings](https://app.supabase.com/project/_/settings/database) for your project in the Supabase Dashboard.
+1. If you're new to Supabase, [create a project](https://supabase.com/dashboard).
+1. Go to the [Database settings](https://supabase.com/dashboard/project/_/settings/database) for your project in the Supabase Dashboard.
 1. Under **Connection Info**, note your Host (`$SUPABASE_HOST`).
-1. Save your password or [reset it](https://app.supabase.com/project/_/settings/database) if you forgot it.
+1. Save your password or [reset it](https://supabase.com/dashboard/project/_/settings/database) if you forgot it.
 
 ![Finding Supabase host address](/docs/img/guides/resources/migrating-to-supabase/render/supabase_dashboard.png)
 
@@ -85,7 +85,7 @@ Run `pg_dump --help` for a full list of options.
 
 <Admonition type="caution">
 
-- If you plan on migrating a database larger than 6 GB, we recommend [contacting support](https://app.supabase.com/support/new) to ensure that you'll have the proper disk size pre-provisioned. You can read more about how the disk is managed on Supabase on the [Database usage](/docs/guides/platform/database-size#disk-management).
+- If you plan on migrating a database larger than 6 GB, we recommend [contacting support](https://supabase.com/dashboard/support/new) to ensure that you'll have the proper disk size pre-provisioned. You can read more about how the disk is managed on Supabase on the [Database usage](/docs/guides/platform/database-size#disk-management).
 - We also recommend upgrading to at least a [Large instance](/docs/guides/platform/compute-add-ons) for the migration (you can downgrade later) to avoid running out of IO-Budget.
 
 </Admonition>

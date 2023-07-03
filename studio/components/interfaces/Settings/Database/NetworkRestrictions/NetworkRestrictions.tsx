@@ -4,7 +4,7 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { Button, IconAlertCircle, IconExternalLink, IconGlobe, IconLock } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks'
 import { useParams } from 'common/hooks'
 import Panel from 'components/ui/Panel'
 import { FormPanel, FormHeader } from 'components/ui/Forms'
@@ -84,7 +84,7 @@ const NetworkRestrictions = ({}) => {
   const [selectedRestrictionToRemove, setSelectedRestrictionToRemove] = useState<string>()
   const { data, isLoading } = useNetworkRestrictionsQuery({ projectRef: ref })
 
-  const canUpdateNetworkRestrictions = checkPermissions(PermissionAction.UPDATE, 'projects')
+  const canUpdateNetworkRestrictions = useCheckPermissions(PermissionAction.UPDATE, 'projects')
 
   const hasAccessToRestrictions = data?.entitlement === 'allowed'
   const restrictedIps = data?.config?.dbAllowedCidrs ?? []
