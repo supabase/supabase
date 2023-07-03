@@ -132,9 +132,9 @@ const IntegrationConnection = React.forwardRef<HTMLLIElement, IntegrationConnect
         ref={ref}
         key={connection.id}
         {...props}
-        className={cn('ml-6 pl-8 pb-2 border-l', 'relative')}
+        className={cn('ml-6 pl-8 pb-2 border-l border-scale-600 dark:border-scale-400', 'relative')}
       >
-        <div className="absolute w-8 rounded-bl-full border-b border-l h-10 -left-px"></div>
+        <div className="absolute w-8 rounded-bl-full border-b border-l border-scale-600 dark:border-scale-400 h-10 -left-px"></div>
         <div className="bg border shadow-sm flex justify-between items-center px-8 py-4 rounded-lg">
           <div className="flex flex-col gap-1">
             <div className="flex gap-2 items-center">
@@ -215,11 +215,11 @@ const EmptyIntegrationConnection = React.forwardRef<
       {...props}
       className={cn('ml-6 pl-8 pb-2 border-l', 'last:border-l-transparent', 'relative', className)}
     >
-      <div className="absolute w-8 rounded-bl-full border-b border-l h-10 -left-px"></div>
+      <div className="absolute w-8 rounded-bl-full border-b border-l border-scale-600 dark:border-scale-400 h-10 -left-px"></div>
       <div
         className={cn(
           'w-full',
-          'border border-dashed',
+          'border border-dashed bg-scale-300 dark:bg-scale-100 border-scale-600 dark:border-scale-400',
           '',
           'flex h-20 px-10 rounded-lg justify-center items-center'
         )}
@@ -238,7 +238,14 @@ interface IntegrationConnectionHeader extends React.HTMLAttributes<HTMLDivElemen
 const IntegrationConnectionHeader = React.forwardRef<HTMLDivElement, IntegrationConnectionHeader>(
   ({ className, name, markdown = '', ...props }, ref) => {
     return (
-      <div {...props} ref={ref} className={cn('border-l ml-6 pl-8 pt-6 pb-3', className)}>
+      <div
+        {...props}
+        ref={ref}
+        className={cn(
+          'border-l border-scale-600 dark:border-scale-400 ml-6 pl-8 pt-6 pb-3',
+          className
+        )}
+      >
         <Markdown content={markdown} className="" />
       </div>
     )
