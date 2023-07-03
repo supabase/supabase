@@ -45,6 +45,10 @@ const ProjectLinker = ({
       _onCreateConnections?.()
       if (setLoading) setLoading(false)
     },
+
+    onError() {
+      if (setLoading) setLoading(false)
+    },
   })
 
   function onCreateConnections() {
