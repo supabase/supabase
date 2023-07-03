@@ -4,8 +4,15 @@ import { useState } from 'react'
 
 import { useParams } from 'common'
 import { AddNewPaymentMethodModal } from 'components/interfaces/Billing'
-import { FormPanel, FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms'
+import {
+  ScaffoldSection,
+  ScaffoldSectionContent,
+  ScaffoldSectionDetail,
+} from 'components/layouts/Scaffold'
+import AlertError from 'components/ui/AlertError'
+import { FormPanel, FormSection, FormSectionContent } from 'components/ui/Forms'
 import NoPermission from 'components/ui/NoPermission'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { organizationKeys } from 'data/organizations/keys'
 import { useOrganizationPaymentMethodsQuery } from 'data/organizations/organization-payment-methods-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
@@ -15,7 +22,6 @@ import { getURL } from 'lib/helpers'
 import { Badge, Button, Dropdown, IconCreditCard, IconMoreHorizontal, IconPlus } from 'ui'
 import ChangePaymentMethodModal from './ChangePaymentMethodModal'
 import DeletePaymentMethodModal from './DeletePaymentMethodModal'
-import AlertError from 'components/ui/AlertError'
 
 const PaymentMethods = () => {
   const { ui } = useStore()
@@ -47,31 +53,36 @@ const PaymentMethods = () => {
 
   return (
     <>
-      <FormSection
-        id="payment-methods"
-        header={
-          <FormSectionLabel>
-            <div className="sticky space-y-6 top-16">
-              <div>
-                <p className="text-base">Payment methods</p>
-                <p className="text-sm text-scale-1000 mb-2">
-                  This copy might need to change, when adding a new payment method, either remove
-                  the old one or go to your projects' subscription to explicitly update the payment
-                  method.
-                </p>
-              </div>
+      <ScaffoldSection>
+        <ScaffoldSectionDetail>
+          <div className="sticky space-y-6 top-16">
+            <div>
+              <p className="text-base">Payment methods</p>
+              <p className="text-sm text-scale-1000 mb-2">
+                This copy might need to change, when adding a new payment method, either remove the
+                old one or go to your projects' subscription to explicitly update the payment
+                method.
+              </p>
             </div>
-          </FormSectionLabel>
-        }
-      >
-        <FormSectionContent loading={isLoading}>
+          </div>
+        </ScaffoldSectionDetail>
+        <ScaffoldSectionContent>
           {!canReadPaymentMethods ? (
             <NoPermission resourceText="view this organization's payment methods" />
           ) : (
             <>
+              {isLoading && (
+                <div className="space-y-2">
+                  <ShimmeringLoader />
+                  <ShimmeringLoader className="w-3/4" />
+                  <ShimmeringLoader className="w-1/2" />
+                </div>
+              )}
+
               {isError && (
                 <AlertError subject="Unable to retrieve payment methods" error={error as any} />
               )}
+
               {isSuccess && (
                 <FormPanel
                   footer={
@@ -125,8 +136,8 @@ const PaymentMethods = () => {
                                     Expires: {paymentMethod.card.exp_month}/
                                     {paymentMethod.card.exp_year}
                                   </p>
-                                  {isActive && <Badge color="green">Active</Badge>}
                                 </div>
+                                {isActive && <Badge color="green">Active</Badge>}
                                 {canUpdatePaymentMethods && !isActive ? (
                                   <Dropdown
                                     size="tiny"
@@ -165,8 +176,8 @@ const PaymentMethods = () => {
               )}
             </>
           )}
-        </FormSectionContent>
-      </FormSection>
+        </ScaffoldSectionContent>
+      </ScaffoldSection>
 
       <AddNewPaymentMethodModal
         visible={showAddPaymentMethodModal}
