@@ -38,7 +38,7 @@ export interface CategoryAttribute {
   description: string
   chartDescription: string
   additionalInfo?: (
-    ref: string,
+    slug: string,
     subscription?: ProjectSubscriptionResponse,
     usage?: ProjectUsageData
   ) => JSX.Element | null

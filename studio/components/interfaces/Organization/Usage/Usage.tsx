@@ -10,6 +10,7 @@ import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants'
 import SizeAndCounts from './SizeAndCounts'
 import Activity from './Activity'
 import { IconLoader } from 'ui'
+import { useOrgUsageQuery } from 'data/usage/org-usage-query'
 
 const Usage = () => {
   const { slug } = useParams()
@@ -21,6 +22,8 @@ const Usage = () => {
     isError,
     isSuccess,
   } = useOrgSubscriptionQuery({ orgSlug: slug })
+  // const { data: usage, isLoading: isLoadingUsage } = useOrgUsageQuery({ orgSlug: slug })
+  // console.log({ usage })
 
   const selectedProjectRef = 'kojplftaeiavuneadgix'
   const billingCycleStart = dayjs.unix(subscription?.current_period_start ?? 0).utc()
@@ -93,6 +96,7 @@ const Usage = () => {
         ) : null}
       </div>
       <Bandwidth
+        orgSlug={slug as string}
         projectRef={selectedProjectRef}
         subscription={subscription}
         startDate={startDate}
@@ -100,14 +104,14 @@ const Usage = () => {
         currentBillingCycleSelected={currentBillingCycleSelected}
       />
       <SizeAndCounts
-        projectRef={selectedProjectRef}
+        orgSlug={slug as string}
         subscription={subscription}
         startDate={startDate}
         endDate={endDate}
         currentBillingCycleSelected={currentBillingCycleSelected}
       />
       <Activity
-        projectRef={selectedProjectRef}
+        orgSlug={slug as string}
         subscription={subscription}
         startDate={startDate}
         endDate={endDate}

@@ -2,9 +2,10 @@ import { useDailyStatsQuery } from 'data/analytics/daily-stats-query'
 import { DataPoint } from 'data/analytics/constants'
 import { ProjectSubscriptionResponse } from 'data/subscriptions/project-subscription-v2-query'
 import UsageSection from './UsageSection'
+import { PricingMetric, useOrgDailyStatsQuery } from 'data/analytics/org-daily-stats-query'
 
 export interface SizeAndCountsProps {
-  projectRef: string
+  orgSlug: string
   startDate: string | undefined
   endDate: string | undefined
   subscription: ProjectSubscriptionResponse | undefined
@@ -12,31 +13,31 @@ export interface SizeAndCountsProps {
 }
 
 const SizeAndCounts = ({
-  projectRef,
+  orgSlug,
   startDate,
   endDate,
   subscription,
   currentBillingCycleSelected,
 }: SizeAndCountsProps) => {
-  const { data: dbSizeData, isLoading: isLoadingDbSizeData } = useDailyStatsQuery({
-    projectRef,
-    attribute: 'total_db_size_bytes',
+  const { data: dbSizeData, isLoading: isLoadingDbSizeData } = useOrgDailyStatsQuery({
+    orgSlug,
+    metric: PricingMetric.DATABASE_SIZE,
     interval: '1d',
     startDate,
     endDate,
   })
 
-  const { data: storageSizeData, isLoading: isLoadingStorageSizeData } = useDailyStatsQuery({
-    projectRef,
-    attribute: 'total_storage_size_bytes',
+  const { data: storageSizeData, isLoading: isLoadingStorageSizeData } = useOrgDailyStatsQuery({
+    orgSlug,
+    metric: PricingMetric.STORAGE_SIZE,
     interval: '1d',
     startDate,
     endDate,
   })
 
-  const { data: functionCountData, isLoading: isLoadingFunctionCountData } = useDailyStatsQuery({
-    projectRef,
-    attribute: 'total_func_count',
+  const { data: functionCountData, isLoading: isLoadingFunctionCountData } = useOrgDailyStatsQuery({
+    orgSlug,
+    metric: PricingMetric.FUNCTION_COUNT,
     interval: '1d',
     startDate,
     endDate,
@@ -67,7 +68,7 @@ const SizeAndCounts = ({
 
   return (
     <UsageSection
-      projectRef={projectRef}
+      orgSlug={orgSlug}
       categoryKey="sizeCount"
       chartMeta={chartMeta}
       subscription={subscription}
