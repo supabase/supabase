@@ -1,12 +1,12 @@
+import { useMemo } from 'react'
+
 import ProjectLinker from 'components/interfaces/Integrations/ProjectLinker'
 import { Markdown } from 'components/interfaces/Markdown'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
-import { useVercelProjectConnectionsQuery } from 'data/integrations/integrations-vercel-installed-connections-query'
 import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useSelectedOrganization } from 'hooks'
 import { EMPTY_ARR } from 'lib/void'
-import { useMemo } from 'react'
 import { useGithubConnectionConfigPanelSnapshot } from 'state/github-connection-config-panel'
 import { SidePanel } from 'ui'
 
@@ -38,7 +38,7 @@ const SidePanelVercelProjectLinker = () => {
    * Supabase projects available
    */
   const { data: supabaseProjectsData } = useProjectsQuery({
-    enabled: organizationIntegrationId !== null,
+    enabled: organizationIntegrationId !== undefined,
   })
 
   const supabaseProjects = useMemo(
@@ -54,7 +54,7 @@ const SidePanelVercelProjectLinker = () => {
     {
       organization_integration_id: organizationIntegrationId,
     },
-    { enabled: organizationIntegrationId !== null }
+    { enabled: organizationIntegrationId !== undefined }
   )
 
   const vercelProjects = useMemo(() => vercelProjectsData ?? EMPTY_ARR, [vercelProjectsData])

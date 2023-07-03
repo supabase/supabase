@@ -21,7 +21,7 @@ import { BASE_PATH } from 'lib/constants'
 import { pluralize } from 'lib/helpers'
 import { EMPTY_ARR } from 'lib/void'
 import { useGithubConnectionConfigPanelSnapshot } from 'state/github-connection-config-panel'
-import { Button, Dropdown, IconChevronDown, IconRefreshCcw, IconTrash } from 'ui'
+import { Button, Dropdown, IconChevronDown, IconTrash } from 'ui'
 
 export interface IntegrationProps {
   title: string
@@ -149,7 +149,7 @@ Repository connections for ${title?.toLowerCase()}
                   )
                 })}
             </div>
-            <Markdown content={`${note}`} className="text-scale-900" />
+            {note !== undefined && <Markdown content={note} className="text-scale-900" />}
           </ScaffoldSectionContent>
         </ScaffoldSection>
       </ScaffoldContainer>
