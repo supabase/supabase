@@ -1187,12 +1187,12 @@ export const integrations: NavMenuConstant = {
       url: undefined,
       items: [
         {
-          name: 'Creating an OAuth App',
-          url: '/guides/integrations/oauth-apps/creating-an-oauth-app',
+          name: 'Publish an OAuth App',
+          url: '/guides/integrations/oauth-apps/publish-an-oauth-app',
         },
         {
-          name: 'Authorizing an OAuth App',
-          url: '/guides/integrations/oauth-apps/authorizing-an-oauth-app',
+          name: 'Authorize an OAuth App',
+          url: '/guides/integrations/oauth-apps/authorize-an-oauth-app',
         },
       ],
     },
