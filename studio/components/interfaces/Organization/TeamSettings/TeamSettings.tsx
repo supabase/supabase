@@ -89,9 +89,10 @@ const TeamSettings = () => {
             placeholder="Filter members"
           />
           <ScaffoldActionsGroup>
-            {canAddMembers && profile !== undefined && (
+            {canAddMembers && profile !== undefined && selectedOrganization !== undefined && (
               <div>
                 <InviteMemberButton
+                  orgId={selectedOrganization.id}
                   userId={profile.id}
                   members={members}
                   roles={roles}
