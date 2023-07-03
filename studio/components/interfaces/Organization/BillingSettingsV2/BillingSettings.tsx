@@ -1,39 +1,54 @@
+import { ScaffoldContainer, ScaffoldDivider } from 'components/layouts/Scaffold'
+import BillingAddress from './BillingAddress/BillingAddress'
 import BillingEmail from './BillingEmail'
 import CostControl from './CostControl/CostControl'
-import Subscription from './Subscription/Subscription'
 import CreditBalance from './CreditBalance'
-import { LayoutWrapper } from './Scaffold'
-import BillingAddress from './BillingAddress/BillingAddress'
-import TaxID from './TaxID/TaxID'
 import PaymentMethods from './PaymentMethods/PaymentMethods'
-
-// [Joshen TODO] Last one: payment method details management
-// Either as part of the subscription plan component like project, or its own section like the old design
+import Subscription from './Subscription/Subscription'
+import TaxID from './TaxID/TaxID'
 
 const BillingSettings = () => {
   return (
     <>
-      <LayoutWrapper>
+      <ScaffoldContainer>
         <Subscription />
-      </LayoutWrapper>
-      <LayoutWrapper>
+      </ScaffoldContainer>
+
+      <ScaffoldDivider />
+
+      <ScaffoldContainer>
         <CostControl />
-      </LayoutWrapper>
-      <LayoutWrapper>
+      </ScaffoldContainer>
+
+      <ScaffoldDivider />
+
+      <ScaffoldContainer>
         <CreditBalance />
-      </LayoutWrapper>
-      <LayoutWrapper>
+      </ScaffoldContainer>
+
+      <ScaffoldDivider />
+
+      <ScaffoldContainer>
         <PaymentMethods />
-      </LayoutWrapper>
-      <LayoutWrapper>
+      </ScaffoldContainer>
+
+      <ScaffoldDivider />
+
+      <ScaffoldContainer>
         <BillingEmail />
-      </LayoutWrapper>
-      <LayoutWrapper>
+      </ScaffoldContainer>
+
+      <ScaffoldDivider />
+
+      <ScaffoldContainer>
         <BillingAddress />
-      </LayoutWrapper>
-      <LayoutWrapper>
+      </ScaffoldContainer>
+
+      <ScaffoldDivider />
+
+      <ScaffoldContainer>
         <TaxID />
-      </LayoutWrapper>
+      </ScaffoldContainer>
     </>
   )
 }
