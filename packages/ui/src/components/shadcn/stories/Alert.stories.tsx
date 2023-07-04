@@ -9,9 +9,9 @@ const meta: Meta<typeof Alert> = {
 
 export const Default = () => (
   <Alert>
-      <Info strokeWidth={2} />
-      <AlertTitle>Heads up!</AlertTitle>
-      <AlertDescription>You can add components to your app using the cli.</AlertDescription> 
+    <Info strokeWidth={2} />
+    <AlertTitle>Heads up!</AlertTitle>
+    <AlertDescription>You can add components to your app using the cli.</AlertDescription> 
   </Alert>
 )
 
@@ -19,12 +19,12 @@ Default.storyName = 'Default'
 
 export const Destructive = () => (
  <Alert variant="destructive">
-      <AlertCircle className="h-4 w-4" />
-      <AlertTitle>Error</AlertTitle>
-      <AlertDescription>
-        Your session has expired. Please log in again.
-      </AlertDescription>
-    </Alert>
+    <AlertCircle className="h-4 w-4" />
+    <AlertTitle>Error</AlertTitle>
+    <AlertDescription>
+      Your session has expired. Please log in again.
+    </AlertDescription>
+  </Alert>
 )
 
 Destructive.storyName = 'Destructive'
