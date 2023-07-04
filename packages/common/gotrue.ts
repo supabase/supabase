@@ -14,6 +14,5 @@ export const gotrueClient = new GoTrueClient({
   url: process.env.NEXT_PUBLIC_GOTRUE_URL,
   storageKey: STORAGE_KEY,
   detectSessionInUrl: true,
-  // @ts-expect-error
   debug,
 })

@@ -56,11 +56,14 @@ import {
 
 const components = {
   ...markdownComponents,
-  a: (href: string, props: any) => (
-    <Link href={href} legacyBehavior passHref>
-      <a {...props} />
-    </Link>
-  ),
+  a: (props: any) =>
+    props.href ? (
+      <Link href={props.href}>
+        <a {...props} />
+      </Link>
+    ) : (
+      <a />
+    ),
   Admonition,
   Button,
   ButtonCard,
