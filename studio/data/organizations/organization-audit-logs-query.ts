@@ -3,6 +3,7 @@ import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { useCallback } from 'react'
 import { organizationKeys } from './keys'
+import { ResponseError } from 'types'
 
 export type OrganizationAuditLog = {
   action: {
@@ -58,7 +59,7 @@ export async function getOrganizationAuditLogs(
 }
 
 export type OrganizationAuditLogsData = Awaited<ReturnType<typeof getOrganizationAuditLogs>>
-export type OrganizationAuditLogsError = unknown
+export type OrganizationAuditLogsError = ResponseError
 
 export const useOrganizationAuditLogsQuery = <TData = OrganizationAuditLogsData>(
   vars: OrganizationAuditLogsVariables,
@@ -73,6 +74,8 @@ export const useOrganizationAuditLogsQuery = <TData = OrganizationAuditLogsData>
     ({ signal }) => getOrganizationAuditLogs(vars, signal),
     {
       enabled: enabled && typeof slug !== 'undefined',
+      staleTime: Infinity,
+      cacheTime: Infinity,
       ...options,
     }
   )

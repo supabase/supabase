@@ -16,7 +16,7 @@ import { useOrganizationDetailQuery } from 'data/organizations/organization-deta
 import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { Alert, Button, IconArrowDown, IconArrowUp, IconUser } from 'ui'
+import { Alert, Button, IconArrowDown, IconArrowUp, IconRefreshCw, IconUser } from 'ui'
 import FilterPopover from './FilterPopover'
 import LogDetailsPanel from './LogDetailsPanel'
 import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
@@ -45,11 +45,12 @@ const AuditLogs = () => {
   const { data: organizations } = useOrganizationsQuery()
   const { data: detailData } = useOrganizationDetailQuery({ slug })
   const { data: rolesData } = useOrganizationRolesQuery({ slug })
-  const { data, isLoading, isSuccess, isError } = useOrganizationAuditLogsQuery({
-    slug,
-    iso_timestamp_start: dateRange.from,
-    iso_timestamp_end: dateRange.to,
-  })
+  const { data, error, isLoading, isSuccess, isError, isRefetching, refetch } =
+    useOrganizationAuditLogsQuery({
+      slug,
+      iso_timestamp_start: dateRange.from,
+      iso_timestamp_end: dateRange.to,
+    })
 
   const members = detailData?.members ?? []
   const roles = rolesData?.roles ?? []
@@ -89,72 +90,82 @@ const AuditLogs = () => {
             </div>
           )}
 
-          {isError && <AlertError subject="Failed to retrieve audit logs" />}
+          {isError && <AlertError error={error} subject="Failed to retrieve audit logs" />}
 
           {isSuccess && (
             <>
-              <div className="flex items-center space-x-2">
-                <p className="text-xs prose">Filter by</p>
-                <FilterPopover
-                  name="Users"
-                  options={members ?? []}
-                  labelKey="username"
-                  valueKey="gotrue_id"
-                  activeOptions={filters.users}
-                  onSaveFilters={(values) => setFilters({ ...filters, users: values })}
-                />
-                <FilterPopover
-                  name="Projects"
-                  options={projects ?? []}
-                  labelKey="name"
-                  valueKey="ref"
-                  activeOptions={filters.projects}
-                  onSaveFilters={(values) => setFilters({ ...filters, projects: values })}
-                />
-                <DatePicker
-                  hideTime
-                  hideClear
-                  triggerButtonType="dashed"
-                  triggerButtonTitle=""
-                  from={dateRange.from}
-                  to={dateRange.to}
-                  minDate={dayjs().subtract(retentionPeriod, 'days').toDate()}
-                  maxDate={dayjs().toDate()}
-                  onChange={(value) => {
-                    if (value.from !== null && value.to !== null) {
-                      const current = dayjs().utc()
-                      const from = dayjs(value.from)
-                        .utc()
-                        .hour(current.hour())
-                        .minute(current.minute())
-                        .second(current.second())
-                        .toISOString()
-                      const to = dayjs(value.to)
-                        .utc()
-                        .hour(current.hour())
-                        .minute(current.minute())
-                        .second(current.second())
-                        .toISOString()
-                      setDateRange({ from, to })
-                    }
-                  }}
-                  renderFooter={() => {
-                    return (
-                      <Alert title="" variant="info" className="mx-3 pl-2 pr-2 pt-1 pb-2">
-                        Your organization has a log retention period of{' '}
-                        <span className="text-brand-900">
-                          {retentionPeriod} day
-                          {retentionPeriod > 1 ? 's' : ''}
-                        </span>
-                        . You may only view logs from{' '}
-                        {dayjs().subtract(retentionPeriod, 'days').format('DD MMM YYYY')} as the
-                        earliest date.
-                      </Alert>
-                    )
-                  }}
-                />
-                <div className="h-[20px] border-r border-scale-700 !ml-4 !mr-2" />
-                <p className="prose text-xs">Viewing {sortedLogs.length} logs in total</p>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <p className="text-xs prose">Filter by</p>
+                  <FilterPopover
+                    name="Users"
+                    options={members ?? []}
+                    labelKey="username"
+                    valueKey="gotrue_id"
+                    activeOptions={filters.users}
+                    onSaveFilters={(values) => setFilters({ ...filters, users: values })}
+                  />
+                  <FilterPopover
+                    name="Projects"
+                    options={projects ?? []}
+                    labelKey="name"
+                    valueKey="ref"
+                    activeOptions={filters.projects}
+                    onSaveFilters={(values) => setFilters({ ...filters, projects: values })}
+                  />
+                  <DatePicker
+                    hideTime
+                    hideClear
+                    triggerButtonType="dashed"
+                    triggerButtonTitle=""
+                    from={dateRange.from}
+                    to={dateRange.to}
+                    minDate={dayjs().subtract(retentionPeriod, 'days').toDate()}
+                    maxDate={dayjs().toDate()}
+                    onChange={(value) => {
+                      if (value.from !== null && value.to !== null) {
+                        const current = dayjs().utc()
+                        const from = dayjs(value.from)
+                          .utc()
+                          .hour(current.hour())
+                          .minute(current.minute())
+                          .second(current.second())
+                          .toISOString()
+                        const to = dayjs(value.to)
+                          .utc()
+                          .hour(current.hour())
+                          .minute(current.minute())
+                          .second(current.second())
+                          .toISOString()
+                        setDateRange({ from, to })
+                      }
+                    }}
+                    renderFooter={() => {
+                      return (
+                        <Alert title="" variant="info" className="mx-3 pl-2 pr-2 pt-1 pb-2">
+                          Your organization has a log retention period of{' '}
+                          <span className="text-brand-900">
+                            {retentionPeriod} day
+                            {retentionPeriod > 1 ? 's' : ''}
+                          </span>
+                          . You may only view logs from{' '}
+                          {dayjs().subtract(retentionPeriod, 'days').format('DD MMM YYYY')} as the
+                          earliest date.
+                        </Alert>
+                      )
+                    }}
+                  />
+                  <div className="h-[20px] border-r border-scale-700 !ml-4 !mr-2" />
+                  <p className="prose text-xs">Viewing {sortedLogs.length} logs in total</p>
+                </div>
+                <Button
+                  type="default"
+                  disabled={isRefetching}
+                  icon={<IconRefreshCw className={isRefetching ? 'animate-spin' : ''} />}
+                  onClick={() => refetch()}
+                >
+                  {isRefetching ? 'Refreshing' : 'Refresh'}
+                </Button>
               </div>
 
               {logs.length === 0 ? (
@@ -234,19 +245,19 @@ const AuditLogs = () => {
                       const hasStatusCode = log.action.metadata[0]?.status !== undefined
                       const userIcon =
                         user === undefined ? (
-                          <div className="flex h-[40px] w-[40px] flex items-center justify-center border-2 rounded-full border-scale-700">
+                          <div className="flex h-[30px] w-[30px] flex items-center justify-center border-2 rounded-full border-scale-700">
                             <p>?</p>
                           </div>
                         ) : user?.invited_id || user?.username === user?.primary_email ? (
-                          <div className="flex h-[40px] w-[40px] flex items-center justify-center border-2 rounded-full border-scale-700">
+                          <div className="flex h-[30px] w-[30px] flex items-center justify-center border-2 rounded-full border-scale-700">
                             <IconUser size={18} strokeWidth={2} />
                           </div>
                         ) : (
                           <Image
                             alt={user?.username}
                             src={`https://github.com/${user?.username ?? ''}.png?size=80`}
-                            width="40"
-                            height="40"
+                            width="30"
+                            height="30"
                             className="border rounded-full"
                           />
                         )
@@ -265,11 +276,6 @@ const AuditLogs = () => {
                                 {role && (
                                   <p className="mt-0.5 text-xs text-scale-1000">{role?.name}</p>
                                 )}
-                                {user === undefined && role === undefined && (
-                                  <p className="mt-0.5 text-xs text-scale-1000">
-                                    ID: {log.actor.id}
-                                  </p>
-                                )}
                               </div>
                             </div>
                           </Table.td>
@@ -280,19 +286,29 @@ const AuditLogs = () => {
                                   {log.action.metadata[0].status}
                                 </p>
                               )}
-                              <p className="max-w-[200px] truncate">{log.action.name}</p>
+                              <p className="max-w-[170px] truncate" title={log.action.name}>
+                                {log.action.name}
+                              </p>
                             </div>
                           </Table.td>
                           <Table.td>
-                            <p className="text-scale-1100 truncate">
+                            <p
+                              className="text-scale-1100 max-w-[230px] truncate"
+                              title={project?.name ?? organization?.name ?? 'Unknown'}
+                            >
                               {project?.name
                                 ? 'Project: '
                                 : organization?.name
                                 ? 'Organization: '
                                 : null}
-                              {project?.name ?? organization?.name ?? 'Entity no longer exists'}
+                              {project?.name ?? organization?.name ?? 'Unknown'}
                             </p>
-                            <p className="text-scale-1000 text-xs mt-0.5 truncate">
+                            <p
+                              className="text-scale-1000 text-xs mt-0.5 truncate"
+                              title={
+                                log.target.metadata.project_ref ?? log.target.metadata.org_slug
+                              }
+                            >
                               {log.target.metadata.project_ref
                                 ? 'Ref: '
                                 : log.target.metadata.org_slug
