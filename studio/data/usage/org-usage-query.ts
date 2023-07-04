@@ -3,38 +3,35 @@ import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { useCallback } from 'react'
 import { usageKeys } from './keys'
+import { ResponseError } from 'types'
+import { PricingMetric } from 'data/analytics/org-daily-stats-query'
 
 export type OrgUsageVariables = {
   orgSlug?: string
 }
 
 export interface UsageMetric {
-  usage: number
-  limit: number
-  cost: number
+  /** Determines if the metric is available based on the plan */
   available_in_plan: boolean
-  // [Joshen] can we verify if this is still getting passed?
-  // Only for database and storage size
-  current?: number
+  cost: number
+  metric: PricingMetric
+  unlimited: boolean
+  /** Determines if over-usage is allowed or not */
+  capped: boolean
+  /** Refers to the included quota, in GB by default for bytes */
+  pricing_free_units?: number
+  pricing_package_price?: number
+  pricing_package_size?: number
+  pricing_per_unit_price?: number
+  pricing_strategy: 'UNIT' | 'PACKAGE' | 'NONE'
+  usage: number
 }
 
-// [Joshen TODO] Go update this
 export type OrgUsageResponse = {
-  db_size: UsageMetric
-  db_egress: UsageMetric
-  storage_size: UsageMetric
-  storage_egress: UsageMetric
-  storage_image_render_count: UsageMetric
-  monthly_active_users: UsageMetric
-  monthly_active_sso_users: UsageMetric
-  realtime_message_count: UsageMetric
-  realtime_peak_connection: UsageMetric
-  func_count: UsageMetric
-  func_invocations: UsageMetric
-  disk_volume_size_gb: number
+  slugs: string[]
+  usage_billing_enabled: boolean
+  usages: UsageMetric[]
 }
-
-export type OrgUsageResponseUsageKeys = keyof Omit<OrgUsageResponse, 'disk_volume_size_gb'>
 
 export async function getOrgUsage({ orgSlug }: OrgUsageVariables, signal?: AbortSignal) {
   if (!orgSlug) throw new Error('orgSlug is required')
@@ -44,7 +41,7 @@ export async function getOrgUsage({ orgSlug }: OrgUsageVariables, signal?: Abort
 }
 
 export type OrgUsageData = Awaited<ReturnType<typeof getOrgUsage>>
-export type OrgUsageError = unknown
+export type OrgUsageError = ResponseError
 
 export const useOrgUsageQuery = <TData = OrgUsageData>(
   { orgSlug }: OrgUsageVariables,
@@ -55,22 +52,6 @@ export const useOrgUsageQuery = <TData = OrgUsageData>(
     ({ signal }) => getOrgUsage({ orgSlug }, signal),
     {
       enabled: enabled && typeof orgSlug !== 'undefined',
-      // select(data) {
-      //   return Object.fromEntries(
-      //     Object.entries(data).map(([key, value]) => {
-      //       if (typeof value === 'object') {
-      //         const formattedValue = {
-      //           ...value,
-      //           usage: Number(value.usage),
-      //         }
-
-      //         return [key, formattedValue]
-      //       } else {
-      //         return [key, value]
-      //       }
-      //     })
-      //   )
-      // },
       ...options,
     }
   )
@@ -84,5 +65,6 @@ export const useOrgUsagePrefetch = ({ orgSlug }: OrgUsageVariables) => {
         getOrgUsage({ orgSlug }, signal)
       )
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orgSlug])
 }

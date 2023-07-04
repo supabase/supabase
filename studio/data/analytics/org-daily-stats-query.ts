@@ -6,6 +6,14 @@ import { useCallback } from 'react'
 import { AnalyticsData } from './constants'
 import { analyticsKeys } from './keys'
 
+export enum EgressType {
+  DATABASE = 'egress_database',
+  AUTH = 'egress_auth',
+  STORAGE = 'egress_storage',
+  REALTIME = 'egress_realtime',
+  UNIFIED = 'egress',
+}
+
 // [Joshen] Get this from common package instead of API and dashboard having one copy each
 export enum PricingMetric {
   EGRESS = 'EGRESS',
@@ -20,7 +28,9 @@ export enum PricingMetric {
   STORAGE_IMAGES_TRANSFORMED = 'STORAGE_IMAGES_TRANSFORMED',
   REALTIME_MESSAGE_COUNT = 'REALTIME_MESSAGE_COUNT',
   REALTIME_PEAK_CONNECTIONS = 'REALTIME_PEAK_CONNECTIONS',
+}
 
+export enum ComputeUsageMetric {
   COMPUTE_HOURS_XS = 'COMPUTE_HOURS_XS',
   COMPUTE_HOURS_SM = 'COMPUTE_HOURS_SM',
   COMPUTE_HOURS_MD = 'COMPUTE_HOURS_MD',
