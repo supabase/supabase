@@ -7,104 +7,144 @@ export const meta = {
     'Get started with Supabase and Snaplet, a developer tool for working with safe, versioned, up-to-date production-like data',
 }
 
-This step-by-step guide explains how to use Snaplet to clone your production Supabase project into another development database.
+This guide will help you get a development Supabase instance set up using Snaplet. In 15 minutes or less, you will create a snapshot of your production Supabase instance and restore it to a development environment you can safely code against.
 
-[Snaplet](https://snaplet.dev/) is a developer tool that copies a Postgres database, transforming personal information, so that you can **safely code against actual data.** This functionality makes it possible to easily achieve environment parity in Supabase.
+<Admonition type="note">
 
-Let's get started!
+If you experience any issues with getting Supabase working with Snaplet, or with this guide, feel free to come chat with us on [Discord](https://app.snaplet.dev/chat).
 
-Follow along in the video below as the founder of Snaplet, Peter Pistorius, takes you through the entire process. Otherwise, you can skip the video and dive into the step-by-step guide.
+</Admonition>
 
-<div className="video-container">
-  <iframe
-    src="https://www.youtube.com/embed/oPtMMhdhEP4?rel=0"
-    frameborder="0"
-    allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; modestbranding; showinfo=0"
-    allowfullscreen
-    width="100%"
-    height="400px"
-  ></iframe>
-</div>
+## Clone Supabase production data, without sensitive information, to a development environment
 
-## Step 1: Prerequisites
+We’re massive fans of Supabase because it makes it so easy to start a project with a dedicated PostgreSQL database. However, we’re willing to bet you know the pain and manual configuration in setting up multiple environments on Supabase and populating each of those with data - that’s why you’re here after all!
 
-1. **A production Supabase project's connection string:** These can be found in Supabase via `Organization > Project > Database > Connection Pooling > Connection string`
-2. **A development Supabase project's connection string:** Same steps as above, but a different project/environment
-3. **A read-only role** in Production (recommended): This can be done by running the following statements on Supabase via `Organization > SQL Editor > + New Query`
+Fortunately, Snaplet makes populating your multiple development environments with data and keeping that data consistent across those environments, incredibly simple. This is rooted in a philosophy we believe in here at Snaplet: [Environment parity](https://www.oreilly.com/content/environment-parity-for-rapidly-deployed-cloud-native-apps/).
 
-> To create a read-only role across all schemas you can checkout the Snaplet [docs](https://docs.snaplet.dev/guides/postgresql/#create-a-read-only-role)
+Environment parity sounds like a dream come true. In this guide, we’re going to tell you exactly how to do that with your data in Supabase! End-to-end, it shouldn’t take more than 15 minutes, and doing so will allow you to code against an accurate development environment that you can sync with production.
 
-## Step 2: Copying your production database
+### Things you'll need before you begin: [#prerequisite]
 
-### 2.1. Connect your data source
+1. **A production Supabase project’s connection string:** This can be found in Supabase via Organization > All Projects > Your Project > Project Settings > Connection String. We’ll refer to this in the guide as your “source database” - where your data comes from.
 
-Navigate to [https://www.snaplet.dev/](https://www.snaplet.dev/) and sign up for a new account (it’s free). Once you have successfully signed up for a new account, create a team, and start by connecting to your Supabase project.
+![Supabase connection string](https://docs.snaplet.dev/screenshots/supabase_connection_string.webp)
 
-![connect-your-database](/docs/img/guides/integrations/snaplet/connect-your-database.png)
+2. A development Supabase project’s connection string: Same steps as above, but a different project/environment. We’ll refer to this in the guide as your “target database” - where we’re restoring the snapshot of the source database to. If you haven’t got this set up yet, we’ll take you through the process of setting this up.
 
-Enter the credentials of your production Supabase project. Find the "Connection string" in Supabase via `Organization > Project > Settings > Database > Connection string` (at the bottom of the page).
+> **Highly Recommended:** Create a read-only role for your connection string. For more info on how to create a read-only role across all schemas, you can check out [our docs](https://docs.snaplet.dev/guides/postgresql#create-a-read-only-role).
 
-The password is the same password you used when creating the Supabase project.
+### Step 1: Connect your source database (Production Database) [#connect-source-db]
 
-![supabase-connection-db-info](/docs/img/guides/integrations/snaplet/supabase-connection-db-info.png)
+The first thing you’ll want to do is navigate to [https://www.snaplet.dev/](https://www.snaplet.dev/) and sign up for a new account (it’s free). Once you have successfully signed up for a new account, you’ll begin the onboarding process...
 
-You’ll have to confirm providing Snaplet access to your database. Snaplet will prompt you to only provide `read-only` access to your database. Snaplet has a guide in their documentation on how to do so [here](https://docs.snaplet.dev/guides/postgresql/#create-read-only-role).
+![Onboarding start](https://docs.snaplet.dev/screenshots/onboarding_start.webp)
 
-> Note that whatever connection string you provide here will be that of your Data Source – essentially the production database in a real-life scenario
+On the “Connect database” step add your Supabase production database (using your read-only role). This is the source database we defined above.
 
-![checking-database-credentials](/docs/img/guides/integrations/snaplet/checking-database-credentials.png)
+![Validating credentials](https://docs.snaplet.dev/screenshots/checking_creds.png)
 
-### 2.2. Transform your data
+### Step 2: Create a snapshot [#create-snapshot]
 
-![transform-your-data](/docs/img/guides/integrations/snaplet/transform-your-data.png)
+Once that is done, continue to the next steps:
 
-The next step is to exclude any schemas that you do not require. You are able to exclude an entire schema by clicking on the drop-down at the top, selecting the schema you would like to exclude and clicking ‘Exclude schema’. Alternatively, you can select a given schema and exclude only specific tables from that particular schema. Exclude any non-required table data (such as logs) and extensions and view your columns.
+- Subsetting (skipping will create a snapshot with all your data).
+- Transforming (skipping will leave all your table columns untouched).
 
-At this point, Snaplet will automatically detect any columns that have Personally Identifiable Information (PII) and mark them in purple. If there are any additional columns that hold data you would like to anonymise, you can click on the respective column name and provide a replacement value for the data in that column. To complete the onboarding, click on `Review and Save` and proceed to the dashboard.
+Once you have gone through those steps, a new snapshot process will start and you will now be on the “capture step.” Wait for it to finish - this is the snapshot you will restore into your **target database.**
 
-![create-your-first-snapshot](/docs/img/guides/integrations/snaplet/create-your-first-snapshot.png)
+### Step 3: Create a target database on Supabase (Development Database) [#create-target-db]
 
-### 2.3. Create a Snapshot
+Your target database is where you want Snaplet to restore the captured snapshot of your production project. This would most likely be either your staging or developer Supabase project.
 
-Create a snapshot of your production database. This is what you’re going to restore later into your data target (more on that later in the guide).
+If you don’t already have a developer database setup on Supabase, you’ll need to create a new database by setting up a new project on Supabase. To create a new project you’ll have to do the following:
 
-## Step 3: Pasting into your development database
+1. Go to [app.supabase.io](https://app.supabase.io/)
 
-### 3.1. Create a data target on Supabase
+2. Go to your organization > All projects
 
-Your data target is where you want Snaplet to restore the captured snapshot of your production project. This would most likely be either your staging or developer Supabase project. If you don’t already have a developer database setup on Supabase, create a new data target by setting up a new project on Supabase. To create a new project, follow the steps below:
+3. In the top left click on your current project name and new project
 
-1. Go to [supabase.com/dashboard](https://supabase.com/dashboard/)
-2. Click on “new project”
-3. Enter your project details
+![New project](https://docs.snaplet.dev/assets/images/new_project-74c5ef5f64da9f0bad9c50c23bc04acb.png)
+
 4. Wait for the new database to launch
 
 > Remember the password you use when creating the project. You’ll need this password to connect your database to Snaplet later.
 
-### 3.2. Install the Snaplet CLI
+### Step 4: Install the Snaplet CLI [#cli-installation]
 
-1. Open your terminal and run `curl -sL https://app.snaplet.dev/get-cli/ | bash`
-2. Run `snaplet auth`
-3. Navigate to [https://app.snaplet.dev/access-token/cli](https://app.snaplet.dev/access-token/cli) to get your access token
-4. Paste your access token in the terminal
+1. Open your terminal and run `npm install snaplet`
+2. Run `snaplet auth login`
+3. Navigate to `https://app.snaplet.dev/access-token/cli` to get your access token.
+4. Paste the access token in the terminal.
 
-### 3.3. Restore to the data target
+### Step 5: Config setup [#config-setup]
 
 You're now ready to restore your production snapshot into your Supabase development project.
 
 1. Navigate to your project directory
-2. Run `snaplet setup` – you will be prompted to enter your database credentials. These are the database credentials of your **data target.** This could be your staging or development database
 
-Once completed, you will be presented with a list of databases that are connected to your Snaplet account.
+2. Run `snaplet config setup`
 
-1. Select a data source from the list
-2. Run `snaplet snapshot restore`
+i. You will be shown a warning to write create `.snaplet/config` in your project directory. Select yes (y) to create the file.
+ii. Then you will be asked for a **target database connection string.** These are the database credentials of your **target database that we set up in step 3** (your staging or development database).
+
+> Note that you need to be using the `postgres` user for your development environment
+
+3. Run `snaplet project setup` - you will be presented with a list of projects, these are databases that are connected to your Snaplet account. Choose the project that contains the snapshot you created in Step 2.
+
+### Step 6: Restore the data target [#restore-data-target]
+
+With all the above steps complete, we can now restore!
+
+1. Run `snaplet snapshot restore --no-reset`
+
+> **Note on `--no-reset`:** This will skip the “reset” step of the restore command. So no existing schemas will be dropped. Learn more about data operations [here](https://docs.snaplet.dev/getting-started/restoring#opting-out)
 
 ## All done!
 
-As a Supabase user, you can see how this solves an issue developers all typically experience when attempting to create multiple development environments and populating each of those environments with data that can be worked with. Snaplet simplifies this process down to creating the respective Supabase projects, connecting the data source (The production database) to Snaplet and telling Snaplet where to restore that data (staging and development databases).
+If you want to learn more about Snaplet, you can explore our docs. If you have any questions, feel free to reach out on [Discord](https://app.snaplet.dev/chat).
 
-If you want to learn more about Snaplet, you can explore the Snaplet [docs](https://docs.snaplet.dev/). If you have any questions, feel free to [reach out on Discord](https://discord.com/invite/6HUuajc866).
+That’s it! You’re all done and should have restored a version of your Supabase production database with transformed data into your target database. You can now safely code against production-realistic data.
+
+## Supabase local development [#local-development]
+
+Supabase allows you [develop locally](https://supabase.com/docs/guides/cli/local-development) through their CLI, you can easily restore any snapshot created in Snaplet to your local instance, just by running:
+
+```bash
+# Login into the Supabase CLI
+supabase login
+
+# Initialize Supabase to set up the configuration for developing your project locally:
+supabase init
+
+# With docker installed and running start up your supabase services locally
+supabase start
+
+# Grab the local database URL and insert it into the ./snaplet/config.json file
+# Restore to the target database URL
+snaplet ss r --no-reset
+```
+
+## Troubleshooting [#troubleshoot]
+
+### Warnings after restoring [#restore-warning]
+
+When running the restore command, you may see warnings such as:
+
+```bash
+Could not drop schema "auth", Snaplet will try to truncate all tables and related objects as a fallback: error: must be owner of schema auth
+[Schema] Warning: type "aal_level" already exists, statement: "CREATE TYPE auth.aal_level AS ENUM (...
+```
+
+Supabase includes a few schemas that are not owned by the postgres user, for example: **auth, graphql, realtime,** and **storage.** During the capture process, Snaplet will try to capture data for tables under these schemas (if it has permission to read data from them)
+
+Your **target database** may already contain these schemas when restoring. The warnings just mean that when Snaplet attempted to restore these schemas (**auth, graphql,** etc) but was unable to drop the ones already existing in your **target database** (since the user is not an owner of these), and consequently it was not able to create any structure for them (since that structure still exists)
+
+Snaplet will still make sure to clear all data for tables in these schemas and restore data for each of these tables to what is in the snapshot. In other words, **these warnings do not mean that the restore failed, but rather show you what Snaplet tried to do.**
+
+If you aren't actually needing the data for some of these schemas, you can stop these warnings by excluding the schema from the captured snapshots. You can read more on how to do this [over here in our docs](https://docs.snaplet.dev/references/data-operations/exclude):
+
+![Supabase schema exclude](https://docs.snaplet.dev/assets/images/snaplet-supabase-schema-exclude-5f123e687bfd94895b5c136a2a5beb87.png)
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
