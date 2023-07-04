@@ -15,7 +15,6 @@ import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
 import { Alert, Button, IconExternalLink } from 'ui'
 import ProjectUpdateDisabledTooltip from '../../BillingSettings/ProjectUpdateDisabledTooltip'
 import PlanUpdateSidePanel from './PlanUpdateSidePanel'
-import SubscriptionPaymentMethod from './SubscriptionPaymentMethod'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 
 const Subscription = () => {
@@ -172,10 +171,6 @@ const Subscription = () => {
                 labelBottomClass="!text-scale-1000 pb-1"
                 labelTop={`${daysToCycleEnd} Days left`}
               />
-
-              {subscription !== undefined && (
-                <SubscriptionPaymentMethod subscription={subscription} />
-              )}
             </div>
           )}
         </ScaffoldSectionContent>

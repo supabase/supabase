@@ -150,6 +150,13 @@ a {
   }
 }
 
+.input-xs {
+  input,
+  textarea {
+    @apply text-xs;
+  }
+}
+
 input[type='radio'] {
   @apply p-0;
 }
