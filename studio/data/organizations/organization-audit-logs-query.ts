@@ -4,6 +4,7 @@ import { API_URL } from 'lib/constants'
 import { useCallback } from 'react'
 import { organizationKeys } from './keys'
 import { ResponseError } from 'types'
+import dayjs from 'dayjs'
 
 export type OrganizationAuditLog = {
   action: {
@@ -52,10 +53,6 @@ export async function getOrganizationAuditLogs(
     `${API_URL}/organizations/${slug}/audit?iso_timestamp_start=${iso_timestamp_start}&iso_timestamp_end=${iso_timestamp_end}`,
     { signal }
   )
-  // if (response.error) {
-  //   if (response.error.code === 400 && response.error.message.includes('Date range specified exceeds the retention period'))
-  //   throw response.error
-  // }
   if (response.error) throw response.error
   return response as OrganizationAuditLogsResponse
 }
@@ -71,13 +68,14 @@ export const useOrganizationAuditLogsQuery = <TData = OrganizationAuditLogsData>
   }: UseQueryOptions<OrganizationAuditLogsData, OrganizationAuditLogsError, TData> = {}
 ) => {
   const { slug, iso_timestamp_start, iso_timestamp_end } = vars
+  const date_start = dayjs(iso_timestamp_start).utc().format('YYYY-MM-DD')
+  const date_end = dayjs(iso_timestamp_end).utc().format('YYYY-MM-DD')
+
   return useQuery<OrganizationAuditLogsData, OrganizationAuditLogsError, TData>(
-    organizationKeys.auditLogs(slug, { iso_timestamp_start, iso_timestamp_end }),
+    organizationKeys.auditLogs(slug, { date_start, date_end }),
     ({ signal }) => getOrganizationAuditLogs(vars, signal),
     {
       enabled: enabled && typeof slug !== 'undefined',
-      staleTime: Infinity,
-      cacheTime: Infinity,
       ...options,
     }
   )
@@ -89,8 +87,10 @@ export const useOrganizationAuditLogsPrefetch = (vars: OrganizationAuditLogsVari
 
   return useCallback(() => {
     if (slug) {
+      const date_start = dayjs(iso_timestamp_start).utc().format('YYYY-MM-DD')
+      const date_end = dayjs(iso_timestamp_end).utc().format('YYYY-MM-DD')
       client.prefetchQuery(
-        organizationKeys.auditLogs(slug, { iso_timestamp_start, iso_timestamp_end }),
+        organizationKeys.auditLogs(slug, { date_start, date_end }),
         ({ signal }) => getOrganizationAuditLogs(vars, signal)
       )
     }
