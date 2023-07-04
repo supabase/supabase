@@ -54,7 +54,7 @@ const EditModal: FC<any> = () => {
       if (error) throw error
       setLoading(false)
       await contentStore.load()
-      setVisible(!visible)
+      setVisible((prevVisible) => !prevVisible)
       return data
     } catch (error: any) {
       ui.setNotification({ category: 'error', message: error.message })

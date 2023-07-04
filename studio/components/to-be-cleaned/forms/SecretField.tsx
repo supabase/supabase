@@ -18,7 +18,7 @@ const SecretField: React.FC = (props: any) => {
   }
 
   function onToggleVisible() {
-    setVisible(!visible)
+    setVisible((prevVisible) => !prevVisible)
   }
 
   return (

@@ -15,7 +15,7 @@ import dart from 'react-syntax-highlighter/dist/cjs/languages/hljs/dart'
 import json from 'react-syntax-highlighter/dist/cjs/languages/hljs/json'
 import kotlin from 'react-syntax-highlighter/dist/cjs/languages/hljs/kotlin'
 
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { useTheme } from 'common/Providers'
 
 export interface CodeBlockProps {
@@ -44,7 +44,7 @@ export const CodeBlock = ({
 
   const [copied, setCopied] = useState(false)
 
-  const handleCopy = React.useCallback(() => {
+  const handleCopy = useCallback(() => {
     setCopied(true)
     setTimeout(() => {
       setCopied(false)

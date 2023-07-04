@@ -31,7 +31,7 @@ const PublicationsTableItem: FC<Props> = ({ table, selectedPublication }) => {
     publication: PostgresPublication
   ) => {
     const originalChecked = checked
-    setChecked(!checked)
+    setChecked((prevChecked) => !prevChecked)
     setLoading(true)
 
     const publicationTables = publication?.tables ?? []

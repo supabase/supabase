@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 import { Loading } from 'ui'
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import {
   BarChart as RechartBarChart,
   Area,
@@ -150,7 +150,7 @@ export function BarChart({
   const [focusBar, setFocusBar] = useState<any>(null)
   const [mouseLeave, setMouseLeave] = useState<any>(true)
 
-  const onMouseMove = (state: any) => {
+  const onMouseMove = useCallback((state: any) => {
     if (state?.activeTooltipIndex) {
       setFocusBar(state.activeTooltipIndex)
       setMouseLeave(false)
@@ -158,12 +158,12 @@ export function BarChart({
       setFocusBar(null)
       setMouseLeave(true)
     }
-  }
+  }, [])
 
-  const onMouseLeave = () => {
+  const onMouseLeave = useCallback(() => {
     setFocusBar(false)
     setMouseLeave(true)
-  }
+  }, [])
 
   const day = (value: number | string) => (displayDateInUtc ? dayjs(value).utc() : dayjs(value))
 

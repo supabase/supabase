@@ -1,5 +1,5 @@
 import Editor, { OnChange, useMonaco } from '@monaco-editor/react'
-import { FC, useEffect, useRef } from 'react'
+import { FC, useEffect, useRef, useCallback} from 'react'
 import { useStore } from 'hooks'
 
 interface Props {
@@ -82,7 +82,7 @@ const SqlEditor: FC<Props> = ({
     }
   }
 
-  const onMount = (editor: any, monaco: any) => {
+  const onMount = useCallback((editor: any, monaco: any) => {
     editorRef.current = editor
 
     // Add margin above first line
@@ -93,7 +93,7 @@ const SqlEditor: FC<Props> = ({
         domNode: document.createElement('div'),
       })
     })
-  }
+  }, [])
 
   const Loading = () => <h4 className="text-lg">Loading</h4>
 

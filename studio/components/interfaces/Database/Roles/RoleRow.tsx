@@ -91,7 +91,7 @@ const RoleRow: FC<Props> = ({ role, disabled = false, onSelectDelete }) => {
                 type="button"
                 className="group flex w-full items-center justify-between rounded py-3 px-6 text-scale-1200"
                 onClick={(event: any) => {
-                  if (event.target.id === 'collapsible-trigger') setIsExpanded(!isExpanded)
+                  if (event.target.id === 'collapsible-trigger') setIsExpanded((prevIsExplained) => !prevIsExplained)
                 }}
               >
                 <div className="flex items-start space-x-3">

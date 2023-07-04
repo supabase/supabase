@@ -88,7 +88,7 @@ const NewAccessTokenButton = observer(({ onCreateToken }: NewAccessTokenButtonPr
         hideFooter
         size="medium"
         visible={isOpen}
-        onCancel={() => setIsOpen(!isOpen)}
+        onCancel={() => setIsOpen((prevOpen) => !prevOpen)}
         header={
           <div className="flex items-baseline gap-2">
             <h5 className="text-sm text-scale-1200">

@@ -1,4 +1,4 @@
-import { MouseEventHandler, PropsWithChildren, useEffect, useState } from 'react'
+import { MouseEventHandler, PropsWithChildren, useEffect, useState, useCallback } from 'react'
 import { Button, Modal } from 'ui'
 
 export interface ConfirmationModalProps {
@@ -33,12 +33,12 @@ const ConfirmationModal = ({
 
   const [loading, setLoading] = useState(false)
 
-  const onConfirm: MouseEventHandler<HTMLButtonElement> = (e) => {
+  const onConfirm: MouseEventHandler<HTMLButtonElement> = useCallback((e) => {
     e.preventDefault()
     e.stopPropagation()
     setLoading(true)
     onSelectConfirm()
-  }
+  }, [onSelectConfirm])
 
   return (
     <Modal

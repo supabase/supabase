@@ -320,7 +320,7 @@ const TableEditorPage: NextPageWithLayout = () => {
               label="Drop column with cascade?"
               description="Deletes the column and its dependent objects"
               checked={isDeleteWithCascade}
-              onChange={() => setIsDeleteWithCascade(!isDeleteWithCascade)}
+              onChange={() => setIsDeleteWithCascade((prevIsDeleteWithCascade) => !prevIsDeleteWithCascade)}
             />
             {isDeleteWithCascade && (
               <Alert
@@ -368,7 +368,7 @@ const TableEditorPage: NextPageWithLayout = () => {
               label="Drop table with cascade?"
               description="Deletes the table and its dependent objects"
               checked={isDeleteWithCascade}
-              onChange={() => setIsDeleteWithCascade(!isDeleteWithCascade)}
+              onChange={() => setIsDeleteWithCascade((prevIsDeleteWithCascade) => !prevIsDeleteWithCascade)}
             />
             {isDeleteWithCascade && (
               <Alert

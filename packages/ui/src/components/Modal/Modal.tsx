@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useCallback } from 'react'
 // @ts-ignore
 import ModalStyles from './Modal.module.css'
 import { Button, IconX, Space } from './../../../index'
@@ -133,7 +133,7 @@ const Modal = ({
     </Space>
   )
 
-  const handleOpenChange = React.useCallback((open: boolean) => {
+  const handleOpenChange = useCallback((open: boolean) => {
     if (visible !== undefined && !open) {
       // controlled component behaviour
       onCancel()
@@ -141,7 +141,7 @@ const Modal = ({
       // un-controlled component behaviour
       setOpen(open)
     }
-  }, [(visible !== undefined && !open), onCancel])
+  }, [(visible !== undefined), onCancel])
 
   return (
     <Dialog.Root open={open} onOpenChange={handleOpenChange}>

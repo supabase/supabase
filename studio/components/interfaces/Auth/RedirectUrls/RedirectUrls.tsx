@@ -125,7 +125,7 @@ const RedirectUrls = () => {
         hideFooter
         size="small"
         visible={open}
-        onCancel={() => setOpen(!open)}
+        onCancel={() => setOpen((prevOpen) => !prevOpen)}
         header={<h3 className="text-sm">Add a new URL</h3>}
       >
         <Form

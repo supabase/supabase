@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState, FormEvent, KeyboardEvent, ReactNode } from 'react'
+import { useRef, useEffect, useState, useCallback, FormEvent, KeyboardEvent, ReactNode } from 'react'
 import { orderBy, filter, without } from 'lodash'
 import {
   Popover,
@@ -82,11 +82,11 @@ export default function MultiSelect({
     return isOptionSelected !== undefined
   }
 
-  const handleRemove = (idx: number) => {
+  const handleRemove = useCallback((idx: number) => {
     const updatedSelected = selected.filter((x, index) => index !== idx)
-    setSelected(updatedSelected)
+    setSelected((prevSelected) => prevSelected.filter((x, index) => index !== idx))
     onChange(updatedSelected)
-  }
+  }, [selected, onChange])
 
   const handleChange = (option: MultiSelectOption) => {
     const _selected = selectedOptions

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import DatePicker from 'react-datepicker'
 import {
   Button,
@@ -66,11 +66,11 @@ function _DatePicker({
     }
   }, [to, from])
 
-  function handleDatePickerChange(dates: [from: Date | null, to: Date | null]) {
+  const handleDatePickerChange = useCallback((dates: [from: Date | null, to: Date | null]) => {
     const [from, to] = dates
     setStartDate(from)
     setEndDate(to)
-  }
+  }, [])
 
   function handleSubmit() {
     setOpen(false)
@@ -95,7 +95,7 @@ function _DatePicker({
     if (onChange) onChange(payload)
   }
 
-  function handleClear() {
+  const handleClear = useCallback(() => {
     setOpen(false)
     setStartDate(START_DATE_DEFAULT)
     setEndDate(END_DATE_DEFAULT)
@@ -105,7 +105,7 @@ function _DatePicker({
 
     setAppliedStartDate(null)
     setAppliedEndDate(null)
-  }
+  }, [])
   return (
     <Popover
       open={open}

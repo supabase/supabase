@@ -287,7 +287,7 @@ const SmtpForm = () => {
                       <Button
                         icon={hidden ? <IconEye /> : <IconEyeOff />}
                         type="default"
-                        onClick={() => setHidden(!hidden)}
+                        onClick={() => setHidden((prevHidden) => !prevHidden)}
                       />
                     }
                     disabled={!canUpdateConfig}

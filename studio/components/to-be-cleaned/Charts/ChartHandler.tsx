@@ -147,7 +147,7 @@ const ChartHandler: FC<Props> = ({
               <Button
                 type="default"
                 icon={chartStyle === 'bar' ? <IconActivity /> : <IconBarChart />}
-                onClick={() => setChartStyle(chartStyle === 'bar' ? 'line' : 'bar')}
+                onClick={() => setChartStyle(prevStyle => prevStyle === 'bar' ? 'line' : 'bar')}
               />
             </div>
           </div>

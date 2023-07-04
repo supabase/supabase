@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useCallback } from 'react'
 
 import { IconCheck } from '../Icon/icons/IconCheck'
 
@@ -151,7 +151,7 @@ interface RadioGroupProps {
 export function RadioGroup({ children, value: propsValue, onChange }: RadioGroupProps) {
   const [value, setValue] = useState(propsValue ? propsValue : '')
 
-  const handleChange = React.useCallback((e: string) => {
+  const handleChange = useCallback((e: string) => {
     if (onChange) onChange(e)
     setValue(e)
   }, [onChange])

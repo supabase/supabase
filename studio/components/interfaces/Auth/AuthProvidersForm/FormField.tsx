@@ -46,7 +46,7 @@ const FormField: FC<Props> = ({ name, properties, formValues, disabled = false }
               <Button
                 icon={hidden ? <IconEye /> : <IconEyeOff />}
                 type="default"
-                onClick={() => setHidden(!hidden)}
+                onClick={() => setHidden((prevHidden) => !prevHidden)}
               />
             ) : (
               <span className="mr-3 text-scale-900">
