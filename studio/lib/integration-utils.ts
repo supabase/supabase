@@ -1,3 +1,4 @@
+import { Integration } from 'data/integrations/integrations.types'
 import { ResponseFailure } from 'types'
 
 type SupaResponse<T> = T | ResponseFailure
@@ -112,4 +113,12 @@ export async function getInitialMigrationSQLFromGitHubRepo(
   `
 
   return `${migrations};${migrationsTableSql};${seed}`
+}
+
+export function getVercelConfigurationUrl(integration: Integration) {
+  return `https://vercel.com/dashboard/${
+    integration.metadata?.account.type === 'Team'
+      ? `${integration.metadata?.account.team_slug}/`
+      : ''
+  }integrations/${integration.metadata?.configuration_id}`
 }
