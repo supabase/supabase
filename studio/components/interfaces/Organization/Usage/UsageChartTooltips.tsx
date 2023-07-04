@@ -63,11 +63,11 @@ export const MultiAttributeTooltipContent = ({
                   <div
                     className={clsx('w-3 h-3 rounded-full border', COLOR_MAP[attr.color].marker)}
                   />
-                  <p className="text-sm prose">
+                  <p className="text-xs prose">
                     {attr.name} ({percentageContribution}%):{' '}
                   </p>
                 </div>
-                <p className="text-sm tabular-nums">
+                <p className="text-xs tabular-nums">
                   {tooltipFormatter !== undefined ? tooltipFormatter(attrValue) : attrValue}
                 </p>
               </div>
