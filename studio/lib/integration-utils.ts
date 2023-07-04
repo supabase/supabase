@@ -117,6 +117,8 @@ export async function getInitialMigrationSQLFromGitHubRepo(
 
 export function getVercelConfigurationUrl(integration: Integration) {
   return `https://vercel.com/dashboard/${
-    integration.metadata?.account.type === 'Team' ? `${integration.metadata?.account.slug}/` : ''
+    integration.metadata?.account.type === 'Team'
+      ? `${integration.metadata?.account.team_slug}/`
+      : ''
   }integrations/${integration.metadata?.configuration_id}`
 }

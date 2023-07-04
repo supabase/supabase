@@ -160,6 +160,23 @@ export type IntegrationName = 'Vercel' | 'Netlify' | 'GitHub'
 export type VercelAccountType = 'Team' | 'Personal'
 export type VercelSource = 'marketplace' | 'deploy button'
 
+type BaseVercelAccount = {
+  name: string
+  avatar: string
+  source: VercelSource
+  owner_id: string
+}
+
+export type VercelAccount = BaseVercelAccount & {
+  type: 'Personal'
+}
+
+export type VercelTeamAccount = BaseVercelAccount & {
+  type: 'Team'
+  team_id: string
+  team_slug: string
+}
+
 export type Integration = {
   id: string
   integration: {
@@ -175,13 +192,7 @@ export type Integration = {
   metadata?: {
     vercelTeam?: string
     gitHubConnectionOwner?: string
-    account: {
-      name: string
-      type: VercelAccountType
-      avatar: string
-      source: VercelSource
-      owner_id: string
-    }
+    account: VercelAccount | VercelTeamAccount
     configuration_id: string
   }
 }
