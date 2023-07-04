@@ -61,10 +61,6 @@ const SidePanel = ({
 }: SidePanelProps) => {
   const __styles = styleHandler('sidepanel')
 
-  // function stopPropagation(e: React.MouseEvent) {
-  //   e.stopPropagation()
-  // }
-
   const footerContent = customFooter ? (
     customFooter
   ) : (
@@ -74,35 +70,37 @@ const SidePanel = ({
           {cancelText}
         </Button>
       </div>
-      <Tooltip.Root delayDuration={0}>
-        <Tooltip.Trigger asChild>
-          <div>
-            <Button
-              htmlType="submit"
-              disabled={disabled || loading}
-              loading={loading}
-              onClick={() => (onConfirm ? onConfirm() : null)}
-            >
-              {confirmText}
-            </Button>
-          </div>
-        </Tooltip.Trigger>
-        {tooltip !== undefined && (
-          <Tooltip.Portal>
-            <Tooltip.Content side="bottom">
-              <Tooltip.Arrow className="radix-tooltip-arrow" />
-              <div
-                className={[
-                  'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                  'border border-scale-200',
-                ].join(' ')}
+      {onConfirm !== undefined && (
+        <Tooltip.Root delayDuration={0}>
+          <Tooltip.Trigger asChild>
+            <div>
+              <Button
+                htmlType="submit"
+                disabled={disabled || loading}
+                loading={loading}
+                onClick={() => (onConfirm ? onConfirm() : null)}
               >
-                <span className="text-xs text-scale-1200">{tooltip}</span>
-              </div>
-            </Tooltip.Content>
-          </Tooltip.Portal>
-        )}
-      </Tooltip.Root>
+                {confirmText}
+              </Button>
+            </div>
+          </Tooltip.Trigger>
+          {tooltip !== undefined && (
+            <Tooltip.Portal>
+              <Tooltip.Content side="bottom">
+                <Tooltip.Arrow className="radix-tooltip-arrow" />
+                <div
+                  className={[
+                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                    'border border-scale-200',
+                  ].join(' ')}
+                >
+                  <span className="text-xs text-scale-1200">{tooltip}</span>
+                </div>
+              </Tooltip.Content>
+            </Tooltip.Portal>
+          )}
+        </Tooltip.Root>
+      )}
     </div>
   )
 

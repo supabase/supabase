@@ -11,6 +11,7 @@ import SizeAndCounts from './SizeAndCounts'
 import Activity from './Activity'
 import { IconLoader } from 'ui'
 import { useOrgUsageQuery } from 'data/usage/org-usage-query'
+import { ScaffoldContainer, ScaffoldDivider, ScaffoldSection } from 'components/layouts/Scaffold'
 
 const Usage = () => {
   const { slug } = useParams()
@@ -68,33 +69,38 @@ const Usage = () => {
 
   return (
     <>
-      <div className="flex items-center space-x-4 px-4 py-4 border-b">
-        {!isLoadingSubscription && (
-          <DateRangePicker
-            id="billingCycle"
-            name="billingCycle"
-            onChange={setDateRange}
-            value={TIME_PERIODS_BILLING[0].key}
-            options={[...TIME_PERIODS_BILLING, ...TIME_PERIODS_REPORTS]}
-            loading={isLoadingSubscription}
-            currentBillingPeriodStart={subscription?.current_period_start}
-            className="!w-[200px]"
-          />
-        )}
+      <ScaffoldContainer>
+        <div className="py-4 flex items-center space-x-4">
+          {!isLoadingSubscription && (
+            <DateRangePicker
+              id="billingCycle"
+              name="billingCycle"
+              onChange={setDateRange}
+              value={TIME_PERIODS_BILLING[0].key}
+              options={[...TIME_PERIODS_BILLING, ...TIME_PERIODS_REPORTS]}
+              loading={isLoadingSubscription}
+              currentBillingPeriodStart={subscription?.current_period_start}
+              className="!w-[200px]"
+            />
+          )}
 
-        {isLoadingSubscription ? (
-          <IconLoader className="animate-spin" size={14} />
-        ) : subscription !== undefined ? (
-          <div className="flex flex-col xl:flex-row xl:gap-3">
-            <p className={clsx('text-sm transition', isLoadingSubscription && 'opacity-50')}>
-              Organization is on the {subscription.plan.name} plan
-            </p>
-            <p className="text-sm text-scale-1000">
-              {billingCycleStart.format('DD MMM YYYY')} - {billingCycleEnd.format('DD MMM YYYY')}
-            </p>
-          </div>
-        ) : null}
-      </div>
+          {isLoadingSubscription ? (
+            <IconLoader className="animate-spin" size={14} />
+          ) : subscription !== undefined ? (
+            <div className="flex flex-col xl:flex-row xl:gap-3">
+              <p className={clsx('text-sm transition', isLoadingSubscription && 'opacity-50')}>
+                Organization is on the {subscription.plan.name} plan
+              </p>
+              <p className="text-sm text-scale-1000">
+                {billingCycleStart.format('DD MMM YYYY')} - {billingCycleEnd.format('DD MMM YYYY')}
+              </p>
+            </div>
+          ) : null}
+        </div>
+      </ScaffoldContainer>
+
+      <ScaffoldDivider />
+
       <Bandwidth
         orgSlug={slug as string}
         projectRef={selectedProjectRef}
@@ -103,6 +109,7 @@ const Usage = () => {
         endDate={endDate}
         currentBillingCycleSelected={currentBillingCycleSelected}
       />
+
       <SizeAndCounts
         orgSlug={slug as string}
         subscription={subscription}

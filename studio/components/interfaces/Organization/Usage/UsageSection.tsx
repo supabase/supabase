@@ -24,6 +24,7 @@ import {
   getUpgradeUrl,
 } from './Usage.utils'
 import UsageBarChart from './UsageBarChart'
+import { ScaffoldContainer, ScaffoldDivider } from 'components/layouts/Scaffold'
 
 interface UsageSectionProps {
   orgSlug: string
@@ -57,7 +58,11 @@ const UsageSection = ({
 
   return (
     <>
-      <SectionHeader title={categoryMeta.name} description={categoryMeta.description} />
+      <ScaffoldContainer>
+        <SectionHeader title={categoryMeta.name} description={categoryMeta.description} />
+      </ScaffoldContainer>
+
+      <ScaffoldDivider />
 
       {categoryMeta.attributes.map((attribute) => {
         const usageMeta = usage?.[attribute.key as keyof ProjectUsageResponse] as UsageMetric

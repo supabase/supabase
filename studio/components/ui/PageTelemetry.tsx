@@ -54,6 +54,13 @@ const PageTelemetry: FC = ({ children }) => {
           language: telemetryProps?.language,
         },
       })
+
+      post(`${API_URL}/telemetry/pageview`, {
+        referrer: referrer,
+        title: document.title,
+        path: router.route,
+        location: router.asPath,
+      })
     }
   }
 

@@ -1,4 +1,6 @@
 import Layout from '~/layouts/DefaultGuideLayout'
+import { Tabs } from 'ui'
+export const TabPanel = Tabs.Panel
 
 export const meta = {
   id: 'ai-lang-chain',
@@ -13,6 +15,21 @@ export const meta = {
 ## Initializing your database
 
 Prepare you database with the relevant tables:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="dashboard"
+>
+<TabPanel id="dashboard" label="Dashboard">
+
+1. Go to the [SQL Editor](https://supabase.com/dashboard/project/_/sql) page in the Dashboard.
+2. Click **LangChain** in the Quick start section.
+3. Click **Run**.
+
+</TabPanel>
+<TabPanel id="sql" label="SQL">
 
 ```sql
 -- Enable the pgvector extension to work with embedding vectors
@@ -54,6 +71,9 @@ begin
 end;
 $$;
 ```
+
+</TabPanel>
+</Tabs>
 
 ## Usage
 
