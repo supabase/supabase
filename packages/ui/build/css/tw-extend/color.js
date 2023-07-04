@@ -409,7 +409,7 @@ module.exports = {
 },
 "foreground-muted": {
   cssVariable: "var(--foreground-muted)",
-  value: "hsl(0, 0%, 100%)"
+  value: "hsl(0, 0%, 43.9%)"
 },
 "foreground-light": {
   cssVariable: "var(--foreground-light)",
@@ -423,18 +423,6 @@ module.exports = {
   cssVariable: "var(--background-default)",
   value: "hsl(0, 0%, 11%)"
 },
-"background-muted": {
-  cssVariable: "var(--background-muted)",
-  value: "hsl(0, 0%, 100%)"
-},
-"background-secondary": {
-  cssVariable: "var(--background-secondary)",
-  value: "hsl(0, 0%, 100%)"
-},
-"background-overlay": {
-  cssVariable: "var(--background-overlay)",
-  value: "hsl(0, 0%, 13.7%)"
-},
 "background-selection": {
   cssVariable: "var(--background-selection)",
   value: "hsl(0, 0%, 20.4%)"
@@ -447,9 +435,25 @@ module.exports = {
   cssVariable: "var(--background-alternative)",
   value: "hsl(0, 0%, 8.6%)"
 },
-"background-sputnik": {
-  cssVariable: "var(--background-sputnik)",
-  value: "hsl(107.89999999999998, 95.1%, 60.2%)"
+"background-surface-100": {
+  cssVariable: "var(--background-surface-100)",
+  value: "hsl(0, 0%, 13.7%)"
+},
+"background-surface-200": {
+  cssVariable: "var(--background-surface-200)",
+  value: "hsl(0, 0%, 15.7%)"
+},
+"background-surface-300": {
+  cssVariable: "var(--background-surface-300)",
+  value: "hsl(0, 0%, 18%)"
+},
+"background-surface-overlay": {
+  cssVariable: "var(--background-surface-overlay)",
+  value: "hsl(0, 0%, 13.7%)"
+},
+"background-surface-overlay-hover": {
+  cssVariable: "var(--background-surface-overlay-hover)",
+  value: "hsl(0, 0%, 18%)"
 },
 "border-DEFAULT": {
   cssVariable: "var(--border-default)",
@@ -502,5 +506,21 @@ module.exports = {
 "warning-DEFAULT": {
   cssVariable: "var(--warning-default)",
   value: "hsl(38.89999999999998, 100%, 57.1%)"
+},
+"brand-200": {
+  cssVariable: "var(--brand-200)",
+  value: "hsl(148.5, 43.5%, 82%)"
+},
+"brand-300": {
+  cssVariable: "var(--brand-300)",
+  value: "hsl(152.70000000000005, 48.5%, 26.7%)"
+},
+"brand-400": {
+  cssVariable: "var(--brand-400)",
+  value: "hsl(153.60000000000002, 41%, 12%)"
+},
+"brand-PRIMARY": {
+  cssVariable: "var(--brand-primary)",
+  value: "hsl(152.89999999999998, 60%, 52.9%)"
 }
 }
