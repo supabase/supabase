@@ -9,12 +9,20 @@ type Directories = '_blog' | '_case-studies' | '_customers' | '_alternatives'
 // based on YYYY-MM-DD format
 const FILENAME_SUBSTRING = 11
 
-export const getSortedPosts = (
-  directory: Directories,
-  limit?: number,
-  tags?: any,
-  runner?: any
-) => {
+type GetSortedPostsParams = {
+  directory: Directories
+  limit?: number
+  tags?: unknown[]
+  runner?: unknown
+  currentPostSlug?: string
+}
+
+export const getSortedPosts = ({
+  directory,
+  limit,
+  tags,
+  currentPostSlug,
+}: GetSortedPostsParams) => {
   //Finding directory named "blog" from the current working directory of Node.
   const postDirectory = path.join(process.cwd(), directory)
 
@@ -83,6 +91,10 @@ export const getSortedPosts = (
     })
   }
 
+  if (currentPostSlug) {
+    sortedPosts = sortedPosts.filter((post) => post.slug !== currentPostSlug)
+  }
+
   if (limit) sortedPosts = sortedPosts.slice(0, limit)
 
   return sortedPosts
@@ -146,7 +158,7 @@ export const getPostdata = async (slug: string, directory: string) => {
 }
 
 export const getAllCategories = (directory: Directories) => {
-  const posts = getSortedPosts(directory)
+  const posts = getSortedPosts({ directory })
   let categories: any = []
 
   posts.map((post: any) => {

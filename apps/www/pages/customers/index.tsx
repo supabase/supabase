@@ -16,7 +16,7 @@ import Link from 'next/link'
 import { GlassPanel } from 'ui'
 
 export async function getStaticProps() {
-  const allPostsData = getSortedPosts('_customers')
+  const allPostsData = getSortedPosts({ directory: '_customers' })
   const categories = getAllCategories('_customers')
   const rss = generateRss(allPostsData)
 

@@ -26,9 +26,13 @@ export async function getStaticProps({ params }: any) {
 
   const mdxSource: any = await mdxSerialize(content)
 
-  const relatedPosts = getSortedPosts('_alternatives', 5, mdxSource.scope.tags)
+  const relatedPosts = getSortedPosts({
+    directory: '_alternatives',
+    limit: 5,
+    tags: mdxSource.scope.tags,
+  })
 
-  const allPosts = getSortedPosts('_alternatives')
+  const allPosts = getSortedPosts({ directory: '_alternatives' })
 
   const currentIndex = allPosts
     .map(function (e) {
