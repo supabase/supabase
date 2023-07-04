@@ -47,7 +47,7 @@ const ChangePaymentMethodModal = ({
     } catch (error: any) {
       ui.setNotification({
         category: 'error',
-        message: `Failed to delete payment method: ${error.message}`,
+        message: `Failed to change payment method: ${error.message}`,
       })
     }
   }
