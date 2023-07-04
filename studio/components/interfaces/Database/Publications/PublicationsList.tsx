@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Button, Input, Toggle, IconSearch, IconAlertCircle } from 'ui'
 
-import { checkPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 import Table from 'components/to-be-cleaned/Table'
 import NoSearchResults from 'components/ui/NoSearchResults'
@@ -17,7 +17,7 @@ const PublicationsList: FC<Props> = ({ onSelectPublication = () => {} }) => {
   const { ui, meta } = useStore()
   const [filterString, setFilterString] = useState<string>('')
 
-  const canUpdatePublications = checkPermissions(
+  const canUpdatePublications = useCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'publications'
   )

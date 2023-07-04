@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import { get } from 'lib/common/fetch'
 
 import { API_URL } from 'lib/constants'
-import { checkPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import { AuthLayout } from 'components/layouts'
 import { Users } from 'components/interfaces/Auth'
 import { NextPageWithLayout } from 'types'
@@ -89,7 +89,7 @@ const UsersPage: NextPageWithLayout = () => {
     PageState!.projectKpsVersion = project?.kpsVersion
   }, [project])
 
-  const canReadUsers = checkPermissions(PermissionAction.TENANT_SQL_SELECT, 'auth.users')
+  const canReadUsers = useCheckPermissions(PermissionAction.TENANT_SQL_SELECT, 'auth.users')
 
   return !canReadUsers ? (
     <NoPermission isFullPage resourceText="access your project's users" />

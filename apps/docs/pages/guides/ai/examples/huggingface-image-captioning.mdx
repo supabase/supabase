@@ -20,15 +20,15 @@ We can combine Hugging Face with [Supabase Storage](https://supabase.com/storage
 
 ## Setup
 
-- Open your Supabase project dashboard or [create a new project](https://app.supabase.com/projects).
-- [Create a new bucket](https://app.supabase.com/project/_/storage/buckets) called `images`.
+- Open your Supabase project dashboard or [create a new project](https://supabase.com/dashboard/projects).
+- [Create a new bucket](https://supabase.com/dashboard/project/_/storage/buckets) called `images`.
 - Generate TypeScript types from remote Database.
 - Create a new Database table called `image_caption`.
   - Create `id` column of type `uuid` which references `storage.objects.id`.
   - Create a `caption` column of type `text`.
 - Regenerate TypeScript types to include new `image_caption` table.
 - Deploy the function to Supabase: `supabase functions deploy huggingface-image-captioning`.
-- Create the Database Webhook in the [Supabase Dashboard](https://app.supabase.com/project/_/database/hooks) to trigger the `huggingface-image-captioning` function anytime a record is added to the `storage.objects` table.
+- Create the Database Webhook in the [Supabase Dashboard](https://supabase.com/dashboard/project/_/database/hooks) to trigger the `huggingface-image-captioning` function anytime a record is added to the `storage.objects` table.
 
 ## Generate TypeScript Types
 

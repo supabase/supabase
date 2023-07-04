@@ -14,6 +14,12 @@ import { useProfile } from 'lib/profile'
 import InviteMemberButton from './InviteMemberButton'
 import MembersView from './MembersView'
 import { hasMultipleOwners, useGetRolesManagementPermissions } from './TeamSettings.utils'
+import {
+  ScaffoldActionsGroup,
+  ScaffoldContainerLegacy,
+  ScaffoldFilterAndContent,
+  ScaffoldActionsContainer,
+} from 'components/layouts/Scaffold'
 
 const TeamSettings = () => {
   const { ui } = useStore()
@@ -70,9 +76,9 @@ const TeamSettings = () => {
   }
 
   return (
-    <>
-      <div className="container my-4 max-w-4xl space-y-8">
-        <div className="flex justify-between">
+    <ScaffoldContainerLegacy>
+      <ScaffoldFilterAndContent>
+        <ScaffoldActionsContainer className="justify-between">
           <Input
             icon={<IconSearch size="tiny" />}
             size="small"
@@ -82,10 +88,11 @@ const TeamSettings = () => {
             id="email"
             placeholder="Filter members"
           />
-          <div className="flex items-center space-x-4">
-            {canAddMembers && profile !== undefined && (
+          <ScaffoldActionsGroup>
+            {canAddMembers && profile !== undefined && selectedOrganization !== undefined && (
               <div>
                 <InviteMemberButton
+                  orgId={selectedOrganization.id}
                   userId={profile.id}
                   members={members}
                   roles={roles}
@@ -124,13 +131,11 @@ const TeamSettings = () => {
                 )}
               </Tooltip.Root>
             </div>
-          </div>
-        </div>
-      </div>
-      <div className="container my-4 max-w-4xl space-y-8">
+          </ScaffoldActionsGroup>
+        </ScaffoldActionsContainer>
         <MembersView searchString={searchString} />
-      </div>
-    </>
+      </ScaffoldFilterAndContent>
+    </ScaffoldContainerLegacy>
   )
 }
 
