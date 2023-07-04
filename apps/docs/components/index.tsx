@@ -56,6 +56,11 @@ import {
 
 const components = {
   ...markdownComponents,
+  a: (props: any) => (
+    <Link passHref href={props.href}>
+      <a {...props} />
+    </Link>
+  ),
   Admonition,
   Button,
   ButtonCard,
