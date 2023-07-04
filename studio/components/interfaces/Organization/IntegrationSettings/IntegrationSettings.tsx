@@ -10,22 +10,23 @@ const IntegrationSettings = () => {
   const org = useSelectedOrganization()
   const { data } = useOrgIntegrationsQuery({ orgSlug: org?.slug })
 
-  const vercelIntegrations = data?.filter(
-    (integration) => integration.integration.name === 'Vercel'
-  ) // vercel
+  const vercelIntegrations = data
+    ?.filter((integration) => integration.integration.name === 'Vercel')
+    .map((integration) => {
+      if (integration.metadata) {
+        const avatarSrc =
+          !integration.metadata.account.avatar && integration.metadata.account.type === 'Team'
+            ? `https://vercel.com/api/www/avatar?teamId=${integration.metadata.account.team_id}&s=48`
+            : `https://vercel.com/api/www/avatar/${integration.metadata.account.avatar}?s=48`
+
+        integration['metadata']['account']['avatar'] = avatarSrc
+      }
+
+      return integration
+    })
   const githubIntegrations = data?.filter(
     (integration) => integration.integration.name === 'GitHub'
-  ) // github
-
-  vercelIntegrations?.forEach((x) => {
-    let data: any = { ...x }
-
-    const avatarSrc = data.metadata.account.avatar
-      ? `https://vercel.com/api/www/avatar/${data.metadata.account.avatar}?s=48`
-      : `https://vercel.com/api/www/avatar?teamId=${data.metadata.account.team_id}&s=48`
-
-    data['metadata']['account']['avatar'] = avatarSrc
-  })
+  )
 
   // We're only supporting one Vercel integration per org for now
   // this will need to be updated when we support multiple integrations
