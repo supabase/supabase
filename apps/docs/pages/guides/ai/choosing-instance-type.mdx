@@ -16,7 +16,7 @@ For more information about engineering at scale, see our [Engineering for Scale]
 
 ## Simple workloads
 
-We've run a set of benchmarks using the [gist-960-angular](http://corpus-texmex.irisa.fr/) dataset. This dataset contains 1,000,000 embeddings for images, with each embedding being 960 dimensions.
+We've run a set of benchmarks using the [gist-960-angular](http://corpus-texmex.irisa.fr/) dataset. This dataset contains 1,000,000 embeddings for images, with each embedding being 960 dimensions. And using the [GloVe Reddit comments](https://nlp.stanford.edu/projects/glove/) dataset, which contains 1,623,397 embeddings for words, with each embedding being 512 dimensions.
 
 We used [Vecs](https://github.com/supabase/vecs) to create a collection, upload the embeddings to a single table, and create an `inner-product` index for the embedding column. We then ran a series of queries to measure the performance of different compute add-ons:
 
