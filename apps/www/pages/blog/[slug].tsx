@@ -79,11 +79,14 @@ export const getStaticProps: GetStaticProps<BlogPostPageProps, Params> = async (
 
   const mdxSource: any = await mdxSerialize(content)
 
-  const relatedPosts = getSortedPosts('_blog', 5, mdxSource.scope.tags).filter(
-    (post) => post.slug !== filePath
-  ) as unknown as (BlogData & Post)[]
+  const relatedPosts = getSortedPosts({
+    directory: '_blog',
+    limit: 5,
+    tags: mdxSource.scope.tags,
+    currentPostSlug: filePath,
+  }) as unknown as (BlogData & Post)[]
 
-  const allPosts = getSortedPosts('_blog')
+  const allPosts = getSortedPosts({ directory: '_blog' })
 
   const currentIndex = allPosts
     .map(function (e) {
