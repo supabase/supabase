@@ -67,7 +67,7 @@ const Usage = () => {
   return (
     <>
       <ScaffoldContainer>
-        <div className="flex items-center space-x-4">
+        <div className="py-4 flex items-center space-x-4">
           {!isLoadingSubscription && (
             <DateRangePicker
               id="billingCycle"
@@ -105,6 +105,7 @@ const Usage = () => {
         endDate={endDate}
         currentBillingCycleSelected={currentBillingCycleSelected}
       />
+
       <SizeAndCounts
         projectRef={selectedProjectRef}
         subscription={subscription}
