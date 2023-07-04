@@ -6,7 +6,7 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { Button, Menu, Alert, IconEdit } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks'
 import { useParams } from 'common/hooks'
 import BucketRow from './BucketRow'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
@@ -21,7 +21,7 @@ const StorageMenu = () => {
   const { ref, bucketId } = useParams()
   const [showCreateBucketModal, setShowCreateBucketModal] = useState(false)
   const [selectedBucketToEdit, setSelectedBucketToEdit] = useState<StorageBucket>()
-  const canCreateBuckets = checkPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
+  const canCreateBuckets = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
 
   const page = router.pathname.split('/')[4] as
     | undefined

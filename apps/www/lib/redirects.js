@@ -2041,4 +2041,9 @@ module.exports = [
     source: '/docs/guides/realtime/extensions/postgres-changes',
     destination: '/docs/guides/realtime/postgres-changes',
   },
+  {
+    permanent: true,
+    source: '/docs/guides/realtime/quickstart',
+    destination: '/docs/guides/realtime',
+  },
 ]

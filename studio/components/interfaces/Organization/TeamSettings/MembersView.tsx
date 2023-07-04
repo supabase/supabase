@@ -111,7 +111,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
 
   return (
     <>
-      <div className="rounded">
+      <div className="rounded w-full">
         <Loading active={!filteredMembers}>
           <Table
             head={[

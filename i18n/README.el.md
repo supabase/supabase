@@ -39,7 +39,7 @@
 ## Κατάσταση
 
 - [x] Alpha: Δοκιμάζουμε το Supabase με ένα κλειστό σύνολο πελατών
-- [x] Δημόσια Alpha: [app.supabase.com](https://app.supabase.com). Αλλά να είστε προσεκτικοί μαζί μας, υπάρχουν μερικές ατέλειες
+- [x] Δημόσια Alpha: [supabase.com/dashboard](https://supabase.com/dashboard). Αλλά να είστε προσεκτικοί μαζί μας, υπάρχουν μερικές ατέλειες
 - [x] Δημόσια Beta: Αρκετά σταθερό για τις περισσότερες περιπτώσεις μη επιχειρηματικής χρήσης
 - [ ] Δημόσια: [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
 
@@ -55,7 +55,7 @@
 
 **Αρχιτεκτονική**
 
-Η Supabase είναι μια [φιλοξενούμενη πλατφόρμα](https://app.supabase.com). Μπορείτε να εγγραφείτε και να αρχίσετε να χρησιμοποιείτε το Supabase χωρίς να εγκαταστήσετε τίποτα.
+Η Supabase είναι μια [φιλοξενούμενη πλατφόρμα](https://supabase.com/dashboard). Μπορείτε να εγγραφείτε και να αρχίσετε να χρησιμοποιείτε το Supabase χωρίς να εγκαταστήσετε τίποτα.
 Μπορείτε επίσης να κάνετε [αυτο-ξενάγηση](https://supabase.com/docs/guides/hosting/overview) και [ανάπτυξη τοπικά](https://supabase.com/docs/guides/local-development).
 
 ![Αρχιτεκτονική](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)

@@ -7,7 +7,7 @@ import FunctionsList from 'components/interfaces/Database/Functions/FunctionsLis
 import { DatabaseLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import NoPermission from 'components/ui/NoPermission'
-import { checkPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import { NextPageWithLayout } from 'types'
 
 const FunctionsPage: NextPageWithLayout = () => {
@@ -17,7 +17,7 @@ const FunctionsPage: NextPageWithLayout = () => {
   const [showCreateFunctionForm, setShowCreateFunctionForm] = useState<boolean>(false)
   const [showDeleteFunctionForm, setShowDeleteFunctionForm] = useState<boolean>(false)
 
-  const canReadFunctions = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'functions')
+  const canReadFunctions = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'functions')
 
   useEffect(() => {
     if (project?.ref) {

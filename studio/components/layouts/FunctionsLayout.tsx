@@ -4,7 +4,7 @@ import { observer } from 'mobx-react-lite'
 import { Button, IconExternalLink, IconCode, Modal, IconTerminal } from 'ui'
 
 import ProjectLayout from './'
-import { checkPermissions, withAuth } from 'hooks'
+import { useCheckPermissions, withAuth } from 'hooks'
 import { useParams } from 'common/hooks'
 import FunctionsNav from '../interfaces/Functions/FunctionsNav'
 import NoPermission from 'components/ui/NoPermission'
@@ -24,7 +24,7 @@ const FunctionsLayout: FC<Props> = ({ title, children }) => {
   const { data: functions, isLoading } = useEdgeFunctionsQuery({ projectRef: ref })
   const { data: selectedFunction } = useEdgeFunctionQuery({ projectRef: ref, slug: functionSlug })
 
-  const canReadFunctions = checkPermissions(PermissionAction.FUNCTIONS_READ, '*')
+  const canReadFunctions = useCheckPermissions(PermissionAction.FUNCTIONS_READ, '*')
   if (!canReadFunctions) {
     return (
       <ProjectLayout title={title || 'Edge Functions'} product="Edge Functions">
