@@ -48,12 +48,14 @@ export async function getOrganizationAuditLogs(
 ) {
   if (!slug) throw new Error('slug is required')
 
-  // return { result: MOCK_LOGS, retention_period: 1 }
-
   const response = await get(
     `${API_URL}/organizations/${slug}/audit?iso_timestamp_start=${iso_timestamp_start}&iso_timestamp_end=${iso_timestamp_end}`,
     { signal }
   )
+  // if (response.error) {
+  //   if (response.error.code === 400 && response.error.message.includes('Date range specified exceeds the retention period'))
+  //   throw response.error
+  // }
   if (response.error) throw response.error
   return response as OrganizationAuditLogsResponse
 }
@@ -68,9 +70,9 @@ export const useOrganizationAuditLogsQuery = <TData = OrganizationAuditLogsData>
     ...options
   }: UseQueryOptions<OrganizationAuditLogsData, OrganizationAuditLogsError, TData> = {}
 ) => {
-  const { slug } = vars
+  const { slug, iso_timestamp_start, iso_timestamp_end } = vars
   return useQuery<OrganizationAuditLogsData, OrganizationAuditLogsError, TData>(
-    organizationKeys.auditLogs(slug),
+    organizationKeys.auditLogs(slug, { iso_timestamp_start, iso_timestamp_end }),
     ({ signal }) => getOrganizationAuditLogs(vars, signal),
     {
       enabled: enabled && typeof slug !== 'undefined',
@@ -82,13 +84,14 @@ export const useOrganizationAuditLogsQuery = <TData = OrganizationAuditLogsData>
 }
 
 export const useOrganizationAuditLogsPrefetch = (vars: OrganizationAuditLogsVariables) => {
-  const { slug } = vars
+  const { slug, iso_timestamp_start, iso_timestamp_end } = vars
   const client = useQueryClient()
 
   return useCallback(() => {
     if (slug) {
-      client.prefetchQuery(organizationKeys.auditLogs(slug), ({ signal }) =>
-        getOrganizationAuditLogs(vars, signal)
+      client.prefetchQuery(
+        organizationKeys.auditLogs(slug, { iso_timestamp_start, iso_timestamp_end }),
+        ({ signal }) => getOrganizationAuditLogs(vars, signal)
       )
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
