@@ -13,7 +13,8 @@ import authors from 'lib/authors.json'
 import DefaultLayout from '~/components/Layouts/Default'
 import PostTypes from '~/types/post'
 import BlogListItem from '~/components/Blog/BlogListItem'
-import BlogFilters from '~/components/Blog/BlogFilters'
+// import BlogFilters from '~/components/Blog/BlogFilters'
+import BlogFiltersExpand from '../components/Blog/BlogFiltersExpand'
 
 export async function getStaticProps() {
   const allPostsData = getSortedPosts('_blog', undefined, undefined, '** BLOG PAGE **')
@@ -120,7 +121,7 @@ function Blog(props: any) {
 
         <div className="border-scale-600 border-t">
           <div className="container mx-auto mt-16 px-8 sm:px-16 xl:px-20">
-            <BlogFilters
+            <BlogFiltersExpand
               blogs={blogs}
               setBlogs={setBlogs}
               setCategory={setCategory}
