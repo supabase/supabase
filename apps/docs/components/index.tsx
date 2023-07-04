@@ -56,8 +56,8 @@ import {
 
 const components = {
   ...markdownComponents,
-  a: (props: any) => (
-    <Link passHref href={props.href}>
+  a: (href: string, props: any) => (
+    <Link href={href} legacyBehavior passHref>
       <a {...props} />
     </Link>
   ),
