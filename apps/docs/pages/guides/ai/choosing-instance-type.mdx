@@ -4,13 +4,13 @@ export const TabPanel = Tabs.Panel
 
 export const meta = {
   id: 'ai-choosing-instance-type',
-  title: 'Choosing Instance Type',
-  description: 'Choosing the right instance type for your workload.',
-  subtitle: 'Choosing the right instance type for your workload.',
-  sidebar_label: 'Choosing Instance Type',
+  title: 'Choosing Compute Add-on',
+  description: 'Choosing the right Compute Add-on for your workload.',
+  subtitle: 'Choosing the right Compute Add-on for your workload.',
+  sidebar_label: 'Choosing Compute Add-on',
 }
 
-This guide will help you choose the right instance type for your workload. We'll provide general guidance, as it is impossible to provide specific instructions for every possible use case. The goal is to give you a starting point from which you can make your own benchmarks and optimizations.
+This guide will help you choose the right Compute Add-on for your workload. We'll provide general guidance, as it is impossible to provide specific instructions for every possible use case. The goal is to give you a starting point from which you can make your own benchmarks and optimizations.
 
 For more information about engineering at scale, see our [Engineering for Scale](/docs/guides/ai/engineering-for-scale) guide.
 
@@ -18,7 +18,7 @@ For more information about engineering at scale, see our [Engineering for Scale]
 
 We've run a set of benchmarks using the [gist-960-angular](http://corpus-texmex.irisa.fr/) dataset. This dataset contains 1,000,000 embeddings for images, with each embedding being 960 dimensions.
 
-We used [Vecs](https://github.com/supabase/vecs) to create a collection, upload the embeddings to a single table, and create an `inner-product` index for the embedding column. We then ran a series of queries to measure the performance of different instance types:
+We used [Vecs](https://github.com/supabase/vecs) to create a collection, upload the embeddings to a single table, and create an `inner-product` index for the embedding column. We then ran a series of queries to measure the performance of different compute add-ons:
 
 ### Results
 
@@ -91,7 +91,7 @@ Random vectors were generated for queries.
 
 <Admonition type="note">
 
-It is possible to upload more vectors to a single table if Memory allows it (for example, 2XL instance and higher). But it will affect the performance of the queries: RPS will be lower, and latency will be higher. Scaling should be almost linear, but it is recommended to benchmark your workload to find the optimal number of vectors per table and per instance.
+It is possible to upload more vectors to a single table if Memory allows it (for example, 2XL plan and higher). But it will affect the performance of the queries: RPS will be lower, and latency will be higher. Scaling should be almost linear, but it is recommended to benchmark your workload to find the optimal number of vectors per table and per database instance.
 
 </Admonition>
 
