@@ -161,5 +161,6 @@ export const useOrgDailyStatsPrefetch = ({
           getOrgDailyStats({ orgSlug, metric, startDate, endDate, interval, projectRef }, signal)
       )
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orgSlug, metric])
 }
