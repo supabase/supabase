@@ -194,7 +194,7 @@ const PlanUpdateSidePanel = () => {
                       <Button block disabled type="default">
                         Current plan
                       </Button>
-                    ) : plan.id !== PRICING_TIER_PRODUCT_IDS.TEAM ? (
+                    ) : (
                       <Tooltip.Root delayDuration={0}>
                         <Tooltip.Trigger asChild>
                           <div>
@@ -246,14 +246,6 @@ const PlanUpdateSidePanel = () => {
                           </Tooltip.Portal>
                         ) : null}
                       </Tooltip.Root>
-                    ) : (
-                      <Link href={plan.href} passHref className="hidden md:block">
-                        <a target="_blank">
-                          <Button block type="primary">
-                            Contact Us
-                          </Button>
-                        </a>
-                      </Link>
                     )}
 
                     <div className="border-t my-6" />
