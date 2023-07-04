@@ -32,6 +32,7 @@ const PaymentMethods = () => {
   const [showAddPaymentMethodModal, setShowAddPaymentMethodModal] = useState(false)
 
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: slug })
+  console.log(subscription)
   const {
     data: paymentMethods,
     error,
@@ -143,13 +144,17 @@ const PaymentMethods = () => {
                                     size="tiny"
                                     align="end"
                                     overlay={[
-                                      <Dropdown.Item
-                                        key="make-default"
-                                        onClick={() => setSelectedMethodForUse(paymentMethod)}
-                                      >
-                                        Use this card
-                                      </Dropdown.Item>,
-                                      <Dropdown.Separator key="card-separator" />,
+                                      ...(subscription?.plan.id !== 'free'
+                                        ? [
+                                            <Dropdown.Item
+                                              key="make-default"
+                                              onClick={() => setSelectedMethodForUse(paymentMethod)}
+                                            >
+                                              Use this card
+                                            </Dropdown.Item>,
+                                            <Dropdown.Separator key="card-separator" />,
+                                          ]
+                                        : []),
                                       <Dropdown.Item
                                         key="delete-method"
                                         onClick={() => setSelectedMethodToDelete(paymentMethod)}
