@@ -1,6 +1,6 @@
 import saveAs from 'file-saver'
 import Papa from 'papaparse'
-import { useState, ReactNode, useMemo } from 'react'
+import { useState, ReactNode, useCallback } from 'react'
 import {
   Button,
   IconDownload,
@@ -335,7 +335,7 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
 
   const [isExporting, setIsExporting] = useState(false)
 
-  async function onRowsExportCSV() {
+  const onRowsExportCSV = useCallback(async() => {
     setIsExporting(true)
 
     if (allRowsSelected && totalRows > MAX_EXPORT_ROW_COUNT) {
@@ -349,7 +349,7 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
     const rows = allRowsSelected
       ? await state.rowService!.fetchAllData(filters, sorts)
       : allRows.filter((x) => selectedRows.has(x.idx))
-    const formattedRows = useMemo(() => {
+    const formattedRows = () => {
       return rows.map((row) => {
         const formattedRow = { ...row };
         Object.keys(row).forEach((column) => {
@@ -359,8 +359,7 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
         });
         return formattedRow;
       });
-    }, [rows]);
-    
+    };
 
     const csv = Papa.unparse(formattedRows, {
       columns: state.table!.columns.map((column) => column.name),
@@ -368,7 +367,7 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
     const csvData = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
     saveAs(csvData, `${state.table!.name}_rows.csv`)
     setIsExporting(false)
-  }
+  }, [allRowsSelected, (totalRows > MAX_EXPORT_ROW_COUNT), ui, state.rowService!, allRows, selectedRows, state.table!])
 
   function deselectRows() {
     dispatch({
