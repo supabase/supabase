@@ -9,11 +9,8 @@ export const organizationKeys = {
     ['organizations', slug, 'customer-profile'] as const,
   auditLogs: (
     slug: string | undefined,
-    {
-      iso_timestamp_start,
-      iso_timestamp_end,
-    }: { iso_timestamp_start: string | undefined; iso_timestamp_end: string | undefined }
-  ) => ['organizations', slug, 'audit-logs', { iso_timestamp_start, iso_timestamp_end }] as const,
+    { date_start, date_end }: { date_start: string | undefined; date_end: string | undefined }
+  ) => ['organizations', slug, 'audit-logs', { date_start, date_end }] as const,
   migrateBilling: (slug: string | undefined) => ['organizations', slug, 'migrate-billing'] as const,
   migrateBillingPreview: (slug: string | undefined) =>
     ['organizations', slug, 'migrate-billing', 'preview'] as const,
