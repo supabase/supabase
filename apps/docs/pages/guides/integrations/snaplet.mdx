@@ -23,11 +23,17 @@ Fortunately, Snaplet makes populating your multiple development environments wit
 
 Environment parity sounds like a dream come true. In this guide, we’re going to tell you exactly how to do that with your data in Supabase! End-to-end, it shouldn’t take more than 15 minutes, and doing so will allow you to code against an accurate development environment that you can sync with production.
 
+<div>
+
+<img src="/docs/img/guides/integrations/snaplet/snappy-holding-supabase-logo.svg/" alt="Supabase connection string" width="30%" style={{ margin: "auto" }} />
+
+</div>
+
 ### Things you'll need before you begin: [#prerequisite]
 
 1. **A production Supabase project’s connection string:** This can be found in Supabase via Organization > All Projects > Your Project > Project Settings > Connection String. We’ll refer to this in the guide as your “source database” - where your data comes from.
 
-![Supabase connection string](https://docs.snaplet.dev/screenshots/supabase_connection_string.webp)
+![Supabase connection string](/docs/img/guides/integrations/snaplet/connection_string.webp)
 
 2. A development Supabase project’s connection string: Same steps as above, but a different project/environment. We’ll refer to this in the guide as your “target database” - where we’re restoring the snapshot of the source database to. If you haven’t got this set up yet, we’ll take you through the process of setting this up.
 
@@ -37,11 +43,11 @@ Environment parity sounds like a dream come true. In this guide, we’re going t
 
 The first thing you’ll want to do is navigate to [https://www.snaplet.dev/](https://www.snaplet.dev/) and sign up for a new account (it’s free). Once you have successfully signed up for a new account, you’ll begin the onboarding process...
 
-![Onboarding start](https://docs.snaplet.dev/screenshots/onboarding_start.webp)
+![Onboarding start](/docs/img/guides/integrations/snaplet/onboarding_start.webp)
 
 On the “Connect database” step add your Supabase production database (using your read-only role). This is the source database we defined above.
 
-![Validating credentials](https://docs.snaplet.dev/screenshots/checking_creds.png)
+![Validating credentials](/docs/img/guides/integrations/snaplet/checking_creds.webp)
 
 ### Step 2: Create a snapshot [#create-snapshot]
 
@@ -64,7 +70,7 @@ If you don’t already have a developer database setup on Supabase, you’ll nee
 
 3. In the top left click on your current project name and new project
 
-![New project](https://docs.snaplet.dev/assets/images/new_project-74c5ef5f64da9f0bad9c50c23bc04acb.png)
+![New project](/docs/img/guides/integrations/snaplet/new_project.webp)
 
 4. Wait for the new database to launch
 
@@ -106,6 +112,12 @@ If you want to learn more about Snaplet, you can explore our docs. If you have a
 
 That’s it! You’re all done and should have restored a version of your Supabase production database with transformed data into your target database. You can now safely code against production-realistic data.
 
+<div>
+
+<img src="/docs/img/guides/integrations/snaplet/snappy-with-supabase-ball.svg/" alt="Supabase connection string" width="30%" style={{ margin: "auto" }} />
+
+</div>
+
 ## Supabase local development [#local-development]
 
 Supabase allows you [develop locally](https://supabase.com/docs/guides/cli/local-development) through their CLI, you can easily restore any snapshot created in Snaplet to your local instance, just by running:
@@ -144,7 +156,7 @@ Snaplet will still make sure to clear all data for tables in these schemas and r
 
 If you aren't actually needing the data for some of these schemas, you can stop these warnings by excluding the schema from the captured snapshots. You can read more on how to do this [over here in our docs](https://docs.snaplet.dev/references/data-operations/exclude):
 
-![Supabase schema exclude](https://docs.snaplet.dev/assets/images/snaplet-supabase-schema-exclude-5f123e687bfd94895b5c136a2a5beb87.png)
+![Supabase schema exclude](/docs/img/guides/integrations/snaplet/schema-exclude.webp)
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
