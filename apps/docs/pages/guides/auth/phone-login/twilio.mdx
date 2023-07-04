@@ -349,20 +349,20 @@ let { data, error } = await supabase.auth.verifyOtp({
 
 ## Twilio Verify
 
-Twilio Verify is an alternative service by Twilio which can replace Twilio Programmable Messaging (previous described). Developers may migrate from Twilio Messaging to:
+[Twilio Verify](https://www.twilio.com/en-us/trusted-activation/verify) is a service that replaces [Twilio Programmable Messaging](https://www.twilio.com/docs/messaging). It is a better choice for authenticating users over phone:
 
 1. Make use of built in fraud detection
 2. Utilize Message Services instead of a registered phone number.
 
-Twilio Verify is currently [set up as a Phone Provider](/docs/img/guides/auth-twilio/twilio-verify.png)
+Twilio Verify is available as a separate phone provider. It can't be used together with other providers, including Twilio Programmable Messaging.
 
 To set up Twilio Verify, you will need to:
 
-1. [Create a Verification Service on Twilio](https://support.twilio.com/hc/en-us/articles/360033309133-Getting-Started-with-Twilio-Verify-V2)
-2. Switch Phone Provider to Twilio Verify
-3. Fill in the Message Service ID field on the Dashboard with the ID of the Verification Service created in 1.
+1. Create a new [verification service](https://support.twilio.com/hc/en-us/articles/360033309133-Getting-Started-with-Twilio-Verify-V2) in the Twilio dashboard.
+2. [Switch Phone Provider to Twilio Verify](https://supabase.com/dashboard/project/_/auth/providers)
+3. Configure the Message Service ID field using the Verification Service ID obtained in 1.
 
-Unlike other providers, the OTP expiry duration, message content fields, and rate limits are not configurable via the Supabase dashboard. Please head to Twilio Verify to configure these settings.
+Unlike other providers, the OTP expiry duration and message content fields are not configurable via the Supabase dashboard. Please head to Twilio Verify to configure these settings. Do keep in mind that Twilio Verify has a seprate set of rate limits that can be configured on the settings page as well.
 
 <Admonition type="caution">
   At this time, Twilio Verify is only supported on the `whatsapp` and `sms` channels.
