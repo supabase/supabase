@@ -51,7 +51,7 @@ export const useOrgSubscriptionUpdateMutation = ({
     (vars) => updateOrgSubscription(vars),
     {
       async onSuccess(data, variables, context) {
-        const { slug } = variables
+        const { slug, paymentMethod } = variables
         await queryClient.invalidateQueries(subscriptionKeys.orgSubscription(slug))
         await onSuccess?.(data, variables, context)
       },

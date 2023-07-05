@@ -32,7 +32,6 @@ const PaymentMethods = () => {
   const [showAddPaymentMethodModal, setShowAddPaymentMethodModal] = useState(false)
 
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: slug })
-  console.log(subscription)
   const {
     data: paymentMethods,
     error,
@@ -40,8 +39,6 @@ const PaymentMethods = () => {
     isError,
     isSuccess,
   } = useOrganizationPaymentMethodsQuery({ slug })
-  const sortedPaymentMethods =
-    paymentMethods?.sort((a, b) => (a.id === subscription?.payment_method_id ? -1 : 0)) ?? []
 
   const canReadPaymentMethods = useCheckPermissions(
     PermissionAction.BILLING_READ,
@@ -115,7 +112,7 @@ const PaymentMethods = () => {
                         </div>
                       ) : (
                         <div className="space-y-3">
-                          {sortedPaymentMethods?.map((paymentMethod) => {
+                          {paymentMethods?.map((paymentMethod) => {
                             const isActive = subscription?.payment_method_id === paymentMethod.id
                             return (
                               <div
