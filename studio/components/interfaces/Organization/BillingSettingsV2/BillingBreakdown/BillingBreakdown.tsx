@@ -138,7 +138,10 @@ const BillingBreakdown = () => {
             <p className="text-sm text-scale-1000">
               The following table shows your upcoming costs. Depending on your usage, the final
               amount may vary. Next invoice on{' '}
-              <span className="text-scale-1100">{billingCycleEnd.format('MMM DD, YYYY')}</span>.
+              <span className="text-scale-1100 whitespace-nowrap">
+                {billingCycleEnd.format('MMM DD, YYYY')}
+              </span>
+              .
             </p>
 
             <UpcomingInvoice slug={orgSlug} />
