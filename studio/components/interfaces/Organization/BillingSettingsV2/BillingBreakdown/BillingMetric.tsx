@@ -52,7 +52,7 @@ const BillingMetric = ({ idx, slug, metric, usage, subscription }: BillingMetric
       )}
     >
       <div className="flex items-center justify-between">
-        <Link href={`/org/${slug}/settings/billing/usage#${metric.anchor}`}>
+        <Link href={`/org/${slug}/usage#${metric.anchor}`}>
           <a>
             <div className="group flex items-center space-x-2">
               <p className="text-sm text-scale-1100 group-hover:text-scale-1200 transition cursor-pointer">
