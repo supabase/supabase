@@ -218,6 +218,7 @@ export const gettingstarted: NavMenuConstant = {
         { name: 'SvelteKit', url: '/guides/getting-started/quickstarts/sveltekit' },
         { name: 'SolidJS', url: '/guides/getting-started/quickstarts/solidjs' },
         { name: 'Vue', url: '/guides/getting-started/quickstarts/vue' },
+        { name: 'refine', url: '/guides/getting-started/quickstarts/refine' },
       ],
     },
     {
@@ -258,6 +259,10 @@ export const gettingstarted: NavMenuConstant = {
         {
           name: 'SvelteKit',
           url: '/guides/getting-started/tutorials/with-sveltekit',
+        },
+        {
+          name: 'refine',
+          url: '/guides/getting-started/tutorials/with-refine',
         },
       ],
     },
