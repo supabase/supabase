@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 // @ts-ignore
-import defaultTheme from '../../theme/defaultTheme'
+import defaultTheme from '../../theme/defaultThemeV0'
 // @ts-ignore
 // import FormLayoutStyles from './FormLayout.module.css'
 
