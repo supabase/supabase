@@ -17,7 +17,7 @@ export type OrgSubscriptionUpdateVariables = {
   tier: SubscriptionTier
 }
 
-export async function updateOrgSubscription<T = void>({
+export async function updateOrgSubscription<T>({
   slug,
   tier,
   paymentMethod,
@@ -31,7 +31,7 @@ export async function updateOrgSubscription<T = void>({
   const response = (await put(
     `${API_URL}/organizations/${slug}/billing/subscription`,
     payload
-  )) as SupaResponseV2<T>
+  )) as SupaResponseV2<void>
   if (typeof response === 'object' && response !== null && 'error' in response) throw response.error
   return response
 }
