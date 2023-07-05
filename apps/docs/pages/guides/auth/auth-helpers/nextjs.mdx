@@ -25,43 +25,55 @@ If you are using the `pages` directory, check out [Auth Helpers in Next.js Pages
 
 </Admonition>
 
-## Configuration
+## Automatic Configuration (recommended)
 
-### Install Next.js Auth Helpers library
+Use the `create-next-app` command and the `with-supabase` template to automate the configuration of cookie-based auth with the Next.js Auth Helpers.
 
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="npm"
->
-
-<TabPanel id="npm" label="npm">
-
-```sh
-npm install @supabase/auth-helpers-nextjs
+```sh Terminal
+npx create-next-app -e with-supabase
 ```
 
-</TabPanel>
-<TabPanel id="yarn" label="Yarn">
+This creates a new Next.js app configured with:
 
-```sh
-yarn add @supabase/auth-helpers-nextjs
-```
-
-</TabPanel>
-</Tabs>
+- [Cookie-based Auth](/docs/guides/auth/auth-helpers/nextjs#authentication)
+- [Middleware to refresh user's session](/docs/guides/auth/auth-helpers/nextjs#managing-session-with-middleware)
+- [Code Exchange Route](/docs/guides/auth/auth-helpers/nextjs#Managing-sign-in-with-code-exchange)
+- [TypeScript](https://www.typescriptlang.org/)
+- [Tailwind CSS](https://tailwindcss.com/)
 
 ### Declare Environment Variables
 
-Retrieve your project's URL and anon key from your [API settings](https://app.supabase.com/project/_/settings/api), and create a `.env.local` file with the following environment variables:
+Retrieve your project's URL and anon key from your [API settings](https://supabase.com/dashboard/project/_/settings/api), and create a `.env.local` file with the following environment variables:
 
 ```bash .env.local
 NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
 ```
 
-Make sure you name these variables exactly as seen here, since these are picked up by the auth helpers library — you no longer have to explicitly pass them to a `createClient()` function as before.
+### Run Next.js App
+
+Run the development server and navigate to http://localhost:3000.
+
+```sh Terminal
+npm run dev
+```
+
+## Manual Configuration
+
+### Install Next.js Auth Helpers library
+
+```sh Terminal
+npm install @supabase/auth-helpers-nextjs @supabase/supabase-js
+```
+
+### Declare Environment Variables
+
+Retrieve your project's URL and anon key from your [API settings](https://supabase.com/dashboard/project/_/settings/api), and create a `.env.local` file with the following environment variables:
+
+```bash .env.local
+NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
+```
 
 ### Managing session with Middleware
 
@@ -614,7 +626,7 @@ const supabase = createClientComponentClient({ isSingleton: false })
 
 <div className="video-container">
   <iframe
-    src="https://www.youtube-nocookie.com/embed/SUS1t6Kq7-8"
+    src="https://www.youtube-nocookie.com/embed/ywvXGW6P4Gs"
     frameBorder="1"
     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
     allowFullScreen
@@ -684,7 +696,7 @@ Check out the [Next.js auth example repo](https://github.com/supabase/supabase/t
 
 <div className="video-container">
   <iframe
-    src="https://www.youtube-nocookie.com/embed/B5TUzTKO9CE"
+    src="https://www.youtube-nocookie.com/embed/4_epZIxqCho"
     frameBorder="1"
     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
     allowFullScreen

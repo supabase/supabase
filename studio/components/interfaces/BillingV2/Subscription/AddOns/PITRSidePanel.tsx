@@ -5,12 +5,14 @@ import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
-import { checkPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { Alert, Button, IconExternalLink, Radio, SidePanel } from 'ui'
+import Telemetry from 'lib/telemetry'
+import { useRouter } from 'next/router'
 
 const PITR_CATEGORY_OPTIONS: {
   id: 'off' | 'on'
@@ -34,6 +36,7 @@ const PITR_CATEGORY_OPTIONS: {
 
 const PITRSidePanel = () => {
   const { ui } = useStore()
+  const router = useRouter()
   const { ref: projectRef } = useParams()
   const { isDarkMode } = useTheme()
 
@@ -41,7 +44,7 @@ const PITRSidePanel = () => {
   const [selectedCategory, setSelectedCategory] = useState<'on' | 'off'>('off')
   const [selectedOption, setSelectedOption] = useState<string>('pitr_0')
 
-  const canUpdatePitr = checkPermissions(PermissionAction.BILLING_WRITE, 'stripe.subscriptions')
+  const canUpdatePitr = useCheckPermissions(PermissionAction.BILLING_WRITE, 'stripe.subscriptions')
 
   const snap = useSubscriptionPageStateSnapshot()
   const visible = snap.panelKey === 'pitr'
@@ -72,6 +75,17 @@ const PITRSidePanel = () => {
         setSelectedCategory('off')
         setSelectedOption('pitr_0')
       }
+      Telemetry.sendActivity(
+        {
+          activity: 'Side Panel Viewed',
+          source: 'Dashboard',
+          data: {
+            title: 'Point in Time Recovery',
+            section: 'Add ons',
+          },
+        },
+        router
+      )
     }
   }, [visible, isLoading])
 
@@ -152,6 +166,18 @@ const PITRSidePanel = () => {
                     onClick={() => {
                       setSelectedCategory(option.id)
                       if (option.id === 'off') setSelectedOption('pitr_0')
+                      Telemetry.sendActivity(
+                        {
+                          activity: 'Option Selected',
+                          source: 'Dashboard',
+                          data: {
+                            title: 'Point in Time Recovery',
+                            section: 'Add ons',
+                            option: option.name,
+                          },
+                        },
+                        router
+                      )
                     }}
                   >
                     <img

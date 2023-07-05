@@ -1,27 +1,29 @@
-import { FC, useState } from 'react'
-import ReactMarkdown from 'react-markdown'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useState } from 'react'
+import ReactMarkdown from 'react-markdown'
 import { Alert, Button, Collapsible, Form, IconCheck, IconChevronUp, Input } from 'ui'
 
-import { useStore, checkPermissions } from 'hooks'
-import { BASE_PATH } from 'lib/constants'
-import { Provider } from './AuthProvidersForm.types'
-import { ProviderCollapsibleClasses } from './AuthProvidersForm.constants'
-import FormField from './FormField'
-import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useParams } from 'common'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
+import { useCheckPermissions, useStore } from 'hooks'
+import { BASE_PATH } from 'lib/constants'
+import { ProviderCollapsibleClasses } from './AuthProvidersForm.constants'
+import { Provider } from './AuthProvidersForm.types'
+import FormField from './FormField'
 
-interface Props {
+export interface ProviderFormProps {
   provider: Provider
 }
 
-const ProviderForm: FC<Props> = ({ provider }) => {
+const ProviderForm = ({ provider }: ProviderFormProps) => {
   const [open, setOpen] = useState(false)
   const { authConfig, ui } = useStore()
+  const { project: selectedProject } = useProjectContext()
   const { ref } = useParams()
   const doubleNegativeKeys = ['MAILER_AUTOCONFIRM', 'SMS_AUTOCONFIRM']
-  const canUpdateConfig = checkPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
+  const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef: ref })
 
@@ -149,18 +151,20 @@ const ProviderForm: FC<Props> = ({ provider }) => {
                   )}
                   {provider.misc.requiresRedirect && (
                     <>
-                      <ReactMarkdown className="text-xs text-scale-900">
-                        {provider.misc.helper}
-                      </ReactMarkdown>
                       <Input
                         copy
                         readOnly
                         disabled
-                        label="Redirect URL"
+                        label="Callback URL (for OAuth)"
                         value={
-                          customDomainData?.customDomain
+                          customDomainData?.customDomain?.status === 'active'
                             ? `https://${customDomainData.customDomain?.hostname}/auth/v1/callback`
-                            : `https://${ui.selectedProjectRef}.supabase.co/auth/v1/callback`
+                            : `https://${selectedProject?.ref}.supabase.co/auth/v1/callback`
+                        }
+                        descriptionText={
+                          <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
+                            {provider.misc.helper}
+                          </ReactMarkdown>
                         }
                       />
                     </>

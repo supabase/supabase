@@ -2,9 +2,9 @@ import Layout from '~/layouts/DefaultGuideLayout'
 import StepHikeCompact from '~/components/StepHikeCompact'
 
 export const meta = {
-  title: 'Use Supabase with NextJS',
+  title: 'Use Supabase with Next.js',
   subtitle:
-    'Learn how to create a Supabase project, add some sample data to your database, and query the data from a NextJS app.',
+    'Learn how to create a Supabase project, add some sample data to your database, and query the data from a Next.js app.',
   breadcrumb: 'Framework Quickstarts',
 }
 
@@ -13,19 +13,21 @@ export const meta = {
   <StepHikeCompact.Step step={1}>
     <StepHikeCompact.Details title="Set up a Supabase project with sample data">
 
-    [Create a new project](https://app.supabase.com) in the Supabase Dashboard.
+    [Create a new project](https://supabase.com/dashboard) in the Supabase Dashboard.
 
-    After your project is ready, create a table in your Supabase database using the [SQL Editor](https://app.supabase.com/project/_/sql) in the Dashboard. Use the following SQL statement to create a `countries` table with some sample data.
+    After your project is ready, create a table in your Supabase database using the [SQL Editor](https://supabase.com/dashboard/project/_/sql) in the Dashboard.
+
+    Use the following SQL statement to create a `countries` table with some sample data.
 
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
-     ```sql Editor
+     ```sql SQL_EDITOR
       -- Create the table
       create table countries (
         id serial primary key,
-        name varchar(255) not null
+        name text not null
       );
 
       -- Insert some sample data into the table
@@ -40,16 +42,19 @@ export const meta = {
 
   <StepHikeCompact.Step step={2}>
 
-    <StepHikeCompact.Details title="Create a NextJS app">
+    <StepHikeCompact.Details title="Create a Next.js app">
 
-    Create a Next.js app using the `create-next-app` command.
+    Use the `create-next-app` command and the `with-supabase` template, to create a Next.js app pre-configured with:
+    - [Supabase Auth](https://supabase.com/docs/guides/auth/auth-helpers/nextjs)
+    - [TypeScript](https://www.typescriptlang.org/)
+    - [Tailwind CSS](https://tailwindcss.com/)
 
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
       ```bash Terminal
-      npx create-next-app my-app
+      npx create-next-app -e with-supabase my-app && cd my-app
       ```
 
     </StepHikeCompact.Code>
@@ -57,18 +62,17 @@ export const meta = {
   </StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={3}>
-    <StepHikeCompact.Details title="Install the Supabase client library">
+    <StepHikeCompact.Details title="Declare Supabase Environment Variables">
 
-      The fastest way to get started is to use the `supabase-js` client library which provides a convenient interface for working with Supabase from a NextJS app.
-
-      Navigate to the NextJS app and install `supabase-js`.
+    Rename `.env.local.example` to `.env.local` and populate with [your project's URL and Anon Key](https://supabase.com/dashboard/project/_/settings/api).
 
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
-      ```bash Terminal
-      cd my-app && npm install @supabase/supabase-js
+      ```text .env.local
+        NEXT_PUBLIC_SUPABASE_URL=your-project-url
+        NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
       ```
 
     </StepHikeCompact.Code>
@@ -76,18 +80,33 @@ export const meta = {
   </StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={4}>
-    <StepHikeCompact.Details title="Create the Supabase client">
+    <StepHikeCompact.Details title="Query Supabase data from Next.js">
 
-    In the `/lib` directory of your Next.js app, create a file called `supabaseClient.js` and add the following code to initialize the Supabase client with your [project URL and public API (anon) key](https://app.supabase.com/project/_/settings/api).
+    Create a new file at `app/countries/page.tsx` and populate with the following.
+
+    This will select all the rows from the `countries` table in Supabase and render them on the page.
 
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
-      ```js lib/supabaseClient.js
-        import { createClient } from '@supabase/supabase-js'
+      ```ts app/countries/page.tsx
+        import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+        import { cookies } from "next/headers";
 
-        export const supabase = createClient('https://<project>.supabase.co', '<your-anon-key>')
+        export default async function Index() {
+          const supabase = createServerComponentClient({ cookies });
+
+          const { data: countries } = await supabase.from("countries").select();
+
+          return (
+            <ul className="my-auto">
+              {countries?.map((country) => (
+                <li key={country.id}>{country.name}</li>
+              ))}
+            </ul>
+          );
+        }
       ```
 
     </StepHikeCompact.Code>
@@ -95,50 +114,9 @@ export const meta = {
   </StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={5}>
-    <StepHikeCompact.Details title="Query data from the app">
-
-    Use the `getServerSideProps` method to fetch the data server-side and display the query result as a simple list.
-
-    Replace the existing function in your index file in the `pages` directory with the following code.
-
-    </StepHikeCompact.Details>
-
-    <StepHikeCompact.Code>
-
-      ```js app/index.js
-        import { supabase } from './../lib/supabaseClient';
-
-        function Page({ countries }) {
-          return (
-            <ul>
-              {countries.map((country) => (
-                <li key={country.id}>{country.name}</li>
-              ))}
-            </ul>
-          );
-        }
-
-        export async function getServerSideProps() {
-          let { data } = await supabase.from('countries').select()
-
-          return {
-            props: {
-             countries: data
-            },
-          }
-        }
-
-        export default Page;
-      ```
-
-    </StepHikeCompact.Code>
-
-  </StepHikeCompact.Step>
-
-  <StepHikeCompact.Step step={6}>
     <StepHikeCompact.Details title="Start the app">
 
-    Start the app and go to http://localhost:3000 in a browser and you should see the list of countries.
+    Run the development server, go to http://localhost:3000/countries in a browser and you should see the list of countries.
 
     </StepHikeCompact.Details>
 

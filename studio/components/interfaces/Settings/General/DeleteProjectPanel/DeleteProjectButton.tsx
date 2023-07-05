@@ -1,24 +1,28 @@
-import { FC, useEffect, useState } from 'react'
-import { useRouter } from 'next/router'
-import { Button, Input } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useQueryClient } from '@tanstack/react-query'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
+import { Button, Input } from 'ui'
 
-import { useStore, checkPermissions } from 'hooks'
-import { API_URL, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
-import { delete_, post } from 'lib/common/fetch'
-import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
 import { CANCELLATION_REASONS } from 'components/interfaces/BillingV2/Billing.constants'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
+import { invalidateProjectsQuery } from 'data/projects/projects-query'
+import { useCheckPermissions, useStore } from 'hooks'
+import { delete_, post } from 'lib/common/fetch'
+import { API_URL, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 
-interface Props {
+export interface DeleteProjectButtonProps {
   type?: 'danger' | 'default'
 }
 
-const DeleteProjectButton: FC<Props> = ({ type = 'danger' }) => {
+const DeleteProjectButton = ({ type = 'danger' }: DeleteProjectButtonProps) => {
+  const queryClient = useQueryClient()
   const router = useRouter()
-  const { app, ui } = useStore()
+  const { ui } = useStore()
 
-  const project = ui.selectedProject
+  const { project } = useProjectContext()
   const projectRef = project?.ref
   const projectTier = project?.subscription_tier ?? PRICING_TIER_PRODUCT_IDS.FREE
   const isFree = projectTier === PRICING_TIER_PRODUCT_IDS.FREE
@@ -35,7 +39,7 @@ const DeleteProjectButton: FC<Props> = ({ type = 'danger' }) => {
     }
   }, [isOpen])
 
-  const canDeleteProject = checkPermissions(PermissionAction.UPDATE, 'projects')
+  const canDeleteProject = useCheckPermissions(PermissionAction.UPDATE, 'projects')
 
   const toggle = () => {
     if (loading) return
@@ -66,7 +70,7 @@ const DeleteProjectButton: FC<Props> = ({ type = 'danger' }) => {
     try {
       const response = await delete_(`${API_URL}/projects/${projectRef}`)
       if (response.error) throw response.error
-      app.onProjectDeleted(response)
+      await invalidateProjectsQuery(queryClient)
       ui.setNotification({ category: 'success', message: `Successfully deleted ${project.name}` })
       router.push(`/projects`)
     } catch (error: any) {

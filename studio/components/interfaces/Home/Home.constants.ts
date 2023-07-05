@@ -7,18 +7,40 @@ export const CLIENT_LIBRARIES = [
     gitUrl: 'https://github.com/supabase/supabase-js',
   },
   {
-    language: 'Python',
-    officialSupport: false,
-    releaseState: 'Alpha',
-    docsUrl: 'https://supabase.com/docs/reference/python/introduction',
-    gitUrl: 'https://github.com/supabase/supabase-py',
-  },
-  {
     language: 'Flutter',
     officialSupport: true,
     releaseState: undefined,
     docsUrl: 'https://supabase.com/docs/reference/dart/installing',
     gitUrl: 'https://github.com/supabase/supabase-flutter',
+  },
+  {
+    language: 'Python',
+    officialSupport: false,
+    releaseState: 'Alpha',
+    docsUrl: 'https://supabase.com/docs/reference/python/initializing',
+    gitUrl: 'https://github.com/supabase/supabase-py',
+  },
+  {
+    language: 'C#',
+    officialSupport: false,
+    releaseState: undefined,
+    docsUrl: 'https://supabase.com/docs/reference/csharp/installing',
+    gitUrl: 'https://github.com/supabase-community/supabase-csharp',
+    altIconName: 'c-sharp',
+  },
+  {
+    language: 'Swift',
+    officialSupport: false,
+    releaseState: undefined,
+    docsUrl: 'https://supabase.com/docs/reference/swift/initializing',
+    gitUrl: 'https://github.com/supabase-community/supabase-swift',
+  },
+  {
+    language: 'Kotlin',
+    officialSupport: false,
+    releaseState: undefined,
+    docsUrl: 'https://supabase.com/docs/reference/kotlin/installing',
+    gitUrl: 'https://github.com/supabase-community/supabase-kt',
   },
 ]
 

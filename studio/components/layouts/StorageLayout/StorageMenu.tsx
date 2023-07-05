@@ -6,7 +6,7 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { Button, Menu, Alert, IconEdit } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks'
 import { useParams } from 'common/hooks'
 import BucketRow from './BucketRow'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
@@ -21,7 +21,7 @@ const StorageMenu = () => {
   const { ref, bucketId } = useParams()
   const [showCreateBucketModal, setShowCreateBucketModal] = useState(false)
   const [selectedBucketToEdit, setSelectedBucketToEdit] = useState<StorageBucket>()
-  const canCreateBuckets = checkPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
+  const canCreateBuckets = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
 
   const page = router.pathname.split('/')[4] as
     | undefined
@@ -31,7 +31,7 @@ const StorageMenu = () => {
     | 'logs'
 
   const storageExplorerStore = useStorageStore()
-  const { data, isLoading } = useBucketsQuery({ projectRef: ref })
+  const { data, isLoading, isError, isSuccess } = useBucketsQuery({ projectRef: ref })
   const { openDeleteBucketModal } = storageExplorerStore || {}
 
   const buckets = data ?? []
@@ -80,13 +80,24 @@ const StorageMenu = () => {
           <div className="">
             <div>
               <Menu.Group title="All buckets" />
-              {isLoading ? (
+
+              {isLoading && (
                 <div className="space-y-2 mx-2">
                   <ShimmeringLoader className="!py-2.5" />
                   <ShimmeringLoader className="!py-2.5" />
                   <ShimmeringLoader className="!py-2.5" />
                 </div>
-              ) : (
+              )}
+
+              {isError && (
+                <div className="px-2">
+                  <Alert variant="warning" title="Failed to fetch buckets">
+                    Please refresh to try again.
+                  </Alert>
+                </div>
+              )}
+
+              {isSuccess && (
                 <>
                   {buckets.length === 0 && (
                     <div className="px-2">

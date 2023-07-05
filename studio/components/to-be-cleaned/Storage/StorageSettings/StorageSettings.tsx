@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Button, Form, IconClock, Input, Listbox } from 'ui'
 
-import { checkPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useProjectStorageConfigUpdateUpdateMutation } from 'data/config/project-storage-config-update-mutation'
@@ -44,7 +44,7 @@ const StorageConfig = ({ config, projectRef }: any) => {
   const [selectedUnit, setSelectedUnit] = useState(unit)
   let initialValues = { fileSizeLimit: value, unformattedFileSizeLimit: fileSizeLimit }
 
-  const canUpdateStorageSettings = checkPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
+  const canUpdateStorageSettings = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
 
   const formattedMaxSizeBytes = `${new Intl.NumberFormat('en-US').format(
     STORAGE_FILE_SIZE_LIMIT_MAX_BYTES

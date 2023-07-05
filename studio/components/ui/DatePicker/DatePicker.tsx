@@ -17,11 +17,15 @@ import { DatePickerToFrom } from 'components/interfaces/Settings/Logs'
 
 export interface DatePickerProps {
   onChange?: (args: DatePickerToFrom) => void
-  to?: string
-  from?: string
+  to?: string // ISO string
+  from?: string // ISO string
   triggerButtonType?: ButtonProps['type']
   triggerButtonClassName?: string
   triggerButtonTitle?: string
+  minDate?: Date
+  maxDate?: Date
+  hideTime?: boolean
+  hideClear?: boolean
   renderFooter?: (args: DatePickerToFrom) => React.ReactNode | void
 }
 
@@ -38,6 +42,10 @@ function _DatePicker({
   triggerButtonType = 'default',
   triggerButtonClassName = '',
   triggerButtonTitle,
+  minDate,
+  maxDate,
+  hideTime = false,
+  hideClear = false,
   renderFooter = () => null,
 }: DatePickerProps) {
   const [open, setOpen] = useState<boolean>(false)
@@ -64,6 +72,7 @@ function _DatePicker({
       setAppliedEndDate(end)
       setEndDate(end)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [to, from])
 
   function handleDatePickerChange(dates: [from: Date | null, to: Date | null]) {
@@ -81,15 +90,15 @@ function _DatePicker({
     const payload = {
       from: dayjs
         .utc(startDate)
-        .second(startTime.ss)
-        .minute(startTime.mm)
-        .hour(startTime.HH)
+        .second(Number(startTime.ss))
+        .minute(Number(startTime.mm))
+        .hour(Number(startTime.HH))
         .toISOString(),
       to: dayjs
         .utc(endDate || startDate)
-        .second(endTime.ss)
-        .minute(endTime.mm)
-        .hour(endTime.HH)
+        .second(Number(endTime.ss))
+        .minute(Number(endTime.mm))
+        .hour(Number(endTime.HH))
         .toISOString(),
     }
     if (onChange) onChange(payload)
@@ -114,52 +123,56 @@ function _DatePicker({
       align="center"
       side="bottom"
       header={
-        <>
-          <div className="flex items-stretch justify-between py-2">
-            <div className="flex grow flex-col gap-1">
-              <TimeSplitInput
-                type="start"
-                startTime={startTime}
-                endTime={endTime}
-                time={startTime}
-                setTime={setStartTime}
-                setStartTime={setStartTime}
-                setEndTime={setEndTime}
-                startDate={startDate}
-                endDate={endDate}
-              />
-            </div>
-            <div
-              className={`
+        hideTime ? null : (
+          <>
+            <div className="flex items-stretch justify-between py-2">
+              <div className="flex grow flex-col gap-1">
+                <TimeSplitInput
+                  type="start"
+                  startTime={startTime}
+                  endTime={endTime}
+                  time={startTime}
+                  setTime={setStartTime}
+                  setStartTime={setStartTime}
+                  setEndTime={setEndTime}
+                  startDate={startDate}
+                  endDate={endDate}
+                />
+              </div>
+              <div
+                className={`
                       flex 
                       w-12 
                       items-center 
                       justify-center
                       text-scale-900
                     `}
-            >
-              <IconArrowRight strokeWidth={1.5} size={14} />
+              >
+                <IconArrowRight strokeWidth={1.5} size={14} />
+              </div>
+              <div className="flex grow flex-col gap-1">
+                <TimeSplitInput
+                  type="end"
+                  startTime={startTime}
+                  endTime={endTime}
+                  time={endTime}
+                  setTime={setEndTime}
+                  setStartTime={setStartTime}
+                  setEndTime={setEndTime}
+                  startDate={startDate}
+                  endDate={endDate}
+                />
+              </div>
             </div>
-            <div className="flex grow flex-col gap-1">
-              <TimeSplitInput
-                type="end"
-                startTime={startTime}
-                endTime={endTime}
-                time={endTime}
-                setTime={setEndTime}
-                setStartTime={setStartTime}
-                setEndTime={setEndTime}
-                startDate={startDate}
-                endDate={endDate}
-              />
-            </div>
-          </div>
-        </>
+          </>
+        )
       }
       overlay={
         <>
           <div className="px-3 py-4">
             <DatePicker
+              inline
+              selectsRange
               selected={startDate}
               onChange={(dates) => {
                 handleDatePickerChange(dates)
@@ -167,8 +180,8 @@ function _DatePicker({
               dateFormat="MMMM d, yyyy h:mm aa"
               startDate={startDate}
               endDate={endDate}
-              selectsRange
-              inline
+              minDate={minDate}
+              maxDate={maxDate}
               dayClassName={() => 'cursor-pointer'}
               renderCustomHeader={({
                 date,
@@ -213,9 +226,11 @@ function _DatePicker({
           })}
           <Popover.Separator />
           <div className="flex items-center justify-end gap-2 py-2 px-3 pb-4">
-            <Button type="default" onClick={() => handleClear()}>
-              Clear
-            </Button>
+            {!hideClear && (
+              <Button type="default" onClick={() => handleClear()}>
+                Clear
+              </Button>
+            )}
             <Button onClick={() => handleSubmit()}>Apply</Button>
           </div>
         </>

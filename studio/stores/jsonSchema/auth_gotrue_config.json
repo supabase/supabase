@@ -17,6 +17,7 @@
     "EXTERNAL_GITHUB_ENABLED",
     "EXTERNAL_GITLAB_ENABLED",
     "EXTERNAL_GOOGLE_ENABLED",
+    "EXTERNAL_KAKAO_ENABLED",
     "EXTERNAL_KEYCLOAK_ENABLED",
     "EXTERNAL_LINKEDIN_ENABLED",
     "EXTERNAL_NOTION_ENABLED",
@@ -194,6 +195,18 @@
     },
     "EXTERNAL_GOOGLE_SECRET": {
       "title": "Google secret",
+      "type": "string"
+    },
+    "EXTERNAL_KAKAO_ENABLED": {
+      "title": "Kakao enabled",
+      "type": "boolean"
+    },
+    "EXTERNAL_KAKAO_CLIENT_ID": {
+      "title": "Kakao client ID",
+      "type": "string"
+    },
+    "EXTERNAL_KAKAO_SECRET": {
+      "title": "Kakao secret",
       "type": "string"
     },
     "EXTERNAL_KEYCLOAK_ENABLED": {
@@ -443,6 +456,10 @@
       "title": "Body",
       "type": "string"
     },
+    "MFA_MAX_ENROLLED_FACTORS": {
+      "title": "Maximum enrolled factors",
+      "type": "integer"
+    }
     "PASSWORD_MIN_LENGTH": {
       "title": "Minimum password length",
       "type": "integer"
@@ -525,6 +542,19 @@
       "title": "Twilio message service SID",
       "type": "string",
       "help": "Twilio message service SID or twilio phone number"
+    },
+    "SMS_TWILIO_VERIFY_ACCOUNT_SID": {
+      "title": "Twilio account SID",
+      "type": "string"
+    },
+    "SMS_TWILIO_VERIFY_AUTH_TOKEN": {
+      "title": "Twilio Verify auth token",
+      "type": "string"
+    },
+    "SMS_TWILIO_VERIFY_MESSAGE_SERVICE_SID": {
+      "title": "Twilio Verify service SID",
+      "type": "string",
+      "help": "Twilio Verify service SID"
     },
     "SMS_MESSAGEBIRD_ACCESS_KEY": {
       "title": "Messagebird access key",
