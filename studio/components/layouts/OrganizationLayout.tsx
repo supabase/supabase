@@ -14,6 +14,7 @@ const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
   const showOAuthApps = useFlag('oauthApps')
   const showAuditLogs = useFlag('auditLogs')
   const showIntegrationsV2 = useFlag('integrationsV2')
+  const isOrgBilling = !!selectedOrganization?.subscription_id
 
   return (
     <AccountLayout
@@ -41,6 +42,7 @@ const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
                 <Tabs.Panel id="integrations" label="Integrations" className="!my-0" />
               )}
               <Tabs.Panel id="billing" label="Billing" className="!my-0" />
+              {isOrgBilling && <Tabs.Panel id="usage" label="Usage" />}
               <Tabs.Panel id="invoices" label="Invoices" className="!my-0" />
               {showOAuthApps && <Tabs.Panel id="apps" label="OAuth Apps" className="!my-0" />}
               {showAuditLogs && <Tabs.Panel id="audit" label="Audit Logs" className="!my-0" />}
