@@ -62,7 +62,7 @@ const components = {
         <a {...props} />
       </Link>
     ) : (
-      <a />
+      <a {...props}/>
     ),
   Admonition,
   Button,
