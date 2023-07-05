@@ -80,7 +80,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
       {
         anchor: 'dbSize',
         key: PricingMetric.DATABASE_SIZE,
-        attributes: [{ key: PricingMetric.DATABASE_SIZE, color: 'white' }],
+        attributes: [{ key: PricingMetric.DATABASE_SIZE.toLowerCase(), color: 'white' }],
         name: 'Database size',
         chartPrefix: 'Average',
         unit: 'bytes',
@@ -131,7 +131,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
       {
         anchor: 'storageSize',
         key: PricingMetric.STORAGE_SIZE,
-        attributes: [{ key: PricingMetric.STORAGE_SIZE, color: 'white' }],
+        attributes: [{ key: PricingMetric.STORAGE_SIZE.toLowerCase(), color: 'white' }],
         name: 'Storage Size',
         chartPrefix: 'Max',
         unit: 'bytes',
@@ -148,7 +148,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
       {
         anchor: 'funcCount',
         key: PricingMetric.FUNCTION_COUNT,
-        attributes: [{ key: PricingMetric.FUNCTION_COUNT, color: 'white' }],
+        attributes: [{ key: PricingMetric.FUNCTION_COUNT.toLowerCase(), color: 'white' }],
         name: 'Edge Function Count',
         chartPrefix: 'Max',
         unit: 'absolute',
@@ -166,7 +166,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
       {
         anchor: 'mau',
         key: PricingMetric.MONTHLY_ACTIVE_USERS,
-        attributes: [{ key: PricingMetric.MONTHLY_ACTIVE_USERS, color: 'white' }],
+        attributes: [{ key: PricingMetric.MONTHLY_ACTIVE_USERS.toLowerCase(), color: 'white' }],
         name: 'Monthly Active Users',
         unit: 'absolute',
         description:
@@ -183,7 +183,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
       {
         anchor: 'mauSso',
         key: PricingMetric.MONTHLY_ACTIVE_SSO_USERS,
-        attributes: [{ key: PricingMetric.MONTHLY_ACTIVE_SSO_USERS, color: 'white' }],
+        attributes: [{ key: PricingMetric.MONTHLY_ACTIVE_SSO_USERS.toLowerCase(), color: 'white' }],
         name: 'Monthly Active SSO Users',
         unit: 'absolute',
         description:
@@ -200,7 +200,9 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
       {
         anchor: 'storageImageTransformations',
         key: PricingMetric.STORAGE_IMAGES_TRANSFORMED,
-        attributes: [{ key: PricingMetric.STORAGE_IMAGES_TRANSFORMED, color: 'white' }],
+        attributes: [
+          { key: PricingMetric.STORAGE_IMAGES_TRANSFORMED.toLowerCase(), color: 'white' },
+        ],
         name: 'Storage Image Transformations',
         unit: 'absolute',
         description:
@@ -217,7 +219,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
       {
         anchor: 'functionInvocations',
         key: PricingMetric.FUNCTION_INVOCATIONS,
-        attributes: [{ key: PricingMetric.FUNCTION_INVOCATIONS, color: 'white' }],
+        attributes: [{ key: PricingMetric.FUNCTION_INVOCATIONS.toLowerCase(), color: 'white' }],
         name: 'Edge Function Invocations',
         unit: 'absolute',
         description:
@@ -233,7 +235,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
       {
         anchor: 'realtimeMessageCount',
         key: PricingMetric.REALTIME_MESSAGE_COUNT,
-        attributes: [{ key: PricingMetric.REALTIME_MESSAGE_COUNT, color: 'white' }],
+        attributes: [{ key: PricingMetric.REALTIME_MESSAGE_COUNT.toLowerCase(), color: 'white' }],
         name: 'Realtime Message Count',
         unit: 'absolute',
         description:
@@ -249,7 +251,9 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
       {
         anchor: 'realtimePeakConnection',
         key: PricingMetric.REALTIME_PEAK_CONNECTIONS,
-        attributes: [{ key: PricingMetric.REALTIME_PEAK_CONNECTIONS, color: 'white' }],
+        attributes: [
+          { key: PricingMetric.REALTIME_PEAK_CONNECTIONS.toLowerCase(), color: 'white' },
+        ],
         name: 'Realtime Peak Connections',
         chartPrefix: 'Max',
         unit: 'absolute',
