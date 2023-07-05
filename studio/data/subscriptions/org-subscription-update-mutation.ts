@@ -2,6 +2,7 @@ import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react
 import { put } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { subscriptionKeys } from './keys'
+import { SupaResponse } from 'types/base'
 
 export type SubscriptionTier =
   | 'tier_free'
@@ -16,15 +17,11 @@ export type OrgSubscriptionUpdateVariables = {
   tier: SubscriptionTier
 }
 
-export type OrgSubscriptionUpdateResponse = {
-  error?: any
-}
-
-export async function updateOrgSubscription({
+export async function updateOrgSubscription<T = any>({
   slug,
   tier,
   paymentMethod,
-}: OrgSubscriptionUpdateVariables) {
+}: OrgSubscriptionUpdateVariables): Promise<SupaResponse<T>> {
   if (!slug) throw new Error('slug is required')
   if (!tier) throw new Error('tier is required')
 
@@ -34,7 +31,7 @@ export async function updateOrgSubscription({
   const response = await put(`${API_URL}/organizations/${slug}/billing/subscription`, payload)
   if (response.error) throw response.error
 
-  return response as OrgSubscriptionUpdateResponse
+  return response as SupaResponse<T>
 }
 
 type OrgSubscriptionUpdateData = Awaited<ReturnType<typeof updateOrgSubscription>>

@@ -65,5 +65,6 @@ export const useOrganizationTaxIDsPrefetch = ({ slug }: OrganizationTaxIDsVariab
         getOrganizationTaxIDs({ slug }, signal)
       )
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [slug])
 }

@@ -83,7 +83,7 @@ export interface ResponseFailure {
   error: ResponseError
 }
 
-export type SupaResponse<T> = T & ResponseFailure
+export type SupaResponse<T> = T | ResponseFailure
 
 export interface ResponseError {
   code: number
