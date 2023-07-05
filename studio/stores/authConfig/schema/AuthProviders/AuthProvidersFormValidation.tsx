@@ -81,7 +81,6 @@ const PROVIDER_PHONE = {
         { label: 'Messagebird', value: 'messagebird', icon: 'messagebird-icon.svg' },
         { label: 'Textlocal', value: 'textlocal', icon: 'textlocal-icon.png' },
         { label: 'Vonage', value: 'vonage', icon: 'vonage-icon.svg' },
-        { label: 'Twilio Verify', value: 'twilio_verify', icon: 'twilio-icon.svg' }
       ],
     },
     RATE_LIMIT_SMS_SENT: {
@@ -123,7 +122,7 @@ const PROVIDER_PHONE = {
       title: 'Twilio Account Sid',
       show: {
         key: 'SMS_PROVIDER',
-        matches: ['twilio_verify'],
+        matches: ['twilio-verify'],
       },
     },
     SMS_TWILIO_VERIFY_AUTH_TOKEN: {
@@ -132,7 +131,7 @@ const PROVIDER_PHONE = {
       isSecret: true,
       show: {
         key: 'SMS_PROVIDER',
-        matches: ['twilio_verify'],
+        matches: ['twilio-verify'],
       },
     },
     SMS_TWILIO_VERIFY_MESSAGE_SERVICE_SID: {
@@ -140,7 +139,7 @@ const PROVIDER_PHONE = {
       title: 'Twilio Message Service Sid',
       show: {
         key: 'SMS_PROVIDER',
-        matches: ['twilio_verify'],
+        matches: ['twilio-verify'],
       },
     },
 
@@ -274,21 +273,21 @@ const PROVIDER_PHONE = {
     // Twilio Verify
     SMS_TWILIO_VERIFY_ACCOUNT_SID: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
       is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
-        return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'twilio_verify'
+        return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'twilio-verify'
       },
       then: (schema) => schema.required('Twilio Verify Account SID is required'),
       otherwise: (schema) => schema,
     }),
     SMS_TWILIO_VERIFY_AUTH_TOKEN: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
       is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
-        return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'twilio_verify'
+        return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'twilio-verify'
       },
       then: (schema) => schema.required('Twilio Verify Auth Token is required'),
       otherwise: (schema) => schema,
     }),
     SMS_TWILIO_VERIFY_MESSAGE_SERVICE_SID: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
       is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
-        return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'twilio_verify'
+        return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'twilio-verify'
       },
       then: (schema) => schema.required('Twilio Verify Service SID is required'),
       otherwise: (schema) => schema,
