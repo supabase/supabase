@@ -81,7 +81,6 @@ const PROVIDER_PHONE = {
         { label: 'Messagebird', value: 'messagebird', icon: 'messagebird-icon.svg' },
         { label: 'Textlocal', value: 'textlocal', icon: 'textlocal-icon.png' },
         { label: 'Vonage', value: 'vonage', icon: 'vonage-icon.svg' },
-        { label: 'Twilio Verify', value: 'twilio-verify', icon: 'twilio-icon.svg' }
       ],
     },
     RATE_LIMIT_SMS_SENT: {
