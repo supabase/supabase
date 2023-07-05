@@ -1,6 +1,6 @@
 import { SupaResponseV2 } from 'types'
 
-async function fetchGitHub<T>(url: string, responseJson = true): Promise<SupaResponseV2<T>> {
+async function fetchGitHub<T = any>(url: string, responseJson = true): Promise<SupaResponseV2<T>> {
   const response = await fetch(url)
   if (!response.ok) {
     return {
