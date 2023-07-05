@@ -5,7 +5,7 @@ import { useProjectReadOnlyStatusQuery } from 'data/projects/project-readonly-st
 import { PROJECT_STATUS } from 'lib/constants'
 import { Project } from 'types'
 
-interface ProjectCardProps {
+export interface ProjectCardProps {
   project: Project
   rewriteHref?: string
 }
@@ -16,9 +16,10 @@ const ProjectCard = ({ project, rewriteHref }: ProjectCardProps) => {
 
   const { data: readonlyStatus } = useProjectReadOnlyStatusQuery({ projectRef })
 
-  // Project status should supercede is read only status
+  // Project status should supersede is read only status
   const isHealthy = project.status === PROJECT_STATUS.ACTIVE_HEALTHY
-  const isPausing = project.status === PROJECT_STATUS.GOING_DOWN
+  const isPausing =
+    project.status === PROJECT_STATUS.GOING_DOWN || project.status === PROJECT_STATUS.PAUSING
   const isPaused = project.status === PROJECT_STATUS.INACTIVE
   const isRestoring = project.status === PROJECT_STATUS.RESTORING
   const isReadonly = readonlyStatus?.enabled ?? false

@@ -19,9 +19,7 @@ export function usePushNext() {
         // vercel integration
         const isVercelIntegration = next.includes('https://vercel.com')
         if (isVercelIntegration) {
-          searchParams.delete('returnTo')
-
-          return await router.push(`/vercel/integrate?${searchParams.toString()}`)
+          return
         }
 
         // database.new integration

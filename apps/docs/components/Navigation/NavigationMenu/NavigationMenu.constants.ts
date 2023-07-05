@@ -210,21 +210,22 @@ export const gettingstarted: NavMenuConstant = {
     {
       name: 'Framework Quickstarts',
       items: [
+        { name: 'Next.js', url: '/guides/getting-started/quickstarts/nextjs' },
         { name: 'React', url: '/guides/getting-started/quickstarts/reactjs' },
-        { name: 'NextJS', url: '/guides/getting-started/quickstarts/nextjs' },
         { name: 'NuxtJS', url: '/guides/getting-started/quickstarts/nuxtjs' },
         { name: 'RedwoodJS', url: '/guides/getting-started/quickstarts/redwoodjs' },
         { name: 'Flutter', url: '/guides/getting-started/quickstarts/flutter' },
         { name: 'SvelteKit', url: '/guides/getting-started/quickstarts/sveltekit' },
         { name: 'SolidJS', url: '/guides/getting-started/quickstarts/solidjs' },
         { name: 'Vue', url: '/guides/getting-started/quickstarts/vue' },
+        { name: 'refine', url: '/guides/getting-started/quickstarts/refine' },
       ],
     },
     {
       name: 'Web app tutorials',
       items: [
         {
-          name: 'NextJS',
+          name: 'Next.js',
           url: '/guides/getting-started/tutorials/with-nextjs',
         },
         {
@@ -258,6 +259,10 @@ export const gettingstarted: NavMenuConstant = {
         {
           name: 'SvelteKit',
           url: '/guides/getting-started/tutorials/with-sveltekit',
+        },
+        {
+          name: 'refine',
+          url: '/guides/getting-started/tutorials/with-refine',
         },
       ],
     },
@@ -350,6 +355,11 @@ export const SocialLoginItems = [
     url: '/guides/auth/social-login/auth-discord',
   },
   {
+    name: 'Kakao',
+    icon: '/docs/img/icons/kakao-icon',
+    url: '/guides/auth/social-login/auth-kakao',
+  },
+  {
     name: 'Keycloak',
     icon: '/docs/img/icons/keycloak-icon',
     url: '/guides/auth/social-login/auth-keycloak',
@@ -424,7 +434,10 @@ export const auth = {
     },
     {
       name: 'Quickstarts',
-      items: [{ name: 'Auth with React', url: '/guides/auth/quickstarts/react', items: [] }],
+      items: [
+        { name: 'Next.js', url: '/guides/auth/quickstarts/nextjs', items: [] },
+        { name: 'React', url: '/guides/auth/quickstarts/react', items: [] },
+      ],
     },
     {
       name: 'Authentication',
@@ -801,10 +814,6 @@ export const realtime: NavMenuConstant = {
       url: '/guides/realtime/concepts',
     },
     {
-      name: 'Quickstart',
-      url: '/guides/realtime/quickstart',
-    },
-    {
       name: 'Features',
       url: undefined,
       items: [
@@ -1059,6 +1068,10 @@ export const platform: NavMenuConstant = {
           url: '/guides/platform/troubleshooting',
         },
         {
+          name: 'High Disk IO Consumption',
+          url: '/guides/platform/exhaust-disk-io',
+        },
+        {
           name: 'High CPU Usage',
           url: '/guides/platform/exhaust-cpu',
         },
@@ -1175,6 +1188,20 @@ export const integrations: NavMenuConstant = {
   url: '/guides/integrations',
   items: [
     { name: 'Overview', url: '/guides/integrations/integrations' },
+    {
+      name: 'OAuth Apps (Beta)',
+      url: undefined,
+      items: [
+        {
+          name: 'Publish an OAuth App',
+          url: '/guides/integrations/oauth-apps/publish-an-oauth-app',
+        },
+        {
+          name: 'Authorize an OAuth App',
+          url: '/guides/integrations/oauth-apps/authorize-an-oauth-app',
+        },
+      ],
+    },
     {
       name: 'Auth',
       url: undefined,

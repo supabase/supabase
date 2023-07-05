@@ -1,17 +1,19 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
-import * as Tooltip from '@radix-ui/react-tooltip'
+import { useQueryClient } from '@tanstack/react-query'
+import { includes, without } from 'lodash'
+import { useRouter } from 'next/router'
+import { useReducer, useRef, useState } from 'react'
+
 import { useParams } from 'common'
+import { setProjectStatus } from 'data/projects/projects-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useProjectSubscriptionUpdateMutation } from 'data/subscriptions/project-subscription-update-mutation'
 import { useFlag, useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
-import { includes, without } from 'lodash'
-import { useRouter } from 'next/router'
-import { useReducer, useRef, useState } from 'react'
 import { Button, Input, Modal } from 'ui'
-import ProjectUpdateDisabledTooltip from '../../ProjectUpdateDisabledTooltip'
 import { CANCELLATION_REASONS } from '../../Billing.constants'
+import ProjectUpdateDisabledTooltip from '../../ProjectUpdateDisabledTooltip'
 
 export interface ExitSurveyModalProps {
   visible: boolean
@@ -21,7 +23,8 @@ export interface ExitSurveyModalProps {
 // [Joshen] For context - Exit survey is only when going to free plan from a paid plan
 
 const ExitSurveyModal = ({ visible, onClose }: ExitSurveyModalProps) => {
-  const { ui, app } = useStore()
+  const queryClient = useQueryClient()
+  const { ui } = useStore()
   const { ref: projectRef } = useParams()
   const captchaRef = useRef<HCaptcha>(null)
   const router = useRouter()
@@ -35,7 +38,6 @@ const ExitSurveyModal = ({ visible, onClose }: ExitSurveyModalProps) => {
   const { data: addons } = useProjectAddonsQuery({ projectRef })
   const { mutateAsync: updateSubscriptionTier } = useProjectSubscriptionUpdateMutation()
 
-  const projectId = ui.selectedProject?.id ?? -1
   const subscriptionAddons = addons?.selected_addons ?? []
   const hasComputeInstance = subscriptionAddons.find((addon) => addon.type === 'compute_instance')
 
@@ -118,7 +120,7 @@ const ExitSurveyModal = ({ visible, onClose }: ExitSurveyModalProps) => {
           : 'Successfully downgraded project to the free plan',
       })
       if (hasComputeInstance) {
-        app.onProjectStatusUpdated(projectId, PROJECT_STATUS.RESTORING)
+        setProjectStatus(queryClient, projectRef, PROJECT_STATUS.RESTORING)
         router.push(`/project/${projectRef}`)
       }
       onClose(true)

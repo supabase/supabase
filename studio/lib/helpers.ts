@@ -160,22 +160,19 @@ export const snakeToCamel = (str: string) =>
  * Safari doesn't support write text into clipboard async, so if you need to load
  * text content async before coping, please use Promise<string> for the 1st arg.
  */
-export const copyToClipboard = async (
-  str: string,
-  callback: () => void = () => {}
-): Promise<void> => {
+export const copyToClipboard = async (str: string | Promise<string>, callback = () => {}) => {
   const focused = window.document.hasFocus()
   if (focused) {
     if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
-      try {
-        await navigator.clipboard.writeText(str)
-        callback()
-      } catch (error) {
-        console.warn('Unable to copy to clipboard')
-      }
-    } else {
-      console.warn('Clipboard writeText method not supported')
+      const text = await Promise.resolve(str)
+      Promise.resolve(window.navigator?.clipboard?.writeText(text)).then(callback)
+
+      return
     }
+
+    Promise.resolve(str)
+      .then((text) => window.navigator?.clipboard?.writeText(text))
+      .then(callback)
   } else {
     console.warn('Unable to copy to clipboard')
   }
@@ -248,4 +245,21 @@ export const detectOS = () => {
   } else {
     return undefined
   }
+}
+
+/**
+ * Pluralize a word based on a count
+ */
+export function pluralize(count: number, singular: string, plural?: string) {
+  return count === 1 ? singular : plural || singular + 's'
+}
+
+export const isValidHttpUrl = (value: string) => {
+  let url: URL
+  try {
+    url = new URL(value)
+  } catch (_) {
+    return false
+  }
+  return url.protocol === 'http:' || url.protocol === 'https:'
 }

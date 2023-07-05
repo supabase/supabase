@@ -1,24 +1,26 @@
-import { useRouter } from 'next/router'
-import { observer } from 'mobx-react-lite'
-import { IconInfo, Tabs } from 'ui'
-import clsx from 'clsx'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import clsx from 'clsx'
+import { observer } from 'mobx-react-lite'
+import { useRouter } from 'next/router'
 
-import { NextPageWithLayout } from 'types'
-import { checkPermissions, useStore } from 'hooks'
-import { DatabaseLayout } from 'components/layouts'
 import { BackupsList } from 'components/interfaces/Database'
-import NoPermission from 'components/ui/NoPermission'
+import { DatabaseLayout } from 'components/layouts'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import InformationBox from 'components/ui/InformationBox'
+import NoPermission from 'components/ui/NoPermission'
+import { useCheckPermissions, useStore } from 'hooks'
+import { NextPageWithLayout } from 'types'
+import { IconInfo, Tabs } from 'ui'
 
 const DatabaseScheduledBackups: NextPageWithLayout = () => {
-  const { ui, backups } = useStore()
   const router = useRouter()
-  const ref = ui.selectedProject?.ref
+  const { backups } = useStore()
+  const { project } = useProjectContext()
+  const ref = project?.ref
 
   const isPitrEnabled = backups?.configuration?.walg_enabled
 
-  const canReadScheduledBackups = checkPermissions(PermissionAction.READ, 'back_ups')
+  const canReadScheduledBackups = useCheckPermissions(PermissionAction.READ, 'back_ups')
 
   return (
     <div

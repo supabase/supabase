@@ -1,18 +1,18 @@
-import { FC, useEffect, useState } from 'react'
-import { isEqual } from 'lodash'
-import { Input, Button, IconPlus, IconX, Listbox } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { isEqual } from 'lodash'
+import { useEffect, useState } from 'react'
+import { Button, IconPlus, IconX, Input, Listbox } from 'ui'
 
-import { checkPermissions, useFlag, useStore } from 'hooks'
-import { uuidv4 } from 'lib/helpers'
-import { post, delete_ } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
-import Panel from 'components/ui/Panel'
-import { StripeTaxId, TAX_IDS } from './TaxID.constants'
 import NoPermission from 'components/ui/NoPermission'
+import Panel from 'components/ui/Panel'
+import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
+import { delete_, post } from 'lib/common/fetch'
+import { API_URL } from 'lib/constants'
+import { uuidv4 } from 'lib/helpers'
+import { StripeTaxId, TAX_IDS } from './TaxID.constants'
 import { sanitizeTaxID } from './TaxID.utils'
 
-interface Props {
+export interface TaxIDProps {
   loading: boolean
   taxIds: any[]
   onTaxIdsUpdated: (taxIds: any) => void
@@ -21,9 +21,10 @@ interface Props {
 // Stripe recommends to delete tax ids and create new ones to update
 // https://stripe.com/docs/billing/customer/tax-ids
 
-const TaxID: FC<Props> = ({ loading, taxIds, onTaxIdsUpdated }) => {
+const TaxID = ({ loading, taxIds, onTaxIdsUpdated }: TaxIDProps) => {
   const { ui } = useStore()
-  const slug = ui.selectedOrganization?.slug ?? ''
+  const selectedOrganization = useSelectedOrganization()
+  const slug = selectedOrganization?.slug ?? ''
 
   const [isSaving, setIsSaving] = useState(false)
   const [errors, setErrors] = useState<string[]>([])
@@ -50,8 +51,8 @@ const TaxID: FC<Props> = ({ loading, taxIds, onTaxIdsUpdated }) => {
   }, [taxIds])
 
   const hasChanges = !isEqual(taxIdValues, formattedTaxIds)
-  const canReadTaxIds = checkPermissions(PermissionAction.BILLING_READ, 'stripe.tax_ids')
-  const canUpdateTaxIds = checkPermissions(PermissionAction.BILLING_WRITE, 'stripe.tax_ids')
+  const canReadTaxIds = useCheckPermissions(PermissionAction.BILLING_READ, 'stripe.tax_ids')
+  const canUpdateTaxIds = useCheckPermissions(PermissionAction.BILLING_WRITE, 'stripe.tax_ids')
 
   const onUpdateTaxId = (id: string, key: string, value: string) => {
     const updatedTaxIds = taxIdValues.map((taxId: any) => {

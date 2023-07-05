@@ -17,7 +17,7 @@ import { Transition } from '@headlessui/react'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks'
 import { URL_EXPIRY_DURATION } from '../Storage.constants'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 
@@ -94,13 +94,17 @@ const PreviewFile = ({ mimeType, previewUrl }: { mimeType: string; previewUrl: s
   )
 }
 
-const PreviewPane = () => {
+export interface PreviewPaneProps {
+  onCopyUrl: (name: string, url: string) => void
+}
+
+const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
   const storageExplorerStore = useStorageStore()
   const {
+    getFileUrl,
     downloadFile,
     selectedBucket,
     selectedFilePreview: file,
-    copyFileURLToClipboard,
     closeFilePreview,
     setSelectedItemsToDelete,
     setSelectedFileCustomExpiry,
@@ -112,7 +116,7 @@ const PreviewPane = () => {
   const mimeType = file.metadata ? file.metadata.mimetype : null
   const createdAt = file.created_at ? new Date(file.created_at).toLocaleString() : 'Unknown'
   const updatedAt = file.updated_at ? new Date(file.updated_at).toLocaleString() : 'Unknown'
-  const canUpdateFiles = checkPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
+  const canUpdateFiles = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
 
   return (
     <>
@@ -194,7 +198,7 @@ const PreviewPane = () => {
                 <Button
                   type="outline"
                   icon={<IconClipboard size={16} strokeWidth={2} />}
-                  onClick={async () => await copyFileURLToClipboard(file)}
+                  onClick={async () => onCopyUrl(file.name, await getFileUrl(file))}
                   disabled={file.isCorrupted}
                 >
                   Get URL
@@ -207,7 +211,7 @@ const PreviewPane = () => {
                     <Dropdown.Item
                       key="expires-one-week"
                       onClick={async () =>
-                        await copyFileURLToClipboard(file, URL_EXPIRY_DURATION.WEEK)
+                        onCopyUrl(file.name, await getFileUrl(file, URL_EXPIRY_DURATION.WEEK))
                       }
                     >
                       Expire in 1 week
@@ -215,7 +219,7 @@ const PreviewPane = () => {
                     <Dropdown.Item
                       key="expires-one-month"
                       onClick={async () =>
-                        await copyFileURLToClipboard(file, URL_EXPIRY_DURATION.MONTH)
+                        onCopyUrl(file.name, await getFileUrl(file, URL_EXPIRY_DURATION.MONTH))
                       }
                     >
                       Expire in 1 month
@@ -223,7 +227,7 @@ const PreviewPane = () => {
                     <Dropdown.Item
                       key="expires-one-year"
                       onClick={async () =>
-                        await copyFileURLToClipboard(file, URL_EXPIRY_DURATION.YEAR)
+                        onCopyUrl(file.name, await getFileUrl(file, URL_EXPIRY_DURATION.YEAR))
                       }
                     >
                       Expire in 1 year

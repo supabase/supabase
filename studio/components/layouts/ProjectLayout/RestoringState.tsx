@@ -1,16 +1,18 @@
 import Link from 'next/link'
 import { FC, useEffect, useRef, useState } from 'react'
-import { Button, IconAlertCircle, IconCheckCircle, IconLoader } from 'ui'
 
+import { getProjectDetail } from 'data/projects/project-detail-query'
 import { useStore } from 'hooks'
-import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import { getWithTimeout } from 'lib/common/fetch'
+import { API_URL, PROJECT_STATUS } from 'lib/constants'
+import { Button, IconAlertCircle, IconCheckCircle, IconLoader } from 'ui'
+import { useProjectContext } from './ProjectContext'
 
 interface Props {}
 
 const RestoringState: FC<Props> = ({}) => {
-  const { app, ui, meta } = useStore()
-  const project = ui.selectedProject
+  const { meta } = useStore()
+  const { project } = useProjectContext()
   const checkServerInterval = useRef<number>()
 
   const [loading, setLoading] = useState(false)
@@ -41,8 +43,13 @@ const RestoringState: FC<Props> = ({}) => {
   }
 
   const onConfirm = async () => {
+    if (!project) return console.error('Project is required')
+
     setLoading(true)
-    await app.projects.fetchDetail(project?.ref ?? '', (project) => meta.setProjectDetails(project))
+    const projectDetail = await getProjectDetail({ ref: project?.ref })
+    if (projectDetail) {
+      meta.setProjectDetails(projectDetail)
+    }
   }
 
   return (

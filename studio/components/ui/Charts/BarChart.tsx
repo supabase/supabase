@@ -13,13 +13,12 @@ dayjs.extend(utc)
 export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
   yAxisKey: string
   xAxisKey: string
-  format?: string
   customDateFormat?: string
   displayDateInUtc?: boolean
   onBarClick?: (datum: Datum, tooltipData?: CategoricalChartState) => void
 }
 
-const BarChart: React.FC<BarChartProps> = ({
+const BarChart = ({
   data,
   yAxisKey,
   xAxisKey,
@@ -30,10 +29,11 @@ const BarChart: React.FC<BarChartProps> = ({
   highlightedLabel,
   displayDateInUtc,
   minimalHeader,
+  valuePrecision,
   className = '',
   size = 'normal',
   onBarClick,
-}) => {
+}: BarChartProps) => {
   const { Container } = useChartSize(size)
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
 
@@ -58,7 +58,7 @@ const BarChart: React.FC<BarChartProps> = ({
         customDateFormat={customDateFormat}
         highlightedValue={
           typeof resolvedHighlightedValue === 'number'
-            ? numberFormatter(resolvedHighlightedValue)
+            ? numberFormatter(resolvedHighlightedValue, valuePrecision)
             : resolvedHighlightedValue
         }
         highlightedLabel={resolvedHighlightedLabel}
