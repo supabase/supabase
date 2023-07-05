@@ -18,11 +18,11 @@ There are two reasons to use Supabase SMS OTP tokens:
 
 What you'll need:
 
-- A Twilio account (sign up here: https://www.twilio.com/try-twilio)
-- A Supabase project (create one here: https://app.supabase.com)
-- A mobile phone capable of receiving SMS
+- Twilio account ([sign up](https://www.twilio.com/try-twilio))
+- Supabase project (create one [here](https://supabase.com/dashboard))
+- Mobile phone capable of receiving SMS
 
-SMS Authentication can be done with either Twilio (Programmable Messaging) or Twilio Verify. [Twilio Verify](https://www.twilio.com/en-us/trusted-activation/verify) is a service that replaces [Twilio Programmable Messaging](https://www.twilio.com/docs/messaging). Twilio Verify is a specialized OTP solution and is recommended for developers requiring features like fraud protection.
+SMS Authentication can be done with either Twilio Verify or Twilio Programmable Messaging. [Twilio Verify](https://www.twilio.com/en-us/trusted-activation/verify) is a specialized OTP solution and is recommended for most developers that need over-the-phone authentication. Alternatively you can use [Twilio Programmable Messaging](https://www.twilio.com/docs/messaging) which offers generic SMS sending support.
 
 <Tabs>
 <TabPanel id="twilio-verify" label="Twilio Verify">
