@@ -22,6 +22,7 @@ This tutorial demonstrates how to build a basic product management app. The app 
 <KotlinProjectSetup />
 
 
+## Building the app
 ### 1. Create new Android with Jetpack Compose in Android Studio
 Open Android Studio > New Project > Base Activity (Jetpack Compose)
 
@@ -349,7 +350,7 @@ class AuthenticationRepositoryImpl @Inject constructor(
 <Admonition type="note">
   By the time this page is written, there might be some changes in the code to make it more simple. If you face any problem when implement, feel free to refer the example repository above
 </Admonition>
-Product list
+### Product list screen
 Create ProductListViewModel
 ```kotlin
 
@@ -517,7 +518,7 @@ private fun AddProductButton(
 ```
 
 
-Product details
+### Product details screen
 Create ProductDetailsViewModel.kt
 ```kotlin
 
@@ -761,7 +762,7 @@ private fun uriToByteArray(contentResolver: ContentResolver, uri: Uri): ByteArra
 }
 ```
 
-Add product
+### Add product screen
 Create AddProductScreen
 ```kotlin
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -851,7 +852,7 @@ class AddProductViewModel @Inject constructor(
 }
 ```
 
-Sign up
+### Sign up screen
 Create SignUpViewModel
 ```kotlin
 @HiltViewModel
@@ -980,7 +981,7 @@ fun SignUpScreen(
     }
 }
 ```
-Sign In screen
+### Sign in screen
 Create SignInViewModel
 ```kotlin
 @HiltViewModel
