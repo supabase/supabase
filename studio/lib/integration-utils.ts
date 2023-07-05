@@ -1,4 +1,5 @@
 import { SupaResponseV2 } from 'types'
+import { Integration } from 'data/integrations/integrations.types'
 
 async function fetchGitHub<T = any>(url: string, responseJson = true): Promise<SupaResponseV2<T>> {
   const response = await fetch(url)
@@ -110,4 +111,12 @@ export async function getInitialMigrationSQLFromGitHubRepo(
   `
 
   return `${migrations};${migrationsTableSql};${seed}`
+}
+
+export function getVercelConfigurationUrl(integration: Integration) {
+  return `https://vercel.com/dashboard/${
+    integration.metadata?.account.type === 'Team'
+      ? `${integration.metadata?.account.team_slug}/`
+      : ''
+  }integrations/${integration.metadata?.configuration_id}`
 }
