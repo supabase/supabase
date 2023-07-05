@@ -14,11 +14,13 @@ import Telemetry from 'lib/telemetry'
 import { useRouter } from 'next/router'
 import { plans as subscriptionsPlans } from 'shared-data/plans'
 import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
-import { Alert, Button, IconCheck, IconExternalLink, Modal, SidePanel } from 'ui'
+import { Button, IconCheck, IconExternalLink, Modal, SidePanel } from 'ui'
+import DowngradeModal from './DowngradeModal'
 import EnterpriseCard from './EnterpriseCard'
 import ExitSurveyModal from './ExitSurveyModal'
 import MembersExceedLimitModal from './MembersExceedLimitModal'
 import PaymentMethodSelection from './PaymentMethodSelection'
+import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 
 // [Joshen TODO] Need to remove all contexts of "projects"
 
@@ -45,14 +47,11 @@ const PlanUpdateSidePanel = () => {
 
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: slug })
   const { data: plans, isLoading: isLoadingPlans } = useOrgPlansQuery({ orgSlug: slug })
+  const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery({ slug })
   const { mutateAsync: updateOrgSubscription } = useOrgSubscriptionUpdateMutation()
-  // const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery({ slug }) // [Joshen] Still need?
 
   const availablePlans = plans ?? []
-  const subscriptionAddons: any[] = [] // [Joshen] Still need?
-
-  // const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
-  const hasMembersExceedingFreeTierLimit = false // [Joshen] Still need?
+  const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
   const selectedTierMeta = subscriptionsPlans.find((tier) => tier.id === selectedTier)
   const selectedPlanMeta = availablePlans.find(
     (plan) => plan.id === selectedTier?.split('tier_')[1]
@@ -278,49 +277,12 @@ const PlanUpdateSidePanel = () => {
         </SidePanel.Content>
       </SidePanel>
 
-      <Modal
-        size="medium"
-        alignFooter="right"
+      <DowngradeModal
         visible={selectedTier === 'tier_free'}
-        onCancel={() => setSelectedTier(undefined)}
+        selectedTier={selectedTierMeta}
+        onClose={() => setSelectedTier(undefined)}
         onConfirm={onConfirmDowngrade}
-        header={`Confirm to downgrade to ${selectedTierMeta?.name}`}
-      >
-        {/* [JOSHEN] We could make this better by only showing a danger warning if the project is already above the free plan limits */}
-        <Modal.Content>
-          <div className="py-6">
-            <Alert
-              withIcon
-              variant="warning"
-              title="Downgrading to the free plan will lead to reductions in your project's capacity"
-            >
-              <p>
-                If you're already past the limits of the free plan, your project could become
-                unresponsive or enter read only mode.
-              </p>
-              {subscriptionAddons.length > 0 && (
-                <>
-                  <p className="mt-2">
-                    Your project's add ons will also be removed, which includes:
-                  </p>
-                  <ul className="list-disc pl-6">
-                    {subscriptionAddons.map((addon) => (
-                      <li key={addon.type} className="mt-0.5">
-                        {addon.variant.name}{' '}
-                        {addon.type === 'compute_instance'
-                          ? 'compute instance'
-                          : addon.type === 'pitr'
-                          ? 'PITR'
-                          : ''}
-                      </li>
-                    ))}
-                  </ul>
-                </>
-              )}
-            </Alert>
-          </div>
-        </Modal.Content>
-      </Modal>
+      />
 
       <Modal
         loading={isSubmitting}
@@ -341,8 +303,7 @@ const PlanUpdateSidePanel = () => {
               previous usage.
             </p>
             <p className="text-sm text-scale-1000">
-              You will also be able to change your project's add-ons after upgrading your project's
-              plan.
+              You will also be able to change your project's add-ons after upgrading your plan.
             </p>
             <div className="!mt-6">
               <PaymentMethodSelection

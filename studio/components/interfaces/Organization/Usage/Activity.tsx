@@ -1,6 +1,6 @@
 import { DataPoint } from 'data/analytics/constants'
 import { ProjectSubscriptionResponse } from 'data/subscriptions/project-subscription-v2-query'
-import UsageSection from './UsageSection'
+import UsageSection from './UsageSection/UsageSection'
 import { PricingMetric, useOrgDailyStatsQuery } from 'data/analytics/org-daily-stats-query'
 
 export interface ActivityProps {

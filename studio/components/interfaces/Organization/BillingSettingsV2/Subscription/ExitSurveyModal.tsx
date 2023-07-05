@@ -14,6 +14,7 @@ import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import { Button, Input, Modal } from 'ui'
 import { CANCELLATION_REASONS } from '../BillingSettings.constants'
 import ProjectUpdateDisabledTooltip from '../../BillingSettings/ProjectUpdateDisabledTooltip'
+import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
 
 export interface ExitSurveyModalProps {
   visible: boolean
@@ -24,23 +25,25 @@ export interface ExitSurveyModalProps {
 // [Joshen TODO] Remove all contexts of projects - i'm presuming we still want the exit survey
 
 const ExitSurveyModal = ({ visible, onClose }: ExitSurveyModalProps) => {
-  const queryClient = useQueryClient()
   const { ui } = useStore()
-  const { ref: projectRef } = useParams()
-  const captchaRef = useRef<HCaptcha>(null)
   const router = useRouter()
+  const { slug } = useParams()
+  const queryClient = useQueryClient()
+  const captchaRef = useRef<HCaptcha>(null)
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [message, setMessage] = useState('')
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [selectedReasons, dispatchSelectedReasons] = useReducer(reducer, [])
 
-  const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
-  const { data: addons } = useProjectAddonsQuery({ projectRef })
-  const { mutateAsync: updateSubscriptionTier } = useProjectSubscriptionUpdateMutation()
+  const subscriptionUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
+  const { mutateAsync: updateOrgSubscription } = useOrgSubscriptionUpdateMutation()
 
-  const subscriptionAddons = addons?.selected_addons ?? []
-  const hasComputeInstance = subscriptionAddons.find((addon) => addon.type === 'compute_instance')
+  // [Joshen] We'll need to fix this - but need a way to check which projects will be affected
+  // const { data: addons } = useProjectAddonsQuery({ projectRef })
+  // const subscriptionAddons = addons?.selected_addons ?? []
+  // const hasComputeInstance = subscriptionAddons.find((addon) => addon.type === 'compute_instance')
+  const hasComputeInstance = false
 
   function reducer(state: any, action: any) {
     if (includes(state, action.target.value)) {
@@ -70,7 +73,7 @@ const ExitSurveyModal = ({ visible, onClose }: ExitSurveyModalProps) => {
       if (!token) {
         const captchaResponse = await captchaRef.current?.execute({ async: true })
         token = captchaResponse?.response ?? null
-        await downgradeProject()
+        await downgradeOrganization()
       }
     } catch (error: any) {
       ui.setNotification({
@@ -82,25 +85,26 @@ const ExitSurveyModal = ({ visible, onClose }: ExitSurveyModalProps) => {
     }
   }
 
-  const downgradeProject = async (values?: any) => {
+  const downgradeOrganization = async (values?: any) => {
     // Update the subscription first, followed by posting the exit survey if successful
     // If compute instance is present within the existing subscription, then a restart will be triggered
-    if (!projectRef) return console.error('Project ref is required')
+    if (!slug) return console.error('Slug is required')
 
     try {
-      await updateSubscriptionTier({ projectRef, tier: 'tier_free' })
+      await updateOrgSubscription({ slug, tier: 'tier_free' })
       resetCaptcha()
     } catch (error: any) {
       return ui.setNotification({
         error,
         category: 'error',
-        message: `Failed to cancel subscription: ${error.message}`,
+        message: `Failed to downgrade subscription: ${error.message}`,
       })
     }
 
     try {
+      // [Joshen TODO] Update to accept org slug once endpoint is updated
       const feedbackRes = await post(`${API_URL}/feedback/downgrade`, {
-        projectRef,
+        projectRef: '',
         reasons: selectedReasons.reduce((a, b) => `${a}- ${b}\n`, ''),
         additionalFeedback: message,
         exitAction: 'downgrade',
@@ -117,13 +121,14 @@ const ExitSurveyModal = ({ visible, onClose }: ExitSurveyModalProps) => {
         category: 'success',
         duration: hasComputeInstance ? 8000 : 4000,
         message: hasComputeInstance
-          ? 'Your project has been downgraded and is currently restarting to update its instance size'
-          : 'Successfully downgraded project to the free plan',
+          ? 'Your organization has been downgraded and your projects are currently restarting to update their compute instances'
+          : 'Successfully downgraded organization to the free plan',
       })
-      if (hasComputeInstance) {
-        setProjectStatus(queryClient, projectRef, PROJECT_STATUS.RESTORING)
-        router.push(`/project/${projectRef}`)
-      }
+      // [Joshen TODO] Think about how to handle this
+      // if (hasComputeInstance) {
+      //   setProjectStatus(queryClient, projectRef, PROJECT_STATUS.RESTORING)
+      //   router.push(`/project/${projectRef}`)
+      // }
       onClose(true)
       window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
     }
@@ -215,11 +220,11 @@ const ExitSurveyModal = ({ visible, onClose }: ExitSurveyModalProps) => {
             <Button type="default" onClick={() => onClose()}>
               Cancel
             </Button>
-            <ProjectUpdateDisabledTooltip projectUpdateDisabled={projectUpdateDisabled}>
+            <ProjectUpdateDisabledTooltip projectUpdateDisabled={subscriptionUpdateDisabled}>
               <Button
                 type="danger"
                 loading={isSubmitting}
-                disabled={projectUpdateDisabled || isSubmitting}
+                disabled={subscriptionUpdateDisabled || isSubmitting}
                 onClick={onSubmit}
               >
                 Confirm downgrade
