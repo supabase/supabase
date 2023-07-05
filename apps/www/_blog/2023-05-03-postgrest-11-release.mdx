@@ -1,6 +1,6 @@
 ---
-title: 'PostgREST v11: configurable role settings, isolation level and more'
-description: 'PostgREST v11 new features'
+title: 'What''s new in PostgREST v11.1'
+description: 'PostgREST v11.1 new features'
 author: steve_chavez
 image: lw6-community/postgrest.png
 thumb: lw6-community/postgrest.png
@@ -10,31 +10,32 @@ tags:
   - isolation level
   - transactions
   - roles
-  - planetpg
 date: '2023-05-03'
 toc_depth: 3
 ---
 
-PostgREST 11 is now fully released! In addition to the [pre-release](https://supabase.com/blog/postgrest-11-prerelease) features, we’ve added security, configuration, and querying improvements. Here is what's new:
+PostgREST 11.1 is now available on the Supabase platform. Besides the [pre-release](https://supabase.com/blog/postgrest-11-prerelease) features, we’ve added configuration and querying improvements. Here is what's new:
 
-## Configurable Role Settings
+## Impersonated Role Settings
 
-Role settings are now applied on every request, you can set these with a regular `ALTER ROLE <role> SET <setting>`. This is useful, for example, to prevent web users from running expensive queries.
+Every role that passes [PostgREST JWT Authentication](https://postgrest.org/en/stable/references/auth.html#jwt-based-user-impersonation) is an impersonated role. On the Supabase platform, these are the ``anon``, ``authenticated`` and ``service_role`` roles. Plus any role you create which is member of ``authenticator`` (the role PostgREST logins with).
+
+These roles can now have settings applied to their HTTP requests. You can set these with a regular `ALTER ROLE <role> SET <setting>`. This is useful, for example, to prevent web users from running expensive queries.
 
 Let’s try it by setting a statement timeout and cost limit.
 
 ### Statement timeout
 
-`statement_timeout` aborts any statement that takes more than the specified amount of time. Let’s set it for the usual `anon`, `authenticated` and `service_role` roles:
+`statement_timeout` aborts any statement that takes more than the specified amount of time. Let’s set it for the `anon`, `authenticated` and `service_role` roles:
 
 ```sql
--- anonymous users can only run queries that take 100 milliseconds max
+-- anonymous users can run queries that take 100 milliseconds max
 alter role anon set statement_timeout = '100ms';
 
--- authenticated users can only run queries that take 5 seconds max
+-- authenticated users can run queries that take 5 seconds max
 alter role authenticated set statement_timeout = '5s';
 
--- backend-only users can only run queries that take 15 seconds max
+-- backend-only users can run queries that take 15 seconds max
 alter role service_role set statement_timeout = '15s';
 ```
 
@@ -44,7 +45,7 @@ You need to reload PostgREST config cache to apply these changes.
 NOTIFY pgrst, 'reload config';
 ```
 
-Now, suppose you do an expensive query, by having a big table and a filter on an unindexed column(this will cause a full table scan):
+Now, suppose you do an expensive query. Having a big table and a filter on an unindexed column (this will cause a full table scan):
 
 ```jsx
 const { data, error } = await supabase
@@ -64,9 +65,15 @@ Then, after 5 seconds, the request will be aborted and the response will be:
 }
 ```
 
-### Statement cost limit
+Note that there's already a global ``statement_timeout`` set but you can be more fine-grained with this. See https://supabase.com/docs/guides/database/timeouts for more details.
 
-With `statement_timeout`, queries will still run for that length of time, consuming resources until they’re terminated. To prevent this, you can abort queries based on their plan cost — this is determined at the planning phase, before they get executed.
+### Statement Cost Limit
+
+With a statement timeout, expensive queries will still run for a length of time. Consuming resources until they’re terminated.
+
+The [pg_plan_filter](https://github.com/pgexperts/pg_plan_filter) extension (available on the Supabase platform), brings a statement cost limit. This abort queries at the planning phase, before they get executed.
+
+You can use it like:
 
 ```sql
 -- anonymous users can only run cheap queries
@@ -101,21 +108,15 @@ Then, immediately, the request will be aborted and the response will be:
 }
 ```
 
-This uses the [pg_plan_filter](https://github.com/pgexperts/pg_plan_filter) extension(available on the Supabase platform) and requires tuning to get the cost limit right. You should use this with care as it can invalidate legitimate queries.
+Tuning is required to get the cost limit right. You should use the `plan_filter.statement_cost_limit` with care as it can invalidate legitimate queries.
 
-## Configurable transaction isolation level
+## Configurable Transaction Isolation Level
 
-By default, all queries in PostgREST run in a transaction with the default *Read Committed* isolation level.
+By default, all queries run in a transaction with the default *read committed* isolation level.
 
-```sql
-BEGIN ISOLATION LEVEL READ COMMITTED;
--- <your_query>
-COMMIT;
-```
+You can now modify this with the `default_transaction_isolation` setting.
 
-Now you can change this by settting `default_transaction_isolation`.
-
-You can do it per-function:
+If you want a function to run with *repeatable read* isolation level:
 
 ```sql
 create function hello()
@@ -125,29 +126,15 @@ $$ language sql
 set default_transaction_isolation = 'repeatable read';
 ```
 
-Or per-role, which will affect all queries ran by that role:
+Or if you want a role to run its queries with a *serializable* isolation level:
 
 ```sql
 alter role service_role set default_transaction_isolation = 'serializable';
+
 NOTIFY pgrst, 'reload config'; -- reload postgREST config cache
 ```
 
-Trying out the function above.
-
-```jsx
-const { data, error } = await supabase
-  .rpc('hello')
-```
-
-Will result in PostgREST running the query with the *Repeatable Read* isolation level:
-
-```sql
-BEGIN ISOLATION LEVEL REPEATABLE READ;
--- SELECT hello();
-COMMIT;
-```
-
-Note that the default *Read Committed* is good enough for almost all use cases. Using higher isolation levels will incur in overhead as they use more sophisticated locking.
+Note that the default *read committed* is good enough for almost all use cases. Higher isolation levels incur in overhead as they use more sophisticated locking. They're only needed in special cases.
 
 ## Bulk insert JSON with default values
 
@@ -219,8 +206,6 @@ For completeness, the `all` modifier is also included.
 ## Closing up
 
 There you have it, now you can make your API more secure with role settings and use higher isolation levels without resorting to direct PostgreSQL connections.
-
-PostgREST v11 is being rolled on the Supabase platform, it will be available for new projects on the coming week.
 
 ## More Postgres resources
 
