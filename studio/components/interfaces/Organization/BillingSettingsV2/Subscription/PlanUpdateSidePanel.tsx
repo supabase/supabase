@@ -202,7 +202,7 @@ const PlanUpdateSidePanel = () => {
                               disabled={
                                 // no self-serve downgrades from team plan right now
                                 (plan.id !== PRICING_TIER_PRODUCT_IDS.TEAM &&
-                                  ['team', 'enterprise'].includes(subscription?.plan?.id || '')) ||
+                                  ['enterprise'].includes(subscription?.plan?.id || '')) ||
                                 !canUpdateSubscription
                               }
                               type={isDowngradeOption ? 'default' : 'primary'}
