@@ -88,6 +88,8 @@
     "@babel/preset-react": "^7.18.6",
     "@babel/preset-typescript": "^7.21.4",
     "@storybook/addon-actions": "^7.0.5",
+    "@storybook/addon-controls": "^7.0.26",
+    "@storybook/addon-docs": "^7.0.26",
     "@storybook/addon-mdx-gfm": "^7.0.5",
     "@storybook/addon-styling": "^1.0.1",
     "@storybook/react": "^7.0.5",
