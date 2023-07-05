@@ -18,6 +18,8 @@ const config: any = {
   ],
   addons: [
     'storybook-dark-mode',
+    '@storybook/addon-controls',
+    '@storybook/addon-docs',
     {
       name: '@storybook/addon-styling',
       options: {

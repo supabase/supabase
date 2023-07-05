@@ -4,7 +4,7 @@ import { CheckboxContext } from './CheckboxContext'
 // @ts-ignore
 import CheckboxStyles from './Checkbox.module.css'
 
-import defaultTheme from '../../lib/theme/defaultTheme'
+import defaultTheme from '../../lib/theme/defaultThemeV0'
 
 import { useFormContext } from '../Form/FormContext'
 import styleHandler from '../../lib/theme/styleHandler'
