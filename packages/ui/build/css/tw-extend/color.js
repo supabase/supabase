@@ -407,10 +407,6 @@ module.exports = {
   cssVariable: "var(--foreground-strong)",
   value: "hsl(0, 0%, 100%)"
 },
-"foreground-muted": {
-  cssVariable: "var(--foreground-muted)",
-  value: "hsl(0, 0%, 43.9%)"
-},
 "foreground-light": {
   cssVariable: "var(--foreground-light)",
   value: "hsl(0, 0%, 62.7%)"
@@ -419,9 +415,17 @@ module.exports = {
   cssVariable: "var(--foreground-lighter)",
   value: "hsl(0, 0%, 49.4%)"
 },
+"foreground-muted": {
+  cssVariable: "var(--foreground-muted)",
+  value: "hsl(0, 0%, 43.9%)"
+},
 "background-DEFAULT": {
   cssVariable: "var(--background-default)",
   value: "hsl(0, 0%, 11%)"
+},
+"background-alternative": {
+  cssVariable: "var(--background-alternative)",
+  value: "hsl(0, 0%, 8.6%)"
 },
 "background-selection": {
   cssVariable: "var(--background-selection)",
@@ -430,10 +434,6 @@ module.exports = {
 "background-control": {
   cssVariable: "var(--background-control)",
   value: "hsl(0, 0%, 13.7%)"
-},
-"background-alternative": {
-  cssVariable: "var(--background-alternative)",
-  value: "hsl(0, 0%, 8.6%)"
 },
 "background-surface-100": {
   cssVariable: "var(--background-surface-100)",
@@ -447,12 +447,12 @@ module.exports = {
   cssVariable: "var(--background-surface-300)",
   value: "hsl(0, 0%, 18%)"
 },
-"background-surface-overlay": {
-  cssVariable: "var(--background-surface-overlay)",
+"background-overlay-DEFAULT": {
+  cssVariable: "var(--background-overlay-default)",
   value: "hsl(0, 0%, 13.7%)"
 },
-"background-surface-overlay-hover": {
-  cssVariable: "var(--background-surface-overlay-hover)",
+"background-overlay-hover": {
+  cssVariable: "var(--background-overlay-hover)",
   value: "hsl(0, 0%, 18%)"
 },
 "border-DEFAULT": {
@@ -474,6 +474,10 @@ module.exports = {
 "border-control": {
   cssVariable: "var(--border-control)",
   value: "hsl(0, 0%, 20.4%)"
+},
+"border-alternative": {
+  cssVariable: "var(--border-alternative)",
+  value: "hsl(0, 0%, 18%)"
 },
 "destructive-200": {
   cssVariable: "var(--destructive-200)",
@@ -497,7 +501,7 @@ module.exports = {
 },
 "warning-300": {
   cssVariable: "var(--warning-300)",
-  value: "hsl(36.30000000000001, 93.5%, 18%)"
+  value: "hsl(35.80000000000001, 82.6%, 13.5%)"
 },
 "warning-400": {
   cssVariable: "var(--warning-400)",

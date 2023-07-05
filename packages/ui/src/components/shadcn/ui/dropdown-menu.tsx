@@ -31,6 +31,7 @@ const DropdownMenuSubTrigger = React.forwardRef<
       __styles.item,
       __styles.item_nested,
       inset && 'pl-8',
+      '[&>svg]:text [&>svg]:w-3.5 [&>svg]:h-3.5',
       className
     )}
     {...props}
