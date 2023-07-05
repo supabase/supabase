@@ -62,6 +62,9 @@ const DowngradeModal = ({ visible, selectedTier, onClose, onConfirm }: Downgrade
                     Your projects are currently consuming resources that are well within the{' '}
                     {selectedTier?.name} plan's quota.
                   </li>
+                  <li className="list-disc ml-4">
+                    Alternatively, you may also transfer projects across organizations.
+                  </li>
                 </ul>
               </div>
             </li>
