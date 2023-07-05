@@ -56,6 +56,12 @@ const PageTelemetry: FC = ({ children }) => {
       })
 
       post(`${API_URL}/telemetry/pageview`, {
+        ...(router.route.includes('/project/') && {
+          projectRef: router.asPath.split('/project/')[1].split('/')[0],
+        }),
+        ...(router.route.includes('/org/') && {
+          orgId: router.asPath.split('/org/')[1].split('/')[0],
+        }),
         referrer: referrer,
         title: document.title,
         path: router.route,
