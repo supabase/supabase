@@ -1,6 +1,6 @@
 ---
 title: 'What''s new in PostgREST v11.1'
-description: 'PostgREST v11.1 new features'
+description: 'Impersonated Role Settings, Configurable Isolation Level, improved Bulk Insert and more'
 author: steve_chavez
 image: lw6-community/postgrest.png
 thumb: lw6-community/postgrest.png
@@ -45,7 +45,7 @@ You need to reload PostgREST config cache to apply these changes.
 NOTIFY pgrst, 'reload config';
 ```
 
-Now, suppose you do an expensive query. Like filtering on a big table's unindexed column (this will cause a full table scan):
+Now, suppose you do an expensive query with the `anon` role. Like filtering on a big table's unindexed column (this will cause a full table scan):
 
 ```jsx
 const { data, error } = await supabase
@@ -88,7 +88,7 @@ ALTER USER service_role SET plan_filter.statement_cost_limit = 0;
 NOTIFY pgrst, 'reload config'; -- reload postgREST config cache to apply changes
 ```
 
-Let’s repeat the previous expensive query.
+Let’s repeat the previous expensive query with the `anon` role.
 
 ```jsx
 const { data, error } = await supabase
