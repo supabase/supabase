@@ -106,7 +106,7 @@ export const useOrgDailyStatsQuery = <TData = OrgDailyStatsData>(
         typeof endDate !== 'undefined',
 
       select(data) {
-        const noDataYet = data.data[0]?.id === undefined
+        const noDataYet = data.data[0]?.period_start === undefined
 
         // [Joshen] Ideally handled by API, like infra-monitoring
         if (noDataYet) {
@@ -117,7 +117,7 @@ export const useOrgDailyStatsQuery = <TData = OrgDailyStatsData>(
               loopId: idx,
               period_start: dayjs(startDate).add(idx, 'day').format('DD MMM YYYY'),
               periodStartFormatted: dayjs(startDate).add(idx, 'day').format(dateFormat),
-              [metric as string]: 0,
+              [metric?.toLowerCase() as string]: 0,
             }
           })
           return { ...data, data: mockData, hasNoData: true } as TData
@@ -128,10 +128,10 @@ export const useOrgDailyStatsQuery = <TData = OrgDailyStatsData>(
             data: data.data.map((x) => {
               return {
                 ...x,
-                [metric as string]:
+                [metric?.toLowerCase() as string]:
                   modifier !== undefined
-                    ? modifier(Number(x[metric as string]))
-                    : Number(x[metric as string]),
+                    ? modifier(Number(x[metric?.toLowerCase() as string]))
+                    : Number(x[metric?.toLowerCase() as string]),
                 periodStartFormatted: dayjs(x.period_start).format(dateFormat),
               }
             }),
@@ -142,25 +142,3 @@ export const useOrgDailyStatsQuery = <TData = OrgDailyStatsData>(
       ...options,
     }
   )
-
-export const useOrgDailyStatsPrefetch = ({
-  orgSlug,
-  metric,
-  startDate,
-  endDate,
-  interval = '1d',
-  projectRef,
-}: OrgDailyStatsVariables) => {
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    if (orgSlug && metric && startDate && endDate && interval) {
-      client.prefetchQuery(
-        analyticsKeys.orgDailyStats(orgSlug, { metric, startDate, endDate, interval, projectRef }),
-        ({ signal }) =>
-          getOrgDailyStats({ orgSlug, metric, startDate, endDate, interval, projectRef }, signal)
-      )
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [orgSlug, metric])
-}
