@@ -1,7 +1,7 @@
 import { DataPoint } from 'data/analytics/constants'
 import { PricingMetric, useOrgDailyStatsQuery } from 'data/analytics/org-daily-stats-query'
 import { ProjectSubscriptionResponse } from 'data/subscriptions/project-subscription-v2-query'
-import UsageSection from './UsageSection'
+import UsageSection from './UsageSection/UsageSection'
 
 const GB = 1073741824
 

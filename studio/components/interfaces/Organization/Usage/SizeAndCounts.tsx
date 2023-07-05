@@ -1,7 +1,7 @@
 import { DataPoint } from 'data/analytics/constants'
 import { PricingMetric, useOrgDailyStatsQuery } from 'data/analytics/org-daily-stats-query'
 import { OrgSubscription } from 'data/subscriptions/org-subscription-query'
-import UsageSection from './UsageSection'
+import UsageSection from './UsageSection/UsageSection'
 
 export interface SizeAndCountsProps {
   orgSlug: string
