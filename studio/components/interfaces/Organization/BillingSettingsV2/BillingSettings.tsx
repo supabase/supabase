@@ -17,43 +17,43 @@ const BillingSettings = () => {
 
       <ScaffoldDivider />
 
-      <ScaffoldContainer>
+      <ScaffoldContainer id='cost-control'>
         <CostControl />
       </ScaffoldContainer>
 
       <ScaffoldDivider />
 
-      <ScaffoldContainer>
+      <ScaffoldContainer id='breakdown'>
         <BillingBreakdown />
       </ScaffoldContainer>
 
       <ScaffoldDivider />
 
-      <ScaffoldContainer>
+      <ScaffoldContainer id='credits-balance'>
         <CreditBalance />
       </ScaffoldContainer>
 
       <ScaffoldDivider />
 
-      <ScaffoldContainer>
+      <ScaffoldContainer id='payment-methods'>
         <PaymentMethods />
       </ScaffoldContainer>
 
       <ScaffoldDivider />
 
-      <ScaffoldContainer>
+      <ScaffoldContainer id='email'>
         <BillingEmail />
       </ScaffoldContainer>
 
       <ScaffoldDivider />
 
-      <ScaffoldContainer>
+      <ScaffoldContainer id='address'>
         <BillingAddress />
       </ScaffoldContainer>
 
       <ScaffoldDivider />
 
-      <ScaffoldContainer>
+      <ScaffoldContainer id='taxId'>
         <TaxID />
       </ScaffoldContainer>
     </>
