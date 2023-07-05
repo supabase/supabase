@@ -198,14 +198,14 @@ const __styles = {
   item_nested: `
     border-none
     focus:outline-none
-    focus:bg-surface-overlay-hover
+    focus:bg-overlay-hover
     focus:text
-    data-open:bg-surface-overlay
+    data-open:bg-overlay
     data-open:text
   `,
   content: `
     z-40
-    bg-surface-overlay
+    bg-overlay
     border-overlay
     rounded
     shadow-lg
@@ -236,7 +236,7 @@ const __styles = {
     text-light
     px-4 py-1.5
     cursor-pointer
-    focus:bg-surface-200
+    focus:bg-overlay-hover
     focus:text
     border-none
     focus:outline-none
