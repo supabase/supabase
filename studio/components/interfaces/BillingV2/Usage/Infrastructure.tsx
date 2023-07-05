@@ -90,6 +90,10 @@ const Infrastructure = ({
     0
   )
 
+  const latestIoBudgetConsumption = ioBudgetData?.data.slice(-1)
+    ? ioBudgetData?.data.slice(-1)[0].disk_io_consumption
+    : 0
+
   const chartMeta: { [key: string]: { data: DataPoint[]; isLoading: boolean } } = {
     max_cpu_usage: {
       isLoading: isLoadingCpuUsageData,
@@ -118,10 +122,10 @@ const Infrastructure = ({
             <SectionContent section={attribute}>
               {attribute.key === 'disk_io_consumption' && (
                 <>
-                  {currentBillingCycleSelected && highestIoBudgetConsumption >= 100 ? (
-                    <Alert withIcon variant="danger" title="IO Budget for today has been used up">
+                  {latestIoBudgetConsumption >= 100 ? (
+                    <Alert withIcon variant="danger" title="Your Disk IO Budget has been used up">
                       <p className="mb-4">
-                        Your workload has used up all the burst IO throughput minutes and ran at the
+                        Your workload has used up all your Disk IO Budget and is now running at the
                         baseline performance. If you need consistent disk performance, consider
                         upgrading to a larger compute add-on.
                       </p>
@@ -133,13 +137,16 @@ const Infrastructure = ({
                         </a>
                       </Link>
                     </Alert>
-                  ) : currentBillingCycleSelected && highestIoBudgetConsumption >= 80 ? (
-                    <Alert withIcon variant="warning" title="IO Budget for today is running out">
+                  ) : currentBillingCycleSelected && highestIoBudgetConsumption >= 100 ? (
+                    <Alert
+                      withIcon
+                      variant="warning"
+                      title="You ran out of IO Budget at least once"
+                    >
                       <p className="mb-4">
-                        Your workload is about to use up all the burst IO throughput minutes during
-                        the day. Once this is completely used up, your workload will run at the
-                        baseline performance. If you need consistent disk performance, consider
-                        upgrading to a larger compute add-on.
+                        Your workload has used up all your Disk IO Budget and reverted to baseline
+                        performance at least once during this billing cycle. If you need consistent
+                        disk performance, consider upgrading to a larger compute add-on.
                       </p>
                       <Link href={upgradeUrl}>
                         <a>
