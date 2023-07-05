@@ -114,6 +114,13 @@ brew upgrade supabase
 </TabPanel>
 </Tabs>
 
+If you have any Supabase containers running locally, remember to restart them after upgrading to use the new features.
+
+```bash
+npx supabase stop --no-backup
+npx supabase start
+```
+
 ## See also
 
 - [Supabase CLI Reference](/docs/reference/cli/introduction)
