@@ -37,8 +37,7 @@ const Subscription = () => {
   const daysToCycleEnd = billingCycleEnd.diff(dayjs(), 'days')
   const daysWithinCycle = billingCycleEnd.diff(billingCycleStart, 'days')
 
-  const canChangeTier =
-    !projectUpdateDisabled && !['team', 'enterprise'].includes(currentPlan?.id ?? '')
+  const canChangeTier = !projectUpdateDisabled && !['enterprise'].includes(currentPlan?.id ?? '')
 
   return (
     <>
