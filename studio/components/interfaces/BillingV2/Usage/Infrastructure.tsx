@@ -91,7 +91,7 @@ const Infrastructure = ({
   )
 
   const latestIoBudgetConsumption = ioBudgetData?.data.slice(-1)
-    ? ioBudgetData?.data.slice(-1)[0].disk_io_consumption
+    ? Number(ioBudgetData?.data.slice(-1)[0].disk_io_consumption)
     : 0
 
   const chartMeta: { [key: string]: { data: DataPoint[]; isLoading: boolean } } = {
