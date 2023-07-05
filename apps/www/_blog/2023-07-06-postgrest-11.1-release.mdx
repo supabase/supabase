@@ -18,7 +18,7 @@ PostgREST 11.1 is now available on the Supabase platform. Besides the [pre-relea
 
 ## Impersonated Role Settings
 
-Every role that passes [PostgREST JWT Authentication](https://postgrest.org/en/stable/references/auth.html#jwt-based-user-impersonation) is an *impersonated role*. On the Supabase platform, these are the ``anon``, ``authenticated`` and ``service_role`` roles. Plus any role you create that is a member of ``authenticator`` (the role PostgREST logins with).
+Every role that passes [PostgREST JWT Authentication](https://postgrest.org/en/stable/references/auth.html#jwt-based-user-impersonation) is an *impersonated role*. On the Supabase platform, these are the ``anon``, ``authenticated`` and ``service_role`` roles.
 
 These roles can now have settings applied with a regular `ALTER ROLE <role> SET <setting>`. This is useful, for example, to prevent web users from running expensive queries.
 
@@ -45,7 +45,7 @@ You need to reload PostgREST config cache to apply these changes.
 NOTIFY pgrst, 'reload config';
 ```
 
-Now, suppose you do an expensive query. Like filtering on an unindexed column on a big table (this will cause a full table scan):
+Now, suppose you do an expensive query. Like filtering on a big table's unindexed column (this will cause a full table scan):
 
 ```jsx
 const { data, error } = await supabase
@@ -206,6 +206,8 @@ For completeness, the `all` modifier is also included.
 ## Closing up
 
 There you have it, now you can make your API more secure with role settings and use higher isolation levels without resorting to direct PostgreSQL connections.
+
+PostgREST v11.1 is available for all new projects.
 
 ## More Postgres resources
 
