@@ -81,6 +81,7 @@ const PROVIDER_PHONE = {
         { label: 'Messagebird', value: 'messagebird', icon: 'messagebird-icon.svg' },
         { label: 'Textlocal', value: 'textlocal', icon: 'textlocal-icon.png' },
         { label: 'Vonage', value: 'vonage', icon: 'vonage-icon.svg' },
+        { label: 'Twilio Verify', value: 'twilio-verify', icon: 'twilio-icon.svg' }
       ],
     },
     RATE_LIMIT_SMS_SENT: {
@@ -95,7 +96,7 @@ const PROVIDER_PHONE = {
       title: 'Twilio Account Sid',
       show: {
         key: 'SMS_PROVIDER',
-        matches: 'twilio',
+        matches: ['twilio'],
       },
     },
     SMS_TWILIO_AUTH_TOKEN: {
@@ -104,7 +105,7 @@ const PROVIDER_PHONE = {
       isSecret: true,
       show: {
         key: 'SMS_PROVIDER',
-        matches: 'twilio',
+        matches: ['twilio'],
       },
     },
     SMS_TWILIO_MESSAGE_SERVICE_SID: {
@@ -112,7 +113,34 @@ const PROVIDER_PHONE = {
       title: 'Twilio Message Service Sid',
       show: {
         key: 'SMS_PROVIDER',
-        matches: 'twilio',
+        matches: ['twilio'],
+      },
+    },
+
+    // Twilio Verify
+    SMS_TWILIO_VERIFY_ACCOUNT_SID: {
+      type: 'string',
+      title: 'Twilio Account Sid',
+      show: {
+        key: 'SMS_PROVIDER',
+        matches: ['twilio-verify'],
+      },
+    },
+    SMS_TWILIO_VERIFY_AUTH_TOKEN: {
+      type: 'string',
+      title: 'Twilio Auth Token',
+      isSecret: true,
+      show: {
+        key: 'SMS_PROVIDER',
+        matches: ['twilio-verify'],
+      },
+    },
+    SMS_TWILIO_VERIFY_MESSAGE_SERVICE_SID: {
+      type: 'string',
+      title: 'Twilio Message Service Sid',
+      show: {
+        key: 'SMS_PROVIDER',
+        matches: ['twilio-verify'],
       },
     },
 
@@ -122,7 +150,7 @@ const PROVIDER_PHONE = {
       title: 'Messagebird Access Key',
       show: {
         key: 'SMS_PROVIDER',
-        matches: 'messagebird',
+        matches: ['messagebird'],
       },
     },
     SMS_MESSAGEBIRD_ORIGINATOR: {
@@ -130,7 +158,7 @@ const PROVIDER_PHONE = {
       title: 'Messagebird Originator',
       show: {
         key: 'SMS_PROVIDER',
-        matches: 'messagebird',
+        matches: ['messagebird'],
       },
     },
 
@@ -140,7 +168,7 @@ const PROVIDER_PHONE = {
       title: 'Textlocal API Key',
       show: {
         key: 'SMS_PROVIDER',
-        matches: 'textlocal',
+        matches: ['textlocal'],
       },
     },
     SMS_TEXTLOCAL_SENDER: {
@@ -148,7 +176,7 @@ const PROVIDER_PHONE = {
       title: 'Textlocal Sender',
       show: {
         key: 'SMS_PROVIDER',
-        matches: 'textlocal',
+        matches: ['textlocal'],
       },
     },
 
@@ -158,7 +186,7 @@ const PROVIDER_PHONE = {
       title: 'Vonage API Key',
       show: {
         key: 'SMS_PROVIDER',
-        matches: 'vonage',
+        matches: ['vonage'],
       },
     },
     SMS_VONAGE_API_SECRET: {
@@ -166,7 +194,7 @@ const PROVIDER_PHONE = {
       title: 'Vonage API Secret',
       show: {
         key: 'SMS_PROVIDER',
-        matches: 'vonage',
+        matches: ['vonage'],
       },
     },
     // [TODO] verify what this is?
@@ -175,7 +203,7 @@ const PROVIDER_PHONE = {
       title: 'Vonage From',
       show: {
         key: 'SMS_PROVIDER',
-        matches: 'vonage',
+        matches: ['vonage'],
       },
     },
 
@@ -191,17 +219,29 @@ const PROVIDER_PHONE = {
       type: 'number',
       description: 'Duration before an SMS OTP expires',
       units: 'seconds',
+      show: {
+        key: 'SMS_PROVIDER',
+        matches: ['twilio', 'messagebird', 'textlocal', 'vonage']
+      }
     },
     SMS_OTP_LENGTH: {
       title: 'SMS OTP Length',
       type: 'number',
       description: 'Number of digits in OTP',
       units: 'digits',
+      show: {
+        key: 'SMS_PROVIDER',
+        matches: ['twilio', 'messagebird', 'textlocal', 'vonage']
+      }
     },
     SMS_TEMPLATE: {
       title: 'SMS Message',
       type: 'string',
       description: 'To format the OTP code use `{{ .Code }}`',
+      show: {
+        key: 'SMS_PROVIDER',
+        matches: ['twilio', 'messagebird', 'textlocal', 'vonage']
+      }
     },
   },
   validationSchema: object().shape({
@@ -228,6 +268,29 @@ const PROVIDER_PHONE = {
         return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'twilio'
       },
       then: (schema) => schema.required('Twilio Message Service SID is required'),
+      otherwise: (schema) => schema,
+    }),
+
+    // Twilio Verify
+    SMS_TWILIO_VERIFY_ACCOUNT_SID: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
+      is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
+        return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'twilio-verify'
+      },
+      then: (schema) => schema.required('Twilio Verify Account SID is required'),
+      otherwise: (schema) => schema,
+    }),
+    SMS_TWILIO_VERIFY_AUTH_TOKEN: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
+      is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
+        return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'twilio-verify'
+      },
+      then: (schema) => schema.required('Twilio Verify Auth Token is required'),
+      otherwise: (schema) => schema,
+    }),
+    SMS_TWILIO_VERIFY_MESSAGE_SERVICE_SID: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
+      is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
+        return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'twilio-verify'
+      },
+      then: (schema) => schema.required('Twilio Verify Service SID is required'),
       otherwise: (schema) => schema,
     }),
 
