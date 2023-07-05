@@ -32,9 +32,9 @@ const CostControl = ({}: CostControlProps) => {
           <div className="sticky top-16">
             <div className="space-y-6">
               <div>
-                <p className="text-base">Cost control</p>
+                <p className="text-base">Cost Control</p>
                 <p className="text-sm text-scale-1000">
-                  Control whether to allow over-usage and avoid surprise bills
+                  Control whether to use beyond your plans included quota
                 </p>
               </div>
               <div className="space-y-2">
@@ -43,7 +43,7 @@ const CostControl = ({}: CostControlProps) => {
                   <Link href="https://supabase.com/docs/guides/platform/spend-cap">
                     <a target="_blank" rel="noreferrer">
                       <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
-                        <p className="text-sm">About spend cap</p>
+                        <p className="text-sm">Spend cap</p>
                         <IconExternalLink size={16} strokeWidth={1.5} />
                       </div>
                     </a>
@@ -70,14 +70,24 @@ const CostControl = ({}: CostControlProps) => {
                 } plan`}
               >
                 {currentPlan?.name || ''} plan requires you to have spend cap off at all times. Your
-                project will never become unresponsive. Only when your included usage is exceeded
-                will you be charged for any additional usage
+                project will never become unresponsive. Only when your{' '}
+                <Link href="#breakdown">
+                  <a className="text-sm text-green-900 transition hover:text-green-1000">
+                    included usage
+                  </a>
+                </Link>{' '}
+                is exceeded will you be charged for any additional usage.
               </Alert>
             ) : (
               <p className="text-sm text-scale-1000">
-                You can control whether your project is charged for additional usage beyond the
-                included quota of your subscription plan. If you need to go beyond the included
-                quota, simply switch off your spend cap to pay for additional usage.
+                You can control whether your project is charged for additional usage beyond the{' '}
+                <Link href="#breakdown">
+                  <a className="text-sm text-green-900 transition hover:text-green-1000">
+                    included quota
+                  </a>
+                </Link>{' '}
+                of your subscription plan. If you need to go beyond the included quota, simply
+                switch off your spend cap to pay for additional usage.
               </p>
             )}
 
@@ -101,9 +111,14 @@ const CostControl = ({}: CostControlProps) => {
                   Spend cap is {isUsageBillingEnabled ? 'disabled' : 'enabled'}
                 </p>
                 <p className="text-sm text-scale-1000">
-                  {isUsageBillingEnabled
-                    ? 'You will be charged for any usage above the included quota'
-                    : 'You will never be charged any extra for usage. However, your project could become unresponsive or enter read only mode if you exceed the included quota'}
+                  {isUsageBillingEnabled ? (
+                    <span>You will be charged for any usage above the included quota.</span>
+                  ) : (
+                    <span>
+                      You won't be charged any extra for usage. However, your project could become
+                      unresponsive or enter read only mode if you exceed the included quota.
+                    </span>
+                  )}
                 </p>
                 {isUsageBillingEnabled && (
                   <p className="text-sm text-scale-1000 mt-1">

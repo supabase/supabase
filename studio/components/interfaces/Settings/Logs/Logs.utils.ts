@@ -1,12 +1,12 @@
 import { Filters, LogData, LogsEndpointParams, LogsTableName, SQL_FILTER_TEMPLATES } from '.'
 import dayjs, { Dayjs } from 'dayjs'
 import { get, isEqual } from 'lodash'
-import { StripeSubscription } from 'components/interfaces/Billing'
 import { useMonaco } from '@monaco-editor/react'
 import logConstants from 'shared-data/logConstants'
 import BackwardIterator from 'components/ui/CodeEditor/Providers/BackwardIterator'
 import uniqBy from 'lodash/uniqBy'
 import { useEffect } from 'react'
+import { PlanId } from 'data/subscriptions/project-subscription-v2-query'
 
 /**
  * Convert a micro timestamp from number/string to iso timestamp
@@ -183,17 +183,14 @@ export const genSingleLogQuery = (table: LogsTableName, id: string) =>
 /**
  * Determine if we should show the user an upgrade prompt while browsing logs
  */
-export const maybeShowUpgradePrompt = (
-  from: string | null | undefined,
-  tierKey?: StripeSubscription['tier']['key']
-) => {
+export const maybeShowUpgradePrompt = (from: string | null | undefined, planId?: PlanId) => {
   const day = Math.abs(dayjs().diff(dayjs(from), 'day'))
 
   return (
-    (day > 1 && tierKey === 'FREE') ||
-    (day > 7 && tierKey === 'PRO') ||
-    (day > 28 && tierKey === 'TEAM') ||
-    (day > 90 && tierKey === 'ENTERPRISE')
+    (day > 1 && planId === 'free') ||
+    (day > 7 && planId === 'pro') ||
+    (day > 28 && planId === 'team') ||
+    (day > 90 && planId === 'enterprise')
   )
 }
 
@@ -237,7 +234,7 @@ export const genChartQuery = (
   const where = _genWhereStatement(table, filters)
 
   let joins = 'cross join unnest(t.metadata) as metadata'
-  if (table === LogsTableName.EDGE) {
+  if (table === LogsTableName.EDGE || table === LogsTableName.FN_EDGE) {
     joins += ' \n  cross join unnest(metadata.request) as request'
     joins += ' \n  cross join unnest(metadata.response) as response'
   } else if (table === LogsTableName.POSTGRES) {
@@ -397,6 +394,12 @@ export const fillTimeseries = (
   })
 
   const diff = maxDate.diff(minDate, truncation as dayjs.UnitType)
+  // Intentional throwing of error here to be caught by Sentry, as this would indicate a bug since charts shouldn't be rendering more than 10k data points
+  if (diff > 10000) {
+    throw new Error(
+      'Data error, filling timeseries dynamically with more than 10k data points degrades performance.'
+    )
+  }
   for (let i = 0; i <= diff; i++) {
     const dateToMaybeAdd = minDate.add(i, truncation as dayjs.ManipulateType)
 

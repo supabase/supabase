@@ -1,7 +1,7 @@
 import { FC, ReactNode, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
-import { useFlag, useStore, withAuth } from 'hooks'
+import { useFlag, useSelectedProject, useStore, withAuth } from 'hooks'
 import { generateSettingsMenu } from './SettingsMenu.utils'
 
 import ProjectLayout from '../'
@@ -14,8 +14,7 @@ interface Props {
 
 const SettingsLayout: FC<Props> = ({ title, children }) => {
   const { ui, meta } = useStore()
-  const projectRef = ui.selectedProjectRef as string
-  const projectBaseInfo = ui.selectedProjectBaseInfo
+  const project = useSelectedProject()
 
   const router = useRouter()
   // billing pages live under /billing/invoices and /billing/subscription, etc
@@ -25,13 +24,13 @@ const SettingsLayout: FC<Props> = ({ title, children }) => {
     : router.pathname.split('/')[4]
 
   const isVaultEnabled = useFlag('vaultExtension')
-  const menuRoutes = generateSettingsMenu(projectRef, projectBaseInfo, isVaultEnabled)
+  const menuRoutes = generateSettingsMenu(project?.ref as string, project, isVaultEnabled)
 
   useEffect(() => {
-    if (ui.selectedProject?.ref) {
+    if (project?.ref) {
       meta.extensions.load()
     }
-  }, [ui.selectedProject?.ref])
+  }, [project?.ref])
 
   return (
     <ProjectLayout

@@ -70,6 +70,7 @@ const IconPanel = ({
                 <img
                   className={iconSize === 'lg' ? 'w-8' : 'w-5'}
                   src={`${icon}${hasLightIcon && !isDarkMode ? '-light' : ''}.svg`}
+                  alt={title !== undefined ? `${title} Icon` : tooltip !== undefined ? `${tooltip} Icon` : 'Icon'}
                 />
               </IconContainer>
             ) : (

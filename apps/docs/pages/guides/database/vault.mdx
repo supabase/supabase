@@ -197,7 +197,7 @@ updated_at       | 2022-12-14 02:51:13.938396+00
 
 </details>
 
-## Deep Dive on How The Vault works
+## Deep Dive
 
 <div className="video-container">
   <iframe
@@ -227,7 +227,7 @@ This is an important safety precaution - there is little value in storing the en
 
 Where are the keys stored? Supabase creates and manages the root keys (from which all key IDs are derived) in our secured backend systems. We keep this root key safe and separate from your data. You remain in control of your keys - a separate API endpoint is available that you can use to access the key if you want to decrypt your data outside of Supabase.
 
-## Internal Details
+### Internal Details
 
 To encrypt data, you need a _key id_. You can use the default key id created automatically for every project, or create your own key ids Using the `pgsodium.create_key()` function. Key ids are used to internally derive the encryption key used to encrypt secrets in the vault. Vault users typically do not have access to the key itself, only the key id.
 
@@ -251,20 +251,6 @@ create_secret | cec9e005-a44d-4b19-86e1-febf3cd40619
 ```
 
 Which roles should have access to the `vault.secrets` table should be carefully considered. There are two ways to grant access, the first is that the `postgres` user can explicitly grant access to the vault table itself.
-
-### Turning off Statement Logging
-
-When you insert secrets into the vault table with an INSERT statement, those statements get logged by default into the Supabase logs. Since this would mean your secrets are stored unencrypted in the logs, you should turn off statement logging while using the Vault.
-
-While turning off statement logging does hinder you if you're used to looking at the logs to debug your application, it provides a much higher level of security by ensuring that your data does not leak out of the database and into the logs. This is especially critical with encrypted column data, because the statement logs will contain the _unencrypted_ secrets. If you _must_ store that data encrypted, then you _must_ turn off statement logging.
-
-```sql
-alter system set statement_log = 'none';
-```
-
-And then restart your project from the dashboard to enable that change.
-
-In the future we are researching various ways to refine the way statement logging interacts with sensitive columns.
 
 ### Resources
 

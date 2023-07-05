@@ -7,19 +7,18 @@ import { Datum, CommonChartProps } from './Charts.types'
 import utc from 'dayjs/plugin/utc'
 import ChartNoData from './NoDataPlaceholder'
 import { numberFormatter, useChartSize } from './Charts.utils'
-import { CategoricalChartProps } from 'recharts/types/chart/generateCategoricalChart'
+import { CategoricalChartState } from 'recharts/types/chart/generateCategoricalChart'
 dayjs.extend(utc)
 
 export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
   yAxisKey: string
   xAxisKey: string
-  format?: string
   customDateFormat?: string
   displayDateInUtc?: boolean
-  onBarClick?: (datum: Datum, tooltipData?: Parameters<CategoricalChartProps['onClick']>[0]) => void
+  onBarClick?: (datum: Datum, tooltipData?: CategoricalChartState) => void
 }
 
-const BarChart: React.FC<BarChartProps> = ({
+const BarChart = ({
   data,
   yAxisKey,
   xAxisKey,
@@ -30,10 +29,11 @@ const BarChart: React.FC<BarChartProps> = ({
   highlightedLabel,
   displayDateInUtc,
   minimalHeader,
+  valuePrecision,
   className = '',
   size = 'normal',
   onBarClick,
-}) => {
+}: BarChartProps) => {
   const { Container } = useChartSize(size)
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
 
@@ -58,7 +58,7 @@ const BarChart: React.FC<BarChartProps> = ({
         customDateFormat={customDateFormat}
         highlightedValue={
           typeof resolvedHighlightedValue === 'number'
-            ? numberFormatter(resolvedHighlightedValue)
+            ? numberFormatter(resolvedHighlightedValue, valuePrecision)
             : resolvedHighlightedValue
         }
         highlightedLabel={resolvedHighlightedLabel}
@@ -81,7 +81,7 @@ const BarChart: React.FC<BarChartProps> = ({
             }
           }}
           onMouseLeave={() => setFocusDataIndex(null)}
-          onClick={(tooltipData: any) => {
+          onClick={(tooltipData) => {
             // receives tooltip data https://github.com/recharts/recharts/blob/2a3405ff64a0c050d2cf94c36f0beef738d9e9c2/src/chart/generateCategoricalChart.tsx
             const datum = tooltipData?.activePayload?.[0]?.payload
             if (onBarClick) onBarClick(datum, tooltipData)

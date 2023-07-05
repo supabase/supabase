@@ -131,7 +131,7 @@ export const useDailyStatsQuery = <TData = DailyStatsData>(
         typeof endDate !== 'undefined',
 
       select(data) {
-        const noDataYet = data.data[0].id === undefined
+        const noDataYet = data.data[0]?.id === undefined
 
         // [Joshen] Ideally handled by API, like infra-monitoring
         if (noDataYet) {

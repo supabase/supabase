@@ -315,7 +315,7 @@ const Performance = () => {
                         color={
                           stat.name === 'Supabase'
                             ? 'bg-brand-900 dark:bg-brand-800'
-                            : 'bg-dark-300 dark:bg-dark-400'
+                            : 'bg-brand-300 dark:bg-brand-400'
                         }
                         finalPercentage={Math.ceil((stat.value / maxValue) * 100)}
                       />
@@ -991,7 +991,7 @@ const Beta = (props: Props) => {
           },
           images: [
             {
-              url: 'https://supabase.com/og/og-image.jpg',
+              url: 'https://supabase.com/og/og-image-v2.jpg',
             },
           ],
         }}

@@ -7,6 +7,54 @@ const HomePageCover = (props) => {
   const isXs = useBreakpoint(639)
   const iconSize = isXs ? 'sm' : 'lg'
 
+  const frameworks = [
+    {
+      tooltip: 'ReactJS',
+      icon: '/docs/img/icons/react-icon',
+      href: '/guides/getting-started/quickstarts/reactjs',
+    },
+    {
+      tooltip: 'NextJS',
+      icon: '/docs/img/icons/nextjs-icon',
+      href: '/guides/getting-started/quickstarts/nextjs',
+    },
+    {
+      tooltip: 'RedwoodJS',
+      icon: '/docs/img/icons/redwoodjs-icon',
+      href: '/guides/getting-started/quickstarts/redwoodjs',
+    },
+    {
+      tooltip: 'Flutter',
+      icon: '/docs/img/icons/flutter-icon',
+      href: '/guides/getting-started/quickstarts/flutter',
+    },
+    {
+      tooltip: 'SvelteKit',
+      icon: '/docs/img/icons/svelte-icon',
+      href: '/guides/getting-started/quickstarts/sveltekit',
+    },
+    {
+      tooltip: 'SolidJS',
+      icon: '/docs/img/icons/solidjs-icon',
+      href: '/guides/getting-started/quickstarts/solidjs',
+    },
+    {
+      tooltip: 'Vue',
+      icon: '/docs/img/icons/vuejs-icon',
+      href: '/guides/getting-started/quickstarts/vue',
+    },
+    {
+      tooltip: 'NuxtJS',
+      icon: '/docs/img/icons/nuxt-icon',
+      href: '/guides/getting-started/quickstarts/nuxtjs',
+    },
+    {
+      tooltip: 'refine',
+      icon: '/docs/img/icons/refine-icon',
+      href: '/guides/getting-started/quickstarts/refine',
+    },
+  ]
+
   const GettingStarted = () => (
     <div
       className="
@@ -30,76 +78,18 @@ const HomePageCover = (props) => {
           </p>
         </div>
         <div className="flex flex-wrap md:grid md:grid-cols-4 2xl:grid-cols-7 gap-2 sm:gap-3">
-          <Link href={`/guides/getting-started/quickstarts/reactjs`} passHref>
-            <a className="no-underline">
-              <IconPanel
-                iconSize={iconSize}
-                hideArrow
-                tooltip="ReactJS"
-                icon="/docs/img/icons/react-icon"
-              />
-            </a>
-          </Link>
-          <Link href={`/guides/getting-started/quickstarts/nextjs`} passHref>
-            <a className="no-underline">
-              <IconPanel
-                iconSize={iconSize}
-                hideArrow
-                tooltip="NextJS"
-                icon="/docs/img/icons/nextjs-icon"
-              />
-            </a>
-          </Link>
-          <Link href={`/guides/getting-started/quickstarts/redwoodjs`} passHref>
-            <a className="no-underline">
-              <IconPanel
-                iconSize={iconSize}
-                hideArrow
-                tooltip="RedwoodJS"
-                icon="/docs/img/icons/redwoodjs-icon"
-              />
-            </a>
-          </Link>
-          <Link href={`/guides/getting-started/quickstarts/flutter`} passHref>
-            <a className="no-underline">
-              <IconPanel
-                iconSize={iconSize}
-                hideArrow
-                tooltip="Flutter"
-                icon="/docs/img/icons/flutter-icon"
-              />
-            </a>
-          </Link>
-          <Link href={`/guides/getting-started/quickstarts/sveltekit`} passHref>
-            <a className="no-underline">
-              <IconPanel
-                iconSize={iconSize}
-                hideArrow
-                tooltip="SvelteKit"
-                icon="/docs/img/icons/svelte-icon"
-              />
-            </a>
-          </Link>
-          <Link href={`/guides/getting-started/quickstarts/solidjs`} passHref>
-            <a className="no-underline">
-              <IconPanel
-                iconSize={iconSize}
-                hideArrow
-                tooltip="SolidJS"
-                icon="/docs/img/icons/solidjs-icon"
-              />
-            </a>
-          </Link>
-          <Link href={`/guides/getting-started/quickstarts/vue`} passHref>
-            <a className="no-underline">
-              <IconPanel
-                iconSize={iconSize}
-                hideArrow
-                tooltip="Vue"
-                icon="/docs/img/icons/vuejs-icon"
-              />
-            </a>
-          </Link>
+          {frameworks.map((framework, i) => (
+            <Link key={i} href={framework.href} passHref>
+              <a className="no-underline">
+                <IconPanel
+                  iconSize={iconSize}
+                  hideArrow
+                  tooltip={framework.tooltip}
+                  icon={framework.icon}
+                />
+              </a>
+            </Link>
+          ))}
         </div>
       </div>
     </div>

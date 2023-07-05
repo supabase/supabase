@@ -12,9 +12,9 @@
 - Database Postgres ospitato. [Documenti](https://supabase.com/docs/guides/database)
 - [x] Autenticazione e autorizzazione. [Documenti](https://supabase.com/docs/guides/auth)
 - [x] API generate automaticamente.
-  - [x] REST. [Documenti](https://supabase.com/docs/guides/database/api#rest-api)
-  - [x] GraphQL. [Documenti](https://supabase.com/docs/guides/database/api#graphql-api)
-  - [x] Sottoscrizioni in tempo reale. [Documenti](https://supabase.com/docs/guides/database/api#realtime-api)
+  - [x] REST. [Documenti](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL. [Documenti](https://supabase.com/docs/guides/api#graphql-api-overview)
+  - [x] Sottoscrizioni in tempo reale. [Documenti](https://supabase.com/docs/guides/api#realtime-api-overview)
 - [x] Funzioni.
   - [x] Funzioni di database. [Docs](https://supabase.com/docs/guides/database/functions)
   - [x] Funzioni Edge [Docs](https://supabase.com/docs/guides/functions)
@@ -27,7 +27,7 @@
 
 Per la documentazione completa, visitate [supabase.com/docs](https://supabase.com/docs)
 
-Per vedere come contribuire, visitate [Getting Started](./DEVELOPERS.md)
+Per vedere come contribuire, visitate [Getting Started](../DEVELOPERS.md)
 
 ## Comunità e supporto
 
@@ -39,7 +39,7 @@ Per vedere come contribuire, visitate [Getting Started](./DEVELOPERS.md)
 ## Stato
 
 - [Alfa: Stiamo testando Supabase con un gruppo chiuso di clienti
-- [x] Alfa pubblica: Chiunque può iscriversi all'indirizzo [app.supabase.com](https://app.supabase.com). Ma andateci piano, ci sono alcuni problemi
+- [x] Alfa pubblica: Chiunque può iscriversi all'indirizzo [supabase.com/dashboard](https://supabase.com/dashboard). Ma andateci piano, ci sono alcuni problemi
 - [x] Beta pubblica: Abbastanza stabile per la maggior parte degli usi non aziendali
 - [ ] Pubblico: Disponibilità generale [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
 
@@ -55,7 +55,7 @@ Supabase è una combinazione di strumenti open source. Stiamo costruendo le funz
 
 **Architettura**
 
-Supabase è una [piattaforma ospitata] (https://app.supabase.com). È possibile registrarsi e iniziare a usare Supabase senza installare nulla.
+Supabase è una [piattaforma ospitata](https://supabase.com/dashboard). È possibile registrarsi e iniziare a usare Supabase senza installare nulla.
 È anche possibile [auto-ospitare](https://supabase.com/docs/guides/hosting/overview) e [sviluppare localmente](https://supabase.com/docs/guides/local-development).
 
 ![Architettura](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)

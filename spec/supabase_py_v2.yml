@@ -672,7 +672,7 @@ functions:
         name: List buckets
         code: |
           ```
-          res = supabase.storage().list_buckets()
+          res = supabase.storage.list_buckets()
           ```
 
   - id: get-bucket
@@ -687,7 +687,7 @@ functions:
         name: Get bucket
         code: |
           ```
-          res = supabase.storage().get_bucket(name)
+          res = supabase.storage.get_bucket(name)
           ```
 
   - id: create-bucket
@@ -702,7 +702,7 @@ functions:
         name: Create bucket
         code: |
           ```
-          res = supabase.storage().create_bucket(name)
+          res = supabase.storage.create_bucket(name)
           ```
 
   - id: empty-bucket
@@ -717,7 +717,7 @@ functions:
         name: Empty bucket
         code: |
           ```
-          res = supabase.storage().empty_bucket(name)
+          res = supabase.storage.empty_bucket(name)
           ```
   - id: delete-bucket
     title: 'delete_bucket()'
@@ -731,7 +731,7 @@ functions:
         name: Delete bucket
         code: |
           ```
-          res = supabase.storage().delete_bucket(name)
+          res = supabase.storage.delete_bucket(name)
           ```
 
   - id: from-upload
@@ -747,7 +747,7 @@ functions:
         code: |
           ```
           with open(source, 'rb+') as f:
-            res = supabase.storage().from_('bucket').upload(destination, os.path.abspath(source))
+            res = supabase.storage.from_('bucket').upload(destination, f)
           ```
   - id: from-move
     title: 'from_.move()'
@@ -761,7 +761,7 @@ functions:
         name: Move file
         code: |
           ```
-          res = supabase.storage().from_(bucket).move('public/avatar1.png', 'private/avatar2.png')
+          res = supabase.storage.from_(bucket).move('public/avatar1.png', 'private/avatar2.png')
           ```
 
   - id: from-create-signed-url
@@ -776,13 +776,13 @@ functions:
         name: Create Signed URL
         code: |
           ```
-          res = supabase.storage().from_(bucket_name).create_signed_url(filepath, expiry_duration)
+          res = supabase.storage.from_(bucket_name).create_signed_url(filepath, expiry_duration)
           ```
 
   - id: from-get-public-url
     title: 'from_.get_public_url()'
     notes: |
-      - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/javascript/storage-updatebucket) or by going to Storage on [app.supabase.com](https://supabase.com/dashboard), clicking the overflow menu on a bucket and choosing "Make public"
+      - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/javascript/storage-updatebucket) or by going to Storage on [supabase.com/dashboard](https://supabase.com/dashboard), clicking the overflow menu on a bucket and choosing "Make public"
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: none
@@ -792,7 +792,7 @@ functions:
         name: Returns the URL for an asset in a public bucket
         code: |
           ```
-          res = supabase.storage().from_(bucket_name).get_public_url('test/avatar1.jpg')
+          res = supabase.storage.from_(bucket_name).get_public_url('test/avatar1.jpg')
           ```
 
   - id: from-download
@@ -808,7 +808,7 @@ functions:
         code: |
           ```
           with open(destination, 'wb+') as f:
-            res = supabase.storage().from_(bucket_name).download(source)
+            res = supabase.storage.from_(bucket_name).download(source)
             f.write(res)
           ```
 
@@ -824,7 +824,7 @@ functions:
         name: Delete file
         code: |
           ```
-          res = supabase.storage().from_('test').remove('test.jpg')
+          res = supabase.storage.from_('test').remove('test.jpg')
           ```
   - id: from-list
     title: 'from_.list()'
@@ -838,9 +838,9 @@ functions:
         name: List files in a bucket
         code: |
           ```
-          res = supabase.storage().from_('test').list()
+          res = supabase.storage.from_('test').list()
           ```
   - id: subscribe
     title: on().subscribe()
     notes: |
-      - We are implementing this feature at the moment. If you have queries feel free to open an issue on the [realtime-py](https://github.com/supabase-community) repository.
+      - We are implementing this feature at the moment. If you have queries feel free to open an issue on the [realtime-py](https://github.com/supabase-community/realtime-py) repository.

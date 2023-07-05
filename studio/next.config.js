@@ -4,7 +4,7 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 })
 
 // this is required to use shared packages in the packages directory
-const withTM = require('next-transpile-modules')(['ui', 'common'])
+const withTM = require('next-transpile-modules')(['ui', 'common', 'shared-data'])
 
 // Required for nextjs standalone build
 const path = require('path')
@@ -140,6 +140,31 @@ const nextConfig = {
         destination: '/org/:slug/general',
         permanent: true,
       },
+      {
+        source: '/project/:ref/settings/billing/update',
+        destination: '/project/:ref/settings/billing/subscription',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/settings/billing/update/free',
+        destination: '/project/:ref/settings/billing/subscription',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/settings/billing/update/pro',
+        destination: '/project/:ref/settings/billing/subscription',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/settings/billing/update/team',
+        destination: '/project/:ref/settings/billing/subscription',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/settings/billing/update/enterprise',
+        destination: '/project/:ref/settings/billing/subscription',
+        permanent: true,
+      },
     ]
   },
   async headers() {
@@ -176,7 +201,7 @@ const nextConfig = {
     ]
   },
   images: {
-    domains: ['github.com'],
+    domains: ['github.com', 'api-frameworks.vercel.sh', 'vercel.com'],
   },
   // Ref: https://nextjs.org/docs/advanced-features/output-file-tracing#caveats
   experimental: {

@@ -10,14 +10,19 @@ date: '2022-08-19'
 toc_depth: 2
 ---
 
-Today we're announcing [Supabase Vault](https://github.com/supabase/vault), a Postgres extension for managing secrets and encryption inside your database.
+Today we're announcing [Supabase Vault](https://supabase.com/docs/guides/database/vault), a Postgres extension for managing secrets and encryption inside your database.
 Vault is a thin usability-layer on top of [pgsodium](https://github.com/michelp/pgsodium).
 
-Vault is not available on the Supabase platform yet. We're finalizing usability and security testing.
-This release is intended to gather user-feedback from our community and customers.
+<div className="bg-gray-300 rounded-lg px-6 py-2 bold">
 
-Soon, we'll release a blog post that describes more about the technology behind Vault - [libsodium](https://doc.libsodium.org/) and
-[pgsodium](https://doc.libsodium.org/). For now, we will go through a quick example of storing a secret, like a service access token, into the Vault.
+❇️ UPDATE JUNE 2023 ❇️
+
+Vault is now available on every Supabase project. [Check it out](https://supabase.com/dashboard/project/_/settings/vault/secrets)
+
+</div>
+
+[Transparent Column Encryption with Postgres](https://supabase.com/blog/transparent-column-encryption-with-postgres) is a blog post that describes the technology behind Vault - [libsodium](https://doc.libsodium.org/) and
+[pgsodium](https://doc.libsodium.org/). Now, we will go through a quick example of storing a secret, like a service access token, into the Vault.
 
 ## Background
 
@@ -179,4 +184,4 @@ optionally creating new keys, and select them from the view when you want to use
 The Vault is good for a reasonable amount of secure data, like API keys, access tokens, or environment variables.
 But if you have a lot more sensitive information, like personally Identifiable Information (PII),
 you may want to break them out into side-tables using pgsodium's
-[Transparent Column Encryption](https://github.com/michelp/pgsodium#transparent-column-encryption) which we will describe soon in a follow-up blog post. Stay tuned!
+[Transparent Column Encryption](https://supabase.com/blog/transparent-column-encryption-with-postgres) which we will describe soon in a follow-up blog post. Stay tuned!

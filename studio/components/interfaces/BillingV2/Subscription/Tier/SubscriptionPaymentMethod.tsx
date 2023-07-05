@@ -1,24 +1,39 @@
-import Panel from 'components/ui/Panel'
-import { ProjectSubscriptionResponse } from 'data/subscriptions/project-subscription-v2-query'
-import { Button, IconCreditCard, IconFileText, Modal } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useState } from 'react'
-import PaymentMethodSelection from './PaymentMethodSelection'
+
 import { useParams } from 'common'
+import Panel from 'components/ui/Panel'
 import {
   SubscriptionTier,
   updateSubscriptionTier,
 } from 'data/subscriptions/project-subscription-update-mutation'
-import { useStore } from 'hooks'
+import { ProjectSubscriptionResponse } from 'data/subscriptions/project-subscription-v2-query'
+import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
+import Link from 'next/link'
+import { Button, IconCreditCard, Modal } from 'ui'
+import PaymentMethodSelection from './PaymentMethodSelection'
 
 export interface SubscriptionTierProps {
   subscription: ProjectSubscriptionResponse
+  onSubscriptionUpdated: () => void
 }
 
-const SubscriptionPaymentMethod = ({ subscription }: SubscriptionTierProps) => {
+const SubscriptionPaymentMethod = ({
+  subscription,
+  onSubscriptionUpdated,
+}: SubscriptionTierProps) => {
   const { ref: projectRef } = useParams()
   const { ui } = useStore()
+
+  const selectedOrganization = useSelectedOrganization()
+  const currentOrgSlug = selectedOrganization?.slug
+
+  const canUpdatePaymentMethod = useCheckPermissions(
+    PermissionAction.BILLING_WRITE,
+    'stripe.subscriptions'
+  )
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showPaymentEditModal, setShowPaymentEditModal] = useState(false)
@@ -54,6 +69,8 @@ const SubscriptionPaymentMethod = ({ subscription }: SubscriptionTierProps) => {
           category: 'success',
           message: `Successfully updated payment method!`,
         })
+
+        onSubscriptionUpdated()
       } catch (error: any) {
         ui.setNotification({
           error,
@@ -83,17 +100,17 @@ const SubscriptionPaymentMethod = ({ subscription }: SubscriptionTierProps) => {
                     src={`${BASE_PATH}/img/payment-methods/${subscription.payment_method_card_details?.brand
                       .replace(' ', '-')
                       .toLowerCase()}.png`}
-                    width="32"
+                    width="24"
                   />
                 ) : (
                   <IconCreditCard />
                 )}
-                <span>
+                <span className="text-sm">
                   **** **** ****{' '}
                   {subscription?.payment_method_card_details?.last_4_digits || '****'}
                 </span>
               </div>
-              <div className="flex flex-row space-x-3 text-scale-1000">
+              <div className="flex flex-row space-x-3 text-scale-1000 text-sm">
                 <span>
                   Expires {subscription?.payment_method_card_details?.expiry_month || '-'}/
                   {subscription?.payment_method_card_details?.expiry_year?.toString()?.slice(-2) ||
@@ -106,9 +123,11 @@ const SubscriptionPaymentMethod = ({ subscription }: SubscriptionTierProps) => {
           {subscription?.payment_method_type === 'invoice' && (
             <>
               <div className="flex space-x-3">
-                <div >
+                <div>
                   <p className="text-scale-1100">Payment via invoice</p>
-                  <p className="text-sm text-scale-1000">You get a monthly invoice and payment link via email.</p>
+                  <p className="text-sm text-scale-1000">
+                    You get a monthly invoice and payment link via email.
+                  </p>
                 </div>
               </div>
             </>
@@ -119,14 +138,14 @@ const SubscriptionPaymentMethod = ({ subscription }: SubscriptionTierProps) => {
               <div>
                 <Button
                   type="default"
-                  disabled={subscription?.payment_method_type !== 'card'}
+                  disabled={subscription?.payment_method_type !== 'card' || !canUpdatePaymentMethod}
                   onClick={() => setShowPaymentEditModal(true)}
                 >
                   Change
                 </Button>
               </div>
             </Tooltip.Trigger>
-            {subscription?.payment_method_type !== 'card' && (
+            {subscription?.payment_method_type !== 'card' ? (
               <Tooltip.Portal>
                 <Tooltip.Content side="bottom">
                   <Tooltip.Arrow className="radix-tooltip-arrow" />
@@ -142,7 +161,23 @@ const SubscriptionPaymentMethod = ({ subscription }: SubscriptionTierProps) => {
                   </div>
                 </Tooltip.Content>
               </Tooltip.Portal>
-            )}
+            ) : !canUpdatePaymentMethod ? (
+              <Tooltip.Portal>
+                <Tooltip.Content side="bottom">
+                  <Tooltip.Arrow className="radix-tooltip-arrow" />
+                  <div
+                    className={[
+                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                      'border border-scale-200',
+                    ].join(' ')}
+                  >
+                    <span className="text-xs text-scale-1200">
+                      You do not have permission to change the payment method
+                    </span>
+                  </div>
+                </Tooltip.Content>
+              </Tooltip.Portal>
+            ) : null}
           </Tooltip.Root>
         </Panel.Content>
       </Panel>
@@ -160,8 +195,18 @@ const SubscriptionPaymentMethod = ({ subscription }: SubscriptionTierProps) => {
         <Modal.Content>
           <div className="py-6 space-y-2">
             <p className="text-sm">
-              Upon clicking confirm, your next and future invoices will be deducted from the
-              selected payment method. There are no immediate charges.
+              Upon clicking confirm, all future charges will be deducted from the selected payment
+              method. There are no immediate charges. Changing the payment method for this project
+              does not affect the payment method for other projects.
+            </p>
+            <p className="text-sm text-scale-1000">
+              To remove unused or expired payment methods, head to your{' '}
+              <Link href={`/org/${currentOrgSlug || '_'}/billing`} passHref>
+                <a target="_blank" className="text-green-900 transition hover:text-green-1000">
+                  organization's billing settings
+                </a>
+              </Link>
+              .
             </p>
             <div className="!mt-6">
               <PaymentMethodSelection

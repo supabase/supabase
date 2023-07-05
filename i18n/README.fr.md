@@ -12,9 +12,9 @@
 - [x] Base de données Postgres hébergée. [Docs](https://supabase.com/docs/guides/database)
 - [x] Authentification et autorisation. [Docs](https://supabase.com/docs/guides/auth)
 - [x] API générées automatiquement.
-  - [x] REST. [Docs](https://supabase.com/docs/guides/database/api#rest-api)
-  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/database/api#graphql-api)
-  - [x] Abonnements en temps réel. [Docs](https://supabase.com/docs/guides/database/api#realtime-api)
+  - [x] REST. [Docs](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/api#graphql-api-overview)
+  - [x] Abonnements en temps réel. [Docs](https://supabase.com/docs/guides/api#realtime-api-overview)
 - [x] Fonctions.
   - [x] Fonctions de base de données. [Docs](https://supabase.com/docs/guides/database/functions)
   - [x] Fonctions Edge [Docs](https://supabase.com/docs/guides/functions)
@@ -27,7 +27,7 @@
 
 Pour une documentation complète, visitez [supabase.com/docs](https://supabase.com/docs)
 
-Pour savoir comment contribuer, visitez [Getting Started](./DEVELOPERS.md)
+Pour savoir comment contribuer, visitez [Getting Started](../DEVELOPERS.md)
 
 ## Communauté et support
 
@@ -39,7 +39,7 @@ Pour savoir comment contribuer, visitez [Getting Started](./DEVELOPERS.md)
 ## Statut
 
 - [x] Alpha : Nous testons Supabase avec un groupe fermé de clients
-- [x] Alpha publique : Tout le monde peut s'inscrire sur [app.supabase.com] (https://app.supabase.com). Mais allez-y doucement, il y a quelques problèmes
+- [x] Alpha publique : Tout le monde peut s'inscrire sur [supabase.com/dashboard](https://supabase.com/dashboard). Mais allez-y doucement, il y a quelques problèmes
 - [x] Bêta publique : Suffisamment stable pour la plupart des cas d'utilisation hors entreprise
 - [ ] Public : Disponibilité générale [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
 
@@ -55,14 +55,14 @@ Supabase est une combinaison d'outils open source. Nous construisons les fonctio
 
 **Architecture**
 
-Supabase est une [plateforme hébergée] (https://app.supabase.com). Vous pouvez vous inscrire et commencer à utiliser Supabase sans rien installer.
+Supabase est une [plateforme hébergée](https://supabase.com/dashboard). Vous pouvez vous inscrire et commencer à utiliser Supabase sans rien installer.
 Vous pouvez également [auto-héberger](https://supabase.com/docs/guides/hosting/overview) et [développer localement](https://supabase.com/docs/guides/local-development).
 
 ![Architecture](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
 
 - [PostgreSQL](https://www.postgresql.org/) est un système de base de données objet-relationnel avec plus de 30 ans de développement actif qui lui a valu une solide réputation de fiabilité, de robustesse et de performance.
 - [Realtime](https://github.com/supabase/realtime) est un serveur Elixir qui vous permet d'écouter les insertions, les mises à jour et les suppressions de PostgreSQL en utilisant des websockets. Realtime interroge la fonctionnalité de réplication intégrée de Postgres pour les changements de base de données, convertit les changements en JSON, puis diffuse le JSON via des websockets aux clients autorisés.
-- [PostgREST] (http://postgrest.org/) est un serveur web qui transforme votre base de données PostgreSQL en une API RESTful
+- [PostgREST](http://postgrest.org/) est un serveur web qui transforme votre base de données PostgreSQL en une API RESTful
 - [pg_graphql](http://github.com/supabase/pg_graphql/) est une extension de PostgreSQL qui expose une API GraphQL
 - [Storage](https://github.com/supabase/storage-api) fournit une interface RESTful pour gérer les fichiers stockés dans S3, en utilisant Postgres pour gérer les permissions.
 - [postgres-meta](https://github.com/supabase/postgres-meta) est une API RESTful pour gérer votre Postgres, vous permettant de récupérer des tables, d'ajouter des rôles, et d'exécuter des requêtes, etc.

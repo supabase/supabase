@@ -12,9 +12,9 @@
 - [x] Hostet Postgres-database. [Dokumenter](https://supabase.com/docs/guides/database)
 - [x] Autentisering og autorisasjon. [Dokumenter](https://supabase.com/docs/guides/auth)
 - [x] Autogenererte API-er.
-  - [x] REST. [Dokumenter](https://supabase.com/docs/guides/database/api#rest-api)
-  - [x] GraphQL. [Dokumenter](https://supabase.com/docs/guides/database/api#graphql-api)
-  - [x] Sanntidsabonnementer. [Dokumenter](https://supabase.com/docs/guides/database/api#realtime-api)
+  - [x] REST. [Dokumenter](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL. [Dokumenter](https://supabase.com/docs/guides/api#graphql-api-overview)
+  - [x] Sanntidsabonnementer. [Dokumenter](https://supabase.com/docs/guides/api#realtime-api-overview)
 - [x] Funksjoner.
   - [x] Databasefunksjoner. [Dokumenter](https://supabase.com/docs/guides/database/functions)
   - [x] Edge-funksjoner [Dokumenter](https://supabase.com/docs/guides/functions)
@@ -27,7 +27,7 @@ supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/a
 
 For fullstendig dokumentasjon, besøk [supabase.com/docs](https://supabase.com/docs)
 
-For å se hvordan du kan bidra, gå til [Getting Started](./DEVELOPERS.md)
+For å se hvordan du kan bidra, gå til [Getting Started](../DEVELOPERS.md)
 
 ## Fellesskap og støtte
 
@@ -39,7 +39,7 @@ For å se hvordan du kan bidra, gå til [Getting Started](./DEVELOPERS.md)
 ## Status
 
 - [x] Alpha: Vi tester Supabase med en lukket gruppe kunder
-- [x] Offentlig Alpha: Alle kan registrere seg på [app.supabase.com](https://app.supabase.com). Men vær snill med oss, det er noen små problemer
+- [x] Offentlig Alpha: Alle kan registrere seg på [supabase.com/dashboard](https://supabase.com/dashboard). Men vær snill med oss, det er noen små problemer
 - [x] Offentlig beta: Stabilt nok for de fleste brukstilfeller som ikke er for bedrifter
 - [ ] Offentlig: Generell tilgjengelighet [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
 
@@ -55,14 +55,14 @@ Supabase er en kombinasjon av verktøy med åpen kildekode. Vi bygger funksjonen
 
 \*\*Arkitektur
 
-Supabase er en [vertsplattform] (https://app.supabase.com). Du kan registrere deg og begynne å bruke Supabase uten å installere noe.
+Supabase er en [vertsplattform](https://supabase.com/dashboard). Du kan registrere deg og begynne å bruke Supabase uten å installere noe.
 Du kan også [selv være vert](https://supabase.com/docs/guides/hosting/overview) og [utvikle lokalt](https://supabase.com/docs/guides/local-development).
 
 arkitektur](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
 
 - [PostgreSQL](https://www.postgresql.org/) er et objektrelasjonsdatabasesystem med over 30 års aktiv utvikling som har gitt det et sterkt rykte for pålitelighet, robusthet og ytelse.
 - [Realtime](https://github.com/supabase/realtime) er en Elixir-server som lar deg lytte til PostgreSQL-innlegg, oppdateringer og slettinger ved hjelp av websockets. Realtime polls Postgres' innebygde replikeringsfunksjonalitet for databaseendringer, konverterer endringer til JSON og sender deretter JSON over websockets til autoriserte klienter.
-- [PostgREST] (http://postgrest.org/) er en webserver som gjør PostgreSQL-databasen din direkte om til et RESTful API
+- [PostgREST](http://postgrest.org/) er en webserver som gjør PostgreSQL-databasen din direkte om til et RESTful API
 - [pg_graphql](http://github.com/supabase/pg_graphql/) en PostgreSQL-utvidelse som eksponerer et GraphQL API
 - [Storage](https://github.com/supabase/storage-api) gir et RESTful-grensesnitt for å administrere filer som er lagret i S3, ved hjelp av Postgres for å administrere tillatelser.
 - [postgres-meta](https://github.com/supabase/postgres-meta) er et RESTful API for å administrere Postgres, slik at du kan hente tabeller, legge til roller og kjøre spørringer osv.

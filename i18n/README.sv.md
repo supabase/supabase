@@ -7,16 +7,16 @@
 
 # Supabase
 
-[Supabase] (https://supabase.com) är ett alternativ till Firebase med öppen källkod. Vi bygger upp Firebase-funktionerna med hjälp av verktyg för öppen källkod i företagsklass.
+[Supabase](https://supabase.com) är ett alternativ till Firebase med öppen källkod. Vi bygger upp Firebase-funktionerna med hjälp av verktyg för öppen källkod i företagsklass.
 
 - [x] Hosted Postgres-databas. [Docs](https://supabase.com/docs/guides/database)
 - [x] Autentisering och auktorisering. [Docs](https://supabase.com/docs/guides/auth)
 - [x] Automatiskt genererade API:er.
-  - [x] REST. [Docs](https://supabase.com/docs/guides/database/api#rest-api)
-  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/database/api#graphql-api)
-  - [x] Prenumerationer i realtid. [Dokument] (https://supabase.com/docs/guides/database/api#realtime-api)
+  - [x] REST. [Docs](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/api#graphql-api-overview)
+  - [x] Prenumerationer i realtid. [Dokument](https://supabase.com/docs/guides/api#realtime-api-overview)
 - [x] Funktioner.
-  - [x] Databasfunktioner. [Dokument] (https://supabase.com/docs/guides/database/functions)
+  - [x] Databasfunktioner. [Dokument](https://supabase.com/docs/guides/database/functions)
   - [x] Edge-funktioner [Docs](https://supabase.com/docs/guides/functions)
 - [x] Lagring av filer. [Docs](https://supabase.com/docs/guides/storage)
 - [x] Kontrollpanel
@@ -25,13 +25,13 @@
 
 ## Dokumentation
 
-Fullständig dokumentation finns på [supabase.com/docs] (https://supabase.com/docs)
+Fullständig dokumentation finns på [supabase.com/docs](https://supabase.com/docs)
 
-För att se hur man bidrar, besök [Getting Started](./DEVELOPERS.md)
+För att se hur man bidrar, besök [Getting Started](../DEVELOPERS.md)
 
 ## Gemenskap och stöd
 
-- [Community Forum] (https://github.com/supabase/supabase/discussions). Bäst för: hjälp med att bygga, diskussion om bästa praxis för databaser.
+- [Community Forum](https://github.com/supabase/supabase/discussions). Bäst för: hjälp med att bygga, diskussion om bästa praxis för databaser.
 - [GitHub Issues](https://github.com/supabase/supabase/issues). Bäst för: buggar och fel som du stöter på när du använder Supabase.
 - [E-postsupport](https://supabase.com/docs/support#business-support). Bäst för: problem med din databas eller infrastruktur.
 - [Discord](https://discord.supabase.com). Bäst för: att dela med dig av dina applikationer och umgås med gemenskapen.
@@ -39,7 +39,7 @@ För att se hur man bidrar, besök [Getting Started](./DEVELOPERS.md)
 ## Status
 
 - [Alpha: Vi testar Supabase med en sluten grupp av kunder
-- [x] Public Alpha: Vem som helst kan registrera sig på [app.supabase.com] (https://app.supabase.com). Men var försiktig med oss, det finns några problem
+- [x] Public Alpha: Vem som helst kan registrera sig på [supabase.com/dashboard](https://supabase.com/dashboard). Men var försiktig med oss, det finns några problem
 - [x] Public Beta: Stabil nog för de flesta användningsområden som inte är företag
 - [ ] Public: Allmän tillgänglighet [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]]
 
@@ -55,14 +55,14 @@ Supabase är en kombination av verktyg med öppen källkod. Vi bygger funktioner
 
 **Arkitektur**
 
-Supabase är en [värdplattform] (https://app.supabase.com). Du kan registrera dig och börja använda Supabase utan att installera något.
+Supabase är en [värdplattform](https://supabase.com/dashboard). Du kan registrera dig och börja använda Supabase utan att installera något.
 Du kan också [självhosta](https://supabase.com/docs/guides/hosting/overview) och [utveckla lokalt](https://supabase.com/docs/guides/local-development).
 
 ![Arkitektur](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
 
 - [PostgreSQL](https://www.postgresql.org/) är ett objektrelationellt databassystem med över 30 års aktiv utveckling som har gett det ett gott rykte när det gäller tillförlitlighet, robusthet och prestanda.
 - [Realtime](https://github.com/supabase/realtime) är en Elixir-server som låter dig lyssna på PostgreSQL-insättningar, uppdateringar och borttagningar med hjälp av websockets. Realtime söker Postgres inbyggda replikeringsfunktionalitet efter databasändringar, omvandlar ändringarna till JSON och sänder sedan JSON via websockets till auktoriserade klienter.
-- [PostgREST] (http://postgrest.org/) är en webbserver som omvandlar din PostgreSQL-databas direkt till ett RESTful API
+- [PostgREST](http://postgrest.org/) är en webbserver som omvandlar din PostgreSQL-databas direkt till ett RESTful API
 - [pg_graphql](http://github.com/supabase/pg_graphql/) är ett PostgreSQL-tillägg som exponerar ett GraphQL API
 - [Storage](https://github.com/supabase/storage-api) tillhandahåller ett RESTful-gränssnitt för hantering av filer som lagras i S3, där Postgres används för att hantera behörigheter.
 - [postgres-meta](https://github.com/supabase/postgres-meta) är ett RESTful API för hantering av Postgres, så att du kan hämta tabeller, lägga till roller, köra frågor osv.

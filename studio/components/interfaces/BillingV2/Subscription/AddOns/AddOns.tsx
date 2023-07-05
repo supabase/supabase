@@ -38,16 +38,8 @@ const AddOns = ({}: AddOnsProps) => {
 
   const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef })
   const selectedAddons = addons?.selected_addons ?? []
-  const availableAddons = addons?.available_addons ?? []
 
   const { computeInstance, pitr, customDomain } = getAddons(selectedAddons)
-  const computeInstanceSpecs =
-    computeInstance !== undefined
-      ? availableAddons
-          .find((addon) => addon.type === 'compute_instance')
-          ?.variants.find((variant) => variant.identifier === computeInstance.variant.identifier)
-          ?.meta
-      : undefined
 
   return (
     <>
@@ -65,7 +57,7 @@ const AddOns = ({}: AddOnsProps) => {
                   <Link href="https://supabase.com/docs/guides/platform/compute-add-ons">
                     <a target="_blank" rel="noreferrer">
                       <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
-                        <p className="text-sm">About compute add-ons</p>
+                        <p className="text-sm">Compute add-ons</p>
                         <IconExternalLink size={16} strokeWidth={1.5} />
                       </div>
                     </a>
@@ -75,7 +67,7 @@ const AddOns = ({}: AddOnsProps) => {
                   <Link href="https://supabase.com/docs/guides/platform/backups#point-in-time-recovery">
                     <a target="_blank" rel="noreferrer">
                       <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
-                        <p className="text-sm">About PITR backups</p>
+                        <p className="text-sm">PITR backups</p>
                         <IconExternalLink size={16} strokeWidth={1.5} />
                       </div>
                     </a>
@@ -85,7 +77,17 @@ const AddOns = ({}: AddOnsProps) => {
                   <Link href="https://supabase.com/docs/guides/platform/custom-domains">
                     <a target="_blank" rel="noreferrer">
                       <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
-                        <p className="text-sm">About custom domains</p>
+                        <p className="text-sm">Custom domains</p>
+                        <IconExternalLink size={16} strokeWidth={1.5} />
+                      </div>
+                    </a>
+                  </Link>
+                </div>
+                <div>
+                  <Link href="https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pooler">
+                    <a target="_blank" rel="noreferrer">
+                      <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
+                        <p className="text-sm">Connection Pooler</p>
                         <IconExternalLink size={16} strokeWidth={1.5} />
                       </div>
                     </a>
@@ -147,8 +149,9 @@ const AddOns = ({}: AddOnsProps) => {
                     >
                       <p>
                         Your workload is currently running at the baseline disk IO bandwidth at{' '}
-                        {computeInstanceSpecs?.baseline_disk_io_mbs?.toLocaleString() ?? 87} Mbps
-                        and may suffer degradation in performance.
+                        {computeInstance?.variant?.meta?.baseline_disk_io_mbs?.toLocaleString() ??
+                          87}{' '}
+                        Mbps and may suffer degradation in performance.
                       </p>
                       <p className="mt-1">
                         Consider upgrading to a larger compute instance for a higher baseline
@@ -165,8 +168,9 @@ const AddOns = ({}: AddOnsProps) => {
                       <p>
                         If the disk IO budget drops to zero, your workload will run at the baseline
                         disk IO bandwidth at{' '}
-                        {computeInstanceSpecs?.baseline_disk_io_mbs?.toLocaleString() ?? 87} Mbps
-                        and may suffer degradation in performance.
+                        {computeInstance?.variant?.meta?.baseline_disk_io_mbs?.toLocaleString() ??
+                          87}{' '}
+                        Mbps and may suffer degradation in performance.
                       </p>
                       <p className="mt-1">
                         Consider upgrading to a larger compute instance for a higher baseline
@@ -190,7 +194,7 @@ const AddOns = ({}: AddOnsProps) => {
                         </div>
                       </a>
                     </Link>
-                    <p className="text-sm">{computeInstanceSpecs?.memory_gb ?? 1} GB</p>
+                    <p className="text-sm">{computeInstance?.variant?.meta?.memory_gb ?? 1} GB</p>
                   </div>
                   <div className="w-full flex items-center justify-between border-b py-2">
                     <Link href={`/project/${projectRef}/settings/billing/usage#cpu`}>
@@ -208,17 +212,21 @@ const AddOns = ({}: AddOnsProps) => {
                       </a>
                     </Link>
                     <p className="text-sm">
-                      {computeInstanceSpecs?.cpu_cores ?? 2}-core ARM{' '}
-                      {computeInstanceSpecs?.cpu_dedicated ? '(Dedicated)' : '(Shared)'}
+                      {computeInstance?.variant?.meta?.cpu_cores ?? 2}-core ARM{' '}
+                      {computeInstance?.variant?.meta?.cpu_dedicated ? '(Dedicated)' : '(Shared)'}
                     </p>
                   </div>
                   <div className="w-full flex items-center justify-between border-b py-2">
                     <p className="text-sm text-scale-1000">No. of direct connections</p>
-                    <p className="text-sm">{computeInstanceSpecs?.connections_direct ?? 60}</p>
+                    <p className="text-sm">
+                      {computeInstance?.variant?.meta?.connections_direct ?? 60}
+                    </p>
                   </div>
                   <div className="w-full flex items-center justify-between border-b py-2">
                     <p className="text-sm text-scale-1000">No. of pooler connections</p>
-                    <p className="text-sm">{computeInstanceSpecs?.connections_pooler ?? 200}</p>
+                    <p className="text-sm">
+                      {computeInstance?.variant?.meta?.connections_pooler ?? 200}
+                    </p>
                   </div>
                   <div className="w-full flex items-center justify-between border-b py-2">
                     <Link href={`/project/${projectRef}/settings/billing/usage#disk_io`}>
@@ -236,7 +244,8 @@ const AddOns = ({}: AddOnsProps) => {
                       </a>
                     </Link>
                     <p className="text-sm">
-                      {computeInstanceSpecs?.max_disk_io_mbs?.toLocaleString() ?? '2,085'} Mbps
+                      {computeInstance?.variant?.meta?.max_disk_io_mbs?.toLocaleString() ?? '2,085'}{' '}
+                      Mbps
                     </p>
                   </div>
                   <div className="w-full flex items-center justify-between py-2">
@@ -255,7 +264,8 @@ const AddOns = ({}: AddOnsProps) => {
                       </a>
                     </Link>
                     <p className="text-sm">
-                      {computeInstanceSpecs?.baseline_disk_io_mbs?.toLocaleString() ?? 87} Mbps
+                      {computeInstance?.variant?.meta?.baseline_disk_io_mbs?.toLocaleString() ?? 87}{' '}
+                      Mbps
                     </p>
                   </div>
                 </div>
@@ -283,9 +293,7 @@ const AddOns = ({}: AddOnsProps) => {
                   <p className="text-sm text-scale-1000">Point in time recovery</p>
                   <p className="">
                     {pitr !== undefined
-                      ? `Point in time recovery of ${
-                          pitr.variant.identifier.split('_')[1]
-                        } days is enabled`
+                      ? `Point in time recovery of ${pitr.variant.meta?.backup_duration_days} days is enabled`
                       : 'Point in time recovery is not enabled'}
                   </p>
                   <ProjectUpdateDisabledTooltip projectUpdateDisabled={projectUpdateDisabled}>

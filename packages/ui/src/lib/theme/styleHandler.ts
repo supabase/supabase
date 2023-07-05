@@ -7,7 +7,7 @@ export default function styleHandler(target: string) {
     theme: { [target]: __styles },
   }: any = useContext(ThemeContext)
 
-  if (!__styles) __styles = defaultTheme.button
+  if (!__styles) __styles = defaultTheme.accordion
 
   // console.log(__styles)
 

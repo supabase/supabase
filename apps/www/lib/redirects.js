@@ -708,17 +708,17 @@ module.exports = [
   {
     permanent: true,
     source: '/blog/2020/12/02/case-study-monitoro',
-    destination: '/blog/case-study-monitoro',
+    destination: '/customers',
   },
   {
     permanent: true,
     source: '/blog/2020/12/02/case-study-tayfa',
-    destination: '/blog/case-study-tayfa',
+    destination: '/customers',
   },
   {
     permanent: true,
     source: '/blog/2020/12/02/case-study-xendit',
-    destination: '/blog/case-study-xendit',
+    destination: '/customers/xendit',
   },
   {
     permanent: true,
@@ -743,7 +743,7 @@ module.exports = [
   {
     permanent: true,
     source: '/blog/2021/02/09/case-study-roboflow',
-    destination: '/blog/case-study-roboflow',
+    destination: '/customers/roboflow',
   },
   {
     permanent: true,
@@ -763,7 +763,7 @@ module.exports = [
   {
     permanent: true,
     source: '/blog/2021/03/08/toad-a-link-shortener-with-simple-apis-for-low-coders',
-    destination: '/blog/toad-a-link-shortener-with-simple-apis-for-low-coders',
+    destination: '/customers',
   },
   {
     permanent: true,
@@ -853,7 +853,7 @@ module.exports = [
   {
     permanent: true,
     source: '/blog/2021/07/26/epsilon3-self-hosting',
-    destination: '/blog/epsilon3-self-hosting',
+    destination: '/customers/epsilon3',
   },
   {
     permanent: true,
@@ -868,7 +868,7 @@ module.exports = [
   {
     permanent: true,
     source: '/blog/2021/07/27/spot-flutter-with-postgres',
-    destination: '/blog/spot-flutter-with-postgres',
+    destination: '/customers',
   },
   {
     permanent: true,
@@ -878,7 +878,7 @@ module.exports = [
   {
     permanent: true,
     source: '/blog/2021/07/28/mobbin-supabase-200000-users',
-    destination: '/blog/mobbin-supabase-200000-users',
+    destination: '/customers/mobbin',
   },
   {
     permanent: true,
@@ -938,7 +938,7 @@ module.exports = [
   {
     permanent: true,
     source: '/blog/2021/10/19/replenysh-time-to-value-in-less-than-24-hours',
-    destination: '/blog/replenysh-time-to-value-in-less-than-24-hours',
+    destination: '/customers/replenysh',
   },
   {
     permanent: true,
@@ -1032,6 +1032,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/blog/audit',
+    destination: '/blog/postgres-audit',
+  },
+  {
+    permanent: true,
     source: '/blog/2022/03/08/audit',
     destination: '/blog/postgres-audit',
   },
@@ -1098,7 +1103,7 @@ module.exports = [
   {
     permanent: true,
     source: '/blog/2022/05/26/how-supabase-accelerates-development-of-all-pull-together',
-    destination: '/blog/how-supabase-accelerates-development-of-all-pull-together',
+    destination: '/customers',
   },
   {
     permanent: true,
@@ -1794,6 +1799,26 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/reference/python',
+    destination: '/docs/reference/python/start',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/csharp',
+    destination: '/docs/reference/csharp/start',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/swift',
+    destination: '/docs/reference/swift/start',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/kotlin',
+    destination: '/docs/reference/kotlin/start',
+  },
+  {
+    permanent: true,
     source: '/docs/reference/cli',
     destination: '/docs/reference/cli/start',
   },
@@ -1872,21 +1897,6 @@ module.exports = [
     source: '/docs/guides/resources/postgres/which-version-of-postgres',
     destination: '/docs/guides/database/postgres/which-version-of-postgres',
   },
-  {
-    permanent: true,
-    source: '/docs/guides/realtime/broadcast',
-    destination: '/docs/guides/realtime/extensions/broadcast',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/realtime/presence',
-    destination: '/docs/guides/realtime/extensions/presence',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/realtime/postgres-changes',
-    destination: '/docs/guides/realtime/extensions/postgres-changes',
-  },
   // Serverless APIs
   {
     permanent: true,
@@ -1921,6 +1931,11 @@ module.exports = [
 
   // old case studies moved to /customers
 
+  {
+    permanent: true,
+    source: '/blog/tags/case-study',
+    destination: '/customers',
+  },
   {
     permanent: true,
     source: '/blog/case-study-monitoro',
@@ -1973,8 +1988,8 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/blog/how-supabase-accelerates-development-of-all-pull-together',
-    destination: '/customers',
+    source: '/blog/case-study-happyteams',
+    destination: '/customers/happyteams',
   },
   {
     permanent: true,
@@ -1995,5 +2010,40 @@ module.exports = [
     permanent: true,
     source: '/docs/guides/functions/examples/openai',
     destination: '/docs/guides/ai/examples/openai',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/realtime/rate-limits',
+    destination: '/docs/guides/realtime/quotas',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/realtime/channels',
+    destination: '/docs/guides/realtime/concepts#channels',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/realtime/extensions',
+    destination: '/docs/guides/realtime/concepts',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/realtime/extensions/broadcast',
+    destination: '/docs/guides/realtime/broadcast',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/realtime/extensions/presence',
+    destination: '/docs/guides/realtime/presence',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/realtime/extensions/postgres-changes',
+    destination: '/docs/guides/realtime/postgres-changes',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/realtime/quickstart',
+    destination: '/docs/guides/realtime',
   },
 ]

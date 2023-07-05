@@ -82,11 +82,12 @@ export const validateFields = (fields: RowField[]) => {
   return errors
 }
 
-const parseValue = (originalValue: any, format: string) => {
+export const parseValue = (originalValue: any, format: string) => {
   try {
     if (
-      (originalValue === null || originalValue.length === 0) &&
-      typeof originalValue !== 'object'
+      originalValue === null ||
+      (Array.isArray(originalValue) && originalValue.length === 0) ||
+      (typeof originalValue === 'string' && originalValue.length === 0)
     ) {
       return originalValue
     } else if (typeof originalValue === 'number' || !format) {

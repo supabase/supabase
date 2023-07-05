@@ -12,9 +12,9 @@
 - [x] Prieglobos Postgres duomenų bazė. [Dokumentai](https://supabase.com/docs/guides/database)
 - [x] Autentiškumo nustatymas ir autorizavimas. [Dokumentai](https://supabase.com/docs/guides/auth)
 - [x] Automatiškai generuojamos API.
-  - [x] REST. [Dokumentai](https://supabase.com/docs/guides/database/api#rest-api)
-  - [x] GraphQL. [Dokumentai](https://supabase.com/docs/guides/database/api#graphql-api)
-  - [x] Realaus laiko prenumeratos. [Dokumentai](https://supabase.com/docs/guides/database/api#realtime-api)
+  - [x] REST. [Dokumentai](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL. [Dokumentai](https://supabase.com/docs/guides/api#graphql-api-overview)
+  - [x] Realaus laiko prenumeratos. [Dokumentai](https://supabase.com/docs/guides/api#realtime-api-overview)
 - [x] Funkcijos.
   - [x] Duomenų bazės funkcijos. [Dokumentai](https://supabase.com/docs/guides/database/functions)
   - [x] Kraštų funkcijos [Docs](https://supabase.com/docs/guides/functions)
@@ -27,19 +27,19 @@
 
 Išsamios dokumentacijos rasite [supabase.com/docs](https://supabase.com/docs)
 
-Norėdami sužinoti, kaip prisidėti, apsilankykite [Getting Started](./DEVELOPERS.md)
+Norėdami sužinoti, kaip prisidėti, apsilankykite [Getting Started](../DEVELOPERS.md)
 
 ## Bendruomenė ir palaikymas
 
 - [Bendrijos forumas](https://github.com/supabase/supabase/discussions). Geriausiai tinka: pagalbai kuriant, diskusijoms apie geriausią duomenų bazių praktiką.
-- [GitHub Issues] (https://github.com/supabase/supabase/issues). Geriausia: klaidos ir klaidos, su kuriomis susiduriate naudodami "Supabase".
+- [GitHub Issues](https://github.com/supabase/supabase/issues). Geriausia: klaidos ir klaidos, su kuriomis susiduriate naudodami "Supabase".
 - [Pagalba el. paštu](https://supabase.com/docs/support#business-support). Geriausiai tinka: problemoms, susijusioms su jūsų duomenų baze ar infrastruktūra, spręsti.
 - [Discord](https://discord.supabase.com). Geriausiai tinka: dalytis savo programomis ir bendrauti su bendruomene.
 
 ## Statusas
 
 - [x] Alfa: Bandome "Supabase" su uždaru klientų rinkiniu
-- [x] Viešoji Alfa versija: [app.supabase.com] (https://app.supabase.com). Tačiau neskubėkite su mumis, yra keletas trūkumų
+- [x] Viešoji Alfa versija: [supabase.com/dashboard](https://supabase.com/dashboard). Tačiau neskubėkite su mumis, yra keletas trūkumų
 - [x] Viešoji beta versija: Pakankamai stabili daugeliui ne įmonių naudojimo atvejų
 - [ ] Vieša: Bendras prieinamumas [[statusas](https://supabase.com/docs/guides/getting-started/features#feature-status)]
 
@@ -55,7 +55,7 @@ Norėdami sužinoti, kaip prisidėti, apsilankykite [Getting Started](./DEVELOPE
 
 **Architektūra**
 
-Supabase yra [prieglobos platforma](https://app.supabase.com). Galite užsiregistruoti ir pradėti naudotis "Supabase" nieko neįdiegę.
+Supabase yra [prieglobos platforma](https://supabase.com/dashboard). Galite užsiregistruoti ir pradėti naudotis "Supabase" nieko neįdiegę.
 Taip pat galite [savarankiškai talpinti](https://supabase.com/docs/guides/hosting/overview) ir [kurti vietoje](https://supabase.com/docs/guides/local-development).
 
 ![Architektūra](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
