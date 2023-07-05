@@ -3,6 +3,12 @@ const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin')
 
 const config: any = {
   stories: [
+    // colors
+    '../src/lib/colors.stories.tsx',
+    // shadcn
+    '../src/components/shadcn/stories/**/*.stories.tsx',
+
+    // rest
     '../src/components/Accordion/Accordion.stories.tsx',
     '../src/components/Alert/Alert.stories.tsx',
     '../src/components/Badge/Badge.stories.tsx',
@@ -13,8 +19,6 @@ const config: any = {
     // '../src/components/ContextMenu/ContextMenu.stories.tsx',
     '../src/components/Dropdown/Dropdown.stories.tsx',
     // '../src/components/Form/Form.stories.tsx',
-
-    '../src/components/shadcn/stories/**/*.stories.tsx',
   ],
   addons: [
     'storybook-dark-mode',
