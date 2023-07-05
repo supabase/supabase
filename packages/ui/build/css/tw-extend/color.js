@@ -447,8 +447,8 @@ module.exports = {
   cssVariable: "var(--background-surface-300)",
   value: "hsl(0, 0%, 18%)"
 },
-"background-overlay": {
-  cssVariable: "var(--background-overlay)",
+"background-overlay-DEFAULT": {
+  cssVariable: "var(--background-overlay-default)",
   value: "hsl(0, 0%, 13.7%)"
 },
 "background-overlay-hover": {

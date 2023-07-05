@@ -1,6 +1,6 @@
 /**
  * Do not edit directly
- * Generated on Wed, 05 Jul 2023 17:35:31 GMT
+ * Generated on Wed, 05 Jul 2023 17:41:32 GMT
  */
 
 .dark {
@@ -24,7 +24,7 @@
   --border-muted: var(--colors-gray-dark-400);
   --border-default: var(--colors-gray-dark-400);
   --background-overlay-hover: var(--colors-gray-dark-500);
-  --background-overlay: var(--colors-gray-dark-300);
+  --background-overlay-default: var(--colors-gray-dark-300);
   --background-surface-300: var(--colors-gray-dark-500);
   --background-surface-200: var(--colors-gray-dark-400);
   --background-surface-100: var(--colors-gray-dark-300);
