@@ -10,7 +10,7 @@ const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
   const selectedOrganization = useSelectedOrganization()
   const router = useRouter()
   const { slug } = useParams()
-  const id = router.asPath.split('/').at(-1)?.split('?')[0]
+  const id = router.asPath.split('/').at(-1)?.split('?')[0]?.split('#')[0]
   const showOAuthApps = useFlag('oauthApps')
   const showAuditLogs = useFlag('auditLogs')
   const showIntegrationsV2 = useFlag('integrationsV2')
