@@ -1,7 +1,6 @@
 import * as React from 'react'
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu'
 import { cn } from '@ui/lib/utils'
-import styleHandler from 'ui/src/lib/theme/styleHandler'
 
 import { IconChevronRight } from '../../Icon/icons/IconChevronRight' 
 import { IconCheck } from '../../Icon/icons/IconCheck'
@@ -24,10 +23,7 @@ const DropdownMenuSubTrigger = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.SubTrigger> & {
     inset?: boolean
   }
->(({ className, inset, children, ...props }, ref) => {
-  let __styles = styleHandler('dropdown')
-  
-  return (
+>(({ className, inset, children, ...props }, ref) => (
   <DropdownMenuPrimitive.SubTrigger
     ref={ref}
     className={cn(
@@ -42,16 +38,13 @@ const DropdownMenuSubTrigger = React.forwardRef<
     {children}
     <IconChevronRight className={__styles.right_slot} size={14} />
   </DropdownMenuPrimitive.SubTrigger>
-)})
+))
 DropdownMenuSubTrigger.displayName = DropdownMenuPrimitive.SubTrigger.displayName
 
 const DropdownMenuSubContent = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.SubContent>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.SubContent>
->(({ className, ...props }, ref) => {
-  let __styles = styleHandler('dropdown')
-
-  return (
+>(({ className, ...props }, ref) => (
   <DropdownMenuPrimitive.SubContent
     ref={ref}
     className={cn(
@@ -61,36 +54,25 @@ const DropdownMenuSubContent = React.forwardRef<
     )}
     {...props}
   />
-)})
+))
 DropdownMenuSubContent.displayName = DropdownMenuPrimitive.SubContent.displayName
 
 const DropdownMenuContent = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Content>
->(({ className, sideOffset = 4, ...props }, ref) => {
-  let __styles = styleHandler('dropdown')
-  
-  // Note: Dropdown previously expected an optional "size" prop, which we're dropping here
-  // let classes = [__styles.content, __styles.size[props.size ?? "medium"]]
-  let classes = [__styles.content]
-  
-  if (className) {
-    classes.push(className)
-  }
-  
-  return (
+>(({ className, sideOffset = 4, ...props }, ref) => (
   <DropdownMenuPrimitive.Portal>
     <DropdownMenuPrimitive.Content
       ref={ref}
       sideOffset={sideOffset}
       className={cn(
-        classes,
+        __styles.content,
         className
       )}
       {...props}
     />
   </DropdownMenuPrimitive.Portal>
-)})
+))
 DropdownMenuContent.displayName = DropdownMenuPrimitive.Content.displayName
 
 const DropdownMenuItem = React.forwardRef<
@@ -98,10 +80,7 @@ const DropdownMenuItem = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Item> & {
     inset?: boolean
   }
->(({ className, inset, ...props }, ref) => {
-  let __styles = styleHandler('dropdown') 
-  
-  return (
+>(({ className, inset, ...props }, ref) => (
   <DropdownMenuPrimitive.Item
     ref={ref}
     className={cn(
@@ -111,16 +90,13 @@ const DropdownMenuItem = React.forwardRef<
     )}
     {...props}
   />
-)})
+))
 DropdownMenuItem.displayName = DropdownMenuPrimitive.Item.displayName
 
 const DropdownMenuCheckboxItem = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.CheckboxItem>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.CheckboxItem>
->(({ className, children, checked, ...props }, ref) => {
-  let __styles = styleHandler('dropdown')
-
-  return (
+>(({ className, children, checked, ...props }, ref) => (
   <DropdownMenuPrimitive.CheckboxItem
     ref={ref}
     className={cn(
@@ -139,16 +115,13 @@ const DropdownMenuCheckboxItem = React.forwardRef<
     </span>
     {children}
   </DropdownMenuPrimitive.CheckboxItem>
-)})
+))
 DropdownMenuCheckboxItem.displayName = DropdownMenuPrimitive.CheckboxItem.displayName
 
 const DropdownMenuRadioItem = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.RadioItem>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.RadioItem>
->(({ className, children, ...props }, ref) => {
-  let __styles = styleHandler('dropdown')
-
-  return (
+>(({ className, children, ...props }, ref) => (
   <DropdownMenuPrimitive.RadioItem
     ref={ref}
     className={cn(
@@ -166,7 +139,7 @@ const DropdownMenuRadioItem = React.forwardRef<
     </span>
     {children}
   </DropdownMenuPrimitive.RadioItem>
-)})
+))
 DropdownMenuRadioItem.displayName = DropdownMenuPrimitive.RadioItem.displayName
 
 const DropdownMenuLabel = React.forwardRef<
@@ -174,10 +147,7 @@ const DropdownMenuLabel = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Label> & {
     inset?: boolean
   }
->(({ className, inset, ...props }, ref) => {
-  let __styles = styleHandler('dropdown')
-
-  return (
+>(({ className, inset, ...props }, ref) => (
   <DropdownMenuPrimitive.Label
     ref={ref}
     className={cn(
@@ -186,32 +156,121 @@ const DropdownMenuLabel = React.forwardRef<
       , inset && 'pl-8', className)}
     {...props}
   />
-)})
+))
 DropdownMenuLabel.displayName = DropdownMenuPrimitive.Label.displayName
 
 const DropdownMenuSeparator = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.Separator>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Separator>
->(({ className, ...props }, ref) => {
-  let __styles = styleHandler('dropdown')
-
-  return (
+>(({ className, ...props }, ref) => (
   <DropdownMenuPrimitive.Separator
     ref={ref}
     className={cn(__styles.separator, className)}
     {...props}
   />
-)})
+))
 DropdownMenuSeparator.displayName = DropdownMenuPrimitive.Separator.displayName
 
-const DropdownMenuRightSlot = ({ className, ...props }: React.HTMLAttributes<HTMLSpanElement>) => {
-  let __styles = styleHandler('dropdown')
-  return <span data-component="right_slot" className={cn(
+const DropdownMenuRightSlot = ({ className, ...props }: React.HTMLAttributes<HTMLSpanElement>) => (
+  <span data-component="right_slot" className={cn(
     // 'ml-auto text-xs tracking-widest opacity-60',
     __styles.right_slot,
     className)} {...props} />
-}
+)
+
 DropdownMenuRightSlot.displayName = 'DropdownMenuRightSlot'
+
+const __styles = {
+  // root:
+  trigger: `
+    flex
+    border-none
+    rounded
+    text-light
+    bg-transparent p-0
+    outline-none
+    outline-offset-1
+    transition-all
+    focus:outline-4
+    focus:outline-scale-600
+  `,
+  item_nested: `
+    border-none
+    focus:outline-none
+    focus:bg-surface-overlay-hover
+    focus:text
+    data-open:bg-surface-overlay
+    data-open:text
+  `,
+  content: `
+    z-40
+    bg-surface-overlay
+    border-overlay
+    rounded
+    shadow-lg
+    py-1.5
+    origin-dropdown
+    data-open:animate-dropdown-content-show
+    data-closed:animate-dropdown-content-hide
+    min-w-fit
+    antialiased
+  `,
+  size: {
+    tiny: `w-40`,
+    small: `w-48`,
+    medium: `w-64`,
+    large: `w-80`,
+    xlarge: `w-96`,
+    content: `w-auto`,
+  },
+  arrow: `
+    fill-current
+    border-0 border-t
+  `,
+  item: `
+    group
+    relative
+    flex items-center space-x-2
+    text-sm
+    text-light
+    px-4 py-1.5
+    cursor-pointer
+    focus:bg-surface-200
+    focus:text
+    border-none
+    focus:outline-none
+  `,
+  disabled: `opacity-50 cursor-default`,
+  label: `
+    text-lighter
+    px-4 flex items-center space-x-2 py-1.5
+    text-xs
+  `,
+  separator: `
+    w-full
+    my-2
+    border-t-[1px]
+  `,
+  misc: `
+    px-4 py-1.5
+  `,
+  check: `
+    absolute left-3
+    flex items-center
+    data-checked:text
+  `,
+  input: `
+    flex items-center space-x-0 pl-8 pr-4
+  `,
+  right_slot: `
+    text-lighter
+    group-focus:text-light
+    absolute
+    -translate-y-1/2
+    right-2
+    top-1/2
+  `,
+}
 
 export {
   DropdownMenu,

@@ -5,7 +5,7 @@ import InputIconContainer from '../../lib/Layout/InputIconContainer'
 
 import { useFormContext } from '../Form/FormContext'
 
-import defaultTheme from '../../lib/theme/defaultThemeV0'
+import defaultTheme from '../../lib/theme/defaultTheme'
 import styleHandler from '../../lib/theme/styleHandler'
 
 interface OptionProps {
