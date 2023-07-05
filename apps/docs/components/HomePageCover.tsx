@@ -48,6 +48,11 @@ const HomePageCover = (props) => {
       icon: '/docs/img/icons/nuxt-icon',
       href: '/guides/getting-started/quickstarts/nuxtjs',
     },
+    {
+      tooltip: 'refine',
+      icon: '/docs/img/icons/refine-icon',
+      href: '/guides/getting-started/quickstarts/refine',
+    },
   ]
 
   const GettingStarted = () => (

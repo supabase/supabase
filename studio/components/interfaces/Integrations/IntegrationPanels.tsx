@@ -6,7 +6,8 @@ import { Markdown } from 'components/interfaces/Markdown'
 import { Integration, IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { BASE_PATH } from 'lib/constants'
-import { Badge, Button, IconArrowRight, IconGitHub, IconSquare, cn } from 'ui'
+import { getVercelConfigurationUrl } from 'lib/integration-utils'
+import { Badge, Button, IconArrowRight, IconExternalLink, IconGitHub, IconSquare, cn } from 'ui'
 
 const ICON_STROKE_WIDTH = 2
 const ICON_SIZE = 14
@@ -110,7 +111,16 @@ const IntegrationInstallation = React.forwardRef<HTMLLIElement, IntegrationInsta
           </div>
         </div>
 
-        <Button type="default">Manage</Button>
+        <Button type="default" asChild iconRight={<IconExternalLink />}>
+          {/* hard coded to vercel for now, TODO: move to a prop */}
+          <a
+            href={getVercelConfigurationUrl(integration)}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Manage
+          </a>
+        </Button>
       </li>
     )
   }
