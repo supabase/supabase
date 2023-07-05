@@ -88,13 +88,13 @@ const PaymentMethods = () => {
                     <Alert
                       withIcon
                       variant="info"
-                      title="Your payment method is currently through invoice"
+                      title="Payment is currently by invoice"
                       actions={[
                         <Link
                           key="payment-method-support"
                           href={`/support/new?category=billing&subject=Request%20to%20change%20payment%20method`}
                         >
-                          <a target="_blank" rel="noreferrer">
+                          <a target="_blank" rel="noreferrer" className="ml-3">
                             <Button type="default">Contact support</Button>
                           </a>
                         </Link>,
