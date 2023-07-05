@@ -17,7 +17,7 @@ export type OrgSubscriptionUpdateVariables = {
   tier: SubscriptionTier
 }
 
-export async function updateOrgSubscription<T>({
+export async function updateOrgSubscription({
   slug,
   tier,
   paymentMethod,
