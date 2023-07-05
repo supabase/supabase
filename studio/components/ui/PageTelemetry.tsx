@@ -1,4 +1,4 @@
-import { useTelemetryProps } from 'common'
+import { useParams, useTelemetryProps } from 'common'
 import { post } from 'lib/common/fetch'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { observer } from 'mobx-react-lite'
@@ -7,6 +7,7 @@ import { FC, useEffect } from 'react'
 
 const PageTelemetry: FC = ({ children }) => {
   const router = useRouter()
+  const { slug, ref } = useParams()
   const telemetryProps = useTelemetryProps()
 
   useEffect(() => {
@@ -56,12 +57,8 @@ const PageTelemetry: FC = ({ children }) => {
       })
 
       post(`${API_URL}/telemetry/pageview`, {
-        ...(router.route.includes('/project/') && {
-          projectRef: router.asPath.split('/project/')[1].split('/')[0],
-        }),
-        ...(router.route.includes('/org/') && {
-          orgId: router.asPath.split('/org/')[1].split('/')[0],
-        }),
+        ...(ref && { projectRef: ref }),
+        ...(slug && { orgSlug: slug }),
         referrer: referrer,
         title: document.title,
         path: router.route,
