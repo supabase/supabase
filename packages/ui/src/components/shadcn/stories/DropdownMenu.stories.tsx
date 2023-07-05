@@ -121,7 +121,6 @@ type Story = StoryObj<typeof DropdownMenu>
  * to learn how to use render functions.
  */
 
-
 const DemoContainer = ({ children }: { children: React.ReactNode }) => (
   <div className="flex justify-center items-center w-full h-full min-h-[400px]">
     {children}

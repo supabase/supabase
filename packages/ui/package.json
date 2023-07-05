@@ -10,7 +10,8 @@
     "build-tokens": "node internals/tokens/build-tokens.js",
     "copy-tokens": "node internals/tokens/copy-tokens.js",
     "cleanse-css-for-tailwind": "node internals/tokens/cleanse-css-for-tailwind.js",
-    "generate-styles": "npm run copy-tokens && npm run build-tokens && npm run cleanse-css-for-tailwind",
+    "generate-demo-tailwind-classes": "node internals/tokens/generate-demo-tailwind-classes.js",
+    "generate-styles": "npm run copy-tokens && npm run build-tokens && npm run cleanse-css-for-tailwind && npm run generate-demo-tailwind-classes",
     "storybook-build": "storybook build",
     "storybook": "storybook dev -p 6006",
     "test": "jest"
