@@ -1,7 +1,7 @@
 import { Badge, IconAlertTriangle, IconLoader, IconPauseCircle } from 'ui'
 
 import CardButton from 'components/ui/CardButton'
-import { useProjectReadOnlyStatusQuery } from 'data/projects/project-readonly-status-query'
+import { useProjectReadOnlyStatus } from 'hooks/misc/useProjectReadOnlyStatus'
 import { PROJECT_STATUS } from 'lib/constants'
 import { Project } from 'types'
 
@@ -14,7 +14,7 @@ const ProjectCard = ({ project, rewriteHref }: ProjectCardProps) => {
   const { name, ref: projectRef } = project
   const desc = `${project.cloud_provider} | ${project.region}`
 
-  const { data: readonlyStatus } = useProjectReadOnlyStatusQuery({ projectRef })
+  const isReadonly = useProjectReadOnlyStatus(projectRef)
 
   // Project status should supersede is read only status
   const isHealthy = project.status === PROJECT_STATUS.ACTIVE_HEALTHY
@@ -22,7 +22,6 @@ const ProjectCard = ({ project, rewriteHref }: ProjectCardProps) => {
     project.status === PROJECT_STATUS.GOING_DOWN || project.status === PROJECT_STATUS.PAUSING
   const isPaused = project.status === PROJECT_STATUS.INACTIVE
   const isRestoring = project.status === PROJECT_STATUS.RESTORING
-  const isReadonly = readonlyStatus?.enabled ?? false
 
   return (
     <li className="col-span-1">
