@@ -1,9 +1,9 @@
 export default {
   "background": [
     "bg",
+    "bg-alternative",
     "bg-selection",
     "bg-control",
-    "bg-alternative",
     "bg-surface-100",
     "bg-surface-200",
     "bg-surface-300",
@@ -21,9 +21,9 @@ export default {
   "text": [
     "text",
     "text-strong",
-    "text-muted",
     "text-light",
-    "text-lighter"
+    "text-lighter",
+    "text-muted"
   ],
   "colors": [
     "bg-destructive-200",
