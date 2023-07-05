@@ -78,7 +78,7 @@ const PaymentMethods = () => {
               )}
 
               {isError && (
-                <AlertError subject="Unable to retrieve payment methods" error={error as any} />
+                <AlertError subject="Failed to retrieve payment methods" error={error as any} />
               )}
 
               {isSuccess && (

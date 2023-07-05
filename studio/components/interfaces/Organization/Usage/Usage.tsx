@@ -74,7 +74,7 @@ const Usage = () => {
           {isErrorSubscription && (
             <AlertError
               className="w-full"
-              subject="Unable to retrieve usage data"
+              subject="Failed to retrieve usage data"
               error={subscriptionError}
             />
           )}

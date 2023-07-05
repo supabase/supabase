@@ -6,6 +6,7 @@ import CreditBalance from './CreditBalance'
 import PaymentMethods from './PaymentMethods/PaymentMethods'
 import Subscription from './Subscription/Subscription'
 import TaxID from './TaxID/TaxID'
+import BillingBreakdown from './BillingBreakdown/BillingBreakdown'
 
 const BillingSettings = () => {
   return (
@@ -48,6 +49,12 @@ const BillingSettings = () => {
 
       <ScaffoldContainer>
         <TaxID />
+      </ScaffoldContainer>
+
+      <ScaffoldDivider />
+
+      <ScaffoldContainer>
+        <BillingBreakdown />
       </ScaffoldContainer>
     </>
   )

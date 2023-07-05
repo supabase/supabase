@@ -86,7 +86,7 @@ const AttributeUsage = ({
           </div>
         )}
 
-        {isError && <AlertError subject="Unable to retrieve usage" error={error} />}
+        {isError && <AlertError subject="Failed to retrieve usage data" error={error} />}
 
         {isSuccess && (
           <>
