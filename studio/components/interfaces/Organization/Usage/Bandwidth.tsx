@@ -5,6 +5,7 @@ import UsageSection from './UsageSection/UsageSection'
 
 const GB = 1073741824
 
+// [Joshen] Can remove this at the end
 const MOCK_DATA_2 = [
   {
     period_start: '2023-06-01',
@@ -244,7 +245,7 @@ const Bandwidth = ({
     [key: string]: { data: DataPoint[]; margin: number; isLoading: boolean; hasNoData: boolean }
   } = {
     [PricingMetric.EGRESS]: {
-      data: MOCK_DATA_2, // egressData?.data ?? [],
+      data: egressData?.data ?? [],
       margin: 16,
       isLoading: isLoadingDbEgressData,
       hasNoData: egressData?.hasNoData ?? false,
