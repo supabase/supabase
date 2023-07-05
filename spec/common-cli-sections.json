@@ -192,9 +192,45 @@
         "type": "cli-command"
       },
       {
+        "id": "supabase-migration-squash",
+        "title": "Squash migrations to a single file",
+        "slug": "supabase-migration-squash",
+        "type": "cli-command"
+      },
+      {
         "id": "supabase-migration-up",
         "title": "Apply pending migrations locally",
         "slug": "supabase-migration-up",
+        "type": "cli-command"
+      }
+    ]
+  },
+  {
+    "type": "category",
+    "title": "Inspect",
+    "items": [
+      {
+        "id": "supabase-inspect",
+        "title": "Inspect database statistics",
+        "slug": "supabase-inspect",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-inspect-db:cache-hit",
+        "title": "Show cache hit rates for tables and indexes",
+        "slug": "supabase-inspect-db:cache-hit",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-inspect-db:index-usage",
+        "title": "Show usage efficiency of indexes",
+        "slug": "supabase-inspect-db:index-usage",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-inspect-db:replication-slots",
+        "title": "Show information about replication slots",
+        "slug": "supabase-inspect-db:replication-slots",
         "type": "cli-command"
       }
     ]
@@ -219,6 +255,12 @@
         "id": "supabase-projects-list",
         "title": "List all projects",
         "slug": "supabase-projects-list",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-projects-api-keys",
+        "title": "Show API keys for a Supabase project",
+        "slug": "supabase-projects-api-keys",
         "type": "cli-command"
       }
     ]
@@ -255,6 +297,12 @@
         "id": "supabase-functions-new",
         "title": "Create a function",
         "slug": "supabase-functions-new",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-functions-list",
+        "title": "List all functions",
+        "slug": "supabase-functions-list",
         "type": "cli-command"
       },
       {
@@ -324,6 +372,12 @@
         "type": "cli-command"
       },
       {
+        "id": "supabase-sso-add",
+        "title": "Add an identity provider",
+        "slug": "supabase-sso-add",
+        "type": "cli-command"
+      },
+      {
         "id": "supabase-sso-list",
         "title": "List all identity providers",
         "slug": "supabase-sso-list",
@@ -331,14 +385,14 @@
       },
       {
         "id": "supabase-sso-show",
-        "title": "Show information for an identity providers",
+        "title": "Show information for an identity provider",
         "slug": "supabase-sso-show",
         "type": "cli-command"
       },
       {
-        "id": "supabase-sso-add",
-        "title": "Add an identity provider",
-        "slug": "supabase-sso-add",
+        "id": "supabase-sso-info",
+        "title": "See your project's SSO information",
+        "slug": "supabase-sso-info",
         "type": "cli-command"
       },
       {
@@ -351,12 +405,6 @@
         "id": "supabase-sso-remove",
         "title": "Remove an identity provider",
         "slug": "supabase-sso-remove",
-        "type": "cli-command"
-      },
-      {
-        "id": "supabase-sso-info",
-        "title": "See your project's SSO information",
-        "slug": "supabase-sso-info",
         "type": "cli-command"
       }
     ]
@@ -493,20 +541,44 @@
     "items": [
       {
         "id": "supabase-ssl-enforcement",
-        "title": "Manage SSL enforcement configuration",
+        "title": "Manage SSL enforcement configurations",
         "slug": "supabase-ssl-enforcement",
         "type": "cli-command"
       },
       {
         "id": "supabase-ssl-enforcement-get",
-        "title": "Get the current SSL enforcement configuration",
+        "title": "Get the current SSL enforcement configurations",
         "slug": "supabase-ssl-enforcement-get",
         "type": "cli-command"
       },
       {
         "id": "supabase-ssl-enforcement-update",
-        "title": "Update SSL enforcement configuration",
+        "title": "Update SSL enforcement configurations",
         "slug": "supabase-ssl-enforcement-update",
+        "type": "cli-command"
+      }
+    ]
+  },
+  {
+    "type": "category",
+    "title": "Postgres Config",
+    "items": [
+      {
+        "id": "supabase-postgres-config",
+        "title": "Manage Postgres configurations",
+        "slug": "supabase-ssl-enforcement",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-postgres-config-get",
+        "title": "Get the current Postgres config overrides",
+        "slug": "supabase-postgres-config-get",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-postgres-config-update",
+        "title": "Update Postgres configurations",
+        "slug": "supabase-postgres-config-update",
         "type": "cli-command"
       }
     ]

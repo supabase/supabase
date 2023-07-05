@@ -47,9 +47,10 @@ export const useProjectAddonUpdateMutation = ({
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
-        // [Joshen] Only invalidate addons, not subscriptions, as AddOn section in
-        // subscription page is using AddOn react query
-        await queryClient.invalidateQueries(subscriptionKeys.addons(projectRef))
+        await Promise.all([
+          queryClient.invalidateQueries(subscriptionKeys.subscriptionV2(projectRef)),
+          queryClient.invalidateQueries(subscriptionKeys.addons(projectRef)),
+        ])
         await onSuccess?.(data, variables, context)
       },
       ...options,

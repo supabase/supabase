@@ -59,8 +59,8 @@ export const Default = (args: any) => (
         </>,
       ]}
     >
-      <Button as="span" type="default" iconRight={<IconChevronDown />}>
-        Click for Popover
+      <Button asChild type="default" iconRight={<IconChevronDown />}>
+        <span>Click for Popover</span>
       </Button>
     </Popover>
   </div>

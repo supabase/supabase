@@ -752,7 +752,7 @@ functions:
       Subscribe to realtime changes in your database.
     title: 'on().subscribe()'
     notes: |
-      - Realtime is disabled by default for new tables. You can turn it on by [managing replication](/docs/guides/realtime/extensions/postgres-changes#replication-setup).
+      - Realtime is disabled by default for new tables. You can turn it on by [managing replication](/docs/guides/realtime/postgres-changes#replication-setup).
       - If you want to receive the "previous" data for updates and deletes, you will need to set `REPLICA IDENTITY` to `FULL`, like this: `ALTER TABLE your_table REPLICA IDENTITY FULL;`
     examples:
       - id: listen-to-all-database-changes
@@ -910,7 +910,7 @@ functions:
       Returns real-time data from your table as a `Stream`.
     title: 'stream()'
     notes: |
-      - Realtime is disabled by default for new tables. You can turn it on by [managing replication](/docs/guides/realtime/extensions/postgres-changes#replication-setup).
+      - Realtime is disabled by default for new tables. You can turn it on by [managing replication](/docs/guides/realtime/postgres-changes#replication-setup).
       - `stream()` will emit the initial data as well as any further change on the database as `Stream<List<Map<String, dynamic>>>` by combining Postgrest and Realtime.
       - Takes a list of primary key column names that will be used to update and delete the proper records within the SDK.
       - The following filters are available
@@ -1216,7 +1216,7 @@ functions:
       Retrieve URLs for assets in public buckets
     title: 'from.getPublicUrl()'
     notes: |
-      - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/javascript/storage-updatebucket) or by going to Storage on [app.supabase.com](https://supabase.com/dashboard), clicking the overflow menu on a bucket and choosing "Make public"
+      - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/javascript/storage-updatebucket) or by going to Storage on [supabase.com/dashboard](https://supabase.com/dashboard), clicking the overflow menu on a bucket and choosing "Make public"
       - Policy permissions required:
         - `buckets` permissions: none
         - `objects` permissions: none

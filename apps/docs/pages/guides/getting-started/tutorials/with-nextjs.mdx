@@ -62,8 +62,8 @@ NEXT_PUBLIC_SUPABASE_URL=YOUR_SUPABASE_URL
 NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
 ```
 
-And one optional step is to update the CSS file `styles/globals.css` to make the app look nice.
-You can find the full contents of this file [here](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/nextjs-ts-user-management/styles/globals.css).
+And one optional step is to update the CSS file `app/globals.css` to make the app look nice.
+You can find the full contents of this file [here](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/nextjs-user-management/app/globals.css).
 
 ### Supabase Auth Helpers
 
@@ -74,7 +74,7 @@ It can be challenging to authenticate your users in all these different environm
 Install the auth helpers for Next.js
 
 ```bash
-npm install @supabase/auth-helpers-nextjs
+npm install @supabase/auth-helpers-nextjs @supabase/supabase-js
 ```
 
 ### NextJS Middleware
@@ -241,6 +241,12 @@ export default function AuthForm() {
 
 </TabPanel>
 </Tabs>
+
+<Admonition type="note">
+
+If you are using TypeScript for this project, see [generating types](/docs/guides/api/rest/generating-types) to automatically generate types from your database tables.
+
+</Admonition>
 
 Add the `AuthForm` component to your home page
 
@@ -448,16 +454,12 @@ export default function AccountForm({ session }) {
     getProfile()
   }, [user, getProfile])
 
-  async function updateProfile({
-    username,
-    website,
-    avatar_url,
-  }) {
+  async function updateProfile({ username, website, avatar_url }) {
     try {
       setLoading(true)
 
       let { error } = await supabase.from('profiles').upsert({
-        id: user?.id as string,
+        id: user?.id,
         full_name: fullname,
         username,
         website,

@@ -1,8 +1,4 @@
-import {
-  DEFAULT_MINIMUM_PASSWORD_STRENGTH,
-  PASSWORD_STRENGTH_COLOR,
-  PASSWORD_STRENGTH_PERCENTAGE,
-} from 'lib/constants'
+import { PASSWORD_STRENGTH_COLOR, PASSWORD_STRENGTH_PERCENTAGE } from 'lib/constants'
 
 interface Props {
   passwordStrengthScore: number

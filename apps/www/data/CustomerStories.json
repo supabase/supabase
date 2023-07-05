@@ -1,6 +1,23 @@
 [
   {
     "type": "Customer Story",
+    "title": "Berri AI Boosts Productivity by Migrating from AWS RDS to Supabase with pgvector.",
+    "description": "Learn how Berri AI overcame challenges with self-hosting their vector database on AWS RDS and successfully migrated to Supabase.",
+    "imgUrl": "images/customers/logos/berriai.png",
+    "logoUrl": "images/customers/logos/berriai.png",
+    "organization": "Berri AI",
+    "url": "/customers/berriai",
+    "path": "/customers/berriai",
+    "postMeta": {
+      "name": "Paul Copplestone",
+      "avatarUrl": "https://avatars0.githubusercontent.com/u/10214025?v=4",
+      "publishDate": "Jun 6, 2023",
+      "readLength": 6
+    },
+    "ctaText": "View story"
+  },
+  {
+    "type": "Customer Story",
     "title": "Mendable.ai switches from Pinecone to Supabase for PostgreSQL vector embeddings.",
     "description": "How Mendable.ai boosts efficiency and accuracy of chat powered search for documentation using Supabase with pg_vector.",
     "imgUrl": "images/customers/logos/mendableai.png",

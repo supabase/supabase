@@ -205,6 +205,10 @@
       "url": "https://supabase.com/docs/guides/getting-started/quickstarts/nextjs"
     },
     {
+      "label": "Nuxt.js",
+      "url": "https://supabase.com/docs/guides/getting-started/quickstarts/nuxtjs"
+    },
+    {
       "label": "Flutter",
       "url": "https://supabase.com/docs/guides/getting-started/quickstarts/flutter"
     },

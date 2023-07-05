@@ -8,7 +8,7 @@ import withTM from 'next-transpile-modules'
 import withYaml from 'next-plugin-yaml'
 import configureBundleAnalyzer from '@next/bundle-analyzer'
 
-import codeHikeTheme from './code-hike.theme.json' assert { type: 'json' }
+import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
 
 const withBundleAnalyzer = configureBundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
@@ -103,7 +103,15 @@ const nextConfig = {
 
 const configExport = () => {
   const plugins = [
-    withTM(['ui', 'common', '@supabase/auth-helpers-nextjs']),
+    withTM([
+      'ui',
+      'common',
+      '@supabase/auth-helpers-nextjs',
+      'mermaid',
+      'mdx-mermaid',
+      'dayjs',
+      'shared-data',
+    ]),
     withMDX,
     withYaml,
     withBundleAnalyzer,

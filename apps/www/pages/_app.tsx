@@ -13,6 +13,7 @@ import '../styles/index.css'
 import { post } from '~/lib/fetchWrapper'
 import { AuthProvider, ThemeProvider, useTelemetryProps } from 'common'
 import Head from 'next/head'
+import 'config/code-hike.scss'
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter()
@@ -69,7 +70,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
           site_name: 'Supabase',
           images: [
             {
-              url: `https://supabase.com${basePath}/images/og/og-image.jpg`,
+              url: `https://supabase.com${basePath}/images/og/og-image-v2.jpg`,
               width: 800,
               height: 600,
               alt: 'Supabase Og Image',

@@ -48,7 +48,7 @@ export async function getStaticProps() {
       html_url: 'https://github.com/marijanasimag',
     },
     {
-      login: 'estee_tey',
+      login: 'lyqht',
       avatar_url: 'https://pbs.twimg.com/profile_images/1589662526941253632/s1cu3vuD_400x400.jpg',
       html_url: 'https://twitter.com/estee_tey',
     },

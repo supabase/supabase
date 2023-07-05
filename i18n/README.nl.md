@@ -12,9 +12,9 @@
 - [x]Gehoste Postgres Database. [Docs](https://supabase.com/docs/guides/database)
 - [x] Authenticatie en Autorisatie. [Docs](https://supabase.com/docs/guides/auth)
 - [x] Automatisch gegenereerde API's.
-  - [x] REST. [Docs](https://supabase.com/docs/guides/database/api#rest-api)
-  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/database/api#graphql-api)
-  - [x] Realtime abonnementen. [Docs](https://supabase.com/docs/guides/database/api#realtime-api)
+  - [x] REST. [Docs](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/api#graphql-api-overview)
+  - [x] Realtime abonnementen. [Docs](https://supabase.com/docs/guides/api#realtime-api-overview)
 - [x] Functies.
   - [x] Database functies. [Docs](https://supabase.com/docs/guides/database/functions)
   - [x] Randfuncties. [Docs](https://supabase.com/docs/guides/functions)
@@ -27,7 +27,7 @@
 
 Voor volledige documentatie, bezoek [supabase.com/docs](https://supabase.com/docs)
 
-Om te zien hoe u kunt bijdragen, bezoek [Aan de slag](./DEVELOPERS.md)
+Om te zien hoe u kunt bijdragen, bezoek [Aan de slag](../DEVELOPERS.md)
 
 ## Gemeenschap en ondersteuning
 
@@ -39,7 +39,7 @@ Om te zien hoe u kunt bijdragen, bezoek [Aan de slag](./DEVELOPERS.md)
 ## Status
 
 - [Alpha: We testen Supabase met een gesloten groep klanten
-- [x] Publieke Alpha: Iedereen kan zich aanmelden op [app.supabase.com](https://app.supabase.com). Maar doe het rustig aan, er zijn een paar kinken
+- [x] Publieke Alpha: Iedereen kan zich aanmelden op [supabase.com/dashboard](https://supabase.com/dashboard). Maar doe het rustig aan, er zijn een paar kinken
 - [Publieke Beta: Stabiel genoeg voor de meeste niet-bedrijfsmatige toepassingen
 - [Publiek: General Availability [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
 
@@ -55,7 +55,7 @@ Supabase is een combinatie van open source tools. We bouwen de functies van Fire
 
 **Architectuur**
 
-Supabase is een [gehost platform] (https://app.supabase.com). U kunt zich aanmelden en Supabase gebruiken zonder iets te installeren.
+Supabase is een [gehost platform](https://supabase.com/dashboard). U kunt zich aanmelden en Supabase gebruiken zonder iets te installeren.
 U kunt ook [zelf hosten](https://supabase.com/docs/guides/hosting/overview) en [lokaal ontwikkelen](https://supabase.com/docs/guides/local-development).
 
 architectuur](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)

@@ -210,20 +210,22 @@ export const gettingstarted: NavMenuConstant = {
     {
       name: 'Framework Quickstarts',
       items: [
+        { name: 'Next.js', url: '/guides/getting-started/quickstarts/nextjs' },
         { name: 'React', url: '/guides/getting-started/quickstarts/reactjs' },
-        { name: 'NextJS', url: '/guides/getting-started/quickstarts/nextjs' },
+        { name: 'NuxtJS', url: '/guides/getting-started/quickstarts/nuxtjs' },
         { name: 'RedwoodJS', url: '/guides/getting-started/quickstarts/redwoodjs' },
         { name: 'Flutter', url: '/guides/getting-started/quickstarts/flutter' },
         { name: 'SvelteKit', url: '/guides/getting-started/quickstarts/sveltekit' },
         { name: 'SolidJS', url: '/guides/getting-started/quickstarts/solidjs' },
         { name: 'Vue', url: '/guides/getting-started/quickstarts/vue' },
+        { name: 'refine', url: '/guides/getting-started/quickstarts/refine' },
       ],
     },
     {
       name: 'Web app tutorials',
       items: [
         {
-          name: 'NextJS',
+          name: 'Next.js',
           url: '/guides/getting-started/tutorials/with-nextjs',
         },
         {
@@ -257,6 +259,10 @@ export const gettingstarted: NavMenuConstant = {
         {
           name: 'SvelteKit',
           url: '/guides/getting-started/tutorials/with-sveltekit',
+        },
+        {
+          name: 'refine',
+          url: '/guides/getting-started/tutorials/with-refine',
         },
       ],
     },
@@ -349,6 +355,11 @@ export const SocialLoginItems = [
     url: '/guides/auth/social-login/auth-discord',
   },
   {
+    name: 'Kakao',
+    icon: '/docs/img/icons/kakao-icon',
+    url: '/guides/auth/social-login/auth-kakao',
+  },
+  {
     name: 'Keycloak',
     icon: '/docs/img/icons/keycloak-icon',
     url: '/guides/auth/social-login/auth-keycloak',
@@ -423,7 +434,10 @@ export const auth = {
     },
     {
       name: 'Quickstarts',
-      items: [{ name: 'Auth with React', url: '/guides/auth/quickstarts/react', items: [] }],
+      items: [
+        { name: 'Next.js', url: '/guides/auth/quickstarts/nextjs', items: [] },
+        { name: 'React', url: '/guides/auth/quickstarts/react', items: [] },
+      ],
     },
     {
       name: 'Authentication',
@@ -472,6 +486,7 @@ export const auth = {
       items: [
         { name: 'Overview', url: '/guides/auth/auth-helpers' },
         { name: 'Auth UI', url: '/guides/auth/auth-helpers/auth-ui' },
+        { name: 'Flutter Auth UI', url: '/guides/auth/auth-helpers/flutter-auth-ui' },
         {
           name: 'Next.js',
           url: '/guides/auth/auth-helpers/nextjs',
@@ -526,9 +541,14 @@ export const database: NavMenuConstant = {
       name: 'Postgres Guides',
       url: undefined,
       items: [
+        {
+          name: 'JSON and unstructured data',
+          url: '/guides/database/json',
+        },
         { name: 'Implementing Full Text Search', url: '/guides/database/full-text-search' },
         { name: 'Implementing Cascade Deletes', url: '/guides/database/postgres/cascade-deletes' },
         { name: 'Implementing column encryption', url: '/guides/database/column-encryption' },
+        { name: 'Partitioning your tables', url: '/guides/database/partitions' },
         { name: 'Testing your database', url: '/guides/database/testing' },
         { name: 'Managing Timeouts', url: '/guides/database/timeouts' },
         { name: 'Managing Passwords', url: '/guides/database/managing-passwords' },
@@ -740,6 +760,7 @@ export const functions: NavMenuConstant = {
           name: 'Connecting directly to Postgres',
           url: '/guides/functions/connect-to-postgres',
         },
+        { name: 'Troubleshooting', url: '/guides/functions/troubleshooting' },
       ],
     },
     {
@@ -750,6 +771,7 @@ export const functions: NavMenuConstant = {
         { name: 'Browserless.io', url: '/guides/functions/examples/screenshots' },
         { name: 'Hugging Face', url: '/guides/ai/examples/huggingface-image-captioning' },
         { name: 'OpenAI API', url: '/guides/ai/examples/openai' },
+        { name: 'Sending Emails with Resend', url: '/guides/functions/examples/send-emails' },
         { name: 'Upstash Redis', url: '/guides/functions/examples/upstash-redis' },
         { name: 'Type-Safe SQL with Kysely', url: '/guides/functions/kysely-postgres' },
       ],
@@ -788,25 +810,18 @@ export const realtime: NavMenuConstant = {
       url: '/guides/realtime',
     },
     {
-      name: 'Quickstart',
-      url: '/guides/realtime/quickstart',
+      name: 'Concepts',
+      url: '/guides/realtime/concepts',
     },
     {
       name: 'Features',
       url: undefined,
       items: [
-        { name: 'Channels', url: '/guides/realtime/channels' },
+        { name: 'Broadcast', url: '/guides/realtime/broadcast' },
+        { name: 'Presence', url: '/guides/realtime/presence' },
         {
-          name: 'Extensions',
-          url: '/guides/realtime/extensions',
-          items: [
-            { name: 'Broadcast', url: '/guides/realtime/extensions/broadcast' },
-            { name: 'Presence', url: '/guides/realtime/extensions/presence' },
-            {
-              name: 'Postgres Changes',
-              url: '/guides/realtime/extensions/postgres-changes',
-            },
-          ],
+          name: 'Postgres Changes',
+          url: '/guides/realtime/postgres-changes',
         },
       ],
     },
@@ -833,7 +848,7 @@ export const realtime: NavMenuConstant = {
       name: 'Deep dive',
       url: undefined,
       items: [
-        { name: 'Rate Limits', url: '/guides/realtime/rate-limits' },
+        { name: 'Quotas', url: '/guides/realtime/quotas' },
         { name: 'Architecture', url: '/guides/realtime/architecture' },
         { name: 'Protocol', url: '/guides/realtime/protocol' },
       ],
@@ -894,6 +909,7 @@ export const ai: NavMenuConstant = {
         { name: 'Managing indexes', url: '/guides/ai/managing-indexes' },
         { name: 'Vector columns', url: '/guides/ai/vector-columns' },
         { name: 'Engineering for scale', url: '/guides/ai/engineering-for-scale' },
+        { name: 'Choosing instance type', url: '/guides/ai/choosing-instance-type' },
       ],
     },
     {
@@ -992,6 +1008,7 @@ export const platform: NavMenuConstant = {
       url: undefined,
       items: [
         { name: 'Access Control', url: '/guides/platform/access-control' },
+        { name: 'Custom Postgres Config', url: '/guides/platform/custom-postgres-config' },
         { name: 'Database Size', url: '/guides/platform/database-size' },
         { name: 'HTTP Status Codes', url: '/guides/platform/http-status-codes' },
         { name: 'Logging', url: '/guides/platform/logs' },
@@ -1051,8 +1068,16 @@ export const platform: NavMenuConstant = {
           url: '/guides/platform/troubleshooting',
         },
         {
+          name: 'High Disk IO Consumption',
+          url: '/guides/platform/exhaust-disk-io',
+        },
+        {
           name: 'High CPU Usage',
           url: '/guides/platform/exhaust-cpu',
+        },
+        {
+          name: 'High RAM Usage',
+          url: '/guides/platform/exhaust-ram',
         },
       ],
     },
@@ -1164,6 +1189,20 @@ export const integrations: NavMenuConstant = {
   items: [
     { name: 'Overview', url: '/guides/integrations/integrations' },
     {
+      name: 'OAuth Apps (Beta)',
+      url: undefined,
+      items: [
+        {
+          name: 'Publish an OAuth App',
+          url: '/guides/integrations/oauth-apps/publish-an-oauth-app',
+        },
+        {
+          name: 'Authorize an OAuth App',
+          url: '/guides/integrations/oauth-apps/authorize-an-oauth-app',
+        },
+      ],
+    },
+    {
       name: 'Auth',
       url: undefined,
       items: [
@@ -1206,6 +1245,7 @@ export const integrations: NavMenuConstant = {
       url: undefined,
       items: [
         { name: 'Appsmith', url: '/guides/integrations/appsmith' },
+        { name: 'Bracket', url: '/guides/integrations/bracket' },
         { name: 'DhiWise', url: '/guides/integrations/dhiwise' },
         { name: 'Directus', url: '/guides/integrations/directus' },
         { name: 'Draftbit', url: '/guides/integrations/draftbit' },

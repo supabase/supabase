@@ -13,7 +13,7 @@ import {
 } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useStore, useUrlState } from 'hooks'
+import { useCheckPermissions, useStore, useUrlState } from 'hooks'
 import FilterDropdown from './filter'
 import SortPopover from './sort'
 import RefreshButton from './RefreshButton'
@@ -106,7 +106,7 @@ const DefaultHeader = ({
   const canAddNew = onAddRow !== undefined || onAddColumn !== undefined
 
   // [Joshen] Using this logic to block both column and row creation/update/delete
-  const canCreateColumns = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
+  const canCreateColumns = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
 
   const [{ filter: filters, sort: sorts }, setParams] = useUrlState({
     arrayKeys: ['sort', 'filter'],

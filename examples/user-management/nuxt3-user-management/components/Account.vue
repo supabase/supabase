@@ -30,7 +30,7 @@
 <script setup>
 const supabase = useSupabaseClient()
 
-const loading = ref(true)
+const loading = ref(false)
 const username = ref('')
 const website = ref('')
 const avatar_path = ref('')

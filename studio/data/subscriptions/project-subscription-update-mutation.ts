@@ -3,7 +3,12 @@ import { put } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { subscriptionKeys } from './keys'
 
-export type SubscriptionTier =  'tier_free' | 'tier_pro' | 'tier_payg' | 'tier_team' | 'tier_enterprise'
+export type SubscriptionTier =
+  | 'tier_free'
+  | 'tier_pro'
+  | 'tier_payg'
+  | 'tier_team'
+  | 'tier_enterprise'
 
 export type ProjectSubscriptionUpdateVariables = {
   projectRef: string
@@ -51,7 +56,10 @@ export const useProjectSubscriptionUpdateMutation = ({
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
-        await queryClient.invalidateQueries(subscriptionKeys.subscriptionV2(projectRef))
+        await Promise.all([
+          queryClient.invalidateQueries(subscriptionKeys.subscriptionV2(projectRef)),
+          queryClient.invalidateQueries(subscriptionKeys.addons(projectRef)),
+        ])
         await onSuccess?.(data, variables, context)
       },
       ...options,

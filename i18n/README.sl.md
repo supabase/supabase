@@ -12,9 +12,9 @@
 - [x] Gostovana podatkovna baza Postgres. [Dokumenti](https://supabase.com/docs/guides/database)
 - [x] Avtentikacija in avtorizacija. [Dokumenti](https://supabase.com/docs/guides/auth)
 - [x] Samodejno generirani API-ji.
-  - [x] REST. [Dokumenti](https://supabase.com/docs/guides/database/api#rest-api)
-  - [x] GraphQL. [Dokumenti](https://supabase.com/docs/guides/database/api#graphql-api)
-  - [x] Naročnine v realnem času. [Dokumenti](https://supabase.com/docs/guides/database/api#realtime-api)
+  - [x] REST. [Dokumenti](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL. [Dokumenti](https://supabase.com/docs/guides/api#graphql-api-overview)
+  - [x] Naročnine v realnem času. [Dokumenti](https://supabase.com/docs/guides/api#realtime-api-overview)
 - [x] Funkcije.
   - [x] Funkcije podatkovne zbirke. [Dokumenti](https://supabase.com/docs/guides/database/functions)
   - [x] Funkcije robov [Dokumenti](https://supabase.com/docs/guides/functions)
@@ -27,19 +27,19 @@
 
 Za celotno dokumentacijo obiščite [supabase.com/docs](https://supabase.com/docs)
 
-Če si želite ogledati, kako prispevati, obiščite [Getting Started](./DEVELOPERS.md)
+Če si želite ogledati, kako prispevati, obiščite [Getting Started](../DEVELOPERS.md)
 
 ## Skupnost in podpora
 
 - [Forum skupnosti](https://github.com/supabase/supabase/discussions). Najprimernejši za: pomoč pri gradnji, razpravo o najboljših praksah zbirke podatkov.
-- [GitHub Issues] (https://github.com/supabase/supabase/issues). Najprimernejši za: hrošče in napake, na katere naletite pri uporabi zbirke Supabase.
+- [GitHub Issues](https://github.com/supabase/supabase/issues). Najprimernejši za: hrošče in napake, na katere naletite pri uporabi zbirke Supabase.
 - [E-poštna podpora](https://supabase.com/docs/support#business-support). Najboljše za: težave s podatkovno zbirko ali infrastrukturo.
 - [Discord](https://discord.supabase.com). Najboljši za: izmenjavo aplikacij in druženje s skupnostjo.
 
 ## Status
 
 - [x] Alfa: Testiramo bazo Supabase z zaprtim naborom strank
-- [x] Javna alfa: [app.supabase.com] (https://app.supabase.com). Vendar nas ne obremenjujte, saj je še nekaj pomanjkljivosti
+- [x] Javna alfa: [supabase.com/dashboard](https://supabase.com/dashboard). Vendar nas ne obremenjujte, saj je še nekaj pomanjkljivosti
 - [x] Javna beta različica: Dovolj stabilna za večino primerov uporabe, ki niso povezani s podjetji
 - [ ] Javna: Splošna razpoložljivost [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
 
@@ -55,7 +55,7 @@ Supabaza je kombinacija odprtokodnih orodij. Funkcije Firebase gradimo z odprtok
 
 **Arhitektura**
 
-Supabase je [gostovana platforma](https://app.supabase.com). Prijavite se lahko in začnete uporabljati bazo Supabase, ne da bi kar koli namestili.
+Supabase je [gostovana platforma](https://supabase.com/dashboard). Prijavite se lahko in začnete uporabljati bazo Supabase, ne da bi kar koli namestili.
 Lahko tudi [gostujete sami](https://supabase.com/docs/guides/hosting/overview) in [razvijate lokalno](https://supabase.com/docs/guides/local-development).
 
 ![Arhitektura](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
