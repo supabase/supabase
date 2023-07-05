@@ -21,10 +21,6 @@ function getLinkTarget(link: string): LinkTarget {
   return "_blank"
 }
 
-function isRelativeLink(link: string): boolean {
-  return link.startsWith("/")
-}
-
 function getUniqueTags(json: Extension[]): string[] {
   const tags = []
   for (const item of json) {
