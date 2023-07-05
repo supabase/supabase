@@ -24,6 +24,12 @@ const BillingSettings = () => {
       <ScaffoldDivider />
 
       <ScaffoldContainer>
+        <BillingBreakdown />
+      </ScaffoldContainer>
+
+      <ScaffoldDivider />
+
+      <ScaffoldContainer>
         <CreditBalance />
       </ScaffoldContainer>
 
@@ -49,12 +55,6 @@ const BillingSettings = () => {
 
       <ScaffoldContainer>
         <TaxID />
-      </ScaffoldContainer>
-
-      <ScaffoldDivider />
-
-      <ScaffoldContainer>
-        <BillingBreakdown />
       </ScaffoldContainer>
     </>
   )
