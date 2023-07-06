@@ -75,6 +75,7 @@ const BillingEmail = () => {
             useEffect(() => {
               const values = { billing_email: billing_email ?? '' }
               resetForm({ values, initialValues: values })
+              // eslint-disable-next-line react-hooks/exhaustive-deps
             }, [slug])
 
             return (

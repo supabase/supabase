@@ -1,9 +1,7 @@
+import { SupaResponseV2 } from 'types'
 import { Integration } from 'data/integrations/integrations.types'
-import { ResponseFailure } from 'types'
 
-type SupaResponse<T> = T | ResponseFailure
-
-async function fetchGitHub<T = any>(url: string, responseJson = true): Promise<SupaResponse<T>> {
+async function fetchGitHub<T = any>(url: string, responseJson = true): Promise<SupaResponseV2<T>> {
   const response = await fetch(url)
   if (!response.ok) {
     return {

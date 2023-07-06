@@ -174,7 +174,6 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
               <div className="flex items-center space-x-3">
                 <p className="text-xs text-scale-900">You can rename your organization later</p>
                 <Button
-                  block
                   htmlType="submit"
                   type="primary"
                   loading={newOrgLoading}

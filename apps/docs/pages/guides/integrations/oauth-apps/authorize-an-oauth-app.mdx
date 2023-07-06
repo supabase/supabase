@@ -17,27 +17,22 @@ The access token returned will grant your application full access to the [Manage
 Once you've published your OAuth App on Supabase, you can use the OAuth 2.0 protocol to seek consent from Supabase users to access their organization or project.
 
 1. Within your app's UI, redirect the user to [`https://api.supabase.com/v1/oauth/authorize`](<https://api.supabase.com/api/v1#/oauth%20(beta)/authorize>). Make sure to include all required query parameters such as:
-
-- `client_id` A UUID uniquely identifying your OAuth app in Supabase.
-- `redirect_uri` The URL where Supabase will redirect the user after providing consent.
-- `scope` The only scope supported is `all`. Scoped access is not available at this time.
-- `response_type` The value `code`.
-- `state` Information about the state of your app. Note that `redirect_uri` and `state` cannot both exceed 4kB in size.
-- We strongly recommend using the PKCE flow for increased security. Generate a random value before taking the user to the authorize endpoint. This value is called code verifier. Hash it with SHA256 and include it as the `code_challenge` parameter, while setting `code_challenge_method` to `s256`. In the next step, you would need to provide the code verifier to get the first access and refresh token.
-
+   - `client_id` A UUID uniquely identifying your OAuth app in Supabase.
+   - `redirect_uri` The URL where Supabase will redirect the user after providing consent.
+   - `scope` The only scope supported is `all`. Scoped access is not available at this time.
+   - `response_type` The value `code`.
+   - `state` Information about the state of your app. Note that `redirect_uri` and `state` cannot both exceed 4kB in size.
+   - We strongly recommend using the PKCE flow for increased security. Generate a random value before taking the user to the authorize endpoint. This value is called code verifier. Hash it with SHA256 and include it as the `code_challenge` parameter, while setting `code_challenge_method` to `s256`. In the next step, you would need to provide the code verifier to get the first access and refresh token.
 2. Once the user consents to providing API access to your OAuth App, Supabase will redirect the user to the `redirect_uri` endpoint you provided in the previous step. The URL will contain these query parameters:
-
-- `code` An authorization code you should exchange with Supabase to get the access and refresh token.
-- `state` The value you provided in the previous step, to help you associate the request with the user. The `state` property returned here should be compared to the `state` you sent previously.
-
+   - `code` An authorization code you should exchange with Supabase to get the access and refresh token.
+   - `state` The value you provided in the previous step, to help you associate the request with the user. The `state` property returned here should be compared to the `state` you sent previously.
 3. Exchange the authorization code for an access and refresh token by calling `POST https://api.supabase.com/v1/oauth/token` and including the following query parameters:
-
-- `grant_type` The value `authorization_code`.
-- `code` The `code` returned in the previous step.
-- `client_id` The unique client ID identifying your OAuth App.
-- `client_secret` The secret that authenticates your OAuth App to Supabase.
-- `redirect_uri` This must be exactly the same URL used in the first step.
-- If you used the PKCE flow in the first step, include the code verifier as `code_verifier`.
+   - `grant_type` The value `authorization_code`.
+   - `code` The `code` returned in the previous step.
+   - `client_id` The unique client ID identifying your OAuth App.
+   - `client_secret` The secret that authenticates your OAuth App to Supabase.
+   - `redirect_uri` This must be exactly the same URL used in the first step.
+   - If you used the PKCE flow in the first step, include the code verifier as `code_verifier`.
 
 ## Refresh an access token
 

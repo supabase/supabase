@@ -124,14 +124,14 @@ const OrganizationProjects = ({
           {isErrorPermissions ? (
             <div className="col-span-3">
               <AlertError
-                subject="Unable to retrieve permissions for your account"
+                subject="Failed to retrieve permissions for your account"
                 error={permissionsError}
               />
             </div>
           ) : isErrorProjects ? (
             <div className="col-span-3">
               <AlertError
-                subject={`Unable to retrieve projects under ${name}`}
+                subject={`Failed to retrieve projects under ${name}`}
                 error={projectsError}
               />
             </div>
