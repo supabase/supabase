@@ -43,6 +43,7 @@ const Bandwidth = ({
   return (
     <UsageSection
       orgSlug={orgSlug}
+      projectRef={projectRef}
       categoryKey="bandwidth"
       chartMeta={chartMeta}
       subscription={subscription}
