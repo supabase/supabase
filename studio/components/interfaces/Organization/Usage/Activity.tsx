@@ -72,43 +72,37 @@ const Activity = ({
     })
 
   const chartMeta: {
-    [key: string]: { data: DataPoint[]; margin: number; isLoading: boolean; hasNoData: boolean }
+    [key: string]: { data: DataPoint[]; margin: number; isLoading: boolean }
   } = {
     [PricingMetric.MONTHLY_ACTIVE_USERS]: {
       data: mauData?.data ?? [],
       margin: 18,
       isLoading: isLoadingMauData,
-      hasNoData: mauData?.hasNoData ?? false,
     },
     [PricingMetric.MONTHLY_ACTIVE_SSO_USERS]: {
       data: mauSSOData?.data ?? [],
       margin: 20,
       isLoading: isLoadingMauSSOData,
-      hasNoData: mauSSOData?.hasNoData ?? false,
     },
     [PricingMetric.STORAGE_IMAGES_TRANSFORMED]: {
       data: assetTransformationsData?.data ?? [],
       margin: 0,
       isLoading: isLoadingAssetTransformationsData,
-      hasNoData: assetTransformationsData?.hasNoData ?? false,
     },
     [PricingMetric.FUNCTION_INVOCATIONS]: {
       data: funcInvocationsData?.data ?? [],
       margin: 26,
       isLoading: isLoadingFuncInvocationsData,
-      hasNoData: funcInvocationsData?.hasNoData ?? false,
     },
     [PricingMetric.REALTIME_MESSAGE_COUNT]: {
       data: realtimeMessagesData?.data ?? [],
       margin: 38,
       isLoading: isLoadingRealtimeMessagesData,
-      hasNoData: realtimeMessagesData?.hasNoData ?? false,
     },
     [PricingMetric.REALTIME_PEAK_CONNECTIONS]: {
       data: realtimeConnectionsData?.data ?? [],
       margin: 0,
       isLoading: isLoadingRealtimeConnectionsData,
-      hasNoData: realtimeConnectionsData?.hasNoData ?? false,
     },
   }
 

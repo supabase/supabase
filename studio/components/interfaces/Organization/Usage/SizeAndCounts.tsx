@@ -43,25 +43,22 @@ const SizeAndCounts = ({
   })
 
   const chartMeta: {
-    [key: string]: { data: DataPoint[]; margin: number; isLoading: boolean; hasNoData: boolean }
+    [key: string]: { data: DataPoint[]; margin: number; isLoading: boolean }
   } = {
     [PricingMetric.DATABASE_SIZE]: {
       isLoading: isLoadingDbSizeData,
       margin: 14,
       data: dbSizeData?.data ?? [],
-      hasNoData: dbSizeData?.hasNoData ?? false,
     },
     [PricingMetric.STORAGE_SIZE]: {
       isLoading: isLoadingStorageSizeData,
       margin: 14,
       data: storageSizeData?.data ?? [],
-      hasNoData: storageSizeData?.hasNoData ?? false,
     },
     [PricingMetric.FUNCTION_COUNT]: {
       isLoading: isLoadingFunctionCountData,
       margin: 0,
       data: functionCountData?.data ?? [],
-      hasNoData: functionCountData?.hasNoData ?? false,
     },
   }
 
