@@ -115,7 +115,7 @@ const Usage = () => {
         currentBillingCycleSelected={currentBillingCycleSelected}
       />
 
-      {/* <SizeAndCounts
+      <SizeAndCounts
         orgSlug={slug as string}
         subscription={subscription}
         startDate={startDate}
@@ -129,7 +129,7 @@ const Usage = () => {
         startDate={startDate}
         endDate={endDate}
         currentBillingCycleSelected={currentBillingCycleSelected}
-      /> */}
+      />
     </>
   )
 }
