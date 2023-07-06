@@ -1,22 +1,28 @@
 import clsx from 'clsx'
 import dayjs from 'dayjs'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
-import { ScaffoldContainer, ScaffoldDivider } from 'components/layouts/Scaffold'
+import { ScaffoldContainer } from 'components/layouts/Scaffold'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import AlertError from 'components/ui/AlertError'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { useProjectsQuery } from 'data/projects/projects-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useSelectedOrganization } from 'hooks'
 import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants'
+import { Listbox } from 'ui'
 import Activity from './Activity'
 import Bandwidth from './Bandwidth'
 import SizeAndCounts from './SizeAndCounts'
 
 const Usage = () => {
-  const { slug } = useParams()
+  const { slug, projectRef } = useParams()
   const [dateRange, setDateRange] = useState<any>()
+  const [selectedProjectRef, setSelectedProjectRef] = useState<string>()
 
+  const organization = useSelectedOrganization()
+  const { data: projects, isSuccess } = useProjectsQuery()
   const {
     data: subscription,
     error: subscriptionError,
@@ -24,6 +30,15 @@ const Usage = () => {
     isError: isErrorSubscription,
     isSuccess: isSuccessSubscription,
   } = useOrgSubscriptionQuery({ orgSlug: slug })
+  const orgProjects = projects?.filter((project) => project.organization_id === organization?.id)
+
+  useEffect(() => {
+    if (projectRef && isSuccess && orgProjects !== undefined) {
+      if (orgProjects.find((project) => project.ref === projectRef)) {
+        setSelectedProjectRef(projectRef)
+      }
+    }
+  }, [projectRef, isSuccess])
 
   const billingCycleStart = dayjs.unix(subscription?.current_period_start ?? 0).utc()
   const billingCycleEnd = dayjs.unix(subscription?.current_period_end ?? 0).utc()
@@ -67,7 +82,7 @@ const Usage = () => {
 
   return (
     <>
-      <ScaffoldContainer>
+      <ScaffoldContainer className="sticky top-0 border-b bg-scale-200 z-10 overflow-hidden">
         <div className="py-4 flex items-center space-x-4">
           {isLoadingSubscription && <ShimmeringLoader className="w-[250px]" />}
 
@@ -91,6 +106,37 @@ const Usage = () => {
                 currentBillingPeriodStart={subscription?.current_period_start}
                 className="!w-[200px]"
               />
+
+              <Listbox
+                size="tiny"
+                name="schema"
+                className="w-[180px]"
+                value={selectedProjectRef}
+                onChange={(value: any) => {
+                  if (value === 'all-projects') setSelectedProjectRef(undefined)
+                  else setSelectedProjectRef(value)
+                }}
+              >
+                <Listbox.Option
+                  key="all-projects"
+                  id="all-projects"
+                  value="all-projects"
+                  label="All projects"
+                >
+                  All projects
+                </Listbox.Option>
+                {orgProjects?.map((project) => (
+                  <Listbox.Option
+                    key={project.ref}
+                    id={project.ref}
+                    value={project.ref}
+                    label={project.name}
+                  >
+                    {project.name}
+                  </Listbox.Option>
+                ))}
+              </Listbox>
+
               <div className="flex flex-col xl:flex-row xl:gap-3">
                 <p className={clsx('text-sm transition', isLoadingSubscription && 'opacity-50')}>
                   Organization is on the {subscription.plan.name} plan
@@ -105,10 +151,9 @@ const Usage = () => {
         </div>
       </ScaffoldContainer>
 
-      <ScaffoldDivider />
-
       <Bandwidth
         orgSlug={slug as string}
+        projectRef={selectedProjectRef}
         subscription={subscription}
         startDate={startDate}
         endDate={endDate}
@@ -117,6 +162,7 @@ const Usage = () => {
 
       <SizeAndCounts
         orgSlug={slug as string}
+        projectRef={selectedProjectRef}
         subscription={subscription}
         startDate={startDate}
         endDate={endDate}
@@ -125,6 +171,7 @@ const Usage = () => {
 
       <Activity
         orgSlug={slug as string}
+        projectRef={selectedProjectRef}
         subscription={subscription}
         startDate={startDate}
         endDate={endDate}
