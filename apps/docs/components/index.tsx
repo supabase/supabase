@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { MDXRemoteProps } from 'next-mdx-remote'
 import { Alert, Button, CodeBlock, GlassPanel, markdownComponents, Tabs } from 'ui'
 import StepHikeCompact from '~/components/StepHikeCompact'
 // Common components
@@ -54,15 +55,15 @@ import {
   IconMenuCli,
 } from './Navigation/NavigationMenu/HomeMenuIcons'
 
-const components = {
+const components: MDXRemoteProps['components'] = {
   ...markdownComponents,
-  a: (props: any) =>
-    props.href ? (
-      <Link href={props.href}>
+  a: ({ href, ...props }) =>
+    href ? (
+      <Link href={href}>
         <a {...props} />
       </Link>
     ) : (
-      <a {...props}/>
+      <a {...props} />
     ),
   Admonition,
   Button,
@@ -84,25 +85,25 @@ const components = {
   StorageManagement,
   Mermaid,
   Extensions,
-  Alert: (props: any) => (
+  Alert: (props) => (
     <Alert {...props} className="not-prose">
       {props.children}
     </Alert>
   ),
   Tabs,
-  TabPanel: (props: any) => <Tabs.Panel {...props}>{props.children}</Tabs.Panel>,
-  h2: (props: any) => (
+  TabPanel: (props) => <Tabs.Panel {...props}>{props.children}</Tabs.Panel>,
+  h2: (props) => (
     <Heading tag="h2" {...props}>
       {props.children}
     </Heading>
   ),
-  h3: (props: any) => (
+  h3: (props) => (
     <Heading tag="h3" {...props}>
       {props.children}
     </Heading>
   ),
   RefSubLayout,
-  RefHeaderSection: (props: any) => <RefHeaderSection {...props} />,
+  RefHeaderSection: (props) => <RefHeaderSection {...props} />,
   CliGlobalFlagsHandler: () => <CliGlobalFlagsHandler />,
   Options,
   Param,
@@ -128,4 +129,6 @@ const components = {
   IconMenuCli,
 }
 
-export default components
+// we need to cast this to any because we're using this same object
+// for both next-mdx-remote and react-markdown
+export default components as any
