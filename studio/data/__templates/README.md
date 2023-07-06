@@ -54,7 +54,7 @@ The blog posts in particular are very helpful for learning best practices and ho
 
 ### Queries
 
-The 3 states that are provided in a query (`isLoading`, `isError`, `isSuccess`) **must** be covered in the UI whenever we're using it. Typically, we'd use the following UI components to cover them, and the states are mutually exclusive so it's preferred not to nest them in a ternary operator for better readability.
+The 3 states that are provided in a query (`isLoading`, `isError`, `isSuccess`) **must** be covered in the UI whenever we're using it (unless reasonably unrequired). Typically, we'd use the following UI components to cover them, and the states are mutually exclusive so it's preferred not to nest them in a ternary operator for better readability.
 
 ```jsx
 const { data, error, isLoading, isError, isSuccess } = useQuery()

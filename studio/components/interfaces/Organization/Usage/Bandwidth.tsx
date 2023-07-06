@@ -5,6 +5,7 @@ import UsageSection from './UsageSection/UsageSection'
 
 export interface BandwidthProps {
   orgSlug: string
+  projectRef?: string
   startDate: string | undefined
   endDate: string | undefined
   subscription: ProjectSubscriptionResponse | undefined
@@ -14,6 +15,7 @@ export interface BandwidthProps {
 // [Joshen TODO] Needs to take in org slug and eventually use daily stats org query
 const Bandwidth = ({
   orgSlug,
+  projectRef,
   subscription,
   startDate,
   endDate,
@@ -21,6 +23,7 @@ const Bandwidth = ({
 }: BandwidthProps) => {
   const { data: egressData, isLoading: isLoadingDbEgressData } = useOrgDailyStatsQuery({
     orgSlug,
+    projectRef,
     metric: PricingMetric.EGRESS,
     interval: '1d',
     startDate,

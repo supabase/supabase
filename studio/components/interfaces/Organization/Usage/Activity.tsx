@@ -5,7 +5,7 @@ import { PricingMetric, useOrgDailyStatsQuery } from 'data/analytics/org-daily-s
 
 export interface ActivityProps {
   orgSlug: string
-  projectRef?: string // [Joshen TODO] remove
+  projectRef?: string
   startDate: string | undefined
   endDate: string | undefined
   subscription: ProjectSubscriptionResponse | undefined
@@ -14,6 +14,7 @@ export interface ActivityProps {
 
 const Activity = ({
   orgSlug,
+  projectRef,
   subscription,
   startDate,
   endDate,
@@ -21,6 +22,7 @@ const Activity = ({
 }: ActivityProps) => {
   const { data: mauData, isLoading: isLoadingMauData } = useOrgDailyStatsQuery({
     orgSlug,
+    projectRef,
     metric: PricingMetric.MONTHLY_ACTIVE_USERS,
     interval: '1d',
     startDate,
@@ -29,6 +31,7 @@ const Activity = ({
 
   const { data: mauSSOData, isLoading: isLoadingMauSSOData } = useOrgDailyStatsQuery({
     orgSlug,
+    projectRef,
     metric: PricingMetric.MONTHLY_ACTIVE_SSO_USERS,
     interval: '1d',
     startDate,
@@ -38,6 +41,7 @@ const Activity = ({
   const { data: assetTransformationsData, isLoading: isLoadingAssetTransformationsData } =
     useOrgDailyStatsQuery({
       orgSlug,
+      projectRef,
       metric: PricingMetric.STORAGE_IMAGES_TRANSFORMED,
       interval: '1d',
       startDate,
@@ -47,6 +51,7 @@ const Activity = ({
   const { data: funcInvocationsData, isLoading: isLoadingFuncInvocationsData } =
     useOrgDailyStatsQuery({
       orgSlug,
+      projectRef,
       metric: PricingMetric.FUNCTION_INVOCATIONS,
       interval: '1d',
       startDate,
@@ -56,6 +61,7 @@ const Activity = ({
   const { data: realtimeMessagesData, isLoading: isLoadingRealtimeMessagesData } =
     useOrgDailyStatsQuery({
       orgSlug,
+      projectRef,
       metric: PricingMetric.REALTIME_MESSAGE_COUNT,
       interval: '1d',
       startDate,
@@ -65,6 +71,7 @@ const Activity = ({
   const { data: realtimeConnectionsData, isLoading: isLoadingRealtimeConnectionsData } =
     useOrgDailyStatsQuery({
       orgSlug,
+      projectRef,
       metric: PricingMetric.REALTIME_PEAK_CONNECTIONS,
       interval: '1d',
       startDate,
