@@ -2061,4 +2061,9 @@ module.exports = [
     source: '/docs/guides/database/extensions/pgrepack',
     destination: '/docs/guides/database/extensions/pg_repack',
   },
+  {
+    permanent: true,
+    source: '/docs/guides/ai/structured-unstructured-embeddings',
+    destination: '/docs/guides/ai/structured-unstructured',
+  },
 ]
