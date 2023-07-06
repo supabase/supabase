@@ -408,8 +408,10 @@ export function useAutoInputFocus() {
 
   // Focus the input when typing from anywhere
   React.useEffect(() => {
-    function isModifierNotShift(event: KeyboardEvent) {
-      return event.key.length !== 1 && event.key !== 'Shift'
+    function isModifierKey(event: KeyboardEvent) {
+      const modifierKeys = ['Alt', 'Control', 'Meta', 'Tab']
+      const { key } = event
+      return modifierKeys.includes(key)
     }
 
     // Keep track of whether the modifier key (except shift) is pressed
@@ -417,7 +419,7 @@ export function useAutoInputFocus() {
 
     function onKeyDown(event: KeyboardEvent) {
       // If the user is typing a modifier key, don't focus the input and set the modifierPressed flag
-      if (isModifierNotShift(event)) {
+      if (isModifierKey(event)) {
         modifierPressed = true
       } else {
         if (!modifierPressed) {
@@ -428,7 +430,7 @@ export function useAutoInputFocus() {
     }
     function onKeyUp(event: KeyboardEvent) {
       console.log('keyup')
-      if (isModifierNotShift(event)) {
+      if (isModifierKey(event)) {
         // Reset the modifierPressed flag when the modifier key is released
         modifierPressed = false
       }
