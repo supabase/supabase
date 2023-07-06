@@ -140,6 +140,26 @@ const Infrastructure = ({
                         </a>
                       </Link>
                     </Alert>
+                  ) : hasLatest && latestIoBudgetConsumption >= 80 ? (
+                    <Alert
+                      withIcon
+                      variant="danger"
+                      title="You are close to running out of Disk IO Budget"
+                    >
+                      <p className="mb-4">
+                        Your workload has consumed {latestIoBudgetConsumption}% of your Disk IO
+                        Budget. If you use up all your Disk IO Budget, your instance will reverted
+                        to baseline performance. If you need consistent disk performance, consider
+                        upgrading to a larger compute add-on.
+                      </p>
+                      <Link href={upgradeUrl}>
+                        <a>
+                          <Button type="danger">
+                            {isFreeTier ? 'Upgrade project' : 'Change compute add-on'}
+                          </Button>
+                        </a>
+                      </Link>
+                    </Alert>
                   ) : currentBillingCycleSelected && highestIoBudgetConsumption >= 100 ? (
                     <Alert
                       withIcon
@@ -149,6 +169,26 @@ const Infrastructure = ({
                       <p className="mb-4">
                         Your workload has used up all your Disk IO Budget and reverted to baseline
                         performance at least once during this billing cycle. If you need consistent
+                        disk performance, consider upgrading to a larger compute add-on.
+                      </p>
+                      <Link href={upgradeUrl}>
+                        <a>
+                          <Button type="warning">
+                            {isFreeTier ? 'Upgrade project' : 'Change compute add-on'}
+                          </Button>
+                        </a>
+                      </Link>
+                    </Alert>
+                  ) : currentBillingCycleSelected && highestIoBudgetConsumption >= 80 ? (
+                    <Alert
+                      withIcon
+                      variant="warning"
+                      title="You were close to using all your IO Budget at least once"
+                    >
+                      <p className="mb-4">
+                        Your workload has consumed {highestIoBudgetConsumption}% of your Disk IO
+                        budget during this billing cycle. If you use up all your Disk IO Budget,
+                        your instance will reverted to baseline performance. If you need consistent
                         disk performance, consider upgrading to a larger compute add-on.
                       </p>
                       <Link href={upgradeUrl}>
