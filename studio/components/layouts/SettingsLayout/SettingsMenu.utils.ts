@@ -5,7 +5,8 @@ import { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
 export const generateSettingsMenu = (
   ref: string,
   project?: ProjectBase,
-  isVaultEnabled: boolean = false
+  isVaultEnabled: boolean = false,
+  isOrgBilling: boolean = false
 ): ProductMenuGroup[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
   const buildingUrl = `/project/${ref}/building`
@@ -65,7 +66,7 @@ export const generateSettingsMenu = (
           : []),
       ],
     },
-    ...(IS_PLATFORM
+    ...(IS_PLATFORM && !isOrgBilling
       ? [
           {
             title: 'Billing',
@@ -88,6 +89,27 @@ export const generateSettingsMenu = (
                 name: 'Invoices',
                 key: 'invoices',
                 url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/billing/invoices`,
+                items: [],
+              },
+            ],
+          },
+        ]
+      : []),
+    ...(IS_PLATFORM && isOrgBilling
+      ? [
+          {
+            title: 'Others',
+            items: [
+              {
+                name: 'Add Ons',
+                key: 'add-ons',
+                url: `/project/${ref}/settings/billing/subscription`,
+                items: [],
+              },
+              {
+                name: 'Usage',
+                key: 'usage',
+                url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/billing/usage`,
                 items: [],
               },
             ],
