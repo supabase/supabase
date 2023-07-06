@@ -1,15 +1,17 @@
+import { useQueryClient } from '@tanstack/react-query'
+import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { Button, IconEdit2, IconInfo, Input, Listbox } from 'ui'
-import { useRouter } from 'next/router'
 
-import { API_URL, BASE_PATH, PRICING_TIER_LABELS_ORG } from 'lib/constants'
+import { PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js'
+import type { PaymentMethod } from '@stripe/stripe-js'
+import InformationBox from 'components/ui/InformationBox'
+import Panel from 'components/ui/Panel'
+import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
-import Panel from 'components/ui/Panel'
-import { useElements, useStripe, PaymentElement } from '@stripe/react-stripe-js'
-import type { PaymentMethod } from '@stripe/stripe-js'
+import { API_URL, BASE_PATH, PRICING_TIER_LABELS_ORG } from 'lib/constants'
 import { getURL } from 'lib/helpers'
-import InformationBox from 'components/ui/InformationBox'
 
 const ORG_KIND_TYPES = {
   PERSONAL: 'Personal',
@@ -38,7 +40,8 @@ interface NewOrgFormProps {
  * No org selected yet, create a new one
  */
 const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
-  const { ui, app } = useStore()
+  const queryClient = useQueryClient()
+  const { ui } = useStore()
   const router = useRouter()
   const stripe = useStripe()
   const elements = useElements()
@@ -97,7 +100,7 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
       })
     } else {
       const org = response
-      app.onOrgAdded(org)
+      await invalidateOrganizationsQuery(queryClient)
       router.push(`/new/${org.slug}`)
     }
     setNewOrgLoading(false)
@@ -171,7 +174,6 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
               <div className="flex items-center space-x-3">
                 <p className="text-xs text-scale-900">You can rename your organization later</p>
                 <Button
-                  block
                   htmlType="submit"
                   type="primary"
                   loading={newOrgLoading}

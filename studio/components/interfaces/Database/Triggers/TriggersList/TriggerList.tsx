@@ -5,7 +5,7 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Badge, Button, Dropdown, IconMoreVertical, IconTrash, IconEdit3 } from 'ui'
 
-import { useStore, checkPermissions } from 'hooks'
+import { useStore, useCheckPermissions } from 'hooks'
 import Table from 'components/to-be-cleaned/Table'
 
 interface Props {
@@ -23,7 +23,7 @@ const TriggerList: FC<Props> = ({ filterString, schema, editTrigger, deleteTrigg
   )
 
   const _triggers = filteredTriggers.filter((x: any) => x.schema == schema)
-  const canUpdateTriggers = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'triggers')
+  const canUpdateTriggers = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'triggers')
 
   function onEdit(trigger: any) {
     editTrigger(trigger)

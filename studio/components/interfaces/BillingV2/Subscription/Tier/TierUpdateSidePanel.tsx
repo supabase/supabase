@@ -1,31 +1,33 @@
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import clsx from 'clsx'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
+
 import { useParams } from 'common'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useProjectPlansQuery } from 'data/subscriptions/project-plans-query'
 import { useProjectSubscriptionUpdateMutation } from 'data/subscriptions/project-subscription-update-mutation'
-import { checkPermissions, useStore } from 'hooks'
-import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
+import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
+import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
+import Telemetry from 'lib/telemetry'
+import { useRouter } from 'next/router'
+import { plans as subscriptionsPlans } from 'shared-data/plans'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { Alert, Button, IconCheck, IconExternalLink, Modal, SidePanel } from 'ui'
 import EnterpriseCard from './EnterpriseCard'
 import ExitSurveyModal from './ExitSurveyModal'
 import MembersExceedLimitModal from './MembersExceedLimitModal'
 import PaymentMethodSelection from './PaymentMethodSelection'
-import { plans as subscriptionsPlans } from 'shared-data/plans'
-import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
-import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import * as Tooltip from '@radix-ui/react-tooltip'
-import Telemetry from 'lib/telemetry'
-import { useRouter } from 'next/router'
 
 const TierUpdateSidePanel = () => {
   const { ui } = useStore()
   const router = useRouter()
-  const slug = ui.selectedOrganization?.slug
+  const selectedOrganization = useSelectedOrganization()
+  const slug = selectedOrganization?.slug
   const { ref: projectRef } = useParams()
 
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -34,7 +36,7 @@ const TierUpdateSidePanel = () => {
   const [showDowngradeError, setShowDowngradeError] = useState(false)
   const [selectedTier, setSelectedTier] = useState<'tier_free' | 'tier_pro' | 'tier_team'>()
 
-  const canUpdateSubscription = checkPermissions(
+  const canUpdateSubscription = useCheckPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.subscriptions'
   )

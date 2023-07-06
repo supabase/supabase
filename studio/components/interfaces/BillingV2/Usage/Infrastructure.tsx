@@ -60,7 +60,7 @@ const Infrastructure = ({
 
   const { data: cpuUsageData, isLoading: isLoadingCpuUsageData } = useInfraMonitoringQuery({
     projectRef,
-    attribute: 'cpu_usage',
+    attribute: 'max_cpu_usage',
     interval,
     startDate,
     endDate,
@@ -91,7 +91,7 @@ const Infrastructure = ({
   )
 
   const chartMeta: { [key: string]: { data: DataPoint[]; isLoading: boolean } } = {
-    cpu_usage: {
+    max_cpu_usage: {
       isLoading: isLoadingCpuUsageData,
       data: cpuUsageData?.data ?? [],
     },
@@ -226,7 +226,7 @@ const Infrastructure = ({
                   </div>
                 )}
 
-                {attribute.key === 'cpu_usage' && (
+                {attribute.key === 'max_cpu_usage' && (
                   <p className="text-sm text-scale-1000">
                     Your compute instance has {currentComputeInstanceSpecs.cpu_cores} CPU cores.
                   </p>

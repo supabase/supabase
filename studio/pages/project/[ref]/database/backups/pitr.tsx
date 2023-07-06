@@ -1,23 +1,24 @@
-import { useRouter } from 'next/router'
-import { observer } from 'mobx-react-lite'
-import { Tabs } from 'ui'
-import clsx from 'clsx'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import clsx from 'clsx'
+import { observer } from 'mobx-react-lite'
+import { useRouter } from 'next/router'
+import { Tabs } from 'ui'
 
-import { NextPageWithLayout } from 'types'
-import { useStore, checkPermissions } from 'hooks'
+import BackupsError from 'components/interfaces/Database/Backups/BackupsError'
+import { PITRNotice, PITRSelection } from 'components/interfaces/Database/Backups/PITR'
 import { DatabaseLayout } from 'components/layouts'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Loading from 'components/ui/Loading'
 import NoPermission from 'components/ui/NoPermission'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
-import { PITRNotice, PITRSelection } from 'components/interfaces/Database/Backups/PITR'
-import BackupsError from 'components/interfaces/Database/Backups/BackupsError'
+import { useCheckPermissions, useStore } from 'hooks'
 import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
+import { NextPageWithLayout } from 'types'
 
 const DatabasePhysicalBackups: NextPageWithLayout = () => {
-  const { ui } = useStore()
   const router = useRouter()
-  const ref = ui.selectedProject?.ref ?? 'default'
+  const { project } = useProjectContext()
+  const ref = project?.ref ?? 'default'
 
   return (
     <div
@@ -53,15 +54,16 @@ DatabasePhysicalBackups.getLayout = (page) => (
   <DatabaseLayout title="Database">{page}</DatabaseLayout>
 )
 
-const PITR = () => {
-  const { ui, backups } = useStore()
+const PITR = observer(() => {
+  const { backups } = useStore()
+  const { project } = useProjectContext()
   const { configuration, error, isLoading } = backups
 
-  const ref = ui.selectedProject?.ref ?? 'default'
-  const tier = ui.selectedProject?.subscription_tier
+  const ref = project?.ref ?? 'default'
+  const tier = project?.subscription_tier
   const isEnabled = configuration.walg_enabled
 
-  const canReadPhysicalBackups = checkPermissions(PermissionAction.READ, 'physical_backups')
+  const canReadPhysicalBackups = useCheckPermissions(PermissionAction.READ, 'physical_backups')
   if (!canReadPhysicalBackups) return <NoPermission resourceText="view PITR backups" />
 
   if (isLoading) return <Loading />
@@ -86,6 +88,6 @@ const PITR = () => {
       <PITRSelection />
     </>
   )
-}
+})
 
-export default observer(DatabasePhysicalBackups)
+export default DatabasePhysicalBackups
