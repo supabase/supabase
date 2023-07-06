@@ -37,7 +37,7 @@ supabase.auth.signInWithOAuth({
 })
 ```
 
-This call takes the user to Google's consent screen. When the flow ends, the user's profile information is exchanegd and validated with Supabase Auth before it redirects back to your web application with an access and refresh token representing the user's session.
+This call takes the user to Google's consent screen. When the flow ends, the user's profile information is exchanged and validated with Supabase Auth before it redirects back to your web application with an access and refresh token representing the user's session.
 
 You can additionally extract the `provider_token` from the session (on initial login only) which is the OAuth 2.0 access token issued by Google that grants your application access to the Google services for the authenticated users. Please store this token in local storage, cookies or in your database or server.
 
@@ -95,7 +95,7 @@ const discoveryUrl =
 
 final appAuth = FlutterAppAuth();
 
-// authorize the user by opening the concent page
+// authorize the user by opening the consent page
 final result = await appAuth.authorize(
   AuthorizationRequest(
     clientId,
