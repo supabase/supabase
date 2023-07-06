@@ -357,7 +357,7 @@ const CreateProject = ({
         <Checkbox
           name="shouldRunMigrations"
           label="Create sample tables with seed data"
-          description="To get you started quickly, we can create new tables for you with seed (sample) data. You can quickly delete these tables later."
+          description="To get you started quickly, we can create new tables for you with seed (sample) data. You can delete these tables later."
           checked={shouldRunMigrations}
           onChange={(e) => setShouldRunMigrations(e.target.checked)}
         />
