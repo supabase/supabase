@@ -136,7 +136,7 @@ const Usage = () => {
     <>
       <div>
         <div className="1xl:px-28 mx-auto flex flex-col px-5 lg:px-16 2xl:px-32 pt-6 space-y-4">
-          <h3 className="text-scale-1200 text-xl">Usage</h3>
+          <h3 className="text-scale-1200 text-xl">{isOrgBilling ? 'Project ' : ''}Usage</h3>
         </div>
       </div>
       <div>
