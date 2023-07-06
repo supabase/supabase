@@ -85,6 +85,27 @@ const VercelIntegration: NextPageWithLayout = () => {
       })
     : []
 
+  /**
+   * Handle the correct route change based on wether the vercel integration
+   * is following the 'marketplace' flow or 'deploy button' flow.
+   *
+   */
+  function handleRouteChange() {
+    const orgSlug = selectedOrg?.slug
+
+    if (externalId) {
+      router.push({
+        pathname: `/integrations/vercel/${orgSlug}/deploy-button/new-project`,
+        query: router.query,
+      })
+    } else {
+      router.push({
+        pathname: `/integrations/vercel/${orgSlug}/marketplace/choose-project`,
+        query: router.query,
+      })
+    }
+  }
+
   const { mutate, isLoading: isLoadingVercelIntegrationCreateMutation } =
     useVercelIntegrationCreateMutation({
       onSuccess({ id }) {
@@ -92,17 +113,7 @@ const VercelIntegration: NextPageWithLayout = () => {
 
         setOrganizationIntegrationId(id)
 
-        if (externalId) {
-          router.push({
-            pathname: `/integrations/vercel/${orgSlug}/deploy-button/new-project`,
-            query: router.query,
-          })
-        } else {
-          router.push({
-            pathname: `/integrations/vercel/${orgSlug}/marketplace/choose-project`,
-            query: router.query,
-          })
-        }
+        handleRouteChange()
       },
       onError(error: any) {
         ui.setNotification({
@@ -150,6 +161,8 @@ const VercelIntegration: NextPageWithLayout = () => {
         source,
         teamId: teamId,
       })
+    } else {
+      handleRouteChange()
     }
   }
 
