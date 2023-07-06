@@ -2046,4 +2046,19 @@ module.exports = [
     source: '/docs/guides/realtime/quickstart',
     destination: '/docs/guides/realtime',
   },
+  {
+    permanent: true,
+    source: '/docs/guides/database/extensions/pgcron',
+    destination: '/docs/guides/database/extensions/pg_cron',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/extensions/pgnet',
+    destination: '/docs/guides/database/extensions/pg_net',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/extensions/pgrepack',
+    destination: '/docs/guides/database/extensions/pg_repack',
+  },
 ]
