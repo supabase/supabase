@@ -127,6 +127,10 @@ services:
       PGRST_DB_ANON_ROLE: anon
       PGRST_JWT_SECRET: ${JWT_SECRET}
       PGRST_DB_USE_LEGACY_GUCS: "false"
+    # The following explicit command quickens the `docker compose down` command from 10s to 0.3s:
+    # https://github.com/PostgREST/postgrest/issues/2851
+    command:
+      command: "postgrest"
 
   realtime:
     container_name: realtime-dev.supabase-realtime
