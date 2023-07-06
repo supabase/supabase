@@ -83,6 +83,7 @@ const PITRSidePanel = () => {
             title: 'Point in Time Recovery',
             section: 'Add ons',
           },
+          projectRef,
         },
         router
       )
@@ -175,6 +176,7 @@ const PITRSidePanel = () => {
                             section: 'Add ons',
                             option: option.name,
                           },
+                          projectRef,
                         },
                         router
                       )

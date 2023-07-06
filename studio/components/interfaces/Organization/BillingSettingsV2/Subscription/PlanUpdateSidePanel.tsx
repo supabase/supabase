@@ -69,6 +69,7 @@ const PlanUpdateSidePanel = () => {
             title: 'Change Subscription Plan',
             section: 'Subscription plan',
           },
+          ...(slug && { orgSlug: slug }),
         },
         router
       )
@@ -219,6 +220,7 @@ const PlanUpdateSidePanel = () => {
                                         : 'Upgrade' + ' to ' + plan.name,
                                       section: 'Subscription plan',
                                     },
+                                    ...(slug && { orgSlug: slug }),
                                   },
                                   router
                                 )

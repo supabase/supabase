@@ -97,6 +97,7 @@ const ComputeInstanceSidePanel = () => {
             title: 'Change project compute size',
             section: 'Add ons',
           },
+          projectRef,
         },
         router
       )
@@ -199,6 +200,7 @@ const ComputeInstanceSidePanel = () => {
                               section: 'Add ons',
                               option: option.name,
                             },
+                            projectRef,
                           },
                           router
                         )
