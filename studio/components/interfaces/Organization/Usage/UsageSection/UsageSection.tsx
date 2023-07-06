@@ -7,7 +7,7 @@ import { CategoryMetaKey, USAGE_CATEGORIES } from '../Usage.constants'
 import AttributeUsage from './AttributeUsage'
 
 export interface ChartMeta {
-  [key: string]: { data: DataPoint[]; margin: number; isLoading: boolean; hasNoData: boolean }
+  [key: string]: { data: DataPoint[]; margin: number; isLoading: boolean }
 }
 
 export interface UsageSectionProps {

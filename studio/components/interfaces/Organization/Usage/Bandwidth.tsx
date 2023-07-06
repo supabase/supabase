@@ -28,13 +28,12 @@ const Bandwidth = ({
   })
 
   const chartMeta: {
-    [key: string]: { data: DataPoint[]; margin: number; isLoading: boolean; hasNoData: boolean }
+    [key: string]: { data: DataPoint[]; margin: number; isLoading: boolean }
   } = {
     [PricingMetric.EGRESS]: {
       data: egressData?.data ?? [],
       margin: 16,
       isLoading: isLoadingDbEgressData,
-      hasNoData: egressData?.hasNoData ?? false,
     },
   }
 
