@@ -3,7 +3,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 
 import { useParams } from 'common'
-import { AddNewPaymentMethodModal } from 'components/interfaces/Billing'
+import { AddNewPaymentMethodModal } from 'components/interfaces/BillingV2'
 import {
   ScaffoldSection,
   ScaffoldSectionContent,

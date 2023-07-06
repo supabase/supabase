@@ -1,9 +1,12 @@
 import clsx from 'clsx'
 import { useParams } from 'common'
+import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 import { useProjectUsageQuery } from 'data/usage/project-usage-query'
 import dayjs from 'dayjs'
+import { useSelectedOrganization } from 'hooks'
+import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants'
 import { useMemo, useRef, useState } from 'react'
 import { InView } from 'react-intersection-observer'
 import { IconAlertCircle, IconLoader, cn } from 'ui'
@@ -13,31 +16,32 @@ import Infrastructure from './Infrastructure'
 import SizeAndCounts from './SizeAndCounts'
 import { USAGE_CATEGORIES, USAGE_STATUS } from './Usage.constants'
 import { getUsageStatus } from './Usage.utils'
-import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
-import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants'
 
 export type usageSectionIds = 'infra' | 'bandwidth' | 'sizeCount' | 'activity'
 
 const Usage = () => {
   const { ref } = useParams()
+  const organization = useSelectedOrganization()
+  const isOrgBilling = !!organization?.subscription_id
 
   // [Joshen] Using a state here for now as in the future, we'd have this usage page support showing
   // stats for different projects. So we'll pass the selected ref as a prop into the individual components
   const [selectedProjectRef] = useState<string>(ref as string)
+  const [activeTab, setActiveTab] = useState<usageSectionIds>('infra')
+  const [dateRange, setDateRange] = useState<any>()
 
   const infrastructureRef = useRef<HTMLDivElement>(null)
   const bandwidthRef = useRef<HTMLDivElement>(null)
   const sizeAndCountsRef = useRef<HTMLDivElement>(null)
   const activityRef = useRef<HTMLDivElement>(null)
 
-  const [activeTab, setActiveTab] = useState<usageSectionIds>('infra')
-
-  const [dateRange, setDateRange] = useState<any>()
-
   const { data: usage } = useProjectUsageQuery({ projectRef: ref })
   const { data: subscription, isLoading: isLoadingSubscription } = useProjectSubscriptionV2Query({
     projectRef: selectedProjectRef,
   })
+  const usageBillingEnabled = subscription?.usage_billing_enabled
+  const billingCycleStart = dayjs.unix(subscription?.current_period_start ?? 0).utc()
+  const billingCycleEnd = dayjs.unix(subscription?.current_period_end ?? 0).utc()
 
   const currentBillingCycleSelected = useMemo(() => {
     // Selected by default
@@ -86,11 +90,6 @@ const Usage = () => {
       'disk_io_budget'
     ] ?? 100
   )
-
-  const billingCycleStart = dayjs.unix(subscription?.current_period_start ?? 0).utc()
-  const billingCycleEnd = dayjs.unix(subscription?.current_period_end ?? 0).utc()
-
-  const usageBillingEnabled = subscription?.usage_billing_enabled
 
   const scrollTo = (id: usageSectionIds) => {
     switch (id) {
@@ -165,7 +164,8 @@ const Usage = () => {
                     <p
                       className={clsx('text-sm transition', isLoadingSubscription && 'opacity-50')}
                     >
-                      Project is on {subscription.plan.name} plan
+                      {isOrgBilling ? 'Organization' : 'Project'} is on the {subscription.plan.name}{' '}
+                      plan
                     </p>
                     <p className="text-sm text-scale-1000">
                       {billingCycleStart.format('DD MMM YYYY')} -{' '}
