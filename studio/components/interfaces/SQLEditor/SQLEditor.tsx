@@ -15,6 +15,20 @@ import UtilityPanel from './UtilityPanel/UtilityPanel'
 // Load the monaco editor client-side only (does not behave well server-side)
 const MonacoEditor = dynamic(() => import('./MonacoEditor'), { ssr: false })
 
+const OptionIcon = () => {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M3 5H7.76472L16.2353 19H21M16.2353 5H21"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="square"
+        strokeLinejoin="round"
+      />
+    </svg>
+  )
+}
+
 const SQLEditor = () => {
   const { ref, id } = useParams()
   const { project } = useProjectContext()
@@ -81,28 +95,10 @@ const SQLEditor = () => {
         icon={<AiIcon className="w-4 h-4 ml-1" />}
         inputClassName="bg-transparent rounded-none focus:border-brand-900"
         iconContainerClassName="transition text-scale-800 peer-focus/input:text-brand-900"
-        placeholder="Generate & edit SQL using Supabase AI..."
+        placeholder="Ask Supabase AI to do something"
         actions={
           <div className="flex items-center space-x-1 mr-6">
-            {os === 'macos' ? (
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M3 5H7.76472L16.2353 19H21M16.2353 5H21"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="square"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            ) : (
-              <p className="text-xs text-scale-1100">ALT</p>
-            )}
+            {os === 'macos' ? <OptionIcon /> : <p className="text-xs text-scale-1100">ALT</p>}
             <IconCornerDownLeft size={16} strokeWidth={1.5} />
           </div>
         }
