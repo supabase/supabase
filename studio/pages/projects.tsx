@@ -32,7 +32,7 @@ const ProjectsPage: NextPageWithLayout = () => {
 
       {isError && (
         <div className="py-4 px-5">
-          <AlertError subject="Unable to retrieve organizations" />
+          <AlertError subject="Failed to retrieve organizations" />
         </div>
       )}
 

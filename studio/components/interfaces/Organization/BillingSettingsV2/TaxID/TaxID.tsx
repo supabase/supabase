@@ -151,7 +151,7 @@ const TaxID = () => {
             )}
 
             {isError && (
-              <AlertError error={error} subject="Unable to retrieve organization tax IDs" />
+              <AlertError error={error} subject="Failed to retrieve organization tax IDs" />
             )}
 
             {isSuccess && (
