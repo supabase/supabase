@@ -2046,4 +2046,9 @@ module.exports = [
     source: '/docs/guides/realtime/quickstart',
     destination: '/docs/guides/realtime',
   },
+  {
+    permanent: true,
+    source: '/docs/guides/ai/choosing-instance-type',
+    destination: '/docs/guides/ai/choosing-compute-addon',
+  },
 ]
