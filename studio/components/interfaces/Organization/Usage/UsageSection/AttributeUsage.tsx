@@ -181,8 +181,8 @@ const AttributeUsage = ({
                       />
                     )}
 
-                  <div>
-                    {projectRef === undefined && (
+                  {projectRef === undefined && (
+                    <div>
                       <div className="flex items-center justify-between border-b py-1">
                         <p className="text-xs text-scale-1000">
                           Included in {subscription?.plan?.name.toLowerCase()} plan
@@ -197,22 +197,19 @@ const AttributeUsage = ({
                           </p>
                         )}
                       </div>
-                    )}
-                    {currentBillingCycleSelected && (
-                      <div className="flex items-center justify-between py-1">
-                        <p className="text-xs text-scale-1000">
-                          {attribute.chartPrefix || 'Used '} in period
-                        </p>
-                        <p className="text-xs">
-                          {attribute.unit === 'bytes'
-                            ? `${usageMeta?.usage ?? 0} GB`
-                            : (usageMeta?.usage ?? 0).toLocaleString()}
-                        </p>
-                      </div>
-                    )}
-                    {projectRef === undefined &&
-                      currentBillingCycleSelected &&
-                      (usageMeta?.pricing_free_units ?? 0) > 0 && (
+                      {currentBillingCycleSelected && (
+                        <div className="flex items-center justify-between py-1">
+                          <p className="text-xs text-scale-1000">
+                            {attribute.chartPrefix || 'Used '} in period
+                          </p>
+                          <p className="text-xs">
+                            {attribute.unit === 'bytes'
+                              ? `${usageMeta?.usage ?? 0} GB`
+                              : (usageMeta?.usage ?? 0).toLocaleString()}
+                          </p>
+                        </div>
+                      )}
+                      {currentBillingCycleSelected && (usageMeta?.pricing_free_units ?? 0) > 0 && (
                         <div className="flex items-center justify-between border-t py-1">
                           <p className="text-xs text-scale-1000">Overage in period</p>
                           <p className="text-xs">
@@ -224,7 +221,8 @@ const AttributeUsage = ({
                           </p>
                         </div>
                       )}
-                  </div>
+                    </div>
+                  )}
                 </div>
 
                 {attribute.additionalInfo?.(usage)}
