@@ -1,7 +1,7 @@
 import Editor, { Monaco, OnMount } from '@monaco-editor/react'
 import { timeout } from 'lib/helpers'
 import { Selection, editor } from 'monaco-editor'
-import { MutableRefObject, useRef, useState } from 'react'
+import { MutableRefObject, useEffect, useRef, useState } from 'react'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import AskAIWidget from './AskAIWidget'
 import InlineWidget from './InlineWidget'
@@ -52,7 +52,7 @@ const MonacoEditor = ({ id, editorRef, isExecuting, executeQuery }: MonacoEditor
     editor.addAction({
       id: 'ask-ai',
       label: 'Ask AI',
-      keybindings: [monaco.KeyMod.Alt + monaco.KeyCode.Enter],
+      keybindings: [monaco.KeyMod.CtrlCmd + monaco.KeyCode.KeyI],
       contextMenuGroupId: 'operation',
       contextMenuOrder: 0,
       run: () => {
@@ -78,6 +78,25 @@ const MonacoEditor = ({ id, editorRef, isExecuting, executeQuery }: MonacoEditor
     await timeout(500)
     editor.focus()
   }
+
+  useEffect(() => {
+    if (!isAiWidgetOpen) {
+      return
+    }
+
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') {
+        setIsAiWidgetOpen(false)
+        editor?.focus()
+      }
+    }
+
+    window.addEventListener('keydown', onKeyDown)
+
+    return () => {
+      window.removeEventListener('keydown', onKeyDown)
+    }
+  }, [editor, isAiWidgetOpen])
 
   function handleEditorChange(value: string | undefined) {
     if (id && value) snap.setSql(id, value)
