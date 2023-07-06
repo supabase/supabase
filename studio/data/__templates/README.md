@@ -47,3 +47,43 @@ Standardized keys for use with `useQuery` and `invalidateQueries`. This is not r
 - [TkDodo's Blog Posts](https://tanstack.com/query/v4/docs/react/community/tkdodos-blog)
 
 The blog posts in particular are very helpful for learning best practices and how to use the library effectively.
+
+## UI Error handling
+
+**All network requests** should be done through queries or mutations as they provide a couple of helpful parameters that can ensure our UI covers all scenarios. The main purpose is so that users are always informed whenever a network request fails, rather than allowing the requests to fail silently in the background and the users are left guessing as to what is happening.
+
+### Queries
+
+The 3 states that are provided in a query (`isLoading`, `isError`, `isSuccess`) **must** be covered in the UI whenever we're using it. Typically, we'd use the following UI components to cover them, and the states are mutually exclusive so it's preferred not to nest them in a ternary operator for better readability.
+
+```jsx
+const { data, error, isLoading, isError, isSuccess } = useQuery()
+
+{
+  isLoading && <GenericSkeletonLoader />
+}
+
+{
+  isError && <AlertError subject="A subject" error={error} />
+}
+
+{
+  isSuccess && <div>Your UI component</div>
+}
+```
+
+### Mutations
+
+The parameter `onError` should be passed when intializing the mutation, where the appropriate UI behaviour should be triggered (usually a toast will be fine). If `onError` is not provided, we will then default to a toast message that will be called from within the mutation itself.
+
+```jsx
+const { mutateAsync } = useMutation({
+  onError: (error) => {
+    ui.setNotification({ category: 'error', message: `Failed: ${error.message}` })
+  },
+})
+
+const onConfirm = async () => {
+  // [Joshen] Need to update here after discussing with Alaister
+}
+```
