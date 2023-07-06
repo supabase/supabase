@@ -59,7 +59,7 @@ const Header: FC<any> = ({ organization, project }) => {
               </p>
             </div>
           </div>
-          <div className="flex">{/* End */}</div>
+          <div className="flex">{/* The End */}</div>
           <div className="flex items-center space-x-2">
             <HelpPopover />
             <FeedbackDropdown />
