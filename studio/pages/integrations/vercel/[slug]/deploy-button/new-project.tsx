@@ -356,8 +356,8 @@ const CreateProject = ({
       <div className="py-2 pb-4">
         <Checkbox
           name="shouldRunMigrations"
-          label="Run migrations & seed.sql"
-          description="If your repository has migrations under supabase/migrations, they will be run automatically."
+          label="Create sample tables with seed data"
+          description="To get you started quickly, we can create new tables for you with seed (sample) data. You can quickly delete these tables later."
           checked={shouldRunMigrations}
           onChange={(e) => setShouldRunMigrations(e.target.checked)}
         />
