@@ -1991,6 +1991,199 @@ module.exports = [
     source: '/blog/case-study-happyteams',
     destination: '/customers/happyteams',
   },
+
+  // Old tags
+  {
+    permanent: true,
+    source: '/blog/tags/supabase',
+    destination: '/blog/tags/company',
+  },
+  {
+    permanent: true,
+    source: '/blog/tags/announcements',
+    destination: '/blog/tags/company',
+  },
+  {
+    permanent: true,
+    source: '/blog/tags/postgresql',
+    destination: '/blog/tags/postgres',
+  },
+  {
+    permanent: true,
+    source: '/blog/tags/sql',
+    destination: '/blog/tags/postgres',
+  },
+  {
+    permanent: true,
+    source: '/blog/tags/planetpg',
+    destination: '/blog/tags/postgres',
+  },
+  {
+    permanent: true,
+    source: '/blog/tags/fintech',
+    destination: '/blog/tags/product',
+  },
+  {
+    permanent: true,
+    source: '/blog/tags/tech',
+    destination: '/blog/tags/product',
+  },
+  {
+    permanent: true,
+    source: '/blog/tags/frontend',
+    destination: '/blog/tags/product',
+  },
+  {
+    permanent: true,
+    source: '/blog/tags/tutorial',
+    destination: '/blog/tags/product',
+  },
+  {
+    permanent: true,
+    source: '/blog/tags/replit',
+    destination: '/blog/tags/postgres',
+  },
+  {
+    permanent: true,
+    source: '/blog/tags/node-js',
+    destination: '/blog/tags/product',
+  },
+  {
+    permanent: true,
+    source: '/blog/tags/o11y',
+    destination: '/blog/tags/logging',
+  },
+  {
+    permanent: true,
+    source: '/blog/tags/fundraising',
+    destination: '/blog/tags/company',
+  },
+  {
+    permanent: true,
+    source: '/blog/tags/pricing',
+    destination: '/blog/tags/product',
+  },
+  {
+    permanent: true,
+    source: '/blog/tags/q-and-a',
+    destination: '/blog/tags/product',
+  },
+  {
+    permanent: true,
+    source: '/blog/tags/developers',
+    destination: '/blog/tags/product',
+  },
+  {
+    permanent: true,
+    source: '/blog/tags/striveschool',
+    destination: '/blog/tags/partnerships',
+  },
+  {
+    permanent: true,
+    source: '/blog/tags/swag',
+    destination: '/blog/tags/company',
+  },
+  {
+    permanent: true,
+    source: '/blog/tags/encryption',
+    destination: '/blog/tags/security',
+  },
+  {
+    permanent: true,
+    source: '/blog/tags/engineering',
+    destination: '/blog/tags/product',
+  },
+  {
+    permanent: true,
+    source: '/blog/tags/nfts',
+    destination: '/blog/tags/product',
+  },
+  {
+    permanent: true,
+    source: '/blog/tags/no-code',
+    destination: '/blog/tags/product',
+  },
+  {
+    permanent: true,
+    source: '/blog/tags/workflows',
+    destination: '/blog/tags/product',
+  },
+  {
+    permanent: true,
+    source: '/blog/tags/hacktoberfest',
+    destination: '/blog/tags/hackathon',
+  },
+  {
+    permanent: true,
+    source: '/blog/tags/hiring',
+    destination: '/blog/tags/company',
+  },
+  {
+    permanent: true,
+    source: '/blog/tags/CDN',
+    destination: '/blog/tags/product',
+  },
+  {
+    permanent: true,
+    source: '/blog/tags/data',
+    destination: '/blog/tags/database',
+  },
+  {
+    permanent: true,
+    source: '/blog/tags/slack',
+    destination: '/blog/tags/product',
+  },
+  {
+    permanent: true,
+    source: '/blog/tags/api',
+    destination: '/blog/tags/product',
+  },
+  {
+    permanent: true,
+    source: '/blog/tags/automation',
+    destination: '/blog/tags/product',
+  },
+  {
+    permanent: true,
+    source: '/blog/tags/backups',
+    destination: '/blog/tags/database',
+  },
+  {
+    permanent: true,
+    source: '/blog/tags/Next.js',
+    destination: '/blog/tags/nextjs',
+  },
+  {
+    permanent: true,
+    source: '/blog/tags/mfa',
+    destination: '/blog/tags/auth',
+  },
+  {
+    permanent: true,
+    source: '/blog/tags/saml',
+    destination: '/blog/tags/auth',
+  },
+  {
+    permanent: true,
+    source: '/blog/tags/ionic',
+    destination: '/blog/tags/angular',
+  },
+  {
+    permanent: true,
+    source: '/blog/tags/postgis',
+    destination: '/blog/tags/product',
+  },
+  {
+    permanent: true,
+    source: '/blog/tags/geoqueries',
+    destination: '/blog/tags/product',
+  },
+  {
+    permanent: true,
+    source: '/blog/tags/mobile',
+    destination: '/blog/tags/product',
+  },
+
   {
     permanent: true,
     source: '/docs/guides/auth/auth-helpers/nextjs-server-components',

@@ -148,12 +148,12 @@ const BlogFiltersExpand = ({ blogs, setBlogs, setCategory, allTags, handleBlogs 
               </>
             )}
           </AnimatePresence>
-          <AnimatePresence exitBeforeEnter>
+          <AnimatePresence>
             {!isTagsMenuOpen && (
               <m.div
                 initial={{ opacity: 0 }}
                 animate={getAnimation({ delay: tagsAnimation.durationOut })}
-                exit={{ visibility: 'hidden' }}
+                exit={{ opacity: 0, transition: { duration: 0 } }}
               >
                 <Button
                   type={isTagsMenuOpen ? 'default' : 'outline'}

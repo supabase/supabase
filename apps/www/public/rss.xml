@@ -204,13 +204,6 @@
   <pubDate>Thu, 16 Feb 2023 23:00:00 GMT</pubDate>
 </item>
 <item>
-  <guid>https://supabase.com/blog/case-study-happyteams</guid>
-  <title>HappyTeams unlocks better performance and reduces cost with Supabase</title>
-  <link>https://supabase.com/blog/case-study-happyteams</link>
-  <description>How a bootstrapped startup migrated from Heroku to Supabase in 30 minutes and never looked back</description>
-  <pubDate>Wed, 15 Feb 2023 23:00:00 GMT</pubDate>
-</item>
-<item>
   <guid>https://supabase.com/blog/flutter-real-time-multiplayer-game</guid>
   <title>How to build a real-time multiplayer game with Flutter Flame</title>
   <link>https://supabase.com/blog/flutter-real-time-multiplayer-game</link>
@@ -862,13 +855,6 @@
   <pubDate>Wed, 27 Oct 2021 22:00:00 GMT</pubDate>
 </item>
 <item>
-  <guid>https://supabase.com/blog/replenysh-time-to-value-in-less-than-24-hours</guid>
-  <title>Replenysh uses Supabase to implement OTP in less than 24-hours</title>
-  <link>https://supabase.com/blog/replenysh-time-to-value-in-less-than-24-hours</link>
-  <description>Learn how Replenysh uses Supabase to power the circular economy, redefining how brands interact with their customers and products.</description>
-  <pubDate>Mon, 18 Oct 2021 22:00:00 GMT</pubDate>
-</item>
-<item>
   <guid>https://supabase.com/blog/hacktoberfest-hackathon-winners-2021</guid>
   <title>Hacktoberfest Hackathon Winners 2021</title>
   <link>https://supabase.com/blog/hacktoberfest-hackathon-winners-2021</link>
@@ -1167,13 +1153,6 @@
   <title>Supabase Partners With Strive School To Help Teach Open Source</title>
   <link>https://supabase.com/blog/supabase-striveschool</link>
   <description>Supabase Partners With Strive School To Help Teach Open Source To The Next Generation Of Developers</description>
-  <pubDate>Tue, 01 Dec 2020 23:00:00 GMT</pubDate>
-</item>
-<item>
-  <guid>https://supabase.com/blog/case-study-xendit</guid>
-  <title>Xendit Built a Counter-Fraud Watchlist for the Fintech Industry</title>
-  <link>https://supabase.com/blog/case-study-xendit</link>
-  <description>See how Xendit use Supabase to build a full-text search engine.</description>
   <pubDate>Tue, 01 Dec 2020 23:00:00 GMT</pubDate>
 </item>
 <item>
