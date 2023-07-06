@@ -85,14 +85,17 @@ const Infrastructure = ({
     dateFormat,
   })
 
+  const hasLatest = dayjs(endDate!).isAfter(dayjs().startOf('day'))
+
+  const latestIoBudgetConsumption =
+    hasLatest && ioBudgetData?.data?.slice(-1)
+      ? Number(ioBudgetData.data.slice(-1)[0].disk_io_consumption)
+      : 0
+
   const highestIoBudgetConsumption = Math.max(
     ...(ioBudgetData?.data || []).map((x) => Number(x.disk_io_consumption) ?? 0),
     0
   )
-
-  const latestIoBudgetConsumption = ioBudgetData?.data.slice(-1)
-    ? Number(ioBudgetData?.data.slice(-1)[0].disk_io_consumption)
-    : 0
 
   const chartMeta: { [key: string]: { data: DataPoint[]; isLoading: boolean } } = {
     max_cpu_usage: {
@@ -122,7 +125,7 @@ const Infrastructure = ({
             <SectionContent section={attribute}>
               {attribute.key === 'disk_io_consumption' && (
                 <>
-                  {latestIoBudgetConsumption >= 100 ? (
+                  {hasLatest && latestIoBudgetConsumption >= 100 ? (
                     <Alert withIcon variant="danger" title="Your Disk IO Budget has been used up">
                       <p className="mb-4">
                         Your workload has used up all your Disk IO Budget and is now running at the
