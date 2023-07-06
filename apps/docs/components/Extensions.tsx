@@ -10,15 +10,15 @@ type Extension = {
   link: string
 }
 
-type LinkTarget = React.ComponentProps<'a'>['target'];
+type LinkTarget = React.ComponentProps<'a'>['target']
 
 function getLinkTarget(link: string): LinkTarget {
   // Link is relative, open in the same tab
-  if (link.startsWith("/")) {
-    return "_self"
+  if (link.startsWith('/')) {
+    return '_self'
   }
   // Link is external, open in a new tab
-  return "_blank"
+  return '_blank'
 }
 
 function getUniqueTags(json: Extension[]): string[] {
@@ -66,7 +66,7 @@ export default function Extensions() {
                     htmlFor={tag}
                     className={`text-sm text-scale-1000 py-0.5 px-2 capitalize inline-block rounded-lg hover:bg-slate-400  hover:border-slate-400 cursor-pointer border ${
                       filters.includes(tag) ? 'bg-slate-400 ' : ''
-                      }`}
+                    }`}
                   >
                     <span className="flex items-center gap-1">
                       <input
@@ -105,10 +105,7 @@ export default function Extensions() {
                 filters.length === 0 ? x : x.tags.some((item) => filters.includes(item))
               )
               .map((extension) => (
-                <Link
-                  passHref
-                  href={extension.link}
-                >
+                <Link passHref href={extension.link}>
                   <a target={getLinkTarget(extension.link)} className="no-underline">
                     <GlassPanel title={extension.name} background={false} key={extension.name}>
                       <p className="mt-4">
