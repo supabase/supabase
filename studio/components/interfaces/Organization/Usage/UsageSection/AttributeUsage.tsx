@@ -24,6 +24,7 @@ import { useMemo } from 'react'
 
 export interface AttributeUsageProps {
   slug: string
+  projectRef?: string
   attribute: CategoryAttribute
   usage?: OrgUsageResponse
   usageMeta?: UsageMetric
@@ -40,6 +41,7 @@ export interface AttributeUsageProps {
 
 const AttributeUsage = ({
   slug,
+  projectRef,
   attribute,
   usage,
   usageMeta,
@@ -158,39 +160,44 @@ const AttributeUsage = ({
                     )}
                   </div>
 
-                  {currentBillingCycleSelected && !usageMeta.unlimited && (
-                    <SparkBar
-                      type="horizontal"
-                      barClass={clsx(
-                        usageRatio >= 1
-                          ? usageBasedBilling
-                            ? 'bg-scale-1100'
-                            : 'bg-red-900'
-                          : usageBasedBilling === false && usageRatio >= USAGE_APPROACHING_THRESHOLD
-                          ? 'bg-amber-900'
-                          : 'bg-scale-1100'
-                      )}
-                      bgClass="bg-gray-300 dark:bg-gray-600"
-                      value={usageMeta?.usage ?? 0}
-                      max={usageMeta?.pricing_free_units || 1}
-                    />
-                  )}
+                  {projectRef === undefined &&
+                    currentBillingCycleSelected &&
+                    !usageMeta.unlimited && (
+                      <SparkBar
+                        type="horizontal"
+                        barClass={clsx(
+                          usageRatio >= 1
+                            ? usageBasedBilling
+                              ? 'bg-scale-1100'
+                              : 'bg-red-900'
+                            : usageBasedBilling === false &&
+                              usageRatio >= USAGE_APPROACHING_THRESHOLD
+                            ? 'bg-amber-900'
+                            : 'bg-scale-1100'
+                        )}
+                        bgClass="bg-gray-300 dark:bg-gray-600"
+                        value={usageMeta?.usage ?? 0}
+                        max={usageMeta?.pricing_free_units || 1}
+                      />
+                    )}
 
                   <div>
-                    <div className="flex items-center justify-between border-b py-1">
-                      <p className="text-xs text-scale-1000">
-                        Included in {subscription?.plan?.name.toLowerCase()} plan
-                      </p>
-                      {usageMeta.unlimited ? (
-                        <p className="text-xs">Unlimited</p>
-                      ) : (
-                        <p className="text-xs">
-                          {attribute.unit === 'bytes'
-                            ? `${usageMeta.pricing_free_units ?? 0} GB`
-                            : (usageMeta.pricing_free_units ?? 0).toLocaleString()}
+                    {projectRef === undefined && (
+                      <div className="flex items-center justify-between border-b py-1">
+                        <p className="text-xs text-scale-1000">
+                          Included in {subscription?.plan?.name.toLowerCase()} plan
                         </p>
-                      )}
-                    </div>
+                        {usageMeta.unlimited ? (
+                          <p className="text-xs">Unlimited</p>
+                        ) : (
+                          <p className="text-xs">
+                            {attribute.unit === 'bytes'
+                              ? `${usageMeta.pricing_free_units ?? 0} GB`
+                              : (usageMeta.pricing_free_units ?? 0).toLocaleString()}
+                          </p>
+                        )}
+                      </div>
+                    )}
                     {currentBillingCycleSelected && (
                       <div className="flex items-center justify-between py-1">
                         <p className="text-xs text-scale-1000">
@@ -203,18 +210,20 @@ const AttributeUsage = ({
                         </p>
                       </div>
                     )}
-                    {currentBillingCycleSelected && (usageMeta?.pricing_free_units ?? 0) > 0 && (
-                      <div className="flex items-center justify-between border-t py-1">
-                        <p className="text-xs text-scale-1000">Overage in period</p>
-                        <p className="text-xs">
-                          {(usageMeta?.pricing_free_units ?? 0) === -1 || usageExcess < 0
-                            ? `0${attribute.unit === 'bytes' ? ' GB' : ''}`
-                            : attribute.unit === 'bytes'
-                            ? `${usageExcess} GB`
-                            : usageExcess.toLocaleString()}
-                        </p>
-                      </div>
-                    )}
+                    {projectRef === undefined &&
+                      currentBillingCycleSelected &&
+                      (usageMeta?.pricing_free_units ?? 0) > 0 && (
+                        <div className="flex items-center justify-between border-t py-1">
+                          <p className="text-xs text-scale-1000">Overage in period</p>
+                          <p className="text-xs">
+                            {(usageMeta?.pricing_free_units ?? 0) === -1 || usageExcess < 0
+                              ? `0${attribute.unit === 'bytes' ? ' GB' : ''}`
+                              : attribute.unit === 'bytes'
+                              ? `${usageExcess} GB`
+                              : usageExcess.toLocaleString()}
+                          </p>
+                        </div>
+                      )}
                   </div>
                 </div>
 

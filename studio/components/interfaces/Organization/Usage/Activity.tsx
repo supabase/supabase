@@ -116,6 +116,7 @@ const Activity = ({
   return (
     <UsageSection
       orgSlug={orgSlug}
+      projectRef={projectRef}
       categoryKey="activity"
       chartMeta={chartMeta}
       subscription={subscription}

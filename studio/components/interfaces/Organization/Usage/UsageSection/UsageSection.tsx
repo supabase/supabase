@@ -50,6 +50,7 @@ const UsageSection = ({
         <AttributeUsage
           key={attribute.name}
           slug={orgSlug}
+          projectRef={projectRef}
           attribute={attribute}
           usage={usage}
           usageMeta={usage?.usages.find((x) => x.metric === attribute.key)}
