@@ -7,7 +7,7 @@ import * as NavItems from './NavigationMenu.constants'
 import Image from 'next/image'
 
 import RevVersionDropdown from '~/components/RefVersionDropdown'
-import { useMenuActiveRefId } from '~/hooks/useMenuState'
+import { menuState, useMenuActiveRefId } from '~/hooks/useMenuState'
 
 import React, { Fragment } from 'react'
 import { ICommonItem, ICommonSection } from '~/components/reference/Reference.types'
@@ -31,6 +31,7 @@ interface FunctionLinkProps {
   slug: string
   isParent?: boolean
   isSubItem?: boolean
+  onClick?: () => void
 }
 
 const FunctionLink = React.memo(function FunctionLink({
@@ -41,6 +42,7 @@ const FunctionLink = React.memo(function FunctionLink({
   slug,
   isParent = false,
   isSubItem = false,
+  onClick = () => {},
 }: FunctionLinkProps) {
   const router = useRouter()
   const activeAccordionItem = useMenuActiveRefId()
@@ -60,6 +62,7 @@ const FunctionLink = React.memo(function FunctionLink({
           e.preventDefault()
           history.pushState({}, '', url)
           document.getElementById(slug)?.scrollIntoView()
+          onClick()
         }}
         className={cn(
           'cursor-pointer transition text-sm hover:text-scale-1200 gap-3 relative',
@@ -103,6 +106,7 @@ const RenderLink = React.memo(function RenderLink({ section, basePath }: RenderL
         basePath={basePath}
         isParent={false}
         isSubItem
+        onClick={() => menuState.setMenuMobileOpen(false)}
       />
     )
   }
@@ -133,6 +137,7 @@ const RenderLink = React.memo(function RenderLink({ section, basePath }: RenderL
                 basePath={basePath}
                 isParent={false}
                 isSubItem={false}
+                onClick={() => menuState.setMenuMobileOpen(false)}
               />
             )
           })}
