@@ -107,9 +107,9 @@ export const generateSettingsMenu = (
                 items: [],
               },
               {
-                name: 'Usage',
+                name: 'Infrastructure',
                 key: 'usage',
-                url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/billing/usage`,
+                url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/infrastructure`,
                 items: [],
               },
             ],
