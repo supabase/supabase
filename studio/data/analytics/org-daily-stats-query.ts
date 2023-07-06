@@ -106,37 +106,19 @@ export const useOrgDailyStatsQuery = <TData = OrgDailyStatsData>(
         typeof endDate !== 'undefined',
 
       select(data) {
-        const noDataYet = data.data[0]?.id === undefined
-
-        // [Joshen] Ideally handled by API, like infra-monitoring
-        if (noDataYet) {
-          const days = dayjs(endDate).diff(dayjs(startDate), 'days')
-          const tempArray = new Array(days).fill(0)
-          const mockData = tempArray.map((x, idx) => {
+        return {
+          ...data,
+          data: data.data.map((x) => {
             return {
-              loopId: idx,
-              period_start: dayjs(startDate).add(idx, 'day').format('DD MMM YYYY'),
-              periodStartFormatted: dayjs(startDate).add(idx, 'day').format(dateFormat),
-              [metric as string]: 0,
+              ...x,
+              [metric as string]:
+                modifier !== undefined
+                  ? modifier(Number(x[metric as string]))
+                  : Number(x[metric as string]),
+              periodStartFormatted: dayjs(x.period_start).format(dateFormat),
             }
-          })
-          return { ...data, data: mockData, hasNoData: true } as TData
-        } else {
-          return {
-            ...data,
-            hasNoData: false,
-            data: data.data.map((x) => {
-              return {
-                ...x,
-                [metric as string]:
-                  modifier !== undefined
-                    ? modifier(Number(x[metric as string]))
-                    : Number(x[metric as string]),
-                periodStartFormatted: dayjs(x.period_start).format(dateFormat),
-              }
-            }),
-          } as TData
-        }
+          }),
+        } as TData
       },
       staleTime: 1000 * 60 * 60, // default good for an hour for now
       ...options,

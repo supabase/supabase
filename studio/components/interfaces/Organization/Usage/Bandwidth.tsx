@@ -37,6 +37,8 @@ const Bandwidth = ({
     },
   }
 
+  console.log(egressData)
+
   return (
     <UsageSection
       orgSlug={orgSlug}
