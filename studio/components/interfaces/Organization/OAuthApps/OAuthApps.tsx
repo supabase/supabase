@@ -75,7 +75,7 @@ const OAuthApps = () => {
           )}
 
           {isErrorPublishedApps && (
-            <AlertError className="mt-4" subject="Unable to retrieve published OAuth apps" />
+            <AlertError className="mt-4" subject="Failed to retrieve published OAuth apps" />
           )}
 
           {createdApp !== undefined && (
@@ -170,7 +170,7 @@ const OAuthApps = () => {
               </div>
             )}
 
-            {isErrorAuthorizedApps && <AlertError subject="Unable to retrieve authorized apps" />}
+            {isErrorAuthorizedApps && <AlertError subject="Failed to retrieve authorized apps" />}
 
             {isSuccessAuthorizedApps && (
               <>

@@ -5,7 +5,7 @@ export interface SectionHeaderProps {
 
 const SectionHeader = ({ title, description }: SectionHeaderProps) => {
   return (
-    <div className="mx-auto flex flex-col gap-10 py-16">
+    <div className="mx-auto flex flex-col gap-10 py-14">
       <div>
         <p className="text-xl">{title}</p>
         <p className="text-sm text-scale-1000">{description}</p>
