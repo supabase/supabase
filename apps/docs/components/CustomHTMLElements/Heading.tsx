@@ -1,10 +1,11 @@
+import { PropsWithChildren } from 'react'
+import { useInView } from 'react-intersection-observer'
 import {
   getAnchor,
-  removeAnchor,
   highlightSelectedTocItem,
+  removeAnchor,
   unHighlightSelectedTocItems,
 } from './CustomHTMLElements.utils'
-import { useInView } from 'react-intersection-observer'
 
 /**
  * [Joshen] The trick with rootMargin
@@ -13,7 +14,7 @@ import { useInView } from 'react-intersection-observer'
  * of our page, it will not be counted as visible.
  */
 
-interface Props {
+export interface HeadingProps {
   tag?: string
   parseAnchors?: boolean
   customAnchor?: string
@@ -28,7 +29,7 @@ interface Props {
  * need to parse the <a> and generate anchors. Custom anchors are used in tsx files.
  * (see: /pages/reference/cli/config.tsx)
  */
-const Heading: React.FC<Props> = ({ tag, customAnchor, children }) => {
+const Heading = ({ tag, customAnchor, children }: PropsWithChildren<HeadingProps>) => {
   const HeadingTag = `${tag}` as any
   const anchor = customAnchor ? customAnchor : getAnchor(children)
   const link = `#${anchor}`
