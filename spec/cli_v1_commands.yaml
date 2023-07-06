@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 1.74.0
+  version: 1.75.2
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -994,6 +994,7 @@ commands:
       - management-api
     links: []
     subcommands:
+      - supabase-orgs-create
       - supabase-orgs-list
     flags: []
   - id: supabase-orgs-list
@@ -1003,6 +1004,15 @@ commands:
     tags: []
     links: []
     usage: supabase orgs list
+    subcommands: []
+    flags: []
+  - id: supabase-orgs-create
+    title: supabase orgs create
+    summary: Create an organization
+    description: Create an organization for the logged-in user.
+    tags: []
+    links: []
+    usage: supabase orgs create
     subcommands: []
     flags: []
   - id: supabase-network-restrictions

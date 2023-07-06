@@ -16,7 +16,7 @@ import {
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { VaultSecret } from 'types'
-import { checkPermissions, useImmutableValue, useStore } from 'hooks'
+import { useCheckPermissions, useImmutableValue, useStore } from 'hooks'
 import { useParams } from 'common/hooks'
 import { useFDWsQuery } from 'data/fdw/fdws-query'
 import { useFDWUpdateMutation } from 'data/fdw/fdw-update-mutation'
@@ -65,7 +65,7 @@ const EditWrapper = () => {
   const [selectedTableToEdit, setSelectedTableToEdit] = useState()
   const [formErrors, setFormErrors] = useState<{ [k: string]: string }>({})
 
-  const canUpdateWrapper = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'wrappers')
+  const canUpdateWrapper = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'wrappers')
 
   const initialValues =
     wrapperMeta !== undefined

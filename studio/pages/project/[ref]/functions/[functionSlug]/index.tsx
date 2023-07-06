@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import { Button } from 'ui'
 import { observer } from 'mobx-react-lite'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { checkPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks'
 import { useParams } from 'common/hooks'
 import { ChartIntervals, NextPageWithLayout } from 'types'
 import NoPermission from 'components/ui/NoPermission'
@@ -54,7 +54,6 @@ const PageLayout: NextPageWithLayout = () => {
     }))
   }, [data?.result])
 
-
   const [startDate, endDate]: [Dayjs, Dayjs] = useMemo(() => {
     const start = dayjs()
       .subtract(selectedInterval.startValue, selectedInterval.startUnit as dayjs.ManipulateType)
@@ -72,7 +71,10 @@ const PageLayout: NextPageWithLayout = () => {
     endDate.toISOString()
   )
 
-  const canReadFunction = checkPermissions(PermissionAction.FUNCTIONS_READ, functionSlug as string)
+  const canReadFunction = useCheckPermissions(
+    PermissionAction.FUNCTIONS_READ,
+    functionSlug as string
+  )
   if (!canReadFunction) {
     return <NoPermission isFullPage resourceText="access this edge function" />
   }

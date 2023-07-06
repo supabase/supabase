@@ -1,24 +1,25 @@
-import { useEffect } from 'react'
-import { observer } from 'mobx-react-lite'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { observer } from 'mobx-react-lite'
+import { useEffect } from 'react'
 
-import { NextPageWithLayout } from 'types'
-import { useStore, checkPermissions } from 'hooks'
-import { AuthLayout } from 'components/layouts'
-
-import NoPermission from 'components/ui/NoPermission'
 import RedirectUrls from 'components/interfaces/Auth/RedirectUrls/RedirectUrls'
-import { FormsContainer } from 'components/ui/Forms'
 import SiteUrl from 'components/interfaces/Auth/SiteUrl/SiteUrl'
+import { AuthLayout } from 'components/layouts'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { FormsContainer } from 'components/ui/Forms'
+import NoPermission from 'components/ui/NoPermission'
+import { useCheckPermissions, useStore } from 'hooks'
+import { NextPageWithLayout } from 'types'
 
 const URLConfiguration: NextPageWithLayout = () => {
-  const { ui, authConfig } = useStore()
+  const { authConfig } = useStore()
+  const { project } = useProjectContext()
 
   useEffect(() => {
     authConfig.load()
-  }, [ui.selectedProjectRef])
+  }, [project?.ref])
 
-  const canReadAuthSettings = checkPermissions(PermissionAction.READ, 'custom_config_gotrue')
+  const canReadAuthSettings = useCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
 
   if (!canReadAuthSettings) {
     return <NoPermission isFullPage resourceText="access your project's email settings" />

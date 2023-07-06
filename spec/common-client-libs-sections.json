@@ -715,11 +715,11 @@
   },
   {
     "type": "category",
-    "title": "Functions",
+    "title": "Edge Functions",
     "items": [
       {
         "id": "invoke",
-        "title": "Invoke a function",
+        "title": "Invokes a Supabase Edge Function.",
         "slug": "functions-invoke",
         "product": "functions",
         "type": "function"

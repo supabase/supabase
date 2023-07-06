@@ -18,12 +18,53 @@ functions:
   - id: initializing
     title: 'Initializing'
     description: |
+      ### Create Supabase Client
+
       Independently of which Supabase module you are using, you will need to initialize the main client first and install the module.
 
       To create a new client, you can use the `createSupabaseClient` function.
 
       When installing a module, you can pass a block to configure it.
 
+      ### OAuth and OTP link verification
+
+      [supabase-kt](https://github.com/supabase-community/supabase-kt) provides several platform implementations for OAuth and OTP link verification. \
+      **On JVM**, it uses a HTTP Callback Server to receive the session data from a successful OAuth login.
+
+      *Note: OTP link verification such as sign ups are not supported on JVM. You may have to send a verification token rather than a url in your E-Mail. To send the token, rather than a redirect url, you have to change `{{ .ConfirmationURL }}` in your sign up email to `{{ .Token }}`*
+
+      **On Android, IOS & MacOS**, it uses deeplinks. Refer to the guide below on how to setup deeplinks.
+      **On JS**, it uses the website origin as the callback url. Session importing gets handled automatically.
+      **Windows & Linux** currently have no default implementation. Feel free to create a PR.
+
+      You always make your own implementation and use `gotrue.parseFragmentAndImportSession(fragment)` to let [supabase-kt](https://github.com/supabase-community/supabase-kt) handle the parsing & importing of the session after receiving a callback.
+
+      ### Configure deeplink callbacks for Authentication
+
+      Deeplinks are supported on Android, IOS and MacOS.
+      1. **Setup a deeplink for you app** \
+      On Android you may setup a [deeplink](https://developer.android.com/training/app-links/deep-linking) in your Android manifest. \
+      On IOS & MacOS you may setup a [url scheme](https://developer.apple.com/documentation/xcode/defining-a-custom-url-scheme-for-your-app).
+      2. **Configure the GoTrue plugin**
+      You have to set the `host` and the `scheme` in the GoTrue config:
+          ```kotlin
+          install(GoTrue) {
+             host = "deeplink host"
+             scheme = "deeplink scheme"
+          }
+          ```
+      3. **Call platform specific function on startup** \
+      On Android: `client.handleDeeplinks(intent)` \
+      On IOS/MacOS: `client.handleDeeplinks(url)`
+
+      ### PKCE Authentication flow
+      suapbase-kt supports the [PKCE authentication flow](https://supabase.com/blog/supabase-auth-sso-pkce).
+      To use it, you just have to change the `flowType` in the GoTrue configuration:
+      ```kotlin
+      install(GoTrue) {
+        flowType = FlowType.PKCE
+      }
+      ```
     examples:
       - id: initialize-client
         name: Initialize Client
@@ -133,7 +174,7 @@ functions:
         description: |
           `transferTimeout` - the timeout for uploading and downloading files. Default: `120.seconds`
 
-          `resumable.cache` - Interface for storing resumable upload urls. Default: `ResumableCache.Disk`
+          `resumable.cache` - Interface for storing resumable upload urls. Default: `SettingsResumableCache`
 
           `resumable.defaultChunkSize` - The default chunk size for resumable uploads. Supabase currently only supports a chunk size of 6MB, so be careful when changing this value. Default: `6MB`
 
@@ -216,7 +257,7 @@ functions:
     title: 'Fetch data: select()'
     notes: |
       Perform a SELECT query on the table or view.
-      - When calling a `decode` method, you have to provide a [serializable class](/docs/reference/kotlin/installing#add-kotlinx-serialization-required-for-postgrest-and-realtime-serialization) as the type parameter.
+      - When calling a `decode` method, you have to provide a [serializable class](/docs/reference/kotlin/installing#serialization) as the type parameter.
       - You can provide a `Columns` object to select specific columns.
       - You can provide a [filter](/docs/reference/kotlin/using-filters) block to filter the results
     examples:
@@ -312,7 +353,7 @@ functions:
     title: 'Create data: insert()'
     $ref: '@supabase/postgrest-js."lib/PostgrestQueryBuilder".PostgrestQueryBuilder.insert'
     notes: |
-      - When calling an `insert` method, you have to provide a [serializable value](/docs/reference/kotlin/installing#add-kotlinx-serialization-required-for-postgrest-and-realtime-serialization).
+      - When calling an `insert` method, you have to provide a [serializable value](/docs/reference/kotlin/installing#serialization).
       - By default, every time you run `insert()`, the client library will make a `select` to return the full record.
       This is convenient, but it can also cause problems if your policies are not configured to allow the `select` operation.
       If you are using Row Level Security and you are encountering problems, try setting the `returning` param to `Returning.MINIMAL`.
@@ -349,7 +390,7 @@ functions:
     title: 'Modify data: update()'
     notes: |
       - `update()` should always be combined with a [filter](/docs/reference/kotlin/using-filters) block to avoid updating all records.
-      - When calling `insert` or `update`, you have to provide a [serializable value](/docs/reference/kotlin/installing#add-kotlinx-serialization-required-for-postgrest-and-realtime-serialization) in the function parameter.
+      - When calling `insert` or `update`, you have to provide a [serializable value](/docs/reference/kotlin/installing#serialization) in the function parameter.
     examples:
       - id: updating-your-data
         name: Updating your data
@@ -437,7 +478,7 @@ functions:
       - Primary keys should be included in the data payload in order for an update to work correctly.
       - Primary keys  must be natural, not surrogate. There are however, [workarounds](https://github.com/PostgREST/postgrest/issues/1118) for surrogate primary keys.
       - If you need to insert new data and update existing data at the same time, use [Postgres triggers](https://github.com/supabase/postgrest-js/issues/173#issuecomment-825124550).
-      - When calling `insert` or `update`, you have to provide a [serializable value](/docs/reference/kotlin/installing#add-kotlinx-serialization-required-for-postgrest-and-realtime-serialization) in the function parameter.
+      - When calling `insert` or `update`, you have to provide a [serializable value](/docs/reference/kotlin/installing#serialization) in the function parameter.
     examples:
       - id: upsert-your-data
         name: Upsert your data
@@ -508,7 +549,7 @@ functions:
       That's a fancy way of saying that you can put some logic into your database then call it from anywhere.
       It's especially useful when the logic rarely changes - like password resets and updates.
 
-      - When calling `rpc` with parameters, you have to provide a [serializable value](/docs/reference/kotlin/installing#add-kotlinx-serialization-required-for-postgrest-and-realtime-serialization) in the function parameter.
+      - When calling `rpc` with parameters, you have to provide a [serializable value](/docs/reference/kotlin/installing#serialization) in the function parameter.
     examples:
       - id: call-a-stored-procedure
         name: Call a stored procedure
@@ -2047,12 +2088,7 @@ functions:
         - If **Confirm email** is enabled, the return value is null and you will be logged in instead.
         - If **Confirm email** is disabled, the return value is the user and you won't be logged in automatically.
       - When the user confirms their email address, they are redirected to the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url) by default. You can modify your `SITE_URL` or add additional redirect URLs in [your project](https://supabase.com/dashboard/project/_/auth/url-configuration).
-      - [supabase-kt](https://github.com/supabase-community/supabase-kt/) has default platform implementations: 
-          - On JVM, you can currently only verify a sign up through the token. To send the token, rather than a redirect url, you have to change `{{ .ConfirmationURL }}` in your sign up email to `{{ .Token }}`
-          - [deep links](https://developer.android.com/training/app-links/deep-linking) (Android), 
-          - [url schemes](https://developer.apple.com/documentation/xcode/defining-a-custom-url-scheme-for-your-app) (IOS) 
-              - To enable deeplinking/url scheme support on Android/IOS set the `host` and the `scheme` in the GoTrue Config and call `client.handleDeeplinks(intent)` (Android) and `client.handleDeeplinks(url)` (IOS) on startup
-          - the website origin (JS)
+      - To learn how to handle OTP links & OAuth refer to [initializing](/docs/reference/kotlin/initializing)
       - If signUpWith() is called for an existing confirmed user:
         - If **Confirm email** is enabled in [your project](https://supabase.com/dashboard/project/_/auth/providers), an obfuscated/fake user object is returned.
         - If **Confirm email** is disabled, the error message, `User already registered` is returned.
@@ -2157,12 +2193,7 @@ functions:
       - If you're using phone, you can configure whether you want the user to receive a OTP.
       - The magic link's destination URL is determined by the [`SITE_URL`](/docs/reference/auth/config#site_url).
       - See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
-      - [supabase-kt](https://github.com/supabase-community/supabase-kt/) has default platform implementations: 
-        - On JVM, you can currently only verify a OTP through the token. To send the token, rather than a redirect url, you have to change `{{ .ConfirmationURL }}` in your OTP email to `{{ .Token }}`
-        - [deep links](https://developer.android.com/training/app-links/deep-linking) (Android), 
-        - [url schemes](https://developer.apple.com/documentation/xcode/defining-a-custom-url-scheme-for-your-app) (IOS) 
-            - To enable deeplinking/url scheme support on Android/IOS set the `host` and the `scheme` in the GoTrue Config and call `client.handleDeeplinks(intent)` (Android) and `client.handleDeeplinks(url)` (IOS) on startup
-        - the website origin (JS)
+      - To learn how to handle OTP links & OAuth refer to [initializing](/docs/reference/kotlin/initializing)
       - Magic links and OTPs share the same implementation. To send users a one-time code instead of a magic link, [modify the magic link email template](https://supabase.com/dashboard/project/_/auth/templates) to include `{{ .Token }}` instead of `{{ .ConfirmationURL }}`.
     examples:
       - id: sign-in-with-email
@@ -2191,12 +2222,7 @@ functions:
     notes: |
       - This method is used for signing in using a third-party provider.
       - Supabase supports many different [third-party providers](https://supabase.com/docs/guides/auth#providers).
-      - [supabase-kt](https://github.com/supabase-community/supabase-kt/) has default platform implementations: 
-          - HTTP Callback Server (JVM), 
-          - [deep links](https://developer.android.com/training/app-links/deep-linking) (Android), 
-          - [url schemes](https://developer.apple.com/documentation/xcode/defining-a-custom-url-scheme-for-your-app) (IOS) 
-              - To enable deeplinking/url scheme support on Android/IOS set the `host` and the `scheme` in the GoTrue Config and call `client.handleDeeplinks(intent)` (Android) and `client.handleDeeplinks(url)` (IOS) on startup
-          - the website origin (JS)
+      - To learn how to handle OTP links & OAuth refer to [initializing](/docs/reference/kotlin/initializing)
     examples:
       - id: sign-in-using-a-third-party-provider
         name: Sign in using a third-party provider
@@ -2249,12 +2275,7 @@ functions:
       - In case you need to use a different way to start the authentication flow with an identity provider, you can use the `SSO.withProviderId` function. For example:
           - Mapping specific user email addresses with an identity provider.
           - Using different hints to identity the identity provider to be used by the user, like a company-specific page, IP address or other tracking information.
-      - [supabase-kt](https://github.com/supabase-community/supabase-kt/) has default platform implementations: 
-          - HTTP Callback Server (JVM), 
-          - [deep links](https://developer.android.com/training/app-links/deep-linking) (Android), 
-          - [url schemes](https://developer.apple.com/documentation/xcode/defining-a-custom-url-scheme-for-your-app) (IOS) 
-              - To enable deeplinking/url scheme support on Android/IOS set the `host` and the `scheme` in the GoTrue Config and call `client.handleDeeplinks(intent)` (Android) and `client.handleDeeplinks(url)` (IOS) on startup
-          - the website origin (JS)
+      - To learn how to handle OTP links & OAuth refer to [initializing](/docs/reference/kotlin/initializing)
 
     examples:
       - id: sign-in-with-domain
@@ -2560,7 +2581,7 @@ functions:
   - id: auth-mfa-api
     title: 'Overview'
     notes: |
-      This section contains methods commonly used for Multi-Factor Authentication (MFA) and are invoked behind the `supabase.gotrue.mfa` namespace. 
+      This section contains methods commonly used for Multi-Factor Authentication (MFA) and are invoked behind the `client.gotrue.mfa` namespace.
 
       Currently, we only support time-based one-time password (TOTP) as the 2nd factor. We don't support recovery codes but we allow users to enroll more than 1 TOTP factor, with an upper limit of 10.
 
@@ -3011,7 +3032,7 @@ functions:
     title: 'invoke()'
     description: |
       Invokes a Supabase Function. See the [guide](/docs/guides/functions) for details on writing Functions.
-      - When invoking a function with parameters, you have to provide a [serializable value](/docs/reference/kotlin/installing#add-kotlinx-serialization-required-for-postgrest-and-realtime-serialization) in the function parameter.
+      - When invoking a function with parameters, you have to provide a [serializable value](/docs/reference/kotlin/installing#serialization) in the function parameter.
     notes: |
       - Requires an Authorization header.
     examples:
@@ -3066,7 +3087,7 @@ functions:
     notes: |
       - Realtime is disabled by default for new Projects for better database performance and security. You can turn it on by [managing replication](/docs/guides/database/api#managing-realtime).
       - If you want to receive the "previous" data for updates and deletes, you will need to set `REPLICA IDENTITY` to `FULL`, like this: `ALTER TABLE your_table REPLICA IDENTITY FULL;`
-      - When using a method with a generic type like `track`, `broadcast` or `broadcastFlow`, you have to provide a [serializable class](/docs/reference/kotlin/installing#add-kotlinx-serialization-required-for-postgrest-and-realtime-serialization) as the type parameter.
+      - When using a method with a generic type like `track`, `broadcast` or `broadcastFlow`, you have to provide a [serializable class](/docs/reference/kotlin/installing#serialization) as the type parameter.
     examples:
       - id: connect-to-realtime-client
         name: Connect to Realtime
@@ -3288,15 +3309,29 @@ functions:
     title: removeAllChannels()
     $ref: '@supabase/supabase-js.index.SupabaseClient.removeAllChannels'
     notes: |
+      Unsubscribes and removes all Realtime channels from Realtime client.
       - Removing channels is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes. Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
     examples:
       - id: remove-all-channels
         name: Remove all channels
         isSpotlight: true
         code: |
-          ```js
+          ```kotlin
           client.realtime.removeAllChannels()
           ```
+  - id: get-channels
+    title: getChannels()
+    $ref: '@supabase/supabase-js.index.SupabaseClient.getChannels'
+    notes: |
+      Returns all Realtime channels.
+    examples:
+        - id: get-all-channels
+          name: Get all channels
+          isSpotlight: true
+          code: |
+            ```kotlin
+            val channels = client.realtime.subscriptions.entries
+            ```
   - id: list-buckets
     title: listBuckets()
     $ref: '@supabase/storage-js.packages/StorageBucketApi.default.listBuckets'
@@ -3643,7 +3678,7 @@ functions:
     title: from.getPublicUrl()
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.getPublicUrl'
     notes: |
-      - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/kotlin/storage-updatebucket) or by going to Storage on [app.supabase.com](https://supabase.com/dashboard), clicking the overflow menu on a bucket and choosing "Make public"
+      - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/kotlin/storage-updatebucket) or by going to Storage on [supabase.com/dashboard](https://supabase.com/dashboard), clicking the overflow menu on a bucket and choosing "Make public"
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: none

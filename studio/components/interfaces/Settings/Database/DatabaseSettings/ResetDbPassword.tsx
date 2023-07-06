@@ -5,7 +5,7 @@ import generator from 'generate-password'
 import { Input, Button, Modal } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import { useParams } from 'common/hooks'
 import { patch } from 'lib/common/fetch'
 import { passwordStrength } from 'lib/helpers'
@@ -13,12 +13,13 @@ import { API_URL, DEFAULT_MINIMUM_PASSWORD_STRENGTH } from 'lib/constants'
 
 import Panel from 'components/ui/Panel'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
+import { getProjectDetail } from 'data/projects/project-detail-query'
 
 const ResetDbPassword: FC<any> = ({ disabled = false }) => {
   const { ui, app, meta } = useStore()
   const { ref } = useParams()
 
-  const canResetDbPassword = checkPermissions(PermissionAction.UPDATE, 'projects')
+  const canResetDbPassword = useCheckPermissions(PermissionAction.UPDATE, 'projects')
 
   const [showResetDbPass, setShowResetDbPass] = useState<boolean>(false)
   const [isUpdatingPassword, setIsUpdatingPassword] = useState<boolean>(false)
@@ -65,7 +66,11 @@ const ResetDbPassword: FC<any> = ({ disabled = false }) => {
       setIsUpdatingPassword(true)
       const res = await patch(`${API_URL}/projects/${ref}/db-password`, { password })
       if (!res.error) {
-        await app.projects.fetchDetail(ref, (project) => meta.setProjectDetails(project))
+        const project = await getProjectDetail({ ref })
+        if (project) {
+          meta.setProjectDetails(project)
+        }
+
         ui.setNotification({ category: 'success', message: res.message })
         setShowResetDbPass(false)
       } else {

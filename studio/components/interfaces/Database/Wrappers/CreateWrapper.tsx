@@ -6,7 +6,7 @@ import { observer } from 'mobx-react-lite'
 import { Button, Form, Input, IconArrowLeft, IconExternalLink, IconEdit, IconTrash } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import { useParams } from 'common/hooks'
 import {
   FormPanel,
@@ -37,7 +37,7 @@ const CreateWrapper = () => {
   const [selectedTableToEdit, setSelectedTableToEdit] = useState()
   const [formErrors, setFormErrors] = useState<{ [k: string]: string }>({})
 
-  const canCreateWrapper = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'wrappers')
+  const canCreateWrapper = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'wrappers')
 
   const wrapperMeta = WRAPPERS.find((wrapper) => wrapper.name === type)
   const initialValues =
