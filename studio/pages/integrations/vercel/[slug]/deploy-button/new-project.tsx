@@ -34,14 +34,14 @@ const VercelIntegration: NextPageWithLayout = () => {
           <ScaffoldContainer className="max-w-md flex flex-col gap-6 grow py-8">
             <h1 className="text-xl text-scale-1200">New project</h1>
             <>
-              <Markdown content={`Choose the Supabase Organization you wish to install to`} />
+              <Markdown content={`Choose the Supabase organization you wish to install in`} />
               <CreateProject loading={loading} setLoading={setLoading} />
             </>
           </ScaffoldContainer>
           <ScaffoldContainer className="flex flex-col gap-6 py-3">
             <Alert withIcon variant="info" title="You can uninstall this Integration at any time.">
               <Markdown
-                content={`You can remove this integration at any time either via Vercel or the Supabase dashboard.`}
+                content={`You can remove this integration at any time via Vercel or the Supabase dashboard.`}
               />
             </Alert>
           </ScaffoldContainer>
@@ -290,7 +290,7 @@ const CreateProject = ({
 
   return (
     <div className="">
-      <p className="mb-2">Project details for integration</p>
+      <p className="mb-2">Supabase project details</p>
       <div className="py-2">
         <Input
           autoFocus
@@ -356,8 +356,8 @@ const CreateProject = ({
       <div className="py-2 pb-4">
         <Checkbox
           name="shouldRunMigrations"
-          label="Run migrations & seed.sql"
-          description="If your repository has migrations under supabase/migrations, they will be run automatically."
+          label="Create sample tables with seed data"
+          description="To get you started quickly, we can create new tables for you with seed (sample) data. You can delete these tables later."
           checked={shouldRunMigrations}
           onChange={(e) => setShouldRunMigrations(e.target.checked)}
         />

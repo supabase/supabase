@@ -1,9 +1,9 @@
 import { observer } from 'mobx-react-lite'
-import { Alert, Badge, Button, IconExternalLink, IconTruck } from 'ui'
+import Link from 'next/link'
+import { Badge, Button, IconExternalLink, IconTruck } from 'ui'
 
 import Panel from 'components/ui/Panel'
 import MigrateOrganizationBillingButton from './MigrateOrganizationBillingButton'
-import Link from 'next/link'
 
 const OrganizationBillingMigrationPanel = observer(() => {
   return (
