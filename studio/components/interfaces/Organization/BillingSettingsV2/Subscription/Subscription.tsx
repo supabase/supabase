@@ -37,8 +37,7 @@ const Subscription = () => {
   const daysToCycleEnd = billingCycleEnd.diff(dayjs(), 'days')
   const daysWithinCycle = billingCycleEnd.diff(billingCycleStart, 'days')
 
-  const canChangeTier =
-    !projectUpdateDisabled && !['team', 'enterprise'].includes(currentPlan?.id ?? '')
+  const canChangeTier = !projectUpdateDisabled && !['enterprise'].includes(currentPlan?.id ?? '')
 
   return (
     <>
@@ -93,13 +92,19 @@ const Subscription = () => {
                 </ProjectUpdateDisabledTooltip>
                 {!canChangeTier &&
                   (projectUpdateDisabled ? (
-                    <Alert withIcon variant="info" title={`Unable to update plan from ${planName}`}>
+                    <Alert
+                      className="mt-2"
+                      withIcon
+                      variant="info"
+                      title={`Unable to update plan from ${planName}`}
+                    >
                       We have temporarily disabled project and subscription changes - our engineers
                       are working on a fix.
                     </Alert>
                   ) : (
                     <Alert
                       withIcon
+                      className="mt-2"
                       variant="info"
                       title={`Unable to update plan from ${planName}`}
                       actions={[

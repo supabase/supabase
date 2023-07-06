@@ -6,47 +6,54 @@ import CreditBalance from './CreditBalance'
 import PaymentMethods from './PaymentMethods/PaymentMethods'
 import Subscription from './Subscription/Subscription'
 import TaxID from './TaxID/TaxID'
+import BillingBreakdown from './BillingBreakdown/BillingBreakdown'
 
 const BillingSettings = () => {
   return (
     <>
-      <ScaffoldContainer>
+      <ScaffoldContainer id='subscription'>
         <Subscription />
       </ScaffoldContainer>
 
       <ScaffoldDivider />
 
-      <ScaffoldContainer>
+      <ScaffoldContainer id='cost-control'>
         <CostControl />
       </ScaffoldContainer>
 
       <ScaffoldDivider />
 
-      <ScaffoldContainer>
+      <ScaffoldContainer id='breakdown'>
+        <BillingBreakdown />
+      </ScaffoldContainer>
+
+      <ScaffoldDivider />
+
+      <ScaffoldContainer id='credits-balance'>
         <CreditBalance />
       </ScaffoldContainer>
 
       <ScaffoldDivider />
 
-      <ScaffoldContainer>
+      <ScaffoldContainer id='payment-methods'>
         <PaymentMethods />
       </ScaffoldContainer>
 
       <ScaffoldDivider />
 
-      <ScaffoldContainer>
+      <ScaffoldContainer id='email'>
         <BillingEmail />
       </ScaffoldContainer>
 
       <ScaffoldDivider />
 
-      <ScaffoldContainer>
+      <ScaffoldContainer id='address'>
         <BillingAddress />
       </ScaffoldContainer>
 
       <ScaffoldDivider />
 
-      <ScaffoldContainer>
+      <ScaffoldContainer id='taxId'>
         <TaxID />
       </ScaffoldContainer>
     </>
