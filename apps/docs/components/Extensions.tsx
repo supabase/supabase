@@ -3,14 +3,25 @@ import React, { useState } from 'react'
 import { GlassPanel, IconLink, IconX, Input } from 'ui'
 import extensions from '../data/extensions.json'
 
-type extension = {
+type Extension = {
   name: string
   comment: string
   tags: string[]
-  link?: string
+  link: string
 }
 
-function getUniqueTags(json: extension[]) {
+type LinkTarget = React.ComponentProps<'a'>['target']
+
+function getLinkTarget(link: string): LinkTarget {
+  // Link is relative, open in the same tab
+  if (link.startsWith('/')) {
+    return '_self'
+  }
+  // Link is external, open in a new tab
+  return '_blank'
+}
+
+function getUniqueTags(json: Extension[]): string[] {
   const tags = []
   for (const item of json) {
     if (item.tags) {
@@ -21,12 +32,12 @@ function getUniqueTags(json: extension[]) {
 }
 
 export default function Extensions() {
-  const [searchTerm, setSearchTerm] = useState('')
-  const [filters, setFilters] = useState([])
+  const [searchTerm, setSearchTerm] = useState<string>('')
+  const [filters, setFilters] = useState<string[]>([])
 
   const tags = getUniqueTags(extensions)
 
-  function handleChecked(tag) {
+  function handleChecked(tag: string) {
     if (filters.includes(tag)) {
       setFilters(filters.filter((x) => x !== tag))
     } else {
@@ -94,15 +105,8 @@ export default function Extensions() {
                 filters.length === 0 ? x : x.tags.some((item) => filters.includes(item))
               )
               .map((extension) => (
-                <Link
-                  passHref
-                  href={`${
-                    extension.link
-                      ? `/guides/database/extensions/${extension.name}`
-                      : '/guides/database/extensions#full-list-of-extensions'
-                  }`}
-                >
-                  <a target={`${extension.link ? '_blank' : '_self'}`} className="no-underline">
+                <Link passHref href={extension.link}>
+                  <a target={getLinkTarget(extension.link)} className="no-underline">
                     <GlassPanel title={extension.name} background={false} key={extension.name}>
                       <p className="mt-4">
                         {extension.comment.charAt(0).toUpperCase() + extension.comment.slice(1)}
