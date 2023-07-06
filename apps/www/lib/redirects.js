@@ -2066,4 +2066,9 @@ module.exports = [
     source: '/docs/guides/ai/structured-unstructured-embeddings',
     destination: '/docs/guides/ai/structured-unstructured',
   },
+  {
+    permanent: true,
+    source: '/docs/guides/ai/choosing-instance-type',
+    destination: '/docs/guides/ai/choosing-compute-addon',
+  },
 ]
