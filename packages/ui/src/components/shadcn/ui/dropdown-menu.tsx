@@ -1,21 +1,150 @@
 import * as React from 'react'
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu'
+import { type VariantProps, cva } from 'class-variance-authority'
 import { cn } from '@ui/lib/utils'
 
-import { IconChevronRight } from '../../Icon/icons/IconChevronRight' 
+import { IconChevronRight } from '../../Icon/icons/IconChevronRight'
 import { IconCheck } from '../../Icon/icons/IconCheck'
 import { IconTarget } from '../../Icon/icons/IconTarget'
 
+export type DropdownMenuVariantsProps = VariantProps<typeof dropdownMenuVariants>
+const dropdownMenuVariants = cva('', {
+  variants: {
+    content: {
+      true: `
+        min-w-[8rem]
+        overflow-hidden
+        z-40
+        bg-overlay
+        border-overlay
+        rounded
+        shadow-lg
+        py-1.5
+        origin-dropdown
+        data-open:animate-dropdown-content-show
+        data-closed:animate-dropdown-content-hide
+        min-w-fit
+        antialiased
+        data-[state=open]:animate-in
+        data-[state=closed]:animate-out
+        data-[state=closed]:fade-out-0
+        data-[state=open]:fade-in-0
+        data-[state=closed]:zoom-out-95
+        data-[state=open]:zoom-in-95
+        data-[side=bottom]:slide-in-from-top-2
+        data-[side=left]:slide-in-from-right-2
+        data-[side=right]:slide-in-from-left-2
+        data-[side=top]:slide-in-from-bottom-2
+      `,
+    },
+    item: {
+      true: `
+        select-none
+        group
+        relative
+        flex items-center space-x-2
+        text-sm
+        text-light
+        px-4 py-1.5
+        cursor-pointer
+        focus:bg-overlay-hover
+        focus:text
+        border-none
+        transition-colors
+        outline-none
+        focus:outline-none
+        data-[disabled]:pointer-events-none
+        data-[disabled]:opacity-50
+      `,
+    },
+    item_nested: {
+      true: `
+        border-none
+        focus:outline-none
+        focus:bg-overlay-hover
+        focus:text
+        data-open:bg-overlay
+        data-open:text
+      `,
+    },
+    size: {
+      tiny: `w-40`,
+      small: `w-48`,
+      medium: `w-64`,
+      large: `w-80`,
+      xlarge: `w-96`,
+      content: `w-auto`,
+    },
+    arrow: {
+      true: `
+        fill-current
+        border-0 border-t
+      `,
+    },
+    disabled: {
+      true: `opacity-50 cursor-default`,
+    },
+    label: {
+      true: `
+        text-lighter
+        px-4 flex items-center space-x-2 py-1.5
+        text-xs
+      `,
+    },
+    separator: {
+      true: `
+        w-full
+        my-2
+        border-t-[1px]
+      `,
+    },
+    misc: {
+      true: `
+        px-4 py-1.5
+      `,
+    },
+    check: {
+      true: `
+        absolute left-3
+        flex items-center
+        data-checked:text
+      `,
+    },
+    input: {
+      true: `
+        flex items-center space-x-0 pl-8 pr-4
+      `,
+    },
+    right_slot: {
+      true: `
+        text-lighter
+        group-focus:text-light
+        absolute
+        -translate-y-1/2
+        right-2
+        top-1/2
+        ml-auto text-xs tracking-widest opacity-60
+      `,
+    },
+    item_indicator: {
+      true: `
+        absolute
+        left-2
+        flex items-center justify-center
+        h-3.5 w-3.5
+      `,
+    },
+    inset: {
+      true: 'pl-8',
+    },
+  },
+})
+
 const DropdownMenu = DropdownMenuPrimitive.Root
-
 const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger
-
 const DropdownMenuGroup = DropdownMenuPrimitive.Group
-
 const DropdownMenuPortal = DropdownMenuPrimitive.Portal
-
 const DropdownMenuSub = DropdownMenuPrimitive.Sub
-
 const DropdownMenuRadioGroup = DropdownMenuPrimitive.RadioGroup
 
 const DropdownMenuSubTrigger = React.forwardRef<
@@ -26,18 +155,11 @@ const DropdownMenuSubTrigger = React.forwardRef<
 >(({ className, inset, children, ...props }, ref) => (
   <DropdownMenuPrimitive.SubTrigger
     ref={ref}
-    className={cn(
-      // 'flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-accent data-[state=open]:bg-accent',
-      __styles.item,
-      __styles.item_nested,
-      inset && 'pl-8',
-      '[&>svg]:text [&>svg]:w-3.5 [&>svg]:h-3.5',
-      className
-    )}
+    className={cn(dropdownMenuVariants({ item: true, item_nested: true, inset }), className)}
     {...props}
   >
     {children}
-    <IconChevronRight className={__styles.right_slot} size={14} />
+    <IconChevronRight className={dropdownMenuVariants({ right_slot: true })} size={14} />
   </DropdownMenuPrimitive.SubTrigger>
 ))
 DropdownMenuSubTrigger.displayName = DropdownMenuPrimitive.SubTrigger.displayName
@@ -48,11 +170,7 @@ const DropdownMenuSubContent = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DropdownMenuPrimitive.SubContent
     ref={ref}
-    className={cn(
-      // 'z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
-      __styles.content,
-      className
-    )}
+    className={cn(dropdownMenuVariants({ content: true }), className)}
     {...props}
   />
 ))
@@ -66,10 +184,7 @@ const DropdownMenuContent = React.forwardRef<
     <DropdownMenuPrimitive.Content
       ref={ref}
       sideOffset={sideOffset}
-      className={cn(
-        __styles.content,
-        className
-      )}
+      className={cn(dropdownMenuVariants({ content: true }), className)}
       {...props}
     />
   </DropdownMenuPrimitive.Portal>
@@ -84,11 +199,7 @@ const DropdownMenuItem = React.forwardRef<
 >(({ className, inset, ...props }, ref) => (
   <DropdownMenuPrimitive.Item
     ref={ref}
-    className={cn(
-      // 'relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-foreground text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
-      __styles.item, className, props.disabled && __styles.disabled,
-      inset && 'pl-8'
-    )}
+    className={cn(dropdownMenuVariants({ item: true, disabled: props.disabled, inset }), className)}
     {...props}
   />
 ))
@@ -101,19 +212,17 @@ const DropdownMenuCheckboxItem = React.forwardRef<
   <DropdownMenuPrimitive.CheckboxItem
     ref={ref}
     className={cn(
-      // 'relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
-      __styles.item, __styles.input,
-      props.disabled && __styles.disabled,
+      dropdownMenuVariants({ item: true, disabled: props.disabled, input: true }),
       className
     )}
     checked={checked}
     {...props}
   >
-    <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
-      <DropdownMenuPrimitive.ItemIndicator>
-        <IconCheck size="tiny" strokeWidth={3} />
-      </DropdownMenuPrimitive.ItemIndicator>
-    </span>
+    <DropdownMenuPrimitive.ItemIndicator
+      className={cn(dropdownMenuVariants({ item_indicator: true }))}
+    >
+      <IconCheck size="tiny" strokeWidth={3} />
+    </DropdownMenuPrimitive.ItemIndicator>
     {children}
   </DropdownMenuPrimitive.CheckboxItem>
 ))
@@ -126,18 +235,16 @@ const DropdownMenuRadioItem = React.forwardRef<
   <DropdownMenuPrimitive.RadioItem
     ref={ref}
     className={cn(
-      // 'relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
-      __styles.item, __styles.input,
-      props.disabled && __styles.disabled,
+      dropdownMenuVariants({ item: true, disabled: props.disabled, input: true }),
       className
     )}
     {...props}
   >
-    <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
-      <DropdownMenuPrimitive.ItemIndicator>
-        <IconTarget strokeWidth={6} size={10} />
-      </DropdownMenuPrimitive.ItemIndicator>
-    </span>
+    <DropdownMenuPrimitive.ItemIndicator
+      className={cn(dropdownMenuVariants({ item_indicator: true }))}
+    >
+      <IconTarget strokeWidth={6} size={10} />
+    </DropdownMenuPrimitive.ItemIndicator>
     {children}
   </DropdownMenuPrimitive.RadioItem>
 ))
@@ -151,10 +258,7 @@ const DropdownMenuLabel = React.forwardRef<
 >(({ className, inset, ...props }, ref) => (
   <DropdownMenuPrimitive.Label
     ref={ref}
-    className={cn(
-      // 'px-2 py-1.5 text-sm font-semibold'
-      __styles.label
-      , inset && 'pl-8', className)}
+    className={cn(dropdownMenuVariants({ label: true, inset }), className)}
     {...props}
   />
 ))
@@ -166,112 +270,21 @@ const DropdownMenuSeparator = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DropdownMenuPrimitive.Separator
     ref={ref}
-    className={cn(__styles.separator, className)}
+    className={cn(dropdownMenuVariants({ separator: true }), className)}
     {...props}
   />
 ))
 DropdownMenuSeparator.displayName = DropdownMenuPrimitive.Separator.displayName
 
 const DropdownMenuRightSlot = ({ className, ...props }: React.HTMLAttributes<HTMLSpanElement>) => (
-  <span data-component="right_slot" className={cn(
-    // 'ml-auto text-xs tracking-widest opacity-60',
-    __styles.right_slot,
-    className)} {...props} />
+  <span
+    data-component="right_slot"
+    className={cn(dropdownMenuVariants({ right_slot: true }), className)}
+    {...props}
+  />
 )
 
 DropdownMenuRightSlot.displayName = 'DropdownMenuRightSlot'
-
-const __styles = {
-  // root:
-  trigger: `
-    flex
-    border-none
-    rounded
-    text-light
-    bg-transparent p-0
-    outline-none
-    outline-offset-1
-    transition-all
-    focus:outline-4
-    focus:outline-scale-600
-  `,
-  item_nested: `
-    border-none
-    focus:outline-none
-    focus:bg-overlay-hover
-    focus:text
-    data-open:bg-overlay
-    data-open:text
-  `,
-  content: `
-    z-40
-    bg-overlay
-    border-overlay
-    rounded
-    shadow-lg
-    py-1.5
-    origin-dropdown
-    data-open:animate-dropdown-content-show
-    data-closed:animate-dropdown-content-hide
-    min-w-fit
-    antialiased
-  `,
-  size: {
-    tiny: `w-40`,
-    small: `w-48`,
-    medium: `w-64`,
-    large: `w-80`,
-    xlarge: `w-96`,
-    content: `w-auto`,
-  },
-  arrow: `
-    fill-current
-    border-0 border-t
-  `,
-  item: `
-    group
-    relative
-    flex items-center space-x-2
-    text-sm
-    text-light
-    px-4 py-1.5
-    cursor-pointer
-    focus:bg-overlay-hover
-    focus:text
-    border-none
-    focus:outline-none
-  `,
-  disabled: `opacity-50 cursor-default`,
-  label: `
-    text-lighter
-    px-4 flex items-center space-x-2 py-1.5
-    text-xs
-  `,
-  separator: `
-    w-full
-    my-2
-    border-t-[1px]
-  `,
-  misc: `
-    px-4 py-1.5
-  `,
-  check: `
-    absolute left-3
-    flex items-center
-    data-checked:text
-  `,
-  input: `
-    flex items-center space-x-0 pl-8 pr-4
-  `,
-  right_slot: `
-    text-lighter
-    group-focus:text-light
-    absolute
-    -translate-y-1/2
-    right-2
-    top-1/2
-  `,
-}
 
 export {
   DropdownMenu,

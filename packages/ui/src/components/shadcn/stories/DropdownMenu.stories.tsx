@@ -30,6 +30,7 @@ import {
   UserPlus,
   Users,
 } from 'lucide-react'
+import { DropdownMenuProps, DropdownMenuCheckboxItemProps } from '@radix-ui/react-dropdown-menu'
 
 type Checked = DropdownMenuCheckboxItemProps['checked']
 
@@ -41,72 +42,68 @@ const meta: Meta<typeof DropdownMenu> = {
   title: 'shadcn/Dropdow Menu',
   component: DropdownMenu,
   argTypes: {
-    defaultOpen: { 
-      name: "defaultOpen",
-      description: null,
+    defaultOpen: {
+      name: 'defaultOpen',
       table: {
         defaultValue: {
-          summary: undefined
+          summary: undefined,
         },
         type: {
-          summary: "boolean"
+          summary: 'boolean',
         },
       },
-      control: "boolean"
+      control: 'boolean',
     },
-    open: { 
-      name: "open",
-      description: null,
+    open: {
+      name: 'open',
       table: {
         defaultValue: {
-          summary: undefined
+          summary: undefined,
         },
         type: {
-          summary: "boolean"
+          summary: 'boolean',
         },
       },
-      control: "boolean"
+      control: 'boolean',
     },
-    onOpenChange: { 
-      name: "onOpenChange",
-      description: null,
+    onOpenChange: {
+      name: 'onOpenChange',
       table: {
         defaultValue: {
-          summary: undefined
+          summary: undefined,
         },
         type: {
-          summary: "function"
+          summary: 'function',
         },
       },
-      control: "function"
+      control: 'function',
     },
-    modal: { 
-      name: "modal",
-      description: null,
+    modal: {
+      name: 'modal',
       table: {
         defaultValue: {
-          summary: true
+          summary: true,
         },
         type: {
-          summary: "boolean"
+          summary: 'boolean',
         },
       },
-      control: "boolean"
+      control: 'boolean',
     },
     // Not used
     dir: {
-      name: "dir",
-      description: "Not optimized",
+      name: 'dir',
+      description: 'Not optimized',
       table: {
         defaultValue: {
-          summary: undefined
+          summary: undefined,
         },
         type: {
-          summary: "ltr | rtl"
+          summary: 'ltr | rtl',
         },
       },
-      control: "select",
-      options: ["ltr", "rtl"]
+      control: 'select',
+      options: ['ltr', 'rtl'],
     },
   },
 }
@@ -122,11 +119,8 @@ type Story = StoryObj<typeof DropdownMenu>
  */
 
 const DemoContainer = ({ children }: { children: React.ReactNode }) => (
-  <div className="flex justify-center items-center w-full h-full min-h-[400px]">
-    {children}
-  </div>
+  <div className="flex justify-center items-center w-full h-full min-h-[400px]">{children}</div>
 )
-
 
 export const Default: Story = {
   // args: {},
@@ -286,7 +280,7 @@ export const AlignEnd: Story = {
 
 export const Checkboxes = {
   // args: {},
-  render: (args) => {
+  render: (args: JSX.IntrinsicAttributes & DropdownMenuProps & { children?: React.ReactNode }) => {
     const [showStatusBar, setShowStatusBar] = React.useState<Checked>(true)
     const [showActivityBar, setShowActivityBar] = React.useState<Checked>(false)
     const [showPanel, setShowPanel] = React.useState<Checked>(false)
@@ -321,7 +315,7 @@ export const Checkboxes = {
 
 export const RadioGroup = {
   // args: {},
-  render: (args) => {
+  render: (args: JSX.IntrinsicAttributes & DropdownMenuProps & { children?: React.ReactNode }) => {
     const [position, setPosition] = React.useState('bottom')
 
     return (
@@ -336,7 +330,9 @@ export const RadioGroup = {
             <DropdownMenuRadioGroup value={position} onValueChange={setPosition}>
               <DropdownMenuRadioItem value="top">Top</DropdownMenuRadioItem>
               <DropdownMenuRadioItem value="bottom">Bottom</DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value="right" disabled>Right</DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value="right" disabled>
+                Right
+              </DropdownMenuRadioItem>
             </DropdownMenuRadioGroup>
           </DropdownMenuContent>
         </DropdownMenu>
