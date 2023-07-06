@@ -1,10 +1,7 @@
-import { detectOS } from 'lib/helpers'
 import { useCallback } from 'react'
 import { AiIcon, IconCornerDownLeft, Input } from 'ui'
 
 const AskAIWidget = () => {
-  const os = detectOS()
-
   // Auto focus input
   const inputRef = useCallback((input: HTMLInputElement | null) => {
     setTimeout(() => {
@@ -23,26 +20,7 @@ const AskAIWidget = () => {
         placeholder="Ask Supabase AI to do something"
         autoFocus
         actions={
-          <div className="flex items-center space-x-1 mr-6">
-            {os === 'macos' ? (
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M3 5H7.76472L16.2353 19H21M16.2353 5H21"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="square"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            ) : (
-              <p className="text-xs text-scale-1100">ALT</p>
-            )}
+          <div className="flex items-center space-x-1 mr-4">
             <IconCornerDownLeft size={16} strokeWidth={1.5} />
           </div>
         }
