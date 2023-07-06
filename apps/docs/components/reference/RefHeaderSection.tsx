@@ -1,15 +1,13 @@
-import React from 'react'
+import { PropsWithChildren } from 'react'
 import RefSubLayout from '~/layouts/ref/RefSubLayout'
 
-interface Props {}
+export interface RefHeaderSectionProps {}
 
-const RefHeaderSection: React.FC<Props> = (props) => {
+const RefHeaderSection = ({ children }: PropsWithChildren<RefHeaderSectionProps>) => {
   return (
-    <>
-      <RefSubLayout.EducationRow>
-        <RefSubLayout.Details>{props.children}</RefSubLayout.Details>
-      </RefSubLayout.EducationRow>
-    </>
+    <RefSubLayout.EducationRow>
+      <RefSubLayout.Details>{children}</RefSubLayout.Details>
+    </RefSubLayout.EducationRow>
   )
 }
 

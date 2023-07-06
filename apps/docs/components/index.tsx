@@ -1,5 +1,5 @@
-import Link from 'next/link'
 import { MDXRemoteProps } from 'next-mdx-remote'
+import Link from 'next/link'
 import { Alert, Button, CodeBlock, GlassPanel, markdownComponents, Tabs } from 'ui'
 import StepHikeCompact from '~/components/StepHikeCompact'
 // Common components
@@ -14,6 +14,7 @@ import Frameworks from './Frameworks'
 import FunctionsExamples from './FunctionsExamples'
 
 // Other components
+import { CH } from '@code-hike/mdx/components'
 import { Mermaid } from 'mdx-mermaid/lib/Mermaid'
 import RefSubLayout from '~/layouts/ref/RefSubLayout'
 import { Heading } from './CustomHTMLElements'
@@ -23,7 +24,6 @@ import QuickstartIntro from './MDX/quickstart_intro.mdx'
 import SocialProviderSettingsSupabase from './MDX/social_provider_settings_supabase.mdx'
 import SocialProviderSetup from './MDX/social_provider_setup.mdx'
 import StorageManagement from './MDX/storage_management.mdx'
-import { CH } from '@code-hike/mdx/components'
 import RefHeaderSection from './reference/RefHeaderSection'
 
 // Ref version specific
@@ -32,27 +32,28 @@ import CliGlobalFlagsHandler from '~/components/reference/enrichments/cli/CliGlo
 import Options from '~/components/Options'
 import Param from '~/components/Params'
 
+import { AlertProps } from 'ui/src/components/Alert/Alert'
 import {
-  IconMenuJavascript,
-  IconMenuHome,
-  IconMenuGettingStarted,
-  IconMenuDatabase,
-  IconMenuServerlessApis,
+  IconMenuApi,
   IconMenuAuth,
+  IconMenuCli,
+  IconMenuCsharp,
+  IconMenuDatabase,
   IconMenuEdgeFunctions,
-  IconMenuRealtime,
-  IconMenuStorage,
+  IconMenuFlutter,
+  IconMenuGettingStarted,
+  IconMenuHome,
+  IconMenuIntegrations,
+  IconMenuJavascript,
+  IconMenuKotlin,
   IconMenuPlatform,
+  IconMenuPython,
+  IconMenuRealtime,
   IconMenuResources,
   IconMenuSelfHosting,
-  IconMenuIntegrations,
-  IconMenuFlutter,
-  IconMenuPython,
-  IconMenuCsharp,
+  IconMenuServerlessApis,
+  IconMenuStorage,
   IconMenuSwift,
-  IconMenuKotlin,
-  IconMenuApi,
-  IconMenuCli,
 } from './Navigation/NavigationMenu/HomeMenuIcons'
 
 const components: MDXRemoteProps['components'] = {
@@ -85,26 +86,26 @@ const components: MDXRemoteProps['components'] = {
   StorageManagement,
   Mermaid,
   Extensions,
-  Alert: (props) => (
+  Alert: ({ children, ...props }: AlertProps) => (
     <Alert {...props} className="not-prose">
-      {props.children}
+      {children}
     </Alert>
   ),
   Tabs,
-  TabPanel: (props) => <Tabs.Panel {...props}>{props.children}</Tabs.Panel>,
-  h2: (props) => (
+  TabPanel: Tabs.Panel,
+  h2: ({ children, ...props }) => (
     <Heading tag="h2" {...props}>
-      {props.children}
+      {children}
     </Heading>
   ),
-  h3: (props) => (
+  h3: ({ children, ...props }) => (
     <Heading tag="h3" {...props}>
-      {props.children}
+      {children}
     </Heading>
   ),
   RefSubLayout,
-  RefHeaderSection: (props) => <RefHeaderSection {...props} />,
-  CliGlobalFlagsHandler: () => <CliGlobalFlagsHandler />,
+  RefHeaderSection,
+  CliGlobalFlagsHandler,
   Options,
   Param,
   IconMenuJavascript,

@@ -1,6 +1,7 @@
 import * as TabsPrimitive from '@radix-ui/react-tabs'
 import { useRouter } from 'next/router'
 import * as React from 'react'
+import { PropsWithChildren } from 'react'
 import styleHandler from '../../lib/theme/styleHandler'
 import { useTabGroup } from './TabsProvider'
 
@@ -121,14 +122,14 @@ interface PanelPropsProps {
   props: PanelProps
 }
 
-interface PanelProps {
+export interface PanelProps {
   id: string
   label?: string
   icon?: React.ReactNode
   className?: string
 }
 
-export const Panel: React.FC<PanelProps> = ({ children, id, className }) => {
+export const Panel = ({ children, id, className }: PropsWithChildren<PanelProps>) => {
   let __styles = styleHandler('tabs')
 
   return (
