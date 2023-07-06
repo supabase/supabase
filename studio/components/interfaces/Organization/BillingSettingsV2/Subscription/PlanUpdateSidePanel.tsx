@@ -125,7 +125,7 @@ const PlanUpdateSidePanel = () => {
         onCancel={() => onClose()}
         header={
           <div className="flex items-center justify-between">
-            <h4>Change subscription plan</h4>
+            <h4>Change subscription plan for {selectedOrganization?.name}</h4>
             <Link href="https://supabase.com/pricing">
               <a target="_blank" rel="noreferrer">
                 <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
