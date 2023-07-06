@@ -2,7 +2,12 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
 
-import { useParams } from 'common/hooks'
+import { useParams } from 'common'
+import {
+  ScaffoldSection,
+  ScaffoldSectionContent,
+  ScaffoldSectionDetail,
+} from 'components/layouts/Scaffold'
 import { FormActions, FormPanel, FormSection, FormSectionContent } from 'components/ui/Forms'
 import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
@@ -18,14 +23,12 @@ const BillingEmail = () => {
   const { name, billing_email } = selectedOrganization ?? {}
 
   const formId = 'org-billing-email'
-  const initialValues = {
-    billing_email: billing_email ?? '',
-  }
+  const initialValues = { billing_email: billing_email ?? '' }
 
   const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
   const canReadBillingEmail = useCheckPermissions(PermissionAction.READ, 'organizations')
 
-  const onUpdateOrganization = async (values: any, { setSubmitting, resetForm }: any) => {
+  const onUpdateOrganizationEmail = async (values: any, { setSubmitting, resetForm }: any) => {
     if (!canUpdateOrganization) {
       return ui.setNotification({
         category: 'error',
@@ -34,10 +37,7 @@ const BillingEmail = () => {
     }
 
     setSubmitting(true)
-    const response = await patch(`${API_URL}/organizations/${slug}`, {
-      ...values,
-      name,
-    })
+    const response = await patch(`${API_URL}/organizations/${slug}`, { ...values, name })
     if (response.error) {
       ui.setNotification({
         category: 'error',
@@ -60,12 +60,19 @@ const BillingEmail = () => {
   }
 
   return (
-    <div className="container my-4 max-w-4xl">
-      <h4>Billing email</h4>
-      <p className="text-sm opacity-50">All billing correspondence will go to this email</p>
-
-      <div className="mt-3">
-        <Form id={formId} initialValues={initialValues} onSubmit={onUpdateOrganization}>
+    <ScaffoldSection>
+      <ScaffoldSectionDetail>
+        <div className="sticky space-y-6 top-16">
+          <div>
+            <p className="text-base">Email Recipient</p>
+            <p className="text-sm text-scale-1000">
+              All billing correspondence will go to this email
+            </p>
+          </div>
+        </div>
+      </ScaffoldSectionDetail>
+      <ScaffoldSectionContent>
+        <Form id={formId} initialValues={initialValues} onSubmit={onUpdateOrganizationEmail}>
           {({ isSubmitting, handleReset, values, initialValues, resetForm }: any) => {
             const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
 
@@ -96,8 +103,8 @@ const BillingEmail = () => {
                   </div>
                 }
               >
-                <FormSection className="-mx-2">
-                  <FormSectionContent loading={false}>
+                <FormSection>
+                  <FormSectionContent fullWidth loading={false}>
                     <Input
                       id="billing_email"
                       size="small"
@@ -111,8 +118,8 @@ const BillingEmail = () => {
             )
           }}
         </Form>
-      </div>
-    </div>
+      </ScaffoldSectionContent>
+    </ScaffoldSection>
   )
 }
 

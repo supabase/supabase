@@ -14,4 +14,5 @@ export const organizationKeys = {
   migrateBilling: (slug: string | undefined) => ['organizations', slug, 'migrate-billing'] as const,
   migrateBillingPreview: (slug: string | undefined) =>
     ['organizations', slug, 'migrate-billing', 'preview'] as const,
+  taxIds: (slug: string | undefined) => ['organizations', slug, 'tax-ids'] as const,
 }

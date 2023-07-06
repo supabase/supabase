@@ -3,6 +3,7 @@ import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { useCallback } from 'react'
 import { subscriptionKeys } from './keys'
+import { ResponseError } from 'types'
 
 export type OrgSubscriptionVariables = {
   orgSlug?: string
@@ -59,7 +60,7 @@ export async function getOrgSubscription(
 }
 
 export type OrgSubscriptionData = Awaited<ReturnType<typeof getOrgSubscription>>
-export type OrgSubscriptionError = unknown
+export type OrgSubscriptionError = ResponseError
 
 export const useOrgSubscriptionQuery = <TData = OrgSubscriptionData>(
   { orgSlug }: OrgSubscriptionVariables,
