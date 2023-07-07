@@ -1,8 +1,7 @@
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { useCallback } from 'react'
 import { AnalyticsData } from './constants'
 import { analyticsKeys } from './keys'
 
@@ -124,25 +123,3 @@ export const useOrgDailyStatsQuery = <TData = OrgDailyStatsData>(
       ...options,
     }
   )
-
-export const useOrgDailyStatsPrefetch = ({
-  orgSlug,
-  metric,
-  startDate,
-  endDate,
-  interval = '1d',
-  projectRef,
-}: OrgDailyStatsVariables) => {
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    if (orgSlug && metric && startDate && endDate && interval) {
-      client.prefetchQuery(
-        analyticsKeys.orgDailyStats(orgSlug, { metric, startDate, endDate, interval, projectRef }),
-        ({ signal }) =>
-          getOrgDailyStats({ orgSlug, metric, startDate, endDate, interval, projectRef }, signal)
-      )
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [orgSlug, metric])
-}
