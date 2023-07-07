@@ -13,10 +13,7 @@ import { LaunchWeekLogoHeader } from '~/components/LaunchWeek/LaunchSection/Laun
 import { UserData } from '~/components/LaunchWeek/Ticket/hooks/use-conf-data'
 import LW7BgGraphic from '~/components/LaunchWeek/LW7BgGraphic'
 import { useTheme } from 'common/Providers'
-import HeroCanvas from '../../components/LaunchWeek/8/HeroCanvas'
 import HeroR3F from '../../components/LaunchWeek/8/HeroR3F'
-import HeroR3FGPT from '../../components/LaunchWeek/8/HeroR3FGPT'
-import HeroGPTParticles from '../../components/LaunchWeek/8/HeroGPTParticles'
 
 const TicketContainer = dynamic(() => import('~/components/LaunchWeek/Ticket/TicketContainer'))
 const LW7Releases = dynamic(() => import('~/components/LaunchWeek/Releases/LW7/LW7Releases'))
@@ -120,11 +117,13 @@ export default function TicketHome({ users }: Props) {
         }}
       />
       <DefaultLayout>
-        <div className="bg-[#020405] -mt-[65px]">
+        <div className="-mt-[65px]">
           <div className="relative pt-16">
             <div className="relative z-10">
               <SectionContainer className="flex flex-col justify-around items-center min-h-[400px] lg:min-h-[600px] !py-4 md:!py-8 gap-2 md:gap-4 !px-2 !mx-auto">
-                <HeroR3FGPT />
+                <div className="absolute inset-0">
+                  <HeroR3F />
+                </div>
               </SectionContainer>
             </div>
           </div>

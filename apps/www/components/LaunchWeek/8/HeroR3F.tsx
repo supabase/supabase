@@ -1,103 +1,104 @@
 import * as THREE from 'three'
-import ReactDOM from 'react-dom'
 import React, { Suspense, useState, useEffect, useRef, useMemo } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
-import Text from './R3F/Text'
-import Effects from './R3F/Effects'
-import Sparks from './R3F/Sparks'
-import Particles from './R3F/Particles'
-// import './R3F/styles.css'
+import { Trail } from '@react-three/drei'
 
-function Ellipse(props: any) {
-  const geometry = useMemo(() => {
-    const curve = new THREE.EllipseCurve(0, 0, 10, 3, 0, 2 * Math.PI, false, 0)
-    const points = curve.getPoints(50)
-    return new THREE.BufferGeometry().setFromPoints(points)
-  }, [])
-  return (
-    <line geometry={geometry} {...props}>
-      <meshBasicMaterial />
-    </line>
-  )
-}
+const Particle = () => {
+  const particle = useRef<any>(null)
 
-function ReactAtom(props: any) {
+  function easeInOutExpo(x: number): number {
+    return x === 0
+      ? 0
+      : x === 1
+      ? 1
+      : x < 0.5
+      ? Math.pow(2, 20 * x - 10) / 2
+      : (2 - Math.pow(2, -20 * x + 10)) / 2
+  }
+
+  function easeOutBounce(x: number): number {
+    const n1 = 7.5625
+    const d1 = 2.75
+
+    if (x < 1 / d1) {
+      return n1 * x * x
+    } else if (x < 2 / d1) {
+      return n1 * (x -= 1.5 / d1) * x + 0.75
+    } else if (x < 2.5 / d1) {
+      return n1 * (x -= 2.25 / d1) * x + 0.9375
+    } else {
+      return n1 * (x -= 2.625 / d1) * x + 0.984375
+    }
+  }
+
+  const easingFunc = (x: number): number => {
+    // if (x > 0.75) {
+    //   return x + 2
+    //   if (x > 0.75) {
+    //   }
+    // }
+    return x
+  }
+
+  useFrame(({ clock }) => {
+    const timer = clock.getElapsedTime() * 2
+    // if (a < 10) {
+    particle.current.position.x = Math.sin(-timer) * 100
+    // particle.current.position.y = Math.cos(a * 1) * 100
+    particle.current.position.y +=
+      // Math.floor(timer) % 4 === 0
+      particle.current.position.x > 0
+        ? // ? Math.sin(easingFunc(Math.cos(timer))) * 100 - 100
+          Math.cos(timer) * 10 - 10
+        : -Math.cos(timer) * 10 + 10
+    // console.log(
+    //   Math.floor(timer) % 4 === 0,
+    //   timer.toFixed(2),
+    //   (timer % 2).toFixed(2),
+    //   Math.sin(timer).toFixed(2),
+    //   Math.cos(timer).toFixed(2),
+    //   `x: ${particle.current.position.x.toFixed(2)}`,
+    //   `y: ${particle.current.position.y.toFixed(2)}`
+    // )
+    // }
+  })
+
   return (
-    <group {...props}>
-      <Ellipse />
-      <Ellipse rotation={[0, 0, Math.PI / 3]} />
-      <Ellipse rotation={[0, 0, -Math.PI / 3]} />
-      <mesh>
-        <sphereGeometry args={[0.5, 32, 32]} />
-        <meshBasicMaterial color="red" />
+    <Trail
+      width={10} // Width of the line
+      color={'white'} // Color of the line
+      length={60} // Length of the line
+      decay={2} // How fast the line fades away
+      local={true} // Wether to use the target's world or local positions
+      stride={0} // Min distance between previous and current point
+      interval={1} // Number of frames to wait before next calculation
+      target={particle} // Optional target. This object will produce the trail.
+      attenuation={(width) => (width / 2) * width} // A function to define the width in each point along it.
+    >
+      <mesh ref={particle}>
+        <circleGeometry args={[2, 16]} />
+        <meshStandardMaterial color="#f1f1f1" />
       </mesh>
-    </group>
-  )
-}
-
-function Number({ hover }: any) {
-  const ref = useRef<any>()
-  // useFrame((state) => {
-  //   if (ref.current) {
-  //     ref.current.position.x = THREE.MathUtils.lerp(ref.current.position.x, state.mouse.x * 2, 0.1)
-  //     ref.current.rotation.x = THREE.MathUtils.lerp(ref.current.rotation.x, state.mouse.y / 2, 0.1)
-  //     ref.current.rotation.y = 0.8
-  //   }
-  // })
-  return (
-    <Suspense fallback={null}>
-      <group ref={ref}>
-        <Text
-          size={10}
-          // onClick={(e: any) =>
-          //   window.open(
-          //     'https://github.com/react-spring/react-three-fiber/blob/master/whatsnew.md',
-          //     '_blank'
-          //   )
-          // }
-          // onPointerOver={() => hover(true)}
-          // onPointerOut={() => hover(false)}
-        >
-          8
-        </Text>
-        {/* <ReactAtom position={[35, -20, 0]} scale={[1, 0.5, 1]} /> */}
-      </group>
-    </Suspense>
+    </Trail>
   )
 }
 
 export default function () {
   if (typeof window === 'undefined') return null
-  const [hovered, hover] = useState(false)
-  const mouse = useRef([0, 0])
-  const isMobile = /iPhone|iPad|iPod|Android/i.test(window.navigator.userAgent)
-
-  useEffect(() => {
-    document.body.style.cursor = hovered
-      ? 'pointer'
-      : "url('https://raw.githubusercontent.com/chenglou/react-motion/master/demos/demo8-draggable-list/cursor.png') 39 39, auto"
-  }, [hovered])
+  const size = {
+    width: window.innerWidth,
+    height: window.innerHeight,
+  }
 
   return (
     <Canvas
       linear
       dpr={[1, 2]}
-      camera={{ fov: 100, position: [0, 0, 30] }}
-      onCreated={({ gl }) => {
-        gl.toneMapping = THREE.Uncharted2ToneMapping
-        gl.setClearColor(new THREE.Color('#020207'))
-      }}
+      camera={{ fov: 75, position: [0, 0, 400] }}
+      // onCreated={}
     >
-      <fog attach="fog" args={['white', 50, 190]} />
-      <pointLight distance={100} intensity={4} color="white" />
-      <Number mouse={mouse} hover={hover} />
-      {/* <Particles count={isMobile ? 50 : 10} mouse={mouse} /> */}
-      {/* <Sparks
-        count={3}
-        mouse={mouse}
-        colors={['#A2CCB6', '#FCEEB5', '#EE786E', '#e0feff', 'lightpink', 'lightblue']}
-      /> */}
-      {/* <Effects /> */}
+      <ambientLight intensity={0.5} />
+      <Particle />
     </Canvas>
   )
 }
