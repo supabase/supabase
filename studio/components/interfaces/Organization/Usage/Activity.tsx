@@ -1,14 +1,14 @@
 import { DataPoint } from 'data/analytics/constants'
-import { ProjectSubscriptionResponse } from 'data/subscriptions/project-subscription-v2-query'
-import UsageSection from './UsageSection/UsageSection'
 import { PricingMetric, useOrgDailyStatsQuery } from 'data/analytics/org-daily-stats-query'
+import { OrgSubscription } from 'data/subscriptions/org-subscription-query'
+import UsageSection from './UsageSection/UsageSection'
 
 export interface ActivityProps {
   orgSlug: string
   projectRef?: string
   startDate: string | undefined
   endDate: string | undefined
-  subscription: ProjectSubscriptionResponse | undefined
+  subscription: OrgSubscription | undefined
   currentBillingCycleSelected: boolean
 }
 
