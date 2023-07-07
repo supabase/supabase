@@ -52,7 +52,7 @@ const PlanUpdateSidePanel = () => {
 
   const availablePlans = plans ?? []
   const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
-  const selectedTierMeta = subscriptionsPlans.find((tier) => tier.id === selectedTier)
+  const subscriptionPlanMeta = subscriptionsPlans.find((tier) => tier.id === selectedTier)
   const selectedPlanMeta = availablePlans.find(
     (plan) => plan.id === selectedTier?.split('tier_')[1]
   )
@@ -100,7 +100,7 @@ const PlanUpdateSidePanel = () => {
       })
       ui.setNotification({
         category: 'success',
-        message: `Successfully updated subscription to ${selectedTierMeta?.name}!`,
+        message: `Successfully updated subscription to ${subscriptionPlanMeta?.name}!`,
       })
       setSelectedTier(undefined)
       onClose()
@@ -279,7 +279,8 @@ const PlanUpdateSidePanel = () => {
 
       <DowngradeModal
         visible={selectedTier === 'tier_free'}
-        selectedTier={selectedTierMeta}
+        selectedPlan={subscriptionPlanMeta}
+        subscription={subscription}
         onClose={() => setSelectedTier(undefined)}
         onConfirm={onConfirmDowngrade}
       />
@@ -292,7 +293,7 @@ const PlanUpdateSidePanel = () => {
         onCancel={() => setSelectedTier(undefined)}
         onConfirm={onUpdateSubscription}
         overlayClassName="pointer-events-none"
-        header={`Confirm to upgrade to ${selectedTierMeta?.name}`}
+        header={`Confirm to upgrade to ${subscriptionPlanMeta?.name}`}
       >
         <Modal.Content>
           <div className="py-6 space-y-2">
