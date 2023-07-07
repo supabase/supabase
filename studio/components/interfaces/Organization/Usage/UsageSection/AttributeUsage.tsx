@@ -63,6 +63,7 @@ const AttributeUsage = ({
   const chartData = useMemo(() => chartMeta[attribute.key]?.data ?? [], [attribute.key, chartMeta])
 
   const showUsageWarning =
+    projectRef === undefined &&
     currentBillingCycleSelected &&
     usageBasedBilling === false &&
     usageRatio >= USAGE_APPROACHING_THRESHOLD
@@ -204,7 +205,7 @@ const AttributeUsage = ({
                           </p>
                           <p className="text-xs">
                             {attribute.unit === 'bytes'
-                              ? `${usageMeta?.usage ?? 0} GB`
+                              ? `${(usageMeta?.usage ?? 0).toFixed(2)} GB`
                               : (usageMeta?.usage ?? 0).toLocaleString()}
                           </p>
                         </div>
@@ -216,7 +217,7 @@ const AttributeUsage = ({
                             {(usageMeta?.pricing_free_units ?? 0) === -1 || usageExcess < 0
                               ? `0${attribute.unit === 'bytes' ? ' GB' : ''}`
                               : attribute.unit === 'bytes'
-                              ? `${usageExcess} GB`
+                              ? `${usageExcess.toFixed(2)} GB`
                               : usageExcess.toLocaleString()}
                           </p>
                         </div>

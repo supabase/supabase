@@ -21,7 +21,6 @@ import { useSelectedOrganization } from 'hooks'
 import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants'
 import { Alert, Button, IconBarChart2, IconExternalLink } from 'ui'
 import { getAddons } from '../../BillingV2/Subscription/Subscription.utils'
-import SectionHeader from '../../Organization/Usage/SectionHeader'
 import UsageBarChart from '../../Organization/Usage/UsageBarChart'
 import { INFRA_ACTIVITY_METRICS } from './Infrastructure.constants'
 
@@ -135,12 +134,15 @@ const InfrastructureActivity = () => {
   return (
     <>
       <ScaffoldContainer>
-        <SectionHeader
-          title="Infrastructure Activity"
-          description="Activity statistics related to your server instance"
-        />
+        <div className="mx-auto flex flex-col gap-10 pt-6">
+          <div>
+            <p className="text-xl">Infrastructure Activity</p>
+            <p className="text-sm text-scale-1000">
+              Activity statistics related to your server instance
+            </p>
+          </div>
+        </div>
       </ScaffoldContainer>
-      <ScaffoldDivider />
       <ScaffoldContainer className="sticky top-0 py-6 border-b bg-scale-200 z-10">
         <div className="flex items-center space-x-4">
           {!isLoadingSubscription && (
