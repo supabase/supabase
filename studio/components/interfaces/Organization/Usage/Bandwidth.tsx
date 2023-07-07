@@ -1,6 +1,6 @@
 import { DataPoint } from 'data/analytics/constants'
 import { PricingMetric, useOrgDailyStatsQuery } from 'data/analytics/org-daily-stats-query'
-import { ProjectSubscriptionResponse } from 'data/subscriptions/project-subscription-v2-query'
+import { OrgSubscription } from 'data/subscriptions/org-subscription-query'
 import UsageSection from './UsageSection/UsageSection'
 
 export interface BandwidthProps {
@@ -8,7 +8,7 @@ export interface BandwidthProps {
   projectRef?: string
   startDate: string | undefined
   endDate: string | undefined
-  subscription: ProjectSubscriptionResponse | undefined
+  subscription: OrgSubscription | undefined
   currentBillingCycleSelected: boolean
 }
 
