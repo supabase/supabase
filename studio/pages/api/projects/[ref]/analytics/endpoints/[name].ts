@@ -44,7 +44,7 @@ const proxyRequest = async (req: NextApiRequest) => {
   const payload = { ...toForward, project_tier: 'ENTERPRISE' }
   const search = '?' + new URLSearchParams(payload as any).toString()
   const apiKey = process.env.LOGFLARE_API_KEY
-  const url = `${PROJECT_ANALYTICS_URL}endpoints/query/name/${name}${search}`
+  const url = `${PROJECT_ANALYTICS_URL}endpoints/query/${name}${search}`
   const result = await get(url, {
     headers: {
       'x-api-key': apiKey,
