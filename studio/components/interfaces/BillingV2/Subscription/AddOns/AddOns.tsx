@@ -10,9 +10,11 @@ import { useMemo } from 'react'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { Alert, Button, IconChevronRight, IconExternalLink } from 'ui'
 import { getAddons } from '../Subscription.utils'
-import ComputeInstanceSidePanel from './ComputeInstanceSidePanel'
-import CustomDomainSidePanel from './CustomDomainSidePanel'
-import PITRSidePanel from './PITRSidePanel'
+import {
+  ComputeInstanceSidePanel,
+  CustomDomainSidePanel,
+  PITRSidePanel,
+} from 'components/interfaces/Settings/Addons'
 import ProjectUpdateDisabledTooltip from '../../ProjectUpdateDisabledTooltip'
 
 export interface AddOnsProps {}
