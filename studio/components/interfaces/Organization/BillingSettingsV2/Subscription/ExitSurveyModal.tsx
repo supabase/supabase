@@ -1,32 +1,27 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
-import { useQueryClient } from '@tanstack/react-query'
 import { includes, without } from 'lodash'
-import { useRouter } from 'next/router'
 import { useReducer, useRef, useState } from 'react'
 
 import { useParams } from 'common'
+import { OrgSubscription } from 'data/subscriptions/org-subscription-query'
+import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
 import { useFlag, useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { Button, Input, Modal } from 'ui'
-import { CANCELLATION_REASONS } from '../BillingSettings.constants'
+import { Alert, Button, Input, Modal } from 'ui'
 import ProjectUpdateDisabledTooltip from '../../BillingSettings/ProjectUpdateDisabledTooltip'
-import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
+import { CANCELLATION_REASONS } from '../BillingSettings.constants'
 
 export interface ExitSurveyModalProps {
   visible: boolean
+  subscription?: OrgSubscription
   onClose: (success?: boolean) => void
 }
 
 // [Joshen] For context - Exit survey is only when going to free plan from a paid plan
-// [Joshen TODO] Remove all contexts of projects - i'm presuming we still want the exit survey
-// [Joshen TODO] Double check if we should have a confirmation here on the restarting of projects once more (i think so)
-
-const ExitSurveyModal = ({ visible, onClose }: ExitSurveyModalProps) => {
+const ExitSurveyModal = ({ visible, subscription, onClose }: ExitSurveyModalProps) => {
   const { ui } = useStore()
-  const router = useRouter()
   const { slug } = useParams()
-  const queryClient = useQueryClient()
   const captchaRef = useRef<HCaptcha>(null)
 
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -37,7 +32,11 @@ const ExitSurveyModal = ({ visible, onClose }: ExitSurveyModalProps) => {
   const subscriptionUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
   const { mutateAsync: updateOrgSubscription } = useOrgSubscriptionUpdateMutation()
 
-  const hasComputeInstance = false
+  const projectsWithComputeInstances =
+    subscription?.project_addons.filter((project) =>
+      project.addons.find((addon) => addon.type === 'compute_instance')
+    ) ?? []
+  const hasComputeInstance = projectsWithComputeInstances.length > 0
 
   function reducer(state: any, action: any) {
     if (includes(state, action.target.value)) {
@@ -96,7 +95,6 @@ const ExitSurveyModal = ({ visible, onClose }: ExitSurveyModalProps) => {
     }
 
     try {
-      // [Joshen TODO] Update to accept org slug once endpoint is updated
       const feedbackRes = await post(`${API_URL}/feedback/downgrade`, {
         orgSlug: slug,
         reasons: selectedReasons.reduce((a, b) => `${a}- ${b}\n`, ''),
@@ -118,11 +116,6 @@ const ExitSurveyModal = ({ visible, onClose }: ExitSurveyModalProps) => {
           ? 'Your organization has been downgraded and your projects are currently restarting to update their compute instances'
           : 'Successfully downgraded organization to the free plan',
       })
-      // [Joshen TODO] Think about how to handle this
-      // if (hasComputeInstance) {
-      //   setProjectStatus(queryClient, projectRef, PROJECT_STATUS.RESTORING)
-      //   router.push(`/project/${projectRef}`)
-      // }
       onClose(true)
       window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
     }
@@ -158,7 +151,7 @@ const ExitSurveyModal = ({ visible, onClose }: ExitSurveyModalProps) => {
         header="We're sad that you're leaving"
       >
         <Modal.Content>
-          <div className="py-6">
+          <div className="py-6 space-y-4">
             <p className="text-sm text-scale-1100">
               We always strive to improve Supabase as much as we can. Please let us know the reasons
               you are canceling your subscription so that we can improve in the future.
@@ -203,6 +196,18 @@ const ExitSurveyModal = ({ visible, onClose }: ExitSurveyModalProps) => {
                 />
               </div>
             </div>
+            {hasComputeInstance && (
+              <Alert
+                withIcon
+                variant="warning"
+                title={`${projectsWithComputeInstances.length} of your project${
+                  projectsWithComputeInstances.length > 1 ? 's' : ''
+                } will be restarted upon hitting confirm`}
+              >
+                This is due to changes in compute instances from the downgrade. Affected project(s)
+                include {projectsWithComputeInstances.map((project) => project.name).join(', ')}.
+              </Alert>
+            )}
           </div>
         </Modal.Content>
 
