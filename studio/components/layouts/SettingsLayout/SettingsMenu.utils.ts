@@ -11,110 +11,156 @@ export const generateSettingsMenu = (
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
   const buildingUrl = `/project/${ref}/building`
 
-  return [
-    {
-      title: 'Project Settings',
-      items: [
-        {
-          name: 'General',
-          key: 'general',
-          url: `/project/${ref}/settings/general`,
-          items: [],
-        },
-        {
-          name: 'Database',
-          key: 'database',
-          url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/database`,
-          items: [],
-        },
-        {
-          name: 'API',
-          key: 'api',
-          url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/api`,
-          items: [],
-        },
-        ...(IS_PLATFORM
-          ? [
-              {
-                name: 'Auth',
-                key: 'auth',
-                url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/auth`,
-                items: [],
-              },
-            ]
-          : []),
-        ...(IS_PLATFORM
-          ? [
-              {
-                name: 'Storage',
-                key: 'storage',
-                url: `/project/${ref}/settings/storage`,
-                items: [],
-              },
-            ]
-          : []),
-        ...(isVaultEnabled
-          ? [
-              {
-                name: 'Vault',
-                key: 'vault',
-                url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/vault/secrets`,
-                items: [],
-                label: 'BETA',
-              },
-            ]
-          : []),
-      ],
-    },
-    ...(IS_PLATFORM && !isOrgBilling
-      ? [
+  if (isOrgBilling) {
+    return [
+      {
+        title: 'Project Settings',
+        items: [
           {
-            title: 'Billing',
-            items: [
-              {
-                name: 'Subscription',
-                key: 'subscription',
-                url: isProjectBuilding
-                  ? buildingUrl
-                  : `/project/${ref}/settings/billing/subscription`,
-                items: [],
-              },
-              {
-                name: 'Usage',
-                key: 'usage',
-                url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/billing/usage`,
-                items: [],
-              },
-              {
-                name: 'Invoices',
-                key: 'invoices',
-                url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/billing/invoices`,
-                items: [],
-              },
-            ],
+            name: 'General',
+            key: 'general',
+            url: `/project/${ref}/settings/general`,
+            items: [],
           },
-        ]
-      : []),
-    ...(IS_PLATFORM && isOrgBilling
-      ? [
           {
-            title: 'Others',
-            items: [
-              {
-                name: 'Add Ons',
-                key: 'add-ons',
-                url: `/project/${ref}/settings/billing/subscription`,
-                items: [],
-              },
-              {
-                name: 'Infrastructure',
-                key: 'usage',
-                url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/infrastructure`,
-                items: [],
-              },
-            ],
+            name: 'Infrastructure',
+            key: 'infrastructure',
+            url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/infrastructure`,
+            items: [],
           },
-        ]
-      : []),
-  ]
+          {
+            name: 'Add Ons',
+            key: 'subscription',
+            url: `/project/${ref}/settings/billing/subscription`,
+            items: [],
+          },
+          ...(isVaultEnabled
+            ? [
+                {
+                  name: 'Vault',
+                  key: 'vault',
+                  url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/vault/secrets`,
+                  items: [],
+                  label: 'BETA',
+                },
+              ]
+            : []),
+        ],
+      },
+      {
+        title: '',
+        items: [
+          {
+            name: 'Database',
+            key: 'database',
+            url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/database`,
+            items: [],
+          },
+          {
+            name: 'API',
+            key: 'api',
+            url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/api`,
+            items: [],
+          },
+          ...(IS_PLATFORM
+            ? [
+                {
+                  name: 'Auth',
+                  key: 'auth',
+                  url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/auth`,
+                  items: [],
+                },
+              ]
+            : []),
+          ...(IS_PLATFORM
+            ? [
+                {
+                  name: 'Storage',
+                  key: 'storage',
+                  url: `/project/${ref}/settings/storage`,
+                  items: [],
+                },
+              ]
+            : []),
+        ],
+      },
+    ]
+  } else {
+    return [
+      {
+        title: 'Project Settings',
+        items: [
+          {
+            name: 'General',
+            key: 'general',
+            url: `/project/${ref}/settings/general`,
+            items: [],
+          },
+          {
+            name: 'Database',
+            key: 'database',
+            url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/database`,
+            items: [],
+          },
+          {
+            name: 'API',
+            key: 'api',
+            url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/api`,
+            items: [],
+          },
+          ...(IS_PLATFORM
+            ? [
+                {
+                  name: 'Auth',
+                  key: 'auth',
+                  url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/auth`,
+                  items: [],
+                },
+              ]
+            : []),
+          ...(IS_PLATFORM
+            ? [
+                {
+                  name: 'Storage',
+                  key: 'storage',
+                  url: `/project/${ref}/settings/storage`,
+                  items: [],
+                },
+              ]
+            : []),
+        ],
+      },
+      ...(IS_PLATFORM
+        ? [
+            {
+              title: 'Billing',
+              items: [
+                {
+                  name: 'Subscription',
+                  key: 'subscription',
+                  url: isProjectBuilding
+                    ? buildingUrl
+                    : `/project/${ref}/settings/billing/subscription`,
+                  items: [],
+                },
+                {
+                  name: 'Usage',
+                  key: 'usage',
+                  url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/billing/usage`,
+                  items: [],
+                },
+                {
+                  name: 'Invoices',
+                  key: 'invoices',
+                  url: isProjectBuilding
+                    ? buildingUrl
+                    : `/project/${ref}/settings/billing/invoices`,
+                  items: [],
+                },
+              ],
+            },
+          ]
+        : []),
+    ]
+  }
 }
