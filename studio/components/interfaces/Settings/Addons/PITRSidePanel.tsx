@@ -125,7 +125,7 @@ const PITRSidePanel = () => {
 
   return (
     <SidePanel
-      size="xxlarge"
+      size="xlarge"
       visible={visible}
       onCancel={onClose}
       onConfirm={onConfirm}
@@ -267,7 +267,7 @@ const PITRSidePanel = () => {
                   <Radio
                     name="pitr"
                     disabled={isFreePlan || subscriptionCompute === undefined}
-                    className="col-span-3 !p-0"
+                    className="col-span-4 !p-0"
                     key={option.identifier}
                     checked={selectedOption === option.identifier}
                     label={<span className="text-sm">{option.name}</span>}

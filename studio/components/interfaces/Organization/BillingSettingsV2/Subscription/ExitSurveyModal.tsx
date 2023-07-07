@@ -5,12 +5,9 @@ import { useRouter } from 'next/router'
 import { useReducer, useRef, useState } from 'react'
 
 import { useParams } from 'common'
-import { setProjectStatus } from 'data/projects/projects-query'
-import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useProjectSubscriptionUpdateMutation } from 'data/subscriptions/project-subscription-update-mutation'
 import { useFlag, useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
-import { API_URL, PROJECT_STATUS } from 'lib/constants'
+import { API_URL } from 'lib/constants'
 import { Button, Input, Modal } from 'ui'
 import { CANCELLATION_REASONS } from '../BillingSettings.constants'
 import ProjectUpdateDisabledTooltip from '../../BillingSettings/ProjectUpdateDisabledTooltip'
@@ -23,6 +20,7 @@ export interface ExitSurveyModalProps {
 
 // [Joshen] For context - Exit survey is only when going to free plan from a paid plan
 // [Joshen TODO] Remove all contexts of projects - i'm presuming we still want the exit survey
+// [Joshen TODO] Double check if we should have a confirmation here on the restarting of projects once more (i think so)
 
 const ExitSurveyModal = ({ visible, onClose }: ExitSurveyModalProps) => {
   const { ui } = useStore()
@@ -39,10 +37,6 @@ const ExitSurveyModal = ({ visible, onClose }: ExitSurveyModalProps) => {
   const subscriptionUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
   const { mutateAsync: updateOrgSubscription } = useOrgSubscriptionUpdateMutation()
 
-  // [Joshen] We'll need to fix this - but need a way to check which projects will be affected
-  // const { data: addons } = useProjectAddonsQuery({ projectRef })
-  // const subscriptionAddons = addons?.selected_addons ?? []
-  // const hasComputeInstance = subscriptionAddons.find((addon) => addon.type === 'compute_instance')
   const hasComputeInstance = false
 
   function reducer(state: any, action: any) {
@@ -104,7 +98,7 @@ const ExitSurveyModal = ({ visible, onClose }: ExitSurveyModalProps) => {
     try {
       // [Joshen TODO] Update to accept org slug once endpoint is updated
       const feedbackRes = await post(`${API_URL}/feedback/downgrade`, {
-        projectRef: '',
+        orgSlug: slug,
         reasons: selectedReasons.reduce((a, b) => `${a}- ${b}\n`, ''),
         additionalFeedback: message,
         exitAction: 'downgrade',
