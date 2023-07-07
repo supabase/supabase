@@ -27,6 +27,7 @@ import { INFRA_ACTIVITY_METRICS } from './Infrastructure.constants'
 const InfrastructureActivity = () => {
   const { ref: projectRef } = useParams()
   const organization = useSelectedOrganization()
+  const isOrgBilling = !!organization?.subscription_id
   const [dateRange, setDateRange] = useState<any>()
 
   const currentBillingCycleSelected = true
@@ -50,16 +51,20 @@ const InfrastructureActivity = () => {
   }
 
   const startDate = useMemo(() => {
+    if (dateRange?.period_start?.date === 'Invalid Date') return undefined
+
     // If end date is in future, set end date to now
     if (!dateRange?.period_start?.date) {
       return undefined
     } else {
       // LF seems to have an issue with the milliseconds, causes infinite loading sometimes
-      return new Date(dateRange?.period_start?.date).toISOString().slice(0, -5) + 'Z'
+      return new Date(dateRange?.period_start?.date ?? 0).toISOString().slice(0, -5) + 'Z'
     }
   }, [dateRange, subscription])
 
   const endDate = useMemo(() => {
+    if (dateRange?.period_end?.date === 'Invalid Date') return undefined
+
     // If end date is in future, set end date to end of current day
     if (dateRange?.period_end?.date && dayjs(dateRange.period_end.date).isAfter(dayjs())) {
       // LF seems to have an issue with the milliseconds, causes infinite loading sometimes
@@ -68,7 +73,7 @@ const InfrastructureActivity = () => {
       return dayjs().endOf('day').toISOString().slice(0, -5) + 'Z'
     } else if (dateRange?.period_end?.date) {
       // LF seems to have an issue with the milliseconds, causes infinite loading sometimes
-      return new Date(dateRange.period_end.date).toISOString().slice(0, -5) + 'Z'
+      return new Date(dateRange.period_end.date ?? 0).toISOString().slice(0, -5) + 'Z'
     }
   }, [dateRange, subscription])
 
@@ -131,6 +136,8 @@ const InfrastructureActivity = () => {
     },
   }
 
+  if (!isOrgBilling) return null
+
   return (
     <>
       <ScaffoldContainer>
@@ -151,7 +158,7 @@ const InfrastructureActivity = () => {
                 id="billingCycle"
                 name="billingCycle"
                 onChange={setDateRange}
-                value={TIME_PERIODS_BILLING[0].key}
+                value={TIME_PERIODS_REPORTS[0].key}
                 options={[...TIME_PERIODS_BILLING, ...TIME_PERIODS_REPORTS]}
                 loading={isLoadingSubscription}
                 currentBillingPeriodStart={subscription?.current_period_start}
