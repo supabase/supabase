@@ -5,6 +5,7 @@ import { observer } from 'mobx-react-lite'
 import { useParams, useTelemetryProps } from 'common'
 import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.constants'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
+import { motion } from 'framer-motion'
 import { useCheckPermissions, useStore } from 'hooks'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
@@ -56,21 +57,34 @@ const SQLTemplates = observer(() => {
   return (
     <div className="block h-full space-y-8 overflow-y-auto p-6">
       <div className="mt-32 mb-32 flex flex-col items-center">
-        <h1 className="text-scale-1200 mb-8 text-3xl">What do you want to build?</h1>
-        <Input
-          size="xlarge"
-          inputRef={(inputElement: HTMLInputElement) => inputElement?.focus()}
-          icon={<AiIcon className="w-4 h-4 ml-1" />}
-          inputClassName=" w-full !border-brand-900 py-4"
-          iconContainerClassName="transition text-scale-800 text-brand-900"
-          placeholder="Ask Supabase AI to build a query"
-          className="w-full max-w-2xl"
-          actions={
-            <div className="flex items-center space-x-1 mr-6">
-              <IconCornerDownLeft size={16} strokeWidth={1.5} />
-            </div>
-          }
-        />
+        <motion.h1
+          className="text-scale-1200 mb-8 text-3xl"
+          initial={{ y: 10, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+        >
+          What do you want to build?
+        </motion.h1>
+        <motion.div
+          layoutId="ask-ai-input"
+          className="w-full flex justify-center"
+          initial={{ y: -50, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+        >
+          <Input
+            size="xlarge"
+            inputRef={(inputElement: HTMLInputElement) => inputElement?.focus()}
+            icon={<AiIcon className="w-4 h-4 ml-1" />}
+            inputClassName=" w-full !border-brand-900 py-4"
+            iconContainerClassName="transition text-scale-800 text-brand-900"
+            placeholder="Ask Supabase AI to build a query"
+            className="w-full max-w-2xl"
+            actions={
+              <div className="flex items-center space-x-1 mr-6">
+                <IconCornerDownLeft size={16} strokeWidth={1.5} />
+              </div>
+            }
+          />
+        </motion.div>
       </div>
       <div>
         <div className="mb-4">

@@ -13,9 +13,18 @@ export type MonacoEditorProps = {
   editorRef: MutableRefObject<IStandaloneCodeEditor | null>
   isExecuting: boolean
   executeQuery: () => void
+  onOpenAiWidget?: () => void
+  onCloseAiWidget?: () => void
 }
 
-const MonacoEditor = ({ id, editorRef, isExecuting, executeQuery }: MonacoEditorProps) => {
+const MonacoEditor = ({
+  id,
+  editorRef,
+  isExecuting,
+  executeQuery,
+  onOpenAiWidget,
+  onCloseAiWidget,
+}: MonacoEditorProps) => {
   const snap = useSqlEditorStateSnapshot({ sync: true })
   const snippet = snap.snippets[id]
 
@@ -61,6 +70,7 @@ const MonacoEditor = ({ id, editorRef, isExecuting, executeQuery }: MonacoEditor
         if (selection) {
           setAiWidgetSelection(selection)
           setIsAiWidgetOpen(true)
+          onOpenAiWidget?.()
         }
       },
     })
@@ -87,6 +97,7 @@ const MonacoEditor = ({ id, editorRef, isExecuting, executeQuery }: MonacoEditor
     function onKeyDown(e: KeyboardEvent) {
       if (e.key === 'Escape') {
         setIsAiWidgetOpen(false)
+        onCloseAiWidget?.()
         editor?.focus()
       }
     }
@@ -96,7 +107,7 @@ const MonacoEditor = ({ id, editorRef, isExecuting, executeQuery }: MonacoEditor
     return () => {
       window.removeEventListener('keydown', onKeyDown)
     }
-  }, [editor, isAiWidgetOpen])
+  }, [editor, isAiWidgetOpen, onCloseAiWidget])
 
   function handleEditorChange(value: string | undefined) {
     if (id && value) snap.setSql(id, value)

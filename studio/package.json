@@ -50,6 +50,7 @@
     "dayjs": "^1.11.7",
     "eslint-config-next": "^13.3.0",
     "file-saver": "^2.0.5",
+    "framer-motion": "^6.5.1",
     "generate-password": "^1.7.0",
     "graphql": "^16.6.0",
     "graphql-ws": "^5.11.3",
