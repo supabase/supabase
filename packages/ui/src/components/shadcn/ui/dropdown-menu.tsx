@@ -130,6 +130,7 @@ const dropdownMenuVariants = cva('', {
       true: `
         absolute
         left-2
+        text
         flex items-center justify-center
         h-3.5 w-3.5
       `,
