@@ -1,11 +1,11 @@
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
+import { motion } from 'framer-motion'
 import { useLocalStorage } from 'hooks'
 import useLatest from 'hooks/misc/useLatest'
-import { detectOS } from 'lib/helpers'
 import dynamic from 'next/dynamic'
-import { useCallback, useRef } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import Split from 'react-split'
 import { getSqlEditorStateSnapshot, useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { AiIcon, IconCornerDownLeft, Input } from 'ui'
@@ -86,23 +86,32 @@ const SQLEditor = () => {
     }
   }, [isExecuting, project])
 
-  const os = detectOS()
+  const [isAiWidgetOpen, setIsAiWidgetOpen] = useState(false)
 
   return (
     <div className="flex h-full flex-col">
-      <Input
-        size="xlarge"
-        icon={<AiIcon className="w-4 h-4 ml-1" />}
-        inputClassName="bg-transparent rounded-none focus:border-brand-900"
-        iconContainerClassName="transition text-scale-800 peer-focus/input:text-brand-900"
-        placeholder="Ask Supabase AI to do something"
-        actions={
-          <div className="flex items-center space-x-1 mr-6">
-            {os === 'macos' ? <OptionIcon /> : <p className="text-xs text-scale-1100">ALT</p>}
-            <IconCornerDownLeft size={16} strokeWidth={1.5} />
-          </div>
-        }
-      />
+      {!isAiWidgetOpen && (
+        <motion.div
+          layoutId="ask-ai-input"
+          initial={{ scaleY: 1, y: 50 }}
+          animate={{ scaleY: 1, y: 0 }}
+          className="w-full flex justify-center z-[1000] mt-0.5"
+        >
+          <Input
+            size="xlarge"
+            icon={<AiIcon className="w-4 h-4 ml-1" />}
+            inputClassName="py-4 !bg-scale-200 !border-brand-900"
+            iconContainerClassName="transition text-scale-800 text-brand-900"
+            placeholder="Ask Supabase AI to build a query"
+            className="w-full"
+            actions={
+              <div className="flex items-center space-x-1 mr-6">
+                <IconCornerDownLeft size={16} strokeWidth={1.5} />
+              </div>
+            }
+          />
+        </motion.div>
+      )}
       <Split
         style={{ height: '100%' }}
         direction="vertical"
@@ -114,7 +123,10 @@ const SQLEditor = () => {
         collapsed={isUtilityPanelCollapsed ? 1 : undefined}
         onDragEnd={onDragEnd}
       >
-        <div className="dark:border-dark flex-grow overflow-y-auto border-b">
+        <motion.div
+          layout="position"
+          className="dark:border-dark flex-grow overflow-y-auto border-b"
+        >
           {isLoading ? (
             <div className="flex h-full w-full items-center justify-center">Loading...</div>
           ) : (
@@ -123,9 +135,11 @@ const SQLEditor = () => {
               editorRef={editorRef}
               isExecuting={isExecuting}
               executeQuery={executeQuery}
+              onOpenAiWidget={() => setIsAiWidgetOpen(true)}
+              onCloseAiWidget={() => setIsAiWidgetOpen(false)}
             />
           )}
-        </div>
+        </motion.div>
         <div className="flex flex-col">
           {isLoading ? (
             <div className="flex h-full w-full items-center justify-center">Loading...</div>
