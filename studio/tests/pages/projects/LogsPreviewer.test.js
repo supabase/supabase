@@ -495,8 +495,8 @@ test('datepicker onChange will set the query params for outbound api request', a
   userEvent.clear(toHH)
   userEvent.type(toHH, '12')
 
-  userEvent.click(await screen.findByText('24'), { selector: '.react-datepicker__day' })
-  userEvent.click(await screen.findByText('25'), { selector: '.react-datepicker__day' })
+  userEvent.click(await screen.findByText('20'), { selector: '.react-datepicker__day' })
+  userEvent.click(await screen.findByText('21'), { selector: '.react-datepicker__day' })
   userEvent.click(await screen.findByText('Apply'))
 
   await waitFor(() => {
