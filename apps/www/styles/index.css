@@ -785,3 +785,9 @@ launch week
 .swiper-transition-linear .swiper-wrapper {
   transition-timing-function: linear;
 }
+
+/* dat.GUI */
+
+.dg.ac {
+  z-index: 9999 !important;
+}
