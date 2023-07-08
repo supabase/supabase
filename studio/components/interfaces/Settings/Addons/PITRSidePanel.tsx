@@ -233,7 +233,7 @@ const PITRSidePanel = () => {
                     )
                   }
                 >
-                  Upgrade your plan to change the compute size of your project
+                  Upgrade your plan to change PITR for your project
                 </Alert>
               ) : subscriptionCompute === undefined ? (
                 <Alert
