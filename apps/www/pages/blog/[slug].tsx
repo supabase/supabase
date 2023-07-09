@@ -73,7 +73,11 @@ export async function getStaticPaths() {
 }
 
 export const getStaticProps: GetStaticProps<BlogPostPageProps, Params> = async ({ params }) => {
-  const filePath = `${params?.slug}`
+  if (params?.slug === undefined) {
+    throw new Error('Missing slug for pages/blog/[slug].tsx')
+  }
+
+  const filePath = `${params.slug}`
   const postContent = await getPostdata(filePath, '_blog')
   const { data, content } = matter(postContent) as unknown as MatterReturn
 
