@@ -654,6 +654,9 @@ functions:
           const { data, error } = await supabase.auth.admin.generateLink({
             type: 'recovery',
             email: 'email@example.com'
+            options: {
+              redirectTo: 'https://example.com/update-password',
+            },
           })
           ```
       - id: generate-links-to-change-current-email-address
