@@ -38,7 +38,9 @@ const Usage = () => {
         setSelectedProjectRef(projectRef)
       }
     }
-  }, [projectRef, isSuccess, orgProjects])
+    // [Joshen] Since we're already looking at isSuccess
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [projectRef, isSuccess])
 
   const billingCycleStart = dayjs.unix(subscription?.current_period_start ?? 0).utc()
   const billingCycleEnd = dayjs.unix(subscription?.current_period_end ?? 0).utc()
