@@ -1,19 +1,20 @@
 import { DataPoint } from 'data/analytics/constants'
-import { ProjectSubscriptionResponse } from 'data/subscriptions/project-subscription-v2-query'
-import UsageSection from './UsageSection/UsageSection'
 import { PricingMetric, useOrgDailyStatsQuery } from 'data/analytics/org-daily-stats-query'
+import { OrgSubscription } from 'data/subscriptions/org-subscription-query'
+import UsageSection from './UsageSection/UsageSection'
 
 export interface ActivityProps {
   orgSlug: string
-  projectRef?: string // [Joshen TODO] remove
+  projectRef?: string
   startDate: string | undefined
   endDate: string | undefined
-  subscription: ProjectSubscriptionResponse | undefined
+  subscription: OrgSubscription | undefined
   currentBillingCycleSelected: boolean
 }
 
 const Activity = ({
   orgSlug,
+  projectRef,
   subscription,
   startDate,
   endDate,
@@ -21,6 +22,7 @@ const Activity = ({
 }: ActivityProps) => {
   const { data: mauData, isLoading: isLoadingMauData } = useOrgDailyStatsQuery({
     orgSlug,
+    projectRef,
     metric: PricingMetric.MONTHLY_ACTIVE_USERS,
     interval: '1d',
     startDate,
@@ -29,6 +31,7 @@ const Activity = ({
 
   const { data: mauSSOData, isLoading: isLoadingMauSSOData } = useOrgDailyStatsQuery({
     orgSlug,
+    projectRef,
     metric: PricingMetric.MONTHLY_ACTIVE_SSO_USERS,
     interval: '1d',
     startDate,
@@ -38,6 +41,7 @@ const Activity = ({
   const { data: assetTransformationsData, isLoading: isLoadingAssetTransformationsData } =
     useOrgDailyStatsQuery({
       orgSlug,
+      projectRef,
       metric: PricingMetric.STORAGE_IMAGES_TRANSFORMED,
       interval: '1d',
       startDate,
@@ -47,6 +51,7 @@ const Activity = ({
   const { data: funcInvocationsData, isLoading: isLoadingFuncInvocationsData } =
     useOrgDailyStatsQuery({
       orgSlug,
+      projectRef,
       metric: PricingMetric.FUNCTION_INVOCATIONS,
       interval: '1d',
       startDate,
@@ -56,6 +61,7 @@ const Activity = ({
   const { data: realtimeMessagesData, isLoading: isLoadingRealtimeMessagesData } =
     useOrgDailyStatsQuery({
       orgSlug,
+      projectRef,
       metric: PricingMetric.REALTIME_MESSAGE_COUNT,
       interval: '1d',
       startDate,
@@ -65,6 +71,7 @@ const Activity = ({
   const { data: realtimeConnectionsData, isLoading: isLoadingRealtimeConnectionsData } =
     useOrgDailyStatsQuery({
       orgSlug,
+      projectRef,
       metric: PricingMetric.REALTIME_PEAK_CONNECTIONS,
       interval: '1d',
       startDate,
@@ -72,49 +79,44 @@ const Activity = ({
     })
 
   const chartMeta: {
-    [key: string]: { data: DataPoint[]; margin: number; isLoading: boolean; hasNoData: boolean }
+    [key: string]: { data: DataPoint[]; margin: number; isLoading: boolean }
   } = {
     [PricingMetric.MONTHLY_ACTIVE_USERS]: {
       data: mauData?.data ?? [],
       margin: 18,
       isLoading: isLoadingMauData,
-      hasNoData: mauData?.hasNoData ?? false,
     },
     [PricingMetric.MONTHLY_ACTIVE_SSO_USERS]: {
       data: mauSSOData?.data ?? [],
       margin: 20,
       isLoading: isLoadingMauSSOData,
-      hasNoData: mauSSOData?.hasNoData ?? false,
     },
     [PricingMetric.STORAGE_IMAGES_TRANSFORMED]: {
       data: assetTransformationsData?.data ?? [],
       margin: 0,
       isLoading: isLoadingAssetTransformationsData,
-      hasNoData: assetTransformationsData?.hasNoData ?? false,
     },
     [PricingMetric.FUNCTION_INVOCATIONS]: {
       data: funcInvocationsData?.data ?? [],
       margin: 26,
       isLoading: isLoadingFuncInvocationsData,
-      hasNoData: funcInvocationsData?.hasNoData ?? false,
     },
     [PricingMetric.REALTIME_MESSAGE_COUNT]: {
       data: realtimeMessagesData?.data ?? [],
       margin: 38,
       isLoading: isLoadingRealtimeMessagesData,
-      hasNoData: realtimeMessagesData?.hasNoData ?? false,
     },
     [PricingMetric.REALTIME_PEAK_CONNECTIONS]: {
       data: realtimeConnectionsData?.data ?? [],
       margin: 0,
       isLoading: isLoadingRealtimeConnectionsData,
-      hasNoData: realtimeConnectionsData?.hasNoData ?? false,
     },
   }
 
   return (
     <UsageSection
       orgSlug={orgSlug}
+      projectRef={projectRef}
       categoryKey="activity"
       chartMeta={chartMeta}
       subscription={subscription}

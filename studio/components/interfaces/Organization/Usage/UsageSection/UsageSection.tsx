@@ -7,11 +7,12 @@ import { CategoryMetaKey, USAGE_CATEGORIES } from '../Usage.constants'
 import AttributeUsage from './AttributeUsage'
 
 export interface ChartMeta {
-  [key: string]: { data: DataPoint[]; margin: number; isLoading: boolean; hasNoData: boolean }
+  [key: string]: { data: DataPoint[]; margin: number; isLoading: boolean }
 }
 
 export interface UsageSectionProps {
   orgSlug: string
+  projectRef?: string
   categoryKey: CategoryMetaKey
   subscription?: OrgSubscription
   chartMeta: ChartMeta
@@ -20,6 +21,7 @@ export interface UsageSectionProps {
 
 const UsageSection = ({
   orgSlug,
+  projectRef,
   categoryKey,
   chartMeta,
   subscription,
@@ -48,6 +50,7 @@ const UsageSection = ({
         <AttributeUsage
           key={attribute.name}
           slug={orgSlug}
+          projectRef={projectRef}
           attribute={attribute}
           usage={usage}
           usageMeta={usage?.usages.find((x) => x.metric === attribute.key)}

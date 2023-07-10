@@ -3,6 +3,7 @@ import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { useCallback } from 'react'
 import { subscriptionKeys } from './keys'
+import { ResponseError } from 'types'
 
 export type ProjectAddonsVariables = {
   projectRef?: string
@@ -59,7 +60,7 @@ export async function getProjectAddons(
 }
 
 export type ProjectAddonsData = Awaited<ReturnType<typeof getProjectAddons>>
-export type ProjectAddonsError = unknown
+export type ProjectAddonsError = ResponseError
 
 export const useProjectAddonsQuery = <TData = ProjectAddonsData>(
   { projectRef }: ProjectAddonsVariables,

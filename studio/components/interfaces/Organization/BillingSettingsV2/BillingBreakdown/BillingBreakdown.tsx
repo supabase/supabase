@@ -39,12 +39,12 @@ const BillingBreakdown = () => {
 
   const hasExceededAnyLimits =
     !isUsageBillingEnabled &&
-    usage?.usages
-      .map(
+    Boolean(
+      usage?.usages.find(
         (metric) =>
           !metric.unlimited && !metric.capped && metric.usage > (metric?.pricing_free_units ?? 0)
       )
-      .includes(true)
+    )
 
   return (
     <ScaffoldSection>
