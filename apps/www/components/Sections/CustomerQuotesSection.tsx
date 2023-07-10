@@ -9,9 +9,9 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 
 import { useRef } from 'react'
 import { INITIAL_BOTTOM, getAnimation } from '~/lib/animations'
-import dynamic from 'next/dynamic'
+// import dynamic from 'next/dynamic'
 
-const CustomersVisual = dynamic(() => import('~/components/Products/Vector/CustomersVisual'))
+// const CustomersVisual = dynamic(() => import('~/components/Products/Vector/CustomersVisual'))
 
 interface Customer {
   type?: string
@@ -91,7 +91,7 @@ const CustomerQuotesSection = (props: Props) => {
     <LazyMotion features={domAnimation}>
       <div className="py-16 sm:py-18 md:py-24 overflow-hidden">
         <div className="relative h-[300px] w-[300vw] left-[-98vw] md:left-0 mx-auto md:w-full -mb-32 z-0">
-          <CustomersVisual />
+          {/* <CustomersVisual /> */}
         </div>
         <SectionContainer className="!py-0">
           <div className="col-span-12 text-center relative z-10">
