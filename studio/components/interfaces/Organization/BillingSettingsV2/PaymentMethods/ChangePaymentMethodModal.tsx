@@ -41,7 +41,7 @@ const ChangePaymentMethodModal = ({
       })
       ui.setNotification({
         category: 'success',
-        message: `Successfully removed payment method ending with ${selectedPaymentMethod.card.last4}`,
+        message: `Successfully changed payment method to the card ending with ${selectedPaymentMethod.card.last4}`,
       })
       onClose()
     } catch (error: any) {

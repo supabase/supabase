@@ -14,7 +14,7 @@ import {
   Modal,
 } from 'ui'
 
-import { AddNewPaymentMethodModal } from 'components/interfaces/Billing'
+import { AddNewPaymentMethodModal } from 'components/interfaces/BillingV2'
 import NoPermission from 'components/ui/NoPermission'
 import Panel from 'components/ui/Panel'
 import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'

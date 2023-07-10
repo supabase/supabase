@@ -3,7 +3,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 
 import { useParams } from 'common'
-import { AddNewPaymentMethodModal } from 'components/interfaces/Billing'
+import { AddNewPaymentMethodModal } from 'components/interfaces/BillingV2'
 import {
   ScaffoldSection,
   ScaffoldSectionContent,
@@ -19,9 +19,10 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useCheckPermissions, useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import { getURL } from 'lib/helpers'
-import { Badge, Button, Dropdown, IconCreditCard, IconMoreHorizontal, IconPlus } from 'ui'
+import { Alert, Badge, Button, Dropdown, IconCreditCard, IconMoreHorizontal, IconPlus } from 'ui'
 import ChangePaymentMethodModal from './ChangePaymentMethodModal'
 import DeletePaymentMethodModal from './DeletePaymentMethodModal'
+import Link from 'next/link'
 
 const PaymentMethods = () => {
   const { ui } = useStore()
@@ -39,8 +40,6 @@ const PaymentMethods = () => {
     isError,
     isSuccess,
   } = useOrganizationPaymentMethodsQuery({ slug })
-  const sortedPaymentMethods =
-    paymentMethods?.sort((a, b) => (a.id === subscription?.payment_method_id ? -1 : 0)) ?? []
 
   const canReadPaymentMethods = useCheckPermissions(
     PermissionAction.BILLING_READ,
@@ -80,99 +79,128 @@ const PaymentMethods = () => {
               )}
 
               {isError && (
-                <AlertError subject="Unable to retrieve payment methods" error={error as any} />
+                <AlertError subject="Failed to retrieve payment methods" error={error as any} />
               )}
 
               {isSuccess && (
-                <FormPanel
-                  footer={
-                    <div className="flex items-center justify-between py-4 px-8">
-                      {!canUpdatePaymentMethods ? (
-                        <p className="text-sm text-scale-1000">
-                          You need additional permissions to manage payment methods
-                        </p>
-                      ) : (
-                        <div />
-                      )}
-                      <Button
-                        type="default"
-                        icon={<IconPlus />}
-                        disabled={!canUpdatePaymentMethods}
-                        onClick={() => setShowAddPaymentMethodModal(true)}
-                      >
-                        Add new card
-                      </Button>
-                    </div>
-                  }
-                >
-                  <FormSection>
-                    <FormSectionContent fullWidth loading={false}>
-                      {(paymentMethods?.length ?? 0) === 0 ? (
-                        <div className="flex items-center space-x-2 opacity-50">
-                          <IconCreditCard />
-                          <p className="text-sm">No payment methods</p>
-                        </div>
-                      ) : (
-                        <div className="space-y-3">
-                          {sortedPaymentMethods?.map((paymentMethod) => {
-                            const isActive = subscription?.payment_method_id === paymentMethod.id
-                            return (
-                              <div
-                                key={paymentMethod.id}
-                                className="flex items-center justify-between"
-                              >
-                                <div className="flex items-center space-x-8">
-                                  <img
-                                    alt="Credit card brand"
-                                    src={`${BASE_PATH}/img/payment-methods/${paymentMethod.card.brand
-                                      .replace(' ', '-')
-                                      .toLowerCase()}.png`}
-                                    width="32"
-                                  />
-                                  <p className="prose text-sm font-mono">
-                                    **** **** **** {paymentMethod.card.last4}
-                                  </p>
-                                  <p className="text-sm tabular-nums">
-                                    Expires: {paymentMethod.card.exp_month}/
-                                    {paymentMethod.card.exp_year}
-                                  </p>
-                                </div>
-                                {isActive && <Badge color="green">Active</Badge>}
-                                {canUpdatePaymentMethods && !isActive ? (
-                                  <Dropdown
-                                    size="tiny"
-                                    align="end"
-                                    overlay={[
-                                      <Dropdown.Item
-                                        key="make-default"
-                                        onClick={() => setSelectedMethodForUse(paymentMethod)}
-                                      >
-                                        Use this card
-                                      </Dropdown.Item>,
-                                      <Dropdown.Separator key="card-separator" />,
-                                      <Dropdown.Item
-                                        key="delete-method"
-                                        onClick={() => setSelectedMethodToDelete(paymentMethod)}
-                                      >
-                                        Delete card
-                                      </Dropdown.Item>,
-                                    ]}
-                                  >
-                                    <Button
-                                      type="outline"
-                                      icon={<IconMoreHorizontal />}
-                                      className="hover:border-gray-500 px-1"
+                <>
+                  {subscription?.payment_method_type === 'invoice' && (
+                    <Alert
+                      withIcon
+                      variant="info"
+                      title="Payment is currently by invoice"
+                      actions={[
+                        <Link
+                          key="payment-method-support"
+                          href={`/support/new?category=billing&subject=Request%20to%20change%20payment%20method`}
+                        >
+                          <a target="_blank" rel="noreferrer" className="ml-3">
+                            <Button type="default">Contact support</Button>
+                          </a>
+                        </Link>,
+                      ]}
+                    >
+                      You get a monthly invoice and payment link via email. To change your payment
+                      method, please contact us via our support form.
+                    </Alert>
+                  )}
+                  <FormPanel
+                    footer={
+                      <div className="flex items-center justify-between py-4 px-8">
+                        {!canUpdatePaymentMethods ? (
+                          <p className="text-sm text-scale-1000">
+                            You need additional permissions to manage payment methods
+                          </p>
+                        ) : (
+                          <div />
+                        )}
+                        <Button
+                          type="default"
+                          icon={<IconPlus />}
+                          disabled={!canUpdatePaymentMethods}
+                          onClick={() => setShowAddPaymentMethodModal(true)}
+                        >
+                          Add new card
+                        </Button>
+                      </div>
+                    }
+                  >
+                    <FormSection>
+                      <FormSectionContent fullWidth loading={false}>
+                        {(paymentMethods?.length ?? 0) === 0 ? (
+                          <div className="flex items-center space-x-2 opacity-50">
+                            <IconCreditCard />
+                            <p className="text-sm">No payment methods</p>
+                          </div>
+                        ) : (
+                          <div className="space-y-3">
+                            {paymentMethods?.map((paymentMethod) => {
+                              const isActive = subscription?.payment_method_id === paymentMethod.id
+                              return (
+                                <div
+                                  key={paymentMethod.id}
+                                  className="flex items-center justify-between"
+                                >
+                                  <div className="flex items-center space-x-8">
+                                    <img
+                                      alt="Credit card brand"
+                                      src={`${BASE_PATH}/img/payment-methods/${paymentMethod.card.brand
+                                        .replace(' ', '-')
+                                        .toLowerCase()}.png`}
+                                      width="32"
                                     />
-                                  </Dropdown>
-                                ) : null}
-                              </div>
-                            )
-                          })}
-                        </div>
-                      )}
-                    </FormSectionContent>
-                  </FormSection>
-                </FormPanel>
+                                    <p className="prose text-sm font-mono">
+                                      **** **** **** {paymentMethod.card.last4}
+                                    </p>
+                                    <p className="text-sm tabular-nums">
+                                      Expires: {paymentMethod.card.exp_month}/
+                                      {paymentMethod.card.exp_year}
+                                    </p>
+                                  </div>
+                                  {isActive && <Badge color="green">Active</Badge>}
+                                  {canUpdatePaymentMethods && !isActive ? (
+                                    <Dropdown
+                                      size="tiny"
+                                      align="end"
+                                      overlay={[
+                                        ...(subscription?.plan.id !== 'free' &&
+                                        subscription?.payment_method_type === 'card'
+                                          ? [
+                                              <Dropdown.Item
+                                                key="make-default"
+                                                onClick={() =>
+                                                  setSelectedMethodForUse(paymentMethod)
+                                                }
+                                              >
+                                                Use this card
+                                              </Dropdown.Item>,
+                                              <Dropdown.Separator key="card-separator" />,
+                                            ]
+                                          : []),
+                                        <Dropdown.Item
+                                          key="delete-method"
+                                          onClick={() => setSelectedMethodToDelete(paymentMethod)}
+                                        >
+                                          Delete card
+                                        </Dropdown.Item>,
+                                      ]}
+                                    >
+                                      <Button
+                                        type="outline"
+                                        icon={<IconMoreHorizontal />}
+                                        className="hover:border-gray-500 px-1"
+                                      />
+                                    </Dropdown>
+                                  ) : null}
+                                </div>
+                              )
+                            })}
+                          </div>
+                        )}
+                      </FormSectionContent>
+                    </FormSection>
+                  </FormPanel>
+                </>
               )}
             </>
           )}

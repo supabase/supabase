@@ -12,7 +12,7 @@ import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
 import { BASE_PATH, PROJECT_STATUS } from 'lib/constants'
 import Telemetry from 'lib/telemetry'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
@@ -45,6 +45,8 @@ const ComputeInstanceSidePanel = () => {
   const { ref: projectRef } = useParams()
   const { isDarkMode } = useTheme()
   const { project: selectedProject } = useProjectContext()
+  const organization = useSelectedOrganization()
+  const isOrgBilling = !!organization?.subscription_id
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showConfirmationModal, setShowConfirmationModal] = useState(false)
@@ -242,9 +244,17 @@ const ComputeInstanceSidePanel = () => {
                     variant="info"
                     title="Changing your compute size is only available on the Pro plan"
                     actions={
-                      <Button type="default" onClick={() => snap.setPanelKey('subscriptionPlan')}>
-                        View available plans
-                      </Button>
+                      isOrgBilling ? (
+                        <Link href={`/org/${organization.slug}/billing?panel=subscriptionPlan`}>
+                          <a>
+                            <Button type="default">View available plans</Button>
+                          </a>
+                        </Link>
+                      ) : (
+                        <Button type="default" onClick={() => snap.setPanelKey('subscriptionPlan')}>
+                          View available plans
+                        </Button>
+                      )
                     }
                   >
                     Upgrade your plan to change the compute size of your project

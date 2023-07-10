@@ -1,6 +1,6 @@
 import Link from 'next/link'
 
-import { Invoices } from 'components/interfaces/Billing'
+import { Invoices } from 'components/interfaces/BillingV2'
 import { SettingsLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useSelectedOrganization } from 'hooks'

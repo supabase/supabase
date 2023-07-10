@@ -11,21 +11,18 @@ import { setProjectPostgrestStatus } from 'data/projects/projects-query'
 import { useCheckPermissions, useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { Project } from 'types'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
-export interface RestartServerButtonProps {
-  project: Project
-}
-
-const RestartServerButton = ({ project }: RestartServerButtonProps) => {
+const RestartServerButton = () => {
   const queryClient = useQueryClient()
+  const { project } = useProjectContext()
   const { ui } = useStore()
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [serviceToRestart, setServiceToRestart] = useState<'project' | 'database'>()
 
-  const projectRef = project.ref
-  const projectRegion = project.region
+  const projectRef = project?.ref ?? ''
+  const projectRegion = project?.region
 
   const canRestartProject = useCheckPermissions(PermissionAction.INFRA_EXECUTE, 'reboot')
 
@@ -105,7 +102,7 @@ const RestartServerButton = ({ project }: RestartServerButtonProps) => {
                   >
                     <div className="space-y-1">
                       <p className="block text-scale-1200">Fast database reboot</p>
-                      <p className="block text-scale-1100">
+                      <p className="block text-scale-1100 text-xs">
                         Restarts only the database - faster but may not be able to recover from all
                         failure modes
                       </p>
