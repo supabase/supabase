@@ -12,6 +12,8 @@ export const meta = {
 
 This guide will help you choose the right Compute Add-on for your workload. We'll provide general guidance, as it is impossible to provide specific instructions for every possible use case. The goal is to give you a starting point from which you can make your own benchmarks and optimizations.
 
+Note that it is only useful for index searches, not for sequential scans. Sequential scans will result to significantly higher latencies and lower throughput, but will guarantee 100% precision and will not be RAM bound. Therefore it is possible to use a smaller plan for sequential scans.
+
 For more information about engineering at scale, see our [Engineering for Scale](/docs/guides/ai/engineering-for-scale) guide.
 
 ## Simple workloads
