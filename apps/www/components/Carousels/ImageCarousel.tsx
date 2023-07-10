@@ -1,6 +1,6 @@
 import { Button, IconCornerRightUp, Tabs } from 'ui'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 
 // Import Swiper React components
 import { Swiper, SwiperSlide } from 'swiper/react'
@@ -11,6 +11,7 @@ import 'swiper/swiper.min.css'
 import Image from 'next/image'
 import TextLink from '../TextLink'
 import ImageCarouselStyles from './ImageCarousel.module.css'
+import { useInView } from 'framer-motion'
 
 interface Content {
   title: string
@@ -29,6 +30,8 @@ interface ImageCarouselProps {
 }
 
 function ImageCarousel(props: ImageCarouselProps) {
+  const sectionRef = useRef<any>(null)
+  const isInView = useInView(sectionRef, { margin: '-25%', once: true })
   // base path for images
   const { basePath } = useRouter()
 
@@ -66,7 +69,7 @@ function ImageCarousel(props: ImageCarouselProps) {
   )
 
   return (
-    <div className="grid grid-cols-12">
+    <div className="grid grid-cols-12" ref={sectionRef}>
       <div className="col-span-12 w-full lg:col-span-6">
         <div className="sbui-tabs--alt col-span-12 lg:col-span-7">
           <div className={props.altTabView ? 'hidden' : 'block'}>
@@ -116,7 +119,7 @@ function ImageCarousel(props: ImageCarouselProps) {
                         height="960"
                       />
                     )}
-                    {content.youtube_id && (
+                    {isInView && content.youtube_id && (
                       <div className="relative w-full" style={{ padding: '56.25% 0 0 0' }}>
                         <iframe
                           title="Demo video showcasing Supabase"
