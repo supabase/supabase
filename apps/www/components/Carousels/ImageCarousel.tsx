@@ -31,7 +31,7 @@ interface ImageCarouselProps {
 
 function ImageCarousel(props: ImageCarouselProps) {
   const sectionRef = useRef<any>(null)
-  const isInView = useInView(sectionRef, { margin: '-25%', once: true })
+  const isInView = useInView(sectionRef, { margin: '75%', once: true })
   // base path for images
   const { basePath } = useRouter()
 
