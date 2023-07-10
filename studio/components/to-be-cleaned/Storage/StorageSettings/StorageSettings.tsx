@@ -1,14 +1,14 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useState } from 'react'
 import { Button, Form, IconClock, Input, Listbox } from 'ui'
 
-import { useCheckPermissions, useStore } from 'hooks'
-import { IS_PLATFORM } from 'lib/constants'
+import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useProjectStorageConfigUpdateUpdateMutation } from 'data/config/project-storage-config-update-mutation'
-import UpgradeToPro from 'components/ui/UpgradeToPro'
+import { useCheckPermissions, useStore } from 'hooks'
+import { IS_PLATFORM } from 'lib/constants'
+import { STORAGE_FILE_SIZE_LIMIT_MAX_BYTES, StorageSizeUnits } from './StorageSettings.constants'
 import { convertFromBytes, convertToBytes } from './StorageSettings.utils'
-import { StorageSizeUnits, STORAGE_FILE_SIZE_LIMIT_MAX_BYTES } from './StorageSettings.constants'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 export type StorageSettingsProps = {
   projectRef: string | undefined
@@ -45,6 +45,7 @@ const StorageConfig = ({ config, projectRef }: any) => {
   let initialValues = { fileSizeLimit: value, unformattedFileSizeLimit: fileSizeLimit }
 
   const canUpdateStorageSettings = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
+  const { mutateAsync: updateStorageConfig } = useProjectStorageConfigUpdateUpdateMutation()
 
   const formattedMaxSizeBytes = `${new Intl.NumberFormat('en-US').format(
     STORAGE_FILE_SIZE_LIMIT_MAX_BYTES
@@ -65,36 +66,26 @@ const StorageConfig = ({ config, projectRef }: any) => {
     return errors
   }
 
-  const { mutateAsync: updateStorageConfig } = useProjectStorageConfigUpdateUpdateMutation()
-
   const onSubmit = async (values: any) => {
     const errors = onValidate(values)
 
     if (errors.fileSizeLimit) {
-      ui.setNotification({
+      return ui.setNotification({
         category: 'error',
         message: `Upload file size limit must be up to 5GB (${formattedMaxSizeBytes})`,
       })
-    } else {
-      try {
-        const res = await updateStorageConfig({
-          projectRef,
-          fileSizeLimit: convertToBytes(values.fileSizeLimit, selectedUnit),
-        })
-
-        const updatedValue = convertFromBytes(res.fileSizeLimit)
-        initialValues = {
-          fileSizeLimit: updatedValue.value,
-          unformattedFileSizeLimit: res.fileSizeLimit,
-        }
-        ui.setNotification({ category: 'success', message: 'Successfully updated settings' })
-      } catch (error: any) {
-        ui.setNotification({
-          category: 'error',
-          message: `Failed to update storage settings: ${error?.message}`,
-        })
-      }
     }
+
+    const res = await updateStorageConfig({
+      projectRef,
+      fileSizeLimit: convertToBytes(values.fileSizeLimit, selectedUnit),
+    })
+    const updatedValue = convertFromBytes(res.fileSizeLimit)
+    initialValues = {
+      fileSizeLimit: updatedValue.value,
+      unformattedFileSizeLimit: res.fileSizeLimit,
+    }
+    ui.setNotification({ category: 'success', message: 'Successfully updated storage settings' })
   }
 
   // [Joshen] To be refactored using FormContainer, FormPanel, FormContent etc once
