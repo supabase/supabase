@@ -1,43 +1,41 @@
-import { FC, useState, Dispatch, SetStateAction } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import {
-  Alert,
-  Button,
-  Dropdown,
-  Input,
-  Modal,
-  IconEye,
-  IconEyeOff,
-  IconKey,
-  IconLoader,
-  IconChevronDown,
-  IconRefreshCw,
-  IconPenTool,
-  IconAlertCircle,
-} from 'ui'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import {
   JwtSecretUpdateError,
   JwtSecretUpdateProgress,
   JwtSecretUpdateStatus,
 } from '@supabase/shared-types/out/events'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { Dispatch, SetStateAction, useState } from 'react'
+import {
+  Alert,
+  Button,
+  Dropdown,
+  IconAlertCircle,
+  IconChevronDown,
+  IconEye,
+  IconEyeOff,
+  IconKey,
+  IconLoader,
+  IconPenTool,
+  IconRefreshCw,
+  Input,
+  Modal,
+} from 'ui'
 
-import { uuidv4 } from 'lib/helpers'
-import { useStore, useCheckPermissions } from 'hooks'
 import { useParams } from 'common/hooks'
-import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
+import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
+import Panel from 'components/ui/Panel'
 import { useJwtSecretUpdateMutation } from 'data/config/jwt-secret-update-mutation'
+import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
+import { useCheckPermissions, useStore } from 'hooks'
+import { uuidv4 } from 'lib/helpers'
 import {
   JWT_SECRET_UPDATE_ERROR_MESSAGES,
   JWT_SECRET_UPDATE_PROGRESS_MESSAGES,
 } from './API.constants'
-import Panel from 'components/ui/Panel'
-import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 
-interface Props {}
-
-const JWTSettings: FC<Props> = ({}) => {
+const JWTSettings = () => {
   const { ui } = useStore()
   const { ref: projectRef } = useParams()
 
@@ -45,8 +43,6 @@ const JWTSettings: FC<Props> = ({}) => {
   const [showCustomTokenInput, setShowCustomTokenInput] = useState(false)
   const [isCreatingKey, setIsCreatingKey] = useState<boolean>(false)
   const [isRegeneratingKey, setIsGeneratingKey] = useState<boolean>(false)
-  const [isSubmittingJwtSecretUpdateRequest, setIsSubmittingJwtSecretUpdateRequest] =
-    useState<boolean>(false)
 
   const canReadJWTSecret = useCheckPermissions(PermissionAction.READ, 'field.jwt_secret')
   const canGenerateNewJWTSecret = useCheckPermissions(
@@ -56,6 +52,8 @@ const JWTSettings: FC<Props> = ({}) => {
 
   const { data } = useJwtSecretUpdatingStatusQuery({ projectRef })
   const { data: config, isError } = useProjectPostgrestConfigQuery({ projectRef })
+  const { mutateAsync: updateJwt, isLoading: isSubmittingJwtSecretUpdateRequest } =
+    useJwtSecretUpdateMutation()
 
   const { Failed, Updated, Updating } = JwtSecretUpdateStatus
 
@@ -68,35 +66,21 @@ const JWTSettings: FC<Props> = ({}) => {
   const jwtSecretUpdateProgressMessage =
     JWT_SECRET_UPDATE_PROGRESS_MESSAGES[data?.jwtSecretUpdateProgress as JwtSecretUpdateProgress]
 
-  const { mutateAsync: updateJwt } = useJwtSecretUpdateMutation()
-
   async function handleJwtSecretUpdate(
     jwt_secret: string,
     setModalVisibility: Dispatch<SetStateAction<boolean>>
   ) {
-    if (!projectRef) return
+    if (!projectRef) return console.error('Project ref is required')
 
-    setIsSubmittingJwtSecretUpdateRequest(true)
-    try {
-      const trackingId = uuidv4()
-      await updateJwt({
-        projectRef,
-        jwtSecret: jwt_secret,
-        changeTrackingId: trackingId,
-      })
+    const trackingId = uuidv4()
+    await updateJwt({ projectRef, jwtSecret: jwt_secret, changeTrackingId: trackingId })
 
-      setModalVisibility(false)
-
-      ui.setNotification({
-        category: 'info',
-        message:
-          'Successfully submitted JWT secret update request. Please wait while your project is updated.',
-      })
-    } catch (error: any) {
-      ui.setNotification({ category: 'error', message: error.message })
-    } finally {
-      setIsSubmittingJwtSecretUpdateRequest(false)
-    }
+    setModalVisibility(false)
+    ui.setNotification({
+      category: 'info',
+      message:
+        'Successfully submitted JWT secret update request. Please wait while your project is updated.',
+    })
   }
 
   return (

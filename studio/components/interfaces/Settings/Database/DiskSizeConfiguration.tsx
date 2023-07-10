@@ -1,5 +1,10 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import Link from 'next/link'
+import { useState } from 'react'
+import { Alert, Button, Form, InputNumber, Modal } from 'ui'
+import { number, object } from 'yup'
+
 import { useParams } from 'common/hooks'
 import { FormHeader } from 'components/ui/Forms'
 import Panel from 'components/ui/Panel'
@@ -7,10 +12,6 @@ import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mu
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 import { useProjectUsageQuery } from 'data/usage/project-usage-query'
 import { useCheckPermissions, useStore } from 'hooks'
-import Link from 'next/link'
-import { useEffect, useState } from 'react'
-import { Alert, Button, Form, InputNumber, Modal } from 'ui'
-import { number, object } from 'yup'
 
 export interface DiskSizeConfigurationProps {
   disabled?: boolean
@@ -20,38 +21,24 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
   const { ui } = useStore()
   const { ref: projectRef } = useParams()
 
-  const canUpdateDiskSizeConfig = useCheckPermissions(PermissionAction.UPDATE, 'projects')
-
   const [showResetDbPass, setShowResetDbPass] = useState<boolean>(false)
-  const [isUpdatingDiskSize, setIsUpdatingDiskSize] = useState<boolean>(false)
+  const canUpdateDiskSizeConfig = useCheckPermissions(PermissionAction.UPDATE, 'projects')
 
   const { data: projectUsage } = useProjectUsageQuery({ projectRef })
   const { data: projectSubscriptionData } = useProjectSubscriptionV2Query({ projectRef })
-  const { mutateAsync: updateProjectUsage } = useProjectDiskResizeMutation()
-
-  useEffect(() => {
-    if (showResetDbPass) {
-      setIsUpdatingDiskSize(false)
-    }
-  }, [showResetDbPass])
+  const { mutateAsync: updateProjectUsage, isLoading: isUpdatingDiskSize } =
+    useProjectDiskResizeMutation()
 
   const confirmResetDbPass = async (values: { [prop: string]: any }) => {
     const volumeSize = values['new-disk-size']
-    if (!projectRef) return
+    if (!projectRef) return console.error('Project ref is required')
 
-    try {
-      setIsUpdatingDiskSize(true)
-      await updateProjectUsage({ projectRef, volumeSize })
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully updated disk size to ${values['new-disk-size']} GB`,
-      })
-      setIsUpdatingDiskSize(false)
-      setShowResetDbPass(false)
-    } catch (error: any) {
-      ui.setNotification({ category: 'error', message: error.message })
-      setIsUpdatingDiskSize(false)
-    }
+    await updateProjectUsage({ projectRef, volumeSize })
+    ui.setNotification({
+      category: 'success',
+      message: `Successfully updated disk size to ${values['new-disk-size']} GB`,
+    })
+    setShowResetDbPass(false)
   }
 
   const currentDiskSize = projectUsage?.disk_volume_size_gb ?? 0
