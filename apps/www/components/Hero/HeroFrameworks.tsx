@@ -93,13 +93,13 @@ const HeroFrameworks = ({ className }: { className?: string }) => {
               </a>
             </Link>
           ))}
-          <ReactTooltip
+          {/* <ReactTooltip
             effect={'solid'}
             place="bottom"
             backgroundColor="#2e2e2e"
             textColor="white"
             className="!py-2 !px-4"
-          />
+          /> */}
         </div>
       </div>
     </div>
