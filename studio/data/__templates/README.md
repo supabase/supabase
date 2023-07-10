@@ -82,8 +82,13 @@ const { mutateAsync: someAction } = useMutation({
 })
 
 const onConfirm = async () => {
+  // Assuming that your mutation needs a URL param like project ref
+  // This check is just to satistfy the linting - there's an implicit assumption that
+  // projectRef here will definitely be available since its obtained from the URL
+  if (!projectRef) return console.error('Project ref is required')
+
   // Any logic before calling the mutation
-  await someAction(someParameters)
+  await someAction({ projectRef, otherParameters })
   // Any logic after calling the mutation
 }
 ```
