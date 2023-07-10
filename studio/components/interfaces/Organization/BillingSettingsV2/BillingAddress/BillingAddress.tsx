@@ -83,7 +83,7 @@ const BillingAddress = () => {
 
             {isError && (
               <AlertError
-                subject="Unable to retrieve organization customer profile"
+                subject="Failed to retrieve organization customer profile"
                 error={error as any}
               />
             )}

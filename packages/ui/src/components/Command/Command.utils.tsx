@@ -408,8 +408,10 @@ export function useAutoInputFocus() {
 
   // Focus the input when typing from anywhere
   React.useEffect(() => {
-    function onKeyDown() {
-      input?.focus()
+    function onKeyDown(e: KeyboardEvent) {
+      if (!e.ctrlKey && !e.altKey && !e.metaKey && e.key !== 'Tab') {
+        input?.focus()
+      }
     }
 
     window.addEventListener('keydown', onKeyDown)

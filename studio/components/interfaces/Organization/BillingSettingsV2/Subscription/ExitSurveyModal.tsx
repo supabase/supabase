@@ -1,46 +1,42 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
-import { useQueryClient } from '@tanstack/react-query'
 import { includes, without } from 'lodash'
-import { useRouter } from 'next/router'
 import { useReducer, useRef, useState } from 'react'
 
 import { useParams } from 'common'
-import { setProjectStatus } from 'data/projects/projects-query'
-import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useProjectSubscriptionUpdateMutation } from 'data/subscriptions/project-subscription-update-mutation'
+import { OrgSubscription } from 'data/subscriptions/org-subscription-query'
+import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
 import { useFlag, useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
-import { API_URL, PROJECT_STATUS } from 'lib/constants'
-import { Button, Input, Modal } from 'ui'
-import { CANCELLATION_REASONS } from '../BillingSettings.constants'
+import { API_URL } from 'lib/constants'
+import { Alert, Button, Input, Modal } from 'ui'
 import ProjectUpdateDisabledTooltip from '../../BillingSettings/ProjectUpdateDisabledTooltip'
+import { CANCELLATION_REASONS } from '../BillingSettings.constants'
 
 export interface ExitSurveyModalProps {
   visible: boolean
+  subscription?: OrgSubscription
   onClose: (success?: boolean) => void
 }
 
 // [Joshen] For context - Exit survey is only when going to free plan from a paid plan
-// [Joshen TODO] Remove all contexts of projects - i'm presuming we still want the exit survey
-
-const ExitSurveyModal = ({ visible, onClose }: ExitSurveyModalProps) => {
-  const queryClient = useQueryClient()
+const ExitSurveyModal = ({ visible, subscription, onClose }: ExitSurveyModalProps) => {
   const { ui } = useStore()
-  const { ref: projectRef } = useParams()
+  const { slug } = useParams()
   const captchaRef = useRef<HCaptcha>(null)
-  const router = useRouter()
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [message, setMessage] = useState('')
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [selectedReasons, dispatchSelectedReasons] = useReducer(reducer, [])
 
-  const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
-  const { data: addons } = useProjectAddonsQuery({ projectRef })
-  const { mutateAsync: updateSubscriptionTier } = useProjectSubscriptionUpdateMutation()
+  const subscriptionUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
+  const { mutateAsync: updateOrgSubscription } = useOrgSubscriptionUpdateMutation()
 
-  const subscriptionAddons = addons?.selected_addons ?? []
-  const hasComputeInstance = subscriptionAddons.find((addon) => addon.type === 'compute_instance')
+  const projectsWithComputeInstances =
+    subscription?.project_addons.filter((project) =>
+      project.addons.find((addon) => addon.type === 'compute_instance')
+    ) ?? []
+  const hasComputeInstance = projectsWithComputeInstances.length > 0
 
   function reducer(state: any, action: any) {
     if (includes(state, action.target.value)) {
@@ -70,7 +66,7 @@ const ExitSurveyModal = ({ visible, onClose }: ExitSurveyModalProps) => {
       if (!token) {
         const captchaResponse = await captchaRef.current?.execute({ async: true })
         token = captchaResponse?.response ?? null
-        await downgradeProject()
+        await downgradeOrganization()
       }
     } catch (error: any) {
       ui.setNotification({
@@ -82,25 +78,25 @@ const ExitSurveyModal = ({ visible, onClose }: ExitSurveyModalProps) => {
     }
   }
 
-  const downgradeProject = async (values?: any) => {
+  const downgradeOrganization = async (values?: any) => {
     // Update the subscription first, followed by posting the exit survey if successful
     // If compute instance is present within the existing subscription, then a restart will be triggered
-    if (!projectRef) return console.error('Project ref is required')
+    if (!slug) return console.error('Slug is required')
 
     try {
-      await updateSubscriptionTier({ projectRef, tier: 'tier_free' })
+      await updateOrgSubscription({ slug, tier: 'tier_free' })
       resetCaptcha()
     } catch (error: any) {
       return ui.setNotification({
         error,
         category: 'error',
-        message: `Failed to cancel subscription: ${error.message}`,
+        message: `Failed to downgrade subscription: ${error.message}`,
       })
     }
 
     try {
       const feedbackRes = await post(`${API_URL}/feedback/downgrade`, {
-        projectRef,
+        orgSlug: slug,
         reasons: selectedReasons.reduce((a, b) => `${a}- ${b}\n`, ''),
         additionalFeedback: message,
         exitAction: 'downgrade',
@@ -117,13 +113,9 @@ const ExitSurveyModal = ({ visible, onClose }: ExitSurveyModalProps) => {
         category: 'success',
         duration: hasComputeInstance ? 8000 : 4000,
         message: hasComputeInstance
-          ? 'Your project has been downgraded and is currently restarting to update its instance size'
-          : 'Successfully downgraded project to the free plan',
+          ? 'Your organization has been downgraded and your projects are currently restarting to update their compute instances'
+          : 'Successfully downgraded organization to the free plan',
       })
-      if (hasComputeInstance) {
-        setProjectStatus(queryClient, projectRef, PROJECT_STATUS.RESTORING)
-        router.push(`/project/${projectRef}`)
-      }
       onClose(true)
       window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
     }
@@ -159,7 +151,7 @@ const ExitSurveyModal = ({ visible, onClose }: ExitSurveyModalProps) => {
         header="We're sad that you're leaving"
       >
         <Modal.Content>
-          <div className="py-6">
+          <div className="py-6 space-y-4">
             <p className="text-sm text-scale-1100">
               We always strive to improve Supabase as much as we can. Please let us know the reasons
               you are canceling your subscription so that we can improve in the future.
@@ -204,6 +196,18 @@ const ExitSurveyModal = ({ visible, onClose }: ExitSurveyModalProps) => {
                 />
               </div>
             </div>
+            {hasComputeInstance && (
+              <Alert
+                withIcon
+                variant="warning"
+                title={`${projectsWithComputeInstances.length} of your project${
+                  projectsWithComputeInstances.length > 1 ? 's' : ''
+                } will be restarted upon hitting confirm`}
+              >
+                This is due to changes in compute instances from the downgrade. Affected project(s)
+                include {projectsWithComputeInstances.map((project) => project.name).join(', ')}.
+              </Alert>
+            )}
           </div>
         </Modal.Content>
 
@@ -215,11 +219,11 @@ const ExitSurveyModal = ({ visible, onClose }: ExitSurveyModalProps) => {
             <Button type="default" onClick={() => onClose()}>
               Cancel
             </Button>
-            <ProjectUpdateDisabledTooltip projectUpdateDisabled={projectUpdateDisabled}>
+            <ProjectUpdateDisabledTooltip projectUpdateDisabled={subscriptionUpdateDisabled}>
               <Button
                 type="danger"
                 loading={isSubmitting}
-                disabled={projectUpdateDisabled || isSubmitting}
+                disabled={subscriptionUpdateDisabled || isSubmitting}
                 onClick={onSubmit}
               >
                 Confirm downgrade

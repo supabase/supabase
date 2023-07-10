@@ -47,7 +47,7 @@ const CreditBalance = () => {
         )}
 
         {isError && (
-          <AlertError subject="Unable to retrieve organization customer profile" error={error} />
+          <AlertError subject="Failed to retrieve organization customer profile" error={error} />
         )}
 
         {isSuccess && (

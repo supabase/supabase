@@ -10,7 +10,7 @@ const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
   const selectedOrganization = useSelectedOrganization()
   const router = useRouter()
   const { slug } = useParams()
-  const id = router.asPath.split('/').at(-1)
+  const id = router.asPath.split('/').at(-1)?.split('?')[0]?.split('#')[0]
   const showOAuthApps = useFlag('oauthApps')
   const showAuditLogs = useFlag('auditLogs')
   const showIntegrationsV2 = useFlag('integrationsV2')
@@ -22,7 +22,7 @@ const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
       breadcrumbs={[{ key: `org-settings`, label: 'Settings' }]}
     >
       <ScaffoldHeader>
-        <ScaffoldContainer>
+        <ScaffoldContainer id="billing-page-top">
           <ScaffoldTitle>{selectedOrganization?.name ?? 'Organization'} settings</ScaffoldTitle>
         </ScaffoldContainer>
         <ScaffoldContainer>
@@ -42,7 +42,7 @@ const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
                 <Tabs.Panel id="integrations" label="Integrations" className="!my-0" />
               )}
               <Tabs.Panel id="billing" label="Billing" className="!my-0" />
-              {isOrgBilling && <Tabs.Panel id="usage" label="Usage" />}
+              {isOrgBilling && <Tabs.Panel id="usage" label="Usage" className="!my-0" />}
               <Tabs.Panel id="invoices" label="Invoices" className="!my-0" />
               {showOAuthApps && <Tabs.Panel id="apps" label="OAuth Apps" className="!my-0" />}
               {showAuditLogs && <Tabs.Panel id="audit" label="Audit Logs" className="!my-0" />}

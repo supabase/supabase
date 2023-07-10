@@ -1,22 +1,25 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import clsx from 'clsx'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
+
 import { useParams } from 'common'
 import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-remove-mutation'
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
-import { useCheckPermissions, useStore } from 'hooks'
-import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
+import Telemetry from 'lib/telemetry'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { Alert, Button, IconExternalLink, Radio, SidePanel } from 'ui'
-import Telemetry from 'lib/telemetry'
-import { useRouter } from 'next/router'
 
 const CustomDomainSidePanel = () => {
   const { ui } = useStore()
   const router = useRouter()
   const { ref: projectRef } = useParams()
+  const organization = useSelectedOrganization()
+  const isOrgBilling = !!organization?.subscription_id
 
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
   const [selectedOption, setSelectedOption] = useState<string>('cd_none')
@@ -235,9 +238,17 @@ const CustomDomainSidePanel = () => {
               variant="info"
               title="Custom domains are unavailable on the free plan"
               actions={
-                <Button type="default" onClick={() => snap.setPanelKey('subscriptionPlan')}>
-                  View available plans
-                </Button>
+                isOrgBilling ? (
+                  <Link href={`/org/${organization.slug}/billing?panel=subscriptionPlan`}>
+                    <a>
+                      <Button type="default">View available plans</Button>
+                    </a>
+                  </Link>
+                ) : (
+                  <Button type="default" onClick={() => snap.setPanelKey('subscriptionPlan')}>
+                    View available plans
+                  </Button>
+                )
               }
             >
               Upgrade your plan to add a custom domain to your project

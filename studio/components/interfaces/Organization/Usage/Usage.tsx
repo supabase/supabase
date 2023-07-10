@@ -1,29 +1,47 @@
 import clsx from 'clsx'
 import dayjs from 'dayjs'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
-import Bandwidth from './Bandwidth'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { ScaffoldContainer } from 'components/layouts/Scaffold'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
+import AlertError from 'components/ui/AlertError'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { useProjectsQuery } from 'data/projects/projects-query'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useSelectedOrganization } from 'hooks'
 import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants'
-import SizeAndCounts from './SizeAndCounts'
+import { Listbox } from 'ui'
 import Activity from './Activity'
-import { IconLoader } from 'ui'
-import { ScaffoldContainer, ScaffoldDivider, ScaffoldSection } from 'components/layouts/Scaffold'
+import Bandwidth from './Bandwidth'
+import SizeAndCounts from './SizeAndCounts'
 
 const Usage = () => {
-  const { slug } = useParams()
+  const { slug, projectRef } = useParams()
   const [dateRange, setDateRange] = useState<any>()
+  const [selectedProjectRef, setSelectedProjectRef] = useState<string>()
 
+  const organization = useSelectedOrganization()
+  const { data: projects, isSuccess } = useProjectsQuery()
   const {
     data: subscription,
+    error: subscriptionError,
     isLoading: isLoadingSubscription,
-    isError,
-    isSuccess,
+    isError: isErrorSubscription,
+    isSuccess: isSuccessSubscription,
   } = useOrgSubscriptionQuery({ orgSlug: slug })
+  const orgProjects = projects?.filter((project) => project.organization_id === organization?.id)
 
-  const selectedProjectRef = 'kojplftaeiavuneadgix'
+  useEffect(() => {
+    if (projectRef && isSuccess && orgProjects !== undefined) {
+      if (orgProjects.find((project) => project.ref === projectRef)) {
+        setSelectedProjectRef(projectRef)
+      }
+    }
+    // [Joshen] Since we're already looking at isSuccess
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [projectRef, isSuccess])
+
   const billingCycleStart = dayjs.unix(subscription?.current_period_start ?? 0).utc()
   const billingCycleEnd = dayjs.unix(subscription?.current_period_end ?? 0).utc()
 
@@ -66,39 +84,77 @@ const Usage = () => {
 
   return (
     <>
-      <ScaffoldContainer>
+      <ScaffoldContainer className="sticky top-0 border-b bg-scale-200 z-10 overflow-hidden">
         <div className="py-4 flex items-center space-x-4">
-          {!isLoadingSubscription && (
-            <DateRangePicker
-              id="billingCycle"
-              name="billingCycle"
-              onChange={setDateRange}
-              value={TIME_PERIODS_BILLING[0].key}
-              options={[...TIME_PERIODS_BILLING, ...TIME_PERIODS_REPORTS]}
-              loading={isLoadingSubscription}
-              currentBillingPeriodStart={subscription?.current_period_start}
-              className="!w-[200px]"
+          {isLoadingSubscription && <ShimmeringLoader className="w-[250px]" />}
+
+          {isErrorSubscription && (
+            <AlertError
+              className="w-full"
+              subject="Failed to retrieve usage data"
+              error={subscriptionError}
             />
           )}
 
-          {isLoadingSubscription ? (
-            <IconLoader className="animate-spin" size={14} />
-          ) : subscription !== undefined ? (
-            <div className="flex flex-col xl:flex-row xl:gap-3">
-              <p className={clsx('text-sm transition', isLoadingSubscription && 'opacity-50')}>
-                Organization is on the {subscription.plan.name} plan
-              </p>
-              <p className="text-sm text-scale-1000">
-                {billingCycleStart.format('DD MMM YYYY')} - {billingCycleEnd.format('DD MMM YYYY')}
-              </p>
-            </div>
-          ) : null}
+          {isSuccessSubscription && (
+            <>
+              <DateRangePicker
+                id="billingCycle"
+                name="billingCycle"
+                onChange={setDateRange}
+                value={TIME_PERIODS_BILLING[0].key}
+                options={[...TIME_PERIODS_BILLING, ...TIME_PERIODS_REPORTS]}
+                loading={isLoadingSubscription}
+                currentBillingPeriodStart={subscription?.current_period_start}
+                className="!w-[200px]"
+              />
+
+              <Listbox
+                size="tiny"
+                name="schema"
+                className="w-[180px]"
+                value={selectedProjectRef}
+                onChange={(value: any) => {
+                  if (value === 'all-projects') setSelectedProjectRef(undefined)
+                  else setSelectedProjectRef(value)
+                }}
+              >
+                <Listbox.Option
+                  key="all-projects"
+                  id="all-projects"
+                  value="all-projects"
+                  label="All projects"
+                >
+                  All projects
+                </Listbox.Option>
+                {orgProjects?.map((project) => (
+                  <Listbox.Option
+                    key={project.ref}
+                    id={project.ref}
+                    value={project.ref}
+                    label={project.name}
+                  >
+                    {project.name}
+                  </Listbox.Option>
+                ))}
+              </Listbox>
+
+              <div className="flex flex-col xl:flex-row xl:gap-3">
+                <p className={clsx('text-sm transition', isLoadingSubscription && 'opacity-50')}>
+                  Organization is on the {subscription.plan.name} plan
+                </p>
+                <p className="text-sm text-scale-1000">
+                  {billingCycleStart.format('DD MMM YYYY')} -{' '}
+                  {billingCycleEnd.format('DD MMM YYYY')}
+                </p>
+              </div>
+            </>
+          )}
         </div>
       </ScaffoldContainer>
 
-      <ScaffoldDivider />
-
       <Bandwidth
+        orgSlug={slug as string}
         projectRef={selectedProjectRef}
         subscription={subscription}
         startDate={startDate}
@@ -107,13 +163,16 @@ const Usage = () => {
       />
 
       <SizeAndCounts
+        orgSlug={slug as string}
         projectRef={selectedProjectRef}
         subscription={subscription}
         startDate={startDate}
         endDate={endDate}
         currentBillingCycleSelected={currentBillingCycleSelected}
       />
+
       <Activity
+        orgSlug={slug as string}
         projectRef={selectedProjectRef}
         subscription={subscription}
         startDate={startDate}

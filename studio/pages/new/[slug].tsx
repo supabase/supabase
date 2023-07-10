@@ -6,7 +6,7 @@ import Router, { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 
 import { useParams } from 'common/hooks'
-import SpendCapModal from 'components/interfaces/Billing/SpendCapModal'
+import { SpendCapModal } from 'components/interfaces/BillingV2'
 import {
   EmptyPaymentMethodWarning,
   FreeProjectLimitWarning,
