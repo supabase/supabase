@@ -9,7 +9,9 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 
 import { useRef } from 'react'
 import { INITIAL_BOTTOM, getAnimation } from '~/lib/animations'
-import CustomersVisual from '../Products/Vector/CustomersVisual'
+import dynamic from 'next/dynamic'
+
+const CustomersVisual = dynamic(() => import('~/components/Products/Vector/CustomersVisual'))
 
 interface Customer {
   type?: string
