@@ -8,15 +8,15 @@ import pageData from '~/data/products/vector/pageData'
 
 import 'swiper/swiper.min.css'
 
-const ProductHeaderCentered = dynamic(() => import('~/components/Sections/ProductHeaderCentered'))
-const HighlightCards = dynamic(() => import('~/components/Sections/HighlightCards'))
-const FeaturesSection = dynamic(() => import('~/components/Sections/FeaturesSection'))
-const UseCasesSection = dynamic(() => import('~/components/Sections/UseCasesSection'))
-const CenteredTitleImage = dynamic(() => import('~/components/Sections/CenteredTitleImage'))
-const CustomerQuotesSection = dynamic(() => import('~/components/Sections/CustomerQuotesSection'))
-const TimedTabsSection = dynamic(() => import('~/components/Sections/TimedTabsSection'))
-const ProductsCta = dynamic(() => import('~/components/Sections/ProductsCta'))
-const EnterpriseCta = dynamic(() => import('~/components/Sections/EnterpriseCta'))
+// const ProductHeaderCentered = dynamic(() => import('~/components/Sections/ProductHeaderCentered'))
+// const HighlightCards = dynamic(() => import('~/components/Sections/HighlightCards'))
+// const FeaturesSection = dynamic(() => import('~/components/Sections/FeaturesSection'))
+// const UseCasesSection = dynamic(() => import('~/components/Sections/UseCasesSection'))
+// const CenteredTitleImage = dynamic(() => import('~/components/Sections/CenteredTitleImage'))
+// const CustomerQuotesSection = dynamic(() => import('~/components/Sections/CustomerQuotesSection'))
+// const TimedTabsSection = dynamic(() => import('~/components/Sections/TimedTabsSection'))
+// const ProductsCta = dynamic(() => import('~/components/Sections/ProductsCta'))
+// const EnterpriseCta = dynamic(() => import('~/components/Sections/EnterpriseCta'))
 
 function VectorPage() {
   // base path for images
@@ -42,7 +42,8 @@ function VectorPage() {
         }}
       />
       <DefaultLayout className="!bg-scale-300 dark:!bg-scale-100">
-        <ProductHeaderCentered {...pageData.heroSection} />
+        Vector
+        {/* <ProductHeaderCentered {...pageData.heroSection} />
         <HighlightCards {...pageData.highlightsSection} />
         <CenteredTitleImage {...pageData.integrations} />
         <TimedTabsSection {...pageData.APIsection} />
@@ -57,7 +58,7 @@ function VectorPage() {
         <div className="bg-scale-200">
           <div className="w-full h-[1px] bg-gradient-to-r from-scale-100 via-scale-500 dark:via-scale-600 to-scale-100" />
           <ProductsCta currentProduct={PRODUCT_SHORTNAMES.VECTOR} />
-        </div>
+        </div> */}
       </DefaultLayout>
     </>
   )
