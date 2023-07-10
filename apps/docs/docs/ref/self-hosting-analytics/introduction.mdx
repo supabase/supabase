@@ -36,6 +36,7 @@ The requirements are as follows after creating the project:
 - Project number
 - A service account key
 
+
 #### Setting up BigQuery Service Account
 
 To ensure that you have sufficient permissions to insert into your Google Cloud BigQuery, ensure that you have created a service account with either:
@@ -121,6 +122,10 @@ Download your Google Cloud API JWT and store it under gcloud.json in your workin
   You must also enable billing on your Google Cloud project, as the streaming inserts feature is
   required.
 </Admonition>
+
+### Storage Location
+
+Currently, all BigQuery datasets stored and managed by Analytics, whether via CLI or self-hosted, will default to the US region.
 
 ## Production Recommendations
 
