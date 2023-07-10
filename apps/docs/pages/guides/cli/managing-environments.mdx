@@ -196,6 +196,7 @@ The Supabase CLI requires a few environment variables to run in non-interactive 
 
 - `SUPABASE_ACCESS_TOKEN` is your personal access token
 - `SUPABASE_DB_PASSWORD` is your project specific database password
+- `SUPABASE_PROJECT_ID` is your project specific reference string
 
 We recommend adding these as [encrypted secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets) to your GitHub Actions runners.
 
@@ -218,19 +219,22 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v3
 
       - uses: supabase/setup-cli@v1
+        with:
+          version: latest
 
       - name: Start Supabase local development setup
         run: supabase start
 
-      - name: Verify generated types are up-to-date
+      - name: Verify generated types are checked in
         run: |
-          supabase gen types typescript --local > types.ts
-          if [ "$(git diff --ignore-space-at-eol types.ts | wc -l)" -gt "0" ]; then
+          supabase gen types typescript --local > types.gen.ts
+          if ! git diff --ignore-space-at-eol --exit-code --quiet types.gen.ts; then
             echo "Detected uncommitted changes after build. See status below:"
             git diff
             exit 1
@@ -251,21 +255,22 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
 
     env:
       SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
       SUPABASE_DB_PASSWORD: ${{ secrets.STAGING_DB_PASSWORD }}
-      STAGING_PROJECT_ID: abcdefghijklmnopqrst
+      SUPABASE_PROJECT_ID: ${{ secrets.STAGING_PROJECT_ID }}
 
     steps:
       - uses: actions/checkout@v3
 
       - uses: supabase/setup-cli@v1
+        with:
+          version: latest
 
-      - run: |
-          supabase link --project-ref $STAGING_PROJECT_ID
-          supabase db push
+      - run: supabase link --project-ref $SUPABASE_PROJECT_ID
+      - run: supabase db push
 ```
 
 </TabPanel>
@@ -282,21 +287,22 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
 
     env:
       SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
       SUPABASE_DB_PASSWORD: ${{ secrets.PRODUCTION_DB_PASSWORD }}
-      PRODUCTION_PROJECT_ID: abcdefghijklmnopqrst
+      SUPABASE_PROJECT_ID: ${{ secrets.PRODUCTION_PROJECT_ID }}
 
     steps:
       - uses: actions/checkout@v3
 
       - uses: supabase/setup-cli@v1
+        with:
+          version: latest
 
-      - run: |
-          supabase link --project-ref $PRODUCTION_PROJECT_ID
-          supabase db push
+      - run: supabase link --project-ref $SUPABASE_PROJECT_ID
+      - run: supabase db push
 ```
 
 </TabPanel>
