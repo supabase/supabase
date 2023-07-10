@@ -1,5 +1,8 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import toast from 'react-hot-toast'
+
 import { post } from 'lib/common/fetch'
+import { ResponseError } from 'types'
 
 export type UserCreateVariables = {
   protocol: string
@@ -37,11 +40,24 @@ export async function createUser({ protocol, endpoint, serviceApiKey, user }: Us
 
 type UserCreateData = Awaited<ReturnType<typeof createUser>>
 
-export const useUserCreateMutation = (
-  options: Omit<UseMutationOptions<UserCreateData, unknown, UserCreateVariables>, 'mutationFn'> = {}
-) => {
-  return useMutation<UserCreateData, unknown, UserCreateVariables>(
+export const useUserCreateMutation = ({
+  onError,
+  ...options
+}: Omit<
+  UseMutationOptions<UserCreateData, ResponseError, UserCreateVariables>,
+  'mutationFn'
+> = {}) => {
+  return useMutation<UserCreateData, ResponseError, UserCreateVariables>(
     (vars) => createUser(vars),
-    options
+    {
+      async onError(data, variables, context) {
+        if (onError === undefined) {
+          toast.error(`Failed to create user: ${data.message}`)
+        } else {
+          onError(data, variables, context)
+        }
+      },
+      ...options,
+    }
   )
 }
