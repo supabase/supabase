@@ -6,10 +6,10 @@ import { IconArrowUpRight } from 'ui'
 import { LazyMotion, domAnimation, m, useInView } from 'framer-motion'
 
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import CustomersVisual from '~/components/Products/Vector/CustomersVisual'
 
 import { useRef } from 'react'
 import { INITIAL_BOTTOM, getAnimation } from '~/lib/animations'
+import CustomersVisual from '../Products/Vector/CustomersVisual'
 
 interface Customer {
   type?: string
