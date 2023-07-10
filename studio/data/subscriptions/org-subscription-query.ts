@@ -11,6 +11,22 @@ export type OrgSubscriptionVariables = {
 
 export type PlanId = 'free' | 'pro' | 'team' | 'enterprise'
 
+export type ProjectAddon = {
+  addons: {
+    type: 'custom_domain' | 'compute_instance' | 'pitr'
+    variant: {
+      identifier: string
+      name: string
+      price: number
+      price_description: string
+      price_interval: string
+      price_type: string
+    }
+  }[]
+  name: string
+  ref: string
+}
+
 export type OrgSubscription = {
   billing_cycle_anchor: number
   current_period_start: number
@@ -45,21 +61,7 @@ export type OrgSubscription = {
     expiry_month: number
     expiry_year: number
   }
-  project_addons: {
-    addons: {
-      type: 'custom_domain' | 'compute_instance' | 'pitr'
-      variant: {
-        identifier: string
-        name: string
-        price: number
-        price_description: string
-        price_interval: string
-        price_type: string
-      }
-    }[]
-    name: string
-    ref: string
-  }[]
+  project_addons: ProjectAddon[]
 }
 
 export async function getOrgSubscription(

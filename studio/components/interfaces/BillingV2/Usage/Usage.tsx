@@ -17,7 +17,7 @@ import SizeAndCounts from './SizeAndCounts'
 import { USAGE_CATEGORIES, USAGE_STATUS } from './Usage.constants'
 import { getUsageStatus } from './Usage.utils'
 
-export type usageSectionIds = 'infra' | 'bandwidth' | 'sizeCount' | 'activity'
+type UsageSectionIds = 'infra' | 'bandwidth' | 'sizeCount' | 'activity'
 
 const Usage = () => {
   const { ref } = useParams()
@@ -27,7 +27,7 @@ const Usage = () => {
   // [Joshen] Using a state here for now as in the future, we'd have this usage page support showing
   // stats for different projects. So we'll pass the selected ref as a prop into the individual components
   const [selectedProjectRef] = useState<string>(ref as string)
-  const [activeTab, setActiveTab] = useState<usageSectionIds>('infra')
+  const [activeTab, setActiveTab] = useState<UsageSectionIds>('infra')
   const [dateRange, setDateRange] = useState<any>()
 
   const infrastructureRef = useRef<HTMLDivElement>(null)
@@ -91,7 +91,7 @@ const Usage = () => {
     ] ?? 100
   )
 
-  const scrollTo = (id: usageSectionIds) => {
+  const scrollTo = (id: UsageSectionIds) => {
     switch (id) {
       case 'infra':
         if (infrastructureRef.current) {
