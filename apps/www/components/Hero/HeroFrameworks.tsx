@@ -86,6 +86,7 @@ const HeroFrameworks = ({ className }: { className?: string }) => {
                   key={framework.name}
                   className="opacity-100 hover:opacity-80 transition-opacity"
                   src={framework.icon}
+                  priority
                   alt={framework.name}
                   width={isXs ? 35 : 45}
                   height={isXs ? 35 : 45}
@@ -93,13 +94,13 @@ const HeroFrameworks = ({ className }: { className?: string }) => {
               </a>
             </Link>
           ))}
-          {/* <ReactTooltip
+          <ReactTooltip
             effect={'solid'}
             place="bottom"
             backgroundColor="#2e2e2e"
             textColor="white"
             className="!py-2 !px-4"
-          /> */}
+          />
         </div>
       </div>
     </div>
