@@ -75,6 +75,9 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
         snap.removeSnippet(data.id)
       }
     },
+    onError(error) {
+      ui.setNotification({ category: 'error', message: `Failed to delete query: ${error.message}` })
+    },
   })
 
   const { id, name } = tabInfo || {}
@@ -100,20 +103,13 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
     if (!ref) return console.error('Project ref is required')
     if (!id) return console.error('Snippet ID is required')
 
-    try {
-      await deleteContent({ projectRef: ref, id })
+    await deleteContent({ projectRef: ref, id })
 
-      const existingSnippetIds = (snap.orders[ref] ?? []).filter((x) => x !== id)
-      if (existingSnippetIds.length === 0) {
-        router.push(`/project/${ref}/sql`)
-      } else {
-        router.push(`/project/${ref}/sql/${existingSnippetIds[0]}`)
-      }
-    } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to create new query: ${error.message}`,
-      })
+    const existingSnippetIds = (snap.orders[ref] ?? []).filter((x) => x !== id)
+    if (existingSnippetIds.length === 0) {
+      router.push(`/project/${ref}/sql`)
+    } else {
+      router.push(`/project/${ref}/sql/${existingSnippetIds[0]}`)
     }
   }
 
