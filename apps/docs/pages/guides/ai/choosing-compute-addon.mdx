@@ -18,7 +18,7 @@ For more information about engineering at scale, see our [Engineering for Scale]
 
 We've run a set of benchmarks using
 
-- The [dbpedia-entities-openai-1M](https://huggingface.co/datasets/KShivendu/dbpedia-entities-openai-1M) dataset. This dataset contains 1,000,000 embeddings for entities, with each embedding being 1536 dimensions made using OpenAI API.
+- The [dbpedia-entities-openai-1M](https://huggingface.co/datasets/KShivendu/dbpedia-entities-openai-1M) dataset. This dataset contains 1,000,000 embeddings for text, with each embedding being 1536 dimensions made using OpenAI API.
 - The [gist-960-angular](http://corpus-texmex.irisa.fr/) dataset. This dataset contains 1,000,000 embeddings for images, with each embedding being 960 dimensions.
 - The [GloVe Reddit comments](https://nlp.stanford.edu/projects/glove/) dataset, which contains 1,623,397 embeddings for words, with each embedding being 512 dimensions.
 
@@ -32,7 +32,7 @@ We used [Vecs](https://github.com/supabase/vecs) to create a collection, upload 
   type="underlined"
   defaultActiveId="dbpedia1536"
 >
-<TabPanel id="dbpedia1536" label="openai-1536, probes = 10">
+<TabPanel id="dbpedia1536" label="OpenAI-1536, probes = 10">
 
 Emdeddings of 1536 dimensions by OpenAI for dbpedia dataset with 1,000,000 vectors.
 
@@ -52,7 +52,7 @@ Emdeddings of 1536 dimensions by OpenAI for dbpedia dataset with 1,000,000 vecto
 For 1,000,000 vectors 10 probes results to precision of 0.91. And for 500,000 vectors and below 10 probes results to precision in the range of 0.95 - 0.99. To increase precision, you need to increase the number of probes.
 
 </TabPanel>
-<TabPanel id="dbpedia1536_40" label="openai-1536, probes = 40">
+<TabPanel id="dbpedia1536_40" label="OpenAI-1536, probes = 40">
 
 Emdeddings of 1536 dimensions by OpenAI for dbpedia dataset with 1,000,000 vectors.
 
@@ -69,7 +69,7 @@ Emdeddings of 1536 dimensions by OpenAI for dbpedia dataset with 1,000,000 vecto
 | 12XL   | 1,000,000 | 2000  | 600 | 0.085 sec    | 0.132 sec   | 41 GB     | 192 GB |
 | 16XL   | 1,000,000 | 2000  | 670 | 0.081 sec    | 0.129 sec   | 45 GB     | 256 GB |
 
-For 1,000,000 vectors 40 probes results to precision of 0.98.
+For 1,000,000 vectors 40 probes results to precision of 0.98. Note that exact values may vary depending on the dataset and queries, we recommend to run benchmarks with your own data to get precise results. Use this table as a reference.
 
 </TabPanel>
 <TabPanel id="gist960" label="gist-960, probes = 10">
