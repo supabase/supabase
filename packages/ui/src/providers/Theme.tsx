@@ -19,14 +19,14 @@ export const useTheme = () => React.useContext(ThemeContext)
 export const ThemeProvider = ({ children }: ThemeProviderProps) => {
   const [isDarkMode, setIsDarkMode] = React.useState(false)
 
-  React.useEffect(() => {
-    const key = localStorage.getItem('supabaseDarkMode')
-    // Default to dark mode if no preference config
-    setIsDarkMode(!key || key === 'true')
-  }, [])
+  // React.useEffect(() => {
+  //   const key = localStorage.getItem('supabaseDarkMode')
+  //   // Default to dark mode if no preference config
+  //   setIsDarkMode(!key || key === 'true')
+  // }, [])
 
   const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode)
+    // setIsDarkMode(!isDarkMode)
   }
 
   return (
