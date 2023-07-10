@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { Input, Button, Modal, Form, Alert, IconChevronDown, Dropdown, IconExternalLink } from 'ui'
-import { useStore } from 'hooks'
 import { useAccessTokenCreateMutation } from 'data/access-tokens/access-tokens-create-mutation'
 import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
@@ -10,7 +9,6 @@ export interface NewAccessTokenButtonProps {
 }
 
 const NewAccessTokenButton = observer(({ onCreateToken }: NewAccessTokenButtonProps) => {
-  const { ui } = useStore()
   const [isOpen, setIsOpen] = useState(false)
   const [tokenScope, setTokenScope] = useState<'V0' | undefined>(undefined)
 
@@ -20,23 +18,12 @@ const NewAccessTokenButton = observer(({ onCreateToken }: NewAccessTokenButtonPr
     return errors
   }
 
-  const { mutateAsync: createAccessToken } = useAccessTokenCreateMutation()
+  const { mutateAsync: createAccessToken, isLoading } = useAccessTokenCreateMutation()
 
-  async function onFormSubmit(values: any, { setSubmitting }: any) {
-    setSubmitting(true)
-
-    try {
-      const response = await createAccessToken({ name: values.tokenName, scope: tokenScope })
-      onCreateToken(response)
-      setSubmitting(false)
-      setIsOpen(false)
-    } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to create token: ${error.message}`,
-      })
-      setSubmitting(false)
-    }
+  async function onFormSubmit(values: any) {
+    const response = await createAccessToken({ name: values.tokenName, scope: tokenScope })
+    onCreateToken(response)
+    setIsOpen(false)
   }
 
   return (
@@ -103,7 +90,7 @@ const NewAccessTokenButton = observer(({ onCreateToken }: NewAccessTokenButtonPr
           onSubmit={onFormSubmit}
           validate={validate}
         >
-          {({ isSubmitting }: { isSubmitting: boolean }) => (
+          {() => (
             <div className="py-3 space-y-4">
               {tokenScope === 'V0' && (
                 <Modal.Content>
@@ -139,10 +126,10 @@ const NewAccessTokenButton = observer(({ onCreateToken }: NewAccessTokenButtonPr
               <Modal.Separator />
               <Modal.Content>
                 <div className="flex items-center space-x-2 justify-end">
-                  <Button type="default" disabled={isSubmitting} onClick={() => setIsOpen(false)}>
+                  <Button type="default" disabled={isLoading} onClick={() => setIsOpen(false)}>
                     Cancel
                   </Button>
-                  <Button htmlType="submit" loading={isSubmitting} disabled={isSubmitting}>
+                  <Button htmlType="submit" loading={isLoading} disabled={isLoading}>
                     Generate token
                   </Button>
                 </div>
