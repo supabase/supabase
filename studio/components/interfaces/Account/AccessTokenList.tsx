@@ -1,15 +1,13 @@
-import { useState } from 'react'
-import { Button, Modal, IconTrash } from 'ui'
-import { useStore } from 'hooks'
-import { AccessToken, useAccessTokensQuery } from 'data/access-tokens/access-tokens-query'
 import { useAccessTokenDeleteMutation } from 'data/access-tokens/access-tokens-delete-mutation'
+import { AccessToken, useAccessTokensQuery } from 'data/access-tokens/access-tokens-query'
 import { observer } from 'mobx-react-lite'
+import { useState } from 'react'
+import { Button, IconTrash, Modal } from 'ui'
 
 import Table from 'components/to-be-cleaned/Table'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 
 const AccessTokenList = observer(() => {
-  const { ui } = useStore()
   const { data: tokens, isLoading } = useAccessTokensQuery()
   const { mutateAsync: deleteToken } = useAccessTokenDeleteMutation()
 
@@ -17,15 +15,8 @@ const AccessTokenList = observer(() => {
   const [token, setToken] = useState<AccessToken | undefined>(undefined)
 
   async function onDeleteToken(tokenId: number) {
-    try {
-      await deleteToken({ id: tokenId })
-      setIsOpen(false)
-    } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to delete token: ${error.message}`,
-      })
-    }
+    await deleteToken({ id: tokenId })
+    setIsOpen(false)
   }
 
   return (
