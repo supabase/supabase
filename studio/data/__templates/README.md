@@ -72,7 +72,7 @@ return (
 
 ### Mutations
 
-The parameter `onError` can be passed when intializing the mutation, where an appropriate UI behavior should be triggered (usually a toast will be fine). If `onError` is not provided, we will then default to a toast message that will be called from within the mutation itself which should handle most cases. However, if there is a specific way that the error should be handled, then this should be passed via the `onError` parameter. (There's no need to repeat the error handling if the default behaviour is sufficient)
+The parameter `onError` can be passed when intializing the mutation, where an appropriate UI behavior should be triggered (usually a toast will be fine). If `onError` is not provided, we will then default to a toast message that will be called from within the mutation itself which should handle most cases. However, if there is a specific way that the error should be handled, then this should be passed via the `onError` parameter. (There's no need to repeat the error handling if the default behavior is sufficient)
 
 ```jsx
 const { mutateAsync: someAction } = useMutation({
