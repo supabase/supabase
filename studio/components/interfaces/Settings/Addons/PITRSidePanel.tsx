@@ -1,18 +1,20 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import clsx from 'clsx'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
+
 import { useParams, useTheme } from 'common'
 import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-remove-mutation'
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
-import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import Telemetry from 'lib/telemetry'
+
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { Alert, Button, IconExternalLink, Radio, SidePanel } from 'ui'
-import Telemetry from 'lib/telemetry'
-import { useRouter } from 'next/router'
 
 const PITR_CATEGORY_OPTIONS: {
   id: 'off' | 'on'
@@ -39,6 +41,8 @@ const PITRSidePanel = () => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const { isDarkMode } = useTheme()
+  const organization = useSelectedOrganization()
+  const isOrgBilling = !!organization?.subscription_id
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState<'on' | 'off'>('off')
@@ -121,7 +125,7 @@ const PITRSidePanel = () => {
 
   return (
     <SidePanel
-      size="xxlarge"
+      size="xlarge"
       visible={visible}
       onCancel={onClose}
       onConfirm={onConfirm}
@@ -216,12 +220,20 @@ const PITRSidePanel = () => {
                   className="mb-4"
                   title="Changing your Point-In-Time-Recovery is only available on the Pro plan"
                   actions={
-                    <Button type="default" onClick={() => snap.setPanelKey('subscriptionPlan')}>
-                      View available plans
-                    </Button>
+                    isOrgBilling ? (
+                      <Link href={`/org/${organization.slug}/billing?panel=subscriptionPlan`}>
+                        <a>
+                          <Button type="default">View available plans</Button>
+                        </a>
+                      </Link>
+                    ) : (
+                      <Button type="default" onClick={() => snap.setPanelKey('subscriptionPlan')}>
+                        View available plans
+                      </Button>
+                    )
                   }
                 >
-                  Upgrade your plan to change the compute size of your project
+                  Upgrade your plan to change PITR for your project
                 </Alert>
               ) : subscriptionCompute === undefined ? (
                 <Alert
@@ -255,7 +267,7 @@ const PITRSidePanel = () => {
                   <Radio
                     name="pitr"
                     disabled={isFreePlan || subscriptionCompute === undefined}
-                    className="col-span-3 !p-0"
+                    className="col-span-4 !p-0"
                     key={option.identifier}
                     checked={selectedOption === option.identifier}
                     label={<span className="text-sm">{option.name}</span>}

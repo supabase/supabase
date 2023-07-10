@@ -5,6 +5,7 @@ import UsageSection from './UsageSection/UsageSection'
 
 export interface SizeAndCountsProps {
   orgSlug: string
+  projectRef?: string
   startDate: string | undefined
   endDate: string | undefined
   subscription: OrgSubscription | undefined
@@ -13,6 +14,7 @@ export interface SizeAndCountsProps {
 
 const SizeAndCounts = ({
   orgSlug,
+  projectRef,
   startDate,
   endDate,
   subscription,
@@ -20,6 +22,7 @@ const SizeAndCounts = ({
 }: SizeAndCountsProps) => {
   const { data: dbSizeData, isLoading: isLoadingDbSizeData } = useOrgDailyStatsQuery({
     orgSlug,
+    projectRef,
     metric: PricingMetric.DATABASE_SIZE,
     interval: '1d',
     startDate,
@@ -28,6 +31,7 @@ const SizeAndCounts = ({
 
   const { data: storageSizeData, isLoading: isLoadingStorageSizeData } = useOrgDailyStatsQuery({
     orgSlug,
+    projectRef,
     metric: PricingMetric.STORAGE_SIZE,
     interval: '1d',
     startDate,
@@ -36,6 +40,7 @@ const SizeAndCounts = ({
 
   const { data: functionCountData, isLoading: isLoadingFunctionCountData } = useOrgDailyStatsQuery({
     orgSlug,
+    projectRef,
     metric: PricingMetric.FUNCTION_COUNT,
     interval: '1d',
     startDate,
@@ -43,31 +48,29 @@ const SizeAndCounts = ({
   })
 
   const chartMeta: {
-    [key: string]: { data: DataPoint[]; margin: number; isLoading: boolean; hasNoData: boolean }
+    [key: string]: { data: DataPoint[]; margin: number; isLoading: boolean }
   } = {
     [PricingMetric.DATABASE_SIZE]: {
       isLoading: isLoadingDbSizeData,
       margin: 14,
       data: dbSizeData?.data ?? [],
-      hasNoData: dbSizeData?.hasNoData ?? false,
     },
     [PricingMetric.STORAGE_SIZE]: {
       isLoading: isLoadingStorageSizeData,
       margin: 14,
       data: storageSizeData?.data ?? [],
-      hasNoData: storageSizeData?.hasNoData ?? false,
     },
     [PricingMetric.FUNCTION_COUNT]: {
       isLoading: isLoadingFunctionCountData,
       margin: 0,
       data: functionCountData?.data ?? [],
-      hasNoData: functionCountData?.hasNoData ?? false,
     },
   }
 
   return (
     <UsageSection
       orgSlug={orgSlug}
+      projectRef={projectRef}
       categoryKey="sizeCount"
       chartMeta={chartMeta}
       subscription={subscription}

@@ -8,6 +8,7 @@ import {
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import SparkBar from 'components/ui/SparkBar'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useFlag } from 'hooks'
@@ -15,7 +16,6 @@ import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
 import { Alert, Button, IconExternalLink } from 'ui'
 import ProjectUpdateDisabledTooltip from '../../BillingSettings/ProjectUpdateDisabledTooltip'
 import PlanUpdateSidePanel from './PlanUpdateSidePanel'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 
 const Subscription = () => {
   const { slug } = useParams()

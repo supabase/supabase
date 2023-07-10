@@ -1,6 +1,5 @@
-import { TaxId } from 'data/organizations/organization-tax-ids-query'
-import { TAX_IDS } from './TaxID.constants'
 import { TaxIdValue } from 'data/organizations/organization-tax-ids-update-mutation'
+import { TAX_IDS } from './TaxID.constants'
 
 /**
  * Sanitize EU VAT ids so they get prepended with the country code
