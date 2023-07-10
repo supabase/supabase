@@ -1,5 +1,5 @@
-import Link from 'next/link'
 import * as Tooltip from '@radix-ui/react-tooltip'
+import Link from 'next/link'
 
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -20,8 +20,6 @@ import ProjectUpgradeAlert from '../General/Infrastructure/ProjectUpgradeAlert'
 const InfrastructureInfo = () => {
   const { ref } = useParams()
   const { project } = useProjectContext()
-  // const { data: subscription } = useProjectSubscriptionV2Query({ projectRef: ref })
-  // const isFreeProject = subscription?.plan?.id === 'free'
 
   const {
     data,

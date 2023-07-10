@@ -74,7 +74,7 @@ const { data, error, isLoading, isError, isSuccess } = useQuery()
 
 ### Mutations
 
-The parameter `onError` should be passed when intializing the mutation, where the appropriate UI behaviour should be triggered (usually a toast will be fine). If `onError` is not provided, we will then default to a toast message that will be called from within the mutation itself.
+The parameter `onError` should be passed when intializing the mutation, where the appropriate UI behavior should be triggered (usually a toast will be fine). If `onError` is not provided, we will then default to a toast message that will be called from within the mutation itself.
 
 ```jsx
 const { mutateAsync } = useMutation({

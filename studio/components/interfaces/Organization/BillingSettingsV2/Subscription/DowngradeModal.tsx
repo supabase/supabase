@@ -1,5 +1,5 @@
 import InformationBox from 'components/ui/InformationBox'
-import { OrgSubscription } from 'data/subscriptions/org-subscription-query'
+import { OrgSubscription, ProjectAddon } from 'data/subscriptions/org-subscription-query'
 import { PricingInformation } from 'shared-data'
 import { Alert, IconAlertOctagon, IconMinusCircle, IconPauseCircle, Modal } from 'ui'
 
@@ -9,6 +9,29 @@ export interface DowngradeModalProps {
   subscription?: OrgSubscription
   onClose: () => void
   onConfirm: () => void
+}
+
+const ProjectDowngradeListItem = ({ projectAddon }: { projectAddon: ProjectAddon }) => {
+  const needsRestart = projectAddon.addons.find((addon) => addon.type === 'compute_instance')
+  const addons = projectAddon.addons.map((addon) => {
+    if (addon.type === 'compute_instance') return `${addon.variant.name} Compute Instance`
+    return addon.variant.name
+  })
+
+  return (
+    <li className="list-disc ml-6">
+      {projectAddon.name}: {addons.join(', ')} will be removed.
+      {needsRestart ? (
+        <>
+          {' '}
+          Project will also <span className="text-amber-900">need to be restarted</span> due to
+          change in compute instance
+        </>
+      ) : (
+        ''
+      )}
+    </li>
+  )
 }
 
 const DowngradeModal = ({
@@ -60,31 +83,9 @@ const DowngradeModal = ({
                   title={`Warning: A total of ${subscription?.project_addons.length} project(s) will be affected from the downgrade`}
                   description={
                     <ul className="space-y-1 max-h-[100px] overflow-y-auto">
-                      {subscription?.project_addons.map((project) => {
-                        const needsRestart = project.addons.find(
-                          (addon) => addon.type === 'compute_instance'
-                        )
-                        const addons = project.addons.map((addon) => {
-                          if (addon.type === 'compute_instance')
-                            return `${addon.variant.name} Compute Instance`
-                          return addon.variant.name
-                        })
-                        return (
-                          <li key={project.ref} className="list-disc ml-6">
-                            {project.name}: {addons.join(', ')} will be removed.
-                            {needsRestart ? (
-                              <>
-                                {' '}
-                                Project will also{' '}
-                                <span className="text-amber-900">need to be restarted</span> due to
-                                change in compute instance
-                              </>
-                            ) : (
-                              ''
-                            )}
-                          </li>
-                        )
-                      })}
+                      {subscription?.project_addons.map((project) => (
+                        <ProjectDowngradeListItem key={project.ref} projectAddon={project} />
+                      ))}
                     </ul>
                   }
                 />
