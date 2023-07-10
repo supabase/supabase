@@ -68,7 +68,7 @@ const Particle = ({ index = 0, animate = true, children, config }: Props) => {
 }
 
 let defaultConfig = {
-  particles: 400,
+  particles: 1500,
   particlesSize: 1.8,
   particlesSides: 5,
   particlesBlending: true,
@@ -82,9 +82,9 @@ let defaultConfig = {
   trailLength: 100,
   trailDecay: 450,
   color: 'white',
-  xThickness: 100,
-  xThicknessRandomnessFactor: 0.8,
-  xThicknessRandomness: 10,
+  xThickness: 5,
+  xThicknessRandomnessFactor: 3.5,
+  xThicknessRandomness: 2.5,
   yThickness: 20,
   min_speed: 1.3,
   max_speed: -0.3,
