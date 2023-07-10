@@ -65,6 +65,7 @@ const CustomDomainSidePanel = () => {
             title: 'Custom domains',
             section: 'Add ons',
           },
+          projectRef,
         },
         router
       )
@@ -156,6 +157,7 @@ const CustomDomainSidePanel = () => {
                       section: 'Add ons',
                       option: event.target.label,
                     },
+                    projectRef,
                   },
                   router
                 )
