@@ -31,7 +31,7 @@ export const generateSettingsMenu = (
           {
             name: 'Add Ons',
             key: 'addons',
-            url: `/project/${ref}/settings/billing/addons`,
+            url: `/project/${ref}/settings/addons`,
             items: [],
           },
           ...(isVaultEnabled
