@@ -40,7 +40,7 @@ const CustomDomainsConfigureHostname = () => {
   }
 
   const onCreateCustomDomain = async (values: yup.InferType<typeof schema>) => {
-    if (!ref) throw new Error('Project ref is required')
+    if (!ref) return console.error('Project ref is required')
 
     const cnameVerified = await verifyCNAME(values.domain)
     if (!cnameVerified) {
@@ -50,18 +50,7 @@ const CustomDomainsConfigureHostname = () => {
       })
     }
 
-    try {
-      await createCustomDomain({
-        projectRef: ref,
-        customDomain: values.domain,
-      })
-    } catch (error: any) {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: error.message,
-      })
-    }
+    await createCustomDomain({ projectRef: ref, customDomain: values.domain })
   }
 
   return (
