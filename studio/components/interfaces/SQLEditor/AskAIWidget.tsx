@@ -23,7 +23,7 @@ const AskAIWidget = () => {
           icon={<AiIcon className="w-4 h-4 ml-1" />}
           inputClassName="bg-scale-100 placeholder:text-scale-900 rounded-sm focus:!border-brand-900"
           iconContainerClassName="transition text-scale-800 peer-focus/input:text-brand-900"
-          placeholder="Ask Supabase AI to build a query"
+          placeholder="Ask Supabase AI to edit this query"
           autoFocus
           actions={
             <div className="flex items-center space-x-1 mr-4">
