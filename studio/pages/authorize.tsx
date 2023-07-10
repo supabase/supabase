@@ -22,7 +22,6 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
   const { ui } = useStore()
   const router = useRouter()
   const { auth_id } = useParams()
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const [selectedOrg, setSelectedOrg] = useState<string>()
 
   const { data: organizations, isLoading: isLoadingOrganizations } = useOrganizationsQuery()
@@ -30,8 +29,11 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
   const isApproved = requester?.approved_at !== null
   const isExpired = dayjs().isAfter(dayjs(requester?.expires_at))
 
-  const { mutateAsync: approveRequest } = useApiAuthorizationApproveMutation()
-  const { mutateAsync: declineRequest } = useApiAuthorizationDeclineMutation()
+  const { mutateAsync: approveRequest, isLoading: isApproving } =
+    useApiAuthorizationApproveMutation()
+  const { mutateAsync: declineRequest, isLoading: isDeclining } =
+    useApiAuthorizationDeclineMutation()
+  const isSubmitting = isApproving || isDeclining
 
   useEffect(() => {
     if (!isLoadingOrganizations) {
@@ -53,17 +55,8 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
       })
     }
 
-    try {
-      setIsSubmitting(true)
-      const res = await approveRequest({ id: auth_id, organization_id: selectedOrg })
-      router.push(res.url)
-    } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to approve request: ${error.message}`,
-      })
-      setIsSubmitting(false)
-    }
+    const res = await approveRequest({ id: auth_id, organization_id: selectedOrg })
+    router.push(res.url)
   }
 
   const onDeclineRequest = async () => {
@@ -73,18 +66,9 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
         message: 'Unable to decline request: auth_id is missing ',
       })
 
-    try {
-      setIsSubmitting(true)
-      await declineRequest({ id: auth_id })
-      ui.setNotification({ category: 'success', message: 'Declined API authorization request' })
-      router.push('/projects')
-    } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to decline request: ${error.message}`,
-      })
-      setIsSubmitting(false)
-    }
+    await declineRequest({ id: auth_id })
+    ui.setNotification({ category: 'success', message: 'Declined API authorization request' })
+    router.push('/projects')
   }
 
   if (isLoading) {
