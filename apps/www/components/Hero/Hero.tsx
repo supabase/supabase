@@ -24,7 +24,7 @@ const Hero = () => {
               <div
                 className={[
                   'appear-first lg:h-[50vh] lg:min-h-[300px] lg:max-h-[450px] flex flex-col items-center justify-center sm:mx-auto md:w-3/4 lg:mx-0 lg:w-full gap-4 lg:gap-8',
-                  // styles['hero-text'],
+                  styles['hero-text'],
                 ].join(' ')}
               >
                 <div>
