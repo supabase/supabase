@@ -59,31 +59,31 @@ The 3 states that are provided in a query (`isLoading`, `isError`, `isSuccess`) 
 ```jsx
 const { data, error, isLoading, isError, isSuccess } = useQuery()
 
-{
-  isLoading && <GenericSkeletonLoader />
-}
+return (
+  <>
+    {isLoading && <GenericSkeletonLoader />}
 
-{
-  isError && <AlertError subject="A subject" error={error} />
-}
+    {isError && <AlertError subject="A subject" error={error} />}
 
-{
-  isSuccess && <div>Your UI component</div>
-}
+    {isSuccess && <div>Your UI component</div>}
+  </>
+)
 ```
 
 ### Mutations
 
-The parameter `onError` should be passed when intializing the mutation, where the appropriate UI behavior should be triggered (usually a toast will be fine). If `onError` is not provided, we will then default to a toast message that will be called from within the mutation itself.
+The parameter `onError` can be passed when intializing the mutation, where an appropriate UI behavior should be triggered (usually a toast will be fine). If `onError` is not provided, we will then default to a toast message that will be called from within the mutation itself which should handle most cases. However, if there is a specific way that the error should be handled, then this should be passed via the `onError` parameter. (There's no need to repeat the error handling if the default behaviour is sufficient)
 
 ```jsx
-const { mutateAsync } = useMutation({
+const { mutateAsync: someAction } = useMutation({
   onError: (error) => {
     ui.setNotification({ category: 'error', message: `Failed: ${error.message}` })
   },
 })
 
 const onConfirm = async () => {
-  // [Joshen] Need to update here after discussing with Alaister
+  // Any logic before calling the mutation
+  await someAction(someParameters)
+  // Any logic after calling the mutation
 }
 ```
