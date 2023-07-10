@@ -35,7 +35,7 @@ const BillingMetric = ({ idx, slug, metric, usage, subscription }: BillingMetric
   const isExceededLimit = hasLimit && usageRatio >= 1
 
   const usageCurrentLabel =
-    metric.units === 'bytes' ? `${usageMeta?.usage ?? 0} GB` : usageMeta?.usage?.toLocaleString()
+    metric.units === 'bytes' ? `${usageMeta?.usage?.toLocaleString() ?? 0} GB` : usageMeta?.usage?.toLocaleString()
   const usageLimitLabel =
     metric.units === 'bytes'
       ? `${usageMeta?.pricing_free_units ?? 0} GB`
