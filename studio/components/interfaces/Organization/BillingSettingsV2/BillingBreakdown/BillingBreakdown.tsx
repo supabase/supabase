@@ -75,15 +75,15 @@ const BillingBreakdown = () => {
             <p className="text-sm">Included usage summary</p>
             {isUsageBillingEnabled ? (
               <p className="text-sm text-scale-1000">
-                Your plan includes a limited amount of usage. If the usage on your project exceeds
-                these quotas, your subscription will be charged for the overages. It may take up to
-                24 hours for usage stats to update.
+                Your plan includes a limited amount of usage. If the usage on your organization
+                exceeds these quotas, your subscription will be charged for the overages. It may
+                take up to 24 hours for usage stats to update.
               </p>
             ) : (
               <p className="text-sm text-scale-1000">
-                Your plan includes a limited amount of usage. If the usage on your project exceeds
-                these quotas, you may experience restrictions, as you are currently not billed for
-                overages. It may take up to 24 hours for usage stats to update.
+                Your plan includes a limited amount of usage. If the usage on your organization
+                exceeds these quotas, you may experience restrictions, as you are currently not
+                billed for overages. It may take up to 24 hours for usage stats to update.
               </p>
             )}
 
