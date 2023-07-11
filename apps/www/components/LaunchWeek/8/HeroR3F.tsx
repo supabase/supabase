@@ -38,7 +38,7 @@ const Particle = ({ index = 0, animate = true, children, config }: Props) => {
       const timer = clock.getElapsedTime() * speed + delayOffset
       const isEven = Math.floor(timer / circumference) % 2 == 0
       particle.current.position.x = isEven
-        ? Math.sin(timer) * config.widthRadius * config.bottomTopWidthRatio + pathOffset
+        ? Math.sin(timer) * config.widthRadius * config.widthRatio + pathOffset
         : Math.sin(timer) * config.widthRadius + pathOffset
       particle.current.position.y = isEven
         ? Math.cos(timer) * config.bottomHeightRadius -
@@ -75,7 +75,7 @@ let defaultConfig = {
   particlesBlending: true,
   lightIntensity: 0.5,
   widthRadius: 100,
-  bottomTopWidthRatio: 1.2,
+  widthRatio: 1.2,
   topHeightRadius: 80,
   bottomHeightRadius: 100,
   trails: 1,
@@ -103,138 +103,149 @@ export default function () {
   const init = async () => {
     const dat = await import('dat.gui')
     const gui = new dat.GUI()
+    const particlesFolder = gui.addFolder('Particles')
+    const shapeFolder = gui.addFolder('Shape')
+    const speedFolder = gui.addFolder('Speed')
+    const trailFolder = gui.addFolder('Trail')
     gui.width = 500
-    gui
+    particlesFolder
       .add(config, 'particles')
       .min(1)
       .max(5000)
       .step(1)
-      .name('Particles')
+      .name('Count')
       .onChange((value) => {
         handleSetConfig('particles', value)
         setParticles(range(0, value))
       })
-    gui
+    particlesFolder
       .add(config, 'particlesSize')
       .min(1)
       .max(10)
       .step(0.05)
-      .name('Particles size')
+      .name('Size')
       .onChange((value) => handleSetConfig('particlesSize', value))
-    gui
+    particlesFolder
       .add(config, 'particlesSides')
       .min(3)
       .max(20)
       .step(1)
-      .name('Particles sides')
+      .name('Sides')
       .onChange((value) => handleSetConfig('particlesSides', value))
-    gui
-      .add(config, 'particlesBlending')
-      .name('Particles blending')
-      .onChange((value) => handleSetConfig('particlesBlending', value))
-    gui
+    particlesFolder
       .add(config, 'lightIntensity')
       .min(0)
       .max(10)
       .step(0.05)
       .name('Light intensity')
       .onChange((value) => handleSetConfig('lightIntensity', value))
-    gui
+    particlesFolder
+      .add(config, 'particlesBlending')
+      .name('Blending')
+      .onChange((value) => handleSetConfig('particles¶Blending', value))
+    shapeFolder
       .add(config, 'widthRadius')
       .min(1)
       .max(200)
       .step(1)
       .name('Width Radius')
       .onChange((value) => handleSetConfig('widthRadius', value))
-    gui
-      .add(config, 'bottomTopWidthRatio')
+    shapeFolder
+      .add(config, 'widthRatio')
       .min(0.5)
       .max(3)
       .step(0.01)
-      .name('Bottom/Top Width Ratio')
-      .onChange((value) => handleSetConfig('bottomTopWidthRatio', value))
-    gui
+      .name('Top/Bottom Ratio')
+      .onChange((value) => handleSetConfig('widthRatio', value))
+    shapeFolder
       .add(config, 'topHeightRadius')
       .min(1)
       .max(200)
       .step(1)
+      .name('Height Radius - Top')
       .onChange((value) => handleSetConfig('topHeightRadius', value))
-    gui
+    shapeFolder
       .add(config, 'bottomHeightRadius')
       .min(1)
       .max(200)
       .step(1)
+      .name('Height Radius - Bottom')
       .onChange((value) => handleSetConfig('bottomHeightRadius', value))
-    gui
+    shapeFolder
       .add(config, 'xThickness')
       .min(1)
       .max(100)
       .step(0.1)
-      .name('x thickness')
+      .name('Stroke Width')
       .onChange((value) => handleSetConfig('xThickness', value))
-    gui
+    shapeFolder
       .add(config, 'xThicknessRandomnessFactor')
       .min(0)
       .max(5)
       .step(0.001)
-      .name('xThick randomn factor')
+      .name('Randomness shape')
       .onChange((value) => handleSetConfig('xThicknessRandomnessFactor', value))
-    gui
+    shapeFolder
       .add(config, 'xThicknessRandomness')
       .min(0)
       .max(50)
       .step(0.01)
-      .name('xThick randomness')
+      .name('Randomness')
       .onChange((value) => handleSetConfig('xThicknessRandomness', value))
-    gui
+    shapeFolder
       .add(config, 'yThickness')
       .min(1)
       .max(50)
       .step(0.1)
       .name('y thickness')
       .onChange((value) => handleSetConfig('yThickness', value))
-    gui
+    speedFolder
       .add(config, 'min_speed')
       .min(-6)
       .max(6)
       .step(0.1)
       .name('Min speed')
       .onChange((value) => handleSetConfig('min_speed', value))
-    gui
+    speedFolder
       .add(config, 'max_speed')
       .min(-6)
       .max(6)
       .step(0.1)
       .name('Max speed')
       .onChange((value) => handleSetConfig('max_speed', value))
-    gui
+    trailFolder
       .add(config, 'trails')
       .min(0)
       .max(10)
       .step(1)
-      .name('Trails count')
+      .name('Count')
       .onChange((value) => handleSetConfig('trails', value))
-    gui
+    trailFolder
       .add(config, 'trailWidth')
       .min(0)
       .max(100)
       .step(0.1)
-      .name('Trails thickness')
+      .name('Thickness')
       .onChange((value) => handleSetConfig('trailWidth', value))
-    gui
+    trailFolder
       .add(config, 'trailLength')
       .min(1)
       .max(100)
       .step(0.1)
-      .name('Trails length')
+      .name('Length')
       .onChange((value) => handleSetConfig('trailLength', value))
-    gui
+    trailFolder
       .add(config, 'trailDecay')
       .min(1)
       .max(1000)
       .step(0.1)
-      .name('Trails decay')
+      .name('Decay')
       .onChange((value) => handleSetConfig('trailLength', value))
+
+    particlesFolder.open()
+    shapeFolder.open()
+    speedFolder.open()
+    trailFolder.open()
   }
 
   useEffect(() => {

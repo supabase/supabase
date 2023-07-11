@@ -1,17 +1,16 @@
 import Image from 'next/image'
+import { useRef } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import dynamic from 'next/dynamic'
 import { useTheme } from 'common/Providers'
 import { IconArrowUpRight } from 'ui'
 import { LazyMotion, domAnimation, m, useInView } from 'framer-motion'
+import { INITIAL_BOTTOM, getAnimation } from '~/lib/animations'
 
 import SectionContainer from '~/components/Layouts/SectionContainer'
 
-import { useRef } from 'react'
-import { INITIAL_BOTTOM, getAnimation } from '~/lib/animations'
-import dynamic from 'next/dynamic'
-
-const CustomersVisual = dynamic(() => import('~/components/Products/vector/CustomersVisual'))
+const CustomersVisual = dynamic(() => import('~/components/Vector/CustomersVisual'))
 
 interface Customer {
   type?: string
