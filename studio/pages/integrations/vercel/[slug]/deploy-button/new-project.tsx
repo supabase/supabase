@@ -256,28 +256,22 @@ const CreateProject = ({
 
         const projectDetails = vercelProjects?.find((x) => x.id === foreignProjectId)
 
-        // Wrap the createConnections function call in a try-catch block
-        try {
-          await createConnections({
-            organizationIntegrationId: organizationIntegration?.id,
-            connection: {
-              foreign_project_id: foreignProjectId,
-              supabase_project_ref: newProjectRef,
-              metadata: {
-                ...projectDetails,
-                supabaseConfig: {
-                  projectEnvVars: {
-                    write: true,
-                  },
+        await createConnections({
+          organizationIntegrationId: organizationIntegration?.id,
+          connection: {
+            foreign_project_id: foreignProjectId,
+            supabase_project_ref: newProjectRef,
+            metadata: {
+              ...projectDetails,
+              supabaseConfig: {
+                projectEnvVars: {
+                  write: true,
                 },
               },
             },
-            orgSlug: selectedOrganization?.slug,
-          })
-        } catch (error) {
-          console.error('An error occurred during createConnections:', error)
-          return
-        }
+          },
+          orgSlug: selectedOrganization?.slug,
+        })
 
         setLoading(false)
 
