@@ -53,7 +53,8 @@ android {
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         manifestPlaceholders += [
-                'appAuthRedirectScheme': applicationId
+                // *account_id* will be unique for every single app
+                'appAuthRedirectScheme': 'com.googleusercontent.apps.*account_id*'
         ]
 
     }
