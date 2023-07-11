@@ -107,7 +107,7 @@ export const getStaticProps: GetStaticProps<BlogPostPageProps, Params> = async (
       nextPost: currentIndex === allPosts.length ? null : nextPost ? nextPost : null,
       relatedPosts,
       blog: {
-        slug: `${params?.slug}`,
+        slug: `${params.slug}`,
         source: content,
         ...data,
         content: mdxSource,
