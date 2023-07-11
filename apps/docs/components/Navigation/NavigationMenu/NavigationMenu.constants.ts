@@ -760,6 +760,7 @@ export const functions: NavMenuConstant = {
           name: 'Connecting directly to Postgres',
           url: '/guides/functions/connect-to-postgres',
         },
+        { name: 'Testing your Edge Functions', url: '/guides/functions/unit-test' },
         { name: 'Troubleshooting', url: '/guides/functions/troubleshooting' },
       ],
     },
