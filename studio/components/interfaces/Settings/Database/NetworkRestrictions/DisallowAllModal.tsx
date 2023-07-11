@@ -1,37 +1,24 @@
-import { FC, useState } from 'react'
-import { Modal, Button } from 'ui'
+import { Button, Modal } from 'ui'
 
-import { useStore } from 'hooks'
 import { useParams } from 'common/hooks'
-import { useNetworkRestrictionsApplyMutation } from 'data/network-restrictions/network-retrictions-apply-mutation'
 import InformationBox from 'components/ui/InformationBox'
+import { useNetworkRestrictionsApplyMutation } from 'data/network-restrictions/network-retrictions-apply-mutation'
 
-interface Props {
+interface DisallowAllModalProps {
   visible: boolean
   onClose: () => void
 }
 
-const DisallowAllModal: FC<Props> = ({ visible, onClose }) => {
-  const { ui } = useStore()
+const DisallowAllModal = ({ visible, onClose }: DisallowAllModalProps) => {
   const { ref } = useParams()
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const { mutateAsync: applyNetworkRestrictions } = useNetworkRestrictionsApplyMutation()
+  const { mutateAsync: applyNetworkRestrictions, isLoading: isApplying } =
+    useNetworkRestrictionsApplyMutation()
 
   const onSubmit = async () => {
     if (!ref) return console.error('Project ref is required')
 
-    setIsSubmitting(true)
-    try {
-      await applyNetworkRestrictions({ projectRef: ref, dbAllowedCidrs: ['127.0.0.1/32'] })
-      onClose()
-    } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to update restriction: ${error.message}`,
-      })
-    } finally {
-      setIsSubmitting(false)
-    }
+    await applyNetworkRestrictions({ projectRef: ref, dbAllowedCidrs: ['127.0.0.1/32'] })
+    onClose()
   }
 
   return (
@@ -58,10 +45,10 @@ const DisallowAllModal: FC<Props> = ({ visible, onClose }) => {
         </div>
       </Modal.Content>
       <div className="flex items-center justify-end px-6 py-4 border-t space-x-2">
-        <Button type="default" disabled={isSubmitting} onClick={() => onClose()}>
+        <Button type="default" disabled={isApplying} onClick={() => onClose()}>
           Cancel
         </Button>
-        <Button loading={isSubmitting} disabled={isSubmitting} onClick={() => onSubmit()}>
+        <Button loading={isApplying} disabled={isApplying} onClick={() => onSubmit()}>
           Confirm
         </Button>
       </div>
