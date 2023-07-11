@@ -19,19 +19,12 @@ const RevokeAppModal = ({ selectedApp, onClose }: RevokeAppModalProps) => {
     if (!slug) return console.error('Slug is required')
     if (!selectedApp?.id) return console.error('App ID is required')
 
-    try {
-      await revokeAuthorizedApp({ slug, id: selectedApp?.id })
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully revoked the app "${selectedApp?.name}"`,
-      })
-      onClose()
-    } catch (error) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to revoke app: ${(error as any).message}`,
-      })
-    }
+    await revokeAuthorizedApp({ slug, id: selectedApp?.id })
+    ui.setNotification({
+      category: 'success',
+      message: `Successfully revoked the app "${selectedApp?.name}"`,
+    })
+    onClose()
   }
 
   return (

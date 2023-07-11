@@ -27,9 +27,7 @@ const InviteMemberButton = ({
 }: InviteMemberButtonProps) => {
   const { ui } = useStore()
   const { slug } = useParams()
-
   const [isOpen, setIsOpen] = useState(false)
-
   const { permissions: allPermissions } = useGetPermissions()
 
   const canInviteMembers = roles.some(({ id: role_id }) =>
@@ -37,23 +35,21 @@ const InviteMemberButton = ({
       allPermissions,
       PermissionAction.CREATE,
       'user_invites',
-      {
-        resource: { role_id },
-      },
+      { resource: { role_id } },
       orgId
     )
   )
 
   const initialValues = { email: '', role: '' }
-
   const schema = object({
     email: string().email('Must be a valid email address').required('Email is required'),
     role: string().required('Role is required'),
   })
 
-  const { mutateAsync } = useOrganizationMemberInviteCreateMutation()
+  const { mutateAsync: inviteMember, isLoading: isInviting } =
+    useOrganizationMemberInviteCreateMutation()
 
-  const onInviteMember = async (values: any, { setSubmitting, resetForm }: any) => {
+  const onInviteMember = async (values: any, { resetForm }: any) => {
     if (!slug) {
       throw new Error('slug is required')
     }
@@ -76,33 +72,21 @@ const InviteMemberButton = ({
     }
 
     const roleId = Number(values.role)
+    const response = await inviteMember({
+      slug,
+      invitedEmail: values.email.toLowerCase(),
+      ownerId: userId,
+      roleId,
+    })
 
-    setSubmitting(true)
+    if (isNil(response)) {
+      ui.setNotification({ category: 'error', message: 'Failed to add member' })
+    } else {
+      ui.setNotification({ category: 'success', message: 'Successfully added new member.' })
 
-    try {
-      const response = await mutateAsync({
-        slug,
-        invitedEmail: values.email.toLowerCase(),
-        ownerId: userId,
-        roleId,
-      })
-
-      if (isNil(response)) {
-        ui.setNotification({ category: 'error', message: 'Failed to add member' })
-      } else {
-        ui.setNotification({ category: 'success', message: 'Successfully added new member.' })
-
-        setIsOpen(!isOpen)
-        resetForm({ initialValues: { ...initialValues, role: roleId } })
-      }
-    } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to add member: ${error.message}`,
-      })
+      setIsOpen(!isOpen)
+      resetForm({ initialValues: { ...initialValues, role: roleId } })
     }
-
-    setSubmitting(false)
   }
 
   return (
@@ -141,7 +125,7 @@ const InviteMemberButton = ({
         header="Invite a member to this organization"
       >
         <Form validationSchema={schema} initialValues={initialValues} onSubmit={onInviteMember}>
-          {({ values, isSubmitting, resetForm }: any) => {
+          {({ values, resetForm }: any) => {
             // [Alaister] although this "technically" is breaking the rules of React hooks
             // it won't error because the hooks are always rendered in the same order
             // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -207,8 +191,8 @@ const InviteMemberButton = ({
                       block
                       size="medium"
                       htmlType="submit"
-                      disabled={isSubmitting || invalidRoleSelected}
-                      loading={isSubmitting}
+                      disabled={isInviting || invalidRoleSelected}
+                      loading={isInviting}
                     >
                       Invite new member
                     </Button>

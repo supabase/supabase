@@ -1,8 +1,10 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'react-hot-toast'
+
 import { delete_ } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { organizationKeys } from './keys'
 import { ResponseError } from 'types'
+import { organizationKeys } from './keys'
 
 export type OrganizationPaymentMethodDeleteVariables = {
   slug: string
@@ -22,11 +24,12 @@ type OrganizationPaymentMethodDeleteData = Awaited<ReturnType<typeof deleteOrgan
 
 export const useOrganizationPaymentMethodDeleteMutation = ({
   onSuccess,
+  onError,
   ...options
 }: Omit<
   UseMutationOptions<
     OrganizationPaymentMethodDeleteData,
-    unknown,
+    ResponseError,
     OrganizationPaymentMethodDeleteVariables
   >,
   'mutationFn'
@@ -35,13 +38,20 @@ export const useOrganizationPaymentMethodDeleteMutation = ({
 
   return useMutation<
     OrganizationPaymentMethodDeleteData,
-    unknown,
+    ResponseError,
     OrganizationPaymentMethodDeleteVariables
   >((vars) => deleteOrganizationMember(vars), {
     async onSuccess(data, variables, context) {
       const { slug } = variables
       await queryClient.invalidateQueries(organizationKeys.paymentMethods(slug))
       await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to delete payment method: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
     },
     ...options,
   })

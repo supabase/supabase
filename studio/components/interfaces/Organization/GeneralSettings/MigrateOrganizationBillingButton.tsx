@@ -31,8 +31,11 @@ const MigrateOrganizationBillingButton = observer(() => {
     }
   }, [tier, isSpendCapEnabled])
 
-  const { error: migrationError, mutateAsync: migrateBilling } =
-    useOrganizationBillingMigrationMutation()
+  const {
+    error: migrationError,
+    mutateAsync: migrateBilling,
+    isLoading: isMigrating,
+  } = useOrganizationBillingMigrationMutation()
 
   const {
     data: migrationPreviewData,
@@ -75,7 +78,7 @@ const MigrateOrganizationBillingButton = observer(() => {
     return errors
   }
 
-  const onConfirmMigrate = async (values: any, { setSubmitting }: any) => {
+  const onConfirmMigrate = async (values: any) => {
     if (!canMigrateOrganization) {
       return ui.setNotification({
         category: 'error',
@@ -83,21 +86,14 @@ const MigrateOrganizationBillingButton = observer(() => {
       })
     }
 
-    setSubmitting(true)
-
-    try {
-      await migrateBilling({ organizationSlug: organization?.slug, tier: dbTier })
-      ui.setNotification({
-        message: 'Successfully migrated to organization-level billing',
-        category: 'success',
-        duration: 5000,
-      })
-      router.push('/projects')
-      setIsOpen(false)
-    } catch {
-    } finally {
-      setSubmitting(false)
-    }
+    await migrateBilling({ organizationSlug: organization?.slug, tier: dbTier })
+    ui.setNotification({
+      message: 'Successfully migrated to organization-level billing',
+      category: 'success',
+      duration: 5000,
+    })
+    router.push('/projects')
+    setIsOpen(false)
   }
 
   return (
@@ -125,7 +121,7 @@ const MigrateOrganizationBillingButton = observer(() => {
           onSubmit={onConfirmMigrate}
           validate={onValidate}
         >
-          {({ isSubmitting }: { isSubmitting: boolean }) => (
+          {() => (
             <div className="space-y-4 py-3">
               <Modal.Content>
                 <div className="space-y-2">
@@ -271,8 +267,8 @@ const MigrateOrganizationBillingButton = observer(() => {
                   size="small"
                   type="primary"
                   htmlType="submit"
-                  loading={isSubmitting}
-                  disabled={migrationPreviewData === undefined || isSubmitting}
+                  loading={isMigrating}
+                  disabled={migrationPreviewData === undefined || isMigrating}
                 >
                   I understand, migrate this organization
                 </Button>

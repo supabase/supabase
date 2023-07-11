@@ -1,6 +1,9 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'react-hot-toast'
+
 import { delete_, post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
+import { ResponseError } from 'types'
 import { organizationKeys } from './keys'
 import { TaxId } from './organization-tax-ids-query'
 
@@ -61,22 +64,35 @@ type OrganizationTaxIDsUpdateData = Awaited<ReturnType<typeof updateOrganization
 
 export const useOrganizationTaxIDsUpdateMutation = ({
   onSuccess,
+  onError,
   ...options
 }: Omit<
-  UseMutationOptions<OrganizationTaxIDsUpdateData, unknown, OrganizationTaxIDsUpdateVariables>,
+  UseMutationOptions<
+    OrganizationTaxIDsUpdateData,
+    ResponseError,
+    OrganizationTaxIDsUpdateVariables
+  >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<OrganizationTaxIDsUpdateData, unknown, OrganizationTaxIDsUpdateVariables>(
-    (vars) => updateOrganizationTaxIDs(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { slug } = variables
-        await queryClient.invalidateQueries(organizationKeys.customerProfile(slug))
-        await onSuccess?.(data, variables, context)
-      },
-      ...options,
-    }
-  )
+  return useMutation<
+    OrganizationTaxIDsUpdateData,
+    ResponseError,
+    OrganizationTaxIDsUpdateVariables
+  >((vars) => updateOrganizationTaxIDs(vars), {
+    async onSuccess(data, variables, context) {
+      const { slug } = variables
+      await queryClient.invalidateQueries(organizationKeys.customerProfile(slug))
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to update tax IDs: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }
