@@ -48,7 +48,6 @@ const ComputeInstanceSidePanel = () => {
   const organization = useSelectedOrganization()
   const isOrgBilling = !!organization?.subscription_id
 
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const [showConfirmationModal, setShowConfirmationModal] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState<'micro' | 'optimized'>('micro')
   const [selectedOption, setSelectedOption] = useState<string>('ci_micro')
@@ -64,8 +63,25 @@ const ComputeInstanceSidePanel = () => {
 
   const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef })
   const { data: subscription } = useProjectSubscriptionV2Query({ projectRef })
-  const { mutateAsync: updateAddon } = useProjectAddonUpdateMutation()
-  const { mutateAsync: removeAddon } = useProjectAddonRemoveMutation()
+  const { mutateAsync: updateAddon, isLoading: isUpdating } = useProjectAddonUpdateMutation({
+    onError: (error) => {
+      ui.setNotification({
+        error,
+        category: 'error',
+        message: `Unable to update compute instance: ${error.message}`,
+      })
+    },
+  })
+  const { mutateAsync: removeAddon, isLoading: isRemoving } = useProjectAddonRemoveMutation({
+    onError: (error) => {
+      ui.setNotification({
+        error,
+        category: 'error',
+        message: `Unable to update compute instance: ${error.message}`,
+      })
+    },
+  })
+  const isSubmitting = isUpdating || isRemoving
 
   const projectId = selectedProject?.id
   const selectedAddons = addons?.selected_addons ?? []
@@ -109,34 +125,22 @@ const ComputeInstanceSidePanel = () => {
     if (!projectRef) return console.error('Project ref is required')
     if (!projectId) return console.error('Project ID is required')
 
-    try {
-      setIsSubmitting(true)
-
-      if (selectedOption === 'ci_micro' && subscriptionCompute !== undefined) {
-        await removeAddon({ projectRef, variant: subscriptionCompute.variant.identifier })
-      } else {
-        await updateAddon({ projectRef, type: 'compute_instance', variant: selectedOption })
-      }
-
-      ui.setNotification({
-        duration: 8000,
-        category: 'success',
-        message: `Successfully updated compute instance to ${
-          selectedCompute?.name || 'Micro'
-        }. Your project is currently being restarted to update its instance`,
-      })
-      setProjectStatus(queryClient, projectRef, PROJECT_STATUS.RESTORING)
-      onClose()
-      router.push(`/project/${projectRef}`)
-    } catch (error: any) {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Unable to update compute instance: ${error.message}`,
-      })
-    } finally {
-      setIsSubmitting(false)
+    if (selectedOption === 'ci_micro' && subscriptionCompute !== undefined) {
+      await removeAddon({ projectRef, variant: subscriptionCompute.variant.identifier })
+    } else {
+      await updateAddon({ projectRef, type: 'compute_instance', variant: selectedOption })
     }
+
+    ui.setNotification({
+      duration: 8000,
+      category: 'success',
+      message: `Successfully updated compute instance to ${
+        selectedCompute?.name || 'Micro'
+      }. Your project is currently being restarted to update its instance`,
+    })
+    setProjectStatus(queryClient, projectRef, PROJECT_STATUS.RESTORING)
+    onClose()
+    router.push(`/project/${projectRef}`)
   }
 
   return (

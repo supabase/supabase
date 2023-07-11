@@ -24,13 +24,20 @@ const ExitSurveyModal = ({ visible, subscription, onClose }: ExitSurveyModalProp
   const { slug } = useParams()
   const captchaRef = useRef<HCaptcha>(null)
 
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const [message, setMessage] = useState('')
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [selectedReasons, dispatchSelectedReasons] = useReducer(reducer, [])
 
   const subscriptionUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
-  const { mutateAsync: updateOrgSubscription } = useOrgSubscriptionUpdateMutation()
+  const { mutateAsync: updateOrgSubscription, isLoading: isUpdating } =
+    useOrgSubscriptionUpdateMutation({
+      onError: (error) => {
+        ui.setNotification({
+          category: 'error',
+          message: `Failed to downgrade project: ${error.message}`,
+        })
+      },
+    })
 
   const projectsWithComputeInstances =
     subscription?.project_addons.filter((project) =>
@@ -59,22 +66,12 @@ const ExitSurveyModal = ({ visible, subscription, onClose }: ExitSurveyModalProp
       })
     }
 
-    setIsSubmitting(true)
     let token = captchaToken
 
-    try {
-      if (!token) {
-        const captchaResponse = await captchaRef.current?.execute({ async: true })
-        token = captchaResponse?.response ?? null
-        await downgradeOrganization()
-      }
-    } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to downgrade project: ${error.message}`,
-      })
-    } finally {
-      setIsSubmitting(false)
+    if (!token) {
+      const captchaResponse = await captchaRef.current?.execute({ async: true })
+      token = captchaResponse?.response ?? null
+      await downgradeOrganization()
     }
   }
 
@@ -222,8 +219,8 @@ const ExitSurveyModal = ({ visible, subscription, onClose }: ExitSurveyModalProp
             <ProjectUpdateDisabledTooltip projectUpdateDisabled={subscriptionUpdateDisabled}>
               <Button
                 type="danger"
-                loading={isSubmitting}
-                disabled={subscriptionUpdateDisabled || isSubmitting}
+                loading={isUpdating}
+                disabled={subscriptionUpdateDisabled || isUpdating}
                 onClick={onSubmit}
               >
                 Confirm downgrade

@@ -29,14 +29,22 @@ const ExitSurveyModal = ({ visible, onClose }: ExitSurveyModalProps) => {
   const captchaRef = useRef<HCaptcha>(null)
   const router = useRouter()
 
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const [message, setMessage] = useState('')
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [selectedReasons, dispatchSelectedReasons] = useReducer(reducer, [])
 
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
   const { data: addons } = useProjectAddonsQuery({ projectRef })
-  const { mutateAsync: updateSubscriptionTier } = useProjectSubscriptionUpdateMutation()
+  const { mutateAsync: updateSubscriptionTier, isLoading: isUpdating } =
+    useProjectSubscriptionUpdateMutation({
+      onError: (error) => {
+        return ui.setNotification({
+          error,
+          category: 'error',
+          message: `Failed to cancel subscription: ${error.message}`,
+        })
+      },
+    })
 
   const subscriptionAddons = addons?.selected_addons ?? []
   const hasComputeInstance = subscriptionAddons.find((addon) => addon.type === 'compute_instance')
@@ -62,22 +70,12 @@ const ExitSurveyModal = ({ visible, onClose }: ExitSurveyModalProps) => {
       })
     }
 
-    setIsSubmitting(true)
     let token = captchaToken
 
-    try {
-      if (!token) {
-        const captchaResponse = await captchaRef.current?.execute({ async: true })
-        token = captchaResponse?.response ?? null
-        await downgradeProject()
-      }
-    } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to downgrade project: ${error.message}`,
-      })
-    } finally {
-      setIsSubmitting(false)
+    if (!token) {
+      const captchaResponse = await captchaRef.current?.execute({ async: true })
+      token = captchaResponse?.response ?? null
+      await downgradeProject()
     }
   }
 
@@ -86,16 +84,8 @@ const ExitSurveyModal = ({ visible, onClose }: ExitSurveyModalProps) => {
     // If compute instance is present within the existing subscription, then a restart will be triggered
     if (!projectRef) return console.error('Project ref is required')
 
-    try {
-      await updateSubscriptionTier({ projectRef, tier: 'tier_free' })
-      resetCaptcha()
-    } catch (error: any) {
-      return ui.setNotification({
-        error,
-        category: 'error',
-        message: `Failed to cancel subscription: ${error.message}`,
-      })
-    }
+    await updateSubscriptionTier({ projectRef, tier: 'tier_free' })
+    resetCaptcha()
 
     try {
       const feedbackRes = await post(`${API_URL}/feedback/downgrade`, {
@@ -217,8 +207,8 @@ const ExitSurveyModal = ({ visible, onClose }: ExitSurveyModalProps) => {
             <ProjectUpdateDisabledTooltip projectUpdateDisabled={projectUpdateDisabled}>
               <Button
                 type="danger"
-                loading={isSubmitting}
-                disabled={projectUpdateDisabled || isSubmitting}
+                loading={isUpdating}
+                disabled={projectUpdateDisabled || isUpdating}
                 onClick={onSubmit}
               >
                 Confirm downgrade

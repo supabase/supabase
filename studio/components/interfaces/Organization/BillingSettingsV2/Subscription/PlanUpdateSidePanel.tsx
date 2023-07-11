@@ -30,7 +30,6 @@ const PlanUpdateSidePanel = () => {
   const selectedOrganization = useSelectedOrganization()
   const slug = selectedOrganization?.slug
 
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const [showExitSurvey, setShowExitSurvey] = useState(false)
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>()
   const [showDowngradeError, setShowDowngradeError] = useState(false)
@@ -48,7 +47,16 @@ const PlanUpdateSidePanel = () => {
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: slug })
   const { data: plans, isLoading: isLoadingPlans } = useOrgPlansQuery({ orgSlug: slug })
   const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery({ slug })
-  const { mutateAsync: updateOrgSubscription } = useOrgSubscriptionUpdateMutation()
+  const { mutateAsync: updateOrgSubscription, isLoading: isUpdating } =
+    useOrgSubscriptionUpdateMutation({
+      onError: (error) => {
+        ui.setNotification({
+          error,
+          category: 'error',
+          message: `Unable to update subscription: ${error.message}`,
+        })
+      },
+    })
 
   const availablePlans = plans ?? []
   const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
@@ -91,29 +99,18 @@ const PlanUpdateSidePanel = () => {
       return ui.setNotification({ category: 'error', message: 'Please select a payment method' })
     }
 
-    try {
-      setIsSubmitting(true)
-      await updateOrgSubscription({
-        slug,
-        tier: selectedTier,
-        paymentMethod: selectedPaymentMethod,
-      })
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully updated subscription to ${subscriptionPlanMeta?.name}!`,
-      })
-      setSelectedTier(undefined)
-      onClose()
-      window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
-    } catch (error: any) {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Unable to update subscription: ${error.message}`,
-      })
-    } finally {
-      setIsSubmitting(false)
-    }
+    await updateOrgSubscription({
+      slug,
+      tier: selectedTier,
+      paymentMethod: selectedPaymentMethod,
+    })
+    ui.setNotification({
+      category: 'success',
+      message: `Successfully updated subscription to ${subscriptionPlanMeta?.name}!`,
+    })
+    setSelectedTier(undefined)
+    onClose()
+    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
   }
 
   return (
@@ -286,7 +283,7 @@ const PlanUpdateSidePanel = () => {
       />
 
       <Modal
-        loading={isSubmitting}
+        loading={isUpdating}
         alignFooter="right"
         className="!w-[450px]"
         visible={selectedTier !== undefined && selectedTier !== 'tier_free'}

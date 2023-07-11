@@ -44,7 +44,6 @@ const PITRSidePanel = () => {
   const organization = useSelectedOrganization()
   const isOrgBilling = !!organization?.subscription_id
 
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState<'on' | 'off'>('off')
   const [selectedOption, setSelectedOption] = useState<string>('pitr_0')
 
@@ -56,8 +55,25 @@ const PITRSidePanel = () => {
 
   const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef })
   const { data: subscription } = useProjectSubscriptionV2Query({ projectRef })
-  const { mutateAsync: updateAddon } = useProjectAddonUpdateMutation()
-  const { mutateAsync: removeAddon } = useProjectAddonRemoveMutation()
+  const { mutateAsync: updateAddon, isLoading: isUpdating } = useProjectAddonUpdateMutation({
+    onError: (error) => {
+      ui.setNotification({
+        error,
+        category: 'error',
+        message: `Unable to update PITR: ${error.message}`,
+      })
+    },
+  })
+  const { mutateAsync: removeAddon, isLoading: isRemoving } = useProjectAddonRemoveMutation({
+    onError: (error) => {
+      ui.setNotification({
+        error,
+        category: 'error',
+        message: `Unable to update PITR: ${error.message}`,
+      })
+    },
+  })
+  const isSubmitting = isUpdating || isRemoving
 
   const selectedAddons = addons?.selected_addons ?? []
   const availableAddons = addons?.available_addons ?? []
@@ -96,31 +112,19 @@ const PITRSidePanel = () => {
   const onConfirm = async () => {
     if (!projectRef) return console.error('Project ref is required')
 
-    try {
-      setIsSubmitting(true)
-
-      if (selectedOption === 'pitr_0' && subscriptionPitr !== undefined) {
-        await removeAddon({ projectRef, variant: subscriptionPitr.variant.identifier })
-      } else {
-        await updateAddon({ projectRef, type: 'pitr', variant: selectedOption })
-      }
-
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully ${
-          selectedOption === 'pitr_0' ? 'disabled' : 'updated'
-        } point in time recovery duration`,
-      })
-      onClose()
-    } catch (error: any) {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Unable to update PITR: ${error.message}`,
-      })
-    } finally {
-      setIsSubmitting(false)
+    if (selectedOption === 'pitr_0' && subscriptionPitr !== undefined) {
+      await removeAddon({ projectRef, variant: subscriptionPitr.variant.identifier })
+    } else {
+      await updateAddon({ projectRef, type: 'pitr', variant: selectedOption })
     }
+
+    ui.setNotification({
+      category: 'success',
+      message: `Successfully ${
+        selectedOption === 'pitr_0' ? 'disabled' : 'updated'
+      } point in time recovery duration`,
+    })
+    onClose()
   }
 
   return (

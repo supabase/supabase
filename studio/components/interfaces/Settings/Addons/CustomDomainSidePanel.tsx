@@ -21,7 +21,6 @@ const CustomDomainSidePanel = () => {
   const organization = useSelectedOrganization()
   const isOrgBilling = !!organization?.subscription_id
 
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
   const [selectedOption, setSelectedOption] = useState<string>('cd_none')
 
   const canUpdateCustomDomain = useCheckPermissions(
@@ -35,8 +34,25 @@ const CustomDomainSidePanel = () => {
 
   const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef })
   const { data: subscription } = useProjectSubscriptionV2Query({ projectRef })
-  const { mutateAsync: updateAddon } = useProjectAddonUpdateMutation()
-  const { mutateAsync: removeAddon } = useProjectAddonRemoveMutation()
+  const { mutateAsync: updateAddon, isLoading: isUpdating } = useProjectAddonUpdateMutation({
+    onError: (error) => {
+      ui.setNotification({
+        error,
+        category: 'error',
+        message: `Unable to update custom domain: ${error.message}`,
+      })
+    },
+  })
+  const { mutateAsync: removeAddon, isLoading: isRemoving } = useProjectAddonRemoveMutation({
+    onError: (error) => {
+      ui.setNotification({
+        error,
+        category: 'error',
+        message: `Unable to update custom domain: ${error.message}`,
+      })
+    },
+  })
+  const isSubmitting = isUpdating || isRemoving
 
   const subscriptionCDOption = (addons?.selected_addons ?? []).find(
     (addon) => addon.type === 'custom_domain'
@@ -74,31 +90,19 @@ const CustomDomainSidePanel = () => {
   const onConfirm = async () => {
     if (!projectRef) return console.error('Project ref is required')
 
-    try {
-      setIsSubmitting(true)
-
-      if (selectedOption === 'cd_none' && subscriptionCDOption !== undefined) {
-        await removeAddon({ projectRef, variant: subscriptionCDOption.variant.identifier })
-      } else {
-        await updateAddon({ projectRef, type: 'custom_domain', variant: selectedOption })
-      }
-
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully ${
-          selectedOption === 'cd_none' ? 'disabled' : 'enabled'
-        } custom domain`,
-      })
-      onClose()
-    } catch (error: any) {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Unable to update custom domain: ${error.message}`,
-      })
-    } finally {
-      setIsSubmitting(false)
+    if (selectedOption === 'cd_none' && subscriptionCDOption !== undefined) {
+      await removeAddon({ projectRef, variant: subscriptionCDOption.variant.identifier })
+    } else {
+      await updateAddon({ projectRef, type: 'custom_domain', variant: selectedOption })
     }
+
+    ui.setNotification({
+      category: 'success',
+      message: `Successfully ${
+        selectedOption === 'cd_none' ? 'disabled' : 'enabled'
+      } custom domain`,
+    })
+    onClose()
   }
 
   return (
