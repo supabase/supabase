@@ -1,6 +1,9 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'react-hot-toast'
+
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
+import { ResponseError } from 'types'
 import { integrationKeys } from './keys'
 
 export type IntegrationConnectionsCreateVariables = {
@@ -32,11 +35,12 @@ type IntegrationConnectionsCreateData = Awaited<ReturnType<typeof createIntegrat
 
 export const useIntegrationConnectionsCreateMutation = ({
   onSuccess,
+  onError,
   ...options
 }: Omit<
   UseMutationOptions<
     IntegrationConnectionsCreateData,
-    unknown,
+    ResponseError,
     IntegrationConnectionsCreateVariables
   >,
   'mutationFn'
@@ -44,7 +48,7 @@ export const useIntegrationConnectionsCreateMutation = ({
   const queryClient = useQueryClient()
   return useMutation<
     IntegrationConnectionsCreateData,
-    unknown,
+    ResponseError,
     IntegrationConnectionsCreateVariables
   >((vars) => createIntegrationConnections(vars), {
     async onSuccess(data, variables, context) {
@@ -59,6 +63,13 @@ export const useIntegrationConnectionsCreateMutation = ({
         ),
       ])
       await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create connection: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
     },
     ...options,
   })
