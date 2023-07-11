@@ -41,7 +41,6 @@ const SpendCapSidePanel = () => {
   const { isDarkMode } = useTheme()
 
   const [showUsageCosts, setShowUsageCosts] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
   const [selectedOption, setSelectedOption] = useState<'on' | 'off'>()
 
   const canUpdateSpendCap = useCheckPermissions(
@@ -54,7 +53,16 @@ const SpendCapSidePanel = () => {
   const onClose = () => snap.setPanelKey(undefined)
 
   const { data: subscription, isLoading } = useOrgSubscriptionQuery({ orgSlug: slug })
-  const { mutateAsync: updateOrgSubscription } = useOrgSubscriptionUpdateMutation()
+  const { mutateAsync: updateOrgSubscription, isLoading: isUpdating } =
+    useOrgSubscriptionUpdateMutation({
+      onError: (error) => {
+        ui.setNotification({
+          error,
+          category: 'error',
+          message: `Failed to toggle spend cap: ${error.message}`,
+        })
+      },
+    })
 
   const isFreePlan = subscription?.plan?.id === 'free'
   const isSpendCapOn = !subscription?.usage_billing_enabled
@@ -82,26 +90,18 @@ const SpendCapSidePanel = () => {
   const onConfirm = async () => {
     if (!slug) return console.error('Org slug is required')
 
-    try {
-      const tier = (
-        selectedOption === 'on' ? PRICING_TIER_PRODUCT_IDS.PRO : PRICING_TIER_PRODUCT_IDS.PAYG
-      ) as 'tier_pro' | 'tier_payg'
-      setIsSubmitting(true)
-      await updateOrgSubscription({ slug, tier })
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully ${isTurningOnCap ? 'enabled' : 'disabled'} spend cap`,
-      })
-      onClose()
-    } catch (error: any) {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Unable to toggle spend cap: ${error.message}`,
-      })
-    } finally {
-      setIsSubmitting(false)
-    }
+    const tier = (
+      selectedOption === 'on' ? PRICING_TIER_PRODUCT_IDS.PRO : PRICING_TIER_PRODUCT_IDS.PAYG
+    ) as 'tier_pro' | 'tier_payg'
+
+    await updateOrgSubscription({ slug, tier })
+
+    ui.setNotification({
+      category: 'success',
+      message: `Successfully ${isTurningOnCap ? 'enabled' : 'disabled'} spend cap`,
+    })
+
+    onClose()
   }
 
   const billingMetricCategories: (keyof typeof pricing)[] = [
@@ -115,8 +115,8 @@ const SpendCapSidePanel = () => {
   return (
     <SidePanel
       size="large"
-      loading={isLoading || isSubmitting}
-      disabled={isFreePlan || isLoading || !hasChanges || isSubmitting || !canUpdateSpendCap}
+      loading={isLoading || isUpdating}
+      disabled={isFreePlan || isLoading || !hasChanges || isUpdating || !canUpdateSpendCap}
       visible={visible}
       onCancel={onClose}
       onConfirm={onConfirm}
