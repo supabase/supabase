@@ -12,6 +12,8 @@ import { useSession } from 'lib/auth'
 import { useProfile } from 'lib/profile'
 import { NextPageWithLayout } from 'types'
 import { Button, IconMoon, IconSun, Input, Listbox } from 'ui'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import AlertError from 'components/ui/AlertError'
 
 const User: NextPageWithLayout = () => {
   return (
@@ -39,53 +41,67 @@ export default User
 
 const ProfileCard = observer(() => {
   const { ui } = useStore()
-  const { mutateAsync } = useProfileUpdateMutation()
-
-  const { profile } = useProfile()
-  // TODO: ^ handle loading state
-
-  const updateUser = async (model: any) => {
-    try {
-      await mutateAsync({
-        firstName: model.first_name,
-        lastName: model.last_name,
-      })
-
-      ui.setNotification({ category: 'success', message: 'Successfully saved profile' })
-    } catch (error) {
+  const { profile, error, isLoading, isError, isSuccess } = useProfile()
+  const { mutateAsync: updateProfile } = useProfileUpdateMutation({
+    onError: (error) => {
       ui.setNotification({
         error,
         category: 'error',
         message: "Couldn't update profile. Please try again later.",
       })
-    }
+    },
+  })
+
+  const updateUser = async (model: any) => {
+    await updateProfile({
+      firstName: model.first_name,
+      lastName: model.last_name,
+    })
+    ui.setNotification({ category: 'success', message: 'Successfully saved profile' })
   }
 
   return (
     <article className="max-w-4xl p-4">
-      <section>
-        <Profile profile={profile} />
-      </section>
-
-      <section>
-        {/* @ts-ignore */}
-        <SchemaFormPanel
-          title="Profile"
-          schema={{
-            type: 'object',
-            required: [],
-            properties: {
-              first_name: { type: 'string' },
-              last_name: { type: 'string' },
-            },
-          }}
-          model={{
-            first_name: profile?.first_name ?? '',
-            last_name: profile?.last_name ?? '',
-          }}
-          onSubmit={updateUser}
-        />
-      </section>
+      {isLoading && (
+        <Panel>
+          <div className="p-4">
+            <GenericSkeletonLoader />
+          </div>
+        </Panel>
+      )}
+      {isError && (
+        <Panel>
+          <div className="p-4">
+            <AlertError error={error} subject="Failed to retrieve account information" />
+          </div>
+        </Panel>
+      )}
+      {isSuccess && (
+        <>
+          <section>
+            <Profile profile={profile} />
+          </section>
+          <section>
+            {/* @ts-ignore */}
+            <SchemaFormPanel
+              title="Profile"
+              schema={{
+                type: 'object',
+                required: [],
+                properties: {
+                  first_name: { type: 'string' },
+                  last_name: { type: 'string' },
+                },
+              }}
+              model={{
+                first_name: profile?.first_name ?? '',
+                last_name: profile?.last_name ?? '',
+              }}
+              onSubmit={updateUser}
+            />
+          </section>
+        </>
+      )}
 
       <section>
         <ThemeSettings />
