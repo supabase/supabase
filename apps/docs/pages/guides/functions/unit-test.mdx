@@ -2,10 +2,13 @@ import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
   id: 'unit-test',
-  title: 'Unit Tests for Edge Functions',
-  description: 'Unit Tests for Edge Functions with Deno Test',
+  title: 'Testing your Edge Functions',
+  description: 'Writing Unit Tests for Edge Functions using Deno Test',
 }
-To ensure the correctness and performance of your Edge Functions, testing is an essential step in the development process. Let's discuss the significance of testing and examining the code in the `deno-test.ts` file, which demonstrates how to test the Supabase client and the `hello-world` function. When creating test files for Edge Functions, it is recommended to place them in the `supabase/tests` directory and name the file by the function name followed by `-test.ts`. For example, `hello-world-test.ts`.
+
+Testing is an essential step in the development process to ensure the correctness and performance of your Edge Functions. 
+
+When creating test files for Edge Functions, it is recommended to place them in the `supabase/tests` directory and name the file by the function name followed by `-test.ts`. For example, `hello-world-test.ts`.
 
 ```typescript
 // deno-test.ts
