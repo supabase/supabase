@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 
-import IntegrationWindowLayout from 'components/layouts/IntegrationWindowLayout'
+import IntegrationWindowLayout from 'components/layouts/IntegrationsLayout/IntegrationWindowLayout'
 import { useRouter } from 'next/router'
 import { NextPageWithLayout } from 'types'
 

@@ -13,7 +13,7 @@ const IntegrationSettings = () => {
   const vercelIntegrations = data
     ?.filter((integration) => integration.integration.name === 'Vercel')
     .map((integration) => {
-      if (integration.metadata) {
+      if (integration.metadata && integration.integration.name === 'Vercel') {
         const avatarSrc =
           !integration.metadata.account.avatar && integration.metadata.account.type === 'Team'
             ? `https://vercel.com/api/www/avatar?teamId=${integration.metadata.account.team_id}&s=48`
