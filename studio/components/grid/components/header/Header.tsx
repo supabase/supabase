@@ -233,9 +233,11 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
   const dispatch = useDispatch()
 
   const { project } = useProjectContext()
-  const { mutateAsync: deleteRows } = useTableRowDeleteMutation()
-  const { mutateAsync: deleteAllRows } = useTableRowDeleteAllMutation()
-  const { mutateAsync: truncateRows } = useTableRowTruncateMutation()
+  // [Joshen] Passing blank error handlers here as the errors are handled via the
+  // error handler in tracked state within catch block
+  const { mutateAsync: deleteRows } = useTableRowDeleteMutation({ onError: () => {} })
+  const { mutateAsync: deleteAllRows } = useTableRowDeleteAllMutation({ onError: () => {} })
+  const { mutateAsync: truncateRows } = useTableRowTruncateMutation({ onError: () => {} })
 
   const { data } = useTableRowsQuery({
     queryKey: [table.schema, table.name],
