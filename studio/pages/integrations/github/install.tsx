@@ -1,15 +1,16 @@
 import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
-import VercelIntegrationWindowLayout from 'components/layouts/IntegrationsLayout/VercelIntegrationWindowLayout'
+import GitHubIntegrationWindowLayout from 'components/layouts/IntegrationsLayout/GitHubIntegrationWindowLayout'
+import IntegrationWindowLayout from 'components/layouts/IntegrationsLayout/IntegrationWindowLayout'
 import { ScaffoldContainer, ScaffoldDivider } from 'components/layouts/Scaffold'
+import { useGitHubIntegrationCreateMutation } from 'data/integrations/github-integration-create-mutation'
 import { useIntegrationsQuery } from 'data/integrations/integrations-query'
 import { IntegrationName } from 'data/integrations/integrations.types'
-import { useVercelIntegrationCreateMutation } from 'data/integrations/vercel-integration-create-mutation'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useStore } from 'hooks'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { useVercelIntegrationInstallationState } from 'state/vercel-integration-installation'
+import { useGitHubIntegrationInstallationState } from 'state/github-integration-installation'
 import { NextPageWithLayout, Organization } from 'types'
 import { Alert, Badge, Button, IconBook, IconHexagon, IconLifeBuoy, Listbox, LoadingLine } from 'ui'
 
@@ -21,28 +22,26 @@ interface OrganizationsResponseWithInstalledData extends Organization {
 }
 
 /**
- * Variations of the Vercel integration flow.
+ * Variations of the GitHub integration flow.
  * They require different UI and logic.
  *
- * Deploy Button - the flow that starts from the Deploy Button - https://vercel.com/docs/integrations#deploy-button
- * Marketplace - the flow that starts from the Marketplace - https://vercel.com/integrations
+ * Deploy Button - the flow that starts from the Deploy Button - https://github.com/docs/integrations#deploy-button
+ * Marketplace - the flow that starts from the Marketplace - https://github.com/integrations
  *
  */
-export type VercelIntegrationFlow = 'deploy-button' | 'marketing'
+export type GitHubIntegrationFlow = 'deploy-button' | 'marketing'
 
-const VercelIntegration: NextPageWithLayout = () => {
+const GitHubIntegration: NextPageWithLayout = () => {
   const router = useRouter()
   const { ui } = useStore()
-  const { code, configurationId, next, teamId, source, externalId } = useParams()
+  const { code, installation_id: installationId } = useParams()
   const [selectedOrg, setSelectedOrg] = useState<Organization | null>(null)
   const [organizationIntegrationId, setOrganizationIntegrationId] = useState<string | null>(null)
 
-  const snapshot = useVercelIntegrationInstallationState()
-
-  const flow: VercelIntegrationFlow = externalId ? 'marketing' : 'deploy-button'
+  const snapshot = useGitHubIntegrationInstallationState()
 
   /**
-   * Fetch the list of organization based integration installations for Vercel.
+   * Fetch the list of organization based integration installations for GitHub.
    *
    * Array of integrations installed on all
    */
@@ -86,28 +85,21 @@ const VercelIntegration: NextPageWithLayout = () => {
     : []
 
   /**
-   * Handle the correct route change based on wether the vercel integration
+   * Handle the correct route change based on wether the github integration
    * is following the 'marketplace' flow or 'deploy button' flow.
    *
    */
   function handleRouteChange() {
     const orgSlug = selectedOrg?.slug
 
-    if (externalId) {
-      router.push({
-        pathname: `/integrations/vercel/${orgSlug}/deploy-button/new-project`,
-        query: router.query,
-      })
-    } else {
-      router.push({
-        pathname: `/integrations/vercel/${orgSlug}/marketplace/choose-project`,
-        query: router.query,
-      })
-    }
+    router.push({
+      pathname: `/integrations/github/${orgSlug}/choose-project`,
+      query: router.query,
+    })
   }
 
-  const { mutate, isLoading: isLoadingVercelIntegrationCreateMutation } =
-    useVercelIntegrationCreateMutation({
+  const { mutate, isLoading: isLoadingGitHubIntegrationCreateMutation } =
+    useGitHubIntegrationCreateMutation({
       onSuccess({ id }) {
         const orgSlug = selectedOrg?.slug
 
@@ -118,7 +110,7 @@ const VercelIntegration: NextPageWithLayout = () => {
       onError(error: any) {
         ui.setNotification({
           category: 'error',
-          message: `Creating Vercel integration failed: ${error.message}`,
+          message: `Creating GitHub integration failed: ${error.message}`,
         })
       },
     })
@@ -135,43 +127,34 @@ const VercelIntegration: NextPageWithLayout = () => {
     }
 
     if (!code) {
-      return ui.setNotification({ category: 'error', message: 'Vercel code missing' })
+      return ui.setNotification({ category: 'error', message: 'GitHub code missing' })
     }
 
-    if (!configurationId) {
-      return ui.setNotification({ category: 'error', message: 'Vercel Configuration ID missing' })
-    }
-
-    if (!source) {
-      return ui.setNotification({
-        category: 'error',
-        message: 'Vercel Configuration source missing',
-      })
+    if (!installationId) {
+      return ui.setNotification({ category: 'error', message: 'GitHub Installation ID is missing' })
     }
 
     /**
-     * Only install if integration hasn't already been installed
+     * Only install if instgration hasn't already been installed
      */
     if (!isIntegrationInstalled) {
       mutate({
         code,
-        configurationId,
+        installationId,
         orgSlug,
         metadata: {},
-        source,
-        teamId: teamId,
       })
     } else {
       handleRouteChange()
     }
   }
 
-  const dataLoading = isLoadingVercelIntegrationCreateMutation || isLoadingOrganizationsQuery
+  const dataLoading = isLoadingGitHubIntegrationCreateMutation || isLoadingOrganizationsQuery
 
   return (
     <>
       <main className="overflow-auto flex flex-col h-full">
-        <LoadingLine loading={isLoadingVercelIntegrationCreateMutation} />
+        <LoadingLine loading={isLoadingGitHubIntegrationCreateMutation} />
         {organizationIntegrationId === null && (
           <>
             <ScaffoldContainer className="max-w-md flex flex-col gap-6 grow py-8">
@@ -179,7 +162,7 @@ const VercelIntegration: NextPageWithLayout = () => {
               <>
                 <Markdown content={`Choose the Supabase organization you wish to install in`} />
                 <OrganizationPicker
-                  integrationName="Vercel"
+                  integrationName="GitHub"
                   organizationsWithInstalledData={organizationsWithInstalledData}
                   onSelectedOrgChange={(e) => {
                     router.query.organizationSlug = e.slug
@@ -191,8 +174,8 @@ const VercelIntegration: NextPageWithLayout = () => {
                   <Button
                     size="medium"
                     className="self-end"
-                    disabled={isLoadingVercelIntegrationCreateMutation}
-                    loading={isLoadingVercelIntegrationCreateMutation}
+                    disabled={isLoadingGitHubIntegrationCreateMutation}
+                    loading={isLoadingGitHubIntegrationCreateMutation}
                     onClick={onInstall}
                   >
                     Install integration
@@ -207,7 +190,7 @@ const VercelIntegration: NextPageWithLayout = () => {
                 title="You can uninstall this Integration at any time."
               >
                 <Markdown
-                  content={`Remove this integration at any time via Vercel or the Supabase dashboard.`}
+                  content={`Remove this integration at any time via GitHub or the Supabase dashboard.`}
                 />
               </Alert>
             </ScaffoldContainer>
@@ -228,8 +211,8 @@ const VercelIntegration: NextPageWithLayout = () => {
   )
 }
 
-VercelIntegration.getLayout = (page) => (
-  <VercelIntegrationWindowLayout>{page}</VercelIntegrationWindowLayout>
+GitHubIntegration.getLayout = (page) => (
+  <GitHubIntegrationWindowLayout>{page}</GitHubIntegrationWindowLayout>
 )
 
 export interface OrganizationPickerProps {
@@ -304,4 +287,4 @@ const OrganizationPicker = ({
   )
 }
 
-export default VercelIntegration
+export default GitHubIntegration

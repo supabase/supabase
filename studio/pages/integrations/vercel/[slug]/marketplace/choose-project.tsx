@@ -3,7 +3,7 @@ import { useMemo, useState } from 'react'
 import { useParams } from 'common'
 import ProjectLinker from 'components/interfaces/Integrations/ProjectLinker'
 import { Markdown } from 'components/interfaces/Markdown'
-import IntegrationWindowLayout from 'components/layouts/IntegrationWindowLayout'
+import { VercelIntegrationLayout } from 'components/layouts'
 import { ScaffoldContainer, ScaffoldDivider } from 'components/layouts/Scaffold'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
 import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
@@ -103,6 +103,6 @@ This Supabase integration manages your envioemnt variables automatically to prov
   )
 }
 
-VercelIntegration.getLayout = (page) => <IntegrationWindowLayout>{page}</IntegrationWindowLayout>
+VercelIntegration.getLayout = (page) => <VercelIntegrationLayout>{page}</VercelIntegrationLayout>
 
 export default VercelIntegration

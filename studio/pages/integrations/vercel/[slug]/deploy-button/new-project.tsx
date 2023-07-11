@@ -4,7 +4,7 @@ import { ChangeEvent, useRef, useState } from 'react'
 
 import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
-import IntegrationWindowLayout from 'components/layouts/IntegrationWindowLayout'
+import { VercelIntegrationLayout } from 'components/layouts'
 import { ScaffoldContainer, ScaffoldDivider } from 'components/layouts/Scaffold'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
 import { useProjectApiQuery } from 'data/config/project-api-query'
@@ -61,7 +61,7 @@ const VercelIntegration: NextPageWithLayout = () => {
   )
 }
 
-VercelIntegration.getLayout = (page) => <IntegrationWindowLayout>{page}</IntegrationWindowLayout>
+VercelIntegration.getLayout = (page) => <VercelIntegrationLayout>{page}</VercelIntegrationLayout>
 
 const CreateProject = ({
   loading,

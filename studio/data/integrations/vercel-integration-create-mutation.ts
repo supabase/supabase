@@ -47,7 +47,6 @@ export const useVercelIntegrationCreateMutation = ({
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  console.log('mutating')
   return useMutation<VercelIntegrationCreateData, unknown, VercelIntegrationCreateVariables>(
     (vars) => createVercelIntegration(vars),
     {
