@@ -136,7 +136,7 @@ const EditWrapper = () => {
     setSelectedTableToEdit(undefined)
   }
 
-  const onSubmit = async (values: any, { setSubmitting }: any) => {
+  const onSubmit = async (values: any) => {
     const validate = makeValidateRequired(wrapperMeta.server.options)
     const errors: any = validate(values)
 
@@ -145,32 +145,21 @@ const EditWrapper = () => {
     if (wrapperTables.length === 0) errors.tables = 'Please add at least one table'
     if (!isEmpty(errors)) return setFormErrors(errors)
 
-    setSubmitting(true)
-    try {
-      await updateFDW({
-        projectRef: project?.ref,
-        connectionString: project?.connectionString,
-        wrapper,
-        wrapperMeta,
-        formState: { ...values, server_name: `${wrapper_name}_server` },
-        tables: wrapperTables,
-      })
+    await updateFDW({
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      wrapper,
+      wrapperMeta,
+      formState: { ...values, server_name: `${wrapper_name}_server` },
+      tables: wrapperTables,
+    })
 
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully updated ${wrapperMeta.label} foreign data wrapper`,
-      })
-      setWrapperTables([])
-      router.push(`/project/${ref}/database/wrappers`)
-    } catch (error: any) {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Failed to create ${wrapperMeta.label} foreign data wrapper: ${error.message}`,
-      })
-    } finally {
-      setSubmitting(false)
-    }
+    ui.setNotification({
+      category: 'success',
+      message: `Successfully updated ${wrapperMeta.label} foreign data wrapper`,
+    })
+    setWrapperTables([])
+    router.push(`/project/${ref}/database/wrappers`)
   }
 
   return (
@@ -205,7 +194,7 @@ const EditWrapper = () => {
         </div>
 
         <Form id={formId} initialValues={initialValues} onSubmit={onSubmit}>
-          {({ isSubmitting, handleReset, values, initialValues, resetForm }: any) => {
+          {({ handleReset, values, initialValues, resetForm }: any) => {
             // [Alaister] although this "technically" is breaking the rules of React hooks
             // it won't error because the hooks are always rendered in the same order
             // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -259,7 +248,7 @@ const EditWrapper = () => {
                   <div className="flex px-8 py-4">
                     <FormActions
                       form={formId}
-                      isSubmitting={isSubmitting}
+                      isSubmitting={isSaving}
                       hasChanges={hasChanges}
                       handleReset={() => {
                         handleReset()

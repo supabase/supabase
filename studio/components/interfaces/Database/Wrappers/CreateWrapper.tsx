@@ -30,7 +30,7 @@ const CreateWrapper = () => {
   const { ui } = useStore()
   const { ref, type } = useParams()
   const { project } = useProjectContext()
-  const { mutateAsync: createFDW } = useFDWCreateMutation()
+  const { mutateAsync: createFDW, isLoading: isCreating } = useFDWCreateMutation()
 
   const [newTables, setNewTables] = useState<any[]>([])
   const [isEditingTable, setIsEditingTable] = useState(false)
@@ -86,7 +86,7 @@ const CreateWrapper = () => {
     setSelectedTableToEdit(undefined)
   }
 
-  const onSubmit = async (values: any, { setSubmitting }: any) => {
+  const onSubmit = async (values: any) => {
     const validate = makeValidateRequired(wrapperMeta.server.options)
     const errors: any = validate(values)
 
@@ -95,30 +95,19 @@ const CreateWrapper = () => {
     if (newTables.length === 0) errors.tables = 'Please add at least one table'
     if (!isEmpty(errors)) return setFormErrors(errors)
 
-    setSubmitting(true)
-    try {
-      await createFDW({
-        projectRef: project?.ref,
-        connectionString: project?.connectionString,
-        wrapperMeta,
-        formState: { ...values, server_name: `${wrapper_name}_server` },
-        tables: newTables,
-      })
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully created ${wrapperMeta.label} foreign data wrapper`,
-      })
-      setNewTables([])
-      router.push(`/project/${ref}/database/wrappers`)
-    } catch (error: any) {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Failed to create ${wrapperMeta.label} foreign data wrapper: ${error.message}`,
-      })
-    } finally {
-      setSubmitting(false)
-    }
+    await createFDW({
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      wrapperMeta,
+      formState: { ...values, server_name: `${wrapper_name}_server` },
+      tables: newTables,
+    })
+    ui.setNotification({
+      category: 'success',
+      message: `Successfully created ${wrapperMeta.label} foreign data wrapper`,
+    })
+    setNewTables([])
+    router.push(`/project/${ref}/database/wrappers`)
   }
 
   return (
@@ -153,7 +142,7 @@ const CreateWrapper = () => {
         </div>
 
         <Form id={formId} initialValues={initialValues} onSubmit={onSubmit}>
-          {({ isSubmitting, handleReset, values, initialValues }: any) => {
+          {({ handleReset, values, initialValues }: any) => {
             const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
             return (
               <FormPanel
@@ -162,7 +151,7 @@ const CreateWrapper = () => {
                   <div className="flex px-8 py-4">
                     <FormActions
                       form={formId}
-                      isSubmitting={isSubmitting}
+                      isSubmitting={isCreating}
                       hasChanges={hasChanges}
                       handleReset={handleReset}
                       disabled={!canCreateWrapper}
