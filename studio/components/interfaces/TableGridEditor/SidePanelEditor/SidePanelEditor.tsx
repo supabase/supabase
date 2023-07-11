@@ -160,32 +160,26 @@ const SidePanelEditor = ({
           payload,
           enumArrayColumns,
         })
-
         onRowCreated(result[0])
       } catch (error: any) {
         saveRowError = true
-        ui.setNotification({ category: 'error', message: error?.message })
       }
     } else {
       const hasChanges = !isEmpty(payload)
       if (hasChanges) {
         if (selectedTable.primary_keys.length > 0) {
-          if (selectedTable!.primary_keys.length > 0) {
-            try {
-              const result = await updateTableRow({
-                projectRef: project.ref,
-                connectionString: project.connectionString,
-                table: selectedTable as any,
-                configuration,
-                payload,
-                enumArrayColumns,
-              })
-
-              onRowUpdated(result[0], configuration.rowIdx)
-            } catch (error: any) {
-              saveRowError = true
-              ui.setNotification({ category: 'error', message: error?.message })
-            }
+          try {
+            const result = await updateTableRow({
+              projectRef: project.ref,
+              connectionString: project.connectionString,
+              table: selectedTable as any,
+              configuration,
+              payload,
+              enumArrayColumns,
+            })
+            onRowUpdated(result[0], configuration.rowIdx)
+          } catch (error: any) {
+            saveRowError = true
           }
         } else {
           saveRowError = true

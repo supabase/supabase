@@ -19,7 +19,9 @@ const RowContextMenu = ({ table, rows }: RowContextMenuProps) => {
   const dispatch = useDispatch()
 
   const { project } = useProjectContext()
-  const { mutateAsync: deleteRows } = useTableRowDeleteMutation()
+  // [Joshen] Passing blank error handlers here as the errors are handled via the
+  // error handler in tracked state within catch block
+  const { mutateAsync: deleteRows } = useTableRowDeleteMutation({ onError: () => {} })
 
   function onDeleteRow(p: ItemParams) {
     confirmAlert({
