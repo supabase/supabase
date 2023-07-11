@@ -24,7 +24,8 @@ const Particle = ({ index = 0, animate = true, children, config }: Props) => {
     pathOffsetRandomness * (pathOffsetRandomness < 1 || Math.random() < 0.5 ? 1 : -1)
 
   const verticalRandomness = Math.random() * (config.yThickness - 1) + 1 - config.yThickness / 2
-  const hasTrail = config.particles < 500 && index + 1 <= config.trails
+  // const hasTrail = config.particles < 500 && index + 1 <= config.trails
+  const hasTrail = index + 1 <= config.trails
   const speed = hasTrail
     ? config.min_speed
     : Math.random() * (config.max_speed - config.min_speed) + config.min_speed
@@ -109,7 +110,10 @@ export default function () {
       .max(5000)
       .step(1)
       .name('Particles')
-      .onChange((value) => setParticles(range(0, value)))
+      .onChange((value) => {
+        handleSetConfig('particles', value)
+        setParticles(range(0, value))
+      })
     gui
       .add(config, 'particlesSize')
       .min(1)

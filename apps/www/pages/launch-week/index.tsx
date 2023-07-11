@@ -13,7 +13,6 @@ import { LaunchWeekLogoHeader } from '~/components/LaunchWeek/LaunchSection/Laun
 import { UserData } from '~/components/LaunchWeek/Ticket/hooks/use-conf-data'
 import LW7BgGraphic from '~/components/LaunchWeek/LW7BgGraphic'
 import { useTheme } from 'common/Providers'
-import HeroR3F from '../../components/LaunchWeek/8/HeroR3F'
 
 const TicketContainer = dynamic(() => import('~/components/LaunchWeek/Ticket/TicketContainer'))
 const LW7Releases = dynamic(() => import('~/components/LaunchWeek/Releases/LW7/LW7Releases'))
@@ -117,24 +116,23 @@ export default function TicketHome({ users }: Props) {
         }}
       />
       <DefaultLayout>
-        <div className="-mt-[65px]">
-          <div className="relative pt-16">
+        <div className="bg-[#1C1C1C] -mt-[65px]">
+          <div className="relative bg-lw7 pt-16">
             <div className="relative z-10">
-              <SectionContainer className="flex flex-col justify-around items-center min-h-[400px] lg:min-h-[600px] !py-4 md:!py-8 gap-2 md:gap-4 !px-2 !mx-auto">
-                <div className="absolute inset-0">
-                  <HeroR3F />
-                </div>
+              <SectionContainer className="flex flex-col justify-around items-center !py-4 md:!py-8 gap-2 md:gap-4 !px-2 !mx-auto">
+                <LaunchWeekLogoHeader />
               </SectionContainer>
+              <LW7BgGraphic />
             </div>
           </div>
 
-          {/* <div className="relative !w-full max-w-[100vw] !px-4 sm:max-w-xl md:max-w-4xl lg:max-w-7xl z-20 flex flex-col justify-around items-center !py-4 md:!py-8 gap-2 md:gap-4 !mx-auto">
+          <div className="relative !w-full max-w-[100vw] !px-4 sm:max-w-xl md:max-w-4xl lg:max-w-7xl -mt-48 md:mt-[-460px] z-20 flex flex-col justify-around items-center !py-4 md:!py-8 gap-2 md:gap-4 !mx-auto">
             <LW7Releases />
             <LaunchWeekPrizeSection className="pt-10" ticket={Ticket} />
           </div>
-          {users && <TicketBrickWall users={users} />} */}
+          {users && <TicketBrickWall users={users} />}
         </div>
-        {/* <CTABanner /> */}
+        <CTABanner />
       </DefaultLayout>
     </>
   )

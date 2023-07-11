@@ -11,7 +11,7 @@ import { useRef } from 'react'
 import { INITIAL_BOTTOM, getAnimation } from '~/lib/animations'
 import dynamic from 'next/dynamic'
 
-const CustomersVisual = dynamic(() => import('~/components/Products/Vector/CustomersVisual'))
+const CustomersVisual = dynamic(() => import('~/components/Products/vector/CustomersVisual'))
 
 interface Customer {
   type?: string

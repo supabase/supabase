@@ -1,4 +1,4 @@
-import { GetServerSideProps } from 'next'
+// import { GetServerSideProps } from 'next'
 import { NextSeo } from 'next-seo'
 import { useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
@@ -9,31 +9,32 @@ import { SITE_ORIGIN, SITE_URL } from '~/lib/constants'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import { LaunchWeekLogoHeader } from '~/components/LaunchWeek/LaunchSection/LaunchWeekLogoHeader'
+// import { LaunchWeekLogoHeader } from '~/components/LaunchWeek/LaunchSection/LaunchWeekLogoHeader'
 import { UserData } from '~/components/LaunchWeek/Ticket/hooks/use-conf-data'
-import LW7BgGraphic from '~/components/LaunchWeek/LW7BgGraphic'
+// import LW7BgGraphic from '~/components/LaunchWeek/LW7BgGraphic'
 import { useTheme } from 'common/Providers'
+import HeroR3F from '~/components/LaunchWeek/8/HeroR3F'
 
 const TicketContainer = dynamic(() => import('~/components/LaunchWeek/Ticket/TicketContainer'))
-const LW7Releases = dynamic(() => import('~/components/LaunchWeek/Releases/LW7/LW7Releases'))
-const LaunchWeekPrizeSection = dynamic(
-  () => import('~/components/LaunchWeek/LaunchSection/LaunchWeekPrizeSection')
-)
-const TicketBrickWall = dynamic(
-  () => import('~/components/LaunchWeek/LaunchSection/TicketBrickWall')
-)
-const CTABanner = dynamic(() => import('~/components/CTABanner'))
+// const LW7Releases = dynamic(() => import('~/components/LaunchWeek/Releases/LW7/LW7Releases'))
+// const LaunchWeekPrizeSection = dynamic(
+//   () => import('~/components/LaunchWeek/LaunchSection/LaunchWeekPrizeSection')
+// )
+// const TicketBrickWall = dynamic(
+//   () => import('~/components/LaunchWeek/LaunchSection/TicketBrickWall')
+// )
+// const CTABanner = dynamic(() => import('~/components/CTABanner'))
 
 interface Props {
-  users: UserData[]
+  users?: UserData[]
 }
 
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL ?? 'http://localhost:54321',
-  process.env.SUPABASE_SERVICE_ROLE_SECRET ??
-    process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_SECRET ??
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9idWxkYW5ycHRsb2t0eGNmZnZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE2Njk3MjcwMTIsImV4cCI6MTk4NTMwMzAxMn0.SZLqryz_-stF8dgzeVXmzZWPOqdOrBwqJROlFES8v3I'
-)
+// const supabaseAdmin = createClient(
+//   process.env.NEXT_PUBLIC_SUPABASE_URL ?? 'http://localhost:54321',
+//   process.env.SUPABASE_SERVICE_ROLE_SECRET ??
+//     process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_SECRET ??
+//     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9idWxkYW5ycHRsb2t0eGNmZnZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE2Njk3MjcwMTIsImV4cCI6MTk4NTMwMzAxMn0.SZLqryz_-stF8dgzeVXmzZWPOqdOrBwqJROlFES8v3I'
+// )
 
 export default function TicketHome({ users }: Props) {
   const { query } = useRouter()
@@ -116,39 +117,40 @@ export default function TicketHome({ users }: Props) {
         }}
       />
       <DefaultLayout>
-        <div className="bg-[#1C1C1C] -mt-[65px]">
-          <div className="relative bg-lw7 pt-16">
+        <div className="-mt-[65px]">
+          <div className="relative pt-16">
             <div className="relative z-10">
-              <SectionContainer className="flex flex-col justify-around items-center !py-4 md:!py-8 gap-2 md:gap-4 !px-2 !mx-auto">
-                <LaunchWeekLogoHeader />
+              <SectionContainer className="flex flex-col justify-around items-center min-h-[400px] lg:min-h-[600px] !py-4 md:!py-8 gap-2 md:gap-4 !px-2 !mx-auto">
+                <div className="absolute inset-0">
+                  <HeroR3F />
+                </div>
               </SectionContainer>
-              <LW7BgGraphic />
             </div>
           </div>
 
-          <div className="relative !w-full max-w-[100vw] !px-4 sm:max-w-xl md:max-w-4xl lg:max-w-7xl -mt-48 md:mt-[-460px] z-20 flex flex-col justify-around items-center !py-4 md:!py-8 gap-2 md:gap-4 !mx-auto">
+          {/* <div className="relative !w-full max-w-[100vw] !px-4 sm:max-w-xl md:max-w-4xl lg:max-w-7xl z-20 flex flex-col justify-around items-center !py-4 md:!py-8 gap-2 md:gap-4 !mx-auto">
             <LW7Releases />
             <LaunchWeekPrizeSection className="pt-10" ticket={Ticket} />
           </div>
-          {users && <TicketBrickWall users={users} />}
+          {users && <TicketBrickWall users={users} />} */}
         </div>
-        <CTABanner />
+        {/* <CTABanner /> */}
       </DefaultLayout>
     </>
   )
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
-  // fetch users for the TicketBrickWall
-  const { data: users } = await supabaseAdmin!
-    .from('lw7_tickets_golden')
-    .select('*')
-    .order('createdAt', { ascending: false })
-    .limit(17)
+// export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+//   // fetch users for the TicketBrickWall
+//   const { data: users } = await supabaseAdmin!
+//     .from('lw7_tickets_golden')
+//     .select('*')
+//     .order('createdAt', { ascending: false })
+//     .limit(17)
 
-  return {
-    props: {
-      users,
-    },
-  }
-}
+//   return {
+//     props: {
+//       users,
+//     },
+//   }
+// }
