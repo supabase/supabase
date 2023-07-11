@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 1.75.3
+  version: 1.77.5
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -2101,14 +2101,23 @@ commands:
     usage: supabase db diff [flags]
     subcommands: []
     flags:
+      - id: db-url
+        name: --db-url <string>
+        description: |
+          Diffs local migration files against the database specified by the connection string (must be percent-encoded).
+        default_value: ''
       - id: file
         name: -f, --file <string>
         description: Saves schema diff to a new migration file.
         default_value: ''
       - id: linked
         name: --linked
-        description: Diffs local schema against the linked project.
+        description: Diffs local migration files against the linked project.
         default_value: 'false'
+      - id: local
+        name: --local
+        description: Diffs local migration files against the local database.
+        default_value: 'true'
       - id: schema
         name: -s, --schema <strings>
         description: List of schema to include.
@@ -2121,10 +2130,6 @@ commands:
         name: --use-pgadmin
         description: Use pgAdmin to generate schema diff.
         default_value: 'false'
-      - id: db-url
-        name: --db-url <string>
-        description: connect using the specified database url
-        default_value: ''
   - id: supabase-completion
     title: supabase completion
     summary: Generate the autocompletion script for the specified shell
