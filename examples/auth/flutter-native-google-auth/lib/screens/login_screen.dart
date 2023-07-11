@@ -65,13 +65,8 @@ class _LoginScreenState extends State<LoginScreen> {
             final clientId =
                 Platform.isIOS ? 'IOS_CLIENT_ID' : 'ANDROID_CLIENT_ID';
 
-            /// Application ID or Bundle ID for your app.
-            /// If the application ID and Bundle ID is different for Android and iOS,
-            /// make sure the value here matches the platform you are running on.
-            const applicationId = 'com.example.myauthapp';
-
-            /// Fixed value for google login
-            const redirectUrl = '$applicationId:/google_auth';
+            /// Set as reversed DNS form of Google Client ID + `:/` for Google login
+            final redirectUrl = '${clientId.split('.').reversed.join('.')}:/';
 
             /// Fixed value for google login
             const discoveryUrl =
