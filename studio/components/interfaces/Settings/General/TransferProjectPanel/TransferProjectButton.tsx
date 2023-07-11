@@ -77,7 +77,6 @@ const TransferProjectButton: FC<{}> = () => {
       await transferProject({ projectRef, targetOrganizationSlug: selectedOrg })
       ui.setNotification({
         category: 'success',
-
         duration: 5000,
         message: `Successfully transferred project ${project?.name}.`,
       })

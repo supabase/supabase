@@ -1,3 +1,4 @@
+import generator from 'generate-password'
 import { debounce } from 'lodash'
 import { useRouter } from 'next/router'
 import { ChangeEvent, useRef, useState } from 'react'
@@ -14,12 +15,11 @@ import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-pr
 import { Integration } from 'data/integrations/integrations.types'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectCreateMutation } from 'data/projects/project-create-mutation'
-import generator from 'generate-password'
 import { useSelectedOrganization, useStore } from 'hooks'
 import { AWS_REGIONS, DEFAULT_MINIMUM_PASSWORD_STRENGTH, PROVIDERS } from 'lib/constants'
 import { passwordStrength } from 'lib/helpers'
 import { getInitialMigrationSQLFromGitHubRepo } from 'lib/integration-utils'
-import { NextPageWithLayout, ProjectBase } from 'types'
+import { NextPageWithLayout } from 'types'
 import { Alert, Button, Checkbox, IconBook, IconLifeBuoy, Input, Listbox, LoadingLine } from 'ui'
 
 const VercelIntegration: NextPageWithLayout = () => {
@@ -79,7 +79,7 @@ const CreateProject = ({
   const [passwordStrengthScore, setPasswordStrengthScore] = useState(-1)
   const [shouldRunMigrations, setShouldRunMigrations] = useState(true)
   const [dbRegion, setDbRegion] = useState(PROVIDERS.AWS.default_region)
-  // const [loading, setLoading] = useState(false)
+
   const delayedCheckPasswordStrength = useRef(
     debounce((value: string) => checkPasswordStrength(value), 300)
   ).current
@@ -96,7 +96,6 @@ const CreateProject = ({
     useIntegrationConnectionsCreateMutation({})
 
   const { data: organizationData, isLoading: isLoadingOrganizationsQuery } = useOrganizationsQuery()
-
   const organization = organizationData?.find((x) => x.slug === slug)
 
   /**
@@ -183,9 +182,7 @@ const CreateProject = ({
     setLoading(true)
 
     try {
-      if (!organization) {
-        throw new Error('No organization set')
-      }
+      if (!organization) throw new Error('No organization set')
 
       let dbSql: string | undefined
       if (shouldRunMigrations) {
@@ -203,29 +200,17 @@ const CreateProject = ({
         })
       }
 
-      let project: ProjectBase
-
-      try {
-        project = await createProject({
-          organizationId: organization.id,
-          name: projectName,
-          dbPass,
-          dbRegion,
-          dbSql,
-          configurationId,
-        })
-
-        setNewProjectRef(project.ref)
-      } catch (error: any) {
-        setLoading(false)
-        ui.setNotification({
-          category: 'error',
-          message: `Failed to create project: ${error.message}`,
-        })
-        return
-      }
-    } catch (error) {
-      console.error('Error', error)
+      const project = await createProject({
+        organizationId: organization.id,
+        name: projectName,
+        dbPass,
+        dbRegion,
+        dbSql,
+        configurationId,
+      })
+      setNewProjectRef(project.ref)
+    } catch (error: any) {
+      ui.setNotification({ error, category: 'error', message: error.message })
       setLoading(false)
     }
   }
