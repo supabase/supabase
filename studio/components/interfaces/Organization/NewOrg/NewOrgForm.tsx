@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { Button, IconEdit2, IconInfo, Input, Listbox } from 'ui'
+import { Button, IconEdit2, IconExternalLink, IconInfo, Input, Listbox } from 'ui'
 
 import { PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js'
 import type { PaymentMethod } from '@stripe/stripe-js'
@@ -12,6 +12,7 @@ import { useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL, BASE_PATH, PRICING_TIER_LABELS_ORG } from 'lib/constants'
 import { getURL } from 'lib/helpers'
+import Link from 'next/link'
 
 const ORG_KIND_TYPES = {
   PERSONAL: 'Personal',
@@ -185,25 +186,6 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
             </div>
           }
         >
-          <Panel.Content>
-            <InformationBox
-              icon={<IconInfo size="large" strokeWidth={1.5} />}
-              defaultVisibility={true}
-              hideCollapse
-              title="Billed via organization"
-              description={
-                <div className="space-y-3">
-                  <p className="text-sm leading-normal">
-                    This is heavy Work-In-Progress and not customer facing yet, use with caution!
-                    This organization will use the new org level billing, instead of having
-                    individual subscriptions per project. There are still a lot of open ends that
-                    may be restrictive for you, follow #team-billing for updates.
-                  </p>
-                </div>
-              }
-            />
-          </Panel.Content>
-
           <Panel.Content className="pt-0">
             <p className="text-sm">This is your organization within Supabase.</p>
             <p className="text-sm text-scale-1100">
@@ -331,6 +313,33 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
               )}
             </Panel.Content>
           )}
+
+          <Panel.Content>
+            <InformationBox
+              icon={<IconInfo size="large" strokeWidth={1.5} />}
+              defaultVisibility={true}
+              hideCollapse
+              title="Billed via organization"
+              description={
+                <div className="space-y-3">
+                  <p className="text-sm leading-normal">
+                    This organization will use the new organization level billing, which gives you a
+                    single subscription for your entire organization, instead of having individual
+                    subscriptions per project.{' '}
+                  </p>
+                  <div>
+                    <Link href="https://www.notion.so/supabase/Organization-Level-Billing-9c159d69375b4af095f0b67881276582?pvs=4">
+                      <a target="_blank" rel="noreferrer">
+                        <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                          Documentation
+                        </Button>
+                      </a>
+                    </Link>
+                  </div>
+                </div>
+              }
+            />
+          </Panel.Content>
         </Panel>
       </form>
     </>
