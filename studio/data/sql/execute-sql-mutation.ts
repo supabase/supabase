@@ -21,7 +21,7 @@ export const useExecuteSqlMutation = ({
       },
       async onError(data, variables, context) {
         if (onError === undefined) {
-          toast.error(`Failed to create project: ${data.message}`)
+          toast.error(`Failed to execute SQL: ${data.message}`)
         } else {
           onError(data, variables, context)
         }
