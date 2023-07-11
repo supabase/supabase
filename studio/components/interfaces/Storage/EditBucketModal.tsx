@@ -34,7 +34,7 @@ const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => 
   const { ui } = useStore()
   const { ref } = useParams()
 
-  const { mutateAsync: updateBucket } = useBucketUpdateMutation()
+  const { mutateAsync: updateBucket, isLoading: isUpdating } = useBucketUpdateMutation()
   const { data } = useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
   const { value, unit } = convertFromBytes(data?.fileSizeLimit ?? 0)
   const formattedGlobalUploadLimit = `${value} ${unit}`
@@ -50,35 +50,27 @@ const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => 
     return errors
   }
 
-  const onSubmit = async (values: any, { setSubmitting }: any) => {
+  const onSubmit = async (values: any) => {
     if (bucket === undefined) return console.error('Bucket is required')
     if (ref === undefined) return console.error('Project ref is required')
 
-    try {
-      await updateBucket({
-        projectRef: ref,
-        id: bucket.id,
-        isPublic: values.public,
-        file_size_limit: values.has_file_size_limit
-          ? convertToBytes(values.formatted_size_limit, selectedUnit)
+    await updateBucket({
+      projectRef: ref,
+      id: bucket.id,
+      isPublic: values.public,
+      file_size_limit: values.has_file_size_limit
+        ? convertToBytes(values.formatted_size_limit, selectedUnit)
+        : null,
+      allowed_mime_types:
+        values.allowed_mime_types.length > 0
+          ? values.allowed_mime_types.split(',').map((x: string) => x.trim())
           : null,
-        allowed_mime_types:
-          values.allowed_mime_types.length > 0
-            ? values.allowed_mime_types.split(',').map((x: string) => x.trim())
-            : null,
-      })
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully updated bucket "${bucket.name}"`,
-      })
-      onClose()
-    } catch (error: any) {
-      setSubmitting(false)
-      ui.setNotification({
-        category: 'success',
-        message: `Failed to update bucket: ${error.message}`,
-      })
-    }
+    })
+    ui.setNotification({
+      category: 'success',
+      message: `Successfully updated bucket "${bucket.name}"`,
+    })
+    onClose()
   }
 
   useEffect(() => {
@@ -98,15 +90,7 @@ const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => 
       onCancel={onClose}
     >
       <Form validateOnBlur={false} initialValues={{}} validate={validate} onSubmit={onSubmit}>
-        {({
-          values,
-          isSubmitting,
-          resetForm,
-        }: {
-          values: any
-          isSubmitting: boolean
-          resetForm: any
-        }) => {
+        {({ values, resetForm }: { values: any; resetForm: any }) => {
           // [Alaister] although this "technically" is breaking the rules of React hooks
           // it won't error because the hooks are always rendered in the same order
           // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -260,14 +244,14 @@ const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => 
               <div className="w-full border-t border-scale-500 !mt-0" />
               <Modal.Content>
                 <div className="flex items-center space-x-2 justify-end">
-                  <Button type="default" disabled={isSubmitting} onClick={() => onClose()}>
+                  <Button type="default" disabled={isUpdating} onClick={() => onClose()}>
                     Cancel
                   </Button>
                   <Button
                     type="primary"
                     htmlType="submit"
-                    loading={isSubmitting}
-                    disabled={isSubmitting}
+                    loading={isUpdating}
+                    disabled={isUpdating}
                   >
                     Save
                   </Button>
