@@ -84,7 +84,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
         }}
       />
       <AuthProvider>
-        <ThemeProvider>
+        <ThemeProvider detectSystemColorPreference={false}>
           <Component {...pageProps} />
         </ThemeProvider>
       </AuthProvider>
