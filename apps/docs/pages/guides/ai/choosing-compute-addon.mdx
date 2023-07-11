@@ -12,11 +12,17 @@ export const meta = {
 
 This guide will help you choose the right Compute Add-on for your workload. We'll provide general guidance, as it is impossible to provide specific instructions for every possible use case. The goal is to give you a starting point from which you can make your own benchmarks and optimizations.
 
+Note that it is only useful for index searches, not for sequential scans. Sequential scans will result to significantly higher latencies and lower throughput, but will guarantee 100% precision and will not be RAM bound. Therefore it is possible to use a smaller plan for sequential scans.
+
 For more information about engineering at scale, see our [Engineering for Scale](/docs/guides/ai/engineering-for-scale) guide.
 
 ## Simple workloads
 
-We've run a set of benchmarks using the [gist-960-angular](http://corpus-texmex.irisa.fr/) dataset. This dataset contains 1,000,000 embeddings for images, with each embedding being 960 dimensions. And using the [GloVe Reddit comments](https://nlp.stanford.edu/projects/glove/) dataset, which contains 1,623,397 embeddings for words, with each embedding being 512 dimensions.
+We've run a set of benchmarks using
+
+- The [dbpedia-entities-openai-1M](https://huggingface.co/datasets/KShivendu/dbpedia-entities-openai-1M) dataset. This dataset contains 1,000,000 embeddings for text, with each embedding being 1536 dimensions made using OpenAI API.
+- The [gist-960-angular](http://corpus-texmex.irisa.fr/) dataset. This dataset contains 1,000,000 embeddings for images, with each embedding being 960 dimensions.
+- The [GloVe Reddit comments](https://nlp.stanford.edu/projects/glove/) dataset, which contains 1,623,397 embeddings for words, with each embedding being 512 dimensions.
 
 We used [Vecs](https://github.com/supabase/vecs) to create a collection, upload the embeddings to a single table, and create an `inner-product` index for the embedding column. We then ran a series of queries to measure the performance of different compute add-ons:
 
@@ -26,8 +32,48 @@ We used [Vecs](https://github.com/supabase/vecs) to create a collection, upload 
   scrollable
   size="small"
   type="underlined"
-  defaultActiveId="gist960"
+  defaultActiveId="dbpedia1536"
 >
+<TabPanel id="dbpedia1536" label="OpenAI-1536, probes = 10">
+
+Emdeddings of 1536 dimensions by OpenAI for dbpedia dataset with 1,000,000 vectors.
+
+| Plan   | Vectors   | Lists | RPS  | Latency Mean | Latency p95 | RAM Usage          | RAM    |
+| ------ | --------- | ----- | ---- | ------------ | ----------- | ------------------ | ------ |
+| Free   | 20,000    | 40    | 135  | 0.372 sec    | 0.412 sec   | 1 GB + 200 Mb Swap | 1 GB   |
+| Small  | 50,000    | 100   | 140  | 0.357 sec    | 0.398 sec   | 1.8 GB             | 2 GB   |
+| Medium | 100,000   | 200   | 130  | 0.383 sec    | 0.446 sec   | 3.7 GB             | 4 GB   |
+| Large  | 250,000   | 500   | 130  | 0.378 sec    | 0.434 sec   | 7 GB               | 8 GB   |
+| XL     | 500,000   | 1000  | 235  | 0.213 sec    | 0.271 sec   | 13.5 GB            | 16 GB  |
+| 2XL    | 1,000,000 | 2000  | 380  | 0.133 sec    | 0.236 sec   | 30 GB              | 32 GB  |
+| 4XL    | 1,000,000 | 2000  | 720  | 0.068 sec    | 0.120 sec   | 35 GB              | 64 GB  |
+| 8XL    | 1,000,000 | 2000  | 1250 | 0.039 sec    | 0.066 sec   | 38 GB              | 128 GB |
+| 12XL   | 1,000,000 | 2000  | 1600 | 0.030 sec    | 0.052 sec   | 41 GB              | 192 GB |
+| 16XL   | 1,000,000 | 2000  | 1790 | 0.029 sec    | 0.051 sec   | 45 GB              | 256 GB |
+
+For 1,000,000 vectors 10 probes results to precision of 0.91. And for 500,000 vectors and below 10 probes results to precision in the range of 0.95 - 0.99. To increase precision, you need to increase the number of probes.
+
+</TabPanel>
+<TabPanel id="dbpedia1536_40" label="OpenAI-1536, probes = 40">
+
+Emdeddings of 1536 dimensions by OpenAI for dbpedia dataset with 1,000,000 vectors.
+
+| Plan   | Vectors   | Lists | RPS | Latency Mean | Latency p95 | RAM Usage | RAM    |
+| ------ | --------- | ----- | --- | ------------ | ----------- | --------- | ------ |
+| Free   | 20,000    | 40    | -   | -            | -           | -         | 1 GB   |
+| Small  | 50,000    | 100   | -   | -            | -           | -         | 2 GB   |
+| Medium | 100,000   | 200   | -   | -            | -           | -         | 4 GB   |
+| Large  | 250,000   | 500   | -   | -            | -           | -         | 8 GB   |
+| XL     | 500,000   | 1000  | -   | -            | -           | -         | 16 GB  |
+| 2XL    | 1,000,000 | 2000  | 140 | 0.358 sec    | 0.575 sec   | 30 GB     | 32 GB  |
+| 4XL    | 1,000,000 | 2000  | 270 | 0.186 sec    | 0.304 sec   | 35 GB     | 64 GB  |
+| 8XL    | 1,000,000 | 2000  | 470 | 0.104 sec    | 0.166 sec   | 38 GB     | 128 GB |
+| 12XL   | 1,000,000 | 2000  | 600 | 0.085 sec    | 0.132 sec   | 41 GB     | 192 GB |
+| 16XL   | 1,000,000 | 2000  | 670 | 0.081 sec    | 0.129 sec   | 45 GB     | 256 GB |
+
+For 1,000,000 vectors 40 probes results to precision of 0.98. Note that exact values may vary depending on the dataset and queries, we recommend to run benchmarks with your own data to get precise results. Use this table as a reference.
+
+</TabPanel>
 <TabPanel id="gist960" label="gist-960, probes = 10">
 
 Emdeddings of 960 dimensions from gist-960 dataset with 1,000,000 vectors.
@@ -91,7 +137,7 @@ Random vectors were generated for queries.
 
 <Admonition type="note">
 
-It is possible to upload more vectors to a single table if Memory allows it (for example, 2XL plan and higher). But it will affect the performance of the queries: RPS will be lower, and latency will be higher. Scaling should be almost linear, but it is recommended to benchmark your workload to find the optimal number of vectors per table and per database instance.
+It is possible to upload more vectors to a single table if Memory allows it (for example, 4XL plan and higher for OpenAI embeddings). But it will affect the performance of the queries: RPS will be lower, and latency will be higher. Scaling should be almost linear, but it is recommended to benchmark your workload to find the optimal number of vectors per table and per database instance.
 
 </Admonition>
 
@@ -115,10 +161,6 @@ We follow techniques outlined in the [ANN Benchmarks](https://github.com/erikber
 Each test is run for a minimum of 30-40 minutes. They include a series of experiments executed at different concurrency levels to measure the engine's performance under different load types. The results are then averaged.
 
 As a general recommendation, we suggest using a concurrency level of 5 or more for most workloads and 30 or more for high-load workloads.
-
-## Future benchmarks
-
-We'll continue to add more benchmarks on datasets consisting of different vector dimensions, number of `lists` in the index, and number of `probes` in the index. Stay tuned for more information about how it may affect the performance and precision of your queries.
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
