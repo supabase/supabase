@@ -1,15 +1,14 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'react-hot-toast'
+
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
+import { ResponseError } from 'types'
 import { organizationKeys } from './keys'
 
 export type OrganizationBillingMigrationVariables = {
   organizationSlug?: string
   tier?: string
-}
-
-type OrganizationBillingMigrationError = {
-  message: string
 }
 
 export async function migrateBilling({
@@ -36,11 +35,12 @@ type OrganizationBillingMigrationData = Awaited<ReturnType<typeof migrateBilling
 
 export const useOrganizationBillingMigrationMutation = ({
   onSuccess,
+  onError,
   ...options
 }: Omit<
   UseMutationOptions<
     OrganizationBillingMigrationData,
-    OrganizationBillingMigrationError,
+    ResponseError,
     OrganizationBillingMigrationVariables
   >,
   'mutationFn'
@@ -49,7 +49,7 @@ export const useOrganizationBillingMigrationMutation = ({
 
   return useMutation<
     OrganizationBillingMigrationData,
-    OrganizationBillingMigrationError,
+    ResponseError,
     OrganizationBillingMigrationVariables
   >((vars) => migrateBilling(vars), {
     async onSuccess(data, variables, context) {
@@ -60,6 +60,13 @@ export const useOrganizationBillingMigrationMutation = ({
         queryClient.invalidateQueries(organizationKeys.freeProjectLimitCheck(organizationSlug)),
       ])
       await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to migrate billing: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
     },
     ...options,
   })

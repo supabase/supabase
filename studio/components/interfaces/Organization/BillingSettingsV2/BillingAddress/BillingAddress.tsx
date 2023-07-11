@@ -23,7 +23,8 @@ const BillingAddress = () => {
   const { data, error, isLoading, isSuccess, isError } = useOrganizationCustomerProfileQuery({
     slug,
   })
-  const { mutateAsync: updateCustomerProfile } = useOrganizationCustomerProfileUpdateMutation()
+  const { mutateAsync: updateCustomerProfile, isLoading: isUpdating } =
+    useOrganizationCustomerProfileUpdateMutation()
 
   const formId = 'billing-address-form'
   const { city, country, line1, line2, postal_code, state } = data?.address ?? {}
@@ -39,25 +40,15 @@ const BillingAddress = () => {
 
   const initialValues = { city, country, line1, line2, postal_code, state }
 
-  const onSubmit = async (values: any, { setSubmitting, resetForm }: any) => {
+  const onSubmit = async (values: any, { resetForm }: any) => {
     if (!slug) return console.error('Slug is required')
 
-    try {
-      setSubmitting(true)
-      await updateCustomerProfile({ slug, address: values })
-      ui.setNotification({
-        category: 'success',
-        message: 'Successfully updated billing address',
-      })
-      resetForm({ values, initialValues: values })
-    } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to update billing address: ${error.message}`,
-      })
-    } finally {
-      setSubmitting(false)
-    }
+    await updateCustomerProfile({ slug, address: values })
+    ui.setNotification({
+      category: 'success',
+      message: 'Successfully updated billing address',
+    })
+    resetForm({ values, initialValues: values })
   }
 
   return (
@@ -90,7 +81,7 @@ const BillingAddress = () => {
 
             {isSuccess && (
               <Form validateOnBlur id={formId} initialValues={initialValues} onSubmit={onSubmit}>
-                {({ isSubmitting, values, initialValues, handleReset, resetForm }: any) => {
+                {({ values, initialValues, handleReset, resetForm }: any) => {
                   const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
 
                   // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -111,7 +102,7 @@ const BillingAddress = () => {
                         <div className="flex py-4 px-8">
                           <FormActions
                             form={formId}
-                            isSubmitting={isSubmitting}
+                            isSubmitting={isUpdating}
                             hasChanges={hasChanges}
                             handleReset={handleReset}
                             helper={

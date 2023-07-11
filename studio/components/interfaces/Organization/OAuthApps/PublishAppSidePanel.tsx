@@ -30,8 +30,9 @@ const PublishAppModal = ({
   const { ui } = useStore()
   const { slug } = useParams()
   const uploadButtonRef = useRef<any>()
-  const { mutateAsync: createOAuthApp } = useOAuthAppCreateMutation()
-  const { mutateAsync: updateOAuthApp } = useOAuthAppUpdateMutation()
+  const { mutateAsync: createOAuthApp, isLoading: isCreating } = useOAuthAppCreateMutation()
+  const { mutateAsync: updateOAuthApp, isLoading: isUpdating } = useOAuthAppUpdateMutation()
+  const isSubmitting = isCreating || isUpdating
 
   const [showPreview, setShowPreview] = useState(false)
   const [iconFile, setIconFile] = useState<File>()
@@ -88,12 +89,11 @@ const PublishAppModal = ({
     return errors
   }
 
-  const onSubmit = async (values: any, { setSubmitting }: any) => {
+  const onSubmit = async (values: any) => {
     if (!slug) return console.error('Slug is required')
 
     const redirect_uris = urls.filter((url) => url.value.length > 0).map((url) => url.value)
     if (redirect_uris.length === 0) {
-      setSubmitting(false)
       setErrors({ urls: 'Please provide at least one URL' })
       return
     } else {
@@ -108,50 +108,34 @@ const PublishAppModal = ({
 
     if (selectedApp === undefined) {
       // Create application
-      try {
-        const res = await createOAuthApp({
-          slug,
-          name,
-          website,
-          redirect_uris,
-          icon: uploadedIconUrl,
-        })
-        ui.setNotification({
-          category: 'success',
-          message: `Successfully created OAuth app "${name}"!`,
-        })
-        onClose()
-        onCreateSuccess(res)
-      } catch (error: any) {
-        setSubmitting(false)
-        ui.setNotification({
-          category: 'error',
-          message: `Failed to create OAuth app: ${error.message}`,
-        })
-      }
+      const res = await createOAuthApp({
+        slug,
+        name,
+        website,
+        redirect_uris,
+        icon: uploadedIconUrl,
+      })
+      ui.setNotification({
+        category: 'success',
+        message: `Successfully created OAuth app "${name}"!`,
+      })
+      onClose()
+      onCreateSuccess(res)
     } else {
       // Update application
-      try {
-        await updateOAuthApp({
-          id: selectedApp.id,
-          slug,
-          name,
-          website,
-          redirect_uris,
-          icon: uploadedIconUrl === undefined ? null : uploadedIconUrl,
-        })
-        ui.setNotification({
-          category: 'success',
-          message: `Successfully updated OAuth app "${name}"!`,
-        })
-        onClose()
-      } catch (error: any) {
-        setSubmitting(false)
-        ui.setNotification({
-          category: 'error',
-          message: `Failed to update OAuth app: ${error.message}`,
-        })
-      }
+      await updateOAuthApp({
+        id: selectedApp.id,
+        slug,
+        name,
+        website,
+        redirect_uris,
+        icon: uploadedIconUrl === undefined ? null : uploadedIconUrl,
+      })
+      ui.setNotification({
+        category: 'success',
+        message: `Successfully updated OAuth app "${name}"!`,
+      })
+      onClose()
     }
   }
 
@@ -173,15 +157,7 @@ const PublishAppModal = ({
           validate={validate}
           onSubmit={onSubmit}
         >
-          {({
-            isSubmitting,
-            resetForm,
-            values,
-          }: {
-            isSubmitting: boolean
-            resetForm: any
-            values: any
-          }) => {
+          {({ resetForm, values }: { resetForm: any; values: any }) => {
             // [Joshen] although this "technically" is breaking the rules of React hooks
             // it won't error because the hooks are always rendered in the same order
             // eslint-disable-next-line react-hooks/rules-of-hooks

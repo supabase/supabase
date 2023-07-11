@@ -1,4 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { isEqual } from 'lodash'
 import { useEffect, useState } from 'react'
 
 import { useParams } from 'common'
@@ -18,7 +19,6 @@ import {
 } from 'data/organizations/organization-tax-ids-update-mutation'
 import { useCheckPermissions, useStore } from 'hooks'
 import { uuidv4 } from 'lib/helpers'
-import { isEqual } from 'lodash'
 import { Button, Form, IconPlus, IconX, Input, Listbox } from 'ui'
 import { TAX_IDS } from './TaxID.constants'
 import { sanitizeTaxID } from './TaxID.utilts'
@@ -33,7 +33,7 @@ const TaxID = () => {
     isSuccess,
     isError,
   } = useOrganizationTaxIDsQuery({ slug })
-  const { mutateAsync: updateTaxIDs } = useOrganizationTaxIDsUpdateMutation()
+  const { mutateAsync: updateTaxIDs, isLoading: isUpdating } = useOrganizationTaxIDsUpdateMutation()
 
   const [errors, setErrors] = useState<string[]>([])
   const [taxIdValues, setTaxIdValues] = useState<TaxIdValue[]>([])
@@ -98,27 +98,20 @@ const TaxID = () => {
     setTaxIdValues(formattedTaxIds)
   }
 
-  const onSaveTaxIds = async (values: any, { setSubmitting }: any) => {
+  const onSaveTaxIds = async (values: any) => {
     if (!slug) return console.error('Slug is required')
     if (taxIds === undefined) return console.error('Tax IDs are required')
 
-    try {
-      setSubmitting(true)
-      const newIds = taxIdValues.map((x) => sanitizeTaxID(x))
-      const { errors } = await updateTaxIDs({ slug, existingIds: taxIds, newIds })
-      setErrors(errors?.map((taxId) => taxId.id) ?? [])
+    const newIds = taxIdValues.map((x) => sanitizeTaxID(x))
+    const { errors } = await updateTaxIDs({ slug, existingIds: taxIds, newIds })
+    setErrors(errors?.map((taxId) => taxId.id) ?? [])
 
-      if (errors !== undefined && errors.length > 0) {
-        errors.forEach((taxId: any) => {
-          ui.setNotification({ category: 'error', message: taxId.result.error.message })
-        })
-      } else {
-        ui.setNotification({ category: 'success', message: 'Successfully updated tax IDs' })
-      }
-    } catch (error: any) {
-      ui.setNotification({ category: 'error', message: `Failed to save tax IDs: ${error.message}` })
-    } finally {
-      setSubmitting(false)
+    if (errors !== undefined && errors.length > 0) {
+      errors.forEach((taxId: any) => {
+        ui.setNotification({ category: 'error', message: taxId.result.error.message })
+      })
+    } else {
+      ui.setNotification({ category: 'success', message: 'Successfully updated tax IDs' })
     }
   }
 
@@ -156,13 +149,13 @@ const TaxID = () => {
 
             {isSuccess && (
               <Form validateOnBlur id={formId} initialValues={{}} onSubmit={onSaveTaxIds}>
-                {({ isSubmitting }: { isSubmitting: boolean }) => (
+                {() => (
                   <FormPanel
                     footer={
                       <div className="flex py-4 px-8">
                         <FormActions
                           form={formId}
-                          isSubmitting={isSubmitting}
+                          isSubmitting={isUpdating}
                           hasChanges={hasChanges}
                           handleReset={() => onResetTaxIds()}
                           helper={
