@@ -34,24 +34,16 @@ const WrapperRow: FC<Props> = ({ wrappers = [], wrapperMeta, isOpen, onOpen }) =
       title: `Confirm to disable ${wrapper.name}`,
       message: `Are you sure you want to disable the ${wrapper.name} wrapper? This will also remove all tables created with this wrapper.`,
       onAsyncConfirm: async () => {
-        try {
-          await deleteFDW({
-            projectRef: project?.ref,
-            connectionString: project?.connectionString,
-            wrapper,
-            wrapperMeta,
-          })
-          ui.setNotification({
-            category: 'success',
-            message: `Successfully disabled ${wrapper.name} foreign data wrapper`,
-          })
-        } catch (error: any) {
-          ui.setNotification({
-            error,
-            category: 'error',
-            message: `Failed to disable ${wrapper.name}: ${error.message}`,
-          })
-        }
+        await deleteFDW({
+          projectRef: project?.ref,
+          connectionString: project?.connectionString,
+          wrapper,
+          wrapperMeta,
+        })
+        ui.setNotification({
+          category: 'success',
+          message: `Successfully disabled ${wrapper.name} foreign data wrapper`,
+        })
       },
     })
   }
