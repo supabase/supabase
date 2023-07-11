@@ -1,6 +1,5 @@
 import { get as _get, find } from 'lodash'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
 
 import { useParams } from 'common'
 import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
@@ -20,55 +19,38 @@ const DeleteBucketModal = ({ visible = false, bucket, onClose }: DeleteBucketMod
   const { ui, meta } = useStore()
   const { ref: projectRef } = useParams()
 
-  const [deleting, setDeleting] = useState(false)
   const { data } = useBucketsQuery({ projectRef })
-  const { mutateAsync: deleteBucket } = useBucketDeleteMutation()
+  const { mutateAsync: deleteBucket, isLoading: isDeleting } = useBucketDeleteMutation()
 
   const buckets = data ?? []
-
-  useEffect(() => {
-    setDeleting(false)
-  }, [visible])
 
   const onDeleteBucket = async () => {
     if (!projectRef) return console.error('Project ref is required')
 
-    setDeleting(true)
-    try {
-      await deleteBucket({ projectRef, id: bucket.id })
+    await deleteBucket({ projectRef, id: bucket.id })
 
-      // Clean up policies from the corresponding bucket that was deleted
-      await meta.policies.loadBySchema('storage')
-      const policies = meta.policies.list()
-      const storageObjectsPolicies = policies.filter((policy) => policy.table === 'objects')
-      const formattedStorageObjectPolicies = formatPoliciesForStorage(
-        buckets,
-        storageObjectsPolicies
-      )
-      const bucketPolicies = _get(
-        find(formattedStorageObjectPolicies, { name: bucket.name }),
-        ['policies'],
-        []
-      )
-      await Promise.all(
-        bucketPolicies.map((policy: any) => {
-          meta.policies.del(policy.id)
-        })
-      )
+    // Clean up policies from the corresponding bucket that was deleted
+    await meta.policies.loadBySchema('storage')
+    const policies = meta.policies.list()
+    const storageObjectsPolicies = policies.filter((policy) => policy.table === 'objects')
+    const formattedStorageObjectPolicies = formatPoliciesForStorage(buckets, storageObjectsPolicies)
+    const bucketPolicies = _get(
+      find(formattedStorageObjectPolicies, { name: bucket.name }),
+      ['policies'],
+      []
+    )
+    await Promise.all(
+      bucketPolicies.map((policy: any) => {
+        meta.policies.del(policy.id)
+      })
+    )
 
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully deleted bucket ${bucket.name}`,
-      })
-      router.push(`/project/${projectRef}/storage/buckets`)
-      onClose()
-    } catch (error: any) {
-      setDeleting(false)
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to delete bucket: ${error.message}`,
-      })
-    }
+    ui.setNotification({
+      category: 'success',
+      message: `Successfully deleted bucket ${bucket.name}`,
+    })
+    router.push(`/project/${projectRef}/storage/buckets`)
+    onClose()
   }
 
   return (
@@ -79,7 +61,7 @@ const DeleteBucketModal = ({ visible = false, bucket, onClose }: DeleteBucketMod
       onConfirm={onDeleteBucket}
       onCancel={onClose}
       confirmString={bucket.name}
-      loading={deleting}
+      loading={isDeleting}
       text={
         <>
           Your bucket <span className="font-bold">{bucket.name}</span> and all its contents will be
