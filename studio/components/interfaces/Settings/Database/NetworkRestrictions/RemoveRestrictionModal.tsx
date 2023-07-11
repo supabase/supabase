@@ -20,8 +20,15 @@ const RemoveRestrictionModal: FC<Props> = ({
 }) => {
   const { ui } = useStore()
   const { ref } = useParams()
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const { mutateAsync: applyNetworkRestrictions } = useNetworkRestrictionsApplyMutation()
+  const { mutateAsync: applyNetworkRestrictions, isLoading: isApplying } =
+    useNetworkRestrictionsApplyMutation({
+      onError: (error) => {
+        ui.setNotification({
+          category: 'error',
+          message: `Failed to remove restriction: ${error.message}`,
+        })
+      },
+    })
 
   const isRemovingOnlyRestriction =
     restrictedIps.length === 1 && restrictedIps[0] === selectedRestriction
@@ -29,24 +36,14 @@ const RemoveRestrictionModal: FC<Props> = ({
   const onSubmit = async () => {
     if (!ref) return console.error('Project ref is required')
 
-    setIsSubmitting(true)
     const dbAllowedCidrs = restrictedIps.filter((ip) => ip !== selectedRestriction)
 
-    try {
-      if (dbAllowedCidrs.length === 0) {
-        await applyNetworkRestrictions({ projectRef: ref, dbAllowedCidrs: ['0.0.0.0/0'] })
-      } else {
-        await applyNetworkRestrictions({ projectRef: ref, dbAllowedCidrs })
-      }
-      onClose()
-    } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to remove restriction: ${error.message}`,
-      })
-    } finally {
-      setIsSubmitting(false)
+    if (dbAllowedCidrs.length === 0) {
+      await applyNetworkRestrictions({ projectRef: ref, dbAllowedCidrs: ['0.0.0.0/0'] })
+    } else {
+      await applyNetworkRestrictions({ projectRef: ref, dbAllowedCidrs })
     }
+    onClose()
   }
 
   return (
@@ -76,10 +73,10 @@ const RemoveRestrictionModal: FC<Props> = ({
         </div>
       </Modal.Content>
       <div className="flex items-center justify-end px-6 py-4 border-t space-x-2">
-        <Button type="default" disabled={isSubmitting} onClick={() => onClose()}>
+        <Button type="default" disabled={isApplying} onClick={() => onClose()}>
           Cancel
         </Button>
-        <Button loading={isSubmitting} disabled={isSubmitting} onClick={() => onSubmit()}>
+        <Button loading={isApplying} disabled={isApplying} onClick={() => onSubmit()}>
           Remove restriction
         </Button>
       </div>
