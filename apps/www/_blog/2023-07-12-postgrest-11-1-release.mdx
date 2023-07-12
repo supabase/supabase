@@ -14,7 +14,7 @@ PostgREST 11.1 is now available on the Supabase platform. Besides the [pre-relea
 
 ## Impersonated Role Settings
 
-Every role that passes [PostgREST JWT Authentication](https://postgrest.org/en/stable/references/auth.html#jwt-based-user-impersonation) is an *impersonated role*. On the Supabase platform, these are the ``anon``, ``authenticated`` and ``service_role`` roles.
+Every role that passes [PostgREST JWT Authentication](https://postgrest.org/en/stable/references/auth.html#jwt-based-user-impersonation) is an _impersonated role_. On the Supabase platform, these are the `anon`, `authenticated` and `service_role` roles.
 
 These roles can now have settings applied with a regular `ALTER ROLE <role> SET <setting>`. This is useful, for example, to prevent web users from running expensive queries.
 
@@ -26,28 +26,35 @@ Let’s try it by setting a statement timeout and cost limit.
 
 ```sql
 -- anonymous users can run queries that take 100 milliseconds max
-alter role anon set statement_timeout = '100ms';
+alter
+  role anon
+set
+  statement_timeout = '100ms';
 
 -- authenticated users can run queries that take 5 seconds max
-alter role authenticated set statement_timeout = '5s';
+alter
+  role authenticated
+set
+  statement_timeout = '5s';
 
 -- backend-only users can run queries that take 15 seconds max
-alter role service_role set statement_timeout = '15s';
+alter
+  role service_role
+set
+  statement_timeout = '15s';
 ```
 
 You need to reload PostgREST config cache to apply these changes.
 
 ```sql
-NOTIFY pgrst, 'reload config';
+NOTIFY pgrst,
+'reload config';
 ```
 
 Now, suppose you do an expensive query with the `anon` role. Like filtering on a big table's unindexed column (this will cause a full table scan):
 
 ```jsx
-const { data, error } = await supabase
-  .from('big_table')
-  .select()
-  .eq('unindexed_column', 'value')
+const { data, error } = await supabase.from('big_table').select().eq('unindexed_column', 'value')
 ```
 
 Then, after 5 seconds, the request will be aborted with the response:
@@ -61,7 +68,7 @@ Then, after 5 seconds, the request will be aborted with the response:
 }
 ```
 
-Which is what we wanted. Note that there's already a global ``statement_timeout`` set but you can be more fine-grained with this feature. See https://supabase.com/docs/guides/database/timeouts for more details.
+Which is what we wanted. Note that there's already a global `statement_timeout` set but you can be more fine-grained with this feature. See https://supabase.com/docs/guides/database/timeouts for more details.
 
 ### Statement Cost Limit
 
@@ -73,24 +80,33 @@ You can use it like:
 
 ```sql
 -- anonymous users can only run cheap queries
-ALTER USER anon SET plan_filter.statement_cost_limit = 10000;
+ALTER
+  USER anon
+SET
+  plan_filter.statement_cost_limit = 10000;
 
 -- authenticated users can run more expensive queries
-ALTER USER authenticated SET plan_filter.statement_cost_limit = 1e6;
+ALTER
+  USER authenticated
+SET
+  plan_filter.statement_cost_limit = 1e6;
 
 -- backend-only users can run any query
-ALTER USER service_role SET plan_filter.statement_cost_limit = 0;
+ALTER
+  USER service_role
+SET
+  plan_filter.statement_cost_limit = 0;
 
-NOTIFY pgrst, 'reload config'; -- reload postgREST config cache to apply changes
+NOTIFY pgrst,
+'reload config';
+
+-- reload postgREST config cache to apply changes
 ```
 
 Let’s repeat the previous expensive query with the `anon` role.
 
 ```jsx
-const { data, error } = await supabase
-  .from('big_table')
-  .select()
-  .eq('unindexed_column', 'value')
+const { data, error } = await supabase.from('big_table').select().eq('unindexed_column', 'value')
 ```
 
 Then, immediately, the request will be aborted and the response will be:
@@ -108,11 +124,11 @@ Note that tuning is required to get the cost limit right. You should use the `pl
 
 ## Configurable Transaction Isolation Level
 
-By default, all queries run in a transaction with the default *read committed* isolation level.
+By default, all queries run in a transaction with the default _read committed_ isolation level.
 
 You can now modify this with the `default_transaction_isolation` setting.
 
-If you want a function to run with *repeatable read* isolation level:
+If you want a function to run with _repeatable read_ isolation level:
 
 ```sql
 create function hello()
@@ -122,15 +138,21 @@ $$ language sql
 set default_transaction_isolation = 'repeatable read';
 ```
 
-Or if you want an impersonated role to run its queries with a *serializable* isolation level:
+Or if you want an impersonated role to run its queries with a _serializable_ isolation level:
 
 ```sql
-alter role service_role set default_transaction_isolation = 'serializable';
+alter
+  role service_role
+set
+  default_transaction_isolation = 'serializable';
 
-NOTIFY pgrst, 'reload config'; -- reload postgREST config cache
+NOTIFY pgrst,
+'reload config';
+
+-- reload postgREST config cache
 ```
 
-Note that the default *read committed* is good enough for almost all use cases. Higher isolation levels incur in overhead as they use more sophisticated locking. They're only needed in special cases.
+Note that the default _read committed_ is good enough for almost all use cases. Higher isolation levels incur in overhead as they use more sophisticated locking. They're only needed in special cases.
 
 ## Bulk insert JSON with default values
 
@@ -139,11 +161,12 @@ A long wanted feature was bulk inserting JSON while considering columns' default
 Having the following sample table.
 
 ```sql
-create table foo (
-  id bigint generated by default as identity primary key,
-  bar text,
-  baz int default 100
-);
+create table
+  foo (
+    id bigint generated by default as identity primary key,
+    bar text,
+    baz int default 100
+  );
 ```
 
 You can now do it like this:
@@ -165,14 +188,8 @@ And the response will be:
 
 ```json
 [
-  { "id":  1
-  , "bar": "val1"
-  , "baz": 100
-  }
-, { "id":  2
-  , "bar": "val2"
-  , "baz": 15
-  }
+  { "id": 1, "bar": "val1", "baz": 100 },
+  { "id": 2, "bar": "val2", "baz": 15 }
 ]
 ```
 
@@ -183,16 +200,18 @@ As you can see, `id` and `baz` took their default values.
 As a shortcut to `OR` filters, you can now use `any` modifiers on various filters. Take the `like` filter as an example:
 
 ```jsx
-const res = await postgrest
-    .from('users')
-    .select()
-    .likeAnyOf('username', ['%supa%', '%kiwi%'])
+const res = await postgrest.from('users').select().likeAnyOf('username', ['%supa%', '%kiwi%'])
 ```
 
 This is equivalent to the following in SQL.
 
 ```sql
-SELECT * FROM users WHERE username LIKE ANY('{%supa%,%kiwi%}');
+SELECT
+  *
+FROM
+  users
+WHERE
+  username LIKE ANY ('{%supa%,%kiwi%}');
 ```
 
 `any` modifiers are available for the `eq,like,ilike,gt,gte,lt,lte,match,imatch` filters.
