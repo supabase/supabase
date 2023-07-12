@@ -1,15 +1,15 @@
+import { useRouter } from 'next/router'
+import { useState } from 'react'
+
 import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
 import GitHubIntegrationWindowLayout from 'components/layouts/IntegrationsLayout/GitHubIntegrationWindowLayout'
-import IntegrationWindowLayout from 'components/layouts/IntegrationsLayout/IntegrationWindowLayout'
 import { ScaffoldContainer, ScaffoldDivider } from 'components/layouts/Scaffold'
 import { useGitHubIntegrationCreateMutation } from 'data/integrations/github-integration-create-mutation'
 import { useIntegrationsQuery } from 'data/integrations/integrations-query'
 import { IntegrationName } from 'data/integrations/integrations.types'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useStore } from 'hooks'
-import { useRouter } from 'next/router'
-import { useState } from 'react'
 import { useGitHubIntegrationInstallationState } from 'state/github-integration-installation'
 import { NextPageWithLayout, Organization } from 'types'
 import { Alert, Badge, Button, IconBook, IconHexagon, IconLifeBuoy, Listbox, LoadingLine } from 'ui'
@@ -21,20 +21,10 @@ interface OrganizationsResponseWithInstalledData extends Organization {
   installationInstalled?: boolean
 }
 
-/**
- * Variations of the GitHub integration flow.
- * They require different UI and logic.
- *
- * Deploy Button - the flow that starts from the Deploy Button - https://github.com/docs/integrations#deploy-button
- * Marketplace - the flow that starts from the Marketplace - https://github.com/integrations
- *
- */
-export type GitHubIntegrationFlow = 'deploy-button' | 'marketing'
-
 const GitHubIntegration: NextPageWithLayout = () => {
   const router = useRouter()
   const { ui } = useStore()
-  const { code, installation_id: installationId } = useParams()
+  const { installation_id: installationId } = useParams()
   const [selectedOrg, setSelectedOrg] = useState<Organization | null>(null)
   const [organizationIntegrationId, setOrganizationIntegrationId] = useState<string | null>(null)
 
@@ -45,7 +35,7 @@ const GitHubIntegration: NextPageWithLayout = () => {
    *
    * Array of integrations installed on all
    */
-  const { data: integrationData, isLoading: integrationDataLoading } = useIntegrationsQuery()
+  const { data: integrationData } = useIntegrationsQuery()
 
   const { data: organizationsData, isLoading: isLoadingOrganizationsQuery } = useOrganizationsQuery(
     {
@@ -66,7 +56,9 @@ const GitHubIntegration: NextPageWithLayout = () => {
    */
   const flatInstalledConnectionsIds: string[] | [] =
     integrationData && integrationData.length > 0
-      ? integrationData?.map((x) => x.organization.slug)
+      ? integrationData
+          .filter((x) => x.integration.name === 'Vercel')
+          .map((x) => x.organization.slug)
       : []
 
   /**
@@ -84,28 +76,15 @@ const GitHubIntegration: NextPageWithLayout = () => {
       })
     : []
 
-  /**
-   * Handle the correct route change based on wether the github integration
-   * is following the 'marketplace' flow or 'deploy button' flow.
-   *
-   */
-  function handleRouteChange() {
-    const orgSlug = selectedOrg?.slug
-
-    router.push({
-      pathname: `/integrations/github/${orgSlug}/choose-project`,
-      query: router.query,
-    })
-  }
-
   const { mutate, isLoading: isLoadingGitHubIntegrationCreateMutation } =
     useGitHubIntegrationCreateMutation({
       onSuccess({ id }) {
-        const orgSlug = selectedOrg?.slug
-
         setOrganizationIntegrationId(id)
 
-        handleRouteChange()
+        router.push({
+          pathname: `/integrations/github/${id}/choose-project`,
+          query: router.query,
+        })
       },
       onError(error: any) {
         ui.setNotification({
@@ -118,16 +97,11 @@ const GitHubIntegration: NextPageWithLayout = () => {
   function onInstall() {
     const orgSlug = selectedOrg?.slug
 
-    const isIntegrationInstalled = organizationsWithInstalledData.some(
-      (x) => x.slug === orgSlug && x.installationInstalled
-    )
+    const installedIntegration = integrationData?.find((x) => x.organization.slug === orgSlug)
+    const isIntegrationInstalled = Boolean(installedIntegration)
 
     if (!orgSlug) {
       return ui.setNotification({ category: 'error', message: 'Please select an organization' })
-    }
-
-    if (!code) {
-      return ui.setNotification({ category: 'error', message: 'GitHub code missing' })
     }
 
     if (!installationId) {
@@ -139,13 +113,15 @@ const GitHubIntegration: NextPageWithLayout = () => {
      */
     if (!isIntegrationInstalled) {
       mutate({
-        code,
         installationId,
         orgSlug,
         metadata: {},
       })
     } else {
-      handleRouteChange()
+      router.push({
+        pathname: `/integrations/github/${installedIntegration?.id}/choose-project`,
+        query: router.query,
+      })
     }
   }
 
@@ -226,11 +202,9 @@ export interface OrganizationPickerProps {
 const OrganizationPicker = ({
   label = 'Choose an organization',
   onSelectedOrgChange,
-  integrationName,
   dataLoading,
   organizationsWithInstalledData,
 }: OrganizationPickerProps) => {
-  const { ui } = useStore()
   const [selectedOrg, setSelectedOrg] = useState<Organization | null>(null)
 
   const { data, isLoading } = useOrganizationsQuery({

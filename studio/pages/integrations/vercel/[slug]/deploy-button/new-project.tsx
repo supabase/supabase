@@ -8,7 +8,7 @@ import { VercelIntegrationLayout } from 'components/layouts'
 import { ScaffoldContainer, ScaffoldDivider } from 'components/layouts/Scaffold'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
 import { useProjectApiQuery } from 'data/config/project-api-query'
-import { useIntegrationConnectionsCreateMutation } from 'data/integrations/integration-connections-create-mutation'
+import { useIntegrationVercelConnectionsCreateMutation } from 'data/integrations/integrations-vercel-connections-create-mutation'
 import { useIntegrationsQuery } from 'data/integrations/integrations-query'
 import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
 import { Integration } from 'data/integrations/integrations.types'
@@ -93,7 +93,7 @@ const CreateProject = ({
   } = useParams()
 
   const { mutateAsync: createConnections, isLoading: isLoadingCreateConnections } =
-    useIntegrationConnectionsCreateMutation({})
+    useIntegrationVercelConnectionsCreateMutation()
 
   const { data: organizationData, isLoading: isLoadingOrganizationsQuery } = useOrganizationsQuery()
 

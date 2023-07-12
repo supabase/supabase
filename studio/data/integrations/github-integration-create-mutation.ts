@@ -4,20 +4,17 @@ import { API_URL } from 'lib/constants'
 import { integrationKeys } from './keys'
 
 export type GitHubIntegrationCreateVariables = {
-  code: string
   installationId: string
   orgSlug: string
   metadata: { [key: string]: string }
 }
 
 export async function createGitHubIntegration({
-  code,
   installationId,
   orgSlug,
   metadata,
 }: GitHubIntegrationCreateVariables) {
   const response = await post(`${API_URL}/integrations/github`, {
-    code,
     installation_id: installationId,
     organization_slug: orgSlug,
     metadata,

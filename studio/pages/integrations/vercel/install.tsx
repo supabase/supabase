@@ -46,7 +46,7 @@ const VercelIntegration: NextPageWithLayout = () => {
    *
    * Array of integrations installed on all
    */
-  const { data: integrationData, isLoading: integrationDataLoading } = useIntegrationsQuery()
+  const { data: integrationData } = useIntegrationsQuery()
 
   const { data: organizationsData, isLoading: isLoadingOrganizationsQuery } = useOrganizationsQuery(
     {
@@ -63,11 +63,12 @@ const VercelIntegration: NextPageWithLayout = () => {
 
   /**
    * Flat array of org slugs that have integration installed
-   *
    */
   const flatInstalledConnectionsIds: string[] | [] =
     integrationData && integrationData.length > 0
-      ? integrationData?.map((x) => x.organization.slug)
+      ? integrationData
+          .filter((x) => x.integration.name === 'Vercel')
+          .map((x) => x.organization.slug)
       : []
 
   /**
