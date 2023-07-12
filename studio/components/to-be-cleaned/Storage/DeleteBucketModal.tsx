@@ -11,7 +11,7 @@ import { formatPoliciesForStorage } from './Storage.utils'
 
 export interface DeleteBucketModalProps {
   visible: boolean
-  bucket: Bucket
+  bucket?: Bucket
   onClose: () => void
 }
 
@@ -32,6 +32,7 @@ const DeleteBucketModal = ({ visible = false, bucket, onClose }: DeleteBucketMod
 
   const onDeleteBucket = async () => {
     if (!projectRef) return console.error('Project ref is required')
+    if (!bucket) return console.error('No bucket is selected')
 
     setDeleting(true)
     try {
@@ -74,20 +75,20 @@ const DeleteBucketModal = ({ visible = false, bucket, onClose }: DeleteBucketMod
   return (
     <TextConfirmModal
       visible={visible}
-      title={`Confirm deletion of ${bucket.name}`}
+      title={`Confirm deletion of ${bucket?.name}`}
       confirmPlaceholder="Type in name of bucket"
       onConfirm={onDeleteBucket}
       onCancel={onClose}
-      confirmString={bucket.name}
+      confirmString={bucket?.name ?? ''}
       loading={deleting}
       text={
         <>
-          Your bucket <span className="font-bold">{bucket.name}</span> and all its contents will be
+          Your bucket <span className="font-bold">{bucket?.name}</span> and all its contents will be
           permanently deleted.
         </>
       }
       alert="You cannot recover this bucket once it is deleted."
-      confirmLabel={`Delete bucket ${bucket.name}`}
+      confirmLabel={`Delete bucket ${bucket?.name}`}
     />
   )
 }
