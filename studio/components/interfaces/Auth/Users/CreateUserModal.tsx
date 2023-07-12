@@ -26,7 +26,7 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
   const validate = (values: any) => {
     const errors: any = {}
     const emailValidateRegex =
-      /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
+      /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
 
     if (values.email.length === 0) {
       errors.email = 'Please enter a valid email'
@@ -117,7 +117,7 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
                     placeholder="user@example.com"
                     disabled={isSubmitting || isLoading}
                   />
-
+                  
                   <Input
                     id="password"
                     name="password"
