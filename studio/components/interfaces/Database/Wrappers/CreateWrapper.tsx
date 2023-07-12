@@ -27,7 +27,7 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 const CreateWrapper = () => {
   const formId = 'create-wrapper-form'
   const router = useRouter()
-  const { ui } = useStore()
+  const { ui, meta } = useStore()
   const { ref, type } = useParams()
   const { project } = useProjectContext()
   const { mutateAsync: createFDW, isLoading: isCreating } = useFDWCreateMutation()
@@ -107,6 +107,10 @@ const CreateWrapper = () => {
       message: `Successfully created ${wrapperMeta.label} foreign data wrapper`,
     })
     setNewTables([])
+
+    const hasNewSchema = newTables.some((table) => table.is_new_schema)
+    if (hasNewSchema) meta.schemas.load()
+
     router.push(`/project/${ref}/database/wrappers`)
   }
 

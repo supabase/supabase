@@ -43,7 +43,7 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 const EditWrapper = () => {
   const formId = 'edit-wrapper-form'
   const router = useRouter()
-  const { ui, vault } = useStore()
+  const { ui, meta, vault } = useStore()
   const { ref, id } = useParams()
   const { project } = useProjectContext()
 
@@ -159,6 +159,10 @@ const EditWrapper = () => {
       message: `Successfully updated ${wrapperMeta.label} foreign data wrapper`,
     })
     setWrapperTables([])
+
+    const hasNewSchema = wrapperTables.some((table) => table.is_new_schema)
+    if (hasNewSchema) meta.schemas.load()
+
     router.push(`/project/${ref}/database/wrappers`)
   }
 

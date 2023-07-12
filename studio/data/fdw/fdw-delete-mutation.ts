@@ -10,7 +10,7 @@ import { ResponseError } from 'types'
 import { FDW } from './fdws-query'
 
 export type FDWDeleteVariables = {
-  projectRef?: string
+  projectRef: string
   connectionString?: string
   wrapper: FDW
   wrapperMeta: WrapperMeta
@@ -49,14 +49,8 @@ export async function deleteFDW({
   wrapper,
   wrapperMeta,
 }: FDWDeleteVariables) {
-  if (!projectRef) {
-    throw new Error('projectRef is required')
-  }
-
   const sql = wrapWithTransaction(getDeleteFDWSql({ wrapper, wrapperMeta }))
-
   const { result } = await executeSql({ projectRef, connectionString, sql })
-
   return result
 }
 
