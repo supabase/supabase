@@ -80,6 +80,7 @@ const SpendCapSidePanel = () => {
             title: 'Spend cap',
             section: 'Cost Control',
           },
+          projectRef,
         },
         router
       )
@@ -231,6 +232,7 @@ const SpendCapSidePanel = () => {
                             section: 'Cost Control',
                             option: option.name,
                           },
+                          projectRef,
                         },
                         router
                       )

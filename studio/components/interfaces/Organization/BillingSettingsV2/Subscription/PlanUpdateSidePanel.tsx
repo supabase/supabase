@@ -76,6 +76,7 @@ const PlanUpdateSidePanel = () => {
             title: 'Change Subscription Plan',
             section: 'Subscription plan',
           },
+          ...(slug && { orgSlug: slug }),
         },
         router
       )
@@ -179,7 +180,7 @@ const PlanUpdateSidePanel = () => {
                       ) : (
                         <p className="text-scale-1200 text-lg">${price}</p>
                       )}
-                      <p className="text-scale-1000 text-sm">{tierMeta?.costUnit}</p>
+                      <p className="text-scale-1000 text-sm">{tierMeta?.costUnitOrg}</p>
                     </div>
                     <div className={clsx('flex mt-1 mb-4', !tierMeta?.warning && 'opacity-0')}>
                       <div className="bg-scale-200 text-brand-1100 border shadow-sm rounded-md bg-opacity-30 py-0.5 px-2 text-xs">
@@ -215,6 +216,7 @@ const PlanUpdateSidePanel = () => {
                                         : 'Upgrade' + ' to ' + plan.name,
                                       section: 'Subscription plan',
                                     },
+                                    ...(slug && { orgSlug: slug }),
                                   },
                                   router
                                 )
@@ -247,7 +249,7 @@ const PlanUpdateSidePanel = () => {
                     <div className="border-t my-6" />
 
                     <ul role="list">
-                      {plan.features.map((feature) => (
+                      {(plan.featuresOrg || plan.features).map((feature) => (
                         <li key={feature} className="flex py-2">
                           <div className="w-[12px]">
                             <IconCheck

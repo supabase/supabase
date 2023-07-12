@@ -45,7 +45,9 @@ export async function getInitialMigrationSQLFromGitHubRepo(
   const baseGitHubUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`
   const supabaseFolderUrl = `${baseGitHubUrl}/supabase?ref=${branch}`
   const supabaseMigrationsPath = `supabase/migrations` // TODO: read this from the `supabase/config.toml` file
-  const migrationsFolderUrl = `${baseGitHubUrl}/${supabaseMigrationsPath}?ref=${branch}`
+  const migrationsFolderUrl = `${baseGitHubUrl}/${supabaseMigrationsPath}${
+    branch ? `?ref=${branch}` : ``
+  }`
 
   const [supabaseFilesResponse, migrationFilesResponse] = await Promise.all([
     fetchGitHub<File[]>(supabaseFolderUrl),

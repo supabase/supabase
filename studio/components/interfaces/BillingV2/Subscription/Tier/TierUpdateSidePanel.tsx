@@ -71,6 +71,7 @@ const TierUpdateSidePanel = () => {
             title: 'Change Subscription Plan',
             section: 'Subscription plan',
           },
+          projectRef,
         },
         router
       )
@@ -209,6 +210,7 @@ const TierUpdateSidePanel = () => {
                                         : 'Upgrade' + ' to ' + plan.name,
                                       section: 'Subscription plan',
                                     },
+                                    projectRef,
                                   },
                                   router
                                 )

@@ -16,7 +16,9 @@ import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
 import { BASE_PATH, PROJECT_STATUS } from 'lib/constants'
 import Telemetry from 'lib/telemetry'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
-import { Alert, Button, IconExternalLink, Modal, Radio, SidePanel } from 'ui'
+import { Alert, Button, IconExternalLink, IconInfo, Modal, Radio, SidePanel } from 'ui'
+
+import * as Tooltip from '@radix-ui/react-tooltip'
 
 const COMPUTE_CATEGORY_OPTIONS: {
   id: 'micro' | 'optimized'
@@ -115,6 +117,7 @@ const ComputeInstanceSidePanel = () => {
             title: 'Change project compute size',
             section: 'Add ons',
           },
+          projectRef,
         },
         router
       )
@@ -205,6 +208,7 @@ const ComputeInstanceSidePanel = () => {
                               section: 'Add ons',
                               option: option.name,
                             },
+                            projectRef,
                           },
                           router
                         )
@@ -289,14 +293,47 @@ const ComputeInstanceSidePanel = () => {
                             {option.meta?.cpu_cores ?? 0}-core ARM CPU (
                             {option.meta?.cpu_dedicated ? 'Dedicated' : 'Shared'})
                           </p>
-                          <div className="flex items-center space-x-1 mt-2">
-                            <p className="text-scale-1200 text-sm">
-                              ${option.price.toLocaleString()}
-                            </p>
-                            <p className="text-scale-1000 translate-y-[1px]">
-                              {' '}
-                              / {option.price_interval === 'monthly' ? 'month' : 'hour'}
-                            </p>
+                          <div className="flex justify-between items-center mt-2">
+                            <div className="flex items-center space-x-1">
+                              <span className="text-scale-1200 text-sm">
+                                ${option.price.toLocaleString()}
+                              </span>
+                              <span className="text-scale-1000 translate-y-[1px]">
+                                {' '}
+                                / {option.price_interval === 'monthly' ? 'month' : 'hour'}
+                              </span>
+                            </div>
+                            {option.price_interval === 'hourly' && (
+                              <Tooltip.Root delayDuration={0}>
+                                <Tooltip.Trigger>
+                                  <div className="flex items-center">
+                                    <IconInfo
+                                      size={14}
+                                      strokeWidth={2}
+                                      className="hover:text-scale-1000"
+                                    />
+                                  </div>
+                                </Tooltip.Trigger>
+                                <Tooltip.Portal>
+                                  <Tooltip.Content side="bottom">
+                                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                                    <div
+                                      className={[
+                                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                                        'border border-scale-200',
+                                      ].join(' ')}
+                                    >
+                                      <div className="flex items-center space-x-1">
+                                        <p className="text-scale-1200 text-sm">
+                                          ${Number(option.price * 672).toFixed(0)} - $
+                                          {Number(option.price * 744).toFixed(0)} per month
+                                        </p>
+                                      </div>
+                                    </div>
+                                  </Tooltip.Content>
+                                </Tooltip.Portal>
+                              </Tooltip.Root>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -314,12 +351,13 @@ const ComputeInstanceSidePanel = () => {
             )}
 
             {hasChanges &&
-              (selectedCategory === 'micro' ? (
+              (selectedCategory === 'micro' && !isOrgBilling ? (
                 <p className="text-sm text-scale-1100">
                   Upon clicking confirm, the amount of that's unused during the current billing
                   cycle will be returned as credits that can be used for subsequent billing cycles
                 </p>
-              ) : (
+              ) : selectedCategory !== 'micro' && selectedCompute?.price_interval === 'monthly' ? (
+                // Monthly payment with project-level subscription
                 <p className="text-sm text-scale-1100">
                   Upon clicking confirm, the amount of{' '}
                   <span className="text-scale-1200">
@@ -330,6 +368,21 @@ const ComputeInstanceSidePanel = () => {
                   is prepaid per month and in case of a downgrade, you get credits for the remaining
                   time.
                 </p>
+              ) : selectedCategory !== 'micro' ? (
+                // Hourly usage-billing with org-level subscription
+                <p className="text-sm text-scale-1100">
+                  There are no immediate charges when changing compute. Compute Hours are a
+                  usage-based item and you're billed at the end of your billing cycle based on your
+                  compute usage. Read more about{' '}
+                  <Link href="https://www.notion.so/supabase/Organization-Level-Billing-9c159d69375b4af095f0b67881276582?pvs=4">
+                    <a target="_blank" rel="noreferrer" className="underline">
+                      Compute Billing
+                    </a>
+                  </Link>
+                  .
+                </p>
+              ) : (
+                <></>
               ))}
 
             {hasChanges && !blockMicroDowngradeDueToPitr && (

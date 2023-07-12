@@ -6,7 +6,7 @@ import { Button, Badge, IconStar, IconChevronDown } from 'ui'
 import FlyOut from '~/components/UI/FlyOut'
 import Transition from 'lib/Transition'
 
-import SolutionsData from 'data/Solutions.json'
+import SolutionsData from 'data/Solutions'
 
 import Solutions from '~/components/Nav/Product'
 import Developers from '~/components/Nav/Developers'
