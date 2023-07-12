@@ -1,12 +1,14 @@
 {
-  "name": "supabase-test",
+  "name": "todo-list-plain-js",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "A simple Javascript todo list with supabase database implementation.",
+  "main": "index.mjs",
+
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node --experimental-modules index.mjs"
   },
-  "author": "",
+  "author": "PreetSuthar",
   "license": "ISC",
   "dependencies": {
     "@supabase/supabase-js": "^2.26.0",
