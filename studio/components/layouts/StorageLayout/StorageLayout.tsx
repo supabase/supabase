@@ -55,4 +55,4 @@ const StorageLayout = ({ title, children }: StorageLayoutProps) => {
   )
 }
 
-export default withAuth(observer(StorageLayout))
+export default withAuth(StorageLayout)
