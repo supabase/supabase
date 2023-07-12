@@ -1,28 +1,32 @@
-import { useState } from 'react'
+import { ReactNode, useState } from 'react'
 
-import { ENV_VAR_RAW_KEYS } from 'components/interfaces/Integrations/Integrations-Vercel.constants'
-import { Markdown } from 'components/interfaces/Markdown'
-import { vercelIcon } from 'components/to-be-cleaned/ListIcons'
-import { useIntegrationConnectionsCreateMutation } from 'data/integrations/integration-connections-create-mutation'
-import { VercelProjectsResponse } from 'data/integrations/integrations-vercel-projects-query'
 import { IntegrationProjectConnection } from 'data/integrations/integrations.types'
+import { IntegrationConnectionsCreateVariables } from 'data/integrations/types'
 import { useSelectedOrganization } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import { Button, Listbox, cn } from 'ui'
 
-interface Project {
+export interface Project {
   id: string
   name: string
   ref: string
 }
 
+export interface ForeignProject {
+  id: string
+  name: string
+}
+
 export interface ProjectLinkerProps {
   organizationIntegrationId: string | undefined
-  foreignProjects: VercelProjectsResponse[]
+  foreignProjects: ForeignProject[]
   supabaseProjects: Project[]
-  onCreateConnections?: () => void
+  onCreateConnections: (variables: IntegrationConnectionsCreateVariables) => void
   installedConnections: IntegrationProjectConnection[] | undefined
-  setLoading?: (x: boolean) => void
+  isLoading?: boolean
+  integrationIcon: ReactNode
+  getForeignProjectIcon?: (project: ForeignProject) => ReactNode
+  choosePrompt?: string
 }
 
 const UNDEFINED_SELECT_VALUE = 'undefined'
@@ -33,45 +37,31 @@ const ProjectLinker = ({
   supabaseProjects,
   onCreateConnections: _onCreateConnections,
   installedConnections = [],
-  setLoading,
+  isLoading,
+  integrationIcon,
+  getForeignProjectIcon,
+  choosePrompt = 'Choose a project',
 }: ProjectLinkerProps) => {
   const selectedOrganization = useSelectedOrganization()
 
   const [supabaseProjectRef, setSupabaseProjectRef] = useState(UNDEFINED_SELECT_VALUE)
-  const [vercelProjectId, setVercelProjectId] = useState(UNDEFINED_SELECT_VALUE)
-
-  const { mutate: createConnections, isLoading } = useIntegrationConnectionsCreateMutation({
-    onSuccess() {
-      _onCreateConnections?.()
-    },
-
-    onSettled() {
-      if (setLoading) setLoading(false)
-    },
-  })
+  const [foreignProjectId, setForeignProjectId] = useState(UNDEFINED_SELECT_VALUE)
 
   function onCreateConnections() {
-    const projectDetails = foreignProjects.filter((x) => x.id === vercelProjectId)[0]
+    const projectDetails = foreignProjects.filter((x) => x.id === foreignProjectId)[0]
 
     if (!organizationIntegrationId) {
       console.error('No integration ID set')
       return
     }
 
-    if (setLoading) setLoading(true)
-
-    createConnections({
+    _onCreateConnections({
       organizationIntegrationId,
       connection: {
-        foreign_project_id: vercelProjectId,
+        foreign_project_id: foreignProjectId,
         supabase_project_ref: supabaseProjectRef,
         metadata: {
           ...projectDetails,
-          supabaseConfig: {
-            projectEnvVars: {
-              write: true,
-            },
-          },
         },
       },
       orgSlug: selectedOrganization?.slug,
@@ -95,12 +85,10 @@ const ProjectLinker = ({
   // create a flat array of foreign project ids. ie, ["prj_MlkO6AiLG5ofS9ojKrkS3PhhlY3f", ..]
   const flatInstalledConnectionsIds = new Set(installedConnections.map((x) => x.foreign_project_id))
 
-  // check that vercel project is not already installed
-  const filteredForeignProjects: VercelProjectsResponse[] = foreignProjects.filter(
-    (foreignProject) => {
-      return !flatInstalledConnectionsIds.has(foreignProject.id)
-    }
-  )
+  // check that foreign project is not already installed
+  const filteredForeignProjects = foreignProjects.filter((foreignProject) => {
+    return !flatInstalledConnectionsIds.has(foreignProject.id)
+  })
 
   return (
     <div className="flex flex-col gap-4">
@@ -149,23 +137,15 @@ const ProjectLinker = ({
           <div className="border border-scale-1000 h-px w-16 border-dashed self-end mb-5"></div>
           <Panel>
             <div className="bg-black shadow rounded p-1 w-12 h-12 flex justify-center items-center">
-              {/* <img src="/img/icons/vercel.svg" style={{ height: 21 }} alt="integration icon" /> */}
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="white"
-                viewBox="0 0 512 512"
-                className="w-6"
-              >
-                <path fill-rule="evenodd" d="M256,48,496,464H16Z" />
-              </svg>
+              {integrationIcon}
             </div>
             <Listbox
               className="w-full"
-              value={vercelProjectId ?? UNDEFINED_SELECT_VALUE}
-              onChange={(e) => setVercelProjectId(e)}
+              value={foreignProjectId ?? UNDEFINED_SELECT_VALUE}
+              onChange={(e) => setForeignProjectId(e)}
             >
-              <Listbox.Option value={UNDEFINED_SELECT_VALUE} label="Choose a project" disabled>
-                Choose Vercel project
+              <Listbox.Option value={UNDEFINED_SELECT_VALUE} label={choosePrompt} disabled>
+                {choosePrompt}
               </Listbox.Option>
               {filteredForeignProjects.map((project) => {
                 return (
@@ -174,20 +154,7 @@ const ProjectLinker = ({
                     value={project.id}
                     label={project.name}
                     addOnBefore={() => {
-                      return (
-                        <>
-                          {!project?.framework ? (
-                            vercelIcon
-                          ) : (
-                            <img
-                              src={`${BASE_PATH}/img/icons/frameworks/${project.framework}.svg`}
-                              width={21}
-                              height={21}
-                              alt={`icon`}
-                            />
-                          )}
-                        </>
-                      )
+                      return getForeignProjectIcon?.(project) ?? null
                     }}
                   >
                     {project.name}
@@ -209,18 +176,6 @@ const ProjectLinker = ({
           Connect project
         </Button>
       </div>
-      <Markdown
-        content={`
-The following environment variables will be added:
-
-${ENV_VAR_RAW_KEYS.map((x, idx) => {
-  return `
-  \n
-  - \`${x}\`
-`
-})}
-`}
-      />
     </div>
   )
 }

@@ -77,8 +77,6 @@ You can change the scope of the access for Supabase by configuring [here](${getV
 Connect any of your GitHub repositories to a project.
 `}
         description={`
-GitHub connections are coming soon.
-
 ### How will GitHub connections work?
 
 You will be able to connect a GitHub repository to a Supabase project. 

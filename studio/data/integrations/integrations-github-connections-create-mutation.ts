@@ -2,22 +2,13 @@ import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { integrationKeys } from './keys'
+import { IntegrationConnectionsCreateVariables } from './types'
 
-export type IntegrationConnectionsCreateVariables = {
-  organizationIntegrationId: string
-  connection: {
-    foreign_project_id: string
-    supabase_project_ref: string
-    metadata: any
-  }
-  orgSlug: string | undefined
-}
-
-export async function createIntegrationConnections({
+export async function createIntegrationGitHubConnections({
   organizationIntegrationId,
   connection,
 }: IntegrationConnectionsCreateVariables) {
-  const response = await post(`${API_URL}/integrations/vercel/connections`, {
+  const response = await post(`${API_URL}/integrations/github/connections`, {
     organization_integration_id: organizationIntegrationId,
     connection,
   })
@@ -28,14 +19,16 @@ export async function createIntegrationConnections({
   return response
 }
 
-type IntegrationConnectionsCreateData = Awaited<ReturnType<typeof createIntegrationConnections>>
+export type IntegrationGitHubConnectionsCreateData = Awaited<
+  ReturnType<typeof createIntegrationGitHubConnections>
+>
 
-export const useIntegrationConnectionsCreateMutation = ({
+export const useIntegrationGitHubConnectionsCreateMutation = ({
   onSuccess,
   ...options
 }: Omit<
   UseMutationOptions<
-    IntegrationConnectionsCreateData,
+    IntegrationGitHubConnectionsCreateData,
     unknown,
     IntegrationConnectionsCreateVariables
   >,
@@ -43,19 +36,19 @@ export const useIntegrationConnectionsCreateMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
   return useMutation<
-    IntegrationConnectionsCreateData,
+    IntegrationGitHubConnectionsCreateData,
     unknown,
     IntegrationConnectionsCreateVariables
-  >((vars) => createIntegrationConnections(vars), {
+  >((vars) => createIntegrationGitHubConnections(vars), {
     async onSuccess(data, variables, context) {
       await Promise.all([
         queryClient.invalidateQueries(integrationKeys.integrationsList()),
         queryClient.invalidateQueries(integrationKeys.integrationsListWithOrg(variables.orgSlug)),
         queryClient.invalidateQueries(
-          integrationKeys.vercelProjectList(variables.organizationIntegrationId)
+          integrationKeys.githubRepoList(variables.organizationIntegrationId)
         ),
         queryClient.invalidateQueries(
-          integrationKeys.vercelConnectionsList(variables.organizationIntegrationId)
+          integrationKeys.githubConnectionsList(variables.organizationIntegrationId)
         ),
       ])
       await onSuccess?.(data, variables, context)
