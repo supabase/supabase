@@ -5,7 +5,7 @@ export const meta = {
   description: 'Learn how to configure the email templates on Supabase.',
 }
 
-You can customise the email messages used for the authentication flows. You can edit the following email templates:
+You can customize the email messages used for the authentication flows. You can edit the following email templates:
 
 - Confirm signup
 - Invite user
@@ -49,7 +49,7 @@ To guard against this:
 
 If you intend to use [Server-side rendering](/docs/guides/auth/server-side-rendering), you might want the email link to redirect the user to a server-side endpoint to check if they are authenticated before returning the page. However, the default email link will redirect the user after verification to the redirect URL with the session in the query fragments. Since the session is returned in the query fragments by default, you won't be able to access it on the server-side.
 
-You can customise the email link in the email template to redirect the user to a server-side endpoint successfully. For example:
+You can customize the email link in the email template to redirect the user to a server-side endpoint successfully. For example:
 
 ```html
 <a href="https://api.example.com/v1/authenticate?token_hash={{ .TokenHash }}&type=invite"
