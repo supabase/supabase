@@ -60,6 +60,22 @@ export async function fetchSources() {
     '../../spec/common-client-libs-sections.json'
   )
 
+  const swiftLibReferenceSource = new ClientLibReferenceSource(
+    'swift-lib',
+    '/reference/swift',
+    { title: 'Swift Reference' },
+    '../../spec/supabase_swift_v0.yml',
+    '../../spec/common-client-libs-sections.json'
+  )
+
+  const ktLibReferenceSource = new ClientLibReferenceSource(
+    'kt-lib',
+    '/reference/kotlin',
+    { title: 'Kotlin Reference' },
+    '../../spec/supabase_kt_v0.yml',
+    '../../spec/common-client-libs-sections.json'
+  )
+
   const cliReferenceSource = new CliReferenceSource(
     'cli',
     '/reference/cli',
@@ -87,6 +103,8 @@ export async function fetchSources() {
     dartLibReferenceSource,
     pythonLibReferenceSource,
     cSharpLibReferenceSource,
+    swiftLibReferenceSource,
+    ktLibReferenceSource,
     cliReferenceSource,
     ...githubDiscussionSources,
     ...guideSources,

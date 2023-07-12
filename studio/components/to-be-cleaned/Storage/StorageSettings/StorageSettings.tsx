@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { Button, Form, IconClock, Input, Listbox } from 'ui'
 
-import { checkPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
+import { IS_PLATFORM } from 'lib/constants'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useProjectStorageConfigUpdateUpdateMutation } from 'data/config/project-storage-config-update-mutation'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
@@ -15,7 +15,7 @@ export type StorageSettingsProps = {
 }
 
 const StorageSettings = ({ projectRef }: StorageSettingsProps) => {
-  const { data, error } = useProjectStorageConfigQuery({ projectRef })
+  const { data, error } = useProjectStorageConfigQuery({ projectRef }, { enabled: IS_PLATFORM })
 
   if (error || data?.error) {
     return (
@@ -44,7 +44,7 @@ const StorageConfig = ({ config, projectRef }: any) => {
   const [selectedUnit, setSelectedUnit] = useState(unit)
   let initialValues = { fileSizeLimit: value, unformattedFileSizeLimit: fileSizeLimit }
 
-  const canUpdateStorageSettings = checkPermissions(PermissionAction.UPDATE, 'projects')
+  const canUpdateStorageSettings = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
 
   const formattedMaxSizeBytes = `${new Intl.NumberFormat('en-US').format(
     STORAGE_FILE_SIZE_LIMIT_MAX_BYTES

@@ -14,6 +14,7 @@ import DefaultLayout from '~/components/Layouts/Default'
 import { Tabs } from 'ui'
 import PostTypes from '~/types/post'
 import BlogListItem from '~/components/Blog/BlogListItem'
+import { useParams } from '~/hooks/useParams'
 
 export async function getStaticProps() {
   const allPostsData = getSortedPosts('_blog', undefined, undefined, '** BLOG PAGE **')
@@ -25,7 +26,7 @@ export async function getStaticProps() {
   fs.writeFileSync('./public/rss.xml', rss)
 
   // generate a series of rss feeds for each author (for PlanetPG)
-  const planetPgPosts = allPostsData.filter((post: any) => post.tags.includes('planetpg'))
+  const planetPgPosts = allPostsData.filter((post: any) => post.tags?.includes('planetpg'))
   const planetPgAuthors = planetPgPosts.map((post: any) => post.author.split(','))
   const uniquePlanetPgAuthors = new Set([].concat(...planetPgAuthors))
 
@@ -37,6 +38,9 @@ export async function getStaticProps() {
     }
   })
 
+  // Append 'all' category here
+  categories.unshift('all')
+
   return {
     props: {
       blogs: allPostsData,
@@ -46,6 +50,7 @@ export async function getStaticProps() {
 }
 
 function Blog(props: any) {
+  const tag = useParams()?.tag
   const [category, setCategory] = useState('all')
   const [blogs, setBlogs] = useState(props.blogs)
 
@@ -57,22 +62,29 @@ function Blog(props: any) {
     const shiftedBlogs = [...props.blogs]
     shiftedBlogs.shift()
 
+    if (category === 'all') {
+      router.replace('/blog', undefined, { shallow: true, scroll: false })
+    } else {
+      router.query.tag = category
+      router.replace(router, undefined, { shallow: true, scroll: false })
+    }
+
     setBlogs(
       category === 'all'
         ? shiftedBlogs
         : props.blogs.filter((post: any) => {
-            const found = post.tags.includes(category)
+            const found = post.tags?.includes(category)
             return found
           })
     )
   }, [category])
 
   useEffect(() => {
-    return props.categories.unshift('all')
-  }, [])
+    if (router.isReady && tag && tag !== 'all') {
+      setCategory(tag)
+    }
+  }, [tag, router.isReady])
 
-  // append 'all' category
-  // const categories = props.categories.push('all')
   const meta_title = 'Supabase Blog: Open Source Firebase alternative Blog'
   const meta_description = 'Get all your Supabase News on the Supabase blog.'
 
@@ -87,7 +99,7 @@ function Blog(props: any) {
           url: `https://supabase.com/${router.pathname}`,
           images: [
             {
-              url: `https://supabase.com/images/og/og-image.jpg`,
+              url: `https://supabase.com/images/og/og-image-v2.jpg`,
             },
           ],
         }}
@@ -116,9 +128,15 @@ function Blog(props: any) {
             <div className="mx-auto ">
               <div className="grid grid-cols-12">
                 <div className="col-span-12 lg:col-span-12">
-                  <Tabs scrollable size="medium" onChange={setCategory} defaultActiveId={'all'}>
-                    {props.categories.map((categoryId: string) => (
-                      <Tabs.Panel id={categoryId} key={categoryId} label={categoryId} />
+                  <Tabs
+                    scrollable
+                    size="medium"
+                    onChange={setCategory}
+                    defaultActiveId={'all'}
+                    activeId={category}
+                  >
+                    {props.categories.map((tag: string) => (
+                      <Tabs.Panel id={tag} key={tag} label={tag} />
                     ))}
                   </Tabs>
                 </div>

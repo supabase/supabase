@@ -1,5 +1,5 @@
 ---
-title: 'What''s New in pg_graphql v1.2'
+title: "What's New in pg_graphql v1.2"
 description: 'New Features in the v1.2 release of pg_graphql'
 launchweek: 7
 tags:
@@ -37,11 +37,9 @@ create view "ProjectOwner" as
     acc.id,
     acc.name
   from
-    account acc
-    join role r
-      on r.id = acc.role_id
-  where
-    acc.role = 'project_owner'
+    account as acc
+    join role as r on r.id = acc.role_id
+  where acc.role = 'project_owner';
 ```
 
 Since all entities exposed by `pg_graphql` require primary keys, we must define that constraint for the view. We do that using a comment directive:
@@ -65,7 +63,7 @@ With associated `Edge` and `Connection` types. That enables querying via:
 
 ```graphql
 {
-  projectOwnerCollection (first: 2) {
+  projectOwnerCollection(first: 2) {
     edges {
       node {
         nodeId
@@ -131,7 +129,7 @@ Note that `startsWith` filters should be preferred where appropriate because the
 
 ```graphql
 {
-  generalLedgerCollection(filter: {identifierCode: {startsWith: "BX1:"}}) {
+  generalLedgerCollection(filter: { identifierCode: { startsWith: "BX1:" } }) {
     edges {
       node {
         nodeId

@@ -9,7 +9,12 @@ on:
       - 'supabase/migrations/**'
       - 'apps/docs/**'
       - 'spec/**'
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      refresh:
+        description: 'Refresh all pages'
+        required: false
+        type: boolean
   schedule:
     - cron: '0 0 * * *'
 
@@ -46,6 +51,12 @@ jobs:
       - name: Run migrations
         run: npx supabase db push
 
+      - name: Update embeddings
+        working-directory: ./apps/docs
+        if: ${{ !inputs.refresh }}
+        run: npm run embeddings
+
       - name: Refresh embeddings
         working-directory: ./apps/docs
-        run: npm run embeddings
+        if: ${{ inputs.refresh }}
+        run: npm run embeddings:refresh

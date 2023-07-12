@@ -3,7 +3,7 @@ import { readFile } from 'fs/promises'
 import yaml from 'js-yaml'
 import { OpenAPIV3 } from 'openapi-types'
 import {
-  ICommonFunc,
+  ICommonItem,
   IFunctionDefinition,
   ISpec,
 } from '../../../components/reference/Reference.types'
@@ -29,7 +29,7 @@ export abstract class ReferenceSource<SpecSection> extends BaseSource {
     const specContents = await readFile(this.specFilePath, 'utf8')
     const refSectionsContents = await readFile(this.sectionsFilePath, 'utf8')
 
-    const refSections: ICommonFunc[] = JSON.parse(refSectionsContents)
+    const refSections: ICommonItem[] = JSON.parse(refSectionsContents)
     const flattenedRefSections = flattenSections(refSections)
 
     const checksum = createHash('sha256')
@@ -69,7 +69,7 @@ export abstract class ReferenceSource<SpecSection> extends BaseSource {
 
   abstract getSpecSections(specContents: string): SpecSection[]
   abstract matchSpecSection(specSections: SpecSection[], id: string): SpecSection
-  abstract formatSection(specSection: SpecSection, refSection: ICommonFunc): string
+  abstract formatSection(specSection: SpecSection, refSection: ICommonItem): string
 }
 
 export class OpenApiReferenceSource extends ReferenceSource<enrichedOperation> {
@@ -106,7 +106,7 @@ export class ClientLibReferenceSource extends ReferenceSource<IFunctionDefinitio
   matchSpecSection(functionDefinitions: IFunctionDefinition[], id: string): IFunctionDefinition {
     return functionDefinitions.find((functionDefinition) => functionDefinition.id === id)
   }
-  formatSection(functionDefinition: IFunctionDefinition, refSection: ICommonFunc): string {
+  formatSection(functionDefinition: IFunctionDefinition, refSection: ICommonItem): string {
     const { title } = refSection
     const { description, title: functionName } = functionDefinition
 

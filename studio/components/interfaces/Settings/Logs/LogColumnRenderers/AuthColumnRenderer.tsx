@@ -1,6 +1,4 @@
-import { tryParseJson } from 'lib/helpers'
 import { PreviewLogData } from '..'
-import { AuthEventParsed } from '../LogSelectionRenderers/AuthSelectionRenderer'
 import {
   RowLayout,
   SeverityFormatter,
@@ -10,17 +8,18 @@ import {
 
 export default [
   {
-    formatter: (data: { row: PreviewLogData }) => {
-      const parsed: AuthEventParsed | undefined = tryParseJson(data.row.event_message.trim())
-
+    formatter: (data: {
+      row: PreviewLogData & { level: string; msg: string | null; status: number; path: string }
+    }) => {
       return (
         <RowLayout>
           <TimestampLocalFormatter value={data.row.timestamp!} />
-          {parsed?.level && <SeverityFormatter value={parsed?.level} />}
+          {data.row.level && <SeverityFormatter value={data.row.level} />}
           <TextFormatter
             className="w-full"
-            value={`${parsed?.path ? parsed?.path + ' | ' : ''}${
-              parsed?.msg.trim() || data.row.event_message
+            value={`${data.row.path ? data.row.path + ' | ' : ''}${
+              // not all log events have metadata.msg
+              data.row.msg?.trim() || data.row.event_message
             }`}
           />
         </RowLayout>

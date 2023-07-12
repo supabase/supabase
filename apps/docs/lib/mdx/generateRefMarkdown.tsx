@@ -1,13 +1,13 @@
 import fs from 'fs'
 
+import { CodeHikeConfig, remarkCodeHike } from '@code-hike/mdx'
+import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
 import matter from 'gray-matter'
 import { serialize } from 'next-mdx-remote/serialize'
+import remarkGfm from 'remark-gfm'
+import { ICommonMarkdown } from '~/components/reference/Reference.types'
 
-// import { remarkCodeHike } from '@code-hike/mdx'
-// import codeHikeTheme from '~/codeHikeTheme.js'
-// import theme from 'shiki/themes/solarized-dark.json'
-
-async function generateRefMarkdown(sections, slug) {
+async function generateRefMarkdown(sections: ICommonMarkdown[], slug: string) {
   let markdownContent = []
   /**
    * Read all the markdown files that might have
@@ -16,10 +16,8 @@ async function generateRefMarkdown(sections, slug) {
    *  - important notes regarding implementation
    */
   await Promise.all(
-    sections.map(async (x, i) => {
-      if (!x.id) return null
-
-      const pathName = `docs/ref${slug}/${x.id}.mdx`
+    sections.map(async (section) => {
+      const pathName = `docs/ref${slug}/${section.id}.mdx`
 
       function checkFileExists(x) {
         if (fs.existsSync(x)) {
@@ -36,9 +34,17 @@ async function generateRefMarkdown(sections, slug) {
       const fileContents = markdownExists ? fs.readFileSync(pathName, 'utf8') : ''
       const { data, content } = matter(fileContents)
 
+      const codeHikeOptions: CodeHikeConfig = {
+        theme: codeHikeTheme,
+        lineNumbers: true,
+        showCopyButton: true,
+        skipLanguages: [],
+        autoImport: false,
+      }
+
       markdownContent.push({
-        id: x.id,
-        title: x.title,
+        id: section.id,
+        title: section.title,
         meta: data,
         // introPage: introPages.includes(x),
         content: content
@@ -46,8 +52,8 @@ async function generateRefMarkdown(sections, slug) {
               // MDX's available options, see the MDX docs for more info.
               // https://mdxjs.com/packages/mdx/#compilefile-options
               mdxOptions: {
-                // remarkPlugins: [[remarkCodeHike, { autoImport: false, theme }]],
                 useDynamicImport: true,
+                remarkPlugins: [remarkGfm, [remarkCodeHike, codeHikeOptions]],
               },
               // Indicates whether or not to parse the frontmatter from the mdx source
             })

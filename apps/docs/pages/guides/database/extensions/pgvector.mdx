@@ -7,7 +7,9 @@ export const meta = {
     'pgvector: a PostgreSQL extension for storing embeddings and performing vector similarity search.',
 }
 
-[pgvector](https://github.com/pgvector/pgvector/) is a PostgreSQL extension for vector similarity search. It can also be used for storing [embeddings](https://en.wikipedia.org/wiki/Word_embedding).
+[pgvector](https://github.com/pgvector/pgvector/) is a PostgreSQL extension for vector similarity search. It can also be used for storing [embeddings](https://supabase.com/blog/openai-embeddings-postgres-vector).
+
+Learn more about Supabase's [AI & Vector](/docs/guides/ai) offering.
 
 ## Concepts
 
@@ -31,7 +33,7 @@ This is particularly useful if you're building on top of OpenAI's [GPT-3](https:
 >
 <TabPanel id="dashboard" label="Dashboard">
 
-1. Go to the [Database](https://app.supabase.com/project/_/database/tables) page in the Dashboard.
+1. Go to the [Database](https://supabase.com/dashboard/project/_/database/tables) page in the Dashboard.
 2. Click on **Extensions** in the sidebar.
 3. Search for "vector" and enable the extension.
 
@@ -81,19 +83,23 @@ const embeddingResponse = await openai.createEmbedding({
   model: 'text-embedding-ada-002',
   input: body,
 })
-const [responseData] = embeddingResponse.data.data.
+
+const [{ embedding }] = embeddingResponse.data.data
 
 // Store the vector in Postgres
 const { data, error } = await supabase.from('posts').insert({
   title,
   body,
-  embedding: responseData.embedding,
+  embedding,
 })
 ```
 
-## Resources
+## More pgvector and Supabase resources
 
-- Source code: [github.com/pgvector/pgvector](https://github.com/pgvector/pgvector/)
+- [Supabase Clippy: ChatGPT for Supabase Docs](https://supabase.com/blog/chatgpt-supabase-docs)
+- [Storing OpenAI embeddings in Postgres with pgvector](https://supabase.com/blog/openai-embeddings-postgres-vector)
+- [A ChatGPT Plugins Template built with Supabase Edge Runtime](https://supabase.com/blog/building-chatgpt-plugins-template)
+- [Template for building your own custom ChatGPT style doc search](https://github.com/supabase-community/nextjs-openai-doc-search)
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

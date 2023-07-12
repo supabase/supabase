@@ -16,6 +16,7 @@ Chase Granberry
 Chris Copplestone
 Dave Wilson
 Div Arora
+Divit D
 Egor Romanov
 Fabrizio Fenoglio
 Francesco Sansalvadore
@@ -41,6 +42,7 @@ Margarita Sandomirskaia
 Marijana Šimag
 Mark Burggraf
 Michel Pelletier
+Mickael Hebert
 Monica El Khoury
 Nikita Kotlyarov
 Oli R
@@ -61,6 +63,7 @@ Thor Schaeff
 Tyler Shukert
 TzeYiing L
 Wen Bo Xie
+Yuri Santana
 ____________
 
 JOBS

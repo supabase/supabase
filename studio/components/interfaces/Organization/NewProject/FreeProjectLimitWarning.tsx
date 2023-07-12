@@ -19,7 +19,7 @@ const FreeProjectLimitWarning: FC<Props> = ({ membersExceededLimit }) => {
           <div className="space-y-3">
             <p className="text-sm leading-normal">
               The following members have reached their maximum limits for the number of active free
-              tier projects within organizations where they are an administrator or owner:
+              plan projects within organizations where they are an administrator or owner:
             </p>
             <ul className="pl-5 list-disc">
               {membersExceededLimit.map((member, idx: number) => (

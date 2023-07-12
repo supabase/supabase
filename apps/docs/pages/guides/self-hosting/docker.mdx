@@ -3,22 +3,18 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   title: 'Self-Hosting with Docker',
   description: 'Learn how to configure and deploy Supabase with Docker.',
+  subtitle: 'Learn how to configure and deploy Supabase with Docker.',
 }
 
-Docker is the easiest way to get started with self-hosted Supabase.
+Docker is the easiest way to get started with self-hosted Supabase. This guide assumes you are running the command from the machine you intend to host from.
 
 ## Before you begin
 
-You need the following installed in your system:
+You need the following installed in your system: [Git](https://git-scm.com/downloads) and Docker ([Windows](https://docs.docker.com/desktop/install/windows-install/), [MacOS](https://docs.docker.com/desktop/install/mac-install/), or [Linux](https://docs.docker.com/desktop/install/linux-install/)).
 
-- [Docker](https://docs.docker.com/engine/install/) and [docker compose](https://docs.docker.com/compose/install/)
-- [Git](https://git-scm.com/downloads)
+## Running Supabase
 
-## Quick Start
-
-### Get the code
-
-Checkout the docker directory in the Supabase repo:
+Running a self-hosted Supabase project is simple. Follow the steps below:
 
 ```sh
 # Get the code
@@ -34,26 +30,28 @@ cp .env.example .env
 docker compose up
 ```
 
-Now visit [http://localhost:3000](http://localhost:3000) to start using Supabase Studio.
+Now visit [localhost:3000](http://localhost:3000) to start using Supabase Studio.
+
+That's everything you need to get started. The rest of this guide will help you to customize your setup.
 
 ## Securing your setup
 
 While we provided you with some example secrets for getting started, you should NEVER deploy your Supabase setup using the defaults we have provided.
 
-Follow these steps to secure your Docker setup. We strongly recommend using a [secrets manager](../self-hosting#managing-your-secrets) when deploying to production.
-
 ### Generate API Keys
 
-Use your `JWT_SECRET` to generate a `anon` and `service` API keys using the [JWT generator](../self-hosting#api-keys).
+Create a new `JWT_SECRET` and store it securely. 
 
-Replace the values in these files:
+We can use your JWT Secret to generate new `anon` and `service` API keys using the form below. Update the "JWT Secret" and then run "Generate JWT" once for the `SERVICE_KEY` and once for the `ANON_KEY`:
 
-- `.env`:
+<JwtGenerator />
+
+### Update API Keys
+
+Replace the values the `.env` file:
+
   - `ANON_KEY` - replace with an `anon` key
   - `SERVICE_ROLE_KEY` - replace with a `service` key
-- `volumes/api/kong.yml`
-  - `anon` - replace with an `anon` key
-  - `service_role` - replace with a `service` key
 
 ### Update Secrets
 
@@ -64,19 +62,45 @@ Update the `.env` file with your own secrets. In particular, these are required:
 - `SITE_URL`: the base URL of your site.
 - `SMTP_*`: mail server credentials. You can use any SMTP server.
 
-### Securing the Dashboard
+## Exposing services
 
-The Docker setup doesn't include a management database for managing users and logins. If you plan to deploy the Studio to the web we suggest you put it behind a web proxy with Basic Auth or hide it behind a VPN.
+The services running on the machine are not exposed to the internet by default. We recommend using a reverse proxy such as [NGINX](https://www.nginx.com/) or [Caddy](https://caddyserver.com/) if you want to expose the services publicly:
 
-## Configuration
+1. Install Caddy using the official [instructions](https://caddyserver.com/docs/install).
+2. Modify the `Caddyfile` at `./docker/deploy/caddy/Caddyfile`.
+    1. Replace `localhost` with your domain.
+    2. Uncomment the "Dashboard" section if you want to expose the Supabase Dashboard. You **MUST** set a password for this to be secure.
+3. Run `caddy run --config ./docker/deploy/caddy/Caddyfile` to start Caddy.
 
-Each system can be [configured](../self-hosting#configuration) to suit your particular use-case.
+You can now access your services at the following URLs:
 
-To keep the setup simple, we made some choices that may not be optimal for production:
+- REST: `https://<your-domain>/proxy/rest/v1/`
+- Auth: `https://<your-domain>/proxy/auth/v1/`
+- Storage: `https://<your-domain>/proxy/storage/v1/`
+- Functions: `https://<your-domain>/proxy/functions/v1/`
+- Realtime: `https://<your-domain>/proxy/realtime/v1/`
+- Dashboard: `https://<your-domain>/` (if you uncommented the Dashboard section in the Caddyfile)
 
-- the database is in the same machine as the servers
-- Storage uses the filesystem backend instead of S3
-- Auth should be configured with a production-ready SMTP server
+## Stop 
+
+You can stop Supabase by running `docker compose stop` in same directory as your `docker-compose.yml` file.
+
+## Uninstall
+
+You can stop Supabase by running `docker compose down -v` in same directory as your `docker-compose.yml` file.
+
+## Advanced configuration
+
+Each system can be [configured](../self-hosting#configuration) independently. Some of the most important configuration options are:
+
+- Consider deploying the database to a different server than the rest of the services
+- Update Storage to use S3 instead of the filesystem backend
+- Configure Auth with a production-ready SMTP server
+
+### Setting up Edge Functions
+
+Your Functions are stored in `volumes/functions`. The default setup has a `hello` Function that you can invoke on `http://localhost:8000/functions/v1/hello`. You can add new Functions as `volumes/functions/<Function name>/index.ts`.
+
 
 ### Using an external database
 
@@ -84,7 +108,7 @@ We strongly recommend [decoupling your database](../self-hosting#managing-your-d
 The middleware will run with any PostgreSQL database that has logical replication enabled. The following environment variables should be updated
 in the `.env` file to point to your external database:
 
-```env title=.env
+```bash .env
 POSTGRES_PASSWORD=your-super-secret-and-long-postgres-password
 
 POSTGRES_HOST=db
@@ -107,19 +131,6 @@ However, you might miss important log messages such as database errors. Configur
 ### File storage backend on macOS
 
 By default, Storage backend is set to `file`, which is to use local files as the storage backend. To make it work on macOS, you need to choose `VirtioFS` as the Docker container file sharing implementation (in Docker Desktop -> Preferences -> General).
-
-## Deploying
-
-See the following guides to deploy Docker Compose setup using your preferred tool and platform:
-
-- [Docker Swarm](https://docs.docker.com/engine/swarm/stack-deploy/)
-- [AWS Fargate](https://aws.amazon.com/blogs/containers/deploy-applications-on-amazon-ecs-using-docker-compose/)
-- [Using Kompose for Kubernetes](https://kubernetes.io/docs/tasks/configure-pod-container/translate-compose-kubernetes/)
-
-## Next steps
-
-- Got a question? [Ask here](https://github.com/supabase/supabase/discussions).
-- Sign in: [app.supabase.com](https://app.supabase.com)
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

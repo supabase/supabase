@@ -1,0 +1,46 @@
+---
+id: introduction
+title: Introduction
+hideTitle: true
+---
+
+<div className="flex items-start gap-6 not-prose" id="introduction">
+  <IconMenuKotlin width={35} height={35} />
+  <div className="flex flex-col gap-2">
+    <h1 className="text-3xl text-scale-1200 m-0">Kotlin Client Library</h1>
+    <h2 className="text-base font-mono text-scale-1100">@supabase-community/supabase-kt</h2>
+  </div>
+</div>
+
+<div className="max-w-xl">
+
+This reference documents every object and method available in Supabase's Kotlin Multiplatform library, [supabase-kt](https://github.com/supabase-community/supabase-kt). You can use supabase-kt to interact with your Postgres database, listen to database changes, invoke Deno Edge Functions, build login and user management functionality, and manage large files.
+
+Supported Kotlin targets:
+
+| **Module**                             | **GoTrue** | **Realtime** | **Postgrest** | **Storage** | **Functions** | **Apollo-GraphQL** |
+| -------------------------------------- | ---------- | ------------ | ------------- | ----------- | ------------- | ------------------ |
+| **JVM**                                | ✅         | ✅           | ✅            | ✅          | ✅            | ✅                 |
+| **Android**                            | ✅         | ✅           | ✅            | ✅          | ✅            | ✅                 |
+| **JS** _(Browser)_                     | ✅         | ✅           | ✅            | ✅          | ✅            | ✅                 |
+| **IOS**                                | ✅         | ✅           | ✅            | ✅          | ✅            | ✅                 |
+| **MacOS** _(macosX64 & macosArm64)_ 🚧 | ✅         | ✅           | ✅            | ✅          | ✅            | ✅                 |
+| **Windows** _(mingwX64)_ 🚧            | ☑️         | ✅           | ✅            | ✅          | ✅            | ❌                 |
+| **Linux** _(linuxX64)_ 🚧              | ☑️         | ✅           | ✅            | ✅          | ✅            | ❌                 |
+
+✅ = full support
+
+☑️ = partial support: no built-in OAuth/OTP link handling. Linux also has no persistent storage.
+
+🚧 = experimental/needs feedback
+
+❌ = not supported
+
+</div>
+
+<div className="max-w-xl bg-slate-300 px-4 py-2 rounded-md">
+<p>The Kotlin client library is created and maintained by the Supabase community, and is not an official library. Please be tolerant of areas where the library is still being developed, and — as with all the libraries — feel free to contribute wherever you find issues.</p>
+
+<p>Huge thanks to official maintainer, [jan-tennert](https://github.com/jan-tennert).</p>
+
+</div>

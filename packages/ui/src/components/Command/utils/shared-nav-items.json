@@ -2,171 +2,171 @@
   "tools": [
     {
       "label": "Table Editor",
-      "url": "https://app.supabase.com/project/_/editor"
+      "url": "https://supabase.com/dashboard/project/_/editor"
     },
     {
       "label": "SQL Editor",
-      "url": "https://app.supabase.com/project/_/sql"
+      "url": "https://supabase.com/dashboard/project/_/sql"
     },
     {
       "label": "Database",
-      "url": "https://app.supabase.com/project/_/database/tables",
+      "url": "https://supabase.com/dashboard/project/_/database/tables",
       "subItems": [
         {
           "label": "Tables",
-          "url": "https://app.supabase.com/project/_/database/tables"
+          "url": "https://supabase.com/dashboard/project/_/database/tables"
         },
         {
           "label": "Triggers",
-          "url": "https://app.supabase.com/project/_/database/triggers"
+          "url": "https://supabase.com/dashboard/project/_/database/triggers"
         },
         {
           "label": "Functions",
-          "url": "https://app.supabase.com/project/_/database/functions"
+          "url": "https://supabase.com/dashboard/project/_/database/functions"
         },
         {
           "label": "Extensions",
-          "url": "https://app.supabase.com/project/_/database/extensions"
+          "url": "https://supabase.com/dashboard/project/_/database/extensions"
         },
         {
           "label": "Roles",
-          "url": "https://app.supabase.com/project/_/database/roles"
+          "url": "https://supabase.com/dashboard/project/_/database/roles"
         },
         {
           "label": "Replication",
-          "url": "https://app.supabase.com/project/_/database/replication"
+          "url": "https://supabase.com/dashboard/project/_/database/replication"
         },
         {
           "label": "Webhooks",
-          "url": "https://app.supabase.com/project/_/database/webhooks"
+          "url": "https://supabase.com/dashboard/project/_/database/webhooks"
         },
         {
           "label": "Backups",
-          "url": "https://app.supabase.com/project/_/database/backups/scheduled"
+          "url": "https://supabase.com/dashboard/project/_/database/backups/scheduled"
         }
       ]
     },
     {
       "label": "Auth",
-      "url": "https://app.supabase.com/project/_/auth/users",
+      "url": "https://supabase.com/dashboard/project/_/auth/users",
       "subItems": [
         {
           "label": "Users",
-          "url": "https://app.supabase.com/project/_/auth/users"
+          "url": "https://supabase.com/dashboard/project/_/auth/users"
         },
         {
           "label": "Policies",
-          "url": "https://app.supabase.com/project/_/auth/policies"
+          "url": "https://supabase.com/dashboard/project/_/auth/policies"
         },
         {
           "label": "Providers",
-          "url": "https://app.supabase.com/project/_/auth/providers"
+          "url": "https://supabase.com/dashboard/project/_/auth/providers"
         },
         {
           "label": "Email Templates",
-          "url": "https://app.supabase.com/project/_/auth/templates"
+          "url": "https://supabase.com/dashboard/project/_/auth/templates"
         },
         {
           "label": "URL Configuration",
-          "url": "https://app.supabase.com/project/_/auth/url-configuration"
+          "url": "https://supabase.com/dashboard/project/_/auth/url-configuration"
         }
       ]
     },
     {
       "label": "Storage",
-      "url": "https://app.supabase.com/project/_/storage"
+      "url": "https://supabase.com/dashboard/project/_/storage"
     },
     {
       "label": "Edge Functions",
-      "url": "https://app.supabase.com/project/_/functions"
+      "url": "https://supabase.com/dashboard/project/_/functions"
     },
     {
       "label": "Logs",
-      "url": "https://app.supabase.com/project/_/logs/explorer",
+      "url": "https://supabase.com/dashboard/project/_/logs/explorer",
       "subItems": [
         {
           "label": "Postgres logs",
-          "url": "https://app.supabase.com/project/_/logs/postgres-logs"
+          "url": "https://supabase.com/dashboard/project/_/logs/postgres-logs"
         },
         {
           "label": "PostgREST logs",
-          "url": "https://app.supabase.com/project/_/logs/postgrest-logs"
+          "url": "https://supabase.com/dashboard/project/_/logs/postgrest-logs"
         },
         {
           "label": "Postgres logs",
-          "url": "https://app.supabase.com/project/_/logs/pgbouncer-logs"
+          "url": "https://supabase.com/dashboard/project/_/logs/pgbouncer-logs"
         },
         {
           "label": "Auth logs logs",
-          "url": "https://app.supabase.com/project/_/logs/auth-logs"
+          "url": "https://supabase.com/dashboard/project/_/logs/auth-logs"
         },
         {
           "label": "Storage logs",
-          "url": "https://app.supabase.com/project/_/logs/storage-logs"
+          "url": "https://supabase.com/dashboard/project/_/logs/storage-logs"
         },
         {
           "label": "realtime logs",
-          "url": "https://app.supabase.com/project/_/logs/realtime-logs"
+          "url": "https://supabase.com/dashboard/project/_/logs/realtime-logs"
         }
       ]
     },
     {
       "label": "API Docs",
-      "url": "https://app.supabase.com/project/_/api",
+      "url": "https://supabase.com/dashboard/project/_/api",
       "subItems": [
         {
           "label": "Auth docs",
-          "url": "https://app.supabase.com/project/_/api?page=auth"
+          "url": "https://supabase.com/dashboard/project/_/api?page=auth"
         },
         {
           "label": "User management docs",
-          "url": "https://app.supabase.com/project/_/api?page=users"
+          "url": "https://supabase.com/dashboard/project/_/api?page=users"
         },
         {
           "label": "Graphql",
-          "url": "https://app.supabase.com/project/_/api/graphiql"
+          "url": "https://supabase.com/dashboard/project/_/api/graphiql"
         }
       ]
     },
     {
       "label": "Project Settings",
-      "url": "https://app.supabase.com/project/_/settings/general",
+      "url": "https://supabase.com/dashboard/project/_/settings/general",
       "subItems": [
         {
           "label": "General settings",
-          "url": "https://app.supabase.com/project/_/settings/general"
+          "url": "https://supabase.com/dashboard/project/_/settings/general"
         },
         {
           "label": "Database settings",
-          "url": "https://app.supabase.com/project/_/settings/database"
+          "url": "https://supabase.com/dashboard/project/_/settings/database"
         },
         {
           "label": "API settings",
-          "url": "https://app.supabase.com/project/_/settings/api"
+          "url": "https://supabase.com/dashboard/project/_/settings/api"
         },
         {
           "label": "Auth settings",
-          "url": "https://app.supabase.com/project/_/settings/auth"
+          "url": "https://supabase.com/dashboard/project/_/settings/auth"
         },
         {
           "label": "Storage settings",
-          "url": "https://app.supabase.com/project/_/settings/storage"
+          "url": "https://supabase.com/dashboard/project/_/settings/storage"
         },
         {
           "label": "Subscription settings",
-          "url": "https://app.supabase.com/project/_/settings/billing/subscription"
+          "url": "https://supabase.com/dashboard/project/_/settings/billing/subscription"
         },
         {
           "label": "Project Usage",
-          "url": "https://app.supabase.com/project/_/settings/billing/usage"
+          "url": "https://supabase.com/dashboard/project/_/settings/billing/usage"
         },
         {
           "label": "Project Invoices",
-          "url": "https://app.supabase.com/project/_/settings/billing/invoices"
+          "url": "https://supabase.com/dashboard/project/_/settings/billing/invoices"
         },
         {
           "label": "Project Invoices",
-          "url": "https://app.supabase.com/project/_/settings/billing/invoices"
+          "url": "https://supabase.com/dashboard/project/_/settings/billing/invoices"
         }
       ]
     }
@@ -174,11 +174,11 @@
   "projectTools": [
     {
       "label": "Your Projects",
-      "url": "https://app.supabase.com/projects"
+      "url": "https://supabase.com/dashboard/projects"
     },
     {
       "label": "Project API Keys",
-      "url": "https://app.supabase.com/project/_/settings/api"
+      "url": "https://supabase.com/dashboard/project/_/settings/api"
     }
   ],
   "support": [
@@ -203,6 +203,10 @@
     {
       "label": "Next.js",
       "url": "https://supabase.com/docs/guides/getting-started/quickstarts/nextjs"
+    },
+    {
+      "label": "Nuxt.js",
+      "url": "https://supabase.com/docs/guides/getting-started/quickstarts/nuxtjs"
     },
     {
       "label": "Flutter",

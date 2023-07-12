@@ -52,13 +52,13 @@ Each folder within the `app` directory represents a route in our application. Ea
 
 > Learn more about [Page](https://beta.nextjs.org/docs/api-reference/file-conventions/page), [Layout](https://beta.nextjs.org/docs/api-reference/file-conventions/layout), [Loading](https://beta.nextjs.org/docs/api-reference/file-conventions/loading) and [Error](https://beta.nextjs.org/docs/api-reference/file-conventions/error) components in the [Next.js beta docs](https://beta.nextjs.org/docs).
 
-Before we jump into fetching data, we need some data to fetch. Let’s [create a new Supabase project](https://app.supabase.com).
+Before we jump into fetching data, we need some data to fetch. Let’s [create a new Supabase project](https://supabase.com/dashboard).
 
-Once your instance is up and running, head over to the [SQL Editor](https://app.supabase.com/project/_/sql), paste in the following snippet and click `RUN`.
+Once your instance is up and running, head over to the [SQL Editor](https://supabase.com/dashboard/project/_/sql), paste in the following snippet and click `RUN`.
 
 ```sql
 create table if not exists posts (
-  id uuid default uuid_generate_v4() primary key,
+  id uuid default gen_random_uuid() primary key,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,
   title text,
   content text
@@ -85,7 +85,7 @@ NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
 ```
 
-> The values for these can be found in [your project’s API settings](https://app.supabase.com/project/_/settings/api).
+> The values for these can be found in [your project’s API settings](https://supabase.com/dashboard/project/_/settings/api).
 
 Lastly, we need to create a Supabase client. Create a file at `utils/supabase.ts` with the following content:
 
@@ -382,7 +382,7 @@ But now we have loading spinners! Yuck!
 
 # Realtime
 
-Realtime allows us to subscribe to changes in Supabase — inserted, updated or deleted posts — and update our UI dynamically. In order to receive realtime events, we need to [enable replication](https://app.supabase.com/project/_/database/replication) on the posts table.
+Realtime allows us to subscribe to changes in Supabase — inserted, updated or deleted posts — and update our UI dynamically. In order to receive realtime events, we need to [enable replication](https://supabase.com/dashboard/project/_/database/replication) on the posts table.
 
 Let’s merge the two previous concepts and fetch the initial state of our posts in a Server Component, and then render a Client Component to do client-y things — like subscribe to changes in the DB and update the UI dynamically:
 

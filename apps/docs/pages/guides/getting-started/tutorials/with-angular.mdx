@@ -40,7 +40,7 @@ And finally we want to save the environment variables in the `environment.ts` fi
 All we need are the API URL and the `anon` key that you copied [earlier](#get-the-api-keys).
 These variables will be exposed on the browser, and that's completely fine since we have [Row Level Security](/docs/guides/auth#row-level-security) enabled on our Database.
 
-```ts title=environment.ts
+```ts environment.ts
 export const environment = {
   production: false,
   supabaseUrl: 'YOUR_SUPABASE_URL',
@@ -50,7 +50,7 @@ export const environment = {
 
 Now that we have the API credentials in place, let's create a **SupabaseService** with `ng g s supabase` to initialize the Supabase client and implement functions to communicate with the Supabase API.
 
-```ts title=src/app/supabase.service.ts
+```ts src/app/supabase.service.ts
 import { Injectable } from '@angular/core'
 import {
   AuthChangeEvent,
@@ -133,7 +133,7 @@ Optionally, update [src/styles.css](https://raw.githubusercontent.com/supabase/s
 Let's set up an Angular component to manage logins and sign ups. We'll use Magic Links, so users can sign in with their email without using passwords.
 Create an **AuthComponent** with `ng g c auth` Angular CLI command.
 
-```ts title=src/app/auth/auth.component.ts
+```ts src/app/auth/auth.component.ts
 import { Component } from '@angular/core'
 import { FormBuilder } from '@angular/forms'
 import { SupabaseService } from '../supabase.service'
@@ -174,7 +174,7 @@ export class AuthComponent {
 }
 ```
 
-```html title=src/app/auth/auth.component.html
+```html src/app/auth/auth.component.html
 <div class="row flex-center flex">
   <div class="col-6 form-widget" aria-live="polite">
     <h1 class="header">Supabase + Angular</h1>
@@ -205,7 +205,7 @@ export class AuthComponent {
 Users also need a way to edit their profile details and manage their accounts after signing in.
 Create an **AccountComponent** with the `ng g c account` Angular CLI command.
 
-```ts title=src/app/account/account.component.ts
+```ts src/app/account/account.component.ts
 import { Component, Input, OnInit } from '@angular/core'
 import { FormBuilder } from '@angular/forms'
 import { AuthSession } from '@supabase/supabase-js'
@@ -295,7 +295,7 @@ export class AccountComponent implements OnInit {
 }
 ```
 
-```html title=src/app/account/account.component.html
+```html src/app/account/account.component.html
 <form [formGroup]="updateProfileForm" (ngSubmit)="updateProfile()" class="form-widget">
   <div>
     <label for="email">Email</label>
@@ -326,7 +326,7 @@ export class AccountComponent implements OnInit {
 
 Now that we have all the components in place, let's update **AppComponent**:
 
-```ts title=src/app/app.component.ts
+```ts src/app/app.component.ts
 import { Component, OnInit } from '@angular/core'
 import { SupabaseService } from './supabase.service'
 
@@ -348,7 +348,7 @@ export class AppComponent implements OnInit {
 }
 ```
 
-```html title=src/app/app.component.html
+```html src/app/app.component.html
 <div class="container" style="padding: 50px 0 100px 0">
   <app-account *ngIf="session; else auth" [session]="session"></app-account>
   <ng-template #auth>
@@ -359,7 +359,7 @@ export class AppComponent implements OnInit {
 
 `app.module.ts` also needs to be modified to include the `ReactiveFormsModule` from the `@angular/forms` package.
 
-```ts title=src/app/app.module.ts
+```ts src/app/app.module.ts
 import { NgModule } from '@angular/core'
 import { BrowserModule } from '@angular/platform-browser'
 
@@ -397,7 +397,7 @@ Every Supabase project is configured with [Storage](/docs/guides/storage) for ma
 Let's create an avatar for the user so that they can upload a profile photo.
 Create an **AvatarComponent** with `ng g c avatar` Angular CLI command.
 
-```ts title=src/app/avatar/avatar.component.ts
+```ts src/app/avatar/avatar.component.ts
 import { Component, EventEmitter, Input, Output } from '@angular/core'
 import { SafeResourceUrl, DomSanitizer } from '@angular/platform-browser'
 import { SupabaseService } from '../supabase.service'
@@ -459,7 +459,7 @@ export class AvatarComponent {
 }
 ```
 
-```html title=src/app/avatar/avatar.component.html
+```html src/app/avatar/avatar.component.html
 <div>
   <img
     *ngIf="_avatarUrl"
@@ -489,7 +489,7 @@ export class AvatarComponent {
 
 And then we can add the widget on top of the **AccountComponent** html template:
 
-```html title=src/app/account.component.html
+```html src/app/account.component.html
 <form [formGroup]="updateProfileForm" (ngSubmit)="updateProfile()" class="form-widget">
   <app-avatar [avatarUrl]="this.avatarUrl" (upload)="updateAvatar($event)"> </app-avatar>
   <!-- input fields -->
@@ -498,7 +498,7 @@ And then we can add the widget on top of the **AccountComponent** html template:
 
 And add an `updateAvatar` function along with an `avatarUrl` getter to the **AccountComponent** typescript file:
 
-```ts title=src/app/account.component.ts
+```ts src/app/account.component.ts
 @Component({
   selector: 'app-account',
   templateUrl: './account.component.html',

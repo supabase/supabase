@@ -1,11 +1,9 @@
 import { NextRouter, useRouter } from 'next/router'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Button, IconExternalLink, IconHelpCircle } from 'ui'
-
+import { Button, IconExternalLink, IconHelpCircle, Loading } from 'ui'
 import { BaseReportParams } from './Reports.types'
 import { LogsEndpointParams } from '../Settings/Logs'
 import Panel from 'components/ui/Panel'
-import LoadingOpacity from 'components/ui/LoadingOpacity'
 
 export interface ReportWidgetProps<T = any> {
   data: T[]
@@ -14,11 +12,15 @@ export interface ReportWidgetProps<T = any> {
   tooltip?: string
   className?: string
   renderer: (props: ReportWidgetRendererProps) => React.ReactNode
-  params: BaseReportParams | LogsEndpointParams
+  append?: (props: ReportWidgetRendererProps) => React.ReactNode
+  // for overriding props, such as data
+  appendProps?: Partial<ReportWidgetRendererProps>
+  // omitting params will hide the "View in logs explorer" button
+  params?: BaseReportParams | LogsEndpointParams
   isLoading: boolean
 }
 
-export interface ReportWidgetRendererProps extends ReportWidgetProps {
+export interface ReportWidgetRendererProps<T = any> extends ReportWidgetProps<T> {
   router: NextRouter
   projectRef: string
 }
@@ -27,7 +29,6 @@ const ReportWidget: React.FC<ReportWidgetProps> = (props) => {
   const router = useRouter()
   const { ref } = router.query
   const projectRef = ref as string
-
   return (
     <Panel
       noMargin
@@ -64,43 +65,48 @@ const ReportWidget: React.FC<ReportWidgetProps> = (props) => {
             </div>
             <p className="text-sm text-scale-1100">{props.description}</p>
           </div>
-          <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger>
-              <Button
-                type="default"
-                icon={<IconExternalLink strokeWidth={1.5} />}
-                className="px-1"
-                onClick={() => {
-                  router.push({
-                    pathname: `/project/${projectRef}/logs/explorer`,
-                    query: {
-                      q: props.params?.sql,
-                      its: props.params.iso_timestamp_start,
-                      ite: props.params.iso_timestamp_end,
-                    },
-                  })
-                }}
-              />
-            </Tooltip.Trigger>
-            <Tooltip.Portal>
-              <Tooltip.Content side="bottom">
-                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                <div
-                  className={[
-                    'rounded bg-scale-100 py-1 px-2 max-w-xs leading-none shadow',
-                    'border border-scale-200',
-                  ].join(' ')}
-                >
-                  <span className="text-xs text-scale-1200">Open in Logs Explorer</span>
-                </div>
-              </Tooltip.Content>
-            </Tooltip.Portal>
-          </Tooltip.Root>
+          {props.params && (
+            <Tooltip.Root delayDuration={0}>
+              <Tooltip.Trigger>
+                <Button
+                  type="default"
+                  icon={<IconExternalLink strokeWidth={1.5} />}
+                  className="px-1"
+                  onClick={() => {
+                    router.push({
+                      pathname: `/project/${projectRef}/logs/explorer`,
+                      query: {
+                        q: props.params?.sql,
+                        its: props.params!.iso_timestamp_start,
+                        ite: props.params!.iso_timestamp_end,
+                      },
+                    })
+                  }}
+                />
+              </Tooltip.Trigger>
+              <Tooltip.Portal>
+                <Tooltip.Content side="bottom">
+                  <Tooltip.Arrow className="radix-tooltip-arrow" />
+                  <div
+                    className={[
+                      'rounded bg-scale-100 py-1 px-2 max-w-xs leading-none shadow',
+                      'border border-scale-200',
+                    ].join(' ')}
+                  >
+                    <span className="text-xs text-scale-1200">Open in Logs Explorer</span>
+                  </div>
+                </Tooltip.Content>
+              </Tooltip.Portal>
+            </Tooltip.Root>
+          )}
         </div>
 
-        <LoadingOpacity className="w-full" active={props.isLoading}>
+        <Loading active={props.isLoading}>
           {props.data === undefined ? null : props.renderer({ ...props, router, projectRef })}
-        </LoadingOpacity>
+        </Loading>
+
+        {props.append &&
+          props.append({ ...props, ...(props.appendProps || {}), router, projectRef })}
       </Panel.Content>
     </Panel>
   )

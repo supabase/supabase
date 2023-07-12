@@ -1,16 +1,16 @@
+import { observer, useLocalObservable } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { FC, createContext, useContext, useEffect, useState } from 'react'
-import { observer, useLocalObservable } from 'mobx-react-lite'
 
-import { NextPageWithLayout } from 'types'
-import { useStore } from 'hooks'
 import { useParams } from 'common/hooks'
-import { snakeToCamel } from 'lib/helpers'
-import { useProjectApiQuery } from 'data/config/project-api-query'
-import { DocsLayout } from 'components/layouts'
 import { GeneralContent, ResourceContent, RpcContent } from 'components/interfaces/Docs'
-import { useProjectJsonSchemaQuery } from 'data/docs/project-json-schema-query'
 import LangSelector from 'components/interfaces/Docs/LangSelector'
+import { DocsLayout } from 'components/layouts'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useProjectApiQuery } from 'data/config/project-api-query'
+import { useProjectJsonSchemaQuery } from 'data/docs/project-json-schema-query'
+import { snakeToCamel } from 'lib/helpers'
+import { NextPageWithLayout } from 'types'
 
 const PageContext = createContext(null)
 
@@ -45,9 +45,7 @@ const PageConfig: NextPageWithLayout = () => {
 
   const router = useRouter()
   const { query } = router
-
-  const { ui } = useStore()
-  const project = ui.selectedProject
+  const { project } = useProjectContext()
   PageState.projectRef = query.ref
 
   return (

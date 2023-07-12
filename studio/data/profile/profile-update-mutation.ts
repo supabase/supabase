@@ -1,5 +1,5 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { post } from 'lib/common/fetch'
+import { patch } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { profileKeys } from './keys'
 
@@ -9,7 +9,7 @@ export type ProfileUpdateVariables = {
 }
 
 export async function updateProfile({ firstName, lastName }: ProfileUpdateVariables) {
-  const response = await post(`${API_URL}/profile/update`, {
+  const response = await patch(`${API_URL}/profile`, {
     first_name: firstName,
     last_name: lastName,
   })

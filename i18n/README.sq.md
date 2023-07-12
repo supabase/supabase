@@ -32,7 +32,7 @@ Për dokumentimin e plotë, vizitoni [supabase.com/docs](https://supabase.com/do
 ## Statusi
 
 - [x] Alfa: Ne po testojmë Supabase me një grup të mbyllur klientësh
-- [x] Publike Alpha: Gjithkush mund të regjistrohet në [app.supabase.com](https://app.supabase.com). Por shkoni lehtë për ne, ka disa ngërçe
+- [x] Publike Alpha: Gjithkush mund të regjistrohet në [supabase.com/dashboard](https://supabase.com/dashboard). Por shkoni lehtë për ne, ka disa ngërçe
 - [x] Publike Beta: Mjaft e qëndrueshme për shumicën e rasteve të përdorimit për jo ndërmarrjet
 - [ ] Publike: Gati për Prodhim / Publikim
 
@@ -48,7 +48,7 @@ Supabase është një kombinim i mjeteve që janë projekte të hapura (open sou
 
 **Arkitektura Aktuale**
 
-Supabase është një [platform hostimi](https://app.supabase.com). Ti mundesh të regjistrohesh dhe të fillosh ta përdorish Supabase duke mos instaluar asgjë. Poashtu ne jemi duke punuar për ta ndërtuar eksperiencën për zhvillim lokal, por kjo nuk është fokusi ynë kryesorë dhe thelbësor, së bashku me stabilitetin e platformës.
+Supabase është një [platform hostimi](https://supabase.com/dashboard). Ti mundesh të regjistrohesh dhe të fillosh ta përdorish Supabase duke mos instaluar asgjë. Poashtu ne jemi duke punuar për ta ndërtuar eksperiencën për zhvillim lokal, por kjo nuk është fokusi ynë kryesorë dhe thelbësor, së bashku me stabilitetin e platformës.
 
 ![Arkitektura](https://user-images.githubusercontent.com/70828596/187547862-ffa9d058-0c3a-4851-a3e7-92ccfca4b596.png)
 

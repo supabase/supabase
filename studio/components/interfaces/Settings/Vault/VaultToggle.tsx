@@ -5,7 +5,7 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { Button, IconExternalLink } from 'ui'
 
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { checkPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import { useParams } from 'common/hooks'
 import { BASE_PATH } from 'lib/constants'
 import { useTheme } from 'common'
@@ -17,7 +17,7 @@ const VaultToggle: FC<Props> = () => {
   const { ref } = useParams()
   const { isDarkMode } = useTheme()
   const [isEnabling, setIsEnabling] = useState(false)
-  const canToggleVault = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'extensions')
+  const canToggleVault = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'extensions')
 
   const vaultExtension = meta.extensions.byId('supabase_vault')
   const isNotAvailable = vaultExtension === undefined
@@ -101,7 +101,7 @@ const VaultToggle: FC<Props> = () => {
                 </div>
               </div>
               <div className="flex items-center space-x-2 my-1 ml-[1px]">
-                <Link href="https://supabase.com/docs/guides/database/vault">
+                <Link href="https://github.com/supabase/vault">
                   <a target="_blank" rel="noreferrer">
                     <Button type="default" icon={<IconExternalLink />}>
                       About Vault
@@ -112,7 +112,7 @@ const VaultToggle: FC<Props> = () => {
             </div>
           ) : (
             <div className="flex items-center space-x-2">
-              <Link href="https://supabase.com/docs/guides/database/vault">
+              <Link href="https://github.com/supabase/vault">
                 <a target="_blank" rel="noreferrer">
                   <Button type="default" icon={<IconExternalLink />}>
                     About Vault

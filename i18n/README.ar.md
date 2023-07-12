@@ -35,7 +35,7 @@
 ## الحالة
 
 - [x] طور الألفا: نحن نختبر Supabase مع مجموعة مغلقة من العملاء
-- [x] طور الألفا العام: يمكن لأي شخص الاشتراك في [app.supabase.com] (https://app.supabase.com). لكن تحلى بالصبر ، فهناك بعض العقد الصغيرة.
+- [x] طور الألفا العام: يمكن لأي شخص الاشتراك في [supabase.com/dashboard](https://supabase.com/dashboard). لكن تحلى بالصبر ، فهناك بعض العقد الصغيرة.
 - [x] طور البيتا العام: مستقر بدرجة كافية لمعظم حالات الاستخدام غير المتعلقة بالمؤسسات
 - [ ] الطور العام: جاهز للإنتاج
 
@@ -49,7 +49,7 @@ Supabase عبارة عن مجموعة من الأدوات مفتوحة المص�
 
 **الهيكلة الحالية**
 
-(supabase) هي [منصة مستضافة](https://app.supabase.com), يمكنك التسجيل والبدأ باستخدامها دون الحاجة لتثبيت أي شئ. يمكنك أيضا [استضافتها ذاتيا](https://supabase.com/docs/guides/hosting/overview) و [تطويرها داخليا](https://supabase.com/docs/guides/local-development).
+(supabase) هي [منصة مستضافة](https://supabase.com/dashboard), يمكنك التسجيل والبدأ باستخدامها دون الحاجة لتثبيت أي شئ. يمكنك أيضا [استضافتها ذاتيا](https://supabase.com/docs/guides/hosting/overview) و [تطويرها داخليا](https://supabase.com/docs/guides/local-development).
 
 ![Architecture](https://user-images.githubusercontent.com/70828596/187547862-ffa9d058-0c3a-4851-a3e7-92ccfca4b596.png)
 
@@ -134,11 +134,11 @@ Supabase عبارة عن مجموعة من الأدوات مفتوحة المص�
   </tr>
   <tr>
     <td>Kotlin</td>
-    <td>-</td>
-    <td><a href="https://github.com/supabase-community/postgrest-kt" target="_blank" rel="noopener noreferrer">postgrest-kt</a></td>
-    <td><a href="https://github.com/supabase-community/gotrue-kt" target="_blank" rel="noopener noreferrer">gotrue-kt</a></td>
-    <td>-</td>
-    <td>-</td>
+    <td><a href="https://github.com/supabase-community/supabase-kt" target="_blank" rel="noopener noreferrer">supabase-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Postgrest" target="_blank" rel="noopener noreferrer">postgrest-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/GoTrue" target="_blank" rel="noopener noreferrer">gotrue-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Realtime" target="_blank" rel="noopener noreferrer">realtime-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Storage" target="_blank" rel="noopener noreferrer">storage-kt</a></td>
   </tr>
   <tr>
     <td>Python</td>

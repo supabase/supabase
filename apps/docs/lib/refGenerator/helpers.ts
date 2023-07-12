@@ -3,6 +3,7 @@ import { TsDoc } from '../../generator/legacy/definitions'
 import { values, mapValues } from 'lodash'
 import { OpenAPIV3 } from 'openapi-types'
 import { flattenSections } from '../helpers'
+import { ICommonItem } from '~/components/reference/Reference.types'
 
 export function extractTsDocNode(nodeToFind: string, definition: any) {
   const nodePath = nodeToFind.split('.')
@@ -294,12 +295,13 @@ export const toArrayWithKey = (obj: object, keyAs: string) =>
     })
   )
 
-export function generateAllowedClientLibKeys(sections, spec) {
+/**
+ * Get a list of common section IDs that are available in this spec
+ */
+export function getAvailableSectionIds(sections: ICommonItem[], spec: any) {
   // Filter parent sections first
 
-  const specIds = spec.functions.map((func) => {
-    return func.id
-  })
+  const specIds = spec.functions.map(({ id }) => id)
 
   const newShape = flattenSections(sections).filter((section) => {
     if (specIds.includes(section.id)) {

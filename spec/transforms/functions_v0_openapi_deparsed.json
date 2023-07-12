@@ -43,10 +43,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "name",
-          "query"
-        ],
+        "required": ["name", "query"],
         "title": "Endpoint",
         "type": "object"
       },
@@ -179,9 +176,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "name"
-        ],
+        "required": ["name"],
         "title": "Source",
         "type": "object"
       },
@@ -200,10 +195,7 @@
                   "type": "string"
                 }
               },
-              "required": [
-                "email",
-                "name"
-              ],
+              "required": ["email", "name"],
               "title": "TeamUser",
               "type": "object"
             },
@@ -257,20 +249,12 @@
                 "type": "string"
               }
             },
-            "required": [
-              "email",
-              "provider",
-              "token",
-              "provider_uid",
-              "api_key"
-            ],
+            "required": ["email", "provider", "token", "provider_uid", "api_key"],
             "title": "User",
             "type": "object"
           }
         },
-        "required": [
-          "name"
-        ],
+        "required": ["name"],
         "title": "Team",
         "type": "object"
       },
@@ -283,10 +267,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "email",
-          "name"
-        ],
+        "required": ["email", "name"],
         "title": "TeamUser",
         "type": "object"
       },
@@ -335,13 +316,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "email",
-          "provider",
-          "token",
-          "provider_uid",
-          "api_key"
-        ],
+        "required": ["email", "provider", "token", "provider_uid", "api_key"],
         "title": "User",
         "type": "object"
       }
@@ -401,10 +376,7 @@
                         "type": "string"
                       }
                     },
-                    "required": [
-                      "name",
-                      "query"
-                    ],
+                    "required": ["name", "query"],
                     "title": "Endpoint",
                     "type": "object"
                   },
@@ -416,9 +388,7 @@
           }
         },
         "summary": "List endpoints",
-        "tags": [
-          "management"
-        ]
+        "tags": ["management"]
       },
       "post": {
         "callbacks": {},
@@ -465,10 +435,7 @@
                     "type": "string"
                   }
                 },
-                "required": [
-                  "name",
-                  "query"
-                ],
+                "required": ["name", "query"],
                 "title": "Endpoint",
                 "type": "object"
               }
@@ -519,10 +486,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "name",
-                    "query"
-                  ],
+                  "required": ["name", "query"],
                   "title": "Endpoint",
                   "type": "object"
                 }
@@ -542,9 +506,7 @@
           }
         },
         "summary": "Create endpoint",
-        "tags": [
-          "management"
-        ]
+        "tags": ["management"]
       }
     },
     "/api/endpoints/{token}": {
@@ -585,10 +547,7 @@
           }
         },
         "summary": "Delete endpoint",
-        "tags": [
-          "management",
-          "management"
-        ]
+        "tags": ["management", "management"]
       },
       "get": {
         "callbacks": {},
@@ -646,10 +605,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "name",
-                    "query"
-                  ],
+                  "required": ["name", "query"],
                   "title": "Endpoint",
                   "type": "object"
                 }
@@ -669,9 +625,7 @@
           }
         },
         "summary": "Fetch endpoint",
-        "tags": [
-          "management"
-        ]
+        "tags": ["management"]
       },
       "patch": {
         "callbacks": {},
@@ -728,10 +682,7 @@
                     "type": "string"
                   }
                 },
-                "required": [
-                  "name",
-                  "query"
-                ],
+                "required": ["name", "query"],
                 "title": "Endpoint",
                 "type": "object"
               }
@@ -782,10 +733,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "name",
-                    "query"
-                  ],
+                  "required": ["name", "query"],
                   "title": "Endpoint",
                   "type": "object"
                 }
@@ -805,9 +753,7 @@
           }
         },
         "summary": "Update endpoint",
-        "tags": [
-          "management"
-        ]
+        "tags": ["management"]
       },
       "put": {
         "callbacks": {},
@@ -864,10 +810,7 @@
                     "type": "string"
                   }
                 },
-                "required": [
-                  "name",
-                  "query"
-                ],
+                "required": ["name", "query"],
                 "title": "Endpoint",
                 "type": "object"
               }
@@ -918,10 +861,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "name",
-                    "query"
-                  ],
+                  "required": ["name", "query"],
                   "title": "Endpoint",
                   "type": "object"
                 }
@@ -941,9 +881,7 @@
           }
         },
         "summary": "Update endpoint",
-        "tags": [
-          "management"
-        ]
+        "tags": ["management"]
       }
     },
     "/api/sources": {
@@ -1046,9 +984,7 @@
                         "type": "string"
                       }
                     },
-                    "required": [
-                      "name"
-                    ],
+                    "required": ["name"],
                     "title": "Source",
                     "type": "object"
                   },
@@ -1060,9 +996,7 @@
           }
         },
         "summary": "List sources",
-        "tags": [
-          "management"
-        ]
+        "tags": ["management"]
       },
       "post": {
         "callbacks": {},
@@ -1161,9 +1095,7 @@
                     "type": "string"
                   }
                 },
-                "required": [
-                  "name"
-                ],
+                "required": ["name"],
                 "title": "Source",
                 "type": "object"
               }
@@ -1266,9 +1198,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "name"
-                  ],
+                  "required": ["name"],
                   "title": "Source",
                   "type": "object"
                 }
@@ -1288,9 +1218,7 @@
           }
         },
         "summary": "Create source",
-        "tags": [
-          "management"
-        ]
+        "tags": ["management"]
       }
     },
     "/api/sources/{token}": {
@@ -1331,9 +1259,7 @@
           }
         },
         "summary": "Delete source",
-        "tags": [
-          "management"
-        ]
+        "tags": ["management"]
       },
       "get": {
         "callbacks": {},
@@ -1443,9 +1369,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "name"
-                  ],
+                  "required": ["name"],
                   "title": "Source",
                   "type": "object"
                 }
@@ -1465,9 +1389,7 @@
           }
         },
         "summary": "Fetch source",
-        "tags": [
-          "management"
-        ]
+        "tags": ["management"]
       },
       "patch": {
         "callbacks": {},
@@ -1576,9 +1498,7 @@
                     "type": "string"
                   }
                 },
-                "required": [
-                  "name"
-                ],
+                "required": ["name"],
                 "title": "Source",
                 "type": "object"
               }
@@ -1681,9 +1601,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "name"
-                  ],
+                  "required": ["name"],
                   "title": "Source",
                   "type": "object"
                 }
@@ -1703,9 +1621,7 @@
           }
         },
         "summary": "Update source",
-        "tags": [
-          "management"
-        ]
+        "tags": ["management"]
       },
       "put": {
         "callbacks": {},
@@ -1814,9 +1730,7 @@
                     "type": "string"
                   }
                 },
-                "required": [
-                  "name"
-                ],
+                "required": ["name"],
                 "title": "Source",
                 "type": "object"
               }
@@ -1919,9 +1833,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "name"
-                  ],
+                  "required": ["name"],
                   "title": "Source",
                   "type": "object"
                 }
@@ -1941,9 +1853,7 @@
           }
         },
         "summary": "Update source",
-        "tags": [
-          "management"
-        ]
+        "tags": ["management"]
       }
     },
     "/api/teams": {
@@ -1971,10 +1881,7 @@
                               "type": "string"
                             }
                           },
-                          "required": [
-                            "email",
-                            "name"
-                          ],
+                          "required": ["email", "name"],
                           "title": "TeamUser",
                           "type": "object"
                         },
@@ -2028,20 +1935,12 @@
                             "type": "string"
                           }
                         },
-                        "required": [
-                          "email",
-                          "provider",
-                          "token",
-                          "provider_uid",
-                          "api_key"
-                        ],
+                        "required": ["email", "provider", "token", "provider_uid", "api_key"],
                         "title": "User",
                         "type": "object"
                       }
                     },
-                    "required": [
-                      "name"
-                    ],
+                    "required": ["name"],
                     "title": "Team",
                     "type": "object"
                   },
@@ -2053,9 +1952,7 @@
           }
         },
         "summary": "List teams",
-        "tags": [
-          "management"
-        ]
+        "tags": ["management"]
       },
       "post": {
         "callbacks": {},
@@ -2079,10 +1976,7 @@
                           "type": "string"
                         }
                       },
-                      "required": [
-                        "email",
-                        "name"
-                      ],
+                      "required": ["email", "name"],
                       "title": "TeamUser",
                       "type": "object"
                     },
@@ -2136,20 +2030,12 @@
                         "type": "string"
                       }
                     },
-                    "required": [
-                      "email",
-                      "provider",
-                      "token",
-                      "provider_uid",
-                      "api_key"
-                    ],
+                    "required": ["email", "provider", "token", "provider_uid", "api_key"],
                     "title": "User",
                     "type": "object"
                   }
                 },
-                "required": [
-                  "name"
-                ],
+                "required": ["name"],
                 "title": "Team",
                 "type": "object"
               }
@@ -2177,10 +2063,7 @@
                             "type": "string"
                           }
                         },
-                        "required": [
-                          "email",
-                          "name"
-                        ],
+                        "required": ["email", "name"],
                         "title": "TeamUser",
                         "type": "object"
                       },
@@ -2234,20 +2117,12 @@
                           "type": "string"
                         }
                       },
-                      "required": [
-                        "email",
-                        "provider",
-                        "token",
-                        "provider_uid",
-                        "api_key"
-                      ],
+                      "required": ["email", "provider", "token", "provider_uid", "api_key"],
                       "title": "User",
                       "type": "object"
                     }
                   },
-                  "required": [
-                    "name"
-                  ],
+                  "required": ["name"],
                   "title": "Team",
                   "type": "object"
                 }
@@ -2267,9 +2142,7 @@
           }
         },
         "summary": "Create Team",
-        "tags": [
-          "management"
-        ]
+        "tags": ["management"]
       }
     },
     "/api/teams/{token}": {
@@ -2310,9 +2183,7 @@
           }
         },
         "summary": "Delete Team",
-        "tags": [
-          "management"
-        ]
+        "tags": ["management"]
       },
       "get": {
         "callbacks": {},
@@ -2347,10 +2218,7 @@
                             "type": "string"
                           }
                         },
-                        "required": [
-                          "email",
-                          "name"
-                        ],
+                        "required": ["email", "name"],
                         "title": "TeamUser",
                         "type": "object"
                       },
@@ -2404,20 +2272,12 @@
                           "type": "string"
                         }
                       },
-                      "required": [
-                        "email",
-                        "provider",
-                        "token",
-                        "provider_uid",
-                        "api_key"
-                      ],
+                      "required": ["email", "provider", "token", "provider_uid", "api_key"],
                       "title": "User",
                       "type": "object"
                     }
                   },
-                  "required": [
-                    "name"
-                  ],
+                  "required": ["name"],
                   "title": "Team",
                   "type": "object"
                 }
@@ -2437,9 +2297,7 @@
           }
         },
         "summary": "Fetch team",
-        "tags": [
-          "management"
-        ]
+        "tags": ["management"]
       },
       "patch": {
         "callbacks": {},
@@ -2473,10 +2331,7 @@
                           "type": "string"
                         }
                       },
-                      "required": [
-                        "email",
-                        "name"
-                      ],
+                      "required": ["email", "name"],
                       "title": "TeamUser",
                       "type": "object"
                     },
@@ -2530,20 +2385,12 @@
                         "type": "string"
                       }
                     },
-                    "required": [
-                      "email",
-                      "provider",
-                      "token",
-                      "provider_uid",
-                      "api_key"
-                    ],
+                    "required": ["email", "provider", "token", "provider_uid", "api_key"],
                     "title": "User",
                     "type": "object"
                   }
                 },
-                "required": [
-                  "name"
-                ],
+                "required": ["name"],
                 "title": "Team",
                 "type": "object"
               }
@@ -2571,10 +2418,7 @@
                             "type": "string"
                           }
                         },
-                        "required": [
-                          "email",
-                          "name"
-                        ],
+                        "required": ["email", "name"],
                         "title": "TeamUser",
                         "type": "object"
                       },
@@ -2628,20 +2472,12 @@
                           "type": "string"
                         }
                       },
-                      "required": [
-                        "email",
-                        "provider",
-                        "token",
-                        "provider_uid",
-                        "api_key"
-                      ],
+                      "required": ["email", "provider", "token", "provider_uid", "api_key"],
                       "title": "User",
                       "type": "object"
                     }
                   },
-                  "required": [
-                    "name"
-                  ],
+                  "required": ["name"],
                   "title": "Team",
                   "type": "object"
                 }
@@ -2661,9 +2497,7 @@
           }
         },
         "summary": "Update team",
-        "tags": [
-          "management"
-        ]
+        "tags": ["management"]
       },
       "put": {
         "callbacks": {},
@@ -2697,10 +2531,7 @@
                           "type": "string"
                         }
                       },
-                      "required": [
-                        "email",
-                        "name"
-                      ],
+                      "required": ["email", "name"],
                       "title": "TeamUser",
                       "type": "object"
                     },
@@ -2754,20 +2585,12 @@
                         "type": "string"
                       }
                     },
-                    "required": [
-                      "email",
-                      "provider",
-                      "token",
-                      "provider_uid",
-                      "api_key"
-                    ],
+                    "required": ["email", "provider", "token", "provider_uid", "api_key"],
                     "title": "User",
                     "type": "object"
                   }
                 },
-                "required": [
-                  "name"
-                ],
+                "required": ["name"],
                 "title": "Team",
                 "type": "object"
               }
@@ -2795,10 +2618,7 @@
                             "type": "string"
                           }
                         },
-                        "required": [
-                          "email",
-                          "name"
-                        ],
+                        "required": ["email", "name"],
                         "title": "TeamUser",
                         "type": "object"
                       },
@@ -2852,20 +2672,12 @@
                           "type": "string"
                         }
                       },
-                      "required": [
-                        "email",
-                        "provider",
-                        "token",
-                        "provider_uid",
-                        "api_key"
-                      ],
+                      "required": ["email", "provider", "token", "provider_uid", "api_key"],
                       "title": "User",
                       "type": "object"
                     }
                   },
-                  "required": [
-                    "name"
-                  ],
+                  "required": ["name"],
                   "title": "Team",
                   "type": "object"
                 }
@@ -2885,9 +2697,7 @@
           }
         },
         "summary": "Update team",
-        "tags": [
-          "management"
-        ]
+        "tags": ["management"]
       }
     }
   },

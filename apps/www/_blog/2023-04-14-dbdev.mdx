@@ -164,10 +164,8 @@ For example, you could apply a deny listing to your API using `hdr.in_deny_list(
 ```sql
 select
   *
-from
-  app.memos
-where
-  not hdr.in_deny_list ();
+from app.memos
+where not hdr.in_deny_list();
 ```
 
 ### olirice-index_advisor

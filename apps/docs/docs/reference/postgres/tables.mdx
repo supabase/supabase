@@ -1,19 +1,15 @@
 ---
 id: tables
-title: "Tables"
+title: 'Tables'
 slug: tables
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/postgres.yml
 ---
-
-import Tabs from '@theme/Tabs';
-import TabsPanel from '@theme/TabsPanel';
 
 Tables are similar to excel spreadsheets. They contain columns & rows of data. There are a few key differences from a spreadsheet however:
 
 - Every column is a strict type of data. When you set up a column, you must define what "data type" it is.
 - Tables can be joined together through relationships. For example you can have a "users" table, which is joined to a "teams" table.
 
-
 <Tabs
   defaultActiveId="sql"
   groupId="reference/postgres"
@@ -28,43 +24,27 @@ create table table_name (
   name text
 );
 
-# with schema 
+# with schema
 create table schema_name.table_name (
   id integer primary key,
   data jsonb,
   name text
 );
 ```
-
 
 </TabsPanel>
 
 </Tabs>
 
-
-
-
-
 ## Notes
 
-- Tables contain columns, rows, triggers, comments, 
+- Tables contain columns, rows, triggers, comments,
 - It is best practice to use lowercase and underscores when naming tables. For example: `table_name`, not `Table Name`.
 - Tables belong to [schemas](/docs/reference/postgres/schemas). If you don't explicitly pass the schema, Postgres will assume that you want to create the table in the `public` schema.
-
-
-
-
-
-
-
-
-
 
 ## Examples
 
 ### Create table
-
-
 
 <Tabs
   defaultActiveId="sql"
@@ -80,22 +60,19 @@ create table table_name (
   name text
 );
 
-# with schema 
+# with schema
 create table schema_name.table_name (
   id integer primary key,
   data jsonb,
   name text
 );
 ```
-
 
 </TabsPanel>
 
 </Tabs>
 
 ### Primary keys using multiple columns
-
-
 
 <Tabs
   defaultActiveId="sql"
@@ -113,14 +90,11 @@ create table table_name (
 );
 ```
 
-
 </TabsPanel>
 
 </Tabs>
 
 ### Multiple foreign keys to the same table
-
-
 
 <Tabs
   defaultActiveId="sql"
@@ -135,14 +109,11 @@ alter table table_name
   add constraint constraint_name_2 foreign key (column_2) references foreign_table(id);
 ```
 
-
 </TabsPanel>
 
 </Tabs>
 
 ### Delete a table
-
-
 
 <Tabs
   defaultActiveId="sql"
@@ -154,7 +125,6 @@ alter table table_name
 ```sql
 delete table if exists table_name;
 ```
-
 
 </TabsPanel>
 

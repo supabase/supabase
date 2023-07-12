@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useParams } from 'common'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
@@ -19,35 +19,52 @@ export interface QueryItemProps {
 
 const QueryItem = ({ tabInfo }: QueryItemProps) => {
   const { ref, id: activeId } = useParams()
-  const { id, name } = tabInfo || {}
+  const { id, name, description } = tabInfo || {}
   const isActive = id === activeId
+  const activeItemRef = useRef<HTMLElement | null>(null)
+
+  useEffect(() => {
+    // scroll to active item
+    if (isActive && activeItemRef.current) {
+      // race condition hack
+      setTimeout(() => {
+        activeItemRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+      }, 0)
+    }
+  })
 
   return (
     <div
       key={id}
       className={clsx(
         'flex items-center justify-between rounded-md group',
-        isActive && 'text-scale-1200 bg-scale-300'
+        isActive && 'text-scale-1200 bg-scale-400 dark:bg-scale-600 -active'
       )}
+      ref={isActive ? (activeItemRef as React.RefObject<HTMLDivElement>) : null}
     >
       <Link href={`/project/${ref}/sql/${id}`}>
         <a className="py-1 px-3 w-full">
           <p
-            title={name}
+            title={description || name}
             className="text-sm text-scale-1100 group-hover:text-scale-1200 transition"
           >
             {name}
           </p>
         </a>
       </Link>
-      <div className="pr-3">{isActive && <QueryItemActions tabInfo={tabInfo} />}</div>
+      <div className="pr-3">{<QueryItemActions tabInfo={tabInfo} activeId={activeId} />}</div>
     </div>
   )
 }
 
 export default QueryItem
 
-const QueryItemActions = observer(({ tabInfo }: { tabInfo: SqlSnippet }) => {
+interface QueryItemActionsProps {
+  tabInfo: SqlSnippet
+  activeId: string | undefined
+}
+
+const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps) => {
   const { ui } = useStore()
   const { ref } = useParams()
   const router = useRouter()
@@ -63,6 +80,7 @@ const QueryItemActions = observer(({ tabInfo }: { tabInfo: SqlSnippet }) => {
   const { id, name } = tabInfo || {}
   const [renameModalOpen, setRenameModalOpen] = useState(false)
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+  const isActive = id === activeId
 
   const onCloseRenameModal = () => {
     setRenameModalOpen(false)
@@ -100,7 +118,7 @@ const QueryItemActions = observer(({ tabInfo }: { tabInfo: SqlSnippet }) => {
   }
 
   return (
-    <div>
+    <div className="group [div&>button[data-state='open']>span]:text-scale-900">
       {IS_PLATFORM ? (
         <Dropdown
           side="bottom"
@@ -117,24 +135,28 @@ const QueryItemActions = observer(({ tabInfo }: { tabInfo: SqlSnippet }) => {
             </>
           }
         >
-          <Button
-            as="span"
-            type="text"
-            icon={<IconChevronDown size="tiny" strokeWidth={2} className="text-scale-1100" />}
-            style={{ padding: '3px' }}
-          />
+          <span
+            className={clsx(
+              'p-0.5 rounded-md',
+              isActive
+                ? 'text-scale-1100 hover:bg-scale-800'
+                : 'text-scale-300 dark:text-scale-200 hover:bg-scale-500 group-hover:text-scale-1100'
+            )}
+          >
+            <IconChevronDown size="tiny" strokeWidth={2} />
+          </span>
         </Dropdown>
       ) : (
-        <Button as="span" type="text" style={{ padding: '3px' }} />
+        <Button asChild disabled type="text" style={{ padding: '3px' }}>
+          <span></span>
+        </Button>
       )}
-
       <RenameQueryModal
         snippet={tabInfo}
         visible={renameModalOpen}
         onCancel={onCloseRenameModal}
         onComplete={onCloseRenameModal}
       />
-
       <ConfirmationModal
         header="Confirm to delete"
         buttonLabel="Delete query"

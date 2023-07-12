@@ -88,15 +88,11 @@ export function getCreateFDWSql({
 
   const createTablesSql = tables
     .map((newTable) => {
-      const table = wrapperMeta.tables[newTable.index]
-
       const columns: AvailableColumn[] = newTable.columns
-        .map((name: string) => table.availableColumns.find((c) => c.name === name))
-        .filter(Boolean)
 
       return /* SQL */ `
-        create foreign table ${newTable.schema_name}.${newTable.table_name} (
-          ${columns.map((column) => `${column.name} ${column.type}`).join(',\n          ')}
+        create foreign table "${newTable.schema_name}"."${newTable.table_name}" (
+          ${columns.map((column) => `"${column.name}" ${column.type}`).join(',\n          ')}
         )
         server ${formState.server_name}
         options (

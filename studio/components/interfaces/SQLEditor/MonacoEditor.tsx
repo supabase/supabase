@@ -1,19 +1,21 @@
 import Editor, { Monaco, OnMount } from '@monaco-editor/react'
 import { timeout } from 'lib/helpers'
-import { useEffect, useRef } from 'react'
+import { MutableRefObject, useEffect, useRef } from 'react'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
+
+export type IStandaloneCodeEditor = Parameters<OnMount>[0]
 
 export type MonacoEditorProps = {
   id: string
+  editorRef: MutableRefObject<IStandaloneCodeEditor | null>
   isExecuting: boolean
-  executeQuery: (overrideSql?: string) => void
+  executeQuery: () => void
 }
 
-const MonacoEditor = ({ id, isExecuting, executeQuery }: MonacoEditorProps) => {
+const MonacoEditor = ({ id, editorRef, isExecuting, executeQuery }: MonacoEditorProps) => {
   const snap = useSqlEditorStateSnapshot({ sync: true })
   const snippet = snap.snippets[id]
 
-  const editorRef = useRef<any>(null)
   const monacoRef = useRef<Monaco | null>(null)
   const executeQueryRef = useRef(executeQuery)
   executeQueryRef.current = executeQuery
@@ -22,7 +24,9 @@ const MonacoEditor = ({ id, isExecuting, executeQuery }: MonacoEditorProps) => {
     if (!editorRef.current || !monacoRef.current) return
 
     const model = editorRef.current.getModel()
-    monacoRef.current.editor.setModelMarkers(model, 'owner', [])
+    if (model !== null) {
+      monacoRef.current.editor.setModelMarkers(model, 'owner', [])
+    }
   }, [])
 
   useEffect(() => {
@@ -49,13 +53,7 @@ const MonacoEditor = ({ id, isExecuting, executeQuery }: MonacoEditorProps) => {
       contextMenuGroupId: 'operation',
       contextMenuOrder: 0,
       run: () => {
-        if (isExecuting) return
-
-        const selectedValue = (editorRef?.current)
-          .getModel()
-          .getValueInRange(editorRef?.current?.getSelection())
-
-        executeQueryRef.current?.(selectedValue || editorRef?.current?.getValue())
+        executeQueryRef.current()
       },
     })
 

@@ -29,9 +29,10 @@ A review of [database normalization](https://ocw.mit.edu/courses/civil-and-envir
 
 Postgres has tons of useful types beyond the basics, knowing how to use them will show you can leverage the true power of Postgres. JSONB for example can be incredibly useful for storing non-structured data, which you can query using syntax like:
 
+{/* prettier-ignore */}
 ```sql
 -- grades = {'geography': 'A', 'history': 'B', 'postgres': 'A++'}
-SELECT * FROM students WHERE grades->>'geography' = 'A';
+select * from students where grades->>'geography' = 'A';
 ```
 
 ### Know about namespacing with SCHEMAs
@@ -47,8 +48,7 @@ The art of indexing in Postgres could fill an entire book. In some circumstances
 An index can be simple, for example, if your students table is most frequently queried on surname alone, you create an index:
 
 ```sql
-CREATE INDEX idx_students_surname
-ON students(surname);
+create index idx_students_surname on students (surname);
 ```
 
 The default index type used here is `btree` (you could have specified this as `USING btree`), but there are other types of indexes, such as `BRIN`, `GiST`, `GIN`, `hash`, and more. Readers wanting to go deeper may also want to explore [Partial](https://www.postgresql.org/docs/current/indexes-partial.html) or [Multicolumn](https://www.postgresql.org/docs/13/indexes-multicolumn.html) Indexes.
@@ -139,22 +139,23 @@ Whilst PL/pgSQL does have [loops](https://www.postgresql.org/docs/current/plpgsq
 
 Common table expressions are temporary or intermediate result sets. They can make your queries more readable and even enable recursion. The typical form is:
 
+{/* prettier-ignore */}
 ```sql
-WITH ten_strumpers AS (
-    SELECT id, first_name
-    FROM students
-    WHERE surname = 'Strumper'
-    ORDER BY first_name
-    LIMIT 10
+with ten_strumpers as (
+  select id, first_name
+  from students
+  where surname = 'Strumper'
+  order by first_name
+  limit 10
 )
-SELECT id
-FROM ten_strumpers
-WHERE first_name LIKE "S%";
+select id
+from ten_strumpers
+where first_name like "S%";
 ```
 
 If you can reason about most of the topics in this post then you'll be in a very strong position to impress with your answers to PostgreSQL interview questions. As with all programming topics however, the real learning starts when you put these things into practice. At Supabase we offer a very very fast (the fastest?) way to spin up a PostgreSQL database and start querying it, and our browser based SQL editor is getting more powerful every day.
 
-[Get started on Supabase for free here](https://app.supabase.com)
+[Get started on Supabase for free here](https://supabase.com/dashboard)
 
 Thanks Steve Chavez for providing all the good bits of this post :)
 

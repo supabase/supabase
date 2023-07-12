@@ -45,7 +45,7 @@ export const useDatabaseHooks = <TData = DatabaseTriggersData>(
       // @ts-ignore
       select(data) {
         return (data as PostgresTrigger[]).filter(
-          (trigger) => trigger.function_schema === 'supabase_functions' && trigger.schema !== 'net'
+          (trigger) => trigger.function_schema === 'supabase_functions' && (trigger.schema !== 'net' || trigger.function_args.length === 0)
         )
       },
       enabled:

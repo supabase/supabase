@@ -114,13 +114,13 @@ functions:
     title: 'signUp()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signUp'
     notes: |
-      - By default, the user needs to verify their email address before logging in. To turn this off, disable **Confirm email** in [your project](https://app.supabase.com/project/_/auth/providers).
+      - By default, the user needs to verify their email address before logging in. To turn this off, disable **Confirm email** in [your project](https://supabase.com/dashboard/project/_/auth/providers).
       - **Confirm email** determines if users need to confirm their email address after signing up.
         - If **Confirm email** is enabled, a `user` is returned but `session` is null.
         - If **Confirm email** is disabled, both a `user` and a `session` are returned.
-      - By default, when the user confirms their email address, they are redirected to the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url). You can modify your `SITE_URL` or add additional redirect URLs in [your project](https://app.supabase.com/project/_/auth/url-configuration).
+      - By default, when the user confirms their email address, they are redirected to the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url). You can modify your `SITE_URL` or add additional redirect URLs in [your project](https://supabase.com/dashboard/project/_/auth/url-configuration).
       - If signUp() is called for an existing confirmed user:
-          - If **Confirm email** is enabled in [your project](https://app.supabase.com/project/_/auth/providers), an obfuscated/fake user object is returned.
+          - If **Confirm email** is enabled in [your project](https://supabase.com/dashboard/project/_/auth/providers), an obfuscated/fake user object is returned.
           - If **Confirm email** is disabled, the error message, `User already registered` is returned.
       - To fetch the currently logged-in user, refer to [`getUser()`](/docs/reference/javascript/auth-getuser).
     examples:
@@ -192,7 +192,7 @@ functions:
       - This method is used for passwordless sign-ins where a OTP is sent to the user's email or phone number.
       - If you're using an email, you can configure whether you want the user to receive a magiclink or a OTP.
       - If you're using phone, you can configure whether you want the user to receive a OTP.
-      - The magic link's destination URL is determined by the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url). You can modify the `SITE_URL` or add additional redirect URLs in [your project](https://app.supabase.com/project/_/auth/url-configuration).
+      - The magic link's destination URL is determined by the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url). You can modify the `SITE_URL` or add additional redirect URLs in [your project](https://supabase.com/dashboard/project/_/auth/url-configuration).
     examples:
       - id: sign-in-with-email.
         name: Sign in with email.
@@ -236,11 +236,11 @@ functions:
         isSpotlight: false
         description: |
           When the third-party provider successfully authenticates the user, the provider will redirect the user to the URL specified in the `redirectTo` parameter. This parameter defaults to the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url). It does not redirect the user immediately after invoking this method.
-          You can modify the `SITE_URL` or add additional redirect URLs in [your project](https://app.supabase.com/project/_/auth/url-configuration).
+          You can modify the `SITE_URL` or add additional redirect URLs in [your project](https://supabase.com/dashboard/project/_/auth/url-configuration).
         js: |
           ```js
           const { data, error } = await supabase.auth.signInWithOAuth({
-            provider: 'github'
+            provider: 'github',
             options: {
               redirectTo: 'https://example.com/welcome'
             }
@@ -255,7 +255,7 @@ functions:
         js: |
           ```js
           const { data, error } = await supabase.auth.signInWithOAuth({
-            provider: 'github'
+            provider: 'github',
             options: {
               scopes: 'repo gist notifications'
             }
@@ -334,7 +334,7 @@ functions:
     notes: |
       - In order to use the `updateUser()` method, the user needs to be signed in first.
       - By Default, email updates sends a confirmation link to both the user's current and new email.
-      To only send a confirmation link to the user's new email, disable **Secure email change** in your project's [email auth provider settings](https://app.supabase.com/project/_/auth/providers).
+      To only send a confirmation link to the user's new email, disable **Secure email change** in your project's [email auth provider settings](https://supabase.com/dashboard/project/_/auth/providers).
     examples:
       - id: update-the-email-for-an-authenticated-user
         name: Update the email for an authenticated user
@@ -746,7 +746,7 @@ functions:
     description: 'This is the description'
     $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.select'
     notes: |
-      - By default, Supabase projects return a maximum of 1,000 rows. This setting can be changed in your project's [API settings](https://app.supabase.com/project/_/settings/api). It's recommended that you keep it low to limit the payload size of accidental or malicious requests. You can use `range()` queries to paginate through your data.
+      - By default, Supabase projects return a maximum of 1,000 rows. This setting can be changed in your project's [API settings](https://supabase.com/dashboard/project/_/settings/api). It's recommended that you keep it low to limit the payload size of accidental or malicious requests. You can use `range()` queries to paginate through your data.
       - `select()` can be combined with [Filters](/docs/reference/javascript/using-filters)
       - `select()` can be combined with [Modifiers](/docs/reference/javascript/using-modifiers)
       - `apikey` is a reserved keyword if you're using the [Supabase Platform](/docs/guides/platform) and [should be avoided as a column name](https://github.com/supabase/supabase/issues/5465).
@@ -5406,7 +5406,7 @@ functions:
     title: 'from.getPublicUrl()'
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.getPublicUrl'
     notes: |
-      - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/javascript/storage-updatebucket) or by going to Storage on [app.supabase.com](https://app.supabase.com), clicking the overflow menu on a bucket and choosing "Make public"
+      - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/javascript/storage-updatebucket) or by going to Storage on [supabase.com/dashboard](https://supabase.com/dashboard), clicking the overflow menu on a bucket and choosing "Make public"
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: none

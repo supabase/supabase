@@ -120,7 +120,7 @@ from
     'https://webhook.site/223c8a43-725b-4cbd-b1fe-d0da73353a6b', -- webhook URL
     '{"hello": "world"}', -- payload
     'application/json'
-  )
+  );
 ```
 
 #### Scheduling the job
@@ -176,6 +176,7 @@ select * from cron.job_run_details;
 
 To stop a running cron job, you can run:
 
+{/* prettier-ignore */}
 ```sql
 select cron.unschedule('webhook-every-minute'); -- pass the name of the cron job
 ```
@@ -210,7 +211,7 @@ If you're familiar with `C`, you could also help `@pramsey` to implement async f
 
 There are plenty of ways to run cron jobs these days. You can trigger them from your local machine. You can install them on a VPS. You can schedule Serverless functions. You can use a paid service. You can use GitHub Actions.
 
-Is Postgres the best place to put your cron jobs? `¯\_(ツ)_/¯`. Postgres databases are free on Supabase and since it takes only one minute to [get started](https://app.supabase.com/), why not make your next cron server a Postgres database?
+Is Postgres the best place to put your cron jobs? `¯\_(ツ)_/¯`. Postgres databases are free on Supabase and since it takes only one minute to [get started](https://supabase.com/dashboard/), why not make your next cron server a Postgres database?
 
 ## More Postgres resources
 

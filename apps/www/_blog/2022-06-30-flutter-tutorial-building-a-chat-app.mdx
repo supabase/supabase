@@ -70,13 +70,13 @@ Run `flutter pub get` to install the packages. Note that you will have to termin
 
 ### Creating a new Supabase project
 
-If you do not have a Supabase account yet, do not worry, you can [get started for free](https://app.supabase.com/).
+If you do not have a Supabase account yet, do not worry, you can [get started for free](https://supabase.com/dashboard/).
 
 You will be prompted to sign in using your Github account with a big green button, so let's go ahead and press it. Proceed with the sign up process and once you are done, you will be taken to a list of projects. You can go ahead and create a new project by pressing the “New Project” button at the top.
 
 ![Create new Supabase project](/images/blog/flutter-chat/create-new-supabase-project.png)
 
-You will be entering a few things here like the name of the project. You can call it “chat” for now. For the database password, go ahead and hit the “Generate a password” button to generate a random password. We won't use this password in this app, but if you ever need it, you can always override it later to whatever you want it to be. You can leave the pricing plan for free as Supabase has a very generous free tier that will be way more than enough for our chat app. Once you have entered everything, you can press the “Create new Project” button. Spinning up a brand new Supabase project could take a few minutes.
+You will be entering a few things here like the name of the project. You can call it “chat” for now. For the database password, go ahead and hit the “Generate a password” button to generate a random password. We won't use this password in this app, but if you ever need it, you can always override it later to whatever you want it to be. You can leave the pricing plan for free as Supabase has a very generous free plan that will be way more than enough for our chat app. Once you have entered everything, you can press the “Create new Project” button. Spinning up a brand new Supabase project could take a few minutes.
 
 Once your project is ready, we can dive into setting up our project!
 
@@ -109,7 +109,7 @@ create table if not exists public.profiles (
 comment on table public.profiles is 'Holds all of users profile information';
 
 create table if not exists public.messages (
-    id uuid not null primary key default uuid_generate_v4(),
+    id uuid not null primary key default gen_random_uuid(),
     profile_id uuid default auth.uid() references public.profiles(id) on delete cascade not null,
     content varchar(500) not null,
     created_at timestamp with time zone default timezone('utc' :: text, now()) not null
@@ -266,7 +266,7 @@ class MyApp extends StatelessWidget {
 
 When a user launches the app, we want to redirect those who have already signed in to the Chat page and those who have not signed in yet to the register page.
 In order to achieve this, we will create a splash page, which is just a page with a preloader at the middle from the user, but takes care of fetching auth state and redirects users accordingly behind the scenes.
-Within the `_redirect()` method, we are fetching the auth state and navigating the user accordingly. 
+Within the `_redirect()` method, we are fetching the auth state and navigating the user accordingly.
 
 ```dart title="lib/pages/splash_page.dart"
 import 'package:flutter/material.dart';

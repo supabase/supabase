@@ -16,7 +16,7 @@ const defaultRouterMock = () => {
 useRouter.mockReturnValue(defaultRouterMock())
 
 import LogsPreviewer from 'components/interfaces/Settings/Logs/LogsPreviewer'
-import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
+import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 import { fireEvent, waitFor, screen, act } from '@testing-library/react'
 import { render } from '../../helpers'
 import userEvent from '@testing-library/user-event'
@@ -87,25 +87,27 @@ test.each([
     queryType: 'auth',
     tableName: undefined,
     tableLog: logDataFixture({
-      event_message: JSON.stringify({
-        msg: 'some message',
-        path: '/auth-path',
-        level: 'info',
-        status: 300,
-      }),
+      event_message: 'some event_message',
+      level: 'info',
+      path: '/auth-path',
+      msg: 'some metadata_msg',
+      level: 'info',
+      status: 300,
+      metadata: undefined,
     }),
     selectionLog: logDataFixture({
-      event_message: JSON.stringify({
-        msg: 'some message',
+      event_message: 'some event_message',
+      metadata: {
+        msg: 'some metadata_msg',
         path: '/auth-path',
         level: 'info',
         status: 300,
-      }),
+      },
     }),
-    tableTexts: [/auth\-path/, /some message/, /INFO/],
+    tableTexts: [/auth\-path/, /some metadata_msg/, /INFO/],
     selectionTexts: [
       /auth\-path/,
-      /some message/,
+      /some metadata_msg/,
       /INFO/,
       /300/,
       /Timestamp/,
@@ -347,7 +349,7 @@ test('log event chart hide', async () => {
     return { result: [] }
   })
   render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
-  await screen.findByText(/Logs \/ Time/)
+  await screen.findByText(/No data/)
   const toggle = await screen.findByText(/Chart/)
   userEvent.click(toggle)
   await expect(screen.findByText('Events')).rejects.toThrow()
@@ -449,13 +451,12 @@ test('filters accept filterOverride', async () => {
   })
 })
 
-describe.each(['FREE', 'PRO', 'TEAM', 'ENTERPRISE'])('upgrade modal for %s', (key) => {
+describe.each(['free', 'pro', 'team', 'enterprise'])('upgrade modal for %s', (key) => {
   beforeEach(() => {
-    useProjectSubscriptionQuery.mockReturnValue({
+    useProjectSubscriptionV2Query.mockReturnValue({
       data: {
-        tier: {
-          supabase_prod_id: `tier_${key.toLocaleLowerCase()}`,
-          key,
+        plan: {
+          id: key,
         },
       },
     })
@@ -472,5 +473,36 @@ describe.each(['FREE', 'PRO', 'TEAM', 'ENTERPRISE'])('upgrade modal for %s', (ke
     useParams.mockReturnValue(router.query)
     render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
     await screen.findByText('Log retention') // assert modal title is present
+  })
+})
+
+test('datepicker onChange will set the query params for outbound api request', async () => {
+  useProjectSubscriptionV2Query.mockReturnValue({
+    data: {
+      plan: {
+        id: 'enterprise',
+      },
+    },
+  })
+  get.mockImplementation((url) => {
+    return { result: [] }
+  })
+  render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
+  // renders time locally
+  userEvent.click(await screen.findByText('Custom'))
+  // inputs with local time
+  const toHH = await screen.findByDisplayValue('23')
+  userEvent.clear(toHH)
+  userEvent.type(toHH, '12')
+
+  userEvent.click(await screen.findByText('20'), { selector: '.react-datepicker__day' })
+  userEvent.click(await screen.findByText('21'), { selector: '.react-datepicker__day' })
+  userEvent.click(await screen.findByText('Apply'))
+
+  await waitFor(() => {
+    expect(get).toHaveBeenCalledWith(
+      expect.stringMatching(/.+select.+event_message.+iso_timestamp_end=/),
+      expect.anything()
+    )
   })
 })

@@ -49,6 +49,7 @@ const GlassPanel = ({
       <div className="relative h-[33px] w-auto max-w-[145px]">
         <Image
           src={logoImage}
+          alt={title}
           layout="fill"
           objectFit="contain"
           objectPosition="left"
@@ -102,13 +103,14 @@ const GlassPanel = ({
             <IconBackground>
               <img
                 className="w-5"
+                alt={title}
                 src={`${icon}${hasLightIcon && !isDarkMode ? '-light' : ''}.svg`}
               />
             </IconBackground>
           ) : (
             icon && <IconBackground>{icon}</IconBackground>
           )}
-          <h5 className="text-base text-scale-1200">{title}</h5>
+          <p className="text-base text-scale-1200">{title}</p>
         </div>
 
         {children && <span className="text-sm text-scale-1100 flex-grow">{children}</span>}

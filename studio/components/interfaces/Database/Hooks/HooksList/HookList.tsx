@@ -1,32 +1,24 @@
-import Image from 'next/image'
-import { FC } from 'react'
-import { includes } from 'lodash'
-import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Badge, Button, Dropdown, IconMoreVertical, IconTrash, IconEdit3 } from 'ui'
+import { includes, noop } from 'lodash'
+import Image from 'next/image'
 
-import { checkPermissions, useStore } from 'hooks'
 import { useParams } from 'common/hooks'
-import { BASE_PATH } from 'lib/constants'
-import Table from 'components/to-be-cleaned/Table'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import Table from 'components/to-be-cleaned/Table'
 import { useDatabaseHooks } from 'data/database-triggers/database-triggers-query'
+import { useCheckPermissions } from 'hooks'
+import { BASE_PATH } from 'lib/constants'
+import { Badge, Button, Dropdown, IconEdit3, IconMoreVertical, IconTrash } from 'ui'
 
-interface Props {
+export interface HookListProps {
   schema: string
   filterString: string
   editHook: (hook: any) => void
   deleteHook: (hook: any) => void
 }
 
-const HookList: FC<Props> = ({
-  schema,
-  filterString,
-  editHook = () => {},
-  deleteHook = () => {},
-}) => {
-  const { ui } = useStore()
+const HookList = ({ schema, filterString, editHook = noop, deleteHook = noop }: HookListProps) => {
   const { ref } = useParams()
   const { project } = useProjectContext()
   const { data: hooks } = useDatabaseHooks({
@@ -34,13 +26,16 @@ const HookList: FC<Props> = ({
     connectionString: project?.connectionString,
   })
 
-  const restUrl = ui.selectedProject?.restUrl
+  const restUrl = project?.restUrl
   const restUrlTld = new URL(restUrl as string).hostname.split('.').pop()
 
   const filteredHooks = (hooks ?? []).filter(
-    (x: any) => includes(x.name.toLowerCase(), filterString.toLowerCase()) && x.schema === schema
+    (x: any) =>
+      includes(x.name.toLowerCase(), filterString.toLowerCase()) &&
+      x.schema === schema &&
+      x.function_args.length >= 2
   )
-  const canUpdateWebhook = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'triggers')
+  const canUpdateWebhook = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'triggers')
 
   return (
     <>
@@ -99,12 +94,14 @@ const HookList: FC<Props> = ({
                       </>
                     }
                   >
-                    <Button as="span" type="default" icon={<IconMoreVertical />} className="px-1" />
+                    <Button asChild type="default" icon={<IconMoreVertical />} className="px-1">
+                      <span></span>
+                    </Button>
                   </Dropdown>
                 ) : (
                   <Tooltip.Root delayDuration={0}>
-                    <Tooltip.Trigger>
-                      <Button as="span" disabled type="default" icon={<IconMoreVertical />} />
+                    <Tooltip.Trigger asChild>
+                      <Button disabled type="default" icon={<IconMoreVertical />} />
                     </Tooltip.Trigger>
                     <Tooltip.Portal>
                       <Tooltip.Content side="left">
@@ -132,4 +129,4 @@ const HookList: FC<Props> = ({
   )
 }
 
-export default observer(HookList)
+export default HookList

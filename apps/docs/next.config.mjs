@@ -1,15 +1,18 @@
+// @ts-check
 import nextMdx from '@next/mdx'
 import remarkGfm from 'remark-gfm'
 import rehypeSlug from 'rehype-slug'
-
-//import theme from 'shiki/themes/nord.json' assert { type: 'json' }
+import { remarkCodeHike } from '@code-hike/mdx'
 
 import withTM from 'next-transpile-modules'
 import withYaml from 'next-plugin-yaml'
-// import admonitions from 'remark-admonitions'
+import configureBundleAnalyzer from '@next/bundle-analyzer'
 
-// import { remarkCodeHike } from '@code-hike/mdx'
-// import codeHikeTheme from './codeHikeTheme.js'
+import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
+
+const withBundleAnalyzer = configureBundleAnalyzer({
+  enabled: process.env.ANALYZE === 'true',
+})
 
 /**
  * Rewrites and redirects are handled by
@@ -22,24 +25,22 @@ const withMDX = nextMdx({
   extension: /\.mdx?$/,
   options: {
     remarkPlugins: [
-      // [
-      //   remarkCodeHike,
-      //   {
-      //     theme: codeHikeTheme,
-      //     autoImport: false,
-      //     lineNumbers: true,
-      //     showCopyButton: true,
-      //   },
-      // ],
+      [
+        remarkCodeHike,
+        {
+          theme: codeHikeTheme,
+          lineNumbers: true,
+          showCopyButton: true,
+        },
+      ],
       remarkGfm,
     ],
     rehypePlugins: [rehypeSlug],
-    // This is required for `MDXProvider` component
-    // providerImportSource: '@mdx-js/react',
+    providerImportSource: '@mdx-js/react',
   },
 })
 
-// /** @type {NextConfig} */
+/** @type {import('next').NextConfig} nextConfig */
 const nextConfig = {
   // Append the default value with md extensions
   pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
@@ -54,10 +55,18 @@ const nextConfig = {
       'user-images.githubusercontent.com',
       'raw.githubusercontent.com',
       'weweb-changelog.ghost.io',
+      'img.youtube.com',
+      'archbee-image-uploads.s3.amazonaws.com',
     ],
   },
   experimental: {
-    mdxRs: true,
+    // TODO: @next/mdx ^13.0.2 only supports experimental mdxRs flag. next ^13.0.2 will stop warning about this being unsupported.
+    // mdxRs: true,
+    modularizeImports: {
+      lodash: {
+        transform: 'lodash/{{member}}',
+      },
+    },
   },
   async headers() {
     return [
@@ -92,9 +101,22 @@ const nextConfig = {
   },
 }
 
-// next.config.js
-export default () => {
-  // const plugins = [withMDX]/
-  const plugins = [withTM(['ui', 'common', '@supabase/auth-helpers-nextjs']), withMDX, withYaml]
+const configExport = () => {
+  const plugins = [
+    withTM([
+      'ui',
+      'common',
+      '@supabase/auth-helpers-nextjs',
+      'mermaid',
+      'mdx-mermaid',
+      'dayjs',
+      'shared-data',
+    ]),
+    withMDX,
+    withYaml,
+    withBundleAnalyzer,
+  ]
   return plugins.reduce((acc, next) => next(acc), nextConfig)
 }
+
+export default configExport

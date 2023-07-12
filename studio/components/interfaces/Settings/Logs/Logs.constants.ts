@@ -1,5 +1,4 @@
 import dayjs from 'dayjs'
-import { IS_PLATFORM } from 'lib/constants'
 import { DatetimeHelper, FilterTableSet, LogTemplate } from '.'
 
 export const LOGS_EXPLORER_DOCS_URL =
@@ -278,19 +277,19 @@ export const SQL_FILTER_TEMPLATES: any = {
   },
   auth_logs: {
     ..._SQL_FILTER_COMMON,
-    'severity.error': `REGEXP_CONTAINS(event_message, "level.{3}error|level.{3}fatal")`,
-    'severity.warning': `REGEXP_CONTAINS(event_message, "level.{3}warning")`,
-    'severity.info': `REGEXP_CONTAINS(event_message, "level.{3}info")`,
-    'status_code.server_error': `REGEXP_CONTAINS(event_message, "status.{3}5[0-9]{2}")`,
-    'status_code.client_error': `REGEXP_CONTAINS(event_message, "status.{3}4[0-9]{2}")`,
-    'status_code.redirection': `REGEXP_CONTAINS(event_message, "status.{3}3[0-9]{2}")`,
-    'status_code.success': `REGEXP_CONTAINS(event_message, "status.{3}2[0-9]{2}")`,
-    'endpoints.admin': `REGEXP_CONTAINS(event_message, "path.{3}/admin")`,
-    'endpoints.signup': `REGEXP_CONTAINS(event_message, "path.{3}/signup|path.{3}/invite|path.{3}/verify")`,
-    'endpoints.authentication': `REGEXP_CONTAINS(event_message, "path.{3}/token|path.{3}/authorize|path.{3}/callback|path.{3}/otp|path.{3}/magiclink")`,
-    'endpoints.recover': `REGEXP_CONTAINS(event_message, "path.{3}/recover")`,
-    'endpoints.user': `REGEXP_CONTAINS(event_message, "path.{3}/user")`,
-    'endpoints.logout': `REGEXP_CONTAINS(event_message, "path.{3}/logout")`,
+    'severity.error': `metadata.level = 'error' or metadata.level = 'fatal'`,
+    'severity.warning': `metadata.level = 'warning'`,
+    'severity.info': `metadata.level = 'info'`,
+    'status_code.server_error': `metadata.status between 500 and 599`,
+    'status_code.client_error': `metadata.status between 400 and 499`,
+    'status_code.redirection': `metadata.status between 300 and 399`,
+    'status_code.success': `metadata.status between 200 and 299`,
+    'endpoints.admin': `REGEXP_CONTAINS(metadata.path, "/admin")`,
+    'endpoints.signup': `REGEXP_CONTAINS(metadata.path, "/signup|/invite|/verify")`,
+    'endpoints.authentication': `REGEXP_CONTAINS(metadata.path, "/token|/authorize|/callback|/otp|/magiclink")`,
+    'endpoints.recover': `REGEXP_CONTAINS(metadata.path, "/recover")`,
+    'endpoints.user': `REGEXP_CONTAINS(metadata.path, "/user")`,
+    'endpoints.logout': `REGEXP_CONTAINS(metadata.path, "/logout")`,
   },
   realtime_logs: {
     ..._SQL_FILTER_COMMON,
@@ -658,13 +657,11 @@ export const getDefaultHelper = (helpers: DatetimeHelper[]) =>
   helpers.find((helper) => helper.default) || helpers[0]
 
 export const TIER_QUERY_LIMITS: {
-  [x: string]: { text: string; value: 1 | 7 | 90; unit: 'day'; promptUpgrade: boolean }
+  [x: string]: { text: string; value: 1 | 7 | 28 | 90; unit: 'day'; promptUpgrade: boolean }
 } = {
   FREE: { text: '1 day', value: 1, unit: 'day', promptUpgrade: true },
   PRO: { text: '7 days', value: 7, unit: 'day', promptUpgrade: true },
-  PAYG: { text: '90 days', value: 90, unit: 'day', promptUpgrade: false },
-  TEAM: { text: '90 days', value: 90, unit: 'day', promptUpgrade: false },
+  PAYG: { text: '7 days', value: 7, unit: 'day', promptUpgrade: true },
+  TEAM: { text: '28 days', value: 28, unit: 'day', promptUpgrade: true },
   ENTERPRISE: { text: '90 days', value: 90, unit: 'day', promptUpgrade: false },
 }
-
-export const SHOW_O11Y = IS_PLATFORM || process.env.NEXT_PUBLIC_ENABLE_LOGS == 'true'

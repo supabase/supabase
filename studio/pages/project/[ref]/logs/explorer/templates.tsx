@@ -67,14 +67,14 @@ const Template = ({ projectRef, template }: { projectRef?: string; template: Log
             }
           >
             <Button
+              asChild
               type="default"
-              as="span"
               onClick={(e) => {
                 e.preventDefault()
                 setShowPreview(!showPreview)
               }}
             >
-              Preview
+              <span>Preview</span>
             </Button>
           </Popover>
         </div>

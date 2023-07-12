@@ -3,7 +3,7 @@ import StepHikeCompact from '~/components/StepHikeCompact'
 
 export const meta = {
   title: 'Use Supabase Auth with React',
-  subtitle: 'Learn how to Supabase Auth with React.js.',
+  subtitle: 'Learn how to use Supabase Auth with React.js.',
   breadcrumb: 'Auth Quickstarts',
 }
 
@@ -12,9 +12,9 @@ export const meta = {
   <StepHikeCompact.Step step={1}>
     <StepHikeCompact.Details title="Create a new Supabase project">
 
-    [Launch a new project](https://app.supabase.com) in the Supabase Dashboard.
+    [Launch a new project](https://supabase.com/dashboard) in the Supabase Dashboard.
 
-    Your new database has a table for storing your users. You can see that this table is currently empty by running some SQL in the [SQL Editor](https://app.supabase.com/project/_/sql).
+    Your new database has a table for storing your users. You can see that this table is currently empty by running some SQL in the [SQL Editor](https://supabase.com/dashboard/project/_/sql).
 
     </StepHikeCompact.Details>
 
@@ -68,7 +68,7 @@ export const meta = {
   <StepHikeCompact.Step step={4}>
     <StepHikeCompact.Details title="Set up your login component">
 
-    In `index.js`, create a Supabase client using your [Project URL and public API (anon) key](https://app.supabase.com/project/_/settings/api).
+    In `index.js`, create a Supabase client using your [Project URL and public API (anon) key](https://supabase.com/dashboard/project/_/settings/api).
 
     You can configure the Auth component to display whenever there is no session inside `supabase.auth.getSession()`
 
@@ -98,7 +98,7 @@ export const meta = {
             } = supabase.auth.onAuthStateChange((_event, session) => {
               setSession(session)
             })
-            
+
             return () => subscription.unsubscribe()
           }, [])
 

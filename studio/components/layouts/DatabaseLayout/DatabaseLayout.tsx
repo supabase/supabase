@@ -1,24 +1,25 @@
-import { FC, ReactNode, useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
+import { PropsWithChildren, useEffect, useState } from 'react'
 
-import { useFlag, useStore, withAuth } from 'hooks'
-import ProjectLayout from '../'
 import Error from 'components/ui/Error'
 import ProductMenu from 'components/ui/ProductMenu'
-import { generateDatabaseMenu } from './DatabaseMenu.utils'
+import { useFlag, useSelectedProject, useStore, withAuth } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
+import ProjectLayout from '../'
+import { generateDatabaseMenu } from './DatabaseMenu.utils'
 
-interface Props {
+export interface DatabaseLayoutProps {
   title?: string
-  children: ReactNode
 }
 
-const DatabaseLayout: FC<Props> = ({ title, children }) => {
-  const { meta, ui, vault, backups } = useStore()
-  const { isLoading } = meta.schemas
+const DatabaseLayout = ({ title, children }: PropsWithChildren<DatabaseLayoutProps>) => {
+  const { ui, meta, vault, backups } = useStore()
+  const { isLoading: isSchemasLoading } = meta.schemas
+  const { isLoading: isVaultLoading } = vault
+
   const { isInitialized, error } = meta.tables
-  const project = ui.selectedProject
+  const project = useSelectedProject()
 
   const router = useRouter()
   const page = router.pathname.split('/')[4]
@@ -26,11 +27,13 @@ const DatabaseLayout: FC<Props> = ({ title, children }) => {
   const vaultExtension = meta.extensions.byId('supabase_vault')
   const isVaultEnabled = vaultExtension !== undefined && vaultExtension.installed_version !== null
   const foreignDataWrappersEnabled = useFlag('foreignDataWrappers')
+  const pgNetExtensionExists = meta.extensions.byId('pg_net') !== undefined
 
+  const isLoading = isSchemasLoading || (isVaultEnabled && isVaultLoading)
   const [loaded, setLoaded] = useState<boolean>(isInitialized)
 
   useEffect(() => {
-    if (ui.selectedProject?.ref) {
+    if (ui.selectedProjectRef) {
       // Eventually should only load the required stores based on the pages
       meta.schemas.load()
       meta.tables.load()
@@ -44,13 +47,13 @@ const DatabaseLayout: FC<Props> = ({ title, children }) => {
         backups.load()
       }
     }
-  }, [ui.selectedProject?.ref])
+  }, [ui.selectedProjectRef])
 
   useEffect(() => {
     if (isVaultEnabled) {
       vault.load()
     }
-  }, [ui.selectedProject?.ref, isVaultEnabled])
+  }, [ui.selectedProjectRef, isVaultEnabled])
 
   // Optimization required: load logic should be at the page level
   // e.g backups page is waiting for meta.tables to load finish when it doesnt even need that data
@@ -73,7 +76,10 @@ const DatabaseLayout: FC<Props> = ({ title, children }) => {
       isLoading={!loaded}
       product="Database"
       productMenu={
-        <ProductMenu page={page} menu={generateDatabaseMenu(project, foreignDataWrappersEnabled)} />
+        <ProductMenu
+          page={page}
+          menu={generateDatabaseMenu(project, foreignDataWrappersEnabled, pgNetExtensionExists)}
+        />
       }
     >
       <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">

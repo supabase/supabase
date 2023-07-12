@@ -11,7 +11,7 @@ import {
   ServiceUpgrade,
   ViolatedLimit,
 } from '@supabase/shared-types/out/notifications'
-import { IconArrowRight, IconExternalLink } from 'ui'
+import { IconArrowRight, IconExternalLink, Button } from 'ui'
 import Link from 'next/link'
 
 export const formatNotificationText = (
@@ -146,7 +146,26 @@ export const formatNotificationText = (
       </div>
     )
   } else if (notification.data.name === NotificationName.ProjectInformational) {
-    return <p className="text-sm">{notification.data.message}</p>
+    const buttons = notification.data.linked_buttons ?? []
+    return (
+      <>
+        <p className="text-sm">{notification.data.message}</p>{' '}
+        {buttons.map((button, index) => {
+          return (
+            <a href={button.url} key={index} target="_blank">
+              <Button
+                asChild
+                type="default"
+                className="mr-2 mt-2 mb-2"
+                icon={<IconExternalLink size={12} strokeWidth={2} />}
+              >
+                <span>{button.text}</span>
+              </Button>
+            </a>
+          )
+        })}
+      </>
+    )
   } else {
     return (
       <p className="text-sm">

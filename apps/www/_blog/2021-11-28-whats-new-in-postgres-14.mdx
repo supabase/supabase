@@ -59,7 +59,7 @@ To store sensor reading metric data, create a table consisting of the sensor des
 create table sensor_range (
   reading_id serial primary key,
   metric_desc varchar(100),
-  metric_level  valid_levels,
+  metric_level valid_levels,
   metric_ts tsmultirange
 );
 ```
@@ -67,27 +67,23 @@ create table sensor_range (
 Now, insert some data into the table. Note that, the insert statement below provides two time ranges that are not contiguous.
 
 ```sql hideCopy
-insert into sensor_range (
-  metric_desc,
-  metric_level,
-  metric_ts
-)
-values (
-  'Temperature',
-  'high',
-  '{[2021-11-01 6:00, 2021-11-01 10:00],[2021-11-05 14:00, 2021-11-05 20:00]}'
-);
+insert into sensor_range
+  (metric_desc, metric_level, metric_ts)
+values
+  (
+    'Temperature',
+    'high',
+    '{[2021-11-01 6:00, 2021-11-01 10:00],[2021-11-05 14:00, 2021-11-05 20:00]}'
+  );
 
-insert into sensor_range (
-  metric_desc,
-  metric_level,
-  metric_ts
-)
-values (
-  'Temperature',
-  'low',
-  '{[2021-11-01 10:00, 2021-11-01 12:00],[2021-11-05 21:00, 2021-11-05 22:00]}'
-);
+insert into sensor_range
+  (metric_desc, metric_level, metric_ts)
+values
+  (
+    'Temperature',
+    'low',
+    '{[2021-11-01 10:00, 2021-11-01 12:00],[2021-11-05 21:00, 2021-11-05 22:00]}'
+  );
 ```
 
 Query the data in the table to see the inserted data rows
@@ -163,7 +159,7 @@ Indeed, there's a lot more to explore in the latest PostgreSQL, and we've barely
 There's no better way to experience some of these features than by trying them out for yourself.
 You can check out these new features within your Supabase project without having to perform a local installation.
 
-Explore the [Supabase dashboard now](https://app.supabase.com) and get started with your new project.
+Explore the [Supabase dashboard now](https://supabase.com/dashboard) and get started with your new project.
 
 ## More Postgres resources
 

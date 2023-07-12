@@ -7,7 +7,6 @@ import { Input, Modal, Form, Button } from 'ui'
 import { useStore } from 'hooks'
 import { useParams } from 'common/hooks'
 import useLogsQuery from 'hooks/analytics/useLogsQuery'
-import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
 import { NextPageWithLayout, UserContent } from 'types'
 import { uuidv4 } from 'lib/helpers'
 import { LogsLayout } from 'components/layouts'
@@ -29,6 +28,7 @@ import {
 import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
 import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 import LogsExplorerHeader from 'components/ui/Logs/LogsExplorerHeader'
+import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 
 const PLACEHOLDER_QUERY =
   'select\n  cast(timestamp as datetime) as timestamp,\n  event_message, metadata \nfrom edge_logs \nlimit 5'
@@ -41,13 +41,14 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   const [editorValue, setEditorValue] = useState<string>(PLACEHOLDER_QUERY)
   const [saveModalOpen, setSaveModalOpen] = useState<boolean>(false)
   const [warnings, setWarnings] = useState<LogsWarning[]>([])
-  const { data: subscription } = useProjectSubscriptionQuery({ projectRef })
-  const tier = subscription?.tier
-  const [{ params, logData, error, isLoading }, { changeQuery, runQuery, setParams }] =
-    useLogsQuery(projectRef as string, {
+  const { data: subscription } = useProjectSubscriptionV2Query({ projectRef })
+  const { params, logData, error, isLoading, changeQuery, runQuery, setParams } = useLogsQuery(
+    projectRef as string,
+    {
       iso_timestamp_start: its ? (its as string) : undefined,
       iso_timestamp_end: ite ? (ite as string) : undefined,
-    })
+    }
+  )
 
   const { showUpgradePrompt, setShowUpgradePrompt } = useUpgradePrompt(
     params.iso_timestamp_start as string
@@ -81,12 +82,12 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   // Show the prompt on page load based on query params
   useEffect(() => {
     if (its) {
-      const shouldShowUpgradePrompt = maybeShowUpgradePrompt(its as string, tier?.key)
+      const shouldShowUpgradePrompt = maybeShowUpgradePrompt(its as string, subscription?.plan?.id)
       if (shouldShowUpgradePrompt) {
         setShowUpgradePrompt(!showUpgradePrompt)
       }
     }
-  }, [its, tier])
+  }, [its, subscription])
 
   const onSelectTemplate = (template: LogTemplate) => {
     setEditorValue(template.searchString)
@@ -133,7 +134,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   }
 
   const handleDateChange = ({ to, from }: DatePickerToFrom) => {
-    const shouldShowUpgradePrompt = maybeShowUpgradePrompt(from, tier?.key)
+    const shouldShowUpgradePrompt = maybeShowUpgradePrompt(from, subscription?.plan?.id)
 
     if (shouldShowUpgradePrompt) {
       setShowUpgradePrompt(!showUpgradePrompt)

@@ -29,7 +29,7 @@ const Index = ({}: Props) => {
           url: `https://supabase.com/${router.pathname}`,
           images: [
             {
-              url: `https://supabase.com/images/og/og-image.jpg`,
+              url: `https://supabase.com/images/og/og-image-v2.jpg`,
             },
           ],
         }}
@@ -199,7 +199,7 @@ const Index = ({}: Props) => {
                     border-gray-100 bg-white p-5
                     pt-14 dark:border-gray-600"
                   >
-                    <a href="https://app.supabase.com/support/new">
+                    <a href="https://supabase.com/dashboard/support/new">
                       <Button size="medium" type="default" iconRight={<IconMail />}>
                         Email Support
                       </Button>

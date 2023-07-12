@@ -39,7 +39,7 @@ npm install @supabase/supabase-js
 And finally we want to save the environment variables in a `.env.local` file.
 All we need are the API URL and the `anon` key that you copied [earlier](#get-the-api-keys).
 
-```bash title=.env
+```bash .env
 VITE_SUPABASE_URL=YOUR_SUPABASE_URL
 VITE_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
 ```
@@ -49,7 +49,7 @@ on the browser, and that's completely fine since we have [Row Level Security](/d
 
 Create and edit `src/supabaseClient.js`:
 
-```js title=src/supabaseClient.js
+```js src/supabaseClient.js
 import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
@@ -67,7 +67,7 @@ Let's set up a React component to manage logins and sign ups. We'll use Magic Li
 
 Create and edit `src/Auth.jsx`:
 
-```jsx title=src/Auth.jsx
+```jsx src/Auth.jsx
 import { useState } from 'react'
 import { supabase } from './supabaseClient'
 
@@ -123,7 +123,7 @@ After a user is signed in we can allow them to edit their profile details and ma
 
 Let's create a new component for that called `src/Account.jsx`.
 
-```jsx title=src/Account.jsx
+```jsx src/Account.jsx
 import { useState, useEffect } from 'react'
 import { supabase } from './supabaseClient'
 
@@ -158,7 +158,7 @@ export default function Account({ session }) {
     getProfile()
   }, [session])
 
-  async function updateProfile(event) {
+  async function updateProfile(event, avatarUrl) {
     event.preventDefault()
 
     setLoading(true)
@@ -168,7 +168,7 @@ export default function Account({ session }) {
       id: user.id,
       username,
       website,
-      avatar_url,
+      avatarUrl,
       updated_at: new Date(),
     }
 
@@ -176,6 +176,8 @@ export default function Account({ session }) {
 
     if (error) {
       alert(error.message)
+    } else {
+      setAvatarUrl(avatarUrl)
     }
     setLoading(false)
   }
@@ -226,7 +228,7 @@ export default function Account({ session }) {
 
 Now that we have all the components in place, let's update `src/App.jsx`:
 
-```jsx title=src/App.jsx
+```jsx src/App.jsx
 import './App.css'
 import { useState, useEffect } from 'react'
 import { supabase } from './supabaseClient'
@@ -276,7 +278,7 @@ Let's create an avatar for the user so that they can upload a profile photo. We 
 
 Create and edit `src/Avatar.jsx`:
 
-```jsx title=src/Avatar.jsx
+```jsx src/Avatar.jsx
 import { useEffect, useState } from 'react'
 import { supabase } from './supabaseClient'
 
@@ -365,7 +367,7 @@ export default function Avatar({ url, size, onUpload }) {
 
 And then we can add the widget to the Account page at `src/Account.jsx`:
 
-```jsx title=src/Account.jsx
+```jsx src/Account.jsx
 // Import the new component
 import Avatar from './Avatar'
 
@@ -378,8 +380,7 @@ return (
       url={avatar_url}
       size={150}
       onUpload={(event, url) => {
-        setAvatarUrl(url)
-        updateProfile(event)
+        updateProfile(event, url)
       }}
     />
     {/* ... */}

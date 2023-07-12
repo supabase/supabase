@@ -6,7 +6,13 @@ import SideBar from '~/components/Navigation/SideBar'
 import TableOfContents from '~/components/TableOfContents'
 
 interface Props {
-  meta: { title: string; description?: string; hide_table_of_contents?: boolean; video?: string }
+  meta: {
+    title: string
+    description?: string
+    hide_table_of_contents?: boolean
+    video?: string
+    tocVideo?: string
+  }
   children: any
   toc?: any
   menuItems: any

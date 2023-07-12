@@ -11,23 +11,25 @@
 		"format": "prettier --plugin-search-dir . --write ."
 	},
 	"devDependencies": {
-		"@fontsource/fira-mono": "^4.5.0",
+		"@fontsource/fira-mono": "^4.5.10",
 		"@neoconfetti/svelte": "^1.0.0",
-		"@sveltejs/adapter-auto": "next",
-		"@sveltejs/kit": "next",
+		"@sveltejs/adapter-auto": "^2.0.1",
+		"@sveltejs/kit": "^1.16.3",
 		"@types/cookie": "^0.5.1",
-		"prettier": "^2.6.2",
-		"prettier-plugin-svelte": "^2.7.0",
-		"svelte": "^3.46.0",
-		"svelte-check": "^2.7.1",
-		"svelte-preprocess": "^4.10.6",
-		"tslib": "^2.3.1",
-		"typescript": "^4.7.4",
-		"vite": "^3.1.0"
+		"prettier": "^2.8.8",
+		"prettier-plugin-svelte": "^2.10.0",
+		"svelte": "^3.59.1",
+		"svelte-check": "^3.3.2",
+		"svelte-preprocess": "^5.0.3",
+		"tslib": "^2.5.0",
+		"typescript": "^5.0.4",
+		"vite": "^4.3.9"
 	},
 	"type": "module",
 	"dependencies": {
-		"@supabase/auth-helpers-sveltekit": "^0.8.3",
-		"@supabase/supabase-js": "^2.0.4"
+		"@supabase/auth-helpers-sveltekit": "^0.10.0",
+		"@supabase/auth-ui-shared": "^0.1.6",
+		"@supabase/auth-ui-svelte": "^0.2.2",
+		"@supabase/supabase-js": "^2.21.0"
 	}
 }

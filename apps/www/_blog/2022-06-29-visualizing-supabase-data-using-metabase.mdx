@@ -40,7 +40,7 @@ After Metabase is launched, select your preferred language and add your contact 
 
 ![screen shot of adding postgres data to metabase](/images/blog/python-1/adding-postgresql-data-metabase.png)
 
-You will be prompted to add the necessary connection information to your Supabase project. Go to your [Supabase project](https://app.supabase.com/) and hit _Settings > Database to get the database info_.
+You will be prompted to add the necessary connection information to your Supabase project. Go to your [Supabase project](https://supabase.com/dashboard/) and hit _Settings > Database to get the database info_.
 
 ![screen shot of supabase dashboard database connection information](/images/blog/python-1/supabase-dashboard-connect-database-info.png)
 
@@ -100,10 +100,11 @@ Next, under the database, select "SupabaseDB".
 We will be using the following SQL query:
 
 ```sql
-SELECT "Vendor".vendor_name, product_name, "Vendor".total_employees
-FROM "Product"
-LEFT JOIN "Vendor" on "Product".vendor_id = "Vendor".vendor_id
-WHERE "Vendor".total_employees
+select "Vendor".vendor_name, product_name, "Vendor".total_employees
+from
+  "Product"
+  left join "Vendor" on "Product".vendor_id = "Vendor".vendor_id
+where "Vendor".total_employees;
 ```
 
 This query should fetch us the vendor name and the product where the number of employees for a given vendor is less than 110.
@@ -130,7 +131,7 @@ Data visualization empowers organizations to turn unused data into actionable in
 
 ![screen shot of a meme saying visualization works every time](/images/blog/python-1/final-meme.png)
 
-With our [free tier Supabase account](https://app.supabase.com/), you can start a new project today and use Metabase to visualize your app data.
+With our [free plan Supabase account](https://supabase.com/dashboard/), you can start a new project today and use Metabase to visualize your app data.
 
 If you have any questions please reach out via [Twitter](https://twitter.com/supabase) or join our [Discord](https://discord.supabase.com).
 

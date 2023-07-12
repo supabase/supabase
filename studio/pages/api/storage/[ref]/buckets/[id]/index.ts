@@ -22,10 +22,16 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
 const handlePatch = async (req: NextApiRequest, res: NextApiResponse) => {
   const { id } = req.query
-  const { public: isPublicBucket } = req.body
+  const {
+    public: isPublicBucket,
+    allowed_mime_types: allowedMimeTypes,
+    file_size_limit: fileSizeLimit,
+  } = req.body
 
   const { data, error } = await supabase.storage.updateBucket(id as string, {
     public: isPublicBucket,
+    allowedMimeTypes,
+    fileSizeLimit,
   })
   if (error) {
     return res.status(400).json({ error: { message: error.message } })

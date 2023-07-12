@@ -104,6 +104,8 @@ create policy "Users can update their own profiles."
 2. Enables RLS.
 3. Creates a policy which allows logged in users to update their own data.
 
+**Note:** If you want to use upsert operations, the user needs to have `INSERT`, `UPDATE`, and `SELECT` permissions.
+
 ### Only anon or authenticated access
 
 You can add a Postgres role
@@ -286,43 +288,24 @@ using (
 
 ## Tips
 
-### Enable Realtime for database tables
-
-Realtime server broadcasts database changes to authorized users depending on your Row Level Security (RLS) policies.
-We recommend that you enable row level security and set row security policies on tables that you add to the publication.
-However, you may choose to disable RLS on a table and have changes broadcast to all connected clients.
-
-```sql
-/**
- * REALTIME SUBSCRIPTIONS
- * Realtime enables listening to any table in your public schema.
- */
-
-begin;
-  -- remove the realtime publication
-  drop publication if exists supabase_realtime;
-
-  -- re-create the publication but don't enable it for any tables
-  create publication supabase_realtime;
-commit;
-
--- add a table to the publication
-alter publication supabase_realtime add table products;
-
--- add other tables to the publication
-alter publication supabase_realtime add table posts;
-```
-
 ### You don't have to use policies
 
-You can also put your authorization rules in your middleware, similar to how you would create security rules with any other `backend <-> middleware <-> frontend` architecture.
+You can also put your authorization rules in your middleware, similar to how you would create security rules with any other `backend <-> middleware <-> frontend` architecture. You can use Edge Functions to run this architecture, or you can use your favorite server framework, like Rails, Django, Node.js, Phoenix, or Laravel.
 
-Policies are a tool. In the case of "serverless/Jamstack" setups, they are especially effective because you don't have to deploy any middleware at all.
+Policies are a tool. In the case of "serverless/Jamstack" setups, they are especially effective because you don't have to deploy any middleware at all and can use the javascript libraries directly from the browser.
 
-However, if you want to use another authorization method for your applications, that's also fine. Supabase is "just Postgres", so if your application
-works with Postgres, then it also works with Supabase.
+That said, if you want to use another authorization method for your applications that's also fine. Supabase is "just Postgres", so if your application works with Postgres, then it also works with Supabase.
 
-Tip: Make sure to enable RLS for all your tables, so that your tables are inaccessible. Then use the "Service" which we provide, which is designed to bypass RLS.
+If you plan to use this approach make sure to enable RLS for your tables. Then use the `service_role` key (for our client libraries) or the `postgres` role - both of these can bypass RLS. You don't need to create any policies with this approach, simply enabling RLS is sufficient:
+
+```sql
+create table profiles (
+  id serial primary key,
+  email text
+);
+
+alter table profiles enable row level security;
+```
 
 ### Never use a service key on the client
 
@@ -334,7 +317,7 @@ Initializing a client with a Service Key will not override RLS if a user token i
 
 ### Testing policies
 
-To test policies on the database itself (i.e., from the [SQL Editor](https://app.supabase.com/project/_/sql) or from `psql`) without switching to your frontend and logging in as different users, you can utilize the following helper SQL procedures ([credits](https://github.com/supabase/supabase/issues/7311#issuecomment-1398648114)):
+To test policies on the database itself (i.e., from the [SQL Editor](https://supabase.com/dashboard/project/_/sql) or from `psql`) without switching to your frontend and logging in as different users, you can utilize the following helper SQL procedures ([credits](https://github.com/supabase/supabase/issues/7311#issuecomment-1398648114)):
 
 ```sql
 grant anon, authenticated to postgres;

@@ -6,15 +6,15 @@ import { PageContext } from 'pages/project/[ref]/auth/users'
 import Table from 'components/to-be-cleaned/Table'
 import UserListItem from './UsersListItem'
 import UsersPagination from './UsersPagination'
-import { checkPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 const UsersList = ({}) => {
   const PageState: any = useContext(PageContext)
 
   // Check once on the top level, rather than checking for every row
-  const canRemoveUser = checkPermissions(PermissionAction.TENANT_SQL_DELETE, 'auth.users')
-  const canRemoveMFAFactors = checkPermissions(
+  const canRemoveUser = useCheckPermissions(PermissionAction.TENANT_SQL_DELETE, 'auth.users')
+  const canRemoveMFAFactors = useCheckPermissions(
     PermissionAction.TENANT_SQL_DELETE,
     'auth.mfa_factors'
   )

@@ -1,23 +1,23 @@
-import Image from 'next/image'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { useState, Fragment } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Badge, Button, Loading, Listbox, IconUser, Modal, IconAlertCircle, IconLoader } from 'ui'
+import Image from 'next/image'
+import { Fragment, useState } from 'react'
 
-import { Member } from 'types'
-import { useStore } from 'hooks'
 import { useParams } from 'common/hooks'
-
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import Table from 'components/to-be-cleaned/Table'
-import MemberActions from './MemberActions'
-import RolesHelperModal from './RolesHelperModal/RolesHelperModal'
-import { getRolesManagementPermissions } from './TeamSettings.utils'
-import { isInviteExpired, getUserDisplayName } from '../Organization.utils'
-import { useProfileQuery } from 'data/profile/profile-query'
-import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useOrganizationDetailQuery } from 'data/organizations/organization-detail-query'
 import { useOrganizationMemberUpdateMutation } from 'data/organizations/organization-member-update-mutation'
+import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
+import { usePermissionsQuery } from 'data/permissions/permissions-query'
+import { useSelectedOrganization, useStore } from 'hooks'
+import { useProfile } from 'lib/profile'
+import { Member } from 'types'
+import { Badge, Button, IconAlertCircle, IconLoader, IconUser, Listbox, Loading, Modal } from 'ui'
+import { getUserDisplayName, isInviteExpired } from '../Organization.utils'
+import MemberActions from './MemberActions'
+import RolesHelperModal from './RolesHelperModal/RolesHelperModal'
+import { useGetRolesManagementPermissions } from './TeamSettings.utils'
 
 interface SelectedMember extends Member {
   oldRoleId: number
@@ -31,8 +31,10 @@ export interface MembersViewProps {
 const MembersView = ({ searchString }: MembersViewProps) => {
   const { ui } = useStore()
   const { slug } = useParams()
+  const selectedOrganization = useSelectedOrganization()
 
-  const { data: profile } = useProfileQuery()
+  const { profile } = useProfile()
+  const { data: permissions } = usePermissionsQuery()
   const { data: detailData, isLoading: isLoadingOrgDetails } = useOrganizationDetailQuery({ slug })
   const { data: rolesData, isLoading: isLoadingRoles } = useOrganizationRolesQuery({ slug })
   const { mutate: updateOrganizationMember, isLoading } = useOrganizationMemberUpdateMutation({
@@ -52,7 +54,11 @@ const MembersView = ({ searchString }: MembersViewProps) => {
 
   const roles = rolesData?.roles ?? []
   const members = detailData?.members ?? []
-  const { rolesAddable, rolesRemovable } = getRolesManagementPermissions(roles)
+  const { rolesAddable, rolesRemovable } = useGetRolesManagementPermissions(
+    selectedOrganization?.id,
+    roles,
+    permissions ?? []
+  )
 
   const [selectedMember, setSelectedMember] = useState<SelectedMember>()
   const [userRoleChangeModalVisible, setUserRoleChangeModalVisible] = useState(false)
@@ -105,7 +111,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
 
   return (
     <>
-      <div className="rounded">
+      <div className="rounded w-full">
         <Loading active={!filteredMembers}>
           <Table
             head={[
@@ -154,7 +160,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                         <div className="flex items-center space-x-4">
                           <div>
                             {x.invited_id ? (
-                              <span className="flex p-2 border-2 rounded-full border-border-secondary-light dark:border-border-secondary-dark">
+                              <span className="flex p-2 border-2 rounded-full border-scale-700">
                                 <IconUser size={20} strokeWidth={2} />
                               </span>
                             ) : isEmailUser ? (

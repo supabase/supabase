@@ -12,7 +12,7 @@ import {
   IconBox,
   IconCode,
   IconDatabase,
-  IconZapOff,
+  IconZap,
 } from 'ui'
 import DatePickers from '../Settings/Logs/Logs.DatePickers'
 import { REPORTS_DATEPICKER_HELPERS } from './Reports.constants'
@@ -59,7 +59,7 @@ const PRODUCT_FILTERS = [
     filterValue: '/realtime',
     label: 'Realtime',
     description: 'Realtime connection requests',
-    icon: IconZapOff,
+    icon: IconZap,
   },
   // TODO: support functions once union parsing is fixed
   // {
@@ -184,12 +184,14 @@ const ReportFilterBar: FC<Props> = ({
           }
         >
           <Button
-            as="span"
+            asChild
             type="default"
             className="inline-flex flex-row gap-2"
             iconRight={<IconChevronDown size={14} />}
           >
-            {currentProductFilter === null ? 'All Requests' : currentProductFilter.label}
+            <span>
+              {currentProductFilter === null ? 'All Requests' : currentProductFilter.label}
+            </span>
           </Button>
         </Dropdown>
         {filters
@@ -281,12 +283,12 @@ const ReportFilterBar: FC<Props> = ({
           showClose
         >
           <Button
-            as="span"
+            asChild
             type="default"
             size="tiny"
             icon={<IconPlus size="tiny" className={`text-scale-1100 `} />}
           >
-            Add filter
+            <span>Add filter</span>
           </Button>
         </Popover>
       </div>

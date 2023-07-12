@@ -4,12 +4,10 @@ import { IS_PLATFORM } from 'lib/constants'
 
 export const generateDatabaseMenu = (
   project?: Project,
-  foreignDataWrappersEnabled: boolean = false
+  foreignDataWrappersEnabled: boolean = false,
+  pgNetExtensionExists: boolean = false
 ): ProductMenuGroup[] => {
   const ref = project?.ref ?? 'default'
-
-  const HOOKS_RELEASED = '2021-07-30T15:33:54.383Z'
-  const showHooksRoute = project?.inserted_at ? project.inserted_at > HOOKS_RELEASED : false
 
   return [
     {
@@ -41,7 +39,7 @@ export const generateDatabaseMenu = (
           url: `/project/${ref}/database/replication`,
           items: [],
         },
-        ...(showHooksRoute
+        ...(pgNetExtensionExists
           ? [
               {
                 name: 'Webhooks',
@@ -72,6 +70,12 @@ export const generateDatabaseMenu = (
               },
             ]
           : []),
+        {
+          name: 'Migrations',
+          key: 'migrations',
+          url: `/project/${ref}/database/migrations`,
+          items: [],
+        },
       ],
     },
   ]

@@ -1,28 +1,28 @@
-import { FC, useState } from 'react'
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { observer } from 'mobx-react-lite'
-import * as Tooltip from '@radix-ui/react-tooltip'
-import { Button, Menu, Alert, IconEdit } from 'ui'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useState } from 'react'
+import { Alert, Button, IconEdit, Menu } from 'ui'
 
-import { checkPermissions } from 'hooks'
 import { useParams } from 'common/hooks'
-import BucketRow from './BucketRow'
-import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
-import { StorageBucket } from 'components/interfaces/Storage/Storage.types'
-import EditBucketModal from 'components/interfaces/Storage/EditBucketModal'
 import CreateBucketModal from 'components/interfaces/Storage/CreateBucketModal'
+import EditBucketModal from 'components/interfaces/Storage/EditBucketModal'
+import { StorageBucket } from 'components/interfaces/Storage/Storage.types'
+import { DeleteBucketModal } from 'components/to-be-cleaned/Storage'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { useBucketsQuery } from 'data/storage/buckets-query'
+import { useCheckPermissions } from 'hooks'
+import BucketRow from './BucketRow'
 
-interface Props {}
-
-const StorageMenu: FC<Props> = () => {
+const StorageMenu = () => {
   const router = useRouter()
   const { ref, bucketId } = useParams()
   const [showCreateBucketModal, setShowCreateBucketModal] = useState(false)
   const [selectedBucketToEdit, setSelectedBucketToEdit] = useState<StorageBucket>()
-  const canCreateBuckets = checkPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
+  const [selectedBucketToDelete, setSelectedBucketToDelete] = useState<StorageBucket>()
+  const canCreateBuckets = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
 
   const page = router.pathname.split('/')[4] as
     | undefined
@@ -31,8 +31,8 @@ const StorageMenu: FC<Props> = () => {
     | 'usage'
     | 'logs'
 
-  const storageExplorerStore = useStorageStore()
-  const { loaded, buckets, openDeleteBucketModal } = storageExplorerStore || {}
+  const { data, isLoading, isError, isSuccess } = useBucketsQuery({ projectRef: ref })
+  const buckets = data ?? []
 
   return (
     <>
@@ -78,13 +78,24 @@ const StorageMenu: FC<Props> = () => {
           <div className="">
             <div>
               <Menu.Group title="All buckets" />
-              {!loaded ? (
-                <div className="space-y-2">
+
+              {isLoading && (
+                <div className="space-y-2 mx-2">
                   <ShimmeringLoader className="!py-2.5" />
-                  <ShimmeringLoader className="!py-2.5 w-3/4" />
-                  <ShimmeringLoader className="!py-2.5 w-1/2" />
+                  <ShimmeringLoader className="!py-2.5" />
+                  <ShimmeringLoader className="!py-2.5" />
                 </div>
-              ) : (
+              )}
+
+              {isError && (
+                <div className="px-2">
+                  <Alert variant="warning" title="Failed to fetch buckets">
+                    Please refresh to try again.
+                  </Alert>
+                </div>
+              )}
+
+              {isSuccess && (
                 <>
                   {buckets.length === 0 && (
                     <div className="px-2">
@@ -101,7 +112,7 @@ const StorageMenu: FC<Props> = () => {
                         bucket={bucket}
                         projectRef={ref}
                         isSelected={isSelected}
-                        onSelectDeleteBucket={openDeleteBucketModal}
+                        onSelectDeleteBucket={() => setSelectedBucketToDelete(bucket)}
                         onSelectEditBucket={() => setSelectedBucketToEdit(bucket)}
                       />
                     )
@@ -131,6 +142,12 @@ const StorageMenu: FC<Props> = () => {
         visible={selectedBucketToEdit !== undefined}
         bucket={selectedBucketToEdit}
         onClose={() => setSelectedBucketToEdit(undefined)}
+      />
+
+      <DeleteBucketModal
+        visible={selectedBucketToDelete !== undefined}
+        bucket={selectedBucketToDelete}
+        onClose={() => setSelectedBucketToDelete(undefined)}
       />
     </>
   )

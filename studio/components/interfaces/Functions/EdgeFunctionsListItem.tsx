@@ -1,14 +1,13 @@
-import dayjs from 'dayjs'
-import { FC, useState } from 'react'
-import { useRouter } from 'next/router'
-import { observer } from 'mobx-react-lite'
-import { IconCheck, IconClipboard } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
+import dayjs from 'dayjs'
+import { useRouter } from 'next/router'
+import { FC, useState } from 'react'
 
-import { useStore } from 'hooks'
 import { useParams } from 'common/hooks'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Table from 'components/to-be-cleaned/Table'
 import { EdgeFunctionsResponse } from 'data/edge-functions/edge-functions-query'
+import { IconCheck, IconClipboard } from 'ui'
 
 interface Props {
   function: EdgeFunctionsResponse
@@ -16,14 +15,14 @@ interface Props {
 
 const EdgeFunctionsListItem: FC<Props> = ({ function: item }) => {
   const router = useRouter()
-  const { ui } = useStore()
   const { ref } = useParams()
   const [isCopied, setIsCopied] = useState(false)
 
+  const { project } = useProjectContext()
   // get the .co or .net TLD from the restUrl
-  const restUrl = ui.selectedProject?.restUrl
+  const restUrl = project?.restUrl
   const restUrlTld = new URL(restUrl as string).hostname.split('.').pop()
-  const functionUrl = `https://${ref}.functions.supabase.${restUrlTld}/${item.slug}`
+  const functionUrl = `https://${ref}.supabase.${restUrlTld}/functions/v1/${item.slug}`
 
   return (
     <Table.tr
@@ -103,4 +102,4 @@ const EdgeFunctionsListItem: FC<Props> = ({ function: item }) => {
   )
 }
 
-export default observer(EdgeFunctionsListItem)
+export default EdgeFunctionsListItem

@@ -1,25 +1,26 @@
+import { useQueryClient } from '@tanstack/react-query'
+import ClientLibrary from 'components/interfaces/Home/ClientLibrary'
+import ExampleProject from 'components/interfaces/Home/ExampleProject'
+import { CLIENT_LIBRARIES, EXAMPLE_PROJECTS } from 'components/interfaces/Home/Home.constants'
 import Link from 'next/link'
 import { FC, useEffect, useRef } from 'react'
-import { observer } from 'mobx-react-lite'
-import { Badge, IconArrowRight, IconLoader, Button } from 'ui'
-import ExampleProject from 'components/interfaces/Home/ExampleProject'
-import ClientLibrary from 'components/interfaces/Home/ClientLibrary'
-import { CLIENT_LIBRARIES, EXAMPLE_PROJECTS } from 'components/interfaces/Home/Home.constants'
+import { Badge, Button, IconArrowRight, IconLoader } from 'ui'
 
-import { API_URL, PROJECT_STATUS } from 'lib/constants'
-import { useStore } from 'hooks'
-import { getWithTimeout } from 'lib/common/fetch'
-import { Project } from 'types'
 import { DisplayApiSettings, DisplayConfigSettings } from 'components/ui/ProjectSettings'
+import { invalidateProjectsQuery } from 'data/projects/projects-query'
+import { getWithTimeout } from 'lib/common/fetch'
+import { API_URL, PROJECT_STATUS } from 'lib/constants'
+import { Project } from 'types'
 
-interface Props {
+export interface BuildingStateProps {
   project: Project
 }
 
-const BuildingState: FC<Props> = ({ project }) => {
-  const { ui, app } = useStore()
+const BuildingState = ({ project }: BuildingStateProps) => {
+  const queryClient = useQueryClient()
   const checkServerInterval = useRef<number>()
 
+  // TODO: move to react-query
   async function checkServer() {
     if (!project) return
 
@@ -30,9 +31,8 @@ const BuildingState: FC<Props> = ({ project }) => {
       const { status } = projectStatus
       if (status === PROJECT_STATUS.ACTIVE_HEALTHY) {
         clearInterval(checkServerInterval.current)
-        // re-fetch project detail.
-        // This will also trigger UI state change to show project building completed
-        await app.projects.fetchDetail(project.ref)
+
+        await invalidateProjectsQuery(queryClient)
       }
     }
   }
@@ -156,7 +156,7 @@ const BuildingState: FC<Props> = ({ project }) => {
     </div>
   )
 }
-export default observer(BuildingState)
+export default BuildingState
 
 const ChecklistItem = ({ description }: any) => {
   return (

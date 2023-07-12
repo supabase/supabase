@@ -1,26 +1,20 @@
-import { createServerComponentSupabaseClient } from "@supabase/auth-helpers-nextjs";
-import { headers, cookies } from "next/headers";
+import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
+import { cookies } from 'next/headers'
+import RealtimePosts from './realtime-posts'
+import NewPost from './new-post'
 
-import type { Database } from "@/lib/database.types";
-import RealtimePosts from "./realtime-posts";
-import Login from "./login";
-import NewPost from "./new-post";
-
-// do not cache this page
-export const revalidate = 0;
+import type { Database } from '@/lib/database.types'
 
 export default async function ServerComponent() {
-  const supabase = createServerComponentSupabaseClient<Database>({
-    headers,
+  const supabase = createServerComponentClient<Database>({
     cookies,
-  });
-  const { data } = await supabase.from("posts").select("*");
+  })
+  const { data } = await supabase.from('posts').select('*')
 
   return (
     <>
-      <Login />
       <NewPost />
       <RealtimePosts serverPosts={data ?? []} />
     </>
-  );
+  )
 }

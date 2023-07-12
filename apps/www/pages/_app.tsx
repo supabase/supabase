@@ -1,22 +1,33 @@
-import { APP_NAME, DESCRIPTION } from 'lib/constants'
+import '../../../packages/ui/build/css/themes/light.css'
+import '../../../packages/ui/build/css/themes/dark.css'
+
+import '../styles/index.css'
+
+import { API_URL, APP_NAME, DESCRIPTION } from 'lib/constants'
 import { DefaultSeo } from 'next-seo'
 import { AppProps } from 'next/app'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import Meta from '~/components/Favicons'
 import '../styles/index.css'
-import { post } from './../lib/fetchWrapper'
-import { AuthProvider, ThemeProvider } from 'common'
+import { post } from '~/lib/fetchWrapper'
+import { AuthProvider, ThemeProvider, useTelemetryProps } from 'common'
 import Head from 'next/head'
+import 'config/code-hike.scss'
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter()
+  const telemetryProps = useTelemetryProps()
 
   function handlePageTelemetry(route: string) {
-    return post(`https://api.supabase.io/platform/telemetry/page`, {
+    return post(`${API_URL}/telemetry/page`, {
       referrer: document.referrer,
       title: document.title,
       route,
+      ga: {
+        screen_resolution: telemetryProps?.screenResolution,
+        language: telemetryProps?.language,
+      },
     })
   }
 
@@ -59,7 +70,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
           site_name: 'Supabase',
           images: [
             {
-              url: `https://supabase.com${basePath}/images/og/og-image.jpg`,
+              url: `https://supabase.com${basePath}/images/og/og-image-v2.jpg`,
               width: 800,
               height: 600,
               alt: 'Supabase Og Image',
@@ -73,7 +84,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
         }}
       />
       <AuthProvider>
-        <ThemeProvider>
+        <ThemeProvider detectSystemColorPreference={false}>
           <Component {...pageProps} />
         </ThemeProvider>
       </AuthProvider>

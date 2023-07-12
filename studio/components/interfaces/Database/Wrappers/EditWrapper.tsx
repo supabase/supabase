@@ -16,7 +16,7 @@ import {
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { VaultSecret } from 'types'
-import { checkPermissions, useImmutableValue, useStore } from 'hooks'
+import { useCheckPermissions, useImmutableValue, useStore } from 'hooks'
 import { useParams } from 'common/hooks'
 import { useFDWsQuery } from 'data/fdw/fdws-query'
 import { useFDWUpdateMutation } from 'data/fdw/fdw-update-mutation'
@@ -56,7 +56,6 @@ const EditWrapper = () => {
   const foundWrapper = wrappers.find((w) => Number(w.id) === Number(id))
   // this call to useImmutableValue should be removed if the redirect after update is also removed
   const wrapper = useImmutableValue(foundWrapper)
-
   const wrapperMeta = WRAPPERS.find((w) => w.handlerName === wrapper?.handler)
 
   const { mutateAsync: updateFDW, isLoading: isSaving } = useFDWUpdateMutation()
@@ -66,7 +65,7 @@ const EditWrapper = () => {
   const [selectedTableToEdit, setSelectedTableToEdit] = useState()
   const [formErrors, setFormErrors] = useState<{ [k: string]: string }>({})
 
-  const canUpdateWrapper = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'wrappers')
+  const canUpdateWrapper = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'wrappers')
 
   const initialValues =
     wrapperMeta !== undefined
@@ -342,7 +341,8 @@ const EditWrapper = () => {
                                 {table.schema_name}.{table.table_name}
                               </p>
                               <p className="text-sm text-scale-1000">
-                                {wrapperMeta.tables[table.index].label}: {table.columns.join(', ')}
+                                {wrapperMeta.tables[table.index].label}:{' '}
+                                {table.columns.map((column: any) => column.name).join(', ')}
                               </p>
                             </div>
                             <div className="flex items-center space-x-2">

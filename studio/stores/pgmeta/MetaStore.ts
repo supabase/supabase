@@ -178,9 +178,11 @@ export default class MetaStore implements IMetaStore {
     'pgsodium',
     'pgsodium_masks',
     'pgbouncer',
+    'pgtle',
     'realtime',
     'storage',
     'supabase_functions',
+    'supabase_migrations',
     'vault',
     'graphql',
     'graphql_public',
@@ -405,7 +407,6 @@ export default class MetaStore implements IMetaStore {
     try {
       // Once pg-meta supports composite keys, we can remove this logic
       const { isPrimaryKey, ...formattedPayload } = payload
-
       const column: any = await this.columns.create(formattedPayload)
       if (column.error) throw column.error
 

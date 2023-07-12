@@ -73,12 +73,10 @@ Thanks to some skilled haxors (well, weak passwords mainly) we had crypto miners
 
 The spreadsheet import is triggered when the user is creating a new table. However the code was previously loaded every time the page was visited - even when a new table was not being created. This made it a good candidate for lazy loading. Using [Next.js dynamic imports](https://nextjs.org/docs/advanced-features/dynamic-import) we are able to load this component (313 kb brotlied) dynamically, whenever the user clicks the "Add content" button.
 
-<video width="99%" muted playsInline controls="true">
+<video width="99%" muted playsInline controls={true}>
   <source
     src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/docs/lazy_loading.mov"
     type="video/mp4"
-    muted
-    playsInline
   />
 </video>
 

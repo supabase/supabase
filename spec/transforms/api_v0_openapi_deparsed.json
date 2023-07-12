@@ -327,6 +327,245 @@
         ]
       }
     },
+    "/v1/oauth/authorize": {
+      "get": {
+        "operationId": "authorize",
+        "parameters": [
+          {
+            "name": "client_id",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "response_type",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "enum": ["code", "token", "id_token token"],
+              "type": "string"
+            }
+          },
+          {
+            "name": "redirect_uri",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "scope",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "state",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "response_mode",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "code_challenge",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "code_challenge_method",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": ["plain", "sha256"],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["oauth (beta)"]
+      }
+    },
+    "/v1/oauth/token": {
+      "post": {
+        "operationId": "token",
+        "parameters": [
+          {
+            "name": "grant_type",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "enum": ["authorization_code", "refresh_token"],
+              "type": "string"
+            }
+          },
+          {
+            "name": "client_id",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "client_secret",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "code",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "code_verifier",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "redirect_uri",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "refresh_token",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": ["oauth (beta)"]
+      }
+    },
+    "/v1/oauth/authorizations/{id}": {
+      "get": {
+        "operationId": "getAuthorizationRequest",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["oauth (beta)"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "approveAuthorizationRequest",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "organization_id": {
+                    "type": "string"
+                  }
+                },
+                "required": ["organization_id"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": ["oauth (beta)"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "declineAuthorizationRequest",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["oauth (beta)"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/v1/projects/{ref}/functions": {
       "post": {
         "operationId": "createFunction",
@@ -375,6 +614,22 @@
             "in": "query",
             "schema": {
               "type": "boolean"
+            }
+          },
+          {
+            "name": "entrypoint_path",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "import_map_path",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
             }
           }
         ],
@@ -460,6 +715,12 @@
                     },
                     "import_map": {
                       "type": "boolean"
+                    },
+                    "entrypoint_path": {
+                      "type": "string"
+                    },
+                    "import_map_path": {
+                      "type": "string"
                     }
                   },
                   "required": [
@@ -547,6 +808,12 @@
                       },
                       "import_map": {
                         "type": "boolean"
+                      },
+                      "entrypoint_path": {
+                        "type": "string"
+                      },
+                      "import_map_path": {
+                        "type": "string"
                       }
                     },
                     "required": [
@@ -645,6 +912,12 @@
                     },
                     "import_map": {
                       "type": "boolean"
+                    },
+                    "entrypoint_path": {
+                      "type": "string"
+                    },
+                    "import_map_path": {
+                      "type": "string"
                     }
                   },
                   "required": [
@@ -736,6 +1009,22 @@
             "schema": {
               "type": "boolean"
             }
+          },
+          {
+            "name": "entrypoint_path",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "import_map_path",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "requestBody": {
@@ -810,6 +1099,12 @@
                     },
                     "import_map": {
                       "type": "boolean"
+                    },
+                    "entrypoint_path": {
+                      "type": "string"
+                    },
+                    "import_map_path": {
+                      "type": "string"
                     }
                   },
                   "required": [
@@ -938,6 +1233,57 @@
             "apiKeyHeader": [],
             "apiKeyParam": []
           },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/api-keys": {
+      "get": {
+        "operationId": "getProjectApiKeys",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "api_key": {
+                        "type": "string"
+                      }
+                    },
+                    "required": ["name", "api_key"]
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          }
+        },
+        "tags": ["projects"],
+        "security": [
           {
             "bearer": []
           }
@@ -1526,7 +1872,7 @@
     },
     "/v1/projects/{ref}/pgsodium": {
       "get": {
-        "operationId": "getConfig",
+        "operationId": "getPgsodiumConfig",
         "summary": "Gets project's pgsodium config",
         "parameters": [
           {
@@ -1573,7 +1919,7 @@
         ]
       },
       "put": {
-        "operationId": "updateConfig",
+        "operationId": "updatePgsodiumConfig",
         "summary": "Updates project's pgsodium config. Updating the root_key can cause all data encrypted with the older key to become inaccessible.",
         "parameters": [
           {
@@ -1668,6 +2014,9 @@
                       "type": "string"
                     },
                     "db_extra_search_path": {
+                      "type": "string"
+                    },
+                    "jwt_secret": {
                       "type": "string"
                     }
                   },
@@ -2983,6 +3332,224 @@
         ]
       }
     },
+    "/v1/projects/{ref}/config/database/pgbouncer": {
+      "get": {
+        "operationId": "getPgbouncerConfig",
+        "summary": "Gets project's pgbouncer config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "db_dns_name": {
+                      "type": "string"
+                    },
+                    "db_host": {
+                      "type": "string"
+                    },
+                    "db_name": {
+                      "type": "string"
+                    },
+                    "db_port": {
+                      "type": "number"
+                    },
+                    "db_ssl": {
+                      "type": "boolean"
+                    },
+                    "db_user": {
+                      "type": "string"
+                    },
+                    "default_pool_size": {
+                      "type": "number"
+                    },
+                    "ignore_startup_parameters": {
+                      "type": "string"
+                    },
+                    "inserted_at": {
+                      "type": "string"
+                    },
+                    "pgbouncer_enabled": {
+                      "type": "boolean"
+                    },
+                    "pgbouncer_status": {
+                      "enum": ["COMING_DOWN", "COMING_UP", "DISABLED", "ENABLED", "RELOADING"],
+                      "type": "string"
+                    },
+                    "pool_mode": {
+                      "enum": ["transaction", "session", "statement"],
+                      "type": "string"
+                    },
+                    "max_client_conn": {
+                      "type": "number",
+                      "nullable": true
+                    }
+                  },
+                  "required": [
+                    "db_dns_name",
+                    "db_host",
+                    "db_name",
+                    "db_port",
+                    "db_ssl",
+                    "db_user",
+                    "default_pool_size",
+                    "ignore_startup_parameters",
+                    "inserted_at",
+                    "pgbouncer_enabled",
+                    "pgbouncer_status",
+                    "pool_mode"
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to retrieve project's pgbouncer config"
+          }
+        },
+        "tags": ["projects config"],
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "updatePgbouncerConfig",
+        "summary": "Updates project's pgbouncer config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "default_pool_size": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 65535
+                  },
+                  "max_client_conn": {
+                    "type": "integer",
+                    "nullable": true,
+                    "minimum": 0,
+                    "maximum": 18000
+                  },
+                  "ignore_startup_parameters": {
+                    "type": "string"
+                  },
+                  "pgbouncer_enabled": {
+                    "type": "boolean"
+                  },
+                  "pool_mode": {
+                    "enum": ["transaction", "session", "statement"],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "default_pool_size",
+                  "ignore_startup_parameters",
+                  "pgbouncer_enabled",
+                  "pool_mode"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "default_pool_size": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 65535
+                    },
+                    "max_client_conn": {
+                      "type": "integer",
+                      "nullable": true,
+                      "minimum": 0,
+                      "maximum": 18000
+                    },
+                    "ignore_startup_parameters": {
+                      "type": "string"
+                    },
+                    "pgbouncer_enabled": {
+                      "type": "boolean"
+                    },
+                    "pool_mode": {
+                      "enum": ["transaction", "session", "statement"],
+                      "type": "string"
+                    },
+                    "pgbouncer_status": {
+                      "enum": ["COMING_DOWN", "COMING_UP", "DISABLED", "ENABLED", "RELOADING"],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "default_pool_size",
+                    "ignore_startup_parameters",
+                    "pgbouncer_enabled",
+                    "pool_mode",
+                    "pgbouncer_status"
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to update project's pgbouncer config"
+          }
+        },
+        "tags": ["projects config"],
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/v1/projects/{ref}/config/auth/sso/providers": {
       "post": {
         "operationId": "createProviderForProject",
@@ -3032,6 +3599,22 @@
                         "additionalProperties": {
                           "type": "object",
                           "properties": {
+                            "default": {
+                              "oneOf": [
+                                {
+                                  "type": "object"
+                                },
+                                {
+                                  "type": "number"
+                                },
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "boolean"
+                                }
+                              ]
+                            },
                             "name": {
                               "type": "string"
                             },
@@ -3040,9 +3623,6 @@
                               "items": {
                                 "type": "string"
                               }
-                            },
-                            "default": {
-                              "type": "object"
                             }
                           }
                         }
@@ -3090,6 +3670,22 @@
                               "additionalProperties": {
                                 "type": "object",
                                 "properties": {
+                                  "default": {
+                                    "oneOf": [
+                                      {
+                                        "type": "object"
+                                      },
+                                      {
+                                        "type": "number"
+                                      },
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "boolean"
+                                      }
+                                    ]
+                                  },
                                   "name": {
                                     "type": "string"
                                   },
@@ -3098,9 +3694,6 @@
                                     "items": {
                                       "type": "string"
                                     }
-                                  },
-                                  "default": {
-                                    "type": "object"
                                   }
                                 }
                               }
@@ -3213,6 +3806,22 @@
                                     "additionalProperties": {
                                       "type": "object",
                                       "properties": {
+                                        "default": {
+                                          "oneOf": [
+                                            {
+                                              "type": "object"
+                                            },
+                                            {
+                                              "type": "number"
+                                            },
+                                            {
+                                              "type": "string"
+                                            },
+                                            {
+                                              "type": "boolean"
+                                            }
+                                          ]
+                                        },
                                         "name": {
                                           "type": "string"
                                         },
@@ -3221,9 +3830,6 @@
                                           "items": {
                                             "type": "string"
                                           }
-                                        },
-                                        "default": {
-                                          "type": "object"
                                         }
                                       }
                                     }
@@ -3345,6 +3951,22 @@
                               "additionalProperties": {
                                 "type": "object",
                                 "properties": {
+                                  "default": {
+                                    "oneOf": [
+                                      {
+                                        "type": "object"
+                                      },
+                                      {
+                                        "type": "number"
+                                      },
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "boolean"
+                                      }
+                                    ]
+                                  },
                                   "name": {
                                     "type": "string"
                                   },
@@ -3353,9 +3975,6 @@
                                     "items": {
                                       "type": "string"
                                     }
-                                  },
-                                  "default": {
-                                    "type": "object"
                                   }
                                 }
                               }
@@ -3464,6 +4083,22 @@
                         "additionalProperties": {
                           "type": "object",
                           "properties": {
+                            "default": {
+                              "oneOf": [
+                                {
+                                  "type": "object"
+                                },
+                                {
+                                  "type": "number"
+                                },
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "boolean"
+                                }
+                              ]
+                            },
                             "name": {
                               "type": "string"
                             },
@@ -3472,9 +4107,6 @@
                               "items": {
                                 "type": "string"
                               }
-                            },
-                            "default": {
-                              "type": "object"
                             }
                           }
                         }
@@ -3521,6 +4153,22 @@
                               "additionalProperties": {
                                 "type": "object",
                                 "properties": {
+                                  "default": {
+                                    "oneOf": [
+                                      {
+                                        "type": "object"
+                                      },
+                                      {
+                                        "type": "number"
+                                      },
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "boolean"
+                                      }
+                                    ]
+                                  },
                                   "name": {
                                     "type": "string"
                                   },
@@ -3529,9 +4177,6 @@
                                     "items": {
                                       "type": "string"
                                     }
-                                  },
-                                  "default": {
-                                    "type": "object"
                                   }
                                 }
                               }
@@ -3647,6 +4292,22 @@
                               "additionalProperties": {
                                 "type": "object",
                                 "properties": {
+                                  "default": {
+                                    "oneOf": [
+                                      {
+                                        "type": "object"
+                                      },
+                                      {
+                                        "type": "number"
+                                      },
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "boolean"
+                                      }
+                                    ]
+                                  },
                                   "name": {
                                     "type": "string"
                                   },
@@ -3655,9 +4316,6 @@
                                     "items": {
                                       "type": "string"
                                     }
-                                  },
-                                  "default": {
-                                    "type": "object"
                                   }
                                 }
                               }
@@ -3868,6 +4526,15 @@
         },
         "required": ["name"]
       },
+      "AuthorizationsApproveBody": {
+        "type": "object",
+        "properties": {
+          "organization_id": {
+            "type": "string"
+          }
+        },
+        "required": ["organization_id"]
+      },
       "CreateFunctionBody": {
         "type": "object",
         "properties": {
@@ -3917,6 +4584,12 @@
           },
           "import_map": {
             "type": "boolean"
+          },
+          "entrypoint_path": {
+            "type": "string"
+          },
+          "import_map_path": {
+            "type": "string"
           }
         },
         "required": ["id", "slug", "name", "status", "version", "created_at", "updated_at"]
@@ -3951,6 +4624,12 @@
           },
           "import_map": {
             "type": "boolean"
+          },
+          "entrypoint_path": {
+            "type": "string"
+          },
+          "import_map_path": {
+            "type": "string"
           }
         },
         "required": ["id", "slug", "name", "status", "version", "created_at", "updated_at"]
@@ -3968,6 +4647,18 @@
             "type": "boolean"
           }
         }
+      },
+      "ApiKeyResponse": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "api_key": {
+            "type": "string"
+          }
+        },
+        "required": ["name", "api_key"]
       },
       "UpdateCustomHostnameResponse": {
         "type": "object",
@@ -4092,7 +4783,7 @@
         },
         "required": ["root_key"]
       },
-      "PostgrestConfigResponse": {
+      "PostgrestConfigWithJWTSecretResponse": {
         "type": "object",
         "properties": {
           "max_rows": {
@@ -4102,6 +4793,9 @@
             "type": "string"
           },
           "db_extra_search_path": {
+            "type": "string"
+          },
+          "jwt_secret": {
             "type": "string"
           }
         },
@@ -4122,6 +4816,21 @@
             "type": "string"
           }
         }
+      },
+      "PostgrestConfigResponse": {
+        "type": "object",
+        "properties": {
+          "max_rows": {
+            "type": "integer"
+          },
+          "db_schema": {
+            "type": "string"
+          },
+          "db_extra_search_path": {
+            "type": "string"
+          }
+        },
+        "required": ["max_rows", "db_schema", "db_extra_search_path"]
       },
       "SecretResponse": {
         "type": "object",
@@ -4563,9 +5272,155 @@
           "session_replication_role"
         ]
       },
+      "ProjectPgBouncerConfig": {
+        "type": "object",
+        "properties": {
+          "db_dns_name": {
+            "type": "string"
+          },
+          "db_host": {
+            "type": "string"
+          },
+          "db_name": {
+            "type": "string"
+          },
+          "db_port": {
+            "type": "number"
+          },
+          "db_ssl": {
+            "type": "boolean"
+          },
+          "db_user": {
+            "type": "string"
+          },
+          "default_pool_size": {
+            "type": "number"
+          },
+          "ignore_startup_parameters": {
+            "type": "string"
+          },
+          "inserted_at": {
+            "type": "string"
+          },
+          "pgbouncer_enabled": {
+            "type": "boolean"
+          },
+          "pgbouncer_status": {
+            "enum": ["COMING_DOWN", "COMING_UP", "DISABLED", "ENABLED", "RELOADING"],
+            "type": "string"
+          },
+          "pool_mode": {
+            "enum": ["transaction", "session", "statement"],
+            "type": "string"
+          },
+          "max_client_conn": {
+            "type": "number",
+            "nullable": true
+          }
+        },
+        "required": [
+          "db_dns_name",
+          "db_host",
+          "db_name",
+          "db_port",
+          "db_ssl",
+          "db_user",
+          "default_pool_size",
+          "ignore_startup_parameters",
+          "inserted_at",
+          "pgbouncer_enabled",
+          "pgbouncer_status",
+          "pool_mode"
+        ]
+      },
+      "UpdatePgbouncerConfigBody": {
+        "type": "object",
+        "properties": {
+          "default_pool_size": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 65535
+          },
+          "max_client_conn": {
+            "type": "integer",
+            "nullable": true,
+            "minimum": 0,
+            "maximum": 18000
+          },
+          "ignore_startup_parameters": {
+            "type": "string"
+          },
+          "pgbouncer_enabled": {
+            "type": "boolean"
+          },
+          "pool_mode": {
+            "enum": ["transaction", "session", "statement"],
+            "type": "string"
+          }
+        },
+        "required": [
+          "default_pool_size",
+          "ignore_startup_parameters",
+          "pgbouncer_enabled",
+          "pool_mode"
+        ]
+      },
+      "UpdatePoolingConfigResponse": {
+        "type": "object",
+        "properties": {
+          "default_pool_size": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 65535
+          },
+          "max_client_conn": {
+            "type": "integer",
+            "nullable": true,
+            "minimum": 0,
+            "maximum": 18000
+          },
+          "ignore_startup_parameters": {
+            "type": "string"
+          },
+          "pgbouncer_enabled": {
+            "type": "boolean"
+          },
+          "pool_mode": {
+            "enum": ["transaction", "session", "statement"],
+            "type": "string"
+          },
+          "pgbouncer_status": {
+            "enum": ["COMING_DOWN", "COMING_UP", "DISABLED", "ENABLED", "RELOADING"],
+            "type": "string"
+          }
+        },
+        "required": [
+          "default_pool_size",
+          "ignore_startup_parameters",
+          "pgbouncer_enabled",
+          "pool_mode",
+          "pgbouncer_status"
+        ]
+      },
       "AttributeValue": {
         "type": "object",
         "properties": {
+          "default": {
+            "oneOf": [
+              {
+                "type": "object"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "boolean"
+              }
+            ]
+          },
           "name": {
             "type": "string"
           },
@@ -4574,9 +5429,6 @@
             "items": {
               "type": "string"
             }
-          },
-          "default": {
-            "type": "object"
           }
         }
       },
@@ -4588,6 +5440,22 @@
             "additionalProperties": {
               "type": "object",
               "properties": {
+                "default": {
+                  "oneOf": [
+                    {
+                      "type": "object"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "boolean"
+                    }
+                  ]
+                },
                 "name": {
                   "type": "string"
                 },
@@ -4596,9 +5464,6 @@
                   "items": {
                     "type": "string"
                   }
-                },
-                "default": {
-                  "type": "object"
                 }
               }
             }
@@ -4634,6 +5499,22 @@
                 "additionalProperties": {
                   "type": "object",
                   "properties": {
+                    "default": {
+                      "oneOf": [
+                        {
+                          "type": "object"
+                        },
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "boolean"
+                        }
+                      ]
+                    },
                     "name": {
                       "type": "string"
                     },
@@ -4642,9 +5523,6 @@
                       "items": {
                         "type": "string"
                       }
-                    },
-                    "default": {
-                      "type": "object"
                     }
                   }
                 }
@@ -4678,6 +5556,22 @@
                 "additionalProperties": {
                   "type": "object",
                   "properties": {
+                    "default": {
+                      "oneOf": [
+                        {
+                          "type": "object"
+                        },
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "boolean"
+                        }
+                      ]
+                    },
                     "name": {
                       "type": "string"
                     },
@@ -4686,9 +5580,6 @@
                       "items": {
                         "type": "string"
                       }
-                    },
-                    "default": {
-                      "type": "object"
                     }
                   }
                 }
@@ -4746,6 +5637,22 @@
                     "additionalProperties": {
                       "type": "object",
                       "properties": {
+                        "default": {
+                          "oneOf": [
+                            {
+                              "type": "object"
+                            },
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "boolean"
+                            }
+                          ]
+                        },
                         "name": {
                           "type": "string"
                         },
@@ -4754,9 +5661,6 @@
                           "items": {
                             "type": "string"
                           }
-                        },
-                        "default": {
-                          "type": "object"
                         }
                       }
                     }
@@ -4826,6 +5730,22 @@
                     "additionalProperties": {
                       "type": "object",
                       "properties": {
+                        "default": {
+                          "oneOf": [
+                            {
+                              "type": "object"
+                            },
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "boolean"
+                            }
+                          ]
+                        },
                         "name": {
                           "type": "string"
                         },
@@ -4834,9 +5754,6 @@
                           "items": {
                             "type": "string"
                           }
-                        },
-                        "default": {
-                          "type": "object"
                         }
                       }
                     }
@@ -4911,6 +5828,22 @@
                           "additionalProperties": {
                             "type": "object",
                             "properties": {
+                              "default": {
+                                "oneOf": [
+                                  {
+                                    "type": "object"
+                                  },
+                                  {
+                                    "type": "number"
+                                  },
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  }
+                                ]
+                              },
                               "name": {
                                 "type": "string"
                               },
@@ -4919,9 +5852,6 @@
                                 "items": {
                                   "type": "string"
                                 }
-                              },
-                              "default": {
-                                "type": "object"
                               }
                             }
                           }
@@ -4995,6 +5925,22 @@
                     "additionalProperties": {
                       "type": "object",
                       "properties": {
+                        "default": {
+                          "oneOf": [
+                            {
+                              "type": "object"
+                            },
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "boolean"
+                            }
+                          ]
+                        },
                         "name": {
                           "type": "string"
                         },
@@ -5003,9 +5949,6 @@
                           "items": {
                             "type": "string"
                           }
-                        },
-                        "default": {
-                          "type": "object"
                         }
                       }
                     }
@@ -5069,6 +6012,22 @@
                 "additionalProperties": {
                   "type": "object",
                   "properties": {
+                    "default": {
+                      "oneOf": [
+                        {
+                          "type": "object"
+                        },
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "boolean"
+                        }
+                      ]
+                    },
                     "name": {
                       "type": "string"
                     },
@@ -5077,9 +6036,6 @@
                       "items": {
                         "type": "string"
                       }
-                    },
-                    "default": {
-                      "type": "object"
                     }
                   }
                 }
@@ -5118,6 +6074,22 @@
                     "additionalProperties": {
                       "type": "object",
                       "properties": {
+                        "default": {
+                          "oneOf": [
+                            {
+                              "type": "object"
+                            },
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "boolean"
+                            }
+                          ]
+                        },
                         "name": {
                           "type": "string"
                         },
@@ -5126,9 +6098,6 @@
                           "items": {
                             "type": "string"
                           }
-                        },
-                        "default": {
-                          "type": "object"
                         }
                       }
                     }
@@ -5198,6 +6167,22 @@
                     "additionalProperties": {
                       "type": "object",
                       "properties": {
+                        "default": {
+                          "oneOf": [
+                            {
+                              "type": "object"
+                            },
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "boolean"
+                            }
+                          ]
+                        },
                         "name": {
                           "type": "string"
                         },
@@ -5206,9 +6191,6 @@
                           "items": {
                             "type": "string"
                           }
-                        },
-                        "default": {
-                          "type": "object"
                         }
                       }
                     }

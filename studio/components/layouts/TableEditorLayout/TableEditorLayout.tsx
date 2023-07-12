@@ -1,24 +1,25 @@
-import { PropsWithChildren, useEffect } from 'react'
-import { useRouter } from 'next/router'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
 import { observer } from 'mobx-react-lite'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useRouter } from 'next/router'
+import { PropsWithChildren, useEffect } from 'react'
 
-import { checkPermissions, useStore } from 'hooks'
 import { useParams } from 'common/hooks'
-import { Entity } from 'data/entity-types/entity-type-query'
+import Connecting from 'components/ui/Loading/Loading'
+import NoPermission from 'components/ui/NoPermission'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
+import { Entity } from 'data/entity-types/entity-type-query'
+import { useCheckPermissions, useSelectedProject, useStore } from 'hooks'
+import useEntityType from 'hooks/misc/useEntityType'
+import useLatest from 'hooks/misc/useLatest'
 import { useIsTableLoaded, useTableEditorStateSnapshot } from 'state/table-editor'
 import ProjectLayout from '../'
-import TableEditorMenu from './TableEditorMenu'
-import NoPermission from 'components/ui/NoPermission'
-import useEntityType from 'hooks/misc/useEntityType'
-import Connecting from 'components/ui/Loading/Loading'
-import useLatest from 'hooks/misc/useLatest'
 import useTableRowsPrefetchWrapper from './TableEditorLayout.utils'
+import TableEditorMenu from './TableEditorMenu'
 
 export interface TableEditorLayoutProps {
   selectedSchema?: string
+  selectedTable?: string
   onSelectSchema: (schema: string) => void
   onAddTable: () => void
   onEditTable: (table: Entity) => void
@@ -28,6 +29,7 @@ export interface TableEditorLayoutProps {
 
 const TableEditorLayout = ({
   selectedSchema,
+  selectedTable,
   onSelectSchema = noop,
   onAddTable = noop,
   onEditTable = noop,
@@ -35,26 +37,27 @@ const TableEditorLayout = ({
   onDuplicateTable = noop,
   children,
 }: PropsWithChildren<TableEditorLayoutProps>) => {
-  const { vault, meta, ui } = useStore()
+  const { ui, vault, meta } = useStore()
+  const selectedProject = useSelectedProject()
   const router = useRouter()
   const { ref, id: _id } = useParams()
   const id = _id ? Number(_id) : undefined
 
   const snap = useTableEditorStateSnapshot()
-  const canReadTables = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'tables')
+  const canReadTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'tables')
 
   const vaultExtension = meta.extensions.byId('supabase_vault')
   const isVaultEnabled = vaultExtension !== undefined && vaultExtension.installed_version !== null
 
   useEffect(() => {
-    if (ui.selectedProject?.ref) {
+    if (ui.selectedProjectRef) {
       meta.schemas.load()
       meta.types.load()
       meta.policies.load()
       meta.publications.load()
       meta.extensions.load()
     }
-  }, [ui.selectedProject?.ref])
+  }, [ui.selectedProjectRef])
 
   const isLoaded = useIsTableLoaded(ref, id)
 
@@ -110,7 +113,7 @@ const TableEditorLayout = ({
     if (isVaultEnabled) {
       vault.load()
     }
-  }, [ui.selectedProject?.ref, isVaultEnabled])
+  }, [selectedProject?.ref, isVaultEnabled])
 
   if (!canReadTables) {
     return (
@@ -123,6 +126,7 @@ const TableEditorLayout = ({
   return (
     <ProjectLayout
       product="Table editor"
+      selectedTable={selectedTable}
       productMenu={
         <TableEditorMenu
           selectedSchema={selectedSchema}

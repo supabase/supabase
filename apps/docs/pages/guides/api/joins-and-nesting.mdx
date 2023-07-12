@@ -40,24 +40,25 @@ Let's use an example database that stores `countries` and `cities`:
 <TabPanel id="SQL" label="SQL">
 
 ```sql
-create table
-  countries ("id" serial primary key, "name" text);
+create table countries (
+  "id" serial primary key,
+  "name" text
+);
 
-insert into
-  countries (id, name)
+insert into countries
+  (id, name)
 values
   (1, 'United Kingdom'),
   (2, 'United States');
 
-create table
-  cities (
-    "id" serial primary key,
-    "name" text,
-    "country_id" int references "countries"
-  );
+create table cities (
+  "id" serial primary key,
+  "name" text,
+  "country_id" int references "countries"
+);
 
-insert into
-  cities (name, country_id)
+insert into cities
+  (name, country_id)
 values
   ('London', 1),
   ('Manchester', 1),
@@ -90,7 +91,7 @@ const { data, error } = await supabase.from('countries').select(`
 <TabPanel id="dart" label="Dart">
 
 ```dart
-final data = await supabase.from('todos').select('id, name, cities(id, name)');
+final data = await supabase.from('countries').select('id, name, cities(id, name)');
 ```
 
 </TabPanel>
@@ -130,18 +131,21 @@ GET https://[REF].supabase.co/rest/v1/countries?select=id,name,cities(id,name)
 The Serverless APIs will detect many-to-many joins. For example, if you have a database which stored teams of users (where each user could belong to many teams):
 
 ```sql
-create table
-  users ("id" serial primary key, "name" text);
+create table users (
+  "id" serial primary key,
+  "name" text
+);
 
-create table
-  teams ("id" serial primary key, "team_name" text);
+create table teams (
+  "id" serial primary key,
+  "team_name" text
+);
 
-create table
-  members (
-    "user_id" int references users,
-    "team_id" int references teams,
-    primary key(user_id, team_id)
-  );
+create table members (
+  "user_id" int references users,
+  "team_id" int references teams,
+  primary key (user_id, team_id)
+);
 ```
 
 In these cases you don't need to explicitly define the joining table (members). If we wanted to fetch all the teams and the members in each team:

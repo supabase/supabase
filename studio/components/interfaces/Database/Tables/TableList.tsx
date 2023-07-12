@@ -16,7 +16,7 @@ import { partition } from 'lodash'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useStore, checkPermissions } from 'hooks'
+import { useStore, useCheckPermissions } from 'hooks'
 import Table from 'components/to-be-cleaned/Table'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import type { PostgresTable, PostgresSchema } from '@supabase/postgres-meta'
@@ -42,7 +42,7 @@ const TableList: FC<Props> = ({
   const { meta } = useStore()
   const { isLoading } = meta.tables
   const [filterString, setFilterString] = useState<string>('')
-  const canUpdateTables = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
+  const canUpdateTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
   const schemas: PostgresSchema[] = meta.schemas.list()
   const [protectedSchemas, openSchemas] = partition(schemas, (schema) =>
@@ -70,7 +70,7 @@ const TableList: FC<Props> = ({
     <>
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <div className="w-[230px]">
+          <div className="w-[260px]">
             <Listbox
               size="small"
               value={selectedSchema}
@@ -216,7 +216,7 @@ const TableList: FC<Props> = ({
                       style={{ paddingTop: 3, paddingBottom: 3 }}
                       onClick={() => onOpenTable(x)}
                     >
-                      {x.columns.length} columns
+                      {x.columns?.length} columns
                     </Button>
 
                     <Tooltip.Root delayDuration={0}>

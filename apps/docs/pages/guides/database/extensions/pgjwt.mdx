@@ -18,7 +18,7 @@ The [pgjwt](https://github.com/michelp/pgjwt) (PostgreSQL JSON Web Token) extens
 >
 <TabPanel id="dashboard" label="Dashboard">
 
-1. Go to the [Database](https://app.supabase.com/project/_/database/tables) page in the Dashboard.
+1. Go to the [Database](https://supabase.com/dashboard/project/_/database/tables) page in the Dashboard.
 2. Click on **Extensions** in the sidebar.
 3. Search for "pgjwt" and enable the extension.
 
@@ -44,7 +44,7 @@ It's good practice to create the extension within a separate schema (like `exten
 
 ## API
 
-- [`sign(payload json, secret text, algorithm text default 'HSA256')`](https://github.com/michelp/pgjwt#usage): Signs a JWT containng _payload_ with _secret_ using _algorithm_.
+- [`sign(payload json, secret text, algorithm text default 'HSA256')`](https://github.com/michelp/pgjwt#usage): Signs a JWT containing _payload_ with _secret_ using _algorithm_.
 - [`verify(token text, secret text, algorithm text default 'HSA256')`](https://github.com/michelp/pgjwt#usage): Decodes a JWT _token_ that was signed with _secret_ using _algorithm_.
 
 Where:

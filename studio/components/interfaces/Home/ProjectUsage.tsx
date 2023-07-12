@@ -2,13 +2,23 @@ import dayjs from 'dayjs'
 import Link from 'next/link'
 import { FC, useState } from 'react'
 import { useRouter } from 'next/router'
-import { Button, Dropdown, IconArchive, IconChevronDown, IconDatabase, IconKey, IconZap } from 'ui'
-import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
+import {
+  Button,
+  Dropdown,
+  IconArchive,
+  IconChevronDown,
+  IconDatabase,
+  IconKey,
+  IconZap,
+  Loading,
+} from 'ui'
 import Panel from 'components/ui/Panel'
-import { DATE_FORMAT, METRICS } from 'lib/constants'
 import { ChartIntervals } from 'types'
 import { useParams } from 'common/hooks'
-import { useProjectLogStatsQuery } from 'data/logs/project-log-stats-query'
+import { UsageApiCounts, useProjectLogStatsQuery } from 'data/analytics/project-log-stats-query'
+import BarChart from 'components/ui/Charts/BarChart'
+import sumBy from 'lodash/sumBy'
+import useFillTimeseriesSorted from 'hooks/analytics/useFillTimeseriesSorted'
 
 const CHART_INTERVALS: ChartIntervals[] = [
   {
@@ -29,29 +39,36 @@ const ProjectUsage: FC<Props> = ({}) => {
 
   const [interval, setInterval] = useState<string>('hourly')
 
-  const { data, error } = useProjectLogStatsQuery({ projectRef, interval })
+  const { data, error, isLoading } = useProjectLogStatsQuery({ projectRef, interval })
 
   const selectedInterval = CHART_INTERVALS.find((i) => i.key === interval) || CHART_INTERVALS[1]
-  const startDate = dayjs()
-    .subtract(selectedInterval.startValue, selectedInterval.startUnit)
-    .format(DATE_FORMAT)
-  const endDate = dayjs().format(DATE_FORMAT)
-  const charts = data?.data
+  const startDateLocal = dayjs().subtract(
+    selectedInterval.startValue,
+    selectedInterval.startUnit as dayjs.ManipulateType
+  )
+  const endDateLocal = dayjs()
+  const charts = useFillTimeseriesSorted(
+    data?.result || [],
+    'timestamp',
+    [
+      'total_auth_requests',
+      'total_rest_requests',
+      'total_storage_requests',
+      'total_realtime_requests',
+    ],
+    0,
+    startDateLocal.toISOString(),
+    endDateLocal.toISOString()
+  )
   const datetimeFormat = selectedInterval.format || 'MMM D, ha'
 
-  const handleBarClick = (v: any, search: string) => {
-    if (!v || !v.activePayload?.[0]?.payload) return
-    // returns rechart internal tooltip data type
-    const payload = v.activePayload[0].payload
-    const timestamp = payload.timestamp
-    const timestampDigits = String(timestamp).length
-    if (timestampDigits < 16) {
-      // pad unix timestamp with additional 0 and then forward
-      const paddedTimestamp = String(timestamp) + '0'.repeat(16 - timestampDigits)
-      router.push(`/project/${projectRef}/logs/edge-logs?te=${paddedTimestamp}`)
-    } else {
-      router.push(`/project/${projectRef}/logs/edge-logs?te=${timestamp}`)
-    }
+  const handleBarClick = (
+    value: UsageApiCounts,
+    // TODO (ziinc): link to edge logs with correct filter applied
+    _type: 'rest' | 'realtime' | 'storage' | 'auth'
+  ) => {
+    const selected = dayjs(value?.timestamp).toISOString()
+    router.push(`/project/${projectRef}/logs/edge-logs?ite=${encodeURIComponent(selected)}`)
   }
 
   return (
@@ -70,126 +87,113 @@ const ProjectUsage: FC<Props> = ({}) => {
             </Dropdown.RadioGroup>
           }
         >
-          <Button as="span" type="default" iconRight={<IconChevronDown />}>
-            {selectedInterval.label}
+          <Button asChild type="default" iconRight={<IconChevronDown />}>
+            <span>{selectedInterval.label}</span>
           </Button>
         </Dropdown>
         <span className="text-xs text-scale-1000">
           Statistics for past {selectedInterval.label}
         </span>
       </div>
-      <div className="">
-        {startDate && endDate && (
-          <>
-            <div className="grid grid-cols-1 md:grid-cols-2 md:gap-4 lg:grid-cols-4 lg:gap-8">
-              <Panel key="database-chart">
-                <Panel.Content className="space-y-4">
-                  <PanelHeader
-                    icon={
-                      <div className="rounded bg-scale-600 p-1.5 text-scale-1000 shadow-sm">
-                        <IconDatabase strokeWidth={2} size={16} />
-                      </div>
-                    }
-                    title="Database"
-                    href={`/project/${projectRef}/editor`}
-                  />
-                  <ChartHandler
-                    startDate={startDate}
-                    endDate={endDate}
-                    attribute={'total_rest_requests'}
-                    label={METRICS.find((x: any) => x.key == 'total_rest_requests')?.label ?? ''}
-                    provider="log-stats"
-                    interval="1d"
-                    hideChartType
-                    customDateFormat={datetimeFormat}
-                    data={charts}
-                    isLoading={!charts && !error ? true : false}
-                    onBarClick={(v) => handleBarClick(v, '/rest')}
-                  />
-                </Panel.Content>
-              </Panel>
-              <Panel key="auth-chart">
-                <Panel.Content className="space-y-4">
-                  <PanelHeader
-                    icon={
-                      <div className="rounded bg-scale-600 p-1.5 text-scale-1000 shadow-sm">
-                        <IconKey strokeWidth={2} size={16} />
-                      </div>
-                    }
-                    title="Auth"
-                    href={`/project/${projectRef}/auth/users`}
-                  />
-                  <ChartHandler
-                    startDate={startDate}
-                    endDate={endDate}
-                    attribute={'total_auth_requests'}
-                    label={METRICS.find((x) => x.key == 'total_auth_requests')?.label ?? ''}
-                    provider="log-stats"
-                    interval="1d"
-                    hideChartType
-                    customDateFormat={datetimeFormat}
-                    data={charts}
-                    isLoading={!charts && !error ? true : false}
-                    onBarClick={(v) => handleBarClick(v, '/auth')}
-                  />
-                </Panel.Content>
-              </Panel>
-              <Panel key="storage-chart">
-                <Panel.Content className="space-y-4">
-                  <PanelHeader
-                    icon={
-                      <div className="rounded bg-scale-600 p-1.5 text-scale-1000 shadow-sm">
-                        <IconArchive strokeWidth={2} size={16} />
-                      </div>
-                    }
-                    title="Storage"
-                    href={`/project/${projectRef}/storage/buckets`}
-                  />
-                  <ChartHandler
-                    startDate={startDate}
-                    endDate={endDate}
-                    attribute={'total_storage_requests'}
-                    label={METRICS.find((x) => x.key == 'total_storage_requests')?.label ?? ''}
-                    provider="log-stats"
-                    interval="1d"
-                    hideChartType
-                    customDateFormat={datetimeFormat}
-                    data={charts}
-                    isLoading={!charts && !error ? true : false}
-                    onBarClick={(v) => handleBarClick(v, '/storage')}
-                  />
-                </Panel.Content>
-              </Panel>
-              <Panel key="realtime-chart">
-                <Panel.Content className="space-y-4">
-                  <PanelHeader
-                    icon={
-                      <div className="rounded bg-scale-600 p-1.5 text-scale-1000 shadow-sm">
-                        <IconZap strokeWidth={2} size={16} />
-                      </div>
-                    }
-                    title="Realtime"
-                  />
-                  <ChartHandler
-                    startDate={startDate}
-                    endDate={endDate}
-                    attribute={'total_realtime_requests'}
-                    label={
-                      METRICS.find((x: any) => x.key == 'total_realtime_requests')?.label ?? ''
-                    }
-                    provider="log-stats"
-                    interval="1h"
-                    hideChartType
-                    customDateFormat={datetimeFormat}
-                    data={charts}
-                    isLoading={!charts && !error ? true : false}
-                    onBarClick={(v) => handleBarClick(v, '/realtime')}
-                  />
-                </Panel.Content>
-              </Panel>
-            </div>
-          </>
-        )}
+      <div className="grid grid-cols-1 md:grid-cols-2 md:gap-4 lg:grid-cols-4 lg:gap-8">
+        <Panel>
+          <Panel.Content className="space-y-4">
+            <PanelHeader
+              icon={
+                <div className="rounded bg-scale-600 p-1.5 text-scale-1000 shadow-sm">
+                  <IconDatabase strokeWidth={2} size={16} />
+                </div>
+              }
+              title="Database"
+              href={`/project/${projectRef}/editor`}
+            />
+
+            <Loading active={isLoading}>
+              <BarChart
+                title="REST Requests"
+                data={charts}
+                xAxisKey="timestamp"
+                yAxisKey="total_rest_requests"
+                onBarClick={(v: unknown) => handleBarClick(v as UsageApiCounts, 'rest')}
+                customDateFormat={datetimeFormat}
+                highlightedValue={sumBy(charts, 'total_rest_requests')}
+              />
+            </Loading>
+          </Panel.Content>
+        </Panel>
+        <Panel>
+          <Panel.Content className="space-y-4">
+            <PanelHeader
+              icon={
+                <div className="rounded bg-scale-600 p-1.5 text-scale-1000 shadow-sm">
+                  <IconKey strokeWidth={2} size={16} />
+                </div>
+              }
+              title="Auth"
+              href={`/project/${projectRef}/auth/users`}
+            />
+            <Loading active={isLoading}>
+              <BarChart
+                title="Auth Requests"
+                data={charts}
+                xAxisKey="timestamp"
+                yAxisKey="total_auth_requests"
+                onBarClick={(v: unknown) => handleBarClick(v as UsageApiCounts, 'auth')}
+                customDateFormat={datetimeFormat}
+                highlightedValue={sumBy(charts || [], 'total_auth_requests')}
+              />
+            </Loading>
+          </Panel.Content>
+        </Panel>
+        <Panel>
+          <Panel.Content className="space-y-4">
+            <PanelHeader
+              icon={
+                <div className="rounded bg-scale-600 p-1.5 text-scale-1000 shadow-sm">
+                  <IconArchive strokeWidth={2} size={16} />
+                </div>
+              }
+              title="Storage"
+              href={`/project/${projectRef}/storage/buckets`}
+            />
+
+            <Loading active={isLoading}>
+              <BarChart
+                title="Storage Requests"
+                data={charts}
+                xAxisKey="timestamp"
+                yAxisKey="total_storage_requests"
+                onBarClick={(v: unknown) => handleBarClick(v as UsageApiCounts, 'storage')}
+                customDateFormat={datetimeFormat}
+                highlightedValue={sumBy(charts, 'total_storage_requests')}
+              />
+            </Loading>
+          </Panel.Content>
+        </Panel>
+        <Panel>
+          <Panel.Content className="space-y-4">
+            <PanelHeader
+              icon={
+                <div className="rounded bg-scale-600 p-1.5 text-scale-1000 shadow-sm">
+                  <IconZap strokeWidth={2} size={16} />
+                </div>
+              }
+              title="Realtime"
+            />
+
+            <Loading active={isLoading}>
+              <BarChart
+                title="Realtime Requests"
+                data={charts}
+                xAxisKey="timestamp"
+                yAxisKey="total_realtime_requests"
+                onBarClick={(v: unknown) => handleBarClick(v as UsageApiCounts, 'realtime')}
+                customDateFormat={datetimeFormat}
+                highlightedValue={sumBy(charts, 'total_realtime_requests')}
+              />
+            </Loading>
+          </Panel.Content>
+        </Panel>
       </div>
     </div>
   )
@@ -206,7 +210,7 @@ const PanelHeader = (props: any) => {
           (props.href ? 'cursor-pointer hover:text-gray-1200 hover:opacity-100' : '')
         }
       >
-        <p>{props.icon}</p>
+        <div>{props.icon}</div>
         <span className="flex items-center space-x-1">
           <h4 className="mb-0 text-lg">{props.title}</h4>
         </span>

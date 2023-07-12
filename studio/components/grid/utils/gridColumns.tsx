@@ -31,6 +31,7 @@ import {
   BooleanFormatter,
   DefaultFormatter,
   ForeignKeyFormatter,
+  JsonFormatter,
 } from 'components/grid/components/formatter'
 
 export const ESTIMATED_CHARACTER_PIXEL_WIDTH = 9
@@ -148,6 +149,9 @@ function getColumnFormatter(columnDef: SupaColumn, columnType: ColumnType) {
       } else {
         return ForeignKeyFormatter
       }
+    }
+    case 'json': {
+      return JsonFormatter
     }
     default: {
       return DefaultFormatter

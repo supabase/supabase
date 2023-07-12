@@ -1,13 +1,12 @@
-import { FC } from 'react'
-import { IconInfo, IconHelpCircle, IconAlertTriangle } from 'ui'
+import { PropsWithChildren } from 'react'
+import { IconAlertTriangle, IconHelpCircle, IconInfo } from 'ui'
 
-interface Props {
+export interface AdmonitionProps {
   type: 'note' | 'tip' | 'info' | 'caution' | 'danger'
   label?: string
-  children: any
 }
 
-const Admonition: FC<Props> = ({ type = 'note', label, children }) => {
+const Admonition = ({ type = 'note', label, children }: PropsWithChildren<AdmonitionProps>) => {
   return (
     <div
       className={[

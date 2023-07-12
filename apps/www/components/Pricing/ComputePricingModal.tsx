@@ -73,7 +73,7 @@ export default function ComputePricingModal({ showComputeModal, setShowComputeMo
                   {i === 0 && (
                     <tr className="">
                       <td className="pb-1 bg-scale-700 px-3 py-1 -mr-1 border-l-4 border-scale-700">
-                        <span className="">Included in Free and Pro tiers</span>
+                        <span className="">Included in Free and Pro plan</span>
                       </td>
                     </tr>
                   )}
@@ -88,9 +88,9 @@ export default function ComputePricingModal({ showComputeModal, setShowComputeMo
                       <td key={column.key} className="p-3">
                         {column.key === 'dedicated' ? (
                           column.value ? (
-                            <IconPricingIncludedCheck tier="Pro tier" />
+                            <IconPricingIncludedCheck plan="Pro plan" />
                           ) : (
-                            <IconPricingMinus tier="Free tier" />
+                            <IconPricingMinus plan="Free plan" />
                           )
                         ) : (
                           column.value
@@ -124,9 +124,9 @@ export default function ComputePricingModal({ showComputeModal, setShowComputeMo
                     >
                       {column.key === 'dedicated' ? (
                         column.value ? (
-                          <IconPricingIncludedCheck tier="Pro tier" />
+                          <IconPricingIncludedCheck plan="Pro plan" />
                         ) : (
-                          <IconPricingMinus tier="Free tier" />
+                          <IconPricingMinus plan="Free plan" />
                         )
                       ) : (
                         column.value

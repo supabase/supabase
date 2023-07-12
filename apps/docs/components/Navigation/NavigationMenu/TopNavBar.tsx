@@ -56,7 +56,7 @@ const TopNavBar: FC = () => {
   }
 
   return (
-    <nav className="h-[60px] border-b px-4 backdrop-blur backdrop-filter bg-white-1200 dark:bg-blackA-300">
+    <nav className="h-[60px] border-b px-4 backdrop-blur backdrop-filter bg-white-1200 bg-scale-200/90">
       <div className="max-w-[1400px] grid grid-cols-12 mx-auto gap-4 px-5 h-full">
         <div className="col-span-3 flex items-center">
           <button className="mr-4 block stroke-2 lg:hidden" onClick={toggleMobileMenu}>
@@ -125,16 +125,15 @@ const TopNavBar: FC = () => {
           </div>
         </div>
         <div className="col-span-4 flex items-center justify-end gap-3">
-          <Button
-            type="outline"
-            as="a"
-            // @ts-ignore
-            href="https://app.supabase.com"
-            className="text-scale-1100 text-sm"
-            target="_blank"
-            rel="noreferrer noopener"
-          >
-            Go to Dashboard
+          <Button type="outline" asChild>
+            <a
+              href="https://supabase.com/dashboard"
+              className="text-scale-1100 text-sm"
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              Go to Dashboard
+            </a>
           </Button>
           <ul className="flex items-center">
             <li className="px-4">

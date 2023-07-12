@@ -1,13 +1,15 @@
-import { useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import { observer } from 'mobx-react-lite'
-import { Button, Input, Listbox } from 'ui'
 import { useRouter } from 'next/router'
+import { useState } from 'react'
+import { Button, Input, Listbox } from 'ui'
 
-import { API_URL } from 'lib/constants'
-import { useStore } from 'hooks'
-import { post } from 'lib/common/fetch'
 import { WizardLayout } from 'components/layouts'
 import Panel from 'components/ui/Panel'
+import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useStore } from 'hooks'
+import { post } from 'lib/common/fetch'
+import { API_URL } from 'lib/constants'
 import { NextPageWithLayout } from 'types'
 
 const ORG_KIND_TYPES = {
@@ -33,7 +35,8 @@ const ORG_SIZE_DEFAULT = '1'
  * No org selected yet, create a new one
  */
 const Wizard: NextPageWithLayout = () => {
-  const { ui, app } = useStore()
+  const queryClient = useQueryClient()
+  const { ui } = useStore()
   const router = useRouter()
 
   const [orgName, setOrgName] = useState('')
@@ -42,8 +45,7 @@ const Wizard: NextPageWithLayout = () => {
   const [newOrgLoading, setNewOrgLoading] = useState(false)
 
   function validateOrgName(name: any) {
-    const value = name ? name.trim() : ''
-    return value.length >= 1
+    return name.length >= 1
   }
 
   function onOrgNameChange(e: any) {
@@ -60,7 +62,8 @@ const Wizard: NextPageWithLayout = () => {
 
   async function onClickSubmit(e: any) {
     e.preventDefault()
-    const isOrgNameValid = validateOrgName(orgName)
+    const trimmedOrgName = orgName ? orgName.trim() : ''
+    const isOrgNameValid = validateOrgName(trimmedOrgName)
     if (!isOrgNameValid) {
       ui.setNotification({ category: 'error', message: 'Organization name is empty' })
       return
@@ -68,7 +71,7 @@ const Wizard: NextPageWithLayout = () => {
 
     setNewOrgLoading(true)
     const response = await post(`${API_URL}/organizations`, {
-      name: orgName,
+      name: trimmedOrgName,
       kind: orgKind,
       ...(orgKind == 'COMPANY' ? { size: orgSize } : {}),
     })
@@ -81,7 +84,7 @@ const Wizard: NextPageWithLayout = () => {
       })
     } else {
       const org = response
-      app.onOrgAdded(org)
+      await invalidateOrganizationsQuery(queryClient)
       router.push(`/new/${org.slug}`)
     }
   }

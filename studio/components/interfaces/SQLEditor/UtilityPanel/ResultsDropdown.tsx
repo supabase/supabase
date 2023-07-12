@@ -9,6 +9,8 @@ import { CSVLink } from 'react-csv'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 // @ts-ignore
 import MarkdownTable from 'markdown-table'
+import { useTelemetryProps } from 'common'
+import { useRouter } from 'next/router'
 
 export type ResultsDropdownProps = {
   id: string
@@ -17,9 +19,11 @@ export type ResultsDropdownProps = {
 const ResultsDropdown = ({ id }: ResultsDropdownProps) => {
   const { project } = useProjectContext()
   const snap = useSqlEditorStateSnapshot()
+  const telemetryProps = useTelemetryProps()
   const result = snap.results?.[id]?.[0] ?? undefined
   const { ui } = useStore()
   const csvRef = useRef<CSVLink & HTMLAnchorElement & { link: HTMLAnchorElement }>(null)
+  const router = useRouter()
 
   const csvData = useMemo(
     () => (result?.rows ? compact(Array.from(result.rows || [])) : ''),
@@ -30,7 +34,8 @@ const ResultsDropdown = ({ id }: ResultsDropdownProps) => {
     csvRef.current?.link.click()
     Telemetry.sendEvent(
       { category: 'sql_editor', action: 'sql_download_csv', label: '' },
-      ui.googleAnalyticsProps
+      telemetryProps,
+      router
     )
   }
 
@@ -53,7 +58,8 @@ const ResultsDropdown = ({ id }: ResultsDropdownProps) => {
         ui.setNotification({ category: 'success', message: 'Copied results to clipboard' })
         Telemetry.sendEvent(
           { category: 'sql_editor', action: 'sql_copy_as_markdown', label: '' },
-          ui.googleAnalyticsProps
+          telemetryProps,
+          router
         )
       })
     }
@@ -74,8 +80,8 @@ const ResultsDropdown = ({ id }: ResultsDropdownProps) => {
         </>
       }
     >
-      <Button as="span" type="text" iconRight={<IconChevronDown />}>
-        Results
+      <Button asChild type="text" iconRight={<IconChevronDown />}>
+        <span>Results</span>
       </Button>
       <CSVLink
         ref={csvRef}

@@ -5,7 +5,7 @@ export type FooterHelpCalloutType = 'default' | 'postgres'
 const content = {
   default: {
     title: 'Need some help?',
-    description: `Not to worry, our specialist engineers are here to help. Submit a support ticket through the [Dashboard](https://app.supabase.com/support/new).`,
+    description: `Not to worry, our specialist engineers are here to help. Submit a support ticket through the [Dashboard](https://supabase.com/dashboard/support/new).`,
   },
   postgres: {
     title: 'Looking for Serverless Postgres?',

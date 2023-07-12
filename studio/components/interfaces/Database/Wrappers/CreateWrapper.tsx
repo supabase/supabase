@@ -6,7 +6,7 @@ import { observer } from 'mobx-react-lite'
 import { Button, Form, Input, IconArrowLeft, IconExternalLink, IconEdit, IconTrash } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import { useParams } from 'common/hooks'
 import {
   FormPanel,
@@ -37,7 +37,7 @@ const CreateWrapper = () => {
   const [selectedTableToEdit, setSelectedTableToEdit] = useState()
   const [formErrors, setFormErrors] = useState<{ [k: string]: string }>({})
 
-  const canCreateWrapper = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'wrappers')
+  const canCreateWrapper = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'wrappers')
 
   const wrapperMeta = WRAPPERS.find((wrapper) => wrapper.name === type)
   const initialValues =
@@ -140,9 +140,9 @@ const CreateWrapper = () => {
               </a>
             </Link>
           </div>
-          <h3 className="mb-2 text-xl text-scale-1200">Create a {wrapperMeta?.label} Wrapper</h3>
+          <h3 className="mb-2 text-xl text-scale-1200">Create a {wrapperMeta.label} Wrapper</h3>
           <div className="flex items-center space-x-2">
-            <Link href="https://supabase.github.io/wrappers/stripe/">
+            <Link href={wrapperMeta.docsUrl}>
               <a target="_blank" rel="noreferrer">
                 <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
                   Documentation
@@ -238,7 +238,8 @@ const CreateWrapper = () => {
                                 {table.schema_name}.{table.table_name}
                               </p>
                               <p className="text-sm text-scale-1000">
-                                {wrapperMeta.tables[table.index].label}: {table.columns.join(', ')}
+                                {wrapperMeta.tables[table.index].label}:{' '}
+                                {table.columns.map((column: any) => column.name).join(', ')}
                               </p>
                             </div>
                             <div className="flex items-center space-x-2">

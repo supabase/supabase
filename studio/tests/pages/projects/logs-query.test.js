@@ -2,12 +2,12 @@ import { get } from 'lib/common/fetch'
 import { useRouter } from 'next/router'
 import { LogsExplorerPage } from 'pages/project/[ref]/logs/explorer/index'
 import { render } from 'tests/helpers'
-import { waitFor, screen } from '@testing-library/react'
+import { waitFor, screen, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { logDataFixture } from '../../fixtures'
 import { clickDropdown } from 'tests/helpers'
 import dayjs from 'dayjs'
-import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
+import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 jest.mock('common/hooks')
 import { useParams } from 'common/hooks'
 
@@ -132,6 +132,10 @@ test('custom sql querying', async () => {
       expect(get).toHaveBeenCalledWith(expect.stringContaining('select'), expect.anything())
       expect(get).toHaveBeenCalledWith(expect.stringContaining('edge_logs'), expect.anything())
       expect(get).toHaveBeenCalledWith(
+        expect.stringContaining(encodeURIComponent('my_count')),
+        expect.anything()
+      )
+      expect(get).toHaveBeenCalledWith(
         expect.stringContaining('iso_timestamp_start'),
         expect.anything()
       )
@@ -159,6 +163,43 @@ test('custom sql querying', async () => {
   await expect(screen.findByText(/Load older/)).rejects.toThrow()
 })
 
+test('bug: can edit query after selecting a log', async () => {
+  get.mockImplementation((url) => {
+    if (url.includes('sql=') && url.includes('select') && !url.includes('limit 222')) {
+      return {
+        result: [{ my_count: 12345 }],
+      }
+    }
+    return { result: [] }
+  })
+  const { container } = render(<LogsExplorerPage />)
+  // run default query
+  userEvent.click(await screen.findByText('Run'))
+  const rowValue = await screen.findByText(/12345/) // row value
+  // open up an show selection panel
+  await userEvent.click(rowValue)
+  await screen.findByText(/Copy/)
+
+  // change the query
+  let editor = container.querySelector('.monaco-editor')
+  // type new query
+  userEvent.click(editor)
+  userEvent.type(editor, ' something')
+  userEvent.click(await screen.findByText('Run'))
+
+  await waitFor(
+    () => {
+      expect(get).toHaveBeenCalledWith(
+        expect.stringContaining(encodeURIComponent('something')),
+        expect.anything()
+      )
+    },
+    { timeout: 1000 }
+  )
+  // closes the selection panel
+  await expect(screen.findByText(/Copy/)).rejects.toThrow()
+})
+
 test('query warnings', async () => {
   const router = defaultRouterMock()
   router.query = {
@@ -179,13 +220,12 @@ test('field reference', async () => {
   await screen.findByText('metadata.request.cf.asOrganization')
 })
 
-describe.each(['FREE', 'PRO', 'TEAM', 'ENTERPRISE'])('upgrade modal for %s', (key) => {
+describe.each(['free', 'pro', 'team', 'enterprise'])('upgrade modal for %s', (key) => {
   beforeEach(() => {
-    useProjectSubscriptionQuery.mockReturnValue({
+    useProjectSubscriptionV2Query.mockReturnValue({
       data: {
-        tier: {
-          supabase_prod_id: `tier_${key.toLocaleLowerCase()}`,
-          key,
+        plan: {
+          id: key,
         },
       },
     })
@@ -206,12 +246,15 @@ describe.each(['FREE', 'PRO', 'TEAM', 'ENTERPRISE'])('upgrade modal for %s', (ke
 
   test('based on datepicker helpers', async () => {
     render(<LogsExplorerPage />)
-    // click on the dropdown
-    clickDropdown(await screen.findByText('Last 24 hours'))
-    userEvent.click(await screen.findByText('Last 3 days'))
 
-    // only free tier will show modal
-    if (key === 'FREE') {
+    clickDropdown(screen.getByText('Last 24 hours'))
+    await waitFor(async () => {
+      const option = await screen.findByText('Last 3 days')
+      fireEvent.click(option)
+    })
+
+    // only free plan will show modal
+    if (key === 'free') {
       await screen.findByText('Log retention') // assert modal title is present
     } else {
       await expect(screen.findByText('Log retention')).rejects.toThrow()

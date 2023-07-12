@@ -1,112 +1,53 @@
 import { Accordion, Button, IconCheck, Select } from 'ui'
-import Solutions from 'data/Solutions.json'
+import Solutions from 'data/Solutions'
 import { NextSeo } from 'next-seo'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
 import { PricingTableRowDesktop, PricingTableRowMobile } from '~/components/Pricing/PricingTableRow'
-import pricing from '~/data/Pricing.json'
+import { pricing } from 'shared-data/pricing'
 import pricingFaq from '~/data/PricingFAQ.json'
 import { useTheme } from 'common/Providers'
 import ComputePricingModal from '~/components/Pricing/ComputePricingModal'
+import { plans } from 'shared-data/plans'
 
 export default function IndexPage() {
   const router = useRouter()
-  const { basePath } = useRouter()
+  const { basePath, asPath } = useRouter()
   const { isDarkMode } = useTheme()
   const [showComputeModal, setShowComputeModal] = useState(false)
-  const [activeMobileTier, setActiveMobileTier] = useState('Free')
+  const [activeMobilePlan, setActiveMobilePlan] = useState('Free')
 
   const meta_title = 'Pricing & fees | Supabase'
   const meta_description =
-    'Explore Supabase fees and pricing information. Find our competitive pricing tiers, with no hidden pricing. We have generous free tiers for those getting started, and Pay As You Go for those scaling up.'
+    'Explore Supabase fees and pricing information. Find our competitive pricing plans, with no hidden pricing. We have a generous free plan for those getting started, and Pay As You Go for those scaling up.'
 
-  /**
-   * @mildtomato same plan metadata is also in /studio dashboard
-   * would be good if this constant was shared across apps
-   *
-   * https://github.com/supabase/supabase/blob/master/www/pages/pricing/index.tsx
-   */
-  const tiers = [
-    {
-      name: 'Free',
-      nameBadge: '',
-      costUnit: 'per month per project',
-      href: 'https://app.supabase.com/new/new-project',
-      priceLabel: 'Starting from',
-      priceMonthly: 0,
-      warning: 'Limit of 2 free projects',
-      description: 'Perfect for passion projects & simple websites.',
-      preface: 'Get started with:',
-      features: [
-        'Up to 500MB database & 1GB file storage',
-        'Up to 2GB bandwidth',
-        'Up to 50MB file uploads',
-        'Social OAuth providers',
-        '50,000 monthly active users',
-        'Up to 500K Edge Function invocations',
-        '1-day log retention',
-        'Community support',
-      ],
-      scale: 'Free projects are paused after 1 week of inactivity.',
+  const plansExceptEnterprise = plans.filter((it) => it.name !== 'Enterprise')
+  const planEnterprise = plans.find((it) => it.name === 'Enterprise')!
 
-      cta: 'Get Started',
-    },
-    {
-      name: 'Pro',
-      nameBadge: '',
-      costUnit: 'per month per project',
-      href: 'https://app.supabase.com/new/new-project',
-      from: true,
-      priceLabel: 'Starting from',
-      warning: '+ usage',
-      priceMonthly: 25,
-      description: 'For production applications with the option to scale.',
-      features: [
-        '8GB database & 100GB file storage',
-        '50GB bandwidth',
-        '5GB file uploads',
-        'Social OAuth providers',
-        '100,000 monthly active users',
-        '2M Edge Function invocations',
-        'Daily backups',
-        '7-day log retention',
-        'No project pausing',
-        'Email support',
-      ],
-      scale: 'Additional fees apply for usage and storage beyond the limits above.',
-      shutdown: '',
-      preface: 'Everything in the Free plan, plus:',
-      additional: '',
-      cta: 'Get Started',
-    },
-    {
-      name: 'Enterprise',
-      href: 'https://forms.supabase.com/enterprise',
-      description: 'For large-scale applications managing serious workloads.',
-      features: [
-        `Designated Support manager & SLAs`,
-        `Enterprise OAuth providers`,
-        `SSO/ SAML`,
-        `SOC2`,
-        `Custom contracts & invoicing`,
-        `On-premise support`,
-        `24×7×365 premium enterprise support`,
-        `Custom Security questionnaires`,
-        `Private Slack channel`,
-        `Uptime SLA`,
-      ],
-      priceLabel: '',
-      priceMonthly: 'Contact us',
-      preface: 'These apply to all projects within the organization:',
-      scale: '',
-      shutdown: '',
-      cta: 'Contact Us',
-    },
-  ]
+  // Ability to scroll into pricing sections like storage
+  useEffect(() => {
+    /**
+     * As we render a mobile and a desktop row for each item and just display based on screen size, we cannot navigate by simple id hash
+     * on both mobile and desktop. To handle both cases, we actually need to check screen size
+     */
+
+    const hash = asPath.split('#')[1]
+    if (!hash) return
+
+    let device = 'desktop'
+    if (window.matchMedia('screen and (max-width: 1024px)').matches) {
+      device = 'mobile'
+    }
+
+    const element = document.querySelector(`#${hash}-${device}`)
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }, [asPath])
 
   const addons = [
     {
@@ -150,21 +91,21 @@ export default function IndexPage() {
     description,
     priceDescription,
     price,
-    tier,
+    plan,
     showDollarSign = true,
     from = false,
   }: {
     description: string
     priceDescription: string
     price: string
-    tier: string
+    plan: string
     showDollarSign?: boolean
     from?: boolean
   }) => {
     return (
       <div className="mt-8 px-4 mobile-header">
         <h2 className="gradient-text-brand-500 dark:gradient-text-brand-100 text-3xl font-medium uppercase font-mono">
-          {tier}
+          {plan}
         </h2>
         <div className="flex items-baseline gap-2">
           {from && <span className="text-scale-1200 text-base">From</span>}
@@ -177,7 +118,7 @@ export default function IndexPage() {
           <p className="p">{priceDescription}</p>
         </div>
         <p className="p">{description}</p>
-        <Link href="https://app.supabase.com" passHref>
+        <Link href="https://supabase.com/dashboard" passHref>
           <a>
             <Button size="medium" block>
               Get started
@@ -199,7 +140,7 @@ export default function IndexPage() {
           url: `https://supabase.com/${router.pathname}`,
           images: [
             {
-              url: `https://supabase.com/images/og/og-image.jpg`,
+              url: `https://supabase.com/images/og/og-image-v2.jpg`,
             },
           ],
         }}
@@ -218,7 +159,7 @@ export default function IndexPage() {
           </div>
         </div>
 
-        <div className="mx-auto flex max-w-7xl flex-col">
+        <div className="mx-auto max-w-7xl flex flex-col">
           {/* <div className="absolute inset-0 shadow-sm bg-scale-200 h-3/5" /> */}
 
           <div
@@ -228,28 +169,28 @@ export default function IndexPage() {
           "
           >
             <div className="mx-auto max-w-md grid lg:max-w-6xl lg:grid-cols-3 gap-24 lg:gap-5">
-              {tiers.map((tier) => (
+              {plansExceptEnterprise.map((plan) => (
                 <div
-                  key={`row-${tier.name}`}
+                  key={`row-${plan.name}`}
                   className={[
-                    tier.name === 'Pro'
+                    plan.name === 'Pro'
                       ? 'bg-brand-1100 dark:bg-brand-900 border px-0.5 -mt-8 rounded-[6px]'
                       : '',
                   ].join(' ')}
                 >
-                  {tier.name === 'Pro' && (
+                  {plan.name === 'Pro' && (
                     <p className="text-xs text-center py-2 text-white">Most Popular</p>
                   )}
                   <div
-                    key={tier.name}
+                    key={plan.name}
                     className={[
                       'flex flex-col overflow-hidden',
-                      tier.name === 'Pro' ? '' : 'border h-full rounded-[4px]',
+                      plan.name === 'Pro' ? '' : 'border h-full rounded-[4px]',
                     ].join(' ')}
                   >
                     <div
                       className={`dark:bg-scale-300 bg-white px-8 pt-6 rounded-tr-[4px] rounded-tl-[4px] ${
-                        tier.name === 'Pro' ? 'rounded-tr-[4px] rounded-tl-[4px]' : ''
+                        plan.name === 'Pro' ? 'rounded-tr-[4px] rounded-tl-[4px]' : ''
                       }`}
                     >
                       <div className="mb-2 flex items-center gap-2">
@@ -258,55 +199,56 @@ export default function IndexPage() {
                             className="gradient-text-brand-500 dark:gradient-text-brand-100 text-2xl font-normal
                            uppercase flex items-center gap-4 font-mono"
                           >
-                            {tier.name}
+                            {plan.name}
                           </h3>
-                          {tier.nameBadge && (
-                            <span className="bg-scale-300 text-scale-900 dark:bg-scale-400 dark:text-scale-1100 rounded-md bg-opacity-10 py-0.5 px-2 text-xs [background-image: none]">
-                              {tier.nameBadge}
+                          {plan.nameBadge && (
+                            <span className="bg-brand-500 text-brand-1100 rounded-md bg-opacity-30 py-0.5 px-2 text-xs">
+                              {plan.nameBadge}
                             </span>
                           )}
                         </div>
                       </div>
-                      <p className="text-scale-1100 my-4 h-[55px] text-sm  border-b dark:border-scale-500 pb-4 lg:pr-20">
-                        {tier.description}
+                      <p className="text-scale-1100 my-4 text-sm  border-b dark:border-scale-500 pb-4 2xl:pr-4">
+                        {plan.description}
                       </p>
 
                       <div
-                        className="
-                      text-scale-1200 flex items-baseline
-                      text-5xl
-                      font-normal
-                      lg:text-4xl
-                      xl:text-4xl
-                      border-b
-                      dark:border-scale-500
-                      pt-4
-                      pb-8
-                      min-h-[175px]
-                      "
+                        className={`
+                        text-scale-1200 flex items-baseline
+                        text-5xl
+                        font-normal
+                        lg:text-4xl
+                        xl:text-4xl
+                        border-b
+                        dark:border-scale-500
+                        min-h-[175px] ${plan.priceLabel ? 'pt-6' : 'pt-10'}`}
                       >
                         <div className="flex flex-col gap-1">
                           <div className="flex items-end gap-2">
                             <div>
-                              <p className="text-scale-900 ml-1 text-xs font-normal">
-                                {tier.priceLabel}
-                              </p>
-                              <p
-                                className={`mt-2 gradient-text-scale-500 dark:gradient-text-scale-100 pb-1 ${
-                                  tier.name !== 'Enterprise' ? 'text-5xl' : 'text-4xl'
-                                }`}
-                              >
-                                {tier.name !== 'Enterprise' && '$'}
-                                {tier.priceMonthly}
-                              </p>
-                              {tier.costUnit && (
-                                <p className="text-scale-900 mt-0.5 text-xs">{tier.costUnit}</p>
+                              {plan.priceLabel && (
+                                <p className="text-scale-900 ml-1 text-xs font-normal">
+                                  {plan.priceLabel}
+                                </p>
                               )}
 
-                              {tier.warning && (
+                              <div className="flex items-end">
+                                <p
+                                  className={`mt-2 gradient-text-scale-500 dark:gradient-text-scale-100 pb-1 ${
+                                    plan.name !== 'Enterprise' ? 'text-5xl' : 'text-4xl'
+                                  }`}
+                                >
+                                  ${plan.priceMonthly}
+                                </p>
+                                <p className="text-scale-900 mb-1.5 ml-1 text-xs">
+                                  {plan.costUnit}
+                                </p>
+                              </div>
+
+                              {plan.warning && (
                                 <p className="-mt-2">
-                                  <span className="bg-brand-500 text-brand-1100 rounded-md bg-opacity-30 py-0.5 px-2 text-xs ">
-                                    {tier.warning}
+                                  <span className="bg-scale-200 text-brand-1100 border shadow-sm rounded-md bg-opacity-30 py-0.5 px-2 text-xs">
+                                    {plan.warning}
                                   </span>
                                 </p>
                               )}
@@ -318,18 +260,18 @@ export default function IndexPage() {
                     <div
                       className={[
                         `dark:border-scale-400 dark:bg-scale-300 flex h-full rounded-bl-[4px] rounded-br-[4px] flex-1 flex-col bg-white px-8 py-6`,
-                        tier.name === 'Pro' ? 'mb-0.5 rounded-bl-[4px] rounded-br-[4px]' : '',
+                        plan.name === 'Pro' ? 'mb-0.5 rounded-bl-[4px] rounded-br-[4px]' : '',
                       ].join(' ')}
                     >
-                      {tier.preface && (
-                        <p className="text-scale-1100 text-xs mt-2 mb-4">{tier.preface}</p>
+                      {plan.preface && (
+                        <p className="text-scale-1100 text-xs mt-2 mb-4">{plan.preface}</p>
                       )}
                       {/* <p className="text-scale-900 text-sm">Included with plan:</p> */}
                       <ul role="list" className="text-xs text-scale-1000">
-                        {tier.features.map((feature) => (
+                        {plan.features.map((feature) => (
                           <li key={feature} className="flex items-center py-2 first:mt-0">
                             <IconCheck
-                              className="text-brand-900 h-4 w-4 "
+                              className="text-brand-900 h-4 w-4"
                               aria-hidden="true"
                               strokeWidth={3}
                             />
@@ -341,15 +283,13 @@ export default function IndexPage() {
 
                       <div className="flex flex-col gap-6 mt-auto prose">
                         <div className="space-y-2 mt-12">
-                          {tier.additional && <p className="text-sm">{tier.additional}</p>}
-                          {tier.scale && <p className="text-xs">{tier.scale}</p>}
-                          {tier.shutdown && (
-                            <p className="text-scale-1000 text-xs">{tier.shutdown}</p>
+                          {plan.footer && (
+                            <p className="text-xs whitespace-pre-wrap">{plan.footer}</p>
                           )}
                         </div>
-                        <a href={tier.href}>
+                        <a href={plan.href}>
                           <Button block size="small">
-                            {tier.cta}
+                            {plan.cta}
                           </Button>
                         </a>
                       </div>
@@ -360,6 +300,51 @@ export default function IndexPage() {
             </div>
           </div>
         </div>
+
+        <div className="mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-md lg:max-w-6xl grid grid-cols-1 lg:grid-cols-3 mx-auto border bg-scale-100 rounded-md p-8 lg:px-0 mt-8 gap-x-5">
+            <div className="flex flex-col justify-center lg:px-8">
+              <div>
+                <h3
+                  className="gradient-text-brand-500 dark:gradient-text-brand-100 text-2xl font-normal
+                           uppercase flex items-center gap-4 font-mono"
+                >
+                  {planEnterprise.name}
+                </h3>
+                <p className="text-scale-1100 my-4 text-sm pb-2 2xl:pr-4">
+                  {planEnterprise.description}
+                </p>
+
+                <a href={planEnterprise.href} className="hidden lg:block">
+                  <Button type="default" size="small">
+                    {planEnterprise.cta}
+                  </Button>
+                </a>
+              </div>
+            </div>
+            <div className="flex flex-col justify-center lg:col-span-2">
+              <ul role="list" className="text-xs text-scale-1000 lg:grid lg:grid-cols-2 lg:gap-x-5">
+                {planEnterprise.features.map((feature) => (
+                  <li key={feature} className="flex items-center py-2 first:mt-0">
+                    <IconCheck
+                      className="text-brand-900 h-4 w-4 "
+                      aria-hidden="true"
+                      strokeWidth={3}
+                    />
+                    <span className="dark:text-scale-1200 mb-0 ml-3 ">{feature}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <a href={planEnterprise.href} className="visible lg:hidden mt-8">
+                <Button block type="default" size="small">
+                  {planEnterprise.cta}
+                </Button>
+              </a>
+            </div>
+          </div>
+        </div>
+
         <div className="text-center mt-24">
           <a href="#compare-plans">
             <Button size="tiny" type="default">
@@ -369,7 +354,10 @@ export default function IndexPage() {
         </div>
       </div>
 
-      <div className="sm:py-18 container relative mx-auto px-4 py-16 shadow-sm md:py-24 lg:px-12 lg:pt-32 lg:pb-12">
+      <div
+        id="addons"
+        className="sm:py-18 container relative mx-auto px-4 py-16 shadow-sm md:py-24 lg:px-12 lg:pt-32 lg:pb-12"
+      >
         <div>
           <div className="text-center">
             <h2 className="text-scale-1200 text-3xl">Easily customizable add-ons</h2>
@@ -442,26 +430,27 @@ export default function IndexPage() {
           </div>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-8 items-center mt-12 lg:mt-8 max-w-6xl mx-auto">
+        <div
+          id="cost-control"
+          className="grid lg:grid-cols-2 gap-8 items-center mt-12 lg:mt-8 max-w-6xl mx-auto"
+        >
           <div>
             <span className="bg-brand-500 text-brand-1100 rounded-md bg-opacity-30 inline-block  dark:bg-scale-400 dark:text-scale-1100 py-0.5 px-2 text-xs mt-2">
               Available for Pro plan
             </span>
             <h2 className="text-scale-1200 text-4xl mt-4">Cost control with spend caps</h2>
             <p className="mt-3 prose lg:max-w-lg">
-              The Pro tier has a usage quota included and a spend cap turned on by default. If you
+              The Pro plan has a usage quota included and a spend cap turned on by default. If you
               need to go beyond the inclusive limits, simply switch off your spend cap to pay for
               additional usage and scale seamlessly. Note that your project will run into
               restrictions if you have the spend cap enabled and exhaust your quota.
             </p>
           </div>
           <div>
-            <div className="">
-              <img
-                className="w-full"
-                src={`${basePath}/images/pricing/spend-cap${isDarkMode ? '' : '-light'}.png`}
-              />
-            </div>
+            <img
+              className="w-full"
+              src={`${basePath}/images/pricing/spend-cap${isDarkMode ? '' : '-light'}.png`}
+            />
           </div>
         </div>
       </div>
@@ -489,71 +478,80 @@ export default function IndexPage() {
                     id="change-plan"
                     name="Change plan"
                     layout="vertical"
-                    value={activeMobileTier}
+                    value={activeMobilePlan}
                     className="min-w-[120px] bg-slate-400 text-red-500"
-                    onChange={(e) => setActiveMobileTier(e.target.value)}
+                    onChange={(e) => setActiveMobilePlan(e.target.value)}
                   >
                     <Select.Option value="Free">Free</Select.Option>
                     <Select.Option value="Pro">Pro</Select.Option>
+                    <Select.Option value="Team">Team</Select.Option>
                     <Select.Option value="Enterprise">Enterprise</Select.Option>
                   </Select>
                 </div>
               </div>
-              {activeMobileTier === 'Free' && (
+              {activeMobilePlan === 'Free' && (
                 <>
                   <MobileHeader
-                    tier="Free"
+                    plan="Free"
                     price={'0'}
                     priceDescription={'/mo'}
                     description={'Perfect for hobby projects and experiments'}
                   />
                   <PricingTableRowMobile
                     category={pricing.database}
-                    tier={'free'}
+                    plan={'free'}
                     icon={Solutions['database'].icon}
+                    sectionId="database"
                   />
                   <PricingTableRowMobile
                     category={pricing.auth}
-                    tier={'free'}
+                    plan={'free'}
                     icon={Solutions['authentication'].icon}
+                    sectionId="auth"
                   />
                   <PricingTableRowMobile
                     category={pricing.storage}
-                    tier={'free'}
+                    plan={'free'}
                     icon={Solutions['storage'].icon}
+                    sectionId="storage"
                   />
                   <PricingTableRowMobile
                     category={pricing.realtime}
-                    tier={'free'}
+                    plan={'free'}
                     icon={Solutions['realtime'].icon}
+                    sectionId="realtime"
                   />
                   <PricingTableRowMobile
-                    category={pricing['edge-functions']}
-                    tier={'free'}
-                    icon={Solutions['edge-functions'].icon}
+                    category={pricing['edge_functions']}
+                    plan={'free'}
+                    icon={Solutions['functions'].icon}
+                    sectionId="edge-functions"
                   />
                   <PricingTableRowMobile
                     category={pricing.dashboard}
-                    tier={'free'}
+                    plan={'free'}
                     icon={pricing.dashboard.icon}
+                    sectionId="dashboard"
                   />
                   <PricingTableRowMobile
                     category={pricing.security}
-                    tier={'free'}
+                    plan={'free'}
                     icon={pricing.security.icon}
+                    sectionId="security"
                   />
                   <PricingTableRowMobile
                     category={pricing.support}
-                    tier={'free'}
+                    plan={'free'}
                     icon={pricing.support.icon}
+                    sectionId="support"
                   />
                 </>
               )}
 
-              {activeMobileTier === 'Pro' && (
+              {activeMobilePlan === 'Pro' && (
                 <>
                   <MobileHeader
-                    tier="Pro"
+                    plan="Pro"
                     from={false}
                     price={'25'}
                     priceDescription={'/mo + additional use'}
@@ -561,51 +559,103 @@ export default function IndexPage() {
                   />
                   <PricingTableRowMobile
                     category={pricing.database}
-                    tier={'pro'}
+                    plan={'pro'}
                     icon={Solutions['database'].icon}
                   />
                   <PricingTableRowMobile
                     category={pricing.auth}
-                    tier={'pro'}
+                    plan={'pro'}
                     icon={Solutions['authentication'].icon}
                   />
                   <PricingTableRowMobile
                     category={pricing.storage}
-                    tier={'pro'}
+                    plan={'pro'}
                     icon={Solutions['storage'].icon}
                   />
                   <PricingTableRowMobile
                     category={pricing.realtime}
-                    tier={'pro'}
+                    plan={'pro'}
                     icon={Solutions['realtime'].icon}
                   />
                   <PricingTableRowMobile
-                    category={pricing['edge-functions']}
-                    tier={'pro'}
-                    icon={Solutions['edge-functions'].icon}
+                    category={pricing['edge_functions']}
+                    plan={'pro'}
+                    icon={Solutions['functions'].icon}
                   />
                   <PricingTableRowMobile
                     category={pricing.dashboard}
-                    tier={'pro'}
+                    plan={'pro'}
                     icon={pricing.dashboard.icon}
                   />
                   <PricingTableRowMobile
                     category={pricing.security}
-                    tier={'pro'}
+                    plan={'pro'}
                     icon={pricing.security.icon}
                   />
                   <PricingTableRowMobile
                     category={pricing.support}
-                    tier={'pro'}
+                    plan={'pro'}
                     icon={pricing.support.icon}
                   />
                 </>
               )}
 
-              {activeMobileTier === 'Enterprise' && (
+              {activeMobilePlan === 'Team' && (
                 <>
                   <MobileHeader
-                    tier="Enterprise"
+                    plan="Team"
+                    from={false}
+                    price={'599'}
+                    priceDescription={'/mo + additional use'}
+                    description={'Collaborate with different permissions and access patterns'}
+                  />
+                  <PricingTableRowMobile
+                    category={pricing.database}
+                    plan={'team'}
+                    icon={Solutions['database'].icon}
+                  />
+                  <PricingTableRowMobile
+                    category={pricing.auth}
+                    plan={'team'}
+                    icon={Solutions['authentication'].icon}
+                  />
+                  <PricingTableRowMobile
+                    category={pricing.storage}
+                    plan={'team'}
+                    icon={Solutions['storage'].icon}
+                  />
+                  <PricingTableRowMobile
+                    category={pricing.realtime}
+                    plan={'team'}
+                    icon={Solutions['realtime'].icon}
+                  />
+                  <PricingTableRowMobile
+                    category={pricing['edge_functions']}
+                    plan={'team'}
+                    icon={Solutions['functions'].icon}
+                  />
+                  <PricingTableRowMobile
+                    category={pricing.dashboard}
+                    plan={'team'}
+                    icon={pricing.dashboard.icon}
+                  />
+                  <PricingTableRowMobile
+                    category={pricing.security}
+                    plan={'team'}
+                    icon={pricing.security.icon}
+                  />
+                  <PricingTableRowMobile
+                    category={pricing.support}
+                    plan={'team'}
+                    icon={pricing.support.icon}
+                  />
+                </>
+              )}
+
+              {activeMobilePlan === 'Enterprise' && (
+                <>
+                  <MobileHeader
+                    plan="Enterprise"
                     price={'Contact us for a quote'}
                     priceDescription={''}
                     description={
@@ -615,42 +665,42 @@ export default function IndexPage() {
                   />
                   <PricingTableRowMobile
                     category={pricing.database}
-                    tier={'enterprise'}
+                    plan={'enterprise'}
                     icon={Solutions['database'].icon}
                   />
                   <PricingTableRowMobile
                     category={pricing.auth}
-                    tier={'enterprise'}
+                    plan={'enterprise'}
                     icon={Solutions['authentication'].icon}
                   />
                   <PricingTableRowMobile
                     category={pricing.storage}
-                    tier={'enterprise'}
+                    plan={'enterprise'}
                     icon={Solutions['storage'].icon}
                   />
                   <PricingTableRowMobile
                     category={pricing.realtime}
-                    tier={'enterprise'}
+                    plan={'enterprise'}
                     icon={Solutions['realtime'].icon}
                   />
                   <PricingTableRowMobile
-                    category={pricing['edge-functions']}
-                    tier={'enterprise'}
-                    icon={Solutions['edge-functions'].icon}
+                    category={pricing['edge_functions']}
+                    plan={'enterprise'}
+                    icon={Solutions['functions'].icon}
                   />
                   <PricingTableRowMobile
                     category={pricing.dashboard}
-                    tier={'enterprise'}
+                    plan={'enterprise'}
                     icon={pricing.dashboard.icon}
                   />
                   <PricingTableRowMobile
                     category={pricing.security}
-                    tier={'enterprise'}
+                    plan={'enterprise'}
                     icon={pricing.security.icon}
                   />
                   <PricingTableRowMobile
                     category={pricing.support}
-                    tier={'enterprise'}
+                    plan={'enterprise'}
                     icon={pricing.support.icon}
                   />
                 </>
@@ -674,14 +724,14 @@ export default function IndexPage() {
                       ></div>
                     </th>
 
-                    {tiers.map((tier) => (
+                    {plans.map((plan) => (
                       <th
                         className="text-scale-1200 w-1/4 px-6 pr-2 pt-2 pb-2 text-left text-sm font-normal"
                         scope="col"
-                        key={tier.name}
+                        key={plan.name}
                       >
                         <h3 className="gradient-text-brand-500 dark:gradient-text-brand-100 text-2xl font-mono font-normal uppercase flex items-center gap-4">
-                          {tier.name}
+                          {plan.name}
                         </h3>
                         <div
                           className="h-0.25 absolute bottom-0 left-0 w-full"
@@ -697,13 +747,13 @@ export default function IndexPage() {
                     scope="col"
                   ></th>
 
-                  {tiers.map((tier) => (
+                  {plans.map((plan) => (
                     <th
                       className="text-scale-1200 w-1/4 px-6 pt-2 pb-2 text-left text-sm font-normal"
                       scope="col"
-                      key={`th-${tier.name}`}
+                      key={`th-${plan.name}`}
                     >
-                      <p className="p text-sm border-b border-scale-700 pb-4">{tier.description}</p>
+                      <p className="p text-sm border-b border-scale-700 pb-4">{plan.description}</p>
                       <div
                         className="h-0.25 absolute bottom-0 left-0 w-full"
                         style={{ height: '1px' }}
@@ -712,47 +762,50 @@ export default function IndexPage() {
                   ))}
                 </tr>
                 <tbody className="border-scale-700 dark:border-scale-400 divide-scale-700 dark:divide-scale-400 divide-y">
-                  <tr className="">
+                  <tr>
                     <th
                       className="text-scale-900 px-6 py-8 text-left align-top text-sm font-medium dark:text-white"
                       scope="row"
                     ></th>
 
-                    {tiers.map((tier) => (
-                      <td className="h-full px-6 py-2 align-top" key={`price-${tier.name}`}>
-                        <div className="relative table h-full w-full">
+                    {plans.map((plan) => (
+                      <td className="h-full px-6 py-2 align-top" key={`price-${plan.name}`}>
+                        <div className="relative h-full w-full">
                           <div className="flex flex-col justify-between h-full">
                             <>
                               <span
                                 className={`text-scale-1200 ${
-                                  tier.name !== 'Enterprise' ? 'text-5xl' : 'text-4xl'
+                                  plan.name !== 'Enterprise' ? 'text-5xl' : 'text-4xl'
                                 }`}
                               >
-                                {tier.name !== 'Enterprise' && '$'}
-                                {tier.priceMonthly}
+                                {plan.name !== 'Enterprise' && '$'}
+                                {plan.priceMonthly}
                               </span>
-                              {tier.name !== 'Enterprise' && (
-                                <p className="p text-xs mt-1">per project per month</p>
+                              {['Pro', 'Free'].includes(plan.name) && (
+                                <p className="p text-xs mt-1">per month</p>
+                              )}
+                              {['Team'].includes(plan.name) && (
+                                <p className="p text-xs mt-1">per month</p>
                               )}
                             </>
 
-                            {tier.warning && (
+                            {plan.warning && (
                               <p className="-mt-2">
-                                <span className="bg-brand-500 text-brand-1100 rounded-md bg-opacity-30 py-0.5 px-2 text-xs ">
-                                  {tier.warning}
+                                <span className="bg-scale-100 text-brand-1100 border shadow-sm rounded-md bg-opacity-30 py-0.5 px-2 text-xs">
+                                  {plan.warning}
                                 </span>
                               </p>
                             )}
 
-                            <div className={tier.name === 'Enterprise' ? 'mt-auto' : 'mt-8'}>
-                              <Link href={tier.href} as={tier.href}>
+                            <div className={plan.name === 'Enterprise' ? 'mt-auto' : 'mt-8'}>
+                              <Link href={plan.href} as={plan.href}>
                                 <a>
                                   <Button
                                     size="tiny"
-                                    type={tier.name === 'Enterprise' ? 'default' : 'primary'}
+                                    type={plan.name === 'Enterprise' ? 'default' : 'primary'}
                                     block
                                   >
-                                    {tier.cta}
+                                    {plan.cta}
                                   </Button>
                                 </a>
                               </Link>
@@ -766,32 +819,43 @@ export default function IndexPage() {
                   <PricingTableRowDesktop
                     category={pricing.database}
                     icon={Solutions['database'].icon}
+                    sectionId="database"
                   />
                   <PricingTableRowDesktop
                     category={pricing.auth}
                     icon={Solutions['authentication'].icon}
+                    sectionId="auth"
                   />
                   <PricingTableRowDesktop
                     category={pricing.storage}
                     icon={Solutions['storage'].icon}
+                    sectionId="storage"
                   />
                   <PricingTableRowDesktop
                     category={pricing.realtime}
                     icon={Solutions['realtime'].icon}
+                    sectionId="realtime"
                   />
                   <PricingTableRowDesktop
-                    category={pricing['edge-functions']}
-                    icon={Solutions['edge-functions'].icon}
+                    category={pricing['edge_functions']}
+                    icon={Solutions['functions'].icon}
+                    sectionId="edge-functions"
                   />
                   <PricingTableRowDesktop
                     category={pricing.dashboard}
                     icon={pricing.dashboard.icon}
+                    sectionId="dashboard"
                   />
                   <PricingTableRowDesktop
                     category={pricing.security}
                     icon={pricing.security.icon}
+                    sectionId="security"
                   />
-                  <PricingTableRowDesktop category={pricing.support} icon={pricing.support.icon} />
+                  <PricingTableRowDesktop
+                    category={pricing.support}
+                    icon={pricing.support.icon}
+                    sectionId="support"
+                  />
                 </tbody>
                 <tfoot>
                   <tr className="border-scale-200 dark:border-scale-600 border-t">
@@ -800,7 +864,10 @@ export default function IndexPage() {
                     </th>
 
                     <td className="px-6 pt-5">
-                      <Link href="https://app.supabase.com" as="https://app.supabase.com">
+                      <Link
+                        href="https://supabase.com/dashboard"
+                        as="https://supabase.com/dashboard"
+                      >
                         <a>
                           <Button size="tiny" type="primary" block>
                             Get started
@@ -810,10 +877,23 @@ export default function IndexPage() {
                     </td>
 
                     <td className="px-6 pt-5">
-                      <Link href="https://app.supabase.com" as="https://app.supabase.com">
+                      <Link
+                        href="https://supabase.com/dashboard"
+                        as="https://supabase.com/dashboard"
+                      >
                         <a>
                           <Button size="tiny" type="primary" block>
                             Get started
+                          </Button>
+                        </a>
+                      </Link>
+                    </td>
+
+                    <td className="px-6 pt-5">
+                      <Link href="https://forms.supabase.com/team">
+                        <a>
+                          <Button size="tiny" type="primary" block>
+                            Contact us
                           </Button>
                         </a>
                       </Link>
@@ -822,7 +902,7 @@ export default function IndexPage() {
                     <td className="px-6 pt-5">
                       <Link href="https://forms.supabase.com/enterprise">
                         <a>
-                          <Button size="tiny" type="primary" block>
+                          <Button size="tiny" type="default" block>
                             Contact us
                           </Button>
                         </a>
@@ -834,7 +914,7 @@ export default function IndexPage() {
             </div>
           </div>
         </div>
-        <div className="border-t">
+        <div id="faq" className="border-t">
           <div className="mx-auto max-w-5xl gap-y-10 gap-x-10 lg:grid-cols-2">
             <div className="sm:py-18 mx-auto px-6 py-16 md:py-24 lg:px-16 lg:py-24 xl:px-20">
               <h2 className="h3 text-center">Frequently asked questions</h2>
@@ -849,7 +929,7 @@ export default function IndexPage() {
                 >
                   {pricingFaq.map((faq, i) => {
                     return (
-                      <div className="border-b pb-3" key={i}>
+                      <div className="border-b py-2" key={i}>
                         <Accordion.Item
                           header={<span className="text-scale-1200">{faq.question}</span>}
                           id={`faq--${i.toString()}`}
@@ -867,7 +947,7 @@ export default function IndexPage() {
                 Can&apos;t find the answer to your question, you can{' '}
                 <a
                   target="_blank"
-                  href="https://app.supabase.com/support/new"
+                  href="https://supabase.com/dashboard/support/new"
                   className="transition text-brand-900 hover:text-brand-1000"
                 >
                   open a support ticket
@@ -878,7 +958,7 @@ export default function IndexPage() {
                 For enterprise enquries,{' '}
                 <a
                   target="_blank"
-                  href="https://app.supabase.com/support/new"
+                  href="https://supabase.com/dashboard/support/new"
                   className="transition text-brand-900 hover:text-brand-1000"
                 >
                   you can contact the team here
