@@ -1,5 +1,5 @@
 ---
-title: 'Flutter Authentication and Authorization with RLS'
+title: 'Flutter Authorization with RLS'
 description: Learn how you can secure your Flutter app using Supabase Row Level Security.
 author: tyler_shukert
 image: flutter-chat-auth/supabase-flutter-auth.jpeg
@@ -7,14 +7,13 @@ thumb: flutter-chat-auth/supabase-flutter-auth.jpeg
 tags:
   - flutter
   - auth
-  - mobile
 date: '2022-11-22'
 toc_depth: 3
 ---
 
 This article is the second part of the Flutter tutorial series. During the series, you will learn how to build cross-platform apps without worrying about the backend.
 
-In this article, I will show you how you can make a secure chat application by introducing authentication and authorization to the basic chat app that we created [previously](https://supabase.com/blog/flutter-tutorial-building-a-chat-app).
+In this article, I will show you how you can make a secure chat application by introducing authorization to the basic chat app that we created [previously](https://supabase.com/blog/flutter-tutorial-building-a-chat-app).
 
 We will use [Supabase](https://supabase.com/) to store the chat data and will use its [auth feature](https://supabase.com/auth) to provide a secure chat room feature.
 Supabase lets us build a secure database where we can control who can access what part of the database, so your users' data is secured without worrying about the backend.
@@ -174,7 +173,7 @@ For Android we edit the AndroidManifest.xml to register the deep link.
 </manifest>
 ```
 
-We also need to set the deep link in our Supabase dashboard. Go to Authentication > URL Configuration in your dashboard and add `io.supabase.chat://login` as one of the redirect URLs.
+We also need to set the deep link in our Supabase dashboard. Go to `Authentication > URL Configuration` in your dashboard and add `io.supabase.chat://login` as one of the redirect URLs.
 
 ![Deep link URL Configuration](/images/blog/flutter-chat-auth/url-configuration.png)
 
@@ -188,7 +187,62 @@ The rooms page will load two types of data, recently added users and a list of r
 
 Let's start out by creating states for the rooms page.
 The rooms page would have four different states, loading, loaded, empty, and error. We will display different UI on the rooms page depending on what state it is.
-Create a `lib/cubit/rooms/rooms_state.dart` file and paste the following code.
+Satrt by defining the `Room` model. Create a `lib/models/room.dart` file and add the following code.
+
+```dart
+import 'package:my_chat_app/models/message.dart';
+
+class Room {
+  Room({
+    required this.id,
+    required this.createdAt,
+    required this.otherUserId,
+    this.lastMessage,
+  });
+
+  /// ID of the room
+  final String id;
+
+  /// Date and time when the room was created
+  final DateTime createdAt;
+
+  /// ID of the user who the user is talking to
+  final String otherUserId;
+
+  /// Latest message submitted in the room
+  final Message? lastMessage;
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'createdAt': createdAt.millisecondsSinceEpoch,
+    };
+  }
+
+  /// Creates a room object from room_participants table
+  Room.fromRoomParticipants(Map<String, dynamic> map)
+      : id = map['room_id'],
+        otherUserId = map['profile_id'],
+        createdAt = DateTime.parse(map['created_at']),
+        lastMessage = null;
+
+  Room copyWith({
+    String? id,
+    DateTime? createdAt,
+    String? otherUserId,
+    Message? lastMessage,
+  }) {
+    return Room(
+      id: id ?? this.id,
+      createdAt: createdAt ?? this.createdAt,
+      otherUserId: otherUserId ?? this.otherUserId,
+      lastMessage: lastMessage ?? this.lastMessage,
+    );
+  }
+}
+```
+
+We will procede with defining the states for the rooms page. Create `lib/cubit/rooms/rooms_state.dart` file and paste the following code.
 You may see some errors, but we will take care of them in the next step.
 
 ```dart title=lib/cubit/rooms/rooms_state.dart
@@ -871,7 +925,7 @@ class _ChatBubble extends StatelessWidget {
 }
 ```
 
-### Step 3: Implementing Authentication in Flutter
+### Step 3: Handle user sign-up/ sign-in
 
 Because we have modified the setting of our Supabase to send a confirmation email, we need to make some modifications to the register page and login page as well.
 
@@ -1053,7 +1107,7 @@ class _RegisterPageState extends State<RegisterPage> {
 }
 ```
 
-Login page becomes more simple.
+Login page becomes simpler.
 All it is doing is taking a user's email and password and logging them in.
 It is not doing any navigation whatsoever.
 This is because `LoginPage` is navigated on top of `RegisterPage`, the auth state listener on `RegisterPage` is still active, and therefore can take care of the navigation.
