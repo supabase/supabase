@@ -1,8 +1,4 @@
-import {
-  DEFAULT_MINIMUM_PASSWORD_STRENGTH,
-  PASSWORD_STRENGTH_COLOR,
-  PASSWORD_STRENGTH_PERCENTAGE,
-} from 'lib/constants'
+import { PASSWORD_STRENGTH_COLOR, PASSWORD_STRENGTH_PERCENTAGE } from 'lib/constants'
 
 interface Props {
   passwordStrengthScore: number
@@ -26,7 +22,7 @@ const PasswordStrengthBar = ({
           aria-valuenow={(PASSWORD_STRENGTH_PERCENTAGE as any)[passwordStrengthScore]}
           aria-valuetext={(PASSWORD_STRENGTH_PERCENTAGE as any)[passwordStrengthScore]}
           role="progressbar"
-          className="mb-2 overflow-hidden transition-all border rounded bg-bg-alt-light dark:bg-bg-alt-dark dark:border-dark"
+          className="mb-2 overflow-hidden transition-all border rounded bg-scale-200 dark:bg-scale-200 dark:border-dark"
         >
           <div
             style={{
@@ -41,7 +37,7 @@ const PasswordStrengthBar = ({
       <p>
         {passwordStrengthMessage
           ? passwordStrengthMessage
-          : 'This is the password to your postgres database, so it must be a strong password and hard to guess.'}{' '}
+          : 'This is the password to your postgres database, so it must be strong and hard to guess.'}{' '}
         <span
           className="text-brand-800 underline hover:text-brand-900 transition cursor-pointer"
           onClick={generateStrongPassword}

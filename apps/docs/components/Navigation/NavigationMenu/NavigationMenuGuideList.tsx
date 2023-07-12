@@ -6,11 +6,10 @@ import * as NavItems from './NavigationMenu.constants'
 
 interface Props {
   id: string
-  active: boolean
   collapsible?: boolean
   value?: string[]
 }
-const NavigationMenuGuideList: React.FC<Props> = ({ id, active, value }) => {
+const NavigationMenuGuideList: React.FC<Props> = ({ id, value }) => {
   const router = useRouter()
 
   const menu = NavItems[id]
@@ -35,16 +34,7 @@ const NavigationMenuGuideList: React.FC<Props> = ({ id, active, value }) => {
       key={id}
       type={value ? 'multiple' : 'single'}
       value={value ?? firstLevelRoute}
-      className={[
-        'transition-all duration-150 ease-out',
-        // enabled
-        active && 'opacity-100 ml-0 delay-150',
-        // level === 'home' && 'ml-12',
-
-        // disabled
-        // level !== 'home' && level !== id ? '-ml-8' : '',
-        !active ? 'opacity-0 invisible absolute h-0 overflow-hidden' : '',
-      ].join(' ')}
+      className="transition-all duration-150 ease-out opacity-100 ml-0 delay-150"
     >
       <NavigationMenuGuideListItems menu={menu} id={id} />
     </Accordion.Root>

@@ -1,4 +1,4 @@
-import { FC, useEffect, createContext, useContext } from 'react'
+import { FC, useEffect, createContext, useContext, useState } from 'react'
 import { makeAutoObservable } from 'mobx'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 import { isEmpty, mapValues, has, without, union } from 'lodash'
@@ -12,6 +12,7 @@ import {
   IconTerminal,
   Badge,
   Button,
+  Modal,
 } from 'ui'
 import { Dictionary } from 'components/grid'
 import { useRouter } from 'next/router'
@@ -22,6 +23,7 @@ import FormEmptyBox from 'components/ui/FormBoxEmpty'
 import NoTableState from 'components/ui/States/NoTableState'
 import { useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
+import ConfirmationModal from 'components/ui/ConfirmationModal'
 
 class CreateTriggerFormState {
   id: number | undefined
@@ -121,6 +123,7 @@ class CreateTriggerStore implements ICreateTriggerStore {
   meta = null
   tables = []
   triggerFunctions = []
+  isDirty = false
 
   constructor() {
     makeAutoObservable(this)
@@ -160,6 +163,10 @@ class CreateTriggerStore implements ICreateTriggerStore {
     this.loading = value
   }
 
+  setisDirty = (value: boolean) => {
+    this.isDirty = value
+  }
+
   setTables = (value: Dictionary<any>[]) => {
     this.tables = value as any
     this.setDefaultSelectedTable()
@@ -170,6 +177,7 @@ class CreateTriggerStore implements ICreateTriggerStore {
   }
 
   onFormChange = ({ key, value }: { key: string; value: any }) => {
+    this.isDirty = true
     if (has(this.formState, key)) {
       const temp = (this.formState as any)[key]
       // @ts-ignore
@@ -249,6 +257,7 @@ type CreateTriggerProps = {
 
 const CreateTrigger: FC<CreateTriggerProps> = ({ trigger, visible, setVisible }) => {
   const { ui, meta } = useStore()
+  const [isClosingPanel, setIsClosingPanel] = useState(false)
   const _localState = useLocalObservable(() => new CreateTriggerStore())
   _localState.meta = meta as any
 
@@ -273,6 +282,7 @@ const CreateTrigger: FC<CreateTriggerProps> = ({ trigger, visible, setVisible })
   }, [])
 
   useEffect(() => {
+    _localState.setisDirty(false)
     if (trigger) {
       _localState.formState.reset(trigger)
     } else {
@@ -321,12 +331,16 @@ const CreateTrigger: FC<CreateTriggerProps> = ({ trigger, visible, setVisible })
 
   const hasPublicTables = _localState.tables.length >= 1
 
+  const isClosingSidePanel = () => {
+    _localState.isDirty ? setIsClosingPanel(true) : setVisible(!visible)
+  }
+
   return (
     <>
       <SidePanel
         size="large"
         visible={visible}
-        onCancel={() => setVisible(!visible)}
+        onCancel={isClosingSidePanel}
         header={_localState.title}
         hideFooter={!hasPublicTables}
         className={
@@ -371,6 +385,23 @@ const CreateTrigger: FC<CreateTriggerProps> = ({ trigger, visible, setVisible })
                 onChange={(id: number) => _localState.onSelectFunction(id)}
               />
             </CreateTriggerContext.Provider>
+            <ConfirmationModal
+              visible={isClosingPanel}
+              header="Confirm to close"
+              buttonLabel="Confirm"
+              onSelectCancel={() => setIsClosingPanel(false)}
+              onSelectConfirm={() => {
+                setIsClosingPanel(false)
+                setVisible(!visible)
+              }}
+            >
+              <Modal.Content>
+                <p className="py-4 text-sm text-scale-1100">
+                  There are unsaved changes. Are you sure you want to close the panel? Your changes
+                  will be lost.
+                </p>
+              </Modal.Content>
+            </ConfirmationModal>
           </div>
         ) : (
           <NoTableState message="You will need to create a table first before you can make a trigger" />
@@ -635,7 +666,7 @@ const ListboxActivation: FC = observer(({}) => {
         value={'BEFORE'}
         label={'Before the event'}
         addOnBefore={() => (
-          <div className="flex  items-center justify-center rounded bg-scale-1200 p-1 text-scale-100 ">
+          <div className="flex items-center justify-center rounded bg-scale-1200 p-1 text-scale-100 ">
             <IconPauseCircle strokeWidth={2} size="small" />
           </div>
         )}
@@ -652,7 +683,7 @@ const ListboxActivation: FC = observer(({}) => {
         value={'AFTER'}
         label={'After the event'}
         addOnBefore={() => (
-          <div className="flex  items-center justify-center rounded bg-green-1200 p-1 text-scale-100 ">
+          <div className="flex items-center justify-center rounded bg-green-1200 p-1 text-scale-100 ">
             <IconPlayCircle strokeWidth={2} size="small" />
           </div>
         )}
@@ -693,18 +724,15 @@ const FunctionEmpty: FC = observer(({}) => {
     <button
       type="button"
       onClick={() => _localState!.setChooseFunctionFormVisible(true)}
-      className="relative w-full
-        rounded
-
-        border
-                  border-scale-600 bg-scale-200 px-5
-                  py-1
-                  shadow-sm
-                  transition-all
-                  hover:border-scale-700 hover:bg-scale-300
-                  dark:bg-scale-400 dark:hover:bg-scale-500
-
-                  "
+      className={[
+        'relative w-full',
+        'rounded',
+        'border border-scale-600',
+        'bg-scale-200 px-5 py-1',
+        'shadow-sm transition-all',
+        'hover:border-scale-700 hover:bg-scale-300',
+        'dark:bg-scale-400 dark:hover:bg-scale-500',
+      ].join(' ')}
     >
       <FormEmptyBox
         icon={<IconTerminal size={14} strokeWidth={2} />}
@@ -720,19 +748,13 @@ const FunctionWithArguments: FC = observer(({}) => {
   return (
     <>
       <div
-        className="
-
-
-              relative
-
-              flex
-              w-full items-center
-              justify-between space-x-3 rounded
-              border
-
-
-              border-scale-200 px-5
-              py-4 shadow-sm transition-shadow dark:border-scale-500"
+        className={[
+          'relative w-full',
+          'flex items-center justify-between',
+          'space-x-3 px-5 py-4',
+          'border border-scale-200 dark:border-scale-500',
+          'rounded shadow-sm transition-shadow',
+        ].join(' ')}
       >
         <div className="flex items-center gap-2">
           <div className="flex h-6 w-6 items-center justify-center rounded bg-scale-1200 text-scale-100 focus-within:bg-opacity-10">

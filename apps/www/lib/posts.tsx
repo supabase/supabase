@@ -78,7 +78,7 @@ export const getSortedPosts = (
 
   if (tags) {
     sortedPosts = sortedPosts.filter((post: any) => {
-      const found = tags.some((tag: any) => post.tags.includes(tag))
+      const found = tags.some((tag: any) => post.tags?.includes(tag))
       return found
     })
   }
@@ -151,7 +151,7 @@ export const getAllCategories = (directory: Directories) => {
 
   posts.map((post: any) => {
     // add tags into categories array
-    post.tags.map((tag: string) => {
+    post.tags?.map((tag: string) => {
       if (!categories.includes(tag)) return categories.push(tag)
     })
   })

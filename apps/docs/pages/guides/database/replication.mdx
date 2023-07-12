@@ -11,21 +11,19 @@ Replication is a technique for copying the data from one database to another. Su
 - Spreading out the "load." For example, if your database has a lot of reads, you might want to split it between two databases.
 - Reducing latency. For example, you may want one database in London to serve your European customers, and one in New York to serve the US.
 
-Replication is done through _publications_, a method of choosing which changes to send to other systems (usually another Postgres database). Publications can be managed in the [Dashboard](https://app.supabase.com) or with SQL.
+Replication is done through _publications_, a method of choosing which changes to send to other systems (usually another Postgres database). Publications can be managed in the [Dashboard](https://supabase.com/dashboard) or with SQL.
 
 ## Manage publications in the Dashboard
 
-1. Go to the [Database](https://app.supabase.com/project/_/database/tables) page in the Dashboard.
+1. Go to the [Database](https://supabase.com/dashboard/project/_/database/tables) page in the Dashboard.
 2. Click on **Replication** in the sidebar.
 3. Control which database events are sent by toggling **Insert**, **Update**, and **Delete**.
 4. Control which tables broadcast changes by selecting **Source** and toggling each table.
 
-<video width="99%" muted playsInline controls="true">
+<video width="99%" muted playsInline controls={true}>
   <source
     src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/docs/api/api-realtime.mp4"
     type="video/mp4"
-    muted
-    playsInline
   />
 </video>
 

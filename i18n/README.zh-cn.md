@@ -12,9 +12,9 @@
 - [x] Postgres 数据库托管。[文档](https://supabase.com/docs/guides/database)
 - [x] 身份验证和授权。[文档](https://supabase.com/docs/guides/auth)
 - [x] 自动生成的 API。
-  - [x] REST。[文档](https://supabase.com/docs/guides/database/api#rest-api)
-  - [x] 实时订阅。[文档](https://supabase.com/docs/guides/database/api#realtime-api)
-  - [x] GraphQL（测试版）。[文档](https://supabase.com/docs/guides/database/api#graphql-api)
+  - [x] REST。[文档](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] 实时订阅。[文档](https://supabase.com/docs/guides/api#realtime-api-overview)
+  - [x] GraphQL（测试版）。[文档](https://supabase.com/docs/guides/api#graphql-api-overview)
 - [x] 函数。
   - [x] 数据库函数。[文档](https://supabase.com/docs/guides/database/functions)
   - [x] 边缘函数。[文档](https://supabase.com/docs/guides/functions)
@@ -39,7 +39,7 @@
 ## 状态
 
 - [x] Alpha：我们正在与一组封闭的客户测试 Supabase
-- [x] Public Alpha：任何人都可以在 [app.supabase.com](https://app.supabase.com)上注册。只是务必手下留情，还有一些纠结的地方。
+- [x] Public Alpha：任何人都可以在 [supabase.com/dashboard](https://supabase.com/dashboard)上注册。只是务必手下留情，还有一些纠结的地方。
 - [x] Public Beta：足够稳定，适合大多数非企业使用场景
 - [ ] Public：生产就绪
 
@@ -55,7 +55,7 @@ Supabase 是一个开源工具的组合。我们正在使用企业级的开源�
 
 **当前架构**
 
-Supabase 是一个[托管平台](https://app.supabase.com)。你可以注册并开始使用 Supabase，而无需安装任何软件。
+Supabase 是一个[托管平台](https://supabase.com/dashboard)。你可以注册并开始使用 Supabase，而无需安装任何软件。
 你也可以[自托管](https://supabase.com/docs/guides/hosting/overview)和[本地开发](https://supabase.com/docs/guides/local-development)。
 
 ![架构](https://user-images.githubusercontent.com/70828596/187547862-ffa9d058-0c3a-4851-a3e7-92ccfca4b596.png)
@@ -141,11 +141,11 @@ Supabase 是一个[托管平台](https://app.supabase.com)。你可以注册并�
   </tr>
   <tr>
     <td>Kotlin</td>
-    <td>-</td>
-    <td><a href="https://github.com/supabase-community/postgrest-kt" target="_blank" rel="noopener noreferrer">postgrest-kt</a></td>
-    <td><a href="https://github.com/supabase-community/gotrue-kt" target="_blank" rel="noopener noreferrer">gotrue-kt</a></td>
-    <td>-</td>
-    <td>-</td>
+    <td><a href="https://github.com/supabase-community/supabase-kt" target="_blank" rel="noopener noreferrer">supabase-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Postgrest" target="_blank" rel="noopener noreferrer">postgrest-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/GoTrue" target="_blank" rel="noopener noreferrer">gotrue-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Realtime" target="_blank" rel="noopener noreferrer">realtime-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Storage" target="_blank" rel="noopener noreferrer">storage-kt</a></td>
   </tr>
   <tr>
     <td>Python</td>

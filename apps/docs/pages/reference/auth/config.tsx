@@ -1,4 +1,3 @@
-// @ts-expect-error
 import specFile from '~/../../spec/gotrue_v1_config.yaml' assert { type: 'yml' }
 import { Parameter } from '~/lib/refGenerator/refTypes'
 import ReactMarkdown from 'react-markdown'

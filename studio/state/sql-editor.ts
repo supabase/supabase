@@ -37,21 +37,25 @@ export const sqlEditorState = proxy({
     [key: string]: 'IDLE' | 'UPDATING' | 'UPDATING_FAILED'
   },
 
+  orderSnippets: (snippets: SqlSnippet[]) => {
+    return (
+      snippets
+        .filter((s) => Boolean(s.id))
+        // first alphabetical
+        .sort((a, b) => a.name?.localeCompare(b.name))
+    )
+  },
+  reorderSnippets: (projectRef: string) => {
+    sqlEditorState.orders[projectRef] = sqlEditorState
+      .orderSnippets(
+        sqlEditorState.orders[projectRef].map((id) => sqlEditorState.snippets[id].snippet)
+      )
+      .map((s) => s.id!)
+  },
+
   setRemoteSnippets: (snippets: SqlSnippet[], projectRef: string) => {
     if (!sqlEditorState.orders[projectRef]) {
-      const orderedSnippets = snippets
-        .filter((s) => Boolean(s.id))
-        .sort((a, b) => {
-          // sort by snippet.inserted_at, falling back to snippet.id
-          if (a.inserted_at && b.inserted_at) {
-            const aDate = new Date(a.inserted_at)
-            const bDate = new Date(b.inserted_at)
-            // sort by date
-            return aDate > bDate ? -1 : 1
-          }
-
-          return a.id! > b.id! ? -1 : 1
-        })
+      const orderedSnippets = sqlEditorState.orderSnippets(snippets)
 
       sqlEditorState.orders[projectRef] = orderedSnippets.map((s) => s.id!)
     }
@@ -74,6 +78,7 @@ export const sqlEditorState = proxy({
         !sqlEditorState.orders[projectRef].includes(snippet.id)
       ) {
         sqlEditorState.orders[projectRef].unshift(snippet.id)
+        sqlEditorState.reorderSnippets(projectRef)
       }
       if (isNew) {
         sqlEditorState.needsCreating.add(snippet.id)
@@ -113,6 +118,17 @@ export const sqlEditorState = proxy({
   setSql: (id: string, sql: string) => {
     if (sqlEditorState.snippets[id]) {
       sqlEditorState.snippets[id].snippet.content.sql = sql
+      sqlEditorState.needsSaving.add(id)
+    }
+  },
+  renameSnippet: (id: string, name: string, description?: string) => {
+    if (sqlEditorState.snippets[id]) {
+      const { snippet, projectRef } = sqlEditorState.snippets[id]
+
+      snippet.name = name
+      snippet.description = description
+
+      sqlEditorState.reorderSnippets(projectRef)
       sqlEditorState.needsSaving.add(id)
     }
   },
@@ -214,6 +230,8 @@ if (typeof window !== 'undefined') {
             content: { ...snippet.snippet.content, content_id: id },
             type: 'sql',
             id,
+            name: snippet.snippet.name,
+            description: snippet.snippet.description,
           })
 
           sqlEditorState.needsSaving.delete(id)

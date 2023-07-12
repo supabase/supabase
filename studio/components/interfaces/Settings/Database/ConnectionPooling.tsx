@@ -1,24 +1,22 @@
-import { FC, useState, useEffect, Fragment } from 'react'
-import { observer } from 'mobx-react-lite'
-import { checkPermissions, useStore } from 'hooks'
-import { pluckObjectFields } from 'lib/helpers'
-import Loading from 'components/ui/Loading'
-import Panel from 'components/ui/Panel'
-import Divider from 'components/ui/Divider'
-import { AutoField } from 'uniforms-bootstrap4'
-import { API_URL } from 'lib/constants'
-import { patch } from 'lib/common/fetch'
-import ToggleField from 'components/to-be-cleaned/forms/ToggleField'
-import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
-import { Input } from 'ui'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { FC, Fragment, useEffect, useState } from 'react'
+import { AutoField } from 'uniforms-bootstrap4'
 
-interface Props {}
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
+import Divider from 'components/ui/Divider'
+import Panel from 'components/ui/Panel'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { useCheckPermissions, useStore } from 'hooks'
+import { patch } from 'lib/common/fetch'
+import { API_URL } from 'lib/constants'
+import { pluckObjectFields } from 'lib/helpers'
+import { Input } from 'ui'
 
-const ConnectionPooling: FC<Props> = () => {
-  const { ui, app } = useStore()
-  const projectRef = ui.selectedProject?.ref ?? 'default'
+const ConnectionPooling = () => {
+  const { app } = useStore()
+  const { project } = useProjectContext()
+  const projectRef = project?.ref ?? 'default'
 
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [poolingConfiguration, setPoolingConfiguration] = useState<any>()
@@ -103,7 +101,7 @@ const ConnectionPooling: FC<Props> = () => {
   )
 }
 
-export default observer(ConnectionPooling)
+export default ConnectionPooling
 
 interface ConfigProps {
   projectRef: string
@@ -122,139 +120,137 @@ interface ConfigProps {
   }
 }
 
-export const PgbouncerConfig: FC<ConfigProps> = observer(
-  ({ projectRef, bouncerInfo, connectionInfo }) => {
-    const { ui } = useStore()
+export const PgbouncerConfig: FC<ConfigProps> = ({ projectRef, bouncerInfo, connectionInfo }) => {
+  const { ui } = useStore()
 
-    const canUpdateConnectionPoolingConfiguration = checkPermissions(
-      PermissionAction.UPDATE,
-      'projects'
-    )
+  const canUpdateConnectionPoolingConfiguration = useCheckPermissions(
+    PermissionAction.UPDATE,
+    'projects'
+  )
 
-    const [updates, setUpdates] = useState<any>({
-      pool_mode: bouncerInfo.pool_mode || 'transaction',
-      default_pool_size: bouncerInfo.default_pool_size || '',
-      ignore_startup_parameters: bouncerInfo.ignore_startup_parameters || '',
-      pgbouncer_enabled: bouncerInfo.pgbouncer_enabled,
-    })
+  const [updates, setUpdates] = useState<any>({
+    pool_mode: bouncerInfo.pool_mode || 'transaction',
+    default_pool_size: bouncerInfo.default_pool_size || '',
+    ignore_startup_parameters: bouncerInfo.ignore_startup_parameters || '',
+    pgbouncer_enabled: bouncerInfo.pgbouncer_enabled,
+  })
 
-    const updateConfig = async (updatedConfig: any) => {
-      try {
-        const response = await patch(`${API_URL}/projects/${projectRef}/config/pgbouncer`, {
-          pgbouncer_enabled: updatedConfig.pgbouncer_enabled,
-          default_pool_size: updatedConfig.default_pool_size,
-          ignore_startup_parameters: updatedConfig.ignore_startup_parameters,
-          pool_mode: updatedConfig.pool_mode,
-          max_client_conn: updatedConfig.max_client_conn,
-        })
-        if (response.error) {
-          throw response.error
-        } else {
-          setUpdates({ ...response })
-          ui.setNotification({ category: 'success', message: 'Successfully saved settings' })
-        }
-      } catch (error: any) {
-        ui.setNotification({
-          category: 'error',
-          message: `Failed to update config: ${error.message}`,
-        })
+  const updateConfig = async (updatedConfig: any) => {
+    try {
+      const response = await patch(`${API_URL}/projects/${projectRef}/config/pgbouncer`, {
+        pgbouncer_enabled: updatedConfig.pgbouncer_enabled,
+        default_pool_size: updatedConfig.default_pool_size,
+        ignore_startup_parameters: updatedConfig.ignore_startup_parameters,
+        pool_mode: updatedConfig.pool_mode,
+        max_client_conn: updatedConfig.max_client_conn,
+      })
+      if (response.error) {
+        throw response.error
+      } else {
+        setUpdates({ ...response })
+        ui.setNotification({ category: 'success', message: 'Successfully saved settings' })
       }
+    } catch (error: any) {
+      ui.setNotification({
+        category: 'error',
+        message: `Failed to update config: ${error.message}`,
+      })
     }
-
-    const formSchema = {
-      properties: {
-        pool_mode: {
-          title: 'Pool Mode',
-          type: 'string',
-          options: [
-            {
-              label: 'Transaction',
-              value: 'transaction',
-            },
-            {
-              label: 'Session',
-              value: 'session',
-            },
-          ],
-        },
-        ignore_startup_parameters: {
-          title: 'Ignore Startup Parameters',
-          type: 'string',
-          help: 'Defaults are either blank or "extra_float_digits"',
-        },
-      },
-      required: ['pool_mode'],
-      type: 'object',
-    }
-
-    return (
-      <div>
-        <SchemaFormPanel
-          title="Connection Pooling"
-          schema={formSchema}
-          model={updates}
-          submitLabel="Save"
-          cancelLabel="Cancel"
-          onChangeModel={(model: any) => setUpdates(model)}
-          onSubmit={(model: any) => updateConfig(model)}
-          onReset={() => setUpdates(bouncerInfo)}
-          disabled={!canUpdateConnectionPoolingConfiguration}
-          disabledMessage="You need additional permissions to update connection pooling settings"
-        >
-          <div className="space-y-6 py-4">
-            {bouncerInfo.pgbouncer_enabled && (
-              <>
-                <AutoField
-                  name="pool_mode"
-                  showInlineError
-                  errorMessage="You must select one of the two options"
-                />
-                <div className="!mt-1 flex" style={{ marginLeft: 'calc(33% + 0.5rem)' }}>
-                  <p className="text-sm text-scale-900">
-                    Specify when a connection can be returned to the pool. To find out the most
-                    suitable mode for your use case,{' '}
-                    <a
-                      className="text-green-900"
-                      target="_blank"
-                      rel="noreferrer"
-                      href="https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pool"
-                    >
-                      click here
-                    </a>
-                    .
-                  </p>
-                </div>
-                <Divider light />
-                <AutoField name="ignore_startup_parameters" />
-              </>
-            )}
-            <Divider light />
-            <Input
-              className="input-mono"
-              layout="horizontal"
-              readOnly
-              copy
-              disabled
-              value={connectionInfo.db_port}
-              label="Port"
-            />
-            <Divider light />
-            <Input
-              className="input-mono"
-              layout="vertical"
-              readOnly
-              copy
-              disabled
-              label="Connection string"
-              value={
-                `postgres://${connectionInfo.db_user}:[YOUR-PASSWORD]@` +
-                `${connectionInfo.db_host}:${connectionInfo.db_port}` +
-                `/${connectionInfo.db_name}`
-              }
-            />
-          </div>
-        </SchemaFormPanel>
-      </div>
-    )
   }
-)
+
+  const formSchema = {
+    properties: {
+      pool_mode: {
+        title: 'Pool Mode',
+        type: 'string',
+        options: [
+          {
+            label: 'Transaction',
+            value: 'transaction',
+          },
+          {
+            label: 'Session',
+            value: 'session',
+          },
+        ],
+      },
+      ignore_startup_parameters: {
+        title: 'Ignore Startup Parameters',
+        type: 'string',
+        help: 'Defaults are either blank or "extra_float_digits"',
+      },
+    },
+    required: ['pool_mode'],
+    type: 'object',
+  }
+
+  return (
+    <div>
+      <SchemaFormPanel
+        title="Connection Pooling"
+        schema={formSchema}
+        model={updates}
+        submitLabel="Save"
+        cancelLabel="Cancel"
+        onChangeModel={(model: any) => setUpdates(model)}
+        onSubmit={(model: any) => updateConfig(model)}
+        onReset={() => setUpdates(bouncerInfo)}
+        disabled={!canUpdateConnectionPoolingConfiguration}
+        disabledMessage="You need additional permissions to update connection pooling settings"
+      >
+        <div className="space-y-6 py-4">
+          {bouncerInfo.pgbouncer_enabled && (
+            <>
+              <AutoField
+                name="pool_mode"
+                showInlineError
+                errorMessage="You must select one of the two options"
+              />
+              <div className="!mt-1 flex" style={{ marginLeft: 'calc(33% + 0.5rem)' }}>
+                <p className="text-sm text-scale-900">
+                  Specify when a connection can be returned to the pool. To find out the most
+                  suitable mode for your use case,{' '}
+                  <a
+                    className="text-green-900"
+                    target="_blank"
+                    rel="noreferrer"
+                    href="https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pool"
+                  >
+                    click here
+                  </a>
+                  .
+                </p>
+              </div>
+              <Divider light />
+              <AutoField name="ignore_startup_parameters" />
+            </>
+          )}
+          <Divider light />
+          <Input
+            className="input-mono"
+            layout="horizontal"
+            readOnly
+            copy
+            disabled
+            value={connectionInfo.db_port}
+            label="Port"
+          />
+          <Divider light />
+          <Input
+            className="input-mono"
+            layout="vertical"
+            readOnly
+            copy
+            disabled
+            label="Connection string"
+            value={
+              `postgres://${connectionInfo.db_user}:[YOUR-PASSWORD]@` +
+              `${connectionInfo.db_host}:${connectionInfo.db_port}` +
+              `/${connectionInfo.db_name}`
+            }
+          />
+        </div>
+      </SchemaFormPanel>
+    </div>
+  )
+}

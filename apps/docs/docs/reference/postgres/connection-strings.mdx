@@ -1,15 +1,11 @@
 ---
 id: connection-strings
-title: "Connection Strings"
+title: 'Connection Strings'
 slug: connection-strings
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/postgres.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabsPanel from '@theme/TabsPanel';
-
 There are various ways to connect to your database, depending on the configuration of your Postgres instance and the tool which you are connecting with.
-
 
 <Tabs
   defaultActiveId="sql"
@@ -20,41 +16,26 @@ There are various ways to connect to your database, depending on the configurati
 
 ```bash
 postgres://postgres:postgres@localhost:5432/postgres
-# or 
+# or
 postgresql://postgres:postgres@localhost:5432/postgres
 ```
-
 
 </TabsPanel>
 
 </Tabs>
-
-
-
-
 
 ## Notes
 
 - [Official Documentation](https://www.postgresql.org/docs/current/libpq-connect.html).
 - Avoid using special characters usernames and passwords. If you use special characters in a connection URL, you'll need to URL encode any special characters.
 
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### Basic connection string
 
-If you're using a default setup, your postgres connection string will likely be in the format: 
+If you're using a default setup, your postgres connection string will likely be in the format:
 
 `postgres://{user}:{password}@{host}:{port}/{database_name}`
-
 
 <Tabs
   defaultActiveId="sql"
@@ -65,10 +46,9 @@ If you're using a default setup, your postgres connection string will likely be 
 
 ```bash
 postgres://postgres:postgres@localhost:5432/postgres
-# or 
+# or
 postgresql://postgres:postgres@localhost:5432/postgres
 ```
-
 
 </TabsPanel>
 
@@ -89,7 +69,6 @@ See full [documentation](http://jdbc.postgresql.org/documentation/head/connect.h
 jdbc:postgresql://{host}:{port}/{database_name}
 ```
 
-
 </TabsPanel>
 
 </Tabs>
@@ -109,7 +88,6 @@ See full [documentation](http://npgsql.projects.postgresql.org/docs/manual/UserM
 Server=host;Port=5432;User Id=username;Password=secret;Database=database_name;
 ```
 
-
 </TabsPanel>
 
 </Tabs>
@@ -128,7 +106,6 @@ See full [documentation](http://php.net/manual/en/book.pgsql.php).
 ```bash
 host=hostname port=5432 dbname=databasename user=username password=secret
 ```
-
 
 </TabsPanel>
 

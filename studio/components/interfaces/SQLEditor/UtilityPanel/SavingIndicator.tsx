@@ -38,7 +38,6 @@ const SavingIndicator = ({ id }: SavingIndicatorProps) => {
         <Button
           type="text"
           size="tiny"
-          shadow={false}
           icon={<IconRefreshCcw className="text-gray-1100" size="tiny" strokeWidth={2} />}
           onClick={retry}
         >

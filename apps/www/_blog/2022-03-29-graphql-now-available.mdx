@@ -15,8 +15,8 @@ toc_depth: 3
 
 🆕 `pg_graphql` has undergone significant enhancements since this announcement. Here is what is new:
 
-	- [pg_graphql v1.0](https://supabase.com/blog/pg-graphql-v1)
-	- [New Features in pg_graphql v1.2](https://supabase.com/blog/whats-new-in-pg-graphql-v1-2)
+- [pg_graphql v1.0](https://supabase.com/blog/pg-graphql-v1)
+- [New Features in pg_graphql v1.2](https://supabase.com/blog/whats-new-in-pg-graphql-v1-2)
 
 </div>
 
@@ -67,11 +67,11 @@ GraphQL types and fields are reflected from the SQL schema:
 For example:
 
 ```sql
-create table "Account"(
-    "id" serial primary key,
-    "email" varchar(255) not null,
-    "createdAt" timestamp not null,
-    "updatedAt" timestamp not null
+create table "Account" (
+  "id" serial primary key,
+  "email" varchar(255) not null,
+  "createdAt" timestamp not null,
+  "updatedAt" timestamp not null
 );
 ```
 
@@ -138,7 +138,7 @@ Another nice side effect of making PostgreSQL do the heavy lifting is that Graph
 
 ## Performance
 
-Each [free tier database](https://supabase.com/pricing) on the Supabase platform runs on a dedicated AWS t4g.micro instance with 2 vCPUs and 1 GB of memory.
+Each [free plan database](https://supabase.com/pricing) on the Supabase platform runs on a dedicated AWS t4g.micro instance with 2 vCPUs and 1 GB of memory.
 
 To squeeze the most out of that limited hardware we had to make a few significant optimizations:
 
@@ -152,12 +152,11 @@ For example, when selecting all comments for a blog post:
 
 ```sql
 select
-	blog_posts.title,
-	comments.body as comment_body
+  blog_posts.title,
+  comments.body as comment_body
 from
-	blog_posts
-join
-	comments on blog_posts.id = comments.blog_post_id
+  blog_posts
+  join comments on blog_posts.id = comments.blog_post_id;
 ```
 
 a SQL response would duplicate all data from the `blog_posts` table (title).
@@ -217,7 +216,7 @@ Batching similar operations reduces network round-trips and time spent in the da
 
 **Result**
 
-As a result of these optimizations, the throughput of a “hello world” equivalent query on Supabase free-tier hardware is:
+As a result of these optimizations, the throughput of a “hello world” equivalent query on Supabase free-plan hardware is:
 
 - 377.4 requests/second through the API (mean)
 - 656.2 queries/second through SQL (single connection, mean)
@@ -229,14 +228,12 @@ As a result of these optimizations, the throughput of a “hello world” equiva
 
 </aside>
 
-To enable GraphQL in your Supabase instance, enable `pg_graphql` from the [dashboard](https://app.supabase.com/).
+To enable GraphQL in your Supabase instance, enable `pg_graphql` from the [dashboard](https://supabase.com/dashboard/).
 
-<video width="99%" autoPlay="autoplay" muted playsInline controls={true}>
+<video width="99%" autoPlay muted playsInline controls={true}>
   <source
     src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/marketing/blog/launch-week-4/api-enable-graphql.mp4"
     type="video/mp4"
-    muted
-    playsInline
   />
 </video>
 
@@ -330,7 +327,6 @@ Didn't see the feature you're interested in? [Let us know](https://github.com/su
 
 ## More pg_graphql
 
-- [Introducing pg_graphql: A GraphQL extension for PostgreSQL](https://supabase.com/blog/pg-graphql) 
+- [Introducing pg_graphql: A GraphQL extension for PostgreSQL](https://supabase.com/blog/pg-graphql)
 - [pg_graphql v1.0](https://supabase.com/blog/pg-graphql-v1)
 - [pg_graphql v1.2](https://supabase.com/blog/whats-new-in-pg-graphql-v1-2)
-

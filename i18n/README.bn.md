@@ -12,9 +12,9 @@
 - [x] হোস্ট করা পোস্টগ্রেস ডাটাবেস. [ডক্স](https://supabase.com/docs/guides/database)
 - [x] অথেনটিকেশন এবং অথরাইজড . [ডক্স](https://supabase.com/docs/guides/auth)
 - [x] স্বয়ংক্রিয়ভাবে তৈরি এপিআই.
-  - [x] রেস্ট. [ডক্স](https://supabase.com/docs/guides/database/api#rest-api)
-  - [x] রিয়েলটাইম সাবস্ক্রিপশন. [ডক্স](https://supabase.com/docs/guides/database/api#realtime-api)
-  - [x] গ্রাফকিউএল (বেটা). [ডক্স](https://supabase.com/docs/guides/database/api#graphql-api)
+  - [x] রেস্ট. [ডক্স](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] রিয়েলটাইম সাবস্ক্রিপশন. [ডক্স](https://supabase.com/docs/guides/api#realtime-api-overview)
+  - [x] গ্রাফকিউএল (বেটা). [ডক্স](https://supabase.com/docs/guides/api#graphql-api-overview)
 - [x] ফাংশনস.
   - [x] ডাটাবেস ফাংশনস. [ডক্স](https://supabase.com/docs/guides/database/functions)
   - [x] এজ ফাংশনস. [ডক্স](https://supabase.com/docs/guides/functions)
@@ -39,11 +39,11 @@
 ## স্ট্যাটাস
 
 - [x] আলফা: আমরা কাছের গ্রাহকদের সাথে Supabase পরীক্ষা করছি
-- [x] পাবলিক আলফা: যে কেউ [app.supabase.com](https://app.supabase.com) এ সাইন আপ করতে পারেন। কিন্তু আমাদের উপর সহজ যান, কয়েক kinks আছে
+- [x] পাবলিক আলফা: যে কেউ [supabase.com/dashboard](https://supabase.com/dashboard) এ সাইন আপ করতে পারেন। কিন্তু আমাদের উপর সহজ যান, কয়েক kinks আছে
 - [x] পাবলিক বেটা: বেশিরভাগ নন-এন্টারপ্রাইজ ব্যবহারের ক্ষেত্রে যথেষ্ট স্থিতিশীল
 - [ ] পাবলিক: প্রোডাকশন রেডি
 
-আমরা বর্তমানে পাবলিক বেটাতে আছি। বড় আপডেটের বিজ্ঞপ্তি পেতে এই রিপুর "রিলিজ" দেখুন।
+আমরা বর্তমানে পাবলিক বিটাতে আছি। বড় আপডেটের বিজ্ঞপ্তি পেতে এই রেপোর "রিলিজ" দেখুন।
 
 <kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="এই রিপু দেখুন"/></kbd>
 
@@ -55,7 +55,7 @@ Supabase হল ওপেন সোর্স টুলের সংমিশ্�
 
 **স্থাপত্য**
 
-সুপাবেস হল একটি [হোস্ট করা প্ল্যাটফর্ম](https://app.supabase.com)। আপনি সাইন আপ করে এবং কিছু ইনস্টল না করে সুপাবেস ব্যবহার শুরু করতে পারেন।
+সুপাবেস হল একটি [হোস্ট করা প্ল্যাটফর্ম](https://supabase.com/dashboard)। আপনি সাইন আপ করে এবং কিছু ইনস্টল না করে সুপাবেস ব্যবহার শুরু করতে পারেন।
 এছাড়াও আপনি [স্ব-হোস্ট](https://supabase.com/docs/guides/hosting/overview) এবং [ডেভেলপ লোকালি](https://supabase.com/docs/guides/local-development) করতে পারেন।
 
 ![আর্কিটেকচার](https://user-images.githubusercontent.com/70828596/187547862-ffa9d058-0c3a-4851-a3e7-92ccfca4b596.png)
@@ -141,11 +141,12 @@ Supabase হল ওপেন সোর্স টুলের সংমিশ্�
   </tr>
   <tr>
     <td>কোটলিন</td>
-    <td>-</td>
-    <td><a href="https://github.com/supabase-community/postgrest-kt" target="_blank" rel="noopener noreferrer">postgrest-kt</a></td>
-    <td><a href="https://github.com/supabase-community/gotrue-kt" target="_blank" rel="noopener noreferrer">গোট্রু-kt</a></td>
-    <td>-</td>
-    <td>-</td>
+    <td>Kotlin</td>
+    <td><a href="https://github.com/supabase-community/supabase-kt" target="_blank" rel="noopener noreferrer">supabase-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Postgrest" target="_blank" rel="noopener noreferrer">postgrest-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/GoTrue" target="_blank" rel="noopener noreferrer">gotrue-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Realtime" target="_blank" rel="noopener noreferrer">realtime-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Storage" target="_blank" rel="noopener noreferrer">storage-kt</a></td>
   </tr>
   <tr>
     <td>পাইথন</td>

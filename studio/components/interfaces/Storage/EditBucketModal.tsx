@@ -1,27 +1,28 @@
 import clsx from 'clsx'
+import { useParams } from 'common'
+import { StorageSizeUnits } from 'components/to-be-cleaned/Storage/StorageSettings/StorageSettings.constants'
+import {
+  convertFromBytes,
+  convertToBytes,
+} from 'components/to-be-cleaned/Storage/StorageSettings/StorageSettings.utils'
+import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
+import { useBucketUpdateMutation } from 'data/storage/bucket-update-mutation'
+import { useStore } from 'hooks'
+import { IS_PLATFORM } from 'lib/constants'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import {
   Alert,
   Button,
-  Modal,
-  Input,
-  Toggle,
-  Form,
   Collapsible,
+  Form,
   IconChevronDown,
+  Input,
   Listbox,
+  Modal,
+  Toggle,
 } from 'ui'
-import { BucketUpdatePayload, StorageBucket } from './Storage.types'
-import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
-import { StorageSizeUnits } from 'components/to-be-cleaned/Storage/StorageSettings/StorageSettings.constants'
-import {
-  convertToBytes,
-  convertFromBytes,
-} from 'components/to-be-cleaned/Storage/StorageSettings/StorageSettings.utils'
-import { useStore } from 'hooks'
-import { useParams } from 'common'
-import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
+import { StorageBucket } from './Storage.types'
 
 export interface EditBucketModalProps {
   visible: boolean
@@ -32,10 +33,9 @@ export interface EditBucketModalProps {
 const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => {
   const { ui } = useStore()
   const { ref } = useParams()
-  const storageExplorerStore = useStorageStore()
-  const { editBucket } = storageExplorerStore
 
-  const { data } = useProjectStorageConfigQuery({ projectRef: ref })
+  const { mutateAsync: updateBucket } = useBucketUpdateMutation()
+  const { data } = useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
   const { value, unit } = convertFromBytes(data?.fileSizeLimit ?? 0)
   const formattedGlobalUploadLimit = `${value} ${unit}`
 
@@ -51,31 +51,33 @@ const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => 
   }
 
   const onSubmit = async (values: any, { setSubmitting }: any) => {
-    if (bucket === undefined) {
-      return console.error('Bucket is required')
-    }
+    if (bucket === undefined) return console.error('Bucket is required')
+    if (ref === undefined) return console.error('Project ref is required')
 
-    const payload: BucketUpdatePayload = {
-      public: values.public,
-      file_size_limit: values.has_file_size_limit
-        ? convertToBytes(values.formatted_size_limit, selectedUnit)
-        : null,
-      allowed_mime_types:
-        values.allowed_mime_types.length > 0
-          ? values.allowed_mime_types.split(',').map((x: string) => x.trim())
+    try {
+      await updateBucket({
+        projectRef: ref,
+        id: bucket.id,
+        isPublic: values.public,
+        file_size_limit: values.has_file_size_limit
+          ? convertToBytes(values.formatted_size_limit, selectedUnit)
           : null,
-    }
-
-    setSubmitting(true)
-    const res = await editBucket(bucket, payload)
-    if (res.error) {
-      setSubmitting(false)
-    } else {
+        allowed_mime_types:
+          values.allowed_mime_types.length > 0
+            ? values.allowed_mime_types.split(',').map((x: string) => x.trim())
+            : null,
+      })
       ui.setNotification({
         category: 'success',
         message: `Successfully updated bucket "${bucket.name}"`,
       })
       onClose()
+    } catch (error: any) {
+      setSubmitting(false)
+      ui.setNotification({
+        category: 'success',
+        message: `Failed to update bucket: ${error.message}`,
+      })
     }
   }
 
@@ -215,6 +217,7 @@ const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => 
                           </div>
                           <div className="col-span-4">
                             <Listbox
+                              id="size_limit_units"
                               disabled={false}
                               value={selectedUnit}
                               onChange={setSelectedUnit}
@@ -226,17 +229,19 @@ const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => 
                               ))}
                             </Listbox>
                           </div>
-                          <div className="col-span-12">
-                            <p className="text-scale-1000 text-sm">
-                              Note: The{' '}
-                              <Link href={`/project/${ref}/settings/storage`}>
-                                <a className="text-brand-900 opacity-80 hover:opacity-100 transition">
-                                  global upload limit
-                                </a>
-                              </Link>{' '}
-                              takes precedence over this value ({formattedGlobalUploadLimit})
-                            </p>
-                          </div>
+                          {IS_PLATFORM && (
+                            <div className="col-span-12">
+                              <p className="text-scale-1000 text-sm">
+                                Note: The{' '}
+                                <Link href={`/project/${ref}/settings/storage`}>
+                                  <a className="text-brand-900 opacity-80 hover:opacity-100 transition">
+                                    global upload limit
+                                  </a>
+                                </Link>{' '}
+                                takes precedence over this value ({formattedGlobalUploadLimit})
+                              </p>
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>

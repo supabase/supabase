@@ -4,11 +4,10 @@ import Link from 'next/link'
 import NavigationMenu from '~/components/Navigation/NavigationMenu/NavigationMenu'
 import TopNavBarRef from '~/components/Navigation/NavigationMenu/TopNavBarRef'
 
-import { memo, useEffect } from 'react'
+import Head from 'next/head'
+import { PropsWithChildren, memo } from 'react'
 import Footer from '~/components/Navigation/Footer'
 import { menuState, useMenuLevelId, useMenuMobileOpen } from '~/hooks/useMenuState'
-import Head from 'next/head'
-import { Announcement, AnnouncementCountdown } from 'ui'
 
 const levelsData = {
   home: {
@@ -46,6 +45,10 @@ const levelsData = {
   storage: {
     icon: '/docs/img/icons/menu/storage',
     name: 'Storage',
+  },
+  ai: {
+    icon: '/docs/img/icons/menu/ai',
+    name: 'AI & Vectors',
   },
   supabase_cli: {
     icon: '/docs/img/icons/menu/reference-cli',
@@ -91,9 +94,13 @@ const levelsData = {
     icon: '/docs/img/icons/menu/reference-python',
     name: 'Python Reference v2.0',
   },
-  reference_swift_v1: {
+  reference_swift_v0: {
     icon: '/docs/img/icons/menu/reference-swift',
-    name: 'Swift Reference v1.0',
+    name: 'Swift Reference v0.0',
+  },
+  reference_kotlin_v0: {
+    icon: '/docs/img/icons/menu/reference-kotlin',
+    name: 'Kotlin Reference v0.0',
   },
   reference_cli: {
     icon: '/docs/img/icons/menu/reference-cli',
@@ -198,32 +205,13 @@ const MobileMenuBackdrop = memo(function MobileMenuBackdrop() {
         'left-0',
         'right-0',
         'z-10',
-        'backdrop-blur-sm backdrop-filter bg-white-1200 dark:bg-blackA-600',
+        'backdrop-blur-sm backdrop-filter bg-white-1200 dark:bg-scale-200/90',
         mobileMenuOpen ? 'absolute h-full w-full top-0 left-0' : 'hidden h-0',
         // always hide on desktop
         'lg:hidden',
       ].join(' ')}
       onClick={() => menuState.setMenuMobileOpen(!mobileMenuOpen)}
     ></div>
-  )
-})
-
-const SideMenu = memo(function SideMenu() {
-  return (
-    <div
-      className={[
-        'transition-all ease-out duration-200',
-        'absolute left-0 right-0 h-screen',
-        'px-5 pl-5 py-16',
-        'top-[0px]',
-        'bg-scale-200',
-        // desktop styles
-        'lg:relative lg:top-0 lg:left-0 lg:pb-10 lg:px-10 lg:pt-0 lg:flex',
-        'lg:opacity-100 lg:visible',
-      ].join(' ')}
-    >
-      <NavigationMenu />
-    </div>
   )
 })
 
@@ -292,7 +280,7 @@ const NavContainer = memo(function NavContainer() {
           'relative',
           'w-auto',
           'border-r overflow-auto h-screen',
-          'backdrop-blur backdrop-filter bg-white-1200 dark:bg-blackA-300',
+          'backdrop-blur backdrop-filter bg-white-1200 dark:bg-scale-200',
           'flex flex-col',
         ].join(' ')}
       >
@@ -312,24 +300,32 @@ const NavContainer = memo(function NavContainer() {
             </div>
           </div>
         </div>
-        <SideMenu />
+        <div
+          className={[
+            'transition-all ease-out duration-200',
+            'absolute left-0 right-0 h-screen',
+            'px-5 pl-5 py-16',
+            'top-[0px]',
+            'bg-scale-200',
+            // desktop styles
+            'lg:relative lg:top-0 lg:left-0 lg:pb-10 lg:px-10 lg:pt-0 lg:flex',
+            'lg:opacity-100 lg:visible',
+          ].join(' ')}
+        >
+          <NavigationMenu />
+        </div>
       </div>
     </div>
   )
 })
 
-const SiteLayout = ({ children }) => {
+const SiteLayout = ({ children }: PropsWithChildren<{}>) => {
   return (
     <>
       <Head>
         <title>Supabase Docs</title>
       </Head>
       <main>
-        <div>
-          <Announcement>
-            <AnnouncementCountdown />
-          </Announcement>
-        </div>
         <div className="flex flex-row h-screen">
           <NavContainer />
           <Container>
@@ -340,14 +336,14 @@ const SiteLayout = ({ children }) => {
               className={[
                 'sticky transition-all top-0',
                 'z-10',
-                'backdrop-blur backdrop-filter bg-white-1200 dark:bg-blackA-300',
+                'backdrop-blur backdrop-filter bg-white-1200 dark:bg-scale-200',
               ].join(' ')}
             >
               <div className={['lg:hidden', 'px-5 ', 'border-b z-10'].join(' ')}>
                 <MobileHeader />
               </div>
             </div>
-            <div className="grow px-5 max-w-7xl mx-auto py-16">
+            <div className="grow">
               {children}
               <Footer />
             </div>

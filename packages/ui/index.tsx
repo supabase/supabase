@@ -15,7 +15,7 @@ export * from './src/components/Icon'
 export * from './src/components/Icon/IconContext'
 export * from './src/components/GlassPanel'
 export * from './src/components/IconPanel'
-// export * from './src/components/Image'
+export * from './src/components/Icon/IconBackground'
 
 // DISPLAYS
 
@@ -30,6 +30,7 @@ export * from './src/components/CodeBlock'
 // NAV
 
 export * from './src/components/Menu'
+export * from './src/components/TextLink'
 
 // OVERLAYS
 
@@ -38,6 +39,7 @@ export * from './src/components/SidePanel'
 export * from './src/components/Dropdown'
 export * from './src/components/ContextMenu'
 export * from './src/components/Popover'
+export * from './src/components/ExpandableVideo'
 
 // UTILITIES
 
@@ -61,9 +63,13 @@ export * from './src/components/Form'
 export * from './src/components/Command'
 
 // layout
+export * from './src/components/LoadingLine'
 
 // banners
 export * from './src/layout/banners'
+
+// utilities
+export * from './src/lib/utils'
 
 // config
 

@@ -147,10 +147,11 @@
                   },
                   "allowed_mime_types": {
                     "type": "array",
+                    "nullable": true,
+                    "examples": [["image/png", "image/jpg"]],
                     "items": {
                       "type": "string"
-                    },
-                    "examples": [["image/png", "image/jpg"]]
+                    }
                   }
                 },
                 "required": ["name"]
@@ -841,6 +842,9 @@
                   "description": "Successful response",
                   "type": "object",
                   "properties": {
+                    "Id": {
+                      "type": "string"
+                    },
                     "Key": {
                       "type": "string",
                       "examples": ["avatars/folder/cat.png"]
@@ -918,6 +922,9 @@
                   "description": "Successful response",
                   "type": "object",
                   "properties": {
+                    "Id": {
+                      "type": "string"
+                    },
                     "Key": {
                       "type": "string",
                       "examples": ["avatars/folder/cat.png"]

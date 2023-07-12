@@ -1,39 +1,28 @@
-import { partition } from 'lodash'
-import { useState, useMemo } from 'react'
-import { observer } from 'mobx-react-lite'
-import {
-  Button,
-  Menu,
-  Input,
-  IconSearch,
-  IconPlus,
-  IconX,
-  Dropdown,
-  IconChevronDown,
-  useCommandMenu,
-} from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-
-import { checkPermissions, useFlag, useStore } from 'hooks'
-import { IS_PLATFORM } from 'lib/constants'
-import { useProfileQuery } from 'data/profile/profile-query'
-import { uuidv4 } from 'lib/helpers'
-
-import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
-import { useParams } from 'common'
-import { useSnippets, useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { SqlSnippet, useSqlSnippetsQuery } from 'data/content/sql-snippets-query'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import QueryItem from './QueryItem'
-import { createSqlSnippetSkeleton } from 'components/interfaces/SQLEditor/SQLEditor.utils'
+import { partition } from 'lodash'
+import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
+import { useMemo, useState } from 'react'
+
+import { useParams } from 'common'
+import { createSqlSnippetSkeleton } from 'components/interfaces/SQLEditor/SQLEditor.utils'
+import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { SqlSnippet, useSqlSnippetsQuery } from 'data/content/sql-snippets-query'
+import { useCheckPermissions, useFlag, useStore } from 'hooks'
+import { IS_PLATFORM } from 'lib/constants'
+import { uuidv4 } from 'lib/helpers'
+import { useProfile } from 'lib/profile'
+import { useSnippets, useSqlEditorStateSnapshot } from 'state/sql-editor'
+import { Button, Dropdown, IconPlus, IconSearch, IconX, Input, Menu, useCommandMenu } from 'ui'
 import { COMMAND_ROUTES } from 'ui/src/components/Command/Command.constants'
+import QueryItem from './QueryItem'
 
 const SideBarContent = observer(() => {
   const { ui } = useStore()
   const { ref, id } = useParams()
   const router = useRouter()
-  const { data: profile } = useProfileQuery()
+  const { profile } = useProfile()
   const [filterString, setFilterString] = useState('')
   const { setPages, setIsOpen } = useCommandMenu()
   const showCmdkHelper = useFlag('dashboardCmdk')
@@ -61,8 +50,7 @@ const SideBarContent = observer(() => {
     filterString.length === 0
       ? queries
       : queries.filter((tab) => tab.name.toLowerCase().includes(filterString.toLowerCase()))
-
-  const canCreateSQLSnippet = checkPermissions(PermissionAction.CREATE, 'user_content', {
+  const canCreateSQLSnippet = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
     resource: { type: 'sql', owner_id: profile?.id },
     subject: { id: profile?.id },
   })
@@ -95,24 +83,21 @@ const SideBarContent = observer(() => {
     <div className="mt-6">
       <Menu type="pills">
         {IS_PLATFORM && (
-          <div className="my-4 mx-3 space-y-1 px-3">
-            <div className="flex items-center">
-              <Button
-                className={showCmdkHelper ? 'rounded-r-none px-3' : undefined}
-                block
-                icon={<IconPlus />}
-                type="default"
-                disabled={isLoading}
-                style={{ justifyContent: 'start' }}
-                onClick={() => handleNewQuery()}
-              >
-                New query
-              </Button>
-              {showCmdkHelper && (
-                <Dropdown
-                  align="end"
-                  side="bottom"
-                  overlay={[
+          <div className="my-4 mx-3 space-y-2 px-3">
+            <div className="flex items-center mb-3 w-full justify-center min-w-[210px] ">
+              <Dropdown
+                align="start"
+                side="bottom"
+                sideOffset={3}
+                className="max-w-[210px]"
+                overlay={[
+                  <Dropdown.Item key="new-blank-query" onClick={() => handleNewQuery()}>
+                    <div className="space-y-1">
+                      <p className="block text-scale-1200 text-xs">New blank query</p>
+                    </div>
+                  </Dropdown.Item>,
+                  <div key={'divider'} className="my-1 border-t border-scale-400" />,
+                  showCmdkHelper ? (
                     <Dropdown.Item
                       key="new-ai-query"
                       onClick={() => {
@@ -121,22 +106,23 @@ const SideBarContent = observer(() => {
                       }}
                     >
                       <div className="space-y-1">
-                        <p className="block text-scale-1200">New AI query</p>
-                        <p className="block text-scale-1100">
-                          Generate a SQL query using Supabase AI
-                        </p>
+                        <p className="block text-scale-1200 text-xs">New AI query</p>
                       </div>
-                    </Dropdown.Item>,
-                  ]}
+                    </Dropdown.Item>
+                  ) : null,
+                ]}
+              >
+                <Button
+                  block
+                  icon={<IconPlus />}
+                  className="min-w-[208px]"
+                  type="outline"
+                  disabled={isLoading}
+                  style={{ justifyContent: 'start' }}
                 >
-                  <Button
-                    disabled={isLoading}
-                    type="default"
-                    className="rounded-l-none px-[4px] py-[5px]"
-                    icon={<IconChevronDown />}
-                  />
-                </Dropdown>
-              )}
+                  New query
+                </Button>
+              </Dropdown>
             </div>
             <Input
               size="tiny"
@@ -190,7 +176,7 @@ const SideBarContent = observer(() => {
               {queryTabs.length >= 1 && (
                 <div className="editor-product-menu">
                   <Menu.Group title="SQL snippets" />
-                  <div className="space-y-1">
+                  <div className="space-y-1 pb-8">
                     {queryTabs.map((tabInfo) => {
                       const { id } = tabInfo || {}
                       return <QueryItem key={id} tabInfo={tabInfo} />

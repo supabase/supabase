@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { boolean, number, object, string } from 'yup'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Button, Form, Input, IconEye, IconEyeOff, InputNumber, Toggle } from 'ui'
+import { Button, Form, Input, IconEye, IconEyeOff, InputNumber, Toggle, Radio } from 'ui'
 
-import { useStore, checkPermissions } from 'hooks'
+import { useStore, useCheckPermissions } from 'hooks'
 import {
   FormActions,
   FormHeader,
@@ -20,7 +20,7 @@ const AutoSchemaForm = observer(() => {
 
   const formId = 'auth-config-general-form'
   const [hidden, setHidden] = useState(true)
-  const canUpdateConfig = checkPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
+  const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
   const INITIAL_VALUES = {
     DISABLE_SIGNUP: !authConfig.config.DISABLE_SIGNUP,
@@ -30,7 +30,8 @@ const AutoSchemaForm = observer(() => {
     SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: authConfig.config.SECURITY_REFRESH_TOKEN_REUSE_INTERVAL,
     SECURITY_CAPTCHA_ENABLED: authConfig.config.SECURITY_CAPTCHA_ENABLED || false,
     SECURITY_CAPTCHA_SECRET: authConfig.config.SECURITY_CAPTCHA_SECRET || '',
-    MAX_ENROLLED_FACTORS: authConfig.config.MAX_ENROLLED_FACTORS,
+    SECURITY_CAPTCHA_PROVIDER: authConfig.config.SECURITY_CAPTCHA_PROVIDER || 'hcaptcha',
+    MFA_MAX_ENROLLED_FACTORS: authConfig.config.MFA_MAX_ENROLLED_FACTORS || 10,
   }
 
   const schema = object({
@@ -46,9 +47,15 @@ const AutoSchemaForm = observer(() => {
     SECURITY_CAPTCHA_ENABLED: boolean().required(),
     SECURITY_CAPTCHA_SECRET: string().when('SECURITY_CAPTCHA_ENABLED', {
       is: true,
-      then: string().required('Must have a hCaptcha secret'),
+      then: string().required('Must have a Captcha secret'),
     }),
-    MAX_ENROLLED_FACTORS: number()
+    SECURITY_CAPTCHA_PROVIDER: string().when('SECURITY_CAPTCHA_ENABLED', {
+      is: true,
+      then: string()
+        .oneOf(['hcaptcha', 'turnstile'])
+        .required('Captcha provider must be either hcaptcha or turnstile'),
+    }),
+    MFA_MAX_ENROLLED_FACTORS: number()
       .min(0, 'Must be be a value more than 0')
       .max(30, 'Must be a value less than 30'),
   })
@@ -56,7 +63,6 @@ const AutoSchemaForm = observer(() => {
   const onSubmit = async (values: any, { setSubmitting, resetForm }: any) => {
     const payload = { ...values }
     payload.DISABLE_SIGNUP = !values.DISABLE_SIGNUP
-    payload.SECURITY_CAPTCHA_PROVIDER = 'hcaptcha'
 
     setSubmitting(true)
     const { error } = await authConfig.update(payload)
@@ -70,7 +76,7 @@ const AutoSchemaForm = observer(() => {
     } else {
       ui.setNotification({
         category: 'error',
-        message: `Failed to update settings`,
+        message: `Failed to update settings:  ${error?.message}`,
       })
     }
 
@@ -144,26 +150,44 @@ const AutoSchemaForm = observer(() => {
                   <Toggle
                     id="SECURITY_CAPTCHA_ENABLED"
                     size="small"
-                    label="Enable hCaptcha protection"
+                    label="Enable Captcha protection"
                     layout="flex"
                     descriptionText="Protect authentication endpoints from abuse."
                     disabled={!canUpdateConfig}
                   />
                   {values.SECURITY_CAPTCHA_ENABLED && (
-                    <Input
-                      id="SECURITY_CAPTCHA_SECRET"
-                      type={hidden ? 'password' : 'text'}
-                      size="small"
-                      label="hCaptcha secret"
-                      disabled={!canUpdateConfig}
-                      actions={
-                        <Button
-                          icon={hidden ? <IconEye /> : <IconEyeOff />}
-                          type="default"
-                          onClick={() => setHidden(!hidden)}
+                    <>
+                      <Radio.Group
+                        id="SECURITY_CAPTCHA_PROVIDER"
+                        name="SECURITY_CAPTCHA_PROVIDER"
+                        label="Captcha Providers"
+                      >
+                        <Radio
+                          label="hCaptcha"
+                          value="hcaptcha"
+                          checked={values.SECURITY_CAPTCHA_PROVIDER === 'hcaptcha'}
                         />
-                      }
-                    />
+                        <Radio
+                          label="Turnstile (Cloudflare)"
+                          value="turnstile"
+                          checked={values.SECURITY_CAPTCHA_PROVIDER === 'turnstile'}
+                        />
+                      </Radio.Group>
+                      <Input
+                        id="SECURITY_CAPTCHA_SECRET"
+                        type={hidden ? 'password' : 'text'}
+                        size="small"
+                        label="Captcha secret"
+                        disabled={!canUpdateConfig}
+                        actions={
+                          <Button
+                            icon={hidden ? <IconEye /> : <IconEyeOff />}
+                            type="default"
+                            onClick={() => setHidden(!hidden)}
+                          />
+                        }
+                      />
+                    </>
                   )}
                   <Toggle
                     id="REFRESH_TOKEN_ROTATION_ENABLED"
@@ -191,7 +215,7 @@ const AutoSchemaForm = observer(() => {
               >
                 <FormSectionContent loading={!isLoaded}>
                   <InputNumber
-                    id="MAX_ENROLLED_FACTORS"
+                    id="MFA_MAX_ENROLLED_FACTORS"
                     size="small"
                     label="Maximum number of enrolled factors"
                     disabled={!canUpdateConfig}

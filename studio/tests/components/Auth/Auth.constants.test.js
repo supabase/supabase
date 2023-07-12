@@ -28,7 +28,7 @@ describe('Auth.constants: domainRegex', () => {
     expect(output2).toBe(true)
   })
   test('should validate subdomains', () => {
-    const mockInput1 = 'https://app.supabase.com'
+    const mockInput1 = 'https://supabase.com/dashboard'
     const output1 = urlRegex.test(mockInput1)
     expect(output1).toBe(true)
   })

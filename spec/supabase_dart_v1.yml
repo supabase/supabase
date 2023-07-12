@@ -56,13 +56,13 @@ functions:
     description: |
       Creates a new user.
     notes: |
-      - By default, the user needs to verify their email address before logging in. To turn this off, disable **Confirm email** in [your project](https://app.supabase.com/project/_/auth/providers).
+      - By default, the user needs to verify their email address before logging in. To turn this off, disable **Confirm email** in [your project](https://supabase.com/dashboard/project/_/auth/providers).
       - **Confirm email** determines if users need to confirm their email address after signing up.
         - If **Confirm email** is enabled, a `user` is returned but `session` is null.
         - If **Confirm email** is disabled, both a `user` and a `session` are returned.
-      - When the user confirms their email address, they are redirected to the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url) by default. You can modify your `SITE_URL` or add additional redirect URLs in [your project](https://app.supabase.com/project/_/auth/url-configuration).
+      - When the user confirms their email address, they are redirected to the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url) by default. You can modify your `SITE_URL` or add additional redirect URLs in [your project](https://supabase.com/dashboard/project/_/auth/url-configuration).
       - If signUp() is called for an existing confirmed user:
-          - If **Confirm email** is enabled in [your project](https://app.supabase.com/project/_/auth/providers), an obfuscated/fake user object is returned.
+          - If **Confirm email** is enabled in [your project](https://supabase.com/dashboard/project/_/auth/providers), an obfuscated/fake user object is returned.
           - If **Confirm email** is disabled, the error message, `User already registered` is returned.
     examples:
       - id: sign-up
@@ -141,7 +141,7 @@ functions:
       - This method is used for passwordless sign-ins where a OTP is sent to the user's email or phone number.
       - If you're using an email, you can configure whether you want the user to receive a magiclink or a OTP.
       - If you're using phone, you can configure whether you want the user to receive a OTP.
-      - The magic link's destination URL is determined by the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url). You can modify the `SITE_URL` or add additional redirect urls in [your project](https://app.supabase.com/project/_/auth/url-configuration).
+      - The magic link's destination URL is determined by the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url). You can modify the `SITE_URL` or add additional redirect urls in [your project](https://supabase.com/dashboard/project/_/auth/url-configuration).
     examples:
       - id: sign-in-with-email
         name: Sign in with email.
@@ -301,7 +301,7 @@ functions:
     notes: |
       - In order to use the `updateUser()` method, the user needs to be signed in first.
       - By Default, email updates sends a confirmation link to both the user's current and new email.
-      To only send a confirmation link to the user's new email, disable **Secure email change** in your project's [email auth provider settings](https://app.supabase.com/project/_/auth/providers).
+      To only send a confirmation link to the user's new email, disable **Secure email change** in your project's [email auth provider settings](https://supabase.com/dashboard/project/_/auth/providers).
     examples:
       - id: update-the-email-for-an-authenticated-user
         name: Update the email for an authenticated user
@@ -448,13 +448,13 @@ functions:
           ```
   - id: select
     description: |
-      Performs vertical filtering with SELECT.
+      Perform a SELECT query on the table or view.
     title: 'Fetch data: select()'
     notes: |
       - By default, Supabase projects will return a maximum of 1,000 rows. This setting can be changed in Project API Settings. It's recommended that you keep it low to limit the payload size of accidental or malicious requests. You can use `range()` queries to paginate through your data.
-      - `select()` can be combined with [Modifiers](/docs/reference/dart/using-modifiers)
       - `select()` can be combined with [Filters](/docs/reference/dart/using-filters)
-      - If using the Supabase hosted platform `apikey` is technically a reserved keyword, since the API gateway will pluck it out for authentication. [It should be avoided as a column name](https://github.com/supabase/supabase/issues/5465).
+      - `select()` can be combined with [Modifiers](/docs/reference/dart/using-modifiers)
+      - `apikey` is a reserved keyword if you're using the [Supabase Platform](/docs/guides/platform) and [should be avoided as a column name](https://github.com/supabase/supabase/issues/5465).
     examples:
       - id: getting-your-data
         name: Getting your data
@@ -568,7 +568,7 @@ functions:
 
   - id: insert
     description: |
-      Performs an INSERT into the table.
+      Perform an INSERT into the table or view.
     title: 'Create data: insert()'
     examples:
       - id: create-a-record
@@ -602,7 +602,7 @@ functions:
 
   - id: update
     description: |
-      Performs an UPDATE on the table.
+      Perform an UPDATE on the table or view.
     title: 'Modify data: update()'
     notes: |
       - `update()` should always be combined with [Filters](/docs/reference/dart/using-filters) to target the item(s) you wish to update.
@@ -651,11 +651,10 @@ functions:
 
   - id: upsert
     description: |
-      Performs an UPSERT into the table.
+      Perform an UPSERT on the table or view. Depending on the column(s) passed to `onConflict`, `.upsert()` allows you to perform the equivalent of `.insert()` if a row with the corresponding `onConflict` columns doesn't exist, or if it does exist, perform an alternative action depending on `ignoreDuplicates`.
     title: 'Upsert data: upsert()'
     notes: |
-      - Primary keys should be included in the data payload in order for an update to work correctly.
-      - Primary keys must be natural, not surrogate. There are however, [workarounds](https://github.com/PostgREST/postgrest/issues/1118) for surrogate primary keys.
+      - Primary keys must be included in `values` to use upsert.
     examples:
       - id: upsert-your-data
         name: Upsert your data
@@ -696,10 +695,11 @@ functions:
 
   - id: delete
     description: |
-      Performs a DELETE on the table.
+      Perform a DELETE on the table or view.
     title: 'Delete data: delete()'
     notes: |
       - `delete()` should always be combined with [Filters](/docs/reference/dart/using-filters) to target the item(s) you wish to delete.
+      - If you use `delete()` with filters and you have RLS enabled, only rows visible through `SELECT` policies are deleted. Note that by default no rows are visible, so you need at least one `SELECT`/`ALL` policy that makes the rows visible.
     examples:
       - id: delete-records
         name: Delete records
@@ -752,7 +752,7 @@ functions:
       Subscribe to realtime changes in your database.
     title: 'on().subscribe()'
     notes: |
-      - Realtime is disabled by default for new Projects for better database performance and security. You can turn it on by [managing replication](/docs/guides/database/api#managing-realtime).
+      - Realtime is disabled by default for new tables. You can turn it on by [managing replication](/docs/guides/realtime/postgres-changes#replication-setup).
       - If you want to receive the "previous" data for updates and deletes, you will need to set `REPLICA IDENTITY` to `FULL`, like this: `ALTER TABLE your_table REPLICA IDENTITY FULL;`
     examples:
       - id: listen-to-all-database-changes
@@ -907,14 +907,23 @@ functions:
 
   - id: stream
     description: |
-      Notifies of data at the queried table.
+      Returns real-time data from your table as a `Stream`.
     title: 'stream()'
     notes: |
-      - `stream()` will emit the initial data as well as any further change on the database as `Stream` of `List<Map<String, dynamic>>` by combining Postgrest and Realtime.
-      - Takes a list of primary key columns as its argument.
+      - Realtime is disabled by default for new tables. You can turn it on by [managing replication](/docs/guides/realtime/postgres-changes#replication-setup).
+      - `stream()` will emit the initial data as well as any further change on the database as `Stream<List<Map<String, dynamic>>>` by combining Postgrest and Realtime.
+      - Takes a list of primary key column names that will be used to update and delete the proper records within the SDK.
+      - The following filters are available
+        - `.eq('column', value)` listens to rows where the column equals the value
+        - `.neq('column', value)` listens to rows where the column does not equal the value
+        - `.gt('column', value)` listens to rows where the column is greater than the value
+        - `.gte('column', value)` listens to rows where the column is greater than or equal to the value
+        - `.lt('column', value)` listens to rows where the column is less than the value
+        - `.lte('column', value)` listens to rows where the column is less than or equal to the value
+        - `.inFilter('column', [val1, val2, val3])` listens to rows where the column is one of the values
     examples:
-      - id: listen-to-a-specific-table
-        name: Listen to a specific table
+      - id: listen-to-table
+        name: Listen to a table
         isSpotlight: true
         code: |
           ```dart
@@ -924,42 +933,25 @@ functions:
             // Do something awesome with the data
           });
           ```
-      - id: listening-to-a-specific-rows-within-a-table
-        name: Listening to a specific rows within a table
-        description: |
-          You can listen to individual rows using the format `{table}:{col}=eq.{val}` - where `{col}` is the column name, and `{val}` is the value which you want to match.
-          This syntax is the as how you can filter data in Realtime
+      - id: with-filter-order-limit
+        name: With filter, order and limit
         code: |
           ```dart
           supabase.from('countries')
             .stream(primaryKey: ['id'])
-            .eq('id', '120')
-            .listen((List<Map<String, dynamic>> data) {
-            // Do something awesome with the data
-          });
+            .eq('id', 120)
+            .order('name')
+            .limit(10);
           ```
-      - id: with-order
-        name: With `order()`
+      - id: with-in-filter
+        name: With an IN filter
         code: |
           ```dart
           supabase.from('countries')
             .stream(primaryKey: ['id'])
-            .order('name', { ascending: true })
-            .listen((List<Map<String, dynamic>> data) {
-            // Do something awesome with the data
-          });
-          ```
-      - id: with-limit
-        name: With `limit()`
-        code: |
-          ```dart
-          supabase.from('countries')
-            .stream(primaryKey: ['id'])
-            .order('name', { ascending: true })
-            .limit(10)
-            .listen((List<Map<String, dynamic>> data) {
-            // Do something awesome with the data
-          });
+            .inFilter('id', [1, 2, 3])
+            .order('name')
+            .limit(10);
           ```
       - id: using-stream-with-stream-builder
         name: Using `stream()` with `StreamBuilder`
@@ -1129,6 +1121,17 @@ functions:
                 fileOptions: const FileOptions(cacheControl: '3600', upsert: false),
               );
           ```
+      - id: upload-file-on-web
+        name: Upload file on web
+        code: |
+          ```dart
+          final avatarFile = chosenFile.bytes;
+          final String path = await supabase.storage.from('avatars').uploadBinary(
+                'public/avatar1.png',
+                avatarFile,
+                fileOptions: const FileOptions(cacheControl: '3600', upsert: false),
+              );
+          ```
 
   - id: from-update
     description: |
@@ -1213,7 +1216,7 @@ functions:
       Retrieve URLs for assets in public buckets
     title: 'from.getPublicUrl()'
     notes: |
-      - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/javascript/storage-updatebucket) or by going to Storage on [app.supabase.com](https://app.supabase.com), clicking the overflow menu on a bucket and choosing "Make public"
+      - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/javascript/storage-updatebucket) or by going to Storage on [supabase.com/dashboard](https://supabase.com/dashboard), clicking the overflow menu on a bucket and choosing "Make public"
       - Policy permissions required:
         - `buckets` permissions: none
         - `objects` permissions: none
@@ -1371,7 +1374,7 @@ functions:
           final data = await supabase
             .from('cities')
             .select('name, country_id')
-            .order('id',  { ascending: false });
+            .order('id', ascending: true);
           ```
       - id: with-embedded-resources
         name: With embedded resources

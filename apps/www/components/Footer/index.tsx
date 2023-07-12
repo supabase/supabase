@@ -8,15 +8,20 @@ import Image from 'next/image'
 import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
 import { useRouter } from 'next/router'
+import { Fragment } from 'react'
 
-const Footer = () => {
+interface Props {
+  className?: string
+}
+
+const Footer = (props: Props) => {
   const { isDarkMode } = useTheme()
   const { pathname } = useRouter()
   const isLaunchWeekPage = pathname.includes('launch-week')
 
   return (
     <footer
-      className="border-scale-500 dark:border-scale-600 border-t"
+      className={['border-scale-500 dark:border-scale-600 border-t', props.className].join(' ')}
       aria-labelledby="footerHeading"
     >
       <h2 id="footerHeading" className="sr-only">
@@ -98,32 +103,39 @@ const Footer = () => {
           </div>
           <div className="mt-12 grid grid-cols-1 gap-8 xl:col-span-2 xl:mt-0">
             <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
-              {FooterLinks.map((segment: any) => {
+              {FooterLinks.map((segment) => {
                 return (
                   <div key={`footer_${segment.title}`}>
                     <h6 className="text-scale-1200 overwrite text-base">{segment.title}</h6>
                     <ul className="mt-4 space-y-2">
-                      {segment.links.map((link: any, idx: number) => (
-                        <li key={`${segment.title}_link_${idx}`}>
-                          <a
-                            href={link.url}
-                            className={`text-sm transition-colors ${
-                              link.url
-                                ? 'text-scale-1100 hover:text-scale-1200 '
-                                : 'text-scale-900 hover:text-scale-900'
-                            } `}
-                          >
-                            {link.text}
-                            {!link.url && (
-                              <div className="ml-2 inline text-xs xl:ml-0 xl:block 2xl:ml-2 2xl:inline">
-                                <Badge color="scale" size="small">
-                                  Coming soon
-                                </Badge>
-                              </div>
-                            )}
-                          </a>
-                        </li>
-                      ))}
+                      {segment.links.map((link, idx) => {
+                        const LinkTag = link.url.startsWith('https') ? Fragment : Link
+
+                        return (
+                          <li key={`${segment.title}_link_${idx}`}>
+                            <LinkTag href={link.url}>
+                              <a
+                                // only add href key if link is external
+                                {...(link.url.startsWith('https') && { href: link.url })}
+                                className={`text-sm transition-colors ${
+                                  link.url
+                                    ? 'text-scale-1100 hover:text-scale-1200 '
+                                    : 'text-scale-900 hover:text-scale-900'
+                                } `}
+                              >
+                                {link.text}
+                                {!link.url && (
+                                  <div className="ml-2 inline text-xs xl:ml-0 xl:block 2xl:ml-2 2xl:inline">
+                                    <Badge color="scale" size="small">
+                                      Coming soon
+                                    </Badge>
+                                  </div>
+                                )}
+                              </a>
+                            </LinkTag>
+                          </li>
+                        )
+                      })}
                     </ul>
                   </div>
                 )

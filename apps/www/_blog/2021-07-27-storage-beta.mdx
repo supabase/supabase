@@ -19,12 +19,10 @@ We've added support for streaming audio and video files.
 
 Clients can use the `Content-Range` HTTP header to request specific parts of a file from a server. This allows them to intelligently download the parts of the video that a user is viewing, without buffering irrelevant sections of the media file. Supabase Storage now supports this header, making it easier to host and watch [nyan cat videos](https://www.youtube.com/watch?v=SkgTxQm9DWM) all day long.
 
-<video width="99%" autoPlay="autoplay" muted playsInline controls={true}>
+<video width="99%" autoPlay muted playsInline controls={true}>
   <source
     src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/marketing/blog/launch-week-storage-2/nyan-cat.mp4"
     type="video/mp4"
-    muted
-    playsInline
   />
 </video>
 
@@ -40,20 +38,18 @@ Objects in public buckets can be accessed via a URL without any Authorization to
 
 Public buckets still require [Auth Policies](/docs/guides/storage#policy-examples) to upload and delete objects, allowing you to securely manage their contents.
 
-<video width="99%" autoPlay="autoplay" muted playsInline controls={true}>
-  <source src="/images/blog/2021-june/public-buckets.mp4" type="video/mp4" muted playsInline />
+<video width="99%" autoPlay muted playsInline controls={true}>
+  <source src="/images/blog/2021-june/public-buckets.mp4" type="video/mp4" />
 </video>
 
 ## Directory uploads
 
 You can now upload an entire directory to Supabase Storage and the directory structure is fully preserved after the upload. We used the [File and Directory entries API](https://developer.mozilla.org/en-US/docs/Web/API/File_and_Directory_Entries_API) for implementing this. This is a non-standard API, but we didn't find any compatibility issues in the browsers we support. So, now you can upload the [Storage GitHub repo](https://github.com/supabase/storage-api/) to storage 🤓
 
-<video width="99%" autoPlay="autoplay" muted playsInline controls={true}>
+<video width="99%" autoPlay muted playsInline controls={true}>
   <source
     src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/marketing/blog/launch-week-storage-2/directory-uploads.mp4"
     type="video/mp4"
-    muted
-    playsInline
   />
 </video>
 
@@ -119,12 +115,10 @@ We significantly improved rendering for a large number of items in the Dashboard
 
 Here is a demo testing rendering the heaviest object known to mankind - the `node_modules` folder!
 
-<video width="99%" autoPlay="autoplay" muted playsInline controls={true}>
+<video width="99%" autoPlay muted playsInline controls={true}>
   <source
     src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/marketing/blog/launch-week-storage-2/large-buckets.mp4"
     type="video/mp4"
-    muted
-    playsInline
   />
 </video>
 
@@ -166,4 +160,4 @@ We have a few production applications using Supabase Storage. Wataru is using St
 
 We're planning a Content Delivery Network for faster downloads, as well as basic transformation and optimization support for media files (like resizing, etc). We will continue our Kaizen on smaller improvements like allowing configurable upload limits and improving service stability and scalability.
 
-Anything else you want to see or can help implement in Storage? Reach out on our [Discord channel](https://discord.supabase.com/) and give Storage a try by [creating a project](https://app.supabase.com/) on Supabase!
+Anything else you want to see or can help implement in Storage? Reach out on our [Discord channel](https://discord.supabase.com/) and give Storage a try by [creating a project](https://supabase.com/dashboard/) on Supabase!

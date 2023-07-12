@@ -14,7 +14,7 @@
       "reference_javascript_v1",
       "reference_dart_v0",
       "reference_python_v2",
-      "reference_swift_v1"
+      "reference_swift_v0"
     ]
   },
   {
@@ -34,7 +34,8 @@
       "reference_dart_v1",
       "reference_python_v2",
       "reference_csharp_v0",
-      "reference_swift_v1"
+      "reference_swift_v0",
+      "reference_kotlin_v0"
     ]
   },
   {
@@ -47,10 +48,12 @@
       "reference_dart_v1",
       "reference_python_v2",
       "reference_csharp_v0",
-      "reference_swift_v1"
+      "reference_swift_v0",
+      "reference_kotlin_v0"
     ]
   },
   {
+    "type": "category",
     "title": "Database",
     "items": [
       {
@@ -292,7 +295,7 @@
       {
         "id": "using-modifiers",
         "isFunc": false,
-        "title": "Using Modifiers",
+        "title": "Using modifiers",
         "slug": "using-modifiers",
         "product": "database",
         "parent": "modifiers",
@@ -340,7 +343,7 @@
           },
           {
             "id": "single",
-            "title": "Retrieve the query as one row",
+            "title": "Retrieve one row of data",
             "slug": "single",
             "product": "database",
             "parent": "modifiers",
@@ -348,7 +351,7 @@
           },
           {
             "id": "maybe-single",
-            "title": "Retrieve the query as 0-1 rows",
+            "title": "Retrieve zero or one row of data",
             "slug": "maybesingle",
             "product": "database",
             "parent": "modifiers",
@@ -356,7 +359,7 @@
           },
           {
             "id": "csv",
-            "title": "Retrieve the query as a CSV string",
+            "title": "Retrieve as a CSV",
             "slug": "db-csv",
             "product": "database",
             "parent": "modifiers",
@@ -375,6 +378,7 @@
     ]
   },
   {
+    "type": "category",
     "title": "Auth",
     "items": [
       {
@@ -450,6 +454,13 @@
         "id": "sign-out",
         "title": "Sign out a user",
         "slug": "auth-signout",
+        "product": "auth",
+        "type": "function"
+      },
+      {
+        "id": "reset-password-for-email",
+        "title": "Send a password reset request",
+        "slug": "auth-resetpasswordforemail",
         "product": "auth",
         "type": "function"
       },
@@ -538,6 +549,20 @@
         "type": "function"
       },
       {
+        "id": "send-password-reauthentication",
+        "title": "Send a password reauthentication nonce",
+        "slug": "auth-reauthentication",
+        "product": "auth",
+        "type": "function"
+      },
+      {
+        "id": "resend-email-or-phone-otps",
+        "title": "Resend an OTP",
+        "slug": "auth-resend",
+        "product": "auth",
+        "type": "function"
+      },
+      {
         "id": "set-session",
         "title": "Set the session data",
         "slug": "auth-setsession",
@@ -552,53 +577,61 @@
         "type": "function"
       },
       {
-        "id": "reset-password-for-email",
-        "title": "Send a password reset request",
-        "slug": "auth-resetpasswordforemail",
+        "id": "exchange-code-for-session",
+        "title": "Exchange an auth code for a session",
+        "slug": "auth-exchangecodeforsession",
         "product": "auth",
         "type": "function"
       },
       {
-        "id": "mfa-enroll",
-        "title": "Enroll a factor",
-        "slug": "auth-mfa-enroll",
-        "product": "auth",
-        "type": "function"
-      },
-      {
-        "id": "mfa-challenge",
-        "title": "Create a challenge",
-        "slug": "auth-mfa-challenge",
-        "product": "auth",
-        "type": "function"
-      },
-      {
-        "id": "mfa-verify",
-        "title": "Verify a challenge",
-        "slug": "auth-mfa-verify",
-        "product": "auth",
-        "type": "function"
-      },
-      {
-        "id": "mfa-challenge-and-verify",
-        "title": "Create and verify a challenge",
-        "slug": "auth-mfa-challengeandverify",
-        "product": "auth",
-        "type": "function"
-      },
-      {
-        "id": "mfa-unenroll",
-        "title": "Unenroll a factor",
-        "slug": "auth-mfa-unenroll",
-        "product": "auth",
-        "type": "function"
-      },
-      {
-        "id": "mfa-get-authenticator-assurance-level",
-        "title": "Get Authenticator Assurance Level",
-        "slug": "auth-mfa-getauthenticatorassurancelevel",
-        "product": "auth",
-        "type": "function"
+        "id": "auth-mfa-api",
+        "title": "Auth MFA",
+        "slug": "auth-mfa-api",
+        "type": "function",
+        "items": [
+          {
+            "id": "mfa-enroll",
+            "title": "Enroll a factor",
+            "slug": "auth-mfa-enroll",
+            "product": "auth",
+            "type": "function"
+          },
+          {
+            "id": "mfa-challenge",
+            "title": "Create a challenge",
+            "slug": "auth-mfa-challenge",
+            "product": "auth",
+            "type": "function"
+          },
+          {
+            "id": "mfa-verify",
+            "title": "Verify a challenge",
+            "slug": "auth-mfa-verify",
+            "product": "auth",
+            "type": "function"
+          },
+          {
+            "id": "mfa-challenge-and-verify",
+            "title": "Create and verify a challenge",
+            "slug": "auth-mfa-challengeandverify",
+            "product": "auth",
+            "type": "function"
+          },
+          {
+            "id": "mfa-unenroll",
+            "title": "Unenroll a factor",
+            "slug": "auth-mfa-unenroll",
+            "product": "auth",
+            "type": "function"
+          },
+          {
+            "id": "mfa-get-authenticator-assurance-level",
+            "title": "Get Authenticator Assurance Level",
+            "slug": "auth-mfa-getauthenticatorassurancelevel",
+            "product": "auth",
+            "type": "function"
+          }
+        ]
       },
       {
         "id": "admin-api",
@@ -642,13 +675,6 @@
             "type": "function"
           },
           {
-            "id": "reset-password-for-email",
-            "title": "Send a password reset request",
-            "slug": "auth-admin-resetpasswordforemail",
-            "product": "auth-admin",
-            "type": "function"
-          },
-          {
             "id": "generate-link",
             "title": "Generate an email link",
             "slug": "auth-admin-generatelink",
@@ -688,11 +714,12 @@
     ]
   },
   {
-    "title": "Functions",
+    "type": "category",
+    "title": "Edge Functions",
     "items": [
       {
         "id": "invoke",
-        "title": "Invoke a function",
+        "title": "Invokes a Supabase Edge Function.",
         "slug": "functions-invoke",
         "product": "functions",
         "type": "function"
@@ -700,6 +727,7 @@
     ]
   },
   {
+    "type": "category",
     "title": "Realtime",
     "items": [
       {
@@ -761,6 +789,7 @@
     ]
   },
   {
+    "type": "category",
     "title": "Storage",
     "items": [
       {
@@ -892,13 +921,15 @@
     ]
   },
   {
+    "type": "category",
     "title": "Misc",
     "excludes": [
       "reference_dart_v1",
       "reference_dart_v0",
       "reference_python_v2",
       "reference_csharp_v0",
-      "reference_swift_v1"
+      "reference_swift_v0",
+      "reference_kotlin_v0"
     ],
     "items": [
       {

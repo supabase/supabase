@@ -27,7 +27,7 @@ Follow the steps to prepare your Supabase project on your local machine.
 - Login to the CLI using the command: `supabase login`. [Docs](/docs/reference/cli/usage#supabase-login).
 - Initialize Supabase inside your project using the command: `supabase init`. [Docs](/docs/guides/getting-started/local-development#getting-started).
 - Link to your Remote Project using the command `supabase link --project-ref your-project-ref`. [Docs](/docs/reference/cli/usage#supabase-link).
-- Optional: Setup your environment: Follow [this setup guide](https://deno.land/manual/getting_started/setup_your_environment) to integrate the Deno language server with your editor.
+- Setup your environment: Follow [the steps below](/docs/guides/functions/quickstart#setting-up-your-environment).
 
 ## Create an Edge Function
 
@@ -40,6 +40,8 @@ supabase functions new hello-world
 This creates a function stub in your `supabase` folder at `./functions/hello-world/index.ts`.
 
 ## Deploy to production
+
+### Deploy a specific function
 
 ```bash
 supabase functions deploy hello-world
@@ -55,6 +57,21 @@ By default, Edge Functions require a valid JWT in the authorization header. This
 If you want to use Edge Functions to handle webhooks (e.g. [Stripe payment webhooks](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/stripe-webhooks) etc.), you need to pass the `--no-verify-jwt` flag when deploying your function.
 
 </Admonition>
+
+### Deploy all functions
+
+```bash
+supabase functions deploy
+```
+
+Since Supabase CLI [v1.62.0](https://github.com/supabase/cli/releases/tag/v1.62.0) you can deploy all functions with a single command. This is useful for example when [deploying with GitHub Actions](/docs/guides/functions/cicd-workflow).
+
+Individual function configuration like [JWT verification](/docs/reference/cli/config#functions.function_name.verify_jwt) and [import map location](/docs/reference/cli/config#functions.function_name.import_map) can be set via the `config.toml` file.
+
+```toml
+[functions.hello-world]
+verify_jwt = false
+```
 
 ## Invoking remote functions
 
@@ -76,6 +93,7 @@ If you receive an error `Invalid JWT`, find the `ANON_KEY` of your project in th
 or using one of the [client libraries](/docs#reference-documentation), e.g. using [supabase-js](/docs/reference/javascript/functions-invoke):
 
 ```js
+// https://supabase.com/docs/reference/javascript/installing
 import { createClient } from '@supabase/supabase-js'
 
 // Create a single supabase client for interacting with your database
@@ -88,11 +106,51 @@ const { data, error } = await supabase.functions.invoke('hello-world', {
 
 After invoking your Edge Function you should see the response `{ "message":"Hello Functions!" }`.
 
+## Importing Node npm modules
+
+We recommend using [esm.sh](https://esm.sh/) for importing Node.js modules that are published to npm. To do so you simply put `https://esm.sh/` in front of the package name.
+
+For example, when you want to use supabase-js within Supabase Edge Functions, you would import `createClient` as follows:
+
+```ts
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+```
+
+As long as your environment is set up properly and the module you're importing is exporting types, the import will have types and autocompletion support.
+
 ## Setting Up Your Environment
 
 You can follow the [Deno guide](https://deno.com/manual@v1.32.5/getting_started/setup_your_environment) for setting up your development environment with your favorite editor/IDE.
 
-When developing with VS Code inside of an existing application, you can utilize [multi-root workspaces](https://code.visualstudio.com/docs/editor/workspaces#_multiroot-workspaces).
+### Deno with Visual Studio Code (vscode)
+
+Install the Deno language server [via this link](vscode:extension/denoland.vscode-deno) or by browsing the extensions in vscode and choosing to install the _Deno_ extension.
+
+#### Partially Deno enabling a workspace
+
+In a given workspace (or workspace folder), sub-paths can be enabled for Deno, while code outside those paths will be not be enabled and the vscode built-in JavaScript/TypeScript language server will be used.
+
+For example if you have a project like this:
+
+```
+project
+├── app
+└── supabase
+  └── functions
+```
+
+Where you only want to enabled the `supabase/functions` path (and its subpaths) to be Deno enabled, you will want to add `./supabase/functions` to the list of _Deno: Enable Paths_ in the configuration. In your `.vscode/settings.json` file add:
+
+```json
+{
+  "deno.enablePaths": ["./supabase/functions"],
+  "deno.importMap": "./supabase/functions/import_map.json"
+}
+```
+
+#### Multi-root workspaces
+
+Alternatively, you can utilize [multi-root workspaces](https://code.visualstudio.com/docs/editor/workspaces#_multiroot-workspaces).
 
 <div className="video-container">
   <iframe
@@ -141,7 +199,8 @@ For use-cases which require low-latency we recommend [Edge Functions](/docs/guid
 
 ## Organizing your Edge Functions
 
-We recommend developing “fat functions”. This means that you should develop few large functions, rather than many small functions. One common pattern when developing Functions is that you need to share code between two or more Functions. To do this, you can store any shared code in a folder prefixed with an underscore (`_`). We recommend this folder structure:
+We recommend developing “fat functions”. This means that you should develop few large functions, rather than many small functions. One common pattern when developing Functions is that you need to share code between two or more Functions. To do this, you can store any shared code in a folder prefixed with an underscore (`_`). We also recommend a separate folder for [Unit Tests](/docs/guides/functions/unit-test) including the name of the function followed by a `-test` suffix.
+We recommend this folder structure:
 
 ```bash
 └── supabase
@@ -154,7 +213,10 @@ We recommend developing “fat functions”. This means that you should develop 
     │   ├── function-one # Use hyphens to name functions.
     │   │   └── index.ts
     │   └── function-two
-    │       └── index.ts
+    │   │   └── index.ts
+    │   └── tests
+    │       └── function-one-test.ts
+    │       └── function-two-test.ts
     ├── migrations
     └── config.toml
 ```

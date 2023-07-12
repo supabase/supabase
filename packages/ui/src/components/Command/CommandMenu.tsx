@@ -96,15 +96,13 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
               <CommandGroup heading="Documentation" forceMount>
                 <CommandItem
                   type="command"
-                  badge={<BadgeExperimental />}
-                  onSelect={() => {
-                    setPages([...pages, COMMAND_ROUTES.AI])
-                  }}
+                  onSelect={() => setPages([...pages, COMMAND_ROUTES.DOCS_SEARCH])}
                   forceMount
                 >
-                  <AiIcon />
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-900 to-brand-1100">
-                    Ask Supabase AI
+                  <IconBook className="" />
+
+                  <span>
+                    Search the docs
                     {search ? (
                       <>
                         {': '}
@@ -117,13 +115,15 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
                 </CommandItem>
                 <CommandItem
                   type="command"
-                  onSelect={() => setPages([...pages, COMMAND_ROUTES.DOCS_SEARCH])}
+                  badge={<BadgeExperimental />}
+                  onSelect={() => {
+                    setPages([...pages, COMMAND_ROUTES.AI])
+                  }}
                   forceMount
                 >
-                  <IconBook className="" />
-
-                  <span>
-                    Search the docs
+                  <AiIcon />
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-900 to-brand-1100">
+                    Ask Supabase AI
                     {search ? (
                       <>
                         {': '}
@@ -207,7 +207,7 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
                   {sharedItems.tools.map((item) => {
                     const itemUrl = (
                       projectRef ? item.url.replace('_', projectRef) : item.url
-                    ).split('https://app.supabase.com')[1]
+                    ).split('https://supabase.com/dashboard')[1]
 
                     return (
                       <CommandItem

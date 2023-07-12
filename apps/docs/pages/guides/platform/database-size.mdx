@@ -6,10 +6,10 @@ export const meta = {
   description: 'Understanding how database size applies to your subscription.',
 }
 
-Database size refers to the _monthly average storage usage_, as reported by Postgres. This metric is reported in your project's [billing usage](https://app.supabase.com/project/_/settings/billing/usage) and is updated daily. As you read this document we will refer to "database size" and "disk size":
+Database size refers to the _monthly average storage usage_, as reported by Postgres. This metric is reported in your project's [billing usage](https://supabase.com/dashboard/project/_/settings/billing/usage) and is updated daily. As you read this document we will refer to "database size" and "disk size":
 
 - "Database size" is the total size of used storage from your database.
-- "Disk size" describes the size of the underlying available storage.
+- "Disk Storage size" describes the size of the underlying available storage.
 
 ## Database space management
 
@@ -23,13 +23,13 @@ select
 from pg_database;
 ```
 
-This value is reported in the [database settings page](https://app.supabase.com/project/_/settings/database).
+This value is reported in the [database report page](https://supabase.com/dashboard/project/_/reports/database).
 
 Database Space is consumed primarily by your data, indexes, and materialized views. You can reduce your disk size by removing any of these and running a Vacuum operation.
 
 <Admonition type="note">
 
-Depending on your billing tier, your database can go into read-only mode which can prevent you inserting and deleting data. There are instructions for managing read-only mode in the [Disk Management](#disk-management) section.
+Depending on your billing plan, your database can go into read-only mode which can prevent you inserting and deleting data. There are instructions for managing read-only mode in the [Disk Management](#disk-management) section.
 
 </Admonition>
 
@@ -44,9 +44,7 @@ Vacuum operations can temporarily increase resource utilization, which may adver
 </Admonition>
 
 Supabase projects have automatic vacuuming enabled, which ensures that these operations are performed regularly to keep the database healthy and performant.
-It is possible to [fine-tune](https://www.percona.com/blog/2018/08/10/tuning-autovacuum-in-postgresql-and-autovacuum-internals/)
-the [autovacuum parameters](https://www.enterprisedb.com/blog/postgresql-vacuum-and-analyze-best-practice-tips),
-or [manually initiate](https://www.postgresql.org/docs/current/sql-vacuum.html) vacuum operations.
+It is possible to [fine-tune](https://www.percona.com/blog/2018/08/10/tuning-autovacuum-in-postgresql-and-autovacuum-internals/) the [autovacuum parameters](https://www.enterprisedb.com/blog/postgresql-vacuum-and-analyze-best-practice-tips), or [manually initiate](https://www.postgresql.org/docs/current/sql-vacuum.html) vacuum operations.
 Running a manual vacuum after deleting large amounts of data from your DB could help reduce the database size reported by Postgres.
 
 ### Preoccupied Space
@@ -55,27 +53,30 @@ New Supabase projects have a database size of ~40-60mb. This space includes pre-
 
 ## Disk management
 
-Supabase uses network-attached storage to balance performance with scalability. The behavior of your disk depends on your billing tier.
+Supabase uses network-attached storage to balance performance with scalability. The behavior of your disk depends on your billing plan.
 
-### Paid Tier Behavior
+### Paid Plan Behavior
 
-Pro and Enterprise projects have auto-scaling Disk Storage.
+Projects on the Pro plan and above have auto-scaling Disk Storage.
 
-Disk storage expands automatically when the database reaches 90% of the disk size. The disk is expanded to be 50% larger (e.g., 8GB -> 12GB). Auto-scaling can only take place once every 6 hours. If within those 6 hours you reach 95% of the disk space, your project will enter read-only mode.
+Disk Storage expands automatically when the database reaches 90% of the disk size. The disk is expanded to be 50% larger (e.g., 8GB -> 12GB). Auto-scaling can only take place once every 6 hours. If within those 6 hours you reach 95% of the disk space, your project will enter read-only mode.
 
-<Admonition type="caution">
+The Disk Storage Size can also be manually expanded on the [Database settings page](https://supabase.com/dashboard/project/_/settings/database). The maximum default you can expand the Disk Storage to is 200GB. If you wish to manually expand it to any more than 200GB, please [contact us](https://supabase.com/dashboard/support/new) to discuss expanding the 200GB limit.
 
-If you intend to import a lot of data into your database which requires multiple disk expansions then [reach out to our team](https://app.supabase.com/support/new). For example, uploading more than 1.5x the current size of your database storage will put your database into [read-only mode](#read-only-mode).
+<Admonition type="info">
+You may want to import a lot of data into your database which requires multiple disk expansions; for example, uploading more than 1.5x the current size of your database storage will put your database into [read-only mode](#read-only-mode). If so, it is highly recommended you increase the Disk Storage Size manually on the [Database settings page](https://supabase.com/dashboard/project/_/settings/database).
+  
+Due to provider restrictions, disk expansions can occur only once every six hours. During the six-hour window, the disk cannot be resized again.
 
 </Admonition>
 
-The maximum Disk Size for Pro Tier is 64TB. If you need more than this, [contact us](https://app.supabase.com/support/new) to learn more about the Enterprise plan.
+The maximum Disk Storage Size for the Pro plan is 16TB. If you need more than this, [contact us](https://forms.supabase.com/enterprise) to learn more about the Enterprise plan.
 
-### Free Tier Behavior
+### Free Plan Behavior
 
-Free Tier projects enter [read-only](#read-only-mode) mode when you exceed the 500mb limit. Once in read-only mode, you have several options:
+Free Plan projects enter [read-only](#read-only-mode) mode when you exceed the 500MB limit. Once in read-only mode, you have several options:
 
-- [Upgrade to the Pro or Enterprise tier](https://app.supabase.com/project/_/settings/billing/subscription) to enable auto-scaling and expand beyond the 500mb database size limit.
+- [Upgrade to the Pro plan or above](https://supabase.com/dashboard/project/_/settings/billing/subscription) to enable auto-scaling and expand beyond the 500MB database size limit.
 - [Disable read-only mode](#disabling-read-only-mode) and reduce your database size.
 
 ### Read-only mode
@@ -86,7 +87,7 @@ In read-only mode, clients will encounter errors such as `cannot execute INSERT 
 
 ### Disabling read-only mode
 
-You can manually override read-only mode to reduce disk size. To do this, run the following in the [SQL Editor](https://app.supabase.com/project/_/sql):
+You can manually override read-only mode to reduce disk size. To do this, run the following in the [SQL Editor](https://supabase.com/dashboard/project/_/sql):
 
 ```sql
 SET

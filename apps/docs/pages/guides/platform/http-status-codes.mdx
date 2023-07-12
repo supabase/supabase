@@ -34,7 +34,13 @@ The Supabase platform offers several HTTP APIs for each project. These APIs can 
 
 The project the request was being made against has been paused. The project cannot process requests until it is un-paused by the owner.
 
-Free-tier projects may be paused due to inactivity, on request by the owner, or in rare instances, due to abuse.
+Free-plan projects may be paused due to inactivity, on request by the owner, or in rare instances, due to abuse.
+
+#### 544 Project API Gateway Timeout
+
+The request is not completed within the configured time limit.
+
+The timeout limit is set to prevent long-running queries which can cause performance issues, increase latency, and potentially even crash the project.
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

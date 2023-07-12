@@ -50,7 +50,7 @@ function CustomerStoriesPage(props: any) {
       category === 'all'
         ? props.blogs
         : props.blogs.filter((post: any) => {
-            const found = post.tags.includes(category)
+            const found = post.tags?.includes(category)
             return found
           })
     )
@@ -104,8 +104,8 @@ function CustomerStoriesPage(props: any) {
               >
                 <h1 className="text-scale-1200 mb-3 text-3xl">Customer stories</h1>
                 <h2 className="text-scale-1100 text-xl">
-                  Discover how Supabase is being used around the world to quickly create outstanding
-                  products and set new industry standards.
+                  Discover case studies on how Supabase is being used around the world to quickly
+                  create outstanding products and set new industry standards.
                 </h2>
               </motion.div>
               <div className="mx-auto my-12 md:my-20 grid grid-cols-12 gap-6 not-prose">

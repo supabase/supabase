@@ -54,13 +54,14 @@ Creating a view consisting of all the three tables will look like this:
 
 ```sql
 create view transcripts as
-    select
-        students.name,
-        students.type,
-        courses.title,
-        courses.code,
-        grades.result
-    from grades
+  select
+    students.name,
+    students.type,
+    courses.title,
+    courses.code,
+    grades.result
+  from
+    grades
     left join students on grades.student_id = students.id
     left join courses on grades.course_id = courses.id;
 ```
@@ -88,14 +89,15 @@ As a query becomes complex it becomes a hassle to call it. Especially when we ru
 
 ```sql
 select
-    students.name,
-    students.type,
-    courses.title,
-    courses.code,
-    grades.result
-from grades
-left join students on grades.student_id = students.id
-left join courses on grades.course_id = courses.id;
+  students.name,
+  students.type,
+  courses.title,
+  courses.code,
+  grades.result
+from
+  grades
+  left join students on grades.student_id = students.id
+  left join courses on grades.course_id = courses.id;
 ```
 
 We can run this instead:
@@ -112,14 +114,15 @@ Views ensure that the likelihood of mistakes decreases when repeatedly executing
 
 ```sql
 select
-    students.name,
-    students.type,
-    courses.title,
-    courses.code,
-    grades.result
-from grades
-    left join students on grades.student_id = students.id
-    left join courses on grades.course_id = courses.id
+  students.name,
+  students.type,
+  courses.title,
+  courses.code,
+  grades.result
+from
+  grades
+  left join students on grades.student_id = students.id
+  left join courses on grades.course_id = courses.id
 where courses.code != 'PG101';
 ```
 
@@ -143,13 +146,14 @@ Using our example above, a materialized view can be created like this:
 
 ```sql
 create materialized view transcripts as
-    select
-        students.name,
-        students.type,
-        courses.title,
-        courses.code,
-        grades.result
-    from grades
+  select
+    students.name,
+    students.type,
+    courses.title,
+    courses.code,
+    grades.result
+  from
+    grades
     left join students on grades.student_id = students.id
     left join courses on grades.course_id = courses.id;
 ```

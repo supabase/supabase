@@ -7,7 +7,7 @@ export const meta = {
   video: 'https://www.youtube.com/v/em1cpOAXknM',
 }
 
-Supabase provides you with the option of adding captcha to your sign-in, sign-up, and password reset forms. This keeps your website safe from bots and malicious scripts. Supabase authentication has support for [hCaptcha](https://www.hcaptcha.com/).
+Supabase provides you with the option of adding captcha to your sign-in, sign-up, and password reset forms. This keeps your website safe from bots and malicious scripts. Supabase authentication has support for [hCaptcha](https://www.hcaptcha.com/) and [Cloudflare Turnstile](https://www.cloudflare.com/products/turnstile/).
 
 <div className="video-container">
   <iframe
@@ -18,8 +18,15 @@ Supabase provides you with the option of adding captcha to your sign-in, sign-up
   ></iframe>
 </div>
 
-## Sign up for hCaptcha
+## Sign up for Captcha
 
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="hcaptcha-1"
+>
+<TabPanel id="hcaptcha-1" label="HCaptcha">
 Go to the [hCaptcha](https://www.hcaptcha.com/) website and sign up for an account. On the welcome page, copy the **Sitekey** and **Secret key**.
 
 If you have already signed up and didn't copy this information from the welcome page, you can get the **Secret key** from the settings page.
@@ -34,17 +41,34 @@ In the Settings page, look for the **Sitekey** section and copy the key.
 
 ![sitekey_settings.png](/docs/img/guides/auth-captcha/sitekey_settings.png)
 
-## Enable hCaptcha protection for your Supabase project
+</TabPanel>
 
-Navigate to the **[Authentication](https://app.supabase.com/project/_/settings/auth)** page in the Supabase Dashboard and find the **Enable hCaptcha protection** toggle under the **Security and Protection** section.
+<TabPanel id="turnstile-1" label="Turnstile">
+ Go to the [Cloudflare website](https://dash.cloudflare.com/login) and sign up for an account. On the welcome page, head to the Turnstile section and add a new site. Create a site and take note of the **Sitekey** and **Secret Key** as shown below
+      ![cloudflare_settings.png](/docs/img/guides/auth-captcha/cloudflare_settings.png)
+</TabPanel>
+</Tabs>
+
+## Enable Captcha protection for your Supabase project
+
+Navigate to the **[Authentication](https://supabase.com/dashboard/project/_/settings/auth)** page in the Supabase Dashboard and find the **Enable Captcha protection** toggle under the **Security and Protection** section.
 
 ![supabase_auth_general_settings.png](/docs/img/guides/auth-captcha/supabase_auth_general_settings.png)
 
-Enter your hCaptcha **Secret key** and click **Save**.
+Enter your Captcha **Secret key** and click **Save**.
 
-## Add the hCaptcha frontend component
+## Add the Captcha frontend component
 
-The frontend requires some changes to provide the captcha on-screen for the user. This example uses React and the hCaptcha React component, but hCaptcha can be used with any JavaScript framework.
+The frontend requires some changes to provide the captcha on-screen for the user. This example uses React and the corresponding Captcha React component, but both Captcha providers can be used with any JavaScript framework.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="hcaptcha-2"
+>
+
+<TabPanel id="hcaptcha-2" label="HCaptcha">
 
 Install `@hcaptcha/react-hcaptcha` in your project as a dependency.
 
@@ -58,7 +82,7 @@ Now import the `HCaptcha` component from the `@hcaptcha/react-hcaptcha` library.
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 ```
 
-Let’s create a empty state to store our `captchaToken`
+Let's create a empty state to store our `captchaToken`
 
 ```jsx
 const [captchaToken, setCaptchaToken] = useState()
@@ -66,7 +90,7 @@ const [captchaToken, setCaptchaToken] = useState()
 
 Now lets add the HCaptcha component to the JSX section of our code
 
-```html
+```jsx
 <HCaptcha />
 ```
 
@@ -75,7 +99,7 @@ We will pass it the sitekey we copied from the hCaptcha website as a property al
 ```jsx
 <HCaptcha
   sitekey="your-sitekey"
-  onVerify={(token) => { setCaptchaToken(token) }
+  onVerify={(token) => { setCaptchaToken(token) }
 />
 ```
 
@@ -116,6 +140,60 @@ captcha.current.resetCaptcha()
 ```
 
 In order to test that this works locally we will need to use something like [ngrok](https://ngrok.com/) or add an entry to your hosts file. You can read more about this in the [hCaptcha docs](https://docs.hcaptcha.com/#local-development).
+
+</TabPanel>
+
+<TabPanel id="turnstile-2" label="Turnstile">
+
+      The frontend requires some changes to provide the captcha on-screen for the user. This example uses React and the Turnstile React component, but Turnstile can be used with any JavaScript framework.
+
+Install @marsidev/react-turnstile in your project as a dependency.
+
+```bash
+npm install @marsidev/react-turnstile
+```
+
+Now import the Turnstile component from the @marsidev/react-turnstile library.
+
+```jsx
+import { Turnstile } from '@marsidev/react-turnstile'
+```
+
+Let's create an empty state to store our `captchaToken`
+
+```jsx
+const [captchaToken, setCaptchaToken] = useState()
+```
+
+Now lets add the Cloudflare Turnstile component to the JSX section of our code:
+
+```html
+<Turnstile />
+```
+
+We will pass it the sitekey we copied from the Cloudflare website as a property along with a `onSuccess` property which takes a callback function. This callback function will have a token as one of its properties. Let's set the token in the state using `setCaptchaToken`:
+
+```jsx
+<Turnstile
+  sitekey="your-sitekey"
+  onSuccess={(token) => { setCaptchaToken(token) }
+/>
+```
+
+We can now use the captchaToken we receive in our Supabase `signUp` function.
+
+```jsx
+await supabase.auth.signUp({
+  email,
+  password,
+  options: { captchaToken },
+})
+```
+
+To test locally, you will need to add localhost to the domain whitelist as per the [Cloudflare docs](https://developers.cloudflare.com/turnstile/reference/testing/)
+
+      </TabPanel>
+      </Tabs>
 
 Run the application and you should now be provided with a captcha challenge.
 

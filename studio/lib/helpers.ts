@@ -49,7 +49,7 @@ export const getURL = () => {
       ? process.env.NEXT_PUBLIC_SITE_URL
       : process?.env?.VERCEL_URL && process.env.VERCEL_URL !== ''
       ? process.env.VERCEL_URL
-      : 'https://app.supabase.com'
+      : 'https://supabase.com/dashboard'
   return url.includes('http') ? url : `https://${url}`
 }
 
@@ -136,15 +136,17 @@ export const propsAreEqual = (prevProps: any, nextProps: any) => {
   }
 }
 
-export const formatBytes = (bytes: any, decimals = 2) => {
-  if (bytes === 0 || bytes === undefined) return '0 bytes'
-
+export const formatBytes = (
+  bytes: any,
+  decimals = 2,
+  size?: 'bytes' | 'KB' | 'MB' | 'GB' | 'TB' | 'PB' | 'EB' | 'ZB' | 'YB'
+) => {
   const k = 1024
   const dm = decimals < 0 ? 0 : decimals
   const sizes = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
 
-  const i = Math.floor(Math.log(bytes) / Math.log(k))
-
+  if (bytes === 0 || bytes === undefined) return size !== undefined ? `0 ${size}` : '0 bytes'
+  const i = size !== undefined ? sizes.indexOf(size) : Math.floor(Math.log(bytes) / Math.log(k))
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
 }
 
@@ -158,14 +160,12 @@ export const snakeToCamel = (str: string) =>
  * Safari doesn't support write text into clipboard async, so if you need to load
  * text content async before coping, please use Promise<string> for the 1st arg.
  */
-export const copyToClipboard = (str: string | Promise<string>, callback = () => {}) => {
+export const copyToClipboard = async (str: string | Promise<string>, callback = () => {}) => {
   const focused = window.document.hasFocus()
   if (focused) {
-    if (window.ClipboardItem) {
-      const text = new ClipboardItem({
-        'text/plain': Promise.resolve(str).then((text) => new Blob([text], { type: 'text/plain' })),
-      })
-      window.navigator?.clipboard?.write([text]).then(callback)
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      const text = await Promise.resolve(str)
+      Promise.resolve(window.navigator?.clipboard?.writeText(text)).then(callback)
 
       return
     }
@@ -245,4 +245,21 @@ export const detectOS = () => {
   } else {
     return undefined
   }
+}
+
+/**
+ * Pluralize a word based on a count
+ */
+export function pluralize(count: number, singular: string, plural?: string) {
+  return count === 1 ? singular : plural || singular + 's'
+}
+
+export const isValidHttpUrl = (value: string) => {
+  let url: URL
+  try {
+    url = new URL(value)
+  } catch (_) {
+    return false
+  }
+  return url.protocol === 'http:' || url.protocol === 'https:'
 }

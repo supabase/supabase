@@ -1,15 +1,16 @@
-import { useState, useEffect } from 'react'
-import { Button, Loading, IconFileText, IconDownload, IconChevronLeft, IconChevronRight } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
 
-import { checkPermissions, useStore } from 'hooks'
-import { API_URL } from 'lib/constants'
-import { get, head } from 'lib/common/fetch'
+import { InvoiceStatusBadge } from 'components/interfaces/BillingV2'
+import { Invoice, InvoiceStatus } from 'components/interfaces/BillingV2/Invoices.types'
 import Table from 'components/to-be-cleaned/Table'
 import NoPermission from 'components/ui/NoPermission'
-import InvoiceStatusBadge from 'components/interfaces/Billing/InvoiceStatusBadge'
-import { Invoice, InvoiceStatus } from 'components/interfaces/Billing/Invoices.types'
+import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
+import { get, head } from 'lib/common/fetch'
+import { API_URL } from 'lib/constants'
+import { Button, IconChevronLeft, IconChevronRight, IconDownload, IconFileText, Loading } from 'ui'
+import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
 
 const PAGE_LIMIT = 10
 
@@ -23,21 +24,23 @@ const InvoicesSettings = () => {
   const [count, setCount] = useState(0)
   const [invoices, setInvoices] = useState<Invoice[]>([])
 
-  const { stripe_customer_id } = ui.selectedOrganization ?? {}
+  const selectedOrganization = useSelectedOrganization()
+  const { stripe_customer_id, slug } = selectedOrganization ?? {}
   const offset = (page - 1) * PAGE_LIMIT
 
-  const canReadInvoices = checkPermissions(PermissionAction.READ, 'invoices')
+  const canReadInvoices = useCheckPermissions(PermissionAction.READ, 'invoices')
 
   useEffect(() => {
-    if (!canReadInvoices) return
+    if (!canReadInvoices || !stripe_customer_id || !slug) return
 
     let cancel = false
     const page = 1
 
     const fetchInvoiceCount = async () => {
-      const res = await head(`${API_URL}/stripe/invoices?customer=${stripe_customer_id}`, [
-        'X-Total-Count',
-      ])
+      const res = await head(
+        `${API_URL}/stripe/invoices?customer=${stripe_customer_id}&slug=${slug}`,
+        ['X-Total-Count']
+      )
       if (!cancel) {
         if (res.error) {
           ui.setNotification({ category: 'error', message: res.error.message })
@@ -54,7 +57,7 @@ const InvoicesSettings = () => {
     return () => {
       cancel = true
     }
-  }, [stripe_customer_id])
+  }, [stripe_customer_id, slug])
 
   const fetchInvoices = async (page: number) => {
     setLoading(true)
@@ -62,7 +65,7 @@ const InvoicesSettings = () => {
 
     const offset = (page - 1) * PAGE_LIMIT
     const invoices = await get(
-      `${API_URL}/stripe/invoices?offset=${offset}&limit=${PAGE_LIMIT}&customer=${stripe_customer_id}`
+      `${API_URL}/stripe/invoices?offset=${offset}&limit=${PAGE_LIMIT}&customer=${stripe_customer_id}&slug=${slug}`
     )
 
     if (invoices.error) {
@@ -91,7 +94,7 @@ const InvoicesSettings = () => {
   }
 
   return (
-    <div className="container my-4 max-w-4xl space-y-1">
+    <ScaffoldContainerLegacy>
       <Loading active={loading}>
         <Table
           head={[
@@ -99,7 +102,7 @@ const InvoicesSettings = () => {
             <Table.th key="header-date">Date</Table.th>,
             <Table.th key="header-amount">Amount due</Table.th>,
             <Table.th key="header-invoice">Invoice number</Table.th>,
-            <Table.th key="header-invoice" className="flex items-center">
+            <Table.th key="header-status" className="flex items-center">
               Status
             </Table.th>,
             <Table.th key="header-download" className="text-right"></Table.th>,
@@ -107,7 +110,7 @@ const InvoicesSettings = () => {
           body={
             invoices.length === 0 ? (
               <Table.tr>
-                <Table.td colSpan={5} className="p-3 py-12 text-center">
+                <Table.td colSpan={6} className="p-3 py-12 text-center">
                   <p className="text-scale-1000">
                     {loading ? 'Checking for invoices' : 'No invoices for this organization yet'}
                   </p>
@@ -183,7 +186,7 @@ const InvoicesSettings = () => {
           }
         />
       </Loading>
-    </div>
+    </ScaffoldContainerLegacy>
   )
 }
 

@@ -31,7 +31,7 @@ Note: when testing locally, the select dropdown doesn't have any effect, and inv
 ## Deploy
 
 - Generate access token and log in to CLI
-  - Navigate to https://app.supabase.com/account/tokens
+  - Navigate to https://supabase.com/dashboard/account/tokens
   - Click "Generate New Token"
   - Copy newly created token
   - Run `supabase login`
@@ -56,7 +56,7 @@ This example includes a create-react-app in the [`./app/`](./app/) directory whi
 
 - `cd app`
 - `cp .env.example .env`
-- Fill in your env vars from https://app.supabase.com/project/_/settings/api
+- Fill in your env vars from https://supabase.com/dashboard/project/_/settings/api
 - `npm install`
 - `npm start`
 
@@ -81,16 +81,25 @@ jobs:
 
     env:
       SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-      PROJECT_ID: zdtdtxajzydjqzuktnqx
+      PROJECT_ID: your-project-id
 
     steps:
       - uses: actions/checkout@v3
 
       - uses: supabase/setup-cli@v1
         with:
-          version: 1.0.0
+          version: latest
 
-      - run: supabase functions deploy your-function-name --project-ref $PROJECT_ID
+      - run: supabase functions deploy --project-ref $PROJECT_ID
+```
+
+Since Supabase CLI [v1.62.0](https://github.com/supabase/cli/releases/tag/v1.62.0) you can deploy all functions with a single command.
+
+Individual function configuration like [JWT verification](/docs/reference/cli/config#functions.function_name.verify_jwt) and [import map location](/docs/reference/cli/config#functions.function_name.import_map) can be set via the `config.toml` file.
+
+```toml
+[functions.hello-world]
+verify_jwt = false
 ```
 
 ## 👁⚡️👁

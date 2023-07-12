@@ -12,9 +12,9 @@
 - [x] होस्टेड पोस्टग्रेज डेटाबेस। [प्रलेखन](https://supabase.com/docs/guides/database)
 - [x] प्रमाणीकरण और प्राधिकरण। [प्रलेखन](https://supabase.com/docs/guides/auth)
 - [x] उत्पन्न एपीआईस।
-  - [x] रेस्ट। [प्रलेखन](https://supabase.com/docs/guides/database/api#rest-api)
-  - [x] रीयलटाइम सदस्यता। [प्रलेखन](https://supabase.com/docs/guides/database/api#realtime-api)
-  - [x] ग्राफ़क्यूएल (प्रयोगात्मक)। [प्रलेखन](https://supabase.com/docs/guides/database/api#graphql-api)
+  - [x] रेस्ट। [प्रलेखन](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] रीयलटाइम सदस्यता। [प्रलेखन](https://supabase.com/docs/guides/api#realtime-api-overview)
+  - [x] ग्राफ़क्यूएल (प्रयोगात्मक)। [प्रलेखन](https://supabase.com/docs/guides/api#graphql-api-overview)
 - [x] फ़ंक्शंस।
   - [x] डेटाबेस फ़ंक्शंस। [प्रलेखन](https://supabase.com/docs/guides/database/functions)
   - [x] एज फ़ंक्शंस। [प्रलेखन](https://supabase.com/docs/guides/functions)
@@ -27,7 +27,7 @@
 
 पूर्ण प्रलेखन के लिए, [supabase.com/docs](https://supabase.com/docs) पर जाएँ
 
-योगदान करने के लिए, [गेट्टिंग स्टार्टेड](https://github.com/supabase/supabase/blob/master/DEVELOPERS.md) पेज पर जाएँ
+योगदान करने के लिए, [गेट्टिंग स्टार्टेड](../DEVELOPERS.md) पेज पर जाएँ
 
 ## सामुदायिक तथा सहयोग
 
@@ -39,7 +39,7 @@
 ## स्थिति
 
 - [x] अल्फा: हम चुनिंदा ग्राहकों के साथ सुपरबास का परीक्षण कर रहे हैं
-- [x] सार्वजनिक अल्फा: कोई भी [app.supabase.com](https://app.supabase.com) के जरिए शामिल हो सकता है। लेकिन हम पर आसान हो जाओ, कुछ मोड़ हैं।
+- [x] सार्वजनिक अल्फा: कोई भी [supabase.com/dashboard](https://supabase.com/dashboard) के जरिए शामिल हो सकता है। लेकिन हम पर आसान हो जाओ, कुछ मोड़ हैं।
 - [x] सार्वजनिक बीटा: अधिकांश गैर-एंटरप्राइज़ उपयोग-मामलों के लिए पर्याप्त स्थिर
 - [ ] सार्वजनिक: उत्पादन-तैयार
 
@@ -55,7 +55,7 @@
 
 **वर्तमान वास्तुकला**
 
-सुपाबसे [होस्टेड प्लेटफार्म](https://app.supabase.com). आप साइन अप कर सकते हैं और कुछ भी स्थापित किए बिना सुपाबसे का उपयोग करना शुरू कर सकते हैं। हम अभी भी स्थानीय विकास का अनुभव पैदा कर रहे हैं - यह अब मंच स्थिरता के साथ-साथ हमारा मुख्य फोकस है।
+सुपाबसे [होस्टेड प्लेटफार्म](https://supabase.com/dashboard). आप साइन अप कर सकते हैं और कुछ भी स्थापित किए बिना सुपाबसे का उपयोग करना शुरू कर सकते हैं। हम अभी भी स्थानीय विकास का अनुभव पैदा कर रहे हैं - यह अब मंच स्थिरता के साथ-साथ हमारा मुख्य फोकस है।
 
 ![आर्किटेक्चर](https://user-images.githubusercontent.com/70828596/187547862-ffa9d058-0c3a-4851-a3e7-92ccfca4b596.png)
 
@@ -139,12 +139,12 @@
     <td>-</td>
   </tr>
   <tr>
-    <td>कोटलिन</td>
-    <td>-</td>
-    <td><a href="https://github.com/supabase-community/postgrest-kt" target="_blank" rel="noopener noreferrer">postgrest-kt</a></td>
-    <td><a href="https://github.com/supabase-community/gotrue-kt" target="_blank" rel="noopener noreferrer">gotrue-kt</a></td>
-    <td>-</td>
-    <td>-</td>
+    <td>Kotlin</td>
+    <td><a href="https://github.com/supabase-community/supabase-kt" target="_blank" rel="noopener noreferrer">supabase-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Postgrest" target="_blank" rel="noopener noreferrer">postgrest-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/GoTrue" target="_blank" rel="noopener noreferrer">gotrue-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Realtime" target="_blank" rel="noopener noreferrer">realtime-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Storage" target="_blank" rel="noopener noreferrer">storage-kt</a></td>
   </tr>
   <tr>
     <td>पाइथन</td>

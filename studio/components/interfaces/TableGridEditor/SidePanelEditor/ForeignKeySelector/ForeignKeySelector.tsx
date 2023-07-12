@@ -317,11 +317,26 @@ const ForeignKeySelector: FC<Props> = ({ column, visible = false, closePanel, sa
                 id="deletionAction"
                 value={selectedForeignKey.deletionAction}
                 label="Action if referenced row is removed"
-                // @ts-ignore
-                descriptionText={generateDeletionActionDescription(
-                  selectedForeignKey.deletionAction,
-                  `${selectedForeignKey.schema}.${selectedForeignKey.table}`
-                )}
+                descriptionText={
+                  <>
+                    <p>
+                      {generateDeletionActionDescription(
+                        selectedForeignKey.deletionAction,
+                        `${selectedForeignKey.schema}.${selectedForeignKey.table}`
+                      )}
+                    </p>
+                    <p className="mt-2">
+                      <a
+                        href="https://supabase.com/docs/guides/database/postgres/cascade-deletes"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-brand-900 opacity-75"
+                      >
+                        Learn more about cascade deletes
+                      </a>
+                    </p>
+                  </>
+                }
                 error={errors.column}
                 onChange={(value: string) => updateDeletionAction(value)}
               >

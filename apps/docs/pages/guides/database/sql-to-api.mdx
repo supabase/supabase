@@ -71,7 +71,7 @@ where team_id = 'NYM';
 ```
 
 ```js
-const { data, error } = await supabase
+const { count, error } = await supabase
   .from('players')
   .select('*', { count: 'exact', head: true }) // exact, planned, or executed
   .eq('team_id', 'NYM')
@@ -79,7 +79,7 @@ const { data, error } = await supabase
 
 ## Resources
 
-- [Supabase Account - Free Tier OK](https://supabase.com)
+- [Supabase Account - Free Plan OK](https://supabase.com)
 - [Postgrest Operators](https://postgrest.org/en/stable/api.html#operators)
 - [Supabase API: JavaScript select](/docs/reference/javascript/select)
 - [Supabase API: JavaScript modifiers](/docs/reference/javascript/using-modifiers)

@@ -18,13 +18,23 @@ export const SQL_TEMPLATES: SQLTemplate[] = [
   {
     id: 2,
     type: 'template',
+    title: 'Add view',
+    description:
+      'Template to add a view. Make sure to change the table and column names to ones that already exist.',
+    sql: `CREATE VIEW countries_view AS
+SELECT id, continent
+FROM countries;`,
+  },
+  {
+    id: 3,
+    type: 'template',
     title: 'Add column',
     description: 'Template to add a column. Make sure to change the name and type.',
     sql: `alter table table_name
 add column new_column_name data_type;`,
   },
   {
-    id: 3,
+    id: 4,
     type: 'template',
     title: 'Add comments',
     description: 'Templates to add a comment to either a table or a column.',
@@ -32,7 +42,7 @@ add column new_column_name data_type;`,
 comment on column table_name.column_name is 'Column description';`,
   },
   {
-    id: 4,
+    id: 5,
     type: 'template',
     title: 'Show extensions',
     description: 'Get a list of extensions in your database and status.',
@@ -44,7 +54,7 @@ order by
   name asc;`,
   },
   {
-    id: 5,
+    id: 6,
     type: 'template',
     title: 'Show version',
     description: 'Get your Postgres version.',
@@ -53,7 +63,7 @@ order by
   (select current_setting('server_version_num')) as version_number;`,
   },
   {
-    id: 6,
+    id: 7,
     type: 'template',
     title: 'Show active connections',
     description: 'Get the number of active and max connections.',
@@ -62,7 +72,7 @@ order by
 (select setting as max_connections from pg_settings where name = 'max_connections') max_connections;`,
   },
   {
-    id: 7,
+    id: 8,
     type: 'template',
     title: 'Automatically update timestamps',
     description: 'Update a column timestamp on every update.',
@@ -79,7 +89,7 @@ for each row execute
   `.trim(),
   },
   {
-    id: 8,
+    id: 9,
     type: 'template',
     title: 'Increment field value',
     description: 'Update a field with incrementing value using stored procedure.',
@@ -98,7 +108,7 @@ language sql volatile;
   `.trim(),
   },
   {
-    id: 9,
+    id: 10,
     type: 'template',
     title: 'pg_stat_statements report',
     description: 'Select from pg_stat_statements and view recent queries',
@@ -131,7 +141,7 @@ select
     100;`,
   },
   {
-    id: 10,
+    id: 11,
     type: 'quickstart',
     title: 'Countries',
     description: 'Create a table with all the countries in the world.',
@@ -410,7 +420,7 @@ insert into public.countries (name,iso2,iso3,local_name,continent) values
 `.trim(),
   },
   {
-    id: 11,
+    id: 12,
     type: 'quickstart',
     title: 'Slack Clone',
     description: 'Build a basic slack clone with Row Level Security.',
@@ -607,7 +617,7 @@ values
 `.trim(),
   },
   {
-    id: 12,
+    id: 13,
     type: 'quickstart',
     title: 'Todo List',
     description: 'Build a basic todo list with Row Level Security.',
@@ -637,7 +647,7 @@ create policy "Individuals can delete their own todos." on todos for
 `.trim(),
   },
   {
-    id: 13,
+    id: 14,
     type: 'quickstart',
     title: 'Stripe Subscriptions',
     description: 'Starter template for the Next.js Stripe Subscriptions Starter.',
@@ -804,7 +814,7 @@ create publication supabase_realtime
 `.trim(),
   },
   {
-    id: 14,
+    id: 15,
     type: 'quickstart',
     title: 'User Management Starter',
     description: 'Sets up a public Profiles table which you can access with your API.',
@@ -862,7 +872,7 @@ create policy "Anyone can upload an avatar." on storage.objects
 `.trim(),
   },
   {
-    id: 15,
+    id: 16,
     type: 'quickstart',
     title: 'NextAuth Schema Setup',
     description: 'Sets up a the Schema and Tables for the NextAuth Supabase Adapter.',
@@ -880,7 +890,7 @@ GRANT ALL ON SCHEMA next_auth TO postgres;
 --
 CREATE TABLE IF NOT EXISTS next_auth.users
 (
-    id uuid NOT NULL DEFAULT uuid_generate_v4(),
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
     name text,
     email text,
     "emailVerified" timestamp with time zone,
@@ -908,7 +918,7 @@ $$;
 --
 CREATE TABLE IF NOT EXISTS  next_auth.sessions
 (
-    id uuid NOT NULL DEFAULT uuid_generate_v4(),
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
     expires timestamp with time zone NOT NULL,
     "sessionToken" text NOT NULL,
     "userId" uuid,
@@ -928,7 +938,7 @@ GRANT ALL ON TABLE next_auth.sessions TO service_role;
 --
 CREATE TABLE IF NOT EXISTS  next_auth.accounts
 (
-    id uuid NOT NULL DEFAULT uuid_generate_v4(),
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
     type text NOT NULL,
     provider text NOT NULL,
     "providerAccountId" text NOT NULL,
@@ -971,7 +981,7 @@ GRANT ALL ON TABLE next_auth.verification_tokens TO service_role;
 `.trim(),
   },
   {
-    id: 16,
+    id: 17,
     type: 'template',
     title: 'Most frequently invoked',
     description: 'Most frequently called queries in your database.',
@@ -1003,7 +1013,7 @@ select
     100;`,
   },
   {
-    id: 17,
+    id: 18,
     type: 'template',
     title: 'Most time consuming',
     description: 'Aggregate time spent on a query type.',
@@ -1025,7 +1035,7 @@ select
     100;`,
   },
   {
-    id: 18,
+    id: 19,
     type: 'template',
     title: 'Slowest execution time',
     description: 'Slowest queries based on max execution time.',
@@ -1056,7 +1066,7 @@ select
     100;`,
   },
   {
-    id: 19,
+    id: 20,
     type: 'template',
     title: 'Hit rate',
     description: 'See your cache and index hit rate.',
@@ -1073,7 +1083,7 @@ select
   from pg_statio_user_tables;`,
   },
   {
-    id: 20,
+    id: 21,
     type: 'quickstart',
     title: 'OpenAI Vector Search',
     description: 'Template for the Next.js OpenAI Doc Search Starter.',
@@ -1081,7 +1091,7 @@ select
 -- Enable pg_vector extension
 create extension if not exists vector with schema public;
 
--- Create tables 
+-- Create tables
 create table "public"."nods_page" (
   id bigserial primary key,
   parent_page_id bigint references public.nods_page,
@@ -1133,7 +1143,7 @@ begin
   --
   -- For the different syntaxes, see https://github.com/pgvector/pgvector
   order by nods_page_section.embedding <#> embedding
-  
+
   limit match_count;
 end;
 $$;
@@ -1144,17 +1154,80 @@ language sql
 as $$
   with recursive chain as (
     select *
-    from nods_page 
+    from nods_page
     where id = page_id
 
     union all
 
     select child.*
       from nods_page as child
-      join chain on chain.parent_page_id = child.id 
+      join chain on chain.parent_page_id = child.id
   )
   select id, parent_page_id, path, meta
   from chain;
+$$;
+`.trim(),
+  },
+  {
+    id: 22,
+    type: 'template',
+    title: 'Replication status report',
+    description: 'See the status of your replication slots and replication lag.',
+    sql: `-- Replication status report
+
+SELECT
+  s.slot_name,
+  s.active,
+  COALESCE(r.state, 'N/A') as state,
+  COALESCE(r.client_addr, null) as replication_client_address,
+  GREATEST(0, ROUND((redo_lsn-restart_lsn)/1024/1024/1024, 2)) as replication_lag_gb
+FROM pg_control_checkpoint(), pg_replication_slots s
+LEFT JOIN pg_stat_replication r ON (r.pid = s.active_pid);
+`,
+  },
+  {
+    id: 23,
+    type: 'quickstart',
+    title: 'LangChain',
+    description: 'LangChain is a popular framework for working with AI, Vectors, and embeddings.',
+    sql: `
+-- Enable the pgvector extension to work with embedding vectors
+create extension vector;
+
+-- Create a table to store your documents
+create table documents (
+  id bigserial primary key,
+  content text, -- corresponds to Document.pageContent
+  metadata jsonb, -- corresponds to Document.metadata
+  embedding vector(1536) -- 1536 works for OpenAI embeddings, change if needed
+);
+
+-- Create a function to search for documents
+create function match_documents (
+  query_embedding vector(1536),
+  match_count int default null,
+  filter jsonb DEFAULT '{}'
+) returns table (
+  id bigint,
+  content text,
+  metadata jsonb,
+  similarity float
+)
+language plpgsql
+as $$
+#variable_conflict use_column
+begin
+  return query
+  select
+    id,
+    content,
+    metadata,
+    1 - (documents.embedding <=> query_embedding) as similarity
+  from documents
+  where metadata @> filter
+  order by documents.embedding <=> query_embedding
+  limit match_count;
+end;
 $$;
 `.trim(),
   },

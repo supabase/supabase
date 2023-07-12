@@ -41,7 +41,7 @@ export default [
     img: 'whiteboard.svg',
     title: 'Shared whiteboard',
     description:
-      'Allow users to collaorate on a shared whiteboard, sharing positions and states of any kind of object in Realtime.',
+      'Allow users to collaborate on a shared whiteboard, sharing positions and states of any kind of object in Realtime.',
   },
   {
     img: 'location.svg',

@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useTheme } from 'common'
-import { useStore } from 'hooks'
+import { useFlag, useStore } from 'hooks'
 import { usePushNext } from 'hooks/misc/useAutoAuthRedirect'
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import { auth, getReturnToPath, STORAGE_KEY } from 'lib/gotrue'
@@ -29,6 +29,7 @@ const SignInLayout = ({
   const pushNext = usePushNext()
   const queryClient = useQueryClient()
   const { isDarkMode } = useTheme()
+  const ongoingIncident = useFlag('ongoingIncident')
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search)
@@ -89,7 +90,7 @@ const SignInLayout = ({
       )}
 
       <div className="flex flex-col flex-1 bg-scale-100">
-        <div className="absolute top-0 w-full px-8 pt-6 mx-auto sm:px-6 lg:px-8">
+        <div className={`absolute top-0 w-full px-8 mx-auto sm:px-6 lg:px-8 ${ongoingIncident ? 'pt-16' : 'pt-6'}`}>
           <nav className="relative flex items-center justify-between sm:h-10">
             <div className="flex items-center flex-grow flex-shrink-0 lg:flex-grow-0">
               <div className="flex items-center justify-between w-full md:w-auto">

@@ -1,12 +1,12 @@
 import { Filters, LogData, LogsEndpointParams, LogsTableName, SQL_FILTER_TEMPLATES } from '.'
 import dayjs, { Dayjs } from 'dayjs'
-import { get } from 'lodash'
-import { StripeSubscription } from 'components/interfaces/Billing'
+import { get, isEqual } from 'lodash'
 import { useMonaco } from '@monaco-editor/react'
 import logConstants from 'shared-data/logConstants'
 import BackwardIterator from 'components/ui/CodeEditor/Providers/BackwardIterator'
-import { uniqBy } from 'lodash'
+import uniqBy from 'lodash/uniqBy'
 import { useEffect } from 'react'
+import { PlanId } from 'data/subscriptions/project-subscription-v2-query'
 
 /**
  * Convert a micro timestamp from number/string to iso timestamp
@@ -150,6 +150,13 @@ export const genDefaultQuery = (table: LogsTableName, filters: Filters) => {
   limit 100
     `
 
+    case 'auth_logs':
+      return `select id, ${table}.timestamp, event_message, metadata.level, metadata.status, metadata.path, metadata.msg as msg, metadata.error from ${table}
+  cross join unnest(metadata) as metadata
+  ${where}
+  limit 100
+    `
+
     case 'function_edge_logs':
       return `select id, ${table}.timestamp, event_message, response.status_code, request.method, m.function_id, m.execution_time_ms, m.deployment_id, m.version from ${table}
   cross join unnest(metadata) as m
@@ -176,17 +183,14 @@ export const genSingleLogQuery = (table: LogsTableName, id: string) =>
 /**
  * Determine if we should show the user an upgrade prompt while browsing logs
  */
-export const maybeShowUpgradePrompt = (
-  from: string | null | undefined,
-  tierKey?: StripeSubscription['tier']['key']
-) => {
+export const maybeShowUpgradePrompt = (from: string | null | undefined, planId?: PlanId) => {
   const day = Math.abs(dayjs().diff(dayjs(from), 'day'))
 
   return (
-    (day > 1 && tierKey === 'FREE') ||
-    (day > 7 && tierKey === 'PRO') ||
-    (day > 28 && tierKey === 'TEAM') ||
-    (day > 90 && tierKey === 'ENTERPRISE')
+    (day > 1 && planId === 'free') ||
+    (day > 7 && planId === 'pro') ||
+    (day > 28 && planId === 'team') ||
+    (day > 90 && planId === 'enterprise')
   )
 }
 
@@ -228,13 +232,23 @@ export const genChartQuery = (
 ) => {
   const [startOffset, trunc] = calcChartStart(params)
   const where = _genWhereStatement(table, filters)
+
+  let joins = 'cross join unnest(t.metadata) as metadata'
+  if (table === LogsTableName.EDGE || table === LogsTableName.FN_EDGE) {
+    joins += ' \n  cross join unnest(metadata.request) as request'
+    joins += ' \n  cross join unnest(metadata.response) as response'
+  } else if (table === LogsTableName.POSTGRES) {
+    joins += ' \n  cross join unnest(metadata.parsed) as parsed'
+  }
+
   return `
 SELECT
+-- event-chart
   timestamp_trunc(t.timestamp, ${trunc}) as timestamp,
   count(t.timestamp) as count
 FROM
   ${table} t
-  cross join unnest(t.metadata) as metadata
+  ${joins}
   ${
     where
       ? where + ` and t.timestamp > '${startOffset.toISOString()}'`
@@ -348,4 +362,103 @@ export const useEditorHints = () => {
       }
     }
   }, [monaco])
+}
+
+/**
+ * Assumes that all timestamps are in ISO-8601 UTC timezone.
+ *
+ * min/max are the datetime strings that extend beyond the given timeseries data.
+ */
+export const fillTimeseries = (
+  timeseriesData: any[],
+  timestampKey: string,
+  valueKey: string | string[],
+  defaultValue: number,
+  min?: string,
+  max?: string
+) => {
+  if (timeseriesData.length <= 1 && !(min || max)) return timeseriesData
+  const dates: unknown[] = timeseriesData.map((datum) => dayjs.utc(datum[timestampKey]))
+
+  const maxDate = max ? dayjs.utc(max) : dayjs.utc(Math.max.apply(null, dates as number[]))
+  const minDate = min ? dayjs.utc(min) : dayjs.utc(Math.min.apply(null, dates as number[]))
+
+  // const truncationSample = timeseriesData.length > 0 ? timeseriesData[0][timestampKey] : min || max
+  const truncationSamples = timeseriesData.length > 0 ? dates : [minDate, maxDate]
+  const truncation = getTimestampTruncation(truncationSamples as Dayjs[])
+
+  const newData = timeseriesData.map((datum) => {
+    const iso = dayjs.utc(datum[timestampKey]).toISOString()
+    datum[timestampKey] = iso
+    return datum
+  })
+
+  const diff = maxDate.diff(minDate, truncation as dayjs.UnitType)
+  // Intentional throwing of error here to be caught by Sentry, as this would indicate a bug since charts shouldn't be rendering more than 10k data points
+  if (diff > 10000) {
+    throw new Error(
+      'Data error, filling timeseries dynamically with more than 10k data points degrades performance.'
+    )
+  }
+  for (let i = 0; i <= diff; i++) {
+    const dateToMaybeAdd = minDate.add(i, truncation as dayjs.ManipulateType)
+
+    const keys = typeof valueKey === 'string' ? [valueKey] : valueKey
+
+    const toMerge = keys.reduce(
+      (acc, key) => ({
+        ...acc,
+        [key]: defaultValue,
+      }),
+      {}
+    )
+
+    if (!dates.find((d) => isEqual(d, dateToMaybeAdd))) {
+      newData.push({
+        [timestampKey]: dateToMaybeAdd.toISOString(),
+        ...toMerge,
+      })
+    }
+  }
+
+  return newData
+}
+
+export const getTimestampTruncation = (samples: Dayjs[]): 'second' | 'minute' | 'hour' | 'day' => {
+  const truncationCounts = samples.reduce(
+    (acc, sample) => {
+      const truncation = _getTruncation(sample)
+      acc[truncation] += 1
+
+      return acc
+    },
+    {
+      second: 0,
+      minute: 0,
+      hour: 0,
+      day: 0,
+    }
+  )
+
+  const mostLikelyTruncation = (
+    Object.keys(truncationCounts) as (keyof typeof truncationCounts)[]
+  ).reduce((a, b) => (truncationCounts[a] > truncationCounts[b] ? a : b))
+  return mostLikelyTruncation
+}
+
+const _getTruncation = (date: Dayjs) => {
+  const values = ['second', 'minute', 'hour'].map((key) => date.get(key as dayjs.UnitType))
+  const zeroCount = values.reduce((acc, value) => {
+    if (value === 0) {
+      acc += 1
+    }
+    return acc
+  }, 0)
+  const truncation = {
+    0: 'second' as const,
+    1: 'minute' as const,
+    2: 'hour' as const,
+    3: 'day' as const,
+  }[zeroCount]!
+  return truncation
 }

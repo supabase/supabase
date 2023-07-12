@@ -17,21 +17,21 @@ This article is the second part of the Flutter tutorial series. During the serie
 In this article, I will show you how you can make a secure chat application by introducing authentication and authorization to the basic chat app that we created [previously](https://supabase.com/blog/flutter-tutorial-building-a-chat-app).
 
 We will use [Supabase](https://supabase.com/) to store the chat data and will use its [auth feature](https://supabase.com/auth) to provide a secure chat room feature.
-Supabase lets us build a secure database where we can control who can access what part of the database, so your users’ data is secured without worrying about the backend. 
+Supabase lets us build a secure database where we can control who can access what part of the database, so your users' data is secured without worrying about the backend.
 
 ## What we created in the previous article
 
-Before we jump in, let’s go over what we built in the [previous article](blog/flutter-tutorial-building-a-chat-app), because we will be building on top of it. If you have not gone through it, I recommend you to go check it out. 
+Before we jump in, let's go over what we built in the [previous article](blog/flutter-tutorial-building-a-chat-app), because we will be building on top of it. If you have not gone through it, I recommend you to go check it out.
 
-In the previous article, we created a basic real-time chat application. Users will register or sign in using an email address and password. Once they are signed in, they are taken to a chat page, where they can view and send messages to everyone in the app. There are no Chat rooms, and everyone’s messages were sent to the same chat room. 
+In the previous article, we created a basic real-time chat application. Users will register or sign in using an email address and password. Once they are signed in, they are taken to a chat page, where they can view and send messages to everyone in the app. There are no Chat rooms, and everyone's messages were sent to the same chat room.
 
-You can also find a complete code example [here](https://github.com/supabase-community/flutter-chat/tree/with_auth) to follow along. 
+You can also find a complete code example [here](https://github.com/supabase-community/flutter-chat/tree/with_auth) to follow along.
 
 ![Chat app without authorization](/images/blog/flutter-chat-auth/chat-app-screenshot.png)
 
 ## Overview of the final app
 
-The app will allow us to have 1 on 1 chat with other users in the app. To enable this, we will introduce a new rooms page. The rooms page serves two purposes here, one is to initiate a conversation with other users, and the other is to display existing chat rooms. At the top of the app, we see a list of other users’ icons. A user can tap the icon to start a 1 on 1 conversation. Below the icons, there is a list of rooms that the user is a part of. 
+The app will allow us to have 1 on 1 chat with other users in the app. To enable this, we will introduce a new rooms page. The rooms page serves two purposes here, one is to initiate a conversation with other users, and the other is to display existing chat rooms. At the top of the app, we see a list of other users' icons. A user can tap the icon to start a 1 on 1 conversation. Below the icons, there is a list of rooms that the user is a part of.
 
 ![Chat app without authorization](/images/blog/flutter-chat-auth/rooms-and-chat-page.png)
 
@@ -52,13 +52,13 @@ flutter_bloc: ^8.0.0
 
 Since the app has evolved, we also need to update our table schema. In order to store rooms data, we will add a rooms table. We will also modify the messages table to add a foreign key constraint to the rooms table so that we can tell which message belongs to which room.
 
-We will also introduce a `create_new_room` function, which is a [database function](https://supabase.com/docs/guides/database/functions) that handles chat room creation. It knows to create a new room if a chat room with the two users does not exist yet, or to just return the room ID if it already exists. 
+We will also introduce a `create_new_room` function, which is a [database function](https://supabase.com/docs/guides/database/functions) that handles chat room creation. It knows to create a new room if a chat room with the two users does not exist yet, or to just return the room ID if it already exists.
 
 ```sql
 -- *** Table definitions ***
 
 create table if not exists public.rooms (
-    id uuid not null primary key default uuid_generate_v4(),
+    id uuid not null primary key default gen_random_uuid(),
     created_at timestamp with time zone default timezone('utc' :: text, now()) not null
 );
 comment on table public.rooms is 'Holds chat rooms';
@@ -89,7 +89,7 @@ create or replace function create_new_room(other_user_id uuid) returns uuid as $
         with rooms_with_profiles as (
             select room_id, array_agg(profile_id) as participants
             from room_participants
-            group by room_id               
+            group by room_id
         )
         select room_id
         into new_room_id
@@ -119,7 +119,7 @@ $$ language plpgsql security definer;
 
 ### Setup deep links
 
-Something we skipped in the previous article was sending confirmation emails to users when they signup. Since today is about security, let's properly send confirmation emails to people who signup. 
+Something we skipped in the previous article was sending confirmation emails to users when they signup. Since today is about security, let's properly send confirmation emails to people who signup.
 
 When we send confirmation emails, the users need to be brought back to the app somehow.
 Since supabase_flutter has a mechanism to detect and handle deep links, we will register a `io.supabase.chat://login` as our deep link for the app and bring the users back after confirming their email address.
@@ -184,9 +184,9 @@ And that is it for deep link configuration.
 
 ### Step1: Create rooms page
 
-The rooms page will load two types of data, recently added users and a list of rooms that the user belongs to. We will be using bloc to load these two types of data and display them on the rooms page. 
+The rooms page will load two types of data, recently added users and a list of rooms that the user belongs to. We will be using bloc to load these two types of data and display them on the rooms page.
 
-Let’s start out by creating states for the rooms page.
+Let's start out by creating states for the rooms page.
 The rooms page would have four different states, loading, loaded, empty, and error. We will display different UI on the rooms page depending on what state it is.
 Create a `lib/cubit/rooms/rooms_state.dart` file and paste the following code.
 You may see some errors, but we will take care of them in the next step.
@@ -223,8 +223,8 @@ class RoomsError extends RoomState {
 ```
 
 Now that we have the states defined, we will create rooms_cubit.
-A [cubit](https://bloclibrary.dev/#/coreconcepts?id=cubit) is a class within the flutter_bloc library where we will make requests to Supabase to get the data and transform them into states and emit them to the UI widgets. 
-Let's create a `lib/cubit/rooms/rooms_cubit.dart` file and complete the cubit. 
+A [cubit](https://bloclibrary.dev/#/coreconcepts?id=cubit) is a class within the flutter_bloc library where we will make requests to Supabase to get the data and transform them into states and emit them to the UI widgets.
+Let's create a `lib/cubit/rooms/rooms_cubit.dart` file and complete the cubit.
 
 ```dart title=lib/cubit/rooms/rooms_cubit.dart
 import 'dart:async';
@@ -369,9 +369,9 @@ class RoomCubit extends Cubit<RoomState> {
 }
 ```
 
-Now that we have the states and cubit to power our rooms page, it’s time to create the `RoomsPage`. 
+Now that we have the states and cubit to power our rooms page, it's time to create the `RoomsPage`.
 
-We have two list views, one horizontal list view to display other users, and one vertical list views with list tiles representing each room that the user is a part of. 
+We have two list views, one horizontal list view to display other users, and one vertical list views with list tiles representing each room that the user is a part of.
 We will create a `lib/pages/rooms_page.dart` file with the following content.
 
 ```dart title=lib/pages/rooms_page.dart
@@ -670,7 +670,7 @@ class ChatCubit extends Cubit<ChatState> {
 }
 ```
 
-Chat cubit is pretty simple. It sets a real-time listener to the database using the stream method and emits an empty state if there are no messages in the room, or emits a loaded state if there are messages. 
+Chat cubit is pretty simple. It sets a real-time listener to the database using the stream method and emits an empty state if there are no messages in the room, or emits a loaded state if there are messages.
 
 Because we are using cubit, we need to modify the MessagesPage widget as well.
 Open `lib/pages/chat_page.dart` and let's update it.
@@ -873,7 +873,7 @@ class _ChatBubble extends StatelessWidget {
 
 ### Step 3: Implementing Authentication in Flutter
 
-Because we have modified the setting of our Supabase to send a confirmation email, we need to make some modifications to the register page and login page as well. 
+Because we have modified the setting of our Supabase to send a confirmation email, we need to make some modifications to the register page and login page as well.
 
 The main change is how we handle navigation.
 Previously, we were able to navigate the user to `ChatPage` right after sign-in was complete.
@@ -1054,9 +1054,9 @@ class _RegisterPageState extends State<RegisterPage> {
 ```
 
 Login page becomes more simple.
-All it is doing is taking a user’s email and password and logging them in.
+All it is doing is taking a user's email and password and logging them in.
 It is not doing any navigation whatsoever.
-This is because `LoginPage` is navigated on top of `RegisterPage`, the auth state listener on `RegisterPage` is still active, and therefore can take care of the navigation. 
+This is because `LoginPage` is navigated on top of `RegisterPage`, the auth state listener on `RegisterPage` is still active, and therefore can take care of the navigation.
 
 ```dart title=lib/pages/login_page.dart
 import 'package:flutter/material.dart';
@@ -1202,7 +1202,7 @@ class SplashPageState extends State<SplashPage> {
 ```
 
 Finally we implement those `ProfilesCubit` that you saw here and there throughout the code.
-This cubit will act as in memory cache of all the profiles data so that the app does not have to go fetch the same profiles every single time it needs it. 
+This cubit will act as in memory cache of all the profiles data so that the app does not have to go fetch the same profiles every single time it needs it.
 Create `profiles_state.dart` and `profiles_cubit.dart` under `lib/cubits/` and add the following code.
 
 ```dart title=lib/cubits/profiles_state.dart
@@ -1301,7 +1301,7 @@ class MyApp extends StatelessWidget {
 
 ### Step 4: Authorization with Row Level Security (RLS)
 
-At this point, we seemingly have a complete app, except if we open the app right now, we will see every user’s room with all the messages that have ever been sent within the app by any user. This is because we have not set up Row Level Security yet. [Row Level Security](https://supabase.com/docs/guides/auth/row-level-security) is a mechanism in PostgreSQL that allows developers to define who can perform what operation on a row-by-row basis. There are two ways we can define Row Level Security policies in Supabase, with the GUI or through SQL, but we will set them using SQL today. Let’s run the following SQL to set the security policy.
+At this point, we seemingly have a complete app, except if we open the app right now, we will see every user's room with all the messages that have ever been sent within the app by any user. This is because we have not set up Row Level Security yet. [Row Level Security](https://supabase.com/docs/guides/auth/row-level-security) is a mechanism in PostgreSQL that allows developers to define who can perform what operation on a row-by-row basis. There are two ways we can define Row Level Security policies in Supabase, with the GUI or through SQL, but we will set them using SQL today. Let's run the following SQL to set the security policy.
 
 ```sql
 -- Returns true if the signed in user is a participant of the room
@@ -1340,9 +1340,9 @@ create policy "Users can insert messages on rooms they are in."
   on public.messages for insert with check (is_room_participant(room_id) and profile_id = auth.uid());
 ```
 
-Notice that we have created a handy `is_room_participant` function that will return whether a particular user is a participant or not in a specific room. 
+Notice that we have created a handy `is_room_participant` function that will return whether a particular user is a participant or not in a specific room.
 
-With the Row Level Security policies set up, our application is complete. We now have a real-time chat application with proper authentication and authorization in place. 
+With the Row Level Security policies set up, our application is complete. We now have a real-time chat application with proper authentication and authorization in place.
 
 ## Conclusions/ Future Improvements
 

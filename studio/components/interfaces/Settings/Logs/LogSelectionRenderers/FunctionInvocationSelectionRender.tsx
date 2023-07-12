@@ -38,7 +38,7 @@ const FunctionInvocationSelectionRender = ({ log }: { log: PreviewLogData }) => 
         />
       </div>
       <div className={`${LOGS_TAILWIND_CLASSES.log_selection_x_padding}`}>
-        <h3 className="text-lg text-scale-1200 mb-4">Request body</h3>
+        <h3 className="text-lg text-scale-1200 mb-4">Request Metadata</h3>
         <pre className="text-sm syntax-highlight overflow-x-auto">
           <div
             className="text-wrap"
@@ -50,7 +50,7 @@ const FunctionInvocationSelectionRender = ({ log }: { log: PreviewLogData }) => 
       </div>
       <div className={`${LOGS_TAILWIND_CLASSES.log_selection_x_padding}`}>
         <h3 className="text-lg text-scale-1200 mb-4">
-          Response{method ? ` ${method}` : null} body
+          Response Metadata
         </h3>
         <pre className="text-sm syntax-highlight overflow-x-auto">
           <div

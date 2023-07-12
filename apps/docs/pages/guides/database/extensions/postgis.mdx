@@ -26,7 +26,7 @@ You can get started with PostGIS by enabling the PostGIS extension in your Supab
 >
 <TabPanel id="dashboard" label="Dashboard">
 
-1. Go to the [Database](https://app.supabase.com/project/_/database/tables) page in the Dashboard.
+1. Go to the [Database](https://supabase.com/dashboard/project/_/database/tables) page in the Dashboard.
 2. Click on **Extensions** in the sidebar.
 3. Search for "postgis" and enable the extension.
 
@@ -226,7 +226,7 @@ final data = await supabase.rpc('nearby_restaurants',params: {
 
 ![Searching within a bounding box of a map](/docs/img/guides/database/extensions/postgis/map.png)
 
-When you are working on a map-based application where the user scrolls through your map, you might want to load the that lies within the bounding box of the map every time your users scroll. PostGIS can return the rows that are within the bounding box just by supplying the bottom left and the top right coordinates. Let’s look at what the function would look like.
+When you are working on a map-based application where the user scrolls through your map, you might want to load the data that lies within the bounding box of the map every time your users scroll. PostGIS can return the rows that are within the bounding box just by supplying the bottom left and the top right coordinates. Let’s look at what the function would look like:
 
 ```sql
 create or replace function restaurants_in_view(min_lat float, min_long float, max_lat float, max_long float)
@@ -235,14 +235,14 @@ language sql
 as $$
 	select id, name, st_astext(location) as location
 	from public.restaurants
-	where location && ST_SetSRID(ST_MakeBox2D(ST_Point(min_long, min_lat), ST_Point(max_long, max_lat)),4326)
+	where location && ST_SetSRID(ST_MakeBox2D(ST_Point(min_long, min_lat), ST_Point(max_long, max_lat)), 4326)
 $$;
 ```
 
-[`&&`](https://postgis.net/docs/geometry_overlaps.html) operator used in the `where` statement here returns a boolean of whether the bounding box of the two geometries intersect or not. We basically are creating a bounding box from the two points and finding those points that fall under the bounding box. We are also utilizing a few different PostGIS functions here.
+The [`&&`](https://postgis.net/docs/geometry_overlaps.html) operator used in the `where` statement here returns a boolean of whether the bounding box of the two geometries intersect or not. We are basically creating a bounding box from the two points and finding those points that fall under the bounding box. We are also utilizing a few different PostGIS functions:
 
 - [ST_MakeBox2D](https://postgis.net/docs/ST_MakeBox2D.html): Creates a 2-dimensional box from two points.
-- [ST_SetSRID](https://postgis.net/docs/ST_SetSRID.html): Sets the [SRID](https://postgis.net/docs/manual-dev/using_postgis_dbmanagement.html#spatial_ref_sys), which is an identifier of what coordinate system to use, for the geometry. 4326 the standard longitude and latitude coordinate systems.
+- [ST_SetSRID](https://postgis.net/docs/ST_SetSRID.html): Sets the [SRID](https://postgis.net/docs/manual-dev/using_postgis_dbmanagement.html#spatial_ref_sys), which is an identifier of what coordinate system to use for the geometry. 4326 is the standard longitude and latitude coordinate system.
 
 You can call this function from your client using `rpc()` like this:
 

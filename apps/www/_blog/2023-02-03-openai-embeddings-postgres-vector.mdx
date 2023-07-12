@@ -7,14 +7,21 @@ thumb: embeddings/og_pgvector.png
 tags:
   - postgres
   - AI
+  - planetpg
 date: '2023-02-06'
 toc_depth: 3
 ---
 
 A new PostgreSQL extension is now available in Supabase: [`pgvector`](https://github.com/pgvector/pgvector), an open-source vector similarity search.
 
-The exponential progress of AI functionality over the past year has inspired many new real world applications. One specific challenge has been the ability to store and query _embeddings_ at scale. 
+The exponential progress of AI functionality over the past year has inspired many new real world applications. One specific challenge has been the ability to store and query _embeddings_ at scale.
 In this post we'll explain what embeddings are, why we might want to use them, and how we can store and query them in PostgreSQL using `pgvector`.
+
+<div className="bg-gray-300 rounded-lg px-6 py-2 bold">
+
+🆕 Supabase has now released an open source toolkit for developing AI applications using Postgres and pgvector. Learn more in the [AI & Vectors docs](https://supabase.com/docs/guides/ai).
+
+</div>
 
 ## What are embeddings?
 
@@ -91,7 +98,7 @@ Next let's create a table to store our documents and their embeddings:
 create table documents (
   id bigserial primary key,
   content text,
-  embedding vector (1536)
+  embedding vector(1536)
 );
 ```
 
@@ -112,10 +119,8 @@ returns table (
   content text,
   similarity float
 )
-language plpgsql
+language sql stable
 as $$
-begin
-  return query
   select
     documents.id,
     documents.content,
@@ -124,7 +129,6 @@ begin
   where 1 - (documents.embedding <=> query_embedding) > match_threshold
   order by similarity desc
   limit match_count;
-end;
 $$;
 ```
 
@@ -147,9 +151,9 @@ Once your table starts to grow with embeddings, you will likely want to add an i
 Each distance operator requires a different type of index. We expect to order by cosine distance, so we need `vector_cosine_ops` index. A good starting number of lists is 4 \* sqrt(table_rows):
 
 ```sql
-create index on documents 
-using ivfflat (embedding vector_cosine_ops)
-with (lists = 100);
+create index on documents using ivfflat (embedding vector_cosine_ops)
+with
+  (lists = 100);
 ```
 
 You can read more about indexing on `pgvector`'s GitHub page [here](https://github.com/pgvector/pgvector#indexing).
@@ -362,7 +366,7 @@ serve(async (req) => {
 
 OpenAI API responses take longer to depending on the length of the “answer”. ChatGPT has a nice UX for this by streaming the response to the user immediately. You can see a similar effect for the Supabase docs:
 
-<video width="99%" autoPlay="" loop="" muted="" playsInline="" controls="true">
+<video width="99%" autoPlay loop muted playsInline controls={true}>
   <source src="/images/blog/embeddings/embeddings.mp4" type="video/mp4" />
 </video>
 
@@ -372,6 +376,11 @@ The OpenAI API supports [completion streaming](https://platform.openai.com/docs/
 
 Storing embeddings in Postgres opens a world of possibilities. You can combine your search function with telemetry functions, add an user-provided feedback (thumbs up/down), and make your search feel more integrated with your products.
 
-Tomorrow we'll be releasing our own version of this interface in the Supabase docs, to provide Supabase-specific answers.
+The [pgvector extension](https://supabase.com/docs/guides/ai/vector-columns) is available on all new Supabase projects today. If you want to try it out, launch a new Postgres database today: [database.new](https://database.new)
 
-The pgvector extension is available on all new Supabase projects today. If you want to try it out, launch a new Postgres database today: [database.new](https://database.new)
+## More pgvector and ChatGPT resources
+
+- [Supabase Clippy: ChatGPT for Supabase Docs](https://supabase.com/blog/chatgpt-supabase-docs)
+- [A ChatGPT Plugins Template built with Supabase Edge Runtime](https://supabase.com/blog/building-chatgpt-plugins-template)
+- [Template for building your own custom ChatGPT style doc search](https://github.com/supabase-community/nextjs-openai-doc-search)
+- [Supabase + LangChain Starter Template](https://blog.langchain.dev/langchain-x-supabase/)

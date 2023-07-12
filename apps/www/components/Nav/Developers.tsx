@@ -1,9 +1,10 @@
 import React from 'react'
-import DevelopersData from 'data/Developers.json'
+import { links } from 'data/Developers'
 import AnnouncementsData from 'data/Announcements.json'
 import { useRouter } from 'next/router'
 import Image from 'next/image'
 import Link from 'next/link'
+import { TextLink } from 'ui'
 
 type Props = {
   text: string
@@ -15,8 +16,8 @@ type Props = {
 const Developers = () => {
   const { basePath } = useRouter()
 
-  const iconSections = Object.values(DevelopersData).map((company: Props) => {
-    const { text, description, url, icon } = company
+  const iconSections = links.map((link: Props) => {
+    const { text, description, url, icon } = link
 
     const content = (
       <div className="dark:hover:bg-scale-500 -m-3 flex items-start rounded-lg p-3 transition duration-150 ease-in-out hover:bg-gray-50">
@@ -55,13 +56,13 @@ const Developers = () => {
 
   return (
     <div className="grid grid-cols-12">
-      <nav className="col-span-6 py-8" aria-labelledby="solutionsHeading">
-        <div className="m-3 grid grid-cols-12 gap-x-8 gap-y-4 py-4 pr-3">{iconSections}</div>
+      <nav className="col-span-6 py-8" aria-labelledby="developersResources">
+        <div className="m-3 grid grid-cols-12 gap-4 py-4 pr-3">{iconSections}</div>
       </nav>
       <div className="col-span-6">
         <div className="m-3 mx-6">
           <p className="p">Latest announcements</p>
-          <ul className="mt-6 space-y-3 pb-6">
+          <ul className="mt-6 space-y-3">
             {AnnouncementsData.map((announcement: any, idx: number) => (
               <li className="flow-root" key={`flyout_case_${idx}`}>
                 <Link href={announcement.url}>
@@ -85,6 +86,9 @@ const Developers = () => {
               </li>
             ))}
           </ul>
+          <div className="pt-4">
+            <TextLink url="/blog" label="Explore more" />
+          </div>
         </div>
       </div>
     </div>

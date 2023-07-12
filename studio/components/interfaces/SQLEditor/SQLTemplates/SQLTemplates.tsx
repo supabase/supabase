@@ -1,28 +1,29 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition } from 'lodash'
 import { observer } from 'mobx-react-lite'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import Telemetry from 'lib/telemetry'
-import { checkPermissions, useStore } from 'hooks'
-import { useProfileQuery } from 'data/profile/profile-query'
+import { useParams, useTelemetryProps } from 'common'
 import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.constants'
-import SQLCard from './SQLCard'
-import { createSqlSnippetSkeleton } from '../SQLEditor.utils'
-import { useParams } from 'common'
-import { useRouter } from 'next/router'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
-import { useSqlEditorStateSnapshot } from 'state/sql-editor'
+import { useCheckPermissions, useStore } from 'hooks'
 import { uuidv4 } from 'lib/helpers'
+import { useProfile } from 'lib/profile'
+import Telemetry from 'lib/telemetry'
+import { useRouter } from 'next/router'
+import { useSqlEditorStateSnapshot } from 'state/sql-editor'
+import { createSqlSnippetSkeleton } from '../SQLEditor.utils'
+import SQLCard from './SQLCard'
 
 const SQLTemplates = observer(() => {
   const { ui } = useStore()
   const { ref } = useParams()
   const router = useRouter()
-  const { data: profile } = useProfileQuery()
+  const { profile } = useProfile()
   const [sql, quickStart] = partition(SQL_TEMPLATES, { type: 'template' })
 
+  const telemetryProps = useTelemetryProps()
   const snap = useSqlEditorStateSnapshot()
-  const canCreateSQLSnippet = checkPermissions(PermissionAction.CREATE, 'user_content', {
+  const canCreateSQLSnippet = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
     resource: { type: 'sql', owner_id: profile?.id },
     subject: { id: profile?.id },
   })
@@ -77,7 +78,8 @@ const SQLTemplates = observer(() => {
                     action: 'script_clicked',
                     label: x.title,
                   },
-                  ui.googleAnalyticsProps
+                  telemetryProps,
+                  router
                 )
               }}
             />
@@ -111,7 +113,8 @@ const SQLTemplates = observer(() => {
                     action: 'quickstart_clicked',
                     label: x.title,
                   },
-                  ui.googleAnalyticsProps
+                  telemetryProps,
+                  router
                 )
               }}
             />

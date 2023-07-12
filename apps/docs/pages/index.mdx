@@ -1,250 +1,230 @@
-import Layout from '~/layouts/DefaultLayout'
+import HomeLayout from '~/layouts/HomeLayout'
 import Link from 'next/link'
-import { GlassPanel, IconPanel, Button, IconChevronRight } from 'ui'
+import {
+  Button,
+  GlassPanel,
+  IconBackground,
+  IconChevronRight,
+  IconPanel,
+  IconPlay,
+  TextLink,
+} from 'ui'
+import HomeMenuIconPicker from '~/components/Navigation/NavigationMenu/HomeMenuIconPicker'
 
 export const meta = {
-  title: 'Supabase Docs',
+  title: 'Supabase Documentation',
   description:
     'Supabase is an open source Firebase alternative providing all the backend features you need to build a product.',
   subtitle: 'Supabase Developer Documentation and API Reference',
 }
 
-<h2 className="text-base max-w-xl m-0">
-  Supabase is an open source Firebase alternative providing all the backend features you need to
-  build a product. [Learn more](/docs/guides/getting-started/architecture) about Supabase, follow a
-  quickstart for an overview, or dive straight into the different products and APIs.
-</h2>
+<div className="flex flex-col">
 
-{/* start container */}
+  <div>
+    <div className="max-w-xl">
+      ## Products
+    </div>
 
-<div className="flex flex-col gap-12 my-12">
+    <div className="grid grid-cols-12 gap-6 not-prose [&_svg]:text-brand-1100 [&_svg]dark:text-brand-900">
+      {products.map((product) => {
+        return (
+          <Link href={product.href} key={product.title} passHref>
+            <a className={product.span ?? 'col-span-12 md:col-span-4'}>
+              <GlassPanel {...product} icon={<HomeMenuIconPicker icon={product.icon} width={18} height={18} />} background={true} showIconBg={true} showLink={false}>
+                {product.description}
+              </GlassPanel>
+            </a>
+          </Link>
+        )
+      })}
+    </div>
 
-<div className="space-y-8">
-  <div className="
-    border border-scale-400
-    relative overflow-hidden
-    grid grid-cols-12
-    rounded-lg
-    px-8 md:px-12 py-5 md:py-12
-    ">
-    <div className="col-span-12 lg:col-span-7 flex flex-col gap-6">
-      <img className="hidden lg:visible absolute right-0 top-0 w-[500px]" src="/docs/img/cards/dark.png" />
-      <div className="">
-        <h3 className="text-2xl m-0 mb-3">Getting Started</h3>
+    <div className="flex flex-col lg:grid grid-cols-12 gap-6 py-12 border-b">
 
-        Discover how to set up a database to an app making queries in just a few minutes.
+      <div className="col-span-4 flex flex-col gap-1 [&_h2]:m-0 [&_h3]:m-0">
 
-        <div className="font-mono uppercase text-xs mb-2">What you will learn</div>
-
-        <div className="flex flex-col">
-          <div className="flex flex-row items-center gap-3">
-            <div className="text-brand-900">
-              <IconChevronRight size={14} strokeWidth={1.5} />
-            </div>
-            <span className="text-scale-1200">Setting up a Supabase project and app</span>
-          </div>
-          <div className="flex flex-row items-center gap-3">
-            <div className="text-brand-900">
-              <IconChevronRight size={14} strokeWidth={1.5} />
-            </div>
-            <span className="text-scale-1200">Adding some sample data to your project</span>
-          </div>
-          <div className="flex flex-row items-center gap-3">
-            <div className="text-brand-900">
-              <IconChevronRight size={14} strokeWidth={1.5} />
-            </div>
-            <span className="text-scale-1200">Select() from your new database table</span>
+        <div className="md:max-w-xs 2xl:max-w-none">
+          <div className="flex items-center gap-3 mb-3 text-brand-1100 dark:text-brand-900">
+            {/* <IconBackground>
+              <HomeMenuIconPicker icon="reference-cli" width={18} height={18} />
+            </IconBackground> */}
+            ## Client Libraries
           </div>
         </div>
 
-        <div className="mt-6">
-          <div className="hidden">
-          <Button size="small">Get started</Button>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-6">
-            <Link href={`/guides/getting-started/quickstarts/reactjs`} passHref>
-              <a className="no-underline">
-                <IconPanel title="ReactJS" icon="/docs/img/icons/react-icon" />
+      </div>
+
+      <div className="grid col-span-8 grid-cols-12 gap-6 not-prose">
+        {clientLibraries.map((product) => {
+          return (
+            <Link href={product.href} key={product.title} passHref>
+              <a className={product.span ?? 'col-span-6 md:col-span-4'}>
+                <IconPanel
+                  {...product}
+                  icon={<HomeMenuIconPicker icon={product.icon} width={18} height={18} />}
+                  background={true}
+                  showIconBg={true}
+                  showLink={false}
+                >
+                  {product.description}
+                </IconPanel>
               </a>
             </Link>
-            <Link href={`/guides/getting-started/quickstarts/nextjs`} passHref>
-              <a className="no-underline">
-                <IconPanel title="NextJS" icon="/docs/img/icons/nextjs-icon" />
+          )
+        })}
+      </div>
+
+    </div>
+
+    <div className="flex flex-col lg:grid grid-cols-12 gap-6 py-12 border-b">
+
+      <div className="col-span-4 flex flex-col gap-1 [&_h2]:m-0">
+
+        ## Migrate to Supabase
+
+        <p className="text-scale-1100 text-sm p-0 m-0">
+          Bring your existing data, auth and storage to Supabase following our migration guides.
+        </p>
+
+        <TextLink
+          label="Explore more resources"
+          url="/guides/resources"
+          className="no-underline text-brand-900 text-sm"
+        />
+      </div>
+
+      <div className="grid col-span-8 grid-cols-12 gap-6 not-prose">
+        {migrationGuides.map((product) => {
+          return (
+            <Link
+              href={product.href}
+              key={product.title}
+              passHref
+            >
+              <a className={product.span ?? 'col-span-6 md:col-span-4'}>
+                <IconPanel {...product} background={true} showIconBg={true} showLink={false}>
+                  {product.description}
+                </IconPanel>
               </a>
             </Link>
-            <Link href={`/guides/getting-started/quickstarts/redwoodjs`} passHref>
-              <a className="no-underline">
-                <IconPanel title="RedwoodJS" icon="/docs/img/icons/redwoodjs-icon" />
-              </a>
-            </Link>
-            <Link href={`/guides/getting-started/quickstarts/flutter`} passHref>
-              <a className="no-underline">
-                <IconPanel title="Flutter" icon="/docs/img/icons/flutter-icon" />
-              </a>
-            </Link>
-            <Link href={`/guides/getting-started/quickstarts/sveltekit`} passHref>
-              <a className="no-underline">
-                <IconPanel title="SvelteKit" icon="/docs/img/icons/svelte-icon" />
-              </a>
-            </Link>
-            <Link href={`/guides/getting-started/quickstarts/solidjs`} passHref>
-              <a className="no-underline">
-                <IconPanel title="SolidJS" icon="/docs/img/icons/solidjs-icon" />
-              </a>
-            </Link>
-            <Link href={`/guides/getting-started/quickstarts/vue`} passHref>
-              <a className="no-underline">
-                <IconPanel title="Vue" icon="/docs/img/icons/vuejs-icon" />
-              </a>
-            </Link>
-          </div>
+          )
+        })}
+      </div>
+
+    </div>
+
+  </div>
+
+  <div className="flex flex-col gap-6 py-12 border-b">
+
+    <div className="col-span-4 flex flex-col gap-1 [&_h2]:m-0 [&_h3]:m-0">
+
+      ### Additional resources
+
+    </div>
+
+    <div className="grid grid-cols-12 gap-6 not-prose">
+      {additionalResources.map((product) => {
+        return (
+          <Link
+            href={product.href}
+            key={product.title}
+            passHref
+          >
+            <a className={product.span ?? 'col-span-12 md:col-span-6 lg:col-span-3'}>
+              <GlassPanel {...product} icon={<HomeMenuIconPicker icon={product.icon} width={18} height={18} />} background={false}>
+                {product.description}
+              </GlassPanel>
+            </a>
+          </Link>
+        )
+      })}
+    </div>
+
+  </div>
+
+  <div className="flex flex-col lg:grid grid-cols-12 gap-6 py-12">
+
+    <div className="col-span-4 flex flex-col gap-1 [&_h2]:m-0 [&_h3]:m-0">
+
+      <div className="md:max-w-xs 2xl:max-w-none">
+        <div className="flex items-center gap-3 mb-3 text-brand-1100 dark:text-brand-900">
+          <IconBackground>
+            <HomeMenuIconPicker icon="self-hosting" width={18} height={18} />
+          </IconBackground>
+          ### Self-Hosting
         </div>
+        <p className="text-scale-1100 text-sm">
+          Get started with self-hosting Supabase.
+        </p>
+        <TextLink
+          label="More on Self-Hosting"
+          url="/guides/self-hosting"
+          className="no-underline text-brand-900 text-sm"
+        />
+      </div>
+
+    </div>
+
+    <div className="grid col-span-8 grid-cols-12 gap-6 not-prose">
+      <div className="col-span-full lg:col-span-8 grid grid-cols-12 gap-6">
+        {selfHostingOptions.map((product) => {
+          return (
+            <Link
+              href={product.href}
+              key={product.title}
+              passHref
+            >
+              <a className={product.span ?? 'col-span-6'}>
+                <IconPanel {...product} icon={<HomeMenuIconPicker icon={product.icon} width={18} height={18} />} background={true} showIconBg={true} showLink={false}>
+                  {product.description}
+                </IconPanel>
+              </a>
+            </Link>
+          )
+        })}
       </div>
     </div>
 
   </div>
-  <div
-    className="
-      border
-      relative
-      px-8 md:px-12 h-20
-      border-scale-400
-      overflow-hidden
-      min-w-full
-      rounded-lg
-      flex flex-row gap-6 items-center
-      "
-  >
-
-    <img
-      className="w-[48px] lg:w-[64px]"
-      src="/docs/img/cards/tutorials-small.svg"
-    />
-    <img
-      className="z-0 absolute -left-32 -bottom-48 w-[320px]"
-      src="/docs/img/purple-glow-dark.png"
-    />
-    <div className="
-      flex flex-col md:flex-row not-prose
-      h-full justify-center
-      md:items-center md:gap-3
-    ">
-      <h2 className="text-sm lg:text-base text-scale-1200 m-0">Ready to make a fully working app?</h2>
-      <p className="text-sm lg:text-base text-scale-1100 m-0">Follow the step-by-step <Link href="/guides/getting-started#web-app-tutorials"><a className="m-0 text-scale-1200 underline">tutorials</a></Link>.</p>
-    </div>
-
-  </div>
-</div>
-
-<div>
-  <div className="max-w-xl">
-
-    ### Product Documentation
-
-  </div>
-
-  <div className="grid grid-cols-12 gap-6 not-prose">
-    {products.map((product) => {
-      return (
-        <Link
-          href={`${product.href}`}
-          key={product.title}
-          passHref
-        >
-          <a className={product.span ?? 'col-span-12 md:col-span-4'}>
-            <GlassPanel {...product} background={true} showIconBg={true} showLink={true}>
-              {product.description}
-            </GlassPanel>
-          </a>
-        </Link>
-      )
-
-})}
-
-    {platform.map((product) => {
-      return (
-        <Link
-          href={`/${product.href}`}
-          key={product.title}
-          passHref
-        >
-          <a className={'col-span-12 md:col-span-6'}>
-            <GlassPanel {...product} background={false} showIconBg={true}>
-              {product.description}
-            </GlassPanel>
-          </a>
-        </Link>
-      )
-
-})}
-
-  </div>
-
-</div>
-
-<div>
-
-  <div className="max-w-xl">
-
-    ### Reference Documentation
-
-  </div>
-
-  <div className="grid grid-cols-12 gap-6 not-prose">
-    {apis.map((product) => {
-      return (
-        <Link
-          href={`/${product.href}`}
-          key={product.title}
-          passHref
-        >
-          <a className={product.span ?? 'col-span-12 lg:col-span-4'}>
-            <GlassPanel {...product} background={false}>
-              {product.description}
-            </GlassPanel>
-          </a>
-        </Link>
-      )
-
-})}
-
-  </div>
-</div>
-
-{/* end of container */}
 
 </div>
 
 export const products = [
   {
     title: 'Database',
-    icon: '/docs/img/icons/menu/database',
+    icon: 'database',
     hasLightIcon: true,
     href: '/guides/database',
     description:
       'Supabase provides a full Postgres database for every project with Realtime functionality, database backups, extensions, and more.',
-    span: 'col-span-12 md:col-span-6',
   },
   {
     title: 'Auth',
-    icon: '/docs/img/icons/menu/auth',
+    icon: 'auth',
     hasLightIcon: true,
-    href: '/guides/auth/overview',
+    href: '/guides/auth',
     description:
       'Add and manage email and password, passwordless, OAuth, and mobile logins to your project through a suite of identity providers and APIs.',
-    span: 'col-span-12 md:col-span-6',
   },
   {
     title: 'Storage',
-    icon: '/docs/img/icons/menu/storage',
+    icon: 'storage',
     hasLightIcon: true,
     href: '/guides/storage',
     description:
       'Store, organize, transform, and serve large files—fully integrated with your Postgres database with Row Level Security access policies.',
   },
   {
+    title: 'AI & Vectors',
+    icon: 'ai',
+    hasLightIcon: true,
+    href: '/guides/ai',
+    description: 'Use Supabase to store and search embedding vectors.',
+  },
+  {
     title: 'Realtime',
-    icon: '/docs/img/icons/menu/realtime',
+    icon: 'realtime',
     hasLightIcon: true,
     href: '/guides/realtime',
     description:
@@ -252,7 +232,7 @@ export const products = [
   },
   {
     title: 'Edge Functions',
-    icon: '/docs/img/icons/menu/functions',
+    icon: 'edge-functions',
     hasLightIcon: true,
     href: '/guides/functions',
     description:
@@ -260,105 +240,122 @@ export const products = [
   },
 ]
 
-export const apis = [
+export const migrationGuides = [
   {
-    title: 'JavaScript Client Library',
-    icon: '/docs/img/icons/menu/reference-javascript',
-    hasLightIcon: true,
+    title: 'Firebase Auth',
+    icon: '/docs/img/icons/firebase-icon',
+    href: '/guides/resources/migrating-to-supabase/firebase-auth',
+  },
+  {
+    title: 'Firestore Data',
+    icon: '/docs/img/icons/firebase-icon',
+    href: '/guides/resources/migrating-to-supabase/firestore-data',
+  },
+  {
+    title: 'Firebase Storage',
+    icon: '/docs/img/icons/firebase-icon',
+    href: '/guides/resources/migrating-to-supabase/firebase-storage',
+  },
+  {
+    title: 'Heroku',
+    icon: '/docs/img/icons/heroku-icon',
+    href: '/guides/resources/migrating-to-supabase/heroku',
+  },
+  {
+    title: 'Render',
+    icon: '/docs/img/icons/render-icon',
+    href: '/guides/resources/migrating-to-supabase/render',
+  },
+  {
+    title: 'Amazon RDS',
+    icon: '/docs/img/icons/aws-rds-icon',
+    href: '/guides/resources/migrating-to-supabase/amazon-rds',
+  },
+]
+
+export const selfHostingOptions = [
+  {
+    title: 'Auth',
+    icon: 'auth',
+    href: 'reference/self-hosting-auth/introduction',
+  },
+  {
+    title: 'Realtime',
+    icon: 'realtime',
+    href: 'reference/self-hosting-realtime/introduction',
+  },
+  {
+    title: 'Storage',
+    icon: 'storage',
+    href: 'reference/self-hosting-storage/introduction',
+  },
+  {
+    title: 'Analytics',
+    icon: 'analytics',
+    href: 'reference/self-hosting-analytics/introduction',
+  },
+]
+
+export const clientLibraries = [
+  {
+    title: 'Javascript',
+    icon: 'reference-javascript',
     href: 'reference/javascript/introduction',
-    description: 'Official client libraries for JavaScript and TypeScript.',
-    span: 'col-span-12 md:col-span-6',
   },
   {
-    title: 'Flutter Client Library',
-    icon: '/docs/img/icons/menu/reference-dart',
-    hasLightIcon: true,
+    title: 'Flutter',
+    icon: 'reference-dart',
     href: 'reference/dart/introduction',
-    description: 'Official client libraries for Flutter and Dart.',
-    span: 'col-span-12 md:col-span-6',
   },
+  {
+    title: 'Python',
+    icon: 'reference-python',
+    href: 'reference/python/introduction',
+  },
+  {
+    title: 'C#',
+    icon: 'reference-csharp',
+    href: 'reference/csharp/introduction',
+  },
+  {
+    title: 'Swift',
+    icon: 'reference-swift',
+    href: 'reference/swift/introduction',
+  },
+  {
+    title: 'Kotlin',
+    icon: 'reference-kotlin',
+    href: 'reference/kotlin/introduction',
+  },
+]
+
+export const additionalResources = [
   {
     title: 'Management API',
-    icon: '/docs/img/icons/menu/reference-api',
-    hasLightIcon: true,
+    description: 'Manage your Supabase projects and organizations.',
+    icon: 'reference-api',
     href: 'reference/api/introduction',
-    description: 'Manage your Supabase projects and organizations programmatically.',
-    span: 'col-span-12 md:col-span-6',
   },
   {
     title: 'Supabase CLI',
-    icon: '/docs/img/icons/menu/reference-api',
-    hasLightIcon: true,
+    description: 'Use the CLI to develop, manage and deploy your projects.',
+    icon: 'reference-cli',
     href: 'reference/cli/introduction',
-    description:
-      'Use the CLI to develop your project locally, manage database migrations, and deploy to the Supabase Platform or self-host.',
-    span: 'col-span-12 md:col-span-6',
   },
   {
-    title: 'Self-Hosting Auth',
-    icon: '/docs/img/icons/menu/reference-auth',
-    hasLightIcon: true,
-    href: 'reference/self-hosting-auth/introduction',
-    description: 'Self-host your own Auth server.',
-  },
-  {
-    title: 'Self-Hosting Storage',
-    icon: '/docs/img/icons/menu/reference-storage',
-    hasLightIcon: true,
-    href: 'reference/self-hosting-storage/introduction',
-    description: 'Self-host your own Storage server.',
-  },
-  {
-    title: 'Self-Hosting Realtime',
-    icon: '/docs/img/icons/menu/reference-realtime',
-    hasLightIcon: true,
-    href: 'reference/self-hosting-realtime/introduction',
-    description: 'Self-host your own Realtime server.',
-  },
-  {
-    title: 'Self-Hosting Analytics',
-    icon: '/docs/img/icons/menu/reference-analytics',
-    hasLightIcon: true,
-    href: 'reference/self-hosting-analytics/introduction',
-    description: 'Self-host your own Analytics server.',
-  },
-]
-
-export const platform = [
-  {
-    // header: '/docs/img/cards/sample-card-header-3.svg',
     title: 'Platform Guides',
-    icon: '/docs/img/icons/menu/platform',
-    hasLightIcon: true,
+    description: 'Learn more about the tools and services powering Supabase.',
+    icon: 'platform',
     href: 'guides/platform',
-    description:
-      'Learn more about the tools and services powering the Supabase Platform, available add-ons, and how to customize the platform for your needs.',
   },
   {
-    // header: '/docs/img/cards/sample-card-header-2.svg',
-    title: 'Resources',
-    icon: '/docs/img/icons/menu/resources',
-    hasLightIcon: true,
-    href: 'guides/resources',
-    description: 'View examples, curated content from the community, migration guides, and more.',
-  },
-  {
-    title: 'Self-Hosting Supabase',
-    icon: '/docs/img/icons/menu/platform',
-    hasLightIcon: true,
-    href: 'guides/self-hosting',
-    description: 'Learn how to self-host Supabase and deploy to your own infrastructure.',
-  },
-  {
-    // header: '/docs/img/cards/sample-card-header-2.svg',
     title: 'Integrations',
-    icon: '/docs/img/icons/menu/integrations',
-    hasLightIcon: true,
-    href: 'guides/integrations',
     description: 'Explore a variety of integrations from Supabase partners.',
+    icon: 'integrations',
+    href: 'guides/integrations',
   },
 ]
 
-export const Page = ({ children }) => <Layout meta={meta} children={children} />
+export const Page = ({ children }) => <HomeLayout meta={meta} children={children} />
 
 export default Page

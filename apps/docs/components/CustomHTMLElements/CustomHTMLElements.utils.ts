@@ -2,53 +2,60 @@
 export const getAnchor = (text: any): string | undefined => {
   if (typeof text === 'object') {
     if (Array.isArray(text)) {
-      const customAnchor = text.find(
-        (x) => typeof x === 'string' && x.includes('[#') && x.endsWith(']')
-      )
-      if (customAnchor !== undefined) return customAnchor.slice(2, customAnchor.indexOf(']'))
+      const customAnchor = text.find((x) => typeof x === 'string' && hasCustomAnchor(x))
+      if (customAnchor !== undefined) {
+        return parseCustomAnchor(customAnchor)
+      }
 
       const formattedText = text
         .map((x) => {
-          if (typeof x !== 'string') return x.props.children
-          else return x.trim()
+          if (typeof x !== 'string') {
+            return x.props.children
+          }
+
+          return x.trim()
         })
         .map((x) => {
-          if (typeof x !== 'string') return x
-          else
+          if (typeof x !== 'string') {
             return x
-              .toLowerCase()
-              .replace(/[^a-z0-9- ]/g, '')
-              .replace(/[ ]/g, '-')
+          }
+
+          return slugify(x)
         })
 
       return formattedText.join('-').toLowerCase()
     } else {
       const anchor = text.props.children
       if (typeof anchor === 'string') {
-        return anchor
-          .toLowerCase()
-          .replace(/[^a-z0-9- ]/g, '')
-          .replace(/[ ]/g, '-')
+        return slugify(anchor)
       }
       return anchor
     }
   } else if (typeof text === 'string') {
-    if (text.includes('[#') && text.endsWith(']')) {
-      return text.slice(text.indexOf('[#') + 2, text.indexOf(']'))
-    } else {
-      return text
-        .toLowerCase()
-        .replace(/[^a-z0-9- ]/g, '')
-        .replace(/[ ]/g, '-')
+    if (hasCustomAnchor(text)) {
+      return parseCustomAnchor(text)
     }
+    return slugify(text)
   } else {
     return undefined
   }
 }
 
+const hasCustomAnchor = (value: string): boolean => value.includes('[#') && value.includes(']')
+
+const parseCustomAnchor = (value: string): string =>
+  value.slice(value.indexOf('[#') + 2, value.indexOf(']'))
+
+const slugify = (value: string): string =>
+  value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9- ]/g, '')
+    .replace(/[ ]/g, '-')
+
 export const removeAnchor = (text: any) => {
   if (typeof text === 'object' && Array.isArray(text)) {
-    return text.filter((x) => !(typeof x === 'string' && x.includes('[#') && x.endsWith(']')))
+    return text.filter((x) => !(typeof x === 'string' && hasCustomAnchor(x)))
   } else if (typeof text === 'string') {
     if (text.indexOf('[#') > 0) return text.slice(0, text.indexOf('[#'))
     else return text
@@ -79,7 +86,7 @@ export const unHighlightSelectedTocItems = () => {
 }
 
 export const highlightSelectedNavItem = (id: string) => {
-  const navMenuItems = document.querySelectorAll('.function-link-item a')
+  const navMenuItems = document.querySelectorAll<HTMLAnchorElement>('.function-link-item a')
 
   // find any currently active items and remove them
   const currentActiveItems = document.querySelectorAll('.function-link-list .text-brand-900')
@@ -87,7 +94,6 @@ export const highlightSelectedNavItem = (id: string) => {
 
   // Add active class to the current item
   navMenuItems.forEach((item) => {
-    // @ts-ignore
     if (item.href.split('/').at(-1) === id) {
       item.classList.add('text-brand-900')
     }

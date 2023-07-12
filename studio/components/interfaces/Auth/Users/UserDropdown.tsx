@@ -233,12 +233,14 @@ const UserDropdown: FC<Props> = ({ user, canRemoveUser, canRemoveMFAFactors }) =
       }
     >
       <Button
-        as="span"
+        asChild
         type="text"
         icon={<IconMoreHorizontal />}
         loading={loading}
         className="hover:border-gray-500"
-      />
+      >
+        <span></span>
+      </Button>
     </Dropdown>
   )
 }

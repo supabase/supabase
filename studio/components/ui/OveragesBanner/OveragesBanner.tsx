@@ -46,7 +46,7 @@ const OveragesBanner: FC<Props> = ({ tier, minimal }) => {
 
   const minimalDescription =
     tier === PRICING_TIER_PRODUCT_IDS.FREE
-      ? "You can check your project's usage details or upgrade to the pro tier to support the growth of your project."
+      ? "You can check your project's usage details or upgrade to the pro plan to support the growth of your project."
       : tier === PRICING_TIER_PRODUCT_IDS.PRO
       ? "You can check your project's usage details or consider disabling spend cap to support the growth of your project."
       : tier === PRICING_TIER_PRODUCT_IDS.PAYG
@@ -55,7 +55,7 @@ const OveragesBanner: FC<Props> = ({ tier, minimal }) => {
 
   const description =
     tier === PRICING_TIER_PRODUCT_IDS.FREE
-      ? 'Upgrade to the pro tier to support the growth of your project.'
+      ? 'Upgrade to the pro plan to support the growth of your project.'
       : tier === PRICING_TIER_PRODUCT_IDS.PRO
       ? 'Consider disabling spend cap to support the growth of your project'
       : tier === PRICING_TIER_PRODUCT_IDS.PAYG
@@ -77,15 +77,15 @@ const OveragesBanner: FC<Props> = ({ tier, minimal }) => {
         }
         title={
           isOverUsageLimits
-            ? `Your project has exceeded it's usage limits for the ${tierName} tier.`
+            ? `Your project has exceeded it's usage limits for the ${tierName} plan.`
             : isApproachingUsageLimits
-            ? `Your project is approaching it's usage limits for the ${tierName} tier.`
+            ? `Your project is approaching it's usage limits for the ${tierName} plan.`
             : ''
         }
         actions={
           minimal ? (
             <div className="flex h-full items-center">
-              <Link href={`/project/${projectRef}/settings/billing/subscription`}>
+              <Link href={`/project/${projectRef}/settings/billing/usage`}>
                 <a>
                   <Button type="default">Explore usage details</Button>
                 </a>

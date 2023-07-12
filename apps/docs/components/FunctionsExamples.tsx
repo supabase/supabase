@@ -7,6 +7,12 @@ const examples = [
     href: 'https://github.com/supabase/supabase/blob/master/examples/edge-functions/supabase/functions/select-from-table-with-auth-rls/index.ts',
   },
   {
+    name: 'Type-Safe SQL with Kysely',
+    description:
+      'Combining Kysely with Deno Postgres gives you a convenient developer experience for interacting directly with your Postgres database.',
+    href: '/guides/functions/kysely-postgres',
+  },
+  {
     name: 'With CORS headers',
     description: 'Send CORS headers for invoking from the browser.',
     href: 'https://github.com/supabase/supabase/blob/master/examples/edge-functions/supabase/functions/browser-with-cors/index.ts',

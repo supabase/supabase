@@ -609,7 +609,7 @@ const DomainsForm = () => {
                     <div className="px-5">
                       <p className="text-scale-1100 text-sm">
                         This will add a domain to a list of allowed domains that can interact with
-                        your Authenticaton services for this project.
+                        your Authentication services for this project.
                       </p>
                     </div>
                     <div className="border-overlay-border border-t"></div>

@@ -21,13 +21,13 @@ html,
 body,
 #__next,
 .main {
+  @apply bg-scale-200;
+  @apply text-scale-1200;
   height: 100%;
   padding: 0;
   margin: 0;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
-  @apply bg-bg-primary-light dark:bg-bg-primary-dark;
-  @apply text-scale-1200;
 }
 
 * {
@@ -147,6 +147,13 @@ a {
   input,
   textarea {
     @apply font-mono;
+  }
+}
+
+.input-xs {
+  input,
+  textarea {
+    @apply text-xs;
   }
 }
 

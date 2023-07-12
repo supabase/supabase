@@ -3,7 +3,7 @@ import { SidePanel, IconBookOpen } from 'ui'
 
 import { useStore } from 'hooks'
 import { useParams } from 'common/hooks'
-import { GeneralContent, ResourceContent } from '../Docs'
+import { ResourceContent } from '../Docs'
 import LangSelector from '../Docs/LangSelector'
 import GeneratingTypes from '../Docs/GeneratingTypes'
 import ActionBar from './SidePanelEditor/ActionBar'
@@ -105,14 +105,6 @@ const APIDocumentationPanel = ({ visible, onClose }: APIDocumentationPanelProps)
                       autoApiService={autoApiService}
                     />
                   </div>
-                  <GeneralContent
-                    autoApiService={autoApiService}
-                    selectedLang={selectedLang}
-                    showApiKey={true}
-                    page={page}
-                  />
-
-                  <GeneratingTypes selectedLang={selectedLang} />
 
                   {jsonSchema?.definitions && (
                     <ResourceContent
@@ -126,6 +118,9 @@ const APIDocumentationPanel = ({ visible, onClose }: APIDocumentationPanelProps)
                       refreshDocs={async () => await refetch()}
                     />
                   )}
+                  <div className="mt-8">
+                    <GeneratingTypes selectedLang={selectedLang} />
+                  </div>
                 </>
               ) : (
                 <div className="p-6 mx-auto text-center sm:w-full md:w-3/4">

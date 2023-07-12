@@ -49,13 +49,13 @@ const WithSidebar: FC<Props> = ({
           id="with-sidebar"
           style={{ height: maxHeight, maxHeight }}
           className={[
-            'h-full bg-sidebar-linkbar-light dark:bg-sidebar-linkbar-dark',
-            'hide-scrollbar w-64 overflow-auto border-r dark:border-dark',
+            'h-full bg-body',
+            'hide-scrollbar w-64 overflow-auto border-r border-scale-500',
           ].join(' ')}
         >
           {title && (
             <div className="mb-2">
-              <div className="flex h-12 max-h-12 items-center border-b px-6 dark:border-dark">
+              <div className="flex h-12 max-h-12 items-center border-b px-6 border-scale-500">
                 <h4 className="mb-0 text-lg truncate" title={title}>
                   {title}
                 </h4>
@@ -75,7 +75,7 @@ const WithSidebar: FC<Props> = ({
                     subitemsParentKey={subitemsParentKey}
                   />
                 ) : (
-                  <div className="border-b py-5 px-6 dark:border-dark" key={section.key}>
+                  <div className="border-b py-5 px-6 border-scale-400" key={section.key}>
                     <SidebarItem
                       links={section.links}
                       subitems={subitems}
@@ -108,7 +108,7 @@ const SectionWithHeaders: FC<SectionWithHeadersProps> = ({
   subitems,
   subitemsParentKey,
 }) => (
-  <div key={section.heading} className="border-b py-5 px-6 dark:border-dark">
+  <div key={section.heading} className="border-b py-5 px-6 border-scale-500">
     {section.heading && <Menu.Group title={section.heading} />}
     {section.versionLabel && (
       <div className="mb-1 px-3">
@@ -211,10 +211,7 @@ const SidebarLinkItem: FC<SidebarLinkProps> = ({
   return (
     <Link href={href || ''}>
       <a className="block" target={isExternal ? '_blank' : '_self'}>
-        <button
-          className="group flex max-w-full cursor-pointer items-center space-x-2 border-scale-500 py-1 font-normal outline-none ring-scale-1200 focus-visible:z-10 focus-visible:ring-1 group-hover:border-scale-900"
-          onClick={onClick || (() => {})}
-        >
+        <span className="group flex max-w-full cursor-pointer items-center space-x-2 border-scale-500 py-1 font-normal outline-none ring-scale-1200 focus-visible:z-10 focus-visible:ring-1 group-hover:border-scale-900">
           {isExternal && (
             <span className="truncate text-sm text-scale-900 transition group-hover:text-scale-1100">
               <IconArrowUpRight size={'tiny'} />
@@ -226,7 +223,7 @@ const SidebarLinkItem: FC<SidebarLinkProps> = ({
           >
             {isSubitem ? <p>{label}</p> : label}
           </span>
-        </button>
+        </span>
       </a>
     </Link>
   )

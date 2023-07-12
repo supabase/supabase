@@ -31,17 +31,17 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
   const queryHitRate = hooks.queryHitRate()
 
   const isLoading = [
-    mostFrequentlyInvoked[0].isLoading,
-    mostTimeConsuming[0].isLoading,
-    slowestExecutionTime[0].isLoading,
-    queryHitRate[0].isLoading,
+    mostFrequentlyInvoked.isLoading,
+    mostTimeConsuming.isLoading,
+    slowestExecutionTime.isLoading,
+    queryHitRate.isLoading,
   ].every((value) => value)
 
   const handleRefresh = async () => {
-    mostFrequentlyInvoked[1].runQuery()
-    mostTimeConsuming[1].runQuery()
-    slowestExecutionTime[1].runQuery()
-    queryHitRate[1].runQuery()
+    mostFrequentlyInvoked.runQuery()
+    mostTimeConsuming.runQuery()
+    slowestExecutionTime.runQuery()
+    queryHitRate.runQuery()
   }
 
   const checkAlert = (
@@ -60,8 +60,8 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
     </div>
   )
 
-  const indexHitRate = queryHitRate[0]?.data?.[0]?.ratio
-  const tableHitRate = queryHitRate[0]?.data?.[1]?.ratio
+  const indexHitRate = queryHitRate.data?.[0]?.ratio
+  const tableHitRate = queryHitRate.data?.[1]?.ratio
   const showIndexWarning =
     indexHitRate && tableHitRate && (indexHitRate <= 0.99 || tableHitRate <= 0.99)
 
@@ -130,7 +130,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
                         : dangerAlert}
                       <div className="flex items-baseline">
                         <span className="text-3xl">
-                          {(queryHitRate[0]?.data![0]?.ratio * 100).toFixed(2)}
+                          {(queryHitRate?.data![0]?.ratio * 100).toFixed(2)}
                         </span>
                         <span className="text-xl">%</span>
                       </div>
@@ -138,7 +138,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
                   </div>
 
                   <div className="w-1/2 bg-slate-200 rounded-md p-4">
-                    {queryHitRate[0]?.data![1]?.name == 'table hit rate' && 'Table Hit Rate'}
+                    {queryHitRate?.data![1]?.name == 'table hit rate' && 'Table Hit Rate'}
                     <div className="flex items-center gap-2">
                       {tableHitRate >= 0.99
                         ? checkAlert
@@ -147,7 +147,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
                         : dangerAlert}
                       <div className="flex items-baseline">
                         <span className="text-3xl">
-                          {(queryHitRate[0]?.data![1]?.ratio * 100).toFixed(2)}
+                          {(queryHitRate?.data![1]?.ratio * 100).toFixed(2)}
                         </span>
                         <span className="text-xl">%</span>
                       </div>
@@ -218,8 +218,8 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
                     </>
                   }
                   body={
-                    !isLoading && mostTimeConsuming && mostTimeConsuming[0]?.data ? (
-                      mostTimeConsuming[0].data!.map((item, i) => {
+                    !isLoading && mostTimeConsuming && mostTimeConsuming?.data ? (
+                      mostTimeConsuming?.data!.map((item, i) => {
                         return (
                           <Table.tr key={i} hoverable className="relative">
                             <Table.td className="table-cell whitespace-nowrap w-36">
@@ -273,8 +273,8 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
                     </>
                   }
                   body={
-                    !isLoading && mostFrequentlyInvoked && mostFrequentlyInvoked[0]?.data ? (
-                      mostFrequentlyInvoked[0].data!.map((item, i) => {
+                    !isLoading && mostFrequentlyInvoked && mostFrequentlyInvoked?.data ? (
+                      mostFrequentlyInvoked.data!.map((item, i) => {
                         return (
                           <Table.tr key={i} hoverable className="relative">
                             <Table.td className="table-cell whitespace-nowrap w-28">
@@ -336,8 +336,8 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
                     </>
                   }
                   body={
-                    !isLoading && slowestExecutionTime && slowestExecutionTime[0]?.data ? (
-                      slowestExecutionTime[0].data!.map((item, i) => {
+                    !isLoading && slowestExecutionTime && slowestExecutionTime?.data ? (
+                      slowestExecutionTime.data!.map((item, i) => {
                         return (
                           <Table.tr key={i} hoverable className="relative">
                             <Table.td className="table-cell whitespace-nowrap w-24">

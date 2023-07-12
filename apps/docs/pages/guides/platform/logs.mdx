@@ -23,35 +23,35 @@ Supabase provides a logging interface specific to each product. You can use simp
 >
 <TabPanel id="api" label="API">
 
-[API logs](https://app.supabase.com/project/_/database/api-logs) show all network requests and response for the REST and GraphQL [APIs](../../guides/database/api).
+[API logs](https://supabase.com/dashboard/project/_/database/api-logs) show all network requests and response for the REST and GraphQL [APIs](../../guides/database/api).
 
 ![API Logs](/docs/img/guides/platform/logs/logs-api.png)
 
 </TabPanel>
 <TabPanel id="postgres" label="Postgres">
 
-[Postgres logs](https://app.supabase.com/project/_/logs/postgres-logs) show queries and activity for your [database](../../guides/database).
+[Postgres logs](https://supabase.com/dashboard/project/_/logs/postgres-logs) show queries and activity for your [database](../../guides/database).
 
 ![Postgres Logs](/docs/img/guides/platform/logs/logs-database.png)
 
 </TabPanel>
 <TabPanel id="auth" label="Auth">
 
-[Auth logs](https://app.supabase.com/project/_/logs/auth-logs) show all server logs for your [Auth usage](../../guides/auth).
+[Auth logs](https://supabase.com/dashboard/project/_/logs/auth-logs) show all server logs for your [Auth usage](../../guides/auth).
 
 ![Auth Logs](/docs/img/guides/platform/logs/logs-auth.png)
 
 </TabPanel>
 <TabPanel id="storage" label="Storage">
 
-[Storage logs](https://app.supabase.com/project/_/logs/storage-logs) shows all server logs for your [Storage API](../../guides/storage).
+[Storage logs](https://supabase.com/dashboard/project/_/logs/storage-logs) shows all server logs for your [Storage API](../../guides/storage).
 
 ![Storage Logs](/docs/img/guides/platform/logs/logs-storage.png)
 
 </TabPanel>
 <TabPanel id="realtime" label="Realtime">
 
-[Realtime logs](https://app.supabase.com/project/_/logs/realtime-logs) show all server logs for your [Realtime API usage](../../guides/realtime).
+[Realtime logs](https://supabase.com/dashboard/project/_/logs/realtime-logs) show all server logs for your [Realtime API usage](../../guides/realtime).
 
 <Admonition type="note">
 
@@ -64,7 +64,7 @@ Realtime connections are not logged by default. Turn on [Realtime connection log
 </TabPanel>
 <TabPanel id="functions" label="Edge Functions">
 
-For each [Edge Function](https://app.supabase.com/project/_/functions), logs are available under the following tabs:
+For each [Edge Function](https://supabase.com/dashboard/project/_/functions), logs are available under the following tabs:
 
 **Invocations**
 
@@ -89,10 +89,10 @@ By default, query logs are disabled for new Supabase projects, as they can revea
 
 To enable query logs:
 
-1. [Enable the pgAudit extension](https://app.supabase.com/project/_/database/extensions).
-2. [Restart your project](https://app.supabase.com/project/_/settings/general) using the **Fast database reboot** option.
+1. [Enable the pgAudit extension](https://supabase.com/dashboard/project/_/database/extensions).
+2. [Restart your project](https://supabase.com/dashboard/project/_/settings/general) using the **Fast database reboot** option.
 3. Configure `pgaudit.log` (see below). Perform a fast reboot if needed.
-4. View your query logs under [Logs > Postgres Logs](https://app.supabase.com/project/_/logs/postgres-logs).
+4. View your query logs under [Logs > Postgres Logs](https://supabase.com/dashboard/project/_/logs/postgres-logs).
 
 ### Configuring `pgaudit.log`
 
@@ -112,7 +112,28 @@ To _permanently_ set a logging configuration (beyond a single session), execute 
 alter role postgres set pgaudit.log to 'function, write, ddl';
 ```
 
-For user-traffic flowing through the [HTTP APIs](../../guides/database/api#rest-api-overview) powered by PostgREST, set your configuration values for the roles `anon` and `authenticated`.  For traffic using the `service_role` key, set the configuration values for the role `service_role`.
+To help with debugging, we recommend adjusting the log scope to only relevant statements as having too wide of a scope would result in a lot of noise in your Postgres logs.
+
+Note that in the above example, the role is set to `postgres`. To log user-traffic flowing through the [HTTP APIs](../../guides/database/api#rest-api-overview) powered by PostgREST, set your configuration values for the roles `anon` and `authenticated`. For traffic using the `service_role` key, set the configuration values for the role `service_role`.
+
+```sql
+-- for API-related logs
+alter role anon set pgaudit.log to 'write';
+alter role authenticated set pgaudit.log to 'write';
+
+-- for service role logs
+alter role service_role set pgaudit.log to 'write';
+```
+
+By default, the log level will be set to `log`. To view other levels, run the following:
+
+```sql
+-- adjust log level
+alter role postgres set pgaudit.log_level to 'info';
+alter role postgres set pgaudit.log_level to 'debug5';
+```
+
+Note that as per the pgAudit [log_level documentation](https://github.com/pgaudit/pgaudit/blob/master/README.md#pgauditlog_level), `error`, `fatal`, and `panic` are not allowed.
 
 To reset system-wide settings, execute the following, then perform a fast reboot:
 
@@ -144,7 +165,7 @@ const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key
 
 ## Logs Explorer
 
-The [Logs Explorer](https://app.supabase.com/project/_/logs-explorer) exposes logs from each part of the Supabase stack as a separate table that can be queried and joined using SQL.
+The [Logs Explorer](https://supabase.com/dashboard/project/_/logs-explorer) exposes logs from each part of the Supabase stack as a separate table that can be queried and joined using SQL.
 
 ![Logs Explorer](/docs/img/guides/platform/logs/logs-explorer.png)
 

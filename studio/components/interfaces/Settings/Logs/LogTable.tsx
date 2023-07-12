@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo, useCallback } from 'react'
 import { Alert, Button, IconEye, IconEyeOff } from 'ui'
 import DataGrid, { Row, RowRendererProps } from '@supabase/react-data-grid'
 
@@ -15,6 +15,7 @@ import DefaultErrorRenderer from './LogsErrorRenderers/DefaultErrorRenderer'
 import FunctionsLogsColumnRender from './LogColumnRenderers/FunctionsLogsColumnRender'
 import FunctionsEdgeColumnRender from './LogColumnRenderers/FunctionsEdgeColumnRender'
 import AuthColumnRenderer from './LogColumnRenderers/AuthColumnRenderer'
+import { isEqual } from 'lodash'
 
 interface Props {
   data?: Array<LogData | Object>
@@ -59,7 +60,6 @@ const LogTable = ({
   onHistogramToggle,
   isHistogramShowing,
   isLoading,
-  showDownload,
   error,
   projectRef,
   params,
@@ -144,8 +144,10 @@ const LogTable = ({
   }, [stringData])
 
   useEffect(() => {
-    if (!hasId || data === null) return
-    if (focusedLog && !(focusedLog.id in logMap)) {
+    if (!data) return
+    const found = data.find((datum) => isEqual(datum, focusedLog))
+    if (!found) {
+      // close selection panel if not found in dataset
       setFocusedLog(null)
     }
   }, [stringData])
@@ -161,14 +163,12 @@ const LogTable = ({
     }
   }, [stringData])
 
-  const RowRenderer = (props: RowRendererProps<any>) => {
-    return (
-      <Row
-        {...props}
-        className="font-mono tracking-tight cursor-pointer !bg-scale-200 hover:!bg-scale-300"
-      />
-    )
-  }
+  const RowRenderer = useCallback(
+    (props: RowRendererProps<any>) => (
+      <Row {...props} isRowSelected={false} selectedCellIdx={undefined} />
+    ),
+    []
+  )
 
   const LogsExplorerTableHeader = () => (
     <div className="flex w-full items-center justify-between rounded-tl rounded-tr border-t border-l border-r bg-scale-100 px-5 py-2 dark:bg-scale-300">
@@ -268,10 +268,11 @@ const LogTable = ({
           `}
             rowHeight={40}
             headerRowHeight={queryType ? 0 : 28}
-            onSelectedCellChange={({ idx, rowIdx }) => {
+            onSelectedCellChange={({ rowIdx }) => {
               if (!hasId) return
               setFocusedLog(data[rowIdx] as LogData)
             }}
+            selectedRows={new Set([])}
             noRowsFallback={
               !isLoading ? (
                 <div className="mx-auto flex h-full w-full items-center justify-center space-y-12 py-4 transition-all delay-200 duration-500">
@@ -282,15 +283,20 @@ const LogTable = ({
             }
             columns={columns as any}
             rowClass={(row: LogData) =>
-              row.id === focusedLog?.id ? '!bg-scale-400 rdg-row--focused' : 'cursor-pointer'
+              [
+                'font-mono tracking-tight',
+                isEqual(row, focusedLog)
+                  ? '!bg-scale-800 rdg-row--focused'
+                  : ' !bg-scale-200 hover:!bg-scale-300 cursor-pointer',
+              ].join(' ')
             }
             rows={logDataRows}
             rowKeyGetter={(r) => {
-              if (!hasId) return Object.keys(r)[0]
+              if (!hasId) return JSON.stringify(r)
               const row = r as LogData
               return row.id
             }}
-            onRowClick={(r) => setFocusedLog(r)}
+            onRowClick={setFocusedLog}
             rowRenderer={RowRenderer}
           />
           {logDataRows.length > 0 ? (

@@ -13,7 +13,7 @@ export interface CommonChartProps<D>
   > {
   title?: string
   className?: string
-  isLoading?: boolean
+  valuePrecision?: number
   size?: 'tiny' | 'small' | 'normal' | 'large'
 }
 
@@ -28,7 +28,7 @@ export interface StackedChartProps<D> extends CommonChartProps<D> {
 export type HeaderType<D> = {
   attribute: string
   focus: number | null
-  format?: string
+  format?: string | ((value: unknown) => string)
   highlightedValue?: number | string
   highlightedLabel?: string
   data: D[]
@@ -38,9 +38,7 @@ export type HeaderType<D> = {
   displayDateInUtc?: boolean
 }
 
-export interface Datum {
-  [attribute: string]: number | string
-}
+export type Datum = Record<string, string | number>
 
 export interface TimeseriesDatum extends Datum {
   timestamp: string

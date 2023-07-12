@@ -1,33 +1,33 @@
-import remarkGfm from 'remark-gfm'
-import ReactMarkdown from 'react-markdown'
-import { PropsWithChildren, useMemo } from 'react'
-import { useParams } from 'common'
-import { CommandMenuProvider, markdownComponents } from 'ui'
-import { observer } from 'mobx-react-lite'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
+import { PropsWithChildren, useMemo } from 'react'
+import { CommandMenuProvider } from 'ui'
 
-import { uuidv4 } from 'lib/helpers'
-import { checkPermissions, useFlag, useStore } from 'hooks'
-import { createSqlSnippetSkeleton } from '../SQLEditor/SQLEditor.utils'
-import { useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { useProfileQuery } from 'data/profile/profile-query'
-import { SqlSnippet } from 'data/content/sql-snippets-query'
-import { useProjectApiQuery } from 'data/config/project-api-query'
 import { codeBlock } from 'common-tags'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useProjectApiQuery } from 'data/config/project-api-query'
+import { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
+import { useCheckPermissions, useFlag, useSelectedOrganization, useStore } from 'hooks'
+import { uuidv4 } from 'lib/helpers'
+import { useProfile } from 'lib/profile'
+import { useSqlEditorStateSnapshot } from 'state/sql-editor'
+import { createSqlSnippetSkeleton } from '../SQLEditor/SQLEditor.utils'
 
-const CommandMenuWrapper = observer(({ children }: PropsWithChildren<{}>) => {
+const CommandMenuWrapper = ({ children }: PropsWithChildren<{}>) => {
   const { ref } = useParams()
   const { ui } = useStore()
-  const { opt_in_tags } = ui.selectedOrganization ?? {}
+  const selectedOrganization = useSelectedOrganization()
+  const { project: selectedProject } = useProjectContext()
+  const opt_in_tags = selectedOrganization?.opt_in_tags
 
   const snap = useSqlEditorStateSnapshot()
   const allowCMDKDataOptIn = useFlag('dashboardCmdkDataOptIn')
   const isOptedInToAI = opt_in_tags?.includes('AI_SQL_GENERATOR_OPT_IN') ?? false
 
-  const { data: profile } = useProfileQuery()
+  const { profile } = useProfile()
   const { data: settings } = useProjectApiQuery({ projectRef: ref })
-  const canCreateSQLSnippet = checkPermissions(PermissionAction.CREATE, 'user_content', {
+  const canCreateSQLSnippet = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
     resource: { type: 'sql', owner_id: profile?.id },
     subject: { id: profile?.id },
   })
@@ -39,8 +39,8 @@ const CommandMenuWrapper = observer(({ children }: PropsWithChildren<{}>) => {
 
   const { data } = useEntityDefinitionsQuery(
     {
-      projectRef: ui.selectedProject?.ref,
-      connectionString: ui.selectedProject?.connectionString,
+      projectRef: selectedProject?.ref,
+      connectionString: selectedProject?.connectionString,
     },
     { enabled: isOptedInToAI }
   )
@@ -98,9 +98,6 @@ const CommandMenuWrapper = observer(({ children }: PropsWithChildren<{}>) => {
       site="studio"
       projectRef={ref}
       apiKeys={apiKeys}
-      MarkdownHandler={(props) => (
-        <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents} {...props} />
-      )}
       metadata={cmdkMetadata}
       isOptedInToAI={allowCMDKDataOptIn && isOptedInToAI}
       saveGeneratedSQL={onSaveGeneratedSQL}
@@ -108,6 +105,6 @@ const CommandMenuWrapper = observer(({ children }: PropsWithChildren<{}>) => {
       {children}
     </CommandMenuProvider>
   )
-})
+}
 
 export default CommandMenuWrapper

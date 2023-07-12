@@ -19,8 +19,10 @@ import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react'
 import { API_URL } from 'lib/constants'
 import { get } from 'lib/common/fetch'
 import dayjs from 'dayjs'
+import useFillTimeseriesSorted from './useFillTimeseriesSorted'
+import useTimeseriesUnixToIso from './useTimeseriesUnixToIso'
 
-interface Data {
+interface LogsPreviewHook {
   logData: LogData[]
   error: string | Object | null
   newCount: number
@@ -29,9 +31,7 @@ interface Data {
   filters: Filters
   params: LogsEndpointParams
   oldestTimestamp?: string
-  eventChartData: EventChartData[] | null
-}
-interface Handlers {
+  eventChartData: EventChartData[]
   loadOlder: () => void
   refresh: () => void
   setFilters: (filters: Filters | ((previous: Filters) => Filters)) => void
@@ -41,7 +41,7 @@ function useLogsPreview(
   projectRef: string,
   table: LogsTableName,
   filterOverride?: Filters
-): [Data, Handlers] {
+): LogsPreviewHook {
   const defaultHelper = getDefaultHelper(PREVIEWER_DATEPICKER_HELPERS)
   const [latestRefresh, setLatestRefresh] = useState<string>(new Date().toISOString())
 
@@ -76,11 +76,13 @@ function useLogsPreview(
   } = useInfiniteQuery(
     ['projects', projectRef, 'logs', queryParamsKey],
     ({ signal, pageParam }) => {
+      const uri = `${API_URL}/projects/${projectRef}/analytics/endpoints/logs.all?${genQueryParams({
+        ...params,
+        // don't overwrite unless user has already clicked on load older
+        iso_timestamp_end: pageParam || params.iso_timestamp_end,
+      } as any)}`
       return get<Logs>(
-        `${API_URL}/projects/${projectRef}/analytics/endpoints/logs.all?${genQueryParams({
-          ...params,
-          iso_timestamp_end: pageParam,
-        } as any)}`,
+        uri,
         { signal }
       )
     },
@@ -166,7 +168,7 @@ function useLogsPreview(
 
   const oldestTimestamp = logData[logData.length - 1]?.timestamp
 
-  const handleSetFilters: Handlers['setFilters'] = (newFilters) => {
+  const handleSetFilters: LogsPreviewHook['setFilters'] = (newFilters) => {
     if (typeof newFilters === 'function') {
       setFilters((prev) => {
         const resolved = newFilters(prev)
@@ -176,24 +178,36 @@ function useLogsPreview(
       setFilters({ ...newFilters, ...filterOverride })
     }
   }
-  return [
-    {
-      newCount,
-      logData,
-      isLoading: isLoading || isRefetching,
-      isLoadingOlder: isFetchingNextPage,
-      error,
-      filters,
-      params,
-      oldestTimestamp: oldestTimestamp ? String(oldestTimestamp) : undefined,
-      eventChartData: eventChartResponse?.result || null,
-    },
-    {
-      setFilters: handleSetFilters,
-      refresh,
-      loadOlder: () => fetchNextPage(),
-      setParams,
-    },
-  ]
+
+  const normalizedEventChartData = useTimeseriesUnixToIso(
+    eventChartResponse?.result || [],
+    'timestamp'
+  )
+
+  const eventChartData = useFillTimeseriesSorted(
+    normalizedEventChartData,
+    'timestamp',
+    'count',
+    0,
+    params.iso_timestamp_start,
+    // default to current time if not set
+    params.iso_timestamp_end || new Date().toISOString()
+  )
+
+  return {
+    newCount,
+    logData,
+    isLoading: isLoading || isRefetching,
+    isLoadingOlder: isFetchingNextPage,
+    error,
+    filters,
+    params,
+    oldestTimestamp: oldestTimestamp ? String(oldestTimestamp) : undefined,
+    eventChartData,
+    setFilters: handleSetFilters,
+    refresh,
+    loadOlder: () => fetchNextPage(),
+    setParams,
+  }
 }
 export default useLogsPreview

@@ -11,12 +11,11 @@ export const sanitizeTaxID = (taxId: StripeTaxId) => {
 
   const selectedTaxId = TAX_IDS.find((option) => option.name === taxId.name)
 
-  // The prefix of the country name (ex: "BE" for Belgium, "ESA" for Spain)")
-  const countryPrefix = selectedTaxId?.placeholder.match(/[a-z]+|[^a-z]+/gi)?.[0]
+  const vatIdPrefix = selectedTaxId?.vatPrefix
 
-  // if the value doesn't start with the country code, prepend them
-  if (taxId.type === 'eu_vat' && countryPrefix && !taxId.value.startsWith(countryPrefix)) {
-    newID.value = `${countryPrefix}${taxId.value}`
+  // if the value doesn't start with the prefix, prepend them
+  if (vatIdPrefix && !taxId.value.startsWith(vatIdPrefix)) {
+    newID.value = `${vatIdPrefix}${taxId.value}`
   }
 
   return newID

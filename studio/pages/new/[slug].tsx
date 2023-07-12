@@ -1,55 +1,73 @@
-import Router, { useRouter } from 'next/router'
-import { useRef, useState, useEffect, PropsWithChildren } from 'react'
-import { debounce, isUndefined, values } from 'lodash'
-import { toJS } from 'mobx'
-import { observer } from 'mobx-react-lite'
-import generator from 'generate-password'
-import { Button, Listbox, IconUsers, Input, Alert, IconHelpCircle, Toggle } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import generator from 'generate-password'
+import { debounce, isUndefined } from 'lodash'
+import { observer } from 'mobx-react-lite'
+import Router, { useRouter } from 'next/router'
+import { useEffect, useRef, useState } from 'react'
 
-import { NextPageWithLayout } from 'types'
-import { passwordStrength, pluckObjectFields } from 'lib/helpers'
+import { useParams } from 'common/hooks'
+import { SpendCapModal } from 'components/interfaces/BillingV2'
+import {
+  EmptyPaymentMethodWarning,
+  FreeProjectLimitWarning,
+  NotOrganizationOwnerWarning,
+} from 'components/interfaces/Organization/NewProject'
+import { WizardLayoutWithoutAuth } from 'components/layouts'
+import DisabledWarningDueToIncident from 'components/ui/DisabledWarningDueToIncident'
+import InformationBox from 'components/ui/InformationBox'
+import Panel from 'components/ui/Panel'
+import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
+import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useCheckPermissions, useFlag, useStore, withAuth } from 'hooks'
 import { get, post } from 'lib/common/fetch'
 import {
   API_URL,
-  PROVIDERS,
-  REGIONS,
-  REGIONS_DEFAULT,
+  AWS_REGIONS,
+  CloudProvider,
   DEFAULT_MINIMUM_PASSWORD_STRENGTH,
-  PRICING_TIER_LABELS,
+  DEFAULT_PROVIDER,
+  FLY_REGIONS,
   PRICING_TIER_DEFAULT_KEY,
   PRICING_TIER_FREE_KEY,
+  PRICING_TIER_LABELS,
   PRICING_TIER_PRODUCT_IDS,
+  PROVIDERS,
+  Region,
 } from 'lib/constants'
-import { useStore, useFlag, withAuth, checkPermissions } from 'hooks'
-import { useParams } from 'common/hooks'
-import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
-
-import { WizardLayoutWithoutAuth } from 'components/layouts'
-import Panel from 'components/ui/Panel'
-import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
-import DisabledWarningDueToIncident from 'components/ui/DisabledWarningDueToIncident'
+import { passwordStrength, pluckObjectFields } from 'lib/helpers'
+import { NextPageWithLayout } from 'types'
 import {
-  FreeProjectLimitWarning,
-  NotOrganizationOwnerWarning,
-  EmptyPaymentMethodWarning,
-} from 'components/interfaces/Organization/NewProject'
-import SpendCapModal from 'components/interfaces/Billing/SpendCapModal'
+  Alert,
+  Button,
+  IconExternalLink,
+  IconHelpCircle,
+  IconInfo,
+  IconUsers,
+  Input,
+  Listbox,
+  Toggle,
+} from 'ui'
+import Link from 'next/link'
 
 const Wizard: NextPageWithLayout = () => {
   const router = useRouter()
   const { slug } = useParams()
-  const { app, ui } = useStore()
+  const { ui } = useStore()
 
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
+  const cloudProviderEnabled = useFlag('enableFlyCloudProvider')
   const kpsEnabled = useFlag('initWithKps')
   const { data: membersExceededLimit, isLoading: isLoadingFreeProjectLimitCheck } =
     useFreeProjectLimitCheckQuery({ slug })
 
   const [projectName, setProjectName] = useState('')
   const [postgresVersion, setPostgresVersion] = useState('')
+  const [cloudProvider, setCloudProvider] = useState<CloudProvider>(PROVIDERS[DEFAULT_PROVIDER].id)
+
   const [dbPass, setDbPass] = useState('')
-  const [dbRegion, setDbRegion] = useState(REGIONS_DEFAULT)
+  const [dbRegion, setDbRegion] = useState(PROVIDERS[cloudProvider].default_region)
   const [dbPricingTierKey, setDbPricingTierKey] = useState(PRICING_TIER_DEFAULT_KEY)
   const [newProjectedLoading, setNewProjectLoading] = useState(false)
   const [passwordStrengthMessage, setPasswordStrengthMessage] = useState('')
@@ -61,29 +79,38 @@ const Wizard: NextPageWithLayout = () => {
 
   const [isSpendCapEnabled, setIsSpendCapEnabled] = useState(true)
 
-  const organizations = values(toJS(app.organizations.list()))
-  const currentOrg = organizations.find((o: any) => o.slug === slug)
-  const stripeCustomerId = currentOrg?.stripe_customer_id
+  const { data: organizations, isSuccess: isOrganizationsSuccess } = useOrganizationsQuery()
+  const currentOrg = organizations?.find((o: any) => o.slug === slug)
+  const billedViaOrg = Boolean(currentOrg?.subscription_id)
 
-  const availableRegions = getAvailableRegions()
-  const isAdmin = checkPermissions(PermissionAction.CREATE, 'projects')
+  const { data: orgSubscription } = useOrgSubscriptionQuery(
+    { orgSlug: slug },
+    { enabled: billedViaOrg }
+  )
+
+  const [availableRegions, setAvailableRegions] = useState(
+    getAvailableRegions(PROVIDERS[cloudProvider].id)
+  )
+
+  const isAdmin = useCheckPermissions(PermissionAction.CREATE, 'projects')
   const isInvalidSlug = isUndefined(currentOrg)
-  const isEmptyOrganizations = organizations.length <= 0 && app.organizations.isInitialized
+  const isEmptyOrganizations = (organizations?.length ?? 0) <= 0 && isOrganizationsSuccess
   const isEmptyPaymentMethod = paymentMethods ? !paymentMethods.length : false
   const isSelectFreeTier = dbPricingTierKey === PRICING_TIER_FREE_KEY
   const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
 
-  const showCustomVersionInput = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
+  const showNonProdFields = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
 
-  const canCreateProject =
-    isAdmin && (!isSelectFreeTier || (isSelectFreeTier && !hasMembersExceedingFreeTierLimit))
+  const freePlanWithExceedingLimits =
+    (isSelectFreeTier || orgSubscription?.plan?.id === 'free') && hasMembersExceedingFreeTierLimit
+
+  const canCreateProject = isAdmin && !freePlanWithExceedingLimits
 
   const canSubmit =
     projectName !== '' &&
     passwordStrengthScore >= DEFAULT_MINIMUM_PASSWORD_STRENGTH &&
-    dbRegion !== '' &&
-    dbPricingTierKey !== '' &&
-    (isSelectFreeTier || (!isSelectFreeTier && !isEmptyPaymentMethod))
+    dbRegion !== undefined &&
+    dbPricingTierKey !== ''
 
   const delayedCheckPasswordStrength = useRef(
     debounce((value) => checkPasswordStrength(value), 300)
@@ -101,8 +128,8 @@ const Wizard: NextPageWithLayout = () => {
    * Redirect to first org if the slug doesn't match an org slug
    * this is mainly to capture the /project/new url, which is redirected from database.new
    */
-  if (isInvalidSlug && organizations.length > 0) {
-    router.push(`/new/${organizations[0].slug}`)
+  if (isInvalidSlug && (organizations?.length ?? 0) > 0) {
+    router.push(`/new/${organizations?.[0].slug}`)
   }
 
   useEffect(() => {
@@ -112,14 +139,14 @@ const Wizard: NextPageWithLayout = () => {
     }
   }, [])
 
-  useEffect(() => {
-    async function getPaymentMethods(slug: string) {
-      const { data: paymentMethods, error } = await get(`${API_URL}/organizations/${slug}/payments`)
-      if (!error) {
-        setPaymentMethods(paymentMethods)
-      }
+  async function getPaymentMethods(slug: string) {
+    const { data: paymentMethods, error } = await get(`${API_URL}/organizations/${slug}/payments`)
+    if (!error) {
+      setPaymentMethods(paymentMethods)
     }
+  }
 
+  useEffect(() => {
     if (slug) {
       getPaymentMethods(slug as string)
     }
@@ -139,12 +166,25 @@ const Wizard: NextPageWithLayout = () => {
     } else delayedCheckPasswordStrength(value)
   }
 
-  function onDbRegionChange(value: string) {
-    setDbRegion(value)
+  function onCloudProviderChange(cloudProviderId: CloudProvider) {
+    setCloudProvider(cloudProviderId)
+    if (cloudProviderId === PROVIDERS.AWS.id) {
+      setAvailableRegions(getAvailableRegions(PROVIDERS['AWS'].id))
+      setDbRegion(PROVIDERS['AWS'].default_region)
+    } else {
+      setAvailableRegions(getAvailableRegions(PROVIDERS['FLY'].id))
+      setDbRegion(PROVIDERS['FLY'].default_region)
+    }
   }
 
   function onDbPricingPlanChange(value: string) {
     setDbPricingTierKey(value)
+  }
+
+  function onPaymentMethodAdded() {
+    if (slug) {
+      return getPaymentMethods(slug)
+    }
   }
 
   async function checkPasswordStrength(value: any) {
@@ -160,9 +200,9 @@ const Wizard: NextPageWithLayout = () => {
     const dbTier = dbPricingTierKey === 'PRO' && !isSpendCapEnabled ? 'PAYG' : dbPricingTierKey
 
     const data: Record<string, any> = {
-      cloud_provider: PROVIDERS.AWS.id, // hardcoded for DB instances to be under AWS
+      cloud_provider: cloudProvider,
       org_id: currentOrg?.id,
-      name: projectName,
+      name: projectName.trim(),
       db_pass: dbPass,
       db_region: dbRegion,
       db_pricing_tier_id: (PRICING_TIER_PRODUCT_IDS as any)[dbTier],
@@ -190,7 +230,6 @@ const Wizard: NextPageWithLayout = () => {
         message: `Failed to create new project: ${response.error.message}`,
       })
     } else {
-      app.onProjectCreated(response)
       router.push(`/project/${response.ref}/building`)
     }
   }
@@ -209,16 +248,23 @@ const Wizard: NextPageWithLayout = () => {
   }
 
   // [Fran] Enforce APSE1 region on staging
-  function getAvailableRegions() {
-    return process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
-      ? pluckObjectFields(REGIONS, ['SOUTHEAST_ASIA'])
-      : REGIONS
+  function getAvailableRegions(cloudProvider: CloudProvider): Region {
+    if (cloudProvider === 'AWS') {
+      return process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
+        ? pluckObjectFields(AWS_REGIONS, ['SOUTHEAST_ASIA'])
+        : AWS_REGIONS
+      // to do - may need to pluck regions for staging for FLY also
+    } else if (cloudProvider === 'FLY') {
+      return FLY_REGIONS
+    }
+
+    throw new Error('Invalid cloud provider')
   }
 
   return (
     <Panel
       hideHeaderStyling
-      loading={!app.organizations.isInitialized || isLoadingFreeProjectLimitCheck}
+      loading={!isOrganizationsSuccess || isLoadingFreeProjectLimitCheck}
       title={
         <div key="panel-title">
           <h3>Create a new project</h3>
@@ -265,14 +311,14 @@ const Wizard: NextPageWithLayout = () => {
                 'border-panel-border-interior-light dark:border-panel-border-interior-dark',
               ].join(' ')}
             >
-              {organizations.length > 0 && (
+              {(organizations?.length ?? 0) > 0 && (
                 <Listbox
                   label="Organization"
                   layout="horizontal"
                   value={currentOrg?.slug}
                   onChange={(slug) => router.push(`/new/${slug}`)}
                 >
-                  {organizations.map((x: any) => (
+                  {organizations?.map((x: any) => (
                     <Listbox.Option
                       key={x.id}
                       label={x.name}
@@ -292,7 +338,7 @@ const Wizard: NextPageWithLayout = () => {
               <>
                 <Panel.Content
                   className={[
-                    'border-t border-b',
+                    'border-b',
                     'border-panel-border-interior-light dark:border-panel-border-interior-dark',
                   ].join(' ')}
                 >
@@ -308,10 +354,10 @@ const Wizard: NextPageWithLayout = () => {
                   />
                 </Panel.Content>
 
-                {showCustomVersionInput && (
+                {showNonProdFields && (
                   <Panel.Content
                     className={[
-                      'border-t border-b',
+                      'border-b',
                       'border-panel-border-interior-light dark:border-panel-border-interior-dark',
                     ].join(' ')}
                   >
@@ -332,6 +378,34 @@ const Wizard: NextPageWithLayout = () => {
                       value={postgresVersion}
                       onChange={(event: any) => setPostgresVersion(event.target.value)}
                     />
+                  </Panel.Content>
+                )}
+
+                {cloudProviderEnabled && showNonProdFields && (
+                  <Panel.Content
+                    className={[
+                      'border-b',
+                      'border-panel-border-interior-light dark:border-panel-border-interior-dark',
+                    ].join(' ')}
+                  >
+                    <Listbox
+                      layout="horizontal"
+                      label="Cloud Provider"
+                      type="select"
+                      value={cloudProvider}
+                      onChange={(value) => onCloudProviderChange(value)}
+                      descriptionText="Cloud Provider (only for staging/local)"
+                    >
+                      {Object.values(PROVIDERS).map((providerObj) => {
+                        const label = providerObj['name']
+                        const value = providerObj['id']
+                        return (
+                          <Listbox.Option key={value} label={label} value={value}>
+                            <span className="text-scale-1200">{label}</span>
+                          </Listbox.Option>
+                        )
+                      })}
+                    </Listbox>
                   </Panel.Content>
                 )}
 
@@ -363,8 +437,7 @@ const Wizard: NextPageWithLayout = () => {
                     label="Region"
                     type="select"
                     value={dbRegion}
-                    // @ts-ignore
-                    onChange={(value: string) => onDbRegionChange(value)}
+                    onChange={(value) => setDbRegion(value)}
                     descriptionText="Select a region close to your users for the best performance."
                   >
                     {Object.keys(availableRegions).map((option: string, i) => {
@@ -374,8 +447,9 @@ const Wizard: NextPageWithLayout = () => {
                           key={option}
                           label={label}
                           value={label}
-                          addOnBefore={({ active, selected }: any) => (
+                          addOnBefore={() => (
                             <img
+                              alt="region icon"
                               className="w-5 rounded-sm"
                               src={`${router.basePath}/img/regions/${
                                 Object.keys(availableRegions)[i]
@@ -392,58 +466,95 @@ const Wizard: NextPageWithLayout = () => {
               </>
             )}
 
+            {billedViaOrg && (
+              <Panel.Content>
+                <InformationBox
+                  icon={<IconInfo size="large" strokeWidth={1.5} />}
+                  defaultVisibility={true}
+                  hideCollapse
+                  title="Billed via organization"
+                  description={
+                    <div className="space-y-3">
+                      <p className="text-sm leading-normal">
+                        This organization uses organization level billing and is on the{' '}
+                        <span className="text-brand-900">{orgSubscription?.plan?.name} plan</span>.
+                      </p>
+
+                      {orgSubscription?.plan?.id !== 'free' && (
+                        <p>
+                          Your plan comes with $10 of Compute Credits. Launching another project
+                          incurs additional compute costs - if you exhaust your Compute Credits, the
+                          additional compute hours result in additional usage charges.
+                        </p>
+                      )}
+
+                      <div>
+                        <Link href="https://www.notion.so/supabase/Organization-Level-Billing-9c159d69375b4af095f0b67881276582?pvs=4">
+                          <a target="_blank" rel="noreferrer">
+                            <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                              Documentation
+                            </Button>
+                          </a>
+                        </Link>
+                      </div>
+                    </div>
+                  }
+                />
+              </Panel.Content>
+            )}
+
             {isAdmin && (
               <Panel.Content>
-                <Listbox
-                  label="Pricing Plan"
-                  layout="horizontal"
-                  value={dbPricingTierKey}
-                  // @ts-ignore
-                  onChange={onDbPricingPlanChange}
-                  // @ts-ignore
-                  descriptionText={
-                    <>
-                      Select a plan that suits your needs.&nbsp;
-                      <a
-                        className="underline"
-                        target="_blank"
-                        rel="noreferrer"
-                        href="https://supabase.com/pricing"
-                      >
-                        More details
-                      </a>
-                      {!isSelectFreeTier && !isEmptyPaymentMethod && (
-                        <Alert
-                          title="Your payment method will be charged"
-                          variant="warning"
-                          withIcon
-                          className="mt-3"
+                {!billedViaOrg && (
+                  <Listbox
+                    label="Pricing Plan"
+                    layout="horizontal"
+                    value={dbPricingTierKey}
+                    onChange={onDbPricingPlanChange}
+                    descriptionText={
+                      <>
+                        Select a plan that suits your needs.&nbsp;
+                        <a
+                          className="underline"
+                          target="_blank"
+                          rel="noreferrer"
+                          href="https://supabase.com/pricing"
                         >
-                          <p>
-                            By creating a new Pro Project, there will be an immediate charge of $25
-                            once the project has been created.
-                          </p>
-                        </Alert>
-                      )}
-                    </>
-                  }
-                >
-                  {Object.entries(PRICING_TIER_LABELS).map(([k, v]) => {
-                    const label = `${v}${k === 'PRO' ? ' - $25/month' : ' - $0/month'}`
-                    return (
-                      <Listbox.Option key={k} label={label} value={k}>
-                        {label}
-                      </Listbox.Option>
-                    )
-                  })}
-                </Listbox>
+                          More details
+                        </a>
+                        {!isSelectFreeTier && !isEmptyPaymentMethod && (
+                          <Alert
+                            title="Your payment method will be charged"
+                            variant="warning"
+                            withIcon
+                            className="mt-3"
+                          >
+                            <p>
+                              By creating a new Pro Project, there will be an immediate charge of
+                              $25 once the project has been created.
+                            </p>
+                          </Alert>
+                        )}
+                      </>
+                    }
+                  >
+                    {Object.entries(PRICING_TIER_LABELS).map(([k, v]) => {
+                      const label = `${v}${k === 'PRO' ? ' - $25/month' : ' - $0/month'}`
+                      return (
+                        <Listbox.Option key={k} label={label} value={k}>
+                          {label}
+                        </Listbox.Option>
+                      )
+                    })}
+                  </Listbox>
+                )}
 
-                {isSelectFreeTier && hasMembersExceedingFreeTierLimit && (
+                {freePlanWithExceedingLimits && (
                   <FreeProjectLimitWarning membersExceededLimit={membersExceededLimit || []} />
                 )}
 
-                {!isSelectFreeTier && isEmptyPaymentMethod && (
-                  <EmptyPaymentMethodWarning stripeCustomerId={stripeCustomerId} />
+                {!billedViaOrg && !isSelectFreeTier && isEmptyPaymentMethod && (
+                  <EmptyPaymentMethodWarning onPaymentMethodAdded={onPaymentMethodAdded} />
                 )}
               </Panel.Content>
             )}
@@ -494,22 +605,18 @@ const Wizard: NextPageWithLayout = () => {
   )
 }
 
-const PageLayout = withAuth(
-  observer<PropsWithChildren<{}>>(({ children }) => {
-    const router = useRouter()
-    const { slug } = router.query
+const PageLayout = withAuth(({ children }) => {
+  const { slug } = useParams()
 
-    const { app } = useStore()
-    const organizations = values(toJS(app.organizations.list()))
-    const currentOrg = organizations.find((o: any) => o.slug === slug)
+  const { data: organizations } = useOrganizationsQuery()
+  const currentOrg = organizations?.find((o: any) => o.slug === slug)
 
-    return (
-      <WizardLayoutWithoutAuth organization={currentOrg} project={null}>
-        {children}
-      </WizardLayoutWithoutAuth>
-    )
-  })
-)
+  return (
+    <WizardLayoutWithoutAuth organization={currentOrg} project={null}>
+      {children}
+    </WizardLayoutWithoutAuth>
+  )
+})
 
 Wizard.getLayout = (page) => <PageLayout>{page}</PageLayout>
 

@@ -5,7 +5,7 @@ import UtilityTabResults from './UtilityTabResults'
 export type UtilityPanelProps = {
   id: string
   isExecuting?: boolean
-  executeQuery?: (overrideSql?: string) => void
+  executeQuery: () => void
 }
 
 const UtilityPanel = ({ id, isExecuting, executeQuery }: UtilityPanelProps) => {

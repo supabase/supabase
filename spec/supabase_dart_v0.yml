@@ -78,10 +78,10 @@ functions:
     description: |
       Creates a new user.
     notes: |
-      - By default, the user will need to verify their email address before logging in. If you would like to change this, you can disable "Email Confirmations" by going to Authentication -> Settings on [app.supabase.com](https://app.supabase.com)
+      - By default, the user will need to verify their email address before logging in. If you would like to change this, you can disable "Email Confirmations" by going to Authentication -> Settings on [supabase.com/dashboard](https://supabase.com/dashboard)
       - If "Email Confirmations" is turned on, a user is returned but session will be null
       - If "Email Confirmations" is turned off, both a `user` and a `session` will be returned
-      - When the user confirms their email address, they will be redirected to localhost:3000 by default. To change this, you can go to Authentication -> Settings on [app.supabase.com](https://app.supabase.com)
+      - When the user confirms their email address, they will be redirected to localhost:3000 by default. To change this, you can go to Authentication -> Settings on [supabase.com/dashboard](https://supabase.com/dashboard)
     examples:
       - id: sign-up
         name: Sign up.
@@ -106,7 +106,7 @@ functions:
     notes: |
       - A user can sign up via email, phone number.
       - If you provide `email` without a `password`, the user will be sent a magic link.
-      - The magic link's destination URL is determined by the SITE_URL config variable. To change this, you can go to Authentication -> Settings on [app.supabase.com](https://app.supabase.com)
+      - The magic link's destination URL is determined by the SITE_URL config variable. To change this, you can go to Authentication -> Settings on [supabase.com/dashboard](https://supabase.com/dashboard)
       - Similarly, if you provide `phone` without a `password`, the user will be sent a one time password.
       - If you are looking to sign users in with OAuth in Flutter apps, go to [`signInWithProvider()`](/docs/reference/dart/v0/auth-signinwithprovider).
     examples:
@@ -1073,7 +1073,7 @@ functions:
       Retrieve URLs for assets in public buckets
     title: 'from.getPublicUrl()'
     notes: |
-      - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/javascript/storage-updatebucket) or by going to Storage on [app.supabase.com](https://app.supabase.com), clicking the overflow menu on a bucket and choosing "Make public"
+      - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/javascript/storage-updatebucket) or by going to Storage on [supabase.com/dashboard](https://supabase.com/dashboard), clicking the overflow menu on a bucket and choosing "Make public"
       - Policy permissions required:
         - `buckets` permissions: none
         - `objects` permissions: none

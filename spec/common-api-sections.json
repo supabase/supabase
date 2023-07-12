@@ -6,6 +6,7 @@
     "type": "markdown"
   },
   {
+    "type": "category",
     "title": "Projects",
     "items": [
       {
@@ -35,6 +36,7 @@
     ]
   },
   {
+    "type": "category",
     "title": "Secrets",
     "items": [
       {
@@ -58,6 +60,7 @@
     ]
   },
   {
+    "type": "category",
     "title": "Typescript",
     "items": [
       {
@@ -69,6 +72,7 @@
     ]
   },
   {
+    "type": "category",
     "title": "Functions",
     "items": [
       {
@@ -109,8 +113,8 @@
       }
     ]
   },
-
   {
+    "type": "category",
     "title": "Custom Hostname",
     "items": [
       {
@@ -146,6 +150,7 @@
     ]
   },
   {
+    "type": "category",
     "title": "pgsodium",
     "items": [
       {
@@ -163,6 +168,7 @@
     ]
   },
   {
+    "type": "category",
     "title": "Network",
     "items": [
       {

@@ -43,7 +43,7 @@ const StackedBarChart: React.FC<Props> = ({
     variant,
   })
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
-  if (!data || data.length === 0) return <NoDataPlaceholder />
+  if (!data || data.length === 0) return <NoDataPlaceholder size={size} />
   return (
     <div className="w-full">
       {!hideHeader && (
@@ -84,7 +84,7 @@ const StackedBarChart: React.FC<Props> = ({
             dataKey={xAxisKey}
             interval={data.length - 2}
             angle={0}
-            tick={{ fontSize: '0px' }}
+            tick={false}
             axisLine={{ stroke: CHART_COLORS.AXIS }}
             tickLine={{ stroke: CHART_COLORS.AXIS }}
           />
@@ -115,14 +115,14 @@ const StackedBarChart: React.FC<Props> = ({
                 ? (label) => timestampFormatter(label, customDateFormat, displayDateInUtc)
                 : undefined
             }
-            formatter={(value: number, name: string, props: any) => {
+            formatter={(value, name, props) => {
               const suffix = format || ''
               if (variant === 'percentages' && percentagesStackedData) {
                 const index = percentagesStackedData.findIndex(
                   (pStack) => pStack === props.payload!
                 )
                 const val = stackedData[index][name]
-                const percentage = precisionFormatter(value * 100, 1) + '%'
+                const percentage = precisionFormatter(Number(value) * 100, 1) + '%'
                 return `${percentage} (${val}${suffix})`
               }
               return String(value) + suffix

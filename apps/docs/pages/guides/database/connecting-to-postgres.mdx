@@ -1,93 +1,84 @@
 import Layout from '~/layouts/DefaultGuideLayout'
+import StepHikeCompact from '~/components/StepHikeCompact'
 
 export const meta = {
   id: 'connecting-to-postgres',
-  title: 'Database Connections',
-  description: 'There are various ways to connect to your Postgres database.',
+  title: 'Connecting to your database',
+  description: 'Explore the options for connecting to your Postgres database.',
 }
 
 Supabase provides several options for programmatically connecting to your Postgres database:
 
-## Types of Connection
+1. Direct connections using Postgres' standard connection system
+2. Connection pooling using PgBouncer
+3. Programmatic access using the [Serverless APIs](/docs/guides/api)
 
-- HTTP connections using the API.
-- Direct connections using Postgres' standard connection system.
-- Connection pooling using PgBouncer.
+## Serverless APIs
 
-### Direct vs Pooling vs API
+Supabase provides auto-updating [APIs](/docs/guides/database/api). This is the easiest way to get started if you are managing data (fetching, inserting, updating). We provides several types of API to suit your preferences:
 
-- A "direct connection" is when a connection is made to the database using Postgres' native connection implementation. You should use this for tools which are always alive - usually installed on a long-running server.
-- A "connection pool" is a system (external to Postgres) which keeps connections "open". You should use this for serverless functions and tools which disconnect from the database frequently.
-- The API is an auto-generated REST interface. You should use this for all browser and application interactions. The API server internally handles a connection pool.
-
-Why would you use a connection pool? Primarily because the way that Postgres handles connections isn't very scalable for a large number of _temporary_ connections.
-You can use these simple questions to determine which connection method to use:
-
-- Are you connecting to a database and _maintaining_ a connection? If yes, use a direct connection.
-- Are you connecting to your database and then _disconnecting_ immediately (e.g. a serverless environment)? If yes, use a connection pool.
-
-## API
-
-Supabase provides an auto-updating [API](/docs/guides/database/api). This is the easiest way to get started if you are managing data (fetching, inserting, updating).
-
-### Interfaces
-
-We provides several types of API to suit your preferences and use-case:
-
-- [REST](/docs/guides/database/api#rest-api): interact with your database through a REST interface.
-- [GraphQL](/docs/guides/database/api#graphql-api): interact with your database through a GraphQL interface.
-- [Realtime](/docs/guides/database/api#realtime-api): listen to database changes over websockets.
-
-You cannot manage the database schema via the API (for security reasons). To do that you can use the dashboard or connect directly to your database.
-
-### API URL and Keys
-
-You can find the API URL and Keys in the [Dashboard](https://app.supabase.com/project/_/settings/api).
-
-<video width="99%" muted playsInline controls="true">
-  <source
-    src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/docs/api/api-url-and-key.mp4"
-    type="video/mp4"
-    muted
-    playsInline
-  />
-</video>
+- [REST](/docs/guides/api#rest-api-overview): interact with your database through a REST interface.
+- [GraphQL](/docs/guides/api#graphql-api-overview): interact with your database through a GraphQL interface.
+- [Realtime](/docs/guides/api#realtime-api-overview): listen to database changes over websockets.
 
 ## Direct connections
 
-Every Supabase project provides a full Postgres database. You can connect to the database using any tool which supports Postgres.
-
-### Finding your connection string
+Every Supabase project provides a full Postgres database. You can connect to the database using [any tool which supports Postgres](#integrations). You can find the connection string in the [Database settings](https://supabase.com/dashboard/project/_/settings/database) inside the dashboard:
 
 1. Go to the `Settings` section.
 2. Click `Database`.
 3. Find your Connection Info and Connection String. Direct connections are on port `5432`.
 
-<video width="99%" muted playsInline controls="true">
+<video width="99%" muted playsInline controls={true}>
   <source
     src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/docs/postgres-connection.mp4"
     type="video/mp4"
-    muted
-    playsInline
   />
 </video>
 
-## Connection Pool
+## Connection Pooler
 
-Connection pools are useful for managing a large number of _temporary_ connections. For example, if you are using [Prisma](/docs/guides/integrations/prisma) deployed to a Serverless environment.
+Every Supabase project comes with PgBouncer for connection pooling. A connection pooler is useful for managing a large number of _temporary_ connections. For example, if you are using [Prisma](/docs/guides/integrations/prisma), Drizzle, Kysely, or anything deployed to a Serverless environment (AWS Lambdas or Edge Functions). You can find the connection pool config in the [Database settings](https://supabase.com/dashboard/project/_/settings/database) inside the dashboard:
 
-### How connection pooling works
+1. Go to the `Settings` section.
+2. Click `Database`.
+3. Find your Connection Info and Connection String. Connection pooling is on port `6543`.
+
+<video width="99%" muted playsInline controls={true}>
+  <source
+    src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/docs/connection-pool-config.mp4"
+    type="video/mp4"
+  />
+</video>
+
+## Choosing a connection method
+
+- The Serverless APIs provide programmatic access and have [built-in connection pooling](https://postgrest.org/en/stable/references/connection_pool.html). You can use these for all browser and application interactions. We recommend using these wherever possible.
+- A "direct connection" is Postgres' native connection system. You should use this for tools which are always alive - usually installed on a long-running server, like Node.js, Ruby, Python, etc.
+- A "connection pooler" is a tool which keeps connections "alive". You should use this for serverless functions and tools which disconnect from the database frequently, like Prisma, Drizzle, Kysely, etc.
+
+Why would you use a connection pool? Primarily because the way that Postgres handles connections isn't very scalable for a large number of _temporary_ connections. You can use these simple questions to determine which connection method to use:
+
+- Are you connecting to a database and _maintaining_ a connection? If yes, use a direct connection.
+- Are you connecting to your database and then _disconnecting_ immediately (e.g. a serverless environment)? If yes, use a connection pool.
+
+## Connecting with SSL
+
+You should connect to your database using SSL wherever possible, to prevent snooping and man-in-the-middle attacks.
+
+You can obtain your connection info and Server root certificate from your application's dashboard:
+
+![Connection Info and Certificate.](/docs/img/guides/database/connection-info-cert.png)
+
+## How connection pooling works
 
 A "connection pool" is a system (external to Postgres) which manages connections, rather than PostgreSQL's native system. Supabase uses [PgBouncer](https://www.pgbouncer.org/) for connection pooling.
 
-When a client makes a request, PgBouncer "allocates" an available connection to the client.
-When the client transaction or session is completed the connection is returned to the pool and is free to be used by another client.
+When a client makes a request, PgBouncer "allocates" an available connection to the client. When the client transaction or session is completed the connection is returned to the pool and is free to be used by another client.
 
 ![Connection pooling](/docs/img/guides/database/connection-pool.png)
 
-### Pool modes
-
-Pool Mode determines how PgBouncer handles a connection.
+Pgbounce provides several Pool Modes, each handling connections differently:
 
 #### Session
 
@@ -97,59 +88,253 @@ All PostgreSQL features can be used with this option.
 
 #### Transaction
 
-This is the suggested option for serverless functions. A connection is only assigned to the client for the duration of a transaction. Two consecutive transactions from the same client
-could be executed over two different connections.
+This is the suggested option for serverless functions. A connection is only assigned to the client for the duration of a transaction. Two consecutive transactions from the same client could be executed over two different connections.
 
-Some session-based PostgreSQL features such as prepared statements are not available with this option.
-A comprehensive list of incompatible features can be found [here](https://www.pgbouncer.org/features.html).
+Some session-based PostgreSQL features such as prepared statements are not available with this option. A comprehensive list of incompatible features can be found [here](https://www.pgbouncer.org/features.html).
 
 #### Statement
 
 This is the most granular option. Connections are returned to the pool after every statement. Transactions with multiple statements are not allowed. This is best used when `AUTOCOMMIT` is in use.
 
-### Finding the connection pool config
+## Integrations
 
-1. Go to the `Settings` section.
-2. Click `Database`.
-3. Find your Connection Info and Connection String. Connection pooling is on port `6543`.
+### Connecting with Drizzle
 
-<video width="99%" muted playsInline controls="true">
-  <source
-    src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/docs/connection-pool-config.mp4"
-    type="video/mp4"
-    muted
-    playsInline
-  />
-</video>
+[Drizzle ORM](https://github.com/drizzle-team/drizzle-orm) is a TypeScript ORM for SQL databases designed with maximum type safety in mind. You can use their ORM to connect to your database.
 
-## Connecting with SSL
+<StepHikeCompact>
 
-Use this when connecting to your database to prevent snooping and man-in-the-middle attacks.
+  <StepHikeCompact.Step step={1}>
 
-Obtain your connection info and Server root certificate from your application’s dashboard.
-![Connection Info and Certificate.](/docs/img/guides/database/connection-info-cert.png)
+    <StepHikeCompact.Details title="Install">
 
-Assuming you’ve downloaded your certificate and it’s located at `$HOME/Downloads/prod-ca-2021.cer`, and your Host address is `db.abcdefghijklm.supabase.co` you can connect to the DB with
-SSL enabled as illustrated below:
+    Install Drizzle and releated dependencies.
 
-1. With `psql`
+    </StepHikeCompact.Details>
 
+    <StepHikeCompact.Code>
+
+     ```shell
+     npm i drizzle-orm postgres
+     npm i -D drizzle-kit
+     ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={2}>
+
+    <StepHikeCompact.Details title="Create your models">
+
+    Create a `schema.ts` file and define your models.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+    ```ts
+    import { pgTable, serial, text, varchar } from "drizzle-orm/pg-core";
+
+    export const users = pgTable('users', {
+      id: serial('id').primaryKey(),
+      fullName: text('full_name'),
+      phone: varchar('phone', { length: 256 }),
+    });
+    ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={3}>
+
+    <StepHikeCompact.Details title="Connect">
+
+    Connect to your database using the Connection Pooler for serverless environments, and the Direct Connection for long-running servers.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+    ```ts
+    import { drizzle } from 'drizzle-orm/postgres-js'
+    import postgres from 'postgres'
+    import { users } from './schema'
+
+    const connectionString = process.env.DATABASE_URL
+    const client = postgres(connectionString)
+    const db = drizzle(client);
+
+    const allUsers = await db.select().from(users);
+    ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+</StepHikeCompact>
+
+### Connecting with pgAdmin
+
+[`pgAdmin`](https://www.pgadmin.org/) is a GUI tool for managing Postgres databases. You can use it to connect to your database via SSL:
+
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={1}>
+
+    <StepHikeCompact.Details title="Register">
+
+    Register a new Postgres server.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+     ![Register a new postgres server.](/docs/img/guides/database/register-server-pgAdmin.png)
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={2}>
+
+    <StepHikeCompact.Details title="Name">
+
+    Name your server.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+     ![Name Postgres Server.](/docs/img/guides/database/name-pg-server.png)
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={3}>
+
+    <StepHikeCompact.Details title="Connect">
+
+    Add the connection info. You can use the "Direct connection" config, which you can find in your Supabase dashboard.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+     ![Add Connection Info.](/docs/img/guides/database/add-pg-server-conn-info.png)
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={4}>
+
+    <StepHikeCompact.Details title="SSL">
+
+    Navigate to the Parameters tab and select connection parameter as Root Certificate. Next navigate to the Root certificate input, it will open up a file-picker modal. Select the certificate you downloaded from your Supabase dashboard and save the server details. PgAdmin should now be able to connect to your Postgres via SSL.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+     ![Add Connection Info.](/docs/img/guides/database/add-ssl-config-parameter.png)
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+</StepHikeCompact>
+
+### Connecting with psql
+
+[`psql`](https://www.postgresql.org/docs/current/app-psql.html) is a command-line tool that comes with Postgres.
+
+Assuming you've downloaded your SSL certificate to `$HOME/Downloads/prod-supabase.cer`, and your host address is `db.ref.supabase.co` you connect to your database via SSL:
+
+```shell
+psql "sslmode=verify-full sslrootcert=$HOME/Downloads/prod-supabase.cer host=db.ref.supabase.co dbname=postgres user=postgres"
 ```
-psql "sslmode=verify-full sslrootcert=$HOME/Downloads/prod-ca-2021.cer host=db.abcdefghijklm.supabase.co dbname=postgres user=postgres"
-```
 
-2. With `pgAdmin`
-   a. Register a new Postgres server
-   ![Register a new postgres server.](/docs/img/guides/database/register-server-pgAdmin.png)
+### Connecting with Postgres.js
 
-   b. Name your server to your liking and add the connection info.
-   ![Name Postgres Server.](/docs/img/guides/database/name-pg-server.png)
-   ![Add Connection Info.](/docs/img/guides/database/add-pg-server-conn-info.png)
+[Postgres.js](https://github.com/porsager/postgres) is a full-featured PostgreSQL client for Node.js and Deno.
 
-3. Navigate to the SSL tab and change the SSL mode to Require. Next navigate to the Root certificate input, it will open up a
-   file-picker modal. Select the certificate you downloaded from your Supabase dashboard and save the server details. PgAdmin
-   should now be able to connect to your Postgres via SSL.
-   ![Add Connection Info.](/docs/img/guides/database/add-ssl-config.png)
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={1}>
+
+    <StepHikeCompact.Details title="Install">
+
+    Install Drizzle and releated dependencies.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+     ```shell
+     npm i postgres
+     npm i -D drizzle-kit
+     ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={2}>
+
+    <StepHikeCompact.Details title="Connect">
+
+    Create a `db.js` file with the connection details. Use the Connection Pooler for serverless environments, and the Direct Connection for long-running servers.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+    ```ts
+    // db.js
+    import postgres from 'postgres'
+
+    const connectionString = process.env.DATABASE_URL
+    const sql = postgres(connectionString)
+
+    export default sql
+    ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={3}>
+
+    <StepHikeCompact.Details title="Execute commands">
+
+    Use the connection to execute commands.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+    ```ts
+    import sql from './db.js'
+
+    async function getUsersOver(age) {
+      const users = await sql`
+        select name, age
+        from users
+        where age > ${ age }
+      `
+      // users = Result [{ name: "Walter", age: 80 }, { name: 'Murray', age: 68 }, ...]
+      return users
+    }
+    ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+</StepHikeCompact>
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

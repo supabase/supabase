@@ -32,6 +32,7 @@ Supabase provides a RESTful API using [PostgREST](https://postgrest.org/). This 
 It provides everything you need from a CRUD API at the URL `https://<project_ref>.supabase.co/rest/v1/`.
 
 The REST interface is automatically reflected from your database's schema and supports:
+
 - Basic CRUD operations (Create/Read/Update/Delete)
 - Arbitrarily deep relationships among tables/views, functions that return table types can also nest related tables/views.
 - Works with Postgres Views, Materialized Views and Foreign Tables
@@ -42,16 +43,18 @@ The REST interface is automatically reflected from your database's schema and su
 The REST API resolves all requests to a single SQL statement leading to fast response times and high throughput.
 
 Reference:
+
 - [Docs](https://postgrest.org/)
 - [Source Code](https://github.com/PostgREST/postgrest)
 
 ## GraphQL API [#graphql-api-overview]
 
 Supabase uses [pg_graphql](https://supabase.github.io/pg_graphql/) to expose a GraphQL API endpoint at `https://<project_ref>.supabase.co/graphql/v1/`.
-You can introspect and query the GraphQL API of an existing Supabase project within Studio [here](https://app.supabase.com/project/_/api/graphiql),
+You can introspect and query the GraphQL API of an existing Supabase project within Studio [here](https://supabase.com/dashboard/project/_/api/graphiql),
 or navigate there manually at `API Docs > GraphQL > GraphiQL`.
 
 The GraphQL interface is automatically reflected from your database's schema and supports:
+
 - Basic CRUD operations (Create/Read/Update/Delete)
 - Support for Tables, Views, Materialized Views, and Foreign Tables
 - Arbitrarily deep relationships among tables/views
@@ -61,6 +64,7 @@ The GraphQL interface is automatically reflected from your database's schema and
 The GraphQL API resolves all requests in a single round-trip leading to fast response times and high throughput.
 
 Reference:
+
 - [Docs](https://supabase.github.io/pg_graphql/)
 - [Source Code](https://github.com/supabase/pg_graphql)
 
@@ -68,7 +72,18 @@ Reference:
 
 Supabase provides a Realtime API using [Realtime](https://github.com/supabase/realtime). You can use this to listen to database changes over websockets.
 Realtime leverages PostgreSQL's built-in logical replication. You can manage your Realtime API simply by managing Postgres publications.
-Go to your project's [Replication section](https://app.supabase.com/project/_/database/replication) to get started.
+Go to your project's [Replication section](https://supabase.com/dashboard/project/_/database/replication) to get started.
+
+## API URL and Keys
+
+You can find the API URL and Keys in the [Dashboard](https://supabase.com/dashboard/project/_/settings/api).
+
+<video width="99%" muted playsInline controls={true}>
+  <source
+    src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/docs/api/api-url-and-key.mp4"
+    type="video/mp4"
+  />
+</video>
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
