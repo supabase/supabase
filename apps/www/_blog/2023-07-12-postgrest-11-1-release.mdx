@@ -206,12 +206,10 @@ const res = await postgrest.from('users').select().likeAnyOf('username', ['%supa
 This is equivalent to the following in SQL.
 
 ```sql
-SELECT
+select
   *
-FROM
-  users
-WHERE
-  username LIKE ANY ('{%supa%,%kiwi%}');
+from users
+where username like ANY('{%supa%,%kiwi%}');
 ```
 
 `any` modifiers are available for the `eq,like,ilike,gt,gte,lt,lte,match,imatch` filters.
