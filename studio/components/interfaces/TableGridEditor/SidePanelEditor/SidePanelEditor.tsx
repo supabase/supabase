@@ -1,30 +1,30 @@
-import { useState } from 'react'
+import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 import { QueryKey, useQueryClient } from '@tanstack/react-query'
-import { find, isEmpty, isUndefined, noop } from 'lodash'
 import { Dictionary } from 'components/grid'
+import { find, isEmpty, isUndefined, noop } from 'lodash'
+import { useState } from 'react'
 import { Modal } from 'ui'
-import type { PostgresTable, PostgresColumn } from '@supabase/postgres-meta'
 
-import { useStore, useUrlState } from 'hooks'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { entityTypeKeys } from 'data/entity-types/keys'
+import { sqlKeys } from 'data/sql/keys'
 import { useTableRowCreateMutation } from 'data/table-rows/table-row-create-mutation'
 import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
-import { RowEditor, ColumnEditor, TableEditor, SpreadsheetImport } from '.'
-import { ImportContent } from './TableEditor/TableEditor.types'
+import { useStore, useUrlState } from 'hooks'
+import { ColumnEditor, RowEditor, SpreadsheetImport, TableEditor } from '.'
+import ForeignRowSelector, {
+  ForeignRowSelectorProps,
+} from './RowEditor/ForeignRowSelector/ForeignRowSelector'
+import JsonEdit from './RowEditor/JsonEditor/JsonEditor'
+import { JsonEditValue } from './RowEditor/RowEditor.types'
 import {
   ColumnField,
   CreateColumnPayload,
   ExtendedPostgresRelationship,
   UpdateColumnPayload,
 } from './SidePanelEditor.types'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
-import JsonEdit from './RowEditor/JsonEditor/JsonEditor'
-import { JsonEditValue } from './RowEditor/RowEditor.types'
-import { sqlKeys } from 'data/sql/keys'
-import ForeignRowSelector, {
-  ForeignRowSelectorProps,
-} from './RowEditor/ForeignRowSelector/ForeignRowSelector'
+import { ImportContent } from './TableEditor/TableEditor.types'
 
 export interface SidePanelEditorProps {
   selectedSchema: string
@@ -84,10 +84,7 @@ const SidePanelEditor = ({
   const { mutateAsync: createTableRows } = useTableRowCreateMutation()
   const { mutateAsync: updateTableRow } = useTableRowUpdateMutation({
     async onMutate({ projectRef, table, configuration, payload }) {
-      closePanel()
-
       const primaryKeyColumns = new Set(Object.keys(configuration.identifiers))
-
       const queryKey = sqlKeys.query(projectRef, [
         table.schema,
         table.name,
@@ -95,9 +92,7 @@ const SidePanelEditor = ({
       ])
 
       await queryClient.cancelQueries(queryKey)
-
       const previousRowsQueries = queryClient.getQueriesData<{ result: any[] }>(queryKey)
-
       queryClient.setQueriesData<{ result: any[] }>(queryKey, (old) => {
         return {
           result:
@@ -137,6 +132,8 @@ const SidePanelEditor = ({
         }
         queryClient.invalidateQueries(queryKey)
       })
+
+      ui.setNotification({ error, category: 'error', message: error.message })
     },
   })
 
@@ -178,7 +175,7 @@ const SidePanelEditor = ({
               enumArrayColumns,
             })
             onRowUpdated(result[0], configuration.rowIdx)
-          } catch (error: any) {
+          } catch (error) {
             saveRowError = true
           }
         } else {
