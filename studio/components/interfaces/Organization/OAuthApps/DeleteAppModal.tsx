@@ -18,19 +18,12 @@ const DeleteAppModal = ({ selectedApp, onClose }: DeleteAppModalProps) => {
     if (!slug) return console.error('Slug is required')
     if (!selectedApp?.id) return console.error('App ID is required')
 
-    try {
-      await deleteOAuthApp({ slug, id: selectedApp?.id })
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully deleted the app "${selectedApp?.name}"`,
-      })
-      onClose()
-    } catch (error) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to delete OAuth app: ${(error as any).message}`,
-      })
-    }
+    await deleteOAuthApp({ slug, id: selectedApp?.id })
+    ui.setNotification({
+      category: 'success',
+      message: `Successfully deleted the app "${selectedApp?.name}"`,
+    })
+    onClose()
   }
 
   return (

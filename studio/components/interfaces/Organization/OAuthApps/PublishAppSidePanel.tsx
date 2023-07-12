@@ -14,26 +14,27 @@ import { Badge, Button, Dropdown, Form, IconEdit, IconUpload, Input, Modal, Side
 import { uploadAttachment } from 'lib/upload'
 import AuthorizeRequesterDetails from './AuthorizeRequesterDetails'
 
-export interface PublishAppModalProps {
+export interface PublishAppSidePanelProps {
   visible: boolean
   selectedApp?: OAuthApp
   onClose: () => void
   onCreateSuccess: (app: OAuthAppCreateResponse) => void
 }
 
-const PublishAppModal = ({
+const PublishAppSidePanel = ({
   visible,
   selectedApp,
   onClose,
   onCreateSuccess,
-}: PublishAppModalProps) => {
+}: PublishAppSidePanelProps) => {
   const { ui } = useStore()
   const { slug } = useParams()
   const uploadButtonRef = useRef<any>()
-  const { mutateAsync: createOAuthApp, isLoading: isCreating } = useOAuthAppCreateMutation()
-  const { mutateAsync: updateOAuthApp, isLoading: isUpdating } = useOAuthAppUpdateMutation()
-  const isSubmitting = isCreating || isUpdating
+  const { mutateAsync: createOAuthApp } = useOAuthAppCreateMutation()
+  const { mutateAsync: updateOAuthApp } = useOAuthAppUpdateMutation()
 
+  // [Joshen] Separate submitting state as there are additional async logic involved in the creation
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [showPreview, setShowPreview] = useState(false)
   const [iconFile, setIconFile] = useState<File>()
   const [iconUrl, setIconUrl] = useState<string>()
@@ -43,6 +44,7 @@ const PublishAppModal = ({
   useEffect(() => {
     if (visible) {
       setErrors({})
+      setIsSubmitting(false)
       setIconFile(undefined)
 
       if (selectedApp !== undefined) {
@@ -100,42 +102,49 @@ const PublishAppModal = ({
       setErrors({})
     }
 
+    setIsSubmitting(true)
     const { name, website } = values
     const uploadedIconUrl =
       iconFile !== undefined
         ? await uploadAttachment('oauth-app-icons', `${slug}/${uuidv4()}.png`, iconFile)
         : iconUrl
 
-    if (selectedApp === undefined) {
-      // Create application
-      const res = await createOAuthApp({
-        slug,
-        name,
-        website,
-        redirect_uris,
-        icon: uploadedIconUrl,
-      })
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully created OAuth app "${name}"!`,
-      })
-      onClose()
-      onCreateSuccess(res)
-    } else {
-      // Update application
-      await updateOAuthApp({
-        id: selectedApp.id,
-        slug,
-        name,
-        website,
-        redirect_uris,
-        icon: uploadedIconUrl === undefined ? null : uploadedIconUrl,
-      })
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully updated OAuth app "${name}"!`,
-      })
-      onClose()
+    try {
+      if (selectedApp === undefined) {
+        // Create application
+        const res = await createOAuthApp({
+          slug,
+          name,
+          website,
+          redirect_uris,
+          icon: uploadedIconUrl,
+        })
+        ui.setNotification({
+          category: 'success',
+          message: `Successfully created OAuth app "${name}"!`,
+        })
+        onClose()
+        onCreateSuccess(res)
+      } else {
+        // Update application
+        await updateOAuthApp({
+          id: selectedApp.id,
+          slug,
+          name,
+          website,
+          redirect_uris,
+          icon: uploadedIconUrl === undefined ? null : uploadedIconUrl,
+        })
+        ui.setNotification({
+          category: 'success',
+          message: `Successfully updated OAuth app "${name}"!`,
+        })
+        onClose()
+        setIsSubmitting(false)
+      }
+    } catch (error) {
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -370,4 +379,4 @@ const PublishAppModal = ({
   )
 }
 
-export default PublishAppModal
+export default PublishAppSidePanel
