@@ -15,8 +15,10 @@ This article is the second part of the Flutter tutorial series. During the serie
 
 In this article, I will show you how you can make a secure chat application by introducing authorization to the basic chat app that we created [previously](https://supabase.com/blog/flutter-tutorial-building-a-chat-app).
 
-We will use [Supabase](https://supabase.com/) to store the chat data and will use its [auth feature](https://supabase.com/auth) to provide a secure chat room feature.
-Supabase lets us build a secure database where we can control who can access what part of the database, so your users' data is secured without worrying about the backend.
+We will store the chat data on [Supabase](https://supabase.com/).
+Supabase utilizes the built in authorization mechanism of PostgreSQL called [Row Level Security](https://supabase.com/docs/guides/auth/row-level-security) or RLS to prevent unauthorized access from accessing or writing data to your database.
+RLS allows developers to define row-by-row conditions that evaluate to either `true` or `false` to either allow the access or deny it.
+We will take a look at more specific examples of authorization using RLS through out this article.
 
 ## What we created in the previous article
 
@@ -1355,7 +1357,10 @@ class MyApp extends StatelessWidget {
 
 ### Step 4: Authorization with Row Level Security (RLS)
 
-At this point, we seemingly have a complete app, except if we open the app right now, we will see every user's room with all the messages that have ever been sent within the app by any user. This is because we have not set up Row Level Security yet. [Row Level Security](https://supabase.com/docs/guides/auth/row-level-security) is a mechanism in PostgreSQL that allows developers to define who can perform what operation on a row-by-row basis. There are two ways we can define Row Level Security policies in Supabase, with the GUI or through SQL, but we will set them using SQL today. Let's run the following SQL to set the security policy.
+At this point, we seemingly have a complete app, except if we open the app right now, we will see every user's room with all the messages that have ever been sent within the app by any user.
+This is because we have not set up Row Level Security to prevent unauthorized users to access the rooms yet.
+There are two ways we can define Row Level Security policies in Supabase, with the GUI or through SQL, but we will set them using SQL today.
+Let's run the following SQL to set the security policy.
 
 ```sql
 -- Returns true if the signed in user is a participant of the room
