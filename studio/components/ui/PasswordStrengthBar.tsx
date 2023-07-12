@@ -1,8 +1,4 @@
-import {
-  DEFAULT_MINIMUM_PASSWORD_STRENGTH,
-  PASSWORD_STRENGTH_COLOR,
-  PASSWORD_STRENGTH_PERCENTAGE,
-} from 'lib/constants'
+import { PASSWORD_STRENGTH_COLOR, PASSWORD_STRENGTH_PERCENTAGE } from 'lib/constants'
 
 interface Props {
   passwordStrengthScore: number
@@ -41,7 +37,7 @@ const PasswordStrengthBar = ({
       <p>
         {passwordStrengthMessage
           ? passwordStrengthMessage
-          : 'This is the password to your postgres database, so it must be a strong password and hard to guess.'}{' '}
+          : 'This is the password to your postgres database, so it must be strong and hard to guess.'}{' '}
         <span
           className="text-brand-800 underline hover:text-brand-900 transition cursor-pointer"
           onClick={generateStrongPassword}

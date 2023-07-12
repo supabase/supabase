@@ -40,14 +40,26 @@ export const METRIC_CATEGORIES = {
 
 export const METRICS = [
   {
-    key: 'cpu_usage',
-    label: 'CPU % usage',
+    key: 'avg_cpu_usage',
+    label: 'Average CPU % usage',
+    provider: 'infra-monitoring',
+    category: METRIC_CATEGORIES.INSTANCE,
+  },
+  {
+    key: 'max_cpu_usage',
+    label: 'Max CPU % usage',
+    provider: 'infra-monitoring',
+    category: METRIC_CATEGORIES.INSTANCE,
+  },
+  {
+    key: 'disk_io_consumption',
+    label: 'Disk IO % Consumed',
     provider: 'infra-monitoring',
     category: METRIC_CATEGORIES.INSTANCE,
   },
   {
     key: 'disk_io_budget',
-    label: 'Daily Disk IO Budget % Remaining',
+    label: 'Disk IO % Remaining',
     provider: 'infra-monitoring',
     category: METRIC_CATEGORIES.INSTANCE,
   },
@@ -416,16 +428,17 @@ export const TIME_PERIODS_INFRA = [
   {
     key: '1h',
     label: 'Last hour',
-    interval: '1m',
   },
   {
     key: '3h',
     label: 'Last 3 hours',
-    interval: '5m',
   },
   {
     key: '1d',
     label: 'Last 24 hours',
-    interval: '30m',
+  },
+  {
+    key: '7d',
+    label: 'Last 7 days',
   },
 ]

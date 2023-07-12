@@ -606,15 +606,7 @@ const InputArgument: FC<InputArgumentProps> = observer(({ idx, name, type, error
         ))}
       </Listbox>
       {!readonly && (
-        <div>
-          <Button
-            danger
-            type="default"
-            icon={<IconTrash size="tiny" />}
-            onClick={onDelete}
-            size="small"
-          />
-        </div>
+        <Button type="danger" icon={<IconTrash size="tiny" />} onClick={onDelete} size="small" />
       )}
     </div>
   )
@@ -718,15 +710,7 @@ const InputConfigParam: FC<InputConfigParamProps> = observer(({ idx, name, value
         size="small"
         error={error?.value}
       />
-      <div>
-        <Button
-          danger
-          type="default"
-          icon={<IconTrash size="tiny" />}
-          onClick={onDelete}
-          size="small"
-        />
-      </div>
+      <Button type="danger" icon={<IconTrash size="tiny" />} onClick={onDelete} size="small" />
     </div>
   )
 })

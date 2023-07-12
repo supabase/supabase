@@ -147,12 +147,9 @@ const RoleRow: FC<Props> = ({ role, disabled = false, onSelectDelete }) => {
                         </>
                       }
                     >
-                      <Button
-                        as="span"
-                        type="default"
-                        className="px-1"
-                        icon={<IconMoreVertical />}
-                      />
+                      <Button asChild type="default" className="px-1" icon={<IconMoreVertical />}>
+                        <span></span>
+                      </Button>
                     </Dropdown>
                   )}
                 </div>

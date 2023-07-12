@@ -1,10 +1,10 @@
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Button, IconDownload, Toggle, IconLoader, Alert } from 'ui'
+import { Button, IconDownload, Toggle, IconLoader, Alert, IconExternalLink } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useStore, useFlag } from 'hooks'
+import { useCheckPermissions, useStore, useFlag } from 'hooks'
 import { useParams } from 'common/hooks'
 import {
   FormHeader,
@@ -25,12 +25,16 @@ const SSLConfiguration = () => {
   const sslEnforcement = useFlag('sslEnforcement')
 
   const { data: projectSettings } = useProjectSettingsQuery({ projectRef: ref })
-  const { data: sslEnforcementConfiguration, isLoading } = useSSLEnforcementQuery({
+  const {
+    data: sslEnforcementConfiguration,
+    isLoading,
+    isSuccess,
+  } = useSSLEnforcementQuery({
     projectRef: ref,
   })
   const { mutateAsync: updateSSLEnforcement } = useSSLEnforcementUpdateMutation()
 
-  const canUpdateSSLEnforcement = checkPermissions(PermissionAction.UPDATE, 'projects')
+  const canUpdateSSLEnforcement = useCheckPermissions(PermissionAction.UPDATE, 'projects')
 
   const hasAccessToSSLEnforcement = !sslEnforcementConfiguration?.isNotAllowed
   const env = process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod' ? 'prod' : 'staging'
@@ -73,7 +77,7 @@ const SSLConfiguration = () => {
     <div>
       <div className="flex items-center justify-between">
         <FormHeader title="SSL Configuration" description="" />
-        {/* <div className="flex items-center space-x-2 mb-6">
+        <div className="flex items-center space-x-2 mb-6">
           <Link href="https://supabase.com/docs/guides/platform/ssl-enforcement">
             <a target="_blank">
               <Button type="default" icon={<IconExternalLink />}>
@@ -81,10 +85,10 @@ const SSLConfiguration = () => {
               </Button>
             </a>
           </Link>
-        </div> */}
+        </div>
       </div>
       <FormPanel>
-        {sslEnforcement && hasAccessToSSLEnforcement && (
+        {sslEnforcement && (
           <FormSection
             header={
               <FormSectionLabel
@@ -94,7 +98,7 @@ const SSLConfiguration = () => {
                     <p className="text-sm text-scale-1000">
                       Reject non-SSL connections to your database
                     </p>
-                    {!sslEnforcementConfiguration?.appliedSuccessfully && (
+                    {isSuccess && !sslEnforcementConfiguration?.appliedSuccessfully && (
                       <Alert
                         withIcon
                         variant="warning"
@@ -121,11 +125,41 @@ const SSLConfiguration = () => {
                 {(isLoading || isSubmitting) && (
                   <IconLoader className="animate-spin" strokeWidth={1.5} size={16} />
                 )}
-                <Toggle
-                  checked={isEnforced}
-                  disabled={isLoading || isSubmitting || !canUpdateSSLEnforcement}
-                  onChange={toggleSSLEnforcement}
-                />
+                <Tooltip.Root delayDuration={0}>
+                  <Tooltip.Trigger>
+                    <Toggle
+                      checked={isEnforced}
+                      disabled={
+                        isLoading ||
+                        isSubmitting ||
+                        !canUpdateSSLEnforcement ||
+                        !hasAccessToSSLEnforcement
+                      }
+                      onChange={toggleSSLEnforcement}
+                    />
+                  </Tooltip.Trigger>
+                  {(!canUpdateSSLEnforcement || !hasAccessToSSLEnforcement) && (
+                    <Tooltip.Portal>
+                      <Tooltip.Content align="center" side="bottom">
+                        <Tooltip.Arrow className="radix-tooltip-arrow" />
+                        <div
+                          className={[
+                            'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                            'border border-scale-200 w-[250px]',
+                          ].join(' ')}
+                        >
+                          <span className="text-xs text-scale-1200 text-center flex items-center justify-center">
+                            {!canUpdateSSLEnforcement
+                              ? 'You need additional permissions to update SSL enforcement for your project'
+                              : !hasAccessToSSLEnforcement
+                              ? 'Your project does not have access to SSL enforcement'
+                              : ''}
+                          </span>
+                        </div>
+                      </Tooltip.Content>
+                    </Tooltip.Portal>
+                  )}
+                </Tooltip.Root>
               </div>
             </FormSectionContent>
           </FormSection>

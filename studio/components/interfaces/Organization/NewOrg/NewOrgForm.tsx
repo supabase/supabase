@@ -1,15 +1,18 @@
-import { useState } from 'react'
-import { Button, IconEdit2, IconInfo, Input, Listbox } from 'ui'
+import { useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/router'
+import { useState } from 'react'
+import { Button, IconEdit2, IconExternalLink, IconInfo, Input, Listbox } from 'ui'
 
-import { API_URL, BASE_PATH, PRICING_TIER_LABELS_ORG } from 'lib/constants'
+import { PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js'
+import type { PaymentMethod } from '@stripe/stripe-js'
+import InformationBox from 'components/ui/InformationBox'
+import Panel from 'components/ui/Panel'
+import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
-import Panel from 'components/ui/Panel'
-import { useElements, useStripe, PaymentElement } from '@stripe/react-stripe-js'
-import { PaymentMethod } from 'components/interfaces/Billing/Billing.types'
+import { API_URL, BASE_PATH, PRICING_TIER_LABELS_ORG } from 'lib/constants'
 import { getURL } from 'lib/helpers'
-import InformationBox from 'components/ui/InformationBox'
+import Link from 'next/link'
 
 const ORG_KIND_TYPES = {
   PERSONAL: 'Personal',
@@ -38,7 +41,8 @@ interface NewOrgFormProps {
  * No org selected yet, create a new one
  */
 const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
-  const { ui, app } = useStore()
+  const queryClient = useQueryClient()
+  const { ui } = useStore()
   const router = useRouter()
   const stripe = useStripe()
   const elements = useElements()
@@ -49,7 +53,7 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
   const [newOrgLoading, setNewOrgLoading] = useState(false)
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>()
 
-  const [dbPricingTierKey, setDbPricingTierKey] = useState('PRO')
+  const [dbPricingTierKey, setDbPricingTierKey] = useState('FREE')
 
   function validateOrgName(name: any) {
     const value = name ? name.trim() : ''
@@ -72,7 +76,7 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
     setDbPricingTierKey(value)
   }
 
-  async function createOrg(paymentMethodId: string) {
+  async function createOrg(paymentMethodId?: string) {
     const response = await post(
       `${API_URL}/organizations`,
       {
@@ -97,7 +101,7 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
       })
     } else {
       const org = response
-      app.onOrgAdded(org)
+      await invalidateOrganizationsQuery(queryClient)
       router.push(`/new/${org.slug}`)
     }
     setNewOrgLoading(false)
@@ -118,7 +122,9 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
     }
     setNewOrgLoading(true)
 
-    if (!paymentMethod) {
+    if (dbPricingTierKey === 'FREE') {
+      await createOrg()
+    } else if (!paymentMethod) {
       const { error, setupIntent } = await stripe.confirmSetup({
         elements,
         redirect: 'if_required',
@@ -169,7 +175,6 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
               <div className="flex items-center space-x-3">
                 <p className="text-xs text-scale-900">You can rename your organization later</p>
                 <Button
-                  block
                   htmlType="submit"
                   type="primary"
                   loading={newOrgLoading}
@@ -181,25 +186,6 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
             </div>
           }
         >
-          <Panel.Content>
-            <InformationBox
-              icon={<IconInfo size="large" strokeWidth={1.5} />}
-              defaultVisibility={true}
-              hideCollapse
-              title="Billed via organization"
-              description={
-                <div className="space-y-3">
-                  <p className="text-sm leading-normal">
-                    This is heavy Work-In-Progress and not customer facing yet, use with caution!
-                    This organization will use the new org level billing, instead of having
-                    individual subscriptions per project. There are still a lot of open ends that
-                    may be restrictive for you, follow #team-billing for updates.
-                  </p>
-                </div>
-              }
-            />
-          </Panel.Content>
-
           <Panel.Content className="pt-0">
             <p className="text-sm">This is your organization within Supabase.</p>
             <p className="text-sm text-scale-1100">
@@ -290,40 +276,69 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
             </Listbox>
           </Panel.Content>
 
+          {dbPricingTierKey !== 'FREE' && (
+            <Panel.Content>
+              {paymentMethod?.card !== undefined ? (
+                <div key={paymentMethod.id} className="flex items-center justify-between">
+                  <div className="flex items-center space-x-8">
+                    <img
+                      alt="Card"
+                      src={`${BASE_PATH}/img/payment-methods/${paymentMethod.card.brand
+                        .replace(' ', '-')
+                        .toLowerCase()}.png`}
+                      width="32"
+                    />
+                    <Input
+                      readOnly
+                      className="w-64"
+                      size="small"
+                      value={`•••• •••• •••• ${paymentMethod.card.last4}`}
+                    />
+                    <p className="text-sm tabular-nums">
+                      Expires: {paymentMethod.card.exp_month}/{paymentMethod.card.exp_year}
+                    </p>
+                  </div>
+                  <div>
+                    <Button
+                      type="outline"
+                      icon={<IconEdit2 />}
+                      onClick={() => resetPaymentMethod()}
+                      disabled={newOrgLoading}
+                      className="hover:border-gray-500"
+                    />
+                  </div>
+                </div>
+              ) : (
+                <PaymentElement />
+              )}
+            </Panel.Content>
+          )}
+
           <Panel.Content>
-            {paymentMethod ? (
-              <div key={paymentMethod.id} className="flex items-center justify-between">
-                <div className="flex items-center space-x-8">
-                  <img
-                    alt="Card"
-                    src={`${BASE_PATH}/img/payment-methods/${paymentMethod.card.brand
-                      .replace(' ', '-')
-                      .toLowerCase()}.png`}
-                    width="32"
-                  />
-                  <Input
-                    readOnly
-                    className="w-64"
-                    size="small"
-                    value={`•••• •••• •••• ${paymentMethod.card.last4}`}
-                  />
-                  <p className="text-sm tabular-nums">
-                    Expires: {paymentMethod.card.exp_month}/{paymentMethod.card.exp_year}
+            <InformationBox
+              icon={<IconInfo size="large" strokeWidth={1.5} />}
+              defaultVisibility={true}
+              hideCollapse
+              title="Billed via organization"
+              description={
+                <div className="space-y-3">
+                  <p className="text-sm leading-normal">
+                    This organization will use the new organization level billing, which gives you a
+                    single subscription for your entire organization, instead of having individual
+                    subscriptions per project.{' '}
                   </p>
+                  <div>
+                    <Link href="https://www.notion.so/supabase/Organization-Level-Billing-9c159d69375b4af095f0b67881276582?pvs=4">
+                      <a target="_blank" rel="noreferrer">
+                        <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                          Documentation
+                        </Button>
+                      </a>
+                    </Link>
+                  </div>
                 </div>
-                <div>
-                  <Button
-                    type="outline"
-                    icon={<IconEdit2 />}
-                    onClick={() => resetPaymentMethod()}
-                    disabled={newOrgLoading}
-                    className="hover:border-gray-500"
-                  />
-                </div>
-              </div>
-            ) : (
-              <PaymentElement />
-            )}
+              }
+            />
           </Panel.Content>
         </Panel>
       </form>

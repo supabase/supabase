@@ -3,6 +3,7 @@ const forms = require('@tailwindcss/forms')
 const plugin = require('tailwindcss/plugin')
 const radixUiColors = require('@radix-ui/colors')
 const brandColors = require('./default-colors')
+const svgToDataUri = require('mini-svg-data-uri')
 
 const { default: flattenColorPalette } = require('tailwindcss/lib/util/flattenColorPalette')
 
@@ -371,39 +372,28 @@ const uiConfig = {
           highlight: (value) => ({ boxShadow: `inset 0 1px 0 0 ${value}` }),
         },
         { values: flattenColorPalette(theme('backgroundColor')), type: 'color' }
-      ),
-        matchUtilities(
-          {
-            subhighlight: (value) => ({
-              boxShadow: `inset 0 -1px 0 0 ${value}`,
-            }),
-          },
-          {
-            values: flattenColorPalette(theme('backgroundColor')),
-            type: 'color',
-          }
-        ),
-        matchUtilities(
-          {
-            bordershadow: (value) => {
-              return {
-                boxShadow: `
-                var(--colors-blackA1) 0px 0px 0px 0px,
-                var(--colors-blackA1) 0px 0px 0px 0px,
-                var(--colors-blackA8) 0px 1px 1px 0px,
-                ${value} 0px 0px 0px 1px,
-                var(--colors-blackA1) 0px 0px 0px 0px,
-                var(--colors-blackA1) 0px 0px 0px 0px,
-                rgb(64 68 82 / 8%) 0px 2px 5px 0px;
-                `,
-              }
-            },
-          },
-          {
-            values: flattenColorPalette(theme('backgroundColor')),
-            type: 'color',
-          }
-        )
+      )
+      matchUtilities(
+        {
+          subhighlight: (value) => ({
+            boxShadow: `inset 0 -1px 0 0 ${value}`,
+          }),
+        },
+        {
+          values: flattenColorPalette(theme('backgroundColor')),
+          type: 'color',
+        }
+      )
+      matchUtilities(
+        {
+          'bg-grid': (value) => ({
+            backgroundImage: `url("${svgToDataUri(
+              `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="${value}"><path d="M0 .5H31.5V32"/></svg>`
+            )}")`,
+          }),
+        },
+        { values: flattenColorPalette(theme('backgroundColor')), type: 'color' }
+      )
     },
     require('tailwindcss-radix')(),
     forms,

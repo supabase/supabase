@@ -37,12 +37,18 @@ const Hero = () => {
                     </span>
                   </h1>
                   <p className="pt-2 text-scale-1200 my-3 text-sm sm:mt-5 lg:mb-0 sm:text-base lg:text-lg">
-                    Supabase is an open source Firebase alternative for building secure and
-                    performant Postgres backends with minimal configuration.
+                    Supabase is an open source Firebase alternative.{' '}
+                    <br className="hidden md:block" />
+                    Start your project with a Postgres database, Authentication, instant APIs, Edge
+                    Functions, Realtime subscriptions, Storage, and Vector embeddings.
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Link href="https://app.supabase.com" as="https://app.supabase.com" passHref>
+                  <Link
+                    href="https://supabase.com/dashboard"
+                    as="https://supabase.com/dashboard"
+                    passHref
+                  >
                     <a onClick={() => sendTelemetryEvent(gaEvents['www_hp_hero_startProject'])}>
                       <Button size="medium" className="text-white">
                         Start your project

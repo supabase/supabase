@@ -1,23 +1,16 @@
-import { observer } from 'mobx-react-lite'
-import { FC, useEffect } from 'react'
-
-import { SettingsLayout } from 'components/layouts'
-import LoadingUI from 'components/ui/Loading'
-import { useStore } from 'hooks'
-import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
-import { NextPageWithLayout, Project } from 'types'
-
-import { Invoices } from 'components/interfaces/Billing'
 import Link from 'next/link'
 
-const ProjectBilling: NextPageWithLayout = () => {
-  const { ui } = useStore()
-  const project = ui.selectedProject
+import { Invoices } from 'components/interfaces/BillingV2'
+import { SettingsLayout } from 'components/layouts'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useSelectedOrganization } from 'hooks'
+import { NextPageWithLayout } from 'types'
 
+const ProjectBilling: NextPageWithLayout = () => {
   return (
     <div className="w-full h-full overflow-y-auto content">
       <div className="w-full mx-auto">
-        <Settings project={project} />
+        <Settings />
       </div>
     </div>
   )
@@ -27,38 +20,15 @@ ProjectBilling.getLayout = (page) => (
   <SettingsLayout title="Billing and Usage">{page}</SettingsLayout>
 )
 
-export default observer(ProjectBilling)
+export default ProjectBilling
 
-interface SettingsProps {
-  project?: Project
-}
-
-const Settings: FC<SettingsProps> = ({ project }) => {
-  const { ui } = useStore()
-  const orgSlug = ui.selectedOrganization?.slug ?? ''
-
-  const { data: subscription, error } = useProjectSubscriptionQuery({
-    projectRef: ui.selectedProject?.ref,
-  })
-
-  useEffect(() => {
-    if (error) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to get project subscription: ${(error as any)?.message ?? 'unknown'}`,
-      })
-    }
-  }, [error])
-
-  if (!subscription) {
-    return <LoadingUI />
-  }
+const Settings = () => {
+  const selectedOrganization = useSelectedOrganization()
+  const { project: selectedProject } = useProjectContext()
+  const orgSlug = selectedOrganization?.slug ?? ''
 
   return (
     <div className="container max-w-4xl p-4 space-y-8">
-      {/* [Joshen TODO] Temporarily hidden until usage endpoint is sorted out */}
-      {/* {projectTier !== undefined && <OveragesBanner tier={projectTier} />} */}
-
       <div className="space-y-2">
         <h4 className="text-lg">Invoices</h4>
 
@@ -74,7 +44,7 @@ const Settings: FC<SettingsProps> = ({ project }) => {
           </Link>
         </div>
 
-        <Invoices projectRef={ui.selectedProject?.ref ?? ''} />
+        <Invoices projectRef={selectedProject?.ref ?? ''} />
       </div>
     </div>
   )

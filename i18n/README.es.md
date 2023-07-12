@@ -12,9 +12,9 @@
 - Base de datos Postgres alojada. [Documentación](https://supabase.com/docs/guides/database)
 - [x] Autenticación y autorización. [Documentos](https://supabase.com/docs/guides/auth)
 - [x] API autogeneradas.
-  - [x] REST. [Docs](https://supabase.com/docs/guides/database/api#rest-api)
-  - [x] GraphQL. [Documentos](https://supabase.com/docs/guides/database/api#graphql-api)
-  - [x] Suscripciones en tiempo real. [Documentos](https://supabase.com/docs/guides/database/api#realtime-api)
+  - [x] REST. [Docs](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL. [Documentos](https://supabase.com/docs/guides/api#graphql-api-overview)
+  - [x] Suscripciones en tiempo real. [Documentos](https://supabase.com/docs/guides/api#realtime-api-overview)
 - [x] Funciones.
   - [x] Funciones de base de datos. [Docs](https://supabase.com/docs/guides/database/functions)
   - [x] Funciones de borde [Docs](https://supabase.com/docs/guides/functions)
@@ -27,7 +27,7 @@
 
 Para consultar la documentación completa, visite [supabase.com/docs](https://supabase.com/docs)
 
-Para ver cómo contribuir, visite [Getting Started](./DEVELOPERS.md)
+Para ver cómo contribuir, visite [Getting Started](../DEVELOPERS.md)
 
 ## Comunidad y soporte
 
@@ -39,7 +39,7 @@ Para ver cómo contribuir, visite [Getting Started](./DEVELOPERS.md)
 ## Estado
 
 - [x] Alfa: Estamos probando Supabase con un grupo cerrado de clientes
-- [x] Alfa público: Cualquiera puede registrarse en [app.supabase.com](https://app.supabase.com). Pero no te pases, hay algunos problemas
+- [x] Alfa público: Cualquiera puede registrarse en [supabase.com/dashboard](https://supabase.com/dashboard). Pero no te pases, hay algunos problemas
 - [Beta pública: Suficientemente estable para la mayoría de los casos de uso no empresariales
 - [Público: Disponibilidad general [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
 
@@ -55,7 +55,7 @@ Supabase es una combinación de herramientas de código abierto. Estamos constru
 
 **Arquitectura**
 
-Supabase es una [plataforma alojada](https://app.supabase.com). Puedes registrarte y empezar a usar Supabase sin instalar nada.
+Supabase es una [plataforma alojada](https://supabase.com/dashboard). Puedes registrarte y empezar a usar Supabase sin instalar nada.
 También puede [autoalojarse](https://supabase.com/docs/guides/hosting/overview) y [desarrollar localmente](https://supabase.com/docs/guides/local-development).
 
 arquitectura](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)

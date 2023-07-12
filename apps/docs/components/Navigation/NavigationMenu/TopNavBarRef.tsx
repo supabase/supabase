@@ -105,56 +105,40 @@ const TopNavBarRef: FC = () => {
           </SearchButton>
         </div>
         <div className="hidden lg:flex grow items-center justify-end gap-3">
-          <Button
-            type="text"
-            as="a"
-            // @ts-ignore
-            href="https://supabase.com"
+          <Button type="text" asChild>
+            <a href="https://supabase.com" target="_blank" rel="noreferrer noopener">
+              Supabase.com
+            </a>
+          </Button>
+          <Button type="text" asChild>
+            <a href="https://supabase.com/dashboard" target="_blank" rel="noreferrer noopener">
+              Dashboard
+            </a>
+          </Button>
+          <Link
+            href="https://github.com/supabase/supabase"
             target="_blank"
             rel="noreferrer noopener"
           >
-            Supabase.com
-          </Button>
-          <Button
-            type="text"
-            as="a"
-            // @ts-ignore
-            href="https://supabase.com/dashboard"
-            target="_blank"
-            rel="noreferrer noopener"
-          >
-            Dashboard
-          </Button>
-          <ul className="flex items-center">
-            <Link
-              href="https://github.com/supabase/supabase"
-              target="_blank"
-              rel="noreferrer noopener"
-            >
-              <a className="px-2.5 py-1" target="_blank">
-                <IconGitHub size={16} />
-              </a>
-            </Link>
-          </ul>
-          <ul className="flex items-center">
-            <li className="px-4">
-              <div className="cursor-pointer" onClick={() => toggleTheme()}>
-                {isDarkMode ? (
-                  <IconMoon
-                    size={16}
-                    strokeWidth={1}
-                    className="text-scale-1100 hover:text-scale-1200 transition"
-                  />
-                ) : (
-                  <IconSun
-                    size={16}
-                    strokeWidth={1}
-                    className="text-scale-1100 hover:text-scale-1200 transition"
-                  />
-                )}
-              </div>
-            </li>
-          </ul>
+            <a className="px-2.5 py-1" target="_blank">
+              <IconGitHub size={16} className="text-scale-1100 hover:text-scale-1200 transition" />
+            </a>
+          </Link>
+          <div className="cursor-pointer px-2.5 py-1" onClick={() => toggleTheme()}>
+            {isDarkMode ? (
+              <IconMoon
+                size={16}
+                strokeWidth={1}
+                className="text-scale-1100 hover:text-scale-1200 transition"
+              />
+            ) : (
+              <IconSun
+                size={16}
+                strokeWidth={1}
+                className="text-scale-1100 hover:text-scale-1200 transition"
+              />
+            )}
+          </div>
         </div>
       </div>
     </nav>

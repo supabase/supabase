@@ -22,39 +22,17 @@ This submodule provides convenience helpers for implementing user authentication
 
 ## Install the Remix helper library
 
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="npm"
->
-<TabPanel id="npm" label="npm">
-
-```sh
-npm install @supabase/auth-helpers-remix
+```sh Terminal
+npm install @supabase/auth-helpers-remix @supabase/supabase-js
 ```
 
 This library supports the following tooling versions:
 
 - Remix: `>=1.7.2`
-
-</TabPanel>
-<TabPanel id="yarn" label="Yarn">
-
-```sh
-yarn add @supabase/auth-helpers-remix
-```
-
-This library supports the following tooling versions:
-
-- Remix: `>=1.7.2`
-
-</TabPanel>
-</Tabs>
 
 ## Set up environment variables
 
-Retrieve your project URL and anon key in your project's [API settings](https://app.supabase.com/project/_/settings/api) in the Dashboard to set up the following environment variables. For local development you can set them in a `.env` file. See an [example](https://github.com/supabase/auth-helpers/blob/main/examples/remix/.env.example).
+Retrieve your project URL and anon key in your project's [API settings](https://supabase.com/dashboard/project/_/settings/api) in the Dashboard to set up the following environment variables. For local development you can set them in a `.env` file. See an [example](https://github.com/supabase/auth-helpers/blob/main/examples/remix/.env.example).
 
 ```bash .env
 SUPABASE_URL=YOUR_SUPABASE_URL
@@ -765,7 +743,7 @@ export default function Index() {
 
 </Tabs>
 
-> Ensure you have [enabled replication](https://app.supabase.com/project/_/database/replication) on the table you are subscribing to.
+> Ensure you have [enabled replication](https://supabase.com/dashboard/project/_/database/replication) on the table you are subscribing to.
 
 ## Migration Guide
 

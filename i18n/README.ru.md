@@ -12,9 +12,9 @@
 - [x] Хостируемая база данных Postgres. [Docs](https://supabase.com/docs/guides/database)
 - [x] Аутентификация и авторизация. [Docs](https://supabase.com/docs/guides/auth)
 - [x] Автоматически генерируемые API.
-  - [x] REST. [Docs](https://supabase.com/docs/guides/database/api#rest-api)
-  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/database/api#graphql-api)
-  - [x] Подписки в реальном времени. [Docs](https://supabase.com/docs/guides/database/api#realtime-api)
+  - [x] REST. [Docs](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/api#graphql-api-overview)
+  - [x] Подписки в реальном времени. [Docs](https://supabase.com/docs/guides/api#realtime-api-overview)
 - [x] Функции.
   - [x] Функции базы данных. [Docs](https://supabase.com/docs/guides/database/functions)
   - [x] Edge Functions [Docs](https://supabase.com/docs/guides/functions)
@@ -27,7 +27,7 @@
 
 Для получения полной документации посетите [supabase.com/docs](https://supabase.com/docs)
 
-Чтобы узнать, как внести вклад, посетите [Getting Started](./DEVELOPERS.md)
+Чтобы узнать, как внести вклад, посетите [Getting Started](../DEVELOPERS.md)
 
 ## Сообщество и поддержка
 
@@ -39,7 +39,7 @@
 ## Статус
 
 - [x] Альфа: Мы тестируем Supabase с закрытым набором клиентов
-- [x] Публичная Альфа: Любой желающий может зарегистрироваться на [app.supabase.com](https://app.supabase.com). Но будьте с нами помягче, есть несколько недоработок
+- [x] Публичная Альфа: Любой желающий может зарегистрироваться на [supabase.com/dashboard](https://supabase.com/dashboard). Но будьте с нами помягче, есть несколько недоработок
 - [x] Публичная бета-версия: Достаточно стабильна для большинства случаев использования не на предприятиях
 - [ ] Public: Общая доступность [[статус](https://supabase.com/docs/guides/getting-started/features#feature-status)]
 
@@ -55,7 +55,7 @@ Supabase - это комбинация инструментов с открыт�
 
 \*\*Архитектура
 
-Supabase - это [размещенная платформа](https://app.supabase.com). Вы можете зарегистрироваться и начать использовать Supabase, ничего не устанавливая.
+Supabase - это [размещенная платформа](https://supabase.com/dashboard). Вы можете зарегистрироваться и начать использовать Supabase, ничего не устанавливая.
 Вы также можете [самостоятельно размещать](https://supabase.com/docs/guides/hosting/overview) и [разрабатывать локально](https://supabase.com/docs/guides/local-development).
 
 ![Архитектура](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)

@@ -61,7 +61,7 @@ const AccessTokenList = observer(() => {
                       </Table.td>
                       <Table.td>
                         <Button
-                          as="span"
+                          asChild
                           type="default"
                           title="Delete token"
                           className="px-1"
@@ -70,7 +70,9 @@ const AccessTokenList = observer(() => {
                             setIsOpen(true)
                           }}
                           icon={<IconTrash />}
-                        ></Button>
+                        >
+                          <span></span>
+                        </Button>
                       </Table.td>
                     </Table.tr>
                   )

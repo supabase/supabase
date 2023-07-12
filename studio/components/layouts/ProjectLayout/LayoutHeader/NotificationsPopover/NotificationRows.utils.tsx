@@ -154,12 +154,12 @@ export const formatNotificationText = (
           return (
             <a href={button.url} key={index} target="_blank">
               <Button
-                as="span"
+                asChild
                 type="default"
                 className="mr-2 mt-2 mb-2"
                 icon={<IconExternalLink size={12} strokeWidth={2} />}
               >
-                {button.text}
+                <span>{button.text}</span>
               </Button>
             </a>
           )

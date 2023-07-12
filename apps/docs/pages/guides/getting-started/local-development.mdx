@@ -369,7 +369,7 @@ The last step is deploying these changes to a live Supabase project.
 
 ## Deploy your project
 
-You've been developing your project locally, making changes to your tables via migrations. It's time to deploy your project to the Supabase Platform and start scaling up to millions of users! Head over to [Supabase](https://app.supabase.com) and create a new project to deploy to.
+You've been developing your project locally, making changes to your tables via migrations. It's time to deploy your project to the Supabase Platform and start scaling up to millions of users! Head over to [Supabase](https://supabase.com/dashboard) and create a new project to deploy to.
 
 ### Link your project
 
@@ -377,7 +377,7 @@ Associate your project with your remote project using [`supabase link`](/docs/re
 
 ```bash
 supabase link --project-ref <project-id>
-# You can get <project-id> from your project's dashboard URL: https://app.supabase.com/project/<project-id>
+# You can get <project-id> from your project's dashboard URL: https://supabase.com/dashboard/project/<project-id>
 
 supabase db remote commit
 # Capture any changes that you have made to your remote database before you went through the steps above
@@ -401,7 +401,7 @@ Deploy any local database migrations using [`db push`](/docs/reference/cli/usage
 supabase db push
 ```
 
-Visiting your live project on [Supabase](https://app.supabase.com), you'll see a new `employees` table, complete with the `department` column you added in the second migration above.
+Visiting your live project on [Supabase](https://supabase.com/dashboard), you'll see a new `employees` table, complete with the `department` column you added in the second migration above.
 
 ### Deploy Edge Functions
 
@@ -413,23 +413,38 @@ supabase functions deploy <function_name>
 
 ### Use Auth locally
 
-To use Auth locally, update your project's `supabase/config.toml` file that gets created after running `supabase init`. Add any providers you want, and set enabled to `true`
+To use Auth locally, update your project's `supabase/config.toml` file that gets created after running `supabase init`. Add any providers you want, and set enabled to `true`.
 
 ```bash config.toml
 [auth.external.github]
 enabled = true
-client_id = ""
-secret = ""
+client_id = "env($SUPABASE_AUTH_GITHUB_CLIENT_ID)"
+secret = "env($SUPABASE_AUTH_GITHUB_SECRET)"
+redirect_uri = "http://localhost:54321/auth/v1/callback"
+```
+
+As a best practice, any secret values should be loaded from environment variables. You can add them to `supabase/.env` for the CLI to automatically substitute them.
+
+```bash supabase/.env
+SUPABASE_AUTH_GITHUB_CLIENT_ID="redacted"
+SUPABASE_AUTH_GITHUB_SECRET="redacted"
 ```
 
 For these changes to take effect, you need to run `supabase stop` and `supabase start` again.
+
+If you have additional RLS policies defined on your `auth` schema, you can pull them as a migration file locally.
+
+```bash
+supabase db remote commit --schema auth
+```
 
 ### Enabling Local Logging
 
 Local logs rely on the Supabase Analytics Server. This can be enabled via the CLI configuration, and requires a Google Cloud project and BigQuery access.
 
 <Admonition type="note">
-  The Google Cloud project must have billing enabled. Read more about this requirement
+  The Google Cloud project must have billing enabled. The dataset created and managed by Analytics
+  will be within the US. Read more about this requirement
   [here](https://supabase.com/docs/reference/self-hosting-analytics/introduction#bigquery).
 </Admonition>
 
@@ -461,8 +476,7 @@ This will switch the logging drivers and will direct logs to the Analytics serve
 
 The local development environment is not as feature-complete as the Supabase Platform. We're working towards parity between the hosted platform and the local environment. Here are some of the differences:
 
-- The Functions interface is coming soon.
-- You cannot update your project settings in the Dashboard. This must be done using the CLI.
+- You cannot update your project settings in the Dashboard. This must be done using the local config file.
 - The CLI version determines the local version of Studio used, so make sure you keep your local [Supabase CLI up to date](https://github.com/supabase/cli#getting-started). We're constantly adding new features and bug fixes.
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />

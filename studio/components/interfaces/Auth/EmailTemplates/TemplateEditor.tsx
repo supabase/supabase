@@ -4,7 +4,7 @@ import { observer } from 'mobx-react-lite'
 import { Input, Form } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useStore, checkPermissions } from 'hooks'
+import { useStore, useCheckPermissions } from 'hooks'
 import { FormSchema } from 'types'
 import { FormActions, FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms'
 import CodeEditor from 'components/ui/CodeEditor'
@@ -23,7 +23,7 @@ const TemplateEditor: FC<Props> = ({ template }) => {
 
   const formId = `auth-config-email-templates-${id}`
   const INITIAL_VALUES: { [x: string]: string } = {}
-  const canUpdateConfig = checkPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
+  const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
   useEffect(() => {
     if (isLoaded) {

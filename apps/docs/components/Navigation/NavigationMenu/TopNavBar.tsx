@@ -125,16 +125,15 @@ const TopNavBar: FC = () => {
           </div>
         </div>
         <div className="col-span-4 flex items-center justify-end gap-3">
-          <Button
-            type="outline"
-            as="a"
-            // @ts-ignore
-            href="https://supabase.com/dashboard"
-            className="text-scale-1100 text-sm"
-            target="_blank"
-            rel="noreferrer noopener"
-          >
-            Go to Dashboard
+          <Button type="outline" asChild>
+            <a
+              href="https://supabase.com/dashboard"
+              className="text-scale-1100 text-sm"
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              Go to Dashboard
+            </a>
           </Button>
           <ul className="flex items-center">
             <li className="px-4">

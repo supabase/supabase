@@ -124,7 +124,7 @@ Queries which are the most time consuming are not necessarily bad, you may have 
 
 Generally for most applications a small percentage of data is accessed more regularly than the rest. To make sure that your regularly accessed data is available, Postgres tracks your data access patterns and keeps this in its [shared_buffers](https://www.postgresql.org/docs/15/runtime-config-resource.html#RUNTIME-CONFIG-RESOURCE-MEMORY) cache.
 
-Applications with lower cache hit rates generally perform more poorly since they have to hit the disk to get results rather than serving them from memory. Very poor hit rates can also cause you to burst past your [Disk I/O limits](https://supabase.com/docs/guides/platform/compute-add-ons#disk-throughput-and-iops) causing significant performance issues.
+Applications with lower cache hit rates generally perform more poorly since they have to hit the disk to get results rather than serving them from memory. Very poor hit rates can also cause you to burst past your [Disk IO limits](./compute-add-ons#disk-io) causing significant performance issues.
 
 You can view your cache and index hit rate by executing the following query:
 
@@ -142,7 +142,7 @@ from pg_statio_user_tables;
 
 This shows the ratio of data blocks fetched from the Postgres [shared_buffers](https://www.postgresql.org/docs/15/runtime-config-resource.html#RUNTIME-CONFIG-RESOURCE-MEMORY) cache against the data blocks that were read from disk/OS cache.
 
-If either of your index or table hit rate are < 99% then this can indicate your compute plan is too small for your current workload and you would benefit from more memory. [Upgrading your compute](https://supabase.com/docs/guides/platform/compute-add-ons) is easy and can be done from your [project dashboard](https://app.supabase.com/project/_/settings/billing/subscription).
+If either of your index or table hit rate are < 99% then this can indicate your compute plan is too small for your current workload and you would benefit from more memory. [Upgrading your compute](./compute-add-ons) is easy and can be done from your [project dashboard](https://supabase.com/dashboard/project/_/settings/billing/subscription).
 
 ### Optimizing poor performing queries
 
@@ -189,7 +189,7 @@ FATAL: remaining connection slots are reserved for non-replication superuser con
 
 In such a scenario, you can consider:
 
-- [upgrading to a larger compute add-on](https://app.supabase.com/project/_/settings/billing)
+- [upgrading to a larger compute add-on](https://supabase.com/dashboard/project/_/settings/billing)
 - configuring your clients to use fewer connections
 - manually configuring the database for a higher number of connections
 
@@ -197,7 +197,7 @@ In such a scenario, you can consider:
 
 You can use the [pg_stat_activity](https://www.postgresql.org/docs/current/monitoring-stats.html#MONITORING-PG-STAT-ACTIVITY-VIEW) view to debug which clients are holding open connections on your DB. `pg_stat_activity` only exposes information on direct connections to the database. Information on the number of connections to pgbouncer is available [via the metrics endpoint](../platform/metrics).
 
-Depending on the clients involved, you might be able to configure them to work with fewer connections (e.g. by imposing a limit on the maximum number of connections they're allowed to use), or shift specific workloads to connect via [pgbouncer](/docs/guides/database/connecting-to-postgres#connection-pool) instead. Transient workflows, which can quickly scale up and down in response to traffic (e.g. serverless functions), can especially benefit from using a connection pooler rather than connecting to the DB directly.
+Depending on the clients involved, you might be able to configure them to work with fewer connections (e.g. by imposing a limit on the maximum number of connections they're allowed to use), or shift specific workloads to connect via [pgbouncer](/docs/guides/database/connecting-to-postgres#connection-pooler) instead. Transient workflows, which can quickly scale up and down in response to traffic (e.g. serverless functions), can especially benefit from using a connection pooler rather than connecting to the DB directly.
 
 ### Allowing higher number of connections
 

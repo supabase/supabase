@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 1.62.3
+  version: 1.77.9
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -45,253 +45,6 @@ flags:
     description: path to a Supabase project directory
     default_value: ''
 commands:
-  - id: supabase-sso
-    title: supabase sso
-    summary: Manage SSO authentication for your project
-    description: |-
-      Manage SSO authentication for Supabase projects.
-    tags:
-      - management-api
-    links: []
-    subcommands:
-      - supabase-sso-list
-      - supabase-sso-show
-      - supabase-sso-add
-      - supabase-sso-remove
-      - supabase-sso-update
-      - supabase-sso-info
-    flags:
-      - id: project-ref
-        name: --project-ref <string>
-        description: Project ref of the Supabase project.
-        default_value: ''
-        type: string
-        required: true
-        inherit: true
-      - id: output
-        name: --output [ pretty | json | yaml | toml ]
-        description: Output format of the command, useful when using the CLI in scripts or CI workflows.
-        default_value: pretty
-        type: '[ pretty | json | yaml | toml ]'
-        inherit: true
-        accepted_values:
-          - name: pretty
-            value: pretty
-            type: '[ pretty | json | yaml | toml ]'
-          - name: json
-            value: json
-            type: '[ pretty | json | yaml | toml ]'
-          - name: yaml
-            value: yaml
-            type: '[ pretty | json | yaml | toml ]'
-          - name: toml
-            value: toml
-            type: '[ pretty | json | yaml | toml ]'
-            description: |-
-              Use only with certain commands to output the raw SAML 2.0 Metadata XML stored in your project's authentication configuration.
-  - id: supabase-sso-info
-    title: supabase sso info
-    summary: Show important SAML 2.0 information about your project
-    description: |-
-      Returns all of the important SSO information necessary for your project to be registered with a SAML 2.0 compatible identity provider.
-    tags:
-      - management-api
-    flags: []
-    links: []
-    examples:
-      - id: basic-usage
-        name: Show project information
-        code: |-
-          supabase sso info --project-ref abcdefghijklmnopqrst
-        response: |-
-          Information about your project's SAML 2.0 configuration.
-  - id: supabase-sso-add
-    title: supabase sso add
-    summary: Add a connection to a SSO identity provider
-    description: |-
-      Add and configure a new connection to a SSO identity provider to your Supabase project.
-    tags:
-      - management-api
-    examples:
-      - id: basic-usage
-        name: Add with Metadata URL
-        code: |-
-          supabase sso add \
-            --project-ref abcdefgijklmnopqrst \
-            --type saml \
-            --metadata-url 'https://...' \
-            --domains company.com
-        response: |-
-          Information about the added identity provider. You can use
-          company.com as the domain name on the frontend side to initiate a SSO
-          request to the identity provider.
-      - id: with-xml
-        name: Add with Metadata File
-        code: |-
-          supabase sso add \
-            --project-ref abcdefgijklmnopqrst \
-            --type saml \
-            --metadata-file /path/to/metadata/file.xml \
-            --domains company.com
-        response: |-
-          Information about the added identity provider. You can use
-          company.com as the domain name on the frontend side to initiate a SSO
-          request to the identity provider.
-    flags:
-      - id: type
-        name: --type saml
-        description: |-
-          Type of identity provider being added. Only SAML 2.0 supported at this time.
-        type: string
-        accepted_values:
-          - name: saml
-            type: string
-        required: true
-      - id: metadata-url
-        name: --metadata-url <URL>
-        description: |-
-          A URL (typically HTTPS) that points to a SAML 2.0 Metadata XML document describing the SAML features supported by the identity provider being added.
-          Mutually exclusive with --metadata-file.
-        type: string
-        required: true
-      - id: metadata-file
-        name: --metadata-file <path to file>
-        description: |
-          A path to a file containing a SAML 2.0 Metadata XML document describing the SAML features supported by the identity provider being added. Prefer using --metadata-url if possible.
-
-          Mutually exclusive with --metadata-url.
-        type: string
-        required: true
-      - id: domains
-        name: domains
-        description: |-
-          A comma separated list of email domains to associate with this identity provider. Used to quickly sign users in on the frontend by identifying the correct identity provider based on the email address of the user.
-        type: string
-      - id: attribute-mapping-file
-        name: attribute-mapping-file
-        type: string
-        description: |-
-          A file containing a JSON document describing the attribute mappings attached to this identity provider. User information contained in the SAML assertion will be mapped according to the rules laid out in this document.
-  - id: supabase-sso-remove
-    title: supabase sso remove <provider-id>
-    summary: Remove a connection to a SSO identity provider
-    description: |-
-      Remove a connection to an already added SSO identity provider. Removing the provider will prevent existing users from logging in. Please treat this command with care.
-    tags:
-      - management-api
-    links: []
-    flags: []
-    examples:
-      - id: basic-usage
-        name: Remove a provider
-        code: |-
-          supabase sso remove 6df4d73f-bf21-405f-a084-b11adf19fea5 \
-            --project-ref abcdefghijklmnopqrst
-        response: |-
-          Information about the removed identity provider. It's a good idea to
-          save this in case you need it later on.
-  - id: supabase-sso-update
-    title: supabase sso update <provider-id>
-    summary: Update the configuration of an identity provider
-    description: |-
-      Update the configuration settings of a already added SSO identity provider.
-    tags:
-      - management-api
-    links: []
-    examples:
-      - id: basic-usage
-        name: Replace domains
-        code: |-
-          supabase sso update 6df4d73f-bf21-405f-a084-b11adf19fea5 \
-            --project-ref abcdefghijklmnopqrst \
-            --domains new-company.com,new-company.net
-        response: |-
-          Information about the updated provider.
-      - id: add-domains
-        name: Add an additional domain
-        code: |-
-          supabase sso update 6df4d73f-bf21-405f-a084-b11adf19fea5 \
-            --project-ref abcdefghijklmnopqrst \
-            --add-domains company.net
-        response: |-
-          Information about the updated provider.
-      - id: remove-domains
-        name: Remove a domain
-        code: |-
-          supabase sso update 6df4d73f-bf21-405f-a084-b11adf19fea5 \
-            --project-ref abcdefghijklmnopqrst \
-            --remove-domains company.org
-        response: |-
-          Information about the updated provider.
-    flags:
-      - id: metadata-url
-        name: --metadata-url <URL>
-        description: |-
-          A URL (typically HTTPS) that points to a SAML 2.0 Metadata XML document describing the SAML features supported by the identity provider being added.
-          Mutually exclusive with --metadata-file.
-        type: string
-      - id: metadata-file
-        name: --metadata-file <path to file>
-        description: |
-          A path to a file containing a SAML 2.0 Metadata XML document describing the SAML features supported by the identity provider being added. Prefer using --metadata-url if possible.
-
-          Mutually exclusive with --metadata-url.
-        type: string
-      - id: domains
-        name: domains
-        description: |-
-          A comma separated list of email domains to associate with this identity provider. Used to quickly sign users in on the frontend by identifying the correct identity provider based on the email address of the user. When provided all of the domains already attached to the identity provider will be replaced with this list.
-        type: string
-      - id: add-domains
-        name: add-domains
-        description: |-
-          Associates these additional email domains to the existing set of domains. See --domains for a detailed explanation.
-      - id: remove-domains
-        name: remove-domains
-        description: |-
-          Removes these email domains from the existing set of domains. See --domains for a detailed explanation.
-      - id: attribute-mapping-file
-        name: attribute-mapping-file
-        type: string
-        description: |-
-          A file containing a JSON document describing the attribute mappings attached to this identity provider. User information contained in the SAML assertion will be mapped according to the rules laid out in this document.
-  - id: supabase-sso-list
-    title: supabase sso list
-    summary: Lists all connections to identity providers
-    description: |-
-      List all connections to a SSO identity provider to your Supabase project.
-    tags:
-      - management-api
-    links: []
-    flags: []
-  - id: supabase-sso-show
-    title: supabase sso show <provider-id>
-    summary: Show information about an identity provider.
-    description: |-
-      Provides the information about an established connection to an identity provider. You can use --metadata to obtain the raw SAML 2.0 Metadata XML document stored in your project's configuration.
-    tags:
-      - management-api
-    examples:
-      - id: basic-usage
-        name: Show information
-        code: |-
-          supabase sso show 6df4d73f-bf21-405f-a084-b11adf19fea5 \
-            --project-ref abcdefghijklmnopqrst
-        response: |-
-          Information about the identity provider in pretty output.
-      - id: metadata-output
-        name: Get raw SAML 2.0 Metadata XML
-        code: |-
-          supabase sso show 6df4d73f-bf21-405f-a084-b11adf19fea5 \
-            --project-ref abcdefghijklmnopqrst \
-            --metadata
-        response: |-
-          Raw SAML 2.0 XML assigned to this identity provider. This is the
-          version used in the authentication project, and if using a SAML 2.0
-          Metadata URL it may change depending on the caching information
-          contained within the metadata.
-    links: []
-    flags: []
   - id: supabase-vanity-subdomains
     title: supabase vanity-subdomains
     summary: Manage vanity subdomains for Supabase projects
@@ -455,7 +208,7 @@ commands:
 
       Requires `supabase/config.toml` to be created in your current working directory by running `supabase init`.
 
-      All Docker resources are cleaned up by default. Use `--backup` flag to persist your local development data between restarts.
+      All Docker resources are maintained across restarts.  Use `--no-backup` flag to reset your local development data between restarts.
     examples:
       - id: basic-usage
         name: Basic usage
@@ -607,6 +360,359 @@ commands:
         name: --ignore-health-check
         description: Ignore unhealthy services and exit 0
         default_value: 'false'
+  - id: supabase-sso
+    title: supabase sso
+    summary: Manage Single Sign-On (SSO) authentication for projects
+    tags:
+      - management-api
+    links: []
+    subcommands:
+      - supabase-sso-add
+      - supabase-sso-info
+      - supabase-sso-list
+      - supabase-sso-remove
+      - supabase-sso-show
+      - supabase-sso-update
+    flags: []
+  - id: supabase-sso-update
+    title: supabase sso update
+    summary: Update information about an SSO identity provider
+    description: |
+      Update the configuration settings of a already added SSO identity provider.
+    examples:
+      - id: basic-usage
+        name: Replace domains
+        code: |-
+          supabase sso update 6df4d73f-bf21-405f-a084-b11adf19fea5 \
+            --project-ref abcdefghijklmnopqrst \
+            --domains new-company.com,new-company.net
+        response: Information about the updated provider.
+      - id: add-domains
+        name: Add an additional domain
+        code: |-
+          supabase sso update 6df4d73f-bf21-405f-a084-b11adf19fea5 \
+            --project-ref abcdefghijklmnopqrst \
+            --add-domains company.net
+        response: Information about the updated provider.
+      - id: remove-domains
+        name: Remove a domain
+        code: |-
+          supabase sso update 6df4d73f-bf21-405f-a084-b11adf19fea5 \
+            --project-ref abcdefghijklmnopqrst \
+            --remove-domains company.org
+        response: Information about the updated provider.
+    tags: []
+    links: []
+    usage: supabase sso update <provider-id> [flags]
+    subcommands: []
+    flags:
+      - id: add-domains
+        name: --add-domains <strings>
+        description: |
+          Add this comma separated list of email domains to the identity provider.
+        default_value: '[]'
+      - id: attribute-mapping-file
+        name: --attribute-mapping-file <string>
+        description: |
+          File containing a JSON mapping between SAML attributes to custom JWT claims.
+        default_value: ''
+      - id: domains
+        name: --domains <strings>
+        description: |
+          Replace domains with this comma separated list of email domains.
+        default_value: '[]'
+      - id: metadata-file
+        name: --metadata-file <string>
+        description: |
+          File containing a SAML 2.0 Metadata XML document describing the identity provider.
+        default_value: ''
+      - id: metadata-url
+        name: --metadata-url <string>
+        description: |
+          URL pointing to a SAML 2.0 Metadata XML document describing the identity provider.
+        default_value: ''
+      - id: remove-domains
+        name: --remove-domains <strings>
+        description: |
+          Remove this comma separated list of email domains from the identity provider.
+        default_value: '[]'
+      - id: skip-url-validation
+        name: --skip-url-validation
+        description: |
+          Whether local validation of the SAML 2.0 Metadata URL should not be performed.
+        default_value: 'false'
+      - id: output
+        name: -o, --output <[ pretty | json | toml | yaml ]>
+        description: Output format
+        default_value: pretty
+        accepted_values:
+          - id: pretty
+            name: pretty
+            type: '[ pretty | json | toml | yaml ]'
+          - id: json
+            name: json
+            type: '[ pretty | json | toml | yaml ]'
+          - id: toml
+            name: toml
+            type: '[ pretty | json | toml | yaml ]'
+          - id: yaml
+            name: yaml
+            type: '[ pretty | json | toml | yaml ]'
+      - id: project-ref
+        name: --project-ref <string>
+        description: Project ref of the Supabase project.
+        default_value: ''
+  - id: supabase-sso-show
+    title: supabase sso show
+    summary: Show information about an SSO identity provider
+    description: |
+      Provides the information about an established connection to an identity provider. You can use --metadata to obtain the raw SAML 2.0 Metadata XML document stored in your project's configuration.
+    examples:
+      - id: basic-usage
+        name: Show information
+        code: |-
+          supabase sso show 6df4d73f-bf21-405f-a084-b11adf19fea5 \
+            --project-ref abcdefghijklmnopqrst
+        response: Information about the identity provider in pretty output.
+      - id: metadata-output
+        name: Get raw SAML 2.0 Metadata XML
+        code: |-
+          supabase sso show 6df4d73f-bf21-405f-a084-b11adf19fea5 \
+            --project-ref abcdefghijklmnopqrst \
+            --metadata
+        response: |-
+          Raw SAML 2.0 XML assigned to this identity provider. This is the
+          version used in the authentication project, and if using a SAML 2.0
+          Metadata URL it may change depending on the caching information
+          contained within the metadata.
+    tags: []
+    links: []
+    usage: supabase sso show <provider-id> [flags]
+    subcommands: []
+    flags:
+      - id: metadata
+        name: --metadata
+        description: Show SAML 2.0 XML Metadata only
+        default_value: 'false'
+      - id: output
+        name: -o, --output <[ pretty | json | toml | yaml ]>
+        description: Output format
+        default_value: pretty
+        accepted_values:
+          - id: pretty
+            name: pretty
+            type: '[ pretty | json | toml | yaml ]'
+          - id: json
+            name: json
+            type: '[ pretty | json | toml | yaml ]'
+          - id: toml
+            name: toml
+            type: '[ pretty | json | toml | yaml ]'
+          - id: yaml
+            name: yaml
+            type: '[ pretty | json | toml | yaml ]'
+      - id: project-ref
+        name: --project-ref <string>
+        description: Project ref of the Supabase project.
+        default_value: ''
+  - id: supabase-sso-remove
+    title: supabase sso remove
+    summary: Remove an existing SSO identity provider
+    description: |
+      Remove a connection to an already added SSO identity provider. Removing the provider will prevent existing users from logging in. Please treat this command with care.
+    examples:
+      - id: basic-usage
+        name: Remove a provider
+        code: |-
+          supabase sso remove 6df4d73f-bf21-405f-a084-b11adf19fea5 \
+            --project-ref abcdefghijklmnopqrst
+        response: |-
+          Information about the removed identity provider. It's a good idea to
+          save this in case you need it later on.
+    tags: []
+    links: []
+    usage: supabase sso remove <provider-id>
+    subcommands: []
+    flags:
+      - id: output
+        name: -o, --output <[ pretty | json | toml | yaml ]>
+        description: Output format
+        default_value: pretty
+        accepted_values:
+          - id: pretty
+            name: pretty
+            type: '[ pretty | json | toml | yaml ]'
+          - id: json
+            name: json
+            type: '[ pretty | json | toml | yaml ]'
+          - id: toml
+            name: toml
+            type: '[ pretty | json | toml | yaml ]'
+          - id: yaml
+            name: yaml
+            type: '[ pretty | json | toml | yaml ]'
+      - id: project-ref
+        name: --project-ref <string>
+        description: Project ref of the Supabase project.
+        default_value: ''
+  - id: supabase-sso-list
+    title: supabase sso list
+    summary: List all SSO identity providers for a project
+    description: |
+      List all connections to a SSO identity provider to your Supabase project.
+    tags: []
+    links: []
+    usage: supabase sso list
+    subcommands: []
+    flags:
+      - id: output
+        name: -o, --output <[ pretty | json | toml | yaml ]>
+        description: Output format
+        default_value: pretty
+        accepted_values:
+          - id: pretty
+            name: pretty
+            type: '[ pretty | json | toml | yaml ]'
+          - id: json
+            name: json
+            type: '[ pretty | json | toml | yaml ]'
+          - id: toml
+            name: toml
+            type: '[ pretty | json | toml | yaml ]'
+          - id: yaml
+            name: yaml
+            type: '[ pretty | json | toml | yaml ]'
+      - id: project-ref
+        name: --project-ref <string>
+        description: Project ref of the Supabase project.
+        default_value: ''
+  - id: supabase-sso-info
+    title: supabase sso info
+    summary: |
+      Returns the SAML SSO settings required for the identity provider
+    description: |
+      Returns all of the important SSO information necessary for your project to be registered with a SAML 2.0 compatible identity provider.
+    examples:
+      - id: basic-usage
+        name: Show project information
+        code: supabase sso info --project-ref abcdefghijklmnopqrst
+        response: Information about your project's SAML 2.0 configuration.
+    tags: []
+    links: []
+    usage: supabase sso info
+    subcommands: []
+    flags:
+      - id: output
+        name: -o, --output <[ pretty | json | toml | yaml ]>
+        description: Output format
+        default_value: pretty
+        accepted_values:
+          - id: pretty
+            name: pretty
+            type: '[ pretty | json | toml | yaml ]'
+          - id: json
+            name: json
+            type: '[ pretty | json | toml | yaml ]'
+          - id: toml
+            name: toml
+            type: '[ pretty | json | toml | yaml ]'
+          - id: yaml
+            name: yaml
+            type: '[ pretty | json | toml | yaml ]'
+      - id: project-ref
+        name: --project-ref <string>
+        description: Project ref of the Supabase project.
+        default_value: ''
+  - id: supabase-sso-add
+    title: supabase sso add
+    summary: Add a new SSO identity provider
+    description: |
+      Add and configure a new connection to a SSO identity provider to your Supabase project.
+    examples:
+      - id: basic-usage
+        name: Add with Metadata URL
+        code: |-
+          supabase sso add \
+            --project-ref abcdefgijklmnopqrst \
+            --type saml \
+            --metadata-url 'https://...' \
+            --domains company.com
+        response: |-
+          Information about the added identity provider. You can use
+          company.com as the domain name on the frontend side to initiate a SSO
+          request to the identity provider.
+      - id: with-xml
+        name: Add with Metadata File
+        code: |-
+          supabase sso add \
+            --project-ref abcdefgijklmnopqrst \
+            --type saml \
+            --metadata-file /path/to/metadata/file.xml \
+            --domains company.com
+        response: |-
+          Information about the added identity provider. You can use
+          company.com as the domain name on the frontend side to initiate a SSO
+          request to the identity provider.
+    tags: []
+    links: []
+    usage: supabase sso add [flags]
+    subcommands: []
+    flags:
+      - id: attribute-mapping-file
+        name: --attribute-mapping-file <string>
+        description: |
+          File containing a JSON mapping between SAML attributes to custom JWT claims.
+        default_value: ''
+      - id: domains
+        name: --domains <strings>
+        description: |
+          Comma separated list of email domains to associate with the added identity provider.
+        default_value: '[]'
+      - id: metadata-file
+        name: --metadata-file <string>
+        description: |
+          File containing a SAML 2.0 Metadata XML document describing the identity provider.
+        default_value: ''
+      - id: metadata-url
+        name: --metadata-url <string>
+        description: |
+          URL pointing to a SAML 2.0 Metadata XML document describing the identity provider.
+        default_value: ''
+      - id: skip-url-validation
+        name: --skip-url-validation
+        description: |
+          Whether local validation of the SAML 2.0 Metadata URL should not be performed.
+        default_value: 'false'
+      - id: type
+        name: -t, --type <[ saml ]>
+        description: Type of identity provider (according to supported protocol).
+        required: true
+        default_value: ''
+        accepted_values:
+          - id: saml
+            name: saml
+            type: '[ saml ]'
+      - id: output
+        name: -o, --output <[ pretty | json | toml | yaml ]>
+        description: Output format
+        default_value: pretty
+        accepted_values:
+          - id: pretty
+            name: pretty
+            type: '[ pretty | json | toml | yaml ]'
+          - id: json
+            name: json
+            type: '[ pretty | json | toml | yaml ]'
+          - id: toml
+            name: toml
+            type: '[ pretty | json | toml | yaml ]'
+          - id: yaml
+            name: yaml
+            type: '[ pretty | json | toml | yaml ]'
+      - id: project-ref
+        name: --project-ref <string>
+        description: Project ref of the Supabase project.
+        default_value: ''
   - id: supabase-ssl-enforcement
     title: supabase ssl-enforcement
     summary: Manage SSL enforcement configuration
@@ -722,6 +828,7 @@ commands:
       - management-api
     links: []
     subcommands:
+      - supabase-projects-api-keys
       - supabase-projects-create
       - supabase-projects-list
     flags: []
@@ -812,6 +919,74 @@ commands:
           - id: us-west-2
             name: us-west-2
             type: string
+  - id: supabase-projects-api-keys
+    title: supabase projects api-keys
+    summary: List all API keys for a Supabase project
+    tags: []
+    links: []
+    usage: supabase projects api-keys [flags]
+    subcommands: []
+    flags:
+      - id: project-ref
+        name: --project-ref <string>
+        description: Project ref of the Supabase project.
+        default_value: ''
+  - id: supabase-postgres-config
+    title: supabase postgres-config
+    summary: Manage Postgres database config
+    tags:
+      - management-api
+    links: []
+    subcommands:
+      - supabase-postgres-config-get
+      - supabase-postgres-config-update
+    flags: []
+  - id: supabase-postgres-config-update
+    title: supabase postgres-config update
+    summary: Update Postgres database config
+    description: |-
+      Overriding the default Postgres config could result in unstable database behavior.
+      Custom configuration also overrides the optimizations generated based on the compute add-ons in use.
+    tags: []
+    links: []
+    usage: supabase postgres-config update [flags]
+    subcommands: []
+    flags:
+      - id: config
+        name: --config <strings>
+        description: Config overrides specified as a 'key=value' pair
+        default_value: '[]'
+      - id: replace-existing-overrides
+        name: --replace-existing-overrides
+        description: |
+          If true, replaces all existing overrides with the ones provided. If false (default), merges existing overrides with the ones provided.
+        default_value: 'false'
+      - id: experimental
+        name: --experimental
+        description: enable experimental features
+        required: true
+        default_value: 'false'
+      - id: project-ref
+        name: --project-ref <string>
+        description: Project ref of the Supabase project.
+        default_value: ''
+  - id: supabase-postgres-config-get
+    title: supabase postgres-config get
+    summary: Get the current Postgres database config overrides
+    tags: []
+    links: []
+    usage: supabase postgres-config get
+    subcommands: []
+    flags:
+      - id: experimental
+        name: --experimental
+        description: enable experimental features
+        required: true
+        default_value: 'false'
+      - id: project-ref
+        name: --project-ref <string>
+        description: Project ref of the Supabase project.
+        default_value: ''
   - id: supabase-orgs
     title: supabase orgs
     summary: Manage Supabase organizations
@@ -819,6 +994,7 @@ commands:
       - management-api
     links: []
     subcommands:
+      - supabase-orgs-create
       - supabase-orgs-list
     flags: []
   - id: supabase-orgs-list
@@ -828,6 +1004,15 @@ commands:
     tags: []
     links: []
     usage: supabase orgs list
+    subcommands: []
+    flags: []
+  - id: supabase-orgs-create
+    title: supabase orgs create
+    summary: Create an organization
+    description: Create an organization for the logged-in user.
+    tags: []
+    links: []
+    usage: supabase orgs create
     subcommands: []
     flags: []
   - id: supabase-network-restrictions
@@ -944,6 +1129,7 @@ commands:
       - supabase-migration-list
       - supabase-migration-new
       - supabase-migration-repair
+      - supabase-migration-squash
       - supabase-migration-up
     flags: []
   - id: supabase-migration-up
@@ -954,6 +1140,30 @@ commands:
     usage: supabase migration up
     subcommands: []
     flags: []
+  - id: supabase-migration-squash
+    title: supabase migration squash
+    summary: Squash migrations to a single file
+    tags: []
+    links: []
+    usage: supabase migration squash [flags]
+    subcommands: []
+    flags:
+      - id: db-url
+        name: --db-url <string>
+        description: connect using the specified database url
+        default_value: ''
+      - id: linked
+        name: --linked
+        description: Update migration history of the linked project.
+        default_value: 'false'
+      - id: password
+        name: -p, --password <string>
+        description: Password to your remote Postgres database.
+        default_value: ''
+      - id: version
+        name: --version <string>
+        description: Squash up to the specified version.
+        default_value: ''
   - id: supabase-migration-repair
     title: supabase migration repair
     summary: Repair the migration history table
@@ -1176,6 +1386,53 @@ commands:
         description: Project ref of the Supabase project.
         required: true
         default_value: ''
+  - id: supabase-inspect
+    title: supabase inspect
+    summary: Tools to inspect your Supabase Database
+    tags:
+      - local-dev
+    links: []
+    subcommands:
+      - supabase-inspect-db:cache-hit
+      - supabase-inspect-db:index-usage
+      - supabase-inspect-db:replication-slots
+    flags: []
+  - id: supabase-inspect-db:replication-slots
+    title: supabase inspect db:replication-slots
+    summary: Shows information about replication slots on the database
+    tags: []
+    links: []
+    usage: supabase inspect db:replication-slots
+    subcommands: []
+    flags:
+      - id: db-url
+        name: --db-url <string>
+        description: connect using the specified database url
+        default_value: ''
+  - id: supabase-inspect-db:index-usage
+    title: supabase inspect db:index-usage
+    summary: Shows information about the efficiency of indexes
+    tags: []
+    links: []
+    usage: supabase inspect db:index-usage
+    subcommands: []
+    flags:
+      - id: db-url
+        name: --db-url <string>
+        description: connect using the specified database url
+        default_value: ''
+  - id: supabase-inspect-db:cache-hit
+    title: supabase inspect db:cache-hit
+    summary: Shows cache hit rates for tables and indices
+    tags: []
+    links: []
+    usage: supabase inspect db:cache-hit
+    subcommands: []
+    flags:
+      - id: db-url
+        name: --db-url <string>
+        description: connect using the specified database url
+        default_value: ''
   - id: supabase-init
     title: supabase init
     summary: Initialize a local project
@@ -1200,9 +1457,13 @@ commands:
     tags:
       - local-dev
     links: []
-    usage: supabase init
+    usage: supabase init [flags]
     subcommands: []
-    flags: []
+    flags:
+      - id: with-vscode-workspace
+        name: --with-vscode-workspace
+        description: Generate VS Code workspace.
+        default_value: 'false'
   - id: supabase-gen
     title: supabase gen
     summary: Run code generation tools
@@ -1299,6 +1560,7 @@ commands:
       - supabase-functions-delete
       - supabase-functions-deploy
       - supabase-functions-download
+      - supabase-functions-list
       - supabase-functions-new
       - supabase-functions-serve
     flags: []
@@ -1307,7 +1569,7 @@ commands:
     summary: Serve all Functions locally
     tags: []
     links: []
-    usage: supabase functions serve <Function name> [flags]
+    usage: supabase functions serve [flags]
     subcommands: []
     flags:
       - id: env-file
@@ -1331,6 +1593,19 @@ commands:
     usage: supabase functions new <Function name>
     subcommands: []
     flags: []
+  - id: supabase-functions-list
+    title: supabase functions list
+    summary: List all Functions in Supabase
+    description: List all Functions in the linked Supabase project.
+    tags: []
+    links: []
+    usage: supabase functions list [flags]
+    subcommands: []
+    flags:
+      - id: project-ref
+        name: --project-ref <string>
+        description: Project ref of the Supabase project.
+        default_value: ''
   - id: supabase-functions-download
     title: supabase functions download
     summary: Download a Function from Supabase
@@ -1762,6 +2037,10 @@ commands:
         name: --role-only
         description: Dumps only cluster roles.
         default_value: 'false'
+      - id: use-copy
+        name: --use-copy
+        description: Uses copy statements in place of inserts.
+        default_value: 'false'
       - id: db-url
         name: --db-url <string>
         description: connect using the specified database url
@@ -1822,14 +2101,23 @@ commands:
     usage: supabase db diff [flags]
     subcommands: []
     flags:
+      - id: db-url
+        name: --db-url <string>
+        description: |
+          Diffs local migration files against the database specified by the connection string (must be percent-encoded).
+        default_value: ''
       - id: file
         name: -f, --file <string>
         description: Saves schema diff to a new migration file.
         default_value: ''
       - id: linked
         name: --linked
-        description: Diffs local schema against the linked project.
+        description: Diffs local migration files against the linked project.
         default_value: 'false'
+      - id: local
+        name: --local
+        description: Diffs local migration files against the local database.
+        default_value: 'true'
       - id: schema
         name: -s, --schema <strings>
         description: List of schema to include.
@@ -1842,10 +2130,6 @@ commands:
         name: --use-pgadmin
         description: Use pgAdmin to generate schema diff.
         default_value: 'false'
-      - id: db-url
-        name: --db-url <string>
-        description: connect using the specified database url
-        default_value: ''
   - id: supabase-completion
     title: supabase completion
     summary: Generate the autocompletion script for the specified shell
