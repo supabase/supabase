@@ -33,9 +33,7 @@ export async function createTableRow({
   enumArrayColumns,
 }: TableRowCreateVariables) {
   const sql = getTableRowCreateSql({ table, payload, enumArrayColumns })
-
   const { result } = await executeSql({ projectRef, connectionString, sql })
-
   return result
 }
 
@@ -61,7 +59,7 @@ export const useTableRowCreateMutation = ({
       },
       async onError(data, variables, context) {
         if (onError === undefined) {
-          toast.error(`Failed to create table row: ${data.message}`)
+          toast.error(data.message)
         } else {
           onError(data, variables, context)
         }
