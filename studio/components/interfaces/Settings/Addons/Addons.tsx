@@ -190,7 +190,7 @@ const Addons = () => {
                     ) : null}
 
                     <div className="mt-2 w-full flex items-center justify-between border-b py-2">
-                      <Link href={`/project/${projectRef}/settings/billing/usage#ram`}>
+                      <Link href={`/project/${projectRef}/settings/infrastructure#ram`}>
                         <a>
                           <div className="group flex items-center space-x-2">
                             <p className="text-sm text-scale-1100 group-hover:text-scale-1200 transition cursor-pointer">
@@ -207,7 +207,7 @@ const Addons = () => {
                       <p className="text-sm">{computeInstance?.variant?.meta?.memory_gb ?? 1} GB</p>
                     </div>
                     <div className="w-full flex items-center justify-between border-b py-2">
-                      <Link href={`/project/${projectRef}/settings/billing/usage#cpu`}>
+                      <Link href={`/project/${projectRef}/settings/infrastructure#cpu`}>
                         <a>
                           <div className="group flex items-center space-x-2">
                             <p className="text-sm text-scale-1100 group-hover:text-scale-1200 transition cursor-pointer">
@@ -239,7 +239,7 @@ const Addons = () => {
                       </p>
                     </div>
                     <div className="w-full flex items-center justify-between border-b py-2">
-                      <Link href={`/project/${projectRef}/settings/billing/usage#disk_io`}>
+                      <Link href={`/project/${projectRef}/settings/infrastructure#disk_io`}>
                         <a>
                           <div className="group flex items-center space-x-2">
                             <p className="text-sm text-scale-1100 group-hover:text-scale-1200 transition cursor-pointer">
@@ -260,7 +260,7 @@ const Addons = () => {
                       </p>
                     </div>
                     <div className="w-full flex items-center justify-between py-2">
-                      <Link href={`/project/${projectRef}/settings/billing/usage#disk_io`}>
+                      <Link href={`/project/${projectRef}/settings/infrastructure#disk_io`}>
                         <a>
                           <div className="group flex items-center space-x-2">
                             <p className="text-sm text-scale-1100 group-hover:text-scale-1200 transition cursor-pointer">
