@@ -8,6 +8,7 @@ import {
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import SparkBar from 'components/ui/SparkBar'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useFlag } from 'hooks'
@@ -15,7 +16,6 @@ import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
 import { Alert, Button, IconExternalLink } from 'ui'
 import ProjectUpdateDisabledTooltip from '../../BillingSettings/ProjectUpdateDisabledTooltip'
 import PlanUpdateSidePanel from './PlanUpdateSidePanel'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 
 const Subscription = () => {
   const { slug } = useParams()
@@ -37,8 +37,7 @@ const Subscription = () => {
   const daysToCycleEnd = billingCycleEnd.diff(dayjs(), 'days')
   const daysWithinCycle = billingCycleEnd.diff(billingCycleStart, 'days')
 
-  const canChangeTier =
-    !projectUpdateDisabled && !['team', 'enterprise'].includes(currentPlan?.id ?? '')
+  const canChangeTier = !projectUpdateDisabled && !['enterprise'].includes(currentPlan?.id ?? '')
 
   return (
     <>
@@ -93,13 +92,19 @@ const Subscription = () => {
                 </ProjectUpdateDisabledTooltip>
                 {!canChangeTier &&
                   (projectUpdateDisabled ? (
-                    <Alert withIcon variant="info" title={`Unable to update plan from ${planName}`}>
+                    <Alert
+                      className="mt-2"
+                      withIcon
+                      variant="info"
+                      title={`Unable to update plan from ${planName}`}
+                    >
                       We have temporarily disabled project and subscription changes - our engineers
                       are working on a fix.
                     </Alert>
                   ) : (
                     <Alert
                       withIcon
+                      className="mt-2"
                       variant="info"
                       title={`Unable to update plan from ${planName}`}
                       actions={[

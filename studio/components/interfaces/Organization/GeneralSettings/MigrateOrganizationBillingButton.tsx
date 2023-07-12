@@ -1,16 +1,15 @@
-import { useState, useEffect, useMemo } from 'react'
-import { observer } from 'mobx-react-lite'
-import { Button, Form, Modal, Listbox, Loading, Alert, IconHelpCircle, Toggle } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { observer } from 'mobx-react-lite'
+import { useEffect, useMemo, useState } from 'react'
+import { Alert, Button, Form, IconHelpCircle, Listbox, Loading, Modal, Toggle } from 'ui'
 
-import { useStore, useCheckPermissions, useSelectedOrganization } from 'hooks'
-import { PRICING_TIER_LABELS_ORG } from 'lib/constants'
+import { SpendCapModal } from 'components/interfaces/BillingV2'
 import { useOrganizationBillingMigrationMutation } from 'data/organizations/organization-migrate-billing-mutation'
 import { useOrganizationBillingMigrationPreview } from 'data/organizations/organization-migrate-billing-preview-query'
+import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
+import { PRICING_TIER_LABELS_ORG } from 'lib/constants'
 import Link from 'next/link'
-import SpendCapModal from 'components/interfaces/Billing/SpendCapModal'
 import { useRouter } from 'next/router'
-import InformationBox from 'components/ui/InformationBox'
 
 const MigrateOrganizationBillingButton = observer(() => {
   const { ui } = useStore()

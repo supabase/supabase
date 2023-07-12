@@ -6,10 +6,10 @@ import { useSelectedOrganization } from 'hooks'
 import { NextPageWithLayout } from 'types'
 
 const OrgUsage: NextPageWithLayout = () => {
-  const { isLoading } = usePermissionsQuery()
+  const { isLoading: isLoadingPermissions } = usePermissionsQuery()
   const selectedOrganization = useSelectedOrganization()
 
-  return <>{selectedOrganization === undefined && isLoading ? <Loading /> : <Usage />}</>
+  return <>{selectedOrganization === undefined && isLoadingPermissions ? <Loading /> : <Usage />}</>
 }
 
 OrgUsage.getLayout = (page) => <OrganizationLayout>{page}</OrganizationLayout>

@@ -128,8 +128,9 @@ const TaxID = () => {
         <div className="sticky space-y-6 top-16">
           <div>
             <p className="text-base">Tax ID</p>
-            <p className="text-sm text-scale-1000">
-              If you would like to include specific tax ID(s) to your invoices.
+            <p className="text-sm text-scale-1000 pr-4">
+              If you would like to include specific tax ID(s) to your invoices. Old invoices are not
+              affected.
             </p>
             <p className="text-sm text-scale-1000">
               Make sure the tax ID looks exactly like the placeholder text.
@@ -151,7 +152,7 @@ const TaxID = () => {
             )}
 
             {isError && (
-              <AlertError error={error} subject="Unable to retrieve organization tax IDs" />
+              <AlertError error={error} subject="Failed to retrieve organization tax IDs" />
             )}
 
             {isSuccess && (
