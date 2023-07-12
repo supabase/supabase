@@ -21,12 +21,16 @@ import { Alert, Button, IconChevronRight, IconExternalLink } from 'ui'
 import { ComputeInstanceSidePanel, CustomDomainSidePanel, PITRSidePanel } from './'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import AlertError from 'components/ui/AlertError'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
 const Addons = () => {
   const { isDarkMode } = useTheme()
   const { ref: projectRef } = useParams()
   const snap = useSubscriptionPageStateSnapshot()
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
+
+  const { project: selectedProject } = useProjectContext()
+  const cpuArchitecture = selectedProject?.cloud_provider === 'FLY' ? 'x86 64-bit' : 'ARM'
 
   // [Joshen] We could possibly look into reducing the interval to be more "realtime"
   // I tried setting the interval to 1m but no data was returned, may need to experiment
@@ -222,7 +226,7 @@ const Addons = () => {
                         </a>
                       </Link>
                       <p className="text-sm">
-                        {computeInstance?.variant?.meta?.cpu_cores ?? 2}-core ARM{' '}
+                        {computeInstance?.variant?.meta?.cpu_cores ?? 2}-core {cpuArchitecture}{' '}
                         {computeInstance?.variant?.meta?.cpu_dedicated ? '(Dedicated)' : '(Shared)'}
                       </p>
                     </div>
