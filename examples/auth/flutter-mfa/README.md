@@ -42,7 +42,7 @@ create policy "Users can view private_posts if they have signed in via MFA"
 
 ## Resources
 
-- [Flutter Authorization with RLS article](https://supabase.com/blog/flutter-authorization-with-rls)
 - [Flutter Tutorial: building a Flutter chat app article](https://supabase.com/blog/flutter-tutorial-building-a-chat-app)
+- [Flutter Authorization with RLS article](https://supabase.com/blog/flutter-authorization-with-rls)
 - [Supabase docs for Flutter](https://supabase.com/docs/reference/dart/introduction)
 - [Supabase Flutter YouTube playlist](https://www.youtube.com/watch?v=F2j6Q-4nLEE&list=PL5S4mPUpp4OtkMf5LNDLXdTcAp1niHjoL)
