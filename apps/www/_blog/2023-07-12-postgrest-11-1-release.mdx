@@ -218,7 +218,7 @@ For completeness, the `all` modifier is also included.
 
 ## Minimal Breaking Changes from v10
 
-If you only use PostgREST through Supabase client libraries(like ``supabase-js``) then it's safe to upgrade to v11. If you use PostgREST with other HTTP clients(like `curl`), consider the breaking changes for this version:
+If you only use PostgREST through Supabase client libraries (like [`supabase-js`](https://supabase.com/docs/reference/javascript/introduction)) then it's safe to upgrade to v11. If you use PostgREST with other HTTP clients (like `curl`), consider the breaking changes for this version:
 
 - The `Range` header is now only considered on GET requests and is ignored for any other method. Previously PostgREST responded with an error but [RFC 9110](https://www.rfc-editor.org/rfc/rfc9110.html#name-range) dictates that we should ignore the `Range` header instead.
 - RPC requests no longer consider the `Prefer: params=multiple-objects` header. This header was already deprecated on [v10.1.0](https://github.com/PostgREST/postgrest/releases/tag/v10.1.0).
