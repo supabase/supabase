@@ -65,7 +65,7 @@ const BillingAddress = () => {
       <ScaffoldSectionDetail>
         <div className="sticky top-16">
           <p className="text-base">Billing Address</p>
-          <p className="text-sm text-scale-1000">This will be reflected in every invoice</p>
+          <p className="text-sm text-scale-1000">This will be reflected in every upcoming invoice, past invoices are not affected</p>
         </div>
       </ScaffoldSectionDetail>
       <ScaffoldSectionContent>
@@ -83,7 +83,7 @@ const BillingAddress = () => {
 
             {isError && (
               <AlertError
-                subject="Unable to retrieve organization customer profile"
+                subject="Failed to retrieve organization customer profile"
                 error={error as any}
               />
             )}

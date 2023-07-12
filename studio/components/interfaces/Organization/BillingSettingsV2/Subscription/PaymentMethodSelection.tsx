@@ -9,7 +9,7 @@ import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import { getURL } from 'lib/helpers'
 import { Button, IconAlertCircle, IconCreditCard, IconLoader, IconPlus, Listbox } from 'ui'
-import { AddNewPaymentMethodModal } from 'components/interfaces/Billing'
+import { AddNewPaymentMethodModal } from 'components/interfaces/BillingV2'
 
 export interface PaymentMethodSelectionProps {
   selectedPaymentMethod?: string

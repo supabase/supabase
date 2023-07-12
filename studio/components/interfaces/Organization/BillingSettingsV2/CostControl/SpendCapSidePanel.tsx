@@ -72,6 +72,7 @@ const SpendCapSidePanel = () => {
             title: 'Spend cap',
             section: 'Cost Control',
           },
+          ...(slug && { orgSlug: slug }),
         },
         router
       )
@@ -235,6 +236,7 @@ const SpendCapSidePanel = () => {
                             section: 'Cost Control',
                             option: option.name,
                           },
+                          ...(slug && { orgSlug: slug }),
                         },
                         router
                       )

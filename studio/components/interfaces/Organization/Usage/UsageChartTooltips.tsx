@@ -39,40 +39,57 @@ export interface MultiAttributeTooltipContentProps {
   tooltipFormatter?: (value: any) => any
 }
 
+const AttributeContent = ({
+  attribute,
+  attributeMeta,
+  sumValue,
+  tooltipFormatter,
+}: {
+  attribute: Attribute
+  attributeMeta?: Payload<ValueType, string | number>
+  sumValue: number
+  tooltipFormatter?: (value: any) => any
+}) => {
+  const attrValue = Number(attributeMeta?.value ?? 0)
+  const percentageContribution = ((attrValue / sumValue) * 100).toFixed(1)
+
+  return (
+    <div key={attribute.name} className="flex items-center justify-between">
+      <div className="flex items-center space-x-2 w-[200px]">
+        <div className={clsx('w-3 h-3 rounded-full border', COLOR_MAP[attribute.color].marker)} />
+        <p className="text-xs prose">
+          {attribute.name} ({percentageContribution}%):{' '}
+        </p>
+      </div>
+      <p className="text-xs tabular-nums">
+        {tooltipFormatter !== undefined ? tooltipFormatter(attrValue) : attrValue}
+      </p>
+    </div>
+  )
+}
+
 export const MultiAttributeTooltipContent = ({
   attributes,
   values,
   isAfterToday,
   tooltipFormatter,
 }: MultiAttributeTooltipContentProps) => {
+  const sumValue = values.reduce((a, b) => a + Number(b.value), 0)
   return (
     <>
       {isAfterToday ? (
         <p className="text-scale-1000 text-lg">No data yet</p>
       ) : (
         <div className="space-y-1 pb-1">
-          {attributes.map((attr) => {
-            const attrMeta = values.find((x) => x.dataKey === attr.key)
-            const attrValue = Number(attrMeta?.value ?? 0)
-            const sumValue = values.reduce((a, b) => a + Number(b.value), 0)
-            const percentageContribution = ((attrValue / sumValue) * 100).toFixed(1)
-
-            return (
-              <div key={attr.name} className="flex items-center justify-between">
-                <div className="flex items-center space-x-2 w-[200px]">
-                  <div
-                    className={clsx('w-3 h-3 rounded-full border', COLOR_MAP[attr.color].marker)}
-                  />
-                  <p className="text-sm prose">
-                    {attr.name} ({percentageContribution}%):{' '}
-                  </p>
-                </div>
-                <p className="text-sm tabular-nums">
-                  {tooltipFormatter !== undefined ? tooltipFormatter(attrValue) : attrValue}
-                </p>
-              </div>
-            )
-          })}
+          {attributes.map((attr) => (
+            <AttributeContent
+              key={attr.name}
+              attribute={attr}
+              attributeMeta={values.find((x) => x.dataKey === attr.key)}
+              sumValue={sumValue}
+              tooltipFormatter={tooltipFormatter}
+            />
+          ))}
         </div>
       )}
     </>
