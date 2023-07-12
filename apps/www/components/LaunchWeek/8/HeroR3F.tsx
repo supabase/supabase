@@ -73,7 +73,7 @@ let defaultConfig = {
   particlesSize: 1.8,
   particlesSides: 5,
   particlesBlending: true,
-  lightIntensity: 0.5,
+  lightIntensity: 0.75,
   widthRadius: 100,
   widthRatio: 1.2,
   topHeightRadius: 80,
