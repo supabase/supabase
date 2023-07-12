@@ -1,5 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { isEqual } from 'lodash'
 import { useEffect, useState } from 'react'
 
 import { useParams } from 'common'
@@ -21,7 +20,7 @@ import { useCheckPermissions, useStore } from 'hooks'
 import { uuidv4 } from 'lib/helpers'
 import { Button, Form, IconPlus, IconX, Input, Listbox } from 'ui'
 import { TAX_IDS } from './TaxID.constants'
-import { sanitizeTaxID } from './TaxID.utilts'
+import { checkTaxIdsEqual, sanitizeTaxID } from './TaxID.utilts'
 
 const TaxID = () => {
   const { ui } = useStore()
@@ -52,7 +51,7 @@ const TaxID = () => {
     }) ?? []
 
   const formId = 'tax-id-form'
-  const hasChanges = !isEqual(taxIdValues, formattedTaxIds)
+  const hasChanges = !checkTaxIdsEqual(taxIdValues, formattedTaxIds)
   const canReadTaxIds = useCheckPermissions(PermissionAction.BILLING_READ, 'stripe.tax_ids')
   const canUpdateTaxIds = useCheckPermissions(PermissionAction.BILLING_WRITE, 'stripe.tax_ids')
 
@@ -103,8 +102,22 @@ const TaxID = () => {
     if (taxIds === undefined) return console.error('Tax IDs are required')
 
     const newIds = taxIdValues.map((x) => sanitizeTaxID(x))
-    const { errors } = await updateTaxIDs({ slug, existingIds: taxIds, newIds })
+    const { created, errors } = await updateTaxIDs({ slug, existingIds: taxIds, newIds })
     setErrors(errors?.map((taxId) => taxId.id) ?? [])
+
+    const updatedTaxIds =
+      created?.map((x) => {
+        return {
+          id: x.id,
+          type: x.type,
+          value: x.value,
+          name:
+            x.type === 'eu_vat'
+              ? `${x.country} VAT`
+              : TAX_IDS.find((option) => option.code === x.type)?.name ?? '',
+        }
+      }) ?? []
+    setTaxIdValues(updatedTaxIds)
 
     if (errors !== undefined && errors.length > 0) {
       errors.forEach((taxId: any) => {

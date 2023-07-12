@@ -83,7 +83,7 @@ export const useOrganizationTaxIDsUpdateMutation = ({
   >((vars) => updateOrganizationTaxIDs(vars), {
     async onSuccess(data, variables, context) {
       const { slug } = variables
-      await queryClient.invalidateQueries(organizationKeys.customerProfile(slug))
+      await queryClient.invalidateQueries(organizationKeys.taxIds(slug))
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {
