@@ -48,14 +48,8 @@ export async function updateFDW({
   formState,
   tables,
 }: FDWUpdateVariables) {
-  if (!projectRef) {
-    throw new Error('projectRef is required')
-  }
-
   const sql = wrapWithTransaction(getUpdateFDWSql({ wrapper, wrapperMeta, formState, tables }))
-
   const { result } = await executeSql({ projectRef, connectionString, sql })
-
   return result
 }
 

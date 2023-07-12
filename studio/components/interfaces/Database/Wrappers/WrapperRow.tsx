@@ -1,52 +1,32 @@
-import Link from 'next/link'
-import Image from 'next/image'
-import { FC } from 'react'
-import { partition } from 'lodash'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Collapsible, IconChevronUp, Button, IconExternalLink, IconTrash, IconEdit } from 'ui'
+import { partition } from 'lodash'
+import Image from 'next/image'
+import Link from 'next/link'
+import { Button, Collapsible, IconChevronUp, IconEdit, IconExternalLink, IconTrash } from 'ui'
 
-import { useStore, useCheckPermissions } from 'hooks'
 import { useParams } from 'common/hooks'
-import { WrapperMeta } from './Wrappers.types'
 import { FDW } from 'data/fdw/fdws-query'
-import { useFDWDeleteMutation } from 'data/fdw/fdw-delete-mutation'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
+import { useCheckPermissions } from 'hooks'
+import { WrapperMeta } from './Wrappers.types'
 
-interface Props {
+interface WrapperRowProps {
   wrappers: FDW[]
   wrapperMeta: WrapperMeta
   isOpen: boolean
   onOpen: (wrapper: string) => void
+  onSelectDelete: (wrapper: FDW) => void
 }
 
-const WrapperRow: FC<Props> = ({ wrappers = [], wrapperMeta, isOpen, onOpen }) => {
-  const { ui } = useStore()
+const WrapperRow = ({
+  wrappers = [],
+  wrapperMeta,
+  isOpen,
+  onOpen,
+  onSelectDelete,
+}: WrapperRowProps) => {
   const { ref } = useParams()
-  const { project } = useProjectContext()
-  const { mutateAsync: deleteFDW } = useFDWDeleteMutation()
-
   const canManageWrappers = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'wrappers')
-
-  const onDeleteWrapper = (wrapper: any) => {
-    confirmAlert({
-      title: `Confirm to disable ${wrapper.name}`,
-      message: `Are you sure you want to disable the ${wrapper.name} wrapper? This will also remove all tables created with this wrapper.`,
-      onAsyncConfirm: async () => {
-        await deleteFDW({
-          projectRef: project?.ref,
-          connectionString: project?.connectionString,
-          wrapper,
-          wrapperMeta,
-        })
-        ui.setNotification({
-          category: 'success',
-          message: `Successfully disabled ${wrapper.name} foreign data wrapper`,
-        })
-      },
-    })
-  }
 
   return (
     <>
@@ -199,7 +179,7 @@ const WrapperRow: FC<Props> = ({ wrappers = [], wrapperMeta, isOpen, onOpen }) =
                           disabled={!canManageWrappers}
                           icon={<IconTrash strokeWidth={1.5} />}
                           className="py-2"
-                          onClick={() => onDeleteWrapper(wrapper)}
+                          onClick={() => onSelectDelete(wrapper)}
                         />
                       </Tooltip.Trigger>
                       {!canManageWrappers && (

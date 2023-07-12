@@ -137,9 +137,7 @@ export async function createFDW({
   tables,
 }: FDWCreateVariables) {
   const sql = wrapWithTransaction(getCreateFDWSql({ wrapperMeta, formState, tables }))
-
   const { result } = await executeSql({ projectRef, connectionString, sql })
-
   return result
 }
 
