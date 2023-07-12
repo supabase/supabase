@@ -1,9 +1,10 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'react-hot-toast'
+
 import { delete_ } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { organizationKeys } from './keys'
-import { toast } from 'react-hot-toast'
 import { ResponseError } from 'types'
+import { organizationKeys } from './keys'
 
 export type OrganizationMemberInviteDeleteVariables = {
   slug: string
@@ -18,10 +19,7 @@ export async function deleteOrganizationMemberInvite({
     `${API_URL}/organizations/${slug}/members/invite?invited_id=${invitedId}`,
     {}
   )
-  if (response.error) {
-    throw response.error
-  }
-
+  if (response.error) throw response.error
   return response
 }
 
