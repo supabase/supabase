@@ -53,7 +53,7 @@ const UpgradeToPro: FC<Props> = ({ icon, primaryText, projectRef, secondaryText 
                   }`}
                 >
                   <a>
-                    {tier === PRICING_TIER_PRODUCT_IDS.FREE ? 'Upgrade to Pro' : 'Enable Addon'}
+                    {tier === PRICING_TIER_PRODUCT_IDS.FREE ? 'Upgrade to Pro' : 'Enable add on'}
                   </a>
                 </Link>
               </Button>

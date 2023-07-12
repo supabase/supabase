@@ -1,5 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useQueryClient } from '@tanstack/react-query'
 import Link from 'next/link'
 import { Button, Form, IconBarChart2, Input } from 'ui'
 
@@ -14,16 +13,13 @@ import {
 } from 'components/ui/Forms'
 import Panel from 'components/ui/Panel'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { invalidateProjectsQuery } from 'data/projects/projects-query'
+import { useProjectUpdateMutation } from 'data/projects/project-update-mutation'
 import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
-import { patch } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
 import PauseProjectButton from './Infrastructure/PauseProjectButton'
 import RestartServerButton from './Infrastructure/RestartServerButton'
 
 const General = () => {
   const { ui } = useStore()
-  const queryClient = useQueryClient()
   const { project } = useProjectContext()
   const organization = useSelectedOrganization()
 
@@ -31,26 +27,17 @@ const General = () => {
   const formId = 'project-general-settings'
   const initialValues = { name: project?.name ?? '', ref: project?.ref ?? '' }
   const canUpdateProject = useCheckPermissions(PermissionAction.UPDATE, 'projects')
+  const { mutateAsync: updateProject, isLoading: isUpdating } = useProjectUpdateMutation()
 
   const onSubmit = async (values: any, { resetForm }: any) => {
-    const response = await patch(`${API_URL}/projects/${project?.ref}`, {
-      name: values.name.trim(),
-    })
-    if (response.error) {
-      ui.setNotification({
-        category: 'error',
-        message: `Update project failed: ${response.error.message}`,
-      })
-    } else {
-      const { name } = response
-      resetForm({ values: { name }, initialValues: { name } })
+    if (!project?.ref) return console.error('Ref is required')
 
-      await invalidateProjectsQuery(queryClient)
-      ui.setNotification({
-        category: 'success',
-        message: 'Successfully saved settings',
-      })
-    }
+    const { name } = await updateProject({ ref: project.ref, name: values.name.trim() })
+    resetForm({ values: { name }, initialValues: { name } })
+    ui.setNotification({
+      category: 'success',
+      message: 'Successfully saved settings',
+    })
   }
 
   return (
@@ -60,7 +47,7 @@ const General = () => {
         <GenericSkeletonLoader />
       ) : (
         <Form id={formId} initialValues={initialValues} onSubmit={onSubmit}>
-          {({ isSubmitting, handleReset, values, initialValues }: any) => {
+          {({ handleReset, values, initialValues }: any) => {
             const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
             return (
               <FormPanel
@@ -69,7 +56,7 @@ const General = () => {
                   <div className="flex py-4 px-8">
                     <FormActions
                       form={formId}
-                      isSubmitting={isSubmitting}
+                      isSubmitting={isUpdating}
                       hasChanges={hasChanges}
                       handleReset={handleReset}
                       helper={
