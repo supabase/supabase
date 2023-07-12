@@ -21,6 +21,12 @@ export const generateDatabaseMenu = (
           items: [],
         },
         {
+          name: 'Schemas',
+          key: 'schemas',
+          url: `/project/${ref}/database/schemas`,
+          items: [],
+        },
+        {
           name: 'Functions',
           key: 'functions',
           url: `/project/${ref}/database/functions`,
