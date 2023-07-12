@@ -4,7 +4,7 @@
 
 A Flutter app demonstrating how to implement Multi-Factor Authentication (MFA) with Supabase and Flutter. A user can sign up, add MFA via an authenticator app, and only after they have signed in using MFA they can view the content from the database.
 
-- Full tutorial article [here](https://supabase.com/blog/flutter-authentication)
+- Full tutorial article [here](https://supabase.com/blog/flutter-multi-factor-authentication)
 
 ## Getting Started
 
