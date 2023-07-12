@@ -5,7 +5,6 @@ import { AutoApiService, useProjectApiQuery } from 'data/config/project-api-quer
 import { useSelectedProject, useStore, withAuth } from 'hooks'
 import { PROJECT_STATUS } from 'lib/constants'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
-import { observer } from 'mobx-react-lite'
 import ProjectLayout from '../'
 import StorageMenu from './StorageMenu'
 
