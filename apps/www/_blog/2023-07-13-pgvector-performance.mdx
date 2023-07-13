@@ -198,7 +198,7 @@ Another way to improve performance without throwing more compute would be to inc
 
 We ran a test to measure the impact of list size: we uploaded 90,000 vectors from the Wikipedia dataset and then queried 10,000 vectors from the same dataset. The documentation recommends to use `lists` constant of `number of vectors / 1000`. In this case, it would be 90.
 
-But as our experiment shows, we can improve `select` speed if we increase lists (i.e. with more lists in the index we need to get less index data to get the same precision). So for 95% precision, we can take any of:
+But as our experiment shows, we can improve RPS if we increase `lists` (i.e. with more lists in the index we need to get less index data to get the same precision). So for 95% precision, we can take any of:
 
 - 3% of index data = 270 lists
 - 6% of index data = 90 lists
