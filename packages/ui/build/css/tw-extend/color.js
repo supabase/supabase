@@ -457,7 +457,7 @@ module.exports = {
 },
 "border-DEFAULT": {
   cssVariable: "var(--border-default)",
-  value: "hsl(0, 0%, 15.7%)"
+  value: "hsl(0, 0%, 18%)"
 },
 "border-muted": {
   cssVariable: "var(--border-muted)",
@@ -491,6 +491,14 @@ module.exports = {
   cssVariable: "var(--destructive-400)",
   value: "hsl(0, 0%, 8.6%)"
 },
+"destructive-background": {
+  cssVariable: "var(--destructive-background)",
+  value: "hsl(350, 24%, 9.8%)"
+},
+"destructive-border": {
+  cssVariable: "var(--destructive-border)",
+  value: "hsl(356.9, 60.5%, 31.8%)"
+},
 "destructive-DEFAULT": {
   cssVariable: "var(--destructive-default)",
   value: "hsl(358.1, 75.1%, 59%)"
@@ -523,8 +531,8 @@ module.exports = {
   cssVariable: "var(--brand-400)",
   value: "hsl(153.60000000000002, 41%, 12%)"
 },
-"brand-PRIMARY": {
-  cssVariable: "var(--brand-primary)",
+"brand-DEFAULT": {
+  cssVariable: "var(--brand-default)",
   value: "hsl(152.89999999999998, 60%, 52.9%)"
 }
 }

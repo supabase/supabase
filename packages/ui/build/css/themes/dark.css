@@ -1,10 +1,10 @@
 /**
  * Do not edit directly
- * Generated on Wed, 05 Jul 2023 17:41:32 GMT
+ * Generated on Thu, 13 Jul 2023 04:13:59 GMT
  */
 
 .dark {
-  --brand-primary: 152.9deg 60% 52.9%;
+  --brand-default: 152.9deg 60% 52.9%;
   --brand-400: 153.6deg 41% 12%;
   --brand-300: 152.7deg 48.5% 26.7%;
   --brand-200: 148.5deg 43.5% 82%;
@@ -13,6 +13,8 @@
   --warning-300: 35.8deg 82.6% 13.5%;
   --warning-200: 38.8deg 97.4% 69.8%;
   --destructive-default: 358.1deg 75.1% 59%;
+  --destructive-border: 356.9deg 60.5% 31.8%;
+  --destructive-background: 350deg 24% 9.8%;
   --destructive-400: 0deg 0% 8.6%;
   --destructive-300: 0deg 40.8% 19.2%;
   --destructive-200: 0deg 97% 74.1%;
@@ -22,7 +24,7 @@
   --border-overlay: var(--colors-gray-dark-400);
   --border-secondary: var(--colors-gray-dark-400);
   --border-muted: var(--colors-gray-dark-400);
-  --border-default: var(--colors-gray-dark-400);
+  --border-default: var(--colors-gray-dark-500);
   --background-overlay-hover: var(--colors-gray-dark-500);
   --background-overlay-default: var(--colors-gray-dark-300);
   --background-surface-300: var(--colors-gray-dark-500);

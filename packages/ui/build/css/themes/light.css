@@ -1,37 +1,41 @@
 /**
  * Do not edit directly
- * Generated on Wed, 05 Jul 2023 17:41:32 GMT
+ * Generated on Thu, 13 Jul 2023 04:13:59 GMT
  */
 
 .light {
   --brand-primary: 152.9deg 60% 52.9%;
-  --brand-400: 153.6deg 41% 12%;
-  --brand-300: 152.7deg 48.5% 26.7%;
+  --brand-400: 153.7deg 68.7% 83.7%;
+  --brand-300: 153deg 46% 65.9%;
   --brand-200: 148.5deg 43.5% 82%;
   --warning-default: 38.9deg 100% 57.1%;
   --warning-400: 38.7deg 100% 93.9%;
   --warning-300: 38.6deg 100% 89%;
   --warning-200: 39deg 100% 75.3%;
   --destructive-default: 0deg 100% 50%;
+  --destructive-background: 0deg 100% 98.4%;
+  --destructive-border: 0deg 100% 87.5%;
   --destructive-400: 0deg 100% 98.4%;
   --destructive-300: 0deg 100% 87.5%;
   --destructive-200: 0deg 97% 74.1%;
   --background-alternative: 0deg 0% 100%;
   --background-muted: 0deg 0% 100%;
   --background-secondary: 0deg 0% 100%;
-  --foreground-muted: 0deg 0% 100%;
+  --border-control: var(--colors-slate-light-600);
   --border-alternative: var(--colors-slate-light-500);
   --border-overlay: var(--colors-slate-light-500);
   --border-secondary: var(--colors-gray-dark-400);
   --border-muted: var(--colors-gray-dark-400);
-  --border-default: var(--colors-gray-dark-400);
+  --border-default: var(--colors-slate-light-500);
   --background-overlay-hover: var(--colors-slate-light-300);
   --background-overlay-default: var(--colors-slate-light-100);
-  --background-surface-300: var(--colors-slate-light-300);
-  --background-surface-200: var(--colors-slate-light-200);
+  --background-surface-300: var(--colors-slate-light-400);
+  --background-surface-200: var(--colors-slate-light-300);
   --background-surface-100: var(--colors-slate-light-100);
+  --background-control: var(--colors-slate-light-300);
   --background-selection: var(--colors-gray-light-400);
-  --background-default: var(--colors-slate-light-100);
+  --background-default: var(--colors-slate-light-200);
+  --foreground-muted: var(--colors-slate-light-800);
   --foreground-lighter: var(--colors-slate-light-1000);
   --foreground-light: var(--colors-slate-light-1100);
   --foreground-strong: var(--colors-slate-light-1200);
