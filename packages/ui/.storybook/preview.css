@@ -112,7 +112,7 @@
 .light,
 .light .docs-story,
 .dark .docs-story {
-  @apply bg text;
+  @apply bg text font-[400];
   font-feature-settings: 'rlig' 1, 'calt' 1;
   font-family: 'Circular std';
 }
