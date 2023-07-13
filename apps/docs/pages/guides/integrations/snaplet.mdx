@@ -7,21 +7,11 @@ export const meta = {
     'Get started with Supabase and Snaplet, a developer tool for working with safe, versioned, up-to-date production-like data',
 }
 
-This guide will help you get a development Supabase instance set up using Snaplet. In 15 minutes or less, you will create a snapshot of your production Supabase instance and restore it to a development environment you can safely code against.
+This guide will help you get a development Supabase instance set up using [Snaplet](https://www.snaplet.dev/). In 15 minutes or less, you will create a snapshot of your production Supabase instance and restore it to a development environment you can safely code against.
 
 <Admonition type="note">
-
-If you experience any issues with getting Supabase working with Snaplet, or with this guide, feel free to come chat with us on [Discord](https://app.snaplet.dev/chat).
-
+If you experience any issues with getting Supabase working with Snaplet, or with this guide, feel free to chat with the Snaplet team on [Discord](https://app.snaplet.dev/chat).
 </Admonition>
-
-## Clone Supabase production data, without sensitive information, to a development environment
-
-We’re massive fans of Supabase because it makes it so easy to start a project with a dedicated PostgreSQL database. However, we’re willing to bet you know the pain and manual configuration in setting up multiple environments on Supabase and populating each of those with data - that’s why you’re here after all!
-
-Fortunately, Snaplet makes populating your multiple development environments with data and keeping that data consistent across those environments, incredibly simple. This is rooted in a philosophy we believe in here at Snaplet: [Environment parity](https://www.oreilly.com/content/environment-parity-for-rapidly-deployed-cloud-native-apps/).
-
-Environment parity sounds like a dream come true. In this guide, we’re going to tell you exactly how to do that with your data in Supabase! End-to-end, it shouldn’t take more than 15 minutes, and doing so will allow you to code against an accurate development environment that you can sync with production.
 
 <div>
 
@@ -37,7 +27,7 @@ Environment parity sounds like a dream come true. In this guide, we’re going t
 
 2. A development Supabase project’s connection string: Same steps as above, but a different project/environment. We’ll refer to this in the guide as your “target database” - where we’re restoring the snapshot of the source database to. If you haven’t got this set up yet, we’ll take you through the process of setting this up.
 
-> **Highly Recommended:** Create a read-only role for your connection string. For more info on how to create a read-only role across all schemas, you can check out [our docs](https://docs.snaplet.dev/guides/postgresql#create-a-read-only-role).
+> **Highly Recommended:** Create a read-only role for your connection string. For more info on how to create a read-only role across all schemas, you can check out this short guide in the [Snaplet docs](https://docs.snaplet.dev/guides/postgresql#create-a-read-only-role).
 
 ### Step 1: Connect your source database (Production Database) [#connect-source-db]
 
@@ -60,7 +50,7 @@ Once you have gone through those steps, a new snapshot process will start and yo
 
 ### Step 3: Create a target database on Supabase (Development Database) [#create-target-db]
 
-Your target database is where you want Snaplet to restore the captured snapshot of your production project. This would most likely be either your staging or developer Supabase project.
+Your target database is where you want Snaplet to restore the captured snapshot of your production project. This would most likely be either your staging or development Supabase project.
 
 If you don’t already have a developer database setup on Supabase, you’ll need to create a new database by setting up a new project on Supabase. To create a new project you’ll have to do the following:
 
@@ -68,9 +58,8 @@ If you don’t already have a developer database setup on Supabase, you’ll nee
 
 2. Go to your organization > All projects
 
-3. In the top left click on your current project name and new project
-
-![New project](/docs/img/guides/integrations/snaplet/new_project.webp)
+3. In the top left click on your current project name and new project:
+  ![New project](/docs/img/guides/integrations/snaplet/new_project.webp)
 
 4. Wait for the new database to launch
 
@@ -78,7 +67,7 @@ If you don’t already have a developer database setup on Supabase, you’ll nee
 
 ### Step 4: Install the Snaplet CLI [#cli-installation]
 
-1. Open your terminal and run `npm install snaplet`
+1. Open your terminal and run `npm install -g snaplet`
 2. Run `snaplet auth login`
 3. Navigate to `https://app.snaplet.dev/access-token/cli` to get your access token.
 4. Paste the access token in the terminal.
@@ -90,11 +79,10 @@ You're now ready to restore your production snapshot into your Supabase developm
 1. Navigate to your project directory
 
 2. Run `snaplet config setup`
+   i. You will be shown a warning to write create `.snaplet/config` in your project directory. Select yes (y) to create the file.
+   ii. Then you will be asked for a **target database connection string.** These are the database credentials of your **target database that we set up in step 3** (your staging or development database).
 
-i. You will be shown a warning to write create `.snaplet/config` in your project directory. Select yes (y) to create the file.
-ii. Then you will be asked for a **target database connection string.** These are the database credentials of your **target database that we set up in step 3** (your staging or development database).
-
-> Note that you need to be using the `postgres` user for your development environment
+   > Note that you need to be using the `postgres` user for your development environment
 
 3. Run `snaplet project setup` - you will be presented with a list of projects, these are databases that are connected to your Snaplet account. Choose the project that contains the snapshot you created in Step 2.
 
@@ -120,7 +108,7 @@ That’s it! You’re all done and should have restored a version of your Supaba
 
 ## Supabase local development [#local-development]
 
-Supabase allows you [develop locally](https://supabase.com/docs/guides/cli/local-development) through their CLI, you can easily restore any snapshot created in Snaplet to your local instance, just by running:
+Supabase allows you [develop locally](/docs/guides/getting-started/local-development) through their CLI, you can easily restore any snapshot created in Snaplet to your local instance, just by running:
 
 ```bash
 # Login into the Supabase CLI
