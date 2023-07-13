@@ -30,7 +30,7 @@ The key elements are:
 
 - **Helper scripts:** a Python test runner which is responsible for data upload, index creation, and query execution. This uses [qdrant's vector-db-benchmark](https://github.com/qdrant/vector-db-benchmark) repo. The “engine” in this repo uses [Vecs](https://github.com/supabase/vecs), a Python client for pgvector.
 - **Runtime:** Each test runs for at least 30-40 minutes and included a series of experiments executed at various concurrency levels. This process allowed us to gauge the engine's performance under different load types. Subsequently, we averaged the results.
-- **Pre-warming RAM:** we executed 10,000 to 50,000 “warm-up” queries before each benchmark, matching the number of probes as the benchmark. Additionally, we executed about 1,000 queries with probes ranging from three to ten times the benchmark's probes. Both of these help with RAM utilization.
+- **Pre-warming RAM:** We executed 10,000 to 50,000 “warm-up” queries before each benchmark, matching the number of probes as the benchmark. Additionally, we executed about 1,000 queries with probes ranging from three to ten times the benchmark's probes. Both of these help with RAM utilization.
 
 <div>
   <img
@@ -196,7 +196,7 @@ It's been about 5 months since we [added](https://supabase.com/blog/openai-embed
 
 Another way to improve performance without throwing more compute would be to increase `lists`.
 
-We ran a test to measure the impact of list size: we uploaded 90,000 vectors from Wikipedia dataset and then queried 10,000 vectors from the same dataset. The documentation recommends to use `lists` constant of `number of vectors / 1000`. In this case, it would be 90.
+We ran a test to measure the impact of list size: we uploaded 90,000 vectors from the Wikipedia dataset and then queried 10,000 vectors from the same dataset. The documentation recommends to use `lists` constant of `number of vectors / 1000`. In this case, it would be 90.
 
 But as our experiment shows, we can improve `select` speed if we increase lists (i.e. with more lists in the index we need to get less index data to get the same precision). So for 95% precision, we can take any of:
 
