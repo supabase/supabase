@@ -96,6 +96,7 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
 
     if (response.error) {
       ui.setNotification({
+        error: response.error,
         category: 'error',
         message: `Failed to create organization: ${response.error?.message ?? response.error}`,
       })

@@ -70,6 +70,7 @@ const JoinOrganizationPage = () => {
 
     if (response.error) {
       ui.setNotification({
+        error: response.error,
         category: 'error',
         message: `Failed to join organization: ${response.error.message}`,
       })
