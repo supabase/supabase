@@ -35,7 +35,7 @@ functions:
 
       **On Android, IOS & MacOS**, it uses deeplinks. Refer to the guide below on how to setup deeplinks. Alternatively you could use Native Google Auth or a WebView for OAuth. Refer to our [demo](https://github.com/supabase-community/supabase-kt/tree/master/demos/android-login) to learn more.
       **On JS**, it uses the website origin as the callback url. Session importing gets handled automatically.
-      **Windows & Linux** currently have no default implementation. Feel free to create a PR.
+      **Windows, tvOS, watchOS & Linux** currently have no default implementation. Feel free to create a PR.
 
       You always make your own implementation and use `gotrue.parseFragmentAndImportSession(fragment)` to let [supabase-kt](https://github.com/supabase-community/supabase-kt) handle the parsing & importing of the session after receiving a callback.
 
@@ -2179,6 +2179,7 @@ functions:
                   //...
               }
           }
+          ```
 
   - id: sign-in-with-otp
     title: 'sendOtpTo()'
