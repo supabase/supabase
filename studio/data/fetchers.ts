@@ -9,6 +9,7 @@ const DEFAULT_HEADERS = {
   Accept: 'application/json',
 }
 
+// This file will eventually replace what we currently have in lib/fetchWrapper
 const {
   get: _get,
   post: _post,
