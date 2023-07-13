@@ -5,14 +5,14 @@
       <link>https://supabase.com/blog</link>
       <description>Latest Postgres news from Oliver Rice at Supabase</description>
       <language>en</language>
-      <lastBuildDate>Thu, 20 Apr 2023 23:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Thu, 20 Apr 2023 22:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.com/planetpg-oli_rice-rss.xml" rel="self" type="application/rss+xml"/>
       <item>
   <guid>https://supabase.com/blog/whats-new-in-pg-graphql-v1-2</guid>
   <title>What&apos;s New in pg_graphql v1.2</title>
   <link>https://supabase.com/blog/whats-new-in-pg-graphql-v1-2</link>
   <description>New Features in the v1.2 release of pg_graphql</description>
-  <pubDate>Thu, 20 Apr 2023 23:00:00 GMT</pubDate>
+  <pubDate>Thu, 20 Apr 2023 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/type-constraints-in-65-lines-of-sql</guid>
@@ -40,7 +40,7 @@
   <title>pg_jsonschema: JSON Schema support for Postgres</title>
   <link>https://supabase.com/blog/pg-jsonschema-a-postgres-extension-for-json-validation</link>
   <description>Today we&apos;re releasing pg_jsonschema, a Postgres extension for JSON validation.</description>
-  <pubDate>Thu, 18 Aug 2022 23:00:00 GMT</pubDate>
+  <pubDate>Thu, 18 Aug 2022 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/postgres-audit</guid>
