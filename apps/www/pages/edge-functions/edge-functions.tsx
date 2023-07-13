@@ -1,6 +1,6 @@
 import { Badge, IconCode, IconFastForward, IconGlobe, IconRefreshCcw } from 'ui'
 import UseCaseExamples from 'data/products/functions/usecase-examples'
-import Solutions from 'data/Solutions.json'
+import Solutions from 'data/Solutions'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
@@ -104,8 +104,8 @@ function Database() {
       />
       <DefaultLayout>
         <ProductHeader
-          icon={Solutions['edge-functions'].icon}
-          title={Solutions['edge-functions'].name}
+          icon={Solutions['functions'].icon}
+          title={Solutions['functions'].name}
           h1={[
             <span key={'database-h1'}>
               Serverless Edge Functions

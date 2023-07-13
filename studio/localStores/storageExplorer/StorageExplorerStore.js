@@ -1,21 +1,20 @@
-import toast from 'react-hot-toast'
-import { createContext, useContext } from 'react'
-import { makeAutoObservable } from 'mobx'
-import { find, compact, isEqual, has, some, chunk, uniq, uniqBy, findIndex } from 'lodash'
-import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
 import { createClient } from '@supabase/supabase-js'
+import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
+import { chunk, compact, find, findIndex, has, isEqual, some, uniq, uniqBy } from 'lodash'
+import { makeAutoObservable } from 'mobx'
+import { createContext, useContext } from 'react'
+import toast from 'react-hot-toast'
 
-import { useStore } from 'hooks'
-import { copyToClipboard } from 'lib/helpers'
-import { API_URL, IS_PLATFORM } from 'lib/constants'
-import { post, delete_ } from 'lib/common/fetch'
-import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
 import {
-  STORAGE_VIEWS,
-  STORAGE_ROW_TYPES,
   STORAGE_ROW_STATUS,
+  STORAGE_ROW_TYPES,
   STORAGE_SORT_BY,
+  STORAGE_VIEWS,
 } from 'components/to-be-cleaned/Storage/Storage.constants.ts'
+import { useStore } from 'hooks'
+import { delete_, post } from 'lib/common/fetch'
+import { API_URL, IS_PLATFORM } from 'lib/constants'
+import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
 
 /**
  * This is a preferred method rather than React Context and useStorageExplorerStore().
@@ -52,7 +51,6 @@ class StorageExplorerStore {
   sortByOrder = 'asc'
   buckets = []
   selectedBucket = {}
-  selectedBucketToEdit = {}
   columns = []
   openedFolders = []
   selectedItems = []
@@ -75,9 +73,6 @@ class StorageExplorerStore {
   /* [Joshen] Move towards using API */
   endpoint = ''
 
-  /* FE to toggle page level modals */
-  showDeleteBucketModal = false
-
   /* FE Cacheing for file previews */
   filePreviewCache = []
 
@@ -90,6 +85,7 @@ class StorageExplorerStore {
   constructor(projectRef) {
     makeAutoObservable(this, { supabaseClient: false })
     this.projectRef = projectRef
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     this.ui = useStore().ui
 
     // ignore when in a non-browser environment
@@ -180,15 +176,6 @@ class StorageExplorerStore {
 
   setLoaded = (val) => {
     this.loaded = val
-  }
-
-  openDeleteBucketModal = (bucket) => {
-    this.selectedBucketToEdit = bucket
-    this.showDeleteBucketModal = true
-  }
-
-  closeDeleteBucketModal = () => {
-    this.showDeleteBucketModal = false
   }
 
   setSelectedBucket = (bucket) => {
