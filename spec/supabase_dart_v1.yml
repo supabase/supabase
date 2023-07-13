@@ -448,13 +448,13 @@ functions:
           ```
   - id: select
     description: |
-      Performs vertical filtering with SELECT.
+      Perform a SELECT query on the table or view.
     title: 'Fetch data: select()'
     notes: |
       - By default, Supabase projects will return a maximum of 1,000 rows. This setting can be changed in Project API Settings. It's recommended that you keep it low to limit the payload size of accidental or malicious requests. You can use `range()` queries to paginate through your data.
-      - `select()` can be combined with [Modifiers](/docs/reference/dart/using-modifiers)
       - `select()` can be combined with [Filters](/docs/reference/dart/using-filters)
-      - If using the Supabase hosted platform `apikey` is technically a reserved keyword, since the API gateway will pluck it out for authentication. [It should be avoided as a column name](https://github.com/supabase/supabase/issues/5465).
+      - `select()` can be combined with [Modifiers](/docs/reference/dart/using-modifiers)
+      - `apikey` is a reserved keyword if you're using the [Supabase Platform](/docs/guides/platform) and [should be avoided as a column name](https://github.com/supabase/supabase/issues/5465).
     examples:
       - id: getting-your-data
         name: Getting your data
@@ -568,7 +568,7 @@ functions:
 
   - id: insert
     description: |
-      Performs an INSERT into the table.
+      Perform an INSERT into the table or view.
     title: 'Create data: insert()'
     examples:
       - id: create-a-record
@@ -602,7 +602,7 @@ functions:
 
   - id: update
     description: |
-      Performs an UPDATE on the table.
+      Perform an UPDATE on the table or view.
     title: 'Modify data: update()'
     notes: |
       - `update()` should always be combined with [Filters](/docs/reference/dart/using-filters) to target the item(s) you wish to update.
@@ -651,11 +651,10 @@ functions:
 
   - id: upsert
     description: |
-      Performs an UPSERT into the table.
+      Perform an UPSERT on the table or view. Depending on the column(s) passed to `onConflict`, `.upsert()` allows you to perform the equivalent of `.insert()` if a row with the corresponding `onConflict` columns doesn't exist, or if it does exist, perform an alternative action depending on `ignoreDuplicates`.
     title: 'Upsert data: upsert()'
     notes: |
-      - Primary keys should be included in the data payload in order for an update to work correctly.
-      - Primary keys must be natural, not surrogate. There are however, [workarounds](https://github.com/PostgREST/postgrest/issues/1118) for surrogate primary keys.
+      - Primary keys must be included in `values` to use upsert.
     examples:
       - id: upsert-your-data
         name: Upsert your data
@@ -696,10 +695,11 @@ functions:
 
   - id: delete
     description: |
-      Performs a DELETE on the table.
+      Perform a DELETE on the table or view.
     title: 'Delete data: delete()'
     notes: |
       - `delete()` should always be combined with [Filters](/docs/reference/dart/using-filters) to target the item(s) you wish to delete.
+      - If you use `delete()` with filters and you have RLS enabled, only rows visible through `SELECT` policies are deleted. Note that by default no rows are visible, so you need at least one `SELECT`/`ALL` policy that makes the rows visible.
     examples:
       - id: delete-records
         name: Delete records

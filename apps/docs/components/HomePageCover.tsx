@@ -77,7 +77,7 @@ const HomePageCover = (props) => {
             Discover how to set up a database to an app making queries in just a few minutes.
           </p>
         </div>
-        <div className="flex flex-wrap md:grid md:grid-cols-4 2xl:grid-cols-7 gap-2 sm:gap-3">
+        <div className="flex flex-wrap md:grid md:grid-cols-4 2xl:grid-cols-8 gap-2 sm:gap-3">
           {frameworks.map((framework, i) => (
             <Link key={i} href={framework.href} passHref>
               <a className="no-underline">
@@ -98,7 +98,7 @@ const HomePageCover = (props) => {
   return (
     <div className="w-full bg-scale-100 border-b prose dark:prose-dar max-w-none mb-16 md:mb-12 xl:mb-0">
       <div className="max-w-7xl px-5 mx-auto py-8 sm:pb-16 sm:pt-12 xl:pt-16 flex flex-col xl:flex-row justify-between gap-12 xl:gap-12">
-        <div className="flex flex-col sm:flex-row gap-4 sm:gap-8 items-start sm:items-center w-full max-w-xl">
+        <div className="flex flex-col sm:flex-row gap-4 sm:gap-8 items-start sm:items-center w-full max-w-xl xl:max-w-[33rem]">
           <DocsCoverLogo />
           <div className="flex flex-col">
             <h1 className="m-0 mb-3 text-2xl sm:text-3xl">{props.meta?.title}</h1>
@@ -108,7 +108,7 @@ const HomePageCover = (props) => {
             </p>
           </div>
         </div>
-        <div className="w-full xl:max-w-[365px] 2xl:max-w-[608px] -mb-40">
+        <div className="w-full xl:max-w-[375px] 2xl:max-w-[620px] -mb-40">
           <GettingStarted />
         </div>
       </div>

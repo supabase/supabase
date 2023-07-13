@@ -15,6 +15,7 @@ export interface UseThemeProps {
 
 interface ThemeProviderProps {
   children?: any
+  detectSystemColorPreference?: boolean
 }
 
 export const ThemeContext = createContext<UseThemeProps>({
@@ -24,16 +25,23 @@ export const ThemeContext = createContext<UseThemeProps>({
 
 export const useTheme = () => useContext(ThemeContext)
 
-export const ThemeProvider = ({ children }: ThemeProviderProps) => {
+export const ThemeProvider = ({
+  detectSystemColorPreference = true,
+  children,
+}: ThemeProviderProps) => {
   const [isDarkMode, setIsDarkMode] = useState(false)
 
   useEffect(() => {
     const key = localStorage.getItem('supabaseDarkMode')
-    const mode = key === 'true'
+    // If no localStorage is set
+    // and detectSystemColorPreference is false
+    // default to dark mode
+    const hasNoKey = key === null
+    const isDarkMode = hasNoKey || key === 'true'
 
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
 
-    prefersDark ? toggleTheme(true) : toggleTheme(mode)
+    hasNoKey && detectSystemColorPreference ? toggleTheme(prefersDark) : toggleTheme(isDarkMode)
   }, [])
 
   const toggleTheme: UseThemeProps['toggleTheme'] = (darkMode) => {
