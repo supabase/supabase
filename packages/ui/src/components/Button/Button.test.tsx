@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import Link from 'next/link'
 import React from 'react'
-import { Button } from '../shadcn/updated/Button/Button'
+import { Button } from '@ui/components/Button'
 
 const SIZES = ['tiny', 'small', 'medium', 'large', 'xlarge'] as const
 const TYPES = [
