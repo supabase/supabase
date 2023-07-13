@@ -226,6 +226,7 @@ const Wizard: NextPageWithLayout = () => {
     if (response.error) {
       setNewProjectLoading(false)
       ui.setNotification({
+        error: response.error,
         category: 'error',
         message: `Failed to create new project: ${response.error.message}`,
       })
