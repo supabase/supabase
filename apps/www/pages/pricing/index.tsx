@@ -1,5 +1,5 @@
 import { Accordion, Button, IconCheck, Select } from 'ui'
-import Solutions from 'data/Solutions.json'
+import Solutions from 'data/Solutions'
 import { NextSeo } from 'next-seo'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -140,7 +140,7 @@ export default function IndexPage() {
           url: `https://supabase.com/${router.pathname}`,
           images: [
             {
-              url: `https://supabase.com/images/og/og-image.jpg`,
+              url: `https://supabase.com/images/og/og-image-v2.jpg`,
             },
           ],
         }}
@@ -524,7 +524,7 @@ export default function IndexPage() {
                   <PricingTableRowMobile
                     category={pricing['edge_functions']}
                     plan={'free'}
-                    icon={Solutions['edge-functions'].icon}
+                    icon={Solutions['functions'].icon}
                     sectionId="edge-functions"
                   />
                   <PricingTableRowMobile
@@ -580,7 +580,7 @@ export default function IndexPage() {
                   <PricingTableRowMobile
                     category={pricing['edge_functions']}
                     plan={'pro'}
-                    icon={Solutions['edge-functions'].icon}
+                    icon={Solutions['functions'].icon}
                   />
                   <PricingTableRowMobile
                     category={pricing.dashboard}
@@ -632,7 +632,7 @@ export default function IndexPage() {
                   <PricingTableRowMobile
                     category={pricing['edge_functions']}
                     plan={'team'}
-                    icon={Solutions['edge-functions'].icon}
+                    icon={Solutions['functions'].icon}
                   />
                   <PricingTableRowMobile
                     category={pricing.dashboard}
@@ -686,7 +686,7 @@ export default function IndexPage() {
                   <PricingTableRowMobile
                     category={pricing['edge_functions']}
                     plan={'enterprise'}
-                    icon={Solutions['edge-functions'].icon}
+                    icon={Solutions['functions'].icon}
                   />
                   <PricingTableRowMobile
                     category={pricing.dashboard}
@@ -838,7 +838,7 @@ export default function IndexPage() {
                   />
                   <PricingTableRowDesktop
                     category={pricing['edge_functions']}
-                    icon={Solutions['edge-functions'].icon}
+                    icon={Solutions['functions'].icon}
                     sectionId="edge-functions"
                   />
                   <PricingTableRowDesktop

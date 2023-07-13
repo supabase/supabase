@@ -5,7 +5,7 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { Button, Form, Input, Modal } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import { FormHeader } from 'components/ui/Forms'
 import { urlRegex } from '../Auth.constants'
 import RedirectUrlList from './RedirectUrlList'
@@ -21,7 +21,7 @@ const RedirectUrls = () => {
   const [isDeleting, setIsDeleting] = useState(false)
   const [selectedUrlToDelete, setSelectedUrlToDelete] = useState<string>()
 
-  const canUpdateConfig = checkPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
+  const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
   const newUrlSchema = object({
     url: string().matches(urlRegex, 'URL is not valid').required(),

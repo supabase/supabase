@@ -1,29 +1,32 @@
-import { FC, useState } from 'react'
-import { isEqual } from 'lodash'
-import { Dictionary } from 'components/grid'
-import { Form, Input, Button, Listbox } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { isEqual } from 'lodash'
+import { useState } from 'react'
+import { Button, Form, Input, Listbox } from 'ui'
 
-import { checkPermissions, useStore } from 'hooks'
+import NoPermission from 'components/ui/NoPermission'
+import Panel from 'components/ui/Panel'
+import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
 import { patch } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { COUNTRIES } from './BillingAddress.constants'
-import Panel from 'components/ui/Panel'
-import NoPermission from 'components/ui/NoPermission'
 
-interface Props {
+export interface BillingAddressProps {
   loading: boolean
-  address: Dictionary<any>
+  address: { [key: string]: any }
   onAddressUpdated: (address: any) => void
 }
 
-const BillingAddress: FC<Props> = ({ loading, address, onAddressUpdated }) => {
+const BillingAddress = ({ loading, address, onAddressUpdated }: BillingAddressProps) => {
   const { ui } = useStore()
-  const orgSlug = ui.selectedOrganization?.slug ?? ''
+  const selectedOrganization = useSelectedOrganization()
+  const orgSlug = selectedOrganization?.slug ?? ''
   const { city, country, line1, line2, postal_code, state } = address
 
-  const canReadBillingAddress = checkPermissions(PermissionAction.BILLING_READ, 'stripe.customer')
-  const canUpdateBillingAddress = checkPermissions(
+  const canReadBillingAddress = useCheckPermissions(
+    PermissionAction.BILLING_READ,
+    'stripe.customer'
+  )
+  const canUpdateBillingAddress = useCheckPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.customer'
   )

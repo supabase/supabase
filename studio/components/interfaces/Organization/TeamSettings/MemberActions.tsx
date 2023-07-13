@@ -2,18 +2,18 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { observer } from 'mobx-react-lite'
 import { FC } from 'react'
-import { Button, Dropdown, IconMoreHorizontal, IconTrash } from 'ui'
 
-import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
-import { checkPermissions, useStore } from 'hooks'
 import { useParams } from 'common/hooks'
-import { Member, Role } from 'types'
-
+import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 import { useOrganizationMemberDeleteMutation } from 'data/organizations/organization-member-delete-mutation'
 import { useOrganizationMemberInviteCreateMutation } from 'data/organizations/organization-member-invite-create-mutation'
 import { useOrganizationMemberInviteDeleteMutation } from 'data/organizations/organization-member-invite-delete-mutation'
+import { usePermissionsQuery } from 'data/permissions/permissions-query'
+import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
+import { Member, Role } from 'types'
+import { Button, Dropdown, IconMoreHorizontal, IconTrash } from 'ui'
 import { isInviteExpired } from '../Organization.utils'
-import { getRolesManagementPermissions } from './TeamSettings.utils'
+import { useGetRolesManagementPermissions } from './TeamSettings.utils'
 
 interface Props {
   member: Member
@@ -23,17 +23,23 @@ interface Props {
 const MemberActions: FC<Props> = ({ member, roles }) => {
   const { ui } = useStore()
   const { slug } = useParams()
-  const { rolesRemovable } = getRolesManagementPermissions(roles)
+  const selectedOrganization = useSelectedOrganization()
+  const { data: permissions } = usePermissionsQuery()
+  const { rolesRemovable } = useGetRolesManagementPermissions(
+    selectedOrganization?.id,
+    roles,
+    permissions ?? []
+  )
 
   const isExpired = isInviteExpired(member?.invited_at ?? '')
   const isPendingInviteAcceptance = member.invited_id
 
   const roleId = member.role_ids?.[0] ?? -1
   const canRemoveMember = rolesRemovable.includes((member?.role_ids ?? [-1])[0])
-  const canResendInvite = checkPermissions(PermissionAction.CREATE, 'user_invites', {
+  const canResendInvite = useCheckPermissions(PermissionAction.CREATE, 'user_invites', {
     resource: { role_id: roleId },
   })
-  const canRevokeInvite = checkPermissions(PermissionAction.DELETE, 'user_invites', {
+  const canRevokeInvite = useCheckPermissions(PermissionAction.DELETE, 'user_invites', {
     resource: { role_id: roleId },
   })
 

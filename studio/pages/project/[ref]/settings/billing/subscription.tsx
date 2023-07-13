@@ -1,9 +1,8 @@
 import { observer } from 'mobx-react-lite'
 
+import SubscriptionV2 from 'components/interfaces/BillingV2/Subscription/Subscription'
 import { SettingsLayout } from 'components/layouts'
 import { NextPageWithLayout } from 'types'
-
-import SubscriptionV2 from 'components/interfaces/BillingV2/Subscription/Subscription'
 
 const ProjectBilling: NextPageWithLayout = () => {
   return <SubscriptionV2 />

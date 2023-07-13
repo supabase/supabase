@@ -1,16 +1,17 @@
+import * as Tooltip from '@radix-ui/react-tooltip'
 import { isNil } from 'lodash'
 import { useEffect, useState } from 'react'
 import { object, string } from 'yup'
-import * as Tooltip from '@radix-ui/react-tooltip'
+
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common/hooks'
+import { useOrganizationMemberInviteCreateMutation } from 'data/organizations/organization-member-invite-create-mutation'
+import { doPermissionsCheck, useGetPermissions, useStore } from 'hooks'
+import { Member, Role } from 'types'
 import { Button, Form, IconMail, Input, Listbox, Modal } from 'ui'
 
-import { Member, Role } from 'types'
-import { checkPermissions, useStore } from 'hooks'
-import { useParams } from 'common/hooks'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useOrganizationMemberInviteCreateMutation } from 'data/organizations/organization-member-invite-create-mutation'
-
 export interface InviteMemberButtonProps {
+  orgId: number
   userId: number
   members: Member[]
   roles: Role[]
@@ -18,6 +19,7 @@ export interface InviteMemberButtonProps {
 }
 
 const InviteMemberButton = ({
+  orgId,
   userId,
   members = [],
   roles = [],
@@ -28,8 +30,18 @@ const InviteMemberButton = ({
 
   const [isOpen, setIsOpen] = useState(false)
 
+  const { permissions: allPermissions } = useGetPermissions()
+
   const canInviteMembers = roles.some(({ id: role_id }) =>
-    checkPermissions(PermissionAction.CREATE, 'user_invites', { resource: { role_id } })
+    doPermissionsCheck(
+      allPermissions,
+      PermissionAction.CREATE,
+      'user_invites',
+      {
+        resource: { role_id },
+      },
+      orgId
+    )
   )
 
   const initialValues = { email: '', role: '' }

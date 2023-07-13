@@ -7,7 +7,7 @@ import { DetailedHTMLProps, HTMLAttributes, KeyboardEventHandler } from 'react'
 import { Modal } from '../Modal'
 import { ModalProps } from '../Modal/Modal'
 import { useCommandMenu } from './CommandMenuProvider'
-import { LoadingLine } from './LoadingLine'
+import { LoadingLine } from '../LoadingLine/LoadingLine'
 
 type CommandPrimitiveElement = React.ElementRef<typeof CommandPrimitive>
 type CommandPrimitiveProps = React.ComponentPropsWithoutRef<typeof CommandPrimitive>
@@ -408,8 +408,10 @@ export function useAutoInputFocus() {
 
   // Focus the input when typing from anywhere
   React.useEffect(() => {
-    function onKeyDown() {
-      input?.focus()
+    function onKeyDown(e: KeyboardEvent) {
+      if (!e.ctrlKey && !e.altKey && !e.metaKey && e.key !== 'Tab') {
+        input?.focus()
+      }
     }
 
     window.addEventListener('keydown', onKeyDown)

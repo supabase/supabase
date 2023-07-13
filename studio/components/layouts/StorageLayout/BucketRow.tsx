@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { Badge, Button, Dropdown, IconChevronDown, IconEdit2, IconLoader, IconTrash } from 'ui'
 
 import { Bucket } from 'data/storage/buckets-query'
-import { checkPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks'
 
 export interface BucketRowProps {
   bucket: Bucket
@@ -22,7 +22,7 @@ const BucketRow = ({
   onSelectDeleteBucket = noop,
   onSelectEditBucket = noop,
 }: BucketRowProps) => {
-  const canUpdateBuckets = checkPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
+  const canUpdateBuckets = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
 
   return (
     <div

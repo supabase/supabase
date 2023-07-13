@@ -1,12 +1,13 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useEffect, useMemo, useState } from 'react'
+
 import { useParams } from 'common'
 import { useOrganizationCustomerProfileQuery } from 'data/organizations/organization-customer-profile-query'
 import { useOrganizationPaymentMethodsQuery } from 'data/organizations/organization-payment-methods-query'
-import { checkPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import { getURL } from 'lib/helpers'
-import { useEffect, useMemo, useState } from 'react'
 import { Button, IconAlertCircle, IconCreditCard, IconLoader, IconPlus, Listbox } from 'ui'
 import AddNewPaymentMethodModal from './AddNewPaymentMethodModal'
 
@@ -21,7 +22,8 @@ const PaymentMethodSelection = ({
 }: PaymentMethodSelectionProps) => {
   const { ui } = useStore()
   const { ref: projectRef } = useParams()
-  const slug = ui.selectedOrganization?.slug
+  const selectedOrganization = useSelectedOrganization()
+  const slug = selectedOrganization?.slug
   const [showAddNewPaymentMethodModal, setShowAddNewPaymentMethodModal] = useState(false)
 
   const {
@@ -35,7 +37,7 @@ const PaymentMethodSelection = ({
   const { data: customerProfile, isSuccess: loadedCustomerProfile } =
     useOrganizationCustomerProfileQuery({ slug })
 
-  const canUpdatePaymentMethods = checkPermissions(
+  const canUpdatePaymentMethods = useCheckPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.payment_methods'
   )

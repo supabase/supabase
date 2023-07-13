@@ -708,17 +708,17 @@ module.exports = [
   {
     permanent: true,
     source: '/blog/2020/12/02/case-study-monitoro',
-    destination: '/blog/case-study-monitoro',
+    destination: '/customers',
   },
   {
     permanent: true,
     source: '/blog/2020/12/02/case-study-tayfa',
-    destination: '/blog/case-study-tayfa',
+    destination: '/customers',
   },
   {
     permanent: true,
     source: '/blog/2020/12/02/case-study-xendit',
-    destination: '/blog/case-study-xendit',
+    destination: '/customers/xendit',
   },
   {
     permanent: true,
@@ -743,7 +743,7 @@ module.exports = [
   {
     permanent: true,
     source: '/blog/2021/02/09/case-study-roboflow',
-    destination: '/blog/case-study-roboflow',
+    destination: '/customers/roboflow',
   },
   {
     permanent: true,
@@ -763,7 +763,7 @@ module.exports = [
   {
     permanent: true,
     source: '/blog/2021/03/08/toad-a-link-shortener-with-simple-apis-for-low-coders',
-    destination: '/blog/toad-a-link-shortener-with-simple-apis-for-low-coders',
+    destination: '/customers',
   },
   {
     permanent: true,
@@ -853,7 +853,7 @@ module.exports = [
   {
     permanent: true,
     source: '/blog/2021/07/26/epsilon3-self-hosting',
-    destination: '/blog/epsilon3-self-hosting',
+    destination: '/customers/epsilon3',
   },
   {
     permanent: true,
@@ -868,7 +868,7 @@ module.exports = [
   {
     permanent: true,
     source: '/blog/2021/07/27/spot-flutter-with-postgres',
-    destination: '/blog/spot-flutter-with-postgres',
+    destination: '/customers',
   },
   {
     permanent: true,
@@ -878,7 +878,7 @@ module.exports = [
   {
     permanent: true,
     source: '/blog/2021/07/28/mobbin-supabase-200000-users',
-    destination: '/blog/mobbin-supabase-200000-users',
+    destination: '/customers/mobbin',
   },
   {
     permanent: true,
@@ -938,7 +938,7 @@ module.exports = [
   {
     permanent: true,
     source: '/blog/2021/10/19/replenysh-time-to-value-in-less-than-24-hours',
-    destination: '/blog/replenysh-time-to-value-in-less-than-24-hours',
+    destination: '/customers/replenysh',
   },
   {
     permanent: true,
@@ -1103,7 +1103,7 @@ module.exports = [
   {
     permanent: true,
     source: '/blog/2022/05/26/how-supabase-accelerates-development-of-all-pull-together',
-    destination: '/blog/how-supabase-accelerates-development-of-all-pull-together',
+    destination: '/customers',
   },
   {
     permanent: true,
@@ -1933,6 +1933,11 @@ module.exports = [
 
   {
     permanent: true,
+    source: '/blog/tags/case-study',
+    destination: '/customers',
+  },
+  {
+    permanent: true,
     source: '/blog/case-study-monitoro',
     destination: '/customers',
   },
@@ -1983,8 +1988,8 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/blog/how-supabase-accelerates-development-of-all-pull-together',
-    destination: '/customers',
+    source: '/blog/case-study-happyteams',
+    destination: '/customers/happyteams',
   },
   {
     permanent: true,
@@ -2035,5 +2040,35 @@ module.exports = [
     permanent: true,
     source: '/docs/guides/realtime/extensions/postgres-changes',
     destination: '/docs/guides/realtime/postgres-changes',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/realtime/quickstart',
+    destination: '/docs/guides/realtime',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/extensions/pgcron',
+    destination: '/docs/guides/database/extensions/pg_cron',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/extensions/pgnet',
+    destination: '/docs/guides/database/extensions/pg_net',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/extensions/pgrepack',
+    destination: '/docs/guides/database/extensions/pg_repack',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/ai/structured-unstructured-embeddings',
+    destination: '/docs/guides/ai/structured-unstructured',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/ai/choosing-instance-type',
+    destination: '/docs/guides/ai/choosing-compute-addon',
   },
 ]

@@ -63,6 +63,7 @@ export * from './src/components/Form'
 export * from './src/components/Command'
 
 // layout
+export * from './src/components/LoadingLine'
 
 // banners
 export * from './src/layout/banners'
