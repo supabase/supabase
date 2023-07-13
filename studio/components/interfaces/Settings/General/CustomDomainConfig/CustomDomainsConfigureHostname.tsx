@@ -4,7 +4,7 @@ import { observer } from 'mobx-react-lite'
 import { Button, Form, IconExternalLink, Input } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import { useParams } from 'common/hooks'
 import {
   FormActions,
@@ -28,7 +28,7 @@ const CustomDomainsConfigureHostname = () => {
 
   const FORM_ID = 'custom-domains-form'
   const endpoint = settings?.autoApiService.endpoint
-  const canConfigureCustomDomain = checkPermissions(PermissionAction.UPDATE, 'projects')
+  const canConfigureCustomDomain = useCheckPermissions(PermissionAction.UPDATE, 'projects')
 
   const verifyCNAME = async (domain: string): Promise<boolean> => {
     const res = await fetch(`https://1.1.1.1/dns-query?name=${domain}`, {

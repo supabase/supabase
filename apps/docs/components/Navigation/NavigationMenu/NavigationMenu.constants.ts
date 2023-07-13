@@ -218,6 +218,7 @@ export const gettingstarted: NavMenuConstant = {
         { name: 'SvelteKit', url: '/guides/getting-started/quickstarts/sveltekit' },
         { name: 'SolidJS', url: '/guides/getting-started/quickstarts/solidjs' },
         { name: 'Vue', url: '/guides/getting-started/quickstarts/vue' },
+        { name: 'refine', url: '/guides/getting-started/quickstarts/refine' },
       ],
     },
     {
@@ -258,6 +259,10 @@ export const gettingstarted: NavMenuConstant = {
         {
           name: 'SvelteKit',
           url: '/guides/getting-started/tutorials/with-sveltekit',
+        },
+        {
+          name: 'refine',
+          url: '/guides/getting-started/tutorials/with-refine',
         },
       ],
     },
@@ -348,6 +353,11 @@ export const SocialLoginItems = [
     name: 'Discord',
     icon: '/docs/img/icons/discord-icon',
     url: '/guides/auth/social-login/auth-discord',
+  },
+  {
+    name: 'Kakao',
+    icon: '/docs/img/icons/kakao-icon',
+    url: '/guides/auth/social-login/auth-kakao',
   },
   {
     name: 'Keycloak',
@@ -750,6 +760,7 @@ export const functions: NavMenuConstant = {
           name: 'Connecting directly to Postgres',
           url: '/guides/functions/connect-to-postgres',
         },
+        { name: 'Testing your Edge Functions', url: '/guides/functions/unit-test' },
         { name: 'Troubleshooting', url: '/guides/functions/troubleshooting' },
       ],
     },
@@ -802,10 +813,6 @@ export const realtime: NavMenuConstant = {
     {
       name: 'Concepts',
       url: '/guides/realtime/concepts',
-    },
-    {
-      name: 'Quickstart',
-      url: '/guides/realtime/quickstart',
     },
     {
       name: 'Features',
@@ -903,7 +910,7 @@ export const ai: NavMenuConstant = {
         { name: 'Managing indexes', url: '/guides/ai/managing-indexes' },
         { name: 'Vector columns', url: '/guides/ai/vector-columns' },
         { name: 'Engineering for scale', url: '/guides/ai/engineering-for-scale' },
-        { name: 'Choosing instance type', url: '/guides/ai/choosing-instance-type' },
+        { name: 'Choosing Compute Add-on', url: '/guides/ai/choosing-compute-addon' },
       ],
     },
     {
@@ -1182,6 +1189,20 @@ export const integrations: NavMenuConstant = {
   url: '/guides/integrations',
   items: [
     { name: 'Overview', url: '/guides/integrations/integrations' },
+    {
+      name: 'OAuth Apps (Beta)',
+      url: undefined,
+      items: [
+        {
+          name: 'Publish an OAuth App',
+          url: '/guides/integrations/oauth-apps/publish-an-oauth-app',
+        },
+        {
+          name: 'Authorize an OAuth App',
+          url: '/guides/integrations/oauth-apps/authorize-an-oauth-app',
+        },
+      ],
+    },
     {
       name: 'Auth',
       url: undefined,

@@ -69,11 +69,11 @@ To contribute code to [Supabase](https://supabase.com), you must fork the [Supab
 
 Then visit, and edit, any of the following sites:
 
-| Site                                           | Directory    | Scope name | Description                          | Local development server   |
-| ---------------------------------------------- | ------------ | ---------- | ------------------------------------ | -------------------------- |
-| [supabase.com](https://supabase.com)           | `/apps/www`  | www        | The main website                     | http://localhost:3000      |
-| [app.supabase.com](https://app.supabase.com)   | `/studio`    | studio     | Studio dashboard                     | http://localhost:8082      |
-| [supabase.com/docs](https://supabase.com/docs) | `/apps/docs` | docs       | Guides and Reference (Next.js based) | http://localhost:3001/docs |
+| Site                                                     | Directory    | Scope name | Description                          | Local development server   |
+| -------------------------------------------------------- | ------------ | ---------- | ------------------------------------ | -------------------------- |
+| [supabase.com](https://supabase.com)                     | `/apps/www`  | www        | The main website                     | http://localhost:3000      |
+| [supabase.com/dashboard](https://supabase.com/dashboard) | `/studio`    | studio     | Studio dashboard                     | http://localhost:8082      |
+| [supabase.com/docs](https://supabase.com/docs)           | `/apps/docs` | docs       | Guides and Reference (Next.js based) | http://localhost:3001/docs |
 
 #### Running sites individually
 

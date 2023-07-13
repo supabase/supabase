@@ -169,8 +169,8 @@ const uiConfig = ui({
               counterReset: 'item',
               listStyleType: 'none',
             },
-            'ol li': { display: 'block', position: 'relative', paddingLeft: '1rem' },
-            'ol li::before': {
+            'ol>li': { display: 'block', position: 'relative', paddingLeft: '1rem' },
+            'ol>li::before': {
               position: 'absolute',
               top: '0.25rem',
               left: '-1rem',

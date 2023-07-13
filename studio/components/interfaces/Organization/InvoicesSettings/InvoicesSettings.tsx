@@ -1,15 +1,16 @@
-import { useState, useEffect } from 'react'
-import { Button, Loading, IconFileText, IconDownload, IconChevronLeft, IconChevronRight } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
 
-import { checkPermissions, useStore } from 'hooks'
-import { API_URL } from 'lib/constants'
-import { get, head } from 'lib/common/fetch'
+import { InvoiceStatusBadge } from 'components/interfaces/BillingV2'
+import { Invoice, InvoiceStatus } from 'components/interfaces/BillingV2/Invoices.types'
 import Table from 'components/to-be-cleaned/Table'
 import NoPermission from 'components/ui/NoPermission'
-import InvoiceStatusBadge from 'components/interfaces/Billing/InvoiceStatusBadge'
-import { Invoice, InvoiceStatus } from 'components/interfaces/Billing/Invoices.types'
+import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
+import { get, head } from 'lib/common/fetch'
+import { API_URL } from 'lib/constants'
+import { Button, IconChevronLeft, IconChevronRight, IconDownload, IconFileText, Loading } from 'ui'
+import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
 
 const PAGE_LIMIT = 10
 
@@ -23,10 +24,11 @@ const InvoicesSettings = () => {
   const [count, setCount] = useState(0)
   const [invoices, setInvoices] = useState<Invoice[]>([])
 
-  const { stripe_customer_id, slug } = ui.selectedOrganization ?? {}
+  const selectedOrganization = useSelectedOrganization()
+  const { stripe_customer_id, slug } = selectedOrganization ?? {}
   const offset = (page - 1) * PAGE_LIMIT
 
-  const canReadInvoices = checkPermissions(PermissionAction.READ, 'invoices')
+  const canReadInvoices = useCheckPermissions(PermissionAction.READ, 'invoices')
 
   useEffect(() => {
     if (!canReadInvoices || !stripe_customer_id || !slug) return
@@ -92,7 +94,7 @@ const InvoicesSettings = () => {
   }
 
   return (
-    <div className="container my-4 max-w-4xl space-y-1">
+    <ScaffoldContainerLegacy>
       <Loading active={loading}>
         <Table
           head={[
@@ -184,7 +186,7 @@ const InvoicesSettings = () => {
           }
         />
       </Loading>
-    </div>
+    </ScaffoldContainerLegacy>
   )
 }
 

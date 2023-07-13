@@ -1,13 +1,15 @@
-import { useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import { observer } from 'mobx-react-lite'
-import { Button, Input, Listbox } from 'ui'
 import { useRouter } from 'next/router'
+import { useState } from 'react'
+import { Button, Input, Listbox } from 'ui'
 
-import { API_URL } from 'lib/constants'
-import { useStore } from 'hooks'
-import { post } from 'lib/common/fetch'
 import { WizardLayout } from 'components/layouts'
 import Panel from 'components/ui/Panel'
+import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useStore } from 'hooks'
+import { post } from 'lib/common/fetch'
+import { API_URL } from 'lib/constants'
 import { NextPageWithLayout } from 'types'
 
 const ORG_KIND_TYPES = {
@@ -33,7 +35,8 @@ const ORG_SIZE_DEFAULT = '1'
  * No org selected yet, create a new one
  */
 const Wizard: NextPageWithLayout = () => {
-  const { ui, app } = useStore()
+  const queryClient = useQueryClient()
+  const { ui } = useStore()
   const router = useRouter()
 
   const [orgName, setOrgName] = useState('')
@@ -81,7 +84,7 @@ const Wizard: NextPageWithLayout = () => {
       })
     } else {
       const org = response
-      app.onOrgAdded(org)
+      await invalidateOrganizationsQuery(queryClient)
       router.push(`/new/${org.slug}`)
     }
   }
