@@ -5,14 +5,14 @@
       <link>https://supabase.com/blog</link>
       <description>Latest Postgres news from Paul Copplestone at Supabase</description>
       <language>en</language>
-      <lastBuildDate>Sun, 30 Apr 2023 23:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Sun, 30 Apr 2023 22:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.com/planetpg-paul_copplestone-rss.xml" rel="self" type="application/rss+xml"/>
       <item>
   <guid>https://supabase.com/blog/postgres-pluggable-strorage</guid>
   <title>Next steps for Postgres pluggable storage</title>
   <link>https://supabase.com/blog/postgres-pluggable-strorage</link>
   <description>Exploring history of Postgres pluggable storage and the possibility of landing it in the Postgres core.</description>
-  <pubDate>Sun, 30 Apr 2023 23:00:00 GMT</pubDate>
+  <pubDate>Sun, 30 Apr 2023 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/postgres-foreign-data-wrappers-rust</guid>
@@ -33,7 +33,7 @@
   <title>Partial data dumps using Postgres Row Level Security</title>
   <link>https://supabase.com/blog/partial-postgresql-data-dumps-with-rls</link>
   <description>Using RLS to create seed files for local PostgreSQL testing.</description>
-  <pubDate>Mon, 27 Jun 2022 23:00:00 GMT</pubDate>
+  <pubDate>Mon, 27 Jun 2022 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/postgres-as-a-cron-server</guid>
