@@ -16,7 +16,7 @@ PostgREST 11.1 is now available on the Supabase platform. Besides the [pre-relea
 
 Every role that passes [PostgREST JWT Authentication](https://postgrest.org/en/stable/references/auth.html#jwt-based-user-impersonation) is an _impersonated role_. On the Supabase platform, these are the `anon`, `authenticated` and `service_role` roles.
 
-These roles can now have settings applied with a regular `ALTER ROLE <role> SET <setting>`. This is useful, for example, to prevent web users from running expensive queries.
+These roles can now have settings applied with a regular `ALTER ROLE .. SET`. This is useful, for example, to prevent web users from running expensive queries.
 
 Let’s try it by setting a statement timeout and cost limit.
 
@@ -68,7 +68,7 @@ Then, after 5 seconds, the request will be aborted with the response:
 }
 ```
 
-Which is what we wanted. Note that there's already a global `statement_timeout` set but you can be more fine-grained with this feature. See https://supabase.com/docs/guides/database/timeouts for more details.
+Which is what we wanted. Note that there's already a global `statement_timeout` set but you can be more fine-grained with this feature. See [timeouts](https://supabase.com/docs/guides/database/timeouts) for more details.
 
 ### Statement Cost Limit
 
@@ -199,15 +199,18 @@ As you can see, `id` and `baz` took their default values.
 
 As a shortcut to `OR` filters, you can now use `any` modifiers on various filters. Take the `like` filter as an example:
 
+{/* prettier-ignore */}
 ```jsx
-const res = await postgrest.from('users').select().likeAnyOf('username', ['%supa%', '%kiwi%'])
+const res = await postgrest
+  .from('users')
+  .select()
+  .likeAnyOf('username', ['%supa%', '%kiwi%'])
 ```
 
 This is equivalent to the following in SQL.
 
 ```sql
-select
-  *
+select *
 from users
 where username like ANY('{%supa%,%kiwi%}');
 ```
