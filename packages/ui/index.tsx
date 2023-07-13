@@ -73,7 +73,45 @@ export * from './src/lib/utils'
 
 // shadcn
 
-export * from './src/components/shadcn/ui/dropdown-menu'
+export {
+  DropdownMenu as ShadcnDropdownMenu,
+  DropdownMenuTrigger as ShadcnDropdownMenuTrigger,
+  DropdownMenuContent as ShadcnDropdownMenuContent,
+  DropdownMenuItem as ShadcnDropdownMenuItem,
+  DropdownMenuCheckboxItem as ShadcnDropdownMenuCheckboxItem,
+  DropdownMenuRadioItem as ShadcnDropdownMenuRadioItem,
+  DropdownMenuLabel as ShadcnDropdownMenuLabel,
+  DropdownMenuSeparator as ShadcnDropdownMenuSeparator,
+  DropdownMenuRightSlot as ShadcnDropdownMenuRightSlot,
+  DropdownMenuGroup as ShadcnDropdownMenuGroup,
+  DropdownMenuPortal as ShadcnDropdownMenuPortal,
+  DropdownMenuSub as ShadcnDropdownMenuSub,
+  DropdownMenuSubContent as ShadcnDropdownMenuSubContent,
+  DropdownMenuSubTrigger as ShadcnDropdownMenuSubTrigger,
+  DropdownMenuRadioGroup as ShadcnDropdownMenuRadioGroup,
+} from './src/components/shadcn/ui/dropdown-menu'
+
+export {
+  Command as ShadcnCommand,
+  CommandDialog as ShadcnCommandDialog,
+  CommandInput as ShadcnCommandInput,
+  CommandList as ShadcnCommandList,
+  CommandEmpty as ShadcnCommandEmpty,
+  CommandGroup as ShadcnCommandGroup,
+  CommandItem as ShadcnCommandItem,
+  CommandShortcut as ShadcnCommandShortcut,
+  CommandSeparator as ShadcnCommandSeparator,
+} from './src/components/shadcn/ui/command'
+
+export {
+  Dialog as ShadcnDialog,
+  DialogTrigger as ShadcnDialogTrigger,
+  DialogContent as ShadcnDialogContent,
+  DialogHeader as ShadcnDialogHeader,
+  DialogFooter as ShadcnDialogFooter,
+  DialogTitle as ShadcnDialogTitle,
+  DialogDescription as ShadcnDialogDescription,
+} from './src/components/shadcn/ui/dialog'
 
 // config
 
