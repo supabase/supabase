@@ -132,6 +132,11 @@ However, you might miss important log messages such as database errors. Configur
 
 By default, Storage backend is set to `file`, which is to use local files as the storage backend. To make it work on macOS, you need to choose `VirtioFS` as the Docker container file sharing implementation (in Docker Desktop -> Preferences -> General).
 
+### Setting up logging with the Analytics server
+
+Additional configuration is required for self-hosting the Analytics server. Full setup instructions can be found [here](https://supabase.com/docs/reference/self-hosting-analytics/introduction#getting-started).
+
+
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
 export default Page
