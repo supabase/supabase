@@ -60,7 +60,10 @@ const Invoices: FC<Props> = ({ projectRef }) => {
     )
 
     if (invoices.error) {
-      ui.setNotification({ category: 'error', message: invoices.error.message })
+      ui.setNotification({
+        category: 'error',
+        message: `Failed to fetch invoices: ${invoices.error.message}`,
+      })
     } else {
       setInvoices(invoices)
     }
@@ -75,7 +78,7 @@ const Invoices: FC<Props> = ({ projectRef }) => {
     } else {
       ui.setNotification({
         category: 'info',
-        message: 'Unable to fetch the selected invoice',
+        message: `Failed to fetch the selected invoice: ${invoice.error.message}`,
       })
     }
   }
