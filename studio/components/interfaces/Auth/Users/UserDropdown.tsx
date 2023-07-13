@@ -1,149 +1,93 @@
-import { FC, useContext, useState } from 'react'
-import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Button, Dropdown, IconTrash, IconMail, IconMoreHorizontal, IconShieldOff } from 'ui'
+import { observer } from 'mobx-react-lite'
+import { useContext } from 'react'
+import { Button, Dropdown, IconMail, IconMoreHorizontal, IconShieldOff, IconTrash } from 'ui'
 
+import { useParams } from 'common'
+import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
+import { useUserDeleteMFAFactorsMutation } from 'data/auth/user-delete-mfa-factors-mutation'
+import { useUserDeleteMutation } from 'data/auth/user-delete-mutation'
+import { useUserResetPasswordMutation } from 'data/auth/user-reset-password-mutation'
+import { useUserSendMagicLinkMutation } from 'data/auth/user-send-magic-link-mutation'
+import { useUserSendOTPMutation } from 'data/auth/user-send-otp-mutation'
 import { useStore } from 'hooks'
 import { timeout } from 'lib/helpers'
-import { post, delete_ } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
 import { PageContext } from 'pages/project/[ref]/auth/users'
-import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 import { User } from './Users.types'
 
-interface Props {
+interface UserDropdownProps {
   user: User
   canRemoveUser: boolean
   canRemoveMFAFactors: boolean
 }
 
-const UserDropdown: FC<Props> = ({ user, canRemoveUser, canRemoveMFAFactors }) => {
-  const PageState: any = useContext(PageContext)
+const UserDropdown = ({ user, canRemoveUser, canRemoveMFAFactors }: UserDropdownProps) => {
   const { ui } = useStore()
-  const [loading, setLoading] = useState<boolean>(false)
+  const { ref } = useParams()
+  const PageState: any = useContext(PageContext)
 
-  async function handleResetPassword() {
-    try {
-      setLoading(true)
-      const response = await post(`${API_URL}/auth/${PageState.projectRef}/recover`, user)
-      if (response.error) {
-        ui.setNotification({
-          category: 'error',
-          message: `Failed to send password recovery: ${response.error.message}`,
-        })
-      } else {
-        ui.setNotification({
-          category: 'success',
-          message: `Sent password recovery to ${user.email}`,
-        })
-      }
-    } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Send password recovery failed: ${error?.message}`,
-      })
-    } finally {
-      setLoading(false)
-    }
+  const { mutateAsync: resetPassword, isLoading: isResetting } = useUserResetPasswordMutation()
+  const { mutateAsync: sendMagicLink, isLoading: isSendingLink } = useUserSendMagicLinkMutation()
+  const { mutateAsync: sendOTP, isLoading: isSendingOTP } = useUserSendOTPMutation()
+  const { mutateAsync: deleteUser, isLoading: isDeleting } = useUserDeleteMutation()
+  const { mutateAsync: deleteUserMFAFactors, isLoading: isDeletingFactors } =
+    useUserDeleteMFAFactorsMutation()
+  const isLoading = isResetting || isSendingLink || isSendingOTP || isDeleting || isDeletingFactors
+
+  const handleResetPassword = async () => {
+    if (!ref) return console.error('Project ref is required')
+    await resetPassword({ projectRef: ref, user })
+    ui.setNotification({
+      category: 'success',
+      message: `Sent password recovery to ${user.email}`,
+    })
   }
 
   async function handleSendMagicLink() {
-    try {
-      setLoading(true)
-      const response = await post(`${API_URL}/auth/${PageState.projectRef}/magiclink`, user)
-      if (response.error) {
-        ui.setNotification({
-          category: 'error',
-          message: `Failed to send magic link: ${response.error.message}`,
-        })
-      } else {
-        ui.setNotification({
-          category: 'success',
-          message: `Sent magic link to ${user.email}`,
-        })
-      }
-    } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to send magic link: ${error?.message}`,
-      })
-    } finally {
-      setLoading(false)
-    }
+    if (!ref) return console.error('Project ref is required')
+    await sendMagicLink({ projectRef: ref, user })
+    ui.setNotification({
+      category: 'success',
+      message: `Sent magic link to ${user.email}`,
+    })
   }
 
   async function handleSendOtp() {
-    try {
-      setLoading(true)
-      const response = await post(`${API_URL}/auth/${PageState.projectRef}/otp`, user)
-      if (response.error) {
-        ui.setNotification({
-          category: 'error',
-          message: `Failed to OTP: ${response.error.message}`,
-        })
-      } else {
-        ui.setNotification({
-          category: 'success',
-          message: `Sent OTP to ${user.phone}`,
-        })
-      }
-    } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to send OTP: ${error?.message}`,
-      })
-    } finally {
-      setLoading(false)
-    }
+    if (!ref) return console.error('Project ref is required')
+    await sendOTP({ projectRef: ref, user })
+    ui.setNotification({
+      category: 'success',
+      message: `Sent OTP to ${user.phone}`,
+    })
   }
 
   async function handleDelete() {
     await timeout(200)
-
     confirmAlert({
       title: 'Confirm to delete',
       message: `This is permanent! Are you sure you want to delete user ${user.email} ?`,
       onAsyncConfirm: async () => {
-        setLoading(true)
-        const response = await delete_(`${API_URL}/auth/${PageState.projectRef}/users`, user)
-        if (response.error) {
-          ui.setNotification({
-            category: 'error',
-            message: `Failed to delete user: ${response.error.message}`,
-          })
-        } else {
-          ui.setNotification({ category: 'success', message: `Successfully deleted ${user.email}` })
-          PageState.users = PageState.users.filter((x: any) => x.id != user.id)
-          PageState.totalUsers -= 1
-        }
-        setLoading(false)
+        if (!ref) return console.error('Project ref is required')
+        await deleteUser({ projectRef: ref, user })
+        ui.setNotification({ category: 'success', message: `Successfully deleted ${user.email}` })
+        PageState.users = PageState.users.filter((x: any) => x.id != user.id)
+        PageState.totalUsers -= 1
       },
     })
   }
 
   async function handleDeleteFactors() {
     await timeout(200)
-
     confirmAlert({
       title: 'Confirm to delete',
       message: `This is permanent! Are you sure you want to delete the user's MFA factors?`,
       onAsyncConfirm: async () => {
-        setLoading(true)
-        const response = await delete_(
-          `${API_URL}/auth/${PageState.projectRef}/users/${user.id}/factors`
-        )
-        if (response.error) {
-          ui.setNotification({
-            category: 'error',
-            message: `Failed to delete factors: ${response.error.message}`,
-          })
-        } else {
-          ui.setNotification({
-            category: 'success',
-            message: "Successfully deleted the user's factors",
-          })
-        }
-        setLoading(false)
+        if (!ref) return console.error('Project ref is required')
+        await deleteUserMFAFactors({ projectRef: ref, userId: user.id })
+        ui.setNotification({
+          category: 'success',
+          message: "Successfully deleted the user's factors",
+        })
       },
     })
   }
@@ -236,10 +180,10 @@ const UserDropdown: FC<Props> = ({ user, canRemoveUser, canRemoveMFAFactors }) =
         asChild
         type="text"
         icon={<IconMoreHorizontal />}
-        loading={loading}
+        loading={isLoading}
         className="hover:border-gray-500"
       >
-        <span></span>
+        <span />
       </Button>
     </Dropdown>
   )
