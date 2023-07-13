@@ -33,7 +33,7 @@ functions:
 
       *Note: OTP link verification such as sign ups are not supported on JVM. You may have to send a verification token rather than a url in your E-Mail. To send the token, rather than a redirect url, you have to change `{{ .ConfirmationURL }}` in your sign up email to `{{ .Token }}`*
 
-      **On Android, IOS & MacOS**, it uses deeplinks. Refer to the guide below on how to setup deeplinks.
+      **On Android, IOS & MacOS**, it uses deeplinks. Refer to the guide below on how to setup deeplinks. Alternatively you could use Native Google Auth or a WebView for OAuth. Refer to our [demo](https://github.com/supabase-community/supabase-kt/tree/master/demos/android-login) to learn more.
       **On JS**, it uses the website origin as the callback url. Session importing gets handled automatically.
       **Windows & Linux** currently have no default implementation. Feel free to create a PR.
 
@@ -596,7 +596,7 @@ functions:
           `delete()`, and `rpc()`
         code: |
           ```kotlin
-          client.postgrest["cities"].select(columns = Columns.list("name, country_id")) {
+          client.postgrest["cities"].select(columns = Columns.list("name", "country_id")) {
               City::name eq "The Shire"
               //or
               eq("name", "The Shire")
@@ -2172,15 +2172,14 @@ functions:
           ```kotlin
           client.gotrue.loginWith(IDToken) {
               idToken = "token"
-              clientId = "oauth client id"
-              provider = Google //Or Apple
+              provider = Google //Also supported: Apple, Azure and Facebook
               //optional:
               nonce = "nonce"
               data = buildJsonObject {
                   //...
               }
           }
-          ```
+
   - id: sign-in-with-otp
     title: 'sendOtpTo()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signInWithOtp'
@@ -2313,8 +2312,22 @@ functions:
         name: Sign out
         isSpotlight: true
         code: |
-          ```js
+          ```kotlin
           client.gotrue.logout()
+          ```
+      - id: sign-out-all-sessions
+        name: Sign out all sessions
+        isSpotlight: true
+        code: |
+          ```kotlin
+          client.gotrue.logout(LogoutScope.GLOBAL)
+          ```
+      - id: sign-out-all-sessions
+        name: Sign out all sessions except yours
+        isSpotlight: true
+        code: |
+          ```kotlin
+          client.gotrue.logout(LogoutScope.OTHERS)
           ```
   - id: verify-otp
     title: 'Verify OTPs'
@@ -3114,6 +3127,7 @@ functions:
               println(it)
           }
 
+          client.realtime.connect()
           channel.join(blockUntilJoined = true)
 
           channel.broadcast(event = "message", Message("I joined!", "John"))
@@ -3138,6 +3152,7 @@ functions:
               connectedUsers -= it.decodeLeavesAs<PresenceState>()
           }
 
+          client.realtime.connect()
           channel.join(blockUntilJoined = true)
           //send own state
           channel.track(PresenceState(username = "John"))
@@ -3160,6 +3175,7 @@ functions:
               }
           }
 
+          client.realtime.connect()
           channel.join()
           ```
       - id: listen-to-a-specific-table
@@ -3183,6 +3199,7 @@ functions:
               }
           }
 
+          client.realtime.connect()
           channel.join()
           ```
       - id: listen-to-inserts
@@ -3201,6 +3218,7 @@ functions:
               println(it.record)
           }
 
+          client.realtime.connect()
           channel.join()
           ```
       - id: listen-to-updates
@@ -3227,6 +3245,7 @@ functions:
               println(it.oldRecord)
           }
 
+          client.realtime.connect()
           channel.join()
           ```
       - id: listen-to-deletes
@@ -3252,6 +3271,7 @@ functions:
               println(it.oldRecord)
           }
 
+          client.realtime.connect()
           channel.join()
           ```
       - id: listening-to-row-level-changes
@@ -3272,6 +3292,7 @@ functions:
               println(it.oldRecord)
           }
 
+          client.realtime.connect()
           channel.join()
           ```
 
