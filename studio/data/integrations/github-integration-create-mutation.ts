@@ -1,10 +1,10 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { post } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+
+import { post } from 'data/fetchers'
 import { integrationKeys } from './keys'
 
 export type GitHubIntegrationCreateVariables = {
-  installationId: string
+  installationId: number
   orgSlug: string
   metadata: { [key: string]: string }
 }
@@ -14,16 +14,16 @@ export async function createGitHubIntegration({
   orgSlug,
   metadata,
 }: GitHubIntegrationCreateVariables) {
-  const response = await post(`${API_URL}/integrations/github`, {
-    installation_id: installationId,
-    organization_slug: orgSlug,
-    metadata,
+  const { data, error } = await post('/platform/integrations/github', {
+    body: {
+      installation_id: installationId,
+      organization_slug: orgSlug,
+      metadata: metadata as any,
+    },
   })
-  if (response.error) {
-    throw response.error
-  }
+  if (error) throw error
 
-  return response
+  return data
 }
 
 type GitHubIntegrationCreateData = Awaited<ReturnType<typeof createGitHubIntegration>>
@@ -43,7 +43,7 @@ export const useGitHubIntegrationCreateMutation = ({
         await Promise.all([
           queryClient.invalidateQueries(integrationKeys.integrationsList()),
           queryClient.invalidateQueries(integrationKeys.integrationsListWithOrg(variables.orgSlug)),
-          // queryClient.invalidateQueries(integrationKeys.githubProjectList(data.id)),
+          queryClient.invalidateQueries(integrationKeys.githubRepoList(data.id)),
         ])
         await onSuccess?.(data, variables, context)
       },

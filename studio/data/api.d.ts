@@ -704,6 +704,29 @@ export interface paths {
     /** Deletes vercel project connection */
     delete: operations["VercelConnectionsController_deleteVercelConnection"];
   };
+  "/platform/integrations/github": {
+    /**
+     * Create github integration 
+     * @description Exchanges a github code for an access token and saves the access token to the new integration record
+     */
+    post: operations["GitHubIntegrationController_createGitHubIntegration"];
+  };
+  "/platform/integrations/github/repos/{organization_integration_id}": {
+    /** Gets github repos for the given organization */
+    get: operations["GitHubRepoController_getRepos"];
+  };
+  "/platform/integrations/github/connections/{organization_integration_id}": {
+    /** Gets installed github project connections for the given organization integration */
+    get: operations["GitHubConnectionsController_getGitHubConnections"];
+  };
+  "/platform/integrations/github/connections": {
+    /** Connects a GitHub project to a supabase project */
+    post: operations["GitHubConnectionsController_createGitHubConnection"];
+  };
+  "/platform/integrations/github/connections/{connection_id}": {
+    /** Deletes github project connection */
+    delete: operations["GitHubConnectionsController_deleteGitHubConnection"];
+  };
   "/system/auth/{ref}/templates/{template}": {
     /** Gets GoTrue template */
     get: operations["AuthTemplateController_getTemplate"];
@@ -2449,9 +2472,6 @@ export interface components {
       packagePrice: number;
       freeUnits?: number;
     };
-    BillingPricingOptionsNone: {
-      freeUnits?: number;
-    };
     BillingUsageBasedPrice: {
       /** @enum {string} */
       metric: "EGRESS" | "DATABASE_EGRESS" | "DATABASE_SIZE" | "STORAGE_EGRESS" | "STORAGE_SIZE" | "MONTHLY_ACTIVE_USERS" | "MONTHLY_ACTIVE_SSO_USERS" | "FUNCTION_INVOCATIONS" | "FUNCTION_COUNT" | "STORAGE_IMAGES_TRANSFORMED" | "REALTIME_MESSAGE_COUNT" | "REALTIME_PEAK_CONNECTIONS" | "COMPUTE_HOURS_XS" | "COMPUTE_HOURS_SM" | "COMPUTE_HOURS_MD" | "COMPUTE_HOURS_L" | "COMPUTE_HOURS_XL" | "COMPUTE_HOURS_2XL" | "COMPUTE_HOURS_4XL" | "COMPUTE_HOURS_8XL" | "COMPUTE_HOURS_12XL" | "COMPUTE_HOURS_16XL";
@@ -3720,6 +3740,27 @@ export interface components {
       metadata: Record<string, never>;
     };
     CreateVercelConnectionsBody: {
+      organization_integration_id: string;
+      connection: components["schemas"]["IntegrationConnection"];
+    };
+    CreateGitHubIntegrationBody: {
+      installation_id: number;
+      organization_slug: string;
+      metadata: Record<string, never>;
+    };
+    CreateGitHubIntegrationResponse: {
+      id: string;
+    };
+    GetGitHubConnections: {
+      id: string;
+      inserted_at: string;
+      updated_at: string;
+      organization_integration_id: string;
+      supabase_project_ref: string;
+      foreign_project_id: string;
+      metadata: Record<string, never>;
+    };
+    CreateGitHubConnectionsBody: {
       organization_integration_id: string;
       connection: components["schemas"]["IntegrationConnection"];
     };
@@ -8129,6 +8170,82 @@ export interface operations {
     responses: {
       200: never;
       /** @description Failed to delete vercel integration project connection */
+      500: never;
+    };
+  };
+  /**
+   * Create github integration 
+   * @description Exchanges a github code for an access token and saves the access token to the new integration record
+   */
+  GitHubIntegrationController_createGitHubIntegration: {
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateGitHubIntegrationBody"];
+      };
+    };
+    responses: {
+      201: {
+        content: {
+          "application/json": components["schemas"]["CreateGitHubIntegrationResponse"];
+        };
+      };
+      /** @description Failed to create github integration */
+      500: never;
+    };
+  };
+  /** Gets github repos for the given organization */
+  GitHubRepoController_getRepos: {
+    parameters: {
+      path: {
+        organization_integration_id: string;
+      };
+    };
+    responses: {
+      200: never;
+      /** @description Failed to get github repos for the given organization */
+      500: never;
+    };
+  };
+  /** Gets installed github project connections for the given organization integration */
+  GitHubConnectionsController_getGitHubConnections: {
+    parameters: {
+      path: {
+        organization_integration_id: string;
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": (components["schemas"]["GetGitHubConnections"])[];
+        };
+      };
+      /** @description Failed to get installed github connections for the given organization integration */
+      500: never;
+    };
+  };
+  /** Connects a GitHub project to a supabase project */
+  GitHubConnectionsController_createGitHubConnection: {
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateGitHubConnectionsBody"];
+      };
+    };
+    responses: {
+      201: never;
+      /** @description Failed to create project connections */
+      500: never;
+    };
+  };
+  /** Deletes github project connection */
+  GitHubConnectionsController_deleteGitHubConnection: {
+    parameters: {
+      path: {
+        connection_id: string;
+      };
+    };
+    responses: {
+      200: never;
+      /** @description Failed to delete github integration project connection */
       500: never;
     };
   };
