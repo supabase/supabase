@@ -9,10 +9,16 @@ import { format } from 'date-fns'
 import { CalendarIcon } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
-import { Calendar } from '../calendar'
-import { Popover, PopoverContent, PopoverTrigger } from '../popover'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../select'
-import { toast } from '../use-toast'
+import { Calendar } from '@ui/components/shadcn/ui/calendar'
+import { Popover, PopoverContent, PopoverTrigger } from '@ui/components/shadcn/ui//popover'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@ui/components/shadcn/ui//select'
+import { toast } from '@ui/components/shadcn/ui/use-toast'
 import {
   Form,
   FormControl,
