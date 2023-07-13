@@ -1,6 +1,6 @@
 import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
-import { Button } from '@ui/components/shadcn/button'
+import { Button } from '@ui/components/shadcn/ui/button'
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -12,7 +12,7 @@ import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
-  DropdownMenuRightSlot,
+  DropdownMenuShortcut,
   DropdownMenuSub,
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
@@ -135,19 +135,19 @@ export const Default: Story = {
           <DropdownMenuGroup>
             <DropdownMenuItem>
               <span>Profile</span>
-              <DropdownMenuRightSlot>⇧⌘P</DropdownMenuRightSlot>
+              <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
             </DropdownMenuItem>
             <DropdownMenuItem>
               <span>Billing</span>
-              <DropdownMenuRightSlot>⌘B</DropdownMenuRightSlot>
+              <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
             </DropdownMenuItem>
             <DropdownMenuItem>
               <span>Settings</span>
-              <DropdownMenuRightSlot>⌘S</DropdownMenuRightSlot>
+              <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
             </DropdownMenuItem>
             <DropdownMenuItem>
               <span>Keyboard shortcuts</span>
-              <DropdownMenuRightSlot>⌘K</DropdownMenuRightSlot>
+              <DropdownMenuShortcut>⌘K</DropdownMenuShortcut>
             </DropdownMenuItem>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
@@ -182,7 +182,7 @@ export const Default: Story = {
             <DropdownMenuItem>
               <Plus className="mr-2 h-4 w-4 text-foreground-light" />
               <span>New Team</span>
-              <DropdownMenuRightSlot>⌘+T</DropdownMenuRightSlot>
+              <DropdownMenuShortcut>⌘+T</DropdownMenuShortcut>
             </DropdownMenuItem>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
@@ -202,7 +202,7 @@ export const Default: Story = {
           <DropdownMenuItem>
             <LogOut className="mr-2 h-4 w-4 text-foreground-light" />
             <span>Log out</span>
-            <DropdownMenuRightSlot>⇧⌘Q</DropdownMenuRightSlot>
+            <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -223,19 +223,19 @@ export const AlignStart: Story = {
           <DropdownMenuGroup>
             <DropdownMenuItem>
               <span>Profile</span>
-              <DropdownMenuRightSlot>⇧⌘P</DropdownMenuRightSlot>
+              <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
             </DropdownMenuItem>
             <DropdownMenuItem>
               <span>Billing</span>
-              <DropdownMenuRightSlot>⌘B</DropdownMenuRightSlot>
+              <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
             </DropdownMenuItem>
             <DropdownMenuItem>
               <span>Settings</span>
-              <DropdownMenuRightSlot>⌘S</DropdownMenuRightSlot>
+              <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
             </DropdownMenuItem>
             <DropdownMenuItem>
               <span>Keyboard shortcuts</span>
-              <DropdownMenuRightSlot>⌘K</DropdownMenuRightSlot>
+              <DropdownMenuShortcut>⌘K</DropdownMenuShortcut>
             </DropdownMenuItem>
           </DropdownMenuGroup>
         </DropdownMenuContent>
@@ -257,19 +257,19 @@ export const AlignEnd: Story = {
           <DropdownMenuGroup>
             <DropdownMenuItem>
               <span>Profile</span>
-              <DropdownMenuRightSlot>⇧⌘P</DropdownMenuRightSlot>
+              <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
             </DropdownMenuItem>
             <DropdownMenuItem>
               <span>Billing</span>
-              <DropdownMenuRightSlot>⌘B</DropdownMenuRightSlot>
+              <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
             </DropdownMenuItem>
             <DropdownMenuItem>
               <span>Settings</span>
-              <DropdownMenuRightSlot>⌘S</DropdownMenuRightSlot>
+              <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
             </DropdownMenuItem>
             <DropdownMenuItem>
               <span>Keyboard shortcuts</span>
-              <DropdownMenuRightSlot>⌘K</DropdownMenuRightSlot>
+              <DropdownMenuShortcut>⌘K</DropdownMenuShortcut>
             </DropdownMenuItem>
           </DropdownMenuGroup>
         </DropdownMenuContent>

@@ -31,8 +31,8 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from '@ui/components/shadcn/ui/dropdown-menu'
-import { Popover, PopoverContent, PopoverTrigger } from '@ui/components/shadcn/popover'
-import { toast } from '@ui/components/shadcn/use-toast'
+import { Popover, PopoverContent, PopoverTrigger } from '@ui/components/shadcn/ui/popover'
+import { toast } from '@ui/components/shadcn/ui/use-toast'
 import { cn } from '@ui/lib/utils'
 import {
   ArrowUpCircle,

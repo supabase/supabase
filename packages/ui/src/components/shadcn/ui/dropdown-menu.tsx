@@ -12,6 +12,7 @@ const dropdownMenuVariants = cva('', {
   variants: {
     content: {
       true: `
+        min-w-[8rem]
         overflow-hidden
         z-40
         bg-overlay
@@ -114,7 +115,7 @@ const dropdownMenuVariants = cva('', {
         flex items-center space-x-0 pl-8 pr-4
       `,
     },
-    right_slot: {
+    shortcut: {
       true: `
         text-lighter
         group-focus:text-light
@@ -276,15 +277,15 @@ const DropdownMenuSeparator = React.forwardRef<
 ))
 DropdownMenuSeparator.displayName = DropdownMenuPrimitive.Separator.displayName
 
-const DropdownMenuRightSlot = ({ className, ...props }: React.HTMLAttributes<HTMLSpanElement>) => (
+const DropdownMenuShortcut = ({ className, ...props }: React.HTMLAttributes<HTMLSpanElement>) => (
   <span
-    data-component="right_slot"
-    className={cn(dropdownMenuVariants({ right_slot: true }), className)}
+    data-component="shortcut"
+    className={cn(dropdownMenuVariants({ shortcut: true }), className)}
     {...props}
   />
 )
 
-DropdownMenuRightSlot.displayName = 'DropdownMenuRightSlot'
+DropdownMenuShortcut.displayName = 'DropdownMenuShortcut'
 
 export {
   DropdownMenu,
@@ -295,7 +296,7 @@ export {
   DropdownMenuRadioItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuRightSlot,
+  DropdownMenuShortcut,
   DropdownMenuGroup,
   DropdownMenuPortal,
   DropdownMenuSub,

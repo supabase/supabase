@@ -24,7 +24,7 @@ import { toast } from '@ui/components/shadcn/ui/use-toast'
 // import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
-import { SelectSeparator } from '../select'
+import { SelectSeparator } from '@ui/components/shadcn/ui/select'
 
 const meta: Meta = {
   title: 'shadcn/Select',
