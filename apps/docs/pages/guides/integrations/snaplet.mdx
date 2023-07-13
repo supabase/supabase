@@ -21,13 +21,13 @@ If you experience any issues with getting Supabase working with Snaplet, or with
 
 ### Things you'll need before you begin: [#prerequisite]
 
-1. **A production Supabase project’s connection string:** This can be found in Supabase via Organization > All Projects > Your Project > Project Settings > Connection String. We’ll refer to this in the guide as your “source database” - where your data comes from.
+1. **A production Supabase project’s connection string:** This can be found in Supabase via **Organization > All Projects > Your Project > Project Settings > Connection Pooling > Connection String**. We’ll refer to this in the guide as your “source database” - where your data comes from.
 
 ![Supabase connection string](/docs/img/guides/integrations/snaplet/connection_string.webp)
 
 2. A development Supabase project’s connection string: Same steps as above, but a different project/environment. We’ll refer to this in the guide as your “target database” - where we’re restoring the snapshot of the source database to. If you haven’t got this set up yet, we’ll take you through the process of setting this up.
 
-> **Highly Recommended:** Create a read-only role for your connection string. For more info on how to create a read-only role across all schemas, you can check out this short guide in the [Snaplet docs](https://docs.snaplet.dev/guides/postgresql#create-a-read-only-role).
+> **Highly Recommended:** Create a read-only role for your connection string. For more info on how to create a read-only role across all schemas, you can check out the [Snaplet docs](https://docs.snaplet.dev/guides/postgresql#create-a-read-only-role).
 
 ### Step 1: Connect your source database (Production Database) [#connect-source-db]
 
@@ -52,11 +52,11 @@ Once you have gone through those steps, a new snapshot process will start and yo
 
 Your target database is where you want Snaplet to restore the captured snapshot of your production project. This would most likely be either your staging or development Supabase project.
 
-If you don’t already have a developer database setup on Supabase, you’ll need to create a new database by setting up a new project on Supabase. To create a new project you’ll have to do the following:
+If you don’t already have a development database setup on Supabase, you’ll need to create a new database by setting up a new project on Supabase. To create a new project you’ll have to do the following:
 
 1. Go to [app.supabase.io](https://app.supabase.io/)
 
-2. Go to your organization > All projects
+2. Go to your **organization > All projects**
 
 3. In the top left click on your current project name and new project:
   ![New project](/docs/img/guides/integrations/snaplet/new_project.webp)
