@@ -187,8 +187,6 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
       }
     }
 
-    console.log(payload)
-
     const response = await post(`${API_URL}/feedback/send`, payload)
     if (response.error) {
       ui.setNotification({
