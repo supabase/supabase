@@ -4,6 +4,7 @@ import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-pr
 import { useSelectedOrganization } from 'hooks'
 import { getVercelConfigurationUrl } from 'lib/integration-utils'
 import Integration from './Integration'
+import SidePanelGitHubRepoLinker from './SidePanelGitHubRepoLinker'
 import SidePanelVercelProjectLinker from './SidePanelVercelProjectLinker'
 
 const IntegrationSettings = () => {
@@ -87,6 +88,7 @@ These connections will be part of a GitHub workflow that is currently in develop
         integrations={githubIntegrations}
       />
       <SidePanelVercelProjectLinker />
+      <SidePanelGitHubRepoLinker />
     </>
   )
 }

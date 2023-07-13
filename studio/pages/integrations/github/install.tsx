@@ -113,7 +113,7 @@ const GitHubIntegration: NextPageWithLayout = () => {
      */
     if (!isIntegrationInstalled) {
       mutate({
-        installationId,
+        installationId: Number(installationId),
         orgSlug,
         metadata: {},
       })
