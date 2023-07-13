@@ -70,6 +70,10 @@ export * from './src/layout/banners'
 // utilities
 export * from './src/lib/utils'
 
+// shadcn
+
+export * from './src/components/shadcn/ui/dropdown-menu'
+
 // config
 
 // export { default as Config } from './../ui.config'

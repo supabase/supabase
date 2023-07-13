@@ -12,7 +12,6 @@ const dropdownMenuVariants = cva('', {
   variants: {
     content: {
       true: `
-        min-w-[8rem]
         overflow-hidden
         z-40
         bg-overlay
@@ -288,19 +287,19 @@ const DropdownMenuRightSlot = ({ className, ...props }: React.HTMLAttributes<HTM
 DropdownMenuRightSlot.displayName = 'DropdownMenuRightSlot'
 
 export {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuCheckboxItem,
-  DropdownMenuRadioItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuRightSlot,
-  DropdownMenuGroup,
-  DropdownMenuPortal,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-  DropdownMenuRadioGroup,
+  DropdownMenu as ShadcnDropdownMenu,
+  DropdownMenuTrigger as ShadcnDropdownMenuTrigger,
+  DropdownMenuContent as ShadcnDropdownMenuContent,
+  DropdownMenuItem as ShadcnDropdownMenuItem,
+  DropdownMenuCheckboxItem as ShadcnDropdownMenuCheckboxItem,
+  DropdownMenuRadioItem as ShadcnDropdownMenuRadioItem,
+  DropdownMenuLabel as ShadcnDropdownMenuLabel,
+  DropdownMenuSeparator as ShadcnDropdownMenuSeparator,
+  DropdownMenuRightSlot as ShadcnDropdownMenuRightSlot,
+  DropdownMenuGroup as ShadcnDropdownMenuGroup,
+  DropdownMenuPortal as ShadcnDropdownMenuPortal,
+  DropdownMenuSub as ShadcnDropdownMenuSub,
+  DropdownMenuSubContent as ShadcnDropdownMenuSubContent,
+  DropdownMenuSubTrigger as ShadcnDropdownMenuSubTrigger,
+  DropdownMenuRadioGroup as ShadcnDropdownMenuRadioGroup,
 }
