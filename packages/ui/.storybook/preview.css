@@ -76,10 +76,10 @@
   /* * {
     @apply border-border;
   } */
-  body {
+  /* body {
     @apply bg-background text-foreground;
     font-feature-settings: 'rlig' 1, 'calt' 1;
-  }
+  } */
 }
 
 @layer utilities {
@@ -101,11 +101,8 @@
 }
 
 @layer base {
-  /* * {
-    @apply border-border;
-  } */
   body {
-    @apply bg-background text-foreground;
+    @apply bg text;
     font-feature-settings: 'rlig' 1, 'calt' 1;
     font-family: 'Circular std';
   }
@@ -115,6 +112,7 @@
 .light,
 .light .docs-story,
 .dark .docs-story {
-  @apply bg-background;
+  @apply bg text;
+  font-feature-settings: 'rlig' 1, 'calt' 1;
   font-family: 'Circular std';
 }

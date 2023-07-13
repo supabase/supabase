@@ -12,7 +12,7 @@ Object.values(color).map((x, i) => {
 })
 
 console.log('colorExtend', colorExtend)
-console.log('colorExtend', kebabToNested(colorExtend))
+console.log('colorExtend kebabToNested', kebabToNested(colorExtend))
 
 // console.log('colorExtend', kebabToNested(colorExtend).colors.gray)
 

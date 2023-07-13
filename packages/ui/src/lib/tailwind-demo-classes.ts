@@ -29,6 +29,8 @@ export default {
     "bg-destructive-200",
     "bg-destructive-300",
     "bg-destructive-400",
+    "bg-destructive-bg",
+    "bg-destructive-border",
     "bg-destructive",
     "bg-warning-200",
     "bg-warning-300",
@@ -37,7 +39,7 @@ export default {
     "bg-brand-200",
     "bg-brand-300",
     "bg-brand-400",
-    "bg-brand-primary"
+    "bg-brand"
   ],
   "palletes": [
     "bg-black",

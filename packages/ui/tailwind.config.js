@@ -2,17 +2,7 @@ const config = require('config/tailwind.config')
 const { fontFamily } = require('tailwindcss/defaultTheme')
 
 module.exports = config({
-  content: [
-    // '../../packages/common/**/*.{ts,tsx}',
-    '../../packages/ui/**/*.{tsx,ts,js}',
-    '../../packages/ui/**/*.*.{tsx,ts,js}',
-    // './pages/**/*.{tsx,mdx}',
-    // './components/**/*.tsx',
-    // './layouts/**/*.tsx',
-    // './src/**/*.{ts,tsx,mdx}',
-    // './_blog/*.mdx',
-    // '../../packages/ui/**/*.stories.{tsx,ts,js}',
-  ],
+  content: ['../../packages/ui/**/*.{tsx,ts,js}', '../../packages/ui/**/*.*.{tsx,ts,js}'],
   theme: {
     container: {
       center: true,
