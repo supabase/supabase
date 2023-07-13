@@ -41,7 +41,7 @@ const ProjectCard = ({ project, rewriteHref }: ProjectCardProps) => {
                 <Badge color="yellow">
                   <div className="flex items-center gap-2">
                     <IconAlertTriangle size={14} strokeWidth={2} />
-                    <span className="truncate">Readonly mode enabled</span>
+                    <span className="truncate">Read-only mode</span>
                   </div>
                 </Badge>
               </div>
