@@ -36,12 +36,12 @@ The key elements are:
   <img
     alt="multi database"
     className="dark:hidden"
-    src="2023-07-13-pgvector-performance/vecs-bench--light.png"
+    src="/images/blog/2023-07-13-pgvector-performance/vecs-bench--light.png"
   />
   <img
     alt="multi database"
     className="hidden dark:block"
-    src="2023-07-13-pgvector-performance/vecs-bench--dark.png"
+    src="/images/blog/2023-07-13-pgvector-performance/vecs-bench--dark.png"
   />
 </div>
 
@@ -61,11 +61,11 @@ All compute add-ons available on Supabase were used to run our benchmarks. Each 
 
 We tested using the same dataset as the Qdrant comparison: [dbpedia-entities-openai-1M](https://huggingface.co/datasets/KShivendu/dbpedia-entities-openai-1M). This dataset includes 1M embeddings with 1536 dimensions (created using OpenAI). The embeddings are created by Wikipedia articles. It's a great dataset!
 
-<Admonition type="note">
+<div className="bg-gray-300 rounded-lg px-6 py-2 italic">
 
 We also have some useful [benchmarks in our docs](https://supabase.com/docs/guides/ai/choosing-compute-addon#results) for [gist-960-angular](http://corpus-texmex.irisa.fr/) (1M image embeddings, 960 dimensions) and [GloVe Reddit comments](https://nlp.stanford.edu/projects/glove/) (1.6M text embeddings, 512 dimensions).
 
-</Admonition>
+</div>
 
 ## Baseline
 
@@ -75,12 +75,12 @@ Let's start with NirantK's results as a baseline:
   <img
     alt="multi database"
     className="dark:hidden"
-    src="2023-07-13-pgvector-performance/nirantk--light.png"
+    src="/images/blog/2023-07-13-pgvector-performance/nirantk--light.png"
   />
   <img
     alt="multi database"
     className="hidden dark:block"
-    src="2023-07-13-pgvector-performance/nirantk--dark.png"
+    src="/images/blog/2023-07-13-pgvector-performance/nirantk--dark.png"
   />
 </div>
 
@@ -115,12 +115,12 @@ With probes set to 10, pgvector was faster and more accurate:
   <img
     alt="multi database"
     className="dark:hidden"
-    src="2023-07-13-pgvector-performance/pgvector-optimized--light.png"
+    src="/images/blog/2023-07-13-pgvector-performance/pgvector-optimized--light.png"
   />
   <img
     alt="multi database"
     className="hidden dark:block"
-    src="2023-07-13-pgvector-performance/pgvector-optimized--dark.png"
+    src="/images/blog/2023-07-13-pgvector-performance/pgvector-optimized--dark.png"
   />
 </div>
 
@@ -135,12 +135,12 @@ With probes set to 40, pgvector was not just substantially faster but also boast
   <img
     alt="multi database"
     className="dark:hidden"
-    src="2023-07-13-pgvector-performance/pgvector-qdrant--light.png"
+    src="/images/blog/2023-07-13-pgvector-performance/pgvector-qdrant--light.png"
   />
   <img
     alt="multi database"
     className="hidden dark:block"
-    src="2023-07-13-pgvector-performance/pgvector-qdrant--dark.png"
+    src="/images/blog/2023-07-13-pgvector-performance/pgvector-qdrant--dark.png"
   />
 </div>
 
@@ -148,11 +148,11 @@ With probes set to 40, pgvector was not just substantially faster but also boast
 
 Another key takeaway is that the performance scales predictably with the size of the database. For instance, a 4XL instance achieves precision@10 of 0.98 and RPS of 270 with probes set to 40. Moreover, an 8XL compute add-on analogously obtains precision@10 of 0.98 and an RPS of 470, surpassing the results of Qdrant.
 
-<Admonition type="note">
+<div className="bg-gray-300 rounded-lg px-6 py-2 italic">
 
 Again, it is NOT our goal to prove that pgvector is better than Qdrant for running vector workloads. The Qdrant benchmark uses “default” configuration and is in not indicative of its capabilities after modifying the configuration.
 
-</Admonition>
+</div>
 
 Although more compute is required to match Qdrant's precision and RPS levels concurrently, this is still a satisfying outcome. It means that it's not a _necessity_ to use another vector database - if you want to lower your operational complexity, just increase your Postgres size.
 
@@ -166,12 +166,12 @@ With a 64-core, 256 GB server we achieve ~1800 RPS and 0.91 precision. This is f
   <img
     alt="multi database"
     className="dark:hidden"
-    src="2023-07-13-pgvector-performance/size-to-rps--light.png"
+    src="/images/blog/2023-07-13-pgvector-performance/size-to-rps--light.png"
   />
   <img
     alt="multi database"
     className="hidden dark:block"
-    src="2023-07-13-pgvector-performance/size-to-rps--dark.png"
+    src="/images/blog/2023-07-13-pgvector-performance/size-to-rps--dark.png"
   />
 </div>
 
@@ -195,12 +195,12 @@ But as our experiment shows, we can improve select queries speed if we make more
   <img
     alt="multi database"
     className="dark:hidden"
-    src="2023-07-13-pgvector-performance/lists-count--light.png"
+    src="/images/blog/2023-07-13-pgvector-performance/lists-count--light.png"
   />
   <img
     alt="multi database"
     className="hidden dark:block"
-    src="2023-07-13-pgvector-performance/lists-count--dark.png"
+    src="/images/blog/2023-07-13-pgvector-performance/lists-count--dark.png"
   />
 </div>
 
@@ -212,16 +212,16 @@ So if you can afford an index build time of 1 hour or more, you can go with `lis
   <img
     alt="multi database"
     className="dark:hidden"
-    src="2023-07-13-pgvector-performance/lists-for-1m--light.png"
+    src="/images/blog/2023-07-13-pgvector-performance/lists-for-1m--light.png"
   />
   <img
     alt="multi database"
     className="hidden dark:block"
-    src="2023-07-13-pgvector-performance/lists-for-1m--dark.png"
+    src="/images/blog/2023-07-13-pgvector-performance/lists-for-1m--dark.png"
   />
 </div>
 
-<Admonition type="note">
+<div className="bg-gray-300 rounded-lg px-6 py-2 italic">
 
 You may need to increase `maintenance_work_mem` to be able to create an index with high values for `lists`. For example:
 
@@ -229,7 +229,7 @@ You may need to increase `maintenance_work_mem` to be able to create an index wi
 SET maintenance_work_mem TO '7168 MB';
 ```
 
-</Admonition>
+</div>
 
 Keeping in mind that the overall index size is almost the same, and only index build time increases, we can say that it's better to use more lists for better select queries speed.
 
@@ -243,12 +243,12 @@ Embeddings generated for similarity search using “real world data” will be m
   <img
     alt="multi database"
     className="dark:hidden"
-    src="2023-07-13-pgvector-performance/random-data--light.png"
+    src="/images/blog/2023-07-13-pgvector-performance/random-data--light.png"
   />
   <img
     alt="multi database"
     className="hidden dark:block"
-    src="2023-07-13-pgvector-performance/random-data--dark.png"
+    src="/images/blog/2023-07-13-pgvector-performance/random-data--dark.png"
   />
 </div>
 
