@@ -68,11 +68,13 @@ const DeleteProjectButton = ({ type = 'danger' }: DeleteProjectButtonProps) => {
     }
 
     await deleteProject({ projectRef: project.ref })
-    await sendExitSurvey({
-      projectRef,
-      message,
-      reasons: selectedReasons.reduce((a, b) => `${a}- ${b}\n`, ''),
-    })
+    if (!isFree) {
+      await sendExitSurvey({
+        projectRef,
+        message,
+        reasons: selectedReasons.reduce((a, b) => `${a}- ${b}\n`, ''),
+      })
+    }
 
     ui.setNotification({ category: 'success', message: `Successfully deleted ${project.name}` })
     router.push(`/projects`)
