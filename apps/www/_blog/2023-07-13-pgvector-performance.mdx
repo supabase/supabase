@@ -284,7 +284,7 @@ First, a few generic tips which you can pick and choose from:
 Before running your pgvector workload in production, here are a few steps you can take to maximize performance.
 
 1. Over-provision RAM during preparation. You can scale down in step `5`, but it's better to start with a larger size to get the best results for RAM requirements. (We'd recommend at least 8XL if you're using Supabase.)
-2. Upload your data to the database. If you use `[vecs](https://supabase.com/docs/guides/ai/python/api)` library, it will automatically generate an index with default parameters.
+2. Upload your data to the database. If you use [`vecs`](https://supabase.com/docs/guides/ai/python/api) library, it will automatically generate an index with default parameters.
 3. Run a benchmark using randomly generated queries and see the results. Again, you can use `vecs` library with the `ann-benchmarks` tool. Do it with probes set to 10 (default) and then with probes set to 100 or more, so RPS will be lower than 10.
 4. Take a look at the RAM usage, and save it as a note for yourself. You would likely want to use compute add-on in the future that would have the same amount of RAM as used at the moment (both actual RAM usage and RAM used for cache and buffers).
 5. Scale down your compute add-on to the one that would have the same amount of RAM as used at the moment.
