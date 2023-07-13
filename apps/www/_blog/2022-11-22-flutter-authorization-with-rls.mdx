@@ -1358,7 +1358,7 @@ class MyApp extends StatelessWidget {
 ### Step 4: Authorization with Row Level Security (RLS)
 
 At this point, we seemingly have a complete app. But if we open the app right now, we will see every users' room along with all the messages that have ever been sent.
-This is because we have not set up Row Level Security to prevent unauthorized users to access the rooms yet.
+This is because we have not set up Row Level Security to prevent users from accessing rooms that don't belong to them.
 There are two ways we can define Row Level Security policies in Supabase, with the GUI or through SQL, but we will set them using SQL today.
 Let's run the following SQL to set the security policy.
 
