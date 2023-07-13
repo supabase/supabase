@@ -3,7 +3,7 @@ import { includes, without } from 'lodash'
 import { useReducer, useRef, useState } from 'react'
 
 import { useParams } from 'common'
-import { useSendDowngradeFeedbackMutation } from 'data/feedback/feedback-downgrade-send'
+import { useSendDowngradeFeedbackMutation } from 'data/feedback/exit-survey-send'
 import { OrgSubscription } from 'data/subscriptions/org-subscription-query'
 import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
 import { useFlag, useStore } from 'hooks'
