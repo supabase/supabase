@@ -122,3 +122,11 @@ export function getVercelConfigurationUrl(integration: Integration) {
       : ''
   }integrations/${integration.metadata?.configuration_id}`
 }
+
+export function getGitHubConfigurationUrl(integration: Integration) {
+  return `https://github.com/${
+    integration.metadata?.account.type === 'Organization'
+      ? `organizations/${integration.metadata?.account.name}/`
+      : ''
+  }settings/installations/${integration.metadata.installation_id}`
+}

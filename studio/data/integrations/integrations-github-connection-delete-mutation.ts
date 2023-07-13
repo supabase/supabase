@@ -1,36 +1,27 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { delete_ } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
-import { UserContent } from 'types'
+
+import { del } from 'data/fetchers'
 import { integrationKeys } from './keys'
 
 type DeleteVariables = {
-  id: string
-  organization_integration_id: string
+  connectionId: string
+
+  integrationId: string
   orgSlug: string | undefined
 }
 
-export async function deleteConnection(
-  { organization_integration_id, id }: DeleteVariables,
-  signal?: AbortSignal
-) {
-  if (!organization_integration_id) {
-    throw new Error('organization_integration_id is required')
-  }
+export async function deleteConnection({ connectionId }: DeleteVariables, signal?: AbortSignal) {
+  const { data, error } = await del('/platform/integrations/github/connections/{connection_id}', {
+    params: { path: { connection_id: connectionId } },
+  })
+  if (error) throw error
 
-  const response = await delete_<UserContent>(
-    `${API_URL}/integrations/vercel/connections/${id}`,
-    { organization_integration_id },
-    { signal }
-  )
-
-  if (response.error) throw response.error
-  return response
+  return data
 }
 
 type DeleteContentData = Awaited<ReturnType<typeof deleteConnection>>
 
-export const useIntegrationsVercelInstalledConnectionDeleteMutation = ({
+export const useIntegrationsGitHubInstalledConnectionDeleteMutation = ({
   onSuccess,
   ...options
 }: Omit<UseMutationOptions<DeleteContentData, unknown, DeleteVariables>, 'mutationFn'> = {}) => {
@@ -42,11 +33,9 @@ export const useIntegrationsVercelInstalledConnectionDeleteMutation = ({
         await Promise.all([
           queryClient.invalidateQueries(integrationKeys.integrationsList()),
           queryClient.invalidateQueries(integrationKeys.integrationsListWithOrg(variables.orgSlug)),
+          queryClient.invalidateQueries(integrationKeys.githubRepoList(variables.integrationId)),
           queryClient.invalidateQueries(
-            integrationKeys.vercelProjectList(variables.organization_integration_id)
-          ),
-          queryClient.invalidateQueries(
-            integrationKeys.vercelConnectionsList(variables.organization_integration_id)
+            integrationKeys.githubConnectionsList(variables.integrationId)
           ),
         ])
         await onSuccess?.(data, variables, context)

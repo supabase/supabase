@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react'
+import { useMemo } from 'react'
 
 import ProjectLinker from 'components/interfaces/Integrations/ProjectLinker'
 import { Markdown } from 'components/interfaces/Markdown'
@@ -8,7 +8,6 @@ import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-or
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useSelectedOrganization } from 'hooks'
 import { EMPTY_ARR } from 'lib/void'
-import { useGithubConnectionConfigPanelSnapshot } from 'state/github-connection-config-panel'
 import { SidePanel } from 'ui'
 
 const GITHUB_ICON = (
@@ -22,7 +21,17 @@ const GITHUB_ICON = (
   </svg>
 )
 
-const SidePanelGitHubRepoLinker = () => {
+export type SidePanelGitHubRepoLinkerProps = {
+  isOpen?: boolean
+  onClose?: () => void
+  organizationIntegrationId?: string
+}
+
+const SidePanelGitHubRepoLinker = ({
+  isOpen = false,
+  onClose,
+  organizationIntegrationId,
+}: SidePanelGitHubRepoLinkerProps) => {
   const selectedOrganization = useSelectedOrganization()
 
   const { data: integrationData } = useOrgIntegrationsQuery({
@@ -32,19 +41,12 @@ const SidePanelGitHubRepoLinker = () => {
     (integration) => integration.integration.name === 'GitHub'
   ) // github
 
-  const snapshot = useGithubConnectionConfigPanelSnapshot()
-
   /**
    * Find the right integration
    *
    * we use the snapshot.organizationIntegrationId which should be set whenever this sidepanel is opened
    */
-  const selectedIntegration = githubIntegrations?.find(
-    (x) => x.id === snapshot.organizationIntegrationId
-  )
-
-  const organizationIntegrationId = snapshot.organizationIntegrationId
-  const open = snapshot.open
+  const selectedIntegration = githubIntegrations?.find((x) => x.id === organizationIntegrationId)
 
   /**
    * Supabase projects available
@@ -81,24 +83,17 @@ const SidePanelGitHubRepoLinker = () => {
   const { mutate: createConnections, isLoading: isCreatingConnection } =
     useIntegrationGitHubConnectionsCreateMutation({
       onSuccess() {
-        snapshot.setOpen(false)
+        onClose?.()
       },
     })
-
-  const onCreateConnections = useCallback(
-    (vars) => {
-      createConnections(vars)
-    },
-    [createConnections]
-  )
 
   return (
     <SidePanel
       header={'Add GitHub repository'}
       size="large"
-      visible={open}
+      visible={isOpen}
       hideFooter
-      onCancel={() => snapshot.setOpen(false)}
+      onCancel={() => onClose?.()}
     >
       <div className="py-10 flex flex-col gap-6 bg-body h-full">
         <SidePanel.Content>
@@ -115,7 +110,7 @@ Check the details below before proceeding
             organizationIntegrationId={selectedIntegration?.id}
             foreignProjects={githubRepos}
             supabaseProjects={supabaseProjects}
-            onCreateConnections={onCreateConnections}
+            onCreateConnections={createConnections}
             installedConnections={selectedIntegration?.connections}
             isLoading={isCreatingConnection}
             integrationIcon={GITHUB_ICON}

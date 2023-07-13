@@ -97,7 +97,9 @@ const GitHubIntegration: NextPageWithLayout = () => {
   function onInstall() {
     const orgSlug = selectedOrg?.slug
 
-    const installedIntegration = integrationData?.find((x) => x.organization.slug === orgSlug)
+    const installedIntegration = integrationData?.find(
+      (x) => x.organization.slug === orgSlug && x.metadata?.installation_id === installationId
+    )
     const isIntegrationInstalled = Boolean(installedIntegration)
 
     if (!orgSlug) {

@@ -84,9 +84,7 @@ This Supabase integration will allow you to link a Supabase project to a GitHub 
               organizationIntegrationId={integration?.id}
               foreignProjects={repos ?? EMPTY_ARR}
               supabaseProjects={projects}
-              onCreateConnections={(vars) => {
-                createConnections(vars)
-              }}
+              onCreateConnections={createConnections}
               installedConnections={integration?.connections}
               isLoading={isCreatingConnection}
               integrationIcon={GITHUB_ICON}

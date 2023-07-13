@@ -12,7 +12,6 @@ import { useProjectsQuery } from 'data/projects/projects-query'
 import { useSelectedOrganization } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import { EMPTY_ARR } from 'lib/void'
-import { useGithubConnectionConfigPanelSnapshot } from 'state/github-connection-config-panel'
 import { SidePanel } from 'ui'
 
 const VERCEL_ICON = (
@@ -21,7 +20,17 @@ const VERCEL_ICON = (
   </svg>
 )
 
-const SidePanelVercelProjectLinker = () => {
+export type SidePanelVercelProjectLinkerProps = {
+  isOpen?: boolean
+  onClose?: () => void
+  organizationIntegrationId?: string
+}
+
+const SidePanelVercelProjectLinker = ({
+  isOpen = false,
+  onClose,
+  organizationIntegrationId,
+}: SidePanelVercelProjectLinkerProps) => {
   const selectedOrganization = useSelectedOrganization()
 
   const { data: integrationData } = useOrgIntegrationsQuery({
@@ -31,19 +40,12 @@ const SidePanelVercelProjectLinker = () => {
     (integration) => integration.integration.name === 'Vercel'
   ) // vercel
 
-  const snapshot = useGithubConnectionConfigPanelSnapshot()
-
   /**
    * Find the right integration
    *
    * we use the snapshot.organizationIntegrationId which should be set whenever this sidepanel is opened
    */
-  const selectedIntegration = vercelIntegrations?.find(
-    (x) => x.id === snapshot.organizationIntegrationId
-  )
-
-  const organizationIntegrationId = snapshot.organizationIntegrationId
-  const open = snapshot.open
+  const selectedIntegration = vercelIntegrations?.find((x) => x.id === organizationIntegrationId)
 
   /**
    * Supabase projects available
@@ -92,7 +94,7 @@ const SidePanelVercelProjectLinker = () => {
   const { mutate: createConnections, isLoading: isCreatingConnection } =
     useIntegrationVercelConnectionsCreateMutation({
       onSuccess() {
-        snapshot.setOpen(false)
+        onClose?.()
       },
     })
 
@@ -120,9 +122,9 @@ const SidePanelVercelProjectLinker = () => {
     <SidePanel
       header={'Add GitHub repository'}
       size="large"
-      visible={open}
+      visible={isOpen}
       hideFooter
-      onCancel={() => snapshot.setOpen(false)}
+      onCancel={() => onClose?.()}
     >
       <div className="py-10 flex flex-col gap-6 bg-body h-full">
         <SidePanel.Content>

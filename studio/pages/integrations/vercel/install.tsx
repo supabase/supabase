@@ -9,7 +9,6 @@ import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useStore } from 'hooks'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { useVercelIntegrationInstallationState } from 'state/vercel-integration-installation'
 import { NextPageWithLayout, Organization } from 'types'
 import { Alert, Badge, Button, IconBook, IconHexagon, IconLifeBuoy, Listbox, LoadingLine } from 'ui'
 
@@ -33,13 +32,9 @@ export type VercelIntegrationFlow = 'deploy-button' | 'marketing'
 const VercelIntegration: NextPageWithLayout = () => {
   const router = useRouter()
   const { ui } = useStore()
-  const { code, configurationId, next, teamId, source, externalId } = useParams()
+  const { code, configurationId, teamId, source, externalId } = useParams()
   const [selectedOrg, setSelectedOrg] = useState<Organization | null>(null)
   const [organizationIntegrationId, setOrganizationIntegrationId] = useState<string | null>(null)
-
-  const snapshot = useVercelIntegrationInstallationState()
-
-  const flow: VercelIntegrationFlow = externalId ? 'marketing' : 'deploy-button'
 
   /**
    * Fetch the list of organization based integration installations for Vercel.
@@ -54,7 +49,6 @@ const VercelIntegration: NextPageWithLayout = () => {
         const firstOrg = organizations?.[0]
         if (firstOrg && selectedOrg === null) {
           setSelectedOrg(firstOrg)
-          snapshot.setSelectedOrganizationSlug(firstOrg.slug)
           router.query.organizationSlug = firstOrg.slug
         }
       },
