@@ -1359,7 +1359,7 @@ class MyApp extends StatelessWidget {
 
 At this point, we seemingly have a complete app. But if we open the app right now, we will see every users' room along with all the messages that have ever been sent.
 This is because we have not set up Row Level Security to prevent users from accessing rooms that don't belong to them.
-There are two ways we can define Row Level Security policies in Supabase, with the GUI or through SQL, but we will set them using SQL today.
+There are two ways we can define Row Level Security policies in Supabase: with the GUI or through SQL. Today we will use SQL.
 Let's run the following SQL to set the security policy.
 
 ```sql
