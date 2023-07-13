@@ -90,8 +90,7 @@ In read-only mode, clients will encounter errors such as `cannot execute INSERT 
 You can manually override read-only mode to reduce disk size. To do this, run the following in the [SQL Editor](https://supabase.com/dashboard/project/_/sql):
 
 ```sql
-SET
-  default_transaction_read_only = 'off';
+SET TRANSACTION READ WRITE;
 ```
 
 This allows you to delete data from within the session. After deleting data, you should run a vacuum to reclaim as much space as possible.
