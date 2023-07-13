@@ -113,6 +113,12 @@ export {
   DialogDescription as ShadcnDialogDescription,
 } from './src/components/shadcn/ui/dialog'
 
+export {
+  Alert as ShadcnAlert,
+  AlertTitle as ShadcnAlertTitle,
+  AlertDescription as ShadcnAlertDescription,
+} from './src/components/shadcn/ui/alert'
+
 // config
 
 // export { default as Config } from './../ui.config'
