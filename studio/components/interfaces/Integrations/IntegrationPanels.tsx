@@ -6,7 +6,6 @@ import { Markdown } from 'components/interfaces/Markdown'
 import { Integration, IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { BASE_PATH } from 'lib/constants'
-import { getVercelConfigurationUrl } from 'lib/integration-utils'
 import { Badge, Button, IconArrowRight, IconExternalLink, IconGitHub, IconSquare, cn } from 'ui'
 
 const ICON_STROKE_WIDTH = 2
@@ -15,6 +14,7 @@ const ICON_SIZE = 14
 export interface IntegrationInstallationProps extends React.RefAttributes<HTMLLIElement> {
   title: string
   integration: Integration
+  getManageUrl: (integration: Integration) => string
 }
 
 type HandleIconType = Integration['integration']['name'] | 'Supabase'
@@ -66,7 +66,7 @@ const Avatar = ({ src }: { src: string | undefined }) => {
 }
 
 const IntegrationInstallation = React.forwardRef<HTMLLIElement, IntegrationInstallationProps>(
-  ({ title, integration, ...props }, ref) => {
+  ({ title, integration, getManageUrl, ...props }, ref) => {
     const IntegrationIconBlock = () => {
       return (
         <div className="bg-black text-white w-8 h-8 rounded flex items-center justify-center">
@@ -112,12 +112,7 @@ const IntegrationInstallation = React.forwardRef<HTMLLIElement, IntegrationInsta
         </div>
 
         <Button type="default" asChild iconRight={<IconExternalLink />}>
-          {/* hard coded to vercel for now, TODO: move to a prop */}
-          <a
-            href={getVercelConfigurationUrl(integration)}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <a href={getManageUrl(integration)} target="_blank" rel="noopener noreferrer">
             Manage
           </a>
         </Button>
@@ -153,7 +148,7 @@ const IntegrationConnection = React.forwardRef<HTMLLIElement, IntegrationConnect
               <IconArrowRight size={14} className="text-scale-900" strokeWidth={1.5} />
               {!connection?.metadata?.framework ? (
                 <div className="bg-black text-white w-4 h-4 rounded flex items-center justify-center">
-                  <HandleIcon type={'Vercel'} className={'!w-2.5'} />
+                  <HandleIcon type={type} className={'!w-2.5'} />
                 </div>
               ) : (
                 <img
