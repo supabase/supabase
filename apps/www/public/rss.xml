@@ -5,189 +5,196 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Wed, 05 Jul 2023 23:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Tue, 11 Jul 2023 22:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/postgrest-11-1-release</guid>
+  <title>What is new in PostgREST v11.1?</title>
+  <link>https://supabase.com/blog/postgrest-11-1-release</link>
+  <description>Impersonated Role Settings, Configurable Isolation Level, improved Bulk Insert, and more</description>
+  <pubDate>Tue, 11 Jul 2023 22:00:00 GMT</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/supabase-beta-update-june-2023</guid>
   <title>Supabase Beta June 2023</title>
   <link>https://supabase.com/blog/supabase-beta-update-june-2023</link>
   <description>A plethora of announcements... read till the end to find out when is the new Launch Week</description>
-  <pubDate>Wed, 05 Jul 2023 23:00:00 GMT</pubDate>
+  <pubDate>Wed, 05 Jul 2023 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/native-mobile-auth</guid>
   <title>Native Mobile Auth Support for Google and Apple Sign in</title>
   <link>https://supabase.com/blog/native-mobile-auth</link>
   <description>Supabase auth adds full support for native mobile sign in with Apple and Google.</description>
-  <pubDate>Mon, 26 Jun 2023 23:00:00 GMT</pubDate>
+  <pubDate>Mon, 26 Jun 2023 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-beta-update-may-2023</guid>
   <title>Supabase Beta May 2023</title>
   <link>https://supabase.com/blog/supabase-beta-update-may-2023</link>
   <description>Learn about the great things we shipped last month. Spoiler alert... lots of AI.</description>
-  <pubDate>Thu, 08 Jun 2023 23:00:00 GMT</pubDate>
+  <pubDate>Thu, 08 Jun 2023 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/vecs</guid>
   <title>Supabase Vecs: a vector client for Postgres</title>
   <link>https://supabase.com/blog/vecs</link>
   <description>Introducing Supabase Vecs, a PostgreSQL vector client</description>
-  <pubDate>Sun, 28 May 2023 23:00:00 GMT</pubDate>
+  <pubDate>Sun, 28 May 2023 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/flutter-hackathon-winners</guid>
   <title>Flutter Hackathon Winners</title>
   <link>https://supabase.com/blog/flutter-hackathon-winners</link>
   <description>Announcing the winners of the Flutter Hackathon!</description>
-  <pubDate>Sun, 28 May 2023 23:00:00 GMT</pubDate>
+  <pubDate>Sun, 28 May 2023 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/chatgpt-plugins-support-postgres</guid>
   <title>ChatGPT plugins now support Postgres &amp; Supabase</title>
   <link>https://supabase.com/blog/chatgpt-plugins-support-postgres</link>
   <description>Supabase recently contributed to the OpenAI Retrieval Plugin repo with a Postgres and a Supabase implementation to help developers build ChatGPT plugins using pgvector.</description>
-  <pubDate>Wed, 24 May 2023 23:00:00 GMT</pubDate>
+  <pubDate>Wed, 24 May 2023 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/building-chatgpt-plugins-template</guid>
   <title>Building ChatGPT Plugins with Supabase Edge Runtime</title>
   <link>https://supabase.com/blog/building-chatgpt-plugins-template</link>
   <description>We&apos;re releasing a ChatGPT plugin template written in TypeScript and running on Deno!</description>
-  <pubDate>Sun, 14 May 2023 23:00:00 GMT</pubDate>
+  <pubDate>Sun, 14 May 2023 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/flutter-hackathon</guid>
   <title>Flutter Hackathon</title>
   <link>https://supabase.com/blog/flutter-hackathon</link>
   <description>Build Flutter apps and win limited edition swag.</description>
-  <pubDate>Thu, 11 May 2023 23:00:00 GMT</pubDate>
+  <pubDate>Thu, 11 May 2023 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-beta-update-april-2023</guid>
   <title>Supabase Beta April 2023</title>
   <link>https://supabase.com/blog/supabase-beta-update-april-2023</link>
   <description>A review of Launch Week 7 and more exciting updates from last month.</description>
-  <pubDate>Mon, 08 May 2023 23:00:00 GMT</pubDate>
+  <pubDate>Mon, 08 May 2023 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/flutter-multi-factor-authentication</guid>
   <title>Securing your Flutter apps with Multi-Factor Authentication</title>
   <link>https://supabase.com/blog/flutter-multi-factor-authentication</link>
   <description>Build a Flutter app where the user is required to authenticate using Multi-Factor Authentication.</description>
-  <pubDate>Wed, 03 May 2023 23:00:00 GMT</pubDate>
+  <pubDate>Wed, 03 May 2023 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/postgres-pluggable-strorage</guid>
   <title>Next steps for Postgres pluggable storage</title>
   <link>https://supabase.com/blog/postgres-pluggable-strorage</link>
   <description>Exploring history of Postgres pluggable storage and the possibility of landing it in the Postgres core.</description>
-  <pubDate>Sun, 30 Apr 2023 23:00:00 GMT</pubDate>
+  <pubDate>Sun, 30 Apr 2023 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/launch-week-7-hackathon-winners</guid>
   <title>Launch Week 7 Hackathon Winners</title>
   <link>https://supabase.com/blog/launch-week-7-hackathon-winners</link>
   <description>Announcing the winners of the Launch Week 7 Hackathon!</description>
-  <pubDate>Sun, 23 Apr 2023 23:00:00 GMT</pubDate>
+  <pubDate>Sun, 23 Apr 2023 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/whats-new-in-pg-graphql-v1-2</guid>
   <title>What&apos;s New in pg_graphql v1.2</title>
   <link>https://supabase.com/blog/whats-new-in-pg-graphql-v1-2</link>
   <description>New Features in the v1.2 release of pg_graphql</description>
-  <pubDate>Thu, 20 Apr 2023 23:00:00 GMT</pubDate>
+  <pubDate>Thu, 20 Apr 2023 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-studio-2.0</guid>
   <title>Supabase Studio 2.0: help when you need it most</title>
   <link>https://supabase.com/blog/supabase-studio-2.0</link>
   <description>Supabase Studio now comes with ChatGPT, and GraphiQL built in, Cascade Deletes, and Foreign Key Selectors, and much more.</description>
-  <pubDate>Thu, 13 Apr 2023 23:00:00 GMT</pubDate>
+  <pubDate>Thu, 13 Apr 2023 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/dbdev</guid>
   <title>dbdev: PostgreSQL Package Manager</title>
   <link>https://supabase.com/blog/dbdev</link>
   <description>We&apos;re publicly previewing dbdev, a PostgreSQL package manager.</description>
-  <pubDate>Thu, 13 Apr 2023 23:00:00 GMT</pubDate>
+  <pubDate>Thu, 13 Apr 2023 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/pg-tle</guid>
   <title>Trusted Language Extensions for Postgres</title>
   <link>https://supabase.com/blog/pg-tle</link>
   <description>We&apos;re collaborating with AWS to bring Trusted Language Extensions to Postgres.</description>
-  <pubDate>Thu, 13 Apr 2023 23:00:00 GMT</pubDate>
+  <pubDate>Thu, 13 Apr 2023 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/launch-week-7-community-highlights</guid>
   <title>Launch Week 7 Community Highlights</title>
   <link>https://supabase.com/blog/launch-week-7-community-highlights</link>
   <description>We&apos;re honored to work with, sponsor, and support incredible people and tools. Here is a highlight of the last 3 months.</description>
-  <pubDate>Thu, 13 Apr 2023 23:00:00 GMT</pubDate>
+  <pubDate>Thu, 13 Apr 2023 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-auth-sso-pkce</guid>
   <title>Supabase Auth: SSO,  Mobile, and Server-side support</title>
   <link>https://supabase.com/blog/supabase-auth-sso-pkce</link>
   <description>Supacharging Supabase Auth with Sign in with Apple on iOS, Single-Sign-On support with SAML 2.0, and PKCE for server-side rendering and mobile auth.</description>
-  <pubDate>Wed, 12 Apr 2023 23:00:00 GMT</pubDate>
+  <pubDate>Wed, 12 Apr 2023 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/storage-v3-resumable-uploads</guid>
   <title>Supabase Storage v3: Resumable Uploads with support for 50GB files</title>
   <link>https://supabase.com/blog/storage-v3-resumable-uploads</link>
   <description>Storage V3 with lots of new features including resumable uploads, more image transformationsm a Next.js image loader and more.</description>
-  <pubDate>Tue, 11 Apr 2023 23:00:00 GMT</pubDate>
+  <pubDate>Tue, 11 Apr 2023 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/edge-runtime-self-hosted-deno-functions</guid>
   <title>Supabase Edge Runtime: Self-hosted Deno Functions</title>
   <link>https://supabase.com/blog/edge-runtime-self-hosted-deno-functions</link>
   <description>We are open-sourcing Supabase Edge Runtime allowing you to host your Edge Functions anywhere.</description>
-  <pubDate>Mon, 10 Apr 2023 23:00:00 GMT</pubDate>
+  <pubDate>Mon, 10 Apr 2023 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-logs-self-hosted</guid>
   <title>Supabase Logs: open source logging server</title>
   <link>https://supabase.com/blog/supabase-logs-self-hosted</link>
   <description>We&apos;re releasing Supabase Logs for both self-hosted users and CLI development.</description>
-  <pubDate>Sun, 09 Apr 2023 23:00:00 GMT</pubDate>
+  <pubDate>Sun, 09 Apr 2023 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-beta-update-march-2023</guid>
   <title>Supabase Beta March 2023</title>
   <link>https://supabase.com/blog/supabase-beta-update-march-2023</link>
   <description>We are in full shipping mode 🛥️… Launch Week 7 can’t come quickly enough!</description>
-  <pubDate>Fri, 07 Apr 2023 23:00:00 GMT</pubDate>
+  <pubDate>Fri, 07 Apr 2023 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/launch-week-7-hackathon</guid>
   <title>The Supabase AI Hackathon</title>
   <link>https://supabase.com/blog/launch-week-7-hackathon</link>
   <description>Build an Open Source Project over 10 days. 5 prize categories.</description>
-  <pubDate>Thu, 06 Apr 2023 23:00:00 GMT</pubDate>
+  <pubDate>Thu, 06 Apr 2023 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/designing-with-ai-midjourney</guid>
   <title>Designing with AI: Generating unique artwork for every user</title>
   <link>https://supabase.com/blog/designing-with-ai-midjourney</link>
   <description>Using MidJourney to generative artwork and serving ticket images with Edge Functions</description>
-  <pubDate>Thu, 06 Apr 2023 23:00:00 GMT</pubDate>
+  <pubDate>Thu, 06 Apr 2023 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/infinite-scroll-with-nextjs-framer-motion</guid>
   <title>Infinite scroll with Next.js, Framer Motion, and Supabase</title>
   <link>https://supabase.com/blog/infinite-scroll-with-nextjs-framer-motion</link>
   <description>Lazy load and paginate data on scroll with Next.js and a sprinkle of Framer Motion magic ✨</description>
-  <pubDate>Mon, 03 Apr 2023 23:00:00 GMT</pubDate>
+  <pubDate>Mon, 03 Apr 2023 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supaclub</guid>
   <title>SupaClub</title>
   <link>https://supabase.com/blog/supaclub</link>
   <description>The Worlds First Software Engineering Nightclub.</description>
-  <pubDate>Fri, 31 Mar 2023 23:00:00 GMT</pubDate>
+  <pubDate>Fri, 31 Mar 2023 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-beta-update-february-2023</guid>
@@ -425,301 +432,301 @@
   <title>What is PostgreSQL commitfest and how to contribute</title>
   <link>https://supabase.com/blog/postgresql-commitfest</link>
   <description>A time-tested method for contributing to the core Postgres code</description>
-  <pubDate>Wed, 26 Oct 2022 23:00:00 GMT</pubDate>
+  <pubDate>Wed, 26 Oct 2022 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-flutter-sdk-v1-released</guid>
   <title>supabase-flutter v1 Released</title>
   <link>https://supabase.com/blog/supabase-flutter-sdk-v1-released</link>
   <description>We&apos;ve released supabase-flutter v1. More intuitive way of accessing Supabase from your Flutter application.</description>
-  <pubDate>Thu, 20 Oct 2022 23:00:00 GMT</pubDate>
+  <pubDate>Thu, 20 Oct 2022 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-js-v2-released</guid>
   <title>supabase-js v2 Released</title>
   <link>https://supabase.com/blog/supabase-js-v2-released</link>
   <description>We&apos;ve released supabase-js v2. Updated examples, quickstarts, and an improved experience.</description>
-  <pubDate>Wed, 19 Oct 2022 23:00:00 GMT</pubDate>
+  <pubDate>Wed, 19 Oct 2022 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/postgres-full-text-search-vs-the-rest</guid>
   <title>Postgres Full Text Search vs the rest</title>
   <link>https://supabase.com/blog/postgres-full-text-search-vs-the-rest</link>
   <description>Comparing one of the most popular Postgres features against alternatives</description>
-  <pubDate>Thu, 13 Oct 2022 23:00:00 GMT</pubDate>
+  <pubDate>Thu, 13 Oct 2022 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-beta-update-september-2022</guid>
   <title>Supabase Beta September 2022</title>
   <link>https://supabase.com/blog/supabase-beta-update-september-2022</link>
   <description>We were too focused on clearing out the backlog so we didn&apos;t ship anything new last month... or did we?!</description>
-  <pubDate>Tue, 04 Oct 2022 23:00:00 GMT</pubDate>
+  <pubDate>Tue, 04 Oct 2022 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/postgres-wasm</guid>
   <title>Postgres WASM by Snaplet and Supabase</title>
   <link>https://supabase.com/blog/postgres-wasm</link>
   <description>We&apos;re open sourcing postgres-wasm, a PostgresQL server that runs inside a browser, with our friends at Snaplet.</description>
-  <pubDate>Sun, 02 Oct 2022 23:00:00 GMT</pubDate>
+  <pubDate>Sun, 02 Oct 2022 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/choosing-a-postgres-primary-key</guid>
   <title>Choosing a Postgres Primary Key</title>
   <link>https://supabase.com/blog/choosing-a-postgres-primary-key</link>
   <description>Turns out the question of which identifier to use as a Primary Key is complicated -- we&apos;re going to dive into some of the complexity and inherent trade-offs, and figure things out</description>
-  <pubDate>Wed, 07 Sep 2022 23:00:00 GMT</pubDate>
+  <pubDate>Wed, 07 Sep 2022 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-beta-update-august-2022</guid>
   <title>Supabase Beta August 2022</title>
   <link>https://supabase.com/blog/supabase-beta-update-august-2022</link>
   <description>Launch Week Special. See everything we shipped, plus winners of the Hackathon and the extended Community Highlights</description>
-  <pubDate>Tue, 06 Sep 2022 23:00:00 GMT</pubDate>
+  <pubDate>Tue, 06 Sep 2022 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/launch-week-5-hackathon-winners</guid>
   <title>Launch Week 5 Hackathon Winners</title>
   <link>https://supabase.com/blog/launch-week-5-hackathon-winners</link>
   <description>Announcing the winners of the Launch Week 5 Hackathon!</description>
-  <pubDate>Wed, 24 Aug 2022 23:00:00 GMT</pubDate>
+  <pubDate>Wed, 24 Aug 2022 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/building-a-realtime-trello-board-with-supabase-and-angular</guid>
   <title>Building a Realtime Trello Board with Supabase and Angular</title>
   <link>https://supabase.com/blog/building-a-realtime-trello-board-with-supabase-and-angular</link>
   <description>Go beyond the hello world example with this real world project.</description>
-  <pubDate>Tue, 23 Aug 2022 23:00:00 GMT</pubDate>
+  <pubDate>Tue, 23 Aug 2022 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-vault</guid>
   <title>Supabase Vault</title>
   <link>https://supabase.com/blog/supabase-vault</link>
   <description>Today we&apos;re announcing Vault, a Postgres extension for managing secrets and encryption inside your database.</description>
-  <pubDate>Thu, 18 Aug 2022 23:00:00 GMT</pubDate>
+  <pubDate>Thu, 18 Aug 2022 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/postgrest-v10</guid>
   <title>PostgREST v10: EXPLAIN and Improved Relationship Detection</title>
   <link>https://supabase.com/blog/postgrest-v10</link>
   <description>Today, PostgREST 10 was released. Let&apos;s take a look at some of the new features that go hand in hand with supabase-js v2.</description>
-  <pubDate>Thu, 18 Aug 2022 23:00:00 GMT</pubDate>
+  <pubDate>Thu, 18 Aug 2022 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/pg-jsonschema-a-postgres-extension-for-json-validation</guid>
   <title>pg_jsonschema: JSON Schema support for Postgres</title>
   <link>https://supabase.com/blog/pg-jsonschema-a-postgres-extension-for-json-validation</link>
   <description>Today we&apos;re releasing pg_jsonschema, a Postgres extension for JSON validation.</description>
-  <pubDate>Thu, 18 Aug 2022 23:00:00 GMT</pubDate>
+  <pubDate>Thu, 18 Aug 2022 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/launch-week-5-one-more-thing</guid>
   <title>One more thing</title>
   <link>https://supabase.com/blog/launch-week-5-one-more-thing</link>
   <description>Let&apos;s be honest, it&apos;s never just one more thing.</description>
-  <pubDate>Thu, 18 Aug 2022 23:00:00 GMT</pubDate>
+  <pubDate>Thu, 18 Aug 2022 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/launch-week-5-community-day</guid>
   <title>Community Day</title>
   <link>https://supabase.com/blog/launch-week-5-community-day</link>
   <description>Wrapping up Launch Week 5 with contributors, partners, and friends.</description>
-  <pubDate>Thu, 18 Aug 2022 23:00:00 GMT</pubDate>
+  <pubDate>Thu, 18 Aug 2022 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-realtime-multiplayer-general-availability</guid>
   <title>Realtime: Multiplayer Edition</title>
   <link>https://supabase.com/blog/supabase-realtime-multiplayer-general-availability</link>
   <description>Announcing the general availability of Realtime&apos;s Broadcast and Presence.</description>
-  <pubDate>Wed, 17 Aug 2022 23:00:00 GMT</pubDate>
+  <pubDate>Wed, 17 Aug 2022 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-soc2</guid>
   <title>Supabase is SOC2 compliant</title>
   <link>https://supabase.com/blog/supabase-soc2</link>
   <description>Supabase is now SOC2 compliant. Learn how we got here and what it means for our customers.</description>
-  <pubDate>Tue, 16 Aug 2022 23:00:00 GMT</pubDate>
+  <pubDate>Tue, 16 Aug 2022 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-js-v2</guid>
   <title>supabase-js v2</title>
   <link>https://supabase.com/blog/supabase-js-v2</link>
   <description>A look at supabase-js v2, which brings type support and focuses on quality-of-life improvements for developers.</description>
-  <pubDate>Mon, 15 Aug 2022 23:00:00 GMT</pubDate>
+  <pubDate>Mon, 15 Aug 2022 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-cli-v1-and-admin-api-beta</guid>
   <title>Supabase CLI v1 and Management API Beta</title>
   <link>https://supabase.com/blog/supabase-cli-v1-and-admin-api-beta</link>
   <description>We are moving Supabase CLI v1 out of beta, and releasing Management API beta.</description>
-  <pubDate>Sun, 14 Aug 2022 23:00:00 GMT</pubDate>
+  <pubDate>Sun, 14 Aug 2022 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-series-b</guid>
   <title>Supabase Series B</title>
   <link>https://supabase.com/blog/supabase-series-b</link>
   <description>Supabase raised $80M in May, bringing our total funding to $116M.</description>
-  <pubDate>Thu, 11 Aug 2022 23:00:00 GMT</pubDate>
+  <pubDate>Thu, 11 Aug 2022 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/launch-week-5-hackathon</guid>
   <title>Launch Week 5 Hackathon</title>
   <link>https://supabase.com/blog/launch-week-5-hackathon</link>
   <description>Build to win $1500 - Friday 12th to Monday 21st August 2022</description>
-  <pubDate>Tue, 09 Aug 2022 23:00:00 GMT</pubDate>
+  <pubDate>Tue, 09 Aug 2022 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/slack-consolidate-slackbot-to-consolidate-messages</guid>
   <title>Slack Consolidate: a slackbot built with Python and Supabase</title>
   <link>https://supabase.com/blog/slack-consolidate-slackbot-to-consolidate-messages</link>
   <description>A slackbot to consolidate messages from different channels using Supabase, Slack SDK and Python</description>
-  <pubDate>Mon, 08 Aug 2022 23:00:00 GMT</pubDate>
+  <pubDate>Mon, 08 Aug 2022 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-beta-update-july-2022</guid>
   <title>Supabase Beta July 2022</title>
   <link>https://supabase.com/blog/supabase-beta-update-july-2022</link>
   <description>Launch Week Golden Tickets, Flutter SDK 1.0 Developer Preview and more...</description>
-  <pubDate>Tue, 02 Aug 2022 23:00:00 GMT</pubDate>
+  <pubDate>Tue, 02 Aug 2022 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-flutter-sdk-1-developer-preview</guid>
   <title>Supabase Flutter SDK 1.0 Developer Preview</title>
   <link>https://supabase.com/blog/supabase-flutter-sdk-1-developer-preview</link>
   <description>Supabase Flutter SDK is getting a major update and we need your help making it better.</description>
-  <pubDate>Mon, 01 Aug 2022 23:00:00 GMT</pubDate>
+  <pubDate>Mon, 01 Aug 2022 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/seen-by-in-postgresql</guid>
   <title>Implementing &quot;seen by&quot; functionality with Postgres</title>
   <link>https://supabase.com/blog/seen-by-in-postgresql</link>
   <description>Different approaches for tracking visitor counts with PostgreSQL.</description>
-  <pubDate>Sun, 17 Jul 2022 23:00:00 GMT</pubDate>
+  <pubDate>Sun, 17 Jul 2022 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-auth-helpers-with-sveltekit-support</guid>
   <title>Revamped Auth Helpers for Supabase (with SvelteKit support)</title>
   <link>https://supabase.com/blog/supabase-auth-helpers-with-sveltekit-support</link>
   <description>Supabase Auth Helpers now have improved developer experience, Sveltekit support, and more.</description>
-  <pubDate>Tue, 12 Jul 2022 23:00:00 GMT</pubDate>
+  <pubDate>Tue, 12 Jul 2022 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/beta-update-june-2022</guid>
   <title>Supabase Beta June 2022</title>
   <link>https://supabase.com/blog/beta-update-june-2022</link>
   <description>Auth Helpers, Unlimited Free Projects, CLI and more...</description>
-  <pubDate>Tue, 05 Jul 2022 23:00:00 GMT</pubDate>
+  <pubDate>Tue, 05 Jul 2022 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/flutter-tutorial-building-a-chat-app</guid>
   <title>Flutter Tutorial: building a Flutter chat app</title>
   <link>https://supabase.com/blog/flutter-tutorial-building-a-chat-app</link>
   <description>Learn how to build a Flutter chat app with open source and scalable backend (inc. auth, realtime, database, and more).</description>
-  <pubDate>Wed, 29 Jun 2022 23:00:00 GMT</pubDate>
+  <pubDate>Wed, 29 Jun 2022 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/visualizing-supabase-data-using-metabase</guid>
   <title>Visualizing Supabase Data using Metabase</title>
   <link>https://supabase.com/blog/visualizing-supabase-data-using-metabase</link>
   <description>How to create different kinds of charts out of data stored in Supabase using Metabase.</description>
-  <pubDate>Tue, 28 Jun 2022 23:00:00 GMT</pubDate>
+  <pubDate>Tue, 28 Jun 2022 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/partial-postgresql-data-dumps-with-rls</guid>
   <title>Partial data dumps using Postgres Row Level Security</title>
   <link>https://supabase.com/blog/partial-postgresql-data-dumps-with-rls</link>
   <description>Using RLS to create seed files for local PostgreSQL testing.</description>
-  <pubDate>Mon, 27 Jun 2022 23:00:00 GMT</pubDate>
+  <pubDate>Mon, 27 Jun 2022 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/loading-data-supabase-python</guid>
   <title>Python data loading with Supabase</title>
   <link>https://supabase.com/blog/loading-data-supabase-python</link>
   <description>An example of how to load data into Supabase using supabase-py</description>
-  <pubDate>Thu, 16 Jun 2022 23:00:00 GMT</pubDate>
+  <pubDate>Thu, 16 Jun 2022 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/beta-update-may-2022</guid>
   <title>Supabase Beta May 2022</title>
   <link>https://supabase.com/blog/beta-update-may-2022</link>
   <description>Product and community updates including wildcard auth redirects, edge functions with webhooks, and Prometheus endpoints for everybody.</description>
-  <pubDate>Tue, 31 May 2022 23:00:00 GMT</pubDate>
+  <pubDate>Tue, 31 May 2022 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/how-supabase-accelerates-development-of-all-pull-together</guid>
   <title>How Mike Lyndon is using Supabase to accelerate development of AllPullTogether</title>
   <link>https://supabase.com/blog/how-supabase-accelerates-development-of-all-pull-together</link>
   <description>Mike Lyndon is learning web development as he builds AllPullTogether, and Supabase is helping him accelerate what he can accomplish.</description>
-  <pubDate>Wed, 25 May 2022 23:00:00 GMT</pubDate>
+  <pubDate>Wed, 25 May 2022 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/partner-gallery-works-with-supabase</guid>
   <title>Works With Supabase - announcing our Partner Gallery</title>
   <link>https://supabase.com/blog/partner-gallery-works-with-supabase</link>
   <description>Introducing our Partner Gallery - open source and made with Supabase.</description>
-  <pubDate>Tue, 19 Apr 2022 23:00:00 GMT</pubDate>
+  <pubDate>Tue, 19 Apr 2022 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/bring-the-func-hackathon-winners</guid>
   <title>Bring the Func Hackathon Winners 2022</title>
   <link>https://supabase.com/blog/bring-the-func-hackathon-winners</link>
   <description>Celebrating many amazing OSS Hackathon projects using GraphQL and Edge Functions.</description>
-  <pubDate>Sun, 17 Apr 2022 23:00:00 GMT</pubDate>
+  <pubDate>Sun, 17 Apr 2022 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/beta-update-march-2022</guid>
   <title>Supabase Beta March 2022</title>
   <link>https://supabase.com/blog/beta-update-march-2022</link>
   <description>Functions, GraphQL, and much more.</description>
-  <pubDate>Thu, 14 Apr 2022 23:00:00 GMT</pubDate>
+  <pubDate>Thu, 14 Apr 2022 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabrew</guid>
   <title>Supabrew - Never Code Thirsty</title>
   <link>https://supabase.com/blog/supabrew</link>
   <description>A light and refreshing non-alcoholic beer for devs.</description>
-  <pubDate>Thu, 31 Mar 2022 23:00:00 GMT</pubDate>
+  <pubDate>Thu, 31 Mar 2022 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-realtime-with-multiplayer-features</guid>
   <title>Supabase Realtime, with Multiplayer Features</title>
   <link>https://supabase.com/blog/supabase-realtime-with-multiplayer-features</link>
   <description>Today we&apos;re announced Realtime, with multiplayer features. Realtime enables broadcast, presence, and listening to database changes delivered over WebSockets.</description>
-  <pubDate>Thu, 31 Mar 2022 23:00:00 GMT</pubDate>
+  <pubDate>Thu, 31 Mar 2022 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/hackathon-bring-the-func</guid>
   <title>Hackathon: Bring the Func(🕺)</title>
   <link>https://supabase.com/blog/hackathon-bring-the-func</link>
   <description>Build open-source projects with our latest features, win limited edition swag and plant a tree!</description>
-  <pubDate>Thu, 31 Mar 2022 23:00:00 GMT</pubDate>
+  <pubDate>Thu, 31 Mar 2022 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-edge-functions</guid>
   <title>Edge Functions are now available in Supabase</title>
   <link>https://supabase.com/blog/supabase-edge-functions</link>
   <description>Today we&apos;re launching Edge Functions. Edge Functions let you execute Typescript code close to your users, no matter where they&apos;re located.</description>
-  <pubDate>Wed, 30 Mar 2022 23:00:00 GMT</pubDate>
+  <pubDate>Wed, 30 Mar 2022 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-enterprise</guid>
   <title>Introducing Supabase Enterprise</title>
   <link>https://supabase.com/blog/supabase-enterprise</link>
   <description>Today we are releasing Supabase Enterprise, a suite of features to scale your project.</description>
-  <pubDate>Tue, 29 Mar 2022 23:00:00 GMT</pubDate>
+  <pubDate>Tue, 29 Mar 2022 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/graphql-now-available</guid>
   <title>GraphQL is now available in Supabase</title>
   <link>https://supabase.com/blog/graphql-now-available</link>
   <description>GraphQL support is now in general availability on the Supabase platform via our open source PostgreSQL extension, pg_graphql.</description>
-  <pubDate>Mon, 28 Mar 2022 23:00:00 GMT</pubDate>
+  <pubDate>Mon, 28 Mar 2022 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/community-day-lw4</guid>
   <title>Community Day</title>
   <link>https://supabase.com/blog/community-day-lw4</link>
   <description>Kicking off Launch Week 4 with contributors, partners, and friends.</description>
-  <pubDate>Sun, 27 Mar 2022 23:00:00 GMT</pubDate>
+  <pubDate>Sun, 27 Mar 2022 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-launch-week-four</guid>
@@ -866,224 +873,224 @@
   <title>Supabase $30m Series A</title>
   <link>https://supabase.com/blog/supabase-series-a</link>
   <description>Supabase just raised $30M, bringing our total funding to $36M.</description>
-  <pubDate>Wed, 27 Oct 2021 23:00:00 GMT</pubDate>
+  <pubDate>Wed, 27 Oct 2021 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/replenysh-time-to-value-in-less-than-24-hours</guid>
   <title>Replenysh uses Supabase to implement OTP in less than 24-hours</title>
   <link>https://supabase.com/blog/replenysh-time-to-value-in-less-than-24-hours</link>
   <description>Learn how Replenysh uses Supabase to power the circular economy, redefining how brands interact with their customers and products.</description>
-  <pubDate>Mon, 18 Oct 2021 23:00:00 GMT</pubDate>
+  <pubDate>Mon, 18 Oct 2021 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/hacktoberfest-hackathon-winners-2021</guid>
   <title>Hacktoberfest Hackathon Winners 2021</title>
   <link>https://supabase.com/blog/hacktoberfest-hackathon-winners-2021</link>
   <description>Celebrating many amazing projects submitted to our Hacktoberfest Hackathon.</description>
-  <pubDate>Wed, 13 Oct 2021 23:00:00 GMT</pubDate>
+  <pubDate>Wed, 13 Oct 2021 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-beta-sept-2021</guid>
   <title>Supabase Beta Sept 2021</title>
   <link>https://supabase.com/blog/supabase-beta-sept-2021</link>
   <description>Hackathon, Aborting request, UI updates, and now Hiring.</description>
-  <pubDate>Sun, 03 Oct 2021 23:00:00 GMT</pubDate>
+  <pubDate>Sun, 03 Oct 2021 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-hacktoberfest-hackathon-2021</guid>
   <title>Supabase Hacktoberfest Hackathon 2021</title>
   <link>https://supabase.com/blog/supabase-hacktoberfest-hackathon-2021</link>
   <description>We&apos;re running another Supabase Hackathon during Hacktoberfest!</description>
-  <pubDate>Mon, 27 Sep 2021 23:00:00 GMT</pubDate>
+  <pubDate>Mon, 27 Sep 2021 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-beta-august-2021</guid>
   <title>Supabase Beta August 2021</title>
   <link>https://supabase.com/blog/supabase-beta-august-2021</link>
   <description>Fundraising, Realtime Security, custom SMS templates, and deployments in South Korea.</description>
-  <pubDate>Thu, 09 Sep 2021 23:00:00 GMT</pubDate>
+  <pubDate>Thu, 09 Sep 2021 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-beta-july-2021</guid>
   <title>Supabase Beta July 2021</title>
   <link>https://supabase.com/blog/supabase-beta-july-2021</link>
   <description>Discord Logins, Vercel Integration, Full text search, and OAuth guides.</description>
-  <pubDate>Wed, 11 Aug 2021 23:00:00 GMT</pubDate>
+  <pubDate>Wed, 11 Aug 2021 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/hackathon-winners</guid>
   <title>Open Source Hackathon Winners</title>
   <link>https://supabase.com/blog/hackathon-winners</link>
   <description>Let the medal ceremony begin for the best projects submitted during the Supabase Hackathon.</description>
-  <pubDate>Sun, 08 Aug 2021 23:00:00 GMT</pubDate>
+  <pubDate>Sun, 08 Aug 2021 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-swag-store</guid>
   <title>Supabase Swag Store</title>
   <link>https://supabase.com/blog/supabase-swag-store</link>
   <description>Today we are officially launching the Supabase Swag Store.</description>
-  <pubDate>Thu, 29 Jul 2021 23:00:00 GMT</pubDate>
+  <pubDate>Thu, 29 Jul 2021 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-functions-updates</guid>
   <title>Updates for Supabase Functions</title>
   <link>https://supabase.com/blog/supabase-functions-updates</link>
   <description>The question on everyone&apos;s mind - are we launching Supabase Functions? Well, it&apos;s complicated.</description>
-  <pubDate>Thu, 29 Jul 2021 23:00:00 GMT</pubDate>
+  <pubDate>Thu, 29 Jul 2021 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/1-the-supabase-hackathon</guid>
   <title>The Supabase Hackathon</title>
   <link>https://supabase.com/blog/1-the-supabase-hackathon</link>
   <description>A whole week of Hacking for Fun and Prizes.</description>
-  <pubDate>Thu, 29 Jul 2021 23:00:00 GMT</pubDate>
+  <pubDate>Thu, 29 Jul 2021 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-reports-and-metrics</guid>
   <title>Supabase Reports and Metrics</title>
   <link>https://supabase.com/blog/supabase-reports-and-metrics</link>
   <description>We&apos;re exposing a full set of metrics in your projects, so that you can build better (and faster) products for your users.</description>
-  <pubDate>Wed, 28 Jul 2021 23:00:00 GMT</pubDate>
+  <pubDate>Wed, 28 Jul 2021 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-auth-passwordless-sms-login</guid>
   <title>Supabase Auth v2: Phone Auth now available</title>
   <link>https://supabase.com/blog/supabase-auth-passwordless-sms-login</link>
   <description>Phone Auth is available today on all new and existing Supabase projects.</description>
-  <pubDate>Tue, 27 Jul 2021 23:00:00 GMT</pubDate>
+  <pubDate>Tue, 27 Jul 2021 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/mobbin-supabase-200000-users</guid>
   <title>Mobbin uses Supabase to authenticate 200,000 users</title>
   <link>https://supabase.com/blog/mobbin-supabase-200000-users</link>
   <description>Learn how Mobbin migrated 200,000 users from Firebase for a better authentication experience.</description>
-  <pubDate>Tue, 27 Jul 2021 23:00:00 GMT</pubDate>
+  <pubDate>Tue, 27 Jul 2021 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/storage-beta</guid>
   <title>Supabase Storage now in Beta</title>
   <link>https://supabase.com/blog/storage-beta</link>
   <description>Supabase Storage moves into Beta.</description>
-  <pubDate>Mon, 26 Jul 2021 23:00:00 GMT</pubDate>
+  <pubDate>Mon, 26 Jul 2021 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/spot-flutter-with-postgres</guid>
   <title>Spot: a video sharing app built with Flutter</title>
   <link>https://supabase.com/blog/spot-flutter-with-postgres</link>
   <description>Spot is a geolocation-based video-sharing app with some social networking features.</description>
-  <pubDate>Mon, 26 Jul 2021 23:00:00 GMT</pubDate>
+  <pubDate>Mon, 26 Jul 2021 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-postgres-13</guid>
   <title>Supabase is now on Postgres 13.3</title>
   <link>https://supabase.com/blog/supabase-postgres-13</link>
   <description>From today, new Supabase projects will be on a version of Supabase Postgres that runs on Postgres 13.3.</description>
-  <pubDate>Sun, 25 Jul 2021 23:00:00 GMT</pubDate>
+  <pubDate>Sun, 25 Jul 2021 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-community-day</guid>
   <title>Supabase Community Day</title>
   <link>https://supabase.com/blog/supabase-community-day</link>
   <description>Community Day</description>
-  <pubDate>Sun, 25 Jul 2021 23:00:00 GMT</pubDate>
+  <pubDate>Sun, 25 Jul 2021 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/epsilon3-self-hosting</guid>
   <title>Epsilon3 Self-Host Supabase To Revolutionize Space Operations </title>
   <link>https://supabase.com/blog/epsilon3-self-hosting</link>
   <description>Learn how the team at Epsilon3 use Supabase to help teams execute secure and reliable operations in an industry that project spend runs into the billions.</description>
-  <pubDate>Sun, 25 Jul 2021 23:00:00 GMT</pubDate>
+  <pubDate>Sun, 25 Jul 2021 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-launch-week-sql</guid>
   <title>Supabase Launch Week II: The SQL</title>
   <link>https://supabase.com/blog/supabase-launch-week-sql</link>
   <description>Five days of Supabase. Again.</description>
-  <pubDate>Wed, 21 Jul 2021 23:00:00 GMT</pubDate>
+  <pubDate>Wed, 21 Jul 2021 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/roles-postgres-hooks</guid>
   <title>Protecting reserved roles with PostgreSQL Hooks</title>
   <link>https://supabase.com/blog/roles-postgres-hooks</link>
   <description>Using Postgres Hooks to protect functionality in your Postgres database.</description>
-  <pubDate>Thu, 01 Jul 2021 23:00:00 GMT</pubDate>
+  <pubDate>Thu, 01 Jul 2021 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-beta-june-2021</guid>
   <title>Supabase Beta June 2021</title>
   <link>https://supabase.com/blog/supabase-beta-june-2021</link>
   <description>Discord Logins, Vercel Integration, Full text search, and OAuth guides.</description>
-  <pubDate>Tue, 01 Jun 2021 23:00:00 GMT</pubDate>
+  <pubDate>Tue, 01 Jun 2021 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-beta-may-2021</guid>
   <title>Supabase Beta May 2021</title>
   <link>https://supabase.com/blog/supabase-beta-may-2021</link>
   <description>Apple &amp;amp; Twitter Logins, Supabase Grid, Go &amp;amp; Swift Libraries.</description>
-  <pubDate>Tue, 01 Jun 2021 23:00:00 GMT</pubDate>
+  <pubDate>Tue, 01 Jun 2021 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-beta-april-2021</guid>
   <title>Supabase Beta April 2021</title>
   <link>https://supabase.com/blog/supabase-beta-april-2021</link>
   <description>Supabase &quot;gardening&quot; - stability, security, and community support.</description>
-  <pubDate>Tue, 04 May 2021 23:00:00 GMT</pubDate>
+  <pubDate>Tue, 04 May 2021 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-beta-march-2021</guid>
   <title>Supabase Beta March 2021</title>
   <link>https://supabase.com/blog/supabase-beta-march-2021</link>
   <description>Launch week, Storage, Supabase CLI, Connection Pooling, Supabase UI, and Pricing.</description>
-  <pubDate>Mon, 05 Apr 2021 23:00:00 GMT</pubDate>
+  <pubDate>Mon, 05 Apr 2021 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-workflows</guid>
   <title>Workflows are coming to Supabase</title>
   <link>https://supabase.com/blog/supabase-workflows</link>
   <description>Functions are great, but you know what&apos;s better?</description>
-  <pubDate>Thu, 01 Apr 2021 23:00:00 GMT</pubDate>
+  <pubDate>Thu, 01 Apr 2021 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-pgbouncer</guid>
   <title>PgBouncer is now available in Supabase</title>
   <link>https://supabase.com/blog/supabase-pgbouncer</link>
   <description>Better support for Serverless and Postgres.</description>
-  <pubDate>Thu, 01 Apr 2021 23:00:00 GMT</pubDate>
+  <pubDate>Thu, 01 Apr 2021 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-dot-com</guid>
   <title>Supabase Dot Com</title>
   <link>https://supabase.com/blog/supabase-dot-com</link>
   <description>The Supabase Domain name is changing.</description>
-  <pubDate>Thu, 01 Apr 2021 23:00:00 GMT</pubDate>
+  <pubDate>Thu, 01 Apr 2021 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-nft-marketplace</guid>
   <title>Supabase Launches NFT Marketplace</title>
   <link>https://supabase.com/blog/supabase-nft-marketplace</link>
   <description>A fully encrypted NFT platform to protect and transact your digital assets</description>
-  <pubDate>Wed, 31 Mar 2021 23:00:00 GMT</pubDate>
+  <pubDate>Wed, 31 Mar 2021 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-cli</guid>
   <title>Supabase CLI</title>
   <link>https://supabase.com/blog/supabase-cli</link>
   <description>Local development, database migrations, and self-hosting.</description>
-  <pubDate>Tue, 30 Mar 2021 23:00:00 GMT</pubDate>
+  <pubDate>Tue, 30 Mar 2021 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-storage</guid>
   <title>Storage is now available in Supabase</title>
   <link>https://supabase.com/blog/supabase-storage</link>
   <description>Launching Supabase Storage and how you can use it in your apps</description>
-  <pubDate>Mon, 29 Mar 2021 23:00:00 GMT</pubDate>
+  <pubDate>Mon, 29 Mar 2021 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/pricing</guid>
   <title>Supabase Beta Pricing</title>
   <link>https://supabase.com/blog/pricing</link>
   <description>Supabase launches Beta pricing structure</description>
-  <pubDate>Sun, 28 Mar 2021 23:00:00 GMT</pubDate>
+  <pubDate>Sun, 28 Mar 2021 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/launch-week</guid>
@@ -1230,91 +1237,91 @@
   <title>Supabase Alpha September 2020</title>
   <link>https://supabase.com/blog/supabase-alpha-september-2020</link>
   <description>Seven months of building.</description>
-  <pubDate>Fri, 02 Oct 2020 23:00:00 GMT</pubDate>
+  <pubDate>Fri, 02 Oct 2020 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-hacktoberfest-2020</guid>
   <title>Supabase Hacktoberfest 2020</title>
   <link>https://supabase.com/blog/supabase-hacktoberfest-2020</link>
   <description>Join us for a celebration of open source software and learn how to contribute to Supabase.</description>
-  <pubDate>Thu, 10 Sep 2020 23:00:00 GMT</pubDate>
+  <pubDate>Thu, 10 Sep 2020 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-alpha-august-2020</guid>
   <title>Supabase Alpha August 2020</title>
   <link>https://supabase.com/blog/supabase-alpha-august-2020</link>
   <description>Six months of building</description>
-  <pubDate>Wed, 02 Sep 2020 23:00:00 GMT</pubDate>
+  <pubDate>Wed, 02 Sep 2020 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-auth</guid>
   <title>Supabase Auth</title>
   <link>https://supabase.com/blog/supabase-auth</link>
   <description>Authenticate and authorize your users with Supabase Auth</description>
-  <pubDate>Tue, 04 Aug 2020 23:00:00 GMT</pubDate>
+  <pubDate>Tue, 04 Aug 2020 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-alpha-july-2020</guid>
   <title>Supabase Alpha July 2020</title>
   <link>https://supabase.com/blog/supabase-alpha-july-2020</link>
   <description>Five months of building</description>
-  <pubDate>Sat, 01 Aug 2020 23:00:00 GMT</pubDate>
+  <pubDate>Sat, 01 Aug 2020 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/continuous-postgresql-backup-walg</guid>
   <title>Continuous PostgreSQL Backups using WAL-G</title>
   <link>https://supabase.com/blog/continuous-postgresql-backup-walg</link>
   <description>Have you ever wanted to restore your database&apos;s state to a particular moment in time? This post explains how, using WAL-G.</description>
-  <pubDate>Sat, 01 Aug 2020 23:00:00 GMT</pubDate>
+  <pubDate>Sat, 01 Aug 2020 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/alpha-launch-postmortem</guid>
   <title>Alpha Launch Postmortem</title>
   <link>https://supabase.com/blog/alpha-launch-postmortem</link>
   <description>Everything that went wrong with Supabase&apos;s launch</description>
-  <pubDate>Thu, 09 Jul 2020 23:00:00 GMT</pubDate>
+  <pubDate>Thu, 09 Jul 2020 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/postgresql-templates</guid>
   <title>What are PostgreSQL Templates?</title>
   <link>https://supabase.com/blog/postgresql-templates</link>
   <description>What are PostgreSQL templates and what are they used for?</description>
-  <pubDate>Wed, 08 Jul 2020 23:00:00 GMT</pubDate>
+  <pubDate>Wed, 08 Jul 2020 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/postgresql-physical-logical-backups</guid>
   <title>Physical vs Logical Backups in PostgreSQL</title>
   <link>https://supabase.com/blog/postgresql-physical-logical-backups</link>
   <description>What are physical and logical backups in Postgres?</description>
-  <pubDate>Mon, 06 Jul 2020 23:00:00 GMT</pubDate>
+  <pubDate>Mon, 06 Jul 2020 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-alpha-june-2020</guid>
   <title>Supabase Alpha June 2020</title>
   <link>https://supabase.com/blog/supabase-alpha-june-2020</link>
   <description>Four months of building</description>
-  <pubDate>Tue, 30 Jun 2020 23:00:00 GMT</pubDate>
+  <pubDate>Tue, 30 Jun 2020 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-steve-chavez</guid>
   <title>Steve Chavez has joined Supabase</title>
   <link>https://supabase.com/blog/supabase-steve-chavez</link>
   <description>Steve joins Supabase to help build Auth.</description>
-  <pubDate>Sun, 14 Jun 2020 23:00:00 GMT</pubDate>
+  <pubDate>Sun, 14 Jun 2020 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-alpha-may-2020</guid>
   <title>Supabase Alpha May 2020</title>
   <link>https://supabase.com/blog/supabase-alpha-may-2020</link>
   <description>Three months of building</description>
-  <pubDate>Sun, 31 May 2020 23:00:00 GMT</pubDate>
+  <pubDate>Sun, 31 May 2020 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-alpha-april-2020</guid>
   <title>Supabase Alpha April 2020</title>
   <link>https://supabase.com/blog/supabase-alpha-april-2020</link>
   <description>Two months of building</description>
-  <pubDate>Sun, 31 May 2020 23:00:00 GMT</pubDate>
+  <pubDate>Sun, 31 May 2020 22:00:00 GMT</pubDate>
 </item>
 
     </channel>
