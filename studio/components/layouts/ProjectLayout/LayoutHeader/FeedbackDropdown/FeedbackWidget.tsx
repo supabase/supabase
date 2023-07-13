@@ -1,14 +1,14 @@
-import Link from 'next/link'
-import { useState, useEffect, useRef, FC, ChangeEvent } from 'react'
-import { useRouter } from 'next/router'
 import { toPng } from 'html-to-image'
-import { Button, Input, Popover, IconCamera, IconX, IconImage, Dropdown, IconUpload } from 'ui'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { ChangeEvent, FC, useEffect, useRef, useState } from 'react'
+import { Button, Dropdown, IconCamera, IconImage, IconUpload, IconX, Input, Popover } from 'ui'
 
+import { useParams } from 'common'
+import { useSendFeedbackMutation } from 'data/feedback/feedback-send'
 import { useStore } from 'hooks'
-import { post } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
-import { convertB64toBlob, uploadAttachment } from './FeedbackDropdown.utils'
 import { timeout } from 'lib/helpers'
+import { convertB64toBlob, uploadAttachment } from './FeedbackDropdown.utils'
 
 interface Props {
   onClose: () => void
@@ -26,7 +26,7 @@ const FeedbackWidget: FC<Props> = ({
   setScreenshot,
 }) => {
   const router = useRouter()
-  const { ref } = router.query
+  const { ref } = useParams()
 
   const { ui } = useStore()
   const inputRef = useRef<any>(null)
@@ -34,6 +34,7 @@ const FeedbackWidget: FC<Props> = ({
 
   const [isSending, setSending] = useState(false)
   const [isSavingScreenshot, setIsSavingScreenshot] = useState(false)
+  const { mutateAsync: submitFeedback } = useSendFeedbackMutation()
 
   useEffect(() => {
     inputRef?.current?.focus()
@@ -89,23 +90,27 @@ const FeedbackWidget: FC<Props> = ({
         message: 'Please include a message in your feedback.',
         duration: 4000,
       })
-    } else if (feedback.length > 0) {
+    } else if (feedback.length > 0 && ref !== undefined) {
       setSending(true)
+
       const attachmentUrl = screenshot
         ? await uploadAttachment(ref as string, screenshot)
         : undefined
       const formattedFeedback =
         attachmentUrl !== undefined ? `${feedback}\n\nAttachments:\n${attachmentUrl}` : feedback
-      await post(`${API_URL}/feedback/send`, {
-        message: formattedFeedback,
-        pathname: router.asPath,
-        category: 'Feedback',
-        projectRef: ref,
-        tags: ['dashboard-feedback'],
-      })
-      setSending(false)
-      setFeedback('')
-      ui.setNotification({ category: 'success', message: 'Feedback sent. Thank you!' })
+
+      try {
+        await submitFeedback({
+          projectRef: ref,
+          message: formattedFeedback,
+          pathname: router.asPath,
+        })
+        setFeedback('')
+        ui.setNotification({ category: 'success', message: 'Feedback sent. Thank you!' })
+      } catch (error) {
+      } finally {
+        setSending(false)
+      }
     }
 
     return onClose()

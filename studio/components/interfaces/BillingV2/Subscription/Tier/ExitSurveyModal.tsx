@@ -5,7 +5,7 @@ import { useRouter } from 'next/router'
 import { useReducer, useRef, useState } from 'react'
 
 import { useParams } from 'common'
-import { useSendDowngradeFeedbackMutation } from 'data/feedback/feedback-downgrade-send'
+import { useSendDowngradeFeedbackMutation } from 'data/feedback/exit-survey-send'
 import { setProjectStatus } from 'data/projects/projects-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useProjectSubscriptionUpdateMutation } from 'data/subscriptions/project-subscription-update-mutation'
