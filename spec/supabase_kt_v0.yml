@@ -2324,7 +2324,7 @@ functions:
           client.gotrue.logout(LogoutScope.GLOBAL)
           ```
       - id: sign-out-others
-        name: Sign out all sessions except yours
+        name: Sign out all sessions except the current
         isSpotlight: true
         code: |
           ```kotlin
