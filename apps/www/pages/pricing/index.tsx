@@ -202,7 +202,7 @@ export default function IndexPage() {
                             {plan.name}
                           </h3>
                           {plan.nameBadge && (
-                            <span className="bg-brand-500 text-brand-1100 rounded-md bg-opacity-30 py-0.5 px-2 text-[13px]">
+                            <span className="bg-brand-500 text-brand-1100 rounded-md bg-opacity-30 py-0.5 px-2 text-[13px] leading-4">
                               {plan.nameBadge}
                             </span>
                           )}
