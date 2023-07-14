@@ -268,11 +268,13 @@ export default class ProjectContentStore implements IProjectContentStore {
         'Content-Type': 'application/json',
       }
       const created = await post<UserContent>(this.baseUrl, payload, { headers })
-      if (created.error) throw created.error
+      if ('error' in created) {
+        throw created.error
+      }
 
       this.savingState = 'IDLE'
 
-      return { data: created as UserContent, error: null }
+      return { data: created, error: null }
     } catch (error) {
       this.savingState = 'CREATING_FAILED'
 
@@ -325,7 +327,9 @@ export default class ProjectContentStore implements IProjectContentStore {
 
       const url = `${this.baseUrl}?id=${id}`
       const updated = await patch<UserContent[]>(url, payload, { headers })
-      if (updated.error) throw updated.error
+      if ('error' in updated) {
+        throw updated.error
+      }
 
       const localUpdate = { ...this.data[id], ...payload }
       this.data[id] = localUpdate

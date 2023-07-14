@@ -17,7 +17,7 @@ export default async function apiWrapper(
 
     if (IS_PLATFORM && withAuth) {
       const response = await apiAuthenticate(req, res)
-      if (response.error) {
+      if ('error' in response) {
         return res.status(401).json({
           error: {
             message: `Unauthorized: ${response.error.message}`,

@@ -81,15 +81,12 @@ function useLogsPreview(
         // don't overwrite unless user has already clicked on load older
         iso_timestamp_end: pageParam || params.iso_timestamp_end,
       } as any)}`
-      return get<Logs>(
-        uri,
-        { signal }
-      )
+      return get<Logs>(uri, { signal })
     },
     {
       refetchOnWindowFocus: false,
       getNextPageParam(lastPage) {
-        if ((lastPage?.result?.length ?? 0) === 0) {
+        if ('error' in lastPage || (lastPage?.result?.length ?? 0) === 0) {
           return undefined
         }
         const len = lastPage.result.length
@@ -124,7 +121,7 @@ function useLogsPreview(
     }
   )
 
-  const newCount = countData?.result?.[0]?.count ?? 0
+  const newCount = countData && !('error' in countData) ? countData.result?.[0]?.count ?? 0 : 0
 
   // chart data
 
@@ -158,7 +155,7 @@ function useLogsPreview(
 
   let error: null | string | object = rqError ? (rqError as any).message : null
   data?.pages.forEach((response) => {
-    if (!error && response?.result) {
+    if (!('error' in response) && !error && response?.result) {
       logData = [...logData, ...response.result]
     }
     if (!error && response && response.error) {
@@ -180,7 +177,7 @@ function useLogsPreview(
   }
 
   const normalizedEventChartData = useTimeseriesUnixToIso(
-    eventChartResponse?.result || [],
+    (eventChartResponse && !('error' in eventChartResponse) && eventChartResponse.result) || [],
     'timestamp'
   )
 
