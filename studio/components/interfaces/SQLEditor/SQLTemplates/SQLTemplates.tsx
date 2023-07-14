@@ -85,7 +85,10 @@ const SQLTemplates = observer(() => {
                 try {
                   const { title, sql } = await generateSql({ prompt: e.currentTarget.value })
 
-                  await handleNewQuery(sql, title)
+                  // TODO: consider `sql-formatter` (though `create` statements format strange)
+                  const formattedSql = sql.toLowerCase()
+
+                  await handleNewQuery(formattedSql, title)
                 } catch (error: unknown) {
                   if (
                     error &&
