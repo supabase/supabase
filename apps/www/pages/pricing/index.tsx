@@ -323,7 +323,10 @@ export default function IndexPage() {
               </div>
             </div>
             <div className="flex flex-col justify-center lg:col-span-2">
-              <ul role="list" className="text-[13px] text-scale-1000 lg:grid lg:grid-cols-2 lg:gap-x-5">
+              <ul
+                role="list"
+                className="text-[13px] text-scale-1000 lg:grid lg:grid-cols-2 lg:gap-x-5"
+              >
                 {planEnterprise.features.map((feature) => (
                   <li key={feature} className="flex items-center py-2 first:mt-0">
                     <IconCheck
