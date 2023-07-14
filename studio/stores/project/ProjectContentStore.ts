@@ -2,7 +2,7 @@ import { makeAutoObservable } from 'mobx'
 import { keyBy } from 'lodash'
 
 import { uuidv4 } from 'lib/helpers'
-import { get, post, patch, delete_ } from 'lib/common/fetch'
+import { get, post, patch, delete_, isResponseOk } from 'lib/common/fetch'
 import { LogSqlSnippets, UserContent, UserContentMap } from 'types'
 import { IRootStore } from '../RootStore'
 import { API_URL } from 'lib/constants'
@@ -268,7 +268,7 @@ export default class ProjectContentStore implements IProjectContentStore {
         'Content-Type': 'application/json',
       }
       const created = await post<UserContent>(this.baseUrl, payload, { headers })
-      if ('error' in created) {
+      if (!isResponseOk(created)) {
         throw created.error
       }
 
@@ -327,7 +327,7 @@ export default class ProjectContentStore implements IProjectContentStore {
 
       const url = `${this.baseUrl}?id=${id}`
       const updated = await patch<UserContent[]>(url, payload, { headers })
-      if ('error' in updated) {
+      if (!isResponseOk(updated)) {
         throw updated.error
       }
 

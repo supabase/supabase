@@ -1,5 +1,5 @@
 import { makeAutoObservable } from 'mobx'
-import { get } from 'lib/common/fetch'
+import { get, isResponseOk } from 'lib/common/fetch'
 import { IRootStore } from '../RootStore'
 import { OpenAPIV2 } from 'openapi-types'
 
@@ -53,7 +53,7 @@ export default class OpenApiStore implements IOpenApiStore {
 
   async fetchData() {
     const response = await get<OpenAPIV2.Document>(this.url)
-    if ('error' in response) {
+    if (!isResponseOk(response)) {
       throw response.error
     }
 

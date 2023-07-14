@@ -1,5 +1,5 @@
 import { action, computed, makeObservable, observable } from 'mobx'
-import { get, patch, post, delete_ } from 'lib/common/fetch'
+import { get, patch, post, delete_, isResponseOk } from 'lib/common/fetch'
 import { keyBy } from 'lodash'
 import { IRootStore } from '../RootStore'
 import { ResponseError } from 'types'
@@ -95,7 +95,7 @@ export default class PostgresMetaInterface<T> implements IPostgresMetaInterface<
   async fetchData() {
     const headers = { 'Content-Type': 'application/json', ...this.headers }
     const response = await get<T[]>(this.url, { headers })
-    if ('error' in response) {
+    if (!isResponseOk(response)) {
       throw response.error
     }
 
@@ -215,7 +215,7 @@ export default class PostgresMetaInterface<T> implements IPostgresMetaInterface<
       const headers = { 'Content-Type': 'application/json', ...this.headers }
       const url = `${this.url}?id=${id}`
       const response = await patch<T>(url, payload, { headers })
-      if (response && typeof response === 'object' && 'error' in response) {
+      if (!isResponseOk(response)) {
         throw response.error
       }
 
@@ -231,7 +231,7 @@ export default class PostgresMetaInterface<T> implements IPostgresMetaInterface<
       const headers = { 'Content-Type': 'application/json', ...this.headers }
       const url = cascade ? `${this.url}?id=${id}&cascade=${cascade}` : `${this.url}?id=${id}`
       const response = await delete_<T>(url, {}, { headers })
-      if (response && typeof response === 'object' && 'error' in response) {
+      if (!isResponseOk(response)) {
         throw response.error
       }
 
