@@ -155,7 +155,7 @@ const SideBarContent = observer(() => {
               <div className="px-3">
                 <Menu.Group title="Getting started" />
                 <ProductMenuItem
-                  name="Welcome"
+                  name="Build a Query"
                   isActive={id === undefined}
                   url={`/project/${ref}/sql`}
                 />
