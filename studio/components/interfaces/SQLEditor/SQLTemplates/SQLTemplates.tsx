@@ -66,52 +66,98 @@ const SQLTemplates = observer(() => {
         >
           What do you want to build?
         </motion.h1>
-        <motion.div
-          layoutId="ask-ai-input"
-          className="w-full flex justify-center"
-          initial={{ y: -50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-        >
-          <Input
-            size="xlarge"
-            inputRef={(inputElement: HTMLInputElement) => inputElement?.focus()}
-            icon={<AiIcon className="w-4 h-4 ml-1" />}
-            inputClassName=" w-full !border-brand-900 py-4"
-            iconContainerClassName="transition text-scale-800 text-brand-900"
-            placeholder="Ask Supabase AI to build a query"
-            className="w-full max-w-2xl"
-            onKeyPress={async (e) => {
-              if (e.key === 'Enter') {
-                try {
-                  const { title, sql } = await generateSql({ prompt: e.currentTarget.value })
-
-                  // TODO: consider `sql-formatter` (though `create` statements format strange)
-                  const formattedSql = sql.toLowerCase()
-
-                  await handleNewQuery(formattedSql, title)
-                } catch (error: unknown) {
-                  if (
-                    error &&
-                    typeof error === 'object' &&
-                    'message' in error &&
-                    typeof error.message === 'string'
-                  ) {
-                    ui.setNotification({
-                      category: 'error',
-                      message: error.message,
-                    })
-                  }
+        <div className="w-full flex justify-center">
+          {!isSqlGenerateLoading ? (
+            <motion.div
+              key="ask-ai-input"
+              layoutId="ask-ai-input"
+              className="w-full max-w-2xl border border-brand-900"
+              initial={{ y: -50, opacity: 0, borderRadius: 6 }}
+              animate={{ y: 0, opacity: 1, borderRadius: 6 }}
+            >
+              <Input
+                size="xlarge"
+                inputRef={(inputElement: HTMLInputElement) => inputElement?.focus()}
+                icon={
+                  <motion.div
+                    key="ask-ai-input-icon"
+                    layoutId="ask-ai-input-icon"
+                    className="ml-1"
+                    initial={{
+                      rotate: 0,
+                    }}
+                    animate={{
+                      rotate: 0,
+                    }}
+                  >
+                    <AiIcon className="w-4 h-4" />
+                  </motion.div>
                 }
-              }
-            }}
-            actions={
-              <div className="flex items-center space-x-1 mr-6">
-                <IconCornerDownLeft size={16} strokeWidth={1.5} />
-              </div>
-            }
-          />
-        </motion.div>
-        {isSqlGenerateLoading && <motion.div className="mt-4">Loading...</motion.div>}
+                inputClassName="w-full border-none py-4 focus:!ring-0"
+                iconContainerClassName="transition text-scale-800 text-brand-900"
+                placeholder="Ask Supabase AI to build a query"
+                className="w-full"
+                onKeyPress={async (e) => {
+                  if (e.key === 'Enter') {
+                    try {
+                      const { title, sql } = await generateSql({ prompt: e.currentTarget.value })
+
+                      // TODO: consider `sql-formatter` (though `create` statements format strange)
+                      const formattedSql = sql.toLowerCase()
+
+                      await handleNewQuery(formattedSql, title)
+                    } catch (error: unknown) {
+                      if (
+                        error &&
+                        typeof error === 'object' &&
+                        'message' in error &&
+                        typeof error.message === 'string'
+                      ) {
+                        ui.setNotification({
+                          category: 'error',
+                          message: error.message,
+                        })
+                      }
+                    }
+                  }
+                }}
+                actions={
+                  <div className="flex items-center space-x-1 mr-6">
+                    <IconCornerDownLeft size={16} strokeWidth={1.5} />
+                  </div>
+                }
+              />
+            </motion.div>
+          ) : (
+            <motion.div
+              key="ask-ai-loading"
+              layoutId="ask-ai-input"
+              className="p-5 border border-brand-900 text-brand-900"
+              initial={{
+                borderRadius: 50,
+              }}
+              animate={{
+                borderRadius: 50,
+              }}
+            >
+              <motion.div
+                key="ask-ai-loading-icon"
+                layoutId="ask-ai-input-icon"
+                animate={{
+                  rotate: 360,
+                  transition: {
+                    delay: 0.2,
+                    ease: 'linear',
+                    duration: 2,
+                    repeat: Infinity,
+                  },
+                }}
+              >
+                <AiIcon className="w-4 h-4" />
+              </motion.div>
+            </motion.div>
+          )}
+        </div>
       </div>
       <div>
         <div className="mb-4">
