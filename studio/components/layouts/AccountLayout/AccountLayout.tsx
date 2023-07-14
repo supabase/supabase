@@ -28,7 +28,6 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
   const signOut = useSignOut()
   const onClickLogout = async () => {
     await signOut()
-
     await router.push('/sign-in')
   }
 
