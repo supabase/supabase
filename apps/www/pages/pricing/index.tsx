@@ -405,7 +405,7 @@ export default function IndexPage() {
                     </Link>
                     {addon.name === 'Optimized Compute' ? (
                       <button
-                        className="text-brand-1000 text-[13px] hover:underline "
+                        className="text-brand-1000 text-[13px] leading-4 hover:underline "
                         onClick={() => setShowComputeModal(true)}
                       >
                         {addon.rightCtaText}
