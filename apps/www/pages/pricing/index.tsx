@@ -240,7 +240,7 @@ export default function IndexPage() {
                                 >
                                   ${plan.priceMonthly}
                                 </p>
-                                <p className="text-scale-900 mb-1.5 ml-1 text-[13px]">
+                                <p className="text-scale-900 mb-1.5 ml-1 text-[13px] leading-4">
                                   {plan.costUnit}
                                 </p>
                               </div>
