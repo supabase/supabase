@@ -227,7 +227,7 @@ export default function IndexPage() {
                           <div className="flex items-end gap-2">
                             <div>
                               {plan.priceLabel && (
-                                <p className="text-scale-900 ml-1 text-[13px] font-normal">
+                                <p className="text-scale-900 ml-1 text-[13px] leading-4 font-normal">
                                   {plan.priceLabel}
                                 </p>
                               )}
