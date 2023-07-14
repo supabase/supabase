@@ -1,22 +1,23 @@
+import Image from 'next/image'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import SVG from 'react-inlinesvg'
 import {
   Button,
+  IconActivity,
+  IconBookOpen,
   IconHelpCircle,
   IconMail,
   IconMessageCircle,
   Popover,
-  IconBookOpen,
-  IconActivity,
 } from 'ui'
-import { useRouter } from 'next/router'
-import { FC } from 'react'
-import Link from 'next/link'
-import Image from 'next/image'
+import * as Tooltip from '@radix-ui/react-tooltip'
 
-import SVG from 'react-inlinesvg'
+interface HelpPopoverProps {
+  alt?: boolean
+}
 
-interface Props {}
-
-const HelpPopover: FC<Props> = () => {
+const HelpPopover = ({ alt = false }: HelpPopoverProps) => {
   const router = useRouter()
   const projectRef = router.query.ref
   const supportUrl = `/support/new${projectRef ? `?ref=${projectRef}` : ''}`
@@ -127,13 +128,39 @@ const HelpPopover: FC<Props> = () => {
         </div>
       }
     >
-      <Button
-        asChild
-        type="default"
-        icon={<IconHelpCircle size={16} strokeWidth={1.5} className="text-scale-900" />}
-      >
-        <span>Help</span>
-      </Button>
+      <Tooltip.Root delayDuration={0}>
+        <Tooltip.Trigger asChild>
+          <Button
+            asChild={alt ? false : true}
+            type={alt ? 'text' : 'default'}
+            className={alt ? 'px-1' : ''}
+            icon={
+              <IconHelpCircle
+                size={alt ? 18 : 16}
+                strokeWidth={1.5}
+                className={alt ? 'text-scale-1100' : 'text-scale-900'}
+              />
+            }
+          >
+            {!alt && <span>Help</span>}
+          </Button>
+        </Tooltip.Trigger>
+        {alt && (
+          <Tooltip.Portal>
+            <Tooltip.Content side="bottom">
+              <Tooltip.Arrow className="radix-tooltip-arrow" />
+              <div
+                className={[
+                  'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                  'space-y-2 border border-scale-200',
+                ].join(' ')}
+              >
+                <p className="text-xs text-scale-1200">Help</p>
+              </div>
+            </Tooltip.Content>
+          </Tooltip.Portal>
+        )}
+      </Tooltip.Root>
     </Popover>
   )
 }
