@@ -18,7 +18,7 @@ const generateSqlSchema = SchemaBuilder.emptySchema()
   .addString('sql', {
     description: stripIndent`
       The generated SQL.
-      - For primary keys, always use "id bigint primary key generated always as identity"
+      - For primary keys, always use "id bigint primary key generated always as identity" (not serial)
       - Prefer creating foreign key references in the create statement
       - Prefer text over varchar
       - Use vector(384) data type for any embedding/vector related query
