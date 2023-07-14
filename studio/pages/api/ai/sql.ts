@@ -1,9 +1,11 @@
+import { SchemaBuilder } from '@serafin/schema-builder'
 import { stripIndent } from 'common-tags'
 import { NextRequest } from 'next/server'
 import type {
   ChatCompletionRequestMessage,
   CreateChatCompletionRequest,
   CreateChatCompletionResponse,
+  ErrorResponse,
 } from 'openai'
 
 export const config = {
@@ -11,6 +13,32 @@ export const config = {
 }
 
 const openAiKey = process.env.OPENAI_KEY
+
+const generateSqlSchema = SchemaBuilder.emptySchema()
+  .addString('sql', {
+    description: stripIndent`
+      The generated SQL.
+      - For primary keys, always use "id bigint primary key generated always as identity"
+      - Prefer creating foreign key references in the create statement
+      - Prefer text over varchar
+    `,
+  })
+  .addString('title', {
+    description: stripIndent`
+      The title of the SQL.
+      - Omit words like 'SQL', 'Postgres', or 'Query'
+    `,
+  })
+
+type GenerateSqlResult = typeof generateSqlSchema.T
+
+const completionFunctions = {
+  generateSql: {
+    name: 'generateSql',
+    description: 'Generates Postgres SQL based on a natural language prompt',
+    parameters: generateSqlSchema.schema,
+  },
+}
 
 export default async function handler(req: NextRequest) {
   const { prompt } = await req.json()
@@ -34,34 +62,9 @@ export default async function handler(req: NextRequest) {
     max_tokens: maxCompletionTokenCount,
     temperature: 0,
     function_call: {
-      name: 'generateSql',
+      name: completionFunctions.generateSql.name,
     },
-    functions: [
-      {
-        name: 'generateSql',
-        description: 'Generates Postgres SQL based on a natural language prompt',
-        parameters: {
-          type: 'object',
-          properties: {
-            sql: {
-              type: 'string',
-              description: stripIndent`
-                The generated SQL.
-                - For primary keys, prefer "id" and always use "bigint primary key generated always as identity"
-              `,
-            },
-            title: {
-              type: 'string',
-              description: stripIndent`
-              The title of the SQL.
-              - Omit words like 'SQL', 'Postgres', or 'query'
-            `,
-            },
-          },
-          required: ['sql', 'title'],
-        },
-      },
-    ],
+    functions: [completionFunctions.generateSql],
     stream: false,
   }
 
@@ -74,17 +77,68 @@ export default async function handler(req: NextRequest) {
     body: JSON.stringify(completionOptions),
   })
 
-  const result: CreateChatCompletionResponse = await response.json()
+  if (!response.ok) {
+    const errorResponse: ErrorResponse = await response.json()
+    console.error(`AI SQL generation failed: ${errorResponse.error.message}`)
 
-  console.log(result)
+    return new Response(
+      JSON.stringify({
+        error: 'There was an unknown error generating the SQL snippet. Please try again.',
+      }),
+      {
+        status: 500,
+        headers: {
+          'content-type': 'application/json',
+        },
+      }
+    )
+  }
 
-  const [firstChoice] = result.choices
+  const completionResponse: CreateChatCompletionResponse = await response.json()
+
+  console.log(completionResponse)
+
+  const [firstChoice] = completionResponse.choices
 
   const sqlResponseString = firstChoice.message?.function_call?.arguments
 
-  const sqlResponse = sqlResponseString ? JSON.parse(sqlResponseString) : undefined
+  if (!sqlResponseString) {
+    console.error(
+      `AI SQL generation failed: OpenAI response succeeded, but response format was incorrect`
+    )
 
-  return new Response(JSON.stringify(sqlResponse), {
+    return new Response(
+      JSON.stringify({
+        error: 'There was an unknown error generating the SQL snippet. Please try again.',
+      }),
+      {
+        status: 500,
+        headers: {
+          'content-type': 'application/json',
+        },
+      }
+    )
+  }
+
+  const generateSqlResult: GenerateSqlResult = JSON.parse(sqlResponseString)
+
+  if (!generateSqlResult.sql) {
+    console.error(`AI SQL generation failed: Unable to generate SQL for the given prompt`)
+
+    return new Response(
+      JSON.stringify({
+        error: 'Unable to generate SQL. Try adding more details to your prompt.',
+      }),
+      {
+        status: 400,
+        headers: {
+          'content-type': 'application/json',
+        },
+      }
+    )
+  }
+
+  return new Response(JSON.stringify(generateSqlResult), {
     headers: {
       'content-type': 'application/json',
     },

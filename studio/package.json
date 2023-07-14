@@ -27,6 +27,7 @@
     "@scaleleap/pg-format": "^1.0.0",
     "@sentry/browser": "^6.15.0",
     "@sentry/nextjs": "^6.17.4",
+    "@serafin/schema-builder": "^0.18.2",
     "@stripe/react-stripe-js": "^1.7.0",
     "@stripe/stripe-js": "^1.25.0",
     "@supabase/auth-helpers-nextjs": "^0.5.6",

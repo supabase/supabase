@@ -3,8 +3,8 @@ import { post } from 'lib/common/fetch'
 import { aiKeys } from './keys'
 
 export type SqlGenerateResponse = {
-  sql: string
   title: string
+  sql: string
 }
 
 export type SqlGenerateVariables = {
