@@ -82,9 +82,23 @@ const SQLTemplates = observer(() => {
             className="w-full max-w-2xl"
             onKeyPress={async (e) => {
               if (e.key === 'Enter') {
-                const { sql, title } = await generateSql({ prompt: e.currentTarget.value })
+                try {
+                  const { title, sql } = await generateSql({ prompt: e.currentTarget.value })
 
-                await handleNewQuery(sql, title)
+                  await handleNewQuery(sql, title)
+                } catch (error: unknown) {
+                  if (
+                    error &&
+                    typeof error === 'object' &&
+                    'message' in error &&
+                    typeof error.message === 'string'
+                  ) {
+                    ui.setNotification({
+                      category: 'error',
+                      message: error.message,
+                    })
+                  }
+                }
               }
             }}
             actions={
