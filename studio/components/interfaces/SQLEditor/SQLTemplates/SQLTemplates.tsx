@@ -3,6 +3,7 @@ import { partition } from 'lodash'
 import { observer } from 'mobx-react-lite'
 
 import { useParams, useTelemetryProps } from 'common'
+import { stripIndent } from 'common-tags'
 import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.constants'
 import { useSqlGenerateMutation } from 'data/ai/sql-generate-mutation'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
@@ -12,10 +13,16 @@ import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import Telemetry from 'lib/telemetry'
 import { useRouter } from 'next/router'
+import { format } from 'sql-formatter'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { AiIcon, IconCornerDownLeft, Input } from 'ui'
 import { createSqlSnippetSkeleton } from '../SQLEditor.utils'
 import SQLCard from './SQLCard'
+
+const sqlDisclaimerComment = stripIndent`
+  -- Supabase AI is experimental and may produce incorrect answers
+  -- Always verify the output before executing
+`
 
 const SQLTemplates = observer(() => {
   const { ui } = useStore()
@@ -102,8 +109,13 @@ const SQLTemplates = observer(() => {
                     try {
                       const { title, sql } = await generateSql({ prompt: e.currentTarget.value })
 
-                      // TODO: consider `sql-formatter` (though `create` statements format strange)
-                      const formattedSql = sql.toLowerCase()
+                      const formattedSql =
+                        sqlDisclaimerComment +
+                        '\n\n' +
+                        format(sql, {
+                          language: 'postgresql',
+                          keywordCase: 'lower',
+                        })
 
                       await handleNewQuery(formattedSql, title)
                     } catch (error: unknown) {
