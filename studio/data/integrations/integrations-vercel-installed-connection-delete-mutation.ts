@@ -24,7 +24,10 @@ export async function deleteConnection(
     { signal }
   )
 
-  if (response.error) throw response.error
+  if ('error' in response) {
+    throw response.error
+  }
+
   return response
 }
 

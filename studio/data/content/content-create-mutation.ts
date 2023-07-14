@@ -17,7 +17,10 @@ export async function createContent(
     signal,
   })
 
-  if (response.error) throw response.error
+  if ('error' in response) {
+    throw response.error
+  }
+
   return { content: response }
 }
 

@@ -53,7 +53,9 @@ export default class OpenApiStore implements IOpenApiStore {
 
   async fetchData() {
     const response = await get<OpenAPIV2.Document>(this.url)
-    if (response.error) throw response.error
+    if ('error' in response) {
+      throw response.error
+    }
 
     const tables = response.definitions
       ? Object.entries(response.definitions).map(([key, table]) => ({

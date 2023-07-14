@@ -19,7 +19,7 @@ export async function updateContent(
     content,
     { signal }
   )
-  if (created.error) {
+  if ('error' in created) {
     throw created.error
   }
 

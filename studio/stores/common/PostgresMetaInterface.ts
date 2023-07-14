@@ -95,7 +95,9 @@ export default class PostgresMetaInterface<T> implements IPostgresMetaInterface<
   async fetchData() {
     const headers = { 'Content-Type': 'application/json', ...this.headers }
     const response = await get<T[]>(this.url, { headers })
-    if (response.error) throw response.error
+    if ('error' in response) {
+      throw response.error
+    }
 
     this.setDataArray(response)
     return response
@@ -213,7 +215,9 @@ export default class PostgresMetaInterface<T> implements IPostgresMetaInterface<
       const headers = { 'Content-Type': 'application/json', ...this.headers }
       const url = `${this.url}?id=${id}`
       const response = await patch<T>(url, payload, { headers })
-      if (response.error) throw response.error
+      if (response && typeof response === 'object' && 'error' in response) {
+        throw response.error
+      }
 
       this.data[id] = response
       return response
@@ -227,7 +231,9 @@ export default class PostgresMetaInterface<T> implements IPostgresMetaInterface<
       const headers = { 'Content-Type': 'application/json', ...this.headers }
       const url = cascade ? `${this.url}?id=${id}&cascade=${cascade}` : `${this.url}?id=${id}`
       const response = await delete_<T>(url, {}, { headers })
-      if (response.error) throw response.error
+      if (response && typeof response === 'object' && 'error' in response) {
+        throw response.error
+      }
 
       delete this.data[id]
       return true

@@ -68,7 +68,7 @@ const useLogsQuery = (
   return {
     params,
     isLoading: (enabled && isLoading) || isRefetching,
-    logData: data?.result ? data?.result : [],
+    logData: data && !('error' in data) && data.result ? data?.result : [],
     error,
     changeQuery,
     runQuery: () => refetch(),
