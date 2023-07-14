@@ -297,7 +297,7 @@ functions:
   - id: update-user
     title: 'updateUser()'
     description: |
-      Updates user data, if there is a logged in user.
+      Updates user data for a logged in user.
     notes: |
       - In order to use the `updateUser()` method, the user needs to be signed in first.
       - By Default, email updates sends a confirmation link to both the user's current and new email.
@@ -339,6 +339,50 @@ functions:
             ),
           );
           final User? updatedUser = res.user;
+          ```
+      - id: update-password-with-reauthentication
+        name: Update the user's password with a nonce
+        description: If "Secure password change" is enabled, updating the user's password would require a nonce. The nonce is sent to the user's email or phone number.
+        isSpotlight: true
+        code: |
+          ```dart
+          supabase.auth.updateUser(UserAttributes(
+            email: 'example@email.com',
+            nonce: '123456',
+          ));
+          ```
+  - id: send-password-reauthentication
+    title: 'reauthenticate()'
+    notes: |
+      - This method is used together with `updateUser()` when a user's password needs to be updated.
+      - This method will send a nonce to the user's email. If the user doesn't have a confirmed email address, the method will send the nonce to the user's confirmed phone number instead.
+    examples:
+      - id: send-reauthentication-nonce
+        name: Send reauthentication nonce
+        description: Sends a reauthentication nonce to the user's email or phone number.
+        isSpotlight: true
+        code: |
+          ```dart
+          await supabase.auth.reauthenticate();
+          ```
+  - id: resend-email-or-phone-otps
+    title: 'resend()'
+    notes: |
+      - Resends a signup confirmation, email change or phone change email to the user.
+      - Passwordless sign-ins can be resent by calling the `signInWithOtp()` method again.
+      - Password recovery emails can be resent by calling the `resetPassswordForEmail()` method again.
+      - This method will only resend an email or phone OTP to the user if there was an initial signup, email change or phone change request being made.
+    examples:
+      - id: resend-email-signup-confirmation
+        name: Resend an email signup confirmation
+        description: Resends the email signup confirmation to the user
+        isSpotlight: true
+        code: |
+          ```dart
+          final ResendResponse res = await supabase.auth.resend(
+            type: OtpType.email,
+            email: 'email@example.com',
+          );
           ```
   - id: on-auth-state-change
     title: 'onAuthStateChange()'
