@@ -66,6 +66,7 @@
     "monaco-editor": "0.33.0",
     "next": "^12.3.2",
     "next-transpile-modules": "^9.0.0",
+    "openai": "^3.3.0",
     "openapi-types": "^12.0.2",
     "p-queue": "^6.6.2",
     "papaparse": "^5.3.1",

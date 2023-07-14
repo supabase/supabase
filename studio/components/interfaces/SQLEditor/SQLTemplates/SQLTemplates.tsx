@@ -4,6 +4,7 @@ import { observer } from 'mobx-react-lite'
 
 import { useParams, useTelemetryProps } from 'common'
 import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.constants'
+import { useSqlGenerateMutation } from 'data/ai/sql-generate-mutation'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
 import { motion } from 'framer-motion'
 import { useCheckPermissions, useStore } from 'hooks'
@@ -22,6 +23,7 @@ const SQLTemplates = observer(() => {
   const router = useRouter()
   const { profile } = useProfile()
   const [sql, quickStart] = partition(SQL_TEMPLATES, { type: 'template' })
+  const { mutateAsync: generateSql, isLoading: isSqlGenerateLoading } = useSqlGenerateMutation()
 
   const telemetryProps = useTelemetryProps()
   const snap = useSqlEditorStateSnapshot()
@@ -78,6 +80,13 @@ const SQLTemplates = observer(() => {
             iconContainerClassName="transition text-scale-800 text-brand-900"
             placeholder="Ask Supabase AI to build a query"
             className="w-full max-w-2xl"
+            onKeyPress={async (e) => {
+              if (e.key === 'Enter') {
+                const { sql, title } = await generateSql({ prompt: e.currentTarget.value })
+
+                await handleNewQuery(sql, title)
+              }
+            }}
             actions={
               <div className="flex items-center space-x-1 mr-6">
                 <IconCornerDownLeft size={16} strokeWidth={1.5} />
@@ -85,6 +94,7 @@ const SQLTemplates = observer(() => {
             }
           />
         </motion.div>
+        {isSqlGenerateLoading && <motion.div className="mt-4">Loading...</motion.div>}
       </div>
       <div>
         <div className="mb-4">
