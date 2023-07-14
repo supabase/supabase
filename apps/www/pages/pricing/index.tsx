@@ -794,7 +794,7 @@ export default function IndexPage() {
 
                             {plan.warning && (
                               <p className="-mt-2">
-                                <span className="bg-scale-100 text-brand-1100 border shadow-sm rounded-md bg-opacity-30 py-0.5 px-2 text-[13px]">
+                                <span className="bg-scale-100 text-brand-1100 border shadow-sm rounded-md bg-opacity-30 py-0.5 px-2 text-[13px] leading-4">
                                   {plan.warning}
                                 </span>
                               </p>
