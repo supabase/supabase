@@ -785,7 +785,7 @@ export default function IndexPage() {
                                 {plan.priceMonthly}
                               </span>
                               {['Pro', 'Free'].includes(plan.name) && (
-                                <p className="p text-[13px] mt-1">per month</p>
+                                <p className="p text-[13px] leading-4 mt-1">per month</p>
                               )}
                               {['Team'].includes(plan.name) && (
                                 <p className="p text-[13px] mt-1">per month</p>
