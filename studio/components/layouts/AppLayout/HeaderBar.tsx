@@ -25,7 +25,7 @@ const HeaderBar = () => {
       </div>
 
       <div className="flex items-center space-x-4">
-        <FeedbackDropdown />
+        <FeedbackDropdown alt />
         <NotificationsPopover alt />
         <HelpPopover alt />
         <UserSettingsDropdown />
