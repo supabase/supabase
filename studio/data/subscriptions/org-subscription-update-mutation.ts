@@ -1,5 +1,5 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { put } from 'lib/common/fetch'
+import { isResponseOk, put } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { subscriptionKeys } from './keys'
 import { SupaResponse } from 'types/base'
@@ -29,7 +29,10 @@ export async function updateOrgSubscription({
   if (paymentMethod !== undefined) payload.payment_method = paymentMethod
 
   const response = await put<void>(`${API_URL}/organizations/${slug}/billing/subscription`, payload)
-  if (typeof response === 'object' && response !== null && 'error' in response) throw response.error
+  if (!isResponseOk(response)) {
+    throw response.error
+  }
+
   return response
 }
 

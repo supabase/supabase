@@ -7,7 +7,7 @@ import {
 import { Dispatch, SetStateAction, useState } from 'react'
 import { LogsEndpointParams, Logs, LogData } from 'components/interfaces/Settings/Logs/Logs.types'
 import { API_URL } from 'lib/constants'
-import { get } from 'lib/common/fetch'
+import { get, isResponseOk } from 'lib/common/fetch'
 export interface LogsQueryHook {
   params: LogsEndpointParams
   isLoading: boolean
@@ -68,7 +68,7 @@ const useLogsQuery = (
   return {
     params,
     isLoading: (enabled && isLoading) || isRefetching,
-    logData: data && !('error' in data) && data.result ? data?.result : [],
+    logData: isResponseOk(data) && data.result ? data.result : [],
     error,
     changeQuery,
     runQuery: () => refetch(),
