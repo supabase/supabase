@@ -2,7 +2,11 @@ import { useState } from 'react'
 import { Button, IconMessageCircle, Popover } from 'ui'
 import FeedbackWidget from './FeedbackWidget'
 
-const FeedbackDropdown = () => {
+interface FeedbackDropdownProps {
+  alt?: boolean
+}
+
+const FeedbackDropdown = ({ alt = false }: FeedbackDropdownProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const [feedback, setFeedback] = useState('')
   const [screenshot, setScreenshot] = useState<string>()
@@ -41,7 +45,9 @@ const FeedbackDropdown = () => {
         asChild
         onClick={onOpen}
         type="default"
-        icon={<IconMessageCircle size={16} strokeWidth={1.5} className="text-scale-900" />}
+        icon={
+          alt ? null : <IconMessageCircle size={16} strokeWidth={1.5} className="text-scale-900" />
+        }
       >
         <span className="hidden md:flex">Feedback</span>
       </Button>
