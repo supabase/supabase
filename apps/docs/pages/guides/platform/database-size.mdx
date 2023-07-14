@@ -101,11 +101,13 @@ You can also change the default transaction access mode for all subsequent trans
 ```sql
 SET SESSION CHARACTERISTICS AS TRANSACTION READ WRITE;
 ```
+
 Ater deleting data, you should run a vacuum to reclaim as much space as possible.
 
 ```sql
-VACUUM;
+vacuum;
 ```
+
 After completing this in a session, then you can run the following to disable [read-only](https://www.postgresql.org/docs/current/runtime-config-client.html#GUC-DEFAULT-TRANSACTION-READ-ONLY) mode:
 
 ```SQL
