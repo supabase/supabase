@@ -71,7 +71,7 @@ val url = BuildConfig.SUPABASE_URL
 val apiKey = BuildConfig.API_KEY
 ```
 
-### 3. Set up Supabase dependencies including Postgrest, GoTrue, Storage and serialization plugin
+### 3. Set up Supabase dependencies
 <img width="720" alt="Screen Shot 2023-06-05 at 21 39 24" src="https://github.com/hieuwu/product-sample-supabase-kt/assets/43868345/3f154fda-aa9e-4baa-81f2-5b744c7ad2fe"></img>
 
 In build.gradle (app) file, add these dependencies then press Sync now. Replace the dependency version placeholders `$supabase_version` and `$ktor_version` with the latest versions as shown below.
@@ -350,7 +350,6 @@ class AuthenticationRepositoryImpl @Inject constructor(
 <Admonition type="note">
   By the time this page is written, there might be some changes in the code to make it more simple. If you face any problem when implement, feel free to refer the example repository above
 </Admonition>
-### Product list screen
 Create ProductListViewModel
 ```kotlin
 
@@ -517,8 +516,6 @@ private fun AddProductButton(
 }
 ```
 
-
-### Product details screen
 Create ProductDetailsViewModel.kt
 ```kotlin
 
@@ -762,7 +759,6 @@ private fun uriToByteArray(contentResolver: ContentResolver, uri: Uri): ByteArra
 }
 ```
 
-### Add product screen
 Create AddProductScreen
 ```kotlin
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -852,7 +848,6 @@ class AddProductViewModel @Inject constructor(
 }
 ```
 
-### Sign up screen
 Create SignUpViewModel
 ```kotlin
 @HiltViewModel
@@ -981,7 +976,6 @@ fun SignUpScreen(
     }
 }
 ```
-### Sign in screen
 Create SignInViewModel
 ```kotlin
 @HiltViewModel
