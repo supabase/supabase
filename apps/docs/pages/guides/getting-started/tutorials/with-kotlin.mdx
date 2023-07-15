@@ -23,15 +23,15 @@ This tutorial demonstrates how to build a basic product management app. The app 
 
 
 ## Building the app
-### 1. Create new Android with Jetpack Compose in Android Studio
+### Create new Android project with Jetpack Compose
 Open Android Studio > New Project > Base Activity (Jetpack Compose)
 
 <img width="720" alt="Screen Shot 2023-06-02 at 21 33 16" src="https://github.com/hieuwu/product-sample-supabase-kt/assets/43868345/288eef97-d8fe-422f-8bb3-1c8424bab08e"></img>
 
-### 2. Set up API key and secret securely
+### Set up API key and secret securely
 API key and secret from any services are credential information, we should not want to expose these to others because some strangers will use it for bad purpose
 
-#### 2.1. Create local environment secret
+#### Create local environment secret
 Create or edit `local.properties` file at top level (same level at build.gradle of the project). 
 
 > **Note**: This file should not be pushed directly to the repository, meaning that you should include this in `.gitignore` file
@@ -43,7 +43,7 @@ SUPABASE_URL=YOUR_SUPABASE_URL
 
 ```
 
-#### 2.2. Read and set value to BuildConfig
+#### Read and set value to BuildConfig
 In `build.gradle (app)`, create `Properties` object and read value from `local.properties`  set value for `BuildConfig` by calling `buildConfigField` method
 
 ```kotlin
@@ -64,14 +64,14 @@ defaultConfig {
 }
 ```
 
-#### 2.3. Use value from `BuildConfig`
+#### Use value from `BuildConfig`
 Read value from `BuildConfig` (Remember to import the right class, it is one from your project). For example:
 ```kotlin
 val url = BuildConfig.SUPABASE_URL
 val apiKey = BuildConfig.API_KEY
 ```
 
-### 3. Set up Supabase dependencies
+### Set up Supabase dependencies
 <img width="720" alt="Screen Shot 2023-06-05 at 21 39 24" src="https://github.com/hieuwu/product-sample-supabase-kt/assets/43868345/3f154fda-aa9e-4baa-81f2-5b744c7ad2fe"></img>
 
 In build.gradle (app) file, add these dependencies then press Sync now. Replace the dependency version placeholders `$supabase_version` and `$ktor_version` with the latest versions as shown below.
@@ -105,7 +105,7 @@ plugins {
 }
 ```
 
-### 4. Set up Hilt for dependency injection
+### Set up Hilt for dependency injection
 In build.gradle (app) file, add these
 ```kotlin
 implementation "com.google.dagger:hilt-android:$hilt_version"
@@ -133,7 +133,7 @@ Add annotation for MainActivity
 class MainActivity : ComponentActivity() {
 }
 ```
-### 5. Provide Supabase instances with Hilt
+### Provide Supabase instances with Hilt
 You can create it by just calling the constructor. However to make the app more testable, these should be provided
 Create SupabaseMdule.kt
 ```kotlin
@@ -149,7 +149,10 @@ object SupabaseModule {
             supabaseKey = BuildConfig.API_KEY
         ) {
             install(Postgrest)
-            install(GoTrue)
+            install(GoTrue) {
+                scheme = "app"
+                host = "supabase.com"
+            }
             install(Storage)
         }
     }
@@ -176,7 +179,7 @@ object SupabaseModule {
 }
 ```
 
-### 6. Create data transfer object (DTO) to get data
+### Create data transfer object (DTO) to get data
 Create `ProductDto.kt` class and use annotations to parse data from Supabase
 ```kotlin
 @Serializable
@@ -206,7 +209,7 @@ data class Product(
 )
 ```
 
-### 7. Implement repositories to interact with Supabase services
+### Implement repositories
 Create ProductRepository interface and its implementation named ProductRepositoryImpl.
 This kind of class will hold every logic to interact with data sources from Supabase. Do the same with AuthenticationRepository
 
@@ -314,6 +317,7 @@ Create Authentication Repository
 interface AuthenticationRepository {
     suspend fun signIn(email: String, password: String): Boolean
     suspend fun signUp(email: String, password: String): Boolean
+    suspend fun signInWithGoogle(): Boolean
 }
 ```
 ```kotlin
@@ -343,10 +347,19 @@ class AuthenticationRepositoryImpl @Inject constructor(
             false
         }
     }
+
+    override suspend fun signInWithGoogle(): Boolean {
+        return try {
+            goTrue.loginWith(Google)
+            true
+        } catch (e: Exception) {
+            false
+        }
+    }
 }
 ```
 
-### 8. Implement screens
+### Implement screens
 <Admonition type="note">
   By the time this page is written, there might be some changes in the code to make it more simple. If you face any problem when implement, feel free to refer the example repository above
 </Admonition>
@@ -1005,6 +1018,13 @@ class SignInViewModel @Inject constructor(
             )
         }
     }
+
+    fun onGoogleSignIn() {
+        viewModelScope.launch {
+            authenticationRepository.signInWithGoogle()
+        }
+    }
+    
 }
 ```
 
@@ -1091,6 +1111,15 @@ fun SignInScreen(
                 .padding(top = 12.dp),
                 onClick = {
                     localSoftwareKeyboardController?.hide()
+                    viewModel.onGoogleSignIn()
+                }) {
+                Text("Sign in with Google")
+            }
+            Button(modifier = modifier
+                .fillMaxWidth()
+                .padding(top = 12.dp),
+                onClick = {
+                    localSoftwareKeyboardController?.hide()
                     viewModel.onSignIn()
                     coroutineScope.launch {
                         snackBarHostState.showSnackbar(
@@ -1112,6 +1141,106 @@ fun SignInScreen(
     }
 }
 ```
+Create successful screen 
+Implement Sign In Success screen
+
+Create new Empty Activity and in AndroidManifest.xml, add deep link, make sure `scheme` and `host` are the same with ones when set up GoTrue instance
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <uses-permission android:name="android.permission.INTERNET" />
+    <application
+        android:name=".ManageProductApplication"
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:enableOnBackInvokedCallback="true"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.ManageProducts"
+        tools:targetApi="31">
+        <activity
+            android:name=".DeepLinkHandlerActivity"
+            android:exported="true"
+            android:theme="@style/Theme.ManageProducts" >
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:host="supabase.com"
+                    android:scheme="app" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.ManageProducts">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>
+```
+
+```kotlin
+@AndroidEntryPoint
+class DeepLinkHandlerActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var supabaseClient: SupabaseClient
+
+    private lateinit var callback: (String, String) -> Unit
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        supabaseClient.handleDeeplinks(intent = intent,
+            onSessionSuccess = { userSession ->
+                Log.d("LOGIN", "Log in successfully with user info: ${userSession.user}")
+                userSession.user?.apply {
+                    callback(email ?: "", createdAt.toString())
+                }
+            })
+        setContent {
+            val navController = rememberNavController()
+            val emailState = remember { mutableStateOf("") }
+            val createdAtState = remember { mutableStateOf("") }
+            callback = { email, created ->
+                emailState.value = email
+                createdAtState.value = created
+            }
+            ManageProductsTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    SignInSuccessScreen(
+                        modifier = Modifier.padding(20.dp),
+                        navController = navController,
+                        email = emailState.value,
+                        createdAt = createdAtState.value,
+                        onClick = { navigateToMainApp() }
+                    )
+                }
+            }
+        }
+    }
+
+    private fun navigateToMainApp() {
+        val intent = Intent(this, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+        startActivity(intent)
+    }
+}
+```
+
+
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
