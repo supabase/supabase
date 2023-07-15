@@ -31,4 +31,13 @@ class AuthenticationRepositoryImpl @Inject constructor(
             false
         }
     }
+
+    override suspend fun signInWithGoogle(): Boolean {
+        return try {
+            goTrue.loginWith(Google)
+            true
+        } catch (e: Exception) {
+            false
+        }
+    }
 }

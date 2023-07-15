@@ -11,7 +11,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SignInViewModel @Inject constructor(
-    private val signInUseCase: SignInUseCase
+    private val signInUseCase: SignInUseCase,
+    private val signInWithGoogleUseCase: SignInWithGoogleUseCase,
 ) : ViewModel() {
 
     private val _email = MutableStateFlow<String>("")
@@ -47,6 +48,12 @@ class SignInViewModel @Inject constructor(
                     message.emit("Login failed !")
                 }
             }
+        }
+    }
+
+    fun onGoogleSignIn() {
+        viewModelScope.launch {
+            signInWithGoogleUseCase.execute(SignInWithGoogleUseCase.Input())
         }
     }
 }
