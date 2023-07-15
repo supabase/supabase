@@ -102,6 +102,14 @@ fun SignInScreen(
                 .padding(top = 12.dp),
                 onClick = {
                     localSoftwareKeyboardController?.hide()
+                    viewModel.onGoogleSignIn()
+                }) {
+                Text("Sign in with Google")
+            }
+            Button(modifier = modifier
+                .fillMaxWidth()
+                .padding(top = 12.dp),
+                onClick = {
                     viewModel.onSignIn()
                     coroutineScope.launch {
                         snackBarHostState.showSnackbar(

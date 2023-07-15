@@ -31,4 +31,7 @@ abstract class UseCaseModule {
 
     @Binds
     abstract fun bindSignUpUseCase(impl: SignUpUseCaseImpl): SignUpUseCase
+
+    @Binds
+    abstract fun bindSignInWithGoogleUseCase(impl: SignInWithGoogleUseCaseImpl): SignInWithGoogleUseCase
 }
