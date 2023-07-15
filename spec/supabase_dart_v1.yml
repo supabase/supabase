@@ -445,6 +445,116 @@ functions:
             redirectTo: kIsWeb ? null : 'io.supabase.flutter://reset-callback/',
           );
           ```
+  - id: auth-mfa-api
+    title: 'Overview'
+    notes: |
+      This section contains methods commonly used for Multi-Factor Authentication (MFA) and are invoked behind the `supabase.auth.mfa` namespace. 
+
+      Currently, we only support time-based one-time password (TOTP) as the 2nd factor. We don't support recovery codes but we allow users to enroll more than 1 TOTP factor, with an upper limit of 10.
+
+      Having a 2nd TOTP factor for recovery frees the user of the burden of having to store their recovery codes somewhere. It also reduces the attack surface since multiple recovery codes are usually generated compared to just having 1 backup TOTP factor.
+  - id: mfa-enroll
+    title: 'mfa.enroll()'
+    notes: |
+      Starts the enrollment process for a new Multi-Factor Authentication (MFA) factor. This method creates a new `unverified` factor.
+      To verify a factor, present the QR code or secret to the user and ask them to add it to their authenticator app.
+      The user has to enter the code from their authenticator app to verify it.
+      - Currently, `totp` is the only supported `factorType`. The returned `id` should be used to create a challenge.
+      - To create a challenge, see [`mfa.challenge()`](/docs/reference/dart/auth-mfa-challenge).
+      - To verify a challenge, see [`mfa.verify()`](/docs/reference/dart/auth-mfa-verify).
+      - To create and verify a challenge in a single step, see [`mfa.challengeAndVerify()`](/docs/reference/dart/auth-mfa-challengeandverify).
+    examples:
+      - id: enroll-totp-factor
+        name: Enroll a time-based, one-time password (TOTP) factor
+        isSpotlight: true
+        code: |
+          ```dart
+          final res = await supabase.auth.mfa.enroll(factorType: FactorType.totp);
+
+          final qrCodeUrl = res.totp.qrCode;
+          ```
+  - id: mfa-challenge
+    title: 'mfa.challenge()'
+    notes: |
+      Prepares a challenge used to verify that a user has access to a MFA factor.
+      - An [enrolled factor](/docs/reference/dart/auth-mfa-enroll) is required before creating a challenge.
+      - To verify a challenge, see [`mfa.verify()`](/docs/reference/dart/auth-mfa-verify).
+    examples:
+      - id: create-mfa-challenge
+        name: Create a challenge for a factor
+        isSpotlight: true
+        code: |
+          ```dart
+          final res = await supabase.auth.mfa.challenge(
+            factorId: '34e770dd-9ff9-416c-87fa-43b31d7ef225',
+          );
+          ```
+  - id: mfa-verify
+    title: 'mfa.verify()'
+    notes: |
+      Verifies a code against a challenge. The verification code is provided by the user by entering a code seen in their authenticator app.
+      - To verify a challenge, please [create a challenge](/docs/reference/dart/auth-mfa-challenge) first.
+    examples:
+      - id: verify-challenge
+        name: Verify a challenge for a factor
+        isSpotlight: true
+        code: |
+          ```dart
+          final res = await supabase.auth.mfa.verify(
+            factorId: '34e770dd-9ff9-416c-87fa-43b31d7ef225',
+            challengeId: '4034ae6f-a8ce-4fb5-8ee5-69a5863a7c15',
+            code: '123456',
+          );
+          ```
+  - id: mfa-challenge-and-verify
+    title: 'mfa.challengeAndVerify()'
+    notes: |
+      Helper method which creates a challenge and immediately uses the given code to verify against it thereafter. The verification code is provided by the user by entering a code seen in their authenticator app.
+      - An [enrolled factor](/docs/reference/dart/auth-mfa-enroll) is required before invoking `challengeAndVerify()`.
+      - Executes [`mfa.challenge()`](/docs/reference/dart/auth-mfa-challenge) and [`mfa.verify()`](/docs/reference/dart/auth-mfa-verify) in a single step.
+    examples:
+      - id: challenge-and-verify
+        name: Create and verify a challenge for a factor
+        isSpotlight: true
+        code: |
+          ```dart
+          final res = await supabase.auth.mfa.challengeAndVerify(
+            factorId: '34e770dd-9ff9-416c-87fa-43b31d7ef225',
+            code: '123456',
+          );
+          ```
+  - id: mfa-unenroll
+    title: 'mfa.unenroll()'
+    notes: |
+      Unenroll removes a MFA factor. A user has to have an aal2 authenticator level in order to unenroll a verified factor.
+    examples:
+      - id: unenroll-a-factor
+        name: Unenroll a factor
+        isSpotlight: true
+        code: |
+          ```dart
+          final res = await supabase.auth.mfa.unenroll(
+            '34e770dd-9ff9-416c-87fa-43b31d7ef225',
+          );
+          ```
+  - id: mfa-get-authenticator-assurance-level
+    title: 'mfa.getAuthenticatorAssuranceLevel()'
+    notes: |
+      Returns the Authenticator Assurance Level (AAL) for the active session.
+      - Authenticator Assurance Level (AAL) is the measure of the strength of an authentication mechanism.
+      - In Supabase, having an AAL of `aal1` refers to having the 1st factor of authentication such as an email and password or OAuth sign-in while `aal2` refers to the 2nd factor of authentication such as a time-based, one-time-password (TOTP).
+      - If the user has a verified factor, the `nextLevel` field will return `aal2`, else, it will return `aal1`.
+    examples:
+      - id: get-aal
+        name: Get the AAL details of a session
+        isSpotlight: true
+        code: |
+          ```dart
+          final res = supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+          final currentLevel = res.currentLevel;
+          final nextLevel = res.nextLevel;
+          final currentAuthenticationMethods = res.currentAuthenticationMethods;
+          ```
   - id: invoke
     title: 'invoke()'
     description: |
