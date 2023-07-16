@@ -117,11 +117,14 @@ Create a new `src/routes/+layout.server.ts` file to handle the session on the se
 
 ```ts src/routes/+layout.server.ts
 // src/routes/+layout.server.ts
-export const load = async ({ locals: { getSession } }) => {
+
+import type { LayoutServerLoad } from './$types';
+
+export const load: LayoutServerLoad = async ({ locals: { getSession } }) => {
   return {
-    session: await getSession(),
-  }
-}
+    session: getSession()
+  };
+};
 ```
 
 > Start your dev server (`npm run dev`) in order to generate the `./$types` files we are referencing in our project.
