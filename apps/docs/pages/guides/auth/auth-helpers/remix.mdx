@@ -751,7 +751,7 @@ export default function Index() {
 
 ### OAuth sign in isn't redirecting on the server side
 
-The reason behind this limitation is that the auth helpers library lacks a direct mechanism for performing server-side redirects, as each framework handles redirects differently. However, the library does offer a URL through the data property it returns, which should be utilised for the purpose of redirection.
+The reason behind this limitation is that the auth helpers library lacks a direct mechanism for performing server-side redirects, as each framework handles redirects differently. However, the library does offer a URL through the data property it returns, which should be utilized for the purpose of redirection.
 
 ```ts
 import { redirect } from "@remix-run/node"; // or cloudflare/deno
