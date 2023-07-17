@@ -43,7 +43,12 @@ const VercelIntegration: NextPageWithLayout = () => {
 
   const organization = data?.find((organization: Organization) => organization.slug === slug)
 
-  const integration = integrationData?.find((x) => x.metadata?.configuration_id === configurationId)
+  const integration = integrationData?.find(
+    (x) =>
+      x.metadata !== undefined &&
+      'configuration_id' in x.metadata &&
+      x.metadata?.configuration_id === configurationId
+  )
 
   const { data: supabaseProjectsData } = useProjectsQuery({
     enabled: integration?.id !== undefined,

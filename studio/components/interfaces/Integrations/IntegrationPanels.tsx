@@ -7,6 +7,7 @@ import { Integration, IntegrationProjectConnection } from 'data/integrations/int
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { BASE_PATH } from 'lib/constants'
 import { Badge, Button, IconArrowRight, IconExternalLink, IconGitHub, IconSquare, cn } from 'ui'
+import { getIntegrationConfigurationUrl } from 'lib/integration-utils'
 
 const ICON_STROKE_WIDTH = 2
 const ICON_SIZE = 14
@@ -14,7 +15,6 @@ const ICON_SIZE = 14
 export interface IntegrationInstallationProps extends React.RefAttributes<HTMLLIElement> {
   title: string
   integration: Integration
-  getManageUrl: (integration: Integration) => string
 }
 
 type HandleIconType = Integration['integration']['name'] | 'Supabase'
@@ -24,9 +24,9 @@ const HandleIcon = ({ type, className }: { type: HandleIconType; className?: str
     case 'GitHub':
       return <IconGitHub strokeWidth={ICON_STROKE_WIDTH} size={ICON_SIZE} />
       break
-    case 'Netlify':
-      return <IconSquare strokeWidth={ICON_STROKE_WIDTH} size={ICON_SIZE} />
-      break
+    // case 'Netlify':
+    //   return <IconSquare strokeWidth={ICON_STROKE_WIDTH} size={ICON_SIZE} />
+    //   break
     case 'Vercel':
       return (
         <svg
@@ -66,7 +66,7 @@ const Avatar = ({ src }: { src: string | undefined }) => {
 }
 
 const IntegrationInstallation = React.forwardRef<HTMLLIElement, IntegrationInstallationProps>(
-  ({ title, integration, getManageUrl, ...props }, ref) => {
+  ({ title, integration, ...props }, ref) => {
     const IntegrationIconBlock = () => {
       return (
         <div className="bg-black text-white w-8 h-8 rounded flex items-center justify-center">
@@ -92,8 +92,10 @@ const IntegrationInstallation = React.forwardRef<HTMLLIElement, IntegrationInsta
           <div className="flex flex-col gap-0">
             <div className="flex items-center gap-2">
               <span className="text-scale-1200 font-medium">
-                {/* {title} integration connection •{' '} */}
-                {integration.metadata?.account.name || integration.metadata?.gitHubConnectionOwner}
+                {integration.metadata?.account.name ||
+                  (integration.metadata !== undefined &&
+                    'gitHubConnectionOwner' in integration.metadata &&
+                    integration.metadata?.gitHubConnectionOwner)}
               </span>
 
               <Badge color="scale" className="capitalize">
@@ -112,7 +114,11 @@ const IntegrationInstallation = React.forwardRef<HTMLLIElement, IntegrationInsta
         </div>
 
         <Button type="default" asChild iconRight={<IconExternalLink />}>
-          <a href={getManageUrl(integration)} target="_blank" rel="noopener noreferrer">
+          <a
+            href={getIntegrationConfigurationUrl(integration)}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             Manage
           </a>
         </Button>
