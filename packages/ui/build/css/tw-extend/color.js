@@ -481,39 +481,47 @@ module.exports = {
 },
 "destructive-200": {
   cssVariable: "var(--destructive-200)",
-  value: "hsl(0, 97%, 74.1%)"
+  value: "hsl(10.899999999999977, 23.4%, 9.2%)"
 },
 "destructive-300": {
   cssVariable: "var(--destructive-300)",
-  value: "hsl(0, 40.8%, 19.2%)"
+  value: "hsl(7.5, 51.3%, 15.3%)"
 },
 "destructive-400": {
   cssVariable: "var(--destructive-400)",
-  value: "hsl(0, 0%, 8.6%)"
+  value: "hsl(6.699999999999989, 60%, 20.6%)"
 },
-"destructive-background": {
-  cssVariable: "var(--destructive-background)",
-  value: "hsl(350, 24%, 9.8%)"
+"destructive-500": {
+  cssVariable: "var(--destructive-500)",
+  value: "hsl(7.899999999999977, 71.6%, 29%)"
 },
-"destructive-border": {
-  cssVariable: "var(--destructive-border)",
-  value: "hsl(356.9, 60.5%, 31.8%)"
+"destructive-600": {
+  cssVariable: "var(--destructive-600)",
+  value: "hsl(9.699999999999989, 85.2%, 62.9%)"
 },
 "destructive-DEFAULT": {
   cssVariable: "var(--destructive-default)",
-  value: "hsl(358.1, 75.1%, 59%)"
+  value: "hsl(10.199999999999989, 77.9%, 53.9%)"
 },
 "warning-200": {
   cssVariable: "var(--warning-200)",
-  value: "hsl(38.80000000000001, 97.4%, 69.8%)"
+  value: "hsl(36.80000000000001, 100%, 6.1%)"
 },
 "warning-300": {
   cssVariable: "var(--warning-300)",
-  value: "hsl(35.80000000000001, 82.6%, 13.5%)"
+  value: "hsl(32.30000000000001, 100%, 10.2%)"
 },
 "warning-400": {
   cssVariable: "var(--warning-400)",
-  value: "hsl(0, 0%, 8.6%)"
+  value: "hsl(33.19999999999999, 100%, 14.5%)"
+},
+"warning-500": {
+  cssVariable: "var(--warning-500)",
+  value: "hsl(34.80000000000001, 90.9%, 21.6%)"
+},
+"warning-600": {
+  cssVariable: "var(--warning-600)",
+  value: "hsl(38.89999999999998, 89.8%, 49.8%)"
 },
 "warning-DEFAULT": {
   cssVariable: "var(--warning-default)",

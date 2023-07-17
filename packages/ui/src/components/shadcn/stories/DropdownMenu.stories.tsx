@@ -39,7 +39,7 @@ const meta: Meta<typeof DropdownMenu> = {
    * See https://storybook.js.org/docs/react/configure/overview#configure-story-loading
    * to learn how to generate automatic titles
    */
-  title: 'shadcn/Dropdow Menu',
+  title: 'shadcn/Dropdown Menu',
   component: DropdownMenu,
   argTypes: {
     defaultOpen: {

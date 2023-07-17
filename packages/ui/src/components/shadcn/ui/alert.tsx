@@ -14,9 +14,9 @@ const alertVariants = cva(
         default:
           'text-foreground bg-alternative border-alternative [&>svg]:text-background [&>svg]:bg-foreground-strong',
         destructive:
-          'text-destructive-100 dark:text-destructive border-destructive-300 bg-destructive-400 [&>svg]:text-destructive-400 [&>svg]:bg-destructive',
+          'text border-destructive-400 bg-destructive-200 [&>svg]:text-destructive-200 [&>svg]:bg-destructive-600',
         warning:
-          'text-warning-100 dark:text-warning border-warning-300 bg-warning-400 [&>svg]:text-warning-400 [&>svg]:bg-warning',
+          'text-warning-100 dark:text-warning border-warning-400 bg-warning-200 [&>svg]:text-warning-200 [&>svg]:bg-warning-600',
       },
     },
     defaultVariants: {
