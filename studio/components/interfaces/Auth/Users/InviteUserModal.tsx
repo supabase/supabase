@@ -4,7 +4,7 @@ import { useContext } from 'react'
 import { Button, Form, IconMail, Input, Modal } from 'ui'
 
 import { useCheckPermissions, useStore } from 'hooks'
-import { post } from 'lib/common/fetch'
+import { isResponseOk, post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { PageContext } from 'pages/project/[ref]/auth/users'
 
@@ -37,10 +37,10 @@ const InviteUserModal = ({ visible, setVisible }: InviteUserModalProps) => {
   const onInviteUser = async (values: any, { setSubmitting }: any) => {
     setSubmitting(true)
 
-    const response = await post(`${API_URL}/auth/${PageState.projectRef}/invite`, {
+    const response = await post<void>(`${API_URL}/auth/${PageState.projectRef}/invite`, {
       email: values.email,
     })
-    if (response.error) {
+    if (!isResponseOk(response)) {
       ui.setNotification({
         category: 'error',
         message: `Failed to invite user: ${response.error.message}`,

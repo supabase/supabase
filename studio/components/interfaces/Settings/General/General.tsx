@@ -16,10 +16,11 @@ import Panel from 'components/ui/Panel'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { invalidateProjectsQuery } from 'data/projects/projects-query'
 import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
-import { patch } from 'lib/common/fetch'
+import { isResponseOk, patch } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import PauseProjectButton from './Infrastructure/PauseProjectButton'
 import RestartServerButton from './Infrastructure/RestartServerButton'
+import { Project } from 'types'
 
 const General = () => {
   const { ui } = useStore()
@@ -33,10 +34,10 @@ const General = () => {
   const canUpdateProject = useCheckPermissions(PermissionAction.UPDATE, 'projects')
 
   const onSubmit = async (values: any, { resetForm }: any) => {
-    const response = await patch(`${API_URL}/projects/${project?.ref}`, {
+    const response = await patch<Project>(`${API_URL}/projects/${project?.ref}`, {
       name: values.name.trim(),
     })
-    if (response.error) {
+    if (!isResponseOk(response)) {
       ui.setNotification({
         category: 'error',
         message: `Update project failed: ${response.error.message}`,

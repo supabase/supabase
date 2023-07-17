@@ -26,7 +26,7 @@ import { useProjectsQuery } from 'data/projects/projects-query'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 import { useFlag, useStore } from 'hooks'
 import useLatest from 'hooks/misc/useLatest'
-import { get, post } from 'lib/common/fetch'
+import { get, isResponseOk, post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { detectBrowser } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
@@ -181,8 +181,8 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
       }
     }
 
-    const response = await post(`${API_URL}/feedback/send`, payload)
-    if (response.error) {
+    const response = await post<void>(`${API_URL}/feedback/send`, payload)
+    if (!isResponseOk(response)) {
       ui.setNotification({
         category: 'error',
         message: `Failed to submit support ticket: ${response.error.message}`,

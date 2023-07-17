@@ -11,9 +11,10 @@ import {
 import { FormActions, FormPanel, FormSection, FormSectionContent } from 'components/ui/Forms'
 import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
-import { patch } from 'lib/common/fetch'
+import { isResponseOk, patch } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { Form, Input } from 'ui'
+import { Organization } from 'types'
 
 const BillingEmail = () => {
   const queryClient = useQueryClient()
@@ -37,8 +38,11 @@ const BillingEmail = () => {
     }
 
     setSubmitting(true)
-    const response = await patch(`${API_URL}/organizations/${slug}`, { ...values, name })
-    if (response.error) {
+    const response = await patch<Organization>(`${API_URL}/organizations/${slug}`, {
+      ...values,
+      name,
+    })
+    if (!isResponseOk(response)) {
       ui.setNotification({
         category: 'error',
         message: `Failed to update organization: ${response.error.message}`,

@@ -1,6 +1,6 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { useStore } from 'hooks'
-import { post } from 'lib/common/fetch'
+import { isResponseOk, post } from 'lib/common/fetch'
 import { API_URL, BASE_PATH } from 'lib/constants'
 import { useRouter } from 'next/router'
 import { useRef, useState } from 'react'
@@ -30,7 +30,7 @@ const ForgotPasswordForm = () => {
       token = captchaResponse?.response ?? null
     }
 
-    const response = await post(`${API_URL}/reset-password`, {
+    const response = await post<void>(`${API_URL}/reset-password`, {
       email,
       hcaptchaToken: token ?? undefined,
       redirectTo: `${
@@ -39,9 +39,8 @@ const ForgotPasswordForm = () => {
           : process.env.NEXT_PUBLIC_SITE_URL
       }${BASE_PATH}/reset-password`,
     })
-    const error = response.error
 
-    if (!error) {
+    if (isResponseOk(response)) {
       ui.setNotification({
         id: toastId,
         category: 'success',
@@ -56,7 +55,7 @@ const ForgotPasswordForm = () => {
       ui.setNotification({
         id: toastId,
         category: 'error',
-        message: error.message,
+        message: response.error.message,
       })
     }
   }
