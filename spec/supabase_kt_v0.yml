@@ -51,7 +51,7 @@ functions:
       You have to set the `host` and the `scheme` in the GoTrue config:
           ```kotlin
           install(GoTrue) {
-             host = "deeplink host" //that can be anything for example your package name, app/company url. (Not your supabase url)
+             host = "deeplink host" // this can be anything, eg. your package name or app/company url (not your supabase url)
              scheme = "deeplink scheme"
           }
           ```
