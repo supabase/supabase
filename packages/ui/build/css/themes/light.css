@@ -1,6 +1,6 @@
 /**
  * Do not edit directly
- * Generated on Thu, 13 Jul 2023 04:13:59 GMT
+ * Generated on Mon, 17 Jul 2023 15:59:23 GMT
  */
 
 .light {
@@ -9,15 +9,17 @@
   --brand-300: 153deg 46% 65.9%;
   --brand-200: 148.5deg 43.5% 82%;
   --warning-default: 38.9deg 100% 57.1%;
-  --warning-400: 38.7deg 100% 93.9%;
-  --warning-300: 38.6deg 100% 89%;
-  --warning-200: 39deg 100% 75.3%;
-  --destructive-default: 0deg 100% 50%;
-  --destructive-background: 0deg 100% 98.4%;
-  --destructive-border: 0deg 100% 87.5%;
-  --destructive-400: 0deg 100% 98.4%;
-  --destructive-300: 0deg 100% 87.5%;
-  --destructive-200: 0deg 97% 74.1%;
+  --warning-600: 30.2deg 100% 33.9%;
+  --warning-500: 36.3deg 85.7% 67.1%;
+  --warning-400: 41.9deg 100% 81.8%;
+  --warning-300: 44.3deg 100% 91.8%;
+  --warning-200: 40deg 60% 99%;
+  --destructive-default: 10.2deg 77.9% 53.9%;
+  --destructive-600: 9.9deg 82% 43.5%;
+  --destructive-500: 10.4deg 77.1% 79.4%;
+  --destructive-400: 7.1deg 91.3% 91%;
+  --destructive-300: 7.1deg 100% 96.7%;
+  --destructive-200: 0deg 100% 99.4%;
   --background-alternative: 0deg 0% 100%;
   --background-muted: 0deg 0% 100%;
   --background-secondary: 0deg 0% 100%;
