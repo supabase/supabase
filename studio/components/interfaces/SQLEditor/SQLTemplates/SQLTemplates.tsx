@@ -79,8 +79,16 @@ const SQLTemplates = observer(() => {
               key="ask-ai-input"
               layoutId="ask-ai-input"
               className="w-full max-w-2xl border border-brand-900"
-              initial={{ y: -50, opacity: 0, borderRadius: 6 }}
-              animate={{ y: 0, opacity: 1, borderRadius: 6 }}
+              initial={{
+                y: -50,
+                opacity: 0,
+                borderRadius: 6,
+              }}
+              animate={{
+                y: 0,
+                opacity: 1,
+                borderRadius: 6,
+              }}
             >
               <Input
                 size="xlarge"
@@ -156,6 +164,12 @@ const SQLTemplates = observer(() => {
               }}
               animate={{
                 borderRadius: 50,
+              }}
+              transition={{
+                type: 'spring',
+                mass: 0.1,
+                stiffness: 200,
+                damping: 30,
               }}
             >
               <motion.div
