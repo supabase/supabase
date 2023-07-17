@@ -92,7 +92,11 @@ const SQLTemplates = observer(() => {
             >
               <Input
                 size="xlarge"
-                inputRef={(inputElement: HTMLInputElement) => inputElement?.focus()}
+                inputRef={(inputElement: HTMLInputElement) => {
+                  setTimeout(() => {
+                    inputElement?.focus()
+                  }, 200)
+                }}
                 icon={
                   <motion.div
                     key="ask-ai-input-icon"
