@@ -101,8 +101,7 @@ const SideBarContent = observer(() => {
                     <Dropdown.Item
                       key="new-ai-query"
                       onClick={() => {
-                        setIsOpen(true)
-                        setPages([COMMAND_ROUTES.GENERATE_SQL])
+                        router.push(`/project/${ref}/sql`)
                       }}
                     >
                       <div className="space-y-1">
