@@ -102,7 +102,7 @@ const SQLEditor = () => {
             icon={<AiIcon className="w-4 h-4 ml-1" />}
             inputClassName="py-4 !bg-scale-200 !border-brand-900"
             iconContainerClassName="transition text-scale-800 text-brand-900"
-            placeholder="Ask Supabase AI to build a query"
+            placeholder="Ask Supabase AI to edit your query"
             className="w-full"
             actions={
               <div className="flex items-center space-x-1 mr-6">
@@ -126,6 +126,17 @@ const SQLEditor = () => {
         <motion.div
           layout="position"
           className="dark:border-dark flex-grow overflow-y-auto border-b"
+          initial={{
+            opacity: 0,
+            filter: 'blur(10px)',
+          }}
+          animate={{
+            opacity: 1,
+            filter: 'blur(0px)',
+          }}
+          transition={{
+            duration: 0.3,
+          }}
         >
           {isLoading ? (
             <div className="flex h-full w-full items-center justify-center">Loading...</div>
