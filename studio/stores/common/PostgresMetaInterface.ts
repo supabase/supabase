@@ -2,7 +2,7 @@ import { action, computed, makeObservable, observable } from 'mobx'
 import { get, patch, post, delete_, isResponseOk } from 'lib/common/fetch'
 import { keyBy } from 'lodash'
 import { IRootStore } from '../RootStore'
-import { ResponseError } from 'types'
+import { ResponseError, SupaResponse } from 'types'
 
 type DataKeys = number | string
 
@@ -15,10 +15,10 @@ export interface IPostgresMetaInterface<T> {
   isInitialized: boolean
 
   load: () => void
-  loadBySchema: (schema: string) => Promise<T[] | { error: ResponseError }>
-  create: (payload: any) => Promise<T | { error: ResponseError }>
-  update: (id: number | string, updates: any) => Promise<T | { error: ResponseError }>
-  del: (id: number | string, cascade?: boolean) => Promise<boolean | { error: ResponseError }>
+  loadBySchema: (schema: string) => Promise<SupaResponse<T[]>>
+  create: (payload: any) => Promise<SupaResponse<T>>
+  update: (id: number | string, updates: any) => Promise<SupaResponse<T>>
+  del: (id: number | string, cascade?: boolean) => Promise<SupaResponse<boolean>>
   list: (filter?: any) => T[]
   find: (filter?: any) => T | undefined
   byId: (id: number | string) => T | undefined

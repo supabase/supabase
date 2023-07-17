@@ -10,7 +10,7 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
 import { invalidateProjectsQuery } from 'data/projects/projects-query'
 import { useCheckPermissions, useStore } from 'hooks'
-import { delete_, post } from 'lib/common/fetch'
+import { delete_, isResponseOk, post } from 'lib/common/fetch'
 import { API_URL, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 
 export interface DeleteProjectButtonProps {
@@ -68,8 +68,10 @@ const DeleteProjectButton = ({ type = 'danger' }: DeleteProjectButtonProps) => {
 
     setLoading(true)
     try {
-      const response = await delete_(`${API_URL}/projects/${projectRef}`)
-      if (response.error) throw response.error
+      const response = await delete_<void>(`${API_URL}/projects/${projectRef}`)
+      if (!isResponseOk(response)) {
+        throw response.error
+      }
       await invalidateProjectsQuery(queryClient)
       ui.setNotification({ category: 'success', message: `Successfully deleted ${project.name}` })
       router.push(`/projects`)

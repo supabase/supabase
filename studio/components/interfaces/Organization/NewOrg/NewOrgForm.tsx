@@ -9,10 +9,11 @@ import InformationBox from 'components/ui/InformationBox'
 import Panel from 'components/ui/Panel'
 import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useStore } from 'hooks'
-import { post } from 'lib/common/fetch'
+import { isResponseOk, post } from 'lib/common/fetch'
 import { API_URL, BASE_PATH, PRICING_TIER_LABELS_ORG } from 'lib/constants'
 import { getURL } from 'lib/helpers'
 import Link from 'next/link'
+import { Organization } from 'types'
 
 const ORG_KIND_TYPES = {
   PERSONAL: 'Personal',
@@ -77,7 +78,7 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
   }
 
   async function createOrg(paymentMethodId?: string) {
-    const response = await post(
+    const response = await post<Organization>(
       `${API_URL}/organizations`,
       {
         name: orgName,
@@ -94,7 +95,7 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
       }
     )
 
-    if (response.error) {
+    if (!isResponseOk(response)) {
       ui.setNotification({
         category: 'error',
         message: `Failed to create organization: ${response.error?.message ?? response.error}`,

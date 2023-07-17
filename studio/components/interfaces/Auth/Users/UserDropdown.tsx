@@ -5,7 +5,7 @@ import { Button, Dropdown, IconTrash, IconMail, IconMoreHorizontal, IconShieldOf
 
 import { useStore } from 'hooks'
 import { timeout } from 'lib/helpers'
-import { post, delete_ } from 'lib/common/fetch'
+import { post, delete_, isResponseOk } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { PageContext } from 'pages/project/[ref]/auth/users'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
@@ -25,8 +25,8 @@ const UserDropdown: FC<Props> = ({ user, canRemoveUser, canRemoveMFAFactors }) =
   async function handleResetPassword() {
     try {
       setLoading(true)
-      const response = await post(`${API_URL}/auth/${PageState.projectRef}/recover`, user)
-      if (response.error) {
+      const response = await post<void>(`${API_URL}/auth/${PageState.projectRef}/recover`, user)
+      if (!isResponseOk(response)) {
         ui.setNotification({
           category: 'error',
           message: `Failed to send password recovery: ${response.error.message}`,
@@ -50,8 +50,8 @@ const UserDropdown: FC<Props> = ({ user, canRemoveUser, canRemoveMFAFactors }) =
   async function handleSendMagicLink() {
     try {
       setLoading(true)
-      const response = await post(`${API_URL}/auth/${PageState.projectRef}/magiclink`, user)
-      if (response.error) {
+      const response = await post<void>(`${API_URL}/auth/${PageState.projectRef}/magiclink`, user)
+      if (!isResponseOk(response)) {
         ui.setNotification({
           category: 'error',
           message: `Failed to send magic link: ${response.error.message}`,
@@ -75,8 +75,8 @@ const UserDropdown: FC<Props> = ({ user, canRemoveUser, canRemoveMFAFactors }) =
   async function handleSendOtp() {
     try {
       setLoading(true)
-      const response = await post(`${API_URL}/auth/${PageState.projectRef}/otp`, user)
-      if (response.error) {
+      const response = await post<void>(`${API_URL}/auth/${PageState.projectRef}/otp`, user)
+      if (!isResponseOk(response)) {
         ui.setNotification({
           category: 'error',
           message: `Failed to OTP: ${response.error.message}`,
@@ -105,8 +105,8 @@ const UserDropdown: FC<Props> = ({ user, canRemoveUser, canRemoveMFAFactors }) =
       message: `This is permanent! Are you sure you want to delete user ${user.email} ?`,
       onAsyncConfirm: async () => {
         setLoading(true)
-        const response = await delete_(`${API_URL}/auth/${PageState.projectRef}/users`, user)
-        if (response.error) {
+        const response = await delete_<void>(`${API_URL}/auth/${PageState.projectRef}/users`, user)
+        if (!isResponseOk(response)) {
           ui.setNotification({
             category: 'error',
             message: `Failed to delete user: ${response.error.message}`,
@@ -129,10 +129,10 @@ const UserDropdown: FC<Props> = ({ user, canRemoveUser, canRemoveMFAFactors }) =
       message: `This is permanent! Are you sure you want to delete the user's MFA factors?`,
       onAsyncConfirm: async () => {
         setLoading(true)
-        const response = await delete_(
+        const response = await delete_<void>(
           `${API_URL}/auth/${PageState.projectRef}/users/${user.id}/factors`
         )
-        if (response.error) {
+        if (!isResponseOk(response)) {
           ui.setNotification({
             category: 'error',
             message: `Failed to delete factors: ${response.error.message}`,
