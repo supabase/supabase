@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ParsedUrlQuery } from 'querystring'
-import { Button, Dropdown, IconPlus, Popover } from 'ui'
+import { Button, Dropdown, IconCode, IconPlus, Popover } from 'ui'
 
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useSelectedOrganization, useSelectedProject } from 'hooks'
@@ -30,7 +30,11 @@ export const sanitizeRoute = (route: string, routerQueries: ParsedUrlQuery) => {
   }
 }
 
-const ProjectDropdown = () => {
+interface ProjectDropdownProps {
+  alt?: boolean
+}
+
+const ProjectDropdown = ({ alt }: ProjectDropdownProps) => {
   const selectedOrganization = useSelectedOrganization()
   const selectedProject = useSelectedProject()
   const { data: allProjects } = useProjectsQuery()
@@ -75,13 +79,18 @@ const ProjectDropdown = () => {
         </>
       }
     >
-      <Button asChild type="text" size="tiny" className="my-1">
-        <span>{selectedProject?.name}</span>
+      <Button
+        type="text"
+        iconRight={
+          alt ? <IconCode className="text-scale-1100 rotate-90" strokeWidth={2} size={12} /> : null
+        }
+      >
+        <span className="text-sm">{selectedProject?.name}</span>
       </Button>
     </Dropdown>
   ) : (
-    <Button asChild type="text" size="tiny">
-      <span>{selectedProject?.name}</span>
+    <Button type="text">
+      <span className="text-sm">{selectedProject?.name}</span>
     </Button>
   )
 }

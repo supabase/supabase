@@ -2,7 +2,6 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { isUndefined } from 'lodash'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { FC } from 'react'
 
 import { useTheme } from 'common'
 import { useParams } from 'common/hooks'
@@ -27,15 +26,13 @@ import {
 } from './NavigationBar.utils'
 import NavigationIconButton from './NavigationIconButton'
 
-interface Props {}
-
-const NavigationBar: FC<Props> = ({}) => {
+const NavigationBar = ({}) => {
   const router = useRouter()
   const { isDarkMode, toggleTheme } = useTheme()
   const { ref: projectRef } = useParams()
 
   const { project } = useProjectContext()
-  const ongoingIncident = useFlag('ongoingIncident')
+  const navLayoutV2 = useFlag('navigationLayoutV2')
 
   const activeRoute = router.pathname.split('/')[3]
   const toolRoutes = generateToolRoutes(projectRef, project)
@@ -46,22 +43,23 @@ const NavigationBar: FC<Props> = ({}) => {
   const { setIsOpen } = useCommandMenu()
   return (
     <div
-      style={{ height: ongoingIncident ? 'calc(100vh - 44px)' : '100vh' }}
       className={[
         'flex w-14 flex-col justify-between overflow-y-hidden p-2',
         'border-r bg-body border-scale-500',
       ].join(' ')}
     >
       <ul className="flex flex-col space-y-2">
-        <Link href="/projects">
-          <a className="block">
-            <img
-              src={`${router.basePath}/img/supabase-logo.svg`}
-              alt="Supabase"
-              className="mx-auto h-[40px] w-6 cursor-pointer rounded"
-            />
-          </a>
-        </Link>
+        {!navLayoutV2 && (
+          <Link href="/projects">
+            <a className="block">
+              <img
+                src={`${router.basePath}/img/supabase-logo.svg`}
+                alt="Supabase"
+                className="mx-auto h-[40px] w-6 cursor-pointer rounded"
+              />
+            </a>
+          </Link>
+        )}
         <NavigationIconButton
           isActive={isUndefined(activeRoute) && !isUndefined(router.query.ref)}
           route={{
@@ -71,7 +69,7 @@ const NavigationBar: FC<Props> = ({}) => {
             link: `/project/${projectRef}`,
           }}
         />
-        <div className="bg-scale-500 h-px w-full"></div>
+        <div className="bg-scale-500 h-px w-full" />
         {toolRoutes.map((route) => (
           <NavigationIconButton
             key={route.key}

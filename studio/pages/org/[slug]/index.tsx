@@ -1,3 +1,6 @@
+import Link from 'next/link'
+import { Button, IconPlus } from 'ui'
+
 import ProjectCard from 'components/interfaces/Home/ProjectList/ProjectCard'
 import ShimmeringCard from 'components/interfaces/Home/ProjectList/ShimmeringCard'
 import AppLayout from 'components/layouts/AppLayout/AppLayout'
@@ -5,9 +8,7 @@ import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useSelectedOrganization } from 'hooks'
-import Link from 'next/link'
 import { NextPageWithLayout } from 'types'
-import { Button, IconPlus } from 'ui'
 
 const ProjectsPage: NextPageWithLayout = () => {
   const {
@@ -27,31 +28,33 @@ const ProjectsPage: NextPageWithLayout = () => {
   return (
     <ScaffoldContainer>
       <ScaffoldSection>
-        <div className="col-span-12 space-y-4">
-          <div className="flex items-center space-x-6">
+        <div className="col-span-12 space-y-8">
+          <Link href={`/new/${organization?.slug}`}>
+            <a>
+              <Button size="medium" type="default" iconRight={<IconPlus />}>
+                New project
+              </Button>
+            </a>
+          </Link>
+          <div className="space-y-4">
             <h4 className="text-lg">Projects</h4>
-            <Link href={`/new/${organization?.slug}`}>
-              <a>
-                <Button icon={<IconPlus />}>New project</Button>
-              </a>
-            </Link>
+            {isLoadingProjects && (
+              <ul className="mx-auto grid grid-cols-1 gap-4 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
+                <ShimmeringCard />
+                <ShimmeringCard />
+              </ul>
+            )}
+            {isErrorProjects && (
+              <AlertError error={projectsError} subject="Failed to retrieve projects" />
+            )}
+            {isSuccessProjects && (
+              <ul className="mx-auto grid grid-cols-1 gap-4 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
+                {projects?.map((project) => (
+                  <ProjectCard key={project.ref} project={project} />
+                ))}
+              </ul>
+            )}
           </div>
-          {isLoadingProjects && (
-            <ul className="mx-auto grid grid-cols-1 gap-4 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
-              <ShimmeringCard />
-              <ShimmeringCard />
-            </ul>
-          )}
-          {isErrorProjects && (
-            <AlertError error={projectsError} subject="Failed to retrieve projects" />
-          )}
-          {isSuccessProjects && (
-            <ul className="mx-auto grid grid-cols-1 gap-4 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
-              {projects?.map((project) => (
-                <ProjectCard key={project.ref} project={project} />
-              ))}
-            </ul>
-          )}
         </div>
       </ScaffoldSection>
     </ScaffoldContainer>

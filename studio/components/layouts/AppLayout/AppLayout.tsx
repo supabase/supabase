@@ -1,13 +1,14 @@
-import Image from 'next/image'
-import Link from 'next/link'
 import { PropsWithChildren } from 'react'
 
-import HeaderBar from './HeaderBar'
+import AppHeader from './AppHeader'
+import { useFlag } from 'hooks'
 
 const AppLayout = ({ children }: PropsWithChildren<{}>) => {
+  const navLayoutV2 = useFlag('navigationLayoutV2')
+
   return (
     <div>
-      <HeaderBar />
+      {navLayoutV2 && <AppHeader />}
       {children}
     </div>
   )

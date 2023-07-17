@@ -1,18 +1,23 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+
 import FeedbackDropdown from '../ProjectLayout/LayoutHeader/FeedbackDropdown'
 import HelpPopover from '../ProjectLayout/LayoutHeader/HelpPopover'
 import NotificationsPopover from '../ProjectLayout/LayoutHeader/NotificationsPopover'
 import OrganizationDropdown from './OrganizationDropdown'
 import UserSettingsDropdown from './UserSettingsDropdown'
+import { useSelectedOrganization, useSelectedProject } from 'hooks'
+import ProjectDropdown from '../ProjectLayout/LayoutHeader/ProjectDropdown'
 
-const HeaderBar = () => {
+const AppHeader = () => {
   const router = useRouter()
+  const project = useSelectedProject()
+  const organization = useSelectedOrganization()
 
   return (
-    <div className="flex items-center justify-between px-4 py-2 bg-scale-100 shadow-md">
+    <div className="flex items-center justify-between px-4 py-1 bg-black shadow-md">
       <div className="flex items-center space-x-4">
-        <Link href="/">
+        <Link href={`/org/${organization?.slug}`}>
           <a className="block">
             <img
               src={`${router.basePath}/img/supabase-logo.svg`}
@@ -22,6 +27,7 @@ const HeaderBar = () => {
           </a>
         </Link>
         <OrganizationDropdown />
+        <ProjectDropdown alt />
       </div>
 
       <div className="flex items-center space-x-4">
@@ -34,4 +40,4 @@ const HeaderBar = () => {
   )
 }
 
-export default HeaderBar
+export default AppHeader
