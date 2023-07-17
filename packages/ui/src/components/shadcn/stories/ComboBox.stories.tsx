@@ -52,6 +52,7 @@ import {
 import React from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
+import { CommandLabel } from '@ui/components/Command/Command.utils'
 
 const meta: Meta<typeof DropdownMenu> = {
   /* 👇 The title prop is optional.
@@ -418,6 +419,338 @@ export const ReactHookFormDemo = {
           <Button type="submit">Submit</Button>
         </form>
       </Form>
+    )
+  },
+}
+
+export const ComboOrgPicker = {
+  args: {},
+  render: ({}) => {
+    type Status = {
+      value: string
+      label: string
+      icon: LucideIcon
+    }
+
+    const personal: Status[] = [
+      {
+        value: 'summersmuir',
+        label: 'Summersmuir',
+        icon: HelpCircle,
+      },
+    ]
+
+    const orgs: Status[] = [
+      {
+        value: 'supabase',
+        label: 'Supabase',
+        icon: Circle,
+      },
+      {
+        value: 'supabaselabz',
+        label: 'Supabase Labs',
+        icon: ArrowUpCircle,
+      },
+      {
+        value: 'supabasedemos',
+        label: 'Supabase Demos',
+        icon: CheckCircle2,
+      },
+    ]
+
+    const [open, setOpen] = React.useState(false)
+    const [selectedStatus, setSelectedStatus] = React.useState<Status | null>(null)
+    console.log('selectedStatus:', selectedStatus)
+
+    return (
+      <div className="flex items-center space-x-4">
+        <p className="text-sm text-muted-foreground">Status</p>
+        <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger asChild>
+            <Button variant="outline" size="sm" className="w-[320px] justify-start">
+              {selectedStatus ? (
+                <>
+                  <selectedStatus.icon className="mr-2 h-4 w-4 shrink-0" />
+                  <span className="text">{selectedStatus.label}</span>
+                </>
+              ) : (
+                <>Organization</>
+              )}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="p-0" side="bottom" align="start">
+            <Command>
+              <CommandInput placeholder="Find organization..." />
+              <CommandList>
+                <CommandEmpty>No results found.</CommandEmpty>
+                <div className="my-2">
+                  <CommandGroup heading="Personal Account">
+                    {personal.map((status) => (
+                      <Popover open={open}>
+                        <PopoverTrigger asChild>
+                          <CommandItem
+                            key={status.value}
+                            value={status.value}
+                            onSelect={(value) => {
+                              setSelectedStatus(
+                                [...personal].find((priority) => priority.value === value) || null
+                              )
+                              setOpen(false)
+                            }}
+                          >
+                            <status.icon
+                              className={cn(
+                                'mr-2 h-4 w-4',
+                                status.value === selectedStatus?.value
+                                  ? 'opacity-100'
+                                  : 'opacity-40'
+                              )}
+                            />
+                            <span>{status.label}</span>
+                          </CommandItem>
+                        </PopoverTrigger>
+                        <PopoverContent className="p-0" side="right" align="start">
+                          Hello world
+                        </PopoverContent>
+                      </Popover>
+                    ))}
+                  </CommandGroup>
+                </div>
+                <div className="my-2">
+                  <CommandGroup heading="Your Organizations">
+                    {orgs.map((status) => (
+                      <CommandItem
+                        key={status.value}
+                        value={status.value}
+                        onSelect={(value) => {
+                          console.log(orgs)
+                          setSelectedStatus(
+                            [...orgs].find((priority) => {
+                              console.log('value:', value)
+                              console.log('priority:', priority)
+                              return priority.value === value
+                            }) || null
+                          )
+                          setOpen(false)
+                        }}
+                      >
+                        <status.icon
+                          className={cn(
+                            'mr-2 h-4 w-4',
+                            status.value === selectedStatus?.value ? 'opacity-100' : 'opacity-40'
+                          )}
+                        />
+                        <span>{status.label}</span>
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </div>
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
+      </div>
+    )
+  },
+}
+
+export const MultipleComboPickers = {
+  args: {},
+  render: ({}) => {
+    type Status = {
+      value: string
+      label: string
+      icon: LucideIcon
+    }
+
+    const personal: Status[] = [
+      {
+        value: 'summersmuir',
+        label: 'Summersmuir',
+        icon: HelpCircle,
+      },
+    ]
+
+    const orgs: Status[] = [
+      {
+        value: 'supabase',
+        label: 'Supabase',
+        icon: Circle,
+      },
+      {
+        value: 'supabaselabz',
+        label: 'Supabase Labs',
+        icon: ArrowUpCircle,
+      },
+      {
+        value: 'supabasedemos',
+        label: 'Supabase Demos',
+        icon: CheckCircle2,
+      },
+    ]
+
+    const projects: Status[] = [
+      {
+        value: 'Next.js',
+        icon: CheckCircle2,
+        label: 'Next.js',
+      },
+      {
+        value: 'supabase-studio-staging',
+        icon: CheckCircle2,
+        label: 'supabase-studio-staging',
+      },
+      {
+        value: 'app.supabase.green',
+        icon: CheckCircle2,
+        label: 'app.supabase.green',
+      },
+      {
+        value: 'studio-self-hosted.vercel.app',
+        icon: CheckCircle2,
+        label: 'studio-self-hosted.vercel.app',
+      },
+      {
+        value: 'supabase.com',
+        icon: CheckCircle2,
+        label: 'supabase.com',
+      },
+      {
+        value: 'supabase.green',
+        icon: CheckCircle2,
+        label: 'supabase.green',
+      },
+      {
+        value: 'app.supabase.com',
+        icon: CheckCircle2,
+        label: 'app.supabase.com',
+      },
+      {
+        value: 'supabase-studio.vercel.app',
+        icon: CheckCircle2,
+        label: 'supabase-studio.vercel.app',
+      },
+    ]
+
+    const [open, setOpen] = React.useState(false)
+    const [selectedStatus, setSelectedStatus] = React.useState<Status | null>(null)
+    console.log('selectedStatus:', selectedStatus)
+
+    return (
+      <div className="flex items-center space-x-4">
+        <p className="text-sm text-muted-foreground">Status</p>
+        <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger asChild>
+            <Button variant="outline" size="sm" className="w-[320px] justify-start">
+              {selectedStatus ? (
+                <>
+                  <selectedStatus.icon className="mr-2 h-4 w-4 shrink-0" />
+                  <span className="text">{selectedStatus.label}</span>
+                </>
+              ) : (
+                <>Organization</>
+              )}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="p-0 flex flex-row w-[520px]" side="bottom" align="start">
+            <Command className="border-r h-full rounded-none grow">
+              <CommandInput placeholder="Find organization..." />
+              <CommandList>
+                <CommandEmpty>No results found.</CommandEmpty>
+                <div className="my-2">
+                  <CommandGroup heading="Personal Account">
+                    {personal.map((status) => {
+                      return (
+                        <CommandItem
+                          key={status.value}
+                          value={status.value}
+                          onSelect={(value) => {
+                            setSelectedStatus(
+                              [...personal].find((priority) => priority.value === value) || null
+                            )
+                            setOpen(false)
+                          }}
+                        >
+                          <status.icon
+                            className={cn(
+                              'mr-2 h-4 w-4',
+                              status.value === selectedStatus?.value ? 'opacity-100' : 'opacity-40'
+                            )}
+                          />
+                          <span>{status.label}</span>
+                        </CommandItem>
+                      )
+                    })}
+                  </CommandGroup>
+                </div>
+                <div className="my-2">
+                  <CommandGroup heading="Your Organizations">
+                    {orgs.map((status) => (
+                      <CommandItem
+                        key={status.value}
+                        value={status.value}
+                        onSelect={(value) => {
+                          console.log(orgs)
+                          setSelectedStatus(
+                            [...orgs].find((priority) => {
+                              console.log('value:', value)
+                              console.log('priority:', priority)
+                              return priority.value === value
+                            }) || null
+                          )
+                          setOpen(false)
+                        }}
+                      >
+                        <status.icon
+                          className={cn(
+                            'mr-2 h-4 w-4',
+                            status.value === selectedStatus?.value ? 'opacity-100' : 'opacity-40'
+                          )}
+                        />
+                        <span>{status.label}</span>
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </div>
+              </CommandList>
+            </Command>
+            <Command>
+              <CommandInput placeholder="Find project..." />
+              <CommandList>
+                <div className="my-2">
+                  <CommandGroup heading="Your Projects">
+                    {projects.map((status) => (
+                      <CommandItem
+                        key={status.value}
+                        value={status.value}
+                        onSelect={(value) => {
+                          console.log(orgs)
+                          setSelectedStatus(
+                            [...orgs].find((priority) => {
+                              console.log('value:', value)
+                              console.log('priority:', priority)
+                              return priority.value === value
+                            }) || null
+                          )
+                          setOpen(false)
+                        }}
+                      >
+                        <status.icon
+                          className={cn(
+                            'mr-2 h-4 w-4',
+                            status.value === selectedStatus?.value ? 'opacity-100' : 'opacity-40'
+                          )}
+                        />
+                        <span>{status.label}</span>
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </div>
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
+      </div>
     )
   },
 }
