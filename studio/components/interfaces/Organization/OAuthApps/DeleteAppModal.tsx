@@ -12,18 +12,20 @@ export interface DeleteAppModalProps {
 const DeleteAppModal = ({ selectedApp, onClose }: DeleteAppModalProps) => {
   const { ui } = useStore()
   const { slug } = useParams()
-  const { mutateAsync: deleteOAuthApp, isLoading: isDeleting } = useOAuthAppDeleteMutation()
+  const { mutate: deleteOAuthApp, isLoading: isDeleting } = useOAuthAppDeleteMutation({
+    onSuccess: () => {
+      ui.setNotification({
+        category: 'success',
+        message: `Successfully deleted the app "${selectedApp?.name}"`,
+      })
+      onClose()
+    },
+  })
 
   const onConfirmDelete = async () => {
     if (!slug) return console.error('Slug is required')
     if (!selectedApp?.id) return console.error('App ID is required')
-
-    await deleteOAuthApp({ slug, id: selectedApp?.id })
-    ui.setNotification({
-      category: 'success',
-      message: `Successfully deleted the app "${selectedApp?.name}"`,
-    })
-    onClose()
+    deleteOAuthApp({ slug, id: selectedApp?.id })
   }
 
   return (

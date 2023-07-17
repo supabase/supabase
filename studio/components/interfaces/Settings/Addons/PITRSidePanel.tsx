@@ -55,7 +55,14 @@ const PITRSidePanel = () => {
 
   const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef })
   const { data: subscription } = useProjectSubscriptionV2Query({ projectRef })
-  const { mutateAsync: updateAddon, isLoading: isUpdating } = useProjectAddonUpdateMutation({
+  const { mutate: updateAddon, isLoading: isUpdating } = useProjectAddonUpdateMutation({
+    onSuccess: () => {
+      ui.setNotification({
+        category: 'success',
+        message: `Successfully updated point in time recovery duration`,
+      })
+      onClose()
+    },
     onError: (error) => {
       ui.setNotification({
         error,
@@ -64,12 +71,19 @@ const PITRSidePanel = () => {
       })
     },
   })
-  const { mutateAsync: removeAddon, isLoading: isRemoving } = useProjectAddonRemoveMutation({
+  const { mutate: removeAddon, isLoading: isRemoving } = useProjectAddonRemoveMutation({
+    onSuccess: () => {
+      ui.setNotification({
+        category: 'success',
+        message: `Successfully disabled point in time recovery`,
+      })
+      onClose()
+    },
     onError: (error) => {
       ui.setNotification({
         error,
         category: 'error',
-        message: `Unable to update PITR: ${error.message}`,
+        message: `Unable to disable PITR: ${error.message}`,
       })
     },
   })
@@ -114,18 +128,10 @@ const PITRSidePanel = () => {
     if (!projectRef) return console.error('Project ref is required')
 
     if (selectedOption === 'pitr_0' && subscriptionPitr !== undefined) {
-      await removeAddon({ projectRef, variant: subscriptionPitr.variant.identifier })
+      removeAddon({ projectRef, variant: subscriptionPitr.variant.identifier })
     } else {
-      await updateAddon({ projectRef, type: 'pitr', variant: selectedOption })
+      updateAddon({ projectRef, type: 'pitr', variant: selectedOption })
     }
-
-    ui.setNotification({
-      category: 'success',
-      message: `Successfully ${
-        selectedOption === 'pitr_0' ? 'disabled' : 'updated'
-      } point in time recovery duration`,
-    })
-    onClose()
   }
 
   return (

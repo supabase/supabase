@@ -15,6 +15,23 @@ export type UserCreateVariables = {
   }
 }
 
+export type UserCreateResponse = {
+  id: string
+  phone: string
+  role: string
+  updated_at: string
+  app_metadata: {
+    provider: string
+    providers: string[]
+  }
+  aud: string
+  created_at: string
+  email: string
+  email_confirmed_at: string
+  identities: any[]
+  user_metadata: any
+}
+
 export async function createUser({ protocol, endpoint, serviceApiKey, user }: UserCreateVariables) {
   const response = await post(
     `${protocol}://${endpoint}/auth/v1/admin/users`,

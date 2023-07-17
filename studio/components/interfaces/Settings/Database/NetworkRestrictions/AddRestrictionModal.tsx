@@ -25,8 +25,8 @@ const AddRestrictionModal = ({
   const formId = 'add-restriction-form'
   const { ui } = useStore()
   const { ref } = useParams()
-  const { mutateAsync: applyNetworkRestrictions, isLoading: isApplying } =
-    useNetworkRestrictionsApplyMutation()
+  const { mutate: applyNetworkRestrictions, isLoading: isApplying } =
+    useNetworkRestrictionsApplyMutation({ onSuccess: () => onClose() })
 
   const validate = (values: any) => {
     const errors: any = {}
@@ -62,9 +62,7 @@ const AddRestrictionModal = ({
     }
 
     const dbAllowedCidrs = hasOverachingRestriction ? [cidr] : [...restrictedIps, cidr]
-
-    await applyNetworkRestrictions({ projectRef: ref, dbAllowedCidrs })
-    onClose()
+    applyNetworkRestrictions({ projectRef: ref, dbAllowedCidrs })
   }
 
   return (

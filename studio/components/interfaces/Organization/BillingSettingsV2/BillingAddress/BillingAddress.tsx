@@ -43,12 +43,14 @@ const BillingAddress = () => {
   const onSubmit = async (values: any, { resetForm }: any) => {
     if (!slug) return console.error('Slug is required')
 
-    await updateCustomerProfile({ slug, address: values })
-    ui.setNotification({
-      category: 'success',
-      message: 'Successfully updated billing address',
-    })
-    resetForm({ values, initialValues: values })
+    try {
+      await updateCustomerProfile({ slug, address: values })
+      ui.setNotification({
+        category: 'success',
+        message: 'Successfully updated billing address',
+      })
+      resetForm({ values, initialValues: values })
+    } catch (error) {}
   }
 
   return (
@@ -56,7 +58,9 @@ const BillingAddress = () => {
       <ScaffoldSectionDetail>
         <div className="sticky top-16">
           <p className="text-base">Billing Address</p>
-          <p className="text-sm text-scale-1000">This will be reflected in every upcoming invoice, past invoices are not affected</p>
+          <p className="text-sm text-scale-1000">
+            This will be reflected in every upcoming invoice, past invoices are not affected
+          </p>
         </div>
       </ScaffoldSectionDetail>
       <ScaffoldSectionContent>

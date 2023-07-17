@@ -29,10 +29,17 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
   const isApproved = requester?.approved_at !== null
   const isExpired = dayjs().isAfter(dayjs(requester?.expires_at))
 
-  const { mutateAsync: approveRequest, isLoading: isApproving } =
-    useApiAuthorizationApproveMutation()
-  const { mutateAsync: declineRequest, isLoading: isDeclining } =
-    useApiAuthorizationDeclineMutation()
+  const { mutate: approveRequest, isLoading: isApproving } = useApiAuthorizationApproveMutation({
+    onSuccess: (res) => {
+      router.push(res.url)
+    },
+  })
+  const { mutate: declineRequest, isLoading: isDeclining } = useApiAuthorizationDeclineMutation({
+    onSuccess: () => {
+      ui.setNotification({ category: 'success', message: 'Declined API authorization request' })
+      router.push('/projects')
+    },
+  })
   const isSubmitting = isApproving || isDeclining
 
   useEffect(() => {
@@ -55,8 +62,7 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
       })
     }
 
-    const res = await approveRequest({ id: auth_id, organization_id: selectedOrg })
-    router.push(res.url)
+    approveRequest({ id: auth_id, organization_id: selectedOrg })
   }
 
   const onDeclineRequest = async () => {
@@ -66,9 +72,7 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
         message: 'Unable to decline request: auth_id is missing ',
       })
 
-    await declineRequest({ id: auth_id })
-    ui.setNotification({ category: 'success', message: 'Declined API authorization request' })
-    router.push('/projects')
+    declineRequest({ id: auth_id })
   }
 
   if (isLoading) {

@@ -26,7 +26,7 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
         if (res.status === '2_initiated') setIsNotVerifiedYet(true)
       },
     })
-  const { mutateAsync: deleteCustomDomain, isLoading: isDeleting } = useCustomDomainDeleteMutation()
+  const { mutate: deleteCustomDomain, isLoading: isDeleting } = useCustomDomainDeleteMutation()
 
   const hasCAAErrors = customDomain.ssl.validation_errors?.reduce(
     (acc, error) => acc || error.message.includes('caa_error'),
@@ -40,7 +40,7 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
 
   const onCancelCustomDomain = async () => {
     if (!projectRef) return console.error('Project ref is required')
-    await deleteCustomDomain({ projectRef })
+    deleteCustomDomain({ projectRef })
   }
 
   return (

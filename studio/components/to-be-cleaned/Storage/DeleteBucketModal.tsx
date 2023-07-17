@@ -20,38 +20,37 @@ const DeleteBucketModal = ({ visible = false, bucket, onClose }: DeleteBucketMod
   const { ref: projectRef } = useParams()
 
   const { data } = useBucketsQuery({ projectRef })
-  const { mutateAsync: deleteBucket, isLoading: isDeleting } = useBucketDeleteMutation()
+  const { mutate: deleteBucket, isLoading: isDeleting } = useBucketDeleteMutation({
+    onSuccess: async () => {
+      // Clean up policies from the corresponding bucket that was deleted
+      await meta.policies.loadBySchema('storage')
+      const policies = meta.policies.list()
+      const storageObjectsPolicies = policies.filter((policy) => policy.table === 'objects')
+      const formattedStorageObjectPolicies = formatPoliciesForStorage(
+        buckets,
+        storageObjectsPolicies
+      )
+      const bucketPolicies = _get(
+        find(formattedStorageObjectPolicies, { name: bucket!.name }),
+        ['policies'],
+        []
+      )
+      await Promise.all(bucketPolicies.map((policy: any) => meta.policies.del(policy.id)))
+      ui.setNotification({
+        category: 'success',
+        message: `Successfully deleted bucket ${bucket!.name}`,
+      })
+      router.push(`/project/${projectRef}/storage/buckets`)
+      onClose()
+    },
+  })
 
   const buckets = data ?? []
 
   const onDeleteBucket = async () => {
     if (!projectRef) return console.error('Project ref is required')
     if (!bucket) return console.error('No bucket is selected')
-
-    await deleteBucket({ projectRef, id: bucket.id })
-
-    // Clean up policies from the corresponding bucket that was deleted
-    await meta.policies.loadBySchema('storage')
-    const policies = meta.policies.list()
-    const storageObjectsPolicies = policies.filter((policy) => policy.table === 'objects')
-    const formattedStorageObjectPolicies = formatPoliciesForStorage(buckets, storageObjectsPolicies)
-    const bucketPolicies = _get(
-      find(formattedStorageObjectPolicies, { name: bucket.name }),
-      ['policies'],
-      []
-    )
-    await Promise.all(
-      bucketPolicies.map((policy: any) => {
-        meta.policies.del(policy.id)
-      })
-    )
-
-    ui.setNotification({
-      category: 'success',
-      message: `Successfully deleted bucket ${bucket.name}`,
-    })
-    router.push(`/project/${projectRef}/storage/buckets`)
-    onClose()
+    deleteBucket({ projectRef, id: bucket.id })
   }
 
   return (

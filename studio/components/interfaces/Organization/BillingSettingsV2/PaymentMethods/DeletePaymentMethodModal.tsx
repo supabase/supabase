@@ -16,19 +16,23 @@ const DeletePaymentMethodModal = ({
   const { ui } = useStore()
   const { slug } = useParams()
 
-  const { mutateAsync: deletePayment, isLoading: isDeleting } =
-    useOrganizationPaymentMethodDeleteMutation()
+  const { mutate: deletePayment, isLoading: isDeleting } =
+    useOrganizationPaymentMethodDeleteMutation({
+      onSuccess: () => {
+        ui.setNotification({
+          category: 'success',
+          message: `Successfully removed payment method ending with ${
+            selectedPaymentMethod!.card.last4
+          }`,
+        })
+        onClose()
+      },
+    })
 
   const onConfirmDelete = async () => {
     if (!slug) return console.error('Slug is required')
     if (!selectedPaymentMethod) return console.error('Card ID is required')
-
-    await deletePayment({ slug, cardId: selectedPaymentMethod.id })
-    ui.setNotification({
-      category: 'success',
-      message: `Successfully removed payment method ending with ${selectedPaymentMethod.card.last4}`,
-    })
-    onClose()
+    deletePayment({ slug, cardId: selectedPaymentMethod.id })
   }
 
   return (

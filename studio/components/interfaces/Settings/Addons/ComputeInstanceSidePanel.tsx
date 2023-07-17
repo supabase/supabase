@@ -65,7 +65,17 @@ const ComputeInstanceSidePanel = () => {
 
   const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef })
   const { data: subscription } = useProjectSubscriptionV2Query({ projectRef })
-  const { mutateAsync: updateAddon, isLoading: isUpdating } = useProjectAddonUpdateMutation({
+  const { mutate: updateAddon, isLoading: isUpdating } = useProjectAddonUpdateMutation({
+    onSuccess: () => {
+      ui.setNotification({
+        duration: 8000,
+        category: 'success',
+        message: `Successfully updated compute instance to ${selectedCompute?.name}. Your project is currently being restarted to update its instance`,
+      })
+      setProjectStatus(queryClient, projectRef!, PROJECT_STATUS.RESTORING)
+      onClose()
+      router.push(`/project/${projectRef}`)
+    },
     onError: (error) => {
       ui.setNotification({
         error,
@@ -74,7 +84,17 @@ const ComputeInstanceSidePanel = () => {
       })
     },
   })
-  const { mutateAsync: removeAddon, isLoading: isRemoving } = useProjectAddonRemoveMutation({
+  const { mutate: removeAddon, isLoading: isRemoving } = useProjectAddonRemoveMutation({
+    onSuccess: () => {
+      ui.setNotification({
+        duration: 8000,
+        category: 'success',
+        message: `Successfully updated compute instance to Micro. Your project is currently being restarted to update its instance`,
+      })
+      setProjectStatus(queryClient, projectRef!, PROJECT_STATUS.RESTORING)
+      onClose()
+      router.push(`/project/${projectRef}`)
+    },
     onError: (error) => {
       ui.setNotification({
         error,
@@ -129,21 +149,10 @@ const ComputeInstanceSidePanel = () => {
     if (!projectId) return console.error('Project ID is required')
 
     if (selectedOption === 'ci_micro' && subscriptionCompute !== undefined) {
-      await removeAddon({ projectRef, variant: subscriptionCompute.variant.identifier })
+      removeAddon({ projectRef, variant: subscriptionCompute.variant.identifier })
     } else {
-      await updateAddon({ projectRef, type: 'compute_instance', variant: selectedOption })
+      updateAddon({ projectRef, type: 'compute_instance', variant: selectedOption })
     }
-
-    ui.setNotification({
-      duration: 8000,
-      category: 'success',
-      message: `Successfully updated compute instance to ${
-        selectedCompute?.name || 'Micro'
-      }. Your project is currently being restarted to update its instance`,
-    })
-    setProjectStatus(queryClient, projectRef, PROJECT_STATUS.RESTORING)
-    onClose()
-    router.push(`/project/${projectRef}`)
   }
 
   return (

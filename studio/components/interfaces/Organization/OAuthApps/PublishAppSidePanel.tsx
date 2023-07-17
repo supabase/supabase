@@ -30,8 +30,43 @@ const PublishAppSidePanel = ({
   const { ui } = useStore()
   const { slug } = useParams()
   const uploadButtonRef = useRef<any>()
-  const { mutateAsync: createOAuthApp } = useOAuthAppCreateMutation()
-  const { mutateAsync: updateOAuthApp } = useOAuthAppUpdateMutation()
+  const { mutate: createOAuthApp } = useOAuthAppCreateMutation({
+    onSuccess: (res, variables) => {
+      ui.setNotification({
+        category: 'success',
+        message: `Successfully created OAuth app "${variables.name}"!`,
+      })
+      onClose()
+      onCreateSuccess(res)
+      setIsSubmitting(false)
+    },
+    onError: (error) => {
+      ui.setNotification({
+        error,
+        category: 'error',
+        message: `Failed to create OAuth application: ${error.message}`,
+      })
+      setIsSubmitting(false)
+    },
+  })
+  const { mutate: updateOAuthApp } = useOAuthAppUpdateMutation({
+    onSuccess: (res, variables) => {
+      ui.setNotification({
+        category: 'success',
+        message: `Successfully updated OAuth app "${variables.name}"!`,
+      })
+      onClose()
+      setIsSubmitting(false)
+    },
+    onError: (error) => {
+      ui.setNotification({
+        error,
+        category: 'error',
+        message: `Failed to update OAuth application: ${error.message}`,
+      })
+      setIsSubmitting(false)
+    },
+  })
 
   // [Joshen] Separate submitting state as there are additional async logic involved in the creation
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -109,42 +144,25 @@ const PublishAppSidePanel = ({
         ? await uploadAttachment('oauth-app-icons', `${slug}/${uuidv4()}.png`, iconFile)
         : iconUrl
 
-    try {
-      if (selectedApp === undefined) {
-        // Create application
-        const res = await createOAuthApp({
-          slug,
-          name,
-          website,
-          redirect_uris,
-          icon: uploadedIconUrl,
-        })
-        ui.setNotification({
-          category: 'success',
-          message: `Successfully created OAuth app "${name}"!`,
-        })
-        onClose()
-        onCreateSuccess(res)
-      } else {
-        // Update application
-        await updateOAuthApp({
-          id: selectedApp.id,
-          slug,
-          name,
-          website,
-          redirect_uris,
-          icon: uploadedIconUrl === undefined ? null : uploadedIconUrl,
-        })
-        ui.setNotification({
-          category: 'success',
-          message: `Successfully updated OAuth app "${name}"!`,
-        })
-        onClose()
-        setIsSubmitting(false)
-      }
-    } catch (error) {
-    } finally {
-      setIsSubmitting(false)
+    if (selectedApp === undefined) {
+      // Create application
+      createOAuthApp({
+        slug,
+        name,
+        website,
+        redirect_uris,
+        icon: uploadedIconUrl,
+      })
+    } else {
+      // Update application
+      updateOAuthApp({
+        id: selectedApp.id,
+        slug,
+        name,
+        website,
+        redirect_uris,
+        icon: uploadedIconUrl === undefined ? null : uploadedIconUrl,
+      })
     }
   }
 

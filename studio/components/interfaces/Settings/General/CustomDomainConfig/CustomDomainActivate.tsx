@@ -19,21 +19,22 @@ const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivate
   const { ui } = useStore()
   const [isActivateConfirmModalVisible, setIsActivateConfirmModalVisible] = useState(false)
 
-  const { mutateAsync: activateCustomDomain } = useCustomDomainActivateMutation()
-  const { mutateAsync: deleteCustomDomain, isLoading: isDeleting } = useCustomDomainDeleteMutation()
+  const { mutate: activateCustomDomain } = useCustomDomainActivateMutation({
+    onSuccess: () => {
+      ui.setNotification({ category: 'success', message: `Successfully activated custom domain` })
+      setIsActivateConfirmModalVisible(false)
+    },
+  })
+  const { mutate: deleteCustomDomain, isLoading: isDeleting } = useCustomDomainDeleteMutation()
 
   const onActivateCustomDomain = async () => {
     if (!projectRef) return console.error('Project ref is required')
-
-    await activateCustomDomain({ projectRef })
-    ui.setNotification({ category: 'success', message: `Successfully activated custom domain` })
-    setIsActivateConfirmModalVisible(false)
+    activateCustomDomain({ projectRef })
   }
 
   const onCancelCustomDomain = async () => {
     if (!projectRef) return console.error('Project ref is required')
-
-    await deleteCustomDomain({ projectRef })
+    deleteCustomDomain({ projectRef })
   }
 
   return (

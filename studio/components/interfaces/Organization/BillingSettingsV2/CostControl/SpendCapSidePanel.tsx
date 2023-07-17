@@ -53,8 +53,16 @@ const SpendCapSidePanel = () => {
   const onClose = () => snap.setPanelKey(undefined)
 
   const { data: subscription, isLoading } = useOrgSubscriptionQuery({ orgSlug: slug })
-  const { mutateAsync: updateOrgSubscription, isLoading: isUpdating } =
-    useOrgSubscriptionUpdateMutation({
+  const { mutate: updateOrgSubscription, isLoading: isUpdating } = useOrgSubscriptionUpdateMutation(
+    {
+      onSuccess: () => {
+        ui.setNotification({
+          category: 'success',
+          message: `Successfully ${isTurningOnCap ? 'enabled' : 'disabled'} spend cap`,
+        })
+
+        onClose()
+      },
       onError: (error) => {
         ui.setNotification({
           error,
@@ -62,7 +70,8 @@ const SpendCapSidePanel = () => {
           message: `Failed to toggle spend cap: ${error.message}`,
         })
       },
-    })
+    }
+  )
 
   const isFreePlan = subscription?.plan?.id === 'free'
   const isSpendCapOn = !subscription?.usage_billing_enabled
@@ -95,14 +104,7 @@ const SpendCapSidePanel = () => {
       selectedOption === 'on' ? PRICING_TIER_PRODUCT_IDS.PRO : PRICING_TIER_PRODUCT_IDS.PAYG
     ) as 'tier_pro' | 'tier_payg'
 
-    await updateOrgSubscription({ slug, tier })
-
-    ui.setNotification({
-      category: 'success',
-      message: `Successfully ${isTurningOnCap ? 'enabled' : 'disabled'} spend cap`,
-    })
-
-    onClose()
+    updateOrgSubscription({ slug, tier })
   }
 
   const billingMetricCategories: (keyof typeof pricing)[] = [

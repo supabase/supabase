@@ -84,8 +84,12 @@ const ExitSurveyModal = ({ visible, onClose }: ExitSurveyModalProps) => {
     // If compute instance is present within the existing subscription, then a restart will be triggered
     if (!projectRef) return console.error('Project ref is required')
 
-    await updateSubscriptionTier({ projectRef, tier: 'tier_free' })
-    resetCaptcha()
+    try {
+      await updateSubscriptionTier({ projectRef, tier: 'tier_free' })
+      resetCaptcha()
+    } catch (error) {
+      return
+    }
 
     try {
       const feedbackRes = await post(`${API_URL}/feedback/downgrade`, {
