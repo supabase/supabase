@@ -4,7 +4,12 @@ import { useState } from 'react'
 import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
 import GitHubIntegrationWindowLayout from 'components/layouts/IntegrationsLayout/GitHubIntegrationWindowLayout'
-import { ScaffoldContainer, ScaffoldDivider } from 'components/layouts/Scaffold'
+import {
+  ScaffoldColoum,
+  ScaffoldContainer,
+  ScaffoldDivider,
+  ScaffoldSectionCol,
+} from 'components/layouts/Scaffold'
 import { useGitHubIntegrationCreateMutation } from 'data/integrations/github-integration-create-mutation'
 import { useIntegrationsQuery } from 'data/integrations/integrations-query'
 import { IntegrationName } from 'data/integrations/integrations.types'
@@ -139,31 +144,33 @@ const GitHubIntegration: NextPageWithLayout = () => {
         <LoadingLine loading={isLoadingGitHubIntegrationCreateMutation} />
         {organizationIntegrationId === null && (
           <>
-            <ScaffoldContainer className="max-w-md flex flex-col gap-6 grow py-8">
-              <h1 className="text-xl text-scale-1200">Choose organization</h1>
-              <>
-                <Markdown content={`Choose the Supabase organization you wish to install in`} />
-                <OrganizationPicker
-                  integrationName="GitHub"
-                  organizationsWithInstalledData={organizationsWithInstalledData}
-                  onSelectedOrgChange={(e) => {
-                    router.query.organizationSlug = e.slug
-                    setSelectedOrg(e)
-                  }}
-                  dataLoading={dataLoading}
-                />
-                <div className="flex flex-row w-full justify-end">
-                  <Button
-                    size="medium"
-                    className="self-end"
-                    disabled={isLoadingGitHubIntegrationCreateMutation}
-                    loading={isLoadingGitHubIntegrationCreateMutation}
-                    onClick={onInstall}
-                  >
-                    Install integration
-                  </Button>
-                </div>
-              </>
+            <ScaffoldContainer className="flex flex-col gap-6 grow py-8">
+              <ScaffoldColoum className="mx-auto">
+                <h1 className="text-xl text-scale-1200">Choose organization</h1>
+                <>
+                  <Markdown content={`Choose the Supabase organization you wish to install in`} />
+                  <OrganizationPicker
+                    integrationName="GitHub"
+                    organizationsWithInstalledData={organizationsWithInstalledData}
+                    onSelectedOrgChange={(e) => {
+                      router.query.organizationSlug = e.slug
+                      setSelectedOrg(e)
+                    }}
+                    dataLoading={dataLoading}
+                  />
+                  <div className="flex flex-row w-full justify-end">
+                    <Button
+                      size="medium"
+                      className="self-end"
+                      disabled={isLoadingGitHubIntegrationCreateMutation}
+                      loading={isLoadingGitHubIntegrationCreateMutation}
+                      onClick={onInstall}
+                    >
+                      Install integration
+                    </Button>
+                  </div>
+                </>
+              </ScaffoldColoum>
             </ScaffoldContainer>
             <ScaffoldContainer className="flex flex-col gap-6 py-3">
               <Alert
@@ -181,7 +188,7 @@ const GitHubIntegration: NextPageWithLayout = () => {
 
         <ScaffoldDivider />
       </main>
-      <ScaffoldContainer className="bg-body flex flex-row gap-6 py-6 border-t">
+      <ScaffoldContainer className="bg-body flex flex-row gap-6 py-6">
         <div className="flex items-center gap-2 text-xs text-scale-900">
           <IconBook size={16} /> Docs
         </div>
