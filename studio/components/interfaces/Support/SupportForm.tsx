@@ -353,7 +353,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
               )}
             </div>
 
-            {values.projectRef === 'no-project' && (
+            {isSuccessProjects && values.projectRef === 'no-project' && (
               <div className="px-6">
                 {isLoadingOrganizations && (
                   <div className="space-y-2">
