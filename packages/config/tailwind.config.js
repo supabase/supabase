@@ -11,8 +11,8 @@ Object.values(color).map((x, i) => {
   colorExtend[Object.keys(color)[i]] = `hsl(${x.cssVariable} / <alpha-value>)` // x.cssVariable
 })
 
-console.log('colorExtend', colorExtend)
-console.log('colorExtend kebabToNested', kebabToNested(colorExtend))
+// console.log('colorExtend', colorExtend)
+// console.log('colorExtend kebabToNested', kebabToNested(colorExtend))
 
 // console.log('colorExtend', kebabToNested(colorExtend).colors.gray)
 
@@ -92,6 +92,7 @@ const uiConfig = ui({
       colors: {
         ...kebabToNested(colorExtend),
       },
+
       typography: ({ theme }) => ({
         // Removal of backticks in code blocks for tailwind v3.0
         // https://github.com/tailwindlabs/tailwindcss-typography/issues/135
@@ -321,9 +322,40 @@ const uiConfig = ui({
         sans: ['Circular', 'custom-font', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'],
         mono: ['Office Code Pro', 'Source Code Pro', 'Menlo', 'monospace'],
       },
+
+      // shadcn defaults START
+      keyframes: {
+        'flash-code': {
+          '0%': { backgroundColor: 'rgba(63, 207, 142, 0.1)' },
+          '100%': { backgroundColor: 'transparent' },
+        },
+      },
+      animation: {
+        'flash-code': 'flash-code 1s forwards',
+        'flash-code-slow': 'flash-code 2s forwards',
+      },
+      // borderRadius: {
+      //   lg: `var(--radius)`,
+      //   md: `calc(var(--radius) - 2px)`,
+      //   sm: 'calc(var(--radius) - 4px)',
+      // },
+      // fontFamily: {
+      //   sans: ['var(--font-sans)', ...fontFamily.sans],
+      // },
+      keyframes: {
+        'accordion-down': {
+          from: { height: 0 },
+          to: { height: 'var(--radix-accordion-content-height)' },
+        },
+        'accordion-up': {
+          from: { height: 'var(--radix-accordion-content-height)' },
+          to: { height: 0 },
+        },
+      },
+      // shadcn defaults END
     },
   },
-  plugins: [require('@tailwindcss/typography')],
+  plugins: [require('@tailwindcss/typography'), require('tailwindcss-animate')],
 })
 
 function arrayMergeFn(destinationArray, sourceArray) {
