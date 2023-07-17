@@ -45,17 +45,25 @@ functions:
       1. **Setup a deeplink for you app** \
       On Android you may setup a [deeplink](https://developer.android.com/training/app-links/deep-linking) in your Android manifest. \
       On IOS & MacOS you may setup a [url scheme](https://developer.apple.com/documentation/xcode/defining-a-custom-url-scheme-for-your-app).
-      2. **Configure the GoTrue plugin**
+      2. **Add your deeplink to the [redirect URLs](https://supabase.com/dashboard/project/_/auth/url-configuration)** \
+      **Pattern**: scheme://host
+      3. **Configure the GoTrue plugin**
       You have to set the `host` and the `scheme` in the GoTrue config:
           ```kotlin
           install(GoTrue) {
-             host = "deeplink host"
+             host = "deeplink host" //that can be anything for example your package name, app/company url. (Not your supabase url)
              scheme = "deeplink scheme"
           }
           ```
-      3. **Call platform specific function on startup** \
+      4. **Call platform specific function on startup** \
       On Android: `client.handleDeeplinks(intent)` \
       On IOS/MacOS: `client.handleDeeplinks(url)`
+
+      Then you can just login using OAuth:
+      ```kotlin
+      client.gotrue.loginWith(Google)
+      ```
+      Or open OTP links directly in your app.
 
       ### PKCE Authentication flow
       suapbase-kt supports the [PKCE authentication flow](https://supabase.com/blog/supabase-auth-sso-pkce).
@@ -65,6 +73,7 @@ functions:
         flowType = FlowType.PKCE
       }
       ```
+      That's it! If you already implemented deeplinks to handle OTPs and OAuth you don't have to change anything!
     examples:
       - id: initialize-client
         name: Initialize Client
