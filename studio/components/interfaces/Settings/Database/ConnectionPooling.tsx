@@ -187,6 +187,7 @@ export const PgbouncerConfig: FC<ConfigProps> = ({ projectRef, bouncerInfo, conn
         model={updates}
         submitLabel="Save"
         cancelLabel="Cancel"
+        loading={undefined}
         onChangeModel={(model: any) => setUpdates(model)}
         onSubmit={(model: any) => updateConfig(model)}
         onReset={() => setUpdates(bouncerInfo)}
