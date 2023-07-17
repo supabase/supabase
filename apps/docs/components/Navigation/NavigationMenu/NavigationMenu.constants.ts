@@ -1030,6 +1030,7 @@ export const platform: NavMenuConstant = {
       url: undefined,
       items: [{ name: 'Spend cap', url: '/guides/platform/spend-cap' }],
     },
+
     {
       name: 'Single sign-on',
       url: undefined,
@@ -1059,6 +1060,30 @@ export const platform: NavMenuConstant = {
           url: '/guides/platform/maturity-model',
         },
         { name: 'Production Checklist', url: '/guides/platform/going-into-prod' },
+      ],
+    },
+    {
+      name: 'OAuth Apps (Beta)',
+      url: undefined,
+      items: [
+        {
+          name: 'Publish an OAuth App',
+          url: '/guides/platform/oauth-apps/publish-an-oauth-app',
+        },
+        {
+          name: 'Authorize an OAuth App',
+          url: '/guides/platform/oauth-apps/authorize-an-oauth-app',
+        },
+      ],
+    },
+    {
+      name: 'Integrations',
+      url: undefined,
+      items: [
+        {
+          name: 'Supabase Marketplace',
+          url: '/guides/platform/marketplace',
+        },
       ],
     },
     {
@@ -1190,20 +1215,6 @@ export const integrations: NavMenuConstant = {
   url: '/guides/integrations',
   items: [
     { name: 'Overview', url: '/guides/integrations/integrations' },
-    {
-      name: 'OAuth Apps (Beta)',
-      url: undefined,
-      items: [
-        {
-          name: 'Publish an OAuth App',
-          url: '/guides/integrations/oauth-apps/publish-an-oauth-app',
-        },
-        {
-          name: 'Authorize an OAuth App',
-          url: '/guides/integrations/oauth-apps/authorize-an-oauth-app',
-        },
-      ],
-    },
     {
       name: 'Auth',
       url: undefined,
