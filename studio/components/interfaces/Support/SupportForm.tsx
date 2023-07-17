@@ -392,28 +392,6 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
               </div>
             )}
 
-            {/* {values.projectRef === 'no-project' && (organizations?.length ?? 0) > 0 && (
-              <div className="px-6">
-                <Listbox
-                  id="organizationSlug"
-                  layout="vertical"
-                  label="Which organization is affected?"
-                >
-                  {organizations?.map((option) => {
-                    return (
-                      <Listbox.Option
-                        key={`option-${option.slug}`}
-                        label={option.name || ''}
-                        value={option.slug}
-                      >
-                        <span>{option.name}</span>
-                      </Listbox.Option>
-                    )
-                  })}
-                </Listbox>
-              </div>
-            )} */}
-
             {subscription?.plan.id === 'free' && (
               <div className="px-6">
                 <InformationBox
