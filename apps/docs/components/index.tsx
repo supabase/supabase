@@ -22,6 +22,7 @@ import QuickstartIntro from './MDX/quickstart_intro.mdx'
 import SocialProviderSettingsSupabase from './MDX/social_provider_settings_supabase.mdx'
 import SocialProviderSetup from './MDX/social_provider_setup.mdx'
 import StorageManagement from './MDX/storage_management.mdx'
+import AuthHelpersFAQ from './MDX/auth_helpers_faq.mdx'
 import { CH } from '@code-hike/mdx/components'
 import RefHeaderSection from './reference/RefHeaderSection'
 
@@ -74,6 +75,7 @@ const components = {
   SocialProviderSettingsSupabase,
   StepHikeCompact,
   StorageManagement,
+  AuthHelpersFAQ,
   Mermaid,
   Extensions,
   Alert: (props: any) => (
