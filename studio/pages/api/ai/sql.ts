@@ -23,6 +23,7 @@ const generateSqlSchema = SchemaBuilder.emptySchema()
       - Prefer 'text' over 'varchar'
       - Prefer 'timestamp with time zone' over 'date'
       - Use vector(384) data type for any embedding/vector related query
+      - Must be valid SQL syntax
     `,
   })
   .addString('title', {
