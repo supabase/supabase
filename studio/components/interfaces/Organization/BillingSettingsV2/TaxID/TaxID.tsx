@@ -32,7 +32,33 @@ const TaxID = () => {
     isSuccess,
     isError,
   } = useOrganizationTaxIDsQuery({ slug })
-  const { mutateAsync: updateTaxIDs, isLoading: isUpdating } = useOrganizationTaxIDsUpdateMutation()
+  const { mutate: updateTaxIDs, isLoading: isUpdating } = useOrganizationTaxIDsUpdateMutation({
+    onSuccess: (res) => {
+      const { created, errors } = res
+      setErrors(errors?.map((taxId) => taxId.id) ?? [])
+      const updatedTaxIds =
+        created?.map((x) => {
+          return {
+            id: x.id,
+            type: x.type,
+            value: x.value,
+            name:
+              x.type === 'eu_vat'
+                ? `${x.country} VAT`
+                : TAX_IDS.find((option) => option.code === x.type)?.name ?? '',
+          }
+        }) ?? []
+      setTaxIdValues(updatedTaxIds)
+
+      if (errors !== undefined && errors.length > 0) {
+        errors.forEach((taxId: any) => {
+          ui.setNotification({ category: 'error', message: taxId.result.error.message })
+        })
+      } else {
+        ui.setNotification({ category: 'success', message: 'Successfully updated tax IDs' })
+      }
+    },
+  })
 
   const [errors, setErrors] = useState<string[]>([])
   const [taxIdValues, setTaxIdValues] = useState<TaxIdValue[]>([])
@@ -102,30 +128,7 @@ const TaxID = () => {
     if (taxIds === undefined) return console.error('Tax IDs are required')
 
     const newIds = taxIdValues.map((x) => sanitizeTaxID(x))
-    const { created, errors } = await updateTaxIDs({ slug, existingIds: taxIds, newIds })
-    setErrors(errors?.map((taxId) => taxId.id) ?? [])
-
-    const updatedTaxIds =
-      created?.map((x) => {
-        return {
-          id: x.id,
-          type: x.type,
-          value: x.value,
-          name:
-            x.type === 'eu_vat'
-              ? `${x.country} VAT`
-              : TAX_IDS.find((option) => option.code === x.type)?.name ?? '',
-        }
-      }) ?? []
-    setTaxIdValues(updatedTaxIds)
-
-    if (errors !== undefined && errors.length > 0) {
-      errors.forEach((taxId: any) => {
-        ui.setNotification({ category: 'error', message: taxId.result.error.message })
-      })
-    } else {
-      ui.setNotification({ category: 'success', message: 'Successfully updated tax IDs' })
-    }
+    updateTaxIDs({ slug, existingIds: taxIds, newIds })
   }
 
   return (

@@ -1,5 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { observer } from 'mobx-react-lite'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
 import { Alert, Button, Form, IconHelpCircle, Listbox, Loading, Modal, Toggle } from 'ui'
 
@@ -8,8 +10,6 @@ import { useOrganizationBillingMigrationMutation } from 'data/organizations/orga
 import { useOrganizationBillingMigrationPreview } from 'data/organizations/organization-migrate-billing-preview-query'
 import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
 import { PRICING_TIER_LABELS_ORG } from 'lib/constants'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
 
 const MigrateOrganizationBillingButton = observer(() => {
   const { ui } = useStore()
@@ -33,9 +33,19 @@ const MigrateOrganizationBillingButton = observer(() => {
 
   const {
     error: migrationError,
-    mutateAsync: migrateBilling,
+    mutate: migrateBilling,
     isLoading: isMigrating,
-  } = useOrganizationBillingMigrationMutation()
+  } = useOrganizationBillingMigrationMutation({
+    onSuccess: () => {
+      ui.setNotification({
+        message: 'Successfully migrated to organization-level billing',
+        category: 'success',
+        duration: 5000,
+      })
+      router.push('/projects')
+      setIsOpen(false)
+    },
+  })
 
   const {
     data: migrationPreviewData,
@@ -86,14 +96,7 @@ const MigrateOrganizationBillingButton = observer(() => {
       })
     }
 
-    await migrateBilling({ organizationSlug: organization?.slug, tier: dbTier })
-    ui.setNotification({
-      message: 'Successfully migrated to organization-level billing',
-      category: 'success',
-      duration: 5000,
-    })
-    router.push('/projects')
-    setIsOpen(false)
+    migrateBilling({ organizationSlug: organization?.slug, tier: dbTier })
   }
 
   return (

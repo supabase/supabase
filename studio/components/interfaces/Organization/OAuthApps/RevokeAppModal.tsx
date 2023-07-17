@@ -12,19 +12,20 @@ export interface RevokeAppModalProps {
 const RevokeAppModal = ({ selectedApp, onClose }: RevokeAppModalProps) => {
   const { ui } = useStore()
   const { slug } = useParams()
-  const { mutateAsync: revokeAuthorizedApp, isLoading: isDeleting } =
-    useAuthorizedAppRevokeMutation()
+  const { mutate: revokeAuthorizedApp, isLoading: isDeleting } = useAuthorizedAppRevokeMutation({
+    onSuccess: () => {
+      ui.setNotification({
+        category: 'success',
+        message: `Successfully revoked the app "${selectedApp?.name}"`,
+      })
+      onClose()
+    },
+  })
 
   const onConfirmDelete = async () => {
     if (!slug) return console.error('Slug is required')
     if (!selectedApp?.id) return console.error('App ID is required')
-
-    await revokeAuthorizedApp({ slug, id: selectedApp?.id })
-    ui.setNotification({
-      category: 'success',
-      message: `Successfully revoked the app "${selectedApp?.name}"`,
-    })
-    onClose()
+    revokeAuthorizedApp({ slug, id: selectedApp?.id })
   }
 
   return (

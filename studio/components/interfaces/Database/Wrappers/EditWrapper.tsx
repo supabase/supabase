@@ -58,7 +58,20 @@ const EditWrapper = () => {
   const wrapper = useImmutableValue(foundWrapper)
   const wrapperMeta = WRAPPERS.find((w) => w.handlerName === wrapper?.handler)
 
-  const { mutateAsync: updateFDW, isLoading: isSaving } = useFDWUpdateMutation()
+  const { mutate: updateFDW, isLoading: isSaving } = useFDWUpdateMutation({
+    onSuccess: () => {
+      ui.setNotification({
+        category: 'success',
+        message: `Successfully updated ${wrapperMeta?.label} foreign data wrapper`,
+      })
+      setWrapperTables([])
+
+      const hasNewSchema = wrapperTables.some((table) => table.is_new_schema)
+      if (hasNewSchema) meta.schemas.load()
+
+      router.push(`/project/${ref}/database/wrappers`)
+    },
+  })
 
   const [wrapperTables, setWrapperTables] = useState<any[]>([])
   const [isEditingTable, setIsEditingTable] = useState(false)
@@ -145,7 +158,7 @@ const EditWrapper = () => {
     if (wrapperTables.length === 0) errors.tables = 'Please add at least one table'
     if (!isEmpty(errors)) return setFormErrors(errors)
 
-    await updateFDW({
+    updateFDW({
       projectRef: project?.ref,
       connectionString: project?.connectionString,
       wrapper,
@@ -153,17 +166,6 @@ const EditWrapper = () => {
       formState: { ...values, server_name: `${wrapper_name}_server` },
       tables: wrapperTables,
     })
-
-    ui.setNotification({
-      category: 'success',
-      message: `Successfully updated ${wrapperMeta.label} foreign data wrapper`,
-    })
-    setWrapperTables([])
-
-    const hasNewSchema = wrapperTables.some((table) => table.is_new_schema)
-    if (hasNewSchema) meta.schemas.load()
-
-    router.push(`/project/${ref}/database/wrappers`)
   }
 
   return (

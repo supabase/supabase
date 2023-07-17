@@ -26,19 +26,21 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
 
   const { data: projectUsage } = useProjectUsageQuery({ projectRef })
   const { data: projectSubscriptionData } = useProjectSubscriptionV2Query({ projectRef })
-  const { mutateAsync: updateProjectUsage, isLoading: isUpdatingDiskSize } =
-    useProjectDiskResizeMutation()
+  const { mutate: updateProjectUsage, isLoading: isUpdatingDiskSize } =
+    useProjectDiskResizeMutation({
+      onSuccess: (res, variables) => {
+        ui.setNotification({
+          category: 'success',
+          message: `Successfully updated disk size to ${variables.volumeSize} GB`,
+        })
+        setShowResetDbPass(false)
+      },
+    })
 
   const confirmResetDbPass = async (values: { [prop: string]: any }) => {
-    const volumeSize = values['new-disk-size']
     if (!projectRef) return console.error('Project ref is required')
-
-    await updateProjectUsage({ projectRef, volumeSize })
-    ui.setNotification({
-      category: 'success',
-      message: `Successfully updated disk size to ${values['new-disk-size']} GB`,
-    })
-    setShowResetDbPass(false)
+    const volumeSize = values['new-disk-size']
+    updateProjectUsage({ projectRef, volumeSize })
   }
 
   const currentDiskSize = projectUsage?.disk_volume_size_gb ?? 0

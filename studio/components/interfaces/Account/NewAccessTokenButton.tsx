@@ -1,8 +1,9 @@
-import { useState } from 'react'
-import { Input, Button, Modal, Form, Alert, IconChevronDown, Dropdown, IconExternalLink } from 'ui'
-import { useAccessTokenCreateMutation } from 'data/access-tokens/access-tokens-create-mutation'
 import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
+import { useState } from 'react'
+import { Alert, Button, Dropdown, Form, IconChevronDown, IconExternalLink, Input, Modal } from 'ui'
+
+import { useAccessTokenCreateMutation } from 'data/access-tokens/access-tokens-create-mutation'
 
 export interface NewAccessTokenButtonProps {
   onCreateToken: (token: any) => void
@@ -18,12 +19,15 @@ const NewAccessTokenButton = observer(({ onCreateToken }: NewAccessTokenButtonPr
     return errors
   }
 
-  const { mutateAsync: createAccessToken, isLoading } = useAccessTokenCreateMutation()
+  const { mutate: createAccessToken, isLoading } = useAccessTokenCreateMutation({
+    onSuccess: (res) => {
+      onCreateToken(res)
+      setIsOpen(false)
+    },
+  })
 
-  async function onFormSubmit(values: any) {
-    const response = await createAccessToken({ name: values.tokenName, scope: tokenScope })
-    onCreateToken(response)
-    setIsOpen(false)
+  const onFormSubmit = async (values: any) => {
+    createAccessToken({ name: values.tokenName, scope: tokenScope })
   }
 
   return (

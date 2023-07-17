@@ -23,7 +23,7 @@ const schema = yup.object({
 const CustomDomainsConfigureHostname = () => {
   const { ui } = useStore()
   const { ref } = useParams()
-  const { mutateAsync: createCustomDomain } = useCustomDomainCreateMutation()
+  const { mutate: createCustomDomain, isLoading: isCreating } = useCustomDomainCreateMutation()
   const { data: settings } = useProjectApiQuery({ projectRef: ref })
 
   const FORM_ID = 'custom-domains-form'
@@ -50,7 +50,7 @@ const CustomDomainsConfigureHostname = () => {
       })
     }
 
-    await createCustomDomain({ projectRef: ref, customDomain: values.domain })
+    createCustomDomain({ projectRef: ref, customDomain: values.domain })
   }
 
   return (
@@ -60,7 +60,7 @@ const CustomDomainsConfigureHostname = () => {
       validationSchema={schema}
       onSubmit={onCreateCustomDomain}
     >
-      {({ isSubmitting, handleReset, values, initialValues }: any) => {
+      {({ handleReset, values, initialValues }: any) => {
         const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
 
         return (
@@ -71,7 +71,7 @@ const CustomDomainsConfigureHostname = () => {
                 <div className="flex py-4 px-8">
                   <FormActions
                     form={FORM_ID}
-                    isSubmitting={isSubmitting}
+                    isSubmitting={isCreating}
                     submitText="Add"
                     hasChanges={hasChanges}
                     handleReset={handleReset}

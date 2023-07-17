@@ -20,8 +20,9 @@ const RemoveRestrictionModal: FC<Props> = ({
 }) => {
   const { ui } = useStore()
   const { ref } = useParams()
-  const { mutateAsync: applyNetworkRestrictions, isLoading: isApplying } =
+  const { mutate: applyNetworkRestrictions, isLoading: isApplying } =
     useNetworkRestrictionsApplyMutation({
+      onSuccess: () => onClose(),
       onError: (error) => {
         ui.setNotification({
           category: 'error',
@@ -39,11 +40,10 @@ const RemoveRestrictionModal: FC<Props> = ({
     const dbAllowedCidrs = restrictedIps.filter((ip) => ip !== selectedRestriction)
 
     if (dbAllowedCidrs.length === 0) {
-      await applyNetworkRestrictions({ projectRef: ref, dbAllowedCidrs: ['0.0.0.0/0'] })
+      applyNetworkRestrictions({ projectRef: ref, dbAllowedCidrs: ['0.0.0.0/0'] })
     } else {
-      await applyNetworkRestrictions({ projectRef: ref, dbAllowedCidrs })
+      applyNetworkRestrictions({ projectRef: ref, dbAllowedCidrs })
     }
-    onClose()
   }
 
   return (

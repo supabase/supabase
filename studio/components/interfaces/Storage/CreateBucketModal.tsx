@@ -35,7 +35,17 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
   const { ref } = useParams()
   const router = useRouter()
 
-  const { mutateAsync: createBucket, isLoading: isCreating } = useBucketCreateMutation()
+  const { mutate: createBucket, isLoading: isCreating } = useBucketCreateMutation({
+    onSuccess: (res) => {
+      ui.setNotification({
+        category: 'success',
+        message: `Successfully created bucket ${res.name}`,
+      })
+      router.push(`/project/${ref}/storage/buckets/${res.name}`)
+      onClose()
+    },
+  })
+
   const { data } = useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
   const { value, unit } = convertFromBytes(data?.fileSizeLimit ?? 0)
   const formattedGlobalUploadLimit = `${value} ${unit}`
@@ -66,7 +76,7 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
   const onSubmit = async (values: any) => {
     if (!ref) return console.error('Project ref is required')
 
-    const res = await createBucket({
+    createBucket({
       projectRef: ref,
       id: values.name,
       isPublic: values.public,
@@ -78,14 +88,6 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
           ? values.allowed_mime_types.split(',').map((x: string) => x.trim())
           : null,
     })
-
-    ui.setNotification({
-      category: 'success',
-      message: `Successfully created bucket ${res.name}`,
-    })
-    router.push(`/project/${ref}/storage/buckets/${res.name}`)
-
-    onClose()
   }
 
   useEffect(() => {

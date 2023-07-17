@@ -46,7 +46,15 @@ const EdgeFunctionDetails = () => {
   const { data: settings } = useProjectApiQuery({ projectRef })
   const { data: selectedFunction } = useEdgeFunctionQuery({ projectRef, slug: functionSlug })
   const { mutateAsync: updateEdgeFunction, isLoading: isUpdating } = useEdgeFunctionUpdateMutation()
-  const { mutateAsync: deleteEdgeFunction, isLoading: isDeleting } = useEdgeFunctionDeleteMutation()
+  const { mutate: deleteEdgeFunction, isLoading: isDeleting } = useEdgeFunctionDeleteMutation({
+    onSuccess: () => {
+      ui.setNotification({
+        category: 'success',
+        message: `Successfully deleted "${selectedFunction?.name}"`,
+      })
+      router.push(`/project/${projectRef}/functions`)
+    },
+  })
 
   const formId = 'edge-function-update-form'
   const canUpdateEdgeFunction = useCheckPermissions(PermissionAction.FUNCTIONS_WRITE, '*')
@@ -70,25 +78,21 @@ const EdgeFunctionDetails = () => {
     if (!projectRef) return console.error('Project ref is required')
     if (selectedFunction === undefined) return console.error('No edge function selected')
 
-    await updateEdgeFunction({
-      projectRef,
-      slug: selectedFunction.slug,
-      payload: values,
-    })
-    resetForm({ values, initialValues: values })
-    ui.setNotification({ category: 'success', message: `Successfully updated edge function` })
+    try {
+      await updateEdgeFunction({
+        projectRef,
+        slug: selectedFunction.slug,
+        payload: values,
+      })
+      resetForm({ values, initialValues: values })
+      ui.setNotification({ category: 'success', message: `Successfully updated edge function` })
+    } catch (error) {}
   }
 
   const onConfirmDelete = async () => {
     if (!projectRef) return console.error('Project ref is required')
     if (selectedFunction === undefined) return console.error('No edge function selected')
-
-    await deleteEdgeFunction({ projectRef, slug: selectedFunction.slug })
-    ui.setNotification({
-      category: 'success',
-      message: `Successfully deleted "${selectedFunction.name}"`,
-    })
-    router.push(`/project/${projectRef}/functions`)
+    deleteEdgeFunction({ projectRef, slug: selectedFunction.slug })
   }
 
   const hasImportMap = useMemo(

@@ -53,8 +53,20 @@ const SpendCapSidePanel = () => {
   const onClose = () => snap.setPanelKey(undefined)
 
   const { data: subscription, isLoading } = useProjectSubscriptionV2Query({ projectRef })
-  const { mutateAsync: updateSubscriptionTier, isLoading: isUpdating } =
+  const isFreePlan = subscription?.plan?.id === 'free'
+  const isSpendCapOn = !subscription?.usage_billing_enabled
+  const isTurningOnCap = !isSpendCapOn && selectedOption === 'on'
+  const hasChanges = selectedOption !== (isSpendCapOn ? 'on' : 'off')
+
+  const { mutate: updateSubscriptionTier, isLoading: isUpdating } =
     useProjectSubscriptionUpdateMutation({
+      onSuccess: () => {
+        ui.setNotification({
+          category: 'success',
+          message: `Successfully ${isTurningOnCap ? 'enabled' : 'disabled'} spend cap`,
+        })
+        onClose()
+      },
       onError: (error) => {
         ui.setNotification({
           error,
@@ -63,11 +75,6 @@ const SpendCapSidePanel = () => {
         })
       },
     })
-
-  const isFreePlan = subscription?.plan?.id === 'free'
-  const isSpendCapOn = !subscription?.usage_billing_enabled
-  const isTurningOnCap = !isSpendCapOn && selectedOption === 'on'
-  const hasChanges = selectedOption !== (isSpendCapOn ? 'on' : 'off')
 
   useEffect(() => {
     if (visible && subscription !== undefined) {
@@ -93,12 +100,7 @@ const SpendCapSidePanel = () => {
     const tier = (
       selectedOption === 'on' ? PRICING_TIER_PRODUCT_IDS.PRO : PRICING_TIER_PRODUCT_IDS.PAYG
     ) as 'tier_pro' | 'tier_payg'
-    await updateSubscriptionTier({ projectRef, tier })
-    ui.setNotification({
-      category: 'success',
-      message: `Successfully ${isTurningOnCap ? 'enabled' : 'disabled'} spend cap`,
-    })
-    onClose()
+    updateSubscriptionTier({ projectRef, tier })
   }
 
   const billingMetricCategories: (keyof typeof pricing)[] = [

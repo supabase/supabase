@@ -45,9 +45,16 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
 
   const { project } = useProjectContext()
   const { data: functions } = useEdgeFunctionsQuery({ projectRef: ref })
-  const { mutateAsync: createDatabaseTrigger, isLoading: isCreatingDatabaseTrigger } =
+  const { mutate: createDatabaseTrigger, isLoading: isCreatingDatabaseTrigger } =
     useDatabaseTriggerCreateMutation({
-      onError(error) {
+      onSuccess: (res) => {
+        ui.setNotification({
+          category: 'success',
+          message: `Successfully created new webhook "${res.name}"`,
+        })
+        onClose()
+      },
+      onError: (error) => {
         ui.setNotification({
           error,
           category: 'error',
@@ -55,9 +62,16 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
         })
       },
     })
-  const { mutateAsync: updateDatabaseTrigger, isLoading: isUpdatingDatabaseTrigger } =
+  const { mutate: updateDatabaseTrigger, isLoading: isUpdatingDatabaseTrigger } =
     useDatabaseTriggerUpdateMutation({
-      onError(error) {
+      onSuccess: (res) => {
+        ui.setNotification({
+          category: 'success',
+          message: `Successfully updated webhook "${res.name}"`,
+        })
+        onClose()
+      },
+      onError: (error) => {
         ui.setNotification({
           error,
           category: 'error',
@@ -211,23 +225,13 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
         connectionString: project?.connectionString,
         payload,
       })
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully created new webhook "${values.name}"`,
-      })
-      onClose()
     } else {
-      await updateDatabaseTrigger({
+      updateDatabaseTrigger({
         projectRef: project?.ref,
         connectionString: project?.connectionString,
         originalTrigger: selectedHook,
         updatedTrigger: payload,
       })
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully updated webhook "${values.name}"`,
-      })
-      onClose()
     }
   }
 

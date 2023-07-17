@@ -34,7 +34,15 @@ const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => 
   const { ui } = useStore()
   const { ref } = useParams()
 
-  const { mutateAsync: updateBucket, isLoading: isUpdating } = useBucketUpdateMutation()
+  const { mutate: updateBucket, isLoading: isUpdating } = useBucketUpdateMutation({
+    onSuccess: () => {
+      ui.setNotification({
+        category: 'success',
+        message: `Successfully updated bucket "${bucket?.name}"`,
+      })
+      onClose()
+    },
+  })
   const { data } = useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
   const { value, unit } = convertFromBytes(data?.fileSizeLimit ?? 0)
   const formattedGlobalUploadLimit = `${value} ${unit}`
@@ -54,7 +62,7 @@ const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => 
     if (bucket === undefined) return console.error('Bucket is required')
     if (ref === undefined) return console.error('Project ref is required')
 
-    await updateBucket({
+    updateBucket({
       projectRef: ref,
       id: bucket.id,
       isPublic: values.public,
@@ -66,11 +74,6 @@ const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => 
           ? values.allowed_mime_types.split(',').map((x: string) => x.trim())
           : null,
     })
-    ui.setNotification({
-      category: 'success',
-      message: `Successfully updated bucket "${bucket.name}"`,
-    })
-    onClose()
   }
 
   useEffect(() => {

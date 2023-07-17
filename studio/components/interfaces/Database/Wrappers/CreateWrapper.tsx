@@ -1,28 +1,28 @@
-import Link from 'next/link'
-import { isEmpty } from 'lodash'
-import { useState } from 'react'
-import { useRouter } from 'next/router'
-import { observer } from 'mobx-react-lite'
-import { Button, Form, Input, IconArrowLeft, IconExternalLink, IconEdit, IconTrash } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { isEmpty } from 'lodash'
+import { observer } from 'mobx-react-lite'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useState } from 'react'
+import { Button, Form, IconArrowLeft, IconEdit, IconExternalLink, IconTrash, Input } from 'ui'
 
-import { useCheckPermissions, useStore } from 'hooks'
 import { useParams } from 'common/hooks'
 import {
-  FormPanel,
   FormActions,
+  FormPanel,
   FormSection,
-  FormsContainer,
-  FormSectionLabel,
   FormSectionContent,
+  FormSectionLabel,
+  FormsContainer,
 } from 'components/ui/Forms'
 import { useFDWCreateMutation } from 'data/fdw/fdw-create-mutation'
+import { useCheckPermissions, useStore } from 'hooks'
 
-import InputField from './InputField'
-import { WRAPPERS } from './Wrappers.constants'
-import WrapperTableEditor from './WrapperTableEditor'
-import { makeValidateRequired } from './Wrappers.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import InputField from './InputField'
+import WrapperTableEditor from './WrapperTableEditor'
+import { WRAPPERS } from './Wrappers.constants'
+import { makeValidateRequired } from './Wrappers.utils'
 
 const CreateWrapper = () => {
   const formId = 'create-wrapper-form'
@@ -30,14 +30,27 @@ const CreateWrapper = () => {
   const { ui, meta } = useStore()
   const { ref, type } = useParams()
   const { project } = useProjectContext()
-  const { mutateAsync: createFDW, isLoading: isCreating } = useFDWCreateMutation()
+  const canCreateWrapper = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'wrappers')
 
   const [newTables, setNewTables] = useState<any[]>([])
   const [isEditingTable, setIsEditingTable] = useState(false)
   const [selectedTableToEdit, setSelectedTableToEdit] = useState()
   const [formErrors, setFormErrors] = useState<{ [k: string]: string }>({})
 
-  const canCreateWrapper = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'wrappers')
+  const { mutate: createFDW, isLoading: isCreating } = useFDWCreateMutation({
+    onSuccess: () => {
+      ui.setNotification({
+        category: 'success',
+        message: `Successfully created ${wrapperMeta?.label} foreign data wrapper`,
+      })
+      setNewTables([])
+
+      const hasNewSchema = newTables.some((table) => table.is_new_schema)
+      if (hasNewSchema) meta.schemas.load()
+
+      router.push(`/project/${ref}/database/wrappers`)
+    },
+  })
 
   const wrapperMeta = WRAPPERS.find((wrapper) => wrapper.name === type)
   const initialValues =
@@ -95,23 +108,13 @@ const CreateWrapper = () => {
     if (newTables.length === 0) errors.tables = 'Please add at least one table'
     if (!isEmpty(errors)) return setFormErrors(errors)
 
-    await createFDW({
+    createFDW({
       projectRef: project?.ref,
       connectionString: project?.connectionString,
       wrapperMeta,
       formState: { ...values, server_name: `${wrapper_name}_server` },
       tables: newTables,
     })
-    ui.setNotification({
-      category: 'success',
-      message: `Successfully created ${wrapperMeta.label} foreign data wrapper`,
-    })
-    setNewTables([])
-
-    const hasNewSchema = newTables.some((table) => table.is_new_schema)
-    if (hasNewSchema) meta.schemas.load()
-
-    router.push(`/project/${ref}/database/wrappers`)
   }
 
   return (

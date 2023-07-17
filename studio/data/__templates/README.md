@@ -74,8 +74,13 @@ return (
 
 The parameter `onError` can be passed when intializing the mutation, where an appropriate UI behavior should be triggered (usually a toast will be fine). If `onError` is not provided, we will then default to a toast message that will be called from within the mutation itself which should handle most cases. However, if there is a specific way that the error should be handled, then this should be passed via the `onError` parameter. (There's no need to repeat the error handling if the default behavior is sufficient)
 
+We should also aim to convert most of the `mutateAsync` to `mutate`, otherwise we'd need to wrap all the `mutateAsync` calls in try catches just to ensure that the client doesn't crash when the request throws an error in the mutation. There's currently a mix due to the Form component that we're using, in particular when a method from the Form component such as `resetForm` needs to be called after the request is completed successfully.
+
 ```jsx
-const { mutateAsync: someAction } = useMutation({
+const { mutate: someAction } = useMutation({
+  onSuccess: (res) => {
+    ui.setNotification({ category: 'success', message: 'Success' })
+  },
   onError: (error) => {
     ui.setNotification({ category: 'error', message: `Failed: ${error.message}` })
   },
@@ -88,7 +93,6 @@ const onConfirm = async () => {
   if (!projectRef) return console.error('Project ref is required')
 
   // Any logic before calling the mutation
-  await someAction({ projectRef, otherParameters })
-  // Any logic after calling the mutation
+  someAction({ projectRef, otherParameters })
 }
 ```
