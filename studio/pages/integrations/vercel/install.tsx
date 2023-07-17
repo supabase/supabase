@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
 import VercelIntegrationWindowLayout from 'components/layouts/IntegrationsLayout/VercelIntegrationWindowLayout'
-import { ScaffoldContainer, ScaffoldDivider } from 'components/layouts/Scaffold'
+import { ScaffoldColumn, ScaffoldContainer, ScaffoldDivider } from 'components/layouts/Scaffold'
 import { useIntegrationsQuery } from 'data/integrations/integrations-query'
 import { IntegrationName } from 'data/integrations/integrations.types'
 import { useVercelIntegrationCreateMutation } from 'data/integrations/vercel-integration-create-mutation'
@@ -104,8 +104,6 @@ const VercelIntegration: NextPageWithLayout = () => {
   const { mutate, isLoading: isLoadingVercelIntegrationCreateMutation } =
     useVercelIntegrationCreateMutation({
       onSuccess({ id }) {
-        const orgSlug = selectedOrg?.slug
-
         setOrganizationIntegrationId(id)
 
         handleRouteChange()
@@ -165,35 +163,37 @@ const VercelIntegration: NextPageWithLayout = () => {
 
   return (
     <>
-      <main className="overflow-auto flex flex-col h-full">
+      <main className="overflow-auto flex flex-col h-full bg-scale-400">
         <LoadingLine loading={isLoadingVercelIntegrationCreateMutation} />
         {organizationIntegrationId === null && (
           <>
-            <ScaffoldContainer className="max-w-md flex flex-col gap-6 grow py-8">
-              <h1 className="text-xl text-scale-1200">Choose organization</h1>
-              <>
-                <Markdown content={`Choose the Supabase organization you wish to install in`} />
-                <OrganizationPicker
-                  integrationName="Vercel"
-                  organizationsWithInstalledData={organizationsWithInstalledData}
-                  onSelectedOrgChange={(e) => {
-                    router.query.organizationSlug = e.slug
-                    setSelectedOrg(e)
-                  }}
-                  dataLoading={dataLoading}
-                />
-                <div className="flex flex-row w-full justify-end">
-                  <Button
-                    size="medium"
-                    className="self-end"
-                    disabled={isLoadingVercelIntegrationCreateMutation}
-                    loading={isLoadingVercelIntegrationCreateMutation}
-                    onClick={onInstall}
-                  >
-                    Install integration
-                  </Button>
-                </div>
-              </>
+            <ScaffoldContainer className="flex flex-col gap-6 grow py-8">
+              <ScaffoldColumn className="mx-auto">
+                <h1 className="text-xl text-scale-1200">Choose organization</h1>
+                <>
+                  <Markdown content={`Choose the Supabase organization you wish to install in`} />
+                  <OrganizationPicker
+                    integrationName="Vercel"
+                    organizationsWithInstalledData={organizationsWithInstalledData}
+                    onSelectedOrgChange={(e) => {
+                      router.query.organizationSlug = e.slug
+                      setSelectedOrg(e)
+                    }}
+                    dataLoading={dataLoading}
+                  />
+                  <div className="flex flex-row w-full justify-end">
+                    <Button
+                      size="medium"
+                      className="self-end"
+                      disabled={isLoadingVercelIntegrationCreateMutation}
+                      loading={isLoadingVercelIntegrationCreateMutation}
+                      onClick={onInstall}
+                    >
+                      Install integration
+                    </Button>
+                  </div>
+                </>
+              </ScaffoldColumn>
             </ScaffoldContainer>
             <ScaffoldContainer className="flex flex-col gap-6 py-3">
               <Alert
