@@ -1,5 +1,5 @@
-import { SupaResponseV2 } from 'types'
 import { Integration } from 'data/integrations/integrations.types'
+import { SupaResponseV2 } from 'types'
 
 async function fetchGitHub<T = any>(url: string, responseJson = true): Promise<SupaResponseV2<T>> {
   const response = await fetch(url)
@@ -115,7 +115,22 @@ export async function getInitialMigrationSQLFromGitHubRepo(
   return `${migrations};${migrationsTableSql};${seed}`
 }
 
-export function getVercelConfigurationUrl(integration: Integration) {
+type VercelIntegration = Extract<Integration, { integration: { name: 'Vercel' } }>
+type GitHubIntegration = Extract<Integration, { integration: { name: 'GitHub' } }>
+
+export function getIntegrationConfigurationUrl(integration: Integration) {
+  if (integration.integration.name === 'Vercel') {
+    return getVercelConfigurationUrl(integration as VercelIntegration)
+  }
+
+  if (integration.integration.name === 'GitHub') {
+    return getGitHubConfigurationUrl(integration as GitHubIntegration)
+  }
+
+  return ''
+}
+
+export function getVercelConfigurationUrl(integration: VercelIntegration) {
   return `https://vercel.com/dashboard/${
     integration.metadata?.account.type === 'Team'
       ? `${integration.metadata?.account.team_slug}/`
@@ -123,10 +138,10 @@ export function getVercelConfigurationUrl(integration: Integration) {
   }integrations/${integration.metadata?.configuration_id}`
 }
 
-export function getGitHubConfigurationUrl(integration: Integration) {
+export function getGitHubConfigurationUrl(integration: GitHubIntegration) {
   return `https://github.com/${
     integration.metadata?.account.type === 'Organization'
       ? `organizations/${integration.metadata?.account.name}/`
       : ''
-  }settings/installations/${integration.metadata.installation_id}`
+  }settings/installations/${integration.metadata?.installation_id}`
 }

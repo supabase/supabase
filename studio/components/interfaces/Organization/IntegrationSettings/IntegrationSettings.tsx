@@ -7,7 +7,7 @@ import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-or
 import { useIntegrationsVercelInstalledConnectionDeleteMutation } from 'data/integrations/integrations-vercel-installed-connection-delete-mutation'
 import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
 import { IntegrationProjectConnection } from 'data/integrations/integrations.types'
-import { getGitHubConfigurationUrl, getVercelConfigurationUrl } from 'lib/integration-utils'
+import { getIntegrationConfigurationUrl } from 'lib/integration-utils'
 import Integration from './Integration'
 import SidePanelGitHubRepoLinker from './SidePanelGitHubRepoLinker'
 import SidePanelVercelProjectLinker from './SidePanelVercelProjectLinker'
@@ -110,14 +110,13 @@ You can also link multiple Vercel Projects to the same Supabase project.
           vercelProjectCount > 0 && vercelIntegration !== undefined
             ? `
 Your Vercel connection has access to ${vercelProjectCount} Vercel Projects. 
-You can change the scope of the access for Supabase by configuring [here](${getVercelConfigurationUrl(
+You can change the scope of the access for Supabase by configuring [here](${getIntegrationConfigurationUrl(
                 vercelIntegration
               )}).
 `
             : undefined
         }
         integrations={vercelIntegrations}
-        getManageUrl={getVercelConfigurationUrl}
         onAddConnection={onAddVercelConnection}
         onDeleteConnection={onDeleteVercelConnection}
       />
@@ -138,7 +137,6 @@ The GitHub app will watch for changes in your repository such as file changes, b
 These connections will be part of a GitHub workflow that is currently in development.
 `}
         integrations={githubIntegrations}
-        getManageUrl={getGitHubConfigurationUrl}
         onAddConnection={onAddGitHubConnection}
         onDeleteConnection={onDeleteGitHubConnection}
       />

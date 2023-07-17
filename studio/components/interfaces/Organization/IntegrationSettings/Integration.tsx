@@ -29,7 +29,6 @@ export interface IntegrationProps {
   note?: string
   detail?: string
   integrations?: TIntegration[]
-  getManageUrl: (integration: TIntegration) => string
   onAddConnection: (integrationId: string) => void
   onDeleteConnection: (connection: IntegrationProjectConnection) => void | Promise<void>
 }
@@ -40,7 +39,6 @@ const Integration = ({
   note,
   detail,
   integrations = EMPTY_ARR,
-  getManageUrl,
   onAddConnection,
   onDeleteConnection,
 }: IntegrationProps) => {
@@ -76,11 +74,7 @@ Repository connections for ${title?.toLowerCase()}
                 integrations.map((integration, i) => {
                   return (
                     <div key={integration.id}>
-                      <IntegrationInstallation
-                        title={title}
-                        integration={integration}
-                        getManageUrl={getManageUrl}
-                      />
+                      <IntegrationInstallation title={title} integration={integration} />
 
                       {integration.connections.length > 0 ? (
                         <>
