@@ -1,17 +1,17 @@
-import { useRouter } from 'next/router'
-import { Button, Dropdown, IconChevronDown, IconChevronsDown, IconCode, IconPlus } from 'ui'
+import Link from 'next/link'
+import { Badge, Button, Dropdown, IconCode, IconPlus } from 'ui'
 
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useFlag, useSelectedOrganization, useStore } from 'hooks'
+import { useFlag, useSelectedOrganization } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
-import Link from 'next/link'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 
 const OrganizationDropdown = () => {
-  const router = useRouter()
-  const { ui } = useStore()
   const { data: organizations } = useOrganizationsQuery()
   const selectedOrganization = useSelectedOrganization()
   const orgCreationV2 = useFlag('orgcreationv2')
+
+  const { data, isSuccess } = useOrgSubscriptionQuery({ orgSlug: selectedOrganization?.slug })
 
   return IS_PLATFORM ? (
     <Dropdown
@@ -52,6 +52,11 @@ const OrganizationDropdown = () => {
         iconRight={<IconCode className="text-scale-1100 rotate-90" strokeWidth={2} size={12} />}
       >
         <span className="text-sm">{selectedOrganization?.name}</span>
+        {isSuccess && (
+          <Badge color="slate" className="ml-2">
+            {data?.plan.name}
+          </Badge>
+        )}
       </Button>
     </Dropdown>
   ) : (
