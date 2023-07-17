@@ -1,21 +1,20 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
+import { useSelectedOrganization } from 'hooks'
 import FeedbackDropdown from '../ProjectLayout/LayoutHeader/FeedbackDropdown'
 import HelpPopover from '../ProjectLayout/LayoutHeader/HelpPopover'
 import NotificationsPopover from '../ProjectLayout/LayoutHeader/NotificationsPopover'
+import ProjectDropdown from '../ProjectLayout/LayoutHeader/ProjectDropdown'
 import OrganizationDropdown from './OrganizationDropdown'
 import UserSettingsDropdown from './UserSettingsDropdown'
-import { useSelectedOrganization, useSelectedProject } from 'hooks'
-import ProjectDropdown from '../ProjectLayout/LayoutHeader/ProjectDropdown'
 
 const AppHeader = () => {
   const router = useRouter()
-  const project = useSelectedProject()
   const organization = useSelectedOrganization()
 
   return (
-    <div className="flex items-center justify-between px-4 py-1 bg-black shadow-md">
+    <div className="flex items-center justify-between px-4 py-1 bg-scale-200 border-b">
       <div className="flex items-center space-x-4">
         <Link href={`/org/${organization?.slug}`}>
           <a className="block">

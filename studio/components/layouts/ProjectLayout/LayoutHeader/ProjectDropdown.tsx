@@ -6,6 +6,7 @@ import { Button, Dropdown, IconCode, IconPlus, Popover } from 'ui'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useSelectedOrganization, useSelectedProject } from 'hooks'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 
 // [Fran] the idea is to let users change projects without losing the current page,
 // but at the same time we need to redirect correctly between urls that might be
@@ -37,10 +38,14 @@ interface ProjectDropdownProps {
 const ProjectDropdown = ({ alt }: ProjectDropdownProps) => {
   const selectedOrganization = useSelectedOrganization()
   const selectedProject = useSelectedProject()
-  const { data: allProjects } = useProjectsQuery()
+  const { data: allProjects, isLoading: isLoadingProjects } = useProjectsQuery()
   const selectedOrganizationSlug = selectedOrganization?.slug
   const router = useRouter()
   const sanitizedRoute = sanitizeRoute(router.route, router.query)
+
+  if (isLoadingProjects && alt) {
+    return <ShimmeringLoader className="w-[90px]" />
+  }
 
   return IS_PLATFORM ? (
     <Dropdown
