@@ -15,6 +15,7 @@ import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscr
 import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
 import { BASE_PATH, PROJECT_STATUS } from 'lib/constants'
 import Telemetry from 'lib/telemetry'
+import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { Alert, Button, IconExternalLink, IconInfo, Modal, Radio, SidePanel } from 'ui'
 
@@ -70,7 +71,7 @@ const ComputeInstanceSidePanel = () => {
   const { mutateAsync: removeAddon } = useProjectAddonRemoveMutation()
 
   const projectId = selectedProject?.id
-  const cpuArchitecture = selectedProject?.cloud_provider === 'FLY' ? 'x86 64-bit' : 'ARM'
+  const cpuArchitecture = getCloudProviderArchitecture(selectedProject?.cloud_provider)
   const selectedAddons = addons?.selected_addons ?? []
   const availableAddons = addons?.available_addons ?? []
 
