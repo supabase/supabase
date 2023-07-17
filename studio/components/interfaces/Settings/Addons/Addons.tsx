@@ -16,6 +16,7 @@ import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useFlag } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
+import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { Alert, Button, IconChevronRight, IconExternalLink } from 'ui'
 import { ComputeInstanceSidePanel, CustomDomainSidePanel, PITRSidePanel } from './'
@@ -30,7 +31,7 @@ const Addons = () => {
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
 
   const { project: selectedProject } = useProjectContext()
-  const cpuArchitecture = selectedProject?.cloud_provider === 'FLY' ? 'x86 64-bit' : 'ARM'
+  const cpuArchitecture = getCloudProviderArchitecture(selectedProject?.cloud_provider)
 
   // [Joshen] We could possibly look into reducing the interval to be more "realtime"
   // I tried setting the interval to 1m but no data was returned, may need to experiment

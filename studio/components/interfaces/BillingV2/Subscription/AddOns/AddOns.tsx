@@ -17,6 +17,7 @@ import {
 } from 'components/interfaces/Settings/Addons'
 import ProjectUpdateDisabledTooltip from '../../ProjectUpdateDisabledTooltip'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 
 export interface AddOnsProps {}
 
@@ -27,7 +28,7 @@ const AddOns = ({}: AddOnsProps) => {
   const { isDarkMode } = useTheme()
 
   const { project: selectedProject } = useProjectContext()
-  const cpuArchitecture = selectedProject?.cloud_provider === 'FLY' ? 'x86 64-bit' : 'ARM'
+  const cpuArchitecture = getCloudProviderArchitecture(selectedProject?.cloud_provider)
 
   // [Joshen] We could possibly look into reducing the interval to be more "realtime"
   // I tried setting the interval to 1m but no data was returned, may need to experiment
