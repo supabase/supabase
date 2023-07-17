@@ -47,7 +47,7 @@ const ScaffoldSection = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HT
   }
 )
 
-const ScaffoldColoum = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+const ScaffoldColumn = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => {
     return (
       <div
@@ -121,7 +121,7 @@ ScaffoldTitle.displayName = 'ScaffoldTitle'
 ScaffoldContainer.displayName = 'ScaffoldContainer'
 ScaffoldDivider.displayName = 'ScaffoldDivider'
 ScaffoldSection.displayName = 'ScaffoldSection'
-ScaffoldColoum.displayName = 'ScaffoldColoum'
+ScaffoldColumn.displayName = 'ScaffoldColumn'
 ScaffoldSectionDetail.displayName = 'ScaffoldSectionDetail'
 ScaffoldSectionContent.displayName = 'ScaffoldSectionContent'
 ScaffoldFilterAndContent.displayName = 'ScaffoldFilterAndContent'
@@ -135,7 +135,7 @@ export {
   ScaffoldContainer,
   ScaffoldDivider,
   ScaffoldSection,
-  ScaffoldColoum,
+  ScaffoldColumn,
   ScaffoldSectionDetail,
   ScaffoldSectionContent,
   ScaffoldFilterAndContent,

@@ -4,12 +4,7 @@ import { useState } from 'react'
 import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
 import GitHubIntegrationWindowLayout from 'components/layouts/IntegrationsLayout/GitHubIntegrationWindowLayout'
-import {
-  ScaffoldColoum,
-  ScaffoldContainer,
-  ScaffoldDivider,
-  ScaffoldSectionCol,
-} from 'components/layouts/Scaffold'
+import { ScaffoldColumn, ScaffoldContainer, ScaffoldDivider } from 'components/layouts/Scaffold'
 import { useGitHubIntegrationCreateMutation } from 'data/integrations/github-integration-create-mutation'
 import { useIntegrationsQuery } from 'data/integrations/integrations-query'
 import { IntegrationName } from 'data/integrations/integrations.types'
@@ -140,12 +135,12 @@ const GitHubIntegration: NextPageWithLayout = () => {
 
   return (
     <>
-      <main className="overflow-auto flex flex-col h-full">
+      <main className="overflow-auto flex flex-col h-full bg-scale-400">
         <LoadingLine loading={isLoadingGitHubIntegrationCreateMutation} />
         {organizationIntegrationId === null && (
           <>
             <ScaffoldContainer className="flex flex-col gap-6 grow py-8">
-              <ScaffoldColoum className="mx-auto">
+              <ScaffoldColumn className="mx-auto">
                 <h1 className="text-xl text-scale-1200">Choose organization</h1>
                 <>
                   <Markdown content={`Choose the Supabase organization you wish to install in`} />
@@ -170,7 +165,7 @@ const GitHubIntegration: NextPageWithLayout = () => {
                     </Button>
                   </div>
                 </>
-              </ScaffoldColoum>
+              </ScaffoldColumn>
             </ScaffoldContainer>
             <ScaffoldContainer className="flex flex-col gap-6 py-3">
               <Alert
