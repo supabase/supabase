@@ -7,18 +7,14 @@ const config: any = {
     '../src/lib/colors.stories.tsx',
     // shadcn
     '../src/components/shadcn/stories/**/*.stories.tsx',
-
-    // rest
+    // older components
     '../src/components/Accordion/Accordion.stories.tsx',
     '../src/components/Alert/Alert.stories.tsx',
     '../src/components/Badge/Badge.stories.tsx',
-    // '../src/components/Avatar/Avatar.stories.tsx',
     '../src/components/Button/Button.stories.tsx',
     '../src/components/Checkbox/Checkbox.stories.tsx',
     '../src/components/Collapsible/Collapsible.stories.tsx',
-    // '../src/components/ContextMenu/ContextMenu.stories.tsx',
     '../src/components/Dropdown/Dropdown.stories.tsx',
-    // '../src/components/Form/Form.stories.tsx',
   ],
   addons: [
     'storybook-dark-mode',
