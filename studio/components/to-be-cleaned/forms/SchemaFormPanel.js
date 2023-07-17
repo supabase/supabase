@@ -11,7 +11,7 @@ export default function SchemaFormPanel({
   onChangeModel = (model) => {},
   onReset = () => {},
   onSubmit,
-  loading = undefined,
+  loading,
   submitLabel = 'Save',
   cancelLabel = 'Cancel',
   message = '',
