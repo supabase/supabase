@@ -5,13 +5,18 @@ import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useFlag, useSelectedOrganization } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 
 const OrganizationDropdown = () => {
-  const { data: organizations } = useOrganizationsQuery()
+  const { data: organizations, isLoading: isLoadingOrganizations } = useOrganizationsQuery()
   const selectedOrganization = useSelectedOrganization()
   const orgCreationV2 = useFlag('orgcreationv2')
 
   const { data, isSuccess } = useOrgSubscriptionQuery({ orgSlug: selectedOrganization?.slug })
+
+  if (isLoadingOrganizations) {
+    return <ShimmeringLoader className="w-[90px]" />
+  }
 
   return IS_PLATFORM ? (
     <Dropdown
