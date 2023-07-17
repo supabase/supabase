@@ -82,7 +82,7 @@ export {
   DropdownMenuRadioItem as ShadcnDropdownMenuRadioItem,
   DropdownMenuLabel as ShadcnDropdownMenuLabel,
   DropdownMenuSeparator as ShadcnDropdownMenuSeparator,
-  DropdownMenuRightSlot as ShadcnDropdownMenuRightSlot,
+  DropdownMenuShortcut as ShadcnDropdownMenuShortcut,
   DropdownMenuGroup as ShadcnDropdownMenuGroup,
   DropdownMenuPortal as ShadcnDropdownMenuPortal,
   DropdownMenuSub as ShadcnDropdownMenuSub,
