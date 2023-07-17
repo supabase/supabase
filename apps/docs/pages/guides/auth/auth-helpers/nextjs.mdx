@@ -854,6 +854,24 @@ See [refreshing session example](/docs/guides/auth/auth-helpers/nextjs#managing-
 - [Protected Routes](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs/app/[id]/page.tsx)
 - [Conditional Rendering in Client Components with SSR](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs/app/login-form.tsx)
 
+## Frequently asked questions
+
+<AuthHelpersFAQ />
+
+### OAuth sign in isn't redirecting on the server side
+
+The reason behind this limitation is that the auth helpers library lacks a direct mechanism for performing server-side redirects, as each framework handles redirects differently. However, the library does offer a URL through the data property it returns, which should be utilized for the purpose of redirection.
+
+```ts
+import { NextResponse } from "next/server";
+...
+const { data } = await supabase.auth.signInWithOAuth({
+  provider: 'github',
+})
+
+return NextResponse.redirect(data.url)
+```
+
 ## Migration Guide
 
 ### Migrating to v0.7.X
