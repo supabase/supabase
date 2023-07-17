@@ -74,61 +74,67 @@ export * from './src/lib/utils'
 // shadcn
 
 export {
-  DropdownMenu as _Shadcn_DropdownMenu,
-  DropdownMenuTrigger as _Shadcn_DropdownMenuTrigger,
-  DropdownMenuContent as _Shadcn_DropdownMenuContent,
-  DropdownMenuItem as _Shadcn_DropdownMenuItem,
-  DropdownMenuCheckboxItem as _Shadcn_DropdownMenuCheckboxItem,
-  DropdownMenuRadioItem as _Shadcn_DropdownMenuRadioItem,
-  DropdownMenuLabel as _Shadcn_DropdownMenuLabel,
-  DropdownMenuSeparator as _Shadcn_DropdownMenuSeparator,
-  DropdownMenuShortcut as _Shadcn_DropdownMenuShortcut,
-  DropdownMenuGroup as _Shadcn_DropdownMenuGroup,
-  DropdownMenuPortal as _Shadcn_DropdownMenuPortal,
-  DropdownMenuSub as _Shadcn_DropdownMenuSub,
-  DropdownMenuSubContent as _Shadcn_DropdownMenuSubContent,
-  DropdownMenuSubTrigger as _Shadcn_DropdownMenuSubTrigger,
-  DropdownMenuRadioGroup as _Shadcn_DropdownMenuRadioGroup,
+  DropdownMenu as DropdownMenu_Shadcn_,
+  DropdownMenuTrigger as DropdownMenuTrigger_Shadcn_,
+  DropdownMenuContent as DropdownMenuContent_Shadcn_,
+  DropdownMenuItem as DropdownMenuItem_Shadcn_,
+  DropdownMenuCheckboxItem as DropdownMenuCheckboxItem_Shadcn_,
+  DropdownMenuRadioItem as DropdownMenuRadioItem_Shadcn_,
+  DropdownMenuLabel as DropdownMenuLabel_Shadcn_,
+  DropdownMenuSeparator as DropdownMenuSeparator_Shadcn_,
+  DropdownMenuShortcut as DropdownMenuShortcut_Shadcn_,
+  DropdownMenuGroup as DropdownMenuGroup_Shadcn_,
+  DropdownMenuPortal as DropdownMenuPortal_Shadcn_,
+  DropdownMenuSub as DropdownMenuSub_Shadcn_,
+  DropdownMenuSubContent as DropdownMenuSubContent_Shadcn_,
+  DropdownMenuSubTrigger as DropdownMenuSubTrigger_Shadcn_,
+  DropdownMenuRadioGroup as DropdownMenuRadioGroup_Shadcn_,
 } from './src/components/shadcn/ui/dropdown-menu'
 
 export {
-  Command as _Shadcn_Command,
-  CommandDialog as _Shadcn_CommandDialog,
-  CommandInput as _Shadcn_CommandInput,
-  CommandList as _Shadcn_CommandList,
-  CommandEmpty as _Shadcn_CommandEmpty,
-  CommandGroup as _Shadcn_CommandGroup,
-  CommandItem as _Shadcn_CommandItem,
-  CommandShortcut as _Shadcn_CommandShortcut,
-  CommandSeparator as _Shadcn_CommandSeparator,
+  Command as Command_Shadcn_,
+  CommandDialog as CommandDialog_Shadcn_,
+  CommandInput as CommandInput_Shadcn_,
+  CommandList as CommandList_Shadcn_,
+  CommandEmpty as CommandEmpty_Shadcn_,
+  CommandGroup as CommandGroup_Shadcn_,
+  CommandItem as CommandItem_Shadcn_,
+  CommandShortcut as CommandShortcut_Shadcn_,
+  CommandSeparator as CommandSeparator_Shadcn_,
 } from './src/components/shadcn/ui/command'
 
 export {
-  Dialog as _Shadcn_Dialog,
-  DialogTrigger as _Shadcn_DialogTrigger,
-  DialogContent as _Shadcn_DialogContent,
-  DialogHeader as _Shadcn_DialogHeader,
-  DialogFooter as _Shadcn_DialogFooter,
-  DialogTitle as _Shadcn_DialogTitle,
-  DialogDescription as _Shadcn_DialogDescription,
+  Dialog as Dialog_Shadcn_,
+  DialogTrigger as DialogTrigger_Shadcn_,
+  DialogContent as DialogContent_Shadcn_,
+  DialogHeader as DialogHeader_Shadcn_,
+  DialogFooter as DialogFooter_Shadcn_,
+  DialogTitle as DialogTitle_Shadcn_,
+  DialogDescription as DialogDescription_Shadcn_,
 } from './src/components/shadcn/ui/dialog'
 
 export {
-  Alert as _Shadcn_Alert,
-  AlertTitle as _Shadcn_AlertTitle,
-  AlertDescription as _Shadcn_AlertDescription,
+  Alert as Alert_Shadcn_,
+  AlertTitle as AlertTitle_Shadcn_,
+  AlertDescription as AlertDescription_Shadcn_,
 } from './src/components/shadcn/ui/alert'
 
 export {
-  useFormField as use_Shadcn_FormField,
-  Form as _Shadcn_Form,
-  FormItem as _Shadcn_FormItem,
-  FormLabel as _Shadcn_FormLabel,
-  FormControl as _Shadcn_FormControl,
-  FormDescription as _Shadcn_FormDescription,
-  FormMessage as _Shadcn_FormMessage,
-  FormField as _Shadcn_FormField,
+  useFormField as useFormField_Shadcn_,
+  Form as Form_Shadcn_,
+  FormItem as FormItem_Shadcn_,
+  FormLabel as FormLabel_Shadcn_,
+  FormControl as FormControl_Shadcn_,
+  FormDescription as FormDescription_Shadcn_,
+  FormMessage as FormMessage_Shadcn_,
+  FormField as FormField_Shadcn_,
 } from './src/components/shadcn/ui/form'
+
+export {
+  Popover as Popover_Shadcn_,
+  PopoverTrigger as PopoverTrigger_Shadcn_,
+  PopoverContent as PopoverContent_Shadcn_,
+} from './src/components/shadcn/ui/popover'
 
 // config
 

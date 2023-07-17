@@ -10,7 +10,7 @@ import {
   useFormContext,
 } from 'react-hook-form'
 
-import { cn } from 'src/lib/utils'
+import { cn } from '@ui/lib/utils'
 import { Label } from '@ui/components/shadcn/ui/label'
 
 // react 17 hack
