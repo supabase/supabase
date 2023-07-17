@@ -549,8 +549,14 @@ const Wizard: NextPageWithLayout = () => {
                   </Listbox>
                 )}
 
-                {freePlanWithExceedingLimits && (
-                  <FreeProjectLimitWarning membersExceededLimit={membersExceededLimit || []} />
+                {freePlanWithExceedingLimits && slug && (
+                  <div className={billedViaOrg ? '' : 'mt-4'}>
+                    <FreeProjectLimitWarning
+                      membersExceededLimit={membersExceededLimit || []}
+                      orgLevelBilling={billedViaOrg}
+                      orgSlug={slug}
+                    />
+                  </div>
                 )}
 
                 {!billedViaOrg && !isSelectFreeTier && isEmptyPaymentMethod && (
