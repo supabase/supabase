@@ -107,6 +107,12 @@ const SQLTemplates = observer(() => {
                 onKeyPress={async (e) => {
                   if (e.key === 'Enter') {
                     try {
+                      const value = e.currentTarget.value
+
+                      if (!value) {
+                        return
+                      }
+
                       const { title, sql } = await generateSql({ prompt: e.currentTarget.value })
 
                       const formattedSql =
