@@ -1,8 +1,8 @@
 import dynamic from 'next/dynamic'
-import Hero from '~/components/Hero/Hero'
-import Layout from '~/components/Layouts/Default'
 import { getSortedPosts } from '~/lib/posts'
 import PostTypes from '~/types/post'
+import Layout from '~/components/Layouts/Default'
+import Hero from '~/components/Hero/Hero'
 
 // Import Swiper styles if swiper used on page
 import 'swiper/swiper.min.css'
