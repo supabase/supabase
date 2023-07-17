@@ -15,9 +15,10 @@ import {
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 import { useSSLEnforcementQuery } from 'data/ssl-enforcement/ssl-enforcement-query'
 import { useSSLEnforcementUpdateMutation } from 'data/ssl-enforcement/ssl-enforcement-update-mutation'
-import { useCheckPermissions, useFlag } from 'hooks'
+import { useCheckPermissions, useFlag, useStore } from 'hooks'
 
 const SSLConfiguration = () => {
+  const { ui } = useStore()
   const { ref } = useParams()
   const [isEnforced, setIsEnforced] = useState(false)
   const sslEnforcement = useFlag('sslEnforcement')
@@ -30,8 +31,18 @@ const SSLConfiguration = () => {
   } = useSSLEnforcementQuery({
     projectRef: ref,
   })
-  const { mutateAsync: updateSSLEnforcement, isLoading: isSubmitting } =
-    useSSLEnforcementUpdateMutation()
+  const { mutate: updateSSLEnforcement, isLoading: isSubmitting } = useSSLEnforcementUpdateMutation(
+    {
+      onError: (error) => {
+        setIsEnforced(isEnforced)
+        ui.setNotification({
+          error,
+          category: 'error',
+          message: `Failed to update SSL enforcement: ${error.message}`,
+        })
+      },
+    }
+  )
 
   const canUpdateSSLEnforcement = useCheckPermissions(PermissionAction.UPDATE, 'projects')
 
@@ -52,16 +63,8 @@ const SSLConfiguration = () => {
 
   const toggleSSLEnforcement = async () => {
     if (!ref) return console.error('Project ref is required')
-
     setIsEnforced(!isEnforced)
-    try {
-      await updateSSLEnforcement({
-        projectRef: ref,
-        requestedConfig: { database: !isEnforced },
-      })
-    } catch (error: any) {
-      setIsEnforced(isEnforced)
-    }
+    updateSSLEnforcement({ projectRef: ref, requestedConfig: { database: !isEnforced } })
   }
 
   return (

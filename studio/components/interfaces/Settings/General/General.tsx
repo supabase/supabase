@@ -31,13 +31,11 @@ const General = () => {
 
   const onSubmit = async (values: any, { resetForm }: any) => {
     if (!project?.ref) return console.error('Ref is required')
-
-    const { name } = await updateProject({ ref: project.ref, name: values.name.trim() })
-    resetForm({ values: { name }, initialValues: { name } })
-    ui.setNotification({
-      category: 'success',
-      message: 'Successfully saved settings',
-    })
+    try {
+      const { name } = await updateProject({ ref: project.ref, name: values.name.trim() })
+      resetForm({ values: { name }, initialValues: { name } })
+      ui.setNotification({ category: 'success', message: 'Successfully saved settings' })
+    } catch (error) {}
   }
 
   return (

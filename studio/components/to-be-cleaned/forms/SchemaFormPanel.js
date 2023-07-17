@@ -11,6 +11,7 @@ export default function SchemaFormPanel({
   onChangeModel = (model) => {},
   onReset = () => {},
   onSubmit,
+  loading,
   submitLabel = 'Save',
   cancelLabel = 'Cancel',
   message = '',
@@ -64,7 +65,7 @@ export default function SchemaFormPanel({
             </Button>
             <Button
               onClick={onClickSubmit}
-              loading={submitButtonLoading}
+              loading={loading !== undefined ? loading : submitButtonLoading}
               disabled={disabled || !hasChanged}
               type="primary"
               className="ml-2 hover:border-green-500"

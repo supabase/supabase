@@ -13,7 +13,15 @@ interface DeleteWrapperModalProps {
 const DeleteWrapperModal = ({ selectedWrapper, onClose }: DeleteWrapperModalProps) => {
   const { ui } = useStore()
   const { project } = useProjectContext()
-  const { mutateAsync: deleteFDW, isLoading: isDeleting } = useFDWDeleteMutation()
+  const { mutate: deleteFDW, isLoading: isDeleting } = useFDWDeleteMutation({
+    onSuccess: () => {
+      ui.setNotification({
+        category: 'success',
+        message: `Successfully disabled ${selectedWrapper?.name} foreign data wrapper`,
+      })
+      onClose()
+    },
+  })
   const wrapperMeta = WRAPPERS.find((meta) => meta.handlerName === selectedWrapper?.handler)
 
   const onConfirmDelete = async () => {
@@ -21,18 +29,12 @@ const DeleteWrapperModal = ({ selectedWrapper, onClose }: DeleteWrapperModalProp
     if (!selectedWrapper) return console.error('Wrapper is required')
     if (!wrapperMeta) return console.error('Wrapper meta is required')
 
-    await deleteFDW({
+    deleteFDW({
       projectRef: project?.ref,
       connectionString: project?.connectionString,
       wrapper: selectedWrapper,
       wrapperMeta: wrapperMeta,
     })
-
-    ui.setNotification({
-      category: 'success',
-      message: `Successfully disabled ${selectedWrapper.name} foreign data wrapper`,
-    })
-    onClose()
   }
 
   return (

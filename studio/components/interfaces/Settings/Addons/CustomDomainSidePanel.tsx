@@ -34,21 +34,35 @@ const CustomDomainSidePanel = () => {
 
   const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef })
   const { data: subscription } = useProjectSubscriptionV2Query({ projectRef })
-  const { mutateAsync: updateAddon, isLoading: isUpdating } = useProjectAddonUpdateMutation({
+  const { mutate: updateAddon, isLoading: isUpdating } = useProjectAddonUpdateMutation({
+    onSuccess: () => {
+      ui.setNotification({
+        category: 'success',
+        message: `Successfully enabled custom domain`,
+      })
+      onClose()
+    },
     onError: (error) => {
       ui.setNotification({
         error,
         category: 'error',
-        message: `Unable to update custom domain: ${error.message}`,
+        message: `Unable to enable custom domain: ${error.message}`,
       })
     },
   })
-  const { mutateAsync: removeAddon, isLoading: isRemoving } = useProjectAddonRemoveMutation({
+  const { mutate: removeAddon, isLoading: isRemoving } = useProjectAddonRemoveMutation({
+    onSuccess: () => {
+      ui.setNotification({
+        category: 'success',
+        message: `Successfully disabled custom domain`,
+      })
+      onClose()
+    },
     onError: (error) => {
       ui.setNotification({
         error,
         category: 'error',
-        message: `Unable to update custom domain: ${error.message}`,
+        message: `Unable to disable custom domain: ${error.message}`,
       })
     },
   })
@@ -90,20 +104,11 @@ const CustomDomainSidePanel = () => {
 
   const onConfirm = async () => {
     if (!projectRef) return console.error('Project ref is required')
-
     if (selectedOption === 'cd_none' && subscriptionCDOption !== undefined) {
-      await removeAddon({ projectRef, variant: subscriptionCDOption.variant.identifier })
+      removeAddon({ projectRef, variant: subscriptionCDOption.variant.identifier })
     } else {
-      await updateAddon({ projectRef, type: 'custom_domain', variant: selectedOption })
+      updateAddon({ projectRef, type: 'custom_domain', variant: selectedOption })
     }
-
-    ui.setNotification({
-      category: 'success',
-      message: `Successfully ${
-        selectedOption === 'cd_none' ? 'disabled' : 'enabled'
-      } custom domain`,
-    })
-    onClose()
   }
 
   return (
