@@ -26,7 +26,12 @@ const PostgrestConfig = () => {
   const { meta } = PageState
 
   const { data: config, isError } = useProjectPostgrestConfigQuery({ projectRef })
-  const { mutateAsync: updatePostgrestConfig } = useProjectPostgrestConfigUpdateMutation()
+  const { mutate: updatePostgrestConfig, isLoading: isUpdating } =
+    useProjectPostgrestConfigUpdateMutation({
+      onSuccess: () => {
+        ui.setNotification({ category: 'success', message: 'Successfully saved settings' })
+      },
+    })
   const canUpdatePostgrestConfig = useCheckPermissions(
     PermissionAction.UPDATE,
     'custom_config_postgrest'
@@ -37,14 +42,12 @@ const PostgrestConfig = () => {
 
   const updateConfig = async (updatedConfig: typeof initialValues) => {
     if (!projectRef) return console.error('Project ref is required')
-
-    await updatePostgrestConfig({
+    updatePostgrestConfig({
       projectRef,
       dbSchema: updatedConfig.db_schema,
       maxRows: updatedConfig.max_rows,
       dbExtraSearchPath: updatedConfig.db_extra_search_path,
     })
-    ui.setNotification({ category: 'success', message: 'Successfully saved settings' })
   }
 
   const permanentSchema = ['public', 'storage']
@@ -69,7 +72,7 @@ const PostgrestConfig = () => {
 
   return (
     <Form id={formId} initialValues={initialValues} validate={() => {}} onSubmit={updateConfig}>
-      {({ isSubmitting, handleReset, resetForm, values, initialValues }: any) => {
+      {({ handleReset, resetForm, values, initialValues }: any) => {
         const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
 
         // [Alaister] although this "technically" is breaking the rules of React hooks
@@ -95,7 +98,7 @@ const PostgrestConfig = () => {
                 <div className="flex px-8 py-4">
                   <FormActions
                     form={formId}
-                    isSubmitting={isSubmitting}
+                    isSubmitting={isUpdating}
                     hasChanges={hasChanges}
                     handleReset={handleReset}
                     disabled={!canUpdatePostgrestConfig}

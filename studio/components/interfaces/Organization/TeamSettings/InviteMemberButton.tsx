@@ -72,21 +72,22 @@ const InviteMemberButton = ({
     }
 
     const roleId = Number(values.role)
-    const response = await inviteMember({
-      slug,
-      invitedEmail: values.email.toLowerCase(),
-      ownerId: userId,
-      roleId,
-    })
 
-    if (isNil(response)) {
-      ui.setNotification({ category: 'error', message: 'Failed to add member' })
-    } else {
-      ui.setNotification({ category: 'success', message: 'Successfully added new member.' })
-
-      setIsOpen(!isOpen)
-      resetForm({ initialValues: { ...initialValues, role: roleId } })
-    }
+    try {
+      const response = await inviteMember({
+        slug,
+        invitedEmail: values.email.toLowerCase(),
+        ownerId: userId,
+        roleId,
+      })
+      if (isNil(response)) {
+        ui.setNotification({ category: 'error', message: 'Failed to add member' })
+      } else {
+        ui.setNotification({ category: 'success', message: 'Successfully added new member.' })
+        setIsOpen(!isOpen)
+        resetForm({ initialValues: { ...initialValues, role: roleId } })
+      }
+    } catch (error) {}
   }
 
   return (

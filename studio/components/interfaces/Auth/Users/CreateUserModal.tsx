@@ -41,8 +41,13 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
     return errors
   }
 
-  const { mutateAsync: createUser, isLoading: isCreatingUser } = useUserCreateMutation({
-    async onSuccess() {
+  const { mutate: createUser, isLoading: isCreatingUser } = useUserCreateMutation({
+    async onSuccess(res) {
+      ui.setNotification({
+        category: 'success',
+        message: `Successfully created user: ${res.email}`,
+      })
+      setVisible(false)
       await PageState.fetchData(1)
     },
   })
@@ -56,17 +61,7 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
     }
 
     const { protocol, endpoint, serviceApiKey } = data.autoApiService
-    await createUser({
-      endpoint,
-      protocol,
-      serviceApiKey,
-      user: values,
-    })
-    ui.setNotification({
-      category: 'success',
-      message: `Successfully created user: ${values.email}`,
-    })
-    setVisible(false)
+    createUser({ endpoint, protocol, serviceApiKey, user: values })
   }
 
   return (

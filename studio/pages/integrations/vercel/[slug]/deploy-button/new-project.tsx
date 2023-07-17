@@ -92,8 +92,13 @@ const CreateProject = ({
     externalId,
   } = useParams()
 
-  const { mutateAsync: createConnections, isLoading: isLoadingCreateConnections } =
-    useIntegrationConnectionsCreateMutation({})
+  const { mutate: createConnections, isLoading: isLoadingCreateConnections } =
+    useIntegrationConnectionsCreateMutation({
+      onSuccess: () => {
+        setLoading(false)
+        if (next) window.location.href = next
+      },
+    })
 
   const { data: organizationData, isLoading: isLoadingOrganizationsQuery } = useOrganizationsQuery()
   const organization = organizationData?.find((x) => x.slug === slug)
@@ -156,63 +161,50 @@ const CreateProject = ({
     delayedCheckPasswordStrength(password)
   }
 
-  const { mutateAsync: createProject } = useProjectCreateMutation()
+  const { mutate: createProject } = useProjectCreateMutation({
+    onSuccess: (res) => {
+      setNewProjectRef(res.ref)
+    },
+    onError: (error) => {
+      ui.setNotification({ error, category: 'error', message: error.message })
+      setLoading(false)
+    },
+  })
 
   const [newProjectRef, setNewProjectRef] = useState<string | undefined>(undefined)
   async function onCreateProject() {
-    if (!organizationIntegration) {
-      console.error('No organization installation details found')
-    }
-
-    if (!organizationIntegration?.id) {
-      console.error('No organization installation ID found')
-      return
-    }
-
-    if (!foreignProjectId) {
-      console.error('No foreignProjectId ID set')
-      return
-    }
-
-    if (!configurationId) {
-      console.error('No configurationId ID set')
-      return
-    }
+    if (!organizationIntegration) return console.error('No organization installation details found')
+    if (!organizationIntegration?.id) return console.error('No organization installation ID found')
+    if (!foreignProjectId) return console.error('No foreignProjectId ID set')
+    if (!configurationId) return console.error('No configurationId ID set')
+    if (!organization) return console.error('No organization ID set')
 
     setLoading(true)
 
-    try {
-      if (!organization) throw new Error('No organization set')
-
-      let dbSql: string | undefined
-      if (shouldRunMigrations) {
-        const id = ui.setNotification({
-          category: 'info',
-          message: `Fetching initial migrations from GitHub repo`,
-        })
-
-        dbSql = (await getInitialMigrationSQLFromGitHubRepo(externalId)) ?? undefined
-
-        ui.setNotification({
-          id,
-          category: 'success',
-          message: `Done fetching initial migrations`,
-        })
-      }
-
-      const project = await createProject({
-        organizationId: organization.id,
-        name: projectName,
-        dbPass,
-        dbRegion,
-        dbSql,
-        configurationId,
+    let dbSql: string | undefined
+    if (shouldRunMigrations) {
+      const id = ui.setNotification({
+        category: 'info',
+        message: `Fetching initial migrations from GitHub repo`,
       })
-      setNewProjectRef(project.ref)
-    } catch (error: any) {
-      ui.setNotification({ error, category: 'error', message: error.message })
-      setLoading(false)
+
+      dbSql = (await getInitialMigrationSQLFromGitHubRepo(externalId)) ?? undefined
+
+      ui.setNotification({
+        id,
+        category: 'success',
+        message: `Done fetching initial migrations`,
+      })
     }
+
+    createProject({
+      organizationId: organization.id,
+      name: projectName,
+      dbPass,
+      dbRegion,
+      dbSql,
+      configurationId,
+    })
   }
   const isInstallingRef = useRef(false)
 
@@ -241,7 +233,7 @@ const CreateProject = ({
 
         const projectDetails = vercelProjects?.find((x) => x.id === foreignProjectId)
 
-        await createConnections({
+        createConnections({
           organizationIntegrationId: organizationIntegration?.id,
           connection: {
             foreign_project_id: foreignProjectId,
@@ -257,12 +249,6 @@ const CreateProject = ({
           },
           orgSlug: selectedOrganization?.slug,
         })
-
-        setLoading(false)
-
-        if (next) {
-          window.location.href = next
-        }
       },
     }
   )

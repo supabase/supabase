@@ -42,16 +42,24 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
     resource: { role_id: roleId },
   })
 
-  const {
-    mutateAsync: deleteOrganizationMemberAsync,
-    isLoading: isOrganizationMemberDeleteLoading,
-  } = useOrganizationMemberDeleteMutation()
+  const { mutate: deleteOrganizationMember, isLoading: isOrganizationMemberDeleteLoading } =
+    useOrganizationMemberDeleteMutation({
+      onSuccess: () => {
+        ui.setNotification({
+          category: 'success',
+          message: `Successfully removed ${member.primary_email}`,
+        })
+      },
+    })
 
   const {
-    mutateAsync: createOrganizationMemberInvite,
+    mutate: createOrganizationMemberInvite,
     isLoading: isOrganizationMemberInviteCreateLoading,
   } = useOrganizationMemberInviteCreateMutation({
-    onError(error) {
+    onSuccess: () => {
+      ui.setNotification({ category: 'success', message: 'Resent the invitation.' })
+    },
+    onError: (error) => {
       ui.setNotification({
         category: 'error',
         message: `Failed to resend invitation: ${error.message}`,
@@ -60,9 +68,13 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
   })
 
   const {
-    mutateAsync: deleteOrganizationMemberInvite,
+    mutate: deleteOrganizationMemberInvite,
     isLoading: isOrganizationMemberInviteDeleteLoading,
-  } = useOrganizationMemberInviteDeleteMutation()
+  } = useOrganizationMemberInviteDeleteMutation({
+    onSuccess: () => {
+      ui.setNotification({ category: 'success', message: 'Successfully revoked the invitation.' })
+    },
+  })
 
   const handleMemberDelete = async () => {
     confirmAlert({
@@ -71,11 +83,7 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
       onAsyncConfirm: async () => {
         if (!slug) return console.error('slug is required')
         if (!member.gotrue_id) return console.error('gotrue_id is required')
-        await deleteOrganizationMemberAsync({ slug, gotrueId: member.gotrue_id })
-        ui.setNotification({
-          category: 'success',
-          message: `Successfully removed ${member.primary_email}`,
-        })
+        deleteOrganizationMember({ slug, gotrueId: member.gotrue_id })
       },
     })
   }
@@ -83,24 +91,20 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
   const handleResendInvite = async (member: Member) => {
     if (!slug) return console.error('Slug is required')
     if (!member.invited_id) return console.error('Member invited ID is required')
-
     const roleId = (member?.role_ids ?? [])[0]
-    await createOrganizationMemberInvite({
+    createOrganizationMemberInvite({
       slug,
       invitedEmail: member.primary_email,
       ownerId: member.invited_id,
       roleId: roleId,
     })
-    ui.setNotification({ category: 'success', message: 'Resent the invitation.' })
   }
 
   const handleRevokeInvitation = async (member: Member) => {
     const invitedId = member.invited_id
     if (!slug) return console.error('Slug is required')
     if (!invitedId) return console.error('Member invited ID is required')
-
-    await deleteOrganizationMemberInvite({ slug, invitedId })
-    ui.setNotification({ category: 'success', message: 'Successfully revoked the invitation.' })
+    deleteOrganizationMemberInvite({ slug, invitedId })
   }
 
   if (!canRemoveMember || (isPendingInviteAcceptance && !canResendInvite && !canRevokeInvite)) {

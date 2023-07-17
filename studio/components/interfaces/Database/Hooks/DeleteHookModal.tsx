@@ -16,8 +16,14 @@ const DeleteHookModal = ({ selectedHook, visible, onClose }: DeleteHookModalProp
   const { id, name, schema } = selectedHook ?? {}
 
   const { project } = useProjectContext()
-  const { mutateAsync: deleteDatabaseTrigger, isLoading: isDeleting } =
-    useDatabaseTriggerDeleteMutation()
+  const { mutate: deleteDatabaseTrigger, isLoading: isDeleting } = useDatabaseTriggerDeleteMutation(
+    {
+      onSuccess: () => {
+        ui.setNotification({ category: 'success', message: `Successfully deleted ${name}` })
+        onClose()
+      },
+    }
+  )
 
   async function handleDelete() {
     if (!project) {
@@ -27,13 +33,11 @@ const DeleteHookModal = ({ selectedHook, visible, onClose }: DeleteHookModalProp
       return ui.setNotification({ category: 'error', message: 'Unable find selected hook' })
     }
 
-    await deleteDatabaseTrigger({
+    deleteDatabaseTrigger({
       id,
       projectRef: project.ref,
       connectionString: project.connectionString,
     })
-    ui.setNotification({ category: 'success', message: `Successfully deleted ${name}` })
-    onClose()
   }
 
   return (

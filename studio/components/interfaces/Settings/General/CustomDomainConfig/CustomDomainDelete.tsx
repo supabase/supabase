@@ -17,14 +17,16 @@ export type CustomDomainDeleteProps = {
 const CustomDomainDelete = ({ projectRef, customDomain }: CustomDomainDeleteProps) => {
   const { ui } = useStore()
   const [isDeleteConfirmModalVisible, setIsDeleteConfirmModalVisible] = useState(false)
-  const { mutateAsync: deleteCustomDomain } = useCustomDomainDeleteMutation()
+  const { mutate: deleteCustomDomain } = useCustomDomainDeleteMutation({
+    onSuccess: () => {
+      ui.setNotification({ category: 'success', message: `Successfully deleted custom domain` })
+      setIsDeleteConfirmModalVisible(false)
+    },
+  })
 
   const onDeleteCustomDomain = async () => {
     if (!projectRef) return console.error('Project ref is required')
-
-    await deleteCustomDomain({ projectRef })
-    ui.setNotification({ category: 'success', message: `Successfully deleted custom domain` })
-    setIsDeleteConfirmModalVisible(false)
+    deleteCustomDomain({ projectRef })
   }
 
   return (

@@ -47,8 +47,17 @@ const PlanUpdateSidePanel = () => {
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: slug })
   const { data: plans, isLoading: isLoadingPlans } = useOrgPlansQuery({ orgSlug: slug })
   const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery({ slug })
-  const { mutateAsync: updateOrgSubscription, isLoading: isUpdating } =
-    useOrgSubscriptionUpdateMutation({
+  const { mutate: updateOrgSubscription, isLoading: isUpdating } = useOrgSubscriptionUpdateMutation(
+    {
+      onSuccess: () => {
+        ui.setNotification({
+          category: 'success',
+          message: `Successfully updated subscription to ${subscriptionPlanMeta?.name}!`,
+        })
+        setSelectedTier(undefined)
+        onClose()
+        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
+      },
       onError: (error) => {
         ui.setNotification({
           error,
@@ -56,7 +65,8 @@ const PlanUpdateSidePanel = () => {
           message: `Unable to update subscription: ${error.message}`,
         })
       },
-    })
+    }
+  )
 
   const availablePlans = plans ?? []
   const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
@@ -100,18 +110,7 @@ const PlanUpdateSidePanel = () => {
       return ui.setNotification({ category: 'error', message: 'Please select a payment method' })
     }
 
-    await updateOrgSubscription({
-      slug,
-      tier: selectedTier,
-      paymentMethod: selectedPaymentMethod,
-    })
-    ui.setNotification({
-      category: 'success',
-      message: `Successfully updated subscription to ${subscriptionPlanMeta?.name}!`,
-    })
-    setSelectedTier(undefined)
-    onClose()
-    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
+    updateOrgSubscription({ slug, tier: selectedTier, paymentMethod: selectedPaymentMethod })
   }
 
   return (

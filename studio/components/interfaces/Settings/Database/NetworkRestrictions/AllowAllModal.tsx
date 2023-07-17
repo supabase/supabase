@@ -11,14 +11,14 @@ interface AllowAllModalProps {
 
 const AllowAllModal = ({ visible, onClose }: AllowAllModalProps) => {
   const { ref } = useParams()
-  const { mutateAsync: applyNetworkRestrictions, isLoading: isApplying } =
-    useNetworkRestrictionsApplyMutation()
+  const { mutate: applyNetworkRestrictions, isLoading: isApplying } =
+    useNetworkRestrictionsApplyMutation({
+      onSuccess: () => onClose(),
+    })
 
   const onSubmit = async () => {
     if (!ref) return console.error('Project ref is required')
-
-    await applyNetworkRestrictions({ projectRef: ref, dbAllowedCidrs: ['0.0.0.0/0'] })
-    onClose()
+    applyNetworkRestrictions({ projectRef: ref, dbAllowedCidrs: ['0.0.0.0/0'] })
   }
 
   return (

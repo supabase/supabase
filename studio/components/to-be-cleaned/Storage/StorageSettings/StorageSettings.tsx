@@ -45,7 +45,20 @@ const StorageConfig = ({ config, projectRef }: any) => {
   let initialValues = { fileSizeLimit: value, unformattedFileSizeLimit: fileSizeLimit }
 
   const canUpdateStorageSettings = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
-  const { mutateAsync: updateStorageConfig } = useProjectStorageConfigUpdateUpdateMutation()
+  const { mutate: updateStorageConfig, isLoading: isUpdating } =
+    useProjectStorageConfigUpdateUpdateMutation({
+      onSuccess: (res) => {
+        const updatedValue = convertFromBytes(res.fileSizeLimit)
+        initialValues = {
+          fileSizeLimit: updatedValue.value,
+          unformattedFileSizeLimit: res.fileSizeLimit,
+        }
+        ui.setNotification({
+          category: 'success',
+          message: 'Successfully updated storage settings',
+        })
+      },
+    })
 
   const formattedMaxSizeBytes = `${new Intl.NumberFormat('en-US').format(
     STORAGE_FILE_SIZE_LIMIT_MAX_BYTES
@@ -76,16 +89,10 @@ const StorageConfig = ({ config, projectRef }: any) => {
       })
     }
 
-    const res = await updateStorageConfig({
+    updateStorageConfig({
       projectRef,
       fileSizeLimit: convertToBytes(values.fileSizeLimit, selectedUnit),
     })
-    const updatedValue = convertFromBytes(res.fileSizeLimit)
-    initialValues = {
-      fileSizeLimit: updatedValue.value,
-      unformattedFileSizeLimit: res.fileSizeLimit,
-    }
-    ui.setNotification({ category: 'success', message: 'Successfully updated storage settings' })
   }
 
   // [Joshen] To be refactored using FormContainer, FormPanel, FormContent etc once
@@ -93,15 +100,7 @@ const StorageConfig = ({ config, projectRef }: any) => {
   return (
     <div className="mx-auto w-[56rem] max-w-4xl px-5 pt-12 pb-20">
       <Form validateOnBlur initialValues={initialValues} validate={onValidate} onSubmit={onSubmit}>
-        {({
-          values,
-          isSubmitting,
-          handleReset,
-        }: {
-          values: any
-          isSubmitting: boolean
-          handleReset: () => void
-        }) => {
+        {({ values, handleReset }: { values: any; handleReset: () => void }) => {
           const hasChanges =
             initialValues.unformattedFileSizeLimit !==
             convertToBytes(values.fileSizeLimit, selectedUnit)
@@ -198,16 +197,18 @@ const StorageConfig = ({ config, projectRef }: any) => {
                           type="default"
                           htmlType="reset"
                           onClick={() => handleReset()}
-                          disabled={!hasChanges && hasChanges !== undefined}
+                          disabled={isUpdating || (!hasChanges && hasChanges !== undefined)}
                         >
                           Cancel
                         </Button>
                         <Button
                           type="primary"
                           htmlType="submit"
-                          loading={isSubmitting}
+                          loading={isUpdating}
                           disabled={
-                            !canUpdateStorageSettings || (!hasChanges && hasChanges !== undefined)
+                            !canUpdateStorageSettings ||
+                            isUpdating ||
+                            (!hasChanges && hasChanges !== undefined)
                           }
                         >
                           Save

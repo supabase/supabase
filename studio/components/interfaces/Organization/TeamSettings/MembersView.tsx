@@ -49,8 +49,9 @@ const MembersView = ({ searchString }: MembersViewProps) => {
     isLoading: isLoadingRoles,
     isError: isErrorRoles,
   } = useOrganizationRolesQuery({ slug })
-  const { mutateAsync: updateOrganizationMember, isLoading } = useOrganizationMemberUpdateMutation({
+  const { mutate: updateOrganizationMember, isLoading } = useOrganizationMemberUpdateMutation({
     onSuccess() {
+      setUserRoleChangeModalVisible(false)
       ui.setNotification({
         category: 'success',
         message: `Successfully updated role for ${getUserDisplayName(selectedMember)}`,
@@ -103,9 +104,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
     const { gotrue_id, newRoleId } = selectedMember
     if (!slug) return console.error('slug is required')
     if (!gotrue_id) return console.error('gotrue_id is required')
-
-    await updateOrganizationMember({ slug, gotrueId: gotrue_id, roleId: newRoleId })
-    setUserRoleChangeModalVisible(false)
+    updateOrganizationMember({ slug, gotrueId: gotrue_id, roleId: newRoleId })
   }
 
   return (

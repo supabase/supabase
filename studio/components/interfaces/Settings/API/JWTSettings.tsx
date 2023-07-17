@@ -71,16 +71,16 @@ const JWTSettings = () => {
     setModalVisibility: Dispatch<SetStateAction<boolean>>
   ) {
     if (!projectRef) return console.error('Project ref is required')
-
     const trackingId = uuidv4()
-    await updateJwt({ projectRef, jwtSecret: jwt_secret, changeTrackingId: trackingId })
-
-    setModalVisibility(false)
-    ui.setNotification({
-      category: 'info',
-      message:
-        'Successfully submitted JWT secret update request. Please wait while your project is updated.',
-    })
+    try {
+      await updateJwt({ projectRef, jwtSecret: jwt_secret, changeTrackingId: trackingId })
+      setModalVisibility(false)
+      ui.setNotification({
+        category: 'info',
+        message:
+          'Successfully submitted JWT secret update request. Please wait while your project is updated.',
+      })
+    } catch (error) {}
   }
 
   return (
