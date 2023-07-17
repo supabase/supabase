@@ -93,16 +93,25 @@ const SQLEditor = () => {
       {!isAiWidgetOpen && (
         <motion.div
           layoutId="ask-ai-input"
-          initial={{ scaleY: 1, y: 50 }}
-          animate={{ scaleY: 1, y: 0 }}
-          className="w-full flex justify-center z-[1000] mt-0.5"
+          initial={{
+            scaleY: 1,
+            y: 50,
+            borderRadius: 0,
+          }}
+          animate={{
+            scaleY: 1,
+            y: 0,
+            borderRadius: 0,
+          }}
+          className="w-full flex justify-center z-[1000] mt-0.5 border border-brand-900"
         >
           <Input
+            autoFocus
             size="xlarge"
             icon={<AiIcon className="w-4 h-4 ml-1" />}
-            inputClassName="py-4 !bg-scale-200 !border-brand-900"
+            inputClassName="w-full !border-brand-900 border-none py-4 focus:!ring-0"
             iconContainerClassName="transition text-scale-800 text-brand-900"
-            placeholder="Ask Supabase AI to edit your query"
+            placeholder="Ask Supabase AI to modify your query"
             className="w-full"
             actions={
               <div className="flex items-center space-x-1 mr-6">
