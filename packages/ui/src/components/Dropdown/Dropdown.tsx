@@ -103,7 +103,7 @@ export function Item({ icon, className, ...props }: ItemProps) {
       {...props}
     >
       {icon && icon}
-      <span>{props.children}</span>
+      <span className="w-full">{props.children}</span>
     </RadixDropdown.Item>
   )
 }
