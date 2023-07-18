@@ -1,8 +1,7 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { post } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { post } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { integrationKeys } from './keys'
 
@@ -20,15 +19,21 @@ export async function createIntegrationConnections({
   organizationIntegrationId,
   connection,
 }: IntegrationConnectionsCreateVariables) {
-  const response = await post(`${API_URL}/integrations/vercel/connections`, {
-    organization_integration_id: organizationIntegrationId,
-    connection,
+  const { data, error } = await post('/platform/integrations/vercel/connections', {
+    body: {
+      organization_integration_id: organizationIntegrationId,
+      connection: {
+        foreign_project_id: connection.foreign_project_id,
+        supabase_project_ref: connection.supabase_project_ref,
+        metadata: connection.metadata,
+      },
+    },
   })
-  if (response.error) {
-    throw response.error
+  if (error) {
+    throw error
   }
 
-  return response
+  return data
 }
 
 type IntegrationConnectionsCreateData = Awaited<ReturnType<typeof createIntegrationConnections>>
