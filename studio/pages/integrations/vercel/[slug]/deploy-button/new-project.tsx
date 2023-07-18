@@ -8,8 +8,9 @@ import { VercelIntegrationLayout } from 'components/layouts'
 import { ScaffoldContainer, ScaffoldDivider } from 'components/layouts/Scaffold'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
 import { useProjectApiQuery } from 'data/config/project-api-query'
-import { useIntegrationVercelConnectionsCreateMutation } from 'data/integrations/integrations-vercel-connections-create-mutation'
 import { useIntegrationsQuery } from 'data/integrations/integrations-query'
+import { useIntegrationsVercelConnectionSyncEnvsMutation } from 'data/integrations/integrations-vercel-connection-sync-envs-mutation'
+import { useIntegrationVercelConnectionsCreateMutation } from 'data/integrations/integrations-vercel-connections-create-mutation'
 import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
 import { Integration } from 'data/integrations/integrations.types'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
@@ -94,6 +95,7 @@ const CreateProject = ({
 
   const { mutateAsync: createConnections, isLoading: isLoadingCreateConnections } =
     useIntegrationVercelConnectionsCreateMutation()
+  const { mutateAsync: syncEnvs } = useIntegrationsVercelConnectionSyncEnvsMutation()
 
   const { data: organizationData, isLoading: isLoadingOrganizationsQuery } = useOrganizationsQuery()
 
@@ -256,9 +258,8 @@ const CreateProject = ({
 
         const projectDetails = vercelProjects?.find((x) => x.id === foreignProjectId)
 
-        // Wrap the createConnections function call in a try-catch block
         try {
-          await createConnections({
+          const { id: connectionId } = await createConnections({
             organizationIntegrationId: organizationIntegration?.id,
             connection: {
               foreign_project_id: foreignProjectId,
@@ -274,6 +275,8 @@ const CreateProject = ({
             },
             orgSlug: selectedOrganization?.slug,
           })
+
+          await syncEnvs({ connectionId })
         } catch (error) {
           console.error('An error occurred during createConnections:', error)
           return

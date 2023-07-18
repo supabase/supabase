@@ -688,9 +688,13 @@ export interface paths {
      */
     post: operations["VercelIntegrationController_createVercelIntegration"];
   };
+  "/platform/integrations/vercel/{organization_integration_id}": {
+    /** Removes Vercel organization integration with the given id */
+    delete: operations["VercelIntegrationController_removeVercelIntegration"];
+  };
   "/platform/integrations/vercel/projects/{organization_integration_id}": {
-    /** Gets vercel projects for the given organization */
-    get: operations["VercelProjectController_getProjects"];
+    /** Gets vercel projects with the given organization integration id */
+    get: operations["VercelProjectController_getVercelProjects"];
   };
   "/platform/integrations/vercel/connections/{organization_integration_id}": {
     /** Gets installed vercel project connections for the given organization integration */
@@ -700,20 +704,17 @@ export interface paths {
     /** Connects a Vercel project to a supabase project */
     post: operations["VercelConnectionsController_createVercelConnection"];
   };
+  "/platform/integrations/vercel/connections/{connection_id}/sync-envs": {
+    /** Syncs supabase project envs with given connection id */
+    post: operations["VercelConnectionsController_syncVercelConnectionEnvs"];
+  };
   "/platform/integrations/vercel/connections/{connection_id}": {
     /** Deletes vercel project connection */
     delete: operations["VercelConnectionsController_deleteVercelConnection"];
   };
   "/platform/integrations/github": {
-    /**
-     * Create github integration 
-     * @description Exchanges a github code for an access token and saves the access token to the new integration record
-     */
+    /** Create github integration */
     post: operations["GitHubIntegrationController_createGitHubIntegration"];
-  };
-  "/platform/integrations/github/repos/{organization_integration_id}": {
-    /** Gets github repos for the given organization */
-    get: operations["GitHubRepoController_getRepos"];
   };
   "/platform/integrations/github/connections/{organization_integration_id}": {
     /** Gets installed github project connections for the given organization integration */
@@ -726,6 +727,14 @@ export interface paths {
   "/platform/integrations/github/connections/{connection_id}": {
     /** Deletes github project connection */
     delete: operations["GitHubConnectionsController_deleteGitHubConnection"];
+  };
+  "/platform/integrations/github/repos/{organization_integration_id}": {
+    /** Gets github repos for the given organization */
+    get: operations["GitHubRepoController_getRepos"];
+  };
+  "/platform/integrations/github/branches/{organization_integration_id}/{repo_owner}/{repo_name}": {
+    /** Gets github branches for a given repo */
+    get: operations["GitHubBranchController_getBranches"];
   };
   "/system/auth/{ref}/templates/{template}": {
     /** Gets GoTrue template */
@@ -799,9 +808,17 @@ export interface paths {
     /** Migrates org to org-level billing. */
     post: operations["BillingMigrationController_migrateToOrgLevelBilling"];
   };
+  "/system/billing/migrate/org-level-billing-preview": {
+    /** Previews the migration of the organization to the new org level billing. */
+    post: operations["BillingMigrationController_preview"];
+  };
   "/system/integrations/vercel/webhooks": {
     /** Processes Vercel event */
     post: operations["VercelWebhooksController_processEvent"];
+  };
+  "/system/integrations/github/webhooks": {
+    /** Processes GitHub event */
+    post: operations["GitHubWebhooksController_processEvent"];
   };
   "/system/stripe/webhooks-v2": {
     /** Processes Stripe event */
@@ -1258,6 +1275,23 @@ export interface paths {
     /** Deletes objects */
     delete: operations["StorageObjectsController_deleteObjects"];
   };
+  "/v1/branch/{branch_id}": {
+    /**
+     * Get database branch config 
+     * @description Fetches configurations of the specified database branch
+     */
+    get: operations["BranchController_getBranchDetails"];
+    /**
+     * Delete a database branch 
+     * @description Deletes the specified database branch
+     */
+    delete: operations["BranchController_deleteBranch"];
+    /**
+     * Update database branch config 
+     * @description Updates the configuration of the specified database branch
+     */
+    patch: operations["BranchController_updateBranch"];
+  };
   "/v1/projects": {
     /**
      * List all projects 
@@ -1269,6 +1303,23 @@ export interface paths {
   };
   "/v1/projects/{ref}/api-keys": {
     get: operations["ApiKeysController_getProjectApiKeys"];
+  };
+  "/v1/projects/{ref}/branches": {
+    /**
+     * List all database branches 
+     * @description Returns all database branches of the specified project.
+     */
+    get: operations["BranchesController_getBranches"];
+    /**
+     * Create a database branch 
+     * @description Creates a database branch from the specified project.
+     */
+    post: operations["BranchesController_createBranch"];
+    /**
+     * Disables preview branching 
+     * @description Disables preview branching for the specified project
+     */
+    delete: operations["BranchesController_disableBranch"];
   };
   "/v1/projects/{ref}/custom-hostname": {
     /** Gets project's custom hostname config */
@@ -2472,6 +2523,9 @@ export interface components {
       packagePrice: number;
       freeUnits?: number;
     };
+    BillingPricingOptionsNone: {
+      freeUnits?: number;
+    };
     BillingUsageBasedPrice: {
       /** @enum {string} */
       metric: "EGRESS" | "DATABASE_EGRESS" | "DATABASE_SIZE" | "STORAGE_EGRESS" | "STORAGE_SIZE" | "MONTHLY_ACTIVE_USERS" | "MONTHLY_ACTIVE_SSO_USERS" | "FUNCTION_INVOCATIONS" | "FUNCTION_COUNT" | "STORAGE_IMAGES_TRANSFORMED" | "REALTIME_MESSAGE_COUNT" | "REALTIME_PEAK_CONNECTIONS" | "COMPUTE_HOURS_XS" | "COMPUTE_HOURS_SM" | "COMPUTE_HOURS_MD" | "COMPUTE_HOURS_L" | "COMPUTE_HOURS_XL" | "COMPUTE_HOURS_2XL" | "COMPUTE_HOURS_4XL" | "COMPUTE_HOURS_8XL" | "COMPUTE_HOURS_12XL" | "COMPUTE_HOURS_16XL";
@@ -3046,6 +3100,15 @@ export interface components {
       postgrest: string;
       "supabase-postgres": string;
     };
+    BranchResponse: {
+      id: string;
+      name: string;
+      project_ref: string;
+      is_default: boolean;
+      git_branch: string;
+      created_at: string;
+      updated_at: string;
+    };
     ProjectDetailResponse: {
       cloud_provider: string;
       db_host: string;
@@ -3066,6 +3129,7 @@ export interface components {
       volumeSizeGb?: number;
       maxDatabasePreprovisionGb?: number;
       lastDatabaseResizeAt?: string;
+      preview_branches: (components["schemas"]["BranchResponse"])[];
     };
     ProjectRefResponse: {
       id: number;
@@ -3724,6 +3788,14 @@ export interface components {
       framework?: string | null;
       link?: components["schemas"]["VercelProjectLink"];
     };
+    GetVercelProjectsResponse: {
+      projects: (components["schemas"]["IntegrationVercelProject"])[];
+      pagination: {
+        count?: number;
+        next?: number | null;
+        prev?: number | null;
+      };
+    };
     GetVercelConnections: {
       id: string;
       inserted_at: string;
@@ -3736,12 +3808,17 @@ export interface components {
     IntegrationConnection: {
       foreign_project_id: string;
       supabase_project_ref: string;
-      integration_id: string;
       metadata: Record<string, never>;
     };
     CreateVercelConnectionsBody: {
       organization_integration_id: string;
       connection: components["schemas"]["IntegrationConnection"];
+    };
+    CreateVercelConnectionResponse: {
+      id: string;
+    };
+    DeleteVercelConnectionResponse: {
+      id: string;
     };
     CreateGitHubIntegrationBody: {
       installation_id: number;
@@ -3763,6 +3840,13 @@ export interface components {
     CreateGitHubConnectionsBody: {
       organization_integration_id: string;
       connection: components["schemas"]["IntegrationConnection"];
+    };
+    GetGithubRepo: {
+      id: number;
+      full_name: string;
+    };
+    GetGithubBranch: {
+      name: string;
     };
     FunctionResponse: {
       id: string;
@@ -3839,6 +3923,21 @@ export interface components {
     GetMetricsResponse: {
       metrics: (components["schemas"]["ProjectMetric"])[];
     };
+    BranchDetailResponse: {
+      db_port: number;
+      ref: string;
+      postgres_version: string;
+      /** @enum {string} */
+      status: "ACTIVE_HEALTHY" | "ACTIVE_UNHEALTHY" | "COMING_UP" | "GOING_DOWN" | "INACTIVE" | "INIT_FAILED" | "REMOVED" | "RESTORING" | "UNKNOWN" | "UPGRADING" | "PAUSING";
+      db_host: string;
+      db_user?: string;
+      db_pass?: string;
+      jwt_secret?: string;
+    };
+    UpdateBranchBody: {
+      branch_name?: string;
+      git_branch?: string;
+    };
     DatabaseResponse: {
       /** @description Database host */
       host: string;
@@ -3848,6 +3947,11 @@ export interface components {
     ApiKeyResponse: {
       name: string;
       api_key: string;
+    };
+    CreateBranchBody: {
+      branch_name: string;
+      git_branch?: string;
+      region?: string;
     };
     UpdateCustomHostnameResponse: {
       /** @enum {string} */
@@ -4050,6 +4154,16 @@ export interface components {
       website: string;
       redirect_uris: (string)[];
       icon?: string;
+    };
+    TokenDTO: {
+      /** @enum {string} */
+      grant_type: "authorization_code" | "refresh_token";
+      client_id: string;
+      client_secret: string;
+      code?: string;
+      code_verifier?: string;
+      redirect_uri?: string;
+      refresh_token?: string;
     };
     AuthorizationsApproveBody: {
       organization_id: string;
@@ -8113,9 +8227,27 @@ export interface operations {
       500: never;
     };
   };
-  /** Gets vercel projects for the given organization */
-  VercelProjectController_getProjects: {
+  /** Removes Vercel organization integration with the given id */
+  VercelIntegrationController_removeVercelIntegration: {
     parameters: {
+      path: {
+        organization_integration_id: string;
+      };
+    };
+    responses: {
+      200: never;
+      /** @description Failed to remove Vercel organization integration with the given id */
+      500: never;
+    };
+  };
+  /** Gets vercel projects with the given organization integration id */
+  VercelProjectController_getVercelProjects: {
+    parameters: {
+      query: {
+        search?: string;
+        from?: string;
+        limit: string;
+      };
       path: {
         organization_integration_id: string;
       };
@@ -8123,10 +8255,10 @@ export interface operations {
     responses: {
       200: {
         content: {
-          "application/json": (components["schemas"]["IntegrationVercelProject"])[];
+          "application/json": components["schemas"]["GetVercelProjectsResponse"];
         };
       };
-      /** @description Failed to get vercel projects for the given organization */
+      /** @description Failed to get vercel projects with the given organization integration id */
       500: never;
     };
   };
@@ -8155,8 +8287,25 @@ export interface operations {
       };
     };
     responses: {
-      201: never;
+      201: {
+        content: {
+          "application/json": components["schemas"]["CreateVercelConnectionResponse"];
+        };
+      };
       /** @description Failed to create project connections */
+      500: never;
+    };
+  };
+  /** Syncs supabase project envs with given connection id */
+  VercelConnectionsController_syncVercelConnectionEnvs: {
+    parameters: {
+      path: {
+        connection_id: string;
+      };
+    };
+    responses: {
+      201: never;
+      /** @description Failed to sync supabase project envs with given connection id */
       500: never;
     };
   };
@@ -8168,15 +8317,16 @@ export interface operations {
       };
     };
     responses: {
-      200: never;
+      200: {
+        content: {
+          "application/json": components["schemas"]["DeleteVercelConnectionResponse"];
+        };
+      };
       /** @description Failed to delete vercel integration project connection */
       500: never;
     };
   };
-  /**
-   * Create github integration 
-   * @description Exchanges a github code for an access token and saves the access token to the new integration record
-   */
+  /** Create github integration */
   GitHubIntegrationController_createGitHubIntegration: {
     requestBody: {
       content: {
@@ -8190,19 +8340,6 @@ export interface operations {
         };
       };
       /** @description Failed to create github integration */
-      500: never;
-    };
-  };
-  /** Gets github repos for the given organization */
-  GitHubRepoController_getRepos: {
-    parameters: {
-      path: {
-        organization_integration_id: string;
-      };
-    };
-    responses: {
-      200: never;
-      /** @description Failed to get github repos for the given organization */
       500: never;
     };
   };
@@ -8246,6 +8383,42 @@ export interface operations {
     responses: {
       200: never;
       /** @description Failed to delete github integration project connection */
+      500: never;
+    };
+  };
+  /** Gets github repos for the given organization */
+  GitHubRepoController_getRepos: {
+    parameters: {
+      path: {
+        organization_integration_id: string;
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": (components["schemas"]["GetGithubRepo"])[];
+        };
+      };
+      /** @description Failed to get github repos for the given organization */
+      500: never;
+    };
+  };
+  /** Gets github branches for a given repo */
+  GitHubBranchController_getBranches: {
+    parameters: {
+      path: {
+        organization_integration_id: string;
+        repo_owner: string;
+        repo_name: string;
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": (components["schemas"]["GetGithubBranch"])[];
+        };
+      };
+      /** @description Failed to get github branches for a given repo */
       500: never;
     };
   };
@@ -8579,6 +8752,19 @@ export interface operations {
       500: never;
     };
   };
+  /** Previews the migration of the organization to the new org level billing. */
+  BillingMigrationController_preview: {
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["MigrateToOrgLevelBillingBody"];
+      };
+    };
+    responses: {
+      201: never;
+      /** @description Failed to preview org billing organization */
+      500: never;
+    };
+  };
   /** Processes Vercel event */
   VercelWebhooksController_processEvent: {
     parameters: {
@@ -8594,6 +8780,25 @@ export interface operations {
     responses: {
       201: never;
       /** @description Failed to process Vercel event */
+      500: never;
+    };
+  };
+  /** Processes GitHub event */
+  GitHubWebhooksController_processEvent: {
+    parameters: {
+      header: {
+        "x-github-delivery": string;
+        "x-hub-signature-256": string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["Buffer"];
+      };
+    };
+    responses: {
+      201: never;
+      /** @description Failed to process GitHub event */
       500: never;
     };
   };
@@ -8634,6 +8839,70 @@ export interface operations {
       };
     };
   };
+  /**
+   * Get database branch config 
+   * @description Fetches configurations of the specified database branch
+   */
+  BranchController_getBranchDetails: {
+    parameters: {
+      path: {
+        /** @description Branch ID */
+        branch_id: string;
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": components["schemas"]["BranchDetailResponse"];
+        };
+      };
+      /** @description Failed to update database branch */
+      500: never;
+    };
+  };
+  /**
+   * Delete a database branch 
+   * @description Deletes the specified database branch
+   */
+  BranchController_deleteBranch: {
+    parameters: {
+      path: {
+        /** @description Branch ID */
+        branch_id: string;
+      };
+    };
+    responses: {
+      200: never;
+      /** @description Failed to delete database branch */
+      500: never;
+    };
+  };
+  /**
+   * Update database branch config 
+   * @description Updates the configuration of the specified database branch
+   */
+  BranchController_updateBranch: {
+    parameters: {
+      path: {
+        /** @description Branch ID */
+        branch_id: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateBranchBody"];
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": components["schemas"]["BranchResponse"];
+        };
+      };
+      /** @description Failed to update database branch */
+      500: never;
+    };
+  };
   ApiKeysController_getProjectApiKeys: {
     parameters: {
       path: {
@@ -8648,6 +8917,70 @@ export interface operations {
         };
       };
       403: never;
+    };
+  };
+  /**
+   * List all database branches 
+   * @description Returns all database branches of the specified project.
+   */
+  BranchesController_getBranches: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string;
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": (components["schemas"]["BranchResponse"])[];
+        };
+      };
+      /** @description Failed to retrieve database branches */
+      500: never;
+    };
+  };
+  /**
+   * Create a database branch 
+   * @description Creates a database branch from the specified project.
+   */
+  BranchesController_createBranch: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateBranchBody"];
+      };
+    };
+    responses: {
+      201: {
+        content: {
+          "application/json": components["schemas"]["BranchResponse"];
+        };
+      };
+      /** @description Failed to create database branch */
+      500: never;
+    };
+  };
+  /**
+   * Disables preview branching 
+   * @description Disables preview branching for the specified project
+   */
+  BranchesController_disableBranch: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string;
+      };
+    };
+    responses: {
+      200: never;
+      /** @description Failed to disable preview branching */
+      500: never;
     };
   };
   /** Gets project's custom hostname config */
@@ -9584,7 +9917,7 @@ export interface operations {
         state?: string;
         response_mode?: string;
         code_challenge?: string;
-        code_challenge_method?: "plain" | "sha256";
+        code_challenge_method?: "plain" | "sha256" | "S256";
       };
     };
     responses: {
@@ -9593,15 +9926,9 @@ export interface operations {
   };
   /** Exchange auth code for user's access and refresh token */
   OAuthController_token: {
-    parameters: {
-      query: {
-        grant_type: "authorization_code" | "refresh_token";
-        client_id: string;
-        client_secret: string;
-        code?: string;
-        code_verifier?: string;
-        redirect_uri?: string;
-        refresh_token?: string;
+    requestBody: {
+      content: {
+        "application/x-www-form-urlencoded": components["schemas"]["TokenDTO"];
       };
     };
     responses: {

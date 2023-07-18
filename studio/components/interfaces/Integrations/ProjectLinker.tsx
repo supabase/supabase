@@ -27,6 +27,7 @@ export interface ProjectLinkerProps {
   integrationIcon: ReactNode
   getForeignProjectIcon?: (project: ForeignProject) => ReactNode
   choosePrompt?: string
+  onSkip?: () => void
 }
 
 const UNDEFINED_SELECT_VALUE = 'undefined'
@@ -41,6 +42,7 @@ const ProjectLinker = ({
   integrationIcon,
   getForeignProjectIcon,
   choosePrompt = 'Choose a project',
+  onSkip,
 }: ProjectLinkerProps) => {
   const selectedOrganization = useSelectedOrganization()
 
@@ -165,7 +167,18 @@ const ProjectLinker = ({
           </Panel>
         </div>
       </div>
-      <div className="flex w-full justify-end">
+      <div className="flex w-full justify-end gap-2">
+        {onSkip !== undefined && (
+          <Button
+            size="medium"
+            type="default"
+            onClick={() => {
+              onSkip()
+            }}
+          >
+            Skip
+          </Button>
+        )}
         <Button
           size="medium"
           className="self-end"
