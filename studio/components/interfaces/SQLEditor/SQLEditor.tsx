@@ -2,7 +2,7 @@ import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useSqlEditMutation } from 'data/ai/sql-edit-mutation'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
-import { motion } from 'framer-motion'
+import { m } from 'framer-motion'
 import { useLocalStorage, useStore } from 'hooks'
 import useLatest from 'hooks/misc/useLatest'
 import dynamic from 'next/dynamic'
@@ -168,7 +168,7 @@ const SQLEditor = () => {
   return (
     <div className="flex h-full flex-col">
       {!isEditSqlLoading ? (
-        <motion.div
+        <m.div
           key="ask-ai-input"
           layoutId="ask-ai-input"
           initial={{
@@ -191,7 +191,7 @@ const SQLEditor = () => {
             disabled={isDiffOpen}
             inputRef={inputRef}
             icon={
-              <motion.div
+              <m.div
                 key="ask-ai-input-icon"
                 layoutId="ask-ai-input-icon"
                 className="ml-1"
@@ -203,7 +203,7 @@ const SQLEditor = () => {
                 }}
               >
                 <AiIcon className="w-4 h-4" />
-              </motion.div>
+              </m.div>
             }
             inputClassName="w-full !border-brand-900 border-none py-4 focus:!ring-0 placeholder:text-scale-900"
             iconContainerClassName="transition text-scale-800 text-brand-900"
@@ -296,9 +296,9 @@ const SQLEditor = () => {
               }
             }}
           />
-        </motion.div>
+        </m.div>
       ) : (
-        <motion.div
+        <m.div
           key="ask-ai-loading"
           layoutId="ask-ai-input"
           className="w-fit p-5 border border-brand-900 text-brand-900 self-center"
@@ -315,7 +315,7 @@ const SQLEditor = () => {
             damping: 30,
           }}
         >
-          <motion.div
+          <m.div
             key="ask-ai-loading-icon"
             layoutId="ask-ai-input-icon"
             animate={{
@@ -329,8 +329,8 @@ const SQLEditor = () => {
             }}
           >
             <AiIcon className="w-4 h-4" />
-          </motion.div>
-        </motion.div>
+          </m.div>
+        </m.div>
       )}
       <Split
         style={{ height: '100%' }}
@@ -343,7 +343,7 @@ const SQLEditor = () => {
         collapsed={isUtilityPanelCollapsed ? 1 : undefined}
         onDragEnd={onDragEnd}
       >
-        <motion.div
+        <m.div
           className="dark:border-dark flex-grow overflow-y-auto border-b"
           initial={{
             opacity: 0,
@@ -362,7 +362,7 @@ const SQLEditor = () => {
           ) : (
             <>
               {isDiffOpen && (
-                <motion.div
+                <m.div
                   key="diff-editor"
                   className="w-full h-full"
                   initial={{
@@ -383,10 +383,10 @@ const SQLEditor = () => {
                       fontSize: 13,
                     }}
                   />
-                </motion.div>
+                </m.div>
               )}
 
-              <motion.div
+              <m.div
                 key="monaco-editor"
                 className={cn('w-full', 'h-full', isDiffOpen && 'invisible')}
               >
@@ -399,10 +399,10 @@ const SQLEditor = () => {
                   // onOpenAiWidget={() => setIsAiWidgetOpen(true)}
                   // onCloseAiWidget={() => setIsAiWidgetOpen(false)}
                 />
-              </motion.div>
+              </m.div>
             </>
           )}
-        </motion.div>
+        </m.div>
         <div className="flex flex-col">
           {isLoading ? (
             <div className="flex h-full w-full items-center justify-center">Loading...</div>

@@ -3,14 +3,13 @@ import { partition } from 'lodash'
 import { observer } from 'mobx-react-lite'
 
 import { useParams, useTelemetryProps } from 'common'
-import { stripIndent } from 'common-tags'
 import {
   SQL_TEMPLATES,
   sqlAiDisclaimerComment,
 } from 'components/interfaces/SQLEditor/SQLEditor.constants'
 import { useSqlGenerateMutation } from 'data/ai/sql-generate-mutation'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
-import { motion } from 'framer-motion'
+import { m } from 'framer-motion'
 import { useCheckPermissions, useStore } from 'hooks'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
@@ -64,16 +63,16 @@ const SQLTemplates = observer(() => {
   return (
     <div className="block h-full space-y-8 overflow-y-auto p-6">
       <div className="mt-32 mb-32 flex flex-col items-center">
-        <motion.h1
+        <m.h1
           className="text-scale-1200 mb-8 text-3xl"
           initial={{ y: 10, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
         >
           What do you want to build?
-        </motion.h1>
+        </m.h1>
         <div className="w-full flex justify-center">
           {!isSqlGenerateLoading ? (
-            <motion.div
+            <m.div
               key="ask-ai-input"
               layoutId="ask-ai-input"
               className="w-full max-w-2xl border border-brand-900"
@@ -96,7 +95,7 @@ const SQLTemplates = observer(() => {
                   }, 200)
                 }}
                 icon={
-                  <motion.div
+                  <m.div
                     key="ask-ai-input-icon"
                     layoutId="ask-ai-input-icon"
                     className="ml-1"
@@ -108,7 +107,7 @@ const SQLTemplates = observer(() => {
                     }}
                   >
                     <AiIcon className="w-4 h-4" />
-                  </motion.div>
+                  </m.div>
                 }
                 inputClassName="w-full border-none py-4 focus:!ring-0"
                 iconContainerClassName="transition text-scale-800 text-brand-900"
@@ -155,9 +154,9 @@ const SQLTemplates = observer(() => {
                   </div>
                 }
               />
-            </motion.div>
+            </m.div>
           ) : (
-            <motion.div
+            <m.div
               key="ask-ai-loading"
               layoutId="ask-ai-input"
               className="p-5 border border-brand-900 text-brand-900"
@@ -174,7 +173,7 @@ const SQLTemplates = observer(() => {
                 damping: 30,
               }}
             >
-              <motion.div
+              <m.div
                 key="ask-ai-loading-icon"
                 layoutId="ask-ai-input-icon"
                 animate={{
@@ -188,8 +187,8 @@ const SQLTemplates = observer(() => {
                 }}
               >
                 <AiIcon className="w-4 h-4" />
-              </motion.div>
-            </motion.div>
+              </m.div>
+            </m.div>
           )}
         </div>
       </div>
