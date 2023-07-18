@@ -6,7 +6,16 @@ import { m } from 'framer-motion'
 import { useLocalStorage, useStore } from 'hooks'
 import useLatest from 'hooks/misc/useLatest'
 import dynamic from 'next/dynamic'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import {
+  Dispatch,
+  SetStateAction,
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
 import Split from 'react-split'
 import { format } from 'sql-formatter'
 import { getSqlEditorStateSnapshot, useSqlEditorStateSnapshot } from 'state/sql-editor'
@@ -41,6 +50,27 @@ type ContentDiff = {
   modified: string
 }
 
+type SQLEditorContextValues = {
+  aiInput: string
+  setAiInput: Dispatch<SetStateAction<string>>
+  sqlDiff?: ContentDiff
+  setSqlDiff: Dispatch<SetStateAction<ContentDiff | undefined>>
+  debugSolution?: string
+  setDebugSolution: Dispatch<SetStateAction<string | undefined>>
+}
+
+const SQLEditorContext = createContext<SQLEditorContextValues | undefined>(undefined)
+
+export function useSqlEditor() {
+  const values = useContext(SQLEditorContext)
+
+  if (!values) {
+    throw new Error('No SQL editor context. Are you using useSqlEditor() outside of SQLEditor?')
+  }
+
+  return values
+}
+
 const SQLEditor = () => {
   const { ui } = useStore()
   const { ref, id } = useParams()
@@ -48,6 +78,7 @@ const SQLEditor = () => {
   const snap = useSqlEditorStateSnapshot()
   const { mutateAsync: editSql, isLoading: isEditSqlLoading } = useSqlEditMutation()
   const [aiInput, setAiInput] = useState('')
+  const [debugSolution, setDebugSolution] = useState<string>()
   const [sqlDiff, setSqlDiff] = useState<ContentDiff>()
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -130,6 +161,7 @@ const SQLEditor = () => {
       ])
 
       setAiInput('')
+      setDebugSolution(undefined)
       setSqlDiff(undefined)
       setTimeout(() => {
         inputRef.current?.focus()
@@ -138,6 +170,7 @@ const SQLEditor = () => {
   }, [sqlDiff, id])
 
   const discardAiHandler = useCallback(() => {
+    setDebugSolution(undefined)
     setSqlDiff(undefined)
     setTimeout(() => {
       inputRef.current?.focus()
@@ -166,257 +199,274 @@ const SQLEditor = () => {
   }, [isDiffOpen, acceptAiHandler, discardAiHandler])
 
   return (
-    <div className="flex h-full flex-col">
-      {!isEditSqlLoading ? (
-        <m.div
-          key="ask-ai-input"
-          layoutId="ask-ai-input"
-          initial={{
-            scaleY: 1,
-            y: 50,
-            borderRadius: 0,
-          }}
-          animate={{
-            scaleY: 1,
-            y: 0,
-            borderRadius: 0,
-          }}
-          className="w-full flex justify-center z-[1000] mt-0.5 bg-brand-400"
-        >
-          <Input
-            autoFocus
-            size="xlarge"
-            value={aiInput}
-            onChange={(e) => setAiInput(e.currentTarget.value)}
-            disabled={isDiffOpen}
-            inputRef={inputRef}
-            icon={
-              <m.div
-                key="ask-ai-input-icon"
-                layoutId="ask-ai-input-icon"
-                className="ml-1"
-                initial={{
-                  rotate: 0,
-                }}
-                animate={{
-                  rotate: 0,
-                }}
-              >
-                <AiIcon className="w-4 h-4" />
-              </m.div>
-            }
-            inputClassName="w-full !border-brand-900 border-none py-4 focus:!ring-0 placeholder:text-scale-900"
-            iconContainerClassName="transition text-scale-800 text-brand-900"
-            placeholder="Ask Supabase AI to modify your query"
-            className="w-full"
-            actions={
-              <div className="flex flex-row items-center gap-2 space-x-1 mr-6">
-                {isDiffOpen ? (
-                  <>
-                    <Button
-                      type="primary"
-                      size="tiny"
-                      icon={<IconCheck />}
-                      iconRight={
-                        <div className="opacity-30">
-                          <IconCornerDownLeft size={12} strokeWidth={1.5} />
-                        </div>
-                      }
-                      onClick={acceptAiHandler}
-                    >
-                      Accept
-                    </Button>
-                    <Button
-                      type="alternative"
-                      size="tiny"
-                      icon={<IconX />}
-                      iconRight={<span className="opacity-30">ESC</span>}
-                      onClick={discardAiHandler}
-                    >
-                      Discard
-                    </Button>
-                  </>
-                ) : (
-                  <IconCornerDownLeft size={16} strokeWidth={1.5} />
-                )}
-              </div>
-            }
-            onKeyPress={async (e) => {
-              if (e.key === 'Enter') {
-                try {
-                  const prompt = e.currentTarget.value
+    <SQLEditorContext.Provider
+      value={{
+        aiInput,
+        setAiInput,
+        sqlDiff,
+        setSqlDiff,
+        debugSolution,
+        setDebugSolution,
+      }}
+    >
+      <div className="flex h-full flex-col">
+        {!isEditSqlLoading ? (
+          <m.div
+            key="ask-ai-input"
+            layoutId="ask-ai-input"
+            initial={{
+              scaleY: 1,
+              y: 50,
+              borderRadius: 0,
+            }}
+            animate={{
+              scaleY: 1,
+              y: 0,
+              borderRadius: 0,
+            }}
+            className="w-full flex justify-center z-[1000] mt-0.5 bg-brand-400"
+          >
+            <Input
+              autoFocus
+              size="xlarge"
+              value={aiInput}
+              onChange={(e) => setAiInput(e.currentTarget.value)}
+              disabled={isDiffOpen}
+              inputRef={inputRef}
+              icon={
+                <div className="h-full flex flex-row gap-3 items-center overflow-y-auto">
+                  <m.div
+                    key="ask-ai-input-icon"
+                    layoutId="ask-ai-input-icon"
+                    className="ml-1"
+                    initial={{
+                      rotate: 0,
+                    }}
+                    animate={{
+                      rotate: 0,
+                    }}
+                  >
+                    <AiIcon className="w-4 h-4" />
+                  </m.div>
 
-                  console.log({ prompt })
+                  {debugSolution && (
+                    <div className="w-full mr-[16.5rem] text-sm text-white">{debugSolution}</div>
+                  )}
+                </div>
+              }
+              inputClassName="w-full !border-brand-900 border-none py-4 focus:!ring-0 placeholder:text-scale-900"
+              iconContainerClassName="transition text-scale-800 text-brand-900"
+              placeholder={!debugSolution ? 'Ask Supabase AI to modify your query' : ''}
+              className="w-full"
+              actions={
+                <div className="flex flex-row items-center gap-2 space-x-1 mr-6">
+                  {isDiffOpen ? (
+                    <>
+                      <Button
+                        type="primary"
+                        size="tiny"
+                        icon={<IconCheck />}
+                        iconRight={
+                          <div className="opacity-30">
+                            <IconCornerDownLeft size={12} strokeWidth={1.5} />
+                          </div>
+                        }
+                        onClick={acceptAiHandler}
+                      >
+                        Accept
+                      </Button>
+                      <Button
+                        type="alternative"
+                        size="tiny"
+                        icon={<IconX />}
+                        iconRight={<span className="opacity-30">ESC</span>}
+                        onClick={discardAiHandler}
+                      >
+                        Discard
+                      </Button>
+                    </>
+                  ) : (
+                    <IconCornerDownLeft size={16} strokeWidth={1.5} />
+                  )}
+                </div>
+              }
+              onKeyPress={async (e) => {
+                if (e.key === 'Enter') {
+                  try {
+                    const prompt = e.currentTarget.value
 
-                  if (!prompt) {
-                    return
-                  }
+                    if (!prompt) {
+                      return
+                    }
 
-                  const sql = editorRef.current?.getValue()
+                    const sql = editorRef.current?.getValue()
 
-                  if (!sql) {
-                    return
-                  }
+                    if (!sql) {
+                      return
+                    }
 
-                  const { sql: modifiedSql } = await editSql({
-                    prompt,
-                    sql: sql.replace(sqlAiDisclaimerComment, '').trim(),
-                  })
-
-                  const formattedSql =
-                    sqlAiDisclaimerComment +
-                    '\n\n' +
-                    format(modifiedSql, {
-                      language: 'postgresql',
-                      keywordCase: 'lower',
+                    const { sql: modifiedSql } = await editSql({
+                      prompt,
+                      sql: sql.replace(sqlAiDisclaimerComment, '').trim(),
                     })
 
-                  // TODO: show error
-                  if (formattedSql.trim() === sql.trim()) {
-                    return
-                  }
+                    const formattedSql =
+                      sqlAiDisclaimerComment +
+                      '\n\n' +
+                      format(modifiedSql, {
+                        language: 'postgresql',
+                        keywordCase: 'lower',
+                      })
 
-                  setSqlDiff({
-                    original: sql,
-                    modified: formattedSql,
-                  })
-                } catch (error: unknown) {
-                  if (
-                    error &&
-                    typeof error === 'object' &&
-                    'message' in error &&
-                    typeof error.message === 'string'
-                  ) {
-                    ui.setNotification({
-                      category: 'error',
-                      message: error.message,
+                    // TODO: show error
+                    if (formattedSql.trim() === sql.trim()) {
+                      return
+                    }
+
+                    setSqlDiff({
+                      original: sql,
+                      modified: formattedSql,
                     })
+                  } catch (error: unknown) {
+                    if (
+                      error &&
+                      typeof error === 'object' &&
+                      'message' in error &&
+                      typeof error.message === 'string'
+                    ) {
+                      ui.setNotification({
+                        category: 'error',
+                        message: error.message,
+                      })
+                    }
                   }
                 }
-              }
-            }}
-          />
-        </m.div>
-      ) : (
-        <m.div
-          key="ask-ai-loading"
-          layoutId="ask-ai-input"
-          className="w-fit p-5 border border-brand-900 text-brand-900 self-center"
-          initial={{
-            borderRadius: 50,
-          }}
-          animate={{
-            borderRadius: 50,
-          }}
-          transition={{
-            type: 'spring',
-            mass: 0.1,
-            stiffness: 200,
-            damping: 30,
-          }}
-        >
+              }}
+            />
+          </m.div>
+        ) : (
           <m.div
-            key="ask-ai-loading-icon"
-            layoutId="ask-ai-input-icon"
+            key="ask-ai-loading"
+            layoutId="ask-ai-input"
+            className="w-fit p-5 border border-brand-900 text-brand-900"
+            initial={{
+              borderRadius: 50,
+            }}
             animate={{
-              rotate: 360,
-              transition: {
-                delay: 0.2,
-                ease: 'linear',
-                duration: 2,
-                repeat: Infinity,
-              },
+              borderRadius: 50,
+            }}
+            transition={{
+              type: 'spring',
+              mass: 0.1,
+              stiffness: 200,
+              damping: 30,
             }}
           >
-            <AiIcon className="w-4 h-4" />
+            <m.div
+              key="ask-ai-loading-icon"
+              layoutId="ask-ai-input-icon"
+              animate={{
+                rotate: 360,
+                transition: {
+                  delay: 0.2,
+                  ease: 'linear',
+                  duration: 2,
+                  repeat: Infinity,
+                },
+              }}
+            >
+              <AiIcon className="w-4 h-4" />
+            </m.div>
           </m.div>
-        </m.div>
-      )}
-      <Split
-        style={{ height: '100%' }}
-        direction="vertical"
-        gutterSize={2}
-        sizes={(splitSize ? splitSize : (snippet?.splitSizes as number[] | undefined)) ?? [50, 50]}
-        minSize={minSize}
-        snapOffset={snapOffset}
-        expandToMin={true}
-        collapsed={isUtilityPanelCollapsed ? 1 : undefined}
-        onDragEnd={onDragEnd}
-      >
-        <m.div
-          className="dark:border-dark flex-grow overflow-y-auto border-b"
-          initial={{
-            opacity: 0,
-            filter: 'blur(10px)',
-          }}
-          animate={{
-            opacity: 1,
-            filter: 'blur(0px)',
-          }}
-          transition={{
-            duration: 0.3,
-          }}
+        )}
+        <Split
+          style={{ height: '100%' }}
+          direction="vertical"
+          gutterSize={2}
+          sizes={
+            (splitSize ? splitSize : (snippet?.splitSizes as number[] | undefined)) ?? [50, 50]
+          }
+          minSize={minSize}
+          snapOffset={snapOffset}
+          expandToMin={true}
+          collapsed={isUtilityPanelCollapsed ? 1 : undefined}
+          onDragEnd={onDragEnd}
         >
-          {isLoading ? (
-            <div className="flex h-full w-full items-center justify-center">Loading...</div>
-          ) : (
-            <>
-              {isDiffOpen && (
-                <m.div
-                  key="diff-editor"
-                  className="w-full h-full"
-                  initial={{
-                    opacity: 0,
-                    filter: 'blur(10px)',
-                  }}
-                  animate={{
-                    opacity: 1,
-                    filter: 'blur(0px)',
-                  }}
-                >
-                  <DiffEditor
-                    theme="supabase"
-                    language="pgsql"
-                    original={sqlDiff.original}
-                    modified={sqlDiff.modified}
-                    options={{
-                      fontSize: 13,
+          <m.div
+            className="dark:border-dark flex-grow overflow-y-auto border-b"
+            initial={{
+              opacity: 0,
+              filter: 'blur(10px)',
+            }}
+            animate={{
+              opacity: 1,
+              filter: 'blur(0px)',
+            }}
+            transition={{
+              duration: 0.3,
+            }}
+          >
+            {isLoading ? (
+              <div className="flex h-full w-full items-center justify-center">Loading...</div>
+            ) : (
+              <>
+                {isDiffOpen && (
+                  <m.div
+                    key="diff-editor"
+                    className="w-full h-full"
+                    initial={{
+                      opacity: 0,
+                      filter: 'blur(10px)',
                     }}
+                    animate={{
+                      opacity: 1,
+                      filter: 'blur(0px)',
+                    }}
+                  >
+                    <DiffEditor
+                      theme="supabase"
+                      language="pgsql"
+                      original={sqlDiff.original}
+                      modified={sqlDiff.modified}
+                      options={{
+                        fontSize: 13,
+                      }}
+                    />
+                  </m.div>
+                )}
+
+                <m.div
+                  key="monaco-editor"
+                  className={cn('w-full', 'h-full', isDiffOpen && 'invisible')}
+                >
+                  <MonacoEditor
+                    id={id}
+                    editorRef={editorRef}
+                    isExecuting={isExecuting}
+                    autoFocus={false}
+                    executeQuery={executeQuery}
+                    // onOpenAiWidget={() => setIsAiWidgetOpen(true)}
+                    // onCloseAiWidget={() => setIsAiWidgetOpen(false)}
                   />
                 </m.div>
-              )}
-
-              <m.div
-                key="monaco-editor"
-                className={cn('w-full', 'h-full', isDiffOpen && 'invisible')}
-              >
-                <MonacoEditor
-                  id={id}
-                  editorRef={editorRef}
-                  isExecuting={isExecuting}
-                  autoFocus={false}
-                  executeQuery={executeQuery}
-                  // onOpenAiWidget={() => setIsAiWidgetOpen(true)}
-                  // onCloseAiWidget={() => setIsAiWidgetOpen(false)}
-                />
-              </m.div>
-            </>
-          )}
-        </m.div>
-        <div className="flex flex-col">
-          {isLoading ? (
-            <div className="flex h-full w-full items-center justify-center">Loading...</div>
-          ) : (
-            <UtilityPanel
-              id={id}
-              isExecuting={isExecuting}
-              isDisabled={isDiffOpen}
-              executeQuery={executeQuery}
-            />
-          )}
-        </div>
-      </Split>
-    </div>
+              </>
+            )}
+          </m.div>
+          <div className="flex flex-col">
+            {isLoading ? (
+              <div className="flex h-full w-full items-center justify-center">Loading...</div>
+            ) : (
+              <UtilityPanel
+                id={id}
+                isExecuting={isExecuting}
+                isDisabled={isDiffOpen}
+                executeQuery={executeQuery}
+              />
+            )}
+          </div>
+        </Split>
+      </div>
+    </SQLEditorContext.Provider>
   )
 }
 

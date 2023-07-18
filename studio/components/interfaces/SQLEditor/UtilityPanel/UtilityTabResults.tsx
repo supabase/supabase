@@ -1,4 +1,9 @@
+import { useSqlDebugMutation } from 'data/ai/sql-debug-mutation'
+import { format } from 'sql-formatter'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
+import { AiIcon, Button, IconLoader } from 'ui'
+import { useSqlEditor } from '../SQLEditor'
+import { sqlAiDisclaimerComment } from '../SQLEditor.constants'
 import Results from './Results'
 
 export type UtilityTabResultsProps = {
@@ -8,6 +13,9 @@ export type UtilityTabResultsProps = {
 
 const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
   const snap = useSqlEditorStateSnapshot()
+  const { mutateAsync: debugSql, isLoading: isDebugSqlLoading } = useSqlDebugMutation()
+  const { setDebugSolution, setAiInput, setSqlDiff, sqlDiff } = useSqlEditor()
+
   const snippet = snap.snippets[id]
   const result = snap.results[id]?.[0]
   const isUtilityPanelCollapsed = (snippet?.splitSizes?.[1] ?? 0) === 0
@@ -23,7 +31,41 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
   } else if (result?.error) {
     return (
       <div className="bg-table-header-light dark:bg-table-header-dark">
-        <p className="m-0 border-0 px-6 py-4 font-mono">{result.error.message ?? result.error}</p>
+        <div className="flex flex-row justify-between items-center pr-8">
+          <p className="m-0 border-0 px-6 py-4 font-mono">{result.error.message ?? result.error}</p>
+          <Button
+            icon={
+              !isDebugSqlLoading ? (
+                <AiIcon className="w-3 h-3" />
+              ) : (
+                <IconLoader className="animate-spin" size={14} />
+              )
+            }
+            disabled={!!sqlDiff}
+            onClick={async () => {
+              const { solution, sql } = await debugSql({
+                sql: snippet.snippet.content.sql.replace(sqlAiDisclaimerComment, '').trim(),
+                errorMessage: result.error.message,
+              })
+
+              const formattedSql =
+                sqlAiDisclaimerComment +
+                '\n\n' +
+                format(sql, {
+                  language: 'postgresql',
+                  keywordCase: 'lower',
+                })
+              setAiInput('')
+              setDebugSolution(solution)
+              setSqlDiff({
+                original: snippet.snippet.content.sql,
+                modified: formattedSql,
+              })
+            }}
+          >
+            Debug using AI
+          </Button>
+        </div>
         {(result.error.message ?? result.error)?.includes(
           'canceling statement due to statement timeout'
         ) && (
