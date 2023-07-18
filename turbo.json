@@ -37,7 +37,9 @@
         "SENTRY_URL",
         "SESSION_COOKIE_SECRET",
         "SUPABASE_ENCRYPTION_KEY",
-        "PLATFORM_PG_META_URL"
+        "PLATFORM_PG_META_URL",
+        "NEXT_PUBLIC_VERCEL_URL",
+        "NEXT_PUBLIC_VERCEL_ENV"
       ],
       "outputs": [".next/**", "!.next/cache/**"]
     },
