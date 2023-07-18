@@ -74,7 +74,10 @@ const ResetDbPassword: FC<any> = ({ disabled = false }) => {
         ui.setNotification({ category: 'success', message: res.message })
         setShowResetDbPass(false)
       } else {
-        ui.setNotification({ category: 'error', message: 'Failed to reset password' })
+        ui.setNotification({
+          category: 'error',
+          message: `Failed to reset password: ${res.error.message}`,
+        })
       }
       setIsUpdatingPassword(false)
     }

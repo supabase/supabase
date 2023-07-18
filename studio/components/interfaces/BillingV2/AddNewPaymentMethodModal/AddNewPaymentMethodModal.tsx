@@ -78,8 +78,8 @@ const AddNewPaymentMethodModal = ({
     if (intent.error) {
       return ui.setNotification({
         category: 'error',
-        message: intent.error.message,
         error: intent.error,
+        message: `Failed to setup intent: ${intent.error.message}`,
       })
     } else {
       setIntent(intent)

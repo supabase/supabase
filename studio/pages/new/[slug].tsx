@@ -144,6 +144,12 @@ const Wizard: NextPageWithLayout = () => {
     const { data: paymentMethods, error } = await get(`${API_URL}/organizations/${slug}/payments`)
     if (!error) {
       setPaymentMethods(paymentMethods)
+    } else {
+      ui.setNotification({
+        error,
+        category: 'error',
+        message: `Failed to retrieve payment methods: ${error.message}`,
+      })
     }
   }
 
@@ -227,6 +233,7 @@ const Wizard: NextPageWithLayout = () => {
     if (response.error) {
       setNewProjectLoading(false)
       ui.setNotification({
+        error: response.error,
         category: 'error',
         message: `Failed to create new project: ${response.error.message}`,
       })
