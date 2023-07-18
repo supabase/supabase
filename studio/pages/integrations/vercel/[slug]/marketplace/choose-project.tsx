@@ -70,7 +70,7 @@ const VercelIntegration: NextPageWithLayout = () => {
               <Markdown
                 className="text-scale-900"
                 content={`
-This Supabase integration manages your envioemnt variables automatically to provide the latest keys in the unlikely event that you will need to refresh your JWT token.
+This Supabase integration manages your environment variables automatically to provide the latest keys in the unlikely event that you will need to refresh your JWT token.
 `}
               />
             </header>
@@ -85,6 +85,7 @@ This Supabase integration manages your envioemnt variables automatically to prov
               }}
               installedConnections={integration?.connections}
               setLoading={setLoading}
+              showSkip={true}
             />
           </ScaffoldContainer>
         </>
