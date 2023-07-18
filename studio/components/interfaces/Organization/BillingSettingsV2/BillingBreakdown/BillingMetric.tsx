@@ -67,7 +67,7 @@ const BillingMetric = ({ idx, slug, metric, usage, subscription }: BillingMetric
           </a>
         </Link>
 
-        {isUsageBillingEnabled && usageFee && (
+        {isUsageBillingEnabled && hasLimit && usageFee && (
           <Tooltip.Root delayDuration={0}>
             <Tooltip.Trigger>
               <div className="flex items-center">
