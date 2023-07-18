@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { toast } from 'react-hot-toast'
 
 import { ENV_VAR_RAW_KEYS } from 'components/interfaces/Integrations/Integrations-Vercel.constants'
@@ -10,7 +10,22 @@ import { VercelProjectsResponse } from 'data/integrations/integrations-vercel-pr
 import { IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { useSelectedOrganization } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
-import { Button, Listbox, cn } from 'ui'
+import {
+  Button,
+  CommandEmpty_Shadcn_,
+  CommandGroup_Shadcn_,
+  CommandInput_Shadcn_,
+  CommandItem_Shadcn_,
+  CommandList_Shadcn_,
+  Command_Shadcn_,
+  IconChevronDown,
+  IconHexagon,
+  Listbox,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+  Popover_Shadcn_,
+  cn,
+} from 'ui'
 
 interface Project {
   id: string
@@ -39,6 +54,11 @@ const ProjectLinker = ({
   setLoading,
   showSkip = false,
 }: ProjectLinkerProps) => {
+  const [supabaseProjectsComboBoxOpen, setSupabaseProjectsComboboxOpen] = useState(false)
+  const [vercelProjectsComboBoxOpen, setVercelProjectsComboboxOpen] = useState(false)
+  const supabaseProjectsComboBoxRef = useRef<HTMLButtonElement>(null)
+  const vercelProjectsComboBoxRef = useRef<HTMLButtonElement>(null)
+
   const selectedOrganization = useSelectedOrganization()
 
   const [supabaseProjectRef, setSupabaseProjectRef] = useState(UNDEFINED_SELECT_VALUE)
@@ -125,6 +145,80 @@ const ProjectLinker = ({
             <div className="bg-white shadow border rounded p-1 w-12 h-12 flex justify-center items-center">
               <img src={`${BASE_PATH}/img/supabase-logo.svg`} alt="Supabase" className="w-6" />
             </div>
+
+            <Popover_Shadcn_
+              open={supabaseProjectsComboBoxOpen}
+              onOpenChange={setSupabaseProjectsComboboxOpen}
+            >
+              <PopoverTrigger_Shadcn_ asChild>
+                <Button
+                  ref={supabaseProjectsComboBoxRef}
+                  type="default"
+                  size="medium"
+                  block
+                  className="justify-start"
+                  icon={
+                    <div className="bg-white shadow border rounded p-1 w-6 h-6 flex justify-center items-center">
+                      <img
+                        src={`${BASE_PATH}/img/supabase-logo.svg`}
+                        alt="Supabase"
+                        className="w-4"
+                      />
+                    </div>
+                  }
+                  iconRight={
+                    <span className="grow flex justify-end">
+                      <IconChevronDown className={''} />
+                    </span>
+                  }
+                >
+                  <span className="flex gap-2">
+                    {supabaseProjectRef ?? UNDEFINED_SELECT_VALUE}
+                    {/* {selectedOrg?.installationInstalled && (
+                      <Badge color="scale">Integration Installed</Badge>
+                    )} */}
+                  </span>
+                </Button>
+              </PopoverTrigger_Shadcn_>
+              <PopoverContent_Shadcn_
+                className="p-0 w-full"
+                side="bottom"
+                align="center"
+                style={{ width: supabaseProjectsComboBoxRef.current?.offsetWidth }}
+              >
+                <Command_Shadcn_>
+                  <CommandInput_Shadcn_ placeholder="Search organization..." />
+                  <CommandList_Shadcn_>
+                    <CommandEmpty_Shadcn_>No results found.</CommandEmpty_Shadcn_>
+                    <CommandGroup_Shadcn_>
+                      {supabaseProjects.map((project) => {
+                        return (
+                          <CommandItem_Shadcn_
+                            value={project.ref}
+                            key={project.ref}
+                            className="flex gap-2 items-center"
+                            onSelect={(ref) => {
+                              if (ref) setSupabaseProjectRef(ref)
+                              setSupabaseProjectsComboboxOpen(false)
+                            }}
+                          >
+                            <div className="bg-white shadow border rounded p-1 w-6 h-6 flex justify-center items-center">
+                              <img
+                                src={`${BASE_PATH}/img/supabase-logo.svg`}
+                                alt="Supabase"
+                                className="w-4"
+                              />
+                            </div>
+                            <span>{project.name}</span>
+                          </CommandItem_Shadcn_>
+                        )
+                      })}
+                    </CommandGroup_Shadcn_>
+                  </CommandList_Shadcn_>
+                </Command_Shadcn_>
+              </PopoverContent_Shadcn_>
+            </Popover_Shadcn_>
+
             <Listbox
               className="w-full"
               value={supabaseProjectRef ?? UNDEFINED_SELECT_VALUE}
@@ -170,6 +264,86 @@ const ProjectLinker = ({
                 <path fill-rule="evenodd" d="M256,48,496,464H16Z" />
               </svg>
             </div>
+
+            <Popover_Shadcn_
+              open={vercelProjectsComboBoxOpen}
+              onOpenChange={setVercelProjectsComboboxOpen}
+            >
+              <PopoverTrigger_Shadcn_ asChild>
+                <Button
+                  ref={supabaseProjectsComboBoxRef}
+                  type="default"
+                  size="medium"
+                  block
+                  className="justify-start"
+                  // icon={
+                  //   !project?.framework ? (
+                  //     vercelIcon
+                  //   ) : (
+                  //     <img
+                  //       src={`${BASE_PATH}/img/icons/frameworks/${project.framework}.svg`}
+                  //       width={21}
+                  //       height={21}
+                  //       alt={`icon`}
+                  //     />
+                  //   )
+                  // }
+                  iconRight={
+                    <span className="grow flex justify-end">
+                      <IconChevronDown className={''} />
+                    </span>
+                  }
+                >
+                  <span className="flex gap-2">
+                    {/* {supabaseProjectRef ?? UNDEFINED_SELECT_VALUE} */}
+                    {/* {selectedOrg?.installationInstalled && (
+                      <Badge color="scale">Integration Installed</Badge>
+                    )} */}
+                  </span>
+                </Button>
+              </PopoverTrigger_Shadcn_>
+              <PopoverContent_Shadcn_
+                className="p-0 w-full"
+                side="bottom"
+                align="center"
+                style={{ width: supabaseProjectsComboBoxRef.current?.offsetWidth }}
+              >
+                <Command_Shadcn_>
+                  <CommandInput_Shadcn_ placeholder="Search organization..." />
+                  <CommandList_Shadcn_>
+                    <CommandEmpty_Shadcn_>No results found.</CommandEmpty_Shadcn_>
+                    <CommandGroup_Shadcn_>
+                      {filteredForeignProjects.map((project) => {
+                        return (
+                          <CommandItem_Shadcn_
+                            value={project.id}
+                            key={project.id}
+                            className="flex gap-2 items-center"
+                            onSelect={(ref) => {
+                              if (ref) setSupabaseProjectRef(ref)
+                              setSupabaseProjectsComboboxOpen(false)
+                            }}
+                          >
+                            {!project?.framework ? (
+                              vercelIcon
+                            ) : (
+                              <img
+                                src={`${BASE_PATH}/img/icons/frameworks/${project.framework}.svg`}
+                                width={21}
+                                height={21}
+                                alt={`icon`}
+                              />
+                            )}
+                            <span>{project.name}</span>
+                          </CommandItem_Shadcn_>
+                        )
+                      })}
+                    </CommandGroup_Shadcn_>
+                  </CommandList_Shadcn_>
+                </Command_Shadcn_>
+              </PopoverContent_Shadcn_>
+            </Popover_Shadcn_>
+
             <Listbox
               className="w-full"
               value={vercelProjectId ?? UNDEFINED_SELECT_VALUE}

@@ -207,7 +207,9 @@ const VercelIntegration: NextPageWithLayout = () => {
   const disableInstallationForm =
     isLoadingVercelIntegrationCreateMutation ||
     // disables installation button if integration is already installed and it is Marketplace flow
-    (selectedOrg?.installationInstalled && source === 'marketplace')
+    (selectedOrg && selectedOrg?.installationInstalled && source === 'marketplace')
+      ? true
+      : false
 
   console.log('selectedOrg', selectedOrg)
 
