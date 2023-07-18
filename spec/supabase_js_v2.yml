@@ -34,6 +34,15 @@ functions:
           // Create a single supabase client for interacting with your database
           const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
           ```
+      - id: create-client
+        name: With a custom domain
+        code: |
+          ```js
+          import { createClient } from '@supabase/supabase-js'
+
+          // Use a custom domain as the supabase URL
+          const supabase = createClient('https://my-custom-domain.com', 'public-anon-key')
+          ```
       - id: with-additional-parameters
         name: With additional parameters
         code: |
