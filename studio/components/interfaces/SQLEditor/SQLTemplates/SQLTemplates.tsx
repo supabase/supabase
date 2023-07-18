@@ -4,6 +4,7 @@ import { observer } from 'mobx-react-lite'
 
 import { useParams, useTelemetryProps } from 'common'
 import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.constants'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useCheckPermissions, useStore } from 'hooks'
 import { uuidv4 } from 'lib/helpers'
@@ -19,6 +20,7 @@ const SQLTemplates = observer(() => {
   const { ref } = useParams()
   const router = useRouter()
   const { profile } = useProfile()
+  const { project } = useProjectContext()
   const [sql, quickStart] = partition(SQL_TEMPLATES, { type: 'template' })
 
   const telemetryProps = useTelemetryProps()
@@ -28,10 +30,9 @@ const SQLTemplates = observer(() => {
     subject: { id: profile?.id },
   })
 
-  // [Joshen TODO] Removed optimistic query creation logic for now, need to figure out
-  // how to do that after using ids as part of the URL
   const handleNewQuery = async (sql: string, name: string) => {
-    if (!ref) return console.error('Project ref is required')
+    if (!project) return console.error('Project is required')
+    if (!profile) return console.error('Profile is required')
     if (!canCreateSQLSnippet) {
       return ui.setNotification({
         category: 'info',
@@ -40,10 +41,16 @@ const SQLTemplates = observer(() => {
     }
 
     try {
-      const snippet = createSqlSnippetSkeleton({ name, sql, owner_id: profile?.id })
-      const data = { ...snippet, id: uuidv4() }
-      snap.addSnippet(data as SqlSnippet, ref)
-      router.push(`/project/${ref}/sql/${data.id}`)
+      const snippet = createSqlSnippetSkeleton({
+        id: uuidv4(),
+        name,
+        sql,
+        owner_id: profile.id,
+        project_id: project.id,
+      })
+
+      snap.addSnippet(snippet as SqlSnippet, project.ref)
+      router.push(`/project/${project.ref}/sql/${snippet.id}`)
     } catch (error: any) {
       ui.setNotification({
         category: 'error',

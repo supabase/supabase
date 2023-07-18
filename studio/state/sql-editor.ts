@@ -1,8 +1,8 @@
-import { Content } from 'data/content/content-query'
-import { upsertContent } from 'data/content/content-upsert-mutation'
+import { UpsertContentPayload, upsertContent } from 'data/content/content-upsert-mutation'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
 import { debounce, memoize } from 'lodash'
 import { useMemo } from 'react'
+import { SqlSnippets } from 'types'
 import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
 import { devtools, proxySet } from 'valtio/utils'
 
@@ -170,10 +170,13 @@ export const useSnippets = (projectRef: string | undefined) => {
   }, [projectRef, snapshot.orders, snapshot.snippets])
 }
 
-async function upsert(id: string, projectRef: string, content: Partial<Content>) {
+async function upsert(id: string, projectRef: string, payload: UpsertContentPayload) {
   try {
     sqlEditorState.savingStates[id] = 'UPDATING'
-    await upsertContent({ projectRef, id, payload: content })
+    await upsertContent({
+      projectRef,
+      payload,
+    })
     sqlEditorState.savingStates[id] = 'IDLE'
   } catch (error) {
     sqlEditorState.savingStates[id] = 'UPDATING_FAILED'
@@ -181,8 +184,8 @@ async function upsert(id: string, projectRef: string, content: Partial<Content>)
 }
 
 const memoizedUpdate = memoize((_id: string) => debounce(upsert, 1000))
-const debouncedUpdate = (id: string, projectRef: string, content: Partial<Content>) =>
-  memoizedUpdate(id)(id, projectRef, content)
+const debouncedUpdate = (id: string, projectRef: string, payload: UpsertContentPayload) =>
+  memoizedUpdate(id)(id, projectRef, payload)
 
 if (typeof window !== 'undefined') {
   devtools(sqlEditorState, { name: 'sqlEditorState', enabled: true })
@@ -195,12 +198,14 @@ if (typeof window !== 'undefined') {
 
       if (snippet) {
         debouncedUpdate(id, snippet.projectRef, {
-          content: { ...snippet.snippet.content, content_id: id },
+          ...snippet.snippet,
+          name: snippet.snippet.name ?? 'Untitled',
+          description: snippet.snippet.description ?? '',
+          visibility: 'user',
+          project_id: snippet.snippet.project_id ?? 0,
+          content: { ...snippet.snippet.content, content_id: id } as SqlSnippets.Content,
           type: 'sql',
           id,
-          name: snippet.snippet.name,
-          description: snippet.snippet.description,
-          visibility: snippet.snippet.visibility ?? 'project',
         })
 
         sqlEditorState.needsSaving.delete(id)

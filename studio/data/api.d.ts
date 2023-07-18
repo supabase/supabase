@@ -396,6 +396,8 @@ export interface paths {
   "/platform/projects/{ref}/content": {
     /** Gets project's content */
     get: operations["ContentController_getContent"];
+    /** Updates project's content */
+    put: operations["ContentController_updateWholeContent"];
     /** Creates project's content */
     post: operations["ContentController_createContent"];
     /** Deletes project's content */
@@ -688,9 +690,13 @@ export interface paths {
      */
     post: operations["VercelIntegrationController_createVercelIntegration"];
   };
+  "/platform/integrations/vercel/{organization_integration_id}": {
+    /** Removes Vercel organization integration with the given id */
+    delete: operations["VercelIntegrationController_removeVercelIntegration"];
+  };
   "/platform/integrations/vercel/projects/{organization_integration_id}": {
-    /** Gets vercel projects for the given organization */
-    get: operations["VercelProjectController_getProjects"];
+    /** Gets vercel projects with the given organization integration id */
+    get: operations["VercelProjectController_getVercelProjects"];
   };
   "/platform/integrations/vercel/connections/{organization_integration_id}": {
     /** Gets installed vercel project connections for the given organization integration */
@@ -699,6 +705,10 @@ export interface paths {
   "/platform/integrations/vercel/connections": {
     /** Connects a Vercel project to a supabase project */
     post: operations["VercelConnectionsController_createVercelConnection"];
+  };
+  "/platform/integrations/vercel/connections/{connection_id}/sync-envs": {
+    /** Syncs supabase project envs with given connection id */
+    post: operations["VercelConnectionsController_syncVercelConnectionEnvs"];
   };
   "/platform/integrations/vercel/connections/{connection_id}": {
     /** Deletes vercel project connection */
@@ -1044,6 +1054,8 @@ export interface paths {
   "/v0/projects/{ref}/content": {
     /** Gets project's content */
     get: operations["ContentController_getContent"];
+    /** Updates project's content */
+    put: operations["ContentController_updateWholeContent"];
     /** Creates project's content */
     post: operations["ContentController_createContent"];
     /** Deletes project's content */
@@ -1235,6 +1247,23 @@ export interface paths {
     /** Deletes objects */
     delete: operations["StorageObjectsController_deleteObjects"];
   };
+  "/v1/branch/{branch_id}": {
+    /**
+     * Get database branch config 
+     * @description Fetches configurations of the specified database branch
+     */
+    get: operations["BranchController_getBranchDetails"];
+    /**
+     * Delete a database branch 
+     * @description Deletes the specified database branch
+     */
+    delete: operations["BranchController_deleteBranch"];
+    /**
+     * Update database branch config 
+     * @description Updates the configuration of the specified database branch
+     */
+    patch: operations["BranchController_updateBranch"];
+  };
   "/v1/projects": {
     /**
      * List all projects 
@@ -1246,6 +1275,23 @@ export interface paths {
   };
   "/v1/projects/{ref}/api-keys": {
     get: operations["ApiKeysController_getProjectApiKeys"];
+  };
+  "/v1/projects/{ref}/branches": {
+    /**
+     * List all database branches 
+     * @description Returns all database branches of the specified project.
+     */
+    get: operations["BranchesController_getBranches"];
+    /**
+     * Create a database branch 
+     * @description Creates a database branch from the specified project.
+     */
+    post: operations["BranchesController_createBranch"];
+    /**
+     * Disables preview branching 
+     * @description Disables preview branching for the specified project
+     */
+    delete: operations["BranchesController_disableBranch"];
   };
   "/v1/projects/{ref}/custom-hostname": {
     /** Gets project's custom hostname config */
@@ -2992,6 +3038,29 @@ export interface components {
       anon_key: string;
       service_key: string;
     };
+    GetUserContentObject: {
+      owner: {
+        id?: number;
+        username?: string;
+      };
+      updated_by: {
+        id?: number;
+        username?: string;
+      };
+      id: string;
+      inserted_at: string;
+      updated_at: string;
+      type: Record<string, never>;
+      visibility: Record<string, never>;
+      name: string;
+      description?: string;
+      project_id: number;
+      owner_id: number;
+      last_updated_by: number;
+    };
+    GetUserContentResponse: {
+      data: (components["schemas"]["GetUserContentObject"])[];
+    };
     CreateContentParams: {
       id: string;
       name: string;
@@ -3002,6 +3071,30 @@ export interface components {
       visibility: "user" | "project" | "org" | "public";
       content?: Record<string, never>;
       owner_id?: number;
+    };
+    UserContentObject: {
+      id: string;
+      inserted_at: string;
+      updated_at: string;
+      type: Record<string, never>;
+      visibility: Record<string, never>;
+      name: string;
+      description?: string;
+      project_id: number;
+      owner_id: number;
+      last_updated_by: number;
+    };
+    UpsertContentParams: {
+      id: string;
+      name: string;
+      description: string;
+      /** @enum {string} */
+      type: "sql" | "report" | "log_sql";
+      /** @enum {string} */
+      visibility: "user" | "project" | "org" | "public";
+      content?: Record<string, never>;
+      owner_id?: number;
+      project_id: number;
     };
     UpdateContentParams: {
       id?: string;
@@ -3026,6 +3119,15 @@ export interface components {
       postgrest: string;
       "supabase-postgres": string;
     };
+    BranchResponse: {
+      id: string;
+      name: string;
+      project_ref: string;
+      is_default: boolean;
+      git_branch: string;
+      created_at: string;
+      updated_at: string;
+    };
     ProjectDetailResponse: {
       cloud_provider: string;
       db_host: string;
@@ -3046,6 +3148,7 @@ export interface components {
       volumeSizeGb?: number;
       maxDatabasePreprovisionGb?: number;
       lastDatabaseResizeAt?: string;
+      preview_branches: (components["schemas"]["BranchResponse"])[];
     };
     ProjectRefResponse: {
       id: number;
@@ -3704,6 +3807,14 @@ export interface components {
       framework?: string | null;
       link?: components["schemas"]["VercelProjectLink"];
     };
+    GetVercelProjectsResponse: {
+      projects: (components["schemas"]["IntegrationVercelProject"])[];
+      pagination: {
+        count?: number;
+        next?: number | null;
+        prev?: number | null;
+      };
+    };
     GetVercelConnections: {
       id: string;
       inserted_at: string;
@@ -3798,6 +3909,21 @@ export interface components {
     GetMetricsResponse: {
       metrics: (components["schemas"]["ProjectMetric"])[];
     };
+    BranchDetailResponse: {
+      db_port: number;
+      ref: string;
+      postgres_version: string;
+      /** @enum {string} */
+      status: "ACTIVE_HEALTHY" | "ACTIVE_UNHEALTHY" | "COMING_UP" | "GOING_DOWN" | "INACTIVE" | "INIT_FAILED" | "REMOVED" | "RESTORING" | "UNKNOWN" | "UPGRADING" | "PAUSING";
+      db_host: string;
+      db_user?: string;
+      db_pass?: string;
+      jwt_secret?: string;
+    };
+    UpdateBranchBody: {
+      branch_name?: string;
+      git_branch?: string;
+    };
     DatabaseResponse: {
       /** @description Database host */
       host: string;
@@ -3807,6 +3933,11 @@ export interface components {
     ApiKeyResponse: {
       name: string;
       api_key: string;
+    };
+    CreateBranchBody: {
+      branch_name: string;
+      git_branch?: string;
+      region?: string;
     };
     UpdateCustomHostnameResponse: {
       /** @enum {string} */
@@ -6639,8 +6770,35 @@ export interface operations {
       };
     };
     responses: {
-      200: never;
+      200: {
+        content: {
+          "application/json": components["schemas"]["GetUserContentResponse"];
+        };
+      };
       /** @description Failed to retrieve project's content */
+      500: never;
+    };
+  };
+  /** Updates project's content */
+  ContentController_updateWholeContent: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpsertContentParams"];
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": components["schemas"]["UserContentObject"];
+        };
+      };
+      /** @description Failed to update project's content */
       500: never;
     };
   };
@@ -6660,7 +6818,7 @@ export interface operations {
     responses: {
       201: {
         content: {
-          "application/json": (Record<string, never>)[];
+          "application/json": (components["schemas"]["UserContentObject"])[];
         };
       };
       /** @description Failed to create project's content */
@@ -6677,7 +6835,7 @@ export interface operations {
     responses: {
       200: {
         content: {
-          "application/json": Record<string, never>;
+          "application/json": components["schemas"]["UserContentObject"];
         };
       };
       /** @description Failed to delete project's content */
@@ -6699,7 +6857,7 @@ export interface operations {
     responses: {
       200: {
         content: {
-          "application/json": (Record<string, never>)[];
+          "application/json": (components["schemas"]["UserContentObject"])[];
         };
       };
       /** @description Failed to update project's content */
@@ -8072,9 +8230,27 @@ export interface operations {
       500: never;
     };
   };
-  /** Gets vercel projects for the given organization */
-  VercelProjectController_getProjects: {
+  /** Removes Vercel organization integration with the given id */
+  VercelIntegrationController_removeVercelIntegration: {
     parameters: {
+      path: {
+        organization_integration_id: string;
+      };
+    };
+    responses: {
+      200: never;
+      /** @description Failed to remove Vercel organization integration with the given id */
+      500: never;
+    };
+  };
+  /** Gets vercel projects with the given organization integration id */
+  VercelProjectController_getVercelProjects: {
+    parameters: {
+      query: {
+        search?: string;
+        from?: string;
+        limit: string;
+      };
       path: {
         organization_integration_id: string;
       };
@@ -8082,10 +8258,10 @@ export interface operations {
     responses: {
       200: {
         content: {
-          "application/json": (components["schemas"]["IntegrationVercelProject"])[];
+          "application/json": components["schemas"]["GetVercelProjectsResponse"];
         };
       };
-      /** @description Failed to get vercel projects for the given organization */
+      /** @description Failed to get vercel projects with the given organization integration id */
       500: never;
     };
   };
@@ -8116,6 +8292,19 @@ export interface operations {
     responses: {
       201: never;
       /** @description Failed to create project connections */
+      500: never;
+    };
+  };
+  /** Syncs supabase project envs with given connection id */
+  VercelConnectionsController_syncVercelConnectionEnvs: {
+    parameters: {
+      path: {
+        connection_id: string;
+      };
+    };
+    responses: {
+      201: never;
+      /** @description Failed to sync supabase project envs with given connection id */
       500: never;
     };
   };
@@ -8517,6 +8706,70 @@ export interface operations {
       };
     };
   };
+  /**
+   * Get database branch config 
+   * @description Fetches configurations of the specified database branch
+   */
+  BranchController_getBranchDetails: {
+    parameters: {
+      path: {
+        /** @description Branch ID */
+        branch_id: string;
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": components["schemas"]["BranchDetailResponse"];
+        };
+      };
+      /** @description Failed to update database branch */
+      500: never;
+    };
+  };
+  /**
+   * Delete a database branch 
+   * @description Deletes the specified database branch
+   */
+  BranchController_deleteBranch: {
+    parameters: {
+      path: {
+        /** @description Branch ID */
+        branch_id: string;
+      };
+    };
+    responses: {
+      200: never;
+      /** @description Failed to delete database branch */
+      500: never;
+    };
+  };
+  /**
+   * Update database branch config 
+   * @description Updates the configuration of the specified database branch
+   */
+  BranchController_updateBranch: {
+    parameters: {
+      path: {
+        /** @description Branch ID */
+        branch_id: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateBranchBody"];
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": components["schemas"]["BranchResponse"];
+        };
+      };
+      /** @description Failed to update database branch */
+      500: never;
+    };
+  };
   ApiKeysController_getProjectApiKeys: {
     parameters: {
       path: {
@@ -8531,6 +8784,70 @@ export interface operations {
         };
       };
       403: never;
+    };
+  };
+  /**
+   * List all database branches 
+   * @description Returns all database branches of the specified project.
+   */
+  BranchesController_getBranches: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string;
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": (components["schemas"]["BranchResponse"])[];
+        };
+      };
+      /** @description Failed to retrieve database branches */
+      500: never;
+    };
+  };
+  /**
+   * Create a database branch 
+   * @description Creates a database branch from the specified project.
+   */
+  BranchesController_createBranch: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateBranchBody"];
+      };
+    };
+    responses: {
+      201: {
+        content: {
+          "application/json": components["schemas"]["BranchResponse"];
+        };
+      };
+      /** @description Failed to create database branch */
+      500: never;
+    };
+  };
+  /**
+   * Disables preview branching 
+   * @description Disables preview branching for the specified project
+   */
+  BranchesController_disableBranch: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string;
+      };
+    };
+    responses: {
+      200: never;
+      /** @description Failed to disable preview branching */
+      500: never;
     };
   };
   /** Gets project's custom hostname config */
