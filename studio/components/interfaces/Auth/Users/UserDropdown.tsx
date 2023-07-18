@@ -26,9 +26,30 @@ const UserDropdown = ({ user, canRemoveUser, canRemoveMFAFactors }: UserDropdown
   const { ref } = useParams()
   const PageState: any = useContext(PageContext)
 
-  const { mutateAsync: resetPassword, isLoading: isResetting } = useUserResetPasswordMutation()
-  const { mutateAsync: sendMagicLink, isLoading: isSendingLink } = useUserSendMagicLinkMutation()
-  const { mutateAsync: sendOTP, isLoading: isSendingOTP } = useUserSendOTPMutation()
+  const { mutate: resetPassword, isLoading: isResetting } = useUserResetPasswordMutation({
+    onSuccess: () => {
+      ui.setNotification({
+        category: 'success',
+        message: `Sent password recovery to ${user.email}`,
+      })
+    },
+  })
+  const { mutate: sendMagicLink, isLoading: isSendingLink } = useUserSendMagicLinkMutation({
+    onSuccess: () => {
+      ui.setNotification({
+        category: 'success',
+        message: `Sent magic link to ${user.email}`,
+      })
+    },
+  })
+  const { mutate: sendOTP, isLoading: isSendingOTP } = useUserSendOTPMutation({
+    onSuccess: () => {
+      ui.setNotification({
+        category: 'success',
+        message: `Sent OTP to ${user.phone}`,
+      })
+    },
+  })
   const { mutateAsync: deleteUser, isLoading: isDeleting } = useUserDeleteMutation()
   const { mutateAsync: deleteUserMFAFactors, isLoading: isDeletingFactors } =
     useUserDeleteMFAFactorsMutation()
@@ -36,29 +57,17 @@ const UserDropdown = ({ user, canRemoveUser, canRemoveMFAFactors }: UserDropdown
 
   const handleResetPassword = async () => {
     if (!ref) return console.error('Project ref is required')
-    await resetPassword({ projectRef: ref, user })
-    ui.setNotification({
-      category: 'success',
-      message: `Sent password recovery to ${user.email}`,
-    })
+    resetPassword({ projectRef: ref, user })
   }
 
   async function handleSendMagicLink() {
     if (!ref) return console.error('Project ref is required')
-    await sendMagicLink({ projectRef: ref, user })
-    ui.setNotification({
-      category: 'success',
-      message: `Sent magic link to ${user.email}`,
-    })
+    sendMagicLink({ projectRef: ref, user })
   }
 
   async function handleSendOtp() {
     if (!ref) return console.error('Project ref is required')
-    await sendOTP({ projectRef: ref, user })
-    ui.setNotification({
-      category: 'success',
-      message: `Sent OTP to ${user.phone}`,
-    })
+    sendOTP({ projectRef: ref, user })
   }
 
   async function handleDelete() {
@@ -68,10 +77,13 @@ const UserDropdown = ({ user, canRemoveUser, canRemoveMFAFactors }: UserDropdown
       message: `This is permanent! Are you sure you want to delete user ${user.email} ?`,
       onAsyncConfirm: async () => {
         if (!ref) return console.error('Project ref is required')
-        await deleteUser({ projectRef: ref, user })
-        ui.setNotification({ category: 'success', message: `Successfully deleted ${user.email}` })
-        PageState.users = PageState.users.filter((x: any) => x.id != user.id)
-        PageState.totalUsers -= 1
+        try {
+          await deleteUser({ projectRef: ref, user })
+          ui.setNotification({ category: 'success', message: `Successfully deleted ${user.email}` })
+          PageState.users = PageState.users.filter((x: any) => x.id != user.id)
+          PageState.totalUsers -= 1
+        } finally {
+        }
       },
     })
   }
@@ -83,11 +95,14 @@ const UserDropdown = ({ user, canRemoveUser, canRemoveMFAFactors }: UserDropdown
       message: `This is permanent! Are you sure you want to delete the user's MFA factors?`,
       onAsyncConfirm: async () => {
         if (!ref) return console.error('Project ref is required')
-        await deleteUserMFAFactors({ projectRef: ref, userId: user.id })
-        ui.setNotification({
-          category: 'success',
-          message: "Successfully deleted the user's factors",
-        })
+        try {
+          await deleteUserMFAFactors({ projectRef: ref, userId: user.id })
+          ui.setNotification({
+            category: 'success',
+            message: "Successfully deleted the user's factors",
+          })
+        } finally {
+        }
       },
     })
   }
