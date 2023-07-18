@@ -85,6 +85,7 @@ This Supabase integration manages your environment variables automatically to pr
               }}
               installedConnections={integration?.connections}
               setLoading={setLoading}
+              showSkip={true}
             />
           </ScaffoldContainer>
         </>
