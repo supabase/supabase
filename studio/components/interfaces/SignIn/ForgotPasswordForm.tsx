@@ -35,7 +35,7 @@ const ForgotPasswordForm = () => {
       hcaptchaToken: token ?? undefined,
       redirectTo: `${
         process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
-          ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
+          ? location.origin
           : process.env.NEXT_PUBLIC_SITE_URL
       }${BASE_PATH}/reset-password`,
     })
