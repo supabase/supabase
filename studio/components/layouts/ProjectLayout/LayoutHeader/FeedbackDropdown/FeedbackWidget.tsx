@@ -107,7 +107,6 @@ const FeedbackWidget: FC<Props> = ({
         })
         setFeedback('')
         ui.setNotification({ category: 'success', message: 'Feedback sent. Thank you!' })
-      } catch (error) {
       } finally {
         setSending(false)
       }

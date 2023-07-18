@@ -77,19 +77,25 @@ const ExitSurveyModal = ({ visible, subscription, onClose }: ExitSurveyModalProp
     }
   }
 
-  const downgradeOrganization = async (values?: any) => {
+  const downgradeOrganization = async () => {
     // Update the subscription first, followed by posting the exit survey if successful
     // If compute instance is present within the existing subscription, then a restart will be triggered
     if (!slug) return console.error('Slug is required')
 
-    await updateOrgSubscription({ slug, tier: 'tier_free' })
-    resetCaptcha()
+    try {
+      await updateOrgSubscription({ slug, tier: 'tier_free' })
+      resetCaptcha()
+    } finally {
+    }
 
-    await sendExitSurvey({
-      orgSlug: slug,
-      reasons: selectedReasons.reduce((a, b) => `${a}- ${b}\n`, ''),
-      message,
-    })
+    try {
+      await sendExitSurvey({
+        orgSlug: slug,
+        reasons: selectedReasons.reduce((a, b) => `${a}- ${b}\n`, ''),
+        message,
+      })
+    } finally {
+    }
 
     ui.setNotification({
       category: 'success',

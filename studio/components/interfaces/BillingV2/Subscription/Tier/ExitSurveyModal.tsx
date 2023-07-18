@@ -93,11 +93,14 @@ const ExitSurveyModal = ({ visible, onClose }: ExitSurveyModalProps) => {
       return
     }
 
-    await sendExitSurvey({
-      projectRef,
-      reasons: selectedReasons.reduce((a, b) => `${a}- ${b}\n`, ''),
-      message,
-    })
+    try {
+      await sendExitSurvey({
+        projectRef,
+        reasons: selectedReasons.reduce((a, b) => `${a}- ${b}\n`, ''),
+        message,
+      })
+    } finally {
+    }
 
     ui.setNotification({
       category: 'success',
