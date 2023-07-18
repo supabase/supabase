@@ -12,6 +12,7 @@ import { invalidateProjectsQuery } from 'data/projects/projects-query'
 import { useCheckPermissions, useStore } from 'hooks'
 import { delete_, post } from 'lib/common/fetch'
 import { API_URL, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
+import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 
 export interface DeleteProjectButtonProps {
   type?: 'danger' | 'default'
@@ -24,8 +25,9 @@ const DeleteProjectButton = ({ type = 'danger' }: DeleteProjectButtonProps) => {
 
   const { project } = useProjectContext()
   const projectRef = project?.ref
-  const projectTier = project?.subscription_tier ?? PRICING_TIER_PRODUCT_IDS.FREE
-  const isFree = projectTier === PRICING_TIER_PRODUCT_IDS.FREE
+  const { data: subscription } = useProjectSubscriptionV2Query({ projectRef })
+  const projectPlan = subscription?.plan?.id ?? 'free'
+  const isFree = projectPlan === PRICING_TIER_PRODUCT_IDS.FREE
 
   const [isOpen, setIsOpen] = useState(false)
   const [loading, setLoading] = useState(false)

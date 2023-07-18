@@ -1,12 +1,14 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { FC, Fragment, useEffect, useState } from 'react'
+import { FC, Fragment, useState } from 'react'
 import { AutoField } from 'uniforms-bootstrap4'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
+import AlertError from 'components/ui/AlertError'
 import Divider from 'components/ui/Divider'
 import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
 import { useCheckPermissions, useStore } from 'hooks'
 import { patch } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
@@ -14,90 +16,83 @@ import { pluckObjectFields } from 'lib/helpers'
 import { Input } from 'ui'
 
 const ConnectionPooling = () => {
-  const { app } = useStore()
   const { project } = useProjectContext()
   const projectRef = project?.ref ?? 'default'
+  const {
+    data: poolingConfiguration,
+    error,
+    isLoading,
+    isError,
+    isSuccess,
+  } = usePoolingConfigurationQuery({ projectRef })
 
-  const [isLoading, setIsLoading] = useState<boolean>(true)
-  const [poolingConfiguration, setPoolingConfiguration] = useState<any>()
-
-  useEffect(() => {
-    fetchPoolingConfiguration()
-  }, [])
-
-  const fetchPoolingConfiguration = async () => {
-    setIsLoading(true)
-    const response = await app.database.getPoolingConfiguration(projectRef)
-    setPoolingConfiguration(response)
-    setIsLoading(false)
-  }
-
-  if (isLoading) {
-    return (
-      <Panel
-        title={
-          <h5 key="panel-title" className="mb-0">
-            Connection Pooling
-          </h5>
-        }
-      >
-        <Panel.Content className="space-y-8">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <Fragment key={i}>
-              <div className="grid gap-2 items-center md:grid md:grid-cols-12 md:gap-x-4 w-full">
-                <ShimmeringLoader className="h-4 w-1/3 col-span-4" delayIndex={i} />
-                <ShimmeringLoader className="h-8 w-full col-span-8" delayIndex={i} />
-              </div>
-              <Divider light />
-            </Fragment>
-          ))}
-
-          <ShimmeringLoader className="h-8 w-full" />
-        </Panel.Content>
-      </Panel>
-    )
-  }
-
-  if (poolingConfiguration.error) {
-    return (
-      <div className="p-4">
-        <p className="text-scale-1000">Error loading pooling configuration</p>
-      </div>
-    )
-  }
-
-  // for older projects
-  if (!poolingConfiguration.pgbouncer_enabled && poolingConfiguration.pool_mode == null)
-    return (
-      <Panel
-        title={
-          <h5 key="panel-title" className="mb-0">
-            Connection Pooling is not available for this project
-          </h5>
-        }
-      >
-        <Panel.Content>
-          <p className="text-scale-1000">Please start a new project to enable this feature.</p>
-        </Panel.Content>
-      </Panel>
-    )
   const formModel = poolingConfiguration
   const DB_FIELDS = ['db_host', 'db_name', 'db_port', 'db_user', 'inserted_at']
-  const connectionInfo = pluckObjectFields(formModel, DB_FIELDS)
+  const connectionInfo = isSuccess ? pluckObjectFields(formModel, DB_FIELDS) : {}
   const BOUNCER_FIELDS = [
     'default_pool_size',
     'ignore_startup_parameters',
     'pool_mode',
     'pgbouncer_enabled',
   ]
-  const bouncerInfo = pluckObjectFields(formModel, BOUNCER_FIELDS)
+  const bouncerInfo = isSuccess ? pluckObjectFields(formModel, BOUNCER_FIELDS) : {}
 
   return (
-    <PgbouncerConfig
-      projectRef={projectRef}
-      bouncerInfo={bouncerInfo}
-      connectionInfo={connectionInfo}
-    />
+    <>
+      {isLoading && (
+        <Panel
+          title={
+            <h5 key="panel-title" className="mb-0">
+              Connection Pooling
+            </h5>
+          }
+        >
+          <Panel.Content className="space-y-8">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <Fragment key={i}>
+                <div className="grid gap-2 items-center md:grid md:grid-cols-12 md:gap-x-4 w-full">
+                  <ShimmeringLoader className="h-4 w-1/3 col-span-4" delayIndex={i} />
+                  <ShimmeringLoader className="h-8 w-full col-span-8" delayIndex={i} />
+                </div>
+                <Divider light />
+              </Fragment>
+            ))}
+
+            <ShimmeringLoader className="h-8 w-full" />
+          </Panel.Content>
+        </Panel>
+      )}
+      {isError && (
+        <div className="p-4">
+          <AlertError error={error} subject="Failed to retrieve pooling configuration" />
+        </div>
+      )}
+      {isSuccess && (
+        <>
+          {!poolingConfiguration?.pgbouncer_enabled && poolingConfiguration?.pool_mode === null ? (
+            <Panel
+              title={
+                <h5 key="panel-title" className="mb-0">
+                  Connection Pooling is not available for this project
+                </h5>
+              }
+            >
+              <Panel.Content>
+                <p className="text-scale-1000">
+                  Please start a new project to enable this feature.
+                </p>
+              </Panel.Content>
+            </Panel>
+          ) : (
+            <PgbouncerConfig
+              projectRef={projectRef}
+              bouncerInfo={bouncerInfo}
+              connectionInfo={connectionInfo}
+            />
+          )}
+        </>
+      )}
+    </>
   )
 }
 
@@ -130,7 +125,7 @@ export const PgbouncerConfig: FC<ConfigProps> = ({ projectRef, bouncerInfo, conn
 
   const [updates, setUpdates] = useState<any>({
     pool_mode: bouncerInfo.pool_mode || 'transaction',
-    default_pool_size: bouncerInfo.default_pool_size || '',
+    default_pool_size: bouncerInfo.default_pool_size || undefined,
     ignore_startup_parameters: bouncerInfo.ignore_startup_parameters || '',
     pgbouncer_enabled: bouncerInfo.pgbouncer_enabled,
   })
@@ -192,6 +187,7 @@ export const PgbouncerConfig: FC<ConfigProps> = ({ projectRef, bouncerInfo, conn
         model={updates}
         submitLabel="Save"
         cancelLabel="Cancel"
+        loading={undefined}
         onChangeModel={(model: any) => setUpdates(model)}
         onSubmit={(model: any) => updateConfig(model)}
         onReset={() => setUpdates(bouncerInfo)}

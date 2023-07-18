@@ -14,11 +14,13 @@ import { AddNewPaymentMethodModal } from 'components/interfaces/BillingV2'
 export interface PaymentMethodSelectionProps {
   selectedPaymentMethod?: string
   onSelectPaymentMethod: (id: string) => void
+  layout?: 'vertical' | 'horizontal'
 }
 
 const PaymentMethodSelection = ({
   selectedPaymentMethod,
   onSelectPaymentMethod,
+  layout = 'vertical',
 }: PaymentMethodSelectionProps) => {
   const { ui } = useStore()
   const { ref: projectRef } = useParams()
@@ -70,8 +72,7 @@ const PaymentMethodSelection = ({
 
   return (
     <>
-      <div className="space-y-2">
-        <p className="text-sm">Select payment method</p>
+      <div>
         {isLoading ? (
           <div className="flex items-center px-4 py-2 space-x-4 border rounded-md border-scale-700 bg-scale-400">
             <IconLoader className="animate-spin" size={14} />
@@ -91,6 +92,7 @@ const PaymentMethodSelection = ({
                   disabled={!canUpdatePaymentMethods}
                   icon={<IconCreditCard />}
                   onClick={() => setShowAddNewPaymentMethodModal(true)}
+                  htmlType='button'
                 >
                   Add new
                 </Button>
@@ -116,7 +118,13 @@ const PaymentMethodSelection = ({
             </Tooltip.Root>
           </div>
         ) : (
-          <Listbox value={selectedPaymentMethod} onChange={onSelectPaymentMethod}>
+          <Listbox
+            layout={layout}
+            label="Payment method"
+            value={selectedPaymentMethod}
+            onChange={onSelectPaymentMethod}
+            className="flex items-center"
+          >
             {paymentMethods.map((method: any) => {
               const label = `•••• •••• •••• ${method.card.last4}`
               return (

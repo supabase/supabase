@@ -745,6 +745,24 @@ export default function Index() {
 
 > Ensure you have [enabled replication](https://supabase.com/dashboard/project/_/database/replication) on the table you are subscribing to.
 
+## Frequently asked questions
+
+<AuthHelpersFAQ />
+
+### OAuth sign in isn't redirecting on the server side
+
+The reason behind this limitation is that the auth helpers library lacks a direct mechanism for performing server-side redirects, as each framework handles redirects differently. However, the library does offer a URL through the data property it returns, which should be utilized for the purpose of redirection.
+
+```ts
+import { redirect } from "@remix-run/node"; // or cloudflare/deno
+...
+const { data } = await supabase.auth.signInWithOAuth({
+  provider: 'github',
+})
+
+return redirect(data.url)
+```
+
 ## Migration Guide
 
 ### Migrating to v0.2.0

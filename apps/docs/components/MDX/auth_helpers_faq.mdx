@@ -1,0 +1,31 @@
+### Fetch requests to API endpoints aren't showing the session
+
+You must pass along the cookie header with the fetch request in order for your API endpoint to get access to the cookie from this request.
+
+```ts
+const res = await fetch('http://localhost/contact', {
+  headers: {
+    cookie: headers().get('cookie') as string,
+  },
+})
+```
+
+### Performing administration tasks on the server side with the `service_role` `secret`
+
+By default, the auth-helpers do not permit the use of the `service_role` `secret`. This restriction is in place to prevent the accidental exposure of your `service_role` `secret` to the public. Since the auth-helpers function on both the server and client side, it becomes challenging to separate the key specifically for client-side usage.
+
+However, there is a solution. You can create a separate Supabase client using the `createClient` method from `@supabase/supabase-js` and provide it with the `service_role` `secret`. In a server environment, you will also need to disable certain properties to ensure proper functionality.
+
+By implementing this approach, you can safely utilize the `service_role` `secret` without compromising security or exposing sensitive information to the public.
+
+```ts
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(supabaseUrl, serviceRoleSecret, {
+  auth: {
+    persistSession: false,
+    autoRefreshToken: false,
+    detectSessionInUrl: false,
+  },
+})
+```

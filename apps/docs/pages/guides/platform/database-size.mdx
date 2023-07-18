@@ -87,13 +87,25 @@ In read-only mode, clients will encounter errors such as `cannot execute INSERT 
 
 ### Disabling read-only mode
 
-You can manually override read-only mode to reduce disk size. To do this, run the following in the [SQL Editor](https://supabase.com/dashboard/project/_/sql):
+You manually override read-only mode to reduce disk size. To do this, run the following in the [SQL Editor](https://supabase.com/dashboard/project/_/sql):
+
+First, change the [transaction access mode](https://www.postgresql.org/docs/current/sql-set-transaction.html):
 
 ```sql
-SET TRANSACTION READ WRITE;
+set session characteristics as transaction read write;
 ```
 
-This allows you to delete data from within the session. After deleting data, you should run a vacuum to reclaim as much space as possible.
+This allows you to delete data from within the session. After deleting data, you should run a vacuum to reclaim as much space as possible. After deleting data, consider running a vacuum to reclaim as much space as possible:
+
+```sql
+vacuum;
+```
+
+Once you have reclaimed space, you can run the following to disable [read-only](https://www.postgresql.org/docs/current/runtime-config-client.html#GUC-DEFAULT-TRANSACTION-READ-ONLY) mode:
+
+```SQL
+set default_transaction_read_only = 'off';
+```
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

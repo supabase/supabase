@@ -1,6 +1,9 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'react-hot-toast'
+
 import { put } from 'lib/common/fetch'
 import { API_ADMIN_URL } from 'lib/constants'
+import { ResponseError } from 'types'
 import { oauthAppKeys } from './keys'
 
 export type OAuthAppUpdateVariables = {
@@ -40,20 +43,28 @@ type OAuthAppUpdateData = Awaited<ReturnType<typeof updateOAuthApp>>
 
 export const useOAuthAppUpdateMutation = ({
   onSuccess,
+  onError,
   ...options
 }: Omit<
-  UseMutationOptions<OAuthAppUpdateData, unknown, OAuthAppUpdateVariables>,
+  UseMutationOptions<OAuthAppUpdateData, ResponseError, OAuthAppUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<OAuthAppUpdateData, unknown, OAuthAppUpdateVariables>(
+  return useMutation<OAuthAppUpdateData, ResponseError, OAuthAppUpdateVariables>(
     (vars) => updateOAuthApp(vars),
     {
       async onSuccess(data, variables, context) {
         const { slug } = variables
         await queryClient.invalidateQueries(oauthAppKeys.oauthApps(slug))
         await onSuccess?.(data, variables, context)
+      },
+      async onError(data, variables, context) {
+        if (onError === undefined) {
+          toast.error(`Failed to update application: ${data.message}`)
+        } else {
+          onError(data, variables, context)
+        }
       },
       ...options,
     }
