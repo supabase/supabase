@@ -8,10 +8,16 @@ import { detectOS } from 'lib/helpers'
 export type UtilityActionsProps = {
   id: string
   isExecuting?: boolean
+  isDisabled?: boolean
   executeQuery: () => void
 }
 
-const UtilityActions = ({ id, isExecuting = false, executeQuery }: UtilityActionsProps) => {
+const UtilityActions = ({
+  id,
+  isExecuting = false,
+  isDisabled = false,
+  executeQuery,
+}: UtilityActionsProps) => {
   const os = detectOS()
 
   return (
@@ -21,7 +27,7 @@ const UtilityActions = ({ id, isExecuting = false, executeQuery }: UtilityAction
       <SizeToggleButton id={id} />
       <Button
         onClick={() => executeQuery()}
-        disabled={isExecuting}
+        disabled={isDisabled}
         loading={isExecuting}
         type="default"
         size="tiny"

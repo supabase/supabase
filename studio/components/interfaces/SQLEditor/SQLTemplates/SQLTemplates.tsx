@@ -4,7 +4,10 @@ import { observer } from 'mobx-react-lite'
 
 import { useParams, useTelemetryProps } from 'common'
 import { stripIndent } from 'common-tags'
-import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.constants'
+import {
+  SQL_TEMPLATES,
+  sqlAiDisclaimerComment,
+} from 'components/interfaces/SQLEditor/SQLEditor.constants'
 import { useSqlGenerateMutation } from 'data/ai/sql-generate-mutation'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
 import { motion } from 'framer-motion'
@@ -18,11 +21,6 @@ import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { AiIcon, IconCornerDownLeft, Input } from 'ui'
 import { createSqlSnippetSkeleton } from '../SQLEditor.utils'
 import SQLCard from './SQLCard'
-
-const sqlDisclaimerComment = stripIndent`
-  -- Supabase AI is experimental and may produce incorrect answers
-  -- Always verify the output before executing
-`
 
 const SQLTemplates = observer(() => {
   const { ui } = useStore()
@@ -128,7 +126,7 @@ const SQLTemplates = observer(() => {
                       const { title, sql } = await generateSql({ prompt: e.currentTarget.value })
 
                       const formattedSql =
-                        sqlDisclaimerComment +
+                        sqlAiDisclaimerComment +
                         '\n\n' +
                         format(sql, {
                           language: 'postgresql',

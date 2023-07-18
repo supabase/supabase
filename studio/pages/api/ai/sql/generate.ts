@@ -17,13 +17,13 @@ const openAiKey = process.env.OPENAI_KEY
 const generateSqlSchema = SchemaBuilder.emptySchema()
   .addString('sql', {
     description: stripIndent`
-      The generated SQL.
+      The generated SQL (must be valid SQL).
       - For primary keys, always use "id bigint primary key generated always as identity" (not serial)
       - Prefer creating foreign key references in the create statement
       - Prefer 'text' over 'varchar'
       - Prefer 'timestamp with time zone' over 'date'
       - Use vector(384) data type for any embedding/vector related query
-      - Must be valid SQL syntax
+      - Always use double apostrophe in SQL strings (eg. 'Night''s watch')
     `,
   })
   .addString('title', {
@@ -52,10 +52,7 @@ export default async function handler(req: NextRequest) {
   const completionMessages: ChatCompletionRequestMessage[] = [
     {
       role: 'user',
-      content: stripIndent`
-        Natural language prompt:
-        ${prompt}
-      `,
+      content: prompt,
     },
   ]
 
@@ -70,6 +67,20 @@ export default async function handler(req: NextRequest) {
     functions: [completionFunctions.generateSql],
     stream: false,
   }
+
+  // await new Promise((resolve) => setTimeout(resolve, 1000))
+
+  // return new Response(
+  //   JSON.stringify({
+  //     error: 'There was an unknown error generating the SQL snippet. Please try again.',
+  //   }),
+  //   {
+  //     status: 500,
+  //     headers: {
+  //       'content-type': 'application/json',
+  //     },
+  //   }
+  // )
 
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
     headers: {
