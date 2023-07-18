@@ -26,7 +26,7 @@ interface Props {
 }
 
 /**
- * Similar to ui/Modal component but with an unstyled dialog content component. 
+ * Similar to ui/Modal component but with an unstyled dialog content component.
  * Mainly used to show images in a overlay.
  */
 const ImageModal = ({
@@ -46,16 +46,15 @@ const ImageModal = ({
 
   function handleOpenChange(open: boolean) {
     if (visible !== undefined && !open) {
-      // controlled component behaviour
+      // controlled component behavior
       onCancel()
     } else {
-      // un-controlled component behaviour
+      // un-controlled component behavior
       setOpen(open)
     }
   }
 
-  const contentClasses =
-    'relative data-open:animate-overlay-show data-closed:animate-overlay-hide'
+  const contentClasses = 'relative data-open:animate-overlay-show data-closed:animate-overlay-hide'
 
   return (
     <Dialog.Root open={open} onOpenChange={handleOpenChange}>

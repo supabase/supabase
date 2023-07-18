@@ -132,7 +132,11 @@ const Footer = (props: Props) => {
 
                         return (
                           <li key={`${segment.title}_link_${idx}`}>
-                            {link.url.startsWith('https') ? <Fragment>{children}</Fragment> : <Link href={link.url}>{children}</Link>}
+                            {link.url.startsWith('https') ? (
+                              <Fragment>{children}</Fragment>
+                            ) : (
+                              <Link href={link.url}>{children}</Link>
+                            )}
                           </li>
                         )
                       })}
