@@ -1,8 +1,9 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { delete_ } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { UserContent } from 'types'
+import { ResponseError, UserContent } from 'types'
 import { integrationKeys } from './keys'
+import { toast } from 'react-hot-toast'
 
 type DeleteVariables = {
   id: string
@@ -32,14 +33,17 @@ type DeleteContentData = Awaited<ReturnType<typeof deleteConnection>>
 
 export const useIntegrationsVercelInstalledConnectionDeleteMutation = ({
   onSuccess,
+  onError,
   ...options
-}: Omit<UseMutationOptions<DeleteContentData, unknown, DeleteVariables>, 'mutationFn'> = {}) => {
+}: Omit<
+  UseMutationOptions<DeleteContentData, ResponseError, DeleteVariables>,
+  'mutationFn'
+> = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<DeleteContentData, unknown, DeleteVariables>(
+  return useMutation<DeleteContentData, ResponseError, DeleteVariables>(
     (args) => deleteConnection(args),
     {
       async onSuccess(data, variables, context) {
-        console.log('variables in mutate delete onSuccess', variables)
         await Promise.all([
           queryClient.invalidateQueries(integrationKeys.integrationsList()),
           queryClient.invalidateQueries(integrationKeys.integrationsListWithOrg(variables.orgSlug)),
@@ -51,6 +55,13 @@ export const useIntegrationsVercelInstalledConnectionDeleteMutation = ({
           ),
         ])
         await onSuccess?.(data, variables, context)
+      },
+      async onError(data, variables, context) {
+        if (onError === undefined) {
+          toast.error(`Failed to delete Vercel connection: ${data.message}`)
+        } else {
+          onError(data, variables, context)
+        }
       },
       ...options,
     }

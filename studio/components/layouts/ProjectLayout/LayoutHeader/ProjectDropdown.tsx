@@ -7,6 +7,8 @@ import { useProjectsQuery } from 'data/projects/projects-query'
 import { useSelectedOrganization, useSelectedProject } from 'hooks'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { Organization, Project } from 'types'
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 
 // [Fran] the idea is to let users change projects without losing the current page,
 // but at the same time we need to redirect correctly between urls that might be
@@ -31,17 +33,51 @@ export const sanitizeRoute = (route: string, routerQueries: ParsedUrlQuery) => {
   }
 }
 
-interface ProjectDropdownProps {
-  alt?: boolean
+const ProjectLink = ({
+  project,
+  organization,
+}: {
+  project: Project
+  organization?: Organization
+}) => {
+  const router = useRouter()
+  const selectedProject = useSelectedProject()
+  const sanitizedRoute = sanitizeRoute(router.route, router.query)
+  const isOrgBilling = !!organization?.subscription_id
+
+  // [Joshen] Temp while we're interim between v1 and v2 billing
+  let href = sanitizedRoute?.replace('[ref]', project.ref) ?? `/project/${project.ref}`
+  if (href.endsWith('settings/addons') && !isOrgBilling) {
+    href = href.replace('settings/addons', 'settings/billing/subscription')
+  } else if (href.endsWith('settings/billing/subscription') && isOrgBilling) {
+    href = href.replace('settings/billing/subscription', 'settings/addons')
+  } else if (href.endsWith('settings/infrastructure') && !isOrgBilling) {
+    href = href.replace('settings/infrastructure', 'settings/billing/usage')
+  } else if (href.endsWith('settings/billing/usage') && !isOrgBilling) {
+    href = href.replace('settings/billing/usage', 'settings/infrastructure')
+  }
+
+  return (
+    <Link passHref href={href}>
+      <a className="block">
+        <Dropdown.Item
+          className={
+            selectedProject?.name === project.name ? 'font-bold bg-slate-400 dark:bg-slate-500' : ''
+          }
+        >
+          {project.name}
+        </Dropdown.Item>
+      </a>
+    </Link>
+  )
 }
 
-const ProjectDropdown = ({ alt }: ProjectDropdownProps) => {
-  const selectedOrganization = useSelectedOrganization()
+const ProjectDropdown = ({ alt }: { alt?: boolean }) => {
   const selectedProject = useSelectedProject()
+  const selectedOrganization = useSelectedOrganization()
   const { data: allProjects, isLoading: isLoadingProjects } = useProjectsQuery()
+  const { data: allOrganizations } = useOrganizationsQuery()
   const selectedOrganizationSlug = selectedOrganization?.slug
-  const router = useRouter()
-  const sanitizedRoute = sanitizeRoute(router.route, router.query)
 
   if (isLoadingProjects && alt) {
     return <ShimmeringLoader className="w-[90px]" />
@@ -56,25 +92,10 @@ const ProjectDropdown = ({ alt }: ProjectDropdownProps) => {
           {allProjects
             ?.filter((x) => x.status !== PROJECT_STATUS.INACTIVE)
             .sort((a, b) => a.name.localeCompare(b.name))
-            .map((x) => (
-              <Link
-                key={x.ref}
-                href={sanitizedRoute?.replace('[ref]', x.ref) ?? `/project/${x.ref}`}
-                passHref
-              >
-                <a className="block">
-                  <Dropdown.Item
-                    className={
-                      selectedProject?.name === x.name
-                        ? 'font-bold bg-slate-400 dark:bg-slate-500'
-                        : ''
-                    }
-                  >
-                    {x.name}
-                  </Dropdown.Item>
-                </a>
-              </Link>
-            ))}
+            .map((x) => {
+              const org = allOrganizations?.find((org) => org.id === x.organization_id)
+              return <ProjectLink key={x.ref} project={x} organization={org} />
+            })}
           <Popover.Separator />
           <Link href={`/new/${selectedOrganizationSlug}`}>
             <a className="block">
