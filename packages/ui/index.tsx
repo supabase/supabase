@@ -135,6 +135,10 @@ export {
   PopoverContent as PopoverContent_Shadcn_,
 } from './src/components/shadcn/ui/popover'
 
+// links
+
+export * from './src/components/TextLink'
+
 // config
 
 // export { default as Config } from './../ui.config'

@@ -211,6 +211,7 @@ export const PopoverExample = {
                 <CommandGroup>
                   {statuses.map((status) => (
                     <CommandItem
+                      value={status.value}
                       key={status.value}
                       onSelect={(value) => {
                         setSelectedStatus(
