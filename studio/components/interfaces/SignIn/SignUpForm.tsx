@@ -36,7 +36,7 @@ const SignUpForm = () => {
 
     resetSignInClicks()
 
-    const response = await post(`${API_URL}/signup`, {
+    const { error } = await post(`${API_URL}/signup`, {
       email,
       password,
       hcaptchaToken: token ?? null,
@@ -46,7 +46,6 @@ const SignUpForm = () => {
           : process.env.NEXT_PUBLIC_SITE_URL
       }${BASE_PATH}/sign-in`,
     })
-    const error = response.error
 
     if (!error) {
       ui.setNotification({
@@ -63,7 +62,7 @@ const SignUpForm = () => {
       ui.setNotification({
         id: toastId,
         category: 'error',
-        message: error.message,
+        message: `Failed to sign up: ${error.message}`,
       })
     }
   }
