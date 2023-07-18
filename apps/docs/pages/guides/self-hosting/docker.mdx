@@ -48,10 +48,14 @@ We can use your JWT Secret to generate new `anon` and `service` API keys using t
 
 ### Update API Keys
 
-Replace the values the `.env` file:
+Replace the values in these files:
 
+- `.env`:
   - `ANON_KEY` - replace with an `anon` key
   - `SERVICE_ROLE_KEY` - replace with a `service` key
+- `volumes/api/kong.yml`
+  - `anon` - replace with an `anon` key
+  - `service_role` - replace with a `service` key
 
 ### Update Secrets
 
@@ -131,6 +135,11 @@ However, you might miss important log messages such as database errors. Configur
 ### File storage backend on macOS
 
 By default, Storage backend is set to `file`, which is to use local files as the storage backend. To make it work on macOS, you need to choose `VirtioFS` as the Docker container file sharing implementation (in Docker Desktop -> Preferences -> General).
+
+### Setting up logging with the Analytics server
+
+Additional configuration is required for self-hosting the Analytics server. For the full setup instructions, see [Self Hosting Analytics](https://supabase.com/docs/reference/self-hosting-analytics/introduction#getting-started).
+
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
