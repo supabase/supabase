@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -41,10 +42,12 @@ class DeepLinkHandlerActivity : ComponentActivity() {
             val navController = rememberNavController()
             val emailState = remember { mutableStateOf("") }
             val createdAtState = remember { mutableStateOf("") }
-            callback = { email, created ->
-                emailState.value = email
-                createdAtState.value = created
-            }
+            LaunchedEffect(key1 = emailState, block =  {
+                callback = { email, created ->
+                    emailState.value = email
+                    createdAtState.value = created
+                }
+            })
             ManageProductsTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),

@@ -150,6 +150,7 @@ object SupabaseModule {
         ) {
             install(Postgrest)
             install(GoTrue) {
+                flowType = FlowType.PKCE
                 scheme = "app"
                 host = "supabase.com"
             }
@@ -1210,10 +1211,12 @@ class DeepLinkHandlerActivity : ComponentActivity() {
             val navController = rememberNavController()
             val emailState = remember { mutableStateOf("") }
             val createdAtState = remember { mutableStateOf("") }
-            callback = { email, created ->
-                emailState.value = email
-                createdAtState.value = created
-            }
+            LaunchedEffect(key1 = emailState, block =  {
+                callback = { email, created ->
+                    emailState.value = email
+                    createdAtState.value = created
+                }
+            })
             ManageProductsTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
