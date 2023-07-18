@@ -1,9 +1,11 @@
 import { useState } from 'react'
+import { toast } from 'react-hot-toast'
 
 import { ENV_VAR_RAW_KEYS } from 'components/interfaces/Integrations/Integrations-Vercel.constants'
 import { Markdown } from 'components/interfaces/Markdown'
 import { vercelIcon } from 'components/to-be-cleaned/ListIcons'
 import { useIntegrationConnectionsCreateMutation } from 'data/integrations/integration-connections-create-mutation'
+import { useIntegrationsVercelConnectionSyncEnvsMutation } from 'data/integrations/integrations-vercel-connection-sync-envs-mutation'
 import { VercelProjectsResponse } from 'data/integrations/integrations-vercel-projects-query'
 import { IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { useSelectedOrganization } from 'hooks'
@@ -40,12 +42,19 @@ const ProjectLinker = ({
   const [supabaseProjectRef, setSupabaseProjectRef] = useState(UNDEFINED_SELECT_VALUE)
   const [vercelProjectId, setVercelProjectId] = useState(UNDEFINED_SELECT_VALUE)
 
+  const { mutateAsync: syncEnvs } = useIntegrationsVercelConnectionSyncEnvsMutation()
   const { mutate: createConnections, isLoading } = useIntegrationConnectionsCreateMutation({
-    onSuccess() {
+    async onSuccess({ id }) {
+      try {
+        await syncEnvs({ connectionId: id })
+      } catch (error: any) {
+        toast.error('Failed to sync environment variables: ', error.message)
+      }
+
+      if (setLoading) setLoading(false)
       _onCreateConnections?.()
     },
-
-    onSettled() {
+    onError() {
       if (setLoading) setLoading(false)
     },
   })
