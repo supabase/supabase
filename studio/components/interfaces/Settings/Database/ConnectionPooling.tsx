@@ -125,7 +125,7 @@ export const PgbouncerConfig: FC<ConfigProps> = ({ projectRef, bouncerInfo, conn
 
   const [updates, setUpdates] = useState<any>({
     pool_mode: bouncerInfo.pool_mode || 'transaction',
-    default_pool_size: bouncerInfo.default_pool_size || '',
+    default_pool_size: bouncerInfo.default_pool_size || undefined,
     ignore_startup_parameters: bouncerInfo.ignore_startup_parameters || '',
     pgbouncer_enabled: bouncerInfo.pgbouncer_enabled,
   })
