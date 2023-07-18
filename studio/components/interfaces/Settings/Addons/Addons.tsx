@@ -20,7 +20,7 @@ import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useFlag } from 'hooks'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import { BASE_PATH } from 'lib/constants'
-import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
+import { SUBSCRIPTION_PANEL_KEYS, useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { Alert, Button, IconChevronRight, IconExternalLink } from 'ui'
 import { ComputeInstanceSidePanel, CustomDomainSidePanel, PITRSidePanel } from './'
 
@@ -29,8 +29,14 @@ const Addons = () => {
   const { ref: projectRef } = useParams()
   const snap = useSubscriptionPageStateSnapshot()
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
-
   const { project: selectedProject } = useProjectContext()
+  const { panel } = useParams()
+
+  const allowedPanelValues = ['computeInstance', 'pitr', 'customDomain']
+  if (panel && typeof panel === 'string' && allowedPanelValues.includes(panel)) {
+    snap.setPanelKey(panel as SUBSCRIPTION_PANEL_KEYS)
+  }
+
   const cpuArchitecture = getCloudProviderArchitecture(selectedProject?.cloud_provider)
 
   // [Joshen] We could possibly look into reducing the interval to be more "realtime"
