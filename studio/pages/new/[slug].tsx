@@ -102,7 +102,8 @@ const Wizard: NextPageWithLayout = () => {
   const showNonProdFields = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
 
   const freePlanWithExceedingLimits =
-    (isSelectFreeTier || orgSubscription?.plan?.id === 'free') && hasMembersExceedingFreeTierLimit
+    ((isSelectFreeTier && !billedViaOrg) || orgSubscription?.plan?.id === 'free') &&
+    hasMembersExceedingFreeTierLimit
 
   const canCreateProject = isAdmin && !freePlanWithExceedingLimits
 
@@ -559,7 +560,7 @@ const Wizard: NextPageWithLayout = () => {
               </Panel.Content>
             )}
 
-            {!isSelectFreeTier && (
+            {!billedViaOrg && !isSelectFreeTier && (
               <>
                 <Panel.Content className="border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
                   <Toggle
