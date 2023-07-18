@@ -71,7 +71,7 @@ const TransferProjectButton = () => {
     }
   }, [isOpen])
 
-  const canTransferProject = useCheckPermissions(PermissionAction.UPDATE, 'projects')
+  const canTransferProject = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
 
   const toggle = () => {
     setIsOpen(!isOpen)
@@ -102,7 +102,7 @@ const TransferProjectButton = () => {
                 ].join(' ')}
               >
                 <span className="text-xs text-scale-1200">
-                  You need additional permissions to delete this project
+                  You need additional permissions to transfer this project
                 </span>
               </div>
             </Tooltip.Content>
