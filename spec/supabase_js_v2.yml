@@ -149,6 +149,8 @@ functions:
       - id: sign-up
         name: Sign up
         isSpotlight: true
+        description: |
+          If the password is larger than 72 chars, it will be truncated to the first 72 chars.
         code: |
           ```js
           const { data, error } = await supabase.auth.signUp({
@@ -452,6 +454,8 @@ functions:
       - id: update-the-password-for-an-authenticated-user
         name: Update the password for an authenticated user
         isSpotlight: false
+        description: |
+          If the password is larger than 72 chars, it will be truncated to the first 72 chars.
         code: |
           ```js
           const { data, error } = await supabase.auth.updateUser({password: 'new password'})
@@ -846,6 +850,8 @@ functions:
       - id: create-a-new-user-with-custom-user-metadata
         name: With custom user metadata
         isSpotlight: true
+        description: |
+          If the password is larger than 72 chars, it will be truncated to the first 72 chars.
         code: |
           ```js
           const { data, error } = await supabase.auth.admin.createUser({
