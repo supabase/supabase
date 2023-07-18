@@ -11,6 +11,7 @@ import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useIntegrationConnectionsCreateMutation } from 'data/integrations/integration-connections-create-mutation'
 import { useIntegrationsQuery } from 'data/integrations/integrations-query'
+import { useIntegrationsVercelConnectionSyncEnvsMutation } from 'data/integrations/integrations-vercel-connection-sync-envs-mutation'
 import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
 import { Integration } from 'data/integrations/integrations.types'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
@@ -92,13 +93,9 @@ const CreateProject = ({
     externalId,
   } = useParams()
 
-  const { mutate: createConnections, isLoading: isLoadingCreateConnections } =
-    useIntegrationConnectionsCreateMutation({
-      onSuccess: () => {
-        setLoading(false)
-        if (next) window.location.href = next
-      },
-    })
+  const { mutateAsync: createConnections, isLoading: isLoadingCreateConnections } =
+    useIntegrationConnectionsCreateMutation()
+  const { mutateAsync: syncEnvs } = useIntegrationsVercelConnectionSyncEnvsMutation()
 
   const { data: organizationData, isLoading: isLoadingOrganizationsQuery } = useOrganizationsQuery()
   const organization = organizationData?.find((x) => x.slug === slug)
@@ -231,24 +228,37 @@ const CreateProject = ({
         }
         isInstallingRef.current = true
 
-        const projectDetails = vercelProjects?.find((x) => x.id === foreignProjectId)
+        const projectDetails = vercelProjects?.find((x: any) => x.id === foreignProjectId)
 
-        createConnections({
-          organizationIntegrationId: organizationIntegration?.id,
-          connection: {
-            foreign_project_id: foreignProjectId,
-            supabase_project_ref: newProjectRef,
-            metadata: {
-              ...projectDetails,
-              supabaseConfig: {
-                projectEnvVars: {
-                  write: true,
+        try {
+          const { id: connectionId } = await createConnections({
+            organizationIntegrationId: organizationIntegration?.id,
+            connection: {
+              foreign_project_id: foreignProjectId,
+              supabase_project_ref: newProjectRef,
+              metadata: {
+                ...projectDetails,
+                supabaseConfig: {
+                  projectEnvVars: {
+                    write: true,
+                  },
                 },
               },
             },
-          },
-          orgSlug: selectedOrganization?.slug,
-        })
+            orgSlug: selectedOrganization?.slug,
+          })
+
+          await syncEnvs({ connectionId })
+        } catch (error) {
+          console.error('An error occurred during createConnections:', error)
+          return
+        }
+
+        setLoading(false)
+
+        if (next) {
+          window.location.href = next
+        }
       },
     }
   )

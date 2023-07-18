@@ -33,8 +33,14 @@ const SSLConfiguration = () => {
   })
   const { mutate: updateSSLEnforcement, isLoading: isSubmitting } = useSSLEnforcementUpdateMutation(
     {
+      onSuccess: () => {
+        ui.setNotification({
+          category: 'success',
+          message: 'Successfully updated SSL configuration',
+        })
+      },
       onError: (error) => {
-        setIsEnforced(isEnforced)
+        setIsEnforced(initialIsEnforced)
         ui.setNotification({
           error,
           category: 'error',
@@ -45,6 +51,10 @@ const SSLConfiguration = () => {
   )
 
   const canUpdateSSLEnforcement = useCheckPermissions(PermissionAction.UPDATE, 'projects')
+  const initialIsEnforced = isSuccess
+    ? sslEnforcementConfiguration.appliedSuccessfully &&
+      sslEnforcementConfiguration.currentConfig.database
+    : false
 
   const hasAccessToSSLEnforcement = !sslEnforcementConfiguration?.isNotAllowed
   const env = process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod' ? 'prod' : 'staging'
@@ -54,10 +64,7 @@ const SSLConfiguration = () => {
 
   useEffect(() => {
     if (!isLoading && sslEnforcementConfiguration) {
-      setIsEnforced(
-        sslEnforcementConfiguration.appliedSuccessfully &&
-          sslEnforcementConfiguration.currentConfig.database
-      )
+      setIsEnforced(initialIsEnforced)
     }
   }, [isLoading])
 

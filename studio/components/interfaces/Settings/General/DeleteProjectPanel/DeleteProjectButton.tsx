@@ -9,6 +9,7 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
 import { useSendDowngradeFeedbackMutation } from 'data/feedback/exit-survey-send'
 import { useProjectDeleteMutation } from 'data/projects/project-delete-mutation'
+import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 import { useCheckPermissions, useStore } from 'hooks'
 import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 
@@ -22,8 +23,9 @@ const DeleteProjectButton = ({ type = 'danger' }: DeleteProjectButtonProps) => {
   const { project } = useProjectContext()
 
   const projectRef = project?.ref
-  const projectTier = project?.subscription_tier ?? PRICING_TIER_PRODUCT_IDS.FREE
-  const isFree = projectTier === PRICING_TIER_PRODUCT_IDS.FREE
+  const { data: subscription } = useProjectSubscriptionV2Query({ projectRef })
+  const projectPlan = subscription?.plan?.id ?? 'free'
+  const isFree = projectPlan === PRICING_TIER_PRODUCT_IDS.FREE
 
   const [isOpen, setIsOpen] = useState(false)
   const [message, setMessage] = useState<string>('')
