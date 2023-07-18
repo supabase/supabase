@@ -18,6 +18,8 @@ import { EMPTY_ARR } from 'lib/void'
 import { NextPageWithLayout, Organization } from 'types'
 import { IconBook, IconLifeBuoy, LoadingLine } from 'ui'
 import { ENV_VAR_RAW_KEYS } from 'components/interfaces/Integrations/Integrations-Vercel.constants'
+import { useIntegrationsVercelConnectionSyncEnvsMutation } from 'data/integrations/integrations-vercel-connection-sync-envs-mutation'
+import { toast } from 'react-hot-toast'
 
 const VERCEL_ICON = (
   <svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 512 512" className="w-6">
@@ -91,9 +93,16 @@ const VercelIntegration: NextPageWithLayout = () => {
     [vercelProjectsById]
   )
 
+  const { mutateAsync: syncEnvs } = useIntegrationsVercelConnectionSyncEnvsMutation()
   const { mutate: createConnections, isLoading: isCreatingConnection } =
     useIntegrationVercelConnectionsCreateMutation({
-      onSuccess() {
+      async onSuccess({ id }) {
+        try {
+          await syncEnvs({ connectionId: id })
+        } catch (error: any) {
+          toast.error('Failed to sync environment variables: ', error.message)
+        }
+
         if (next) {
           window.location.href = next
         }
@@ -147,6 +156,11 @@ This Supabase integration manages your environment variables automatically to pr
               integrationIcon={VERCEL_ICON}
               getForeignProjectIcon={getForeignProjectIcon}
               choosePrompt="Choose Vercel Project"
+              onSkip={() => {
+                if (next) {
+                  window.location.href = next
+                }
+              }}
             />
             <Markdown
               content={`

@@ -79,7 +79,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
 
 When using the Supabase client on the server, you must perform extra steps to ensure the user's auth session remains active. Since the user's session is tracked in a cookie, we need to read this cookie and update it if necessary.
 
-In Next.js Server Components, you can read a cookie, but you can't write back to it. Middleware on the other hand, allow you to both read a write to cookies.
+Next.js Server Components allow you to read a cookie but not write back to it. Middleware on the other hand allow you to both read and write to cookies.
 
 Next.js [Middleware](https://nextjs.org/docs/app/building-your-application/routing/middleware) runs immediately before each route is rendered. We'll use Middleware to refresh the user's session before loading Server Component routes.
 
@@ -528,7 +528,7 @@ This allows for the Supabase client to be easily instantiated in the correct con
 
 <div className="video-container">
   <iframe
-    src="https://www.youtube-nocookie.com/embed/f4yAnVgcJqI"
+    src="https://www.youtube-nocookie.com/embed/6Sb8R1PYhTY"
     frameBorder="1"
     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
     allowFullScreen
@@ -784,7 +784,7 @@ TypeScript types can be [generated with the Supabase CLI](/docs/reference/javasc
 
 <div className="video-container">
   <iframe
-    src="https://www.youtube-nocookie.com/embed/3kK-40z0DHI"
+    src="https://www.youtube-nocookie.com/embed/r6q7ypXbPFI"
     frameBorder="1"
     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
     allowFullScreen
@@ -853,6 +853,24 @@ See [refreshing session example](/docs/guides/auth/auth-helpers/nextjs#managing-
 - [Realtime Subscriptions](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs/app/realtime-posts.tsx)
 - [Protected Routes](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs/app/[id]/page.tsx)
 - [Conditional Rendering in Client Components with SSR](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs/app/login-form.tsx)
+
+## Frequently asked questions
+
+<AuthHelpersFAQ />
+
+### OAuth sign in isn't redirecting on the server side
+
+The reason behind this limitation is that the auth helpers library lacks a direct mechanism for performing server-side redirects, as each framework handles redirects differently. However, the library does offer a URL through the data property it returns, which should be utilized for the purpose of redirection.
+
+```ts
+import { NextResponse } from "next/server";
+...
+const { data } = await supabase.auth.signInWithOAuth({
+  provider: 'github',
+})
+
+return NextResponse.redirect(data.url)
+```
 
 ## Migration Guide
 
