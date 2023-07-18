@@ -1,9 +1,11 @@
 import { useRouter } from 'next/router'
+import { Accordion_Shadcn_, Button } from 'ui'
 
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useSelectedOrganization } from 'hooks'
 import OrganizationSettingsMenuItem from './OrganizationSettingsMenuItem'
 import ProjectSettingsMenuItem from './ProjectSettingsMenuItem'
+import Link from 'next/link'
 
 const OrganizationSettingsMenu = () => {
   const router = useRouter()
@@ -25,7 +27,7 @@ const OrganizationSettingsMenu = () => {
   return (
     <div className="space-y-10">
       <div className="space-y-2">
-        <p className="text-sm">Organization</p>
+        <p className="text-sm font-medium">Organization</p>
         {organizationSettings.map((link) => (
           <OrganizationSettingsMenuItem
             key={link.label}
@@ -35,11 +37,24 @@ const OrganizationSettingsMenu = () => {
           />
         ))}
       </div>
+
+      {/* [Joshen] We'll implement this in the second iteration, just to keep things small */}
       <div className="space-y-2">
-        <p className="text-sm">Projects</p>
-        {projects?.map((project) => (
-          <ProjectSettingsMenuItem key={project.ref} project={project} />
-        ))}
+        <p className="text-sm font-medium">Projects</p>
+        <Accordion_Shadcn_ type="single" collapsible className="w-full">
+          {projects?.map((project) => (
+            <ProjectSettingsMenuItem key={project.ref} project={project} />
+          ))}
+        </Accordion_Shadcn_>
+      </div>
+      <div>
+        <Link href={`/new/${organization?.slug}`}>
+          <a>
+            <Button type="default" size="small">
+              Create new project
+            </Button>
+          </a>
+        </Link>
       </div>
     </div>
   )
