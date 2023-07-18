@@ -21,6 +21,7 @@ const {
   trace: _trace,
   options: _options,
 } = createClient<paths>({
+  // [Joshen] Just FYI, the replace is temporary until we update env vars API_URL to remove /platform or /v1 - should just be the base URL
   baseUrl: API_URL?.replace('/platform', ''),
   referrerPolicy: 'no-referrer-when-downgrade',
   headers: DEFAULT_HEADERS,

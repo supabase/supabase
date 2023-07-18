@@ -9,17 +9,20 @@ import { organizationKeys } from './keys'
 export type OrganizationBillingMigrationVariables = {
   organizationSlug?: string
   tier?: string
+  paymentMethodId?: string
 }
 
 export async function migrateBilling({
   organizationSlug,
   tier,
+  paymentMethodId,
 }: OrganizationBillingMigrationVariables) {
   if (!organizationSlug) throw new Error('organizationSlug is required')
   if (!tier) throw new Error('tier is required')
 
-  const payload: { tier: string } = {
+  const payload: { tier: string; payment_method_id?: string } = {
     tier,
+    payment_method_id: paymentMethodId,
   }
 
   const response = await post(
