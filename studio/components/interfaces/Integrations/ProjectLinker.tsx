@@ -25,6 +25,7 @@ export interface ProjectLinkerProps {
   onCreateConnections?: () => void
   installedConnections: IntegrationProjectConnection[] | undefined
   setLoading?: (x: boolean) => void
+  showSkip?: boolean
 }
 
 const UNDEFINED_SELECT_VALUE = 'undefined'
@@ -36,6 +37,7 @@ const ProjectLinker = ({
   onCreateConnections: _onCreateConnections,
   installedConnections = [],
   setLoading,
+  showSkip = false,
 }: ProjectLinkerProps) => {
   const selectedOrganization = useSelectedOrganization()
 
@@ -207,7 +209,18 @@ const ProjectLinker = ({
           </Panel>
         </div>
       </div>
-      <div className="flex w-full justify-end">
+      <div className="flex w-full justify-end gap-2">
+        {showSkip && (
+          <Button
+            size="medium"
+            type="default"
+            onClick={() => {
+              _onCreateConnections?.()
+            }}
+          >
+            Skip
+          </Button>
+        )}
         <Button
           size="medium"
           className="self-end"
