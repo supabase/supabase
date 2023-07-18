@@ -1,28 +1,43 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { put } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
-import { UserContent } from 'types'
-import { contentKeys } from './keys'
 
-type UpsertContentVariables = {
+import { components } from 'data/api'
+import { put } from 'data/fetchers'
+import { contentKeys } from './keys'
+import { Content } from './content-query'
+
+export type UpsertContentPayload = Omit<components['schemas']['UpsertContentParams'], 'content'> & {
+  content: Content['content']
+}
+
+export type UpsertContentVariables = {
   projectRef: string
-  id: string
-  payload: Partial<UserContent>
+  payload: UpsertContentPayload
 }
 
 export async function upsertContent(
   { projectRef, payload }: UpsertContentVariables,
   signal?: AbortSignal
 ) {
-  const response = await put<UserContent[]>(`${API_URL}/projects/${projectRef}/content`, payload, {
+  const { data, error } = await put('/platform/projects/{ref}/content', {
+    params: { path: { ref: projectRef } },
+    body: {
+      id: payload.id,
+      name: payload.name,
+      description: payload.description,
+      project_id: payload.project_id,
+      owner_id: payload.owner_id,
+      type: payload.type,
+      visibility: payload.visibility,
+      content: payload.content as any,
+    },
     signal,
   })
+  if (error) throw error
 
-  if (response.error) throw response.error
-  return { content: response }
+  return data
 }
 
-type UpsertContentData = Awaited<ReturnType<typeof upsertContent>>
+export type UpsertContentData = Awaited<ReturnType<typeof upsertContent>>
 
 export const useContentUpsertMutation = ({
   onSuccess,
