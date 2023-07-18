@@ -45,9 +45,7 @@ const ProjectLayout = ({
   const projectName = selectedProject?.name
   const organizationName = selectedOrganization?.name
 
-  const ongoingIncident = useFlag('ongoingIncident')
   const navLayoutV2 = useFlag('navigationLayoutV2')
-  const appHeaderHeight = navLayoutV2 ? 48 : 0
 
   const isPaused = selectedProject?.status === PROJECT_STATUS.INACTIVE
   const ignorePausedState =
@@ -71,14 +69,7 @@ const ProjectLayout = ({
           </title>
           <meta name="description" content="Supabase Studio" />
         </Head>
-        <div
-          className="flex"
-          style={{
-            height: ongoingIncident
-              ? `calc(100vh - 44px - ${appHeaderHeight}px)`
-              : `calc(100vh - ${appHeaderHeight}px)`,
-          }}
-        >
+        <div className="flex h-full">
           {/* Left-most navigation side bar to access products */}
           {!hideIconBar && <NavigationBar />}
 
@@ -205,9 +196,7 @@ export const ProjectLayoutNonBlocking = ({
     router.pathname === '/project/[ref]' || router.pathname.includes('/project/[ref]/settings')
   const showPausedState = isPaused && !ignorePausedState
 
-  const ongoingIncident = useFlag('ongoingIncident')
   const navLayoutV2 = useFlag('navigationLayoutV2')
-  const appHeaderHeight = navLayoutV2 ? 48 : 0
 
   return (
     <AppLayout>
@@ -217,14 +206,7 @@ export const ProjectLayoutNonBlocking = ({
           <meta name="description" content="Supabase Studio" />
           <link rel="icon" href="/favicon.ico" />
         </Head>
-        <div
-          className="flex"
-          style={{
-            height: ongoingIncident
-              ? `calc(100vh - 44px - ${appHeaderHeight}px)`
-              : `calc(100vh - ${appHeaderHeight}px)`,
-          }}
-        >
+        <div className="flex h-full">
           {/* Left-most navigation side bar to access products */}
           {!hideIconBar && <NavigationBar />}
 
@@ -234,7 +216,7 @@ export const ProjectLayoutNonBlocking = ({
           )}
 
           <main className="flex w-full flex-1 flex-col overflow-x-hidden">
-            {!hideHeader && <LayoutHeader />}
+            {!navLayoutV2 && !hideHeader && <LayoutHeader />}
             {showPausedState ? (
               <div className="mx-auto my-16 w-full h-full max-w-7xl flex items-center">
                 <div className="w-full">
