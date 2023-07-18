@@ -24,13 +24,21 @@ const ExitSurveyModal = ({ visible, subscription, onClose }: ExitSurveyModalProp
   const { slug } = useParams()
   const captchaRef = useRef<HCaptcha>(null)
 
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const [message, setMessage] = useState('')
+  // [Joshen] Separate submitting state as there are additional async logic involved in the submit
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [selectedReasons, dispatchSelectedReasons] = useReducer(reducer, [])
 
   const subscriptionUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
-  const { mutateAsync: updateOrgSubscription } = useOrgSubscriptionUpdateMutation()
+  const { mutateAsync: updateOrgSubscription } = useOrgSubscriptionUpdateMutation({
+    onError: (error) => {
+      ui.setNotification({
+        category: 'error',
+        message: `Failed to downgrade project: ${error.message}`,
+      })
+    },
+  })
 
   const projectsWithComputeInstances =
     subscription?.project_addons.filter((project) =>
@@ -59,22 +67,12 @@ const ExitSurveyModal = ({ visible, subscription, onClose }: ExitSurveyModalProp
       })
     }
 
-    setIsSubmitting(true)
     let token = captchaToken
 
-    try {
-      if (!token) {
-        const captchaResponse = await captchaRef.current?.execute({ async: true })
-        token = captchaResponse?.response ?? null
-        await downgradeOrganization()
-      }
-    } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to downgrade project: ${error.message}`,
-      })
-    } finally {
-      setIsSubmitting(false)
+    if (!token) {
+      const captchaResponse = await captchaRef.current?.execute({ async: true })
+      token = captchaResponse?.response ?? null
+      await downgradeOrganization()
     }
   }
 
@@ -83,15 +81,12 @@ const ExitSurveyModal = ({ visible, subscription, onClose }: ExitSurveyModalProp
     // If compute instance is present within the existing subscription, then a restart will be triggered
     if (!slug) return console.error('Slug is required')
 
+    setIsSubmitting(true)
     try {
       await updateOrgSubscription({ slug, tier: 'tier_free' })
       resetCaptcha()
     } catch (error: any) {
-      return ui.setNotification({
-        error,
-        category: 'error',
-        message: `Failed to downgrade subscription: ${error.message}`,
-      })
+      setIsSubmitting(false)
     }
 
     try {
@@ -117,6 +112,7 @@ const ExitSurveyModal = ({ visible, subscription, onClose }: ExitSurveyModalProp
           : 'Successfully downgraded organization to the free plan',
       })
       onClose(true)
+      setIsSubmitting(false)
       window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
     }
   }

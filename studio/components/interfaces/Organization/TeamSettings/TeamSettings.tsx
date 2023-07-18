@@ -19,6 +19,7 @@ import {
   ScaffoldContainerLegacy,
   ScaffoldFilterAndContent,
   ScaffoldActionsContainer,
+  ScaffoldSectionContent,
 } from 'components/layouts/Scaffold'
 
 const TeamSettings = () => {
@@ -133,7 +134,9 @@ const TeamSettings = () => {
             </div>
           </ScaffoldActionsGroup>
         </ScaffoldActionsContainer>
-        <MembersView searchString={searchString} />
+        <ScaffoldSectionContent className="w-full">
+          <MembersView searchString={searchString} />
+        </ScaffoldSectionContent>
       </ScaffoldFilterAndContent>
     </ScaffoldContainerLegacy>
   )
