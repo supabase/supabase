@@ -68,7 +68,7 @@ const SideBarContent = observer(() => {
       const snippet = createSqlSnippetSkeleton({ name: 'Untitled query', owner_id: profile?.id })
       const data = { ...snippet, id: uuidv4() }
 
-      snap.addSnippet(data as SqlSnippet, ref, true)
+      snap.addSnippet(data as SqlSnippet, ref)
 
       router.push(`/project/${ref}/sql/${data.id}`)
     } catch (error: any) {

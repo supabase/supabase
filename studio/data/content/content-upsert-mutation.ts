@@ -1,19 +1,20 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { post } from 'lib/common/fetch'
+import { put } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { UserContent } from 'types'
 import { contentKeys } from './keys'
 
-type CreateContentVariables = {
+type UpsertContentVariables = {
   projectRef: string
-  payload: UserContent
+  id: string
+  payload: Partial<UserContent>
 }
 
-export async function createContent(
-  { projectRef, payload }: CreateContentVariables,
+export async function upsertContent(
+  { projectRef, payload }: UpsertContentVariables,
   signal?: AbortSignal
 ) {
-  const response = await post<UserContent[]>(`${API_URL}/projects/${projectRef}/content`, payload, {
+  const response = await put<UserContent[]>(`${API_URL}/projects/${projectRef}/content`, payload, {
     signal,
   })
 
@@ -21,19 +22,19 @@ export async function createContent(
   return { content: response }
 }
 
-type CreateContentData = Awaited<ReturnType<typeof createContent>>
+type UpsertContentData = Awaited<ReturnType<typeof upsertContent>>
 
-export const useContentCreateMutation = ({
+export const useContentUpsertMutation = ({
   onSuccess,
   ...options
 }: Omit<
-  UseMutationOptions<CreateContentData, unknown, CreateContentVariables>,
+  UseMutationOptions<UpsertContentData, unknown, UpsertContentVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<CreateContentData, unknown, CreateContentVariables>(
-    (args) => createContent(args),
+  return useMutation<UpsertContentData, unknown, UpsertContentVariables>(
+    (args) => upsertContent(args),
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables

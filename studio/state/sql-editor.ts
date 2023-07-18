@@ -1,6 +1,5 @@
-import { createContent } from 'data/content/content-create-mutation'
 import { Content } from 'data/content/content-query'
-import { updateContent } from 'data/content/content-update-mutation'
+import { upsertContent } from 'data/content/content-upsert-mutation'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
 import { debounce, memoize } from 'lodash'
 import { useMemo } from 'react'
@@ -31,7 +30,6 @@ export const sqlEditorState = proxy({
     [key: string]: boolean
   },
 
-  needsCreating: proxySet<string>([]),
   needsSaving: proxySet<string>([]),
   savingStates: {} as {
     [key: string]: 'IDLE' | 'UPDATING' | 'UPDATING_FAILED'
@@ -64,7 +62,7 @@ export const sqlEditorState = proxy({
       sqlEditorState.addSnippet(snippet, projectRef)
     })
   },
-  addSnippet: (snippet: SqlSnippet, projectRef: string, isNew?: boolean) => {
+  addSnippet: (snippet: SqlSnippet, projectRef: string) => {
     if (snippet.id && !sqlEditorState.snippets[snippet.id]) {
       sqlEditorState.snippets[snippet.id] = {
         snippet,
@@ -80,9 +78,8 @@ export const sqlEditorState = proxy({
         sqlEditorState.orders[projectRef].unshift(snippet.id)
         sqlEditorState.reorderSnippets(projectRef)
       }
-      if (isNew) {
-        sqlEditorState.needsCreating.add(snippet.id)
-      }
+
+      sqlEditorState.needsSaving.add(snippet.id)
     }
     sqlEditorState.loaded[projectRef] = true
   },
@@ -98,7 +95,6 @@ export const sqlEditorState = proxy({
     )
 
     sqlEditorState.needsSaving.delete(id)
-    sqlEditorState.needsCreating.delete(id)
   },
   setSplitSizes: (id: string, splitSizes: number[]) => {
     if (sqlEditorState.snippets[id]) {
@@ -174,68 +170,41 @@ export const useSnippets = (projectRef: string | undefined) => {
   }, [projectRef, snapshot.orders, snapshot.snippets])
 }
 
-async function update(id: string, projectRef: string, content: Partial<Content>) {
+async function upsert(id: string, projectRef: string, content: Partial<Content>) {
   try {
     sqlEditorState.savingStates[id] = 'UPDATING'
-    await updateContent({ projectRef, id, content })
+    await upsertContent({ projectRef, id, payload: content })
     sqlEditorState.savingStates[id] = 'IDLE'
   } catch (error) {
     sqlEditorState.savingStates[id] = 'UPDATING_FAILED'
   }
 }
 
-const memoizedUpdate = memoize((_id: string) => debounce(update, 1000))
+const memoizedUpdate = memoize((_id: string) => debounce(upsert, 1000))
 const debouncedUpdate = (id: string, projectRef: string, content: Partial<Content>) =>
   memoizedUpdate(id)(id, projectRef, content)
 
 if (typeof window !== 'undefined') {
   devtools(sqlEditorState, { name: 'sqlEditorState', enabled: true })
 
-  subscribe(sqlEditorState.needsCreating, () => {
-    const state = getSqlEditorStateSnapshot()
-
-    state.needsCreating.forEach((id) => {
-      const snippet = state.snippets[id]
-
-      if (snippet) {
-        sqlEditorState.savingStates[id] = 'UPDATING'
-        createContent({
-          projectRef: snippet.projectRef,
-          payload: {
-            ...snippet.snippet,
-            type: 'sql',
-          },
-        })
-          .then(() => {
-            sqlEditorState.savingStates[id] = 'IDLE'
-            sqlEditorState.needsCreating.delete(id)
-          })
-          .catch(() => {
-            sqlEditorState.savingStates[id] = 'UPDATING_FAILED'
-          })
-      }
-    })
-  })
-
   subscribe(sqlEditorState.needsSaving, () => {
     const state = getSqlEditorStateSnapshot()
 
-    Array.from(state.needsSaving)
-      .filter((id) => !state.needsCreating.has(id))
-      .forEach((id) => {
-        const snippet = state.snippets[id]
+    Array.from(state.needsSaving).forEach((id) => {
+      const snippet = state.snippets[id]
 
-        if (snippet) {
-          debouncedUpdate(id, snippet.projectRef, {
-            content: { ...snippet.snippet.content, content_id: id },
-            type: 'sql',
-            id,
-            name: snippet.snippet.name,
-            description: snippet.snippet.description,
-          })
+      if (snippet) {
+        debouncedUpdate(id, snippet.projectRef, {
+          content: { ...snippet.snippet.content, content_id: id },
+          type: 'sql',
+          id,
+          name: snippet.snippet.name,
+          description: snippet.snippet.description,
+          visibility: snippet.snippet.visibility ?? 'project',
+        })
 
-          sqlEditorState.needsSaving.delete(id)
-        }
-      })
+        sqlEditorState.needsSaving.delete(id)
+      }
+    })
   })
 }
