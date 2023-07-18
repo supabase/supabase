@@ -47,7 +47,7 @@ const PauseProjectButton = () => {
       ui.setNotification({
         error: res.error,
         category: 'error',
-        message: 'Failed to pause project',
+        message: `Failed to pause project: ${res.error.message}`,
       })
       setLoading(false)
     } else {

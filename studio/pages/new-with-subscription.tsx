@@ -55,7 +55,7 @@ const Wizard: NextPageWithLayout = () => {
       return ui.setNotification({
         category: 'error',
         message: intent.error.message,
-        error: intent.error,
+        error: `Failed to retrieve intent: ${intent.error}`,
       })
     } else {
       setIntent(intent)

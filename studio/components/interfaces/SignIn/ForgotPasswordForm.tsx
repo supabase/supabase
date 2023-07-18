@@ -30,7 +30,7 @@ const ForgotPasswordForm = () => {
       token = captchaResponse?.response ?? null
     }
 
-    const response = await post(`${API_URL}/reset-password`, {
+    const { error } = await post(`${API_URL}/reset-password`, {
       email,
       hcaptchaToken: token ?? undefined,
       redirectTo: `${
@@ -39,7 +39,6 @@ const ForgotPasswordForm = () => {
           : process.env.NEXT_PUBLIC_SITE_URL
       }${BASE_PATH}/reset-password`,
     })
-    const error = response.error
 
     if (!error) {
       ui.setNotification({
@@ -56,7 +55,7 @@ const ForgotPasswordForm = () => {
       ui.setNotification({
         id: toastId,
         category: 'error',
-        message: error.message,
+        message: `Failed to send reset email: ${error.message}`,
       })
     }
   }
