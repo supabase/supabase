@@ -54,7 +54,7 @@ const TeamSettings = () => {
     try {
       confirmAlert({
         title: 'Are you sure?',
-        message: 'Are you sure you want to leave this team? This is permanent.',
+        message: 'Are you sure you want to leave this organization? This is permanent.',
         onAsyncConfirm: async () => {
           const response = await delete_(
             `${API_URL}/organizations/${slug}/members/${profile!.gotrue_id}`
@@ -69,7 +69,7 @@ const TeamSettings = () => {
     } catch (error: any) {
       ui.setNotification({
         category: 'error',
-        message: `Error leaving: ${error?.message}`,
+        message: `Failed to leave organization: ${error?.message}`,
       })
     } finally {
       setIsLeaving(false)
