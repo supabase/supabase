@@ -80,7 +80,7 @@ const CommandMenuWrapper = ({ children }: PropsWithChildren<{}>) => {
         sql: formattedSql,
       })
       const data = { ...snippet, id: uuidv4() }
-      snap.addSnippet(data as SqlSnippet, ref, true)
+      snap.addSnippet(data as SqlSnippet, ref)
       ui.setNotification({
         category: 'success',
         message: `Successfully saved snippet!`,
