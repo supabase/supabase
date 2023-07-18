@@ -69,7 +69,9 @@ Deleting users from an application requires two steps:
     const { data, error } = await supabase.rpc("deleteUser");
   }
   ```
-
+<Admonition type="note">
+This will only allow users to delete *their own* user.
+</Admonition>
 
 ## Exporting Users
 
