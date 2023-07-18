@@ -33,6 +33,12 @@ const SSLConfiguration = () => {
   })
   const { mutate: updateSSLEnforcement, isLoading: isSubmitting } = useSSLEnforcementUpdateMutation(
     {
+      onSuccess: () => {
+        ui.setNotification({
+          category: 'success',
+          message: 'Successfully updated SSL configuration',
+        })
+      },
       onError: (error) => {
         setIsEnforced(isEnforced)
         ui.setNotification({
