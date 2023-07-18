@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion'
+import { m } from 'framer-motion'
 import { useCallback } from 'react'
 import { AiIcon, IconCornerDownLeft, Input } from 'ui'
 
@@ -11,12 +11,12 @@ const AskAIWidget = () => {
   }, [])
 
   return (
-    <motion.div
+    <m.div
       initial={{ y: -50 }}
       animate={{ y: 0 }}
       className="bg-scale-200 rounded-md p-2 my-2 border border-scale-700 shadow-xl shadow-scale-100 flex flex-col gap-2 text-sm text-scale-1100 max-w-xl"
     >
-      <motion.div initial={{ y: -25 }} animate={{ y: 0 }}>
+      <m.div initial={{ y: -25 }} animate={{ y: 0 }}>
         <Input
           inputRef={inputRef}
           size="xlarge"
@@ -31,9 +31,9 @@ const AskAIWidget = () => {
             </div>
           }
         />
-      </motion.div>
+      </m.div>
       AI generated code may be incorrect.
-    </motion.div>
+    </m.div>
   )
 }
 

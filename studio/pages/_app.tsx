@@ -54,6 +54,9 @@ import Favicons from 'components/head/Favicons'
 import { IS_PLATFORM } from 'lib/constants'
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
 import { createClient } from '@supabase/supabase-js'
+import { LazyMotion } from 'framer-motion'
+
+const motionFeatures = () => import('./motion-features').then((res) => res.default)
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
@@ -143,7 +146,9 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                       <ThemeProvider>
                         <CommandMenuWrapper>
                           <AppBannerWrapper>
-                            {getLayout(<Component {...pageProps} />)}
+                            <LazyMotion features={motionFeatures} strict>
+                              {getLayout(<Component {...pageProps} />)}
+                            </LazyMotion>
                           </AppBannerWrapper>
                         </CommandMenuWrapper>
                       </ThemeProvider>
