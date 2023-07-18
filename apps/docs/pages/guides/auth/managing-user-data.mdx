@@ -46,15 +46,15 @@ You will encounter an error when you try to delete an Auth user that owns any St
 
 Deleting users from an application requires two steps:
 1. **Setting up a custom function deleteUser() **
-  - **Name of function** - deleteUser
-  - **Schema** - public
-  - **Return type** - void
-  - **Arguments** - none
+  - `Name of function` - deleteUser
+  - `Schema` - public
+  - `Return type` - void
+  - `Arguments` - none
   - **Advanced settings**
-    - **Language** - plpgsql
-    - **Behavior** - volatile
-    - **Config Params** - none
-    - **Type of security** - SECURITY DEFINER
+    - `Language` - plpgsql
+    - `Behavior` - volatile
+    - `Config Params` - none
+    - `Type of security` - SECURITY DEFINER
   - **Definition**
     ```sql
     begin
