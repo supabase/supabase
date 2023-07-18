@@ -16,7 +16,7 @@ const openAiKey = process.env.OPENAI_KEY
 
 const debugSqlSchema = SchemaBuilder.emptySchema()
   .addString('solution', {
-    description: 'The suggested solution for the error (as short and concise as possible).',
+    description: 'A short suggested solution for the error (as concise as possible).',
   })
   .addString('sql', {
     description: 'The SQL rewritten to apply the solution. Includes all the original SQL.',
@@ -80,6 +80,7 @@ export default async function handler(req: NextRequest) {
 
   if (!response.ok) {
     const errorResponse: ErrorResponse = await response.json()
+    console.log({ errorResponse })
     console.error(`AI SQL debugging failed: ${errorResponse.error.message}`)
 
     return new Response(
