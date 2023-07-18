@@ -44,6 +44,33 @@ You cannot delete a user if they are the owner of any objects in Supabase Storag
 You will encounter an error when you try to delete an Auth user that owns any Storage objects. If this happens, try deleting all the objects for that user, or reassign ownership to another user.
 </Admonition>
 
+Deleting users from an application requires two steps:
+1. **Setting up a custom function deleteUser() **
+  - **Name of function** - deleteUser
+  - **Schema** - public
+  - **Return type** - void
+  - **Arguments** - none
+  - **Advanced settings**
+    - **Language** - plpgsql
+    - **Behavior** - volatile
+    - **Config Params** - none
+    - **Type of security** - SECURITY DEFINER
+  - **Definition**
+    ```sql
+    begin
+    delete from auth.users where id = auth.uid();
+    end;
+    ```
+2. **Calling this function from client with RPC**
+  This example shows the function call from a Next.js application.
+   ```js
+  const supabase = createClientComponentClient();
+  async function deleteUser() {
+    const { data, error } = await supabase.rpc("deleteUser");
+  }
+  ```
+
+
 ## Exporting Users
 
 As Supabase is built on top of PostgreSQL, you can query the `auth.users` and `auth.identities` table via the `SQL Editor` tab to extract all users:
