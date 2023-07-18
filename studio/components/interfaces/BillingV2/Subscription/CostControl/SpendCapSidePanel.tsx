@@ -186,7 +186,7 @@ const SpendCapSidePanel = () => {
                             </Table.td>
                             <Table.td>
                               <p className="text-xs pl-4">
-                                {item.plans[subscription?.plan?.id || 'pro']}
+                                {item.plans['pro']}
                               </p>
                             </Table.td>
                           </Table.tr>
