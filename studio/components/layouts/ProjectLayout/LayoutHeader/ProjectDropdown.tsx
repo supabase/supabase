@@ -6,6 +6,8 @@ import { Button, Dropdown, IconPlus, Popover } from 'ui'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useSelectedOrganization, useSelectedProject } from 'hooks'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
+import { Organization, Project } from 'types'
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 
 // [Fran] the idea is to let users change projects without losing the current page,
 // but at the same time we need to redirect correctly between urls that might be
@@ -30,13 +32,51 @@ export const sanitizeRoute = (route: string, routerQueries: ParsedUrlQuery) => {
   }
 }
 
-const ProjectDropdown = () => {
-  const selectedOrganization = useSelectedOrganization()
-  const selectedProject = useSelectedProject()
-  const { data: allProjects } = useProjectsQuery()
-  const selectedOrganizationSlug = selectedOrganization?.slug
+const ProjectLink = ({
+  project,
+  organization,
+}: {
+  project: Project
+  organization?: Organization
+}) => {
   const router = useRouter()
+  const selectedProject = useSelectedProject()
   const sanitizedRoute = sanitizeRoute(router.route, router.query)
+  const isOrgBilling = !!organization?.subscription_id
+
+  // [Joshen] Temp while we're interim between v1 and v2 billing
+  let href = sanitizedRoute?.replace('[ref]', project.ref) ?? `/project/${project.ref}`
+  if (href.endsWith('settings/addons') && !isOrgBilling) {
+    href = href.replace('settings/addons', 'settings/billing/subscription')
+  } else if (href.endsWith('settings/billing/subscription') && isOrgBilling) {
+    href = href.replace('settings/billing/subscription', 'settings/addons')
+  } else if (href.endsWith('settings/infrastructure') && !isOrgBilling) {
+    href = href.replace('settings/infrastructure', 'settings/billing/usage')
+  } else if (href.endsWith('settings/billing/usage') && !isOrgBilling) {
+    href = href.replace('settings/billing/usage', 'settings/infrastructure')
+  }
+
+  return (
+    <Link passHref href={href}>
+      <a className="block">
+        <Dropdown.Item
+          className={
+            selectedProject?.name === project.name ? 'font-bold bg-slate-400 dark:bg-slate-500' : ''
+          }
+        >
+          {project.name}
+        </Dropdown.Item>
+      </a>
+    </Link>
+  )
+}
+
+const ProjectDropdown = () => {
+  const selectedProject = useSelectedProject()
+  const selectedOrganization = useSelectedOrganization()
+  const { data: allProjects } = useProjectsQuery()
+  const { data: allOrganizations } = useOrganizationsQuery()
+  const selectedOrganizationSlug = selectedOrganization?.slug
 
   return IS_PLATFORM ? (
     <Dropdown
@@ -47,25 +87,10 @@ const ProjectDropdown = () => {
           {allProjects
             ?.filter((x) => x.status !== PROJECT_STATUS.INACTIVE)
             .sort((a, b) => a.name.localeCompare(b.name))
-            .map((x) => (
-              <Link
-                key={x.ref}
-                href={sanitizedRoute?.replace('[ref]', x.ref) ?? `/project/${x.ref}`}
-                passHref
-              >
-                <a className="block">
-                  <Dropdown.Item
-                    className={
-                      selectedProject?.name === x.name
-                        ? 'font-bold bg-slate-400 dark:bg-slate-500'
-                        : ''
-                    }
-                  >
-                    {x.name}
-                  </Dropdown.Item>
-                </a>
-              </Link>
-            ))}
+            .map((x) => {
+              const org = allOrganizations?.find((org) => org.id === x.organization_id)
+              return <ProjectLink key={x.ref} project={x} organization={org} />
+            })}
           <Popover.Separator />
           <Link href={`/new/${selectedOrganizationSlug}`}>
             <a className="block">

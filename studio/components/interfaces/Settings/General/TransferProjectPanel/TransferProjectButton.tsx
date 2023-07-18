@@ -1,4 +1,7 @@
-import { FC, useEffect, useMemo, useState } from 'react'
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
 import {
   Alert,
   Button,
@@ -11,16 +14,13 @@ import {
   Loading,
   Modal,
 } from 'ui'
-import * as Tooltip from '@radix-ui/react-tooltip'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useStore, useSelectedProject, useCheckPermissions } from 'hooks'
-import { useProjectTransferPreviewQuery } from 'data/projects/project-transfer-preview-query'
-import { useProjectTransferMutation } from 'data/projects/project-transfer-mutation'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import Link from 'next/link'
+import { useProjectTransferMutation } from 'data/projects/project-transfer-mutation'
+import { useProjectTransferPreviewQuery } from 'data/projects/project-transfer-preview-query'
+import { useCheckPermissions, useSelectedProject, useStore } from 'hooks'
 
-const TransferProjectButton: FC<{}> = () => {
+const TransferProjectButton = () => {
   const { ui } = useStore()
 
   const project = useSelectedProject()
@@ -34,11 +34,22 @@ const TransferProjectButton: FC<{}> = () => {
     .filter((it) => it.subscription_id)
 
   const [isOpen, setIsOpen] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-
   const [selectedOrg, setSelectedOrg] = useState()
 
-  const { error: transferError, mutateAsync: transferProject } = useProjectTransferMutation()
+  const {
+    mutate: transferProject,
+    error: transferError,
+    isLoading: isTransferring,
+  } = useProjectTransferMutation({
+    onSuccess: () => {
+      ui.setNotification({
+        category: 'success',
+        duration: 5000,
+        message: `Successfully transferred project ${project?.name}.`,
+      })
+      setIsOpen(false)
+    },
+  })
 
   const {
     data: transferPreviewData,
@@ -47,14 +58,13 @@ const TransferProjectButton: FC<{}> = () => {
     remove,
   } = useProjectTransferPreviewQuery(
     { projectRef, targetOrganizationSlug: selectedOrg },
-    { enabled: !isLoading && isOpen }
+    { enabled: !isTransferring && isOpen }
   )
 
   useEffect(() => {
     if (isOpen) {
       // reset state
       setSelectedOrg(undefined)
-      setIsLoading(false)
     } else {
       // Invalidate cache
       remove()
@@ -70,22 +80,7 @@ const TransferProjectButton: FC<{}> = () => {
   async function handleTransferProject() {
     if (project === undefined) return
     if (selectedOrg === undefined) return
-
-    setIsLoading(true)
-
-    try {
-      await transferProject({ projectRef, targetOrganizationSlug: selectedOrg })
-      ui.setNotification({
-        category: 'success',
-
-        duration: 5000,
-        message: `Successfully transferred project ${project?.name}.`,
-      })
-      setIsOpen(false)
-    } catch {
-    } finally {
-      setIsLoading(false)
-    }
+    transferProject({ projectRef, targetOrganizationSlug: selectedOrg })
   }
 
   return (
@@ -119,7 +114,7 @@ const TransferProjectButton: FC<{}> = () => {
         closable
         onCancel={() => toggle()}
         visible={isOpen}
-        loading={isLoading}
+        loading={isTransferring}
         size={'xlarge'}
         header={`Transfer project ${project?.name}`}
         customFooter={
@@ -130,7 +125,7 @@ const TransferProjectButton: FC<{}> = () => {
             <Button
               onClick={() => handleTransferProject()}
               disabled={
-                !transferPreviewData || !transferPreviewData.valid || isLoading || !selectedOrg
+                !transferPreviewData || !transferPreviewData.valid || isTransferring || !selectedOrg
               }
             >
               Transfer Project

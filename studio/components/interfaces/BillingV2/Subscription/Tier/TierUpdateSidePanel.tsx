@@ -30,7 +30,6 @@ const TierUpdateSidePanel = () => {
   const slug = selectedOrganization?.slug
   const { ref: projectRef } = useParams()
 
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const [showExitSurvey, setShowExitSurvey] = useState(false)
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>()
   const [showDowngradeError, setShowDowngradeError] = useState(false)
@@ -49,7 +48,18 @@ const TierUpdateSidePanel = () => {
   const { data: subscription } = useProjectSubscriptionV2Query({ projectRef })
   const { data: addons } = useProjectAddonsQuery({ projectRef })
   const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery({ slug })
-  const { mutateAsync: updateSubscriptionTier } = useProjectSubscriptionUpdateMutation()
+  const { mutate: updateSubscriptionTier, isLoading: isUpdating } =
+    useProjectSubscriptionUpdateMutation({
+      onSuccess: () => {
+        ui.setNotification({
+          category: 'success',
+          message: `Successfully updated subscription to ${selectedTierMeta?.name}!`,
+        })
+        setSelectedTier(undefined)
+        onClose()
+        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
+      },
+    })
 
   const availablePlans = plans ?? []
   const subscriptionAddons = addons?.selected_addons ?? []
@@ -94,29 +104,11 @@ const TierUpdateSidePanel = () => {
       return ui.setNotification({ category: 'error', message: 'Please select a payment method' })
     }
 
-    try {
-      setIsSubmitting(true)
-      await updateSubscriptionTier({
-        projectRef,
-        tier: selectedTier,
-        paymentMethod: selectedPaymentMethod,
-      })
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully updated subscription to ${selectedTierMeta?.name}!`,
-      })
-      setSelectedTier(undefined)
-      onClose()
-      window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
-    } catch (error: any) {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Unable to update subscription: ${error.message}`,
-      })
-    } finally {
-      setIsSubmitting(false)
-    }
+    updateSubscriptionTier({
+      projectRef,
+      tier: selectedTier,
+      paymentMethod: selectedPaymentMethod,
+    })
   }
 
   return (
@@ -334,7 +326,7 @@ const TierUpdateSidePanel = () => {
       </Modal>
 
       <Modal
-        loading={isSubmitting}
+        loading={isUpdating}
         alignFooter="right"
         className="!w-[450px]"
         visible={selectedTier !== undefined && selectedTier !== 'tier_free'}
