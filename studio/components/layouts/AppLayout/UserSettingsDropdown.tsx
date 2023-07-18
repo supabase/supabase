@@ -31,12 +31,12 @@ const UserSettingsDropdown = () => {
           <p className="text-sm text-scale-1000">{profile?.primary_email}</p>
         </div>,
         <Dropdown.Separator key="sep-1" />,
-        <Link key="preferences" href="/">
+        <Link key="preferences" href="/account/me">
           <a>
             <Dropdown.Item>Preferences</Dropdown.Item>
           </a>
         </Link>,
-        <Link key="access-tokens" href="/">
+        <Link key="access-tokens" href="/account/tokens">
           <a>
             <Dropdown.Item>Access tokens</Dropdown.Item>
           </a>
