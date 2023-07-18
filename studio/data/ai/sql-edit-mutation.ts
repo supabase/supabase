@@ -3,18 +3,18 @@ import { post } from 'lib/common/fetch'
 import { ResponseFailure } from 'types'
 import { aiKeys } from './keys'
 
-export type SqlGenerateResponse = {
-  title: string
+export type SqlEditResponse = {
   sql: string
 }
 
-export type SqlGenerateVariables = {
+export type SqlEditVariables = {
   prompt: string
+  sql: string
 }
 
-export async function generateSql({ prompt }: SqlGenerateVariables) {
-  const response = (await post<SqlGenerateResponse>('/api/ai/sql/generate', { prompt })) as
-    | SqlGenerateResponse
+export async function editSql({ prompt, sql }: SqlEditVariables) {
+  const response = (await post<SqlEditResponse>('/api/ai/sql/edit', { prompt, sql })) as
+    | SqlEditResponse
     | ResponseFailure
 
   if ('error' in response) {
@@ -24,15 +24,15 @@ export async function generateSql({ prompt }: SqlGenerateVariables) {
   return response
 }
 
-type SqlGenerateData = Awaited<ReturnType<typeof generateSql>>
+type SqlEditData = Awaited<ReturnType<typeof editSql>>
 
-export const useSqlGenerateMutation = ({
+export const useSqlEditMutation = ({
   onSuccess,
   ...options
-}: Omit<UseMutationOptions<SqlGenerateData, unknown, SqlGenerateVariables>, 'mutationFn'> = {}) => {
+}: Omit<UseMutationOptions<SqlEditData, unknown, SqlEditVariables>, 'mutationFn'> = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<SqlGenerateData, unknown, SqlGenerateVariables>((vars) => generateSql(vars), {
+  return useMutation<SqlEditData, unknown, SqlEditVariables>((vars) => editSql(vars), {
     async onSuccess(data, variables, context) {
       await queryClient.invalidateQueries(aiKeys.sql())
 

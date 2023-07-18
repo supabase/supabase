@@ -12,6 +12,7 @@ export type MonacoEditorProps = {
   id: string
   editorRef: MutableRefObject<IStandaloneCodeEditor | null>
   isExecuting: boolean
+  autoFocus?: boolean
   executeQuery: () => void
   onOpenAiWidget?: () => void
   onCloseAiWidget?: () => void
@@ -21,6 +22,7 @@ const MonacoEditor = ({
   id,
   editorRef,
   isExecuting,
+  autoFocus = true,
   executeQuery,
   onOpenAiWidget,
   onCloseAiWidget,
@@ -84,9 +86,10 @@ const MonacoEditor = ({
       })
     })
 
-    // when editor did mount, it will need a delay before focus() works properly
-    await timeout(500)
-    editor.focus()
+    if (autoFocus) {
+      await timeout(500)
+      editor.focus()
+    }
   }
 
   useEffect(() => {

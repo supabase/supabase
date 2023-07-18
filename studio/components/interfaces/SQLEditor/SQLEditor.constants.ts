@@ -1,3 +1,4 @@
+import { stripIndent } from 'common-tags'
 import { SqlSnippets, UserContent } from 'types'
 import { SQLTemplate } from './SQLEditor.types'
 
@@ -1201,3 +1202,8 @@ export const NEW_SQL_SNIPPET_SKELETON: UserContent<SqlSnippets.Content> = {
     favorite: false,
   },
 }
+
+export const sqlAiDisclaimerComment = stripIndent`
+  -- Supabase AI is experimental and may produce incorrect answers
+  -- Always verify the output before executing
+`
