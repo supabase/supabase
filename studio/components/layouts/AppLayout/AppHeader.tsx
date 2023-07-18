@@ -8,6 +8,7 @@ import NotificationsPopover from '../ProjectLayout/LayoutHeader/NotificationsPop
 import ProjectDropdown from '../ProjectLayout/LayoutHeader/ProjectDropdown'
 import OrganizationDropdown from './OrganizationDropdown'
 import UserSettingsDropdown from './UserSettingsDropdown'
+import { Button, IconSettings } from 'ui'
 
 const AppHeader = () => {
   const router = useRouter()
@@ -34,6 +35,15 @@ const AppHeader = () => {
         <FeedbackDropdown alt />
         <NotificationsPopover alt />
         <HelpPopover alt />
+        <Link href={`/org/${organization?.slug}/settings`}>
+          <a>
+            <Button
+              type="text"
+              className="px-1"
+              icon={<IconSettings size={18} strokeWidth={1.5} className="text-scale-1100" />}
+            />
+          </a>
+        </Link>
         <UserSettingsDropdown />
       </div>
     </div>
