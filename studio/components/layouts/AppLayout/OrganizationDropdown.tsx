@@ -6,8 +6,10 @@ import { useFlag, useSelectedOrganization } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { useRouter } from 'next/router'
 
 const OrganizationDropdown = () => {
+  const router = useRouter()
   const { data: organizations, isLoading: isLoadingOrganizations } = useOrganizationsQuery()
   const selectedOrganization = useSelectedOrganization()
   const orgCreationV2 = useFlag('orgcreationv2')
@@ -29,9 +31,13 @@ const OrganizationDropdown = () => {
           {organizations
             ?.sort((a, b) => a.name.localeCompare(b.name))
             .map((x) => {
-              // [Joshen] Improvement: maintain URL if navigating in between org pages
+              const href = router.pathname.includes('[slug]')
+                ? router.pathname.replace('[slug]', x.slug)
+                : router.pathname.includes('[ref]/settings')
+                ? `/org/${x.slug}/general`
+                : `/org/${x.slug}`
               return (
-                <Link key={x.slug} href={`/org/${x.slug}`}>
+                <Link key={x.slug} href={href}>
                   <a>
                     <Dropdown.Item>{x.name}</Dropdown.Item>
                   </a>
