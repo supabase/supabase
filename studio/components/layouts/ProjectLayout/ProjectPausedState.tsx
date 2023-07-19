@@ -57,9 +57,20 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
       })
     }
 
-    await post(`${API_URL}/projects/${project.ref}/restore`, { kps_enabled: kpsEnabled })
-    setProjectStatus(queryClient, project.ref, PROJECT_STATUS.RESTORING)
-    ui.setNotification({ category: 'success', message: 'Restoring project' })
+    const { error } = await post(`${API_URL}/projects/${project.ref}/restore`, {
+      kps_enabled: kpsEnabled,
+    })
+
+    if (error) {
+      ui.setNotification({
+        category: 'error',
+        error,
+        message: `Failed to restore project: ${error.message}`,
+      })
+    } else {
+      setProjectStatus(queryClient, project.ref, PROJECT_STATUS.RESTORING)
+      ui.setNotification({ category: 'success', message: 'Restoring project' })
+    }
   }
 
   return (

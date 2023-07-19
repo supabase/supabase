@@ -19,8 +19,8 @@ import {
 import { useParams } from 'common'
 import Divider from 'components/ui/Divider'
 import InformationBox from 'components/ui/InformationBox'
-import Connecting from 'components/ui/Loading'
 import MultiSelect from 'components/ui/MultiSelect'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
@@ -51,19 +51,48 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
   const [uploadedDataUrls, setUploadedDataUrls] = useState<string[]>([])
   const [selectedServices, setSelectedServices] = useState<string[]>([])
 
-  const { data: organizations, isSuccess: isOrganizationsSuccess } = useOrganizationsQuery()
+  const {
+    data: organizations,
+    isLoading: isLoadingOrganizations,
+    isError: isErrorOrganizations,
+    isSuccess: isSuccessOrganizations,
+  } = useOrganizationsQuery()
   // for use in useEffect
   const organizationsRef = useLatest(organizations)
 
-  const { data: allProjects, isSuccess: isProjectsSuccess } = useProjectsQuery()
-  const { data: subscription, isLoading: isLoadingSubscription } = useProjectSubscriptionV2Query({
-    projectRef: ref,
-  })
+  const {
+    data: allProjects,
+    isLoading: isLoadingProjects,
+    isError: isErrorProjects,
+    isSuccess: isSuccessProjects,
+  } = useProjectsQuery()
 
-  const isInitialized = isOrganizationsSuccess && isProjectsSuccess
   const projectDefaults: Partial<Project>[] = [{ ref: 'no-project', name: 'No specific project' }]
 
   const projects = [...(allProjects ?? []), ...projectDefaults]
+  const selectedProjectFromUrl = projects.find((project) => project.ref === ref)
+  const selectedCategoryFromUrl = CATEGORY_OPTIONS.find((option) => {
+    if (option.value.toLowerCase() === ((category as string) ?? '').toLowerCase()) return option
+  })
+
+  const selectedProjectRef =
+    selectedProjectFromUrl !== undefined
+      ? selectedProjectFromUrl.ref
+      : projects.length > 0
+      ? projects[0].ref
+      : 'no-project'
+  const selectedOrganizationSlug =
+    selectedProjectRef !== 'no-project'
+      ? organizations?.find((org) => {
+          const project = projects.find((project) => project.ref === selectedProjectRef)
+          return org.id === project?.organization_id
+        })?.slug
+      : organizations?.[0]?.slug
+
+  const { data: subscription, isLoading: isLoadingSubscription } = useProjectSubscriptionV2Query(
+    { projectRef: selectedProjectRef },
+    { enabled: selectedProjectRef !== 'no-project' }
+  )
 
   useEffect(() => {
     if (!uploadedFiles) return
@@ -78,37 +107,14 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
   const { profile } = useProfile()
   const respondToEmail = profile?.primary_email ?? 'your email'
 
-  if (!isInitialized) {
-    return (
-      <div className="w-[622px] py-48">
-        <Connecting />
-      </div>
-    )
-  }
-
-  const selectedProject = projects.find((project) => project.ref === ref)
-  const selectedCategory = CATEGORY_OPTIONS.find((option) => {
-    if (option.value.toLowerCase() === ((category as string) ?? '').toLowerCase()) return option
-  })
-
-  const initialProjectRef =
-    selectedProject !== undefined
-      ? selectedProject.ref
-      : projects.length > 0
-      ? projects[0].ref
-      : 'no-project'
-  const initialOrganizationSlug =
-    initialProjectRef !== 'no-project'
-      ? organizations?.find((org) => {
-          const project = projects.find((project) => project.ref === initialProjectRef)
-          return org.id === project?.organization_id
-        })?.slug
-      : organizations?.[0]?.slug
   const initialValues = {
-    category: selectedCategory !== undefined ? selectedCategory.value : CATEGORY_OPTIONS[0].value,
+    category:
+      selectedCategoryFromUrl !== undefined
+        ? selectedCategoryFromUrl.value
+        : CATEGORY_OPTIONS[0].value,
     severity: 'Low',
-    projectRef: initialProjectRef,
-    organizationSlug: initialOrganizationSlug,
+    projectRef: selectedProjectRef,
+    organizationSlug: selectedOrganizationSlug,
     library: 'no-library',
     subject: subject ?? '',
     message: message || '',
@@ -235,6 +241,23 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
           }
         }, [values.projectRef])
 
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        useEffect(() => {
+          if (
+            isSuccessProjects &&
+            isSuccessOrganizations &&
+            allProjects.length > 0 &&
+            organizations.length > 0
+          ) {
+            const updatedValues = {
+              ...values,
+              projectRef: selectedProjectRef,
+              organizationSlug: selectedOrganizationSlug,
+            }
+            resetForm({ values: updatedValues, initialValues: updatedValues })
+          }
+        }, [isSuccessProjects, isSuccessOrganizations])
+
         return (
           <div className="space-y-8 w-[620px]">
             <div className="px-6">
@@ -264,21 +287,40 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
 
             <div className="px-6">
               <div className="grid grid-cols-2 gap-4">
-                <Listbox id="projectRef" layout="vertical" label="Which project is affected?">
-                  {projects.map((option) => {
-                    const organization = organizations?.find((x) => x.id === option.organization_id)
-                    return (
-                      <Listbox.Option
-                        key={`option-${option.ref}`}
-                        label={option.name || ''}
-                        value={option.ref}
-                      >
-                        <span>{option.name}</span>
-                        <span className="block text-xs opacity-50">{organization?.name}</span>
-                      </Listbox.Option>
-                    )
-                  })}
-                </Listbox>
+                {isLoadingProjects && (
+                  <div className="space-y-2">
+                    <p className="text-sm prose">Which project is affected?</p>
+                    <ShimmeringLoader className="!py-[19px]" />
+                  </div>
+                )}
+                {isErrorProjects && (
+                  <div className="space-y-2">
+                    <p className="text-sm prose">Which project is affected?</p>
+                    <div className="border rounded-md px-4 py-2 flex items-center space-x-2">
+                      <IconAlertCircle strokeWidth={2} className="text-scale-1000" />
+                      <p className="text-sm prose">Failed to retrieve projects</p>
+                    </div>
+                  </div>
+                )}
+                {isSuccessProjects && (
+                  <Listbox id="projectRef" layout="vertical" label="Which project is affected?">
+                    {projects.map((option) => {
+                      const organization = organizations?.find(
+                        (x) => x.id === option.organization_id
+                      )
+                      return (
+                        <Listbox.Option
+                          key={`option-${option.ref}`}
+                          label={option.name || ''}
+                          value={option.ref}
+                        >
+                          <span>{option.name}</span>
+                          <span className="block text-xs opacity-50">{organization?.name}</span>
+                        </Listbox.Option>
+                      )
+                    })}
+                  </Listbox>
+                )}
                 <Listbox id="severity" layout="vertical" label="Severity">
                   {SEVERITY_OPTIONS.map((option: any) => {
                     return (
@@ -295,7 +337,8 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                   })}
                 </Listbox>
               </div>
-              {subscription ? (
+
+              {values.projectRef !== 'no-project' && subscription && isSuccessProjects ? (
                 <p className="text-sm text-scale-1000 mt-2">
                   This project is on the{' '}
                   <span className="text-scale-1100">{subscription.plan.name} plan</span>
@@ -310,25 +353,42 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
               )}
             </div>
 
-            {values.projectRef === 'no-project' && (organizations?.length ?? 0) > 0 && (
+            {isSuccessProjects && values.projectRef === 'no-project' && (
               <div className="px-6">
-                <Listbox
-                  id="organizationSlug"
-                  layout="vertical"
-                  label="Which organization is affected?"
-                >
-                  {organizations?.map((option) => {
-                    return (
-                      <Listbox.Option
-                        key={`option-${option.slug}`}
-                        label={option.name || ''}
-                        value={option.slug}
-                      >
-                        <span>{option.name}</span>
-                      </Listbox.Option>
-                    )
-                  })}
-                </Listbox>
+                {isLoadingOrganizations && (
+                  <div className="space-y-2">
+                    <p className="text-sm prose">Which organization is affected?</p>
+                    <ShimmeringLoader className="!py-[19px]" />
+                  </div>
+                )}
+                {isErrorOrganizations && (
+                  <div className="space-y-2">
+                    <p className="text-sm prose">Which organization is affected?</p>
+                    <div className="border rounded-md px-4 py-2 flex items-center space-x-2">
+                      <IconAlertCircle strokeWidth={2} className="text-scale-1000" />
+                      <p className="text-sm prose">Failed to retrieve organizations</p>
+                    </div>
+                  </div>
+                )}
+                {isSuccessOrganizations && (
+                  <Listbox
+                    id="organizationSlug"
+                    layout="vertical"
+                    label="Which organization is affected?"
+                  >
+                    {organizations?.map((option) => {
+                      return (
+                        <Listbox.Option
+                          key={`option-${option.slug}`}
+                          label={option.name || ''}
+                          value={option.slug}
+                        >
+                          <span>{option.name}</span>
+                        </Listbox.Option>
+                      )
+                    })}
+                  </Listbox>
+                )}
               </div>
             )}
 
@@ -368,13 +428,6 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
             )}
 
             <Divider light />
-
-            {/* {values.category === 'Problem' && (
-              <>
-                <ClientLibrariesGuidance />
-                <Divider light />
-              </>
-            )} */}
 
             {!isDisabled ? (
               <>

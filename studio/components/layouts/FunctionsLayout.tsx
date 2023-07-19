@@ -53,14 +53,6 @@ const FunctionsLayout: FC<Props> = ({ title, children }) => {
             xl:flex-row"
             >
               <div className="flex items-center gap-3">
-                <div
-                  className={[
-                    'h-6 w-6 rounded border border-brand-600 bg-brand-300',
-                    'flex items-center justify-center text-brand-900',
-                  ].join(' ')}
-                >
-                  <IconCode size={14} strokeWidth={3} />
-                </div>
                 <div className="flex items-center space-x-4">
                   <h1 className="text-2xl text-scale-1200">Edge Functions</h1>
                 </div>

@@ -1,7 +1,8 @@
+import toast from 'react-hot-toast'
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { isResponseOk, patch } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { UserContent } from 'types'
+import { ResponseError, UserContent } from 'types'
 import { contentKeys } from './keys'
 
 type UpdateContentVariables = {
@@ -30,22 +31,28 @@ type UpdateContentData = Awaited<ReturnType<typeof updateContent>>
 
 export const useContentUpdateMutation = ({
   onSuccess,
+  onError,
   ...options
 }: Omit<
-  UseMutationOptions<UpdateContentData, unknown, UpdateContentVariables>,
+  UseMutationOptions<UpdateContentData, ResponseError, UpdateContentVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<UpdateContentData, unknown, UpdateContentVariables>(
+  return useMutation<UpdateContentData, ResponseError, UpdateContentVariables>(
     (args) => updateContent(args),
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
-
         await Promise.all([queryClient.invalidateQueries(contentKeys.list(projectRef))])
-
         await onSuccess?.(data, variables, context)
+      },
+      async onError(data, variables, context) {
+        if (onError === undefined) {
+          toast.error(`Failed to update content: ${data.message}`)
+        } else {
+          onError(data, variables, context)
+        }
       },
       ...options,
     }

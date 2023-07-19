@@ -1,13 +1,16 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'react-hot-toast'
+
 import { WrapperMeta } from 'components/interfaces/Database/Wrappers/Wrappers.types'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
 import { wrapWithTransaction } from 'data/sql/utils/transaction'
 import { useStore } from 'hooks'
+import { ResponseError } from 'types'
 import { FDW } from './fdws-query'
 
 export type FDWDeleteVariables = {
-  projectRef?: string
+  projectRef: string
   connectionString?: string
   wrapper: FDW
   wrapperMeta: WrapperMeta
@@ -46,14 +49,8 @@ export async function deleteFDW({
   wrapper,
   wrapperMeta,
 }: FDWDeleteVariables) {
-  if (!projectRef) {
-    throw new Error('projectRef is required')
-  }
-
   const sql = wrapWithTransaction(getDeleteFDWSql({ wrapper, wrapperMeta }))
-
   const { result } = await executeSql({ projectRef, connectionString, sql })
-
   return result
 }
 
@@ -61,12 +58,16 @@ type FDWDeleteData = Awaited<ReturnType<typeof deleteFDW>>
 
 export const useFDWDeleteMutation = ({
   onSuccess,
+  onError,
   ...options
-}: Omit<UseMutationOptions<FDWDeleteData, unknown, FDWDeleteVariables>, 'mutationFn'> = {}) => {
+}: Omit<
+  UseMutationOptions<FDWDeleteData, ResponseError, FDWDeleteVariables>,
+  'mutationFn'
+> = {}) => {
   const queryClient = useQueryClient()
   const { vault } = useStore()
 
-  return useMutation<FDWDeleteData, unknown, FDWDeleteVariables>((vars) => deleteFDW(vars), {
+  return useMutation<FDWDeleteData, ResponseError, FDWDeleteVariables>((vars) => deleteFDW(vars), {
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
 
@@ -76,6 +77,15 @@ export const useFDWDeleteMutation = ({
       ])
 
       await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(
+          `Failed to disable ${variables.wrapper.name} foreign data wrapper: ${data.message}`
+        )
+      } else {
+        onError(data, variables, context)
+      }
     },
     ...options,
   })
