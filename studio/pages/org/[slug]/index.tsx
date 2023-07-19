@@ -21,10 +21,6 @@ const ProjectsPage: NextPageWithLayout = () => {
   const organization = useSelectedOrganization()
   const projects = allProjects?.filter((project) => project.organization_id === organization?.id)
 
-  if (!organization) {
-    // Return a 404 page
-  }
-
   return (
     <ScaffoldContainer>
       <ScaffoldSection>
@@ -48,11 +44,31 @@ const ProjectsPage: NextPageWithLayout = () => {
               <AlertError error={projectsError} subject="Failed to retrieve projects" />
             )}
             {isSuccessProjects && (
-              <ul className="mx-auto grid grid-cols-1 gap-4 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
-                {projects?.map((project) => (
-                  <ProjectCard key={project.ref} project={project} />
-                ))}
-              </ul>
+              <>
+                {(projects?.length ?? 0) === 0 ? (
+                  <div className="col-span-4 space-y-4 rounded-lg border-2 border-dashed border-gray-300 p-6 text-center">
+                    <div className="space-y-1">
+                      <p>No projects</p>
+                      <p className="text-sm text-scale-1100">
+                        Get started by creating a new project.
+                      </p>
+                    </div>
+                    <div>
+                      <Link href={`/new/${organization?.slug}`}>
+                        <a>
+                          <Button icon={<IconPlus />}>New Project</Button>
+                        </a>
+                      </Link>
+                    </div>
+                  </div>
+                ) : (
+                  <ul className="mx-auto grid grid-cols-1 gap-4 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
+                    {projects?.map((project) => (
+                      <ProjectCard key={project.ref} project={project} />
+                    ))}
+                  </ul>
+                )}
+              </>
             )}
           </div>
         </div>

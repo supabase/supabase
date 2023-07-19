@@ -12,7 +12,9 @@ const OrganizationDropdown = () => {
   const selectedOrganization = useSelectedOrganization()
   const orgCreationV2 = useFlag('orgcreationv2')
 
-  const { data, isSuccess } = useOrgSubscriptionQuery({ orgSlug: selectedOrganization?.slug })
+  const slug = selectedOrganization?.slug
+  const orgName = selectedOrganization?.name
+  const { data, isSuccess } = useOrgSubscriptionQuery({ orgSlug: slug })
 
   if (isLoadingOrganizations) {
     return <ShimmeringLoader className="w-[90px]" />
@@ -56,7 +58,7 @@ const OrganizationDropdown = () => {
         type="text"
         iconRight={<IconCode className="text-scale-1100 rotate-90" strokeWidth={2} size={12} />}
       >
-        <span className="text-sm">{selectedOrganization?.name}</span>
+        <span className="text-sm">{orgName}</span>
         {isSuccess && (
           <Badge color="slate" className="ml-2">
             {data?.plan.name}
@@ -66,7 +68,7 @@ const OrganizationDropdown = () => {
     </Dropdown>
   ) : (
     <Button type="text">
-      <span className="text-sm">{selectedOrganization?.name}</span>
+      <span className="text-sm">{orgName}</span>
     </Button>
   )
 }

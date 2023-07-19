@@ -127,7 +127,7 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
       : []),
   ]
 
-  if (navLayoutV2) {
+  if (navLayoutV2 && router.pathname !== '/projects') {
     return <SettingsLayout>{children}</SettingsLayout>
   }
 
