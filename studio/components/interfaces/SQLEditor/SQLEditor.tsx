@@ -31,20 +31,6 @@ const DiffEditor = dynamic(
   { ssr: false }
 )
 
-const OptionIcon = () => {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path
-        d="M3 5H7.76472L16.2353 19H21M16.2353 5H21"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="square"
-        strokeLinejoin="round"
-      />
-    </svg>
-  )
-}
-
 type ContentDiff = {
   original: string
   modified: string
