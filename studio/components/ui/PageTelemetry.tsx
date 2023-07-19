@@ -1,7 +1,7 @@
 import { useParams, useTelemetryProps } from 'common'
 import { useSelectedOrganization } from 'hooks'
 import { post } from 'lib/common/fetch'
-import { API_URL, IS_PLATFORM } from 'lib/constants'
+import { API_URL, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect } from 'react'
@@ -11,6 +11,11 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
   const { ref } = useParams()
   const telemetryProps = useTelemetryProps()
   const selectedOrganization = useSelectedOrganization()
+
+  const consent =
+    typeof window !== 'undefined'
+      ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
+      : null
 
   useEffect(() => {
     function handleRouteChange(url: string) {
@@ -39,7 +44,7 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
    * @param route: the browser url
    * */
   const handlePageTelemetry = async (route: string) => {
-    if (IS_PLATFORM) {
+    if (IS_PLATFORM && consent === 'true') {
       /**
        * Get referrer from browser
        */
