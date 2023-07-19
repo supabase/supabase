@@ -11,9 +11,11 @@ import { useStore } from 'hooks'
 import { useSession } from 'lib/auth'
 import { useProfile } from 'lib/profile'
 import { NextPageWithLayout } from 'types'
-import { Button, IconMoon, IconSun, Input, Listbox } from 'ui'
+import { Button, IconMoon, IconSun, Input, Listbox, Toggle } from 'ui'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import AlertError from 'components/ui/AlertError'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { useEffect, useState } from 'react'
 
 const User: NextPageWithLayout = () => {
   return (
@@ -198,9 +200,33 @@ const ThemeSettings = observer(() => {
 })
 
 const AnalyticsSettings = observer(() => {
+  const [isOptedIn, setIsOptedIn] = useState(false)
+
+  useEffect(() => {
+    const telemetryConsent =
+      typeof window !== 'undefined'
+        ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
+        : null
+    if (telemetryConsent === 'true') setIsOptedIn(true)
+  }, [])
+
+  const onToggleOptIn = () => {
+    const value = !isOptedIn ? 'true' : 'false'
+    setIsOptedIn(!isOptedIn)
+    if (typeof window !== 'undefined')
+      localStorage.setItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT, value)
+  }
+
   return (
     <Panel title={<h5 key="panel-title">Analytics</h5>}>
-      <Panel.Content>Something</Panel.Content>
+      <Panel.Content>
+        <Toggle
+          checked={isOptedIn}
+          onChange={onToggleOptIn}
+          label="Opt-in to send telemetry data from the dashboard"
+          descriptionText="By opting into sending telemetry data, Supabase can improve the overall dashboard user experience"
+        />
+      </Panel.Content>
     </Panel>
   )
 })
