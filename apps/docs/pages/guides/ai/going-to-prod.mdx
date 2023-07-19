@@ -30,7 +30,7 @@ On the other hand, if you need to scale your application, you will need to creat
 
 Indexes used for approximate vector similarity search in pgvector divides a dataset into partitions. The number of these partitions is defined by the `lists` constant. The `probes` controls how many lists are going to be searched during a query.
 
-The values of lists and probes directly affect precision and RPS.
+The values of lists and probes directly affect precision and requests per second (RPS).
 
 - Higher `lists` means an index will be built slower, but you can achieve better RPS and precision.
 - Higher `probes` means that select queries will be slower, but you can achieve better precision.
@@ -60,7 +60,7 @@ First, a few generic tips which you can pick and choose from:
 3. **Pre-warm your database.** Implement the warm-up technique before transitioning to production or running benchmarks.
    - Execute 10,000 to 50,000 "warm-up" queries before each benchmark, matching the number of `probes` you are going to use in production. Additionally, you can execute about 1,000 queries with probes ranging from three to ten times the prod's probes. Both of these help to increase RAM utilization.
 4. **Establish your workload.** Increasing the lists constant for the pgvector index can accelerate your queries (at the expense of a slower build). For instance, for benchmarks with 1,000,000 embeddings, we employed a `lists` constant of 2000 (`number of vectors / 500`) as opposed to the suggested 1000 (`number of vectors / 1000`).
-5. **Benchmark your own specific workloads.** Doing this during cache warm-up helps gauge the best value for the `probes` constant, balancing precision with RPS.
+5. **Benchmark your own specific workloads.** Doing this during cache warm-up helps gauge the best value for the `probes` constant, balancing precision with requests per second (RPS).
 
 ## Going into production
 
