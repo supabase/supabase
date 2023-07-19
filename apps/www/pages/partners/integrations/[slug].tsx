@@ -41,7 +41,6 @@ function Partner({ partner }: { partner: Partner }) {
           onCancel={() => setFocusedImage(null)}
           size="xxlarge"
           className="w-full outline-none"
-          // hideFooter
         >
           <Image
             layout="responsive"
