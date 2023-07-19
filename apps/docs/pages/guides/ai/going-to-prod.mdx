@@ -55,7 +55,7 @@ You can find more examples of how `lists` and `probes` constants affect precisio
 
 First, a few generic tips which you can pick and choose from:
 
-1. If you are using Supabase you don't need to change your Postgres configs. But if you self-host, you should **adjust your Postgres config** aligned with RAM & CPU cores. [Find more details here](https://gist.github.com/egor-romanov/323e2847851bbd758081511785573c08).
+1. The Supabase managed platform will automatically optimize Postgres configs for you based on your compute addon. But if you self-host, consider **adjusting your Postgres config** based on RAM & CPU cores. See [example optimizations](https://gist.github.com/egor-romanov/323e2847851bbd758081511785573c08) for more details.
 2. Prefer `inner-product` to `L2` or `Cosine` distances if your vectors are normalized (like `text-embedding-ada-002`). If embeddings are not normalized, `Cosine` distance should give the best results with an index.
 3. **Pre-warm your database.** Implement the warm-up technique before transitioning to production or running benchmarks.
    - Execute 10,000 to 50,000 "warm-up" queries before each benchmark, matching the number of `probes` you are going to use in production. Additionally, you can execute about 1,000 queries with probes ranging from three to ten times the prod's probes. Both of these help to increase RAM utilization.
