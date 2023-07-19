@@ -1,7 +1,6 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
-
-import { post } from 'lib/common/fetch'
+import { isResponseOk, post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { ResponseError, UserContent } from 'types'
 import { contentKeys } from './keys'
@@ -19,7 +18,10 @@ export async function createContent(
     signal,
   })
 
-  if (response.error) throw response.error
+  if (!isResponseOk(response)) {
+    throw response.error
+  }
+
   return { content: response }
 }
 
