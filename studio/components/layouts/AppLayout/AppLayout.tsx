@@ -16,6 +16,9 @@ const AppLayout = ({ children }: PropsWithChildren<{}>) => {
           height: ongoingIncident
             ? `calc(100vh - 44px - ${appHeaderHeight}px)`
             : `calc(100vh - ${appHeaderHeight}px)`,
+          maxHeight: ongoingIncident
+            ? `calc(100vh - 44px - ${appHeaderHeight}px)`
+            : `calc(100vh - ${appHeaderHeight}px)`,
         }}
       >
         {children}

@@ -135,11 +135,11 @@ const nextConfig = {
         destination: '/project/:ref/sql',
         permanent: true,
       },
-      // {
-      //   source: '/org/:slug/settings',
-      //   destination: '/org/:slug/general',
-      //   permanent: true,
-      // },
+      {
+        source: '/org/:slug/settings',
+        destination: '/org/:slug/general',
+        permanent: true,
+      },
       {
         source: '/project/:ref/settings/billing/update',
         destination: '/project/:ref/settings/billing/subscription',

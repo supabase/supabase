@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react'
 import { Collapsible, Form, IconChevronRight, Input, Toggle } from 'ui'
 
 import { useParams } from 'common/hooks'
+import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
 import {
   FormActions,
   FormPanel,
@@ -19,7 +20,6 @@ import { useCheckPermissions, useFlag, useSelectedOrganization, useStore } from 
 import { patch } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import OrganizationDeletePanel from './OrganizationDeletePanel'
-import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
 
 const GeneralSettings = () => {
   const queryClient = useQueryClient()

@@ -11,7 +11,7 @@ const OrganizationSettingsMenu = () => {
   const router = useRouter()
   const organization = useSelectedOrganization()
   const organizationSettings = [
-    { label: 'Overview', pathname: `/org/[slug]/settings` },
+    { label: 'General', pathname: `/org/[slug]/general` },
     { label: 'Members', pathname: `/org/[slug]/team` },
     { label: 'Integrations', pathname: `/org/[slug]/integrations` },
     { label: 'Billing', pathname: `/org/[slug]/billing` },
