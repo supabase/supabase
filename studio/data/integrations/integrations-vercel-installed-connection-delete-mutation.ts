@@ -1,5 +1,5 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { delete_ } from 'lib/common/fetch'
+import { delete_, isResponseOk } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { ResponseError, UserContent } from 'types'
 import { integrationKeys } from './keys'
@@ -25,7 +25,10 @@ export async function deleteConnection(
     { signal }
   )
 
-  if (response.error) throw response.error
+  if (!isResponseOk(response)) {
+    throw response.error
+  }
+
   return response
 }
 
