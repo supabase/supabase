@@ -5,16 +5,23 @@ import { PropsWithChildren } from 'react'
 import { Tabs } from 'ui'
 import { AccountLayout } from './'
 import { ScaffoldContainer, ScaffoldDivider, ScaffoldHeader, ScaffoldTitle } from './Scaffold'
+import SettingsLayout from './SettingsLayout/SettingsLayout'
 
 const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
   const selectedOrganization = useSelectedOrganization()
   const router = useRouter()
   const { slug } = useParams()
   const id = router.asPath.split('/').at(-1)?.split('?')[0]?.split('#')[0]
+  const isOrgBilling = !!selectedOrganization?.subscription_id
+
+  const navLayoutV2 = useFlag('navigationLayoutV2')
   const showOAuthApps = useFlag('oauthApps')
   const showAuditLogs = useFlag('auditLogs')
   const showIntegrationsV2 = useFlag('integrationsV2')
-  const isOrgBilling = !!selectedOrganization?.subscription_id
+
+  if (navLayoutV2) {
+    return <SettingsLayout>{children}</SettingsLayout>
+  }
 
   return (
     <AccountLayout

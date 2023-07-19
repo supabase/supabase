@@ -7,13 +7,15 @@ import AccountSettingsMenu from './AccountSettingsMenu'
 const SettingsLayout = ({ children }: PropsWithChildren<{}>) => {
   const { slug } = useParams()
 
+  // [Joshen] Note to self - these could contribute to a Scaffold component
+
   return (
     <AppLayout>
       <div className="flex h-full">
-        <div className="w-[280px] border-r h-full px-8 py-8">
+        <div className="h-full overflow-y-auto min-w-[280px] border-r px-8 py-8">
           {slug !== undefined ? <OrganizationSettingsMenu /> : <AccountSettingsMenu />}
         </div>
-        <div className="flex-grow">{children}</div>
+        <div className="h-full overflow-y-auto flex-grow">{children}</div>
       </div>
     </AppLayout>
   )
