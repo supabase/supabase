@@ -32,7 +32,7 @@ const ProjectsPage: NextPageWithLayout = () => {
         typeof window !== 'undefined'
           ? localStorage.getItem(LOCAL_STORAGE_KEYS.RECENTLY_VISITED_ORGANIZATION)
           : undefined
-      if (localStorageSlug !== undefined) router.push(`/org/${localStorageSlug}`)
+      if (localStorageSlug) router.push(`/org/${localStorageSlug}`)
       else router.push(`/org/${organizations[0].slug}`)
     }
   }, [navLayoutV2, isSuccess, typeof window])
