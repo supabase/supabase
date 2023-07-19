@@ -1,20 +1,40 @@
-import { marked } from 'marked'
 import { GetStaticPaths, GetStaticProps } from 'next'
+import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
+import { serialize } from 'next-mdx-remote/serialize'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Link from 'next/link'
+import { Dispatch, SetStateAction, useState } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import 'swiper/swiper.min.css'
-import { IconChevronLeft, IconExternalLink, Modal } from 'ui'
+import { IconChevronLeft, IconExternalLink } from 'ui'
+import ImageModal from '~/components/ImageModal'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import supabase from '~/lib/supabase'
 import { Partner } from '~/types/partners'
 import Error404 from '../../404'
-import { useState } from 'react'
-import ImageModal from '~/components/ImageModal'
 
-function Partner({ partner }: { partner: Partner }) {
+/**
+ * Returns a custom img element which has a bound onClick listener. When the image is clicked, it will open a modal showing that particular image.
+ */
+const buildCustomImg = (callback: Dispatch<SetStateAction<string | null>>) => {
+  const img = (
+    props: React.DetailedHTMLProps<React.ImgHTMLAttributes<HTMLImageElement>, HTMLImageElement>
+  ) => {
+    return <img {...props} onClick={() => callback(props.src!)} />
+  }
+
+  return { img }
+}
+
+function Partner({
+  partner,
+  overview,
+}: {
+  partner: Partner
+  overview: MDXRemoteSerializeResult<Record<string, unknown>, Record<string, unknown>>
+}) {
   const [focusedImage, setFocusedImage] = useState<string | null>(null)
 
   if (!partner) return <Error404 />
@@ -151,7 +171,9 @@ function Partner({ partner }: { partner: Partner }) {
                   </div>
                 )}
 
-                <div className="prose" dangerouslySetInnerHTML={{ __html: partner.overview }} />
+                <div className="prose">
+                  <MDXRemote {...overview} components={buildCustomImg(setFocusedImage)} />
+                </div>
               </div>
 
               <div>
@@ -253,10 +275,10 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   }
 
   // Parse markdown
-  partner.overview = marked.parse(partner.overview)
+  const overview = await serialize(partner.overview)
 
   return {
-    props: { partner },
+    props: { partner, overview },
     revalidate: 18000, // In seconds - refresh every 5 hours
   }
 }

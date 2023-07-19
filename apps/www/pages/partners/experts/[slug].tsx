@@ -1,5 +1,6 @@
-import { marked } from 'marked'
 import { GetStaticPaths, GetStaticProps } from 'next'
+import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
+import { serialize } from 'next-mdx-remote/serialize'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -12,7 +13,13 @@ import supabase from '~/lib/supabase'
 import { Partner } from '~/types/partners'
 import Error404 from '../../404'
 
-function Partner({ partner }: { partner: Partner }) {
+function Partner({
+  partner,
+  overview,
+}: {
+  partner: Partner
+  overview: MDXRemoteSerializeResult<Record<string, unknown>, Record<string, unknown>>
+}) {
   if (!partner) return <Error404 />
   return (
     <>
@@ -129,7 +136,9 @@ function Partner({ partner }: { partner: Partner }) {
                   </div>
                 )}
 
-                <div className="prose" dangerouslySetInnerHTML={{ __html: partner.overview }} />
+                <div className="prose">
+                  <MDXRemote {...overview} />
+                </div>
               </div>
 
               <div>
@@ -231,10 +240,10 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   }
 
   // Parse markdown
-  partner.overview = marked.parse(partner.overview)
+  const overview = await serialize(partner.overview)
 
   return {
-    props: { partner },
+    props: { partner, overview },
     revalidate: 18000, // In seconds - refresh every 5 hours
   }
 }
