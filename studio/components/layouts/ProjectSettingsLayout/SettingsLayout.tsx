@@ -3,11 +3,9 @@ import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect } from 'react'
 import { generateSettingsMenu } from './SettingsMenu.utils'
-import NewSettingsLayout from '../SettingsLayout/SettingsLayout'
 
 import ProductMenu from 'components/ui/ProductMenu'
 import ProjectLayout from '..'
-import { ProjectContextProvider } from '../ProjectLayout/ProjectContext'
 
 interface SettingsLayoutProps {
   title?: string
@@ -19,8 +17,6 @@ const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutPro
   const project = useSelectedProject()
   const organization = useSelectedOrganization()
   const isOrgBilling = !!organization?.subscription_id
-
-  const navLayoutV2 = useFlag('navigationLayoutV2')
 
   // billing pages live under /billing/invoices and /billing/subscription, etc
   // so we need to pass the [5]th part of the url to the menu
@@ -41,14 +37,6 @@ const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutPro
       meta.extensions.load()
     }
   }, [ui.selectedProjectRef])
-
-  if (navLayoutV2) {
-    return (
-      <NewSettingsLayout>
-        <ProjectContextProvider projectRef={project?.ref}>{children}</ProjectContextProvider>
-      </NewSettingsLayout>
-    )
-  }
 
   return (
     <ProjectLayout

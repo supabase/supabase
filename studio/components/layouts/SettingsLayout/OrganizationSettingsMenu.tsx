@@ -1,10 +1,6 @@
 import { useRouter } from 'next/router'
-import { Accordion_Shadcn_, Button } from 'ui'
 
-import { useProjectsQuery } from 'data/projects/projects-query'
 import { useSelectedOrganization } from 'hooks'
-import ProjectSettingsMenuItem from './ProjectSettingsMenuItem'
-import Link from 'next/link'
 import SettingsMenuItem from './SettingsMenuItem'
 
 const OrganizationSettingsMenu = () => {
@@ -21,8 +17,8 @@ const OrganizationSettingsMenu = () => {
     { label: 'Audit Logs', pathname: `/org/[slug]/audit` },
   ]
 
-  const { data: allProjects } = useProjectsQuery()
-  const projects = allProjects?.filter((project) => project.organization_id === organization?.id)
+  // const { data: allProjects } = useProjectsQuery()
+  // const projects = allProjects?.filter((project) => project.organization_id === organization?.id)
 
   return (
     <div className="space-y-10">
@@ -38,8 +34,8 @@ const OrganizationSettingsMenu = () => {
         ))}
       </div>
 
-      {/* [Joshen] We'll implement this in the second iteration, just to keep things small */}
-      <div className="space-y-2">
+      {/* [Joshen] Hiding below until we figure out a better UX for consolidating settings on projects */}
+      {/* <div className="space-y-2">
         <p className="text-sm font-medium">Projects</p>
         <Accordion_Shadcn_ type="single" collapsible className="w-full">
           {projects?.map((project) => (
@@ -55,7 +51,7 @@ const OrganizationSettingsMenu = () => {
             </Button>
           </a>
         </Link>
-      </div>
+      </div> */}
     </div>
   )
 }
