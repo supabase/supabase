@@ -216,12 +216,10 @@ const SQLEditor = () => {
             layoutId="ask-ai-input"
             initial={{
               scaleY: 1,
-              y: 50,
               borderRadius: 0,
             }}
             animate={{
               scaleY: 1,
-              y: 0,
               borderRadius: 0,
             }}
             className="w-full flex justify-center z-[1000] mt-0.5 bg-brand-400"
@@ -234,27 +232,29 @@ const SQLEditor = () => {
               disabled={isDiffOpen}
               inputRef={inputRef}
               icon={
-                <div className="h-full flex flex-row gap-3 items-center overflow-y-auto">
+                <div className="h-full flex flex-row gap-3 items-center">
                   <m.div
                     key="ask-ai-input-icon"
                     layoutId="ask-ai-input-icon"
                     className="ml-1"
                     initial={{
-                      rotate: 0,
+                      scale: 1,
                     }}
                     animate={{
-                      rotate: 0,
+                      scale: 1,
                     }}
                   >
                     <AiIcon className="w-4 h-4" />
                   </m.div>
 
                   {debugSolution && (
-                    <div className="w-full mr-[16.5rem] text-sm text-white">{debugSolution}</div>
+                    <div className="h-full w-full flex flex-row items-center overflow-y-hidden mr-[16.5rem] text-sm text-white">
+                      {debugSolution}
+                    </div>
                   )}
                 </div>
               }
-              inputClassName="w-full !border-brand-900 border-none py-4 focus:!ring-0 placeholder:text-scale-900"
+              inputClassName="w-full !border-brand-900 border-none bg-transparent py-4 focus:!ring-0 placeholder:text-scale-900"
               iconContainerClassName="transition text-scale-800 text-brand-900"
               placeholder={!debugSolution ? 'Ask Supabase AI to modify your query' : ''}
               className="w-full"
@@ -348,13 +348,7 @@ const SQLEditor = () => {
           <m.div
             key="ask-ai-loading"
             layoutId="ask-ai-input"
-            className="w-fit p-5 border border-brand-900 text-brand-900"
-            initial={{
-              borderRadius: 50,
-            }}
-            animate={{
-              borderRadius: 50,
-            }}
+            className="w-full flex flex-row gap-2 items-center justify-center mt-0.5 bg-brand-400 p-4 text-md"
             transition={{
               type: 'spring',
               mass: 0.1,
@@ -365,8 +359,9 @@ const SQLEditor = () => {
             <m.div
               key="ask-ai-loading-icon"
               layoutId="ask-ai-input-icon"
+              className="text-brand-900"
               animate={{
-                rotate: 360,
+                scale: [0.9, 1.1, 0.9],
                 transition: {
                   delay: 0.2,
                   ease: 'linear',
@@ -377,6 +372,21 @@ const SQLEditor = () => {
             >
               <AiIcon className="w-4 h-4" />
             </m.div>
+            <m.span
+              initial={{
+                opacity: 0,
+                y: 20,
+              }}
+              animate={{
+                opacity: 0.5,
+                y: 0,
+              }}
+              transition={{
+                ease: 'circOut',
+              }}
+            >
+              Thinking...
+            </m.span>
           </m.div>
         )}
         <Split
