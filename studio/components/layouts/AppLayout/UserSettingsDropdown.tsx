@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { Dropdown, IconLogOut, Listbox, useCommandMenu } from 'ui'
+import { Dropdown, IconLogOut, IconUser, Listbox, useCommandMenu } from 'ui'
 
 import { useSignOut } from 'lib/auth'
 import { useProfile } from 'lib/profile'
@@ -90,7 +90,7 @@ const UserSettingsDropdown = () => {
       ]}
     >
       <div className="flex items-center justify-center border rounded-full h-7 w-7 text-scale-1100">
-        {profile?.first_name[0]}
+        {profile?.first_name ? profile?.first_name?.[0] : <IconUser size={14} strokeWidth={2} />}
       </div>
     </Dropdown>
   )
