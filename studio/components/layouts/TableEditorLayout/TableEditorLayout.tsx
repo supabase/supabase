@@ -9,7 +9,7 @@ import Connecting from 'components/ui/Loading/Loading'
 import NoPermission from 'components/ui/NoPermission'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { Entity } from 'data/entity-types/entity-type-query'
-import { checkPermissions, useSelectedProject, useStore } from 'hooks'
+import { useCheckPermissions, useSelectedProject, useStore } from 'hooks'
 import useEntityType from 'hooks/misc/useEntityType'
 import useLatest from 'hooks/misc/useLatest'
 import { useIsTableLoaded, useTableEditorStateSnapshot } from 'state/table-editor'
@@ -44,7 +44,7 @@ const TableEditorLayout = ({
   const id = _id ? Number(_id) : undefined
 
   const snap = useTableEditorStateSnapshot()
-  const canReadTables = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'tables')
+  const canReadTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'tables')
 
   const vaultExtension = meta.extensions.byId('supabase_vault')
   const isVaultEnabled = vaultExtension !== undefined && vaultExtension.installed_version !== null

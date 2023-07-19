@@ -6,7 +6,7 @@ import { Button, Dropdown, IconPlus } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks'
 import { useParams } from 'common/hooks'
 import { WRAPPERS } from './Wrappers.constants'
 
@@ -17,7 +17,7 @@ interface Props {
 
 const WrapperDropdown: FC<Props> = ({ buttonText = 'Add wrapper', align = 'end' }) => {
   const { ref } = useParams()
-  const canManageWrappers = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'wrappers')
+  const canManageWrappers = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'wrappers')
 
   if (!canManageWrappers) {
     return (

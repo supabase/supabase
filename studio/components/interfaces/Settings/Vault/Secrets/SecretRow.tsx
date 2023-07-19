@@ -16,7 +16,7 @@ import {
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { VaultSecret } from 'types'
-import { useStore, checkPermissions } from 'hooks'
+import { useStore, useCheckPermissions } from 'hooks'
 import { useParams } from 'common/hooks'
 
 interface Props {
@@ -33,7 +33,7 @@ const SecretRow: FC<Props> = ({ secret, onSelectEdit, onSelectRemove }) => {
   const [revealedValue, setRevealedValue] = useState<string>()
   const name = secret?.name ?? 'No name provided'
 
-  const canManageSecrets = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
+  const canManageSecrets = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
   const revealSecret = async () => {
     setIsLoading(true)

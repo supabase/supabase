@@ -15,10 +15,12 @@ import {
   FormSectionLabel,
 } from 'components/ui/Forms'
 import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
-import { checkPermissions, useFlag, useSelectedOrganization, useStore } from 'hooks'
-import { patch } from 'lib/common/fetch'
+import { useCheckPermissions, useFlag, useSelectedOrganization, useStore } from 'hooks'
+import { isResponseOk, patch } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import OrganizationDeletePanel from './OrganizationDeletePanel'
+import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
+import { Organization } from 'types'
 
 const GeneralSettings = () => {
   const queryClient = useQueryClient()
@@ -35,9 +37,8 @@ const GeneralSettings = () => {
   const showCMDK = useFlag('dashboardCmdk')
   const allowCMDKDataOptIn = useFlag('dashboardCmdkDataOptIn')
 
-  const canUpdateOrganization = checkPermissions(PermissionAction.UPDATE, 'organizations')
-  const canDeleteOrganization = checkPermissions(PermissionAction.UPDATE, 'organizations')
-
+  const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
+  const canDeleteOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
   const onUpdateOrganization = async (values: any, { setSubmitting, resetForm }: any) => {
     if (!canUpdateOrganization) {
       return ui.setNotification({
@@ -50,13 +51,13 @@ const GeneralSettings = () => {
 
     // [Joshen] Need to update this logic once we support multiple opt in tags
     const optInTags = values.isOptedIntoAi ? ['AI_SQL_GENERATOR_OPT_IN'] : []
-    const response = await patch(`${API_URL}/organizations/${slug}`, {
+    const response = await patch<Organization>(`${API_URL}/organizations/${slug}`, {
       name: values.name,
       billing_email: selectedOrganization?.billing_email ?? '',
       ...(allowCMDKDataOptIn && { opt_in_tags: optInTags }),
     })
 
-    if (response.error) {
+    if (!isResponseOk(response)) {
       ui.setNotification({
         category: 'error',
         message: `Failed to update organization: ${response.error.message}`,
@@ -70,7 +71,7 @@ const GeneralSettings = () => {
   }
 
   return (
-    <div className="container my-4 max-w-4xl space-y-8">
+    <ScaffoldContainerLegacy>
       <Form id={formId} initialValues={initialValues} onSubmit={onUpdateOrganization}>
         {({ isSubmitting, handleReset, values, initialValues, resetForm }: any) => {
           const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
@@ -191,7 +192,7 @@ const GeneralSettings = () => {
       </Form>
 
       {canDeleteOrganization && <OrganizationDeletePanel />}
-    </div>
+    </ScaffoldContainerLegacy>
   )
 }
 

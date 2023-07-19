@@ -3,9 +3,10 @@ import { observer } from 'mobx-react-lite'
 import { Badge, IconLoader, Toggle } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 import EnableExtensionModal from './EnableExtensionModal'
+import { isResponseOk } from 'lib/common/fetch'
 
 interface Props {
   extension: any
@@ -18,7 +19,7 @@ const ExtensionCard: FC<Props> = ({ extension }) => {
   const [loading, setLoading] = useState(false)
   const [showConfirmEnableModal, setShowConfirmEnableModal] = useState(false)
 
-  const canUpdateExtensions = checkPermissions(
+  const canUpdateExtensions = useCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'extensions'
   )
@@ -34,8 +35,8 @@ const ExtensionCard: FC<Props> = ({ extension }) => {
       onAsyncConfirm: async () => {
         try {
           setLoading(true)
-          const response: any = await meta.extensions.del(extension.name)
-          if (response.error) {
+          const response = await meta.extensions.del(extension.name)
+          if (!isResponseOk(response)) {
             throw response.error
           } else {
             ui.setNotification({

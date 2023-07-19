@@ -1,6 +1,5 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { Button, Input } from 'ui'
@@ -8,41 +7,45 @@ import { Button, Input } from 'ui'
 import { CANCELLATION_REASONS } from 'components/interfaces/BillingV2/Billing.constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
-import { invalidateProjectsQuery } from 'data/projects/projects-query'
-import { checkPermissions, useStore } from 'hooks'
-import { delete_, post } from 'lib/common/fetch'
-import { API_URL, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
+import { useSendDowngradeFeedbackMutation } from 'data/feedback/exit-survey-send'
+import { useProjectDeleteMutation } from 'data/projects/project-delete-mutation'
+import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
+import { useCheckPermissions, useStore } from 'hooks'
+import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 
 export interface DeleteProjectButtonProps {
   type?: 'danger' | 'default'
 }
 
 const DeleteProjectButton = ({ type = 'danger' }: DeleteProjectButtonProps) => {
-  const queryClient = useQueryClient()
   const router = useRouter()
   const { ui } = useStore()
-
   const { project } = useProjectContext()
+
   const projectRef = project?.ref
-  const projectTier = project?.subscription_tier ?? PRICING_TIER_PRODUCT_IDS.FREE
-  const isFree = projectTier === PRICING_TIER_PRODUCT_IDS.FREE
+  const { data: subscription } = useProjectSubscriptionV2Query({ projectRef })
+  const projectPlan = subscription?.plan?.id ?? 'free'
+  const isFree = projectPlan === PRICING_TIER_PRODUCT_IDS.FREE
 
   const [isOpen, setIsOpen] = useState(false)
-  const [loading, setLoading] = useState(false)
+  const [message, setMessage] = useState<string>('')
   const [selectedReasons, setSelectedReasons] = useState<string[]>([])
-  const [cancellationMessage, setCancellationMessage] = useState<string>('')
+
+  const { mutateAsync: deleteProject, isLoading: isDeleting } = useProjectDeleteMutation()
+  const { mutateAsync: sendExitSurvey, isLoading: isSending } = useSendDowngradeFeedbackMutation()
+  const isSubmitting = isDeleting || isSending
 
   useEffect(() => {
     if (isOpen) {
       setSelectedReasons([])
-      setCancellationMessage('')
+      setMessage('')
     }
   }, [isOpen])
 
-  const canDeleteProject = checkPermissions(PermissionAction.UPDATE, 'projects')
+  const canDeleteProject = useCheckPermissions(PermissionAction.UPDATE, 'projects')
 
   const toggle = () => {
-    if (loading) return
+    if (isSubmitting) return
     setIsOpen(!isOpen)
   }
 
@@ -66,30 +69,20 @@ const DeleteProjectButton = ({ type = 'danger' }: DeleteProjectButtonProps) => {
       })
     }
 
-    setLoading(true)
     try {
-      const response = await delete_(`${API_URL}/projects/${projectRef}`)
-      if (response.error) throw response.error
-      await invalidateProjectsQuery(queryClient)
+      await deleteProject({ projectRef: project.ref })
+
+      if (!isFree) {
+        await sendExitSurvey({
+          projectRef,
+          message,
+          reasons: selectedReasons.reduce((a, b) => `${a}- ${b}\n`, ''),
+        })
+      }
+
       ui.setNotification({ category: 'success', message: `Successfully deleted ${project.name}` })
       router.push(`/projects`)
-    } catch (error: any) {
-      setLoading(false)
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to delete project ${project.name}: ${error.message}`,
-      })
-    }
-
-    // Submit exit survey to Hubspot for paid projects
-    if (!isFree) {
-      const feedbackRes = await post(`${API_URL}/feedback/downgrade`, {
-        projectRef,
-        reasons: selectedReasons.reduce((a, b) => `${a}- ${b}\n`, ''),
-        additionalFeedback: cancellationMessage,
-        exitAction: 'delete',
-      })
-      if (feedbackRes.error) throw feedbackRes.error
+    } finally {
     }
   }
 
@@ -121,7 +114,7 @@ const DeleteProjectButton = ({ type = 'danger' }: DeleteProjectButtonProps) => {
       </Tooltip.Root>
       <TextConfirmModal
         visible={isOpen}
-        loading={loading}
+        loading={isSubmitting}
         size={isFree ? 'small' : 'xlarge'}
         title={`Confirm deletion of ${project?.name}`}
         alert={
@@ -188,8 +181,8 @@ const DeleteProjectButton = ({ type = 'danger' }: DeleteProjectButtonProps) => {
                   name="message"
                   label="Anything else that we can improve on?"
                   rows={3}
-                  value={cancellationMessage}
-                  onChange={(event) => setCancellationMessage(event.target.value)}
+                  value={message}
+                  onChange={(event) => setMessage(event.target.value)}
                 />
               </div>
             </div>

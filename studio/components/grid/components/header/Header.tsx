@@ -13,7 +13,7 @@ import {
 } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useStore, useUrlState } from 'hooks'
+import { useCheckPermissions, useStore, useUrlState } from 'hooks'
 import FilterDropdown from './filter'
 import SortPopover from './sort'
 import RefreshButton from './RefreshButton'
@@ -106,7 +106,7 @@ const DefaultHeader = ({
   const canAddNew = onAddRow !== undefined || onAddColumn !== undefined
 
   // [Joshen] Using this logic to block both column and row creation/update/delete
-  const canCreateColumns = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
+  const canCreateColumns = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
 
   const [{ filter: filters, sort: sorts }, setParams] = useUrlState({
     arrayKeys: ['sort', 'filter'],
@@ -233,9 +233,45 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
   const dispatch = useDispatch()
 
   const { project } = useProjectContext()
-  const { mutateAsync: deleteRows } = useTableRowDeleteMutation()
-  const { mutateAsync: deleteAllRows } = useTableRowDeleteAllMutation()
-  const { mutateAsync: truncateRows } = useTableRowTruncateMutation()
+  // [Joshen] Passing blank error handlers here as the errors are handled via the
+  // error handler in tracked state within catch block
+  const { mutateAsync: deleteRows } = useTableRowDeleteMutation({
+    onSuccess: (res, variables) => {
+      const rowIdxs = variables.rows.map((x) => x.idx)
+      dispatch({ type: 'REMOVE_ROWS', payload: { rowIdxs } })
+      dispatch({
+        type: 'SELECTED_ROWS_CHANGE',
+        payload: { selectedRows: new Set() },
+      })
+    },
+    onError: (error) => {
+      if (state.onError) state.onError(error)
+    },
+  })
+  const { mutateAsync: deleteAllRows } = useTableRowDeleteAllMutation({
+    onSuccess: () => {
+      dispatch({ type: 'REMOVE_ALL_ROWS' })
+      dispatch({
+        type: 'SELECTED_ROWS_CHANGE',
+        payload: { selectedRows: new Set() },
+      })
+    },
+    onError: (error) => {
+      if (state.onError) state.onError(error)
+    },
+  })
+  const { mutateAsync: truncateRows } = useTableRowTruncateMutation({
+    onSuccess: () => {
+      dispatch({ type: 'REMOVE_ALL_ROWS' })
+      dispatch({
+        type: 'SELECTED_ROWS_CHANGE',
+        payload: { selectedRows: new Set() },
+      })
+    },
+    onError: (error) => {
+      if (state.onError) state.onError(error)
+    },
+  })
 
   const { data } = useTableRowsQuery({
     queryKey: [table.schema, table.name],
@@ -299,15 +335,7 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
                 filters,
               })
             }
-
-            dispatch({ type: 'REMOVE_ALL_ROWS' })
-            dispatch({
-              type: 'SELECTED_ROWS_CHANGE',
-              payload: { selectedRows: new Set() },
-            })
-          } catch (error) {
-            if (state.onError) state.onError(error)
-          }
+          } catch (error) {}
         } else {
           const rowIdxs = Array.from(selectedRows) as number[]
           const rows = allRows.filter((x) => rowIdxs.includes(x.idx))
@@ -319,15 +347,7 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
               table,
               rows,
             })
-
-            dispatch({ type: 'REMOVE_ROWS', payload: { rowIdxs } })
-            dispatch({
-              type: 'SELECTED_ROWS_CHANGE',
-              payload: { selectedRows: new Set() },
-            })
-          } catch (error) {
-            if (state.onError) state.onError(error)
-          }
+          } catch (error) {}
         }
       },
     })

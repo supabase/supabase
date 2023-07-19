@@ -5,7 +5,7 @@ import generator from 'generate-password'
 import { Input, Button, Modal } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import { useParams } from 'common/hooks'
 import { patch } from 'lib/common/fetch'
 import { passwordStrength } from 'lib/helpers'
@@ -19,7 +19,7 @@ const ResetDbPassword: FC<any> = ({ disabled = false }) => {
   const { ui, app, meta } = useStore()
   const { ref } = useParams()
 
-  const canResetDbPassword = checkPermissions(PermissionAction.UPDATE, 'projects')
+  const canResetDbPassword = useCheckPermissions(PermissionAction.UPDATE, 'projects')
 
   const [showResetDbPass, setShowResetDbPass] = useState<boolean>(false)
   const [isUpdatingPassword, setIsUpdatingPassword] = useState<boolean>(false)
@@ -74,7 +74,10 @@ const ResetDbPassword: FC<any> = ({ disabled = false }) => {
         ui.setNotification({ category: 'success', message: res.message })
         setShowResetDbPass(false)
       } else {
-        ui.setNotification({ category: 'error', message: 'Failed to reset password' })
+        ui.setNotification({
+          category: 'error',
+          message: `Failed to reset password: ${res.error.message}`,
+        })
       }
       setIsUpdatingPassword(false)
     }

@@ -8,7 +8,7 @@ import { DatabaseLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import InformationBox from 'components/ui/InformationBox'
 import NoPermission from 'components/ui/NoPermission'
-import { checkPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import { NextPageWithLayout } from 'types'
 import { IconInfo, Tabs } from 'ui'
 
@@ -20,7 +20,7 @@ const DatabaseScheduledBackups: NextPageWithLayout = () => {
 
   const isPitrEnabled = backups?.configuration?.walg_enabled
 
-  const canReadScheduledBackups = checkPermissions(PermissionAction.READ, 'back_ups')
+  const canReadScheduledBackups = useCheckPermissions(PermissionAction.READ, 'back_ups')
 
   return (
     <div

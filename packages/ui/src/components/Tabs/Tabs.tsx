@@ -37,8 +37,12 @@ const Tabs: React.FC<TabsProps> & TabsSubComponents = ({
   addOnBefore,
   addOnAfter,
   listClassNames,
-  children,
+  children: _children,
 }) => {
+  // toArray is used here to filter out invalid children
+  // another method would be to use React.Children.map
+  const children = React.Children.toArray(_children) as PanelPropsProps[]
+
   const [activeTab, setActiveTab] = React.useState(
     defaultActiveId ??
       // if no defaultActiveId is set use the first panel
@@ -49,10 +53,6 @@ const Tabs: React.FC<TabsProps> & TabsSubComponents = ({
   const hash = router?.asPath?.split('#')[1]?.toUpperCase()
 
   let __styles = styleHandler('tabs')
-
-  if (children && !Array.isArray(children)) {
-    children = [children]
-  }
 
   const tabIds = children.map((tab) => tab.props.id)
 

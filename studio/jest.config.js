@@ -13,4 +13,7 @@ module.exports = {
   },
   maxConcurrency: 3,
   maxWorkers: '50%',
+  moduleNameMapper: {
+    '^@ui/(.*)$': '<rootDir>/../packages/ui/src/$1',
+  },
 }
