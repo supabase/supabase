@@ -471,8 +471,6 @@ const SQLEditor = () => {
                     isExecuting={isExecuting}
                     autoFocus={false}
                     executeQuery={executeQuery}
-                    // onOpenAiWidget={() => setIsAiWidgetOpen(true)}
-                    // onCloseAiWidget={() => setIsAiWidgetOpen(false)}
                   />
                 </m.div>
               </>
