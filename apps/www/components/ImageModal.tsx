@@ -1,4 +1,4 @@
-import  { useEffect } from 'react'
+import  { useEffect, useState } from 'react'
 
 import * as Dialog from '@radix-ui/react-dialog'
 
@@ -36,7 +36,7 @@ const ImageModal = ({
   size = 'large',
   className = '',
 }: ImageModalProps) => {
-  const [open, setOpen] = React.useState(visible ? visible : false)
+  const [open, setOpen] = useState(visible ? visible : false)
 
   const __styles = styleHandler('modal')
 
