@@ -24,11 +24,11 @@ There are a couple of cases where you might not need indexes:
 
 You don't have to create indexes in these cases and can use sequential scans instead. This type of workload will not be RAM bound and will not require any additional resources but will result in higher latencies and lower throughput. Extra CPU cores may help to improve queries per second, but it will not help to improve latency.
 
-On the other hand, if you need to scale your application, you will need to create indexes. This will result in lower latencies and higher throughput, but will require additional RAM to make use of Postgres Caching. Also, using indexes will result in lower precision, as with indexes, you replace exact (KNN) search with approximate (ANN) search.
+On the other hand, if you need to scale your application, you will need to create indexes. This will result in lower latencies and higher throughput, but will require additional RAM to make use of Postgres Caching. Also, using indexes will result in lower precision, since you are replacing exact (KNN) search with approximate (ANN) search.
 
 ## Understanding `probes` and `lists`
 
-Index used for approximate vector similarity search in pgvector divides a dataset into partitions. Number of these partitions is defined by the `lists` constant. The `probes` controls how many lists are going to be searched during a query.
+Indexes used for approximate vector similarity search in pgvector divides a dataset into partitions. The number of these partitions is defined by the `lists` constant. The `probes` controls how many lists are going to be searched during a query.
 
 The values of lists and probes directly affect precision and RPS.
 
@@ -66,21 +66,21 @@ First, a few generic tips which you can pick and choose from:
 
 1. Decide if you are going to use indexes or not. You can skip the rest of this guide if you do not use indexes.
 2. Over-provision RAM during preparation. You can scale down in step `5`, but it's better to start with a larger size to get the best results for RAM requirements. (We'd recommend at least 8XL if you're using Supabase.)
-3. Upload your data to the database. If you use [`vecs`](https://supabase.com/docs/guides/ai/python/api) library, it will automatically generate an index with default parameters.
-4. Run a benchmark using randomly generated queries and see the results. Again, you can use `vecs` library with the `ann-benchmarks` tool. Do it with probes set to 10 (default) and then with probes set to 100 or more, so RPS will be lower than 10.
-5. Take a look at the RAM usage, and save it as a note for yourself. You would likely want to use compute add-on in the future that would have the same amount of RAM as used at the moment (both actual RAM usage and RAM used for cache and buffers).
-6. Scale down your compute add-on to the one that would have the same amount of RAM as used at the moment.
-7. Repeat step 3. to load the data into RAM. You should see that RPS is increased on subsequent runs, and stop when it no longer increases. Then repeat the benchmark with probes set to a higher value as well if you didn't do it before on that compute add-on size.
-8. Run a benchmark using real queries and see the results. You can use `vecs` library for that as well with `ann-benchmarks` tool. Do it with probes set to 10 (default) and then gradually increase/decrease probes value until you see that both precision and RPS match your requirements.
-9. If you want higher RPS and you don't expect to have frequent inserts and reindexing, you can increase `lists` constantly. You have to rebuild the index with higher lists value and repeat steps 6-7 to find the best combination of `lists` and `probes` constants to achieve the best RPS and precision values. Higher `lists` mean that index will build slower, but you can achieve better RPS and precision. Higher probes mean that select queries will be slower, but you can achieve better precision.
+3. Upload your data to the database. If you use the [`vecs`](/docs/guides/ai/python/api) library, it will automatically generate an index with default parameters.
+4. Run a benchmark using randomly generated queries and observe the results. Again, you can use the `vecs` library with the `ann-benchmarks` tool. Do it with probes set to 10 (default) and then with probes set to 100 or more, so RPS will be lower than 10.
+5. Monitor the RAM usage, and save it as a note for yourself. You would likely want to use a compute add-on in the future that has the same amount of RAM that was used at the moment (both actual RAM usage and RAM used for cache and buffers).
+6. Scale down your compute add-on to the one that would have the same amount of RAM used at the moment.
+7. Repeat step 3 to load the data into RAM. You should see RPS increase on subsequent runs, and stop when it no longer increases. Then repeat the benchmark with probes set to a higher value if you haven't already performed it for that compute add-on size.
+8. Run a benchmark using real queries and observe the results. You can use the `vecs` library for that as well with `ann-benchmarks` tool. Set probes to 10 (default) and then gradually increase/decrease probes until you see that both precision and RPS match your requirements.
+9. If you want higher RPS and you don't expect to have frequent inserts and reindexing, you can increase `lists` constantly. You have to rebuild the index with a higher lists value and repeat steps 6-7 to find the best combination of `lists` and `probes` constants to achieve the best RPS and precision values. Higher `lists` mean that index will build slower, but you can achieve better RPS and precision. Higher probes mean that select queries will be slower, but you can achieve better precision.
 
 ## Useful links
 
-Don't forget to check out the general [Production Checklist](/guides/platform/going-into-prod) to ensure your project is secure, performant, and will remain available for your users.
+Don't forget to check out the general [Production Checklist](/docs/guides/platform/going-into-prod) to ensure your project is secure, performant, and will remain available for your users.
 
-You can look at our [Choosing Compute Add-on](/guides/ai/choosing-compute-addon) guide to get a basic understanding of how much compute you might need for your workload.
+You can look at our [Choosing Compute Add-on](/docs/guides/ai/choosing-compute-addon) guide to get a basic understanding of how much compute you might need for your workload.
 
-Or take a look at [pgvector 0.4.0 performance](https://supabase.com/blog/pgvector-performance) blogpost to check out what pgvector is capable of and how the technique described above can be used to achieve the best results.
+Or take a look at our [pgvector 0.4.0 performance](https://supabase.com/blog/pgvector-performance) blog post to see what pgvector is capable of and how the above technique can be used to achieve the best results.
 
 <div>
   <img
