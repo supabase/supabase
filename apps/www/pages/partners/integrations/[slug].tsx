@@ -5,14 +5,18 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import 'swiper/swiper.min.css'
-import { IconChevronLeft, IconExternalLink } from 'ui'
+import { IconChevronLeft, IconExternalLink, Modal } from 'ui'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import supabase from '~/lib/supabase'
 import { Partner } from '~/types/partners'
 import Error404 from '../../404'
+import { useState } from 'react'
+import ImageModal from '~/components/ImageModal'
 
 function Partner({ partner }: { partner: Partner }) {
+  const [focusedImage, setFocusedImage] = useState<string | null>(null)
+
   if (!partner) return <Error404 />
   return (
     <>
@@ -31,6 +35,23 @@ function Partner({ partner }: { partner: Partner }) {
         }}
       />
 
+      {focusedImage ? (
+        <ImageModal
+          visible
+          onCancel={() => setFocusedImage(null)}
+          size="xxlarge"
+          className="w-full outline-none"
+        >
+          <Image
+            layout="responsive"
+            objectFit="contain"
+            width={1152}
+            height={766}
+            src={focusedImage!}
+            alt={partner.title}
+          />
+        </ImageModal>
+      ) : null}
       <DefaultLayout>
         <SectionContainer>
           <div className="col-span-12 mx-auto mb-2 max-w-5xl space-y-12 lg:col-span-2">
@@ -80,7 +101,7 @@ function Partner({ partner }: { partner: Partner }) {
                   1024: {
                     slidesPerView: 4,
                   },
-                  1208: {
+                  1280: {
                     slidesPerView: 5,
                   },
                 }}
@@ -96,6 +117,7 @@ function Partner({ partner }: { partner: Partner }) {
                           height={960}
                           src={image}
                           alt={partner.title}
+                          onClick={() => setFocusedImage(image)}
                         />
                       </div>
                     </SwiperSlide>
