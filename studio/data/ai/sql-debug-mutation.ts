@@ -1,6 +1,5 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { post } from 'lib/common/fetch'
-import { ResponseFailure } from 'types'
+import { isResponseOk, post } from 'lib/common/fetch'
 import { aiKeys } from './keys'
 
 export type SqlDebugResponse = {
@@ -14,11 +13,9 @@ export type SqlDebugVariables = {
 }
 
 export async function debugSql({ errorMessage, sql }: SqlDebugVariables) {
-  const response = (await post<SqlDebugResponse>('/api/ai/sql/debug', { errorMessage, sql })) as
-    | SqlDebugResponse
-    | ResponseFailure
+  const response = await post<SqlDebugResponse>('/api/ai/sql/debug', { errorMessage, sql })
 
-  if ('error' in response) {
+  if (!isResponseOk(response)) {
     throw response.error
   }
 
