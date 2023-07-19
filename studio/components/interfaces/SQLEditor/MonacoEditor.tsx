@@ -1,10 +1,8 @@
 import Editor, { Monaco, OnMount } from '@monaco-editor/react'
 import { timeout } from 'lib/helpers'
-import { Selection, editor } from 'monaco-editor'
-import { MutableRefObject, useEffect, useRef, useState } from 'react'
+import { editor } from 'monaco-editor'
+import { MutableRefObject, useRef, useState } from 'react'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
-import AskAIWidget from './AskAIWidget'
-import InlineWidget from './InlineWidget'
 
 export type IStandaloneCodeEditor = Parameters<OnMount>[0]
 
@@ -14,8 +12,6 @@ export type MonacoEditorProps = {
   isExecuting: boolean
   autoFocus?: boolean
   executeQuery: () => void
-  onOpenAiWidget?: () => void
-  onCloseAiWidget?: () => void
 }
 
 const MonacoEditor = ({
@@ -24,8 +20,6 @@ const MonacoEditor = ({
   isExecuting,
   autoFocus = true,
   executeQuery,
-  onOpenAiWidget,
-  onCloseAiWidget,
 }: MonacoEditorProps) => {
   const snap = useSqlEditorStateSnapshot({ sync: true })
   const snippet = snap.snippets[id]
@@ -35,8 +29,6 @@ const MonacoEditor = ({
   executeQueryRef.current = executeQuery
 
   const [editor, setEditor] = useState<editor.IStandaloneCodeEditor>()
-  const [isAiWidgetOpen, setIsAiWidgetOpen] = useState(false)
-  const [aiWidgetSelection, setAiWidgetSelection] = useState<Selection>()
 
   const handleEditorOnMount: OnMount = async (editor, monaco) => {
     editorRef.current = editor
@@ -60,23 +52,6 @@ const MonacoEditor = ({
       },
     })
 
-    editor.addAction({
-      id: 'ask-ai',
-      label: 'Ask AI',
-      keybindings: [monaco.KeyMod.CtrlCmd + monaco.KeyCode.KeyI],
-      contextMenuGroupId: 'operation',
-      contextMenuOrder: 0,
-      run: () => {
-        const selection = editor.getSelection()
-
-        if (selection) {
-          setAiWidgetSelection(selection)
-          setIsAiWidgetOpen(true)
-          onOpenAiWidget?.()
-        }
-      },
-    })
-
     // add margin above first line
     editorRef.current.changeViewZones((accessor) => {
       accessor.addZone({
@@ -91,26 +66,6 @@ const MonacoEditor = ({
       editor.focus()
     }
   }
-
-  useEffect(() => {
-    if (!isAiWidgetOpen) {
-      return
-    }
-
-    function onKeyDown(e: KeyboardEvent) {
-      if (e.key === 'Escape') {
-        setIsAiWidgetOpen(false)
-        onCloseAiWidget?.()
-        editor?.focus()
-      }
-    }
-
-    window.addEventListener('keydown', onKeyDown)
-
-    return () => {
-      window.removeEventListener('keydown', onKeyDown)
-    }
-  }, [editor, isAiWidgetOpen, onCloseAiWidget])
 
   function handleEditorChange(value: string | undefined) {
     if (id && value) snap.setSql(id, value)
@@ -136,16 +91,6 @@ const MonacoEditor = ({
           fixedOverflowWidgets: true,
         }}
       />
-      {editor && isAiWidgetOpen && aiWidgetSelection && (
-        <InlineWidget
-          editor={editor}
-          id="ask-ai"
-          afterLineNumber={aiWidgetSelection.endLineNumber}
-          heightInLines={6}
-        >
-          <AskAIWidget />
-        </InlineWidget>
-      )}
     </>
   )
 }
