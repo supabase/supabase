@@ -5,11 +5,15 @@ import AlertError from 'components/ui/AlertError'
 import Connecting from 'components/ui/Loading/Loading'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useAutoProjectsPrefetch } from 'data/projects/projects-query'
-import { IS_PLATFORM } from 'lib/constants'
+import { useFlag } from 'hooks'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useProfile } from 'lib/profile'
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
 import { NextPageWithLayout } from 'types'
 
 const ProjectsPage: NextPageWithLayout = () => {
+  const router = useRouter()
   const {
     data: organizations,
     isLoading: isOrganizationLoading,
@@ -19,8 +23,19 @@ const ProjectsPage: NextPageWithLayout = () => {
   useAutoProjectsPrefetch()
 
   const { isLoading: isProfileLoading } = useProfile()
-
   const isLoading = isOrganizationLoading || isProfileLoading
+  const navLayoutV2 = useFlag('navigationLayoutV2')
+
+  useEffect(() => {
+    if (navLayoutV2 && isSuccess && typeof window !== 'undefined') {
+      const localStorageSlug =
+        typeof window !== 'undefined'
+          ? localStorage.getItem(LOCAL_STORAGE_KEYS.RECENTLY_VISITED_ORGANIZATION)
+          : undefined
+      if (localStorageSlug !== undefined) router.push(`/org/${localStorageSlug}`)
+      else router.push(`/org/${organizations[0].slug}`)
+    }
+  }, [navLayoutV2, isSuccess, typeof window])
 
   return (
     <>

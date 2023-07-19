@@ -4,9 +4,10 @@ import { PropsWithChildren, useEffect } from 'react'
 
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { useStore } from 'hooks'
+import { useFlag, useStore } from 'hooks'
 import useLatest from 'hooks/misc/useLatest'
 import { useParams } from 'common'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 
 // Ideally these could all be within a _middleware when we use Next 12
 const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
@@ -80,7 +81,9 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
       // Save organization slug to local storage
       const organizations = organizationsRef.current ?? []
       const organization = organizations.find((org) => org.slug === slug)
-      if (organization) localStorage.setItem('supabase-organization', organization.slug)
+      if (organization) {
+        localStorage.setItem(LOCAL_STORAGE_KEYS.RECENTLY_VISITED_ORGANIZATION, organization.slug)
+      }
     }
   }, [slug, orgsInitialized])
 
@@ -91,7 +94,9 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
       const project = projects.find((project) => project.ref === ref)
       const organizationId = project?.organization_id
       const organization = organizations?.find((organization) => organization.id === organizationId)
-      if (organization) localStorage.setItem('supabase-organization', organization.slug)
+      if (organization) {
+        localStorage.setItem(LOCAL_STORAGE_KEYS.RECENTLY_VISITED_ORGANIZATION, organization.slug)
+      }
     }
   }, [ref, projectsInitialized])
 
