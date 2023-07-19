@@ -7,8 +7,8 @@ import HelpPopover from '../ProjectLayout/LayoutHeader/HelpPopover'
 import NotificationsPopover from '../ProjectLayout/LayoutHeader/NotificationsPopover'
 import ProjectDropdown from '../ProjectLayout/LayoutHeader/ProjectDropdown'
 import OrganizationDropdown from './OrganizationDropdown'
+import SettingsButton from './SettingsButton'
 import UserSettingsDropdown from './UserSettingsDropdown'
-import { Button, IconSettings } from 'ui'
 
 const AppHeader = () => {
   const router = useRouter()
@@ -35,15 +35,7 @@ const AppHeader = () => {
         <FeedbackDropdown alt />
         <NotificationsPopover alt />
         <HelpPopover alt />
-        <Link href={`/org/${organization?.slug}/general`}>
-          <a>
-            <Button
-              type="text"
-              className="px-1"
-              icon={<IconSettings size={18} strokeWidth={1.5} className="text-scale-1100" />}
-            />
-          </a>
-        </Link>
+        <SettingsButton slug={organization?.slug ?? ''} />
         <UserSettingsDropdown />
       </div>
     </div>

@@ -45,11 +45,7 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
     if (orgsInitialized && slug) {
       // Check validity of organization that user is trying to access
       const organizations = organizationsRef.current ?? []
-      const organization = organizations.find((org) => org.slug === slug)
-      const isValidOrg = organization !== undefined
-
-      // Save organization slug to local storage
-      if (organization) localStorage.setItem('supabase-organization', organization.slug)
+      const isValidOrg = organizations.some((org) => org.slug === slug)
 
       if (!isValidOrg) {
         ui.setNotification({ category: 'error', message: 'This organization does not exist' })
@@ -57,7 +53,7 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
         return
       }
     }
-  }, [slug, orgsInitialized])
+  }, [orgsInitialized])
 
   const { data: projects, isSuccess: projectsInitialized } = useProjectsQuery()
   const projectsRef = useLatest(projects)
@@ -69,19 +65,33 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
     if (projectsInitialized && ref) {
       // Check validity of project that the user is trying to access
       const projects = projectsRef.current ?? []
-      const project = projects.find((project) => project.ref === ref)
-      const isValidProject = project !== undefined
-
-      // Save organization slug to local storage
-      const organizationId = project?.organization_id
-      const organization = organizations?.find((organization) => organization.id === organizationId)
-      if (organization) localStorage.setItem('supabase-organization', organization.slug)
+      const isValidProject = projects.some((project) => project.ref === ref)
 
       if (!isValidProject) {
         ui.setNotification({ category: 'error', message: 'This project does not exist' })
         router.push('/projects')
         return
       }
+    }
+  }, [projectsInitialized])
+
+  useEffect(() => {
+    if (orgsInitialized && slug) {
+      // Save organization slug to local storage
+      const organizations = organizationsRef.current ?? []
+      const organization = organizations.find((org) => org.slug === slug)
+      if (organization) localStorage.setItem('supabase-organization', organization.slug)
+    }
+  }, [slug, orgsInitialized])
+
+  useEffect(() => {
+    if (projectsInitialized && ref) {
+      // Save organization slug to local storage
+      const projects = projectsRef.current ?? []
+      const project = projects.find((project) => project.ref === ref)
+      const organizationId = project?.organization_id
+      const organization = organizations?.find((organization) => organization.id === organizationId)
+      if (organization) localStorage.setItem('supabase-organization', organization.slug)
     }
   }, [ref, projectsInitialized])
 
