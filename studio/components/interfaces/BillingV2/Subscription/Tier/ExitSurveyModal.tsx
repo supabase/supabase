@@ -5,12 +5,12 @@ import { useRouter } from 'next/router'
 import { useReducer, useRef, useState } from 'react'
 
 import { useParams } from 'common'
+import { useSendDowngradeFeedbackMutation } from 'data/feedback/exit-survey-send'
 import { setProjectStatus } from 'data/projects/projects-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useProjectSubscriptionUpdateMutation } from 'data/subscriptions/project-subscription-update-mutation'
 import { useFlag, useStore } from 'hooks'
-import { post } from 'lib/common/fetch'
-import { API_URL, PROJECT_STATUS } from 'lib/constants'
+import { PROJECT_STATUS } from 'lib/constants'
 import { Button, Input, Modal } from 'ui'
 import { CANCELLATION_REASONS } from '../../Billing.constants'
 import ProjectUpdateDisabledTooltip from '../../ProjectUpdateDisabledTooltip'
@@ -29,15 +29,25 @@ const ExitSurveyModal = ({ visible, onClose }: ExitSurveyModalProps) => {
   const captchaRef = useRef<HCaptcha>(null)
   const router = useRouter()
 
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const [message, setMessage] = useState('')
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [selectedReasons, dispatchSelectedReasons] = useReducer(reducer, [])
 
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
   const { data: addons } = useProjectAddonsQuery({ projectRef })
-  const { mutateAsync: updateSubscriptionTier } = useProjectSubscriptionUpdateMutation()
-
+  const { mutateAsync: sendExitSurvey, isLoading: isSubmittingFeedback } =
+    useSendDowngradeFeedbackMutation()
+  const { mutateAsync: updateSubscriptionTier, isLoading: isUpdatingSubscription } =
+    useProjectSubscriptionUpdateMutation({
+      onError: (error) => {
+        return ui.setNotification({
+          error,
+          category: 'error',
+          message: `Failed to cancel subscription: ${error.message}`,
+        })
+      },
+    })
+  const isSubmitting = isUpdatingSubscription || isSubmittingFeedback
   const subscriptionAddons = addons?.selected_addons ?? []
   const hasComputeInstance = subscriptionAddons.find((addon) => addon.type === 'compute_instance')
 
@@ -62,22 +72,12 @@ const ExitSurveyModal = ({ visible, onClose }: ExitSurveyModalProps) => {
       })
     }
 
-    setIsSubmitting(true)
     let token = captchaToken
 
-    try {
-      if (!token) {
-        const captchaResponse = await captchaRef.current?.execute({ async: true })
-        token = captchaResponse?.response ?? null
-        await downgradeProject()
-      }
-    } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to downgrade project: ${error.message}`,
-      })
-    } finally {
-      setIsSubmitting(false)
+    if (!token) {
+      const captchaResponse = await captchaRef.current?.execute({ async: true })
+      token = captchaResponse?.response ?? null
+      await downgradeProject()
     }
   }
 
@@ -89,43 +89,32 @@ const ExitSurveyModal = ({ visible, onClose }: ExitSurveyModalProps) => {
     try {
       await updateSubscriptionTier({ projectRef, tier: 'tier_free' })
       resetCaptcha()
-    } catch (error: any) {
-      return ui.setNotification({
-        error,
-        category: 'error',
-        message: `Failed to cancel subscription: ${error.message}`,
-      })
+    } catch (error) {
+      return
     }
 
     try {
-      const feedbackRes = await post(`${API_URL}/feedback/downgrade`, {
+      await sendExitSurvey({
         projectRef,
         reasons: selectedReasons.reduce((a, b) => `${a}- ${b}\n`, ''),
-        additionalFeedback: message,
-        exitAction: 'downgrade',
-      })
-      if (feedbackRes.error) throw feedbackRes.error
-    } catch (error: any) {
-      return ui.setNotification({
-        error,
-        category: 'info',
-        message: `Failed to submit exit survey: ${error.message}`,
+        message,
       })
     } finally {
-      ui.setNotification({
-        category: 'success',
-        duration: hasComputeInstance ? 8000 : 4000,
-        message: hasComputeInstance
-          ? 'Your project has been downgraded and is currently restarting to update its instance size'
-          : 'Successfully downgraded project to the free plan',
-      })
-      if (hasComputeInstance) {
-        setProjectStatus(queryClient, projectRef, PROJECT_STATUS.RESTORING)
-        router.push(`/project/${projectRef}`)
-      }
-      onClose(true)
-      window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
     }
+
+    ui.setNotification({
+      category: 'success',
+      duration: hasComputeInstance ? 8000 : 4000,
+      message: hasComputeInstance
+        ? 'Your project has been downgraded and is currently restarting to update its instance size'
+        : 'Successfully downgraded project to the free plan',
+    })
+    if (hasComputeInstance) {
+      setProjectStatus(queryClient, projectRef, PROJECT_STATUS.RESTORING)
+      router.push(`/project/${projectRef}`)
+    }
+    onClose(true)
+    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
   }
 
   return (

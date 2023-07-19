@@ -61,7 +61,7 @@ const BillingEmail = () => {
   }
 
   return (
-    <div className="container my-4 max-w-4xl">
+    <div className="container my-4">
       <h4>Billing email</h4>
       <p className="text-sm opacity-50">All billing correspondence will go to this email</p>
 

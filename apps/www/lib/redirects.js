@@ -2071,4 +2071,9 @@ module.exports = [
     source: '/docs/guides/ai/choosing-instance-type',
     destination: '/docs/guides/ai/choosing-compute-addon',
   },
+  {
+    permanent: true,
+    source: '/blog/flutter-authentication-and-authorization-with-rls',
+    destination: '/blog/flutter-authorization-with-rls',
+  },
 ]

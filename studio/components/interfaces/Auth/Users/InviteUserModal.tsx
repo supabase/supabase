@@ -3,9 +3,9 @@ import { observer } from 'mobx-react-lite'
 import { useContext } from 'react'
 import { Button, Form, IconMail, Input, Modal } from 'ui'
 
+import { useParams } from 'common'
+import { useUserInviteMutation } from 'data/auth/user-invite-mutation'
 import { useCheckPermissions, useStore } from 'hooks'
-import { isResponseOk, post } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
 import { PageContext } from 'pages/project/[ref]/auth/users'
 
 export type InviteUserModalProps = {
@@ -15,9 +15,11 @@ export type InviteUserModalProps = {
 
 const InviteUserModal = ({ visible, setVisible }: InviteUserModalProps) => {
   const { ui } = useStore()
+  const { ref } = useParams()
   const PageState: any = useContext(PageContext)
 
   const handleToggle = () => setVisible(!visible)
+  const { mutateAsync: inviteUser, isLoading: isInviting } = useUserInviteMutation()
   const canInviteUsers = useCheckPermissions(PermissionAction.AUTH_EXECUTE, 'invite_user')
 
   const validate = (values: any) => {
@@ -34,27 +36,13 @@ const InviteUserModal = ({ visible, setVisible }: InviteUserModalProps) => {
     return errors
   }
 
-  const onInviteUser = async (values: any, { setSubmitting }: any) => {
-    setSubmitting(true)
+  const onInviteUser = async (values: any) => {
+    if (!ref) return console.error('Project ref is required')
 
-    const response = await post<void>(`${API_URL}/auth/${PageState.projectRef}/invite`, {
-      email: values.email,
-    })
-    if (!isResponseOk(response)) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to invite user: ${response.error.message}`,
-      })
-    } else {
-      PageState.fetchData(1)
-      ui.setNotification({
-        category: 'success',
-        message: `Sent invite email to ${values.email}`,
-      })
-      setVisible(false)
-    }
-
-    setSubmitting(false)
+    await inviteUser({ projectRef: ref, email: values.email })
+    PageState.fetchData(1)
+    ui.setNotification({ category: 'success', message: `Sent invite email to ${values.email}` })
+    setVisible(false)
   }
 
   return (
@@ -74,7 +62,7 @@ const InviteUserModal = ({ visible, setVisible }: InviteUserModalProps) => {
           validate={validate}
           onSubmit={onInviteUser}
         >
-          {({ isSubmitting }: { isSubmitting: boolean }) => (
+          {() => (
             <div className="space-y-6 py-4">
               <Modal.Content>
                 <Input
@@ -93,8 +81,8 @@ const InviteUserModal = ({ visible, setVisible }: InviteUserModalProps) => {
                   block
                   size="small"
                   htmlType="submit"
-                  loading={isSubmitting}
-                  disabled={!canInviteUsers || isSubmitting}
+                  loading={isInviting}
+                  disabled={!canInviteUsers || isInviting}
                 >
                   Invite user
                 </Button>

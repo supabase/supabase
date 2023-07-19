@@ -30,8 +30,6 @@ export interface Project extends ProjectBase {
   dbVersion?: string
   kpsVersion?: string
   restUrl?: string
-  // store subscription tier products.metadata.supabase_prod_id
-  subscription_tier?: string
 
   /**
    * postgrestStatus is available on client side only.
@@ -86,7 +84,7 @@ export interface ResponseFailure {
 export type SupaResponse<T> = T | ResponseFailure
 
 export interface ResponseError {
-  code: number
+  code?: number
   message: string
-  requestId: string
+  requestId?: string
 }

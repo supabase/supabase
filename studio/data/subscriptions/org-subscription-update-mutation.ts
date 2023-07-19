@@ -1,8 +1,9 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { isResponseOk, put } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
+import { toast } from 'react-hot-toast'
+import { ResponseError } from 'types/base'
 import { subscriptionKeys } from './keys'
-import { SupaResponse } from 'types/base'
 
 export type SubscriptionTier =
   | 'tier_free'
@@ -40,20 +41,28 @@ type OrgSubscriptionUpdateData = Awaited<ReturnType<typeof updateOrgSubscription
 
 export const useOrgSubscriptionUpdateMutation = ({
   onSuccess,
+  onError,
   ...options
 }: Omit<
-  UseMutationOptions<OrgSubscriptionUpdateData, unknown, OrgSubscriptionUpdateVariables>,
+  UseMutationOptions<OrgSubscriptionUpdateData, ResponseError, OrgSubscriptionUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<OrgSubscriptionUpdateData, unknown, OrgSubscriptionUpdateVariables>(
+  return useMutation<OrgSubscriptionUpdateData, ResponseError, OrgSubscriptionUpdateVariables>(
     (vars) => updateOrgSubscription(vars),
     {
       async onSuccess(data, variables, context) {
         const { slug } = variables
         await queryClient.invalidateQueries(subscriptionKeys.orgSubscription(slug))
         await onSuccess?.(data, variables, context)
+      },
+      async onError(data, variables, context) {
+        if (onError === undefined) {
+          toast.error(`Failed to update subscription: ${data.message}`)
+        } else {
+          onError(data, variables, context)
+        }
       },
       ...options,
     }
