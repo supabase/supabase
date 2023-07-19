@@ -77,7 +77,7 @@ const PROVIDER_PHONE = {
       title: 'SMS provider',
       description: 'External provider that will handle sending SMS messages',
       enum: [
-        { label: 'Twilio (Programmable Messaging)', value: 'twilio', icon: 'twilio-icon.svg' },
+        { label: 'Twilio', value: 'twilio', icon: 'twilio-icon.svg' },
         { label: 'Messagebird', value: 'messagebird', icon: 'messagebird-icon.svg' },
         { label: 'Textlocal', value: 'textlocal', icon: 'textlocal-icon.png' },
         { label: 'Vonage', value: 'vonage', icon: 'vonage-icon.svg' },
