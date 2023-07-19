@@ -5,7 +5,7 @@ import OrganizationSettingsMenu from './OrganizationSettingsMenu'
 import AccountSettingsMenu from './AccountSettingsMenu'
 
 const SettingsLayout = ({ children }: PropsWithChildren<{}>) => {
-  const { slug } = useParams()
+  const { ref, slug } = useParams()
 
   // [Joshen] Note to self - these could contribute to a Scaffold component
 
@@ -13,7 +13,11 @@ const SettingsLayout = ({ children }: PropsWithChildren<{}>) => {
     <AppLayout>
       <div className="flex h-full">
         <div className="h-full overflow-y-auto min-w-[280px] border-r px-8 py-8">
-          {slug !== undefined ? <OrganizationSettingsMenu /> : <AccountSettingsMenu />}
+          {slug === undefined && ref === undefined ? (
+            <AccountSettingsMenu />
+          ) : (
+            <OrganizationSettingsMenu />
+          )}
         </div>
         <div className="h-full overflow-y-auto flex-grow">{children}</div>
       </div>

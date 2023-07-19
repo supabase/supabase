@@ -1,5 +1,4 @@
-import clsx from 'clsx'
-import Link from 'next/link'
+import { useRouter } from 'next/router'
 import {
   AccordionContent_Shadcn_,
   AccordionItem_Shadcn_,
@@ -9,27 +8,29 @@ import {
 
 import { useSelectedOrganization } from 'hooks'
 import { Project } from 'types'
+import SettingsMenuItem from './SettingsMenuItem'
 
 interface ProjectSettingsMenuItemProps {
   project: Project
 }
 
 const ProjectSettingsMenuItem = ({ project }: ProjectSettingsMenuItemProps) => {
+  const router = useRouter()
   const organization = useSelectedOrganization()
   const isOrgBilling = !!organization?.subscription_id
 
   // [Joshen] Links need to be updated once we start implementing these
   const projectSettings = isOrgBilling
     ? [
-        { label: 'General', pathname: `/org/[slug]/settings` },
-        { label: 'Infrastructure', pathname: `/org/[slug]/settings` },
-        { label: 'Add Ons', pathname: `/org/[slug]/settings` },
+        { label: 'General', pathname: `/project/[ref]/settings/general` },
+        { label: 'Infrastructure', pathname: `/project/[ref]/settings/infrastructure` },
+        { label: 'Add Ons', pathname: `/project/[ref]/settings/addons` },
       ]
     : [
-        { label: 'General', pathname: `/org/[slug]/settings` },
-        { label: 'Subscription', pathname: `/org/[slug]/settings` },
-        { label: 'Usage', pathname: `/org/[slug]/settings` },
-        { label: 'Invoices', pathname: `/org/[slug]/settings` },
+        { label: 'General', pathname: `/project/[ref]/settings/general` },
+        { label: 'Subscription', pathname: `/project/[ref]/settings/billing/subscription` },
+        { label: 'Usage', pathname: `/project/[ref]/settings/billing/usage` },
+        { label: 'Invoices', pathname: `/project/[ref]/settings/billing/invoices` },
       ]
 
   return (
@@ -50,20 +51,17 @@ const ProjectSettingsMenuItem = ({ project }: ProjectSettingsMenuItemProps) => {
       </AccordionTrigger_Shadcn_>
       <AccordionContent_Shadcn_>
         <div className="space-y-2 pl-6 mt-1">
-          {projectSettings.map((link) => (
-            <div key={link.label}>
-              <Link href={link.pathname.replace('[slug]', '')}>
-                <a
-                  className={clsx(
-                    'text-sm',
-                    false ? 'text-scale-1200' : 'text-scale-1100 hover:text-scale-1200 transition'
-                  )}
-                >
-                  {link.label}
-                </a>
-              </Link>
-            </div>
-          ))}
+          {projectSettings.map((link) => {
+            const href = link.pathname.replace('[ref]', project.ref)
+            return (
+              <SettingsMenuItem
+                key={link.label}
+                label={link.label}
+                href={href}
+                isActive={href === router.asPath}
+              />
+            )
+          })}
         </div>
       </AccordionContent_Shadcn_>
     </AccordionItem_Shadcn_>
