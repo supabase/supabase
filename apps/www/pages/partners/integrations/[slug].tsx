@@ -1,3 +1,4 @@
+import { CH } from '@code-hike/mdx/components'
 import { GetStaticPaths, GetStaticProps } from 'next'
 import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
 import { serialize } from 'next-mdx-remote/serialize'
@@ -7,8 +8,9 @@ import Link from 'next/link'
 import { Dispatch, SetStateAction, useState } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import 'swiper/swiper.min.css'
-import { IconChevronLeft, IconExternalLink } from 'ui'
+import { CodeBlock, IconChevronLeft, IconExternalLink } from 'ui'
 import ImageModal from '~/components/ImageModal'
+import InlineCodeTag from '~/components/InlineCode'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import supabase from '~/lib/supabase'
@@ -16,16 +18,27 @@ import { Partner } from '~/types/partners'
 import Error404 from '../../404'
 
 /**
- * Returns a custom img element which has a bound onClick listener. When the image is clicked, it will open a modal showing that particular image.
+ * Returns custom components so that the markdown converts to a nice looking html.
  */
-const buildCustomImg = (callback: Dispatch<SetStateAction<string | null>>) => {
-  const img = (
-    props: React.DetailedHTMLProps<React.ImgHTMLAttributes<HTMLImageElement>, HTMLImageElement>
-  ) => {
-    return <img {...props} onClick={() => callback(props.src!)} />
+function mdxComponents(callback: Dispatch<SetStateAction<string | null>>) {
+  const components = {
+    CodeBlock,
+    CH,
+    pre: (props: any) => {
+      return <CodeBlock {...props.children.props} />
+    },
+    /**
+     * Returns a custom img element which has a bound onClick listener. When the image is clicked, it will open a modal showing that particular image.
+     */
+    img: (
+      props: React.DetailedHTMLProps<React.ImgHTMLAttributes<HTMLImageElement>, HTMLImageElement>
+    ) => {
+      return <img {...props} onClick={() => callback(props.src!)} />
+    },
+    code: (props: any) => <InlineCodeTag>{props.children}</InlineCodeTag>,
   }
 
-  return { img }
+  return components
 }
 
 function Partner({
@@ -172,7 +185,7 @@ function Partner({
                 )}
 
                 <div className="prose">
-                  <MDXRemote {...overview} components={buildCustomImg(setFocusedImage)} />
+                  <MDXRemote {...overview} components={mdxComponents(setFocusedImage)} />
                 </div>
               </div>
 
