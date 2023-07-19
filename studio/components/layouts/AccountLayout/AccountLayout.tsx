@@ -8,6 +8,7 @@ import { useSignOut } from 'lib/auth'
 import { IS_PLATFORM } from 'lib/constants'
 import { SidebarSection } from './AccountLayout.types'
 import WithSidebar from './WithSidebar'
+import SettingsLayout from '../SettingsLayout/SettingsLayout'
 
 export interface AccountLayoutProps {
   title: string
@@ -23,6 +24,7 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
   const selectedOrganization = useSelectedOrganization()
 
   const ongoingIncident = useFlag('ongoingIncident')
+  const navLayoutV2 = useFlag('navigationLayoutV2')
   const maxHeight = ongoingIncident ? 'calc(100vh - 44px)' : '100vh'
 
   const signOut = useSignOut()
@@ -124,6 +126,10 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
         ]
       : []),
   ]
+
+  if (navLayoutV2) {
+    return <SettingsLayout>{children}</SettingsLayout>
+  }
 
   return (
     <>

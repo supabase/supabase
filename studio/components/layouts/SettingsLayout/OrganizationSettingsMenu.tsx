@@ -3,9 +3,9 @@ import { Accordion_Shadcn_, Button } from 'ui'
 
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useSelectedOrganization } from 'hooks'
-import OrganizationSettingsMenuItem from './OrganizationSettingsMenuItem'
 import ProjectSettingsMenuItem from './ProjectSettingsMenuItem'
 import Link from 'next/link'
+import SettingsMenuItem from './SettingsMenuItem'
 
 const OrganizationSettingsMenu = () => {
   const router = useRouter()
@@ -29,10 +29,10 @@ const OrganizationSettingsMenu = () => {
       <div className="space-y-2">
         <p className="text-sm font-medium">Organization</p>
         {organizationSettings.map((link) => (
-          <OrganizationSettingsMenuItem
+          <SettingsMenuItem
             key={link.label}
-            slug={organization?.slug ?? ''}
-            link={link}
+            label={link.label}
+            href={link.pathname.replace('[slug]', organization?.slug ?? '')}
             isActive={link.pathname === router.pathname}
           />
         ))}
