@@ -6,14 +6,13 @@ import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useStore } from 'hooks'
 import useLatest from 'hooks/misc/useLatest'
+import { useParams } from 'common'
 
 // Ideally these could all be within a _middleware when we use Next 12
 const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
   const { ui } = useStore()
-
   const router = useRouter()
-  const projectRef = router.query.ref
-  const orgSlug = router.query.slug
+  const { ref, slug } = useParams()
 
   /**
    * Array of urls/routes that should be ignored
@@ -43,10 +42,14 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
     // check if current route is excempted from route validation check
     if (isExceptUrl()) return
 
-    if (orgsInitialized && orgSlug) {
+    if (orgsInitialized && slug) {
       // Check validity of organization that user is trying to access
       const organizations = organizationsRef.current ?? []
-      const isValidOrg = organizations.some((org) => org.slug === orgSlug)
+      const organization = organizations.find((org) => org.slug === slug)
+      const isValidOrg = organization !== undefined
+
+      // Save organization slug to local storage
+      if (organization) localStorage.setItem('supabase-organization', organization.slug)
 
       if (!isValidOrg) {
         ui.setNotification({ category: 'error', message: 'This organization does not exist' })
@@ -54,7 +57,7 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
         return
       }
     }
-  }, [orgsInitialized])
+  }, [slug, orgsInitialized])
 
   const { data: projects, isSuccess: projectsInitialized } = useProjectsQuery()
   const projectsRef = useLatest(projects)
@@ -63,10 +66,16 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
     // check if current route is excempted from route validation check
     if (isExceptUrl()) return
 
-    if (projectsInitialized && projectRef) {
+    if (projectsInitialized && ref) {
       // Check validity of project that the user is trying to access
       const projects = projectsRef.current ?? []
-      const isValidProject = projects.some((project) => project.ref === projectRef)
+      const project = projects.find((project) => project.ref === ref)
+      const isValidProject = project !== undefined
+
+      // Save organization slug to local storage
+      const organizationId = project?.organization_id
+      const organization = organizations?.find((organization) => organization.id === organizationId)
+      if (organization) localStorage.setItem('supabase-organization', organization.slug)
 
       if (!isValidProject) {
         ui.setNotification({ category: 'error', message: 'This project does not exist' })
@@ -74,7 +83,7 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
         return
       }
     }
-  }, [projectsInitialized])
+  }, [ref, projectsInitialized])
 
   return <>{children}</>
 }

@@ -35,7 +35,7 @@ const AppHeader = () => {
         <FeedbackDropdown alt />
         <NotificationsPopover alt />
         <HelpPopover alt />
-        <Link href={`/org/${organization?.slug}/settings`}>
+        <Link href={`/org/${organization?.slug}/general`}>
           <a>
             <Button
               type="text"
