@@ -80,9 +80,10 @@ const ProjectDropdown = ({ alt }: { alt?: boolean }) => {
   const { data: allOrganizations } = useOrganizationsQuery()
   const selectedOrganizationSlug = selectedOrganization?.slug
 
+  const isOrgBilling = !!selectedOrganization?.subscription_id
   const { data: subscription, isSuccess } = useProjectSubscriptionV2Query(
     { projectRef: selectedProject?.ref },
-    { enabled: alt }
+    { enabled: alt && !isOrgBilling }
   )
 
   if (isLoadingProjects && alt) {
@@ -118,7 +119,7 @@ const ProjectDropdown = ({ alt }: { alt?: boolean }) => {
         }
       >
         <span className="text-sm">{selectedProject?.name}</span>
-        {alt && isSuccess && (
+        {alt && isSuccess && !isOrgBilling && (
           <Badge color="slate" className="ml-2">
             {subscription?.plan.name}
           </Badge>
