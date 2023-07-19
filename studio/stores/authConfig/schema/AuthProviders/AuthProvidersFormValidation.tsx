@@ -137,7 +137,7 @@ const PROVIDER_PHONE = {
     },
     SMS_TWILIO_VERIFY_MESSAGE_SERVICE_SID: {
       type: 'string',
-      title: 'Twilio Message Service Sid',
+      title: 'Twilio Verify Service Sid',
       show: {
         key: 'SMS_PROVIDER',
         matches: ['twilio_verify'],
