@@ -59,15 +59,8 @@ const DeletePaymentMethodModal = ({
     >
       <div className="py-4">
         <Modal.Content>
-          <Alert
-            withIcon
-            variant="warning"
-            title="This will permanently delete your payment method."
-          >
-            <p className="">
-              Any subscription currently charging this payment method will start charging your
-              default payment method.
-            </p>
+          <Alert withIcon variant="info" title="This will permanently delete your payment method.">
+            <p>You can re-add the payment method any time.</p>
           </Alert>
         </Modal.Content>
       </div>
