@@ -19,7 +19,7 @@ const editSqlSchema = SchemaBuilder.emptySchema().addString('sql', {
       The modified SQL (must be valid SQL).
       - Assume the query hasn't been executed yet
       - For primary keys, always use "id bigint primary key generated always as identity" (not serial)
-      - Prefer creating foreign key references in the create statement
+      - When creating tables, always add foreign key references inline
       - Prefer 'text' over 'varchar'
       - Prefer 'timestamp with time zone' over 'date'
       - Use vector(384) data type for any embedding/vector related query
