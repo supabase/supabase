@@ -109,6 +109,10 @@ const ProfileCard = observer(() => {
       <section>
         <ThemeSettings />
       </section>
+
+      <section>
+        <AnalyticsSettings />
+      </section>
     </article>
   )
 })
@@ -189,6 +193,14 @@ const ThemeSettings = observer(() => {
           </Listbox.Option>
         </Listbox>
       </Panel.Content>
+    </Panel>
+  )
+})
+
+const AnalyticsSettings = observer(() => {
+  return (
+    <Panel title={<h5 key="panel-title">Analytics</h5>}>
+      <Panel.Content>Something</Panel.Content>
     </Panel>
   )
 })
