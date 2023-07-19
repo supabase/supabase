@@ -23,6 +23,7 @@ import { API_URL, BASE_PATH, PRICING_TIER_LABELS_ORG } from 'lib/constants'
 import { getURL } from 'lib/helpers'
 import Link from 'next/link'
 import { SpendCapModal } from 'components/interfaces/BillingV2'
+import { Organization } from 'types'
 
 const ORG_KIND_TYPES = {
   PERSONAL: 'Personal',
@@ -92,7 +93,7 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
   async function createOrg(paymentMethodId?: string) {
     const dbTier = dbPricingTierKey === 'PRO' && !isSpendCapEnabled ? 'PAYG' : dbPricingTierKey
 
-    const response = await post(
+    const response = await post<Organization>(
       `${API_URL}/organizations`,
       {
         name: orgName,
