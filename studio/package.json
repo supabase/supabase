@@ -13,7 +13,8 @@
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook",
     "prettier:check": "prettier --check .",
-    "prettier:write": "prettier --write ."
+    "prettier:write": "prettier --write .",
+    "codegen": "openapi-typescript http://localhost:8080/api-json -o ./data/api.d.ts"
   },
   "dependencies": {
     "@graphiql/react": "^0.15.0",
@@ -68,6 +69,7 @@
     "next": "^12.3.2",
     "next-transpile-modules": "^9.0.0",
     "openai": "^3.3.0",
+    "openapi-fetch": "^0.6.1",
     "openapi-types": "^12.0.2",
     "p-queue": "^6.6.2",
     "papaparse": "^5.3.1",
@@ -151,6 +153,7 @@
     "config": "*",
     "jest": "^27.4.7",
     "jest-canvas-mock": "^2.3.1",
+    "openapi-typescript": "^6.3.4",
     "postcss": "^8.4.22",
     "prettier": "^2.8.8",
     "storybook-dark-mode": "^3.0.0",

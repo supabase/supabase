@@ -34,8 +34,8 @@ After developing your project and deciding it's Production Ready, you should run
 - Perform load testing (preferably on a staging env)
   - Tools like [k6](https://k6.io/) can simulate traffic from many different users.
 - Upgrade your database if you require more resources. If you need anything beyond what is listed, contact enterprise@supabase.io.
-- If you are expecting a surge in traffic (for a big launch) [contact support](https://app.supabase.com/support/new) with more details about your launch. We'll keep an eye on your project.
-- If you expect your database size to be > 4 GB, [enable](https://app.supabase.com/project/_/settings/billing/subscription?panel=pitr) the Point in Time Recovery (PITR) addon. Daily backups can take up resources from your database when the backup is in progress. PITR is more resource efficient, since only the changes to the database are backed up.
+- If you are expecting a surge in traffic (for a big launch) [contact support](https://supabase.com/dashboard/support/new) with more details about your launch. We'll keep an eye on your project.
+- If you expect your database size to be > 4 GB, [enable](https://supabase.com/dashboard/project/_/settings/billing/subscription?panel=pitr) the Point in Time Recovery (PITR) addon. Daily backups can take up resources from your database when the backup is in progress. PITR is more resource efficient, since only the changes to the database are backed up.
 
 ## Availability
 
@@ -49,32 +49,32 @@ After developing your project and deciding it's Production Ready, you should run
   - You can set up your own backup systems using tools like [pg_dump](https://www.postgresqltutorial.com/postgresql-backup-database/) or [wal-g](https://github.com/wal-g/wal-g).
   - Nightly backups for Pro plan projects are available on the Supabase dashboard for up to 7 days.
   - Point in Time Recovery (PITR) allows a project to be backed up at much shorter intervals. This provides users an option to restore to any chosen point of up to seconds in granularity. In terms of Recovery Point Objective (RPO), Daily Backups would be suitable for projects willing to lose up to 24 hours worth of data. If a lower RPO is required, enable PITR.
-- Upgrading to the Supabase Pro plan will give you [access to our support team](https://app.supabase.com/support/new).
+- Upgrading to the Supabase Pro plan will give you [access to our support team](https://supabase.com/dashboard/support/new).
 
 ## Rate Limiting, Resource Allocation, & Abuse Prevention
 
 - Supabase employs a number of safeguards against bursts of incoming traffic to prevent abuse and help maximize stability across the platform
-  - If you're expecting high load events including production launches or heavy load testing, or prolonged high resource usage please give us at least 2 weeks notice. You can do this by opening a ticket via the [support form](https://app.supabase.com/support/new).
+  - If you're expecting high load events including production launches or heavy load testing, or prolonged high resource usage please give us at least 2 weeks notice. You can do this by opening a ticket via the [support form](https://supabase.com/dashboard/support/new).
 
 ### Auth Rate Limits
 
 - The table below shows the rate limit quotas on the following authentication endpoints:
 
-| Endpoint                                         | Path                                                           | Limited By               | Rate Limit                                                                      |
-| ------------------------------------------------ | -------------------------------------------------------------- | ------------------------ | ------------------------------------------------------------------------------- |
-| All endpoints that send emails                   | `/auth/v1/signup` `/auth/v1/recover` `/auth/v1/user`[^1]       | Sum of combined requests | Defaults to 30 emails per hour. Is customizable with custom SMTP set up.        |
-| All endpoints that send One-Time-Passwords (OTP) | `/auth/v1/otp`                                                 | Sum of combined requests | Defaults to 30 OTPs per hour. Is customizable.                                  |
-| Send OTPs or magiclinks                          | `/auth/v1/otp`                                                 | Last request             | Defaults to 60 seconds window before a new request is allowed. Is customizable. |
-| Signup confirmation request                      | `/auth/v1/signup`                                              | Last request             | Defaults to 60 seconds window before a new request is allowed. Is customizable. |
-| Password Reset Request                           | `/auth/v1/recover`                                             | Last request             | Defaults to 60 seconds window before a new request is allowed. Is customizable. |
-| Verification requests                            | `/auth/v1/verify`                                              | IP Address               | 360 requests per hour (with bursts up to 30 requests)                           |
-| Token refresh requests                           | `/auth/v1/token`                                               | IP Address               | 360 requests per hour (with bursts up to 30 requests)                           |
-| Create or Verify an MFA challenge                | `/auth/v1/factors/:id/challenge` `/auth/v1/factors/:id/verify` | IP Address               | 15 requests per minute (with bursts up to 30 requests)                          |
+| Endpoint                                         | Path                                                           | Limited By               | Rate Limit                                                                                                                                 |
+| ------------------------------------------------ | -------------------------------------------------------------- | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| All endpoints that send emails                   | `/auth/v1/signup` `/auth/v1/recover` `/auth/v1/user`[^1]       | Sum of combined requests | Defaults to 30 emails per hour. As of 14th July 2023, this has been updated to 4 emails per hour. Is customizable with custom SMTP set up. |
+| All endpoints that send One-Time-Passwords (OTP) | `/auth/v1/otp`                                                 | Sum of combined requests | Defaults to 30 OTPs per hour. Is customizable.                                                                                             |
+| Send OTPs or magiclinks                          | `/auth/v1/otp`                                                 | Last request             | Defaults to 60 seconds window before a new request is allowed. Is customizable.                                                            |
+| Signup confirmation request                      | `/auth/v1/signup`                                              | Last request             | Defaults to 60 seconds window before a new request is allowed. Is customizable.                                                            |
+| Password Reset Request                           | `/auth/v1/recover`                                             | Last request             | Defaults to 60 seconds window before a new request is allowed. Is customizable.                                                            |
+| Verification requests                            | `/auth/v1/verify`                                              | IP Address               | 360 requests per hour (with bursts up to 30 requests)                                                                                      |
+| Token refresh requests                           | `/auth/v1/token`                                               | IP Address               | 360 requests per hour (with bursts up to 30 requests)                                                                                      |
+| Create or Verify an MFA challenge                | `/auth/v1/factors/:id/challenge` `/auth/v1/factors/:id/verify` | IP Address               | 15 requests per minute (with bursts up to 30 requests)                                                                                     |
 
 ### Realtime Quotas
 
 - Review the [Realtime quotas](/docs/guides/realtime/quotas).
-- If you need quotas increased you can always [contact support](https://app.supabase.com/support/new).
+- If you need quotas increased you can always [contact support](https://supabase.com/dashboard/support/new).
 
 ### Abuse Prevention
 
@@ -84,6 +84,8 @@ After developing your project and deciding it's Production Ready, you should run
 
 - When working with enterprise systems, email scanners may scan and make a `GET` request to the reset password link or sign up link in your email. Since links in Supabase Auth are single use, a user who opens an email post-scan to click on a link will receive an error. To get around this problem,
   consider altering the email template to replace the original magic link with a link to a domain you control. The domain can present the user with a "Sign-in" button which redirect the user to the original magic link URL when clicked.
+
+- When using a custom SMTP service, some services might have link tracking enabled which may overwrite or malform the email confirmation links sent by Supabase Auth. To prevent this from happening, we recommend that you disable link tracking when using a custom SMTP service.
 
 ## Next steps
 

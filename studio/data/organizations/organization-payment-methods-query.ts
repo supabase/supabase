@@ -5,7 +5,7 @@ import { useCallback } from 'react'
 import { organizationKeys } from './keys'
 
 export type OrganizationPaymentMethodsVariables = { slug?: string }
-export type OrganizationPaymentMethodsResponse = {
+export type OrganizationPaymentMethod = {
   id: string
   customer: string
   type: string
@@ -29,7 +29,7 @@ export type OrganizationPaymentMethodsResponse = {
     name: string | null
     phone: string | null
   }
-}[]
+}
 
 export async function getOrganizations(
   { slug }: OrganizationPaymentMethodsVariables,
@@ -40,7 +40,7 @@ export async function getOrganizations(
   const response = await get(`${API_URL}/organizations/${slug}/payments`, { signal })
   if (response.error) throw response.error
 
-  return response.data as OrganizationPaymentMethodsResponse
+  return response.data as OrganizationPaymentMethod[]
 }
 
 export type OrganizationPaymentMethodsData = Awaited<ReturnType<typeof getOrganizations>>

@@ -1,24 +1,20 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
-import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
-import { FC, useState } from 'react'
+import { useState } from 'react'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import { setProjectStatus } from 'data/projects/projects-query'
-import { checkPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import { Button, IconPause } from 'ui'
 
-interface Props {
-  projectId: number
-  projectRef: string
-}
+export interface PauseProjectButtonProps {}
 
-const PauseProjectButton: FC<Props> = observer(({ projectRef, projectId }) => {
+const PauseProjectButton = () => {
   const queryClient = useQueryClient()
   const { ui } = useStore()
   const { project } = useProjectContext()
@@ -29,8 +25,9 @@ const PauseProjectButton: FC<Props> = observer(({ projectRef, projectId }) => {
   const openModal = () => setIsModalOpen(true)
   const closeModal = () => setIsModalOpen(false)
 
+  const projectRef = project?.ref ?? ''
   const isPaused = project?.status === PROJECT_STATUS.INACTIVE
-  const canPauseProject = checkPermissions(
+  const canPauseProject = useCheckPermissions(
     PermissionAction.INFRA_EXECUTE,
     'queue_jobs.projects.pause'
   )
@@ -50,7 +47,7 @@ const PauseProjectButton: FC<Props> = observer(({ projectRef, projectId }) => {
       ui.setNotification({
         error: res.error,
         category: 'error',
-        message: 'Failed to pause project',
+        message: `Failed to pause project: ${res.error.message}`,
       })
       setLoading(false)
     } else {
@@ -122,6 +119,6 @@ const PauseProjectButton: FC<Props> = observer(({ projectRef, projectId }) => {
       />
     </>
   )
-})
+}
 
 export default PauseProjectButton

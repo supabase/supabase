@@ -1,0 +1,205 @@
+/**
+ * Do not edit directly
+ * Generated on Mon, 17 Jul 2023 15:59:23 GMT
+ */
+
+:root {
+  --content-width-screen-xl: 1128px;
+  --base: 16;
+  --input-sm-height: 28px;
+  --datatable-rowheight: 28px; /* Height of datatable rows */
+  --modal-drop-shadow: 1px 4px 4px 4px rgba(0,0,0,0.15);
+  --icon-width-default: 1px;
+  --icon-md: 18px;
+  --icon-sm: 16px;
+  --icon-xs: 12px;
+  --variables-colors-brand-accent: 152.9deg 56.1% 46.5%;
+  --variables-colors-brand-primary: 153.1deg 60.2% 52.7%;
+  --text-decoration-none: none;
+  --text-case-uppercase: uppercase;
+  --text-case-none: none;
+  --font-size-2: 48.829px;
+  --font-size-1: 39.063px;
+  --font-size-0: 14px;
+  --inner-shadow-text-new: inset 0 0.5px 0.5px 0 #00000026;
+  --inner-shadow-label-copy: inset 0 1px 1px 0 #858585;
+  --font-weights-heading-mono: 500;
+  --font-weights-inter-2: Book;
+  --font-weights-inter-1: 500;
+  --font-weights-roboto-0: 400;
+  --font-weights-body-bold: 700;
+  --font-weights-body-regular: 400;
+  --font-weights-heading-bold: 700;
+  --font-weights-heading-regular: 400;
+  --paragraph-spacing-h2: 26;
+  --paragraph-spacing-h1: 32;
+  --paragraph-spacing-1: 32;
+  --paragraph-spacing-0: 26;
+  --letter-spacing-8: 0.08em;
+  --letter-spacing-decreased: -0.05em;
+  --letter-spacing-increased: 0.1em;
+  --letter-spacing-default: 0;
+  --letter-spacing-1: -0.02em;
+  --letter-spacing-0: 0em;
+  --line-heights-heading: 1.1;
+  --line-heights-0: 1.1;
+  --font-families-mono: Office Code Pro;
+  --font-families-body2: Circular Std;
+  --font-families-roboto: Roboto;
+  --font-families-body: Circular Std;
+  --font-families-heading: Inter;
+  --opacity-high: 0.9;
+  --opacity-md: 0.5;
+  --opacity-low: 0.1;
+  --colors-slate-light-alpha-1200: hsla(200, 100%, 2.4%, 0.9294117647058824); /* 00080C */
+  --colors-slate-light-alpha-1100: hsla(205, 100%, 4.7%, 0.5882352941176471); /* 000E18 */
+  --colors-slate-light-alpha-1000: hsla(204.39999999999998, 100%, 5.3%, 0.5098039215686274); /* 00101B */
+  --colors-slate-light-alpha-900: hsla(206, 100%, 5.9%, 0.47058823529411764); /* 00111E */
+  --colors-slate-light-alpha-800: hsla(204.5, 96.1%, 10%, 0.23921568627450981); /* 011E32 */
+  --colors-slate-light-alpha-700: hsla(209.39999999999998, 100%, 10%, 0.1607843137254902); /* 001A33 */
+  --colors-slate-light-alpha-600: hsla(205.70000000000005, 96.6%, 11.4%, 0.12941176470588237); /* 012139 */
+  --colors-slate-light-alpha-500: hsla(215.29999999999995, 92.7%, 10.8%, 0.10196078431372549); /* 021735 */
+  --colors-slate-light-alpha-400: hsla(210.60000000000002, 93%, 11.2%, 0.0784313725490196); /* 021C37 */
+  --colors-slate-light-alpha-300: hsla(209.60000000000002, 100%, 14.3%, 0.050980392156862744); /* 002549 */
+  --colors-slate-light-alpha-200: hsla(210, 87.8%, 16.1%, 0.03137254901960784); /* 05294D */
+  --colors-slate-light-alpha-100: hsla(209.79999999999995, 92.6%, 26.5%, 0.0196078431372549); /* 054482 */
+  --colors-slate-light-1200: 201.8deg 24.4% 8.8%; /* 11181C */
+  --colors-slate-light-1100: 205.7deg 6.3% 43.5%; /* 687076 */
+  --colors-slate-light-1000: 205.7deg 5.7% 52.2%; /* 7E868C */
+  --colors-slate-light-900: 205.7deg 6.3% 56.1%; /* 889096 */
+  --colors-slate-light-800: 205deg 10.7% 78%; /* C1C8CD */
+  --colors-slate-light-700: 210deg 11.1% 85.9%; /* D7DBDF */
+  --colors-slate-light-600: 205.7deg 12.3% 88.8%; /* DFE3E6 */
+  --colors-slate-light-500: 216deg 11.1% 91.2%; /* E6E8EB */
+  --colors-slate-light-400: 210deg 11.8% 93.3%; /* ECEEF0 */
+  --colors-slate-light-300: 210deg 16.7% 95.3%; /* F1F3F5 */
+  --colors-slate-light-200: 210deg 16.7% 97.6%; /* F8F9FA */
+  --colors-slate-light-100: 210deg 33.3% 98.8%; /* FBFCFD */
+  --colors-slate-dark-alpha-1200: hsla(210, 100%, 99.6%, 0.9294117647058824); /* FDFEFF */
+  --colors-slate-dark-alpha-1100: hsla(210, 100%, 96.9%, 0.6196078431372549); /* EFF7FF */
+  --colors-slate-dark-alpha-1000: hsla(210, 100%, 95.3%, 0.47058823529411764); /* E7F3FF */
+  --colors-slate-dark-alpha-900: hsla(208, 100%, 94.1%, 0.4117647058823529); /* E1F1FF */
+  --colors-slate-dark-alpha-800: hsla(208.79999999999995, 92.6%, 94.7%, 0.25882352941176473); /* E5F2FE */
+  --colors-slate-dark-alpha-700: hsla(203.20000000000005, 100%, 93.9%, 0.1803921568627451); /* E0F3FF */
+  --colors-slate-dark-alpha-600: hsla(209, 93.9%, 93.5%, 0.1411764705882353); /* DFEFFE */
+  --colors-slate-dark-alpha-500: hsla(200, 88.2%, 93.3%, 0.10980392156862745); /* DFF3FD */
+  --colors-slate-dark-alpha-400: hsla(208.89999999999998, 87.1%, 93.9%, 0.0784313725490196); /* E2F0FD */
+  --colors-slate-dark-alpha-300: hsla(181.60000000000002, 86.4%, 91.4%, 0.058823529411764705); /* D6FBFC */
+  --colors-slate-dark-alpha-200: hsla(181.39999999999998, 100%, 91.8%, 0.03137254901960784); /* D5FEFF */
+  --colors-slate-dark-alpha-100: hsla(0, 0%, 0%, 0); /* 000000 */
+  --colors-slate-dark-1200: 210deg 5.6% 92.9%; /* ECEDEE */
+  --colors-slate-dark-1100: 207.3deg 5.8% 62.9%; /* 9BA1A6 */
+  --colors-slate-dark-1000: 207.7deg 5.1% 49.6%; /* 787F85 */
+  --colors-slate-dark-900: 205.7deg 6.3% 43.9%; /* 697177 */
+  --colors-slate-dark-800: 206.7deg 5.6% 31.6%; /* 4C5155 */
+  --colors-slate-dark-700: 202.5deg 6.5% 24.3%; /* 3A3F42 */
+  --colors-slate-dark-600: 205.7deg 6.7% 20.6%; /* 313538 */
+  --colors-slate-dark-500: 200deg 6.5% 18%; /* 2B2F31 */
+  --colors-slate-dark-400: 204deg 6.2% 15.9%; /* 26292B */
+  --colors-slate-dark-300: 192deg 7.2% 13.5%; /* 202425 */
+  --colors-slate-dark-200: 195deg 7.1% 11%; /* 1A1D1E */
+  --colors-slate-dark-100: 200deg 6.7% 8.8%; /* 151718 */
+  --colors-gray-light-alpha-1200: hsla(0, 0%, 0%, 0.9098039215686274); /* 000000 */
+  --colors-gray-light-alpha-1100: hsla(0, 0%, 0%, 0.5607843137254902); /* 000000 */
+  --colors-gray-light-alpha-1000: hsla(0, 0%, 0%, 0.47843137254901963); /* 000000 */
+  --colors-gray-light-alpha-900: hsla(0, 0%, 0%, 0.4392156862745098); /* 000000 */
+  --colors-gray-light-alpha-800: hsla(0, 0%, 0%, 0.2196078431372549); /* 000000 */
+  --colors-gray-light-alpha-700: hsla(0, 0%, 0%, 0.1411764705882353); /* 000000 */
+  --colors-gray-light-alpha-600: hsla(0, 0%, 0%, 0.10980392156862745); /* 000000 */
+  --colors-gray-light-alpha-500: hsla(0, 0%, 0%, 0.09019607843137255); /* 000000 */
+  --colors-gray-light-alpha-400: hsla(0, 0%, 0%, 0.07058823529411765); /* 000000 */
+  --colors-gray-light-alpha-300: hsla(0, 0%, 0%, 0.050980392156862744); /* 000000 */
+  --colors-gray-light-alpha-200: hsla(0, 0%, 0%, 0.03137254901960784); /* 000000 */
+  --colors-gray-light-alpha-100: hsla(0, 0%, 0%, 0.011764705882352941); /* 000000 */
+  --colors-gray-light-1200: 0deg 0% 9%; /* 171717 */
+  --colors-gray-light-1100: 0deg 0% 43.5%; /* 6F6F6F */
+  --colors-gray-light-1000: 0deg 0% 52.2%; /* 858585 */
+  --colors-gray-light-900: 0deg 0% 56.1%; /* 8F8F8F */
+  --colors-gray-light-800: 0deg 0% 78%; /* C7C7C7 */
+  --colors-gray-light-700: 0deg 0% 85.9%; /* DBDBDB */
+  --colors-gray-light-600: 0deg 0% 88.6%; /* E2E2E2 */
+  --colors-gray-light-500: 0deg 0% 91%; /* E8E8E8 */
+  --colors-gray-light-400: 0deg 0% 92.9%; /* EDEDED */
+  --colors-gray-light-300: 0deg 0% 95.3%; /* F3F3F3 */
+  --colors-gray-light-200: 0deg 0% 97.3%; /* F8F8F8 */
+  --colors-gray-light-100: 0deg 0% 98.8%; /* FCFCFC */
+  --colors-gray-dark-alpha-1200: hsla(0, 0%, 100%, 0.9215686274509803); /* FFFFFF */
+  --colors-gray-dark-alpha-1100: hsla(0, 0%, 100%, 0.5882352941176471); /* FFFFFF */
+  --colors-gray-dark-alpha-1000: hsla(0, 0%, 100%, 0.45098039215686275); /* FFFFFF */
+  --colors-gray-dark-alpha-900: hsla(0, 0%, 100%, 0.38823529411764707); /* FFFFFF */
+  --colors-gray-dark-alpha-800: hsla(0, 0%, 100%, 0.25098039215686274); /* FFFFFF */
+  --colors-gray-dark-alpha-700: hsla(0, 0%, 100%, 0.16862745098039217); /* FFFFFF */
+  --colors-gray-dark-alpha-600: hsla(0, 0%, 100%, 0.12941176470588237); /* FFFFFF */
+  --colors-gray-dark-alpha-500: hsla(0, 0%, 100%, 0.10196078431372549); /* FFFFFF */
+  --colors-gray-dark-alpha-400: hsla(0, 0%, 100%, 0.0784313725490196); /* FFFFFF */
+  --colors-gray-dark-alpha-300: hsla(0, 0%, 100%, 0.058823529411764705); /* FFFFFF */
+  --colors-gray-dark-alpha-200: hsla(0, 0%, 100%, 0.03137254901960784); /* FFFFFF */
+  --colors-gray-dark-alpha-100: hsla(0, 0%, 0%, 0); /* 000000 */
+  --colors-gray-dark-1200: 0deg 0% 92.9%; /* EDEDED */
+  --colors-gray-dark-1100: 0deg 0% 62.7%; /* A0A0A0 */
+  --colors-gray-dark-1000: 0deg 0% 49.4%; /* 7E7E7E */
+  --colors-gray-dark-900: 0deg 0% 43.9%; /* 707070 */
+  --colors-gray-dark-800: 0deg 0% 31.4%; /* 505050 */
+  --colors-gray-dark-700: 0deg 0% 24.3%; /* 3E3E3E */
+  --colors-gray-dark-600: 0deg 0% 20.4%; /* 343434 */
+  --colors-gray-dark-500: 0deg 0% 18%; /* 2E2E2E */
+  --colors-gray-dark-400: 0deg 0% 15.7%; /* 282828 */
+  --colors-gray-dark-300: 0deg 0% 13.7%; /* 232323 */
+  --colors-gray-dark-200: 0deg 0% 11%; /* 1C1C1C */
+  --colors-gray-dark-100: 0deg 0% 8.6%; /* 161616 */
+  --colors-white: 0deg 0% 100%;
+  --colors-black: 0deg 0% 0%;
+  --border-width-lg: 8px;
+  --border-width-md: 4px;
+  --border-width-sm: 2px;
+  --border-width-xs: 1px;
+  --border-width-none: 0;
+  --border-radius-xs: 2px;
+  --border-radius-xl: 16px;
+  --border-radius-lg: 8px;
+  --border-radius-sm: 4px;
+  --sizing-xs: 4px;
+  --sizing-scale: 1.5px;
+  --spacing-xs: 4px;
+  --spacing-scale: 2px;
+  --panel2: var(--border-radius-sm);
+  --options-icon: var(--icon-md); /* Size of product/dropdown icons icons */
+  --datatable-headericon: var(--icon-sm);
+  --panel: var(--border-radius-xs);
+  --font-sizes-9xl: 128;
+  --font-sizes-8xl: 96;
+  --font-sizes-7xl: 72;
+  --font-sizes-6xl: 60;
+  --font-sizes-xs: 12;
+  --font-sizes-sm: 14;
+  --font-sizes-base: var(--base);
+  --font-sizes-lg: 18;
+  --font-sizes-xl: 20;
+  --font-sizes-2xl: 24;
+  --font-sizes-3xl: 30;
+  --font-sizes-4xl: 36;
+  --font-sizes-5xl: 48;
+  --line-heights-9xl: 128;
+  --line-heights-8xl: 96;
+  --line-heights-7xl: 72;
+  --line-heights-6xl: 60;
+  --line-heights-5xl: 48;
+  --line-heights-4xl: 40;
+  --line-heights-3xl: var(--base) *2.25;
+  --line-heights-2xl: 32;
+  --line-heights-xl: 28;
+  --line-heights-lg: 28;
+  --line-heights-sm: 20;
+  --line-heights-xs: var(--base);
+  --line-heights-base: 24;
+  --border-radius-table-header: var(--border-radius-sm);
+  --sizing-sm: 6px;
+  --spacing-sm: 8px;
+  --sizing-md: 9px;
+  --spacing-md: 16px;
+  --sizing-lg: 13.5px;
+  --spacing-lg: 3var(--spacing-scale);
+  --sizing-xl: 20.25px;
+  --spacing-xl: 64px;
+  --xxl: 128px;
+}

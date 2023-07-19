@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react'
 
 import { useParams } from 'common/hooks'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { useSelectedOrganization, useStore } from 'hooks'
+import { useCheckPermissions, useFlag, useSelectedOrganization, useStore } from 'hooks'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import BillingAddress from './BillingAddress/BillingAddress'
@@ -11,6 +12,8 @@ import CreditBalance from './CreditBalance'
 import PaymentMethods from './PaymentMethods'
 import ProjectsSummary from './ProjectsSummary'
 import TaxID from './TaxID/TaxID'
+import OrganizationBillingMigrationPanel from '../GeneralSettings/OrganizationBillingMigrationPanel'
+import { ScaffoldContainer, ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
 
 const BillingSettings = () => {
   const { ui } = useStore()
@@ -38,6 +41,11 @@ const BillingSettings = () => {
     isCredit && customerBalance !== 0
       ? customerBalance.toString().replace('-', '')
       : customerBalance
+
+  const orgBillingMigrationEnabled = useFlag('orgBillingMigration')
+  const canMigrateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
+  const selectedOrganization = useSelectedOrganization()
+  const { subscription_id } = selectedOrganization ?? {}
 
   const getCustomerProfile = async () => {
     try {
@@ -94,33 +102,34 @@ const BillingSettings = () => {
   }, [slug])
 
   return (
-    <article className="container my-4 max-w-4xl space-y-8">
-      <div className="space-y-8">
-        <ProjectsSummary projects={projects} />
-        <CreditBalance balance={balance} isCredit={isCredit} isDebt={isDebt} />
-        <PaymentMethods
-          loading={isLoadingCustomer || isLoadingPaymentMethods}
-          defaultPaymentMethod={defaultPaymentMethod}
-          paymentMethods={paymentMethods || []}
-          onDefaultMethodUpdated={setCustomer}
-          onPaymentMethodsDeleted={() => getPaymentMethods()}
-          onPaymentMethodAdded={() => getPaymentMethods()}
-        />
+    <ScaffoldContainerLegacy>
+      {orgBillingMigrationEnabled && canMigrateOrganization && !subscription_id && (
+        <OrganizationBillingMigrationPanel />
+      )}
+      <ProjectsSummary projects={projects} />
+      <CreditBalance balance={balance} isCredit={isCredit} isDebt={isDebt} />
+      <PaymentMethods
+        loading={isLoadingCustomer || isLoadingPaymentMethods}
+        defaultPaymentMethod={defaultPaymentMethod}
+        paymentMethods={paymentMethods || []}
+        onDefaultMethodUpdated={setCustomer}
+        onPaymentMethodsDeleted={() => getPaymentMethods()}
+        onPaymentMethodAdded={() => getPaymentMethods()}
+      />
 
-        <BillingEmail />
+      <BillingEmail />
 
-        <BillingAddress
-          loading={isLoadingCustomer}
-          address={customer?.address ?? {}}
-          onAddressUpdated={(address: any) => setCustomer({ ...customer, address })}
-        />
-        <TaxID
-          loading={isLoadingTaxIds}
-          taxIds={taxIds || []}
-          onTaxIdsUpdated={(ids: any) => setTaxIds(ids)}
-        />
-      </div>
-    </article>
+      <BillingAddress
+        loading={isLoadingCustomer}
+        address={customer?.address ?? {}}
+        onAddressUpdated={(address: any) => setCustomer({ ...customer, address })}
+      />
+      <TaxID
+        loading={isLoadingTaxIds}
+        taxIds={taxIds || []}
+        onTaxIdsUpdated={(ids: any) => setTaxIds(ids)}
+      />
+    </ScaffoldContainerLegacy>
   )
 }
 

@@ -6,7 +6,7 @@ import Router, { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 
 import { useParams } from 'common/hooks'
-import SpendCapModal from 'components/interfaces/Billing/SpendCapModal'
+import { SpendCapModal } from 'components/interfaces/BillingV2'
 import {
   EmptyPaymentMethodWarning,
   FreeProjectLimitWarning,
@@ -38,7 +38,18 @@ import {
 } from 'lib/constants'
 import { passwordStrength, pluckObjectFields } from 'lib/helpers'
 import { NextPageWithLayout } from 'types'
-import { Alert, Button, IconHelpCircle, IconInfo, IconUsers, Input, Listbox, Toggle } from 'ui'
+import {
+  Alert,
+  Button,
+  IconExternalLink,
+  IconHelpCircle,
+  IconInfo,
+  IconUsers,
+  Input,
+  Listbox,
+  Toggle,
+} from 'ui'
+import Link from 'next/link'
 
 const Wizard: NextPageWithLayout = () => {
   const router = useRouter()
@@ -91,7 +102,8 @@ const Wizard: NextPageWithLayout = () => {
   const showNonProdFields = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
 
   const freePlanWithExceedingLimits =
-    (isSelectFreeTier || orgSubscription?.plan?.id === 'free') && hasMembersExceedingFreeTierLimit
+    ((isSelectFreeTier && !billedViaOrg) || orgSubscription?.plan?.id === 'free') &&
+    hasMembersExceedingFreeTierLimit
 
   const canCreateProject = isAdmin && !freePlanWithExceedingLimits
 
@@ -132,6 +144,12 @@ const Wizard: NextPageWithLayout = () => {
     const { data: paymentMethods, error } = await get(`${API_URL}/organizations/${slug}/payments`)
     if (!error) {
       setPaymentMethods(paymentMethods)
+    } else {
+      ui.setNotification({
+        error,
+        category: 'error',
+        message: `Failed to retrieve payment methods: ${error.message}`,
+      })
     }
   }
 
@@ -215,6 +233,7 @@ const Wizard: NextPageWithLayout = () => {
     if (response.error) {
       setNewProjectLoading(false)
       ui.setNotification({
+        error: response.error,
         category: 'error',
         message: `Failed to create new project: ${response.error.message}`,
       })
@@ -318,24 +337,6 @@ const Wizard: NextPageWithLayout = () => {
                     </Listbox.Option>
                   ))}
                 </Listbox>
-              )}
-
-              {billedViaOrg && (
-                <InformationBox
-                  icon={<IconInfo size="large" strokeWidth={1.5} />}
-                  defaultVisibility={true}
-                  hideCollapse
-                  title="Billed via organization"
-                  description={
-                    <div className="space-y-3">
-                      <p className="text-sm leading-normal">
-                        This is heavy Work-In-Progress and not customer facing yet, use with
-                        caution! This organization uses the new org level billing, instead of having
-                        individual subscriptions per project.
-                      </p>
-                    </div>
-                  }
-                />
               )}
 
               {!isAdmin && <NotOrganizationOwnerWarning />}
@@ -473,6 +474,43 @@ const Wizard: NextPageWithLayout = () => {
               </>
             )}
 
+            {billedViaOrg && (
+              <Panel.Content>
+                <InformationBox
+                  icon={<IconInfo size="large" strokeWidth={1.5} />}
+                  defaultVisibility={true}
+                  hideCollapse
+                  title="Billed via organization"
+                  description={
+                    <div className="space-y-3">
+                      <p className="text-sm leading-normal">
+                        This organization uses organization level billing and is on the{' '}
+                        <span className="text-brand-900">{orgSubscription?.plan?.name} plan</span>.
+                      </p>
+
+                      {orgSubscription?.plan?.id !== 'free' && (
+                        <p>
+                          Your plan comes with $10 of Compute Credits. Launching another project
+                          incurs additional compute costs - if you exhaust your Compute Credits, the
+                          additional compute hours result in additional usage charges.
+                        </p>
+                      )}
+
+                      <div>
+                        <Link href="https://www.notion.so/supabase/Organization-Level-Billing-9c159d69375b4af095f0b67881276582?pvs=4">
+                          <a target="_blank" rel="noreferrer">
+                            <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                              Documentation
+                            </Button>
+                          </a>
+                        </Link>
+                      </div>
+                    </div>
+                  }
+                />
+              </Panel.Content>
+            )}
+
             {isAdmin && (
               <Panel.Content>
                 {!billedViaOrg && (
@@ -519,8 +557,14 @@ const Wizard: NextPageWithLayout = () => {
                   </Listbox>
                 )}
 
-                {freePlanWithExceedingLimits && (
-                  <FreeProjectLimitWarning membersExceededLimit={membersExceededLimit || []} />
+                {freePlanWithExceedingLimits && slug && (
+                  <div className={billedViaOrg ? '' : 'mt-4'}>
+                    <FreeProjectLimitWarning
+                      membersExceededLimit={membersExceededLimit || []}
+                      orgLevelBilling={billedViaOrg}
+                      orgSlug={slug}
+                    />
+                  </div>
                 )}
 
                 {!billedViaOrg && !isSelectFreeTier && isEmptyPaymentMethod && (
@@ -529,7 +573,7 @@ const Wizard: NextPageWithLayout = () => {
               </Panel.Content>
             )}
 
-            {!isSelectFreeTier && (
+            {!billedViaOrg && !isSelectFreeTier && (
               <>
                 <Panel.Content className="border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
                   <Toggle

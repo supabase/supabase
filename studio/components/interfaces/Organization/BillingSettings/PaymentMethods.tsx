@@ -14,10 +14,10 @@ import {
   Modal,
 } from 'ui'
 
-import { AddNewPaymentMethodModal } from 'components/interfaces/Billing'
+import { AddNewPaymentMethodModal } from 'components/interfaces/BillingV2'
 import NoPermission from 'components/ui/NoPermission'
 import Panel from 'components/ui/Panel'
-import { checkPermissions, useSelectedOrganization, useStore } from 'hooks'
+import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
 import { delete_, patch } from 'lib/common/fetch'
 import { API_URL, BASE_PATH } from 'lib/constants'
 import { getURL } from 'lib/helpers'
@@ -48,11 +48,11 @@ const PaymentMethods = ({
   const [showAddPaymentMethodModal, setShowAddPaymentMethodModal] = useState(false)
   const [isUpdatingPaymentMethod, setIsUpdatingPaymentMethod] = useState(false)
 
-  const canReadPaymentMethods = checkPermissions(
+  const canReadPaymentMethods = useCheckPermissions(
     PermissionAction.BILLING_READ,
     'stripe.payment_methods'
   )
-  const canUpdatePaymentMethods = checkPermissions(
+  const canUpdatePaymentMethods = useCheckPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.payment_methods'
   )

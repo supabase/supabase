@@ -10,10 +10,14 @@ import { useMemo } from 'react'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { Alert, Button, IconChevronRight, IconExternalLink } from 'ui'
 import { getAddons } from '../Subscription.utils'
-import ComputeInstanceSidePanel from './ComputeInstanceSidePanel'
-import CustomDomainSidePanel from './CustomDomainSidePanel'
-import PITRSidePanel from './PITRSidePanel'
+import {
+  ComputeInstanceSidePanel,
+  CustomDomainSidePanel,
+  PITRSidePanel,
+} from 'components/interfaces/Settings/Addons'
 import ProjectUpdateDisabledTooltip from '../../ProjectUpdateDisabledTooltip'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 
 export interface AddOnsProps {}
 
@@ -22,6 +26,9 @@ const AddOns = ({}: AddOnsProps) => {
   const snap = useSubscriptionPageStateSnapshot()
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
   const { isDarkMode } = useTheme()
+
+  const { project: selectedProject } = useProjectContext()
+  const cpuArchitecture = getCloudProviderArchitecture(selectedProject?.cloud_provider)
 
   // [Joshen] We could possibly look into reducing the interval to be more "realtime"
   // I tried setting the interval to 1m but no data was returned, may need to experiment
@@ -212,7 +219,7 @@ const AddOns = ({}: AddOnsProps) => {
                       </a>
                     </Link>
                     <p className="text-sm">
-                      {computeInstance?.variant?.meta?.cpu_cores ?? 2}-core ARM{' '}
+                      {computeInstance?.variant?.meta?.cpu_cores ?? 2}-core {cpuArchitecture}{' '}
                       {computeInstance?.variant?.meta?.cpu_dedicated ? '(Dedicated)' : '(Shared)'}
                     </p>
                   </div>

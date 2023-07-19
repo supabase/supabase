@@ -9,7 +9,7 @@ version: "3.8"
 services:
   studio:
     container_name: supabase-studio
-    image: supabase/studio:20230622-d8395eb
+    image: supabase/studio:v0.23.06
     restart: unless-stopped
     healthcheck:
       test:
@@ -115,7 +115,7 @@ services:
 
   rest:
     container_name: supabase-rest
-    image: postgrest/postgrest:v10.1.2
+    image: postgrest/postgrest:v11.1.0
     depends_on:
       db:
         # Disable this if you are using an external Postgres database

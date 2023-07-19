@@ -11,7 +11,7 @@ import { DatabaseLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import NoPermission from 'components/ui/NoPermission'
-import { checkPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { NextPageWithLayout } from 'types'
@@ -30,12 +30,12 @@ const HooksPage: NextPageWithLayout = () => {
   const [showDeleteHookForm, setShowDeleteHookForm] = useState<boolean>(false)
 
   const isHooksEnabled = schemas.some((schema: any) => schema.name === 'supabase_functions')
-  const canReadWebhooks = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'triggers')
-  const canCreateWebhooks = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'triggers')
+  const canReadWebhooks = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'triggers')
+  const canCreateWebhooks = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'triggers')
 
   useEffect(() => {
-    if (project?.ref) meta.hooks.load()
-  }, [project?.ref])
+    if (ui.selectedProjectRef) meta.hooks.load()
+  }, [ui.selectedProjectRef])
 
   const enableHooksForProject = async () => {
     const res = await post(`${API_URL}/database/${ref}/hook-enable`, {})
