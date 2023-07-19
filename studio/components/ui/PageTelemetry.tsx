@@ -4,9 +4,9 @@ import { post } from 'lib/common/fetch'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
-import { FC, useEffect } from 'react'
+import { PropsWithChildren, useEffect } from 'react'
 
-const PageTelemetry: FC = ({ children }) => {
+const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
   const router = useRouter()
   const { ref } = useParams()
   const telemetryProps = useTelemetryProps()
