@@ -45,18 +45,11 @@ const OrganizationDropdown = () => {
               )
             })}
           <Dropdown.Separator />
-          <Link href="/new">
+          <Link href={orgCreationV2 ? `/new-with-subscription` : `/new`}>
             <a>
               <Dropdown.Item icon={<IconPlus size="tiny" />}>New organization</Dropdown.Item>
             </a>
           </Link>
-          {orgCreationV2 && (
-            <Link href="/new-with-subscription">
-              <a>
-                <Dropdown.Item icon={<IconPlus size="tiny" />}>New organization V2</Dropdown.Item>
-              </a>
-            </Link>
-          )}
         </>
       }
     >
