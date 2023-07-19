@@ -115,5 +115,9 @@ export async function constructHeaders(requestId: string, optionHeaders?: { [pro
 }
 
 export function isResponseOk<T>(response: SupaResponse<T> | undefined): response is T {
-  return response !== undefined && !(typeof response === 'object' && 'error' in response)
+  return (
+    response !== undefined &&
+    response !== null &&
+    !(typeof response === 'object' && 'error' in response)
+  )
 }
