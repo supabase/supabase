@@ -3356,13 +3356,13 @@ functions:
     notes: |
       Returns all Realtime channels.
     examples:
-        - id: get-all-channels
-          name: Get all channels
-          isSpotlight: true
-          code: |
-            ```kotlin
-            val channels = client.realtime.subscriptions.entries
-            ```
+      - id: get-all-channels
+        name: Get all channels
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val channels = client.realtime.subscriptions.entries
+          ```
   - id: list-buckets
     title: listBuckets()
     $ref: '@supabase/storage-js.packages/StorageBucketApi.default.listBuckets'
