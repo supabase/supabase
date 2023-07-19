@@ -1,6 +1,5 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { post } from 'lib/common/fetch'
-import { ResponseFailure } from 'types'
+import { isResponseOk, post } from 'lib/common/fetch'
 import { aiKeys } from './keys'
 
 export type SqlEditResponse = {
@@ -13,11 +12,9 @@ export type SqlEditVariables = {
 }
 
 export async function editSql({ prompt, sql }: SqlEditVariables) {
-  const response = (await post<SqlEditResponse>('/api/ai/sql/edit', { prompt, sql })) as
-    | SqlEditResponse
-    | ResponseFailure
+  const response = await post<SqlEditResponse>('/api/ai/sql/edit', { prompt, sql })
 
-  if ('error' in response) {
+  if (!isResponseOk(response)) {
     throw response.error
   }
 
