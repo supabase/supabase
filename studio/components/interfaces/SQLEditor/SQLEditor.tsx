@@ -2,7 +2,7 @@ import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useSqlEditMutation } from 'data/ai/sql-edit-mutation'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
-import { m } from 'framer-motion'
+import { AnimatePresence, m } from 'framer-motion'
 import { useLocalStorage, useStore } from 'hooks'
 import useLatest from 'hooks/misc/useLatest'
 import dynamic from 'next/dynamic'
@@ -19,7 +19,7 @@ import {
 import Split from 'react-split'
 import { format } from 'sql-formatter'
 import { getSqlEditorStateSnapshot, useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { AiIcon, Button, IconCheck, IconCornerDownLeft, IconX, Input, cn } from 'ui'
+import { AiIcon, Button, IconCheck, IconCornerDownLeft, IconX, Input } from 'ui'
 import type { IStandaloneCodeEditor } from './MonacoEditor'
 import { sqlAiDisclaimerComment } from './SQLEditor.constants'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
@@ -210,185 +210,200 @@ const SQLEditor = () => {
       }}
     >
       <div className="flex h-full flex-col">
-        {!isEditSqlLoading ? (
-          <m.div
-            key="ask-ai-input"
-            layoutId="ask-ai-input"
-            initial={{
-              scaleY: 1,
+        <m.div
+          key="ask-ai-input-container"
+          layoutId="ask-ai-input-container"
+          variants={{
+            visible: {
               borderRadius: 0,
-            }}
-            animate={{
-              scaleY: 1,
-              borderRadius: 0,
-            }}
-            className="w-full flex justify-center z-[1000] mt-0.5 bg-brand-400"
-          >
-            <Input
-              autoFocus
-              size="xlarge"
-              value={aiInput}
-              onChange={(e) => setAiInput(e.currentTarget.value)}
-              disabled={isDiffOpen}
-              inputRef={inputRef}
-              icon={
-                <div className="h-full flex flex-row gap-3 items-center">
-                  <m.div
-                    key="ask-ai-input-icon"
-                    layoutId="ask-ai-input-icon"
-                    className="ml-1"
-                    initial={{
-                      scale: 1,
-                    }}
-                    animate={{
-                      scale: 1,
-                    }}
-                  >
-                    <AiIcon className="w-4 h-4" />
-                  </m.div>
+            },
+          }}
+          initial="visible"
+          animate="visible"
+          className="w-full flex justify-center z-10 mt-0.5 bg-brand-400"
+        >
+          <AnimatePresence initial={false} exitBeforeEnter>
+            {!isEditSqlLoading ? (
+              <m.div
+                key="ask-ai-input"
+                className="w-full"
+                variants={{
+                  visible: {
+                    opacity: 1,
+                    y: 0,
+                  },
+                  hidden: {
+                    opacity: 0,
+                    y: -25,
+                  },
+                }}
+                initial="hidden"
+                animate="visible"
+                exit="hidden"
+                transition={{
+                  duration: 0.1,
+                }}
+              >
+                <Input
+                  autoFocus
+                  size="xlarge"
+                  value={aiInput}
+                  onChange={(e) => setAiInput(e.currentTarget.value)}
+                  disabled={isDiffOpen}
+                  inputRef={inputRef}
+                  icon={
+                    <div className="h-full flex flex-row gap-3 items-center">
+                      <m.div layoutId="ask-ai-input-icon" className="ml-1">
+                        <AiIcon className="w-4 h-4" />
+                      </m.div>
 
-                  {debugSolution && (
-                    <div className="h-full w-full flex flex-row items-center overflow-y-hidden mr-[16.5rem] text-sm text-white">
-                      {debugSolution}
+                      {debugSolution && (
+                        <div className="h-full w-full flex flex-row items-center overflow-y-hidden mr-[16.5rem] text-sm text-white">
+                          {debugSolution}
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-              }
-              inputClassName="w-full !border-brand-900 border-none bg-transparent py-4 focus:!ring-0 placeholder:text-scale-900"
-              iconContainerClassName="transition text-scale-800 text-brand-900"
-              placeholder={!debugSolution ? 'Ask Supabase AI to modify your query' : ''}
-              className="w-full"
-              actions={
-                <div className="flex flex-row items-center gap-2 space-x-1 mr-6">
-                  {isDiffOpen ? (
-                    <>
-                      <Button
-                        type="primary"
-                        size="tiny"
-                        icon={<IconCheck />}
-                        iconRight={
-                          <div className="opacity-30">
-                            <IconCornerDownLeft size={12} strokeWidth={1.5} />
-                          </div>
-                        }
-                        onClick={acceptAiHandler}
-                      >
-                        Accept
-                      </Button>
-                      <Button
-                        type="alternative"
-                        size="tiny"
-                        icon={<IconX />}
-                        iconRight={<span className="opacity-30">ESC</span>}
-                        onClick={discardAiHandler}
-                      >
-                        Discard
-                      </Button>
-                    </>
-                  ) : (
-                    <IconCornerDownLeft size={16} strokeWidth={1.5} />
-                  )}
-                </div>
-              }
-              onKeyPress={async (e) => {
-                if (e.key === 'Enter') {
-                  try {
-                    const prompt = e.currentTarget.value
-
-                    if (!prompt) {
-                      return
-                    }
-
-                    const sql = editorRef.current?.getValue()
-
-                    if (!sql) {
-                      return
-                    }
-
-                    const { sql: modifiedSql } = await editSql({
-                      prompt,
-                      sql: sql.replace(sqlAiDisclaimerComment, '').trim(),
-                    })
-
-                    const formattedSql =
-                      sqlAiDisclaimerComment +
-                      '\n\n' +
-                      format(modifiedSql, {
-                        language: 'postgresql',
-                        keywordCase: 'lower',
-                      })
-
-                    // TODO: show error
-                    if (formattedSql.trim() === sql.trim()) {
-                      return
-                    }
-
-                    setSqlDiff({
-                      original: sql,
-                      modified: formattedSql,
-                    })
-                  } catch (error: unknown) {
-                    if (
-                      error &&
-                      typeof error === 'object' &&
-                      'message' in error &&
-                      typeof error.message === 'string'
-                    ) {
-                      ui.setNotification({
-                        category: 'error',
-                        message: error.message,
-                      })
-                    }
                   }
-                }
-              }}
-            />
-          </m.div>
-        ) : (
-          <m.div
-            key="ask-ai-loading"
-            layoutId="ask-ai-input"
-            className="w-full flex flex-row gap-2 items-center justify-center mt-0.5 bg-brand-400 p-4 text-md"
-            transition={{
-              type: 'spring',
-              mass: 0.1,
-              stiffness: 200,
-              damping: 30,
-            }}
-          >
-            <m.div
-              key="ask-ai-loading-icon"
-              layoutId="ask-ai-input-icon"
-              className="text-brand-900"
-              animate={{
-                scale: [0.9, 1.1, 0.9],
-                transition: {
-                  delay: 0.2,
-                  ease: 'linear',
-                  duration: 2,
-                  repeat: Infinity,
-                },
-              }}
-            >
-              <AiIcon className="w-4 h-4" />
-            </m.div>
-            <m.span
-              initial={{
-                opacity: 0,
-                y: 20,
-              }}
-              animate={{
-                opacity: 0.5,
-                y: 0,
-              }}
-              transition={{
-                ease: 'circOut',
-              }}
-            >
-              Thinking...
-            </m.span>
-          </m.div>
-        )}
+                  inputClassName="w-full !border-brand-900 border-none bg-transparent !shadow-none py-4 focus:!ring-0 placeholder:text-scale-900"
+                  iconContainerClassName="transition text-scale-800 text-brand-900"
+                  placeholder={!debugSolution ? 'Ask Supabase AI to modify your query' : ''}
+                  className="w-full"
+                  actions={
+                    <div className="flex flex-row items-center gap-2 space-x-1 mr-6">
+                      {isDiffOpen ? (
+                        <>
+                          <Button
+                            type="primary"
+                            size="tiny"
+                            icon={<IconCheck />}
+                            iconRight={
+                              <div className="opacity-30">
+                                <IconCornerDownLeft size={12} strokeWidth={1.5} />
+                              </div>
+                            }
+                            onClick={acceptAiHandler}
+                          >
+                            Accept
+                          </Button>
+                          <Button
+                            type="alternative"
+                            size="tiny"
+                            icon={<IconX />}
+                            iconRight={<span className="opacity-30">ESC</span>}
+                            onClick={discardAiHandler}
+                          >
+                            Discard
+                          </Button>
+                        </>
+                      ) : (
+                        <IconCornerDownLeft size={16} strokeWidth={1.5} />
+                      )}
+                    </div>
+                  }
+                  onKeyPress={async (e) => {
+                    if (e.key === 'Enter') {
+                      try {
+                        const prompt = e.currentTarget.value
+
+                        if (!prompt) {
+                          return
+                        }
+
+                        const sql = editorRef.current?.getValue()
+
+                        if (!sql) {
+                          return
+                        }
+
+                        const { sql: modifiedSql } = await editSql({
+                          prompt,
+                          sql: sql.replace(sqlAiDisclaimerComment, '').trim(),
+                        })
+
+                        const formattedSql =
+                          sqlAiDisclaimerComment +
+                          '\n\n' +
+                          format(modifiedSql, {
+                            language: 'postgresql',
+                            keywordCase: 'lower',
+                          })
+
+                        // TODO: show error
+                        if (formattedSql.trim() === sql.trim()) {
+                          return
+                        }
+
+                        setSqlDiff({
+                          original: sql,
+                          modified: formattedSql,
+                        })
+                      } catch (error: unknown) {
+                        if (
+                          error &&
+                          typeof error === 'object' &&
+                          'message' in error &&
+                          typeof error.message === 'string'
+                        ) {
+                          ui.setNotification({
+                            category: 'error',
+                            message: error.message,
+                          })
+                        }
+                      }
+                    }
+                  }}
+                />
+              </m.div>
+            ) : (
+              <m.div
+                key="ask-ai-loading"
+                className="p-4 flex flex-row gap-2 items-center w-full"
+                variants={{
+                  visible: {
+                    opacity: 1,
+                    y: 0,
+                  },
+                  hidden: {
+                    opacity: 0,
+                    y: 25,
+                  },
+                }}
+                transition={{
+                  duration: 0.2,
+                }}
+                initial="hidden"
+                animate="visible"
+                exit="hidden"
+              >
+                <m.div
+                  className="text-brand-900"
+                  animate={{
+                    scale: [0.9, 1.1, 0.9],
+                    transition: {
+                      ease: 'linear',
+                      duration: 2,
+                      repeat: Infinity,
+                    },
+                  }}
+                >
+                  <AiIcon className="w-4 h-4" />
+                </m.div>
+                <m.span
+                  animate={{
+                    opacity: ['0.5', '0.75', '0.5'],
+                    transition: {
+                      ease: 'linear',
+                      duration: 2,
+                      repeat: Infinity,
+                    },
+                  }}
+                >
+                  Thinking...
+                </m.span>
+              </m.div>
+            )}
+          </AnimatePresence>
+        </m.div>
         <Split
           style={{ height: '100%' }}
           direction="vertical"
@@ -402,36 +417,26 @@ const SQLEditor = () => {
           collapsed={isUtilityPanelCollapsed ? 1 : undefined}
           onDragEnd={onDragEnd}
         >
-          <m.div
-            className="dark:border-dark flex-grow overflow-y-auto border-b"
-            initial={{
-              opacity: 0,
-              filter: 'blur(10px)',
-            }}
-            animate={{
-              opacity: 1,
-              filter: 'blur(0px)',
-            }}
-            transition={{
-              duration: 0.3,
-            }}
-          >
+          <div className="dark:border-dark flex-grow overflow-y-auto border-b">
             {isLoading ? (
               <div className="flex h-full w-full items-center justify-center">Loading...</div>
             ) : (
               <>
                 {isDiffOpen && (
                   <m.div
-                    key="diff-editor"
                     className="w-full h-full"
-                    initial={{
-                      opacity: 0,
-                      filter: 'blur(10px)',
+                    variants={{
+                      visible: {
+                        opacity: 1,
+                        filter: 'blur(0px)',
+                      },
+                      hidden: {
+                        opacity: 0,
+                        filter: 'blur(10px)',
+                      },
                     }}
-                    animate={{
-                      opacity: 1,
-                      filter: 'blur(0px)',
-                    }}
+                    initial="hidden"
+                    animate="visible"
                   >
                     <DiffEditor
                       theme="supabase"
@@ -444,10 +449,21 @@ const SQLEditor = () => {
                     />
                   </m.div>
                 )}
-
                 <m.div
-                  key="monaco-editor"
-                  className={cn('w-full', 'h-full', isDiffOpen && 'invisible')}
+                  key={id}
+                  variants={{
+                    visible: {
+                      opacity: 1,
+                      filter: 'blur(0px)',
+                    },
+                    hidden: {
+                      opacity: 0,
+                      filter: 'blur(10px)',
+                    },
+                  }}
+                  initial="hidden"
+                  animate={isDiffOpen ? 'hidden' : 'visible'}
+                  className="w-full h-full"
                 >
                   <MonacoEditor
                     id={id}
@@ -461,7 +477,7 @@ const SQLEditor = () => {
                 </m.div>
               </>
             )}
-          </m.div>
+          </div>
           <div className="flex flex-col">
             {isLoading ? (
               <div className="flex h-full w-full items-center justify-center">Loading...</div>

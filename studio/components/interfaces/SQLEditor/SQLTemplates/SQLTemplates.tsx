@@ -65,27 +65,41 @@ const SQLTemplates = observer(() => {
       <div className="mt-32 mb-32 flex flex-col items-center">
         <m.h1
           className="text-scale-1200 mb-8 text-3xl"
-          initial={{ y: 10, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
+          variants={{
+            visible: {
+              y: 0,
+              opacity: 1,
+            },
+            hidden: {
+              y: 10,
+              opacity: 0,
+            },
+          }}
+          initial="hidden"
+          animate="visible"
         >
           What do you want to build?
         </m.h1>
         <div className="w-full flex justify-center">
           {!isSqlGenerateLoading ? (
             <m.div
-              key="ask-ai-input"
-              layoutId="ask-ai-input"
+              key="ask-ai-input-container"
+              layoutId="ask-ai-input-container"
               className="w-full max-w-2xl border border-brand-900"
-              initial={{
-                y: -50,
-                opacity: 0,
-                borderRadius: 6,
+              variants={{
+                visible: {
+                  y: 0,
+                  opacity: 1,
+                  borderRadius: 6,
+                },
+                hidden: {
+                  y: -50,
+                  opacity: 0,
+                  borderRadius: 6,
+                },
               }}
-              animate={{
-                y: 0,
-                opacity: 1,
-                borderRadius: 6,
-              }}
+              initial="hidden"
+              animate="visible"
             >
               <Input
                 size="xlarge"
@@ -99,12 +113,13 @@ const SQLTemplates = observer(() => {
                     key="ask-ai-input-icon"
                     layoutId="ask-ai-input-icon"
                     className="ml-1"
-                    initial={{
-                      rotate: 0,
+                    variants={{
+                      visible: {
+                        rotate: 0,
+                      },
                     }}
-                    animate={{
-                      rotate: 0,
-                    }}
+                    initial="visible"
+                    animate="visible"
                   >
                     <AiIcon className="w-4 h-4" />
                   </m.div>
@@ -158,13 +173,12 @@ const SQLTemplates = observer(() => {
           ) : (
             <m.div
               key="ask-ai-loading"
-              layoutId="ask-ai-input"
+              layoutId="ask-ai-input-container"
               className="p-5 border border-brand-900 text-brand-900"
-              initial={{
-                borderRadius: 50,
-              }}
-              animate={{
-                borderRadius: 50,
+              variants={{
+                visible: {
+                  borderRadius: 50,
+                },
               }}
               transition={{
                 type: 'spring',
@@ -172,6 +186,8 @@ const SQLTemplates = observer(() => {
                 stiffness: 200,
                 damping: 30,
               }}
+              initial="visible"
+              animate="visible"
             >
               <m.div
                 key="ask-ai-loading-icon"
