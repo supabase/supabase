@@ -34,10 +34,10 @@ const SettingsLayout: FC<Props> = ({ title, children }) => {
   )
 
   useEffect(() => {
-    if (project?.ref) {
+    if (ui.selectedProjectRef) {
       meta.extensions.load()
     }
-  }, [project?.ref])
+  }, [ui.selectedProjectRef])
 
   return (
     <ProjectLayout

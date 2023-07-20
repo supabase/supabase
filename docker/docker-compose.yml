@@ -9,7 +9,7 @@ version: "3.8"
 services:
   studio:
     container_name: supabase-studio
-    image: supabase/studio:20230621-7a24ddd
+    image: supabase/studio:v0.23.06
     restart: unless-stopped
     healthcheck:
       test:
@@ -40,24 +40,20 @@ services:
     container_name: supabase-kong
     image: kong:2.8.1
     restart: unless-stopped
-    # https://unix.stackexchange.com/a/294837
-    entrypoint: bash -c 'eval "echo \"$(cat ~/temp.yml)\"" > ~/kong.yml && /docker-entrypoint.sh kong docker-start'
     ports:
       - ${KONG_HTTP_PORT}:8000/tcp
       - ${KONG_HTTPS_PORT}:8443/tcp
     environment:
       KONG_DATABASE: "off"
-      KONG_DECLARATIVE_CONFIG: /home/kong/kong.yml
+      KONG_DECLARATIVE_CONFIG: /var/lib/kong/kong.yml
       # https://github.com/supabase/cli/issues/14
       KONG_DNS_ORDER: LAST,A,CNAME
       KONG_PLUGINS: request-transformer,cors,key-auth,acl
       KONG_NGINX_PROXY_PROXY_BUFFER_SIZE: 160k
       KONG_NGINX_PROXY_PROXY_BUFFERS: 64 160k
-      SUPABASE_ANON_KEY: ${ANON_KEY}
-      SUPABASE_SERVICE_KEY: ${SERVICE_ROLE_KEY}
     volumes:
       # https://github.com/supabase/supabase/issues/12661
-      - ./volumes/api/kong.yml:/home/kong/temp.yml:ro
+      - ./volumes/api/kong.yml:/var/lib/kong/kong.yml:ro
 
   auth:
     container_name: supabase-auth
@@ -119,7 +115,7 @@ services:
 
   rest:
     container_name: supabase-rest
-    image: postgrest/postgrest:v10.1.2
+    image: postgrest/postgrest:v11.1.0
     depends_on:
       db:
         # Disable this if you are using an external Postgres database

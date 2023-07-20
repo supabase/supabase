@@ -30,7 +30,6 @@ const PlanUpdateSidePanel = () => {
   const selectedOrganization = useSelectedOrganization()
   const slug = selectedOrganization?.slug
 
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const [showExitSurvey, setShowExitSurvey] = useState(false)
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>()
   const [showDowngradeError, setShowDowngradeError] = useState(false)
@@ -48,7 +47,26 @@ const PlanUpdateSidePanel = () => {
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: slug })
   const { data: plans, isLoading: isLoadingPlans } = useOrgPlansQuery({ orgSlug: slug })
   const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery({ slug })
-  const { mutateAsync: updateOrgSubscription } = useOrgSubscriptionUpdateMutation()
+  const { mutate: updateOrgSubscription, isLoading: isUpdating } = useOrgSubscriptionUpdateMutation(
+    {
+      onSuccess: () => {
+        ui.setNotification({
+          category: 'success',
+          message: `Successfully updated subscription to ${subscriptionPlanMeta?.name}!`,
+        })
+        setSelectedTier(undefined)
+        onClose()
+        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
+      },
+      onError: (error) => {
+        ui.setNotification({
+          error,
+          category: 'error',
+          message: `Unable to update subscription: ${error.message}`,
+        })
+      },
+    }
+  )
 
   const availablePlans = plans ?? []
   const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
@@ -92,29 +110,7 @@ const PlanUpdateSidePanel = () => {
       return ui.setNotification({ category: 'error', message: 'Please select a payment method' })
     }
 
-    try {
-      setIsSubmitting(true)
-      await updateOrgSubscription({
-        slug,
-        tier: selectedTier,
-        paymentMethod: selectedPaymentMethod,
-      })
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully updated subscription to ${subscriptionPlanMeta?.name}!`,
-      })
-      setSelectedTier(undefined)
-      onClose()
-      window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
-    } catch (error: any) {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Unable to update subscription: ${error.message}`,
-      })
-    } finally {
-      setIsSubmitting(false)
-    }
+    updateOrgSubscription({ slug, tier: selectedTier, paymentMethod: selectedPaymentMethod })
   }
 
   return (
@@ -183,7 +179,7 @@ const PlanUpdateSidePanel = () => {
                       ) : (
                         <p className="text-scale-1200 text-lg">${price}</p>
                       )}
-                      <p className="text-scale-1000 text-sm">{tierMeta?.costUnit}</p>
+                      <p className="text-scale-1000 text-sm">{tierMeta?.costUnitOrg}</p>
                     </div>
                     <div className={clsx('flex mt-1 mb-4', !tierMeta?.warning && 'opacity-0')}>
                       <div className="bg-scale-200 text-brand-1100 border shadow-sm rounded-md bg-opacity-30 py-0.5 px-2 text-xs">
@@ -201,10 +197,8 @@ const PlanUpdateSidePanel = () => {
                             <Button
                               block
                               disabled={
-                                // no self-serve downgrades from team plan right now
-                                (plan.id !== PRICING_TIER_PRODUCT_IDS.TEAM &&
-                                  ['enterprise'].includes(subscription?.plan?.id || '')) ||
-                                !canUpdateSubscription
+                                // No self-serve downgrades from Enterprise
+                                subscription?.plan?.id === 'enterprise' || !canUpdateSubscription
                               }
                               type={isDowngradeOption ? 'default' : 'primary'}
                               onClick={() => {
@@ -252,7 +246,7 @@ const PlanUpdateSidePanel = () => {
                     <div className="border-t my-6" />
 
                     <ul role="list">
-                      {plan.features.map((feature) => (
+                      {(plan.featuresOrg || plan.features).map((feature) => (
                         <li key={feature} className="flex py-2">
                           <div className="w-[12px]">
                             <IconCheck
@@ -288,7 +282,7 @@ const PlanUpdateSidePanel = () => {
       />
 
       <Modal
-        loading={isSubmitting}
+        loading={isUpdating}
         alignFooter="right"
         className="!w-[450px]"
         visible={selectedTier !== undefined && selectedTier !== 'tier_free'}
