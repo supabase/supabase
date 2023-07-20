@@ -19,21 +19,21 @@
   <title>Continuous PostgreSQL Backups using WAL-G</title>
   <link>https://supabase.com/blog/continuous-postgresql-backup-walg</link>
   <description>Have you ever wanted to restore your database&apos;s state to a particular moment in time? This post explains how, using WAL-G.</description>
-  <pubDate>Sat, 01 Aug 2020 23:00:00 GMT</pubDate>
+  <pubDate>Sat, 01 Aug 2020 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/postgresql-templates</guid>
   <title>What are PostgreSQL Templates?</title>
   <link>https://supabase.com/blog/postgresql-templates</link>
   <description>What are PostgreSQL templates and what are they used for?</description>
-  <pubDate>Wed, 08 Jul 2020 23:00:00 GMT</pubDate>
+  <pubDate>Wed, 08 Jul 2020 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/postgresql-physical-logical-backups</guid>
   <title>Physical vs Logical Backups in PostgreSQL</title>
   <link>https://supabase.com/blog/postgresql-physical-logical-backups</link>
   <description>What are physical and logical backups in Postgres?</description>
-  <pubDate>Mon, 06 Jul 2020 23:00:00 GMT</pubDate>
+  <pubDate>Mon, 06 Jul 2020 22:00:00 GMT</pubDate>
 </item>
 
     </channel>

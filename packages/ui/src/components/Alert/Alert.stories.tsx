@@ -1,6 +1,6 @@
 import React from 'react'
 
-import Alert, { AlertProps } from './Alert'
+import { Alert, AlertProps } from './Alert'
 
 export default {
   title: 'Displays/Alerts',

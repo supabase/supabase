@@ -149,7 +149,7 @@ class VercelIntegrationStore implements IVercelIntegrationStore {
       await this.getVercelProjects()
       this.loading = false
     } else {
-      toast.error('Retrieve vercel token failed')
+      toast.error(`Failed to retrieve Vercel token: ${response.error.message}`)
       this.loading = false
     }
   }
@@ -337,7 +337,7 @@ const ProjectLinks: FC = observer(() => {
           runInAction(() => {
             item.result = {
               status: 'fail',
-              message: 'Error: validate Vercel project envs fails',
+              message: 'Error: Failed to validate Vercel project envs',
             }
           })
           continue
@@ -348,7 +348,7 @@ const ProjectLinks: FC = observer(() => {
           runInAction(() => {
             item.result = {
               status: 'fail',
-              message: 'Error: this Vercel project already contains Supabase envs',
+              message: 'Error: This Vercel project already contains Supabase envs',
             }
           })
           continue
@@ -360,7 +360,7 @@ const ProjectLinks: FC = observer(() => {
           runInAction(() => {
             item.result = {
               status: 'fail',
-              message: 'Error: fetch Supabase project details fails',
+              message: 'Error: Failed to fetch Supabase project details',
             }
           })
           continue

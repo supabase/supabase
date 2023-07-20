@@ -1,26 +1,27 @@
-import { useState } from 'react'
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { observer } from 'mobx-react-lite'
-import * as Tooltip from '@radix-ui/react-tooltip'
-import { Button, Menu, Alert, IconEdit } from 'ui'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useState } from 'react'
+import { Alert, Button, IconEdit, Menu } from 'ui'
 
-import { useCheckPermissions } from 'hooks'
 import { useParams } from 'common/hooks'
-import BucketRow from './BucketRow'
-import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
-import { StorageBucket } from 'components/interfaces/Storage/Storage.types'
-import EditBucketModal from 'components/interfaces/Storage/EditBucketModal'
 import CreateBucketModal from 'components/interfaces/Storage/CreateBucketModal'
+import EditBucketModal from 'components/interfaces/Storage/EditBucketModal'
+import { StorageBucket } from 'components/interfaces/Storage/Storage.types'
+import { DeleteBucketModal } from 'components/to-be-cleaned/Storage'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useBucketsQuery } from 'data/storage/buckets-query'
+import { useCheckPermissions } from 'hooks'
+import BucketRow from './BucketRow'
 
 const StorageMenu = () => {
   const router = useRouter()
   const { ref, bucketId } = useParams()
   const [showCreateBucketModal, setShowCreateBucketModal] = useState(false)
   const [selectedBucketToEdit, setSelectedBucketToEdit] = useState<StorageBucket>()
+  const [selectedBucketToDelete, setSelectedBucketToDelete] = useState<StorageBucket>()
   const canCreateBuckets = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
 
   const page = router.pathname.split('/')[4] as
@@ -30,10 +31,7 @@ const StorageMenu = () => {
     | 'usage'
     | 'logs'
 
-  const storageExplorerStore = useStorageStore()
   const { data, isLoading, isError, isSuccess } = useBucketsQuery({ projectRef: ref })
-  const { openDeleteBucketModal } = storageExplorerStore || {}
-
   const buckets = data ?? []
 
   return (
@@ -114,7 +112,7 @@ const StorageMenu = () => {
                         bucket={bucket}
                         projectRef={ref}
                         isSelected={isSelected}
-                        onSelectDeleteBucket={openDeleteBucketModal}
+                        onSelectDeleteBucket={() => setSelectedBucketToDelete(bucket)}
                         onSelectEditBucket={() => setSelectedBucketToEdit(bucket)}
                       />
                     )
@@ -144,6 +142,12 @@ const StorageMenu = () => {
         visible={selectedBucketToEdit !== undefined}
         bucket={selectedBucketToEdit}
         onClose={() => setSelectedBucketToEdit(undefined)}
+      />
+
+      <DeleteBucketModal
+        visible={selectedBucketToDelete !== undefined}
+        bucket={selectedBucketToDelete}
+        onClose={() => setSelectedBucketToDelete(undefined)}
       />
     </>
   )

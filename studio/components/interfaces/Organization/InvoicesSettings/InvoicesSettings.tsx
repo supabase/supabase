@@ -69,7 +69,11 @@ const InvoicesSettings = () => {
     )
 
     if (invoices.error) {
-      ui.setNotification({ category: 'error', message: invoices.error.message })
+      ui.setNotification({
+        error: invoices.error,
+        category: 'error',
+        message: `Failed to fetch invoices: ${invoices.error.message}`,
+      })
     } else {
       setInvoices(invoices)
     }
@@ -83,8 +87,9 @@ const InvoicesSettings = () => {
       window.open(invoice.invoice_pdf, '_blank')
     } else {
       ui.setNotification({
+        error: invoice.error,
         category: 'info',
-        message: 'Unable to fetch the selected invoice',
+        message: `Unable to fetch the selected invoice: ${invoice.error.message}`,
       })
     }
   }

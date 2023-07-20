@@ -8,7 +8,7 @@ import { useParams } from 'common'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 import { setProjectStatus } from 'data/projects/projects-query'
-import { useCheckPermissions, useFlag, useSelectedOrganization, useStore } from 'hooks'
+import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import { Button, IconPauseCircle, Modal } from 'ui'
@@ -26,7 +26,6 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
   const { project } = useProjectContext()
   const orgSlug = selectedOrganization?.slug
 
-  const kpsEnabled = useFlag('initWithKps')
   const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery({ slug: orgSlug })
   const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
 
@@ -57,9 +56,18 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
       })
     }
 
-    await post(`${API_URL}/projects/${project.ref}/restore`, { kps_enabled: kpsEnabled })
-    setProjectStatus(queryClient, project.ref, PROJECT_STATUS.RESTORING)
-    ui.setNotification({ category: 'success', message: 'Restoring project' })
+    const { error } = await post(`${API_URL}/projects/${project.ref}/restore`, {})
+
+    if (error) {
+      ui.setNotification({
+        category: 'error',
+        error,
+        message: `Failed to restore project: ${error.message}`,
+      })
+    } else {
+      setProjectStatus(queryClient, project.ref, PROJECT_STATUS.RESTORING)
+      ui.setNotification({ category: 'success', message: 'Restoring project' })
+    }
   }
 
   return (

@@ -6,13 +6,14 @@ import { getResourcesExceededLimits } from 'components/ui/OveragesBanner/Overage
 import { useProjectReadOnlyQuery } from 'data/config/project-read-only-query'
 import { useProjectUsageQuery } from 'data/usage/project-usage-query'
 import { useFlag, useSelectedOrganization, useSelectedProject } from 'hooks'
-import { IS_PLATFORM, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
+import { IS_PLATFORM } from 'lib/constants'
 import BreadcrumbsView from './BreadcrumbsView'
 import FeedbackDropdown from './FeedbackDropdown'
 import HelpPopover from './HelpPopover'
 import NotificationsPopover from './NotificationsPopover'
 import OrgDropdown from './OrgDropdown'
 import ProjectDropdown from './ProjectDropdown'
+import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 
 const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder = true }: any) => {
   const selectedOrganization = useSelectedOrganization()
@@ -24,17 +25,24 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
     connectionString: selectedProject?.connectionString,
   })
 
-  const { data: usage } = useProjectUsageQuery({ projectRef })
+  // Skip with org-level-billing, as quota is for the entire org
+  const { data: usage } = useProjectUsageQuery(
+    { projectRef },
+    { enabled: selectedOrganization && !selectedOrganization.subscription_id }
+  )
   const resourcesExceededLimits = getResourcesExceededLimits(usage)
 
-  const projectHasNoLimits =
-    selectedProject?.subscription_tier === PRICING_TIER_PRODUCT_IDS.PAYG ||
-    selectedProject?.subscription_tier === PRICING_TIER_PRODUCT_IDS.ENTERPRISE ||
-    selectedProject?.subscription_tier === PRICING_TIER_PRODUCT_IDS.TEAM
+  // Skip with org-level-billing, as quota is for the entire org
+  const { data: subscription } = useProjectSubscriptionV2Query(
+    { projectRef },
+    { enabled: selectedOrganization && !selectedOrganization.subscription_id }
+  )
+
+  const projectHasNoLimits = subscription?.usage_billing_enabled === false
 
   const showOverUsageBadge =
     useFlag('overusageBadge') &&
-    selectedProject?.subscription_tier !== undefined &&
+    subscription !== undefined &&
     !projectHasNoLimits &&
     resourcesExceededLimits.length > 0
 

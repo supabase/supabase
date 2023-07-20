@@ -1,24 +1,11 @@
 import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { get } from 'data/fetchers'
 import { useCallback } from 'react'
-import { integrationKeys } from './keys'
 import { VercelFramework } from './integrations.types'
+import { integrationKeys } from './keys'
 
 export type VercelProjectsVariables = {
   organization_integration_id: string | undefined
-}
-
-export type VercelProjectsResponse = {
-  id: string
-  name: string
-  framework: VercelFramework
-  metadata: {
-    id: string
-    name: string
-    framework: string
-    link: string
-  }
 }
 
 export async function getVercelProjects(
@@ -29,20 +16,30 @@ export async function getVercelProjects(
     throw new Error('organization_integration_id is required')
   }
 
-  const response = await get(
-    `${API_URL}/integrations/vercel/projects/${organization_integration_id}`,
+  const { data, error } = await get(
+    '/platform/integrations/vercel/projects/{organization_integration_id}',
     {
+      params: {
+        path: { organization_integration_id },
+        query: {
+          // [Alaister]: setting a large limit here to avoid pagination
+          // until we have merged the new shadcn listbox which will support it
+          limit: '1000',
+        },
+      },
       signal,
     }
   )
-  if (response.error) {
-    throw response.error
+
+  if (error) {
+    throw error
   }
 
-  return response as VercelProjectsResponse[]
+  return data.projects
 }
 
 export type VercelProjectsData = Awaited<ReturnType<typeof getVercelProjects>>
+export type VercelProjectsResponse = VercelProjectsData[0]
 export type VercelProjectsError = unknown
 
 export const useVercelProjectsQuery = <TData = VercelProjectsData>(

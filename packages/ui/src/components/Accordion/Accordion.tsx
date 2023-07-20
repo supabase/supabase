@@ -74,7 +74,7 @@ function Accordion({
 
   return (
     <>
-      {/* // 
+      {/* // 	
       @ts-expect-error */}
       <RadixAccordion.Root
         type={openBehaviour}
