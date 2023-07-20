@@ -40,7 +40,7 @@ curl -X POST 'https://<project-ref>.supabase.co/auth/v1/magiclink' \
 }'
 ```
 
-Gotrue is responsible for issuing access tokens for your users, sends confirmation, magic-link, and password recovery emails (by default we send these from a Supabase SMTP server, but you can easily plug in your own inside the dashboard at Auth > Settings) and also transacting with third party OAuth providers to get basic user data.
+Gotrue is responsible for issuing access tokens for your users, sends confirmation, magic-link, and password recovery emails (by default we send these from a Supabase SMTP server, but you can easily plug in your own inside the dashboard at Project Project Settings > Auth) and also transacting with third party OAuth providers to get basic user data.
 
 The community even recently built in the functionality to request custom OAuth scopes, if your users need to interact more closely with the provider. See the scopes parameter here: [https://github.com/supabase/gotrue#get-authorize](https://github.com/supabase/gotrue#get-authorize).
 
