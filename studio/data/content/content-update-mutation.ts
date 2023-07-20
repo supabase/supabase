@@ -1,7 +1,6 @@
 import toast from 'react-hot-toast'
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-
-import { patch } from 'lib/common/fetch'
+import { isResponseOk, patch } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { ResponseError, UserContent } from 'types'
 import { contentKeys } from './keys'
@@ -21,7 +20,7 @@ export async function updateContent(
     content,
     { signal }
   )
-  if (created.error) {
+  if (!isResponseOk(created)) {
     throw created.error
   }
 
