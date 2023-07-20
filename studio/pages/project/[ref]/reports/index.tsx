@@ -8,7 +8,7 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import { createReport } from 'components/to-be-cleaned/Reports/Reports.utils'
 import Loading from 'components/ui/Loading'
-import { useCheckPermissions, useFlag, useStore } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import { useProfile } from 'lib/profile'
@@ -31,11 +31,9 @@ export const UserReportPage: NextPageWithLayout = () => {
     subject: { id: profile?.id },
   })
 
-  const kpsEnabled = useFlag('initWithKps')
-
   useEffect(() => {
     if (project && project.status === PROJECT_STATUS.INACTIVE) {
-      post(`${API_URL}/projects/${ref}/restore`, { kps_enabled: kpsEnabled })
+      post(`${API_URL}/projects/${ref}/restore`, {})
     }
   }, [project])
 
