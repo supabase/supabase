@@ -14,19 +14,26 @@ export const config = {
 
 const openAiKey = process.env.OPENAI_KEY
 
-const generateTitleSchema = SchemaBuilder.emptySchema().addString('title', {
-  description: stripIndent`
+const generateTitleSchema = SchemaBuilder.emptySchema()
+  .addString('title', {
+    description: stripIndent`
       The generated title for the SQL snippet (short and concise).
-      - Omit words like 'SQL', 'Postgres', or 'Query'
+      - Omit these words: 'SQL', 'Postgres', 'Query', 'Database'
     `,
-})
+  })
+  .addString('description', {
+    description: stripIndent`
+      The generated description for the SQL snippet (longer and more detailed than title).
+      - Read the SQL line by line and summarize it
+    `,
+  })
 
 type GenerateTitleResult = typeof generateTitleSchema.T
 
 const completionFunctions = {
   generateTitle: {
     name: 'generateTitle',
-    description: 'Generates a short title for a Postgres SQL snippet',
+    description: 'Generates a short title and detailed description for a Postgres SQL snippet',
     parameters: generateTitleSchema.schema,
   },
 }

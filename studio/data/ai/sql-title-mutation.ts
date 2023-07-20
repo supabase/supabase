@@ -4,6 +4,7 @@ import { aiKeys } from './keys'
 
 export type SqlTitleGenerateResponse = {
   title: string
+  description: string
 }
 
 export type SqlTitleGenerateVariables = {
