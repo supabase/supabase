@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
 import IntegrationWindowLayout from 'components/layouts/IntegrationWindowLayout'
-import { ScaffoldContainer, ScaffoldDivider } from 'components/layouts/Scaffold'
+import { ScaffoldColumn, ScaffoldContainer, ScaffoldDivider } from 'components/layouts/Scaffold'
 import { useIntegrationsQuery } from 'data/integrations/integrations-query'
 import { IntegrationName } from 'data/integrations/integrations.types'
 import { useVercelIntegrationCreateMutation } from 'data/integrations/vercel-integration-create-mutation'
@@ -29,7 +29,6 @@ import {
   IconHexagon,
   IconInfo,
   IconLifeBuoy,
-  Listbox,
   LoadingLine,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
@@ -205,9 +204,9 @@ const VercelIntegration: NextPageWithLayout = () => {
   const dataLoading = isLoadingVercelIntegrationCreateMutation || isLoadingOrganizationsQuery
 
   const disableInstallationForm =
-    isLoadingVercelIntegrationCreateMutation ||
+    (isLoadingVercelIntegrationCreateMutation && !dataLoading) ||
     // disables installation button if integration is already installed and it is Marketplace flow
-    (selectedOrg && selectedOrg?.installationInstalled && source === 'marketplace')
+    (selectedOrg && selectedOrg?.installationInstalled && source === 'marketplace' && !dataLoading)
       ? true
       : false
 
@@ -219,50 +218,52 @@ const VercelIntegration: NextPageWithLayout = () => {
         <LoadingLine loading={isLoadingVercelIntegrationCreateMutation} />
         {organizationIntegrationId === null && (
           <>
-            <ScaffoldContainer className="max-w-md flex flex-col gap-6 grow py-8">
-              <h1 className="text-xl text-scale-1200">Choose organization</h1>
-              <>
-                <Markdown content={`Choose the Supabase organization you wish to install in`} />
-                <OrganizationPicker
-                  integrationName="Vercel"
-                  organizationsWithInstalledData={organizationsWithInstalledData}
-                  onSelectedOrgChange={(e: string) => {
-                    console.log('e:', e)
+            <ScaffoldContainer className="flex flex-col gap-6 grow py-8">
+              <ScaffoldColumn className="mx-auto w-full max-w-md">
+                <h1 className="text-xl text-scale-1200">Choose organization</h1>
+                <>
+                  <Markdown content={`Choose the Supabase organization you wish to install in`} />
+                  <OrganizationPicker
+                    integrationName="Vercel"
+                    organizationsWithInstalledData={organizationsWithInstalledData}
+                    onSelectedOrgChange={(e: string) => {
+                      console.log('e:', e)
 
-                    const org = organizationsWithInstalledData?.find((org) => org.slug === e)
-                    console.log('const:', org)
+                      const org = organizationsWithInstalledData?.find((org) => org.slug === e)
+                      console.log('const:', org)
 
-                    if (org) {
-                      setSelectedOrg(org)
-                      router.query.organizationSlug = org.slug
-                    }
-                  }}
-                  selectedOrg={selectedOrg}
-                  dataLoading={dataLoading}
-                />
-                {disableInstallationForm && (
-                  <Alert_Shadcn_ variant="warning">
-                    <IconAlertTriangle className="h-4 w-4" strokeWidth={2} />
-                    <AlertTitle_Shadcn_>
-                      Vercel Integration is already installed.
-                    </AlertTitle_Shadcn_>
-                    <AlertDescription_Shadcn_>
-                      You will need to choose another organization to install the integration.
-                    </AlertDescription_Shadcn_>
-                  </Alert_Shadcn_>
-                )}
-                <div className="flex flex-row w-full justify-end">
-                  <Button
-                    size="medium"
-                    className="self-end"
-                    disabled={disableInstallationForm}
-                    loading={isLoadingVercelIntegrationCreateMutation}
-                    onClick={onInstall}
-                  >
-                    Install integration
-                  </Button>
-                </div>
-              </>
+                      if (org) {
+                        setSelectedOrg(org)
+                        router.query.organizationSlug = org.slug
+                      }
+                    }}
+                    selectedOrg={selectedOrg}
+                    dataLoading={dataLoading}
+                  />
+                  {disableInstallationForm && (
+                    <Alert_Shadcn_ variant="warning">
+                      <IconAlertTriangle className="h-4 w-4" strokeWidth={2} />
+                      <AlertTitle_Shadcn_>
+                        Vercel Integration is already installed.
+                      </AlertTitle_Shadcn_>
+                      <AlertDescription_Shadcn_>
+                        You will need to choose another organization to install the integration.
+                      </AlertDescription_Shadcn_>
+                    </Alert_Shadcn_>
+                  )}
+                  <div className="flex flex-row w-full justify-end">
+                    <Button
+                      size="medium"
+                      className="self-end"
+                      disabled={disableInstallationForm}
+                      loading={isLoadingVercelIntegrationCreateMutation}
+                      onClick={onInstall}
+                    >
+                      Install integration
+                    </Button>
+                  </div>
+                </>
+              </ScaffoldColumn>
             </ScaffoldContainer>
             <ScaffoldContainer className="flex flex-col gap-6 py-3">
               <Alert_Shadcn_ variant="default">
@@ -280,7 +281,7 @@ const VercelIntegration: NextPageWithLayout = () => {
 
         <ScaffoldDivider />
       </main>
-      <ScaffoldContainer className="bg-body flex flex-row gap-6 py-6 border-t">
+      <ScaffoldContainer className="bg-body flex flex-row gap-6 py-6">
         <div className="flex items-center gap-2 text-xs text-scale-900">
           <IconBook size={16} /> Docs
         </div>
@@ -313,16 +314,6 @@ const OrganizationPicker = ({
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLButtonElement>(null)
 
-  if (dataLoading) {
-    return (
-      <Listbox label={label} value="loading" disabled>
-        <Listbox.Option key="loading" value="loading" label="Loading...">
-          Loading...
-        </Listbox.Option>
-      </Listbox>
-    )
-  }
-
   return (
     <>
       <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
@@ -334,6 +325,8 @@ const OrganizationPicker = ({
             block
             className="justify-start"
             icon={<IconHexagon />}
+            loading={dataLoading}
+            disabled={dataLoading}
             iconRight={
               <span className="grow flex justify-end">
                 <IconChevronDown className={''} />
@@ -341,7 +334,7 @@ const OrganizationPicker = ({
             }
           >
             <span className="flex gap-2">
-              {selectedOrg?.name}
+              <span className="truncate">{selectedOrg?.name}</span>
               {selectedOrg?.installationInstalled && (
                 <Badge color="scale">Integration Installed</Badge>
               )}
@@ -371,9 +364,11 @@ const OrganizationPicker = ({
                       }}
                     >
                       <IconHexagon />
-                      <span>{org.name}</span>{' '}
+                      <span className="truncate">{org.name}</span>{' '}
                       {org?.installationInstalled && (
-                        <Badge color="scale">Integration Installed</Badge>
+                        <Badge color="scale" className="!flex-none">
+                          Integration Installed
+                        </Badge>
                       )}
                     </CommandItem_Shadcn_>
                   )

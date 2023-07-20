@@ -1,6 +1,3 @@
-import { useRef, useState } from 'react'
-import { toast } from 'react-hot-toast'
-
 import { ENV_VAR_RAW_KEYS } from 'components/interfaces/Integrations/Integrations-Vercel.constants'
 import { Markdown } from 'components/interfaces/Markdown'
 import { vercelIcon } from 'components/to-be-cleaned/ListIcons'
@@ -10,6 +7,8 @@ import { VercelProjectsResponse } from 'data/integrations/integrations-vercel-pr
 import { IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { useSelectedOrganization } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
+import { useRef, useState } from 'react'
+import { toast } from 'react-hot-toast'
 import {
   Button,
   CommandEmpty_Shadcn_,
@@ -19,8 +18,6 @@ import {
   CommandList_Shadcn_,
   Command_Shadcn_,
   IconChevronDown,
-  IconHexagon,
-  Listbox,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
@@ -41,9 +38,9 @@ export interface ProjectLinkerProps {
   installedConnections: IntegrationProjectConnection[] | undefined
   setLoading?: (x: boolean) => void
   showSkip?: boolean
+  loadingForeignProjects?: boolean
+  loadingSupabaseProjects?: boolean
 }
-
-const UNDEFINED_SELECT_VALUE = 'undefined'
 
 const ProjectLinker = ({
   organizationIntegrationId,
@@ -53,6 +50,8 @@ const ProjectLinker = ({
   installedConnections = [],
   setLoading,
   showSkip = false,
+  loadingForeignProjects,
+  loadingSupabaseProjects,
 }: ProjectLinkerProps) => {
   const [supabaseProjectsComboBoxOpen, setSupabaseProjectsComboboxOpen] = useState(false)
   const [vercelProjectsComboBoxOpen, setVercelProjectsComboboxOpen] = useState(false)
@@ -61,8 +60,8 @@ const ProjectLinker = ({
 
   const selectedOrganization = useSelectedOrganization()
 
-  const [supabaseProjectRef, setSupabaseProjectRef] = useState(UNDEFINED_SELECT_VALUE)
-  const [vercelProjectId, setVercelProjectId] = useState(UNDEFINED_SELECT_VALUE)
+  const [supabaseProjectRef, setSupabaseProjectRef] = useState<string | undefined>(undefined)
+  const [vercelProjectId, setVercelProjectId] = useState<string | undefined>(undefined)
 
   const { mutateAsync: syncEnvs } = useIntegrationsVercelConnectionSyncEnvsMutation()
   const { mutate: createConnections, isLoading } = useIntegrationConnectionsCreateMutation({
@@ -113,7 +112,7 @@ const ProjectLinker = ({
     return (
       <div
         className={cn(
-          'flex flex-col gap-6 px-5 mx-auto w-full justify-center items-center',
+          'flex flex-col grow gap-6 px-5 mx-auto w-full justify-center items-center',
           className
         )}
         {...props}
@@ -132,6 +131,20 @@ const ProjectLinker = ({
       return !flatInstalledConnectionsIds.has(foreignProject.id)
     }
   )
+
+  const selectedSupabaseProject = supabaseProjectRef
+    ? supabaseProjects.find((x) => x.ref?.toLowerCase() === supabaseProjectRef?.toLowerCase())
+    : undefined
+  const selectedVercelProject = vercelProjectId
+    ? filteredForeignProjects.find((x) => x.id?.toLowerCase() === vercelProjectId?.toLowerCase())
+    : undefined
+
+  // console.log('selectedSupabaseProject', selectedSupabaseProject)
+  console.log('filteredForeignProjects', filteredForeignProjects)
+  console.log('vercelProjectId', vercelProjectId)
+  console.log('selectedVercelProject', selectedVercelProject)
+
+  // console.log('supabaseProjects', supabaseProjects)
 
   return (
     <div className="flex flex-col gap-4">
@@ -156,6 +169,8 @@ const ProjectLinker = ({
                   type="default"
                   size="medium"
                   block
+                  disabled={loadingSupabaseProjects}
+                  loading={loadingSupabaseProjects}
                   className="justify-start"
                   icon={
                     <div className="bg-white shadow border rounded p-1 w-6 h-6 flex justify-center items-center">
@@ -172,12 +187,7 @@ const ProjectLinker = ({
                     </span>
                   }
                 >
-                  <span className="flex gap-2">
-                    {supabaseProjectRef ?? UNDEFINED_SELECT_VALUE}
-                    {/* {selectedOrg?.installationInstalled && (
-                      <Badge color="scale">Integration Installed</Badge>
-                    )} */}
-                  </span>
+                  {selectedSupabaseProject ? selectedSupabaseProject.name : 'Choose Project'}
                 </Button>
               </PopoverTrigger_Shadcn_>
               <PopoverContent_Shadcn_
@@ -188,7 +198,7 @@ const ProjectLinker = ({
               >
                 <Command_Shadcn_>
                   <CommandInput_Shadcn_ placeholder="Search organization..." />
-                  <CommandList_Shadcn_>
+                  <CommandList_Shadcn_ className="!max-h-[170px]">
                     <CommandEmpty_Shadcn_>No results found.</CommandEmpty_Shadcn_>
                     <CommandGroup_Shadcn_>
                       {supabaseProjects.map((project) => {
@@ -218,38 +228,6 @@ const ProjectLinker = ({
                 </Command_Shadcn_>
               </PopoverContent_Shadcn_>
             </Popover_Shadcn_>
-
-            <Listbox
-              className="w-full"
-              value={supabaseProjectRef ?? UNDEFINED_SELECT_VALUE}
-              onChange={(e) => setSupabaseProjectRef(e)}
-            >
-              <Listbox.Option value={UNDEFINED_SELECT_VALUE} label="Choose a project" disabled>
-                Choose project
-              </Listbox.Option>
-              {supabaseProjects.map((project) => (
-                <Listbox.Option
-                  key={project.id}
-                  value={project.ref}
-                  label={project.name}
-                  addOnBefore={() => {
-                    return (
-                      <>
-                        <div className="bg-white shadow border rounded p-1 w-6 h-6 flex justify-center items-center">
-                          <img
-                            src={`${BASE_PATH}/img/supabase-logo.svg`}
-                            alt="Supabase"
-                            className="w-4"
-                          />
-                        </div>
-                      </>
-                    )
-                  }}
-                >
-                  {project.name}
-                </Listbox.Option>
-              ))}
-            </Listbox>
           </Panel>
           <div className="border border-scale-1000 h-px w-16 border-dashed self-end mb-5"></div>
           <Panel>
@@ -271,46 +249,48 @@ const ProjectLinker = ({
             >
               <PopoverTrigger_Shadcn_ asChild>
                 <Button
-                  ref={supabaseProjectsComboBoxRef}
+                  ref={vercelProjectsComboBoxRef}
                   type="default"
                   size="medium"
                   block
+                  disabled={loadingForeignProjects}
+                  loading={loadingForeignProjects}
                   className="justify-start"
-                  // icon={
-                  //   !project?.framework ? (
-                  //     vercelIcon
-                  //   ) : (
-                  //     <img
-                  //       src={`${BASE_PATH}/img/icons/frameworks/${project.framework}.svg`}
-                  //       width={21}
-                  //       height={21}
-                  //       alt={`icon`}
-                  //     />
-                  //   )
-                  // }
+                  icon={
+                    selectedVercelProject ? (
+                      selectedVercelProject?.framework ? (
+                        vercelIcon
+                      ) : (
+                        <img
+                          src={`${BASE_PATH}/img/icons/frameworks/${selectedVercelProject.framework}.svg`}
+                          width={21}
+                          height={21}
+                          alt={`icon`}
+                        />
+                      )
+                    ) : (
+                      <></>
+                    )
+                  }
                   iconRight={
                     <span className="grow flex justify-end">
                       <IconChevronDown className={''} />
                     </span>
                   }
                 >
-                  <span className="flex gap-2">
-                    {/* {supabaseProjectRef ?? UNDEFINED_SELECT_VALUE} */}
-                    {/* {selectedOrg?.installationInstalled && (
-                      <Badge color="scale">Integration Installed</Badge>
-                    )} */}
-                  </span>
+                  {(selectedVercelProject && selectedVercelProject.name) ??
+                    'Choose a Vercel Project'}
                 </Button>
               </PopoverTrigger_Shadcn_>
               <PopoverContent_Shadcn_
                 className="p-0 w-full"
                 side="bottom"
                 align="center"
-                style={{ width: supabaseProjectsComboBoxRef.current?.offsetWidth }}
+                style={{ width: vercelProjectsComboBoxRef.current?.offsetWidth }}
               >
                 <Command_Shadcn_>
                   <CommandInput_Shadcn_ placeholder="Search organization..." />
-                  <CommandList_Shadcn_>
+                  <CommandList_Shadcn_ className="!max-h-[170px]">
                     <CommandEmpty_Shadcn_>No results found.</CommandEmpty_Shadcn_>
                     <CommandGroup_Shadcn_>
                       {filteredForeignProjects.map((project) => {
@@ -319,9 +299,10 @@ const ProjectLinker = ({
                             value={project.id}
                             key={project.id}
                             className="flex gap-2 items-center"
-                            onSelect={(ref) => {
-                              if (ref) setSupabaseProjectRef(ref)
-                              setSupabaseProjectsComboboxOpen(false)
+                            onSelect={(id) => {
+                              console.log('id set', id)
+                              if (id) setVercelProjectId(id)
+                              setVercelProjectsComboboxOpen(false)
                             }}
                           >
                             {!project?.framework ? (
@@ -343,43 +324,6 @@ const ProjectLinker = ({
                 </Command_Shadcn_>
               </PopoverContent_Shadcn_>
             </Popover_Shadcn_>
-
-            <Listbox
-              className="w-full"
-              value={vercelProjectId ?? UNDEFINED_SELECT_VALUE}
-              onChange={(e) => setVercelProjectId(e)}
-            >
-              <Listbox.Option value={UNDEFINED_SELECT_VALUE} label="Choose a project" disabled>
-                Choose Vercel project
-              </Listbox.Option>
-              {filteredForeignProjects.map((project) => {
-                return (
-                  <Listbox.Option
-                    key={project.id}
-                    value={project.id}
-                    label={project.name}
-                    addOnBefore={() => {
-                      return (
-                        <>
-                          {!project?.framework ? (
-                            vercelIcon
-                          ) : (
-                            <img
-                              src={`${BASE_PATH}/img/icons/frameworks/${project.framework}.svg`}
-                              width={21}
-                              height={21}
-                              alt={`icon`}
-                            />
-                          )}
-                        </>
-                      )
-                    }}
-                  >
-                    {project.name}
-                  </Listbox.Option>
-                )
-              })}
-            </Listbox>
           </Panel>
         </div>
       </div>
@@ -400,7 +344,15 @@ const ProjectLinker = ({
           className="self-end"
           onClick={onCreateConnections}
           loading={isLoading}
-          disabled={isLoading}
+          disabled={
+            // data loading states
+            loadingForeignProjects ||
+            loadingSupabaseProjects ||
+            isLoading ||
+            // check wether both project types are not undefined
+            !selectedSupabaseProject ||
+            !selectedVercelProject
+          }
         >
           Connect project
         </Button>

@@ -53,7 +53,7 @@ const ScaffoldColumn = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTM
       <div
         ref={ref}
         {...props}
-        className={cn('flex flex-col gap-3 py-6', maxWidthClassesColumn, className)}
+        className={cn('flex flex-col gap-3', maxWidthClassesColumn, className)}
       />
     )
   }

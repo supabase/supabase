@@ -36,7 +36,7 @@ const Header: FC<any> = ({ organization, project }) => {
 
   return (
     <div className="bg">
-      <ScaffoldContainer className={cn('py-3 border-b', INTEGRATION_LAYOUT_MAX_WIDTH)}>
+      <ScaffoldContainer className={cn('py-3', INTEGRATION_LAYOUT_MAX_WIDTH)}>
         <div className="flex items-center gap-6 w-full">
           <div className="flex gap-2 items-center">
             <div className="bg-white shadow border rounded p-1 w-8 h-8 flex justify-center items-center">
