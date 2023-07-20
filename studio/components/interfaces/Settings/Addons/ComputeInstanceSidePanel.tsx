@@ -3,7 +3,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import clsx from 'clsx'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import { useParams, useTheme } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -356,8 +356,8 @@ const ComputeInstanceSidePanel = () => {
 
             {selectedCategory === 'micro' && (
               <p className="text-sm text-scale-1100">
-                Your database will use the standard Micro size instance of 2-core {cpuArchitecture} CPU (Shared)
-                with 1GB of memory.
+                Your database will use the standard Micro size instance of 2-core {cpuArchitecture}{' '}
+                CPU (Shared) with 1GB of memory.
               </p>
             )}
 
