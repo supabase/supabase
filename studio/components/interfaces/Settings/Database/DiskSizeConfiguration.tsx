@@ -155,7 +155,7 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
 
       <Modal
         header={<h5 className="text-sm text-scale-1200">Increase Disk Storage Size</h5>}
-        size="medium"
+        size="small"
         visible={showResetDbPass}
         loading={isUpdatingDiskSize}
         onCancel={() => setShowResetDbPass(false)}
@@ -182,14 +182,7 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
             ) : (
               <>
                 <Modal.Content>
-                  <div className="w-full space-y-4 py-6">
-                    <Alert
-                      withIcon
-                      variant="warning"
-                      title="This operation is only possible every 6 hours"
-                    >
-                      NEED TO UPDATE THE DESCRIPTION HERE
-                    </Alert>
+                  <div className="w-full space-y-4 py-8">
                     <InputNumber
                       id="new-disk-size"
                       label="New disk size"
