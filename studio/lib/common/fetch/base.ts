@@ -118,6 +118,6 @@ export function isResponseOk<T>(response: SupaResponse<T> | undefined): response
   return (
     response !== undefined &&
     response !== null &&
-    !(typeof response === 'object' && 'error' in response)
+    !(typeof response === 'object' && 'error' in response && Boolean(response.error))
   )
 }
