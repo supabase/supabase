@@ -36,6 +36,7 @@ const BackupsList = () => {
         primaryText="Free Plan does not include project backups."
         projectRef={projectRef}
         secondaryText="Upgrade to the Pro plan for up to 7 days of scheduled backups."
+        addon="pitr"
       />
     )
   }
