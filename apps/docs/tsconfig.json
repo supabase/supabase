@@ -4,7 +4,8 @@
     "noImplicitAny": false,
     "baseUrl": ".",
     "paths": {
-      "~/*": ["./*"]
+      "~/*": ["./*"],
+      "@ui/*": ["./../../packages/ui/src/*"] // handle ui package paths
     },
     "target": "es2015",
     "lib": ["dom", "dom.iterable", "esnext"],
