@@ -69,11 +69,19 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
   const { ref } = useParams()
   const router = useRouter()
   const snap = useSqlEditorStateSnapshot()
-  const { mutateAsync: deleteContent } = useContentDeleteMutation({
+  const { mutate: deleteContent } = useContentDeleteMutation({
     onSuccess(data) {
-      if (data.id) {
-        snap.removeSnippet(data.id)
+      if (data.id) snap.removeSnippet(data.id)
+
+      const existingSnippetIds = (snap.orders[ref!] ?? []).filter((x) => x !== id)
+      if (existingSnippetIds.length === 0) {
+        router.push(`/project/${ref}/sql`)
+      } else {
+        router.push(`/project/${ref}/sql/${existingSnippetIds[0]}`)
       }
+    },
+    onError(error) {
+      ui.setNotification({ category: 'error', message: `Failed to delete query: ${error.message}` })
     },
   })
 
@@ -99,22 +107,7 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
   const onConfirmDelete = async () => {
     if (!ref) return console.error('Project ref is required')
     if (!id) return console.error('Snippet ID is required')
-
-    try {
-      await deleteContent({ projectRef: ref, id })
-
-      const existingSnippetIds = (snap.orders[ref] ?? []).filter((x) => x !== id)
-      if (existingSnippetIds.length === 0) {
-        router.push(`/project/${ref}/sql`)
-      } else {
-        router.push(`/project/${ref}/sql/${existingSnippetIds[0]}`)
-      }
-    } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to create new query: ${error.message}`,
-      })
-    }
+    deleteContent({ projectRef: ref, id })
   }
 
   return (

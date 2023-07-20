@@ -10,7 +10,6 @@ import { NextPageWithLayout } from 'types'
 
 const Home: NextPageWithLayout = () => {
   const { project } = useProjectContext()
-  const projectTier = project?.subscription_tier
 
   const projectName =
     project?.ref !== 'default' && project?.name !== undefined

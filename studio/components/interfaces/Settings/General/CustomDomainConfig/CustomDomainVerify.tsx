@@ -1,16 +1,15 @@
+import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useState } from 'react'
-import { observer } from 'mobx-react-lite'
 import { Alert, Button, IconAlertCircle, IconExternalLink, IconHelpCircle, IconRefreshCw } from 'ui'
 
-import { useStore } from 'hooks'
+import InformationBox from 'components/ui/InformationBox'
+import Panel from 'components/ui/Panel'
 import { ProjectApiResponse } from 'data/config/project-api-query'
-import { CustomDomainResponse } from 'data/custom-domains/custom-domains-query'
 import { useCustomDomainDeleteMutation } from 'data/custom-domains/custom-domains-delete-mutation'
+import { CustomDomainResponse } from 'data/custom-domains/custom-domains-query'
 import { useCustomDomainReverifyMutation } from 'data/custom-domains/custom-domains-reverify-mutation'
 import DNSRecord from './DNSRecord'
-import Panel from 'components/ui/Panel'
-import InformationBox from 'components/ui/InformationBox'
 
 export type CustomDomainVerifyProps = {
   projectRef?: string
@@ -19,7 +18,6 @@ export type CustomDomainVerifyProps = {
 }
 
 const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomainVerifyProps) => {
-  const { ui } = useStore()
   const [isNotVerifiedYet, setIsNotVerifiedYet] = useState(false)
 
   const { mutate: reverifyCustomDomain, isLoading: isReverifyLoading } =
@@ -28,7 +26,7 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
         if (res.status === '2_initiated') setIsNotVerifiedYet(true)
       },
     })
-  const { mutateAsync: deleteCustomDomain, isLoading: isDeleting } = useCustomDomainDeleteMutation()
+  const { mutate: deleteCustomDomain, isLoading: isDeleting } = useCustomDomainDeleteMutation()
 
   const hasCAAErrors = customDomain.ssl.validation_errors?.reduce(
     (acc, error) => acc || error.message.includes('caa_error'),
@@ -36,22 +34,13 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
   )
 
   const onReverifyCustomDomain = () => {
-    if (!projectRef) {
-      throw new Error('Project ref is required')
-    }
-
+    if (!projectRef) return console.error('Project ref is required')
     reverifyCustomDomain({ projectRef })
   }
 
   const onCancelCustomDomain = async () => {
-    if (!projectRef) {
-      throw new Error('Project ref is required')
-    }
-    try {
-      await deleteCustomDomain({ projectRef })
-    } catch (error: any) {
-      ui.setNotification({ category: 'error', message: error.message })
-    }
+    if (!projectRef) return console.error('Project ref is required')
+    deleteCustomDomain({ projectRef })
   }
 
   return (

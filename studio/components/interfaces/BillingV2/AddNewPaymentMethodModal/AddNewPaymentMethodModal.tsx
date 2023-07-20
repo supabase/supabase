@@ -11,7 +11,7 @@ import { useIsHCaptchaLoaded } from 'stores/hcaptcha-loaded-store'
 import { Modal } from 'ui'
 import AddPaymentMethodForm from './AddPaymentMethodForm'
 
-interface Props {
+interface AddNewPaymentMethodModalProps {
   visible: boolean
   returnUrl: string
   onCancel: () => void
@@ -20,7 +20,12 @@ interface Props {
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
-const AddNewPaymentMethodModal: FC<Props> = ({ visible, returnUrl, onCancel, onConfirm }) => {
+const AddNewPaymentMethodModal = ({
+  visible,
+  returnUrl,
+  onCancel,
+  onConfirm,
+}: AddNewPaymentMethodModalProps) => {
   const { ui } = useStore()
   const [intent, setIntent] = useState<any>()
 
@@ -73,8 +78,8 @@ const AddNewPaymentMethodModal: FC<Props> = ({ visible, returnUrl, onCancel, onC
     if (intent.error) {
       return ui.setNotification({
         category: 'error',
-        message: intent.error.message,
         error: intent.error,
+        message: `Failed to setup intent: ${intent.error.message}`,
       })
     } else {
       setIntent(intent)
@@ -106,10 +111,18 @@ const AddNewPaymentMethodModal: FC<Props> = ({ visible, returnUrl, onCancel, onC
         ref={captchaRefCallback}
         sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
         size="invisible"
+        onOpen={() => {
+          // [Joshen] This is to ensure that hCaptcha popup remains clickable
+          if (document !== undefined) document.body.classList.add('!pointer-events-auto')
+        }}
+        onClose={() => {
+          onLocalCancel()
+          if (document !== undefined) document.body.classList.remove('!pointer-events-auto')
+        }}
         onVerify={(token) => {
           setCaptchaToken(token)
+          if (document !== undefined) document.body.classList.remove('!pointer-events-auto')
         }}
-        onClose={onLocalCancel}
         onExpire={() => {
           setCaptchaToken(null)
         }}

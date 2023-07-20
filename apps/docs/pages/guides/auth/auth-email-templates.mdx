@@ -49,6 +49,28 @@ To guard against this:
 
 Certain email providers may have email tracking, which results in emails sent by GoTrue being overwritten. We recommend disabling email tracking to ensure email links are not overwritten and work as expected.
 
+### Redirecting the user to a server-side endpoint
+
+If you intend to use [Server-side rendering](/docs/guides/auth/server-side-rendering), you might want the email link to redirect the user to a server-side endpoint to check if they are authenticated before returning the page. However, the default email link will redirect the user after verification to the redirect URL with the session in the query fragments. Since the session is returned in the query fragments by default, you won't be able to access it on the server-side.
+
+You can customize the email link in the email template to redirect the user to a server-side endpoint successfully. For example:
+
+```html
+<a href="https://api.example.com/v1/authenticate?token_hash={{ .TokenHash }}&type=invite"
+    >Accept the invite
+  </a>
+```
+When the user clicks on the link, the request will hit `https://api.example.com/v1/authenticate` and you can grab the `token_hash` and `type` query parameters from the URL. Then, you can call the [`verifyOtp`](/docs/reference/javascript/auth-verifyotp) method to get back an authenticated session before redirecting the user back to the client. Since the `verifyOtp` method makes a `POST` request to Supabase Auth to verify the user, the session will be returned in the response body, which can be read by the server. For example:
+
+```js
+const { token_hash, type } = Object.fromEntries(new URLSearchParams(window.location.search))
+const { data: { session }, error } = supabase.auth.verifyOtp({ token_hash, type })
+
+// subsequently redirect the user back to the client
+// ...
+
+```
+
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
 export default Page

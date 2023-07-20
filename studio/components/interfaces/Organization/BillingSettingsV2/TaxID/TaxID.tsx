@@ -18,10 +18,9 @@ import {
 } from 'data/organizations/organization-tax-ids-update-mutation'
 import { useCheckPermissions, useStore } from 'hooks'
 import { uuidv4 } from 'lib/helpers'
-import { isEqual } from 'lodash'
 import { Button, Form, IconPlus, IconX, Input, Listbox } from 'ui'
 import { TAX_IDS } from './TaxID.constants'
-import { sanitizeTaxID } from './TaxID.utilts'
+import { checkTaxIdsEqual, sanitizeTaxID } from './TaxID.utilts'
 
 const TaxID = () => {
   const { ui } = useStore()
@@ -33,7 +32,33 @@ const TaxID = () => {
     isSuccess,
     isError,
   } = useOrganizationTaxIDsQuery({ slug })
-  const { mutateAsync: updateTaxIDs } = useOrganizationTaxIDsUpdateMutation()
+  const { mutate: updateTaxIDs, isLoading: isUpdating } = useOrganizationTaxIDsUpdateMutation({
+    onSuccess: (res) => {
+      const { created, errors } = res
+      setErrors(errors?.map((taxId) => taxId.id) ?? [])
+      const updatedTaxIds =
+        created?.map((x) => {
+          return {
+            id: x.id,
+            type: x.type,
+            value: x.value,
+            name:
+              x.type === 'eu_vat'
+                ? `${x.country} VAT`
+                : TAX_IDS.find((option) => option.code === x.type)?.name ?? '',
+          }
+        }) ?? []
+      setTaxIdValues(updatedTaxIds)
+
+      if (errors !== undefined && errors.length > 0) {
+        errors.forEach((taxId: any) => {
+          ui.setNotification({ category: 'error', message: taxId.result.error.message })
+        })
+      } else {
+        ui.setNotification({ category: 'success', message: 'Successfully updated tax IDs' })
+      }
+    },
+  })
 
   const [errors, setErrors] = useState<string[]>([])
   const [taxIdValues, setTaxIdValues] = useState<TaxIdValue[]>([])
@@ -52,7 +77,7 @@ const TaxID = () => {
     }) ?? []
 
   const formId = 'tax-id-form'
-  const hasChanges = !isEqual(taxIdValues, formattedTaxIds)
+  const hasChanges = !checkTaxIdsEqual(taxIdValues, formattedTaxIds)
   const canReadTaxIds = useCheckPermissions(PermissionAction.BILLING_READ, 'stripe.tax_ids')
   const canUpdateTaxIds = useCheckPermissions(PermissionAction.BILLING_WRITE, 'stripe.tax_ids')
 
@@ -98,28 +123,12 @@ const TaxID = () => {
     setTaxIdValues(formattedTaxIds)
   }
 
-  const onSaveTaxIds = async (values: any, { setSubmitting }: any) => {
+  const onSaveTaxIds = async (values: any) => {
     if (!slug) return console.error('Slug is required')
     if (taxIds === undefined) return console.error('Tax IDs are required')
 
-    try {
-      setSubmitting(true)
-      const newIds = taxIdValues.map((x) => sanitizeTaxID(x))
-      const { errors } = await updateTaxIDs({ slug, existingIds: taxIds, newIds })
-      setErrors(errors?.map((taxId) => taxId.id) ?? [])
-
-      if (errors !== undefined && errors.length > 0) {
-        errors.forEach((taxId: any) => {
-          ui.setNotification({ category: 'error', message: taxId.result.error.message })
-        })
-      } else {
-        ui.setNotification({ category: 'success', message: 'Successfully updated tax IDs' })
-      }
-    } catch (error: any) {
-      ui.setNotification({ category: 'error', message: `Failed to save tax IDs: ${error.message}` })
-    } finally {
-      setSubmitting(false)
-    }
+    const newIds = taxIdValues.map((x) => sanitizeTaxID(x))
+    updateTaxIDs({ slug, existingIds: taxIds, newIds })
   }
 
   return (
@@ -157,13 +166,13 @@ const TaxID = () => {
 
             {isSuccess && (
               <Form validateOnBlur id={formId} initialValues={{}} onSubmit={onSaveTaxIds}>
-                {({ isSubmitting }: { isSubmitting: boolean }) => (
+                {() => (
                   <FormPanel
                     footer={
                       <div className="flex py-4 px-8">
                         <FormActions
                           form={formId}
-                          isSubmitting={isSubmitting}
+                          isSubmitting={isUpdating}
                           hasChanges={hasChanges}
                           handleReset={() => onResetTaxIds()}
                           helper={

@@ -41,7 +41,6 @@ const SpendCapSidePanel = () => {
   const { isDarkMode } = useTheme()
 
   const [showUsageCosts, setShowUsageCosts] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
   const [selectedOption, setSelectedOption] = useState<'on' | 'off'>()
 
   const canUpdateSpendCap = useCheckPermissions(
@@ -54,12 +53,28 @@ const SpendCapSidePanel = () => {
   const onClose = () => snap.setPanelKey(undefined)
 
   const { data: subscription, isLoading } = useProjectSubscriptionV2Query({ projectRef })
-  const { mutateAsync: updateSubscriptionTier } = useProjectSubscriptionUpdateMutation()
-
   const isFreePlan = subscription?.plan?.id === 'free'
   const isSpendCapOn = !subscription?.usage_billing_enabled
   const isTurningOnCap = !isSpendCapOn && selectedOption === 'on'
   const hasChanges = selectedOption !== (isSpendCapOn ? 'on' : 'off')
+
+  const { mutate: updateSubscriptionTier, isLoading: isUpdating } =
+    useProjectSubscriptionUpdateMutation({
+      onSuccess: () => {
+        ui.setNotification({
+          category: 'success',
+          message: `Successfully ${isTurningOnCap ? 'enabled' : 'disabled'} spend cap`,
+        })
+        onClose()
+      },
+      onError: (error) => {
+        ui.setNotification({
+          error,
+          category: 'error',
+          message: `Unable to toggle spend cap: ${error.message}`,
+        })
+      },
+    })
 
   useEffect(() => {
     if (visible && subscription !== undefined) {
@@ -82,26 +97,10 @@ const SpendCapSidePanel = () => {
   const onConfirm = async () => {
     if (!projectRef) return console.error('Project ref is required')
 
-    try {
-      const tier = (
-        selectedOption === 'on' ? PRICING_TIER_PRODUCT_IDS.PRO : PRICING_TIER_PRODUCT_IDS.PAYG
-      ) as 'tier_pro' | 'tier_payg'
-      setIsSubmitting(true)
-      await updateSubscriptionTier({ projectRef, tier })
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully ${isTurningOnCap ? 'enabled' : 'disabled'} spend cap`,
-      })
-      onClose()
-    } catch (error: any) {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Unable to toggle spend cap: ${error.message}`,
-      })
-    } finally {
-      setIsSubmitting(false)
-    }
+    const tier = (
+      selectedOption === 'on' ? PRICING_TIER_PRODUCT_IDS.PRO : PRICING_TIER_PRODUCT_IDS.PAYG
+    ) as 'tier_pro' | 'tier_payg'
+    updateSubscriptionTier({ projectRef, tier })
   }
 
   const billingMetricCategories: (keyof typeof pricing)[] = [
@@ -115,8 +114,8 @@ const SpendCapSidePanel = () => {
   return (
     <SidePanel
       size="large"
-      loading={isLoading || isSubmitting}
-      disabled={isFreePlan || isLoading || !hasChanges || isSubmitting || !canUpdateSpendCap}
+      loading={isLoading || isUpdating}
+      disabled={isFreePlan || isLoading || !hasChanges || isUpdating || !canUpdateSpendCap}
       visible={visible}
       onCancel={onClose}
       onConfirm={onConfirm}
@@ -187,7 +186,7 @@ const SpendCapSidePanel = () => {
                             </Table.td>
                             <Table.td>
                               <p className="text-xs pl-4">
-                                {item.plans[subscription?.plan?.id || 'pro']}
+                                {item.plans['pro']}
                               </p>
                             </Table.td>
                           </Table.tr>
