@@ -1253,3 +1253,5 @@ export const sqlAiDisclaimerComment = stripIndent`
   -- Supabase AI is experimental and may produce incorrect answers
   -- Always verify the output before executing
 `
+
+export const untitledSnippetTitle = 'Untitled query'
