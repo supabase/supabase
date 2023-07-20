@@ -9,6 +9,7 @@ import { Dispatch, SetStateAction, useState } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import 'swiper/swiper.min.css'
 import { CodeBlock, IconChevronLeft, IconExternalLink } from 'ui'
+import Admonition from '~/components/Admonition'
 import ImageModal from '~/components/ImageModal'
 import InlineCodeTag from '~/components/InlineCode'
 import DefaultLayout from '~/components/Layouts/Default'
@@ -24,6 +25,7 @@ function mdxComponents(callback: Dispatch<SetStateAction<string | null>>) {
   const components = {
     CodeBlock,
     CH,
+    Admonition,
     pre: (props: any) => {
       return <CodeBlock {...props.children.props} />
     },
