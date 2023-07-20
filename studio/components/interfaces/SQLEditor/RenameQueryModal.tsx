@@ -21,6 +21,7 @@ const RenameQueryModal = ({ snippet, visible, onCancel, onComplete }: RenameQuer
   const { id, name, description } = snippet
 
   const [nameInput, setNameInput] = useState(name)
+  const [descriptionInput, setDescriptionInput] = useState(description)
 
   const validate = () => {
     const errors: any = {}
@@ -34,7 +35,7 @@ const RenameQueryModal = ({ snippet, visible, onCancel, onComplete }: RenameQuer
 
     setSubmitting(true)
     try {
-      snap.renameSnippet(id, nameInput, values.description)
+      snap.renameSnippet(id, nameInput, descriptionInput)
       if (onComplete) onComplete()
       return Promise.resolve()
     } catch (error: any) {
@@ -77,8 +78,13 @@ const RenameQueryModal = ({ snippet, visible, onCancel, onComplete }: RenameQuer
                   isAiButtonVisible ? (
                     <Button
                       onClick={async () => {
-                        const { title } = await generateSqlTitle({ sql: snippet.content.sql })
+                        const { title, description } = await generateSqlTitle({
+                          sql: snippet.content.sql,
+                        })
                         setNameInput(title)
+                        if (!descriptionInput) {
+                          setDescriptionInput(description)
+                        }
                       }}
                       icon={
                         !isTitleGenerationLoading ? (
@@ -95,7 +101,15 @@ const RenameQueryModal = ({ snippet, visible, onCancel, onComplete }: RenameQuer
               />
             </Modal.Content>
             <Modal.Content>
-              <Input label="Description" id="description" placeholder="Describe query" />
+              <Input.TextArea
+                label="Description"
+                id="description"
+                placeholder="Describe query"
+                size="medium"
+                textAreaClassName="resize-none"
+                value={descriptionInput}
+                onChange={(e) => setDescriptionInput(e.target.value)}
+              />
             </Modal.Content>
             <Modal.Separator />
             <Modal.Content>

@@ -193,6 +193,7 @@ function Input({
 
 export interface TextAreaProps
   extends Omit<React.InputHTMLAttributes<HTMLTextAreaElement>, 'size' | 'onCopy'> {
+  textAreaClassName?: string
   descriptionText?: string
   error?: string
   icon?: any
@@ -213,6 +214,7 @@ export interface TextAreaProps
 
 function TextArea({
   className,
+  textAreaClassName,
   descriptionText,
   disabled,
   error,
@@ -296,6 +298,7 @@ function TextArea({
   if (icon) classes.push(__styles.with_icon)
   if (size) classes.push(__styles.size[size])
   if (disabled) classes.push(__styles.disabled)
+  if (textAreaClassName) classes.push(textAreaClassName)
 
   return (
     <FormLayout
