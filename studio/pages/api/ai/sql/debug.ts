@@ -127,11 +127,11 @@ export default async function handler(req: NextRequest) {
   const debugSqlResult: DebugSqlResult = JSON.parse(sqlResponseString)
 
   if (!debugSqlResult.sql) {
-    console.error(`AI SQL debugging failed: Unable to debug SQL for the given prompt`)
+    console.error(`AI SQL debugging failed: Unable to debug SQL for the given error message`)
 
     return new Response(
       JSON.stringify({
-        error: 'Unable to debug SQL. Try adding more details to your prompt.',
+        error: 'Unable to debug SQL',
       }),
       {
         status: 400,
