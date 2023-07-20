@@ -14,12 +14,17 @@ import { API_URL, DEFAULT_MINIMUM_PASSWORD_STRENGTH } from 'lib/constants'
 import Panel from 'components/ui/Panel'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
 import { getProjectDetail } from 'data/projects/project-detail-query'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
 const ResetDbPassword: FC<any> = ({ disabled = false }) => {
   const { ui, app, meta } = useStore()
   const { ref } = useParams()
-
-  const canResetDbPassword = useCheckPermissions(PermissionAction.UPDATE, 'projects')
+  const { project } = useProjectContext()
+  const canResetDbPassword = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
+    resource: {
+      project_id: project?.id,
+    },
+  })
 
   const [showResetDbPass, setShowResetDbPass] = useState<boolean>(false)
   const [isUpdatingPassword, setIsUpdatingPassword] = useState<boolean>(false)

@@ -12,6 +12,7 @@ import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mu
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 import { useProjectUsageQuery } from 'data/usage/project-usage-query'
 import { useCheckPermissions, useStore } from 'hooks'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
 export interface DiskSizeConfigurationProps {
   disabled?: boolean
@@ -22,7 +23,12 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
   const { ref: projectRef } = useParams()
 
   const [showResetDbPass, setShowResetDbPass] = useState<boolean>(false)
-  const canUpdateDiskSizeConfig = useCheckPermissions(PermissionAction.UPDATE, 'projects')
+  const { project } = useProjectContext()
+  const canUpdateDiskSizeConfig = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
+    resource: {
+      project_id: project?.id,
+    },
+  })
 
   const { data: projectUsage } = useProjectUsageQuery({ projectRef })
   const { data: projectSubscriptionData } = useProjectSubscriptionV2Query({ projectRef })

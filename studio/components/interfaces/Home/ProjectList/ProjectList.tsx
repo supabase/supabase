@@ -93,7 +93,11 @@ const OrganizationProjects = ({
   rewriteHref,
 }: OrganizationProjectsProps) => {
   const isEmpty = !projects || projects.length === 0
-  const canReadProjects = useCheckPermissions(PermissionAction.READ, 'projects', undefined, id)
+  // TODO: we dont have general READ permission for all projects anymore.
+  // We need to check READ permission per project
+  const canReadProjects = true
+  // useCheckPermissions(PermissionAction.READ, 'projects', undefined, id)
+  // End
 
   return (
     <div className="space-y-3" key={makeRandomString(5)}>

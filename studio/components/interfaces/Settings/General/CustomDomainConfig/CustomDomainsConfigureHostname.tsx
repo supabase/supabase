@@ -15,6 +15,7 @@ import {
 } from 'components/ui/Forms'
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useCustomDomainCreateMutation } from 'data/custom-domains/custom-domains-create-mutation'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
 const schema = yup.object({
   domain: yup.string().required('A value for your custom domain is required'),
@@ -25,10 +26,15 @@ const CustomDomainsConfigureHostname = () => {
   const { ref } = useParams()
   const { mutate: createCustomDomain, isLoading: isCreating } = useCustomDomainCreateMutation()
   const { data: settings } = useProjectApiQuery({ projectRef: ref })
+  const { project } = useProjectContext()
 
   const FORM_ID = 'custom-domains-form'
   const endpoint = settings?.autoApiService.endpoint
-  const canConfigureCustomDomain = useCheckPermissions(PermissionAction.UPDATE, 'projects')
+  const canConfigureCustomDomain = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
+    resource: {
+      project_id: project?.id,
+    },
+  })
 
   const verifyCNAME = async (domain: string): Promise<boolean> => {
     const res = await fetch(`https://1.1.1.1/dns-query?name=${domain}`, {

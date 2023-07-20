@@ -14,6 +14,7 @@ import RemoveRestrictionModal from './RemoveRestrictionModal'
 import DisallowAllModal from './DisallowAllModal'
 import AllowAllModal from './AllowAllModal'
 import { useNetworkRestrictionsQuery } from 'data/network-restrictions/network-restrictions-query'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
 const AllowAllAccessButton: FC<{ disabled: boolean; onClick: (value: boolean) => void }> = ({
   disabled,
@@ -77,14 +78,18 @@ const DisallowAllAccessButton: FC<{ disabled: boolean; onClick: (value: boolean)
 
 const NetworkRestrictions = ({}) => {
   const { ref } = useParams()
-
+  const { project } = useProjectContext()
   const [isAddingAddress, setIsAddingAddress] = useState(false)
   const [isAllowingAll, setIsAllowingAll] = useState(false)
   const [isDisallowingAll, setIsDisallowingAll] = useState(false)
   const [selectedRestrictionToRemove, setSelectedRestrictionToRemove] = useState<string>()
   const { data, isLoading } = useNetworkRestrictionsQuery({ projectRef: ref })
 
-  const canUpdateNetworkRestrictions = useCheckPermissions(PermissionAction.UPDATE, 'projects')
+  const canUpdateNetworkRestrictions = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
+    resource: {
+      project_id: project?.id,
+    },
+  })
 
   const hasAccessToRestrictions = data?.entitlement === 'allowed'
   const restrictedIps = data?.config?.dbAllowedCidrs ?? []
