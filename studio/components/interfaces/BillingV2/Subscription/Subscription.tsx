@@ -5,7 +5,6 @@ import CostControl from './CostControl/CostControl'
 import SubscriptionTier from './Tier/SubscriptionTier'
 import { SUBSCRIPTION_PANEL_KEYS, useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { useSelectedOrganization } from 'hooks'
-import { useEffect } from 'react'
 
 export interface SubscriptionProps {}
 
@@ -24,40 +23,12 @@ const Subscription = ({}: SubscriptionProps) => {
   const panel = router.query.panel
   const isOrgBilling = !!organization?.subscription_id
 
-  useEffect(() => {
-    if (isOrgBilling) {
-      const { ref, panel } = router.query
-      let redirectUri = `/org/${organization.slug}/billing`
-      switch (panel) {
-        case 'subscriptionPlan':
-          redirectUri = `/org/${organization.slug}/billing?panel=subscriptionPlan`
-          break
-        case 'costControl':
-          redirectUri = `/org/${organization.slug}/billing?panel=costControl`
-          break
-        case 'computeInstance':
-          redirectUri = `/project/${ref}/settings/addons?panel=computeInstance`
-          break
-        case 'pitr':
-          redirectUri = `/project/${ref}/settings/addons?panel=pitr`
-          break
-        case 'customDomain':
-          redirectUri = `/project/${ref}/settings/addons?panel=customDomain`
-          break
-      }
-
-      router.push(redirectUri)
-    }
-  }, [router, organization?.slug, isOrgBilling])
-
-  useEffect(() => {
-    if (panel && typeof panel === 'string' && allowedValues.includes(panel)) {
-      snap.setPanelKey(panel as SUBSCRIPTION_PANEL_KEYS)
-    }
-  }, [panel])
-
   // No need to bother rendering, we'll redirect anyway
   if (isOrgBilling) return null
+
+  if (panel && typeof panel === 'string' && allowedValues.includes(panel)) {
+    snap.setPanelKey(panel as SUBSCRIPTION_PANEL_KEYS)
+  }
 
   return (
     <>
