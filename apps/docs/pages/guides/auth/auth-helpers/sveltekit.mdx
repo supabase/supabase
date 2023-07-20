@@ -749,24 +749,6 @@ export const actions = {
 }
 ```
 
-## Frequently asked questions
-
-<AuthHelpersFAQ />
-
-### OAuth sign in isn't redirecting on the server side
-
-The reason behind this limitation is that the auth helpers library lacks a direct mechanism for performing server-side redirects, as each framework handles redirects differently. However, the library does offer a URL through the data property it returns, which should be utilized for the purpose of redirection.
-
-```ts
-import { redirect } from '@sveltejs/kit';
-...
-const { data } = await supabase.auth.signInWithOAuth({
-  provider: 'github',
-})
-
-throw redirect(303, data.url)
-```
-
 ## Migration Guide [#migration]
 
 ### Migrate to 0.10
