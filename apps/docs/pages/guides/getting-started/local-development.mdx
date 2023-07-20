@@ -426,8 +426,8 @@ redirect_uri = "http://localhost:54321/auth/v1/callback"
 As a best practice, any secret values should be loaded from environment variables. You can add them to `supabase/.env` for the CLI to automatically substitute them.
 
 ```bash supabase/.env
-SUPABASE_AUTH_GITHUB_CLIENT_ID="redacted"
-SUPABASE_AUTH_GITHUB_SECRET="redacted"
+GITHUB_CLIENT_ID="redacted"
+GITHUB_SECRET="redacted"
 ```
 
 For these changes to take effect, you need to run `supabase stop` and `supabase start` again.
