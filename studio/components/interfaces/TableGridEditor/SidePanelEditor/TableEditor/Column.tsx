@@ -1,25 +1,24 @@
-import { FC } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import {
-  Checkbox,
-  Input,
-  IconX,
-  IconMenu,
-  Popover,
-  IconLink,
-  IconSettings,
-  Button,
-  IconArrowRight,
-} from 'ui'
 import type { PostgresType } from '@supabase/postgres-meta'
+import {
+  Button,
+  Checkbox,
+  IconArrowRight,
+  IconLink,
+  IconMenu,
+  IconSettings,
+  IconX,
+  Input,
+  Popover,
+} from 'ui'
 
-import { ColumnField } from '../SidePanelEditor.types'
+import { FOREIGN_KEY_DELETION_ACTION } from 'data/database/database-query-constants'
+import { typeExpressionSuggestions } from '../ColumnEditor/ColumnEditor.constants'
+import { Suggestion } from '../ColumnEditor/ColumnEditor.types'
+import { getForeignKeyDeletionAction } from '../ColumnEditor/ColumnEditor.utils'
 import ColumnType from '../ColumnEditor/ColumnType'
 import InputWithSuggestions from '../ColumnEditor/InputWithSuggestions'
-import { Suggestion } from '../ColumnEditor/ColumnEditor.types'
-import { typeExpressionSuggestions } from '../ColumnEditor/ColumnEditor.constants'
-import { FOREIGN_KEY_DELETION_ACTION } from 'data/database/database-query-constants'
-import { getForeignKeyDeletionAction } from '../ColumnEditor/ColumnEditor.utils'
+import { ColumnField } from '../SidePanelEditor.types'
 
 /**
  * [Joshen] For context:
@@ -50,7 +49,7 @@ interface Props {
   onRemoveColumn: () => void
 }
 
-const Column: FC<Props> = ({
+const Column = ({
   column = {} as ColumnField,
   enumTypes = [] as PostgresType[],
   isNewRecord = false,
@@ -59,7 +58,7 @@ const Column: FC<Props> = ({
   onEditRelation = () => {},
   onUpdateColumn = () => {},
   onRemoveColumn = () => {},
-}) => {
+}: Props) => {
   const suggestions: Suggestion[] = typeExpressionSuggestions?.[column.format] ?? []
 
   const settingsCount = [
@@ -150,7 +149,11 @@ const Column: FC<Props> = ({
             className="table-editor-column-type lg:gap-0 "
             disabled={column.foreignKey !== undefined}
             onOptionSelect={(format: string) => {
-              onUpdateColumn({ format, defaultValue: null })
+              let defaultValue = null
+              if (format === 'uuid') {
+                defaultValue = 'gen_random_uuid()'
+              }
+              onUpdateColumn({ format, defaultValue })
             }}
           />
         </div>
