@@ -444,21 +444,27 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                         id="subject"
                         label="Subject"
                         placeholder="Summary of the problem you have"
-                        actions={
-                          values.subject.length > 0 && INCLUDE_DISCUSSIONS.includes(values.category)
-                            ? [
-                                <Link
-                                  key="gh-discussions"
-                                  href={`https://github.com/orgs/supabase/discussions?discussions_q=${values.subject}`}
+                        descriptionText={
+                          values.subject.length > 0 &&
+                          INCLUDE_DISCUSSIONS.includes(values.category) ? (
+                            <p className="flex items-center space-x-1">
+                              <span>Have you checked our </span>
+                              <Link
+                                key="gh-discussions"
+                                href={`https://github.com/orgs/supabase/discussions?discussions_q=${values.subject}`}
+                              >
+                                <a
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="flex items-center space-x-2 text-scale-1000 underline hover:text-scale-1100 transition"
                                 >
-                                  <a className="mr-1" target="_blank" rel="noreferrer">
-                                    <Button type="default" icon={<IconExternalLink />}>
-                                      Check Github discussions
-                                    </Button>
-                                  </a>
-                                </Link>,
-                              ]
-                            : []
+                                  Github discussions
+                                  <IconExternalLink size={14} strokeWidth={2} className="ml-1" />
+                                </a>
+                              </Link>
+                              <span>?</span>
+                            </p>
+                          ) : null
                         }
                       />
                     </div>
