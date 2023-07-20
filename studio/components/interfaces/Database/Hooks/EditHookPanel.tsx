@@ -28,12 +28,10 @@ export interface EditHookPanelProps {
 export type HTTPArgument = { id: string; name: string; value: string }
 
 const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) => {
-  // [Joshen] Need to change to use RQ once Alaister's PR goes in
   const { ref } = useParams()
   const { meta, ui } = useStore()
   const submitRef = useRef<any>(null)
   const [isEdited, setIsEdited] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const [isClosingPanel, setIsClosingPanel] = useState(false)
 
   // [Joshen] There seems to be some bug between Checkbox.Group within the Form component
@@ -47,8 +45,41 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
 
   const { project } = useProjectContext()
   const { data: functions } = useEdgeFunctionsQuery({ projectRef: ref })
-  const { mutateAsync: createDatabaseTrigger } = useDatabaseTriggerCreateMutation()
-  const { mutateAsync: updateDatabaseTrigger } = useDatabaseTriggerUpdateMutation()
+  const { mutate: createDatabaseTrigger, isLoading: isCreatingDatabaseTrigger } =
+    useDatabaseTriggerCreateMutation({
+      onSuccess: (res) => {
+        ui.setNotification({
+          category: 'success',
+          message: `Successfully created new webhook "${res.name}"`,
+        })
+        onClose()
+      },
+      onError: (error) => {
+        ui.setNotification({
+          error,
+          category: 'error',
+          message: `Failed to create webhook: ${error.message}`,
+        })
+      },
+    })
+  const { mutate: updateDatabaseTrigger, isLoading: isUpdatingDatabaseTrigger } =
+    useDatabaseTriggerUpdateMutation({
+      onSuccess: (res) => {
+        ui.setNotification({
+          category: 'success',
+          message: `Successfully updated webhook "${res.name}"`,
+        })
+        onClose()
+      },
+      onError: (error) => {
+        ui.setNotification({
+          error,
+          category: 'error',
+          message: `Failed to update webhook: ${error.message}`,
+        })
+      },
+    })
+  const isSubmitting = isCreatingDatabaseTrigger || isUpdatingDatabaseTrigger
 
   const tables = meta.tables.list().sort((a, b) => (a.schema > b.schema ? 0 : -1))
   const restUrl = project?.restUrl
@@ -70,7 +101,6 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
   useEffect(() => {
     if (visible) {
       setIsEdited(false)
-      setIsSubmitting(false)
       setIsClosingPanel(false)
 
       // Reset form fields outside of the Form context
@@ -190,50 +220,18 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
     }
 
     if (selectedHook === undefined) {
-      try {
-        setIsSubmitting(true)
-        await createDatabaseTrigger({
-          projectRef: project?.ref,
-          connectionString: project?.connectionString,
-          payload,
-        })
-        ui.setNotification({
-          category: 'success',
-          message: `Successfully created new webhook "${values.name}"`,
-        })
-        onClose()
-      } catch (error: any) {
-        ui.setNotification({
-          error,
-          category: 'error',
-          message: `Failed to create webhook: ${error.message}`,
-        })
-      } finally {
-        setIsSubmitting(false)
-      }
+      createDatabaseTrigger({
+        projectRef: project?.ref,
+        connectionString: project?.connectionString,
+        payload,
+      })
     } else {
-      try {
-        setIsSubmitting(true)
-        await updateDatabaseTrigger({
-          projectRef: project?.ref,
-          connectionString: project?.connectionString,
-          originalTrigger: selectedHook,
-          updatedTrigger: payload,
-        })
-        ui.setNotification({
-          category: 'success',
-          message: `Successfully updated webhook "${values.name}"`,
-        })
-        onClose()
-      } catch (error: any) {
-        ui.setNotification({
-          error,
-          category: 'error',
-          message: `Failed to update webhook: ${error.message}`,
-        })
-      } finally {
-        setIsSubmitting(false)
-      }
+      updateDatabaseTrigger({
+        projectRef: project?.ref,
+        connectionString: project?.connectionString,
+        originalTrigger: selectedHook,
+        updatedTrigger: payload,
+      })
     }
   }
 

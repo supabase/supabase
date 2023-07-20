@@ -1,7 +1,10 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'react-hot-toast'
+
 import { Query, SupaTable } from 'components/grid'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
+import { ResponseError } from 'types'
 
 export type TableRowCreateVariables = {
   projectRef: string
@@ -30,9 +33,7 @@ export async function createTableRow({
   enumArrayColumns,
 }: TableRowCreateVariables) {
   const sql = getTableRowCreateSql({ table, payload, enumArrayColumns })
-
   const { result } = await executeSql({ projectRef, connectionString, sql })
-
   return result
 }
 
@@ -40,22 +41,28 @@ type TableRowCreateData = Awaited<ReturnType<typeof createTableRow>>
 
 export const useTableRowCreateMutation = ({
   onSuccess,
+  onError,
   ...options
 }: Omit<
-  UseMutationOptions<TableRowCreateData, unknown, TableRowCreateVariables>,
+  UseMutationOptions<TableRowCreateData, ResponseError, TableRowCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<TableRowCreateData, unknown, TableRowCreateVariables>(
+  return useMutation<TableRowCreateData, ResponseError, TableRowCreateVariables>(
     (vars) => createTableRow(vars),
     {
       async onSuccess(data, variables, context) {
         const { projectRef, table } = variables
-
         await queryClient.invalidateQueries(sqlKeys.query(projectRef, [table.schema, table.name]))
-
         await onSuccess?.(data, variables, context)
+      },
+      async onError(data, variables, context) {
+        if (onError === undefined) {
+          toast.error(data.message)
+        } else {
+          onError(data, variables, context)
+        }
       },
       ...options,
     }

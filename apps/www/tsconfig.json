@@ -2,7 +2,8 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "~/*": ["./*"]
+      "~/*": ["./*"],
+      "@ui/*": ["./../../packages/ui/src/*"] // handle ui package paths
     },
     "downlevelIteration": true,
     "target": "es5",

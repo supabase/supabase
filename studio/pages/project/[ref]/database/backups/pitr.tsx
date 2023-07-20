@@ -12,8 +12,8 @@ import Loading from 'components/ui/Loading'
 import NoPermission from 'components/ui/NoPermission'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useCheckPermissions, useStore } from 'hooks'
-import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import { NextPageWithLayout } from 'types'
+import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 
 const DatabasePhysicalBackups: NextPageWithLayout = () => {
   const router = useRouter()
@@ -59,8 +59,13 @@ const PITR = observer(() => {
   const { project } = useProjectContext()
   const { configuration, error, isLoading } = backups
 
+  const { data: subscription } = useProjectSubscriptionV2Query(
+    { projectRef: project?.ref },
+    { enabled: project?.ref !== undefined }
+  )
+
   const ref = project?.ref ?? 'default'
-  const tier = project?.subscription_tier
+  const plan = subscription?.plan?.id
   const isEnabled = configuration.walg_enabled
 
   const canReadPhysicalBackups = useCheckPermissions(PermissionAction.READ, 'physical_backups')
@@ -74,7 +79,7 @@ const PITR = observer(() => {
         projectRef={ref}
         primaryText="Point in time recovery is a Pro plan add-on."
         secondaryText={
-          tier === PRICING_TIER_PRODUCT_IDS.FREE
+          plan === 'free'
             ? 'Upgrade to the Pro plan with the PITR add-on selected to enable point in time recovery for your project.'
             : 'Please enable the add-on to enable point in time recovery for your project.'
         }

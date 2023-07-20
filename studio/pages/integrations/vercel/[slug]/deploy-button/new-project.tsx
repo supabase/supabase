@@ -1,3 +1,4 @@
+import generator from 'generate-password'
 import { debounce } from 'lodash'
 import { useRouter } from 'next/router'
 import { ChangeEvent, useRef, useState } from 'react'
@@ -15,12 +16,11 @@ import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-pr
 import { Integration } from 'data/integrations/integrations.types'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectCreateMutation } from 'data/projects/project-create-mutation'
-import generator from 'generate-password'
 import { useSelectedOrganization, useStore } from 'hooks'
 import { AWS_REGIONS, DEFAULT_MINIMUM_PASSWORD_STRENGTH, PROVIDERS } from 'lib/constants'
 import { passwordStrength } from 'lib/helpers'
 import { getInitialMigrationSQLFromGitHubRepo } from 'lib/integration-utils'
-import { NextPageWithLayout, ProjectBase } from 'types'
+import { NextPageWithLayout } from 'types'
 import { Alert, Button, Checkbox, IconBook, IconLifeBuoy, Input, Listbox, LoadingLine } from 'ui'
 
 const VercelIntegration: NextPageWithLayout = () => {
@@ -80,7 +80,7 @@ const CreateProject = ({
   const [passwordStrengthScore, setPasswordStrengthScore] = useState(-1)
   const [shouldRunMigrations, setShouldRunMigrations] = useState(true)
   const [dbRegion, setDbRegion] = useState(PROVIDERS.AWS.default_region)
-  // const [loading, setLoading] = useState(false)
+
   const delayedCheckPasswordStrength = useRef(
     debounce((value: string) => checkPasswordStrength(value), 300)
   ).current
@@ -98,7 +98,6 @@ const CreateProject = ({
   const { mutateAsync: syncEnvs } = useIntegrationsVercelConnectionSyncEnvsMutation()
 
   const { data: organizationData, isLoading: isLoadingOrganizationsQuery } = useOrganizationsQuery()
-
   const organization = organizationData?.find((x) => x.slug === slug)
 
   /**
@@ -159,77 +158,50 @@ const CreateProject = ({
     delayedCheckPasswordStrength(password)
   }
 
-  const { mutateAsync: createProject } = useProjectCreateMutation()
+  const { mutate: createProject } = useProjectCreateMutation({
+    onSuccess: (res) => {
+      setNewProjectRef(res.ref)
+    },
+    onError: (error) => {
+      ui.setNotification({ error, category: 'error', message: error.message })
+      setLoading(false)
+    },
+  })
 
   const [newProjectRef, setNewProjectRef] = useState<string | undefined>(undefined)
   async function onCreateProject() {
-    if (!organizationIntegration) {
-      console.error('No organization installation details found')
-    }
-
-    if (!organizationIntegration?.id) {
-      console.error('No organization installation ID found')
-      return
-    }
-
-    if (!foreignProjectId) {
-      console.error('No foreignProjectId ID set')
-      return
-    }
-
-    if (!configurationId) {
-      console.error('No configurationId ID set')
-      return
-    }
+    if (!organizationIntegration) return console.error('No organization installation details found')
+    if (!organizationIntegration?.id) return console.error('No organization installation ID found')
+    if (!foreignProjectId) return console.error('No foreignProjectId ID set')
+    if (!configurationId) return console.error('No configurationId ID set')
+    if (!organization) return console.error('No organization ID set')
 
     setLoading(true)
 
-    try {
-      if (!organization) {
-        throw new Error('No organization set')
-      }
+    let dbSql: string | undefined
+    if (shouldRunMigrations) {
+      const id = ui.setNotification({
+        category: 'info',
+        message: `Fetching initial migrations from GitHub repo`,
+      })
 
-      let dbSql: string | undefined
-      if (shouldRunMigrations) {
-        const id = ui.setNotification({
-          category: 'info',
-          message: `Fetching initial migrations from GitHub repo`,
-        })
+      dbSql = (await getInitialMigrationSQLFromGitHubRepo(externalId)) ?? undefined
 
-        dbSql = (await getInitialMigrationSQLFromGitHubRepo(externalId)) ?? undefined
-
-        ui.setNotification({
-          id,
-          category: 'success',
-          message: `Done fetching initial migrations`,
-        })
-      }
-
-      let project: ProjectBase
-
-      try {
-        project = await createProject({
-          organizationId: organization.id,
-          name: projectName,
-          dbPass,
-          dbRegion,
-          dbSql,
-          configurationId,
-        })
-
-        setNewProjectRef(project.ref)
-      } catch (error: any) {
-        setLoading(false)
-        ui.setNotification({
-          category: 'error',
-          message: `Failed to create project: ${error.message}`,
-        })
-        return
-      }
-    } catch (error) {
-      console.error('Error', error)
-      setLoading(false)
+      ui.setNotification({
+        id,
+        category: 'success',
+        message: `Done fetching initial migrations`,
+      })
     }
+
+    createProject({
+      organizationId: organization.id,
+      name: projectName,
+      dbPass,
+      dbRegion,
+      dbSql,
+      configurationId,
+    })
   }
   const isInstallingRef = useRef(false)
 
@@ -256,7 +228,7 @@ const CreateProject = ({
         }
         isInstallingRef.current = true
 
-        const projectDetails = vercelProjects?.find((x) => x.id === foreignProjectId)
+        const projectDetails = vercelProjects?.find((x: any) => x.id === foreignProjectId)
 
         try {
           const { id: connectionId } = await createConnections({
