@@ -1175,9 +1175,9 @@ functions:
           <TabPanel id="js" label="JavaScript">
 
             ```ts
-            const { count, error } = await supabase
-              .from('countries')
-              .select('*', { count: 'exact', head: true })
+            const { error, data, count } = await supabase
+              .from('table')
+              .select('*', { count: 'exact' })
             ```
 
           </TabPanel>
