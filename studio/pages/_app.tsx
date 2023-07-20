@@ -55,6 +55,7 @@ import Favicons from 'components/head/Favicons'
 import ConsentToast from 'components/ui/ConsentToast'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { toast } from 'react-hot-toast'
+import { useAppStateSnapshot } from 'state/app-state'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
@@ -65,6 +66,7 @@ dart(Prism)
 function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   const consentToastId = useRef<string>()
   const queryClient = useRootQueryClient()
+  const snap = useAppStateSnapshot()
   const [rootStore] = useState(() => new RootStore())
 
   // [Joshen] Some issues with using createBrowserSupabaseClient
@@ -79,20 +81,19 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
 
   const getSavingState = () => rootStore.content.savingState
 
-  const onAcceptConsent = () => {
-    if (typeof window !== 'undefined')
-      localStorage.setItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT, 'true')
-    if (consentToastId.current) toast.dismiss(consentToastId.current)
-  }
-  const onOptOut = () => {
-    if (typeof window !== 'undefined')
-      localStorage.setItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT, 'false')
-    if (consentToastId.current) toast.dismiss(consentToastId.current)
-  }
-
   useEffect(() => {
     // Check for telemetry consent
     if (typeof window !== 'undefined') {
+      const onAcceptConsent = () => {
+        snap.setIsOptedInTelemetry(true)
+        if (consentToastId.current) toast.dismiss(consentToastId.current)
+      }
+
+      const onOptOut = () => {
+        snap.setIsOptedInTelemetry(false)
+        if (consentToastId.current) toast.dismiss(consentToastId.current)
+      }
+
       const hasAcknowledgedConsent = localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
       if (hasAcknowledgedConsent === null) {
         consentToastId.current = toast(
