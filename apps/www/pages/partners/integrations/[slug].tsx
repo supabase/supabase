@@ -1,4 +1,6 @@
+import { CodeHikeConfig, remarkCodeHike } from '@code-hike/mdx'
 import { CH } from '@code-hike/mdx/components'
+import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
 import { GetStaticPaths, GetStaticProps } from 'next'
 import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
 import { serialize } from 'next-mdx-remote/serialize'
@@ -6,11 +8,11 @@ import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Dispatch, SetStateAction, useState } from 'react'
+import remarkGfm from 'remark-gfm'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import 'swiper/swiper.min.css'
-import { Admonition, CodeBlock, IconChevronLeft, IconExternalLink } from 'ui'
+import { Admonition, IconChevronLeft, IconExternalLink } from 'ui'
 import ImageModal from '~/components/ImageModal'
-import InlineCodeTag from '~/components/InlineCode'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import supabase from '~/lib/supabase'
@@ -22,12 +24,8 @@ import Error404 from '../../404'
  */
 function mdxComponents(callback: Dispatch<SetStateAction<string | null>>) {
   const components = {
-    CodeBlock,
     CH,
     Admonition,
-    pre: (props: any) => {
-      return <CodeBlock {...props.children.props} />
-    },
     /**
      * Returns a custom img element which has a bound onClick listener. When the image is clicked, it will open a modal showing that particular image.
      */
@@ -36,7 +34,6 @@ function mdxComponents(callback: Dispatch<SetStateAction<string | null>>) {
     ) => {
       return <img {...props} onClick={() => callback(props.src!)} />
     },
-    code: (props: any) => <InlineCodeTag>{props.children}</InlineCodeTag>,
   }
 
   return components
@@ -292,8 +289,21 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     }
   }
 
+  const codeHikeOptions: CodeHikeConfig = {
+    theme: codeHikeTheme,
+    lineNumbers: true,
+    showCopyButton: true,
+    skipLanguages: [],
+    autoImport: false,
+  }
+
   // Parse markdown
-  const overview = await serialize(partner.overview)
+  const overview = await serialize(partner.overview, {
+    mdxOptions: {
+      useDynamicImport: true,
+      remarkPlugins: [remarkGfm, [remarkCodeHike, codeHikeOptions]],
+    },
+  })
 
   return {
     props: { partner, overview },
