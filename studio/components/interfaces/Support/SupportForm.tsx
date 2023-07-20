@@ -36,6 +36,7 @@ import { CATEGORY_OPTIONS, SERVICE_OPTIONS, SEVERITY_OPTIONS } from './Support.c
 import { formatMessage, uploadAttachments } from './SupportForm.utils'
 
 const MAX_ATTACHMENTS = 5
+const INCLUDE_DISCUSSIONS = ['Problem', 'Database_unresponsive']
 
 export interface SupportFormProps {
   setSentCategory: (value: string) => void
@@ -443,6 +444,22 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                         id="subject"
                         label="Subject"
                         placeholder="Summary of the problem you have"
+                        actions={
+                          values.subject.length > 0 && INCLUDE_DISCUSSIONS.includes(values.category)
+                            ? [
+                                <Link
+                                  key="gh-discussions"
+                                  href={`https://github.com/orgs/supabase/discussions?discussions_q=${values.subject}`}
+                                >
+                                  <a className="mr-1" target="_blank" rel="noreferrer">
+                                    <Button type="default" icon={<IconExternalLink />}>
+                                      Check Github discussions
+                                    </Button>
+                                  </a>
+                                </Link>,
+                              ]
+                            : []
+                        }
                       />
                     </div>
                     {values.category === 'Problem' && (

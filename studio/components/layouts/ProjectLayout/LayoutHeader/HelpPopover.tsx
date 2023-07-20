@@ -6,6 +6,7 @@ import {
   Popover,
   IconBookOpen,
   IconActivity,
+  IconTool,
 } from 'ui'
 import { useRouter } from 'next/router'
 import { FC } from 'react'
@@ -36,10 +37,10 @@ const HelpPopover: FC<Props> = () => {
               hosted services.
             </p>
             <div className="space-x-1">
-              <Link passHref href={supportUrl}>
-                <a>
-                  <Button type="default" icon={<IconMail />}>
-                    Contact Support
+              <Link passHref href="https://supabase.com/docs/guides/platform/troubleshooting">
+                <a target="_blank" rel="noreferrer">
+                  <Button type="default" icon={<IconTool />}>
+                    Troubleshooting
                   </Button>
                 </a>
               </Link>
@@ -62,6 +63,15 @@ const HelpPopover: FC<Props> = () => {
               Expected response time is based on your billing plan. Pro and Pay as You Go plans are
               prioritized.
             </p>
+            <div>
+              <Link passHref href={supportUrl}>
+                <a>
+                  <Button type="default" icon={<IconMail />}>
+                    Contact Support
+                  </Button>
+                </a>
+              </Link>
+            </div>
           </div>
           <Popover.Separator />
           <div className="mb-4 space-y-2">
