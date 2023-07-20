@@ -228,7 +228,7 @@ function Partner({
                     </a>
                   </div>
 
-                  {partner.type === 'technology' && (
+                  {partner.type === 'technology' && partner.docs && (
                     <div className="flex items-center justify-between py-2">
                       <span className="text-scale-900">Documentation</span>
                       <a
