@@ -1,25 +1,31 @@
+import { observer } from 'mobx-react-lite'
+import { useRouter } from 'next/router'
+import { PropsWithChildren, useEffect } from 'react'
+
 import { useParams, useTelemetryProps } from 'common'
 import { useSelectedOrganization } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { observer } from 'mobx-react-lite'
-import { useRouter } from 'next/router'
-import { PropsWithChildren, useEffect } from 'react'
+import { useAppStateSnapshot } from 'state/app-state'
 
 const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
   const router = useRouter()
   const { ref } = useParams()
   const telemetryProps = useTelemetryProps()
   const selectedOrganization = useSelectedOrganization()
+  const snap = useAppStateSnapshot()
 
-  const consent =
-    typeof window !== 'undefined'
-      ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
-      : null
+  useEffect(() => {
+    const consent =
+      typeof window !== 'undefined'
+        ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
+        : null
+    snap.setIsOptedInTelemetry(consent === 'true')
+  }, [])
 
   useEffect(() => {
     function handleRouteChange(url: string) {
-      handlePageTelemetry(url)
+      if (snap.isOptedInTelemetry) handlePageTelemetry(url)
     }
 
     // Listen for page changes after a navigation or when the query changes
@@ -27,16 +33,16 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
     return () => {
       router.events.off('routeChangeComplete', handleRouteChange)
     }
-  }, [router])
+  }, [router, snap.isOptedInTelemetry])
 
   useEffect(() => {
     // Send page telemetry on first page load
     // Waiting for router ready before sending page_view
     // if not the path will be dynamic route instead of the browser url
-    if (router.isReady) {
+    if (router.isReady && snap.isOptedInTelemetry) {
       handlePageTelemetry(router.asPath)
     }
-  }, [router.isReady])
+  }, [router.isReady, snap.isOptedInTelemetry])
 
   /**
    * send page_view event
@@ -44,11 +50,13 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
    * @param route: the browser url
    * */
   const handlePageTelemetry = async (route: string) => {
-    if (IS_PLATFORM && consent === 'true') {
+    if (IS_PLATFORM) {
       /**
        * Get referrer from browser
        */
       let referrer: string | undefined = document.referrer
+
+      console.log('handle page telemetry')
 
       /**
        * Send page telemetry

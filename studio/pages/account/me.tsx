@@ -16,6 +16,7 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import AlertError from 'components/ui/AlertError'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useEffect, useState } from 'react'
+import { useAppStateSnapshot } from 'state/app-state'
 
 const User: NextPageWithLayout = () => {
   return (
@@ -200,28 +201,18 @@ const ThemeSettings = observer(() => {
 })
 
 const AnalyticsSettings = observer(() => {
-  const [isOptedIn, setIsOptedIn] = useState(false)
-
-  useEffect(() => {
-    const telemetryConsent =
-      typeof window !== 'undefined'
-        ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
-        : null
-    if (telemetryConsent === 'true') setIsOptedIn(true)
-  }, [])
+  const snap = useAppStateSnapshot()
 
   const onToggleOptIn = () => {
-    const value = !isOptedIn ? 'true' : 'false'
-    setIsOptedIn(!isOptedIn)
-    if (typeof window !== 'undefined')
-      localStorage.setItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT, value)
+    const value = !snap.isOptedInTelemetry ? 'true' : 'false'
+    snap.setIsOptedInTelemetry(value === 'true')
   }
 
   return (
     <Panel title={<h5 key="panel-title">Analytics</h5>}>
       <Panel.Content>
         <Toggle
-          checked={isOptedIn}
+          checked={snap.isOptedInTelemetry}
           onChange={onToggleOptIn}
           label="Opt-in to send telemetry data from the dashboard"
           descriptionText="By opting into sending telemetry data, Supabase can improve the overall dashboard user experience"
