@@ -760,6 +760,7 @@ export const functions: NavMenuConstant = {
           name: 'Connecting directly to Postgres',
           url: '/guides/functions/connect-to-postgres',
         },
+        { name: 'Testing your Edge Functions', url: '/guides/functions/unit-test' },
         { name: 'Troubleshooting', url: '/guides/functions/troubleshooting' },
       ],
     },
@@ -909,7 +910,8 @@ export const ai: NavMenuConstant = {
         { name: 'Managing indexes', url: '/guides/ai/managing-indexes' },
         { name: 'Vector columns', url: '/guides/ai/vector-columns' },
         { name: 'Engineering for scale', url: '/guides/ai/engineering-for-scale' },
-        { name: 'Choosing instance type', url: '/guides/ai/choosing-instance-type' },
+        { name: 'Choosing Compute Add-on', url: '/guides/ai/choosing-compute-addon' },
+        { name: 'Going to Production', url: '/guides/ai/going-to-prod' },
       ],
     },
     {

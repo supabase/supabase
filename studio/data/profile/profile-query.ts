@@ -4,25 +4,21 @@ import { API_URL } from 'lib/constants'
 import { useCallback } from 'react'
 import { profileKeys } from './keys'
 import { Profile } from './types'
+import { ResponseError } from 'types'
 
 export type ProfileResponse = Profile
 
 export async function getProfile(signal?: AbortSignal) {
   const response = await get(`${API_URL}/profile`, {
     signal,
-    headers: {
-      Version: '2',
-    },
+    headers: { Version: '2' },
   })
-  if (response.error) {
-    throw response.error
-  }
-
+  if (response.error) throw response.error
   return response as ProfileResponse
 }
 
 export type ProfileData = Awaited<ReturnType<typeof getProfile>>
-export type ProfileError = unknown
+export type ProfileError = ResponseError
 
 export const useProfileQuery = <TData = ProfileData>({
   enabled = true,

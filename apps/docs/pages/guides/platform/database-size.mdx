@@ -57,13 +57,11 @@ Supabase uses network-attached storage to balance performance with scalability. 
 
 ### Paid Plan Behavior
 
-Pro and Enterprise projects have auto-scaling Disk Storage.
+Projects on the Pro plan and above have auto-scaling Disk Storage.
 
 Disk Storage expands automatically when the database reaches 90% of the disk size. The disk is expanded to be 50% larger (e.g., 8GB -> 12GB). Auto-scaling can only take place once every 6 hours. If within those 6 hours you reach 95% of the disk space, your project will enter read-only mode.
 
-The maximum Disk Storage Size for Pro plan is 64TB. If you need more than this, [contact us](https://supabase.com/dashboard/support/new) to learn more about the Enterprise plan.
-
-The Disk Storage Size can also be manually expanded in [Database settings page](https://supabase.com/dashboard/project/_/settings/database). The maximum default you can expand the Disk Storage to is 200GB. If you wish to manually expand it any more than 200GB, please [contact us](https://supabase.com/dashboard/support/new) to discuss expanding the 200GB limit.
+The Disk Storage Size can also be manually expanded on the [Database settings page](https://supabase.com/dashboard/project/_/settings/database). The maximum default you can expand the Disk Storage to is 200GB. If you wish to manually expand it to any more than 200GB, please [contact us](https://supabase.com/dashboard/support/new) to discuss expanding the 200GB limit.
 
 <Admonition type="info">
 You may want to import a lot of data into your database which requires multiple disk expansions; for example, uploading more than 1.5x the current size of your database storage will put your database into [read-only mode](#read-only-mode). If so, it is highly recommended you increase the Disk Storage Size manually on the [Database settings page](https://supabase.com/dashboard/project/_/settings/database).
@@ -72,11 +70,13 @@ Due to provider restrictions, disk expansions can occur only once every six hour
 
 </Admonition>
 
+The maximum Disk Storage Size for the Pro plan is 16TB. If you need more than this, [contact us](https://forms.supabase.com/enterprise) to learn more about the Enterprise plan.
+
 ### Free Plan Behavior
 
-Free Plan projects enter [read-only](#read-only-mode) mode when you exceed the 500mb limit. Once in read-only mode, you have several options:
+Free Plan projects enter [read-only](#read-only-mode) mode when you exceed the 500MB limit. Once in read-only mode, you have several options:
 
-- [Upgrade to the Pro or Enterprise plan](https://supabase.com/dashboard/project/_/settings/billing/subscription) to enable auto-scaling and expand beyond the 500mb database size limit.
+- [Upgrade to the Pro plan or above](https://supabase.com/dashboard/project/_/settings/billing/subscription) to enable auto-scaling and expand beyond the 500MB database size limit.
 - [Disable read-only mode](#disabling-read-only-mode) and reduce your database size.
 
 ### Read-only mode
@@ -87,14 +87,25 @@ In read-only mode, clients will encounter errors such as `cannot execute INSERT 
 
 ### Disabling read-only mode
 
-You can manually override read-only mode to reduce disk size. To do this, run the following in the [SQL Editor](https://supabase.com/dashboard/project/_/sql):
+You manually override read-only mode to reduce disk size. To do this, run the following in the [SQL Editor](https://supabase.com/dashboard/project/_/sql):
+
+First, change the [transaction access mode](https://www.postgresql.org/docs/current/sql-set-transaction.html):
 
 ```sql
-SET
-  default_transaction_read_only = 'off';
+set session characteristics as transaction read write;
 ```
 
-This allows you to delete data from within the session. After deleting data, you should run a vacuum to reclaim as much space as possible.
+This allows you to delete data from within the session. After deleting data, you should run a vacuum to reclaim as much space as possible. After deleting data, consider running a vacuum to reclaim as much space as possible:
+
+```sql
+vacuum;
+```
+
+Once you have reclaimed space, you can run the following to disable [read-only](https://www.postgresql.org/docs/current/runtime-config-client.html#GUC-DEFAULT-TRANSACTION-READ-ONLY) mode:
+
+```SQL
+set default_transaction_read_only = 'off';
+```
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

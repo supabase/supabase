@@ -1,9 +1,11 @@
 import { useState } from 'react'
+import { toast } from 'react-hot-toast'
 
 import { ENV_VAR_RAW_KEYS } from 'components/interfaces/Integrations/Integrations-Vercel.constants'
 import { Markdown } from 'components/interfaces/Markdown'
 import { vercelIcon } from 'components/to-be-cleaned/ListIcons'
 import { useIntegrationConnectionsCreateMutation } from 'data/integrations/integration-connections-create-mutation'
+import { useIntegrationsVercelConnectionSyncEnvsMutation } from 'data/integrations/integrations-vercel-connection-sync-envs-mutation'
 import { VercelProjectsResponse } from 'data/integrations/integrations-vercel-projects-query'
 import { IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { useSelectedOrganization } from 'hooks'
@@ -23,6 +25,7 @@ export interface ProjectLinkerProps {
   onCreateConnections?: () => void
   installedConnections: IntegrationProjectConnection[] | undefined
   setLoading?: (x: boolean) => void
+  showSkip?: boolean
 }
 
 const UNDEFINED_SELECT_VALUE = 'undefined'
@@ -34,18 +37,26 @@ const ProjectLinker = ({
   onCreateConnections: _onCreateConnections,
   installedConnections = [],
   setLoading,
+  showSkip = false,
 }: ProjectLinkerProps) => {
   const selectedOrganization = useSelectedOrganization()
 
   const [supabaseProjectRef, setSupabaseProjectRef] = useState(UNDEFINED_SELECT_VALUE)
   const [vercelProjectId, setVercelProjectId] = useState(UNDEFINED_SELECT_VALUE)
 
+  const { mutateAsync: syncEnvs } = useIntegrationsVercelConnectionSyncEnvsMutation()
   const { mutate: createConnections, isLoading } = useIntegrationConnectionsCreateMutation({
-    onSuccess() {
+    async onSuccess({ id }) {
+      try {
+        await syncEnvs({ connectionId: id })
+      } catch (error: any) {
+        toast.error('Failed to sync environment variables: ', error.message)
+      }
+
+      if (setLoading) setLoading(false)
       _onCreateConnections?.()
     },
-
-    onSettled() {
+    onError() {
       if (setLoading) setLoading(false)
     },
   })
@@ -198,7 +209,18 @@ const ProjectLinker = ({
           </Panel>
         </div>
       </div>
-      <div className="flex w-full justify-end">
+      <div className="flex w-full justify-end gap-2">
+        {showSkip && (
+          <Button
+            size="medium"
+            type="default"
+            onClick={() => {
+              _onCreateConnections?.()
+            }}
+          >
+            Skip
+          </Button>
+        )}
         <Button
           size="medium"
           className="self-end"
