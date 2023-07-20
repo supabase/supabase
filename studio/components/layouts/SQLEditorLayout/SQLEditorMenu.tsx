@@ -5,6 +5,7 @@ import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
 
 import { useParams } from 'common'
+import { untitledSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
 import { createSqlSnippetSkeleton } from 'components/interfaces/SQLEditor/SQLEditor.utils'
 import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
@@ -15,7 +16,6 @@ import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useSnippets, useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { Button, Dropdown, IconPlus, IconSearch, IconX, Input, Menu, useCommandMenu } from 'ui'
-import { COMMAND_ROUTES } from 'ui/src/components/Command/Command.constants'
 import QueryItem from './QueryItem'
 
 const SideBarContent = observer(() => {
@@ -65,7 +65,10 @@ const SideBarContent = observer(() => {
     }
 
     try {
-      const snippet = createSqlSnippetSkeleton({ name: 'Untitled query', owner_id: profile?.id })
+      const snippet = createSqlSnippetSkeleton({
+        name: untitledSnippetTitle,
+        owner_id: profile?.id,
+      })
       const data = { ...snippet, id: uuidv4() }
 
       snap.addSnippet(data as SqlSnippet, ref, true)

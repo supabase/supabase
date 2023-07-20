@@ -1,6 +1,7 @@
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useSqlEditMutation } from 'data/ai/sql-edit-mutation'
+import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { AnimatePresence, m } from 'framer-motion'
 import { useLocalStorage, useStore } from 'hooks'
@@ -21,7 +22,7 @@ import { format } from 'sql-formatter'
 import { getSqlEditorStateSnapshot, useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { AiIcon, Button, IconCheck, IconCornerDownLeft, IconX, Input } from 'ui'
 import type { IStandaloneCodeEditor } from './MonacoEditor'
-import { sqlAiDisclaimerComment } from './SQLEditor.constants'
+import { sqlAiDisclaimerComment, untitledSnippetTitle } from './SQLEditor.constants'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
 
 // Load the monaco editor client-side only (does not behave well server-side)
@@ -63,6 +64,7 @@ const SQLEditor = () => {
   const { project } = useProjectContext()
   const snap = useSqlEditorStateSnapshot()
   const { mutateAsync: editSql, isLoading: isEditSqlLoading } = useSqlEditMutation()
+  const { mutateAsync: generateSqlTitle } = useSqlTitleGenerateMutation()
   const [aiInput, setAiInput] = useState('')
   const [debugSolution, setDebugSolution] = useState<string>()
   const [sqlDiff, setSqlDiff] = useState<ContentDiff>()
@@ -103,7 +105,23 @@ const SQLEditor = () => {
 
   const editorRef = useRef<IStandaloneCodeEditor | null>(null)
 
-  const executeQuery = useCallback(() => {
+  /**
+   * Sets the snippet title using AI if it is still untitled.
+   */
+  const setAiTitle = useCallback(async () => {
+    if (
+      id &&
+      snippet &&
+      snippet.snippet.name === untitledSnippetTitle &&
+      !!snippet.snippet.content.sql
+    ) {
+      const { title } = await generateSqlTitle({ sql: snippet.snippet.content.sql })
+
+      snap.renameSnippet(id, title)
+    }
+  }, [id, snippet, generateSqlTitle, snap])
+
+  const executeQuery = useCallback(async () => {
     if (isDiffOpen) {
       return
     }
@@ -118,13 +136,15 @@ const SQLEditor = () => {
       const selectedValue = selection ? editor.getModel()?.getValueInRange(selection) : undefined
       const overrideSql = selectedValue || editorRef.current?.getValue()
 
+      setAiTitle()
+
       execute({
         projectRef: project.ref,
         connectionString: project.connectionString,
         sql: overrideSql ?? snippet.snippet.content.sql,
       })
     }
-  }, [isExecuting, isDiffOpen, execute, project])
+  }, [isExecuting, isDiffOpen, execute, project, setAiTitle])
 
   const acceptAiHandler = useCallback(() => {
     if (!sqlDiff) {

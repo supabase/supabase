@@ -1,10 +1,13 @@
 import { useParams } from 'common'
+import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
+import { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useStore } from 'hooks'
+import { useState } from 'react'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { Button, Form, Input, Modal } from 'ui'
+import { AiIcon, Button, Form, IconLoader, Input, Modal, cn } from 'ui'
 
 export interface RenameQueryModalProps {
-  snippet: any
+  snippet: SqlSnippet
   visible: boolean
   onCancel: () => void
   onComplete: () => void
@@ -17,9 +20,11 @@ const RenameQueryModal = ({ snippet, visible, onCancel, onComplete }: RenameQuer
 
   const { id, name, description } = snippet
 
-  const validate = (values: any) => {
+  const [nameInput, setNameInput] = useState(name)
+
+  const validate = () => {
     const errors: any = {}
-    if (!values.name) errors.name = 'Please enter a query name'
+    if (!nameInput) errors.name = 'Please enter a query name'
     return errors
   }
 
@@ -29,7 +34,7 @@ const RenameQueryModal = ({ snippet, visible, onCancel, onComplete }: RenameQuer
 
     setSubmitting(true)
     try {
-      snap.renameSnippet(id, values.name, values.description)
+      snap.renameSnippet(id, nameInput, values.description)
       if (onComplete) onComplete()
       return Promise.resolve()
     } catch (error: any) {
@@ -40,6 +45,11 @@ const RenameQueryModal = ({ snippet, visible, onCancel, onComplete }: RenameQuer
       })
     }
   }
+
+  const { mutateAsync: generateSqlTitle, isLoading: isTitleGenerationLoading } =
+    useSqlTitleGenerateMutation()
+
+  const isAiButtonVisible = !!snippet.content.sql
 
   return (
     <Modal visible={visible} onCancel={onCancel} hideFooter header="Rename" size="small">
@@ -56,7 +66,33 @@ const RenameQueryModal = ({ snippet, visible, onCancel, onComplete }: RenameQuer
         {({ isSubmitting }: { isSubmitting: boolean }) => (
           <div className="space-y-4 py-4">
             <Modal.Content>
-              <Input label="Name" id="name" name="name" />
+              <Input
+                label="Name"
+                id="name"
+                name="name"
+                value={nameInput}
+                onChange={(e) => setNameInput(e.target.value)}
+                inputClassName={cn(isAiButtonVisible && 'pr-[6.5rem]')}
+                actions={
+                  isAiButtonVisible ? (
+                    <Button
+                      onClick={async () => {
+                        const { title } = await generateSqlTitle({ sql: snippet.content.sql })
+                        setNameInput(title)
+                      }}
+                      icon={
+                        !isTitleGenerationLoading ? (
+                          <AiIcon className="w-3 h-3" />
+                        ) : (
+                          <IconLoader className="animate-spin" size={14} />
+                        )
+                      }
+                    >
+                      Generate
+                    </Button>
+                  ) : undefined
+                }
+              />
             </Modal.Content>
             <Modal.Content>
               <Input label="Description" id="description" placeholder="Describe query" />
