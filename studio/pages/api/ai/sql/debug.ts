@@ -27,7 +27,10 @@ type DebugSqlResult = typeof debugSqlSchema.T
 const completionFunctions = {
   debugSql: {
     name: 'debugSql',
-    description: 'Debugs a Postgres SQL error and modifies the SQL to fix it',
+    description: stripIndent`
+      Debugs a Postgres SQL error and modifies the SQL to fix it.
+      - Create extensions if they are missing (only for valid extensions)
+    `,
     parameters: debugSqlSchema.schema,
   },
 }
