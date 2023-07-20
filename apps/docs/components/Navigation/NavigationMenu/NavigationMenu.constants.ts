@@ -1030,7 +1030,6 @@ export const platform: NavMenuConstant = {
       url: undefined,
       items: [{ name: 'Spend cap', url: '/guides/platform/spend-cap' }],
     },
-
     {
       name: 'Single sign-on',
       url: undefined,
