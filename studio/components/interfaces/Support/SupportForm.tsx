@@ -448,7 +448,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                           values.subject.length > 0 &&
                           INCLUDE_DISCUSSIONS.includes(values.category) ? (
                             <p className="flex items-center space-x-1">
-                              <span>Have you checked our </span>
+                              <span>Check our </span>
                               <Link
                                 key="gh-discussions"
                                 href={`https://github.com/orgs/supabase/discussions?discussions_q=${values.subject}`}
@@ -462,7 +462,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                                   <IconExternalLink size={14} strokeWidth={2} className="ml-1" />
                                 </a>
                               </Link>
-                              <span>?</span>
+                              <span> for a quick answer</span>
                             </p>
                           ) : null
                         }
