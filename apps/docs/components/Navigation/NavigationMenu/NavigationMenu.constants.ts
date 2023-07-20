@@ -78,6 +78,13 @@ export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
       href: '/guides/self-hosting',
       level: 'self_hosting',
     },
+    {
+      label: 'Integrations',
+      icon: 'integrations',
+      hasLightIcon: true,
+      href: 'https://supabase.com/partners/integrations',
+      level: 'integrations',
+    },
   ],
   [
     {
@@ -1055,26 +1062,20 @@ export const platform: NavMenuConstant = {
       ],
     },
     {
-      name: 'OAuth Apps (Beta)',
+      name: 'Integrations',
       url: undefined,
       items: [
+        {
+          name: 'Integrations Marketplace',
+          url: '/guides/platform/marketplace',
+        },
         {
           name: 'Publish an OAuth App',
           url: '/guides/platform/oauth-apps/publish-an-oauth-app',
         },
         {
-          name: 'Authorize an OAuth App',
+          name: 'Sign in with Supabase',
           url: '/guides/platform/oauth-apps/authorize-an-oauth-app',
-        },
-      ],
-    },
-    {
-      name: 'Integrations',
-      url: undefined,
-      items: [
-        {
-          name: 'Supabase Marketplace',
-          url: '/guides/platform/marketplace',
         },
       ],
     },
