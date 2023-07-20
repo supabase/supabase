@@ -38,25 +38,25 @@ const HelpPopover: FC<Props> = () => {
             </p>
             <div className="space-x-1">
               <Link passHref href="https://supabase.com/docs/guides/platform/troubleshooting">
-                <a target="_blank" rel="noreferrer">
-                  <Button type="default" icon={<IconTool />}>
+                <Button asChild type="default" icon={<IconTool />}>
+                  <a target="_blank" rel="noreferrer">
                     Troubleshooting
-                  </Button>
-                </a>
+                  </a>
+                </Button>
               </Link>
               <Link passHref href="https://supabase.com/docs/">
-                <a target="_blank" rel="noreferrer">
-                  <Button type="text" size="tiny" icon={<IconBookOpen />}>
+                <Button asChild type="text" size="tiny" icon={<IconBookOpen />}>
+                  <a target="_blank" rel="noreferrer">
                     Docs
-                  </Button>
-                </a>
+                  </a>
+                </Button>
               </Link>
               <Link passHref href="https://status.supabase.com/">
-                <a target="_blank" rel="noreferrer">
-                  <Button type="text" size="tiny" icon={<IconActivity />}>
+                <Button asChild type="text" size="tiny" icon={<IconActivity />}>
+                  <a target="_blank" rel="noreferrer">
                     Supabase Status
-                  </Button>
-                </a>
+                  </a>
+                </Button>
               </Link>
             </div>
             <p className="text-sm text-scale-900">
@@ -65,11 +65,9 @@ const HelpPopover: FC<Props> = () => {
             </p>
             <div>
               <Link passHref href={supportUrl}>
-                <a>
-                  <Button type="default" icon={<IconMail />}>
-                    Contact Support
-                  </Button>
-                </a>
+                <Button asChild type="default" icon={<IconMail />}>
+                  <a>Contact Support</a>
+                </Button>
               </Link>
             </div>
           </div>
