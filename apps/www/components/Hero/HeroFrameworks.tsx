@@ -33,9 +33,9 @@ const frameworks = [
     gaEvent: 'www_hp_hero_frameworks_flutter',
   },
   {
-    name: 'Kotlin',
+    name: 'Android',
     icon: '/images/logos/frameworks/kotlin.svg',
-    docs: '/docs/guides/getting-started/quickstarts/kotlin',
+    docs: '/docs/guides/getting-started/quickstarts/android',
     gaEvent: 'www_hp_hero_frameworks_kotlin',
   },
   {

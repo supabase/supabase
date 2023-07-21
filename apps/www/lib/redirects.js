@@ -1714,8 +1714,8 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/docs/guides/with-kotlin',
-    destination: '/docs/guides/getting-started/tutorials/with-kotlin',
+    source: '/docs/guides/with-android',
+    destination: '/docs/guides/getting-started/tutorials/with-android',
   },
   {
     permanent: true,
