@@ -911,6 +911,7 @@ export const ai: NavMenuConstant = {
         { name: 'Vector columns', url: '/guides/ai/vector-columns' },
         { name: 'Engineering for scale', url: '/guides/ai/engineering-for-scale' },
         { name: 'Choosing Compute Add-on', url: '/guides/ai/choosing-compute-addon' },
+        { name: 'Going to Production', url: '/guides/ai/going-to-prod' },
       ],
     },
     {

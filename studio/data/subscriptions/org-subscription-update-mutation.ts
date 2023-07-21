@@ -1,9 +1,8 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
-
-import { put } from 'lib/common/fetch'
+import { isResponseOk, put } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { ResponseError, SupaResponseV2 } from 'types/base'
+import { toast } from 'react-hot-toast'
+import { ResponseError } from 'types/base'
 import { subscriptionKeys } from './keys'
 
 export type SubscriptionTier =
@@ -30,11 +29,11 @@ export async function updateOrgSubscription({
   const payload: { tier: string; payment_method?: string } = { tier }
   if (paymentMethod !== undefined) payload.payment_method = paymentMethod
 
-  const response = (await put(
-    `${API_URL}/organizations/${slug}/billing/subscription`,
-    payload
-  )) as SupaResponseV2<void>
-  if (typeof response === 'object' && response !== null && 'error' in response) throw response.error
+  const response = await put<void>(`${API_URL}/organizations/${slug}/billing/subscription`, payload)
+  if (!isResponseOk(response)) {
+    throw response.error
+  }
+
   return response
 }
 
