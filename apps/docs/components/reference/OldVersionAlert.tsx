@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { Admonition } from 'ui'
 import { useMenuActiveRefId } from '~/hooks/useMenuState'
-import Admonition from '../Admonition'
 import { ICommonSection } from './Reference.types'
 
 export interface OldVersionAlertProps {
