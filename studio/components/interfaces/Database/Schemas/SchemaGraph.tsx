@@ -1,7 +1,8 @@
 import dagre from '@dagrejs/dagre'
+import clsx from 'clsx'
 import { observer } from 'mobx-react-lite'
 import { uniqBy } from 'lodash'
-import { FC, useEffect, useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import ReactFlow, {
   Background,
   BackgroundVariant,
@@ -15,6 +16,7 @@ import ReactFlow, {
 } from 'reactflow'
 
 import { PostgresTable } from '@supabase/postgres-meta'
+import { useTheme } from 'common/Providers'
 import { useStore } from 'hooks'
 import { IconLoader } from 'ui'
 
@@ -203,20 +205,20 @@ function TableNode({ data, targetPosition, sourcePosition }: NodeProps<TableNode
     <>
       {data.isForeign ? (
         <div className="rounded-lg overflow-hidden">
-          <header className="text-[0.5rem] leading-5 font-bold px-2 text-center bg-yellow-900 text-gray-300">
+          <header className="text-[0.5rem] leading-5 font-bold px-2 text-center bg-brand-900 text-gray-300">
             {data.name}
             {targetPosition && (
               <Handle
                 type="target"
                 id={data.name}
                 position={targetPosition}
-                className={`${hiddenNodeConnector} !left-0`}
+                className={clsx(hiddenNodeConnector, '!left-0')}
               />
             )}
           </header>
         </div>
       ) : (
-        <div className={`w-[${NODE_WIDTH / 2}px] rounded-lg overflow-hidden`}>
+        <div className="rounded-lg overflow-hidden" style={{ width: NODE_WIDTH / 2 }}>
           <header className="text-[0.5rem] leading-5 font-bold px-2 text-center bg-brand-900 text-gray-300">
             {data.name}
           </header>
@@ -227,9 +229,10 @@ function TableNode({ data, targetPosition, sourcePosition }: NodeProps<TableNode
               key={column.id}
             >
               <span
-                className={`${
-                  column.isPrimary ? 'border-l-2 border-l-brand-900 pl-[6px] pr-2' : 'px-2'
-                } text-ellipsis overflow-hidden whitespace-nowrap`}
+                className={clsx(
+                  column.isPrimary ? 'border-l-2 border-l-brand-900 pl-[6px] pr-2' : 'px-2',
+                  'text-ellipsis overflow-hidden whitespace-nowrap'
+                )}
               >
                 {column.name}
               </span>
@@ -239,7 +242,7 @@ function TableNode({ data, targetPosition, sourcePosition }: NodeProps<TableNode
                   type="target"
                   id={column.id}
                   position={targetPosition}
-                  className={`${hiddenNodeConnector} !left-0`}
+                  className={clsx(hiddenNodeConnector, '!left-0')}
                 />
               )}
               {sourcePosition && (
@@ -247,7 +250,7 @@ function TableNode({ data, targetPosition, sourcePosition }: NodeProps<TableNode
                   type="source"
                   id={column.id}
                   position={sourcePosition}
-                  className={`${hiddenNodeConnector} !right-0`}
+                  className={clsx(hiddenNodeConnector, '!right-0')}
                 />
               )}
             </div>
@@ -258,7 +261,11 @@ function TableNode({ data, targetPosition, sourcePosition }: NodeProps<TableNode
   )
 }
 
-const TablesGraph: FC<{ tables: PostgresTable[] }> = ({ tables }) => {
+const TablesGraph = ({ tables }: { tables: PostgresTable[] }) => {
+  const { isDarkMode } = useTheme()
+  const backgroundPatternColor = isDarkMode ? '#2e2e2e' : '#e6e8eb'
+  const edgeStrokeColor = isDarkMode ? '#ededed' : '#111318'
+
   const reactFlowInstance = useReactFlow()
   const nodeTypes = useMemo(
     () => ({
@@ -273,11 +280,11 @@ const TablesGraph: FC<{ tables: PostgresTable[] }> = ({ tables }) => {
       reactFlowInstance.setEdges(edges)
       setTimeout(() => reactFlowInstance.fitView({})) // it needs to happen during next event tick
     })
-  }, [tables])
+  }, [tables, isDarkMode])
 
   return (
     <>
-      <div style={{ width: '100%', height: '100%' }}>
+      <div className="w-full h-full">
         <ReactFlow
           defaultNodes={[]}
           defaultEdges={[]}
@@ -286,7 +293,7 @@ const TablesGraph: FC<{ tables: PostgresTable[] }> = ({ tables }) => {
             animated: true,
             deletable: false,
             style: {
-              stroke: '#ededed',
+              stroke: edgeStrokeColor,
             },
           }}
           nodeTypes={nodeTypes}
@@ -295,21 +302,14 @@ const TablesGraph: FC<{ tables: PostgresTable[] }> = ({ tables }) => {
             hideAttribution: true,
           }}
         >
-          <Background id="1" gap={10} color="#262626" variant={BackgroundVariant.Lines} />
-          <Background
-            id="2"
-            gap={100}
-            offset={1}
-            color="#2c2c2c"
-            variant={BackgroundVariant.Lines}
-          />
+          <Background gap={16} color={backgroundPatternColor} variant={BackgroundVariant.Lines} />
         </ReactFlow>
       </div>
     </>
   )
 }
 
-const SchemaGraph: FC<{ schema: string }> = ({ schema }) => {
+const SchemaGraph = ({ schema }: { schema: string }) => {
   const { meta } = useStore()
   const tables = meta.tables.list((table: { schema: string }) => table.schema === schema)
 
