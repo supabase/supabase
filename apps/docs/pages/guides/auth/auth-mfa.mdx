@@ -687,7 +687,7 @@ json_query_path(auth.jwt(), '$.amr[0]')
   authentication method in the JWT.
 
 Once you have extracted the most recent entry in the array, you can compare the
-`method` and `timestamp` to enforce stricter rules.
+`method` and `timestamp` to enforce stricter rules. For instance, you can mandate that access will be only be granted on a table to users who have recently signed in with a password.
 
 Currently recognized authentication methods are:
 
@@ -702,7 +702,7 @@ Currently recognized authentication methods are:
 - `email/signup` - any login resulting from an email signup.
 - `email_change` - any login resulting from a change in email.
 
-This list will expand in the future.
+More authentication methods will be added over time as we increase the number of authentication methods supported by Supabase.
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
