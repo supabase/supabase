@@ -57,14 +57,14 @@ export const meta = {
     <StepHikeCompact.Details title="Install the Supabase client library">
     Setup Supabase libraries requires some others libraries from ktor, so make sure all dependencies are added.
     Replace the dependency version placeholders `$supabase_version` and `$ktor_version` with the latest versions as shown below.
-    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}> 
-      <a href="https://github.com/supabase-community/supabase-kt/releases" style={{ marginRight: '8px' }}> 
-          <img src="https://img.shields.io/github/release/supabase-community/supabase-kt?label=supabase-kt stable" alt="latest stable supabase-kt version"/> 
-      </a> 
-      <a href="https://github.com/ktorio/ktor/releases"> 
-          <img src="https://img.shields.io/github/v/release/ktorio/ktor.svg?label=ktor" alt="latest ktor version"/> 
-      </a> 
-    </div> 
+    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+      <a href="https://github.com/supabase-community/supabase-kt/releases" style={{ marginRight: '8px' }}>
+          <img src="https://img.shields.io/github/release/supabase-community/supabase-kt?label=supabase-kt stable" alt="latest stable supabase-kt version"/>
+      </a>
+      <a href="https://github.com/ktorio/ktor/releases">
+          <img src="https://img.shields.io/github/v/release/ktorio/ktor.svg?label=ktor" alt="latest ktor version"/>
+      </a>
+    </div>
 
     </StepHikeCompact.Details>
 
@@ -84,8 +84,8 @@ export const meta = {
 
     <StepHikeCompact.Details title="Install the serializable plugin">
     Open `build.gradle` (app), add serialization plugin to use annotation for data parsing. Please note that the plugin version should be the same with Kotlin version in your app.
-    <a href="https://github.com/JetBrains/kotlin" style={{ marginRight: '8px' }}> 
-          <img src="https://img.shields.io/maven-central/v/org.jetbrains.kotlin/kotlin-maven-plugin.svg?label=kotlin_version" alt="latest stable supabase-kt version"/> 
+    <a href="https://github.com/JetBrains/kotlin" style={{ marginRight: '8px' }}>
+          <img src="https://img.shields.io/maven-central/v/org.jetbrains.kotlin/kotlin-maven-plugin.svg?label=kotlin_version" alt="latest stable supabase-kt version"/>
     </a>
     </StepHikeCompact.Details>
 
@@ -114,7 +114,7 @@ export const meta = {
       ```kotlin
       // Handy create instance when need
       val client = createSupabaseClient(
-          supabaseUrl = "https://xyzcompany.supabase.co", 
+          supabaseUrl = "https://xyzcompany.supabase.co",
           supabaseKey = "public-anon-key"
         ) {
               install(GoTrue)
@@ -260,7 +260,7 @@ export const meta = {
               description = this.description,
               category = this.category,
               nutrition = this.nutrition,
-              _id = this._id 
+              _id = this._id
           )
       }
       ```
