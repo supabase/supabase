@@ -42,7 +42,7 @@ const BillingBreakdown = () => {
     Boolean(
       usage?.usages.find(
         (metric) =>
-          !metric.unlimited && !metric.capped && metric.usage > (metric?.pricing_free_units ?? 0)
+          !metric.unlimited && metric.capped && metric.usage > (metric?.pricing_free_units ?? 0)
       )
     )
 
@@ -98,7 +98,7 @@ const BillingBreakdown = () => {
                   </Button>,
                 ]}
               >
-                Your project can become unresponsive or enter read only mode.{' '}
+                Your projects can become unresponsive or enter read only mode.{' '}
                 {currentPlan?.id === 'free'
                   ? 'Please upgrade to the Pro plan to ensure that your projects remain available.'
                   : 'Please disable spend cap to ensure that your projects remain available.'}
