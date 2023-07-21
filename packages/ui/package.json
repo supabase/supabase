@@ -54,7 +54,7 @@
     "autoprefixer": "^10.4.14",
     "class-variance-authority": "^0.6.0",
     "clsx": "^1.2.1",
-    "cmdk-supabase": "1.0.2",
+    "cmdk-supabase": "^1.0.4",
     "color": "^4.2.3",
     "colorjs.io": "^0.4.3",
     "common-tags": "^1.8.2",
