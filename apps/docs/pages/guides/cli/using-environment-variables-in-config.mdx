@@ -6,20 +6,16 @@ export const meta = {
   description: 'How to use environment variables in config.toml with the Supabase CLI.',
 }
 
-The Supabase CLI is capable of utilizing environment variables stored in our project's root directory's `.env` file within the `config.toml` file.
+The Supabase CLI is capable of utilizing environment variables from `.env` file in our project's root directory.
 
-We can reference the environment variable by using the `env()` function.
-
-Inside of our `.env` file we add the environment variable as we normally would
-
-```bash
+```bash .env
 GITHUB_CLIENT_ID=""
 GITHUB_SECRET=""
 ```
 
-And then reference them inside of our `config.toml`
+We can reference the environment variable by using the `env()` function within the `supabase/config.toml` file.
 
-```toml
+```toml supabase/config.toml
 [auth.external.github]
 enabled = true
 client_id = "env(GITHUB_CLIENT_ID)"
@@ -28,7 +24,7 @@ secret = "env(GITHUB_SECRET)"
 redirect_uri = ""
 ```
 
-These same environment variables will be referenced by the `supabase start` command from the Supabase CLI.
+These values will be substituted at runtime by the CLI when running the `supabase start` command.
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
