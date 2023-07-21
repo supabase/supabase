@@ -157,8 +157,8 @@ function Partner({
               </Swiper>
             </div>
 
-            <div className="grid gap-3 space-y-16 lg:grid-cols-4 lg:space-y-0 lg:space-x-3">
-              <div className="lg:col-span-3">
+            <div className="grid lg:grid-cols-8 lg:space-x-12">
+              <div className="lg:col-span-5">
                 <h2
                   className="text-scale-1200"
                   style={{ fontSize: '1.5rem', marginBottom: '1rem' }}
@@ -171,7 +171,7 @@ function Partner({
                 </div>
               </div>
 
-              <div>
+              <div className="lg:col-span-3 order-first lg:order-last pt-16 lg:pt-0">
                 <div className="sticky top-20">
                   <h2
                     className="text-scale-1200"
