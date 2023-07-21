@@ -698,11 +698,11 @@ Currently recognized authentication methods are:
 - `totp` - a TOTP additional factor.
 - `sso/saml` - any Single Sign On (SAML) method.
 
-The following additional claims are available only when using PKCE flow:
-- `invite` - any sign in via an invitation. Only available with PKCE.
+The following additional claims are available when using PKCE flow:
+- `invite` - any sign in via an invitation.
 - `magiclink` - any sign in via magic link. Excludes logins resulting from invocation of `signUp`.
-- `email/signup` - any login resulting from an email signup. Only available with PKCE.
-- `email_change` - any login resulting from a change in email. Only available with PKCE
+- `email/signup` - any login resulting from an email signup.
+- `email_change` - any login resulting from a change in email.
 
 More authentication methods will be added over time as we increase the number of authentication methods supported by Supabase.
 
