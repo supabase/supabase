@@ -206,7 +206,11 @@ function Partner({
 
 // This function gets called at build time
 export const getStaticPaths: GetStaticPaths = async () => {
-  const { data: slugs } = await supabase.from('partners').select('slug')
+  const { data: slugs } = await supabase
+    .from('partners')
+    .select('slug')
+    .eq('approved', true)
+    .eq('type', 'expert')
 
   const paths: {
     params: { slug: string }

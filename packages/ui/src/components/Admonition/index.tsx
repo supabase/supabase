@@ -6,7 +6,11 @@ export interface AdmonitionProps {
   label?: string
 }
 
-const Admonition = ({ type = 'note', label, children }: PropsWithChildren<AdmonitionProps>) => {
+export const Admonition = ({
+  type = 'note',
+  label,
+  children,
+}: PropsWithChildren<AdmonitionProps>) => {
   return (
     <div
       className={[
@@ -46,5 +50,3 @@ const Admonition = ({ type = 'note', label, children }: PropsWithChildren<Admoni
     </div>
   )
 }
-
-export default Admonition

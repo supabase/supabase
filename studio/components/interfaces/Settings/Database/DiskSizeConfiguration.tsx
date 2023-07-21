@@ -181,7 +181,7 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
           validationSchema={diskSizeValidationSchema}
           onSubmit={confirmResetDbPass}
         >
-          {({ isSubmitting }: { isSubmitting: boolean }) =>
+          {() =>
             currentDiskSize >= maxDiskSize ? (
               <>
                 <Alert withIcon variant="warning" title="Maximum manual disk size increase reached">
@@ -225,7 +225,7 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
                       htmlType="submit"
                       type="primary"
                       disabled={!isAbleToResizeDatabase}
-                      loading={isSubmitting}
+                      loading={isUpdatingDiskSize}
                     >
                       Update disk size
                     </Button>
