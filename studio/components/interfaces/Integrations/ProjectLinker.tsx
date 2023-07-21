@@ -83,10 +83,9 @@ const ProjectLinker = ({
   function onCreateConnections() {
     const projectDetails = foreignProjects.filter((x) => x.id === vercelProjectId)[0]
 
-    if (!organizationIntegrationId) {
-      console.error('No integration ID set')
-      return
-    }
+    if (!organizationIntegrationId) return console.error('No integration ID set')
+    if (!vercelProjectId) return console.error('No Vercel project ID set')
+    if (!supabaseProjectRef) return console.error('No Supabase project ref set')
 
     if (setLoading) setLoading(true)
 
