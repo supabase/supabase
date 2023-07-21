@@ -97,7 +97,9 @@ const VercelIntegration: NextPageWithLayout = () => {
      */
     const flatInstalledConnectionsIds: string[] | [] =
       integrationData && integrationData.length > 0
-        ? integrationData?.map((x) => x.organization.slug)
+        ? integrationData
+            .filter((x) => x.integration.name === 'Vercel')
+            .map((x) => x.organization.slug)
         : []
 
     return organizations
