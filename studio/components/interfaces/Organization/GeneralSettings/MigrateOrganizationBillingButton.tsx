@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
-import { Alert, Button, Form, IconHelpCircle, Listbox, Loading, Modal, Toggle } from 'ui'
+import { Alert, Button, IconHelpCircle, Listbox, Loading, Modal, Toggle } from 'ui'
 
 import { SpendCapModal } from 'components/interfaces/BillingV2'
 import { useOrganizationBillingMigrationMutation } from 'data/organizations/organization-migrate-billing-mutation'
@@ -118,8 +118,7 @@ const MigrateOrganizationBillingButton = observer(() => {
                 <div className="text-sm space-y-2">
                   <p>
                     Migrating to new organization-level billing combines subscriptions for all
-                    projects in the organization into a single subscription. This cannot be
-                    reversed.{' '}
+                    projects in the organization into a single subscription.
                   </p>
 
                   <p>
@@ -136,6 +135,15 @@ const MigrateOrganizationBillingButton = observer(() => {
                       </a>
                     </Link>
                     .
+                  </p>
+                </div>
+              </Alert>
+
+              <Alert title="Irreversible" withIcon variant="danger">
+                <div className="text-sm">
+                  <p>
+                    Once migrated to the new organization-level billing, you cannot go back to the
+                    old project-level billing.
                   </p>
                 </div>
               </Alert>

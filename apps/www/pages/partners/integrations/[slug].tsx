@@ -1,3 +1,6 @@
+import { CodeHikeConfig, remarkCodeHike } from '@code-hike/mdx'
+import { CH } from '@code-hike/mdx/components'
+import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
 import { GetStaticPaths, GetStaticProps } from 'next'
 import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
 import { serialize } from 'next-mdx-remote/serialize'
@@ -5,9 +8,10 @@ import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Dispatch, SetStateAction, useState } from 'react'
+import remarkGfm from 'remark-gfm'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import 'swiper/swiper.min.css'
-import { IconChevronLeft, IconExternalLink } from 'ui'
+import { Admonition, IconChevronLeft, IconExternalLink } from 'ui'
 import ImageModal from '~/components/ImageModal'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
@@ -16,16 +20,23 @@ import { Partner } from '~/types/partners'
 import Error404 from '../../404'
 
 /**
- * Returns a custom img element which has a bound onClick listener. When the image is clicked, it will open a modal showing that particular image.
+ * Returns custom components so that the markdown converts to a nice looking html.
  */
-const buildCustomImg = (callback: Dispatch<SetStateAction<string | null>>) => {
-  const img = (
-    props: React.DetailedHTMLProps<React.ImgHTMLAttributes<HTMLImageElement>, HTMLImageElement>
-  ) => {
-    return <img {...props} onClick={() => callback(props.src!)} />
+function mdxComponents(callback: Dispatch<SetStateAction<string | null>>) {
+  const components = {
+    CH,
+    Admonition,
+    /**
+     * Returns a custom img element which has a bound onClick listener. When the image is clicked, it will open a modal showing that particular image.
+     */
+    img: (
+      props: React.DetailedHTMLProps<React.ImgHTMLAttributes<HTMLImageElement>, HTMLImageElement>
+    ) => {
+      return <img {...props} onClick={() => callback(props.src!)} />
+    },
   }
 
-  return { img }
+  return components
 }
 
 function Partner({
@@ -172,7 +183,7 @@ function Partner({
                 )}
 
                 <div className="prose">
-                  <MDXRemote {...overview} components={buildCustomImg(setFocusedImage)} />
+                  <MDXRemote {...overview} components={mdxComponents(setFocusedImage)} />
                 </div>
               </div>
 
@@ -213,7 +224,7 @@ function Partner({
                     </a>
                   </div>
 
-                  {partner.type === 'technology' && (
+                  {partner.type === 'technology' && partner.docs && (
                     <div className="flex items-center justify-between py-2">
                       <span className="text-scale-900">Documentation</span>
                       <a
@@ -241,7 +252,11 @@ function Partner({
 
 // This function gets called at build time
 export const getStaticPaths: GetStaticPaths = async () => {
-  const { data: slugs } = await supabase.from('partners').select('slug')
+  const { data: slugs } = await supabase
+    .from('partners')
+    .select('slug')
+    .eq('approved', true)
+    .eq('type', 'technology')
 
   const paths: {
     params: { slug: string }
@@ -274,8 +289,21 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     }
   }
 
+  const codeHikeOptions: CodeHikeConfig = {
+    theme: codeHikeTheme,
+    lineNumbers: true,
+    showCopyButton: true,
+    skipLanguages: [],
+    autoImport: false,
+  }
+
   // Parse markdown
-  const overview = await serialize(partner.overview)
+  const overview = await serialize(partner.overview, {
+    mdxOptions: {
+      useDynamicImport: true,
+      remarkPlugins: [remarkGfm, [remarkCodeHike, codeHikeOptions]],
+    },
+  })
 
   return {
     props: { partner, overview },
