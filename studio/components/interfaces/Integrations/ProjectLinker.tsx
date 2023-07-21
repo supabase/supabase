@@ -139,13 +139,6 @@ const ProjectLinker = ({
     ? filteredForeignProjects.find((x) => x.id?.toLowerCase() === vercelProjectId?.toLowerCase())
     : undefined
 
-  // console.log('selectedSupabaseProject', selectedSupabaseProject)
-  console.log('filteredForeignProjects', filteredForeignProjects)
-  console.log('vercelProjectId', vercelProjectId)
-  console.log('selectedVercelProject', selectedVercelProject)
-
-  // console.log('supabaseProjects', supabaseProjects)
-
   return (
     <div className="flex flex-col gap-4">
       <div className="relative border rounded-lg p-12 bg shadow">
@@ -232,7 +225,6 @@ const ProjectLinker = ({
           <div className="border border-scale-1000 h-px w-16 border-dashed self-end mb-5"></div>
           <Panel>
             <div className="bg-black shadow rounded p-1 w-12 h-12 flex justify-center items-center">
-              {/* <img src="/img/icons/vercel.svg" style={{ height: 21 }} alt="integration icon" /> */}
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="white"
@@ -300,7 +292,6 @@ const ProjectLinker = ({
                             key={project.id}
                             className="flex gap-2 items-center"
                             onSelect={(id) => {
-                              console.log('id set', id)
                               if (id) setVercelProjectId(id)
                               setVercelProjectsComboboxOpen(false)
                             }}

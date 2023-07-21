@@ -78,7 +78,6 @@ const VercelIntegration: NextPageWithLayout = () => {
   useEffect(() => {
     if (organizationsData !== undefined && integrationData !== undefined) {
       const firstOrg = organizationsWithInstalls(organizationsData)?.[0]
-      console.log('firstOrg', firstOrg)
 
       if (firstOrg && selectedOrg === null) {
         setSelectedOrg(firstOrg)
@@ -210,8 +209,6 @@ const VercelIntegration: NextPageWithLayout = () => {
       ? true
       : false
 
-  console.log('selectedOrg', selectedOrg)
-
   return (
     <>
       <main className="overflow-auto flex flex-col h-full">
@@ -227,10 +224,7 @@ const VercelIntegration: NextPageWithLayout = () => {
                     integrationName="Vercel"
                     organizationsWithInstalledData={organizationsWithInstalledData}
                     onSelectedOrgChange={(e: string) => {
-                      console.log('e:', e)
-
                       const org = organizationsWithInstalledData?.find((org) => org.slug === e)
-                      console.log('const:', org)
 
                       if (org) {
                         setSelectedOrg(org)
