@@ -1,16 +1,13 @@
 import { SchemaBuilder } from '@serafin/schema-builder'
 import { stripIndent } from 'common-tags'
-import { NextRequest } from 'next/server'
+import apiWrapper from 'lib/api/apiWrapper'
+import { NextApiRequest, NextApiResponse } from 'next'
 import type {
   ChatCompletionRequestMessage,
   CreateChatCompletionRequest,
   CreateChatCompletionResponse,
   ErrorResponse,
 } from 'openai'
-
-export const config = {
-  runtime: 'experimental-edge',
-}
 
 const openAiKey = process.env.OPENAI_KEY
 
@@ -37,8 +34,28 @@ const completionFunctions = {
   },
 }
 
-export default async function handler(req: NextRequest) {
-  const { prompt, sql } = await req.json()
+async function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (!openAiKey) {
+    return res.status(500).json({
+      error: 'No OPENAI_KEY set. Create this environment variable to use AI features.',
+    })
+  }
+
+  const { method } = req
+
+  switch (method) {
+    case 'POST':
+      return handlePost(req, res)
+    default:
+      res.setHeader('Allow', ['POST'])
+      res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
+  }
+}
+
+export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
+  const {
+    body: { prompt, sql },
+  } = req
 
   const model = 'gpt-3.5-turbo-0613'
   const maxCompletionTokenCount = 2048
@@ -51,13 +68,6 @@ export default async function handler(req: NextRequest) {
         ${sql}
       `,
     },
-    // {
-    //   role: 'user',
-    //   content: stripIndent`
-    //     Add to the above SQL using the following instructions:
-    //     ${prompt}
-    //   `,
-    // },
     {
       role: 'user',
       content: prompt,
@@ -78,20 +88,6 @@ export default async function handler(req: NextRequest) {
 
   console.log({ sql, prompt, completionMessages })
 
-  // await new Promise((resolve) => setTimeout(resolve, 1000))
-
-  // return new Response(
-  //   JSON.stringify({
-  //     error: 'There was an unknown error editing the SQL snippet. Please try again.',
-  //   }),
-  //   {
-  //     status: 500,
-  //     headers: {
-  //       'content-type': 'application/json',
-  //     },
-  //   }
-  // )
-
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
     headers: {
       Authorization: `Bearer ${openAiKey}`,
@@ -105,17 +101,9 @@ export default async function handler(req: NextRequest) {
     const errorResponse: ErrorResponse = await response.json()
     console.error(`AI SQL editing failed: ${errorResponse.error.message}`)
 
-    return new Response(
-      JSON.stringify({
-        error: 'There was an unknown error editing the SQL snippet. Please try again.',
-      }),
-      {
-        status: 500,
-        headers: {
-          'content-type': 'application/json',
-        },
-      }
-    )
+    return res.status(500).json({
+      error: 'There was an unknown error editing the SQL snippet. Please try again.',
+    })
   }
 
   const completionResponse: CreateChatCompletionResponse = await response.json()
@@ -131,17 +119,9 @@ export default async function handler(req: NextRequest) {
       `AI SQL editing failed: OpenAI response succeeded, but response format was incorrect`
     )
 
-    return new Response(
-      JSON.stringify({
-        error: 'There was an unknown error editing the SQL snippet. Please try again.',
-      }),
-      {
-        status: 500,
-        headers: {
-          'content-type': 'application/json',
-        },
-      }
-    )
+    return res.status(500).json({
+      error: 'There was an unknown error editing the SQL snippet. Please try again.',
+    })
   }
 
   console.log({ sqlResponseString })
@@ -151,22 +131,14 @@ export default async function handler(req: NextRequest) {
   if (!editSqlResult.sql) {
     console.error(`AI SQL editing failed: Unable to edit SQL for the given prompt`)
 
-    return new Response(
-      JSON.stringify({
-        error: 'Unable to edit SQL. Try adding more details to your prompt.',
-      }),
-      {
-        status: 400,
-        headers: {
-          'content-type': 'application/json',
-        },
-      }
-    )
+    return res.status(400).json({
+      error: 'Unable to edit SQL. Try adding more details to your prompt.',
+    })
   }
 
-  return new Response(JSON.stringify(editSqlResult), {
-    headers: {
-      'content-type': 'application/json',
-    },
-  })
+  return res.json(editSqlResult)
 }
+
+const wrapper = (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
+
+export default wrapper

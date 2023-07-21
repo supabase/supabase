@@ -1,16 +1,13 @@
 import { SchemaBuilder } from '@serafin/schema-builder'
 import { stripIndent } from 'common-tags'
-import { NextRequest } from 'next/server'
+import apiWrapper from 'lib/api/apiWrapper'
+import { NextApiRequest, NextApiResponse } from 'next'
 import type {
   ChatCompletionRequestMessage,
   CreateChatCompletionRequest,
   CreateChatCompletionResponse,
   ErrorResponse,
 } from 'openai'
-
-export const config = {
-  runtime: 'experimental-edge',
-}
 
 const openAiKey = process.env.OPENAI_KEY
 
@@ -38,8 +35,28 @@ const completionFunctions = {
   },
 }
 
-export default async function handler(req: NextRequest) {
-  const { sql } = await req.json()
+async function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (!openAiKey) {
+    return res.status(500).json({
+      error: 'No OPENAI_KEY set. Create this environment variable to use AI features.',
+    })
+  }
+
+  const { method } = req
+
+  switch (method) {
+    case 'POST':
+      return handlePost(req, res)
+    default:
+      res.setHeader('Allow', ['POST'])
+      res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
+  }
+}
+
+export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
+  const {
+    body: { sql },
+  } = req
 
   const model = 'gpt-3.5-turbo-0613'
   const maxCompletionTokenCount = 1024
@@ -76,17 +93,9 @@ export default async function handler(req: NextRequest) {
     const errorResponse: ErrorResponse = await response.json()
     console.error(`AI title generation failed: ${errorResponse.error.message}`)
 
-    return new Response(
-      JSON.stringify({
-        error: 'There was an unknown error generating the snippet title. Please try again.',
-      }),
-      {
-        status: 500,
-        headers: {
-          'content-type': 'application/json',
-        },
-      }
-    )
+    return res.status(500).json({
+      error: 'There was an unknown error generating the snippet title. Please try again.',
+    })
   }
 
   const completionResponse: CreateChatCompletionResponse = await response.json()
@@ -102,17 +111,9 @@ export default async function handler(req: NextRequest) {
       `AI title generation failed: OpenAI response succeeded, but response format was incorrect`
     )
 
-    return new Response(
-      JSON.stringify({
-        error: 'There was an unknown error generating the snippet title. Please try again.',
-      }),
-      {
-        status: 500,
-        headers: {
-          'content-type': 'application/json',
-        },
-      }
-    )
+    return res.status(500).json({
+      error: 'There was an unknown error generating the snippet title. Please try again.',
+    })
   }
 
   const generateTitleResult: GenerateTitleResult = JSON.parse(titleResponseString)
@@ -120,22 +121,14 @@ export default async function handler(req: NextRequest) {
   if (!generateTitleResult.title) {
     console.error(`AI title generation failed: Unable to generate title for the given SQL`)
 
-    return new Response(
-      JSON.stringify({
-        error: 'Unable to generate title',
-      }),
-      {
-        status: 400,
-        headers: {
-          'content-type': 'application/json',
-        },
-      }
-    )
+    res.status(400).json({
+      error: 'Unable to generate title',
+    })
   }
 
-  return new Response(JSON.stringify(generateTitleResult), {
-    headers: {
-      'content-type': 'application/json',
-    },
-  })
+  return res.json(generateTitleResult)
 }
+
+const wrapper = (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
+
+export default wrapper
