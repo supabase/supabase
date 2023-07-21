@@ -1,4 +1,3 @@
-import InformationBox from 'components/ui/InformationBox'
 import { OrgSubscription, ProjectAddon } from 'data/subscriptions/org-subscription-query'
 import { PricingInformation } from 'shared-data'
 import { Alert, IconAlertOctagon, IconMinusCircle, IconPauseCircle, Modal } from 'ui'
@@ -24,8 +23,8 @@ const ProjectDowngradeListItem = ({ projectAddon }: { projectAddon: ProjectAddon
       {needsRestart ? (
         <>
           {' '}
-          Project will also <span className="text-amber-900">need to be restarted</span> due to
-          change in compute instance
+          Project will also <span className="font-bold">need to be restarted</span> due to change in
+          compute instance
         </>
       ) : (
         ''
@@ -55,10 +54,10 @@ const DowngradeModal = ({
           <Alert
             withIcon
             variant="warning"
-            title="Downgrading to the free plan will lead to reductions in your project's capacity"
+            title="Downgrading to the free plan will lead to reductions in your organization's quota"
           >
             <p>
-              If you're already past the limits of the free plan, your project could become
+              If you're already past the limits of the free plan, your projects could become
               unresponsive or enter read only mode.
             </p>
           </Alert>
@@ -79,23 +78,24 @@ const DowngradeModal = ({
                 <span>Add ons from all projects under this organization will be removed.</span>
               </div>
               {(subscription?.project_addons.length ?? 0) > 0 && (
-                <InformationBox
-                  title={`Warning: A total of ${subscription?.project_addons.length} project(s) will be affected from the downgrade`}
-                  description={
-                    <ul className="space-y-1 max-h-[100px] overflow-y-auto">
-                      {subscription?.project_addons.map((project) => (
-                        <ProjectDowngradeListItem key={project.ref} projectAddon={project} />
-                      ))}
-                    </ul>
-                  }
-                />
+                <Alert
+                  title={`A total of ${subscription?.project_addons.length} project(s) will be affected from the downgrade`}
+                  variant="warning"
+                  withIcon
+                >
+                  <ul className="space-y-1 max-h-[100px] overflow-y-auto">
+                    {subscription?.project_addons.map((project) => (
+                      <ProjectDowngradeListItem key={project.ref} projectAddon={project} />
+                    ))}
+                  </ul>
+                </Alert>
               )}
             </li>
 
             <li className="flex gap-3">
               <IconAlertOctagon w={14} className="flex-shrink-0" />
               <div>
-                <strong>Before you downgrading to the {selectedPlan?.name} plan, consider:</strong>
+                <strong>Before you downgrade to the {selectedPlan?.name} plan, consider:</strong>
                 <ul className="space-y-2 mt-2">
                   <li className="list-disc ml-4">
                     Your projects no longer require their respective add ons.

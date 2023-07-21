@@ -27,6 +27,8 @@ const Invoices: FC<Props> = ({ projectRef }) => {
   const offset = (page - 1) * PAGE_LIMIT
 
   useEffect(() => {
+    if (!projectRef) return
+
     let cancel = false
     const page = 1
 
@@ -48,7 +50,7 @@ const Invoices: FC<Props> = ({ projectRef }) => {
     return () => {
       cancel = true
     }
-  }, [])
+  }, [projectRef])
 
   const fetchInvoices = async (page: number) => {
     setLoading(true)
