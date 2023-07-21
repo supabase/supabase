@@ -188,58 +188,60 @@ function Partner({
               </div>
 
               <div>
-                <h2
-                  className="text-scale-1200"
-                  style={{ fontSize: '1.5rem', marginBottom: '1rem' }}
-                >
-                  Details
-                </h2>
+                <div className="sticky top-20">
+                  <h2
+                    className="text-scale-1200"
+                    style={{ fontSize: '1.5rem', marginBottom: '1rem' }}
+                  >
+                    Details
+                  </h2>
 
-                <div className="text-scale-1200 divide-y">
-                  {partner.type === 'technology' && (
+                  <div className="text-scale-1200 divide-y">
+                    {partner.type === 'technology' && (
+                      <div className="flex items-center justify-between py-2">
+                        <span className="text-scale-900">Developer</span>
+                        <span className="text-scale-1200">{partner.developer}</span>
+                      </div>
+                    )}
+
                     <div className="flex items-center justify-between py-2">
-                      <span className="text-scale-900">Developer</span>
-                      <span className="text-scale-1200">{partner.developer}</span>
+                      <span className="text-scale-900">Category</span>
+                      <Link href={`/partners/integrations#${partner.category.toLowerCase()}`}>
+                        <a className="text-brand-900 hover:text-brand-800 transition-colors">
+                          {partner.category}
+                        </a>
+                      </Link>
                     </div>
-                  )}
 
-                  <div className="flex items-center justify-between py-2">
-                    <span className="text-scale-900">Category</span>
-                    <Link href={`/partners/integrations#${partner.category.toLowerCase()}`}>
-                      <a className="text-brand-900 hover:text-brand-800 transition-colors">
-                        {partner.category}
-                      </a>
-                    </Link>
-                  </div>
-
-                  <div className="flex items-center justify-between py-2">
-                    <span className="text-scale-900">Website</span>
-                    <a
-                      href={partner.website}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-brand-900 hover:text-brand-800 transition-colors"
-                    >
-                      {new URL(partner.website).host}
-                    </a>
-                  </div>
-
-                  {partner.type === 'technology' && partner.docs && (
                     <div className="flex items-center justify-between py-2">
-                      <span className="text-scale-900">Documentation</span>
+                      <span className="text-scale-900">Website</span>
                       <a
-                        href={partner.docs}
+                        href={partner.website}
                         target="_blank"
                         rel="noreferrer"
                         className="text-brand-900 hover:text-brand-800 transition-colors"
                       >
-                        <span className="flex items-center space-x-1">
-                          <span>Learn</span>
-                          <IconExternalLink size="small" />
-                        </span>
+                        {new URL(partner.website).host}
                       </a>
                     </div>
-                  )}
+
+                    {partner.type === 'technology' && partner.docs && (
+                      <div className="flex items-center justify-between py-2">
+                        <span className="text-scale-900">Documentation</span>
+                        <a
+                          href={partner.docs}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-brand-900 hover:text-brand-800 transition-colors"
+                        >
+                          <span className="flex items-center space-x-1">
+                            <span>Learn</span>
+                            <IconExternalLink size="small" />
+                          </span>
+                        </a>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
