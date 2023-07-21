@@ -11,7 +11,7 @@ import { Dispatch, SetStateAction, useState } from 'react'
 import remarkGfm from 'remark-gfm'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import 'swiper/swiper.min.css'
-import { Admonition, IconChevronLeft, IconExternalLink } from 'ui'
+import { Admonition, Button, IconChevronLeft, IconExternalLink } from 'ui'
 import ImageModal from '~/components/ImageModal'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
@@ -245,6 +245,20 @@ function Partner({
                 </div>
               </div>
             </div>
+            {partner.call_to_action_link && (
+              <div className="bg-scale-100 dark:bg-scale-300 hover:border-scale-600 hover:dark:border-scale-700 border-scale-300 dark:border-scale-400 rounded-2xl border p-10 drop-shadow-sm max-w-5xl mx-auto mt-12">
+                <div className="flex flex-row justify-between">
+                  <h1 className="text-2xl font-medium self-center">
+                    Get started with {partner.title} and Supabase.
+                  </h1>
+                  <a href={partner.call_to_action_link} target="_blank" rel="noreferrer">
+                    <Button size="medium" type="secondary">
+                      Add integration
+                    </Button>
+                  </a>
+                </div>
+              </div>
+            )}
           </div>
         </SectionContainer>
       </DefaultLayout>
