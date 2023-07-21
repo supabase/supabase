@@ -11,7 +11,7 @@ import { Dispatch, SetStateAction, useState } from 'react'
 import remarkGfm from 'remark-gfm'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import 'swiper/swiper.min.css'
-import { Admonition, Button, IconChevronLeft, IconExternalLink } from 'ui'
+import { Admonition, Button, ExpandableVideo, IconChevronLeft, IconExternalLink } from 'ui'
 import ImageModal from '~/components/ImageModal'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
@@ -166,22 +166,6 @@ function Partner({
                   Overview
                 </h2>
 
-                {partner.video && (
-                  <div
-                    className="bg-scale-1000 relative w-full rounded-md shadow-lg"
-                    style={{ padding: '56.25% 0 0 0', marginBottom: '1rem' }}
-                  >
-                    <iframe
-                      title="Demo video showcasing Supabase"
-                      className="absolute h-full w-full rounded-md"
-                      src={`https://www.youtube-nocookie.com/embed/${partner.video}?autoplay=0&loop=0&controls=1&modestbranding=1&rel=0&disablekb=1`}
-                      style={{ top: 0, left: 0 }}
-                      frameBorder="0"
-                      allow="autoplay; modestbranding; encrypted-media"
-                    />
-                  </div>
-                )}
-
                 <div className="prose">
                   <MDXRemote {...overview} components={mdxComponents(setFocusedImage)} />
                 </div>
@@ -195,6 +179,16 @@ function Partner({
                   >
                     Details
                   </h2>
+
+                  {partner.video && (
+                    <div className="mb-6">
+                      <ExpandableVideo
+                        imgUrl=""
+                        videoId={partner.video}
+                        imgOverlayText="Watch an introductory video"
+                      />
+                    </div>
+                  )}
 
                   <div className="text-scale-1200 divide-y">
                     {partner.type === 'technology' && (
