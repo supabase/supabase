@@ -17,7 +17,7 @@ const path = require('path')
 const csp = [
   "frame-ancestors 'none';",
   // IS_PLATFORM
-  process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' && process.env.NODE_ENV === 'production'
+  process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' && process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod'
     ? 'upgrade-insecure-requests;'
     : '',
 ]
