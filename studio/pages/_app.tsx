@@ -56,7 +56,7 @@ import { SessionContextProvider } from '@supabase/auth-helpers-react'
 import { createClient } from '@supabase/supabase-js'
 import { LazyMotion } from 'framer-motion'
 
-const motionFeatures = () => import('./motion-features').then((res) => res.default)
+const motionFeatures = () => import('../motion-features').then((res) => res.default)
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
