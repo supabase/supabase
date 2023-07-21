@@ -18,6 +18,7 @@ const ProjectsPage: NextPageWithLayout = () => {
     isError: isErrorProjects,
     isSuccess: isSuccessProjects,
   } = useProjectsQuery()
+
   const organization = useSelectedOrganization()
   const projects = allProjects?.filter((project) => project.organization_id === organization?.id)
 

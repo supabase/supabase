@@ -14,6 +14,7 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
   const { ui } = useStore()
   const router = useRouter()
   const { ref, slug } = useParams()
+  const navLayoutV2 = useFlag('navigationLayoutV2')
 
   /**
    * Array of urls/routes that should be ignored
@@ -50,7 +51,7 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
 
       if (!isValidOrg) {
         ui.setNotification({ category: 'error', message: 'This organization does not exist' })
-        router.push('/projects')
+        router.push(navLayoutV2 ? `/org/${organizations[0].slug}` : '/projects')
         return
       }
     }
@@ -70,7 +71,7 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
 
       if (!isValidProject) {
         ui.setNotification({ category: 'error', message: 'This project does not exist' })
-        router.push('/projects')
+        router.push(navLayoutV2 ? `/org/${organizations?.[0].slug}` : '/projects')
         return
       }
     }

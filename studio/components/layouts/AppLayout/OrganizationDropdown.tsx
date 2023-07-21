@@ -61,29 +61,27 @@ const OrganizationDropdown = () => {
             <CommandList_Shadcn_>
               <CommandEmpty_Shadcn_>No results found.</CommandEmpty_Shadcn_>
               <CommandGroup_Shadcn_>
-                {organizations
-                  ?.sort((a, b) => a.name.localeCompare(b.name))
-                  .map((org) => {
-                    const href = router.pathname.includes('[slug]')
-                      ? router.pathname.replace('[slug]', org.slug)
-                      : router.pathname.includes('[ref]/settings')
-                      ? `/org/${org.slug}/general`
-                      : `/org/${org.slug}`
-                    return (
-                      <CommandItem_Shadcn_
-                        key={org.slug}
-                        value={org.name}
-                        className="cursor-pointer"
-                        onSelect={() => {
-                          setOpen(false)
-                        }}
-                      >
-                        <Link passHref href={href}>
-                          <a className="w-full">{org.name}</a>
-                        </Link>
-                      </CommandItem_Shadcn_>
-                    )
-                  })}
+                {organizations?.map((org) => {
+                  const href = router.pathname.includes('[slug]')
+                    ? router.pathname.replace('[slug]', org.slug)
+                    : router.pathname.includes('[ref]/settings')
+                    ? `/org/${org.slug}/general`
+                    : `/org/${org.slug}`
+                  return (
+                    <CommandItem_Shadcn_
+                      key={org.slug}
+                      value={org.name}
+                      className="cursor-pointer"
+                      onSelect={() => {
+                        setOpen(false)
+                      }}
+                    >
+                      <Link passHref href={href}>
+                        <a className="w-full">{org.name}</a>
+                      </Link>
+                    </CommandItem_Shadcn_>
+                  )
+                })}
               </CommandGroup_Shadcn_>
               <CommandGroup_Shadcn_ className="border-t">
                 <CommandItem_Shadcn_ className="cursor-pointer" onSelect={() => setOpen(false)}>
