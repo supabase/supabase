@@ -49,7 +49,12 @@ export default function TileGrid({
                         <h3 className="text-scale-1100 group-hover:text-scale-1200 mb-2 text-xl transition-colors">
                           {p.title}
                         </h3>
-                        <p className="text-scale-900 text-sm">{p.description}</p>
+                        <p
+                          className="text-scale-900 text-sm line-clamp-4 min-h-[80px]"
+                          title={p.description}
+                        >
+                          {p.description}
+                        </p>
                       </div>
                     </div>
                   </div>
