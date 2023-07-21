@@ -32,7 +32,10 @@ const ProjectsPage: NextPageWithLayout = () => {
       const localStorageSlug = localStorage.getItem(
         LOCAL_STORAGE_KEYS.RECENTLY_VISITED_ORGANIZATION
       )
-      if (localStorageSlug) router.push(`/org/${localStorageSlug}`)
+      const verifiedSlug = organizations.some((org) => org.slug === localStorageSlug)
+
+      if (organizations.length === 0) router.push('/new')
+      else if (localStorageSlug && verifiedSlug) router.push(`/org/${localStorageSlug}`)
       else router.push(`/org/${organizations[0].slug}`)
     }
   }, [navLayoutV2, isSuccess, hasWindowLoaded])
