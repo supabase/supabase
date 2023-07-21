@@ -25,33 +25,35 @@ const ProjectsPage: NextPageWithLayout = () => {
   const { isLoading: isProfileLoading } = useProfile()
   const isLoading = isOrganizationLoading || isProfileLoading
   const navLayoutV2 = useFlag('navigationLayoutV2')
+  const hasWindowLoaded = typeof window !== 'undefined'
 
   useEffect(() => {
-    if (navLayoutV2 && isSuccess && typeof window !== 'undefined') {
-      const localStorageSlug =
-        typeof window !== 'undefined'
-          ? localStorage.getItem(LOCAL_STORAGE_KEYS.RECENTLY_VISITED_ORGANIZATION)
-          : undefined
+    if (navLayoutV2 && isSuccess && hasWindowLoaded) {
+      const localStorageSlug = localStorage.getItem(
+        LOCAL_STORAGE_KEYS.RECENTLY_VISITED_ORGANIZATION
+      )
       if (localStorageSlug) router.push(`/org/${localStorageSlug}`)
       else router.push(`/org/${organizations[0].slug}`)
     }
-  }, [navLayoutV2, isSuccess, typeof window])
+  }, [navLayoutV2, isSuccess, hasWindowLoaded])
 
   return (
     <>
-      {isLoading && (
-        <div className="flex h-full items-center justify-center space-x-2">
+      {navLayoutV2 && isLoading && (
+        <div className={`flex items-center justify-center h-full`}>
           <Connecting />
         </div>
       )}
 
       {isError && (
-        <div className="py-4 px-5">
+        <div
+          className={`py-4 px-5 ${navLayoutV2 ? 'h-full flex items-center justify-center' : ''}`}
+        >
           <AlertError subject="Failed to retrieve organizations" />
         </div>
       )}
 
-      {isSuccess && (
+      {!navLayoutV2 && isSuccess && (
         <div className="py-4 px-5">
           {IS_PLATFORM && (
             <div className="my-2">
