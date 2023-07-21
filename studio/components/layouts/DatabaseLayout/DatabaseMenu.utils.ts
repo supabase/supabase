@@ -15,15 +15,15 @@ export const generateDatabaseMenu = (
       items: [
         { name: 'Tables', key: 'tables', url: `/project/${ref}/database/tables`, items: [] },
         {
-          name: 'Triggers',
-          key: 'triggers',
-          url: `/project/${ref}/database/triggers`,
+          name: 'Schema Visualizer',
+          key: 'schemas',
+          url: `/project/${ref}/database/schemas`,
           items: [],
         },
         {
-          name: 'Schemas',
-          key: 'schemas',
-          url: `/project/${ref}/database/schemas`,
+          name: 'Triggers',
+          key: 'triggers',
+          url: `/project/${ref}/database/triggers`,
           items: [],
         },
         {

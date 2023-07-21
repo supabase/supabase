@@ -27,7 +27,7 @@ const SchemasPage: NextPageWithLayout = () => {
   return (
     <>
       <div className="flex w-full h-full flex-col">
-        <div className="p-4">
+        <div className="p-4 border-b border-scale-500">
           <Listbox
             className="w-[260px]"
             size="small"
