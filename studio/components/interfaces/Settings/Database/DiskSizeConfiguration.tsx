@@ -182,7 +182,7 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
             ) : (
               <>
                 <Modal.Content>
-                  <div className="w-full space-y-8 py-8">
+                  <div className="w-full space-y-4 py-8">
                     <InputNumber
                       id="new-disk-size"
                       label="New disk size"
@@ -193,7 +193,7 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
                 </Modal.Content>
                 <Modal.Separator />
                 <Modal.Content>
-                  <div className="flex space-x-2 justify-between pb-2">
+                  <div className="flex space-x-2 justify-end pt-1 pb-3">
                     <Button type="default" onClick={() => setShowResetDbPass(false)}>
                       Cancel
                     </Button>
