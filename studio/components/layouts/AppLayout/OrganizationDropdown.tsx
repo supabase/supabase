@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import {
@@ -11,17 +12,15 @@ import {
   Command_Shadcn_,
   IconCode,
   IconPlus,
-  Popover,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
 } from 'ui'
 
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useFlag, useSelectedOrganization } from 'hooks'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import Link from 'next/link'
 
 const OrganizationDropdown = () => {
   const router = useRouter()

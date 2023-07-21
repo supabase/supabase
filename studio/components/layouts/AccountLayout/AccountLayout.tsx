@@ -127,7 +127,7 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
       : []),
   ]
 
-  if (navLayoutV2 && router.pathname !== '/projects') {
+  if (navLayoutV2) {
     return <SettingsLayout>{children}</SettingsLayout>
   }
 
@@ -142,7 +142,12 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
           style={{ height: maxHeight, maxHeight }}
           className="flex flex-col flex-1 w-full overflow-y-auto"
         >
-          <WithSidebar title={title} breadcrumbs={breadcrumbs} sections={sectionsWithHeaders}>
+          <WithSidebar
+            hideSidebar={navLayoutV2}
+            title={title}
+            breadcrumbs={breadcrumbs}
+            sections={sectionsWithHeaders}
+          >
             {children}
           </WithSidebar>
         </main>
