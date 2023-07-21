@@ -474,6 +474,7 @@ export const auth = {
       url: undefined,
       items: [
         { name: 'Enable Captcha Protection', url: '/guides/auth/auth-captcha' },
+        { name: 'Configuring Custom SMTP', url: '/guides/auth/auth-smtp' },
         { name: 'Managing User Data', url: '/guides/auth/managing-user-data' },
         { name: 'Multi-Factor Authentication', url: '/guides/auth/auth-mfa' },
         { name: 'Row Level Security', url: '/guides/auth/row-level-security' },
