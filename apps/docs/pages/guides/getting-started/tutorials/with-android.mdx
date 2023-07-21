@@ -11,7 +11,6 @@ This tutorial demonstrates how to build a basic product management app. The app 
 - [Supabase Auth](/docs/guides/auth) - users log in through magic links sent to their email (without having to set up passwords).
 - [Supabase Storage](/docs/guides/storage) - users can upload a profile photo.
 
-
 ![manage-product-cover](https://github.com/hieuwu/product-sample-supabase-kt/assets/43868345/1bed0c84-208a-4266-a2ec-2bac50ddf80c)
 
 <Admonition type="note">
@@ -21,18 +20,25 @@ This tutorial demonstrates how to build a basic product management app. The app 
 
 <KotlinProjectSetup />
 
-
 ## Building the app
+
 ### Create new Android project
+
 Open Android Studio > New Project > Base Activity (Jetpack Compose)
 
-<img width="720" alt="Screen Shot 2023-06-02 at 21 33 16" src="https://github.com/hieuwu/product-sample-supabase-kt/assets/43868345/288eef97-d8fe-422f-8bb3-1c8424bab08e"></img>
+<img
+  width="720"
+  alt="Screen Shot 2023-06-02 at 21 33 16"
+  src="https://github.com/hieuwu/product-sample-supabase-kt/assets/43868345/288eef97-d8fe-422f-8bb3-1c8424bab08e"
+></img>
 
 ### Set up API key and secret securely
+
 API key and secret from any services are credential information, we should not want to expose these to others because some strangers will use it for bad purpose
 
 #### Create local environment secret
-Create or edit `local.properties` file at top level (same level at build.gradle of the project). 
+
+Create or edit `local.properties` file at top level (same level at build.gradle of the project).
 
 > **Note**: This file should not be pushed directly to the repository, meaning that you should include this in `.gitignore` file
 
@@ -44,7 +50,8 @@ SUPABASE_URL=YOUR_SUPABASE_URL
 ```
 
 #### Read and set value to BuildConfig
-In `build.gradle (app)`, create `Properties` object and read value from `local.properties`  set value for `BuildConfig` by calling `buildConfigField` method
+
+In `build.gradle (app)`, create `Properties` object and read value from `local.properties` set value for `BuildConfig` by calling `buildConfigField` method
 
 ```kotlin
 defaultConfig {
@@ -65,24 +72,32 @@ defaultConfig {
 ```
 
 #### Use value from `BuildConfig`
+
 Read value from `BuildConfig` (Remember to import the right class, it is one from your project). For example:
+
 ```kotlin
 val url = BuildConfig.SUPABASE_URL
 val apiKey = BuildConfig.API_KEY
 ```
 
 ### Set up Supabase dependencies
-<img width="720" alt="Screen Shot 2023-06-05 at 21 39 24" src="https://github.com/hieuwu/product-sample-supabase-kt/assets/43868345/3f154fda-aa9e-4baa-81f2-5b744c7ad2fe"></img>
+
+<img
+  width="720"
+  alt="Screen Shot 2023-06-05 at 21 39 24"
+  src="https://github.com/hieuwu/product-sample-supabase-kt/assets/43868345/3f154fda-aa9e-4baa-81f2-5b744c7ad2fe"
+></img>
 
 In build.gradle (app) file, add these dependencies then press Sync now. Replace the dependency version placeholders `$supabase_version` and `$ktor_version` with the latest versions as shown below.
-    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}> 
-      <a href="https://github.com/supabase-community/supabase-kt/releases" style={{ marginRight: '8px' }}> 
-          <img src="https://img.shields.io/github/release/supabase-community/supabase-kt?label=supabase-kt stable" alt="latest stable supabase-kt version"/> 
-      </a> 
-      <a href="https://github.com/supabase-community/supabase-kt/releases"> 
-          <img src="https://img.shields.io/github/v/release/ktorio/ktor.svg?label=ktor" alt="latest ktor version"/> 
-      </a> 
-    </div> 
+<div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+<a href="https://github.com/supabase-community/supabase-kt/releases" style={{ marginRight: '8px' }}>
+<img src="https://img.shields.io/github/release/supabase-community/supabase-kt?label=supabase-kt stable" alt="latest stable supabase-kt version"/>
+</a>
+<a href="https://github.com/supabase-community/supabase-kt/releases">
+<img src="https://img.shields.io/github/v/release/ktorio/ktor.svg?label=ktor" alt="latest ktor version"/>
+</a>
+</div>
+
 ```kotlin
 // Supabase setup
 implementation "io.github.jan-tennert.supabase:postgrest-kt:$supabase_version"
@@ -94,6 +109,7 @@ implementation "io.ktor:ktor-utils:$ktor_version"
 ```
 
 Also in build.gradle (app) file, add plugin for serialization. The version of this plugin should be the same with Kotlin version
+
 <a href="https://github.com/JetBrains/kotlin" style={{ marginRight: '8px' }}> 
         <img src="https://img.shields.io/maven-central/v/org.jetbrains.kotlin/kotlin-maven-plugin.svg?label=kotlin_version" alt="latest kotlin version"/> 
 </a>
@@ -106,19 +122,25 @@ plugins {
 ```
 
 ### Set up Hilt for dependency injection
+
 In build.gradle (app) file, add these
+
 ```kotlin
 implementation "com.google.dagger:hilt-android:$hilt_version"
 annotationProcessor "com.google.dagger:hilt-compiler:$hilt_version"
 implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
 ```
+
 Create new `ManageProductApplication.kt` class extending Application with `@HiltAndroidApp` annotation
+
 ```kotlin
 // ManageProductApplication.kt
 @HiltAndroidApp
 class ManageProductApplication: Application()
 ```
+
 Open AndroidManifest.xml file, update name property of Application tag
+
 ```xml
 <application
 ...
@@ -127,15 +149,20 @@ Open AndroidManifest.xml file, update name property of Application tag
 </application>
 
 ```
+
 Add annotation for MainActivity
+
 ```kotlin
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 }
 ```
+
 ### Provide Supabase instances with Hilt
+
 You can create it by just calling the constructor. However to make the app more testable, these should be provided
 Create SupabaseMdule.kt
+
 ```kotlin
 @InstallIn(SingletonComponent::class)
 @Module
@@ -163,7 +190,7 @@ object SupabaseModule {
     fun provideSupabaseDatabase(client: SupabaseClient): Postgrest {
         return client.postgrest
     }
-    
+
     @Provides
     @Singleton
     fun provideSupabaseGoTrue(client: SupabaseClient): GoTrue {
@@ -181,7 +208,9 @@ object SupabaseModule {
 ```
 
 ### Create data transfer object to get data
+
 Create `ProductDto.kt` class and use annotations to parse data from Supabase
+
 ```kotlin
 @Serializable
 data class ProductDto(
@@ -201,6 +230,7 @@ data class ProductDto(
 ```
 
 Domain object `Product.kt`to provide to view
+
 ```kotlin
 data class Product(
     val id: String,
@@ -211,10 +241,12 @@ data class Product(
 ```
 
 ### Implement repositories
+
 Create ProductRepository interface and its implementation named ProductRepositoryImpl.
 This kind of class will hold every logic to interact with data sources from Supabase. Do the same with AuthenticationRepository
 
 Create Product Repository
+
 ```kotlin
 interface ProductRepository {
     suspend fun createProduct(product: Product): Boolean
@@ -314,6 +346,7 @@ class ProductRepositoryImpl @Inject constructor(
 ```
 
 Create Authentication Repository
+
 ```kotlin
 interface AuthenticationRepository {
     suspend fun signIn(email: String, password: String): Boolean
@@ -321,6 +354,7 @@ interface AuthenticationRepository {
     suspend fun signInWithGoogle(): Boolean
 }
 ```
+
 ```kotlin
 class AuthenticationRepositoryImpl @Inject constructor(
     private val goTrue: GoTrue
@@ -361,15 +395,16 @@ class AuthenticationRepositoryImpl @Inject constructor(
 ```
 
 ### Implement screens
+
 <Admonition type="note">
-  By the time this page is written, there might be some changes in the code to make it more simple. If you face any problem when implement, feel free to refer the example repository above
+  By the time this page is written, there might be some changes in the code to make it more simple.
+  If you face any problem when implement, feel free to refer the example repository above
 </Admonition>
-Create ProductListViewModel
-```kotlin
+Create ProductListViewModel ```kotlin
 
 @HiltViewModel
 class ProductListViewModel @Inject constructor(
-    private val productRepository: ProductRepository,
+private val productRepository: ProductRepository,
 ) : ViewModel() {
 
     private val _productList = MutableStateFlow<List<Product>?>(listOf())
@@ -410,8 +445,10 @@ class ProductListViewModel @Inject constructor(
             image = this.image
         )
     }
+
 }
-```
+
+````
 
 Create ProductListScreen.kt
 ```kotlin
@@ -528,9 +565,10 @@ private fun AddProductButton(
         )
     }
 }
-```
+````
 
 Create ProductDetailsViewModel.kt
+
 ```kotlin
 
 @HiltViewModel
@@ -538,7 +576,7 @@ class ProductDetailsViewModel @Inject constructor(
     private val productRepository: ProductRepository,
     savedStateHandle: SavedStateHandle,
     ) : ViewModel() {
-        
+
     private val _product = MutableStateFlow<Product?>(null)
     val product: Flow<Product?> = _product
 
@@ -603,6 +641,7 @@ class ProductDetailsViewModel @Inject constructor(
 ```
 
 Create ProductDetailsScreen.kt
+
 ```kotlin
 @OptIn(ExperimentalCoilApi::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -774,6 +813,7 @@ private fun uriToByteArray(contentResolver: ContentResolver, uri: Uri): ByteArra
 ```
 
 Create AddProductScreen
+
 ```kotlin
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -832,6 +872,7 @@ fun AddProductScreen(
 ```
 
 Create AddProductViewModel.kt
+
 ```kotlin
 @HiltViewModel
 class AddProductViewModel @Inject constructor(
@@ -863,6 +904,7 @@ class AddProductViewModel @Inject constructor(
 ```
 
 Create SignUpViewModel
+
 ```kotlin
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
@@ -895,6 +937,7 @@ class SignUpViewModel @Inject constructor(
 ```
 
 Create SignUpScreen.kt
+
 ```kotlin
 @Composable
 fun SignUpScreen(
@@ -990,7 +1033,9 @@ fun SignUpScreen(
     }
 }
 ```
+
 Create SignInViewModel
+
 ```kotlin
 @HiltViewModel
 class SignInViewModel @Inject constructor(
@@ -1025,11 +1070,12 @@ class SignInViewModel @Inject constructor(
             authenticationRepository.signInWithGoogle()
         }
     }
-    
+
 }
 ```
 
 Create SignInScreen.kt
+
 ```kotlin
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
@@ -1142,10 +1188,12 @@ fun SignInScreen(
     }
 }
 ```
-Create successful screen 
+
+Create successful screen
 Implement Sign In Success screen
 
 Create new Empty Activity and in AndroidManifest.xml, add deep link, make sure `scheme` and `host` are the same with ones when set up GoTrue instance
+
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
@@ -1242,8 +1290,6 @@ class DeepLinkHandlerActivity : ComponentActivity() {
     }
 }
 ```
-
-
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
