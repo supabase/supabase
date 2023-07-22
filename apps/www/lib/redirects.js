@@ -2071,4 +2071,14 @@ module.exports = [
     source: '/docs/guides/ai/choosing-instance-type',
     destination: '/docs/guides/ai/choosing-compute-addon',
   },
+  {
+    permanent: true,
+    source: '/guides/cli/using-environment-variables-in-config',
+    destination: '/guides/cli/managing-config',
+  },
+  {
+    permanent: true,
+    source: '/guides/getting-started/local-development',
+    destination: '/guides/cli/local-development',
+  },
 ]

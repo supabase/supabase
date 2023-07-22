@@ -4,7 +4,9 @@ export const meta = {
   id: 'local-development',
   title: 'Local Development',
   description: 'How to use Supabase on your local development machine.',
-  video: 'https://www.youtube.com/v/vyHyYpvjaks',
+  subtitle: 'How to use Supabase on your local development machine.',
+  video: 'https://www.youtube-nocookie.com/v/vyHyYpvjaks',
+  tocVideo: 'vyHyYpvjaks',
 }
 
 Supabase is a flexible platform that lets you decide how you want to build your projects. You can use the Dashboard directly to get up and running quickly, or use a proper local setup. We suggest you work locally and deploy your changes to a linked project on the [Supabase Platform](https://app.supabase.io/).
@@ -24,23 +26,6 @@ The Dashboard provides a wide range of features for setting up your project: cre
 4. **Configuration in code**: If you directly change your tables via the Dashboard, none of that gets captured in code. If you follow these local development practices, you'll store all of your table schemas in code.
 
 5. **Work offline**: Need to work from a train? A plane? An automobile? No problem. Developing your project locally allows you to work offline.
-
-<div className="video-container">
-  <iframe
-    src="https://www.youtube-nocookie.com/embed/vyHyYpvjaks"
-    frameBorder="1"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-    allowFullScreen
-  ></iframe>
-</div>
-
-## Prerequisites
-
-Make sure you have these installed on your local machine:
-
-- [Docker Desktop](https://docs.docker.com/desktop/)
-- [Supabase CLI](/docs/guides/cli)
-- [Git](https://github.com/git-guides/install-git)
 
 ## Log in to the Supabase CLI
 
@@ -474,7 +459,7 @@ This will switch the logging drivers and will direct logs to the Analytics serve
 
 ## Limitations and considerations
 
-The local development environment is not as feature-complete as the Supabase Platform. We're working towards parity between the hosted platform and the local environment. Here are some of the differences:
+The local development environment is not as feature-complete as the Supabase Platform. Here are some of the differences:
 
 - You cannot update your project settings in the Dashboard. This must be done using the local config file.
 - The CLI version determines the local version of Studio used, so make sure you keep your local [Supabase CLI up to date](https://github.com/supabase/cli#getting-started). We're constantly adding new features and bug fixes.

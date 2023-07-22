@@ -206,7 +206,6 @@ export const gettingstarted: NavMenuConstant = {
   items: [
     { name: 'Features', url: '/guides/getting-started/features' },
     { name: 'Architecture', url: '/guides/getting-started/architecture' },
-    { name: 'Local Development', url: '/guides/getting-started/local-development' },
     {
       name: 'Framework Quickstarts',
       items: [
@@ -973,18 +972,27 @@ export const supabase_cli: NavMenuConstant = {
   title: 'Local Dev / CLI',
   url: '/guides/cli',
   items: [
-    { name: 'Overview', url: '/guides/cli' },
-    { name: 'Managing Environments', url: '/guides/cli/managing-environments' },
+    { name: 'Getting started', url: '/guides/cli' },
+    { name: 'Local Development', url: '/guides/cli/local-development' },
+    { name: 'Managing environments', url: '/guides/cli/managing-environments' },
     {
-      name: 'Using environment variables in config.toml',
-      url: '/guides/cli/using-environment-variables-in-config',
+      name: 'Managing config and secrets',
+      url: '/guides/cli/managing-config',
+    },
+    {
+      name: 'Testing emails locally',
+      url: '/guides/cli/testing-emails',
     },
     {
       name: 'GitHub Action',
       url: undefined,
       items: [
-        { name: 'Getting started', url: '/guides/cli/github-action/intro' },
-        { name: 'Managing database migrations', url: '/guides/cli/github-action/migrations' },
+        // { name: 'Getting started', url: '/guides/cli/github-action/intro' },
+        // { name: 'Managing database migrations', url: '/guides/cli/github-action/migrations' },
+        {
+          name: 'Generate types from your database',
+          url: '/guides/cli/github-action/generating-types',
+        },
       ],
     },
     {
