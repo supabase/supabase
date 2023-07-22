@@ -136,7 +136,7 @@ export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
       label: 'Integrations',
       icon: 'integrations',
       hasLightIcon: true,
-      href: '/guides/integrations',
+      href: 'https://supabase.com/partners/integrations',
       level: 'integrations',
     },
     {
@@ -910,6 +910,7 @@ export const ai: NavMenuConstant = {
         { name: 'Vector columns', url: '/guides/ai/vector-columns' },
         { name: 'Engineering for scale', url: '/guides/ai/engineering-for-scale' },
         { name: 'Choosing Compute Add-on', url: '/guides/ai/choosing-compute-addon' },
+        { name: 'Going to Production', url: '/guides/ai/going-to-prod' },
       ],
     },
     {
@@ -1077,6 +1078,24 @@ export const platform: NavMenuConstant = {
       ],
     },
     {
+      name: 'Integrations',
+      url: undefined,
+      items: [
+        {
+          name: 'Integrations Marketplace',
+          url: '/guides/platform/marketplace',
+        },
+        {
+          name: 'Publish an OAuth App',
+          url: '/guides/platform/oauth-apps/publish-an-oauth-app',
+        },
+        {
+          name: 'Sign in with Supabase',
+          url: '/guides/platform/oauth-apps/authorize-an-oauth-app',
+        },
+      ],
+    },
+    {
       name: 'Troubleshooting',
       url: undefined,
       items: [
@@ -1196,87 +1215,6 @@ export const migrate = {
     { name: 'Heroku', url: '/guides/migrations/heroku' },
     { name: 'Render', url: '/guides/migrations/render' },
     { name: 'Amazon RDS', url: '/guides/migrations/amazon-rds' },
-  ],
-}
-
-export const integrations: NavMenuConstant = {
-  icon: 'integrations',
-  title: 'Integrations',
-  url: '/guides/integrations',
-  items: [
-    { name: 'Overview', url: '/guides/integrations/integrations' },
-    {
-      name: 'OAuth Apps (Beta)',
-      url: undefined,
-      items: [
-        {
-          name: 'Publish an OAuth App',
-          url: '/guides/integrations/oauth-apps/publish-an-oauth-app',
-        },
-        {
-          name: 'Authorize an OAuth App',
-          url: '/guides/integrations/oauth-apps/authorize-an-oauth-app',
-        },
-      ],
-    },
-    {
-      name: 'Auth',
-      url: undefined,
-      items: [
-        {
-          name: 'Auth0',
-          url: '/guides/integrations/auth0',
-        },
-        { name: 'Authsignal', url: '/guides/integrations/authsignal' },
-        { name: 'Clerk', url: '/guides/integrations/clerk' },
-        { name: 'keyri', url: '/guides/integrations/keyri' },
-        { name: 'Passage', url: '/guides/integrations/passage' },
-        { name: 'Stytch', url: '/guides/integrations/stytch' },
-        { name: 'SuperTokens', url: '/guides/integrations/supertokens' },
-      ],
-    },
-    {
-      name: 'Caching / Offline-first',
-      url: undefined,
-      items: [{ name: 'Polyscale', url: '/guides/integrations/polyscale' }],
-    },
-    {
-      name: 'Developer Tools',
-      url: undefined,
-      items: [
-        { name: 'Cloudflare Workers', url: '/guides/integrations/cloudflare-workers' },
-        { name: 'Estuary', url: '/guides/integrations/estuary' },
-        { name: 'OpenAI', url: '/guides/ai/examples/openai' },
-        { name: 'pgMustard', url: '/guides/integrations/pgmustard' },
-        { name: 'Prisma', url: '/guides/integrations/prisma' },
-        { name: 'Sequin', url: '/guides/integrations/sequin' },
-        { name: 'Snaplet', url: '/guides/integrations/snaplet' },
-        { name: 'Vercel', url: '/guides/integrations/vercel' },
-        { name: 'Upstash Redis', url: '/guides/functions/examples/upstash-redis' },
-        { name: 'WeWeb', url: '/guides/integrations/weweb' },
-        { name: 'Zuplo', url: '/guides/integrations/zuplo' },
-      ],
-    },
-    {
-      name: 'Low-code',
-      url: undefined,
-      items: [
-        { name: 'Appsmith', url: '/guides/integrations/appsmith' },
-        { name: 'Bracket', url: '/guides/integrations/bracket' },
-        { name: 'DhiWise', url: '/guides/integrations/dhiwise' },
-        { name: 'Directus', url: '/guides/integrations/directus' },
-        { name: 'Draftbit', url: '/guides/integrations/draftbit' },
-        { name: 'FlutterFlow', url: '/guides/integrations/flutterflow' },
-        { name: 'Forest Admin', url: '/guides/integrations/forestadmin' },
-        { name: 'Plasmic', url: '/guides/integrations/plasmic' },
-        { name: 'ILLA', url: '/guides/integrations/illa' },
-      ],
-    },
-    {
-      name: 'Messaging',
-      url: undefined,
-      items: [{ name: 'OneSignal', url: '/guides/integrations/onesignal' }],
-    },
   ],
 }
 

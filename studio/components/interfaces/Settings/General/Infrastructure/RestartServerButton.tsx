@@ -61,7 +61,7 @@ const RestartServerButton = () => {
     ui.setNotification({
       error,
       category: 'error',
-      message: `Unable to restart ${type}`,
+      message: `Unable to restart ${type}: ${error.message}`,
     })
     setLoading(false)
     setServiceToRestart(undefined)
