@@ -21,19 +21,29 @@ const externalSite = 'https://supabase.github.io/setup-cli'
 
 // Each external docs page is mapped to a local page
 const pageMap = [
+  // {
+  //   slug: 'intro',
+  //   meta: {
+  //     title: 'Getting Started',
+  //   },
+  //   remoteFile: 'index.md',
+  // },
+  // {
+  //   slug: 'migrations',
+  //   meta: {
+  //     title: 'Managing database migrations',
+  //   },
+  //   remoteFile: 'migrations.md',
+  // },
   {
-    slug: 'intro',
+    slug: 'generating-types',
     meta: {
-      title: 'Getting Started',
+      title: 'Generate types from your database',
+      description: 'End-to-end type safety across client, server, and database.',
+      subtitle: 'End-to-end type safety across client, server, and database.',
+      tocVideo: 'VSNgAIObBdw',
     },
-    remoteFile: 'index.md',
-  },
-  {
-    slug: 'migrations',
-    meta: {
-      title: 'Managing database migrations',
-    },
-    remoteFile: 'migrations.md',
+    remoteFile: 'generating-types.md',
   },
 ]
 
