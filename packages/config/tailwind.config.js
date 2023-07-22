@@ -4,6 +4,19 @@ const deepMerge = require('deepmerge')
 const color = require('./../ui/build/css/tw-extend/color')
 
 /**
+ *
+ */
+let colorExtend = {}
+Object.values(color).map((x, i) => {
+  colorExtend[Object.keys(color)[i]] = `hsl(${x.cssVariable} / <alpha-value>)` // x.cssVariable
+})
+
+// console.log('colorExtend', colorExtend)
+// console.log('colorExtend kebabToNested', kebabToNested(colorExtend))
+
+// console.log('colorExtend', kebabToNested(colorExtend).colors.gray)
+
+/**
  * Generates Tailwind colors for the theme
  * adds <alpha-value> as part of the hsl value
  */
@@ -35,15 +48,15 @@ function kebabToNested(obj) {
     const parts = key.split('-')
     let currentObj = result
     for (let i = 0; i < parts.length; i++) {
-      const part = parts[i]
+      const part = parts[i] === 'DEFAULT' ? parts[i] : parts[i].toLowerCase() // convert key to lowercase
       if (!currentObj[part]) {
         currentObj[part] = {}
       }
       if (i === parts.length - 1) {
         if (typeof value === 'object') {
-          currentObj[part] = nestObject(value)
+          currentObj[part] = kebabToNested(value) // recursively convert nested objects
         } else {
-          currentObj[part] = value
+          currentObj[part] = value.toString().toLowerCase() // convert value to lowercase
         }
       } else {
         currentObj = currentObj[part]
@@ -65,53 +78,21 @@ const uiConfig = ui({
      */
     textColor: (theme) => ({
       ...theme('colors'),
-      ...generateTwColorClasses('textColor', color),
-    }),
-    accentColor: (theme) => ({
-      ...theme('colors'),
-      ...generateTwColorClasses('accentColor', color),
+      ...generateTwColorClasses('foreground', color),
     }),
     backgroundColor: (theme) => ({
       ...theme('colors'),
-      ...generateTwColorClasses('backgroundColor', color),
+      ...generateTwColorClasses('background', color),
     }),
     borderColor: (theme) => ({
       ...theme('colors'),
-      ...generateTwColorClasses('borderColor', color),
-    }),
-    boxShadowColor: (theme) => ({
-      ...theme('colors'),
-      ...generateTwColorClasses('boxShadowColor', color),
-    }),
-    caretColor: (theme) => ({
-      ...theme('colors'),
-      ...generateTwColorClasses('caretColor', color),
-    }),
-    divideColor: (theme) => ({
-      ...theme('colors'),
-      ...generateTwColorClasses('divideColor', color),
-    }),
-    outlineColor: (theme) => ({
-      ...theme('colors'),
-      ...generateTwColorClasses('outlineColor', color),
-    }),
-    placeholderColor: (theme) => ({
-      ...theme('colors'),
-      ...generateTwColorClasses('placeholderColor', color),
-    }),
-    ringColor: (theme) => ({
-      ...theme('colors'),
-      ...generateTwColorClasses('ringColor', color),
-    }),
-    ringOffsetColor: (theme) => ({
-      ...theme('colors'),
-      ...generateTwColorClasses('ringOffsetColor', color),
-    }),
-    textDecorationColor: (theme) => ({
-      ...theme('colors'),
-      ...generateTwColorClasses('textDecorationColor', color),
+      ...generateTwColorClasses('border', color),
     }),
     extend: {
+      colors: {
+        ...kebabToNested(colorExtend),
+      },
+
       typography: ({ theme }) => ({
         // Removal of backticks in code blocks for tailwind v3.0
         // https://github.com/tailwindlabs/tailwindcss-typography/issues/135
@@ -341,9 +322,40 @@ const uiConfig = ui({
         sans: ['Circular', 'custom-font', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'],
         mono: ['Office Code Pro', 'Source Code Pro', 'Menlo', 'monospace'],
       },
+
+      // shadcn defaults START
+      keyframes: {
+        'flash-code': {
+          '0%': { backgroundColor: 'rgba(63, 207, 142, 0.1)' },
+          '100%': { backgroundColor: 'transparent' },
+        },
+      },
+      animation: {
+        'flash-code': 'flash-code 1s forwards',
+        'flash-code-slow': 'flash-code 2s forwards',
+      },
+      // borderRadius: {
+      //   lg: `var(--radius)`,
+      //   md: `calc(var(--radius) - 2px)`,
+      //   sm: 'calc(var(--radius) - 4px)',
+      // },
+      // fontFamily: {
+      //   sans: ['var(--font-sans)', ...fontFamily.sans],
+      // },
+      keyframes: {
+        'accordion-down': {
+          from: { height: 0 },
+          to: { height: 'var(--radix-accordion-content-height)' },
+        },
+        'accordion-up': {
+          from: { height: 'var(--radix-accordion-content-height)' },
+          to: { height: 0 },
+        },
+      },
+      // shadcn defaults END
     },
   },
-  plugins: [require('@tailwindcss/typography')],
+  plugins: [require('@tailwindcss/typography'), require('tailwindcss-animate')],
 })
 
 function arrayMergeFn(destinationArray, sourceArray) {

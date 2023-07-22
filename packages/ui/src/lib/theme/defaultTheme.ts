@@ -1085,7 +1085,7 @@ export default {
     `,
     content: `
       z-40
-      bg
+      bg-overlay
       border
       rounded
       shadow-lg

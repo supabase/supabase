@@ -88,7 +88,7 @@ const Infrastructure = ({
   const hasLatest = dayjs(endDate!).isAfter(dayjs().startOf('day'))
 
   const latestIoBudgetConsumption =
-    hasLatest && ioBudgetData?.data?.slice(-1)
+    hasLatest && ioBudgetData?.data?.slice(-1)?.[0]
       ? Number(ioBudgetData.data.slice(-1)[0].disk_io_consumption)
       : 0
 

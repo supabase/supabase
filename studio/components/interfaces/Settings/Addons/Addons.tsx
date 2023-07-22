@@ -5,6 +5,7 @@ import { useMemo } from 'react'
 import { useParams, useTheme } from 'common'
 import { getAddons } from 'components/interfaces/BillingV2/Subscription/Subscription.utils'
 import ProjectUpdateDisabledTooltip from 'components/interfaces/Organization/BillingSettings/ProjectUpdateDisabledTooltip'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import {
   ScaffoldContainer,
   ScaffoldDivider,
@@ -12,25 +13,30 @@ import {
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
+import AlertError from 'components/ui/AlertError'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useFlag } from 'hooks'
-import { BASE_PATH } from 'lib/constants'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
-import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
+import { BASE_PATH } from 'lib/constants'
+import { SUBSCRIPTION_PANEL_KEYS, useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { Alert, Button, IconChevronRight, IconExternalLink } from 'ui'
 import { ComputeInstanceSidePanel, CustomDomainSidePanel, PITRSidePanel } from './'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import AlertError from 'components/ui/AlertError'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
 const Addons = () => {
   const { isDarkMode } = useTheme()
   const { ref: projectRef } = useParams()
   const snap = useSubscriptionPageStateSnapshot()
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
-
   const { project: selectedProject } = useProjectContext()
+  const { panel } = useParams()
+
+  const allowedPanelValues = ['computeInstance', 'pitr', 'customDomain']
+  if (panel && typeof panel === 'string' && allowedPanelValues.includes(panel)) {
+    snap.setPanelKey(panel as SUBSCRIPTION_PANEL_KEYS)
+  }
+
   const cpuArchitecture = getCloudProviderArchitecture(selectedProject?.cloud_provider)
 
   // [Joshen] We could possibly look into reducing the interval to be more "realtime"

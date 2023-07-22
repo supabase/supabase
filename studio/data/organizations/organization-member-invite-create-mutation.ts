@@ -1,6 +1,9 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'react-hot-toast'
+
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
+import { ResponseError } from 'types'
 import { organizationKeys } from './keys'
 
 export type OrganizationMemberInviteCreateVariables = {
@@ -32,11 +35,12 @@ type OrganizationMemberInviteCreateData = Awaited<ReturnType<typeof createOrgani
 
 export const useOrganizationMemberInviteCreateMutation = ({
   onSuccess,
+  onError,
   ...options
 }: Omit<
   UseMutationOptions<
     OrganizationMemberInviteCreateData,
-    unknown,
+    ResponseError,
     OrganizationMemberInviteCreateVariables
   >,
   'mutationFn'
@@ -45,7 +49,7 @@ export const useOrganizationMemberInviteCreateMutation = ({
 
   return useMutation<
     OrganizationMemberInviteCreateData,
-    unknown,
+    ResponseError,
     OrganizationMemberInviteCreateVariables
   >((vars) => createOrganizationMemberInvite(vars), {
     async onSuccess(data, variables, context) {
@@ -57,6 +61,13 @@ export const useOrganizationMemberInviteCreateMutation = ({
       ])
 
       await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to invite member: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
     },
     ...options,
   })

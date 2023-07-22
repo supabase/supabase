@@ -1,18 +1,53 @@
-import { marked } from 'marked'
+import { CodeHikeConfig, remarkCodeHike } from '@code-hike/mdx'
+import { CH } from '@code-hike/mdx/components'
+import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
 import { GetStaticPaths, GetStaticProps } from 'next'
+import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
+import { serialize } from 'next-mdx-remote/serialize'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Link from 'next/link'
+import { Dispatch, SetStateAction, useState } from 'react'
+import remarkGfm from 'remark-gfm'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import 'swiper/swiper.min.css'
-import { IconChevronLeft, IconExternalLink } from 'ui'
+import { Admonition, IconChevronLeft, IconExternalLink } from 'ui'
+import ImageModal from '~/components/ImageModal'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import supabase from '~/lib/supabase'
 import { Partner } from '~/types/partners'
 import Error404 from '../../404'
 
-function Partner({ partner }: { partner: Partner }) {
+/**
+ * Returns custom components so that the markdown converts to a nice looking html.
+ */
+function mdxComponents(callback: Dispatch<SetStateAction<string | null>>) {
+  const components = {
+    CH,
+    Admonition,
+    /**
+     * Returns a custom img element which has a bound onClick listener. When the image is clicked, it will open a modal showing that particular image.
+     */
+    img: (
+      props: React.DetailedHTMLProps<React.ImgHTMLAttributes<HTMLImageElement>, HTMLImageElement>
+    ) => {
+      return <img {...props} onClick={() => callback(props.src!)} />
+    },
+  }
+
+  return components
+}
+
+function Partner({
+  partner,
+  overview,
+}: {
+  partner: Partner
+  overview: MDXRemoteSerializeResult<Record<string, unknown>, Record<string, unknown>>
+}) {
+  const [focusedImage, setFocusedImage] = useState<string | null>(null)
+
   if (!partner) return <Error404 />
   return (
     <>
@@ -31,6 +66,23 @@ function Partner({ partner }: { partner: Partner }) {
         }}
       />
 
+      {focusedImage ? (
+        <ImageModal
+          visible
+          onCancel={() => setFocusedImage(null)}
+          size="xxlarge"
+          className="w-full outline-none"
+        >
+          <Image
+            layout="responsive"
+            objectFit="contain"
+            width={1152}
+            height={766}
+            src={focusedImage!}
+            alt={partner.title}
+          />
+        </ImageModal>
+      ) : null}
       <DefaultLayout>
         <SectionContainer>
           <div className="col-span-12 mx-auto mb-2 max-w-5xl space-y-12 lg:col-span-2">
@@ -80,7 +132,7 @@ function Partner({ partner }: { partner: Partner }) {
                   1024: {
                     slidesPerView: 4,
                   },
-                  1208: {
+                  1280: {
                     slidesPerView: 5,
                   },
                 }}
@@ -96,6 +148,7 @@ function Partner({ partner }: { partner: Partner }) {
                           height={960}
                           src={image}
                           alt={partner.title}
+                          onClick={() => setFocusedImage(image)}
                         />
                       </div>
                     </SwiperSlide>
@@ -129,7 +182,9 @@ function Partner({ partner }: { partner: Partner }) {
                   </div>
                 )}
 
-                <div className="prose" dangerouslySetInnerHTML={{ __html: partner.overview }} />
+                <div className="prose">
+                  <MDXRemote {...overview} components={mdxComponents(setFocusedImage)} />
+                </div>
               </div>
 
               <div>
@@ -169,7 +224,7 @@ function Partner({ partner }: { partner: Partner }) {
                     </a>
                   </div>
 
-                  {partner.type === 'technology' && (
+                  {partner.type === 'technology' && partner.docs && (
                     <div className="flex items-center justify-between py-2">
                       <span className="text-scale-900">Documentation</span>
                       <a
@@ -197,7 +252,11 @@ function Partner({ partner }: { partner: Partner }) {
 
 // This function gets called at build time
 export const getStaticPaths: GetStaticPaths = async () => {
-  const { data: slugs } = await supabase.from('partners').select('slug')
+  const { data: slugs } = await supabase
+    .from('partners')
+    .select('slug')
+    .eq('approved', true)
+    .eq('type', 'technology')
 
   const paths: {
     params: { slug: string }
@@ -230,11 +289,24 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     }
   }
 
+  const codeHikeOptions: CodeHikeConfig = {
+    theme: codeHikeTheme,
+    lineNumbers: true,
+    showCopyButton: true,
+    skipLanguages: [],
+    autoImport: false,
+  }
+
   // Parse markdown
-  partner.overview = marked.parse(partner.overview)
+  const overview = await serialize(partner.overview, {
+    mdxOptions: {
+      useDynamicImport: true,
+      remarkPlugins: [remarkGfm, [remarkCodeHike, codeHikeOptions]],
+    },
+  })
 
   return {
-    props: { partner },
+    props: { partner, overview },
     revalidate: 18000, // In seconds - refresh every 5 hours
   }
 }
