@@ -33,10 +33,10 @@ const frameworks = [
     gaEvent: 'www_hp_hero_frameworks_flutter',
   },
   {
-    name: 'Android',
-    icon: '/images/logos/frameworks/android.svg',
-    docs: '/docs/guides/getting-started/quickstarts/android',
-    gaEvent: 'www_hp_hero_frameworks_android',
+    name: 'Android Kotlin',
+    icon: '/images/logos/frameworks/kotlin.svg',
+    docs: '/docs/guides/getting-started/quickstarts/kotlin',
+    gaEvent: 'www_hp_hero_frameworks_kotlin',
   },
   {
     name: 'Svelte',

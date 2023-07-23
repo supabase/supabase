@@ -38,12 +38,12 @@ const Frameworks = () => {
       href: '/reference/javascript/installing#javascript',
     },
     {
-      name: 'Android',
+      name: 'Kotlin',
       logo: {
-        light: '/docs/img/icons/android-icon.svg',
-        dark: '/docs/img/icons/android-icon.svg',
+        light: '/docs/img/icons/kotlin-icon.svg',
+        dark: '/docs/img/icons/kotlin-icon.svg',
       },
-      href: '/guides/with-android',
+      href: '/guides/with-kotlin',
     },
     {
       name: 'Next.js',

@@ -215,7 +215,7 @@ export const gettingstarted: NavMenuConstant = {
         { name: 'NuxtJS', url: '/guides/getting-started/quickstarts/nuxtjs' },
         { name: 'RedwoodJS', url: '/guides/getting-started/quickstarts/redwoodjs' },
         { name: 'Flutter', url: '/guides/getting-started/quickstarts/flutter' },
-        { name: 'Android', url: '/guides/getting-started/quickstarts/android' },
+        { name: 'Android Kotlin', url: '/guides/getting-started/quickstarts/kotlin' },
         { name: 'SvelteKit', url: '/guides/getting-started/quickstarts/sveltekit' },
         { name: 'SolidJS', url: '/guides/getting-started/quickstarts/solidjs' },
         { name: 'Vue', url: '/guides/getting-started/quickstarts/vue' },
@@ -274,8 +274,8 @@ export const gettingstarted: NavMenuConstant = {
           url: '/guides/getting-started/tutorials/with-expo',
         },
         {
-          name: 'Android',
-          url: '/guides/getting-started/tutorials/with-android',
+          name: 'Android Kotlin',
+          url: '/guides/getting-started/tutorials/with-kotlin',
         },
         {
           name: 'Ionic React',
