@@ -8,12 +8,6 @@ import { useStore } from 'hooks'
 import { NextPageWithLayout } from 'types'
 import { IconLock, Listbox } from 'ui'
 
-/**
- * TODO: Sponsor Reactflow before using it in production! 😇
- *
- * https://pro.reactflow.dev/
- */
-
 const SchemasPage: NextPageWithLayout = () => {
   const { meta } = useStore()
   const schemas = meta.schemas.list()
