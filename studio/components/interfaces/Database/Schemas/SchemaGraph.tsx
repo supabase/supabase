@@ -298,8 +298,13 @@ const TablesGraph = ({ tables }: { tables: PostgresTable[] }) => {
           }}
           nodeTypes={nodeTypes}
           fitView
+          maxZoom={1.5}
           proOptions={{
-            hideAttribution: true,
+            /**
+             * TODO: Sponsor Reactflow before using it in production! 😇
+             * https://pro.reactflow.dev/
+             */
+            hideAttribution: false,
           }}
         >
           <Background gap={16} color={backgroundPatternColor} variant={BackgroundVariant.Lines} />
