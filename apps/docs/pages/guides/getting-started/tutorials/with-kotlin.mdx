@@ -410,7 +410,9 @@ class AuthenticationRepositoryImpl @Inject constructor(
   By the time this page is written, there might be some changes in the code to make it more simple.
   If you face any problem when implement, feel free to refer the example repository above
 </Admonition>
-Create ProductListViewModel 
+
+Create ProductListViewModel
+
 ```kotlin
 
 @HiltViewModel
@@ -462,6 +464,7 @@ private val productRepository: ProductRepository,
 ```
 
 Create ProductListScreen.kt
+
 ```kotlin
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
