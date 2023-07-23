@@ -230,8 +230,16 @@ function TableNode({ data, targetPosition, sourcePosition }: NodeProps<TableNode
             >
               <span
                 className={clsx(
-                  column.isPrimary ? 'border-l-2 border-l-brand-900 pl-[6px] pr-2' : 'px-2',
-                  'text-ellipsis overflow-hidden whitespace-nowrap'
+                  column.isPrimary && 'border-l-2 border-l-brand-900 pl-[6px] pr-2',
+                  'pl-2 text-ellipsis overflow-hidden whitespace-nowrap'
+                )}
+              >
+                {column.name}
+              </span>
+              <span
+                className={clsx(
+                  column.isPrimary && 'ml-[2px] pl-[6px]',
+                  'absolute top-0 left-0 right-0 pl-2 bg-scale-500 text-ellipsis overflow-hidden whitespace-nowrap opacity-0 hover:opacity-100'
                 )}
               >
                 {column.name}
