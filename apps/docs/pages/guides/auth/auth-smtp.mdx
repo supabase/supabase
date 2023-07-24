@@ -6,7 +6,7 @@ export const meta = {
   description: 'Moving towards production: Configuring a custom SMTP provider',
 }
 
-## Overview
+# Auth SMTP
 
 At present, you can trial the Supabase platform by sending up to 4 emails per hour via the built-in service. The default email service as a whole is offered on a best effort basis: we will do our best to maintain it and will review usage of the service on a regular basis to see if the email service should be continued.
 As you progress toward production, you may find yourself wanting for a custom SMTP service in order to increase your limits. A custom SMTP server will allow you to set your own cap on the number of emails sent per hour.
@@ -16,7 +16,6 @@ Beyond rate limits, an SMTP server might also help with:
 - Scalability
 - Analytics and Tracking
 - Compliance and Anti Spam measures
-
 
 ## How to Set up SMTP
 
@@ -28,8 +27,7 @@ Fill in fields below with the relevant details obtained from your custom SMTP pr
 
 ## Configuring and Interpreting the email Rate limits
 
-The rate limit for sending emails is an aggregate number applied across all endpoints in the service which send emails. It also takes into account all users using the service. For example, if there are 50 users on the platform and the rate limit is `RATE_LIMIT`, the total number of emails that can be sent per hour is `RATE_LIMIT` and not `RATE_LIMIT` * 50.
-
+The rate limit for sending emails is an aggregate number applied across all endpoints in the service which send emails. It also takes into account all users using the service. For example, if there are 50 users on the platform and the rate limit is `RATE_LIMIT`, the total number of emails that can be sent per hour is `RATE_LIMIT` and not `RATE_LIMIT` \* 50.
 
 ### SMTP Providers
 
@@ -38,3 +36,6 @@ You can use Supabase Auth with any major SMTP provider of your choosing. Some SM
 - [Twilio SendGrid](https://docs.sendgrid.com/for-developers/sending-email/integrating-with-the-smtp-api)
 - [AWS SES](https://docs.aws.amazon.com/ses/latest/dg/send-email-smtp.html)
 - [Resend](https://resend.com/docs/dashboard/emails/introduction)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+export default Page
