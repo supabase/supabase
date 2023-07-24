@@ -63,7 +63,7 @@ const UserSettingsDropdown = () => {
           </DropdownMenuItem_Shadcn_>
           <DropdownMenuSeparator_Shadcn_ className="bg-scale-500" />
           <DropdownMenuItem_Shadcn_ className="cursor-pointer" onClick={() => setIsOpen(true)}>
-            <span>Quick search</span>
+            <span>Command menu</span>
             <DropdownMenuShortcut_Shadcn_>⌘K</DropdownMenuShortcut_Shadcn_>
           </DropdownMenuItem_Shadcn_>
           <DropdownMenuSeparator_Shadcn_ className="bg-scale-500" />

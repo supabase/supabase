@@ -11,6 +11,7 @@ import {
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
   Command_Shadcn_,
+  IconCheck,
   IconCode,
   IconPlus,
   PopoverContent_Shadcn_,
@@ -24,6 +25,7 @@ import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscr
 import { useSelectedOrganization, useSelectedProject } from 'hooks'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { Organization, Project } from 'types'
+import { useParams } from 'common'
 
 // [Fran] the idea is to let users change projects without losing the current page,
 // but at the same time we need to redirect correctly between urls that might be
@@ -58,6 +60,7 @@ const ProjectLink = ({
   setOpen: (value: boolean) => void
 }) => {
   const router = useRouter()
+  const { ref } = useParams()
   const sanitizedRoute = sanitizeRoute(router.route, router.query)
   const isOrgBilling = !!organization?.subscription_id
 
@@ -81,7 +84,10 @@ const ProjectLink = ({
       onSelect={() => setOpen(false)}
     >
       <Link passHref href={href}>
-        <a className="w-full">{project.name}</a>
+        <a className="w-full flex items-center justify-between">
+          <span>{project.name}</span>
+          {project.ref === ref && <IconCheck className="text-brand-900" />}
+        </a>
       </Link>
     </CommandItem_Shadcn_>
   )
