@@ -179,7 +179,9 @@ export default function IndexPage() {
                   ].join(' ')}
                 >
                   {plan.name === 'Pro' && (
-                    <p className="text-[13px] leading-4 text-center py-2 text-white">Most Popular</p>
+                    <p className="text-[13px] leading-4 text-center py-2 text-scale-100">
+                      Most Popular
+                    </p>
                   )}
                   <div
                     key={plan.name}
