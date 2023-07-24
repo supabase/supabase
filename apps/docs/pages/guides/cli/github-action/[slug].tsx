@@ -21,20 +21,6 @@ const externalSite = 'https://supabase.github.io/setup-cli'
 
 // Each external docs page is mapped to a local page
 const pageMap = [
-  // {
-  //   slug: 'intro',
-  //   meta: {
-  //     title: 'Getting Started',
-  //   },
-  //   remoteFile: 'index.md',
-  // },
-  // {
-  //   slug: 'migrations',
-  //   meta: {
-  //     title: 'Managing database migrations',
-  //   },
-  //   remoteFile: 'migrations.md',
-  // },
   {
     slug: 'generating-types',
     meta: {

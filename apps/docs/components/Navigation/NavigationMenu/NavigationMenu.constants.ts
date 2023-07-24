@@ -988,8 +988,6 @@ export const supabase_cli: NavMenuConstant = {
       name: 'GitHub Action',
       url: undefined,
       items: [
-        // { name: 'Getting started', url: '/guides/cli/github-action/intro' },
-        // { name: 'Managing database migrations', url: '/guides/cli/github-action/migrations' },
         {
           name: 'Generate types from your database',
           url: '/guides/cli/github-action/generating-types',
