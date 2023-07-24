@@ -8,7 +8,8 @@ export const meta = {
 
 ## Overview
 
-At present, you can trial the Supabase platform by sending up to four emails per hour via the built service. As you progress toward production, you may find yourself wanting for a custom SMTP service in order to increase your limits. A custom SMTP server will allow you to set your own cap on the number of emails sent per hour.
+At present, you can trial the Supabase platform by sending up to 4 emails per hour via the built-in service. The default email service as a whole is offered on a best effort basis: we will do our best to maintain it and will review usage of the service on a regular basis to see if the email service should be continued.
+As you progress toward production, you may find yourself wanting for a custom SMTP service in order to increase your limits. A custom SMTP server will allow you to set your own cap on the number of emails sent per hour.
 Beyond rate limits, an SMTP server might also help with:
 
 - Deliverability and Reputation Management
@@ -32,7 +33,8 @@ The rate limit for sending emails is an aggregate number applied across all endp
 
 ### SMTP Providers
 
-Some SMTP providers you could consider using are:
+You can use Supabase Auth with any SMTP provider of your choosing. Some SMTP providers you could consider using are:
+
 - [Twilio SendGrid](https://docs.sendgrid.com/for-developers/sending-email/integrating-with-the-smtp-api)
 - [AWS SES](https://docs.aws.amazon.com/ses/latest/dg/send-email-smtp.html)
 - [Resend](https://resend.com/docs/dashboard/emails/introduction)
