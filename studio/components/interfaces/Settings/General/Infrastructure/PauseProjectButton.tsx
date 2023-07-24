@@ -4,7 +4,10 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import {
+  useIsProjectActive,
+  useProjectContext,
+} from 'components/layouts/ProjectLayout/ProjectContext'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import { setProjectStatus } from 'data/projects/projects-query'
 import { useCheckPermissions, useStore } from 'hooks'
@@ -19,6 +22,7 @@ const PauseProjectButton = () => {
   const { ui } = useStore()
   const { project } = useProjectContext()
   const router = useRouter()
+  const isProjectActive = useIsProjectActive()
   const [loading, setLoading] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
 
@@ -68,26 +72,12 @@ const PauseProjectButton = () => {
             icon={<IconPause />}
             onClick={openModal}
             loading={loading}
-            disabled={isPaused || !canPauseProject}
+            disabled={isPaused || !canPauseProject || !isProjectActive}
           >
             Pause Project
           </Button>
         </Tooltip.Trigger>
-        {isPaused ? (
-          <Tooltip.Portal>
-            <Tooltip.Content side="bottom">
-              <Tooltip.Arrow className="radix-tooltip-arrow" />
-              <div
-                className={[
-                  'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                  'border border-scale-200 ', //border
-                ].join(' ')}
-              >
-                <span className="text-xs text-scale-1200">Your project is already paused</span>
-              </div>
-            </Tooltip.Content>
-          </Tooltip.Portal>
-        ) : !canPauseProject ? (
+        {isPaused || !canPauseProject || !isProjectActive ? (
           <Tooltip.Portal>
             <Tooltip.Content side="bottom">
               <Tooltip.Arrow className="radix-tooltip-arrow" />
@@ -98,14 +88,18 @@ const PauseProjectButton = () => {
                 ].join(' ')}
               >
                 <span className="text-xs text-scale-1200">
-                  You need additional permissions to pause this project
+                  {isPaused
+                    ? 'Your project is already paused'
+                    : !canPauseProject
+                    ? 'You need additional permissions to pause this project'
+                    : !isProjectActive
+                    ? 'Unable to pause project as project is not active'
+                    : ''}
                 </span>
               </div>
             </Tooltip.Content>
           </Tooltip.Portal>
-        ) : (
-          <></>
-        )}
+        ) : null}
       </Tooltip.Root>
       <ConfirmModal
         danger
