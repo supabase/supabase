@@ -1714,6 +1714,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/with-kotlin',
+    destination: '/docs/guides/getting-started/tutorials/with-kotlin',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/with-ionic-react',
     destination: '/docs/guides/getting-started/tutorials/with-ionic-react',
   },
