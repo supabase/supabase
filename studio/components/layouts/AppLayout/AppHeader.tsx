@@ -1,18 +1,19 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
-import { useSelectedOrganization, useSelectedProject } from 'hooks'
+import { useParams } from 'common'
+import { useSelectedOrganization } from 'hooks'
 import FeedbackDropdown from '../ProjectLayout/LayoutHeader/FeedbackDropdown'
 import HelpPopover from '../ProjectLayout/LayoutHeader/HelpPopover'
 import NotificationsPopover from '../ProjectLayout/LayoutHeader/NotificationsPopover'
-import ProjectDropdown from './ProjectDropdown'
 import OrganizationDropdown from './OrganizationDropdown'
+import ProjectDropdown from './ProjectDropdown'
 import SettingsButton from './SettingsButton'
 import UserSettingsDropdown from './UserSettingsDropdown'
 
 const AppHeader = () => {
   const router = useRouter()
-  const project = useSelectedProject()
+  const { ref } = useParams()
   const organization = useSelectedOrganization()
 
   return (
@@ -28,7 +29,7 @@ const AppHeader = () => {
           </a>
         </Link>
         <OrganizationDropdown />
-        {project !== undefined && <ProjectDropdown />}
+        {ref !== undefined && <ProjectDropdown />}
       </div>
 
       <div className="flex items-center space-x-4">
