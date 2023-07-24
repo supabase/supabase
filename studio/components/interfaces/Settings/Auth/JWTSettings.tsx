@@ -33,7 +33,7 @@ import { uuidv4 } from 'lib/helpers'
 import {
   JWT_SECRET_UPDATE_ERROR_MESSAGES,
   JWT_SECRET_UPDATE_PROGRESS_MESSAGES,
-} from './API.constants'
+} from '../API/API.constants'
 
 const JWTSettings = () => {
   const { ui } = useStore()

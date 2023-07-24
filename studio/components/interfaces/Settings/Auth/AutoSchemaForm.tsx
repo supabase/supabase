@@ -1,4 +1,16 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
+import {
+  FormActions,
+  FormHeader,
+  FormPanel,
+  FormSection,
+  FormSectionContent,
+  FormSectionLabel,
+} from 'components/ui/Forms'
+import { useAuthConfigQuery } from 'data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
+import { useCheckPermissions, useStore } from 'hooks'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useState } from 'react'
 import {
@@ -16,19 +28,6 @@ import {
   Toggle,
 } from 'ui'
 import { boolean, number, object, string } from 'yup'
-
-import { useParams } from 'common'
-import {
-  FormActions,
-  FormHeader,
-  FormPanel,
-  FormSection,
-  FormSectionContent,
-  FormSectionLabel,
-} from 'components/ui/Forms'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useCheckPermissions, useStore } from 'hooks'
 
 const AutoSchemaForm = observer(() => {
   const { ui } = useStore()

@@ -30,7 +30,7 @@ import {
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useCheckPermissions, useStore } from 'hooks'
-import { urlRegex } from './../Auth.constants'
+import { urlRegex } from '../../../Auth/Auth.constants'
 import { defaultDisabledSmtpFormValues } from './SmtpForm.constants'
 import { generateFormValues, isSmtpEnabled } from './SmtpForm.utils'
 import EmailRateLimitsAlert from '../EmailRateLimitsAlert'
