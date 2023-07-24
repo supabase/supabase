@@ -1,16 +1,17 @@
+import * as Tooltip from '@radix-ui/react-tooltip'
 import { isNil } from 'lodash'
 import { useEffect, useState } from 'react'
 import { object, string } from 'yup'
-import * as Tooltip from '@radix-ui/react-tooltip'
+
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common/hooks'
+import { useOrganizationMemberInviteCreateMutation } from 'data/organizations/organization-member-invite-create-mutation'
+import { doPermissionsCheck, useGetPermissions, useStore } from 'hooks'
+import { Member, Role } from 'types'
 import { Button, Form, IconMail, Input, Listbox, Modal } from 'ui'
 
-import { Member, Role } from 'types'
-import { checkPermissions, useStore } from 'hooks'
-import { useParams } from 'common/hooks'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useOrganizationMemberInviteCreateMutation } from 'data/organizations/organization-member-invite-create-mutation'
-
 export interface InviteMemberButtonProps {
+  orgId: number
   userId: number
   members: Member[]
   roles: Role[]
@@ -18,6 +19,7 @@ export interface InviteMemberButtonProps {
 }
 
 const InviteMemberButton = ({
+  orgId,
   userId,
   members = [],
   roles = [],
@@ -25,23 +27,29 @@ const InviteMemberButton = ({
 }: InviteMemberButtonProps) => {
   const { ui } = useStore()
   const { slug } = useParams()
-
   const [isOpen, setIsOpen] = useState(false)
+  const { permissions: allPermissions } = useGetPermissions()
 
   const canInviteMembers = roles.some(({ id: role_id }) =>
-    checkPermissions(PermissionAction.CREATE, 'user_invites', { resource: { role_id } })
+    doPermissionsCheck(
+      allPermissions,
+      PermissionAction.CREATE,
+      'user_invites',
+      { resource: { role_id } },
+      orgId
+    )
   )
 
   const initialValues = { email: '', role: '' }
-
   const schema = object({
     email: string().email('Must be a valid email address').required('Email is required'),
     role: string().required('Role is required'),
   })
 
-  const { mutateAsync } = useOrganizationMemberInviteCreateMutation()
+  const { mutateAsync: inviteMember, isLoading: isInviting } =
+    useOrganizationMemberInviteCreateMutation()
 
-  const onInviteMember = async (values: any, { setSubmitting, resetForm }: any) => {
+  const onInviteMember = async (values: any, { resetForm }: any) => {
     if (!slug) {
       throw new Error('slug is required')
     }
@@ -65,32 +73,21 @@ const InviteMemberButton = ({
 
     const roleId = Number(values.role)
 
-    setSubmitting(true)
-
     try {
-      const response = await mutateAsync({
+      const response = await inviteMember({
         slug,
         invitedEmail: values.email.toLowerCase(),
         ownerId: userId,
         roleId,
       })
-
       if (isNil(response)) {
         ui.setNotification({ category: 'error', message: 'Failed to add member' })
       } else {
         ui.setNotification({ category: 'success', message: 'Successfully added new member.' })
-
         setIsOpen(!isOpen)
         resetForm({ initialValues: { ...initialValues, role: roleId } })
       }
-    } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to add member: ${error.message}`,
-      })
-    }
-
-    setSubmitting(false)
+    } catch (error) {}
   }
 
   return (
@@ -129,7 +126,7 @@ const InviteMemberButton = ({
         header="Invite a member to this organization"
       >
         <Form validationSchema={schema} initialValues={initialValues} onSubmit={onInviteMember}>
-          {({ values, isSubmitting, resetForm }: any) => {
+          {({ values, resetForm }: any) => {
             // [Alaister] although this "technically" is breaking the rules of React hooks
             // it won't error because the hooks are always rendered in the same order
             // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -195,8 +192,8 @@ const InviteMemberButton = ({
                       block
                       size="medium"
                       htmlType="submit"
-                      disabled={isSubmitting || invalidRoleSelected}
-                      loading={isSubmitting}
+                      disabled={isInviting || invalidRoleSelected}
+                      loading={isInviting}
                     >
                       Invite new member
                     </Button>

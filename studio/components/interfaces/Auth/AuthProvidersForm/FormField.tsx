@@ -14,7 +14,8 @@ interface Props {
 const FormField: FC<Props> = ({ name, properties, formValues, disabled = false }) => {
   const [hidden, setHidden] = useState(!!properties.isSecret)
 
-  if (properties.show && formValues[properties.show.key] !== properties.show.matches) return null
+  if (properties.show && !properties.show.matches.includes(formValues[properties.show.key]))
+    return null
 
   switch (properties.type) {
     case 'string':

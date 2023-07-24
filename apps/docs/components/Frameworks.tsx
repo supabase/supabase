@@ -93,6 +93,14 @@ const Frameworks = () => {
       },
       href: '/guides/with-vue-3',
     },
+    {
+      name: 'refine',
+      logo: {
+        light: '/docs/img/icons/refine-icon.svg',
+        dark: '/docs/img/icons/refine-icon.svg',
+      },
+      href: '/guides/getting-started/tutorials/with-refine',
+    },
   ]
   return (
     <div className="grid md:grid-cols-12 gap-4 not-prose">

@@ -84,6 +84,7 @@ function Group({
                     checked={option.checked}
                     name={option.name}
                     description={option.description}
+                    defaultChecked={option.defaultChecked}
                   />
                 )
               })

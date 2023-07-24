@@ -1,16 +1,12 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useQueryClient } from '@tanstack/react-query'
 import clsx from 'clsx'
+import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { observer } from 'mobx-react-lite'
-import { Collapsible, Form, IconChevronRight, IconHelpCircle, Input, Toggle } from 'ui'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { Collapsible, Form, IconChevronRight, Input, Toggle } from 'ui'
 
-import { useStore, checkPermissions, useFlag } from 'hooks'
 import { useParams } from 'common/hooks'
-import { API_URL } from 'lib/constants'
-import { patch } from 'lib/common/fetch'
-
-import OrganizationDeletePanel from './OrganizationDeletePanel'
 import {
   FormActions,
   FormPanel,
@@ -18,12 +14,21 @@ import {
   FormSectionContent,
   FormSectionLabel,
 } from 'components/ui/Forms'
+import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useCheckPermissions, useFlag, useSelectedOrganization, useStore } from 'hooks'
+import { isResponseOk, patch } from 'lib/common/fetch'
+import { API_URL } from 'lib/constants'
+import OrganizationDeletePanel from './OrganizationDeletePanel'
+import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
+import { Organization } from 'types'
 
 const GeneralSettings = () => {
-  const { app, ui } = useStore()
+  const queryClient = useQueryClient()
+  const { ui } = useStore()
   const { slug } = useParams()
   const [open, setOpen] = useState(false)
-  const { name, opt_in_tags } = ui.selectedOrganization ?? {}
+  const selectedOrganization = useSelectedOrganization()
+  const { name, opt_in_tags } = selectedOrganization ?? {}
 
   const formId = 'org-general-settings'
   const isOptedIntoAi = opt_in_tags?.includes('AI_SQL_GENERATOR_OPT_IN')
@@ -32,9 +37,8 @@ const GeneralSettings = () => {
   const showCMDK = useFlag('dashboardCmdk')
   const allowCMDKDataOptIn = useFlag('dashboardCmdkDataOptIn')
 
-  const canUpdateOrganization = checkPermissions(PermissionAction.UPDATE, 'organizations')
-  const canDeleteOrganization = checkPermissions(PermissionAction.UPDATE, 'organizations')
-
+  const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
+  const canDeleteOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
   const onUpdateOrganization = async (values: any, { setSubmitting, resetForm }: any) => {
     if (!canUpdateOrganization) {
       return ui.setNotification({
@@ -47,27 +51,27 @@ const GeneralSettings = () => {
 
     // [Joshen] Need to update this logic once we support multiple opt in tags
     const optInTags = values.isOptedIntoAi ? ['AI_SQL_GENERATOR_OPT_IN'] : []
-    const response = await patch(`${API_URL}/organizations/${slug}`, {
+    const response = await patch<Organization>(`${API_URL}/organizations/${slug}`, {
       name: values.name,
-      billing_email: ui.selectedOrganization?.billing_email ?? '',
+      billing_email: selectedOrganization?.billing_email ?? '',
       ...(allowCMDKDataOptIn && { opt_in_tags: optInTags }),
     })
 
-    if (response.error) {
+    if (!isResponseOk(response)) {
       ui.setNotification({
         category: 'error',
         message: `Failed to update organization: ${response.error.message}`,
       })
     } else {
       resetForm({ values, initialValues: values })
-      app.onOrgUpdated(response)
+      invalidateOrganizationsQuery(queryClient)
       ui.setNotification({ category: 'success', message: 'Successfully saved settings' })
     }
     setSubmitting(false)
   }
 
   return (
-    <div className="container my-4 max-w-4xl space-y-8">
+    <ScaffoldContainerLegacy>
       <Form id={formId} initialValues={initialValues} onSubmit={onUpdateOrganization}>
         {({ isSubmitting, handleReset, values, initialValues, resetForm }: any) => {
           const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
@@ -78,7 +82,7 @@ const GeneralSettings = () => {
           useEffect(() => {
             const values = { name: name ?? '', isOptedIntoAi }
             resetForm({ values, initialValues: values })
-          }, [ui.selectedOrganization?.slug])
+          }, [selectedOrganization?.slug])
 
           return (
             <FormPanel
@@ -188,7 +192,7 @@ const GeneralSettings = () => {
       </Form>
 
       {canDeleteOrganization && <OrganizationDeletePanel />}
-    </div>
+    </ScaffoldContainerLegacy>
   )
 }
 

@@ -1,34 +1,29 @@
 import dayjs from 'dayjs'
 import { observer } from 'mobx-react-lite'
-import { FC, useEffect, useState } from 'react'
-import { Badge, Button, IconArrowRight, IconExternalLink } from 'ui'
+import { useEffect, useState } from 'react'
 
-import { useStore } from 'hooks'
 import { useParams } from 'common/hooks'
-import {
-  PRICING_TIER_PRODUCT_IDS,
-  TIME_PERIODS_INFRA,
-  USAGE_APPROACHING_THRESHOLD,
-} from 'lib/constants'
+import { useStore } from 'hooks'
+import { TIME_PERIODS_INFRA, USAGE_APPROACHING_THRESHOLD } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 import { NextPageWithLayout } from 'types'
+import { Badge, Button, IconArrowRight, IconExternalLink } from 'ui'
 
 import { ReportsLayout } from 'components/layouts'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import Panel from 'components/ui/Panel'
 import SparkBar from 'components/ui/SparkBar'
 import { useProjectUsageQuery } from 'data/usage/project-usage-query'
+import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 
 const DatabaseReport: NextPageWithLayout = () => {
-  const { ui } = useStore()
-  const project = ui.selectedProject
-
   return (
     <div className="1xl:px-28 mx-auto flex flex-col gap-4 px-5 py-6 lg:px-16 xl:px-24 2xl:px-32">
       <div className="content h-full w-full overflow-y-auto">
         <div className="w-full">
-          <DatabaseUsage project={project} />
+          <DatabaseUsage />
         </div>
       </div>
     </div>
@@ -37,15 +32,17 @@ const DatabaseReport: NextPageWithLayout = () => {
 
 DatabaseReport.getLayout = (page) => <ReportsLayout title="Database">{page}</ReportsLayout>
 
-export default observer(DatabaseReport)
+export default DatabaseReport
 
-const DatabaseUsage: FC<any> = () => {
+const DatabaseUsage = observer(() => {
   const { meta, ui } = useStore()
+  const { project } = useProjectContext()
   const [databaseSize, setDatabaseSize] = useState<any>(0)
   const [dateRange, setDateRange] = useState<any>(undefined)
 
   const { ref: projectRef } = useParams()
   const { data: usage } = useProjectUsageQuery({ projectRef })
+  const { data: subscription } = useProjectSubscriptionV2Query({ projectRef })
 
   const databaseSizeLimit = usage?.db_size?.limit ?? 0
   const databaseEgressLimit = usage?.db_egress?.limit ?? 0
@@ -76,9 +73,9 @@ const DatabaseUsage: FC<any> = () => {
   const egressIsApproaching = databaseSizeUsageRatio >= USAGE_APPROACHING_THRESHOLD
   const egressIsExceeded = databaseSizeUsageRatio >= 1
 
-  const subscriptionTier = ui.selectedProject?.subscription_tier
+  const subscriptionPlan = subscription?.plan?.id
 
-  const isPaidTier = subscriptionTier !== PRICING_TIER_PRODUCT_IDS.FREE
+  const isPaidTier = subscriptionPlan !== 'free'
 
   return (
     <>
@@ -197,8 +194,19 @@ const DatabaseUsage: FC<any> = () => {
                   <ChartHandler
                     startDate={dateRange?.period_start?.date}
                     endDate={dateRange?.period_end?.date}
-                    attribute={'cpu_usage'}
-                    label={'CPU usage'}
+                    attribute={'avg_cpu_usage'}
+                    label={'Average CPU usage'}
+                    interval={dateRange.interval}
+                    provider={'infra-monitoring'}
+                  />
+                )}
+
+                {dateRange && (
+                  <ChartHandler
+                    startDate={dateRange?.period_start?.date}
+                    endDate={dateRange?.period_end?.date}
+                    attribute={'max_cpu_usage'}
+                    label={'Max CPU usage'}
                     interval={dateRange.interval}
                     provider={'infra-monitoring'}
                   />
@@ -221,4 +229,4 @@ const DatabaseUsage: FC<any> = () => {
       </div>
     </>
   )
-}
+})

@@ -1,12 +1,11 @@
-import { FC, useState } from 'react'
-import Link from 'next/link'
-import React from 'react'
-import { Button, IconDownload, IconExternalLink } from 'ui'
-import { API_ADMIN_URL } from 'lib/constants'
-import { get } from 'lib/common/fetch'
-import { useStore } from 'hooks'
 import { useParams } from 'common/hooks'
 import CodeSnippet from 'components/to-be-cleaned/Docs/CodeSnippet'
+import { useStore } from 'hooks'
+import { get } from 'lib/common/fetch'
+import { API_ADMIN_URL } from 'lib/constants'
+import Link from 'next/link'
+import { useState } from 'react'
+import { Button, IconDownload, IconExternalLink } from 'ui'
 
 interface Props {
   selectedLang: string

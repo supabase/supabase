@@ -29,7 +29,7 @@ const Index = ({}: Props) => {
           url: `https://supabase.com/${router.pathname}`,
           images: [
             {
-              url: `https://supabase.com/images/og/og-image.jpg`,
+              url: `https://supabase.com/images/og/og-image-v2.jpg`,
             },
           ],
         }}

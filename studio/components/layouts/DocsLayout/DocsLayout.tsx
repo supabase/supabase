@@ -1,20 +1,21 @@
-import { ReactElement, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
+import { ReactElement, useEffect } from 'react'
 
-import ProjectLayout from '../'
-import { useStore, withAuth } from 'hooks'
 import Error from 'components/ui/Error'
 import ProductMenu from 'components/ui/ProductMenu'
-import { generateDocsMenu } from './DocsLayout.utils'
+import { useSelectedProject, useStore, withAuth } from 'hooks'
 import { PROJECT_STATUS } from 'lib/constants'
+import ProjectLayout from '../'
+import { generateDocsMenu } from './DocsLayout.utils'
 
 function DocsLayout({ title, children }: { title: string; children: ReactElement }) {
   const router = useRouter()
-  const { meta, ui } = useStore()
+  const { ui, meta } = useStore()
   const { data, isLoading, error } = meta.openApi
+  const selectedProject = useSelectedProject()
 
-  const isPaused = ui.selectedProject?.status === PROJECT_STATUS.INACTIVE
+  const isPaused = selectedProject?.status === PROJECT_STATUS.INACTIVE
 
   const getPage = () => {
     if (router.pathname.endsWith('graphiql')) return 'graphiql'
@@ -25,10 +26,10 @@ function DocsLayout({ title, children }: { title: string; children: ReactElement
   }
 
   useEffect(() => {
-    if (ui.selectedProject?.ref && !isPaused) {
+    if (ui.selectedProjectRef && !isPaused) {
       meta.openApi.load()
     }
-  }, [ui.selectedProject?.ref])
+  }, [ui.selectedProjectRef])
 
   if (error) {
     return (
@@ -38,7 +39,7 @@ function DocsLayout({ title, children }: { title: string; children: ReactElement
     )
   }
 
-  const projectRef = ui.selectedProject?.ref ?? 'default'
+  const projectRef = selectedProject?.ref ?? 'default'
   const tableNames = (data?.tables ?? []).map((table: any) => table.name)
   const functionNames = (data?.functions ?? []).map((fn: any) => fn.name)
 

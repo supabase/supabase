@@ -1,47 +1,50 @@
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { useEffect, useState, FC, ChangeEvent, useRef } from 'react'
+import { CLIENT_LIBRARIES } from 'common/constants'
 import { observer } from 'mobx-react-lite'
+import Link from 'next/link'
+import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import {
   Button,
+  Checkbox,
+  Form,
+  IconAlertCircle,
+  IconExternalLink,
+  IconLoader,
   IconMail,
   IconPlus,
   IconX,
   Input,
   Listbox,
-  Form,
-  IconLoader,
-  IconAlertCircle,
-  IconExternalLink,
-  Checkbox,
 } from 'ui'
-import { CLIENT_LIBRARIES } from 'common/constants'
 
-import { Project } from 'types'
-import { useStore, useFlag } from 'hooks'
-import { post, get } from 'lib/common/fetch'
-import { detectBrowser } from 'lib/helpers'
-import { API_URL, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
-
+import { useParams } from 'common'
 import Divider from 'components/ui/Divider'
-import Connecting from 'components/ui/Loading'
-import MultiSelect from 'components/ui/MultiSelect'
 import InformationBox from 'components/ui/InformationBox'
-import { formatMessage, uploadAttachments } from './SupportForm.utils'
-import { CATEGORY_OPTIONS, SEVERITY_OPTIONS, SERVICE_OPTIONS } from './Support.constants'
+import MultiSelect from 'components/ui/MultiSelect'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useProjectsQuery } from 'data/projects/projects-query'
+import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
+import { useFlag, useStore } from 'hooks'
+import useLatest from 'hooks/misc/useLatest'
+import { get, isResponseOk, post } from 'lib/common/fetch'
+import { API_URL } from 'lib/constants'
+import { detectBrowser } from 'lib/helpers'
+import { useProfile } from 'lib/profile'
+import { Project } from 'types'
 import DisabledStateForFreeTier from './DisabledStateForFreeTier'
-import { useProfileQuery } from 'data/profile/profile-query'
+import { CATEGORY_OPTIONS, SERVICE_OPTIONS, SEVERITY_OPTIONS } from './Support.constants'
+import { formatMessage, uploadAttachments } from './SupportForm.utils'
 
 const MAX_ATTACHMENTS = 5
+const INCLUDE_DISCUSSIONS = ['Problem', 'Database_unresponsive']
 
-interface Props {
+export interface SupportFormProps {
   setSentCategory: (value: string) => void
 }
 
-const SupportForm: FC<Props> = ({ setSentCategory }) => {
-  const { ui, app } = useStore()
-  const router = useRouter()
-  const { ref, subject, category, message } = router.query
+const SupportForm = ({ setSentCategory }: SupportFormProps) => {
+  const { ui } = useStore()
+  const { ref, subject, category, message } = useParams()
 
   const uploadButtonRef = useRef()
   const enableFreeSupport = useFlag('enableFreeSupport')
@@ -49,22 +52,48 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
   const [uploadedDataUrls, setUploadedDataUrls] = useState<string[]>([])
   const [selectedServices, setSelectedServices] = useState<string[]>([])
 
-  // Get all orgs and projects from global store
-  const sortedOrganizations = app.organizations.list()
-  const sortedProjects = app.projects.list()
+  const {
+    data: organizations,
+    isLoading: isLoadingOrganizations,
+    isError: isErrorOrganizations,
+    isSuccess: isSuccessOrganizations,
+  } = useOrganizationsQuery()
+  // for use in useEffect
+  const organizationsRef = useLatest(organizations)
 
-  const isInitialized = app.projects.isInitialized
+  const {
+    data: allProjects,
+    isLoading: isLoadingProjects,
+    isError: isErrorProjects,
+    isSuccess: isSuccessProjects,
+  } = useProjectsQuery()
+
   const projectDefaults: Partial<Project>[] = [{ ref: 'no-project', name: 'No specific project' }]
 
-  const projects = [...sortedProjects, ...projectDefaults]
+  const projects = [...(allProjects ?? []), ...projectDefaults]
+  const selectedProjectFromUrl = projects.find((project) => project.ref === ref)
+  const selectedCategoryFromUrl = CATEGORY_OPTIONS.find((option) => {
+    if (option.value.toLowerCase() === ((category as string) ?? '').toLowerCase()) return option
+  })
 
-  const planNames = {
-    [PRICING_TIER_PRODUCT_IDS.FREE]: 'Free',
-    [PRICING_TIER_PRODUCT_IDS.PRO]: 'Pro',
-    [PRICING_TIER_PRODUCT_IDS.PAYG]: 'Pro',
-    [PRICING_TIER_PRODUCT_IDS.TEAM]: 'Team',
-    [PRICING_TIER_PRODUCT_IDS.ENTERPRISE]: 'Enterprise',
-  }
+  const selectedProjectRef =
+    selectedProjectFromUrl !== undefined
+      ? selectedProjectFromUrl.ref
+      : projects.length > 0
+      ? projects[0].ref
+      : 'no-project'
+  const selectedOrganizationSlug =
+    selectedProjectRef !== 'no-project'
+      ? organizations?.find((org) => {
+          const project = projects.find((project) => project.ref === selectedProjectRef)
+          return org.id === project?.organization_id
+        })?.slug
+      : organizations?.[0]?.slug
+
+  const { data: subscription, isLoading: isLoadingSubscription } = useProjectSubscriptionV2Query(
+    { projectRef: selectedProjectRef },
+    { enabled: selectedProjectRef !== 'no-project' }
+  )
 
   useEffect(() => {
     if (!uploadedFiles) return
@@ -76,40 +105,17 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
     }
   }, [uploadedFiles])
 
-  const { data: profile } = useProfileQuery()
+  const { profile } = useProfile()
   const respondToEmail = profile?.primary_email ?? 'your email'
 
-  if (!isInitialized) {
-    return (
-      <div className="w-[622px] py-48">
-        <Connecting />
-      </div>
-    )
-  }
-
-  const selectedProject = sortedProjects.find((project) => project.ref === ref)
-  const selectedCategory = CATEGORY_OPTIONS.find((option) => {
-    if (option.value.toLowerCase() === ((category as string) ?? '').toLowerCase()) return option
-  })
-
-  const initialProjectRef =
-    selectedProject !== undefined
-      ? selectedProject.ref
-      : sortedProjects.length > 0
-      ? sortedProjects[0].ref
-      : 'no-project'
-  const initialOrganizationSlug =
-    initialProjectRef !== 'no-project'
-      ? sortedOrganizations.find((org) => {
-          const project = sortedProjects.find((project) => project.ref === initialProjectRef)
-          return org.id === project?.organization_id
-        })?.slug
-      : sortedOrganizations[0]?.slug
   const initialValues = {
-    category: selectedCategory !== undefined ? selectedCategory.value : CATEGORY_OPTIONS[0].value,
+    category:
+      selectedCategoryFromUrl !== undefined
+        ? selectedCategoryFromUrl.value
+        : CATEGORY_OPTIONS[0].value,
     severity: 'Low',
-    projectRef: initialProjectRef,
-    organizationSlug: initialOrganizationSlug,
+    projectRef: selectedProjectRef,
+    organizationSlug: selectedOrganizationSlug,
     library: 'no-library',
     subject: subject ?? '',
     message: message || '',
@@ -182,8 +188,8 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
       }
     }
 
-    const response = await post(`${API_URL}/feedback/send`, payload)
-    if (response.error) {
+    const response = await post<void>(`${API_URL}/feedback/send`, payload)
+    if (!isResponseOk(response)) {
       ui.setNotification({
         category: 'error',
         message: `Failed to submit support ticket: ${response.error.message}`,
@@ -209,9 +215,7 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
         )
 
         const selectedProject = projects.find((project) => project.ref === values.projectRef)
-        const isFreeProject =
-          (selectedProject?.subscription_tier ?? PRICING_TIER_PRODUCT_IDS.FREE) ===
-          PRICING_TIER_PRODUCT_IDS.FREE
+        const isFreeProject = (subscription?.plan.id ?? 'free') === 'free'
         const isDisabled =
           !enableFreeSupport &&
           isFreeProject &&
@@ -222,13 +226,13 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
         // eslint-disable-next-line react-hooks/rules-of-hooks
         useEffect(() => {
           if (values.projectRef === 'no-project') {
-            const updatedValues = { ...values, organizationSlug: sortedOrganizations[0]?.slug }
+            const updatedValues = {
+              ...values,
+              organizationSlug: organizationsRef.current?.[0]?.slug,
+            }
             resetForm({ values: updatedValues, initialValues: updatedValues })
           } else if (selectedProject) {
-            if (!selectedProject.subscription_tier) {
-              app.projects.fetchSubscriptionTier(selectedProject as Project)
-            }
-            const organization = sortedOrganizations.find(
+            const organization = organizationsRef.current?.find(
               (org) => org.id === selectedProject.organization_id
             )
             if (organization) {
@@ -237,6 +241,23 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
             }
           }
         }, [values.projectRef])
+
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        useEffect(() => {
+          if (
+            isSuccessProjects &&
+            isSuccessOrganizations &&
+            allProjects.length > 0 &&
+            organizations.length > 0
+          ) {
+            const updatedValues = {
+              ...values,
+              projectRef: selectedProjectRef,
+              organizationSlug: selectedOrganizationSlug,
+            }
+            resetForm({ values: updatedValues, initialValues: updatedValues })
+          }
+        }, [isSuccessProjects, isSuccessOrganizations])
 
         return (
           <div className="space-y-8 w-[620px]">
@@ -267,23 +288,40 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
 
             <div className="px-6">
               <div className="grid grid-cols-2 gap-4">
-                <Listbox id="projectRef" layout="vertical" label="Which project is affected?">
-                  {projects.map((option) => {
-                    const organization = sortedOrganizations.find(
-                      (x) => x.id === option.organization_id
-                    )
-                    return (
-                      <Listbox.Option
-                        key={`option-${option.ref}`}
-                        label={option.name || ''}
-                        value={option.ref}
-                      >
-                        <span>{option.name}</span>
-                        <span className="block text-xs opacity-50">{organization?.name}</span>
-                      </Listbox.Option>
-                    )
-                  })}
-                </Listbox>
+                {isLoadingProjects && (
+                  <div className="space-y-2">
+                    <p className="text-sm prose">Which project is affected?</p>
+                    <ShimmeringLoader className="!py-[19px]" />
+                  </div>
+                )}
+                {isErrorProjects && (
+                  <div className="space-y-2">
+                    <p className="text-sm prose">Which project is affected?</p>
+                    <div className="border rounded-md px-4 py-2 flex items-center space-x-2">
+                      <IconAlertCircle strokeWidth={2} className="text-scale-1000" />
+                      <p className="text-sm prose">Failed to retrieve projects</p>
+                    </div>
+                  </div>
+                )}
+                {isSuccessProjects && (
+                  <Listbox id="projectRef" layout="vertical" label="Which project is affected?">
+                    {projects.map((option) => {
+                      const organization = organizations?.find(
+                        (x) => x.id === option.organization_id
+                      )
+                      return (
+                        <Listbox.Option
+                          key={`option-${option.ref}`}
+                          label={option.name || ''}
+                          value={option.ref}
+                        >
+                          <span>{option.name}</span>
+                          <span className="block text-xs opacity-50">{organization?.name}</span>
+                        </Listbox.Option>
+                      )
+                    })}
+                  </Listbox>
+                )}
                 <Listbox id="severity" layout="vertical" label="Severity">
                   {SEVERITY_OPTIONS.map((option: any) => {
                     return (
@@ -300,14 +338,13 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
                   })}
                 </Listbox>
               </div>
-              {selectedProject?.subscription_tier ? (
+
+              {values.projectRef !== 'no-project' && subscription && isSuccessProjects ? (
                 <p className="text-sm text-scale-1000 mt-2">
                   This project is on the{' '}
-                  <span className="text-scale-1100">
-                    {planNames[selectedProject?.subscription_tier]} plan
-                  </span>
+                  <span className="text-scale-1100">{subscription.plan.name} plan</span>
                 </p>
-              ) : selectedProject?.ref !== 'no-project' ? (
+              ) : isLoadingSubscription ? (
                 <div className="flex items-center space-x-2 mt-2">
                   <IconLoader size={14} className="animate-spin" />
                   <p className="text-sm text-scale-1000">Checking project's plan</p>
@@ -317,29 +354,46 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
               )}
             </div>
 
-            {values.projectRef === 'no-project' && sortedOrganizations.length > 0 && (
+            {isSuccessProjects && values.projectRef === 'no-project' && (
               <div className="px-6">
-                <Listbox
-                  id="organizationSlug"
-                  layout="vertical"
-                  label="Which organization is affected?"
-                >
-                  {sortedOrganizations.map((option) => {
-                    return (
-                      <Listbox.Option
-                        key={`option-${option.slug}`}
-                        label={option.name || ''}
-                        value={option.slug}
-                      >
-                        <span>{option.name}</span>
-                      </Listbox.Option>
-                    )
-                  })}
-                </Listbox>
+                {isLoadingOrganizations && (
+                  <div className="space-y-2">
+                    <p className="text-sm prose">Which organization is affected?</p>
+                    <ShimmeringLoader className="!py-[19px]" />
+                  </div>
+                )}
+                {isErrorOrganizations && (
+                  <div className="space-y-2">
+                    <p className="text-sm prose">Which organization is affected?</p>
+                    <div className="border rounded-md px-4 py-2 flex items-center space-x-2">
+                      <IconAlertCircle strokeWidth={2} className="text-scale-1000" />
+                      <p className="text-sm prose">Failed to retrieve organizations</p>
+                    </div>
+                  </div>
+                )}
+                {isSuccessOrganizations && (
+                  <Listbox
+                    id="organizationSlug"
+                    layout="vertical"
+                    label="Which organization is affected?"
+                  >
+                    {organizations?.map((option) => {
+                      return (
+                        <Listbox.Option
+                          key={`option-${option.slug}`}
+                          label={option.name || ''}
+                          value={option.slug}
+                        >
+                          <span>{option.name}</span>
+                        </Listbox.Option>
+                      )
+                    })}
+                  </Listbox>
+                )}
               </div>
             )}
 
-            {selectedProject?.subscription_tier === PRICING_TIER_PRODUCT_IDS.FREE && (
+            {subscription?.plan.id === 'free' && (
               <div className="px-6">
                 <InformationBox
                   icon={<IconAlertCircle strokeWidth={2} />}
@@ -353,7 +407,9 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
                         Enhanced SLAs for support are available on our Enterprise Plan.
                       </p>
                       <div className="flex items-center space-x-2">
-                        <Link href={`/project/${values.projectRef}/settings/billing/subscription?panel=subscriptionPlan`}>
+                        <Link
+                          href={`/project/${values.projectRef}/settings/billing/subscription?panel=subscriptionPlan`}
+                        >
                           <a>
                             <Button>Upgrade project</Button>
                           </a>
@@ -374,13 +430,6 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
 
             <Divider light />
 
-            {/* {values.category === 'Problem' && (
-              <>
-                <ClientLibrariesGuidance />
-                <Divider light />
-              </>
-            )} */}
-
             {!isDisabled ? (
               <>
                 {['Performance'].includes(values.category) && isFreeProject ? (
@@ -395,6 +444,28 @@ const SupportForm: FC<Props> = ({ setSentCategory }) => {
                         id="subject"
                         label="Subject"
                         placeholder="Summary of the problem you have"
+                        descriptionText={
+                          values.subject.length > 0 &&
+                          INCLUDE_DISCUSSIONS.includes(values.category) ? (
+                            <p className="flex items-center space-x-1">
+                              <span>Check our </span>
+                              <Link
+                                key="gh-discussions"
+                                href={`https://github.com/orgs/supabase/discussions?discussions_q=${values.subject}`}
+                              >
+                                <a
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="flex items-center space-x-2 text-scale-1000 underline hover:text-scale-1100 transition"
+                                >
+                                  Github discussions
+                                  <IconExternalLink size={14} strokeWidth={2} className="ml-1" />
+                                </a>
+                              </Link>
+                              <span> for a quick answer</span>
+                            </p>
+                          ) : null
+                        }
                       />
                     </div>
                     {values.category === 'Problem' && (

@@ -1,31 +1,31 @@
+import Divider from 'components/ui/Divider'
+import { makeAutoObservable, runInAction } from 'mobx'
+import { observer, useLocalObservable } from 'mobx-react-lite'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { ChangeEvent, createContext, FC, useContext, useEffect, useState } from 'react'
 import { toast } from 'react-hot-toast'
-import { useRouter } from 'next/router'
-import { observer, useLocalObservable } from 'mobx-react-lite'
-import { makeAutoObservable, runInAction } from 'mobx'
-import { Button, Select, IconPlusCircle, IconX, IconChevronRight, Listbox } from 'ui'
-import Divider from 'components/ui/Divider'
 
+import { Button, IconChevronRight, IconPlusCircle, IconX, Listbox, Select } from 'ui'
 import { Dictionary } from 'components/grid'
-
-import { useStore, withAuth } from 'hooks'
-import { API_URL } from 'lib/constants'
-import { get } from 'lib/common/fetch'
-import {
-  VERCEL_INTEGRATION_CONFIGS,
-  VERCEL_DEFAULT_EXTERNAL_ID,
-  INTEGRATION_ENVS_ALIAS,
-} from 'lib/vercelConfigs'
+import VercelIntegrationLayout from 'components/layouts/VercelIntegrationLayout'
 import {
   createVercelEnv,
   fetchVercelProjectEnvs,
   fetchVercelProjects,
   prepareVercelEvns,
 } from 'components/to-be-cleaned/Integration/Vercel.utils'
+import { databaseIcon, vercelIcon } from 'components/to-be-cleaned/ListIcons'
 import Loading from 'components/ui/Loading'
-import VercelIntegrationLayout from 'components/layouts/VercelIntegrationLayout'
-import { vercelIcon, databaseIcon } from 'components/to-be-cleaned/ListIcons'
+import { useProjectsQuery } from 'data/projects/projects-query'
+import { useStore, withAuth } from 'hooks'
+import { get } from 'lib/common/fetch'
+import { API_URL } from 'lib/constants'
+import {
+  INTEGRATION_ENVS_ALIAS,
+  VERCEL_DEFAULT_EXTERNAL_ID,
+  VERCEL_INTEGRATION_CONFIGS,
+} from 'lib/vercelConfigs'
 
 interface IVercelIntegrationStore {
   code: string
@@ -149,7 +149,7 @@ class VercelIntegrationStore implements IVercelIntegrationStore {
       await this.getVercelProjects()
       this.loading = false
     } else {
-      toast.error('Retrieve vercel token failed')
+      toast.error(`Failed to retrieve Vercel token: ${response.error.message}`)
       this.loading = false
     }
   }
@@ -177,9 +177,8 @@ type VercelIntegrationProps = {} & any
 const VercelIntegration: FC<VercelIntegrationProps> = ({}) => {
   // @ts-ignore
   const _store: IVercelIntegrationStore = useLocalObservable(() => new VercelIntegrationStore())
-  const { app } = useStore()
-  const projects = app.projects.list()
-  const isSupabaseProjectListEmpty = projects.length == 0
+  const { data: projects } = useProjectsQuery()
+  const isSupabaseProjectListEmpty = !projects || projects?.length === 0
 
   useEffect(() => {
     _store.loadInitialData()
@@ -338,7 +337,7 @@ const ProjectLinks: FC = observer(() => {
           runInAction(() => {
             item.result = {
               status: 'fail',
-              message: 'Error: validate Vercel project envs fails',
+              message: 'Error: Failed to validate Vercel project envs',
             }
           })
           continue
@@ -349,7 +348,7 @@ const ProjectLinks: FC = observer(() => {
           runInAction(() => {
             item.result = {
               status: 'fail',
-              message: 'Error: this Vercel project already contains Supabase envs',
+              message: 'Error: This Vercel project already contains Supabase envs',
             }
           })
           continue
@@ -361,7 +360,7 @@ const ProjectLinks: FC = observer(() => {
           runInAction(() => {
             item.result = {
               status: 'fail',
-              message: 'Error: fetch Supabase project details fails',
+              message: 'Error: Failed to fetch Supabase project details',
             }
           })
           continue
@@ -522,8 +521,7 @@ const ProjectLinkItem: FC<ProjectLinkItemProps> = observer(
     const _store = useContext(PageContext)
     const selectedVercelProject = _store.vercelProjects.find((x) => x.id == vercelProjectId)
 
-    const { app } = useStore()
-    const sortedProjects = app.projects.list()
+    const { data: projects } = useProjectsQuery()
 
     function onVercelProjectChange(e: string) {
       const value = e != UNDEFINED_SELECT_VALUE ? e : undefined
@@ -591,7 +589,7 @@ const ProjectLinkItem: FC<ProjectLinkItemProps> = observer(
               <Listbox.Option value={UNDEFINED_SELECT_VALUE} label="Choose a project" disabled>
                 Choose a project
               </Listbox.Option>
-              {sortedProjects?.map((x: Dictionary<any>) => (
+              {projects?.map((x: Dictionary<any>) => (
                 <Listbox.Option
                   key={x.id}
                   value={x.ref}

@@ -58,14 +58,14 @@ const sendActivity = (
     activity: string
     source: string
     projectRef?: string
-    orgId?: string
+    orgSlug?: string
     data?: object
   },
   router: NextRouter
 ) => {
   if (!IS_PLATFORM) return
 
-  const { activity, source, projectRef, orgId, data } = event
+  const { activity, source, projectRef, orgSlug, data } = event
 
   const properties = {
     activity,
@@ -77,15 +77,8 @@ const sendActivity = (
       title: document?.title || '',
     },
     ...(data && { data }),
-    // add if included, else estimate from path
     ...(projectRef && { projectRef }),
-    ...(router.route.includes('/project/') &&
-      !projectRef && {
-        projectRef: router.route.split('/project/')[1].split('/')[0],
-      }),
-    ...(orgId && { orgId }),
-    ...(router.route.includes('/org/') &&
-      !orgId && { orgId: router.route.split('/org/')[1].split('/')[0] }),
+    ...(orgSlug && { orgSlug }),
   }
   return post(`${API_URL}/telemetry/activity`, properties)
 }

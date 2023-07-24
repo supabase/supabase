@@ -30,8 +30,8 @@ export interface Project extends ProjectBase {
   dbVersion?: string
   kpsVersion?: string
   restUrl?: string
-  // store subscription tier products.metadata.supabase_prod_id
-  subscription_tier?: string
+  lastDatabaseResizeAt?: string | null
+  maxDatabasePreprovisionGb?: string | null
 
   /**
    * postgrestStatus is available on client side only.
@@ -79,18 +79,14 @@ export interface Permission {
   resources: string[]
 }
 
-export interface ResponseError {
-  message: string
-}
-
 export interface ResponseFailure {
   error: ResponseError
 }
 
-export type SupaResponse<T> = T & ResponseFailure
+export type SupaResponse<T> = T | ResponseFailure
 
 export interface ResponseError {
-  code: number
+  code?: number
   message: string
-  requestId: string
+  requestId?: string
 }

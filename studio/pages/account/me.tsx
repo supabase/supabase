@@ -1,17 +1,19 @@
 import { observer } from 'mobx-react-lite'
-import { Button, IconMoon, IconSun, Input, Listbox } from 'ui'
+import Link from 'next/link'
 
+import { useTheme } from 'common'
 import { AccountLayout } from 'components/layouts'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
 import Panel from 'components/ui/Panel'
-import { Profile as ProfileType } from 'data/profile/types'
 import { useProfileUpdateMutation } from 'data/profile/profile-update-mutation'
-import { useProfileQuery } from 'data/profile/profile-query'
+import { Profile as ProfileType } from 'data/profile/types'
 import { useStore } from 'hooks'
 import { useSession } from 'lib/auth'
-import Link from 'next/link'
+import { useProfile } from 'lib/profile'
 import { NextPageWithLayout } from 'types'
-import { useTheme } from 'common'
+import { Button, IconMoon, IconSun, Input, Listbox } from 'ui'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import AlertError from 'components/ui/AlertError'
 
 const User: NextPageWithLayout = () => {
   return (
@@ -39,53 +41,70 @@ export default User
 
 const ProfileCard = observer(() => {
   const { ui } = useStore()
-  const { mutateAsync } = useProfileUpdateMutation()
-
-  const { data: profile } = useProfileQuery()
-  // TODO: ^ handle loading state
-
-  const updateUser = async (model: any) => {
-    try {
-      await mutateAsync({
-        firstName: model.first_name,
-        lastName: model.last_name,
-      })
-
+  const { profile, error, isLoading, isError, isSuccess } = useProfile()
+  const { mutate: updateProfile, isLoading: isUpdating } = useProfileUpdateMutation({
+    onSuccess: () => {
       ui.setNotification({ category: 'success', message: 'Successfully saved profile' })
-    } catch (error) {
+    },
+    onError: (error) => {
       ui.setNotification({
         error,
         category: 'error',
         message: "Couldn't update profile. Please try again later.",
       })
-    }
+    },
+  })
+
+  const updateUser = async (model: any) => {
+    updateProfile({
+      firstName: model.first_name,
+      lastName: model.last_name,
+    })
   }
 
   return (
     <article className="max-w-4xl p-4">
-      <section>
-        <Profile profile={profile} />
-      </section>
-
-      <section>
-        {/* @ts-ignore */}
-        <SchemaFormPanel
-          title="Profile"
-          schema={{
-            type: 'object',
-            required: [],
-            properties: {
-              first_name: { type: 'string' },
-              last_name: { type: 'string' },
-            },
-          }}
-          model={{
-            first_name: profile?.first_name ?? '',
-            last_name: profile?.last_name ?? '',
-          }}
-          onSubmit={updateUser}
-        />
-      </section>
+      {isLoading && (
+        <Panel>
+          <div className="p-4">
+            <GenericSkeletonLoader />
+          </div>
+        </Panel>
+      )}
+      {isError && (
+        <Panel>
+          <div className="p-4">
+            <AlertError error={error} subject="Failed to retrieve account information" />
+          </div>
+        </Panel>
+      )}
+      {isSuccess && (
+        <>
+          <section>
+            <Profile profile={profile} />
+          </section>
+          <section>
+            {/* @ts-ignore */}
+            <SchemaFormPanel
+              title="Profile"
+              schema={{
+                type: 'object',
+                required: [],
+                properties: {
+                  first_name: { type: 'string' },
+                  last_name: { type: 'string' },
+                },
+              }}
+              model={{
+                first_name: profile?.first_name ?? '',
+                last_name: profile?.last_name ?? '',
+              }}
+              onSubmit={updateUser}
+              loading={isUpdating}
+            />
+          </section>
+        </>
+      )}
 
       <section>
         <ThemeSettings />

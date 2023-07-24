@@ -297,7 +297,7 @@ functions:
   - id: update-user
     title: 'updateUser()'
     description: |
-      Updates user data, if there is a logged in user.
+      Updates user data for a logged in user.
     notes: |
       - In order to use the `updateUser()` method, the user needs to be signed in first.
       - By Default, email updates sends a confirmation link to both the user's current and new email.
@@ -339,6 +339,50 @@ functions:
             ),
           );
           final User? updatedUser = res.user;
+          ```
+      - id: update-password-with-reauthentication
+        name: Update the user's password with a nonce
+        description: If "Secure password change" is enabled, updating the user's password would require a nonce. The nonce is sent to the user's email or phone number.
+        isSpotlight: true
+        code: |
+          ```dart
+          supabase.auth.updateUser(UserAttributes(
+            email: 'example@email.com',
+            nonce: '123456',
+          ));
+          ```
+  - id: send-password-reauthentication
+    title: 'reauthenticate()'
+    notes: |
+      - This method is used together with `updateUser()` when a user's password needs to be updated.
+      - This method will send a nonce to the user's email. If the user doesn't have a confirmed email address, the method will send the nonce to the user's confirmed phone number instead.
+    examples:
+      - id: send-reauthentication-nonce
+        name: Send reauthentication nonce
+        description: Sends a reauthentication nonce to the user's email or phone number.
+        isSpotlight: true
+        code: |
+          ```dart
+          await supabase.auth.reauthenticate();
+          ```
+  - id: resend-email-or-phone-otps
+    title: 'resend()'
+    notes: |
+      - Resends a signup confirmation, email change or phone change email to the user.
+      - Passwordless sign-ins can be resent by calling the `signInWithOtp()` method again.
+      - Password recovery emails can be resent by calling the `resetPassswordForEmail()` method again.
+      - This method will only resend an email or phone OTP to the user if there was an initial signup, email change or phone change request being made.
+    examples:
+      - id: resend-email-signup-confirmation
+        name: Resend an email signup confirmation
+        description: Resends the email signup confirmation to the user
+        isSpotlight: true
+        code: |
+          ```dart
+          final ResendResponse res = await supabase.auth.resend(
+            type: OtpType.email,
+            email: 'email@example.com',
+          );
           ```
   - id: on-auth-state-change
     title: 'onAuthStateChange()'
@@ -401,6 +445,267 @@ functions:
             redirectTo: kIsWeb ? null : 'io.supabase.flutter://reset-callback/',
           );
           ```
+  - id: auth-mfa-api
+    title: 'Overview'
+    notes: |
+      This section contains methods commonly used for Multi-Factor Authentication (MFA) and are invoked behind the `supabase.auth.mfa` namespace. 
+
+      Currently, we only support time-based one-time password (TOTP) as the 2nd factor. We don't support recovery codes but we allow users to enroll more than 1 TOTP factor, with an upper limit of 10.
+
+      Having a 2nd TOTP factor for recovery frees the user of the burden of having to store their recovery codes somewhere. It also reduces the attack surface since multiple recovery codes are usually generated compared to just having 1 backup TOTP factor.
+  - id: mfa-enroll
+    title: 'mfa.enroll()'
+    notes: |
+      Starts the enrollment process for a new Multi-Factor Authentication (MFA) factor. This method creates a new `unverified` factor.
+      To verify a factor, present the QR code or secret to the user and ask them to add it to their authenticator app.
+      The user has to enter the code from their authenticator app to verify it.
+      - Currently, `totp` is the only supported `factorType`. The returned `id` should be used to create a challenge.
+      - To create a challenge, see [`mfa.challenge()`](/docs/reference/dart/auth-mfa-challenge).
+      - To verify a challenge, see [`mfa.verify()`](/docs/reference/dart/auth-mfa-verify).
+      - To create and verify a challenge in a single step, see [`mfa.challengeAndVerify()`](/docs/reference/dart/auth-mfa-challengeandverify).
+    examples:
+      - id: enroll-totp-factor
+        name: Enroll a time-based, one-time password (TOTP) factor
+        isSpotlight: true
+        code: |
+          ```dart
+          final res = await supabase.auth.mfa.enroll(factorType: FactorType.totp);
+
+          final qrCodeUrl = res.totp.qrCode;
+          ```
+  - id: mfa-challenge
+    title: 'mfa.challenge()'
+    notes: |
+      Prepares a challenge used to verify that a user has access to a MFA factor.
+      - An [enrolled factor](/docs/reference/dart/auth-mfa-enroll) is required before creating a challenge.
+      - To verify a challenge, see [`mfa.verify()`](/docs/reference/dart/auth-mfa-verify).
+    examples:
+      - id: create-mfa-challenge
+        name: Create a challenge for a factor
+        isSpotlight: true
+        code: |
+          ```dart
+          final res = await supabase.auth.mfa.challenge(
+            factorId: '34e770dd-9ff9-416c-87fa-43b31d7ef225',
+          );
+          ```
+  - id: mfa-verify
+    title: 'mfa.verify()'
+    notes: |
+      Verifies a code against a challenge. The verification code is provided by the user by entering a code seen in their authenticator app.
+      - To verify a challenge, please [create a challenge](/docs/reference/dart/auth-mfa-challenge) first.
+    examples:
+      - id: verify-challenge
+        name: Verify a challenge for a factor
+        isSpotlight: true
+        code: |
+          ```dart
+          final res = await supabase.auth.mfa.verify(
+            factorId: '34e770dd-9ff9-416c-87fa-43b31d7ef225',
+            challengeId: '4034ae6f-a8ce-4fb5-8ee5-69a5863a7c15',
+            code: '123456',
+          );
+          ```
+  - id: mfa-challenge-and-verify
+    title: 'mfa.challengeAndVerify()'
+    notes: |
+      Helper method which creates a challenge and immediately uses the given code to verify against it thereafter. The verification code is provided by the user by entering a code seen in their authenticator app.
+      - An [enrolled factor](/docs/reference/dart/auth-mfa-enroll) is required before invoking `challengeAndVerify()`.
+      - Executes [`mfa.challenge()`](/docs/reference/dart/auth-mfa-challenge) and [`mfa.verify()`](/docs/reference/dart/auth-mfa-verify) in a single step.
+    examples:
+      - id: challenge-and-verify
+        name: Create and verify a challenge for a factor
+        isSpotlight: true
+        code: |
+          ```dart
+          final res = await supabase.auth.mfa.challengeAndVerify(
+            factorId: '34e770dd-9ff9-416c-87fa-43b31d7ef225',
+            code: '123456',
+          );
+          ```
+  - id: mfa-unenroll
+    title: 'mfa.unenroll()'
+    notes: |
+      Unenroll removes a MFA factor. A user has to have an aal2 authenticator level in order to unenroll a verified factor.
+    examples:
+      - id: unenroll-a-factor
+        name: Unenroll a factor
+        isSpotlight: true
+        code: |
+          ```dart
+          final res = await supabase.auth.mfa.unenroll(
+            '34e770dd-9ff9-416c-87fa-43b31d7ef225',
+          );
+          ```
+  - id: mfa-get-authenticator-assurance-level
+    title: 'mfa.getAuthenticatorAssuranceLevel()'
+    notes: |
+      Returns the Authenticator Assurance Level (AAL) for the active session.
+      - Authenticator Assurance Level (AAL) is the measure of the strength of an authentication mechanism.
+      - In Supabase, having an AAL of `aal1` refers to having the 1st factor of authentication such as an email and password or OAuth sign-in while `aal2` refers to the 2nd factor of authentication such as a time-based, one-time-password (TOTP).
+      - If the user has a verified factor, the `nextLevel` field will return `aal2`, else, it will return `aal1`.
+    examples:
+      - id: get-aal
+        name: Get the AAL details of a session
+        isSpotlight: true
+        code: |
+          ```dart
+          final res = supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+          final currentLevel = res.currentLevel;
+          final nextLevel = res.nextLevel;
+          final currentAuthenticationMethods = res.currentAuthenticationMethods;
+          ```
+  - id: admin-api
+    title: 'Overview'
+    notes: |
+      - Any method under the `supabase.auth.admin` namespace requires a `service_role` key.
+      - These methods are considered admin methods and should be called on a trusted server. Never expose your `service_role` key in the Flutter app.
+    examples:
+      - id: create-auth-admin-client
+        name: Create server-side auth client
+        isSpotlight: true
+        code: |
+          ```dart
+          final supabase = SupabaseClient(supabaseUrl, serviceRoleKey);
+          ```
+  - id: get-user-by-id
+    title: 'getUserById()'
+    notes: |
+      Get user by id.
+      - Fetches the user object from the database based on the user's id.
+      - The `getUserById()` method requires the user's id which maps to the `auth.users.id` column.
+    examples:
+      - id: fetch-the-user-object-using-the-access-token-jwt
+        name: Fetch the user object using the access_token jwt
+        isSpotlight: true
+        code: |
+          ```dart
+          final res = await supabase.auth.admin.getUserById(userId);
+          final user = res.user;
+          ```
+  - id: list-users
+    title: 'listUsers()'
+    notes: |
+      Get a list of users.
+      - Defaults to return 50 users per page.
+    examples:
+      - id: get-a-full-list-of-users
+        name: Get a page of users
+        isSpotlight: true
+        code: |
+          ```dart
+          final List<User> users = await supabase.auth.admin.listUsers();
+          ```
+      - id: get-paginated-list-of-users
+        name: Paginated list of users
+        isSpotlight: false
+        code: |
+          ```dart
+          final List<User> res = await supabase.auth.admin.listUsers(
+            page: 1,
+            perPage: 100,
+          );
+          ```
+  - id: create-user
+    title: 'createUser()'
+    notes: |
+      Creates a new user.
+      - To confirm the user's email address or phone number, set `email_confirm` or `phone_confirm` to true. Both arguments default to false.
+      - `createUser()` will not send a confirmation email to the user. You can use [`inviteUserByEmail()`](/docs/reference/dart/auth-admin-inviteuserbyemail) if you want to send them an email invite instead.
+      - If you are sure that the created user's email or phone number is legitimate and verified, you can set the `email_confirm` or `phone_confirm` param to `true`.
+    examples:
+      - id: create-a-new-user-with-custom-user-metadata
+        name: With custom user metadata
+        isSpotlight: true
+        code: |
+          ```dart
+          final res = await supabase.auth.admin.createUser(AdminUserAttributes(
+            email: 'user@email.com',
+            password: 'password',
+            userMetadata: {'name': 'Yoda'},
+          ));
+          ```
+      - id: auto-confirm-the-users-email
+        name: Auto-confirm the user's email
+        code: |
+          ```dart
+          final res = await supabase.auth.admin.createUser(AdminUserAttributes(
+            email: 'user@email.com',
+            emailConfirm: true,
+          ));
+          ```
+      - id: auto-confirm-the-users-phone-number
+        name: Auto-confirm the user's phone number
+        code: |
+          ```dart
+          final res = await supabase.auth.admin.createUser(AdminUserAttributes(
+            phone: '1234567890',
+            phoneConfirm: true,
+          ));
+          ```
+  - id: delete-user
+    title: 'deleteUser()'
+    notes: |
+      Delete a user.
+      - The `deleteUser()` method requires the user's ID, which maps to the `auth.users.id` column.
+    examples:
+      - id: removes-a-user
+        name: Removes a user
+        isSpotlight: true
+        code: |
+          ```dart
+          await supabase.auth.admin
+              .deleteUser('715ed5db-f090-4b8c-a067-640ecee36aa0');
+          ```
+  - id: invite-user-by-email
+    title: 'inviteUserByEmail()'
+    notes: |
+      Sends an invite link to the user's email address.
+    examples:
+      - id: invite-a-user
+        name: Invite a user
+        isSpotlight: true
+        code: |
+          ```dart
+          final UserResponse res = await supabase.auth.admin
+              .inviteUserByEmail('email@example.com');
+          final User? user = res.user;
+          ```
+  - id: generate-link
+    title: 'generateLink()'
+    notes: |
+      Generates email links and OTPs to be sent via a custom email provider.
+      - The following types can be passed into `generateLink()`: `signup`, `magiclink`, `invite`, `recovery`, `emailChangeCurrent`, `emailChangeNew`, `phoneChange`.
+      - `generateLink()` only generates the email link for `email_change_email` if the "Secure email change" setting is enabled under the "Email" provider in your Supabase project.
+      - `generateLink()` handles the creation of the user for `signup`, `invite` and `magiclink`.
+    examples:
+      - id: generate-a-signup-link
+        name: Generate a signup link
+        isSpotlight: true
+        code: |
+          ```dart
+          final res = await supabase.auth.admin.generateLink(
+            type: GenerateLinkType.signup,
+            email: 'email@example.com',
+            password: 'secret',
+          );
+          final actionLink = res.properties.actionLink;
+          ```
+  - id: update-user-by-id
+    title: 'updateUserById()'
+    examples:
+      - id: updates-a-users-email
+        name: Updates a user's email
+        isSpotlight: false
+        code: |
+          ```dart
+          final UserResponse res = await supabase.auth.admin.updateUserById(
+            '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
+            attributes: AdminUserAttributes(
+              email: 'new@email.com',
+            ),
+          );
+          ```
   - id: invoke
     title: 'invoke()'
     description: |
@@ -448,13 +753,13 @@ functions:
           ```
   - id: select
     description: |
-      Performs vertical filtering with SELECT.
+      Perform a SELECT query on the table or view.
     title: 'Fetch data: select()'
     notes: |
       - By default, Supabase projects will return a maximum of 1,000 rows. This setting can be changed in Project API Settings. It's recommended that you keep it low to limit the payload size of accidental or malicious requests. You can use `range()` queries to paginate through your data.
-      - `select()` can be combined with [Modifiers](/docs/reference/dart/using-modifiers)
       - `select()` can be combined with [Filters](/docs/reference/dart/using-filters)
-      - If using the Supabase hosted platform `apikey` is technically a reserved keyword, since the API gateway will pluck it out for authentication. [It should be avoided as a column name](https://github.com/supabase/supabase/issues/5465).
+      - `select()` can be combined with [Modifiers](/docs/reference/dart/using-modifiers)
+      - `apikey` is a reserved keyword if you're using the [Supabase Platform](/docs/guides/platform) and [should be avoided as a column name](https://github.com/supabase/supabase/issues/5465).
     examples:
       - id: getting-your-data
         name: Getting your data
@@ -568,7 +873,7 @@ functions:
 
   - id: insert
     description: |
-      Performs an INSERT into the table.
+      Perform an INSERT into the table or view.
     title: 'Create data: insert()'
     examples:
       - id: create-a-record
@@ -602,7 +907,7 @@ functions:
 
   - id: update
     description: |
-      Performs an UPDATE on the table.
+      Perform an UPDATE on the table or view.
     title: 'Modify data: update()'
     notes: |
       - `update()` should always be combined with [Filters](/docs/reference/dart/using-filters) to target the item(s) you wish to update.
@@ -651,11 +956,10 @@ functions:
 
   - id: upsert
     description: |
-      Performs an UPSERT into the table.
+      Perform an UPSERT on the table or view. Depending on the column(s) passed to `onConflict`, `.upsert()` allows you to perform the equivalent of `.insert()` if a row with the corresponding `onConflict` columns doesn't exist, or if it does exist, perform an alternative action depending on `ignoreDuplicates`.
     title: 'Upsert data: upsert()'
     notes: |
-      - Primary keys should be included in the data payload in order for an update to work correctly.
-      - Primary keys must be natural, not surrogate. There are however, [workarounds](https://github.com/PostgREST/postgrest/issues/1118) for surrogate primary keys.
+      - Primary keys must be included in `values` to use upsert.
     examples:
       - id: upsert-your-data
         name: Upsert your data
@@ -696,10 +1000,11 @@ functions:
 
   - id: delete
     description: |
-      Performs a DELETE on the table.
+      Perform a DELETE on the table or view.
     title: 'Delete data: delete()'
     notes: |
       - `delete()` should always be combined with [Filters](/docs/reference/dart/using-filters) to target the item(s) you wish to delete.
+      - If you use `delete()` with filters and you have RLS enabled, only rows visible through `SELECT` policies are deleted. Note that by default no rows are visible, so you need at least one `SELECT`/`ALL` policy that makes the rows visible.
     examples:
       - id: delete-records
         name: Delete records
@@ -1216,7 +1521,7 @@ functions:
       Retrieve URLs for assets in public buckets
     title: 'from.getPublicUrl()'
     notes: |
-      - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/javascript/storage-updatebucket) or by going to Storage on [app.supabase.com](https://supabase.com/dashboard), clicking the overflow menu on a bucket and choosing "Make public"
+      - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/dart/storage-updatebucket) or by going to Storage on [supabase.com/dashboard](https://supabase.com/dashboard), clicking the overflow menu on a bucket and choosing "Make public"
       - Policy permissions required:
         - `buckets` permissions: none
         - `objects` permissions: none

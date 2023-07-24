@@ -2,7 +2,6 @@ import Link from 'next/link'
 import { Alert, Button, CodeBlock, GlassPanel, markdownComponents, Tabs } from 'ui'
 import StepHikeCompact from '~/components/StepHikeCompact'
 // Common components
-import Admonition from './Admonition'
 import ButtonCard from './ButtonCard'
 import JwtGenerator from './JwtGenerator'
 
@@ -32,6 +31,7 @@ import CliGlobalFlagsHandler from '~/components/reference/enrichments/cli/CliGlo
 import Options from '~/components/Options'
 import Param from '~/components/Params'
 
+import { Admonition } from 'ui'
 import {
   IconMenuJavascript,
   IconMenuHome,

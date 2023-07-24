@@ -1,13 +1,11 @@
-import { Button } from 'ui'
-import { observer } from 'mobx-react-lite'
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import Link from 'next/link'
 import { FC, ReactNode } from 'react'
-import * as Tooltip from '@radix-ui/react-tooltip'
 
-import { checkPermissions, useStore, useFlag } from 'hooks'
-import { useParams } from 'common/hooks'
-import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useCheckPermissions, useFlag } from 'hooks'
+import { Button } from 'ui'
+import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 
 interface Props {
   icon?: ReactNode
@@ -17,16 +15,14 @@ interface Props {
 }
 
 const UpgradeToPro: FC<Props> = ({ icon, primaryText, projectRef, secondaryText }) => {
-  const { ui } = useStore()
-  const { ref } = useParams()
-  const tier = ui.selectedProject?.subscription_tier
+  const { data: subscription } = useProjectSubscriptionV2Query({ projectRef })
+  const plan = subscription?.plan?.id
 
-  const canUpdateSubscription = checkPermissions(
+  const canUpdateSubscription = useCheckPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.subscriptions'
   )
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
-  const isEnterprise = tier === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
 
   return (
     <div
@@ -48,12 +44,12 @@ const UpgradeToPro: FC<Props> = ({ icon, primaryText, projectRef, secondaryText 
           <Tooltip.Root delayDuration={0}>
             <Tooltip.Trigger>
               <Button type="primary" disabled={!canUpdateSubscription || projectUpdateDisabled}>
-                <Link href={`/project/${ref}/settings/billing/subscription?panel=subscriptionPlan`}>
-                  <a>
-                    {tier === PRICING_TIER_PRODUCT_IDS.FREE
-                      ? 'Upgrade to Pro'
-                      : 'Modify subscription'}
-                  </a>
+                <Link
+                  href={`/project/${projectRef}/settings/billing/subscription${
+                    plan === 'free' ? '?panel=subscriptionPlan' : ''
+                  }`}
+                >
+                  <a>{plan === 'free' ? 'Upgrade to Pro' : 'Enable Addon'}</a>
                 </Link>
               </Button>
             </Tooltip.Trigger>
@@ -93,4 +89,4 @@ const UpgradeToPro: FC<Props> = ({ icon, primaryText, projectRef, secondaryText 
   )
 }
 
-export default observer(UpgradeToPro)
+export default UpgradeToPro
