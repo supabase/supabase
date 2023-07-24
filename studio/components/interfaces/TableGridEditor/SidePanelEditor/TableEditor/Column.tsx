@@ -13,6 +13,7 @@ import {
 } from 'ui'
 
 import { FOREIGN_KEY_DELETION_ACTION } from 'data/database/database-query-constants'
+import { noop } from 'lodash'
 import { typeExpressionSuggestions } from '../ColumnEditor/ColumnEditor.constants'
 import { Suggestion } from '../ColumnEditor/ColumnEditor.types'
 import { getForeignKeyDeletionAction } from '../ColumnEditor/ColumnEditor.utils'
@@ -38,7 +39,7 @@ import { ColumnField } from '../SidePanelEditor.types'
  * - Cannot be both identity AND array, still checkboxes as they can be toggled off
  */
 
-interface Props {
+interface ColumnProps {
   column: ColumnField
   enumTypes: PostgresType[]
   isNewRecord: boolean
@@ -55,10 +56,10 @@ const Column = ({
   isNewRecord = false,
   hasImportContent = false,
   dragHandleProps = {},
-  onEditRelation = () => {},
-  onUpdateColumn = () => {},
-  onRemoveColumn = () => {},
-}: Props) => {
+  onEditRelation = noop,
+  onUpdateColumn = noop,
+  onRemoveColumn = noop,
+}: ColumnProps) => {
   const suggestions: Suggestion[] = typeExpressionSuggestions?.[column.format] ?? []
 
   const settingsCount = [
@@ -149,10 +150,7 @@ const Column = ({
             className="table-editor-column-type lg:gap-0 "
             disabled={column.foreignKey !== undefined}
             onOptionSelect={(format: string) => {
-              let defaultValue = null
-              if (format === 'uuid') {
-                defaultValue = 'gen_random_uuid()'
-              }
+              const defaultValue = format === 'uuid' ? 'gen_random_uuid()' : null
               onUpdateColumn({ format, defaultValue })
             }}
           />
