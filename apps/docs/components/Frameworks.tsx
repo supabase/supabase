@@ -38,6 +38,14 @@ const Frameworks = () => {
       href: '/reference/javascript/installing#javascript',
     },
     {
+      name: 'Kotlin',
+      logo: {
+        light: '/docs/img/icons/kotlin-icon.svg',
+        dark: '/docs/img/icons/kotlin-icon.svg',
+      },
+      href: '/guides/with-kotlin',
+    },
+    {
       name: 'Next.js',
       logo: {
         light: '/docs/img/icons/nextjs-light-icon.svg',
