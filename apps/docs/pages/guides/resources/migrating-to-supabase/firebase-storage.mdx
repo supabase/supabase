@@ -21,7 +21,7 @@ git clone https://github.com/supabase-community/firebase-to-supabase.git
 ```
 
 1. In the `/storage` directory, rename [supabase-keys-sample.js](https://github.com/supabase-community/firebase-to-supabase/blob/main/storage/supabase-keys-sample.js) to `supabase-keys.js`.
-1. Go to your Supabase project's [API settings](https://app.supabase.com/project/_/settings/api) in the Dashboard.
+1. Go to your Supabase project's [API settings](https://supabase.com/dashboard/project/_/settings/api) in the Dashboard.
 1. Copy the **Project URL** and update the `SUPABASE_URL` value in `supabase-keys.js`.
 1. Under **Project API keys**, copy the **service_role** key and update the `SUPABASE_KEY` value in `supabase-keys.js`.
 
@@ -57,7 +57,7 @@ To process in batches using multiple command-line executions, you must use the s
 
 <Admonition type="note">
 
-If the bucket doesn't exist, it's created as a `non-public` bucket. You must set permissions on this new bucket in the [Supabase Dashboard](https://app.supabase.com/project/_/storage/buckets) before users can download any files.
+If the bucket doesn't exist, it's created as a `non-public` bucket. You must set permissions on this new bucket in the [Supabase Dashboard](https://supabase.com/dashboard/project/_/storage/buckets) before users can download any files.
 
 </Admonition>
 

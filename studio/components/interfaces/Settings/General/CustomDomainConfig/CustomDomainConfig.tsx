@@ -1,29 +1,25 @@
 import Link from 'next/link'
-import { observer } from 'mobx-react-lite'
-import { IconAlertCircle } from 'ui'
 
-import { useStore } from 'hooks'
 import { useParams } from 'common/hooks'
-import { useProjectApiQuery } from 'data/config/project-api-query'
-import {
-  CustomDomainResponse,
-  useCustomDomainsQuery,
-} from 'data/custom-domains/custom-domains-query'
-import Panel from 'components/ui/Panel'
 import { FormHeader } from 'components/ui/Forms'
+import Panel from 'components/ui/Panel'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
+import { useProjectApiQuery } from 'data/config/project-api-query'
+import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
+import { IconAlertCircle } from 'ui'
+import CustomDomainActivate from './CustomDomainActivate'
 import CustomDomainDelete from './CustomDomainDelete'
 import CustomDomainVerify from './CustomDomainVerify'
-import CustomDomainActivate from './CustomDomainActivate'
 import CustomDomainsConfigureHostname from './CustomDomainsConfigureHostname'
 import CustomDomainsShimmerLoader from './CustomDomainsShimmerLoader'
-import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
+import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 
 const CustomDomainConfig = () => {
-  const { ui } = useStore()
   const { ref } = useParams()
 
-  const tier = ui.selectedProject?.subscription_tier
+  const { data: subscription } = useProjectSubscriptionV2Query({ projectRef: ref })
+
+  const plan = subscription?.plan?.id
   const { isLoading: isSettingsLoading, data: settings } = useProjectApiQuery({
     projectRef: ref,
   })
@@ -69,7 +65,7 @@ const CustomDomainConfig = () => {
           primaryText="Custom domains are a Pro plan add-on"
           projectRef={ref as string}
           secondaryText={
-            tier === PRICING_TIER_PRODUCT_IDS.FREE
+            plan === 'free'
               ? 'To configure a custom domain for your project, please upgrade to the Pro plan with the custom domains add-on selected'
               : 'To configure a custom domain for your project, please enable the add-on'
           }
@@ -103,4 +99,4 @@ const CustomDomainConfig = () => {
   )
 }
 
-export default observer(CustomDomainConfig)
+export default CustomDomainConfig

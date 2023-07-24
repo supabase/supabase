@@ -1,15 +1,21 @@
-import React from 'react'
-import Image from 'next/image'
-import { IconPlay, Modal } from 'ui'
 import { useBreakpoint } from 'common'
+import Image from 'next/image'
+import React from 'react'
+import { IconPlay, Modal } from 'ui'
 
 interface ExpandableVideoProps {
   imgUrl: string
   videoId: string
+  imgOverlayText?: string
   imgAltText?: string
 }
 
-function ExpandableVideo({ imgUrl, videoId, imgAltText }: ExpandableVideoProps) {
+export function ExpandableVideo({
+  imgUrl,
+  videoId,
+  imgOverlayText,
+  imgAltText,
+}: ExpandableVideoProps) {
   const [expandVideo, setExpandVideo] = React.useState(false)
   const isMobile = useBreakpoint(768)
 
@@ -81,7 +87,7 @@ function ExpandableVideo({ imgUrl, videoId, imgAltText }: ExpandableVideoProps) 
                     `}
         >
           <IconPlay strokeWidth={2} size="small" />
-          <p className="text-sm">Watch video guide</p>
+          <p className="text-sm">{imgOverlayText ?? 'Watch video guide'}</p>
         </div>
         <Image
           src={imgUrl}
@@ -94,5 +100,3 @@ function ExpandableVideo({ imgUrl, videoId, imgAltText }: ExpandableVideoProps) 
     </>
   )
 }
-
-export default ExpandableVideo

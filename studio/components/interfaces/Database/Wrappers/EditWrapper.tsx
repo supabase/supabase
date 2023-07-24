@@ -16,7 +16,7 @@ import {
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { VaultSecret } from 'types'
-import { checkPermissions, useImmutableValue, useStore } from 'hooks'
+import { useCheckPermissions, useImmutableValue, useStore } from 'hooks'
 import { useParams } from 'common/hooks'
 import { useFDWsQuery } from 'data/fdw/fdws-query'
 import { useFDWUpdateMutation } from 'data/fdw/fdw-update-mutation'
@@ -43,7 +43,7 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 const EditWrapper = () => {
   const formId = 'edit-wrapper-form'
   const router = useRouter()
-  const { ui, vault } = useStore()
+  const { ui, meta, vault } = useStore()
   const { ref, id } = useParams()
   const { project } = useProjectContext()
 
@@ -58,14 +58,27 @@ const EditWrapper = () => {
   const wrapper = useImmutableValue(foundWrapper)
   const wrapperMeta = WRAPPERS.find((w) => w.handlerName === wrapper?.handler)
 
-  const { mutateAsync: updateFDW, isLoading: isSaving } = useFDWUpdateMutation()
+  const { mutate: updateFDW, isLoading: isSaving } = useFDWUpdateMutation({
+    onSuccess: () => {
+      ui.setNotification({
+        category: 'success',
+        message: `Successfully updated ${wrapperMeta?.label} foreign data wrapper`,
+      })
+      setWrapperTables([])
+
+      const hasNewSchema = wrapperTables.some((table) => table.is_new_schema)
+      if (hasNewSchema) meta.schemas.load()
+
+      router.push(`/project/${ref}/database/wrappers`)
+    },
+  })
 
   const [wrapperTables, setWrapperTables] = useState<any[]>([])
   const [isEditingTable, setIsEditingTable] = useState(false)
   const [selectedTableToEdit, setSelectedTableToEdit] = useState()
   const [formErrors, setFormErrors] = useState<{ [k: string]: string }>({})
 
-  const canUpdateWrapper = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'wrappers')
+  const canUpdateWrapper = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'wrappers')
 
   const initialValues =
     wrapperMeta !== undefined
@@ -136,7 +149,7 @@ const EditWrapper = () => {
     setSelectedTableToEdit(undefined)
   }
 
-  const onSubmit = async (values: any, { setSubmitting }: any) => {
+  const onSubmit = async (values: any) => {
     const validate = makeValidateRequired(wrapperMeta.server.options)
     const errors: any = validate(values)
 
@@ -145,32 +158,14 @@ const EditWrapper = () => {
     if (wrapperTables.length === 0) errors.tables = 'Please add at least one table'
     if (!isEmpty(errors)) return setFormErrors(errors)
 
-    setSubmitting(true)
-    try {
-      await updateFDW({
-        projectRef: project?.ref,
-        connectionString: project?.connectionString,
-        wrapper,
-        wrapperMeta,
-        formState: { ...values, server_name: `${wrapper_name}_server` },
-        tables: wrapperTables,
-      })
-
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully updated ${wrapperMeta.label} foreign data wrapper`,
-      })
-      setWrapperTables([])
-      router.push(`/project/${ref}/database/wrappers`)
-    } catch (error: any) {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Failed to create ${wrapperMeta.label} foreign data wrapper: ${error.message}`,
-      })
-    } finally {
-      setSubmitting(false)
-    }
+    updateFDW({
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      wrapper,
+      wrapperMeta,
+      formState: { ...values, server_name: `${wrapper_name}_server` },
+      tables: wrapperTables,
+    })
   }
 
   return (
@@ -205,7 +200,7 @@ const EditWrapper = () => {
         </div>
 
         <Form id={formId} initialValues={initialValues} onSubmit={onSubmit}>
-          {({ isSubmitting, handleReset, values, initialValues, resetForm }: any) => {
+          {({ handleReset, values, initialValues, resetForm }: any) => {
             // [Alaister] although this "technically" is breaking the rules of React hooks
             // it won't error because the hooks are always rendered in the same order
             // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -259,7 +254,7 @@ const EditWrapper = () => {
                   <div className="flex px-8 py-4">
                     <FormActions
                       form={formId}
-                      isSubmitting={isSubmitting}
+                      isSubmitting={isSaving}
                       hasChanges={hasChanges}
                       handleReset={() => {
                         handleReset()

@@ -3,6 +3,7 @@ import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { useCallback } from 'react'
 import { subscriptionKeys } from './keys'
+import { ResponseError } from 'types'
 
 export type OrgSubscriptionVariables = {
   orgSlug?: string
@@ -10,7 +11,23 @@ export type OrgSubscriptionVariables = {
 
 export type PlanId = 'free' | 'pro' | 'team' | 'enterprise'
 
-export type OrgSubscriptionResponse = {
+export type ProjectAddon = {
+  addons: {
+    type: 'custom_domain' | 'compute_instance' | 'pitr'
+    variant: {
+      identifier: string
+      name: string
+      price: number
+      price_description: string
+      price_interval: string
+      price_type: string
+    }
+  }[]
+  name: string
+  ref: string
+}
+
+export type OrgSubscription = {
   billing_cycle_anchor: number
   current_period_start: number
   current_period_end: number
@@ -44,6 +61,7 @@ export type OrgSubscriptionResponse = {
     expiry_month: number
     expiry_year: number
   }
+  project_addons: ProjectAddon[]
 }
 
 export async function getOrgSubscription(
@@ -55,11 +73,11 @@ export async function getOrgSubscription(
   const response = await get(`${API_URL}/organizations/${orgSlug}/billing/subscription`, { signal })
   if (response.error) throw response.error
 
-  return response as OrgSubscriptionResponse
+  return response as OrgSubscription
 }
 
 export type OrgSubscriptionData = Awaited<ReturnType<typeof getOrgSubscription>>
-export type OrgSubscriptionError = unknown
+export type OrgSubscriptionError = ResponseError
 
 export const useOrgSubscriptionQuery = <TData = OrgSubscriptionData>(
   { orgSlug }: OrgSubscriptionVariables,
@@ -86,5 +104,6 @@ export const useOrgSubscriptionPrefetch = ({ orgSlug }: OrgSubscriptionVariables
         getOrgSubscription({ orgSlug }, signal)
       )
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orgSlug])
 }

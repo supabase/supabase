@@ -4,7 +4,7 @@ import { Button, Dropdown, IconEdit, IconTrash, IconMoreVertical } from 'ui'
 import type { PostgresPolicy } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks'
 import Panel from 'components/ui/Panel'
 
 interface Props {
@@ -18,7 +18,7 @@ const PolicyRow: FC<Props> = ({
   onSelectEditPolicy = () => {},
   onSelectDeletePolicy = () => {},
 }) => {
-  const canUpdatePolicies = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'policies')
+  const canUpdatePolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'policies')
 
   return (
     <Panel.Content

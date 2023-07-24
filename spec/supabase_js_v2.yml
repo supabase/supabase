@@ -34,6 +34,15 @@ functions:
           // Create a single supabase client for interacting with your database
           const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
           ```
+      - id: create-client
+        name: With a custom domain
+        code: |
+          ```js
+          import { createClient } from '@supabase/supabase-js'
+
+          // Use a custom domain as the supabase URL
+          const supabase = createClient('https://my-custom-domain.com', 'public-anon-key')
+          ```
       - id: with-additional-parameters
         name: With additional parameters
         code: |
@@ -149,6 +158,8 @@ functions:
       - id: sign-up
         name: Sign up
         isSpotlight: true
+        description: |
+          If the password is larger than 72 chars, it will be truncated to the first 72 chars.
         code: |
           ```js
           const { data, error } = await supabase.auth.signUp({
@@ -297,7 +308,7 @@ functions:
         code: |
           ```js
           const { data, error } = await supabase.auth.signInWithOAuth({
-            provider: 'github'
+            provider: 'github',
             options: {
               redirectTo: 'https://example.com/welcome'
             }
@@ -312,7 +323,7 @@ functions:
         code: |
           ```js
           const { data, error } = await supabase.auth.signInWithOAuth({
-            provider: 'github'
+            provider: 'github',
             options: {
               scopes: 'repo gist notifications'
             }
@@ -452,6 +463,8 @@ functions:
       - id: update-the-password-for-an-authenticated-user
         name: Update the password for an authenticated user
         isSpotlight: false
+        description: |
+          If the password is larger than 72 chars, it will be truncated to the first 72 chars.
         code: |
           ```js
           const { data, error } = await supabase.auth.updateUser({password: 'new password'})
@@ -846,6 +859,8 @@ functions:
       - id: create-a-new-user-with-custom-user-metadata
         name: With custom user metadata
         isSpotlight: true
+        description: |
+          If the password is larger than 72 chars, it will be truncated to the first 72 chars.
         code: |
           ```js
           const { data, error } = await supabase.auth.admin.createUser({
@@ -4273,7 +4288,7 @@ functions:
   - id: invoke
     title: invoke()
     description: |
-      Invoke a Supabase Function.
+      Invoke a Supabase Edge Function.
     $ref: '@supabase/functions-js.FunctionsClient.invoke'
     notes: |
       - Requires an Authorization header.
@@ -4327,6 +4342,35 @@ functions:
               "my-custom-header": 'my-custom-header-value'
             },
             body: { foo: 'bar' }
+          })
+          ```
+      - id: calling-with-delete-verb
+        name: Calling with DELETE HTTP verb
+        description: |
+          You can also set the HTTP verb to `DELETE` when calling your Edge Function.
+        isSpotlight: true
+        code: |
+          ```js
+          const { data, error } = await supabase.functions.invoke('hello', {
+            headers: {
+              "my-custom-header": 'my-custom-header-value'
+            },
+            body: { foo: 'bar' },
+            method: 'DELETE'
+          })
+          ```
+      - id: calling-with-get-verb
+        name: Calling with GET HTTP verb
+        description: |
+          You can also set the HTTP verb to `GET` when calling your Edge Function.
+        isSpotlight: true
+        code: |
+          ```js
+          const { data, error } = await supabase.functions.invoke('hello', {
+            headers: {
+              "my-custom-header": 'my-custom-header-value'
+            },
+            method: 'GET'
           })
           ```
 
@@ -4890,7 +4934,7 @@ functions:
     title: from.getPublicUrl()
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.getPublicUrl'
     notes: |
-      - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/javascript/storage-updatebucket) or by going to Storage on [app.supabase.com](https://supabase.com/dashboard), clicking the overflow menu on a bucket and choosing "Make public"
+      - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/javascript/storage-updatebucket) or by going to Storage on [supabase.com/dashboard](https://supabase.com/dashboard), clicking the overflow menu on a bucket and choosing "Make public"
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: none

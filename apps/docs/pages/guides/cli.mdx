@@ -4,12 +4,15 @@ export const meta = {
   title: 'Supabase CLI',
   description:
     'The Supabase CLI provides tools to develop your project locally and deploy to the Supabase Platform.',
+  subtitle:
+    'The Supabase CLI provides tools to develop your project locally and deploy to the Supabase Platform.',
 }
 
-The Supabase CLI provides tools to develop your project locally and deploy to the Supabase Platform.
-You can also use the CLI to manage your Supabase projects, handle database migrations and CI/CD workflows, and generate types directly from your database schema.
+You can use the Supabase CLI to run the entire Supabase stack locally on your machine, simply by running `supabase init` (to create a new local project) and then `supabase start`.
 
-## Installation
+The Supabase CLI provides tools to develop your project locally, deploy to the Supabase Platform, handle database migrations, and generate types directly from your database schema.
+
+## Installing the Supabase CLI
 
 <Tabs
   scrollable
@@ -74,7 +77,7 @@ and run one of the following:
 </TabPanel>
 </Tabs>
 
-## Updates
+## Updating the Supabase CLI
 
 When a new [version](https://github.com/supabase/cli/releases) is released, you can update the CLI using the same methods.
 
@@ -114,12 +117,45 @@ brew upgrade supabase
 </TabPanel>
 </Tabs>
 
+If you have any Supabase containers running locally, remember to restart them after upgrading to use the new features.
+
+```bash
+npx supabase stop --no-backup
+npx supabase start
+```
+
+## Running Supabase locally
+
+Inside the folder where you want to create your project, run:
+
+```bash
+supabase init
+```
+
+This will create a new `supabase` folder. It's safe to commit this folder to your version control system.
+
+Now, to start the Supabase stack, run:
+
+```bash
+supabase start
+```
+
+This takes time on your first run because the CLI needs to download the local Docker images. The CLI includes the entire Supabase toolset, and a few additional images that are useful for local development (like a local SMTP server and a database diff tool).
+
+The local development environment includes Supabase Studio, a graphical interface for working with your database, running by default on [localhost:54323](http://localhost:54323).
+
+![Local Studio](/docs/img/guides/cli/local-studio.png)
+
+When you are finished working on your Supabase project, you can stop the stack with:
+
+```bash
+supabase stop
+```
+
 ## See also
 
 - [Supabase CLI Reference](/docs/reference/cli/introduction)
 - [Supabase CLI Configuration](/docs/reference/cli/config)
-- [Local Development](/docs/guides/getting-started/local-development)
-- [Managing Environments](/docs/guides/cli/managing-environments)
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

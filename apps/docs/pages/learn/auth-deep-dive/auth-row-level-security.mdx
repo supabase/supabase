@@ -82,7 +82,7 @@ or via the Supabase Dashboard, by navigating to Auth > Policies, and clicking th
 
 ![Enable row level security in Supabase](/docs/img/auth-deep-dive-2.png)
 
-You'll notice that both reading and writing now fail with an error like:
+You'll notice that reading will return no rows and writing will now fail with an error like:
 
 ```jsx
 {
@@ -128,7 +128,7 @@ In the next guide we will look at using Policies in combination with User Accoun
 - Watch [Part Three: Policies](../../learn/auth-deep-dive/auth-policies)
 - Watch [Part Four: GoTrue](../../learn/auth-deep-dive/auth-gotrue)
 - Watch [Part Five: Google Oauth](../../learn/auth-deep-dive/auth-google-oauth)
-- Sign up for Supabase: [app.supabase.com](https://app.supabase.com)
+- Sign up for Supabase: [supabase.com/dashboard](https://supabase.com/dashboard)
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
