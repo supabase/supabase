@@ -31,10 +31,6 @@ interface Props {
 
 function ExpertPartnersPage(props: Props) {
   const { partners } = props
-  const partnersByCategory: { [category: string]: Partner[] } = {}
-  partners.map(
-    (p) => (partnersByCategory[p.category] = [...(partnersByCategory[p.category] ?? []), p])
-  )
   const router = useRouter()
 
   const meta_title = 'Find an expert'
@@ -122,7 +118,7 @@ function ExpertPartnersPage(props: Props) {
               {/* Partner Tiles */}
               <div className="grid">
                 {partners.length ? (
-                  <TileGrid partnersByCategory={partnersByCategory} hideCategories={true} />
+                  <TileGrid partners={partners} hideCategories={true} />
                 ) : (
                   <h2 className="h2">No Partners Found</h2>
                 )}
