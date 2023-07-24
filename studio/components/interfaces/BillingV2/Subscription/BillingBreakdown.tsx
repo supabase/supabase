@@ -274,44 +274,55 @@ const BillingBreakdown = ({}: BillingBreakdownProps) => {
                           </Tooltip.Root>
                         )}
                     </div>
-                    {usageMeta?.available_in_plan ? (
-                      <SparkBar
-                        type="horizontal"
-                        // If the limit is 0, it means that the usage is unlimited and not billed
-                        // By setting "1" as max, the bar is only filled if the metric has any usage
-                        // This is only the case for Enterprise plans
-                        max={usageMeta.limit || 1}
-                        value={usageMeta.usage ?? 0}
-                        barClass={
-                          !hasLimit && usageMeta.usage > 0
-                            ? 'bg-scale-1100'
-                            : isExceededLimit && !isUsageBillingEnabled
-                            ? 'bg-red-900'
-                            : isApproachingLimit && !isUsageBillingEnabled
-                            ? 'bg-amber-900'
-                            : 'bg-scale-1100'
-                        }
-                        bgClass="bg-gray-300 dark:bg-gray-600"
-                        labelBottom={usageLabel}
-                        labelBottomClass="!text-scale-1000"
-                        labelTop={hasLimit ? percentageLabel : undefined}
-                        labelTopClass={
-                          !hasLimit
-                            ? ''
-                            : isExceededLimit && !isUsageBillingEnabled
-                            ? '!text-red-900'
-                            : isApproachingLimit && !isUsageBillingEnabled
-                            ? '!text-amber-900'
-                            : ''
-                        }
-                      />
+                    {usageMeta ? (
+                      usageMeta.available_in_plan ? (
+                        <SparkBar
+                          type="horizontal"
+                          // If the limit is 0, it means that the usage is unlimited and not billed
+                          // By setting "1" as max, the bar is only filled if the metric has any usage
+                          // This is only the case for Enterprise plans
+                          max={usageMeta.limit || 1}
+                          value={usageMeta.usage ?? 0}
+                          barClass={
+                            !hasLimit && usageMeta.usage > 0
+                              ? 'bg-scale-1100'
+                              : isExceededLimit && !isUsageBillingEnabled
+                              ? 'bg-red-900'
+                              : isApproachingLimit && !isUsageBillingEnabled
+                              ? 'bg-amber-900'
+                              : 'bg-scale-1100'
+                          }
+                          bgClass="bg-gray-300 dark:bg-gray-600"
+                          labelBottom={usageLabel}
+                          labelBottomClass="!text-scale-1000"
+                          labelTop={hasLimit ? percentageLabel : undefined}
+                          labelTopClass={
+                            !hasLimit
+                              ? ''
+                              : isExceededLimit && !isUsageBillingEnabled
+                              ? '!text-red-900'
+                              : isApproachingLimit && !isUsageBillingEnabled
+                              ? '!text-amber-900'
+                              : ''
+                          }
+                        />
+                      ) : (
+                        // [Joshen] Needs a better CTA here
+                        <div className="flex items-center justify-between flex-grow">
+                          <p className="text-sm text-scale-1000">Unavailable in your plan</p>
+                          <Button
+                            type="default"
+                            onClick={() => snap.setPanelKey('subscriptionPlan')}
+                          >
+                            Upgrade
+                          </Button>
+                        </div>
+                      )
                     ) : (
-                      // [Joshen] Needs a better CTA here
                       <div className="flex items-center justify-between flex-grow">
-                        <p className="text-sm text-scale-1000">Unavailable in your plan</p>
-                        <Button type="default" onClick={() => snap.setPanelKey('subscriptionPlan')}>
-                          Upgrade
-                        </Button>
+                        <p className="text-sm text-scale-1000">
+                          The usage for this metric is missing.
+                        </p>
                       </div>
                     )}
                   </div>
