@@ -1,18 +1,17 @@
-import { useQueryClient } from '@tanstack/react-query'
 import { JwtSecretUpdateError, JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
+import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useRef } from 'react'
 import { IconAlertCircle, Input } from 'ui'
 
-import { useStore } from 'hooks'
 import { useParams } from 'common/hooks'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
+import { useStore } from 'hooks'
 
-import { useProjectApiQuery } from 'data/config/project-api-query'
-import { configKeys } from 'data/config/keys'
 import Panel from 'components/ui/Panel'
 import { DisplayApiSettings } from 'components/ui/ProjectSettings'
+import { configKeys } from 'data/config/keys'
+import { useProjectApiQuery } from 'data/config/project-api-query'
 import { JWT_SECRET_UPDATE_ERROR_MESSAGES } from './API.constants'
-import JWTSettings from './JWTSettings'
 import PostgrestConfig from './PostgrestConfig'
 
 const ServiceList = () => {
@@ -88,10 +87,6 @@ const ServiceList = () => {
 
       <section>
         <DisplayApiSettings key="DisplayAPISettings" />
-      </section>
-
-      <section>
-        <JWTSettings />
       </section>
 
       <section>
