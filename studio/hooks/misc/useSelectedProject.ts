@@ -8,6 +8,9 @@ export function useSelectedProject() {
   const { data: allProjects } = useProjectsQuery()
   const { data } = useProjectDetailQuery({ ref })
 
-  const projectMinimal = useMemo(() => allProjects?.find((project) => project.ref === ref), [ref])
+  const projectMinimal = useMemo(
+    () => allProjects?.find((project) => project.ref === ref),
+    [ref, allProjects]
+  )
   return data || projectMinimal
 }
