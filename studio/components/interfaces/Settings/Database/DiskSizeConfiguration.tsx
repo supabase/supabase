@@ -224,7 +224,7 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
                     <Button
                       htmlType="submit"
                       type="primary"
-                      disabled={!isAbleToResizeDatabase}
+                      disabled={!isAbleToResizeDatabase || isUpdatingDiskSize}
                       loading={isUpdatingDiskSize}
                     >
                       Update disk size
