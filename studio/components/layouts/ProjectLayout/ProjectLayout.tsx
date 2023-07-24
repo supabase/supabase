@@ -159,7 +159,9 @@ const ContentWrapper = ({ isLoading, children }: ContentWrapperProps) => {
   const selectedProject = useSelectedProject()
   const router = useRouter()
 
-  const requiresDbConnection: boolean = router.pathname !== '/project/[ref]/settings/general'
+  const requiresDbConnection: boolean =
+    !router.pathname.includes('/project/[ref]/settings') ||
+    router.pathname.includes('/project/[ref]/settings/vault')
   const requiresPostgrestConnection = !routesToIgnorePostgrestConnection.includes(router.pathname)
   const requiresProjectDetails = !routesToIgnoreProjectDetailsRequest.includes(router.pathname)
 
