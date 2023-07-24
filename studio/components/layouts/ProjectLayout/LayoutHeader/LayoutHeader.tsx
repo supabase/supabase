@@ -37,7 +37,6 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
     { projectRef },
     { enabled: selectedOrganization && !selectedOrganization.subscription_id }
   )
-  console.log({ subscription })
 
   const projectHasNoLimits = subscription?.usage_billing_enabled === false
 
