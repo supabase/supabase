@@ -37,7 +37,7 @@ export const CREATE_PG_GET_TABLEDEF_SQL = minify(
       AND pg_catalog.format_type(t.oid, NULL) in ('tabledefs');
       IF cnt = 0 THEN
         RAISE INFO 'Creating custom types.';
-        CREATE TYPE pg_temp.tabledefs AS ENUM ('FKEYS_INTERNAL', 'FKEYS_EXTERNAL', 'FKEYS_COMMENTED', 'FKEYS_NONE', 'INCLUDE_TRIGGERS', 'NO_TRIGGERS');
+        CREATE TYPE pg_temp.tabledefs AS ENUM ('PKEY_INTERNAL','PKEY_EXTERNAL','FKEYS_INTERNAL', 'FKEYS_EXTERNAL', 'FKEYS_COMMENTED', 'FKEYS_NONE', 'INCLUDE_TRIGGERS', 'NO_TRIGGERS');
       END IF;
     end first_block $$;
     
@@ -71,7 +71,7 @@ export const CREATE_PG_GET_TABLEDEF_SQL = minify(
     $$;
     
     -- SELECT * FROM pg_temp.pg_get_tabledef('sample', 'address', false);
-    DROP FUNCTION IF EXISTS pg_get_tabledef(character varying,character varying,boolean,tabledefs[]);
+    DROP FUNCTION IF EXISTS pg_temp.pg_get_tabledef(character varying,character varying,boolean,tabledefs[]);
     CREATE OR REPLACE FUNCTION pg_temp.pg_get_tabledef(
       in_schema varchar,
       in_table varchar,
@@ -82,13 +82,13 @@ export const CREATE_PG_GET_TABLEDEF_SQL = minify(
     LANGUAGE plpgsql VOLATILE
     AS
     $$
-    
       DECLARE
         v_qualified text;
         v_table_ddl text;
         v_table_oid int;
         v_colrec record;
         v_constraintrec record;
+        v_trigrec       record;
         v_indexrec record;
         v_primary boolean := False;
         v_constraint_name text;
@@ -113,13 +113,15 @@ export const CREATE_PG_GET_TABLEDEF_SQL = minify(
         bVerbose boolean := False;
     
         -- assume defaults for ENUMs at the getgo	
+        pkcnt            int := 0;
         fkcnt            int := 0;
         trigcnt          int := 0;
-        fktype           pg_temp.tabledefs := 'FKEYS_INTERNAL';
-        trigtype         pg_temp.tabledefs := 'NO_TRIGGERS';
+        pktype           tabledefs := 'PKEY_INTERNAL';	  
+        fktype           tabledefs := 'FKEYS_INTERNAL';
+        trigtype         tabledefs := 'NO_TRIGGERS';
         arglen           integer;
         vargs            text;
-        avarg            pg_temp.tabledefs;
+        avarg            tabledefs;
     
         -- exception variables
         v_ret            text;
@@ -152,14 +154,20 @@ export const CREATE_PG_GET_TABLEDEF_SQL = minify(
                 ELSEIF avarg = 'INCLUDE_TRIGGERS' OR avarg = 'NO_TRIGGERS' THEN
                     trigcnt = trigcnt + 1;
                     trigtype = avarg;
+                ELSEIF avarg = 'PKEY_INTERNAL' OR avarg = 'PKEY_EXTERNAL' THEN
+                    pkcnt = pkcnt + 1;
+                    pktype = avarg;				
                 END IF;
             END LOOP;
             IF fkcnt > 1 THEN 
-          RAISE WARNING 'Only one foreign key option can be provided. You provided %', fkcnt;
-          RETURN '';
+                RAISE WARNING 'Only one foreign key option can be provided. You provided %', fkcnt;
+                RETURN '';
             ELSEIF trigcnt > 1 THEN 
                 RAISE WARNING 'Only one trigger option can be provided. You provided %', trigcnt;
                 RETURN '';
+            ELSEIF pkcnt > 1 THEN 
+                RAISE WARNING 'Only one pkey option can be provided. You provided %', pkcnt;
+                RETURN '';			
             END IF;		   		   
         END IF;
       
@@ -467,15 +475,16 @@ export const CREATE_PG_GET_TABLEDEF_SQL = minify(
         IF bVerbose THEN RAISE INFO '(7)tabledef so far: %', v_table_ddl; END IF;
       
         IF trigtype = 'INCLUDE_TRIGGERS' THEN
-          select pg_get_triggerdef(t.oid, True) || ';' INTO v_trigger FROM pg_trigger t, pg_class c, pg_namespace n 
-          WHERE n.nspname = in_schema and n.oid = c.relnamespace and c.relname = in_table and c.relkind = 'r' and t.tgrelid = c.oid and NOT t.tgisinternal;
-          IF v_trigger <> '' THEN
-            v_table_ddl := v_table_ddl || v_trigger;
-          END IF;  
+          -- Issue#14: handle multiple triggers for a table
+          FOR v_trigrec IN
+              select pg_get_triggerdef(t.oid, True) || ';' as triggerdef FROM pg_trigger t, pg_class c, pg_namespace n 
+              WHERE n.nspname = in_schema and n.oid = c.relnamespace and c.relname = in_table and c.relkind = 'r' and t.tgrelid = c.oid and NOT t.tgisinternal
+          LOOP
+              v_table_ddl := v_table_ddl || v_trigrec.triggerdef;
+              v_table_ddl := v_table_ddl || E'\\n';          
+              IF bVerbose THEN RAISE INFO 'triggerdef = %', v_trigrec.triggerdef; END IF;
+          END LOOP;       	    
         END IF;
-      
-        -- add empty line
-        v_table_ddl := v_table_ddl || E'\\n';
     
         RETURN v_table_ddl;
       
