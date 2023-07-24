@@ -1,0 +1,70 @@
+import ProductManagementSQLTemplate from './product_management_sql_template.mdx'
+import { Tabs } from 'ui'
+export const TabPanel = Tabs.Panel
+
+## Project setup
+
+Before we start building we're going to set up our Database and API. This is as simple as starting a new Project in Supabase and then creating a "schema" inside the database.
+
+### Create a project
+
+1. [Create a new project](https://app.supabase.com) in the Supabase Dashboard.
+1. Enter your project details.
+1. Wait for the new database to launch.
+
+### Set up the database schema
+
+Now we are going to set up the database schema. You can just copy/paste the SQL from below and run it yourself.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="dashboard"
+>
+<TabPanel id="dashboard" label="Dashboard">
+
+1. Go to the [SQL Editor](https://app.supabase.com/project/_/sql) page in the Dashboard.
+2. Click **Product Management**.
+3. Click **Run**.
+
+</TabPanel>
+<TabPanel id="sql" label="SQL">
+
+<ProductManagementSQLTemplate />
+
+</TabPanel>
+</Tabs>
+
+### Get the API Keys
+
+Now that you've created some database tables, you are ready to insert data using the auto-generated API.
+We just need to get the Project URL and `anon` key from the API settings.
+
+1. Go to the [API Settings](https://app.supabase.com/project/_/settings/api) page in the Dashboard.
+2. Find your Project `URL`, `anon`, and `service_role` keys on this page.
+
+### Set up Google Authentication
+
+From [Google Console](https://console.developers.google.com/apis/library), create a Project
+In the project, create new credential
+
+<img
+  width="750"
+  alt="Screenshot 2023-07-15 at 20 47 31"
+  src="https://github.com/hieuwu/product-sample-supabase-kt/assets/43868345/f57fc92c-9458-44b2-ba94-688ec61a6a24"
+/>
+
+Then go to Supabase dashboard, in Authentication tab, open Providers to enable Google. Turn on toggle then copy and paste Client ID and Secret from Google Cloud
+
+<img
+  width="750"
+  alt="Screenshot 2023-07-15 at 20 48 26"
+  src="https://github.com/hieuwu/product-sample-supabase-kt/assets/43868345/9b8adf4f-05a9-4ed3-a48c-e64cc7701225"
+/>
+
+<img
+  width="750"
+  alt="Screenshot 2023-07-15 at 20 49 34"
+  src="https://github.com/hieuwu/product-sample-supabase-kt/assets/43868345/9dc29384-f7ba-4ace-97f1-2ca0a2ff299a"
+/>
