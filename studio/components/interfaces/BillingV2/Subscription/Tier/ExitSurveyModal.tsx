@@ -13,7 +13,7 @@ import { useFlag, useStore } from 'hooks'
 import { PROJECT_STATUS } from 'lib/constants'
 import { Button, Input, Modal } from 'ui'
 import { CANCELLATION_REASONS } from '../../Billing.constants'
-import ProjectUpdateDisabledTooltip from '../../ProjectUpdateDisabledTooltip'
+import ProjectUpdateDisabledTooltip from 'components/interfaces/Organization/BillingSettings/ProjectUpdateDisabledTooltip'
 
 export interface ExitSurveyModalProps {
   visible: boolean
@@ -206,6 +206,7 @@ const ExitSurveyModal = ({ visible, onClose }: ExitSurveyModalProps) => {
             <ProjectUpdateDisabledTooltip projectUpdateDisabled={projectUpdateDisabled}>
               <Button
                 type="danger"
+                className="pointer-events-auto"
                 loading={isSubmitting}
                 disabled={projectUpdateDisabled || isSubmitting}
                 onClick={onSubmit}
