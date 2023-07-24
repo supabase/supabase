@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ParsedUrlQuery } from 'querystring'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import {
   Badge,
   Button,
@@ -87,15 +87,17 @@ const ProjectLink = ({
   )
 }
 
-const ProjectDropdown = ({ alt }: { alt?: boolean }) => {
+const ProjectDropdown = () => {
+  const router = useRouter()
   const selectedProject = useSelectedProject()
   const selectedOrganization = useSelectedOrganization()
+  const projectNameRef = useRef<HTMLAnchorElement>(null)
   const { data: allProjects, isLoading: isLoadingProjects } = useProjectsQuery()
 
   const isOrgBilling = !!selectedOrganization?.subscription_id
   const { data: subscription, isSuccess } = useProjectSubscriptionV2Query(
     { projectRef: selectedProject?.ref },
-    { enabled: alt && !isOrgBilling }
+    { enabled: !isOrgBilling }
   )
   const projects = allProjects
     ?.filter((x) => x.status !== PROJECT_STATUS.INACTIVE)
@@ -103,15 +105,16 @@ const ProjectDropdown = ({ alt }: { alt?: boolean }) => {
     .sort((a, b) => a.name.localeCompare(b.name))
 
   const [open, setOpen] = useState(false)
+  const popoverOffset = (projectNameRef.current?.offsetWidth ?? 0) + 12
 
-  if (isLoadingProjects && alt) {
+  if (isLoadingProjects) {
     return <ShimmeringLoader className="w-[90px]" />
   }
 
   return IS_PLATFORM ? (
     <div className="flex items-center space-x-2 px-2">
       <Link href={`/project/${selectedProject?.ref}`}>
-        <a className="flex items-center space-x-2">
+        <a ref={projectNameRef} className="flex items-center space-x-2">
           <p className="text-sm">{selectedProject?.name}</p>
           {isSuccess && !isOrgBilling && <Badge color="slate">{subscription?.plan.name}</Badge>}
         </a>
@@ -125,7 +128,12 @@ const ProjectDropdown = ({ alt }: { alt?: boolean }) => {
             icon={<IconCode className="text-scale-1100 rotate-90" strokeWidth={2} size={12} />}
           />
         </PopoverTrigger_Shadcn_>
-        <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start">
+        <PopoverContent_Shadcn_
+          className="p-0"
+          side="bottom"
+          align="start"
+          style={{ marginLeft: `-${popoverOffset}px` }}
+        >
           <Command_Shadcn_>
             <CommandInput_Shadcn_ placeholder="Find project..." />
             <CommandList_Shadcn_>
@@ -141,7 +149,13 @@ const ProjectDropdown = ({ alt }: { alt?: boolean }) => {
                 ))}
               </CommandGroup_Shadcn_>
               <CommandGroup_Shadcn_ className="border-t">
-                <CommandItem_Shadcn_ className="cursor-pointer" onSelect={() => setOpen(false)}>
+                <CommandItem_Shadcn_
+                  className="cursor-pointer"
+                  onSelect={() => {
+                    setOpen(false)
+                    router.push(`/new/${selectedOrganization?.slug}`)
+                  }}
+                >
                   <Link passHref href={`/new/${selectedOrganization?.slug}`}>
                     <a className="flex items-center space-x-2 w-full">
                       <IconPlus size={14} strokeWidth={1.5} />
