@@ -6,6 +6,7 @@ import {
   Popover,
   IconBookOpen,
   IconActivity,
+  IconTool,
 } from 'ui'
 import { useRouter } from 'next/router'
 import { FC } from 'react'
@@ -36,32 +37,39 @@ const HelpPopover: FC<Props> = () => {
               hosted services.
             </p>
             <div className="space-x-1">
-              <Link passHref href={supportUrl}>
-                <a>
-                  <Button type="default" icon={<IconMail />}>
-                    Contact Support
-                  </Button>
-                </a>
+              <Link passHref href="https://supabase.com/docs/guides/platform/troubleshooting">
+                <Button asChild type="default" icon={<IconTool />}>
+                  <a target="_blank" rel="noreferrer">
+                    Troubleshooting
+                  </a>
+                </Button>
               </Link>
               <Link passHref href="https://supabase.com/docs/">
-                <a target="_blank" rel="noreferrer">
-                  <Button type="text" size="tiny" icon={<IconBookOpen />}>
+                <Button asChild type="text" size="tiny" icon={<IconBookOpen />}>
+                  <a target="_blank" rel="noreferrer">
                     Docs
-                  </Button>
-                </a>
+                  </a>
+                </Button>
               </Link>
               <Link passHref href="https://status.supabase.com/">
-                <a target="_blank" rel="noreferrer">
-                  <Button type="text" size="tiny" icon={<IconActivity />}>
+                <Button asChild type="text" size="tiny" icon={<IconActivity />}>
+                  <a target="_blank" rel="noreferrer">
                     Supabase Status
-                  </Button>
-                </a>
+                  </a>
+                </Button>
               </Link>
             </div>
             <p className="text-sm text-scale-900">
               Expected response time is based on your billing plan. Pro and Pay as You Go plans are
               prioritized.
             </p>
+            <div>
+              <Link passHref href={supportUrl}>
+                <Button asChild type="default" icon={<IconMail />}>
+                  <a>Contact Support</a>
+                </Button>
+              </Link>
+            </div>
           </div>
           <Popover.Separator />
           <div className="mb-4 space-y-2">
