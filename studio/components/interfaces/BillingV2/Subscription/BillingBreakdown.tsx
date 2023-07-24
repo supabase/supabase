@@ -1,24 +1,20 @@
+import * as Tooltip from '@radix-ui/react-tooltip'
 import clsx from 'clsx'
 import { useParams } from 'common'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import SparkBar from 'components/ui/SparkBar'
 import { useUpcomingInvoiceQuery } from 'data/invoices/invoice-upcoming-query'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
-import {
-  ProjectUsageResponse,
-  UsageMetric,
-  useProjectUsageQuery,
-} from 'data/usage/project-usage-query'
+import { useProjectUsageQuery } from 'data/usage/project-usage-query'
 import dayjs from 'dayjs'
 import { USAGE_APPROACHING_THRESHOLD } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 import { partition } from 'lodash'
+import Link from 'next/link'
 import { useState } from 'react'
+import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { Alert, Button, Collapsible, IconAlertTriangle, IconChevronRight, IconInfo } from 'ui'
 import { BILLING_BREAKDOWN_METRICS } from './Subscription.constants'
-import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
-import Link from 'next/link'
-import * as Tooltip from '@radix-ui/react-tooltip'
 
 export interface BillingBreakdownProps {}
 
@@ -127,22 +123,18 @@ const BillingBreakdown = ({}: BillingBreakdownProps) => {
           ) : (
             <div className="grid grid-cols-12">
               {BILLING_BREAKDOWN_METRICS.map((metric, i) => {
-                const usageMeta =
-                  (usage?.[metric.key as keyof ProjectUsageResponse] as UsageMetric) ?? undefined
-                const usageRatio =
-                  typeof usageMeta !== 'number'
-                    ? (usageMeta?.usage ?? 0) / (usageMeta?.limit ?? 0)
-                    : 0
+                const usageMeta = usage?.[metric.key]
+                const usageRatio = (usageMeta?.usage ?? 0) / (usageMeta?.limit ?? 0)
 
-                const hasLimit = usageMeta.limit > 0
+                const hasLimit = (usageMeta?.limit ?? 0) > 0
                 const usageCurrentLabel =
                   metric.units === 'bytes'
-                    ? formatBytes(usageMeta.usage)
-                    : usageMeta.usage?.toLocaleString()
+                    ? formatBytes(usageMeta?.usage)
+                    : usageMeta?.usage?.toLocaleString()
                 const usageLimitLabel =
                   metric.units === 'bytes'
-                    ? formatBytes(usageMeta.limit)
-                    : usageMeta.limit.toLocaleString()
+                    ? formatBytes(usageMeta?.limit)
+                    : usageMeta?.limit.toLocaleString()
                 const usageLabel = `${usageCurrentLabel} ${hasLimit ? `of ${usageLimitLabel}` : ''}`
                 const percentageLabel = `${(usageRatio * 100).toFixed(2)}%`
 
@@ -282,7 +274,7 @@ const BillingBreakdown = ({}: BillingBreakdownProps) => {
                           </Tooltip.Root>
                         )}
                     </div>
-                    {usageMeta.available_in_plan ? (
+                    {usageMeta?.available_in_plan ? (
                       <SparkBar
                         type="horizontal"
                         // If the limit is 0, it means that the usage is unlimited and not billed
