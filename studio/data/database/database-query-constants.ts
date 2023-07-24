@@ -494,5 +494,3 @@ export const CREATE_PG_GET_TABLEDEF_SQL = minify(
     $$;`,
   { compress: true, removeAll: true }
 )
-
-console.log('CREATE_PG_GET_TABLEDEF_SQL:', CREATE_PG_GET_TABLEDEF_SQL)
