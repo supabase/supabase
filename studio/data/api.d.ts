@@ -396,6 +396,8 @@ export interface paths {
   "/platform/projects/{ref}/content": {
     /** Gets project's content */
     get: operations["ContentController_getContent"];
+    /** Updates project's content */
+    put: operations["ContentController_updateWholeContent"];
     /** Creates project's content */
     post: operations["ContentController_createContent"];
     /** Deletes project's content */
@@ -1056,6 +1058,8 @@ export interface paths {
   "/v0/projects/{ref}/content": {
     /** Gets project's content */
     get: operations["ContentController_getContent"];
+    /** Updates project's content */
+    put: operations["ContentController_updateWholeContent"];
     /** Creates project's content */
     post: operations["ContentController_createContent"];
     /** Deletes project's content */
@@ -1247,7 +1251,7 @@ export interface paths {
     /** Deletes objects */
     delete: operations["StorageObjectsController_deleteObjects"];
   };
-  "/v1/branch/{branch_id}": {
+  "/v1/branches/{branch_id}": {
     /**
      * Get database branch config 
      * @description Fetches configurations of the specified database branch
@@ -1339,7 +1343,7 @@ export interface paths {
     /** Updates project's postgrest config */
     patch: operations["PostgrestConfigController_updatePostgRESTConfig"];
   };
-  "/v1/projects/{ref}/query": {
+  "/v1/projects/{ref}/database/query": {
     /** Run sql query */
     post: operations["QueryController_runQuery"];
   };
@@ -1609,7 +1613,8 @@ export interface components {
       SMTP_HOST: string;
       SMTP_PORT: string;
       SMTP_USER: string;
-      SMTP_PASS: string;
+      SMTP_PASS?: string | null;
+      SMTP_PASS_ENCRYPTED?: string | null;
       SMTP_MAX_FREQUENCY: number;
       MAILER_AUTOCONFIRM: boolean;
       MAILER_URLPATHS_INVITE: string;
@@ -1684,7 +1689,6 @@ export interface components {
       EXTERNAL_SLACK_SECRET: string;
       SMS_MESSAGEBIRD_ACCESS_KEY: string;
       SMS_MESSAGEBIRD_ORIGINATOR: string;
-      SMTP_PASS_ENCRYPTED: string;
       REFRESH_TOKEN_ROTATION_ENABLED: boolean;
       EXTERNAL_LINKEDIN_ENABLED: boolean;
       EXTERNAL_LINKEDIN_CLIENT_ID: string;
@@ -1749,7 +1753,8 @@ export interface components {
       SMTP_HOST: string;
       SMTP_PORT: string;
       SMTP_USER: string;
-      SMTP_PASS: string;
+      SMTP_PASS?: string | null;
+      SMTP_PASS_ENCRYPTED?: string | null;
       SMTP_MAX_FREQUENCY: number;
       MAILER_AUTOCONFIRM: boolean;
       MAILER_URLPATHS_INVITE: string;
@@ -1824,7 +1829,6 @@ export interface components {
       EXTERNAL_SLACK_SECRET: string;
       SMS_MESSAGEBIRD_ACCESS_KEY: string;
       SMS_MESSAGEBIRD_ORIGINATOR: string;
-      SMTP_PASS_ENCRYPTED: string;
       REFRESH_TOKEN_ROTATION_ENABLED: boolean;
       EXTERNAL_LINKEDIN_ENABLED: boolean;
       EXTERNAL_LINKEDIN_CLIENT_ID: string;
@@ -1889,7 +1893,8 @@ export interface components {
       SMTP_HOST: string;
       SMTP_PORT: string;
       SMTP_USER: string;
-      SMTP_PASS: string;
+      SMTP_PASS?: string | null;
+      SMTP_PASS_ENCRYPTED?: string | null;
       SMTP_MAX_FREQUENCY: number;
       MAILER_AUTOCONFIRM: boolean;
       MAILER_URLPATHS_INVITE: string;
@@ -1964,7 +1969,6 @@ export interface components {
       EXTERNAL_SLACK_SECRET: string;
       SMS_MESSAGEBIRD_ACCESS_KEY: string;
       SMS_MESSAGEBIRD_ORIGINATOR: string;
-      SMTP_PASS_ENCRYPTED: string;
       REFRESH_TOKEN_ROTATION_ENABLED: boolean;
       EXTERNAL_LINKEDIN_ENABLED: boolean;
       EXTERNAL_LINKEDIN_CLIENT_ID: string;
@@ -3038,6 +3042,29 @@ export interface components {
       anon_key: string;
       service_key: string;
     };
+    GetUserContentObject: {
+      owner: {
+        id?: number;
+        username?: string;
+      };
+      updated_by: {
+        id?: number;
+        username?: string;
+      };
+      id: string;
+      inserted_at: string;
+      updated_at: string;
+      type: Record<string, never>;
+      visibility: Record<string, never>;
+      name: string;
+      description?: string;
+      project_id: number;
+      owner_id: number;
+      last_updated_by: number;
+    };
+    GetUserContentResponse: {
+      data: (components["schemas"]["GetUserContentObject"])[];
+    };
     CreateContentParams: {
       id: string;
       name: string;
@@ -3048,6 +3075,30 @@ export interface components {
       visibility: "user" | "project" | "org" | "public";
       content?: Record<string, never>;
       owner_id?: number;
+    };
+    UserContentObject: {
+      id: string;
+      inserted_at: string;
+      updated_at: string;
+      type: Record<string, never>;
+      visibility: Record<string, never>;
+      name: string;
+      description?: string;
+      project_id: number;
+      owner_id: number;
+      last_updated_by: number;
+    };
+    UpsertContentParams: {
+      id: string;
+      name: string;
+      description: string;
+      /** @enum {string} */
+      type: "sql" | "report" | "log_sql";
+      /** @enum {string} */
+      visibility: "user" | "project" | "org" | "public";
+      content?: Record<string, never>;
+      owner_id?: number;
+      project_id: number;
     };
     UpdateContentParams: {
       id?: string;
@@ -3191,6 +3242,11 @@ export interface components {
       name: string;
       limit: number;
     };
+    PreviewTransferInvoiceItem: {
+      description: string;
+      quantity: number;
+      amount: number;
+    };
     PreviewProjectTransferResponse: {
       valid: boolean;
       warnings: (components["schemas"]["PreviewTransferInfo"])[];
@@ -3206,6 +3262,8 @@ export interface components {
       charge_on_target_organization: number;
       source_subscription_plan: Record<string, never>;
       target_subscription_plan: Record<string, unknown> | null;
+      source_invoice_items: (components["schemas"]["PreviewTransferInvoiceItem"])[];
+      target_invoice_items: (components["schemas"]["PreviewTransferInvoiceItem"])[];
     };
     AnalyticsResponse: {
       error?: OneOf<[{
@@ -6738,8 +6796,35 @@ export interface operations {
       };
     };
     responses: {
-      200: never;
+      200: {
+        content: {
+          "application/json": components["schemas"]["GetUserContentResponse"];
+        };
+      };
       /** @description Failed to retrieve project's content */
+      500: never;
+    };
+  };
+  /** Updates project's content */
+  ContentController_updateWholeContent: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpsertContentParams"];
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": components["schemas"]["UserContentObject"];
+        };
+      };
+      /** @description Failed to update project's content */
       500: never;
     };
   };
@@ -6759,7 +6844,7 @@ export interface operations {
     responses: {
       201: {
         content: {
-          "application/json": (Record<string, never>)[];
+          "application/json": (components["schemas"]["UserContentObject"])[];
         };
       };
       /** @description Failed to create project's content */
@@ -6776,7 +6861,7 @@ export interface operations {
     responses: {
       200: {
         content: {
-          "application/json": Record<string, never>;
+          "application/json": components["schemas"]["UserContentObject"];
         };
       };
       /** @description Failed to delete project's content */
@@ -6798,7 +6883,7 @@ export interface operations {
     responses: {
       200: {
         content: {
-          "application/json": (Record<string, never>)[];
+          "application/json": (components["schemas"]["UserContentObject"])[];
         };
       };
       /** @description Failed to update project's content */
