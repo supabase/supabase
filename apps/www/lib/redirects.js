@@ -2078,6 +2078,13 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/guides/cli/using-environment-variables-in-config',
+    destination: '/guides/cli/managing-config',
+  },
+  {
+    permanent: true,
+    source: '/guides/getting-started/local-development',
+    destination: '/guides/cli/local-development',
     source: '/blog/flutter-authentication-and-authorization-with-rls',
     destination: '/blog/flutter-authorization-with-rls',
   },
