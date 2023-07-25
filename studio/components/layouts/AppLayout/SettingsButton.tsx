@@ -5,17 +5,13 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 const SettingsButton = ({ slug }: { slug: string }) => {
   return (
     <Tooltip.Root delayDuration={0}>
-      <Tooltip.Trigger type="button">
-        <Link href={`/org/${slug}/general`}>
+      <Link href={`/org/${slug}/general`} passHref>
+        <Tooltip.Trigger type="button" asChild className="px-1">
           <a>
-            <Button
-              type="text"
-              className="px-1"
-              icon={<IconSettings size={18} strokeWidth={1.5} className="text-scale-1100" />}
-            />
+            <IconSettings size={18} strokeWidth={1.5} className="text-scale-1100" />
           </a>
-        </Link>
-      </Tooltip.Trigger>
+        </Tooltip.Trigger>
+      </Link>
       <Tooltip.Portal>
         <Tooltip.Content side="bottom">
           <Tooltip.Arrow className="radix-tooltip-arrow" />
