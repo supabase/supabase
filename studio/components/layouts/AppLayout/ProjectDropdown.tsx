@@ -77,19 +77,24 @@ const ProjectLink = ({
   }
 
   return (
-    <CommandItem_Shadcn_
-      key={project.ref}
-      value={project.name}
-      className="cursor-pointer"
-      onSelect={() => setOpen(false)}
-    >
-      <Link passHref href={href}>
-        <a className="w-full flex items-center justify-between">
-          <span>{project.name}</span>
-          {project.ref === ref && <IconCheck className="text-brand-900" />}
+    <Link passHref href={href}>
+      <CommandItem_Shadcn_
+        asChild
+        key={project.ref}
+        value={project.name}
+        className="cursor-pointer w-full flex items-center justify-between"
+        onSelect={() => {
+          router.push(href)
+          setOpen(false)
+        }}
+        onClick={() => setOpen(false)}
+      >
+        <a>
+          {project.name}
+          {project.ref === ref && <IconCheck />}
         </a>
-      </Link>
-    </CommandItem_Shadcn_>
+      </CommandItem_Shadcn_>
+    </Link>
   )
 }
 
@@ -143,7 +148,7 @@ const ProjectDropdown = () => {
           <Command_Shadcn_>
             <CommandInput_Shadcn_ placeholder="Find project..." />
             <CommandList_Shadcn_>
-              <CommandEmpty_Shadcn_>No results found.</CommandEmpty_Shadcn_>
+              <CommandEmpty_Shadcn_>No projects found</CommandEmpty_Shadcn_>
               <CommandGroup_Shadcn_>
                 {projects?.map((project) => (
                   <ProjectLink
@@ -155,20 +160,28 @@ const ProjectDropdown = () => {
                 ))}
               </CommandGroup_Shadcn_>
               <CommandGroup_Shadcn_ className="border-t">
-                <CommandItem_Shadcn_
-                  className="cursor-pointer"
-                  onSelect={() => {
+                <Link
+                  passHref
+                  href={`/new/${selectedOrganization?.slug}`}
+                  onClick={() => {
                     setOpen(false)
-                    router.push(`/new/${selectedOrganization?.slug}`)
                   }}
                 >
-                  <Link passHref href={`/new/${selectedOrganization?.slug}`}>
-                    <a className="flex items-center space-x-2 w-full">
+                  <CommandItem_Shadcn_
+                    asChild
+                    className="cursor-pointer flex items-center space-x-2 w-full"
+                    onSelect={() => {
+                      setOpen(false)
+                      router.push(`/new/${selectedOrganization?.slug}`)
+                    }}
+                    onClick={() => setOpen(false)}
+                  >
+                    <a>
                       <IconPlus size={14} strokeWidth={1.5} />
                       <p>New project</p>
                     </a>
-                  </Link>
-                </CommandItem_Shadcn_>
+                  </CommandItem_Shadcn_>
+                </Link>
               </CommandGroup_Shadcn_>
             </CommandList_Shadcn_>
           </Command_Shadcn_>

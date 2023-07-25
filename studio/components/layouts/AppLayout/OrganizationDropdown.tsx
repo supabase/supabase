@@ -46,7 +46,7 @@ const OrganizationDropdown = () => {
       <Link passHref href={slug ? `/org/${slug}` : '/'}>
         <a ref={orgNameRef} className="flex items-center space-x-2">
           <p className="text-sm">{orgName}</p>
-          {isSuccess && <Badge color="slate">{subscription?.plan.name}</Badge>}
+          {isSuccess && <Badge color="scale">{subscription?.plan.name}</Badge>}
         </a>
       </Link>
 
@@ -67,7 +67,7 @@ const OrganizationDropdown = () => {
           <Command_Shadcn_>
             <CommandInput_Shadcn_ placeholder="Find organization..." />
             <CommandList_Shadcn_>
-              <CommandEmpty_Shadcn_>No results found.</CommandEmpty_Shadcn_>
+              <CommandEmpty_Shadcn_>No organizations found</CommandEmpty_Shadcn_>
               <CommandGroup_Shadcn_>
                 {organizations?.map((org) => {
                   const href = router.pathname.includes('[slug]')
@@ -76,40 +76,43 @@ const OrganizationDropdown = () => {
                     ? `/org/${org.slug}/general`
                     : `/org/${org.slug}`
                   return (
-                    <CommandItem_Shadcn_
-                      key={org.slug}
-                      value={org.name}
-                      className="cursor-pointer"
-                      onSelect={() => {
-                        setOpen(false)
-                        router.push(href)
-                      }}
-                    >
-                      <Link passHref href={href}>
-                        <a className="w-full flex items-center justify-between">
-                          <span>{org.name}</span>
-                          {org.slug === slug && <IconCheck className="text-brand-900" />}
+                    <Link passHref href={href} key={org.slug}>
+                      <CommandItem_Shadcn_
+                        asChild
+                        value={org.name}
+                        className="cursor-pointer w-full flex items-center justify-between"
+                        onSelect={() => {
+                          setOpen(false)
+                          router.push(href)
+                        }}
+                        onClick={() => setOpen(false)}
+                      >
+                        <a>
+                          {org.name}
+                          {org.slug === slug && <IconCheck />}
                         </a>
-                      </Link>
-                    </CommandItem_Shadcn_>
+                      </CommandItem_Shadcn_>
+                    </Link>
                   )
                 })}
               </CommandGroup_Shadcn_>
               <CommandGroup_Shadcn_ className="border-t">
-                <CommandItem_Shadcn_
-                  className="cursor-pointer"
-                  onSelect={(e) => {
-                    setOpen(false)
-                    router.push(orgCreationV2 ? `/new-with-subscription` : `/new`)
-                  }}
-                >
-                  <Link passHref href={orgCreationV2 ? `/new-with-subscription` : `/new`}>
-                    <a className="flex items-center space-x-2 w-full">
+                <Link passHref href={orgCreationV2 ? `/new-with-subscription` : `/new`}>
+                  <CommandItem_Shadcn_
+                    asChild
+                    className="cursor-pointer flex items-center space-x-2 w-full"
+                    onSelect={(e) => {
+                      setOpen(false)
+                      router.push(orgCreationV2 ? `/new-with-subscription` : `/new`)
+                    }}
+                    onClick={() => setOpen(false)}
+                  >
+                    <a>
                       <IconPlus size={14} strokeWidth={1.5} />
                       <p>New organization</p>
                     </a>
-                  </Link>
-                </CommandItem_Shadcn_>
+                  </CommandItem_Shadcn_>
+                </Link>
               </CommandGroup_Shadcn_>
             </CommandList_Shadcn_>
           </Command_Shadcn_>
