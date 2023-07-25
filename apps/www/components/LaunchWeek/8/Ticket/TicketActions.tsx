@@ -62,13 +62,11 @@ export default function TicketActions({
         .eq('username', username)
         .is('sharedOnTwitter', null)
     } else if (social === 'linkedin') {
-      const res = await supabase
+      await supabase
         .from(LW_TABLE)
         .update({ sharedOnLinkedIn: 'now' })
         .eq('username', username)
         .is('sharedOnLinkedIn', null)
-
-      console.log('shareing on LinkedIn', res)
     }
   }
 
