@@ -3,37 +3,15 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   id: 'managing-environments',
   title: 'Managing Environments',
-  description: 'How to deploy Supabase schema changes with a CI / CD pipeline.',
-  video: 'https://www.youtube.com/v/rOLyOsBR1Uc',
+  description: 'Manage multiple environments using Database Migrations and GitHub Actions.',
+  subtitle: 'Manage multiple environments using Database Migrations and GitHub Actions.',
+  video: 'https://www.youtube-nocookie.com/v/rOLyOsBR1Uc',
+  tocVideo: 'rOLyOsBR1Uc',
 }
 
-## Overview
+This guide shows you how to set up your local Supabase development environment that integrates with GitHub Actions to automatically test and release schema changes to staging and production Supabase projects.
 
-The Supabase CLI provides the tools you need to manage multiple environments.
-This guide shows you how to set up your local Supabase development environment that integrates with GitHub Actions to automatically
-test and release schema changes to staging and production Supabase projects.
-
-## Prerequisites
-
-Make sure you have these installed on your local machine:
-
-- [Docker Desktop](https://docs.docker.com/desktop/)
-- [Supabase CLI](/docs/guides/cli)
-- [Git](https://github.com/git-guides/install-git)
-
-To get started:
-
-- Create a [Supabase project](https://supabase.com/dashboard) or use an existing one
-- Initialize a local Git repository
-
-<div className="video-container">
-  <iframe
-    src="https://www.youtube-nocookie.com/embed/rOLyOsBR1Uc"
-    frameBorder="1"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-    allowFullScreen
-  ></iframe>
-</div>
+![Deploy migration](/docs/img/guides/cli/cicd-github.png)
 
 ## Set up a local environment
 

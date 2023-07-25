@@ -31,7 +31,7 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
 
   const { mutate: approveRequest, isLoading: isApproving } = useApiAuthorizationApproveMutation({
     onSuccess: (res) => {
-      router.push(res.url)
+      window.location.href = res.url
     },
   })
   const { mutate: declineRequest, isLoading: isDeclining } = useApiAuthorizationDeclineMutation({
