@@ -1,3 +1,4 @@
+import dayjs from 'dayjs'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import Link from 'next/link'
@@ -12,6 +13,7 @@ import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mu
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 import { useProjectUsageQuery } from 'data/usage/project-usage-query'
 import { useCheckPermissions, useStore } from 'hooks'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
 export interface DiskSizeConfigurationProps {
   disabled?: boolean
@@ -19,7 +21,19 @@ export interface DiskSizeConfigurationProps {
 
 const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps) => {
   const { ui } = useStore()
+  const { project } = useProjectContext()
   const { ref: projectRef } = useParams()
+  const { lastDatabaseResizeAt } = project ?? {}
+
+  const timeTillNextAvailableDatabaseResize =
+    lastDatabaseResizeAt === null ? 0 : 6 * 60 - dayjs().diff(lastDatabaseResizeAt, 'minutes')
+  const isAbleToResizeDatabase = timeTillNextAvailableDatabaseResize <= 0
+  const formattedTimeTillNextAvailableResize =
+    timeTillNextAvailableDatabaseResize < 60
+      ? `${timeTillNextAvailableDatabaseResize} minute(s)`
+      : `${Math.floor(timeTillNextAvailableDatabaseResize / 60)} hours and ${
+          timeTillNextAvailableDatabaseResize % 60
+        } minute(s)`
 
   const [showResetDbPass, setShowResetDbPass] = useState<boolean>(false)
   const canUpdateDiskSizeConfig = useCheckPermissions(PermissionAction.UPDATE, 'projects')
@@ -155,26 +169,22 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
 
       <Modal
         header={<h5 className="text-sm text-scale-1200">Increase Disk Storage Size</h5>}
-        size="small"
+        size="medium"
         visible={showResetDbPass}
         loading={isUpdatingDiskSize}
         onCancel={() => setShowResetDbPass(false)}
         hideFooter
       >
         <Form
-          name={`disk-resize-form`}
+          name="disk-resize-form"
           initialValues={INITIAL_VALUES}
           validationSchema={diskSizeValidationSchema}
           onSubmit={confirmResetDbPass}
         >
-          {({ isSubmitting }: { isSubmitting: boolean }) =>
+          {() =>
             currentDiskSize >= maxDiskSize ? (
               <>
-                <Alert
-                  withIcon
-                  variant="warning"
-                  title={'Maximum manual disk size increase reached'}
-                >
+                <Alert withIcon variant="warning" title="Maximum manual disk size increase reached">
                   You cannot manually expand the disk size any more than {maxDiskSize} GB. If you
                   need more than this, contact us to learn more about the Enterprise plan.
                 </Alert>
@@ -182,22 +192,41 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
             ) : (
               <>
                 <Modal.Content>
-                  <div className="w-full space-y-8 py-8">
+                  <div className="w-full space-y-4 py-6">
+                    <Alert
+                      withIcon
+                      variant={isAbleToResizeDatabase ? 'info' : 'warning'}
+                      title="This operation is only possible every 6 hours"
+                    >
+                      {isAbleToResizeDatabase
+                        ? `Upon updating your disk size, the next disk size update will only be available from ${dayjs().format(
+                            'DD MMM YYYY, HH:mm (ZZ)'
+                          )}`
+                        : `Your database was last resized at ${dayjs(lastDatabaseResizeAt).format(
+                            'DD MMM YYYY, HH:mm (ZZ)'
+                          )}. You can resize your database again in approximately ${formattedTimeTillNextAvailableResize}`}
+                    </Alert>
                     <InputNumber
+                      required
                       id="new-disk-size"
                       label="New disk size"
                       labelOptional="GB"
-                      required
+                      disabled={!isAbleToResizeDatabase}
                     />
                   </div>
                 </Modal.Content>
                 <Modal.Separator />
                 <Modal.Content>
-                  <div className="flex space-x-2 justify-between pb-2">
+                  <div className="flex space-x-2 justify-end pt-1 pb-3">
                     <Button type="default" onClick={() => setShowResetDbPass(false)}>
                       Cancel
                     </Button>
-                    <Button htmlType="submit" type="primary" loading={isSubmitting}>
+                    <Button
+                      htmlType="submit"
+                      type="primary"
+                      disabled={!isAbleToResizeDatabase || isUpdatingDiskSize}
+                      loading={isUpdatingDiskSize}
+                    >
                       Update disk size
                     </Button>
                   </div>
