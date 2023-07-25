@@ -147,7 +147,7 @@ const CostControl = ({}: CostControlProps) => {
                   <ProjectUpdateDisabledTooltip projectUpdateDisabled={projectUpdateDisabled}>
                     <Button
                       type="default"
-                      className="mt-4"
+                      className="mt-4 pointer-events-auto"
                       disabled={!canChangeTier}
                       onClick={() => snap.setPanelKey('costControl')}
                     >

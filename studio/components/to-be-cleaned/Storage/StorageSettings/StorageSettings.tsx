@@ -9,6 +9,7 @@ import { useCheckPermissions, useStore } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import { STORAGE_FILE_SIZE_LIMIT_MAX_BYTES, StorageSizeUnits } from './StorageSettings.constants'
 import { convertFromBytes, convertToBytes } from './StorageSettings.utils'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 
 export type StorageSettingsProps = {
   projectRef: string | undefined
@@ -27,8 +28,8 @@ const StorageSettings = ({ projectRef }: StorageSettingsProps) => {
 
   if (!data) {
     return (
-      <div className="p-6 mx-auto text-center sm:w-full md:w-3/4">
-        <p className="text-sm">Loading...</p>
+      <div className="w-full">
+        <GenericSkeletonLoader />
       </div>
     )
   }
