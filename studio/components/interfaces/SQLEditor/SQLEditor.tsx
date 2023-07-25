@@ -20,7 +20,8 @@ import {
 import Split from 'react-split'
 import { format } from 'sql-formatter'
 import { getSqlEditorStateSnapshot, useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { AiIcon, Button, IconCheck, IconCornerDownLeft, IconX, Input } from 'ui'
+import { AiIcon, Button, IconCheck, IconCornerDownLeft, IconSettings, IconX, Input } from 'ui'
+import AISettingsModal from './AISettingsModal'
 import type { IStandaloneCodeEditor } from './MonacoEditor'
 import { sqlAiDisclaimerComment, untitledSnippetTitle } from './SQLEditor.constants'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
@@ -69,6 +70,7 @@ const SQLEditor = () => {
   const [debugSolution, setDebugSolution] = useState<string>()
   const [sqlDiff, setSqlDiff] = useState<ContentDiff>()
   const inputRef = useRef<HTMLInputElement>(null)
+  const [isAISettingsOpen, setIsAISettingsOpen] = useState(false)
 
   const isDiffOpen = !!sqlDiff
 
@@ -215,6 +217,7 @@ const SQLEditor = () => {
         setDebugSolution,
       }}
     >
+      <AISettingsModal visible={isAISettingsOpen} onCancel={() => setIsAISettingsOpen(false)} />
       <div className="flex h-full flex-col">
         <m.div
           key="ask-ai-input-container"
@@ -270,7 +273,7 @@ const SQLEditor = () => {
                       )}
                     </div>
                   }
-                  inputClassName="w-full !border-brand-900 border-none bg-transparent !shadow-none py-4 focus:!ring-0 placeholder:text-scale-900"
+                  inputClassName="w-full !border-brand-900 border-none bg-transparent !shadow-none py-4 focus:!ring-0 placeholder:text-scale-900 pr-20"
                   iconContainerClassName="transition text-scale-800 text-brand-900"
                   placeholder={!debugSolution ? 'Ask Supabase AI to modify your query' : ''}
                   className="w-full"
@@ -302,7 +305,13 @@ const SQLEditor = () => {
                           </Button>
                         </>
                       ) : (
-                        <IconCornerDownLeft size={16} strokeWidth={1.5} />
+                        <>
+                          <IconCornerDownLeft size={16} strokeWidth={1.5} />
+                          <IconSettings
+                            className="cursor-pointer"
+                            onClick={() => setIsAISettingsOpen(true)}
+                          />
+                        </>
                       )}
                     </div>
                   }
