@@ -1,5 +1,12 @@
 import { useState } from 'react'
-import { Button, IconMessageCircle, Popover } from 'ui'
+import {
+  Button,
+  IconMessageCircle,
+  Popover,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+  Popover_Shadcn_,
+} from 'ui'
 import FeedbackWidget from './FeedbackWidget'
 
 interface FeedbackDropdownProps {
@@ -22,16 +29,29 @@ const FeedbackDropdown = ({ alt = false }: FeedbackDropdownProps) => {
   }
 
   return (
-    <Popover
+    <Popover_Shadcn_
+      modal={false}
       open={isOpen}
       onOpenChange={(e) => {
         setIsOpen(e)
         if (!e) setScreenshot(undefined)
       }}
-      size="content"
-      side="bottom"
-      align="end"
-      overlay={
+    >
+      <PopoverTrigger_Shadcn_ asChild>
+        <Button
+          asChild
+          onClick={onOpen}
+          type="default"
+          icon={
+            alt ? null : (
+              <IconMessageCircle size={16} strokeWidth={1.5} className="text-scale-900" />
+            )
+          }
+        >
+          <span className="hidden md:flex">Feedback</span>
+        </Button>
+      </PopoverTrigger_Shadcn_>
+      <PopoverContent_Shadcn_ side="bottom" align="end" className="w-full p-0">
         <FeedbackWidget
           onClose={onClose}
           feedback={feedback}
@@ -39,19 +59,8 @@ const FeedbackDropdown = ({ alt = false }: FeedbackDropdownProps) => {
           screenshot={screenshot}
           setScreenshot={setScreenshot}
         />
-      }
-    >
-      <Button
-        asChild
-        onClick={onOpen}
-        type="default"
-        icon={
-          alt ? null : <IconMessageCircle size={16} strokeWidth={1.5} className="text-scale-900" />
-        }
-      >
-        <span className="hidden md:flex">Feedback</span>
-      </Button>
-    </Popover>
+      </PopoverContent_Shadcn_>
+    </Popover_Shadcn_>
   )
 }
 

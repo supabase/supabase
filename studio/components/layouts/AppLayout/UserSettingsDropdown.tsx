@@ -6,6 +6,8 @@ import {
   DropdownMenuGroup_Shadcn_,
   DropdownMenuItem_Shadcn_,
   DropdownMenuLabel_Shadcn_,
+  DropdownMenuRadioGroup_Shadcn_,
+  DropdownMenuRadioItem_Shadcn_,
   DropdownMenuSeparator_Shadcn_,
   DropdownMenuShortcut_Shadcn_,
   DropdownMenuSubContent_Shadcn_,
@@ -21,12 +23,14 @@ import {
 import { useTheme } from 'common'
 import { useSignOut } from 'lib/auth'
 import { useProfile } from 'lib/profile'
+import { useState } from 'react'
 
 const UserSettingsDropdown = () => {
   const signOut = useSignOut()
   const router = useRouter()
+  const [open, setOpen] = useState(false)
   const { profile } = useProfile()
-  const { setIsOpen } = useCommandMenu()
+  const { setIsOpen: setCommandMenuOpen } = useCommandMenu()
   const { isDarkMode, toggleTheme } = useTheme()
 
   const onClickLogout = async () => {
@@ -35,11 +39,9 @@ const UserSettingsDropdown = () => {
   }
 
   return (
-    <DropdownMenu_Shadcn_>
-      <DropdownMenuTrigger_Shadcn_>
-        <div className="flex items-center justify-center border rounded-full h-7 w-7 text-scale-1100">
-          {profile?.first_name ? profile?.first_name?.[0] : <IconUser size={14} strokeWidth={2} />}
-        </div>
+    <DropdownMenu_Shadcn_ open={open} onOpenChange={() => setOpen(!open)} modal={false}>
+      <DropdownMenuTrigger_Shadcn_ className="flex items-center justify-center border font-bold rounded-full h-7 w-7 text-scale-1100 bg-surface-100">
+        {profile?.first_name ? profile?.first_name?.[0] : <IconUser size={14} strokeWidth={2} />}
       </DropdownMenuTrigger_Shadcn_>
       <DropdownMenuContent_Shadcn_ align="end" className="w-60">
         <DropdownMenuGroup_Shadcn_>
@@ -51,38 +53,62 @@ const UserSettingsDropdown = () => {
           </div>
 
           <DropdownMenuSeparator_Shadcn_ />
-          <DropdownMenuItem_Shadcn_ onSelect={() => router.push('/account/me')}>
-            <Link passHref href="/account/me">
-              <a className="w-full">Preferences</a>
-            </Link>
-          </DropdownMenuItem_Shadcn_>
-          <DropdownMenuItem_Shadcn_ onSelect={() => router.push('/account/tokens')}>
-            <Link passHref href="/account/tokens">
-              <a className="w-full">Access tokens</a>
-            </Link>
-          </DropdownMenuItem_Shadcn_>
+          <Link passHref href="/account/me">
+            <DropdownMenuItem_Shadcn_
+              className="cursor-pointer"
+              onSelect={() => {
+                router.push('/account/me')
+              }}
+              onClick={() => setOpen(false)}
+              asChild
+            >
+              <a>Preferences</a>
+            </DropdownMenuItem_Shadcn_>
+          </Link>
+          <Link passHref href="/account/tokens">
+            <DropdownMenuItem_Shadcn_
+              className="cursor-pointer"
+              onSelect={() => {
+                router.push('/account/tokens')
+              }}
+              onClick={() => setOpen(false)}
+              asChild
+            >
+              <a>Access tokens</a>
+            </DropdownMenuItem_Shadcn_>
+          </Link>
           <DropdownMenuSeparator_Shadcn_ />
-          <DropdownMenuItem_Shadcn_ className="cursor-pointer" onClick={() => setIsOpen(true)}>
+          <DropdownMenuItem_Shadcn_
+            className="cursor-pointer"
+            onSelect={() => {
+              setOpen(false)
+              setCommandMenuOpen(true)
+            }}
+          >
             <span>Command menu</span>
             <DropdownMenuShortcut_Shadcn_>⌘K</DropdownMenuShortcut_Shadcn_>
           </DropdownMenuItem_Shadcn_>
           <DropdownMenuSeparator_Shadcn_ />
           <DropdownMenuLabel_Shadcn_>Theme</DropdownMenuLabel_Shadcn_>
-          <DropdownMenuCheckboxItem_Shadcn_
-            checked={isDarkMode}
-            onCheckedChange={() => toggleTheme(true)}
+          <DropdownMenuRadioGroup_Shadcn_
+            value={isDarkMode ? 'dark' : 'light'}
+            onValueChange={(x) => {
+              const dark = x === 'dark'
+              toggleTheme(Boolean(dark))
+            }}
           >
-            Dark
-          </DropdownMenuCheckboxItem_Shadcn_>
-          <DropdownMenuCheckboxItem_Shadcn_
-            checked={!isDarkMode}
-            onCheckedChange={() => toggleTheme(false)}
-          >
-            Light
-          </DropdownMenuCheckboxItem_Shadcn_>
+            <DropdownMenuRadioItem_Shadcn_ value={'dark'}>Dark</DropdownMenuRadioItem_Shadcn_>
+            <DropdownMenuRadioItem_Shadcn_ value={'light'}>Light</DropdownMenuRadioItem_Shadcn_>
+          </DropdownMenuRadioGroup_Shadcn_>
 
           <DropdownMenuSeparator_Shadcn_ />
-          <DropdownMenuItem_Shadcn_ className="cursor-pointer" onClick={() => onClickLogout()}>
+          <DropdownMenuItem_Shadcn_
+            className="cursor-pointer"
+            onClick={() => {
+              onClickLogout()
+              setOpen(false)
+            }}
+          >
             <span>Log out</span>
           </DropdownMenuItem_Shadcn_>
         </DropdownMenuGroup_Shadcn_>

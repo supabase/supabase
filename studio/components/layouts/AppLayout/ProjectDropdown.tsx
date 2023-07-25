@@ -131,7 +131,7 @@ const ProjectDropdown = () => {
         </a>
       </Link>
 
-      <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
+      <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
         <PopoverTrigger_Shadcn_ asChild>
           <Button
             type="text"
