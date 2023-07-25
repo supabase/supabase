@@ -10,6 +10,7 @@ import OrganizationDropdown from './OrganizationDropdown'
 import ProjectDropdown from './ProjectDropdown'
 import SettingsButton from './SettingsButton'
 import UserSettingsDropdown from './UserSettingsDropdown'
+import BranchDropdown from './BranchDropdown'
 
 const AppHeader = () => {
   const router = useRouter()
@@ -30,6 +31,7 @@ const AppHeader = () => {
         </Link>
         <OrganizationDropdown />
         {ref !== undefined && <ProjectDropdown />}
+        <BranchDropdown />
       </div>
 
       <div className="flex items-center space-x-4">

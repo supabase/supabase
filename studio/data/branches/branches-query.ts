@@ -4,12 +4,12 @@ import { branchKeys } from './keys'
 import { ResponseError } from 'types'
 
 export type BranchesVariables = {
-  projectRef: string
+  projectRef?: string
 }
 
 export async function getBranches({ projectRef }: BranchesVariables, signal?: AbortSignal) {
   const { data, error } = await get(`/v1/projects/{ref}/branches`, {
-    params: { path: { ref: projectRef } },
+    params: { path: { ref: projectRef ?? '' } },
     signal,
   })
 
@@ -20,7 +20,7 @@ export async function getBranches({ projectRef }: BranchesVariables, signal?: Ab
 export type BranchesData = Awaited<ReturnType<typeof getBranches>>
 export type BranchesError = ResponseError
 
-export const useResourcesQuery = <TData = BranchesData>(
+export const useBranchesQuery = <TData = BranchesData>(
   { projectRef }: BranchesVariables,
   { enabled = true, ...options }: UseQueryOptions<BranchesData, BranchesError, TData> = {}
 ) =>
