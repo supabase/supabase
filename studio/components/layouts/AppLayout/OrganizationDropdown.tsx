@@ -76,14 +76,7 @@ const OrganizationDropdown = () => {
                     ? `/org/${org.slug}/general`
                     : `/org/${org.slug}`
                   return (
-                    <Link
-                      passHref
-                      href={href}
-                      key={org.slug}
-                      onClick={() => {
-                        setOpen(false)
-                      }}
-                    >
+                    <Link passHref href={href} key={org.slug}>
                       <CommandItem_Shadcn_
                         asChild
                         value={org.name}
@@ -103,20 +96,21 @@ const OrganizationDropdown = () => {
                 })}
               </CommandGroup_Shadcn_>
               <CommandGroup_Shadcn_ className="border-t">
-                <CommandItem_Shadcn_
-                  className="cursor-pointer"
-                  onSelect={(e) => {
-                    setOpen(false)
-                    router.push(orgCreationV2 ? `/new-with-subscription` : `/new`)
-                  }}
-                >
-                  <Link passHref href={orgCreationV2 ? `/new-with-subscription` : `/new`}>
-                    <a className="flex items-center space-x-2 w-full">
+                <Link passHref href={orgCreationV2 ? `/new-with-subscription` : `/new`}>
+                  <CommandItem_Shadcn_
+                    className="cursor-pointer flex items-center space-x-2 w-full"
+                    onSelect={(e) => {
+                      setOpen(false)
+                      router.push(orgCreationV2 ? `/new-with-subscription` : `/new`)
+                    }}
+                    asChild
+                  >
+                    <a>
                       <IconPlus size={14} strokeWidth={1.5} />
                       <p>New organization</p>
                     </a>
-                  </Link>
-                </CommandItem_Shadcn_>
+                  </CommandItem_Shadcn_>
+                </Link>
               </CommandGroup_Shadcn_>
             </CommandList_Shadcn_>
           </Command_Shadcn_>

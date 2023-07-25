@@ -77,24 +77,24 @@ const ProjectLink = ({
   }
 
   return (
-    // <Link passHref href={href}>
-    <CommandItem_Shadcn_
-      asChild
-      key={project.ref}
-      value={project.name}
-      className="cursor-pointer w-full flex items-center justify-between"
-      onSelect={() => {
-        console.log('hello')
-        router.push(href)
-        setOpen(false)
-      }}
-    >
-      <a>
-        {project.name}
-        {project.ref === ref && <IconCheck />}
-      </a>
-    </CommandItem_Shadcn_>
-    // </Link>
+    <Link passHref href={href}>
+      <CommandItem_Shadcn_
+        asChild
+        key={project.ref}
+        value={project.name}
+        className="cursor-pointer w-full flex items-center justify-between"
+        onSelect={() => {
+          router.push(href)
+          setOpen(false)
+        }}
+        onClick={() => setOpen(false)}
+      >
+        <a>
+          {project.name}
+          {project.ref === ref && <IconCheck />}
+        </a>
+      </CommandItem_Shadcn_>
+    </Link>
   )
 }
 
@@ -163,17 +163,17 @@ const ProjectDropdown = () => {
                 <Link
                   passHref
                   href={`/new/${selectedOrganization?.slug}`}
-                  // onClick={() => {
-                  //   setOpen(false)
-                  // }}
+                  onClick={() => {
+                    setOpen(false)
+                  }}
                 >
                   <CommandItem_Shadcn_
                     asChild
                     className="cursor-pointer flex items-center space-x-2 w-full"
-                    // onSelect={() => {
-                    //   setOpen(false)
-                    //   router.push(`/new/${selectedOrganization?.slug}`)
-                    // }}
+                    onSelect={() => {
+                      setOpen(false)
+                      router.push(`/new/${selectedOrganization?.slug}`)
+                    }}
                   >
                     <a>
                       <IconPlus size={14} strokeWidth={1.5} />
