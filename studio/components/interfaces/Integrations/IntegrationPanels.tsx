@@ -35,7 +35,7 @@ const HandleIcon = ({ type, className }: { type: HandleIconType; className?: str
           viewBox="0 0 512 512"
           className={cn('w-3.5', className)}
         >
-          <path fill-rule="evenodd" d="M256,48,496,464H16Z" />
+          <path fillRule="evenodd" d="M256,48,496,464H16Z" />
         </svg>
       )
 
