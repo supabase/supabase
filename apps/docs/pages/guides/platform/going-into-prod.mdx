@@ -21,7 +21,7 @@ After developing your project and deciding it's Production Ready, you should run
   - Go to the Authentication > Policies page in the Supabase Dashboard to enable RLS and create security policies.
   - Go to the Database > Replication page in the Supabase Dashboard to manage replication tables.
 - Enable 2FA on GitHub. Since your GitHub account gives you administrative rights to your Supabase project, you should protect it with a strong password and 2FA using a U2F key or a TOTP app.
-- Ensure email confirmations are enabled in the `Auth > Settings` page.
+- Ensure email confirmations are enabled in the `Settings > Auth` page.
 - Use a custom SMTP server for auth emails so that your users can see that the mails are coming from a trusted domain (preferably the same domain that your app is hosted on). Grab SMTP credentials from any major email provider such as SendGrid, AWS SES, etc.
 - Think hard about how _you_ would abuse your service as an attacker, and mitigate.
 - Review these [common cybersecurity threats](https://auth0.com/docs/security/prevent-threats).
@@ -39,9 +39,9 @@ After developing your project and deciding it's Production Ready, you should run
 
 ## Availability
 
-- Use your own SMTP credentials so that you have full control over the deliverability of your transactional auth emails (see Auth > Settings)
+- Use your own SMTP credentials so that you have full control over the deliverability of your transactional auth emails (see Settings > Auth)
   - you can grab SMTP credentials from any major email provider such as SendGrid, AWS SES, etc. You can refer to our [SMTP guide](/docs/guides/auth/auth-smtp) for more details.
-  - The default rate limit for auth emails provided by Supabase is 30 new users per hour, if doing a major public announcement you will likely require more than this.
+  - The default rate limit for auth emails when using a custom SMTP provider is 30 new users per hour, if doing a major public announcement you will likely require more than this.
 - If your application is on the free plan and is **not** expected to be queried at least once every 7 days, then it may be paused by Supabase to save on server resources.
   - You can restore paused projects from the Supabase dashboard.
   - Upgrade to Pro to guarantee that your project will not be paused for inactivity.

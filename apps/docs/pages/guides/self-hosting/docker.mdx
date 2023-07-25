@@ -48,14 +48,10 @@ We can use your JWT Secret to generate new `anon` and `service` API keys using t
 
 ### Update API Keys
 
-Replace the values in these files:
+Replace the values the `.env` file:
 
-- `.env`:
   - `ANON_KEY` - replace with an `anon` key
   - `SERVICE_ROLE_KEY` - replace with a `service` key
-- `volumes/api/kong.yml`
-  - `anon` - replace with an `anon` key
-  - `service_role` - replace with a `service` key
 
 ### Update Secrets
 
@@ -65,6 +61,18 @@ Update the `.env` file with your own secrets. In particular, these are required:
 - `JWT_SECRET`: used by PostgREST and GoTrue, among others.
 - `SITE_URL`: the base URL of your site.
 - `SMTP_*`: mail server credentials. You can use any SMTP server.
+
+### Adding a firewall
+
+We recommend using a firewall to restrict access to your Supabase setup (something like `ufw`). One thing to highlight is that Docker usually [makes changes to your iptables](https://askubuntu.com/questions/652556/uncomplicated-firewall-ufw-is-not-blocking-anything-when-using-docker). 
+
+To disable this behavior, you can add the following to your `/etc/docker/daemon.json` file and then run `sudo service docker restart`:
+
+```json
+{
+  "iptables": false
+}
+```
 
 ## Exposing services
 

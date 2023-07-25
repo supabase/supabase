@@ -6,7 +6,6 @@ import SubscriptionTier from './Tier/SubscriptionTier'
 import { SUBSCRIPTION_PANEL_KEYS, useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { useSelectedOrganization } from 'hooks'
 import { useEffect } from 'react'
-import ProjectBackupsStore from 'stores/project/ProjectBackupsStore'
 
 export interface SubscriptionProps {}
 
@@ -51,12 +50,14 @@ const Subscription = ({}: SubscriptionProps) => {
     }
   }, [router, organization?.slug, isOrgBilling])
 
+  useEffect(() => {
+    if (panel && typeof panel === 'string' && allowedValues.includes(panel)) {
+      snap.setPanelKey(panel as SUBSCRIPTION_PANEL_KEYS)
+    }
+  }, [panel])
+
   // No need to bother rendering, we'll redirect anyway
   if (isOrgBilling) return null
-
-  if (panel && typeof panel === 'string' && allowedValues.includes(panel)) {
-    snap.setPanelKey(panel as SUBSCRIPTION_PANEL_KEYS)
-  }
 
   return (
     <>
