@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 1.77.9
+  version: 1.82.1
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -1388,45 +1388,268 @@ commands:
         default_value: ''
   - id: supabase-inspect
     title: supabase inspect
-    summary: Tools to inspect your Supabase Database
+    summary: Tools to inspect your Supabase project
     tags:
       - local-dev
     links: []
     subcommands:
-      - supabase-inspect-db:cache-hit
-      - supabase-inspect-db:index-usage
-      - supabase-inspect-db:replication-slots
+      - supabase-inspect-db
     flags: []
-  - id: supabase-inspect-db:replication-slots
-    title: supabase inspect db:replication-slots
-    summary: Shows information about replication slots on the database
+  - id: supabase-inspect-db
+    title: supabase inspect db
+    summary: Tools to inspect your Supabase database
     tags: []
     links: []
-    usage: supabase inspect db:replication-slots
+    subcommands:
+      - supabase-inspect-db-bloat
+      - supabase-inspect-db-blocking
+      - supabase-inspect-db-cache-hit
+      - supabase-inspect-db-calls
+      - supabase-inspect-db-index-sizes
+      - supabase-inspect-db-index-usage
+      - supabase-inspect-db-locks
+      - supabase-inspect-db-long-running-queries
+      - supabase-inspect-db-outliers
+      - supabase-inspect-db-replication-slots
+      - supabase-inspect-db-role-connections
+      - supabase-inspect-db-seq-scans
+      - supabase-inspect-db-table-index-sizes
+      - supabase-inspect-db-table-record-counts
+      - supabase-inspect-db-table-sizes
+      - supabase-inspect-db-total-index-size
+      - supabase-inspect-db-total-table-sizes
+      - supabase-inspect-db-unused-indexes
+      - supabase-inspect-db-vacuum-stats
+    flags: []
+  - id: supabase-inspect-db-vacuum-stats
+    title: supabase inspect db vacuum-stats
+    summary: Show statistics related to vacuum operations per table
+    tags: []
+    links: []
+    usage: supabase inspect db vacuum-stats
     subcommands: []
     flags:
       - id: db-url
         name: --db-url <string>
         description: connect using the specified database url
         default_value: ''
-  - id: supabase-inspect-db:index-usage
-    title: supabase inspect db:index-usage
-    summary: Shows information about the efficiency of indexes
+  - id: supabase-inspect-db-unused-indexes
+    title: supabase inspect db unused-indexes
+    summary: Show indexes with low usage
     tags: []
     links: []
-    usage: supabase inspect db:index-usage
+    usage: supabase inspect db unused-indexes
     subcommands: []
     flags:
       - id: db-url
         name: --db-url <string>
         description: connect using the specified database url
         default_value: ''
-  - id: supabase-inspect-db:cache-hit
-    title: supabase inspect db:cache-hit
-    summary: Shows cache hit rates for tables and indices
+  - id: supabase-inspect-db-total-table-sizes
+    title: supabase inspect db total-table-sizes
+    summary: Show total table sizes, including table index sizes
     tags: []
     links: []
-    usage: supabase inspect db:cache-hit
+    usage: supabase inspect db total-table-sizes
+    subcommands: []
+    flags:
+      - id: db-url
+        name: --db-url <string>
+        description: connect using the specified database url
+        default_value: ''
+  - id: supabase-inspect-db-total-index-size
+    title: supabase inspect db total-index-size
+    summary: Show total size of all indexes
+    tags: []
+    links: []
+    usage: supabase inspect db total-index-size
+    subcommands: []
+    flags:
+      - id: db-url
+        name: --db-url <string>
+        description: connect using the specified database url
+        default_value: ''
+  - id: supabase-inspect-db-table-sizes
+    title: supabase inspect db table-sizes
+    summary: |
+      Show table sizes of individual tables without their index sizes
+    tags: []
+    links: []
+    usage: supabase inspect db table-sizes
+    subcommands: []
+    flags:
+      - id: db-url
+        name: --db-url <string>
+        description: connect using the specified database url
+        default_value: ''
+  - id: supabase-inspect-db-table-record-counts
+    title: supabase inspect db table-record-counts
+    summary: Show estimated number of rows per table
+    tags: []
+    links: []
+    usage: supabase inspect db table-record-counts
+    subcommands: []
+    flags:
+      - id: db-url
+        name: --db-url <string>
+        description: connect using the specified database url
+        default_value: ''
+  - id: supabase-inspect-db-table-index-sizes
+    title: supabase inspect db table-index-sizes
+    summary: Show index sizes of individual tables
+    tags: []
+    links: []
+    usage: supabase inspect db table-index-sizes
+    subcommands: []
+    flags:
+      - id: db-url
+        name: --db-url <string>
+        description: connect using the specified database url
+        default_value: ''
+  - id: supabase-inspect-db-seq-scans
+    title: supabase inspect db seq-scans
+    summary: Show number of sequential scans recorded against all tables
+    tags: []
+    links: []
+    usage: supabase inspect db seq-scans
+    subcommands: []
+    flags:
+      - id: db-url
+        name: --db-url <string>
+        description: connect using the specified database url
+        default_value: ''
+  - id: supabase-inspect-db-role-connections
+    title: supabase inspect db role-connections
+    summary: Show number of active connections for all database roles
+    tags: []
+    links: []
+    usage: supabase inspect db role-connections
+    subcommands: []
+    flags:
+      - id: db-url
+        name: --db-url <string>
+        description: connect using the specified database url
+        default_value: ''
+  - id: supabase-inspect-db-replication-slots
+    title: supabase inspect db replication-slots
+    summary: Show information about replication slots on the database
+    tags: []
+    links: []
+    usage: supabase inspect db replication-slots
+    subcommands: []
+    flags:
+      - id: db-url
+        name: --db-url <string>
+        description: connect using the specified database url
+        default_value: ''
+  - id: supabase-inspect-db-outliers
+    title: supabase inspect db outliers
+    summary: |
+      Show queries from pg_stat_statements ordered by total execution time
+    tags: []
+    links: []
+    usage: supabase inspect db outliers
+    subcommands: []
+    flags:
+      - id: db-url
+        name: --db-url <string>
+        description: connect using the specified database url
+        default_value: ''
+  - id: supabase-inspect-db-long-running-queries
+    title: supabase inspect db long-running-queries
+    summary: |
+      Show currently running queries running for longer than 5 minutes
+    tags: []
+    links: []
+    usage: supabase inspect db long-running-queries
+    subcommands: []
+    flags:
+      - id: db-url
+        name: --db-url <string>
+        description: connect using the specified database url
+        default_value: ''
+  - id: supabase-inspect-db-locks
+    title: supabase inspect db locks
+    summary: |
+      Show queries which have taken out an exclusive lock on a relation
+    tags: []
+    links: []
+    usage: supabase inspect db locks
+    subcommands: []
+    flags:
+      - id: db-url
+        name: --db-url <string>
+        description: connect using the specified database url
+        default_value: ''
+  - id: supabase-inspect-db-index-usage
+    title: supabase inspect db index-usage
+    summary: Show information about the efficiency of indexes
+    tags: []
+    links: []
+    usage: supabase inspect db index-usage
+    subcommands: []
+    flags:
+      - id: db-url
+        name: --db-url <string>
+        description: connect using the specified database url
+        default_value: ''
+  - id: supabase-inspect-db-index-sizes
+    title: supabase inspect db index-sizes
+    summary: Show index sizes of individual indexes
+    tags: []
+    links: []
+    usage: supabase inspect db index-sizes
+    subcommands: []
+    flags:
+      - id: db-url
+        name: --db-url <string>
+        description: connect using the specified database url
+        default_value: ''
+  - id: supabase-inspect-db-calls
+    title: supabase inspect db calls
+    summary: |
+      Show queries from pg_stat_statements ordered by total times called
+    tags: []
+    links: []
+    usage: supabase inspect db calls
+    subcommands: []
+    flags:
+      - id: db-url
+        name: --db-url <string>
+        description: connect using the specified database url
+        default_value: ''
+  - id: supabase-inspect-db-cache-hit
+    title: supabase inspect db cache-hit
+    summary: Show cache hit rates for tables and indices
+    tags: []
+    links: []
+    usage: supabase inspect db cache-hit
+    subcommands: []
+    flags:
+      - id: db-url
+        name: --db-url <string>
+        description: connect using the specified database url
+        default_value: ''
+  - id: supabase-inspect-db-blocking
+    title: supabase inspect db blocking
+    summary: |
+      Show queries that are holding locks and the queries that are waiting for them to be released
+    tags: []
+    links: []
+    usage: supabase inspect db blocking
+    subcommands: []
+    flags:
+      - id: db-url
+        name: --db-url <string>
+        description: connect using the specified database url
+        default_value: ''
+  - id: supabase-inspect-db-bloat
+    title: supabase inspect db bloat
+    summary: |
+      Estimates space allocated to a relation that is full of dead tuples
+    tags: []
+    links: []
+    usage: supabase inspect db bloat
     subcommands: []
     flags:
       - id: db-url
@@ -1908,6 +2131,14 @@ commands:
         description: |
           Print the migrations that would be applied, but don't actually apply them.
         default_value: 'false'
+      - id: include-roles
+        name: --include-roles
+        description: Include custom roles from supabase/roles.sql.
+        default_value: 'false'
+      - id: include-seed
+        name: --include-seed
+        description: Include seed data from supabase/seed.sql.
+        default_value: 'false'
       - id: password
         name: -p, --password <string>
         description: Password to your remote Postgres database.
@@ -2021,6 +2252,10 @@ commands:
         name: --data-only
         description: Dumps only data records.
         default_value: 'false'
+      - id: dry-run
+        name: --dry-run
+        description: Print the pg_dump script that would be executed.
+        default_value: 'false'
       - id: file
         name: -f, --file <string>
         description: File path to save the dumped contents.
@@ -2037,6 +2272,10 @@ commands:
         name: --role-only
         description: Dumps only cluster roles.
         default_value: 'false'
+      - id: schema
+        name: -s, --schema <strings>
+        description: List of schema to include.
+        default_value: all
       - id: use-copy
         name: --use-copy
         description: Uses copy statements in place of inserts.
@@ -2257,4 +2496,211 @@ commands:
       - id: no-descriptions
         name: --no-descriptions
         description: disable completion descriptions
+        default_value: 'false'
+  - id: supabase-branches
+    title: supabase branches
+    summary: Manage Supabase preview branches
+    tags:
+      - management-api
+    links: []
+    subcommands:
+      - supabase-branches-create
+      - supabase-branches-delete
+      - supabase-branches-disable
+      - supabase-branches-get
+      - supabase-branches-list
+      - supabase-branches-update
+    flags: []
+  - id: supabase-branches-update
+    title: supabase branches update
+    summary: Update a preview branch
+    description: Update a preview branch by its ID.
+    tags: []
+    links: []
+    usage: supabase branches update <branch-id> [flags]
+    subcommands: []
+    flags:
+      - id: git-branch
+        name: --git-branch <string>
+        description: Change the associated git branch.
+        default_value: ''
+      - id: name
+        name: --name <string>
+        description: Rename the preview branch.
+        default_value: ''
+      - id: experimental
+        name: --experimental
+        description: enable experimental features
+        required: true
+        default_value: 'false'
+  - id: supabase-branches-list
+    title: supabase branches list
+    summary: List all preview branches
+    description: List all preview branches of the linked project.
+    tags: []
+    links: []
+    usage: supabase branches list
+    subcommands: []
+    flags:
+      - id: experimental
+        name: --experimental
+        description: enable experimental features
+        required: true
+        default_value: 'false'
+  - id: supabase-branches-get
+    title: supabase branches get
+    summary: Retrieve details of a preview branch
+    description: Retrieve details of the specified preview branch.
+    tags: []
+    links: []
+    usage: supabase branches get <branch-id>
+    subcommands: []
+    flags:
+      - id: experimental
+        name: --experimental
+        description: enable experimental features
+        required: true
+        default_value: 'false'
+  - id: supabase-branches-disable
+    title: supabase branches disable
+    summary: Disable preview branching
+    description: Disable preview branching for the linked project.
+    tags: []
+    links: []
+    usage: supabase branches disable
+    subcommands: []
+    flags:
+      - id: experimental
+        name: --experimental
+        description: enable experimental features
+        required: true
+        default_value: 'false'
+  - id: supabase-branches-delete
+    title: supabase branches delete
+    summary: Delete a preview branch
+    description: Delete a preview branch by its ID.
+    tags: []
+    links: []
+    usage: supabase branches delete <branch-id>
+    subcommands: []
+    flags:
+      - id: experimental
+        name: --experimental
+        description: enable experimental features
+        required: true
+        default_value: 'false'
+  - id: supabase-branches-create
+    title: supabase branches create
+    summary: Create a preview branch
+    description: Create a preview branch for the linked project.
+    tags: []
+    links: []
+    usage: supabase branches create <name> [flags]
+    subcommands: []
+    flags:
+      - id: region
+        name: --region <string>
+        description: Select a region to deploy the branch database.
+        default_value: ''
+        accepted_values:
+          - id: ams
+            name: ams
+            type: string
+          - id: arn
+            name: arn
+            type: string
+          - id: bog
+            name: bog
+            type: string
+          - id: bos
+            name: bos
+            type: string
+          - id: cdg
+            name: cdg
+            type: string
+          - id: den
+            name: den
+            type: string
+          - id: dfw
+            name: dfw
+            type: string
+          - id: ewr
+            name: ewr
+            type: string
+          - id: fra
+            name: fra
+            type: string
+          - id: gdl
+            name: gdl
+            type: string
+          - id: gig
+            name: gig
+            type: string
+          - id: gru
+            name: gru
+            type: string
+          - id: hkg
+            name: hkg
+            type: string
+          - id: iad
+            name: iad
+            type: string
+          - id: jnb
+            name: jnb
+            type: string
+          - id: lax
+            name: lax
+            type: string
+          - id: lhr
+            name: lhr
+            type: string
+          - id: maa
+            name: maa
+            type: string
+          - id: mad
+            name: mad
+            type: string
+          - id: mia
+            name: mia
+            type: string
+          - id: nrt
+            name: nrt
+            type: string
+          - id: ord
+            name: ord
+            type: string
+          - id: otp
+            name: otp
+            type: string
+          - id: qro
+            name: qro
+            type: string
+          - id: scl
+            name: scl
+            type: string
+          - id: sea
+            name: sea
+            type: string
+          - id: sin
+            name: sin
+            type: string
+          - id: sjc
+            name: sjc
+            type: string
+          - id: syd
+            name: syd
+            type: string
+          - id: waw
+            name: waw
+            type: string
+          - id: yul
+            name: yul
+            type: string
+          - id: yyz
+            name: yyz
+            type: string
+      - id: experimental
+        name: --experimental
+        description: enable experimental features
+        required: true
         default_value: 'false'
