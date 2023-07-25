@@ -73,3 +73,15 @@ max_parallel_workers    |3        |
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
 export default Page
+
+## Pooler Config
+
+You can also [customize some parameters](https://app.supabase.com/project/_/settings/database) for the Connection Pooler:
+
+1. [Pooling Mode](https://devcenter.heroku.com/articles/best-practices-pgbouncer-configuration#pgbouncer-s-connection-pooling-modes)
+1. [Default Pool Size](https://www.pgbouncer.org/config.html)
+1. [Max Client Connections](https://www.pgbouncer.org/config.html)
+
+The default pool size, and the maximum number of clients allowed to connect concurrently is automatically optimized based on the compute add-on being used. At the moment, the Dashboard only reflects any custom configuration being used, and does not include the default optimized numbers used for your project.
+
+Custom Pooler Config may also require manual updates to any relevant overrides when changing compute add-ons.
