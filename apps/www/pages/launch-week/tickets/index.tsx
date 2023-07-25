@@ -6,6 +6,7 @@ import { Button } from 'ui'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { createClient } from '@supabase/supabase-js'
+import { debounce } from 'lodash'
 
 import { SITE_ORIGIN, SITE_URL } from '~/lib/constants'
 import { useTheme } from 'common/Providers'
@@ -80,6 +81,16 @@ export default function TicketsPage({ users }: Props) {
       setHasLoaded((prev) => !prev && isInView)
     }
   }
+
+  useEffect(() => {
+    const handleDebouncedScroll = debounce(() => !isLast && handleScroll(), 200)
+
+    window.addEventListener('scroll', handleDebouncedScroll)
+
+    return () => {
+      window.removeEventListener('scroll', handleDebouncedScroll)
+    }
+  }, [])
 
   useEffect(() => {
     toggleTheme(true)
