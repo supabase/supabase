@@ -9,8 +9,15 @@ import {
 } from 'components/interfaces/SQLEditor/SQLEditor.constants'
 import { useSqlGenerateMutation } from 'data/ai/sql-generate-mutation'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
+import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
 import { m } from 'framer-motion'
-import { useCheckPermissions, useStore } from 'hooks'
+import {
+  useCheckPermissions,
+  useLocalStorage,
+  useSelectedOrganization,
+  useSelectedProject,
+  useStore,
+} from 'hooks'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import Telemetry from 'lib/telemetry'
@@ -31,6 +38,23 @@ const SQLTemplates = observer(() => {
   const [sql, quickStart] = partition(SQL_TEMPLATES, { type: 'template' })
   const { mutateAsync: generateSql, isLoading: isSqlGenerateLoading } = useSqlGenerateMutation()
   const [isAISettingsOpen, setIsAISettingsOpen] = useState(false)
+  const selectedOrganization = useSelectedOrganization()
+  const selectedProject = useSelectedProject()
+  const isOptedInToAI =
+    selectedOrganization?.opt_in_tags?.includes('AI_SQL_GENERATOR_OPT_IN') ?? false
+  const [isOptedInToAISchema] = useLocalStorage('supabase_sql-editor-ai-schema', false)
+
+  const includeSchemaMetadata = isOptedInToAI && isOptedInToAISchema
+
+  const { data } = useEntityDefinitionsQuery(
+    {
+      projectRef: selectedProject?.ref,
+      connectionString: selectedProject?.connectionString,
+    },
+    { enabled: includeSchemaMetadata }
+  )
+
+  const entityDefinitions = includeSchemaMetadata ? data?.map((def) => def.sql.trim()) : undefined
 
   const telemetryProps = useTelemetryProps()
   const snap = useSqlEditorStateSnapshot()
@@ -142,7 +166,10 @@ const SQLTemplates = observer(() => {
                           return
                         }
 
-                        const { title, sql } = await generateSql({ prompt: e.currentTarget.value })
+                        const { title, sql } = await generateSql({
+                          prompt: e.currentTarget.value,
+                          entityDefinitions,
+                        })
 
                         const formattedSql =
                           sqlAiDisclaimerComment +

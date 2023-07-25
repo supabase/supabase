@@ -1,6 +1,5 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import { isResponseOk, post } from 'lib/common/fetch'
-import { aiKeys } from './keys'
 
 export type SqlDebugResponse = {
   solution: string
@@ -10,10 +9,15 @@ export type SqlDebugResponse = {
 export type SqlDebugVariables = {
   errorMessage: string
   sql: string
+  entityDefinitions?: string[]
 }
 
-export async function debugSql({ errorMessage, sql }: SqlDebugVariables) {
-  const response = await post<SqlDebugResponse>('/api/ai/sql/debug', { errorMessage, sql })
+export async function debugSql({ errorMessage, sql, entityDefinitions }: SqlDebugVariables) {
+  const response = await post<SqlDebugResponse>('/api/ai/sql/debug', {
+    errorMessage,
+    sql,
+    entityDefinitions,
+  })
 
   if (!isResponseOk(response)) {
     throw response.error
@@ -28,12 +32,8 @@ export const useSqlDebugMutation = ({
   onSuccess,
   ...options
 }: Omit<UseMutationOptions<SqlDebugData, unknown, SqlDebugVariables>, 'mutationFn'> = {}) => {
-  const queryClient = useQueryClient()
-
   return useMutation<SqlDebugData, unknown, SqlDebugVariables>((vars) => debugSql(vars), {
     async onSuccess(data, variables, context) {
-      await queryClient.invalidateQueries(aiKeys.sql())
-
       await onSuccess?.(data, variables, context)
     },
     ...options,
