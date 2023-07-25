@@ -105,6 +105,8 @@ const ProjectDropdown = () => {
   const projectNameRef = useRef<HTMLAnchorElement>(null)
   const { data: allProjects, isLoading: isLoadingProjects } = useProjectsQuery()
 
+  console.log({ selectedProject })
+
   const isOrgBilling = !!selectedOrganization?.subscription_id
   const { data: subscription, isSuccess } = useProjectSubscriptionV2Query(
     { projectRef: selectedProject?.ref },

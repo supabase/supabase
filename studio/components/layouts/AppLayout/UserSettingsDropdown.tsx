@@ -1,7 +1,6 @@
-import Link from 'next/link'
+import Link from 'components/ui/ProjectLink'
 import { useRouter } from 'next/router'
 import {
-  DropdownMenuCheckboxItem_Shadcn_,
   DropdownMenuContent_Shadcn_,
   DropdownMenuGroup_Shadcn_,
   DropdownMenuItem_Shadcn_,
@@ -10,12 +9,8 @@ import {
   DropdownMenuRadioItem_Shadcn_,
   DropdownMenuSeparator_Shadcn_,
   DropdownMenuShortcut_Shadcn_,
-  DropdownMenuSubContent_Shadcn_,
-  DropdownMenuSubTrigger_Shadcn_,
-  DropdownMenuSub_Shadcn_,
   DropdownMenuTrigger_Shadcn_,
   DropdownMenu_Shadcn_,
-  IconCheck,
   IconUser,
   useCommandMenu,
 } from 'ui'

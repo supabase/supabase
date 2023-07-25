@@ -2,10 +2,13 @@ import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { get } from 'data/fetchers'
 import { branchKeys } from './keys'
 import { ResponseError } from 'types'
+import { components } from 'data/api'
 
 export type BranchesVariables = {
   projectRef?: string
 }
+
+export type Branch = components['schemas']['BranchResponse']
 
 export async function getBranches({ projectRef }: BranchesVariables, signal?: AbortSignal) {
   const { data, error } = await get(`/v1/projects/{ref}/branches`, {
@@ -13,7 +16,13 @@ export async function getBranches({ projectRef }: BranchesVariables, signal?: Ab
     signal,
   })
 
-  if (error) throw error
+  if (error) {
+    if ((error as ResponseError).message === 'Preview branching is not enabled for this project.') {
+      return []
+    } else {
+      throw error
+    }
+  }
   return data
 }
 
