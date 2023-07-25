@@ -3127,6 +3127,7 @@ export interface components {
       id: string;
       name: string;
       project_ref: string;
+      parent_project_ref: string;
       is_default: boolean;
       git_branch: string;
       created_at: string;
