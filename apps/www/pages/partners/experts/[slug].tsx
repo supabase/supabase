@@ -32,7 +32,7 @@ function Partner({
           url: `https://supabase.com/partners/experts/${partner.slug}`,
           images: [
             {
-              url: partner.images[0] ?? partner.logo,
+              url: partner.images ? partner.images[0] : partner.logo,
             },
           ],
         }}
@@ -92,7 +92,7 @@ function Partner({
                   },
                 }}
               >
-                {partner.images.map((image: any, i: number) => {
+                {partner.images?.map((image: any, i: number) => {
                   return (
                     <SwiperSlide key={i}>
                       <div className="relative ml-3 mr-3 block cursor-move overflow-hidden rounded-md">
@@ -178,7 +178,7 @@ function Partner({
                     </a>
                   </div>
 
-                  {partner.type === 'technology' && (
+                  {partner.type === 'technology' && partner.docs && (
                     <div className="flex items-center justify-between py-2">
                       <span className="text-scale-900">Documentation</span>
                       <a

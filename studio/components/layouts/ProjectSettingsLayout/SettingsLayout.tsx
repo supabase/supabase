@@ -6,6 +6,7 @@ import { generateSettingsMenu } from './SettingsMenu.utils'
 
 import ProductMenu from 'components/ui/ProductMenu'
 import ProjectLayout from '..'
+import { useParams } from 'common'
 
 interface SettingsLayoutProps {
   title?: string
@@ -13,6 +14,7 @@ interface SettingsLayoutProps {
 
 const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutProps>) => {
   const router = useRouter()
+  const { ref } = useParams()
   const { ui, meta } = useStore()
   const project = useSelectedProject()
   const organization = useSelectedOrganization()
@@ -25,12 +27,7 @@ const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutPro
     : router.pathname.split('/')[4]
 
   const isVaultEnabled = useFlag('vaultExtension')
-  const menuRoutes = generateSettingsMenu(
-    project?.ref as string,
-    project,
-    isVaultEnabled,
-    isOrgBilling
-  )
+  const menuRoutes = generateSettingsMenu(ref, project, isVaultEnabled, isOrgBilling)
 
   useEffect(() => {
     if (ui.selectedProjectRef) {
