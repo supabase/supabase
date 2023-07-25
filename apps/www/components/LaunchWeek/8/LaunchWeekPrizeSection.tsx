@@ -55,7 +55,7 @@ export default function LaunchWeekPrizeSection({
               imgObjectPosition="center"
               content={
                 <h3 className="w-full text-sm md:text-center flex md:justify-center items-center gap-4">
-                  Supabase Desk Mat <LabelBadge text="10 pieces" />
+                  Supabase Desk Mat <LabelBadge text="10 mats" />
                 </h3>
               }
               animateFrom="down"
@@ -66,7 +66,7 @@ export default function LaunchWeekPrizeSection({
               imgObjectPosition="right"
               content={
                 <h3 className="text-sm flex items-center gap-4">
-                  Supabase T-Shirt <LabelBadge text="20 pieces" />
+                  Supabase T-Shirt <LabelBadge text="20 t-shirts" />
                 </h3>
               }
               animateFrom="down"
