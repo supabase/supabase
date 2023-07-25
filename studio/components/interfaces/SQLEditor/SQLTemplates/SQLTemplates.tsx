@@ -10,25 +10,16 @@ import {
 import { useSqlGenerateMutation } from 'data/ai/sql-generate-mutation'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
 import { m } from 'framer-motion'
-import { useCheckPermissions, useLocalStorage, useSelectedOrganization, useStore } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import Telemetry from 'lib/telemetry'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { format } from 'sql-formatter'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
-import {
-  AiIcon,
-  Alert,
-  IconCornerDownLeft,
-  IconExternalLink,
-  IconSettings,
-  Input,
-  Modal,
-  Toggle,
-} from 'ui'
+import { AiIcon, IconCornerDownLeft, IconSettings, Input } from 'ui'
+import AISettingsModal from '../AISettingsModal'
 import { createSqlSnippetSkeleton } from '../SQLEditor.utils'
 import SQLCard from './SQLCard'
 
@@ -39,16 +30,7 @@ const SQLTemplates = observer(() => {
   const { profile } = useProfile()
   const [sql, quickStart] = partition(SQL_TEMPLATES, { type: 'template' })
   const { mutateAsync: generateSql, isLoading: isSqlGenerateLoading } = useSqlGenerateMutation()
-  const selectedOrganization = useSelectedOrganization()
-  const isOptedInToAI =
-    selectedOrganization?.opt_in_tags?.includes('AI_SQL_GENERATOR_OPT_IN') ?? false
-  const [isOptedInToAISchema, setIsOptedInToAISchema] = useLocalStorage(
-    'supabase_sql-editor-ai-schema',
-    false
-  )
   const [isAISettingsOpen, setIsAISettingsOpen] = useState(false)
-
-  const includeSchemaMetadata = isOptedInToAI && isOptedInToAISchema
 
   const telemetryProps = useTelemetryProps()
   const snap = useSqlEditorStateSnapshot()
@@ -83,43 +65,7 @@ const SQLTemplates = observer(() => {
 
   return (
     <>
-      <Modal
-        visible={isAISettingsOpen}
-        hideFooter
-        closable
-        header="SQL Editor AI Settings"
-        onCancel={() => setIsAISettingsOpen(false)}
-      >
-        <div className="flex flex-col items-start justify-between gap-4 px-6 py-3">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm">Include database metadata in AI requests</p>
-              <p className="text-sm text-scale-1000">
-                Includes table names, column names and their corresponding data types in the
-                request. This will generate snippets that are more relevant to your project.
-              </p>
-            </div>
-            <Toggle
-              disabled={!isOptedInToAI}
-              checked={includeSchemaMetadata}
-              onChange={() => setIsOptedInToAISchema((prev) => !prev)}
-            />
-          </div>
-          {!isOptedInToAI && selectedOrganization && (
-            <Alert
-              variant="warning"
-              title="This option requires the OpenAI data opt-in on your organization"
-            >
-              <Link href={`/org/${selectedOrganization.slug}/general`} passHref>
-                <a className="flex flex-row gap-1 items-center" target="_blank" rel="noopener">
-                  Go to your organization's settings to opt-in.
-                  <IconExternalLink className="inline-block w-3 h-3" />
-                </a>
-              </Link>
-            </Alert>
-          )}
-        </div>
-      </Modal>
+      <AISettingsModal visible={isAISettingsOpen} onCancel={() => setIsAISettingsOpen(false)} />
       <div className="block h-full space-y-8 overflow-y-auto p-6">
         <div className="mt-32 mb-32 flex flex-col items-center">
           <m.h1
