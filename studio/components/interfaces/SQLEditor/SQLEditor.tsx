@@ -32,6 +32,7 @@ import AISettingsModal from './AISettingsModal'
 import type { IStandaloneCodeEditor } from './MonacoEditor'
 import { sqlAiDisclaimerComment, untitledSnippetTitle } from './SQLEditor.constants'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
+import { IS_PLATFORM } from 'lib/constants'
 
 // Load the monaco editor client-side only (does not behave well server-side)
 const MonacoEditor = dynamic(() => import('./MonacoEditor'), { ssr: false })
@@ -84,7 +85,7 @@ const SQLEditor = () => {
     selectedOrganization?.opt_in_tags?.includes('AI_SQL_GENERATOR_OPT_IN') ?? false
   const [isOptedInToAISchema] = useLocalStorageQuery('supabase_sql-editor-ai-schema', false)
 
-  const includeSchemaMetadata = isOptedInToAI && isOptedInToAISchema
+  const includeSchemaMetadata = (isOptedInToAI || !IS_PLATFORM) && isOptedInToAISchema
 
   const { data } = useEntityDefinitionsQuery(
     {

@@ -18,6 +18,7 @@ import {
   useSelectedProject,
   useStore,
 } from 'hooks'
+import { IS_PLATFORM } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import Telemetry from 'lib/telemetry'
@@ -44,7 +45,7 @@ const SQLTemplates = observer(() => {
     selectedOrganization?.opt_in_tags?.includes('AI_SQL_GENERATOR_OPT_IN') ?? false
   const [isOptedInToAISchema] = useLocalStorageQuery('supabase_sql-editor-ai-schema', false)
 
-  const includeSchemaMetadata = isOptedInToAI && isOptedInToAISchema
+  const includeSchemaMetadata = (isOptedInToAI || !IS_PLATFORM) && isOptedInToAISchema
 
   const { data } = useEntityDefinitionsQuery(
     {
