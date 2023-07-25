@@ -105,6 +105,7 @@ interface ConfigProps {
     ignore_startup_parameters: 'string'
     pool_mode: string
     pgbouncer_enabled: boolean
+    max_client_conn: number
   }
   connectionInfo: {
     db_host: string
@@ -128,6 +129,7 @@ export const PgbouncerConfig: FC<ConfigProps> = ({ projectRef, bouncerInfo, conn
     default_pool_size: bouncerInfo.default_pool_size || undefined,
     ignore_startup_parameters: bouncerInfo.ignore_startup_parameters || '',
     pgbouncer_enabled: bouncerInfo.pgbouncer_enabled,
+    max_client_conn: bouncerInfo.max_client_conn || undefined,
   })
 
   const updateConfig = async (updatedConfig: any) => {
@@ -174,6 +176,16 @@ export const PgbouncerConfig: FC<ConfigProps> = ({ projectRef, bouncerInfo, conn
         type: 'string',
         help: 'Defaults are either blank or "extra_float_digits"',
       },
+      max_client_conn: {
+        title: 'Max Client Connections',
+        type: 'integer',
+        help: 'The maximum number of concurrent client connections allowed. Overrides default optimizations; refer to https://supabase.com/docs/guides/platform/custom-postgres-config#pooler-config',
+      },
+      default_pool_size: {
+        title: 'Default Pool Size',
+        type: 'integer',
+        help: 'The maximum number of connections made to the underlying Postgres cluster, per user+db combination. Overrides default optimizations; refer to https://supabase.com/docs/guides/platform/custom-postgres-config#pooler-config',
+      }
     },
     required: ['pool_mode'],
     type: 'object',
@@ -182,7 +194,7 @@ export const PgbouncerConfig: FC<ConfigProps> = ({ projectRef, bouncerInfo, conn
   return (
     <div>
       <SchemaFormPanel
-        title="Connection Pooling"
+        title="Connection Pooling Custom Configuration"
         schema={formSchema}
         model={updates}
         submitLabel="Save"
@@ -219,6 +231,10 @@ export const PgbouncerConfig: FC<ConfigProps> = ({ projectRef, bouncerInfo, conn
               </div>
               <Divider light />
               <AutoField name="ignore_startup_parameters" />
+              <Divider light />
+              <AutoField name="max_client_conn" />
+              <Divider light />
+              <AutoField name="default_pool_size" />
             </>
           )}
           <Divider light />
