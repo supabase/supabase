@@ -32,8 +32,6 @@ export default function TicketContainer({ user, sharePage, referrals, supabase }
     useState<TicketGenerationState>('default')
   const winningChances = useWinningChances()
 
-  console.log(supabase)
-
   if (!user.username)
     return (
       <div className="w-full flex items-center justify-center min-h-[400px]">
