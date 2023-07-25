@@ -4,7 +4,7 @@ import { useSqlEditMutation } from 'data/ai/sql-edit-mutation'
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
-import { AnimatePresence, m } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import {
   useLocalStorage,
   useLocalStorageQuery,
@@ -243,7 +243,7 @@ const SQLEditor = () => {
     >
       <AISettingsModal visible={isAISettingsOpen} onCancel={() => setIsAISettingsOpen(false)} />
       <div className="flex h-full flex-col">
-        <m.div
+        <motion.div
           key="ask-ai-input-container"
           layoutId="ask-ai-input-container"
           variants={{
@@ -257,7 +257,7 @@ const SQLEditor = () => {
         >
           <AnimatePresence initial={false} exitBeforeEnter>
             {!isEditSqlLoading ? (
-              <m.div
+              <motion.div
                 key="ask-ai-input"
                 className="w-full"
                 variants={{
@@ -286,9 +286,9 @@ const SQLEditor = () => {
                   inputRef={inputRef}
                   icon={
                     <div className="h-full flex flex-row gap-3 items-center">
-                      <m.div layoutId="ask-ai-input-icon" className="ml-1">
+                      <motion.div layoutId="ask-ai-input-icon" className="ml-1">
                         <AiIcon className="w-4 h-4" />
-                      </m.div>
+                      </motion.div>
 
                       {debugSolution && (
                         <div className="h-full w-full flex flex-row items-center overflow-y-hidden mr-[16.5rem] text-sm text-white">
@@ -393,9 +393,9 @@ const SQLEditor = () => {
                     }
                   }}
                 />
-              </m.div>
+              </motion.div>
             ) : (
-              <m.div
+              <motion.div
                 key="ask-ai-loading"
                 className="p-4 flex flex-row gap-2 items-center w-full"
                 variants={{
@@ -415,7 +415,7 @@ const SQLEditor = () => {
                 animate="visible"
                 exit="hidden"
               >
-                <m.div
+                <motion.div
                   className="text-brand-900"
                   animate={{
                     scale: [0.9, 1.1, 0.9],
@@ -427,8 +427,8 @@ const SQLEditor = () => {
                   }}
                 >
                   <AiIcon className="w-4 h-4" />
-                </m.div>
-                <m.span
+                </motion.div>
+                <motion.span
                   animate={{
                     opacity: ['0.5', '0.75', '0.5'],
                     transition: {
@@ -439,11 +439,11 @@ const SQLEditor = () => {
                   }}
                 >
                   Thinking...
-                </m.span>
-              </m.div>
+                </motion.span>
+              </motion.div>
             )}
           </AnimatePresence>
-        </m.div>
+        </motion.div>
         <Split
           style={{ height: '100%' }}
           direction="vertical"
@@ -463,7 +463,7 @@ const SQLEditor = () => {
             ) : (
               <>
                 {isDiffOpen && (
-                  <m.div
+                  <motion.div
                     className="w-full h-full"
                     variants={{
                       visible: {
@@ -487,9 +487,9 @@ const SQLEditor = () => {
                         fontSize: 13,
                       }}
                     />
-                  </m.div>
+                  </motion.div>
                 )}
-                <m.div
+                <motion.div
                   key={id}
                   variants={{
                     visible: {
@@ -512,7 +512,7 @@ const SQLEditor = () => {
                     autoFocus={false}
                     executeQuery={executeQuery}
                   />
-                </m.div>
+                </motion.div>
               </>
             )}
           </div>

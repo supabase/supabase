@@ -10,7 +10,7 @@ import {
 import { useSqlGenerateMutation } from 'data/ai/sql-generate-mutation'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
-import { m } from 'framer-motion'
+import { motion } from 'framer-motion'
 import {
   useCheckPermissions,
   useLocalStorageQuery,
@@ -92,7 +92,7 @@ const SQLTemplates = observer(() => {
       <AISettingsModal visible={isAISettingsOpen} onCancel={() => setIsAISettingsOpen(false)} />
       <div className="block h-full space-y-8 overflow-y-auto p-6">
         <div className="mt-32 mb-32 flex flex-col items-center">
-          <m.h1
+          <motion.h1
             className="text-scale-1200 mb-8 text-3xl"
             variants={{
               visible: {
@@ -108,10 +108,10 @@ const SQLTemplates = observer(() => {
             animate="visible"
           >
             What do you want to build?
-          </m.h1>
+          </motion.h1>
           <div className="w-full flex justify-center">
             {!isSqlGenerateLoading ? (
-              <m.div
+              <motion.div
                 key="ask-ai-input-container"
                 layoutId="ask-ai-input-container"
                 className="w-full max-w-2xl border border-brand-900"
@@ -138,7 +138,7 @@ const SQLTemplates = observer(() => {
                     }, 200)
                   }}
                   icon={
-                    <m.div
+                    <motion.div
                       key="ask-ai-input-icon"
                       layoutId="ask-ai-input-icon"
                       className="ml-1"
@@ -151,7 +151,7 @@ const SQLTemplates = observer(() => {
                       animate="visible"
                     >
                       <AiIcon className="w-4 h-4" />
-                    </m.div>
+                    </motion.div>
                   }
                   inputClassName="w-full border-none py-4 focus:!ring-0 pr-20"
                   iconContainerClassName="transition text-scale-800 text-brand-900"
@@ -205,9 +205,9 @@ const SQLTemplates = observer(() => {
                     </div>
                   }
                 />
-              </m.div>
+              </motion.div>
             ) : (
-              <m.div
+              <motion.div
                 key="ask-ai-loading"
                 layoutId="ask-ai-input-container"
                 className="p-5 border border-brand-900 text-brand-900"
@@ -225,7 +225,7 @@ const SQLTemplates = observer(() => {
                 initial="visible"
                 animate="visible"
               >
-                <m.div
+                <motion.div
                   key="ask-ai-loading-icon"
                   layoutId="ask-ai-input-icon"
                   animate={{
@@ -239,8 +239,8 @@ const SQLTemplates = observer(() => {
                   }}
                 >
                   <AiIcon className="w-4 h-4" />
-                </m.div>
-              </m.div>
+                </motion.div>
+              </motion.div>
             )}
           </div>
         </div>
