@@ -1,5 +1,6 @@
 import { ModalProps } from '@ui/components/Modal/Modal'
 import { useLocalStorageQuery, useSelectedOrganization } from 'hooks'
+import { IS_PLATFORM } from 'lib/constants'
 import Link from 'next/link'
 import { Alert, IconExternalLink, Modal, Toggle } from 'ui'
 
@@ -16,7 +17,7 @@ const AISettingsModal = (props: ModalProps) => {
     false
   )
 
-  const includeSchemaMetadata = isOptedInToAI && isOptedInToAISchema
+  const includeSchemaMetadata = (isOptedInToAI || !IS_PLATFORM) && isOptedInToAISchema
 
   return (
     <Modal header="SQL Editor AI Settings" hideFooter closable {...props}>
@@ -30,12 +31,12 @@ const AISettingsModal = (props: ModalProps) => {
             </p>
           </div>
           <Toggle
-            disabled={!isOptedInToAI}
+            disabled={IS_PLATFORM && !isOptedInToAI}
             checked={includeSchemaMetadata}
             onChange={() => setIsOptedInToAISchema((prev) => !prev)}
           />
         </div>
-        {!isOptedInToAI && selectedOrganization && (
+        {IS_PLATFORM && !isOptedInToAI && selectedOrganization && (
           <Alert
             variant="warning"
             title="This option requires the OpenAI data opt-in on your organization"
