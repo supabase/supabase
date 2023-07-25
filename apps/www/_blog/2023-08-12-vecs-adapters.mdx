@@ -1,0 +1,89 @@
+---
+title: 'Vecs Adapters'
+description: 'supabase/vecs adapters: query vectors with text'
+author: oli_rice
+image: 2023-06-01-vecs/og-image.jpg
+thumb: 2023-06-01-vecs/og-image.jpg
+tags:
+  - postgres
+  - AI
+  - python
+date: '2023-08-11'
+toc_depth: 3
+---
+
+[supabase/vecs](https://github.com/supabase/vecs) is our python client for rapid development of vector projects based on postgres + pgvector.
+
+Today, we're releasing a new feature for vecs called "adapters" that enables developers to manage embeddings without ever having to touch a vector.
+Adapters allow you to assoicate transforms with a collection (table of vectors) that are applied to your input when upserting and querying.
+
+As an example, lets look at how we might adapt text input.
+
+To start we need to install the optional components for creating text embeddings:
+```sh
+pip install "vecs[text_embedding]"
+```
+
+If we're inserting large text documents, it might be a good idea to chunk the text into paragraphs using the `ParagraphChunker` before creating an embedding for each paragraph with the `TextEmbedding` adapter step.
+
+```python
+import vecs
+from vecs.adapter import Adapter, ParagraphChunker, TextEmbedding
+
+vx = vecs.create_client(
+    "postgresql://<user>:<password>@<host>:<port>/<db_name>"
+)
+
+# create a new collection with an associated adapter
+docs = vx.get_or_create_collection(
+    name="docs",
+    # here comes the new part
+    adapter=Adapter(
+        [
+            ParagraphChunker(skip_during_query=True),
+            TextEmbedding(model='all-Mini-LM6-v2'),
+        ]
+    )
+)
+```
+In the example, we're using the `all-Mini-LM6-v2` model, but any [sentence transformers model](https://www.sbert.net/docs/pretrained_models.html) can by used in its place.
+
+With the adapter registered with the collection we can upsert data using plain text and records are automatically converted to vectors.
+
+```python
+docs.upsert(
+    records=[
+        (
+         "vec0",
+         "the diameter of a 747 ...", # <- inserting text! 
+         {"publish_year": 2019}
+        )
+    ]
+)
+```
+
+similarly, queries are transparently converted into vectors.
+
+```python
+# search by text
+docs.query(data="how many ping pong balls fit in a Boeing ...")
+
+# Results: [...]
+```
+
+Meaning you can build complete semantic search pipelines without ever having to touch a vector!
+
+Check out [the docs](https://supabase.github.io/vecs/concepts_adapters/) for more info.
+
+### Future Work
+
+You may have noticed that when we created a collection with an adapter, we didn't have to specify the dimension of the output vectors.
+Thats possible because the `TextEmbedding` adapter step exports the dimension of the selected model and passes it up to the collection. 
+
+In the future we're looking forward to being able to further exploit knowledge of the pre-processing steps to better configure the underlying tables and indexes
+to optimize for performance.
+
+
+
+
+
