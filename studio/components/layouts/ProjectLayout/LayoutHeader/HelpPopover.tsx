@@ -138,22 +138,24 @@ const HelpPopover = ({ alt = false }: HelpPopoverProps) => {
     >
       <Tooltip.Root delayDuration={0}>
         <Tooltip.Trigger asChild>
-          <Button
-            asChild={alt ? false : true}
-            type={alt ? 'text' : 'default'}
-            className={alt ? 'px-1' : ''}
-            icon={
-              <IconHelpCircle
-                size={alt ? 18 : 16}
-                strokeWidth={1.5}
-                className={alt ? 'text-scale-1100' : 'text-scale-900'}
-              />
-            }
-          >
-            {!alt && <span>Help</span>}
-          </Button>
+          <div>
+            <Button
+              asChild
+              type={alt ? 'text' : 'default'}
+              className={alt ? 'px-1' : ''}
+              icon={
+                <IconHelpCircle
+                  size={alt ? 18 : 16}
+                  strokeWidth={1.5}
+                  className={alt ? 'text-scale-1100' : 'text-scale-900'}
+                />
+              }
+            >
+              {alt ? <span></span> : <span>Help</span>}
+            </Button>
+          </div>
         </Tooltip.Trigger>
-        {alt && (
+        {alt ? (
           <Tooltip.Portal>
             <Tooltip.Content side="bottom">
               <Tooltip.Arrow className="radix-tooltip-arrow" />
@@ -167,7 +169,7 @@ const HelpPopover = ({ alt = false }: HelpPopoverProps) => {
               </div>
             </Tooltip.Content>
           </Tooltip.Portal>
-        )}
+        ) : null}
       </Tooltip.Root>
     </Popover>
   )
