@@ -2,9 +2,10 @@ import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useSqlEditMutation } from 'data/ai/sql-edit-mutation'
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
+import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { AnimatePresence, m } from 'framer-motion'
-import { useLocalStorage, useStore } from 'hooks'
+import { useLocalStorage, useSelectedOrganization, useSelectedProject, useStore } from 'hooks'
 import useLatest from 'hooks/misc/useLatest'
 import dynamic from 'next/dynamic'
 import {
@@ -71,6 +72,23 @@ const SQLEditor = () => {
   const [sqlDiff, setSqlDiff] = useState<ContentDiff>()
   const inputRef = useRef<HTMLInputElement>(null)
   const [isAISettingsOpen, setIsAISettingsOpen] = useState(false)
+  const selectedOrganization = useSelectedOrganization()
+  const selectedProject = useSelectedProject()
+  const isOptedInToAI =
+    selectedOrganization?.opt_in_tags?.includes('AI_SQL_GENERATOR_OPT_IN') ?? false
+  const [isOptedInToAISchema] = useLocalStorage('supabase_sql-editor-ai-schema', false)
+
+  const includeSchemaMetadata = isOptedInToAI && isOptedInToAISchema
+
+  const { data } = useEntityDefinitionsQuery(
+    {
+      projectRef: selectedProject?.ref,
+      connectionString: selectedProject?.connectionString,
+    },
+    { enabled: includeSchemaMetadata }
+  )
+
+  const entityDefinitions = includeSchemaMetadata ? data?.map((def) => def.sql.trim()) : undefined
 
   const isDiffOpen = !!sqlDiff
 
@@ -333,6 +351,7 @@ const SQLEditor = () => {
                         const { sql: modifiedSql } = await editSql({
                           prompt,
                           sql: sql.replace(sqlAiDisclaimerComment, '').trim(),
+                          entityDefinitions,
                         })
 
                         const formattedSql =

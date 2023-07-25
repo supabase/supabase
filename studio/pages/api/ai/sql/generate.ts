@@ -1,5 +1,5 @@
 import { SchemaBuilder } from '@serafin/schema-builder'
-import { stripIndent } from 'common-tags'
+import { codeBlock, stripIndent } from 'common-tags'
 import apiWrapper from 'lib/api/apiWrapper'
 import { NextApiRequest, NextApiResponse } from 'next'
 import type {
@@ -60,18 +60,30 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
 export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   const {
-    body: { prompt },
+    body: { prompt, entityDefinitions },
   } = req
 
   const model = 'gpt-3.5-turbo-0613'
   const maxCompletionTokenCount = 1024
 
-  const completionMessages: ChatCompletionRequestMessage[] = [
-    {
+  const completionMessages: ChatCompletionRequestMessage[] = []
+
+  if (entityDefinitions?.length > 0) {
+    completionMessages.push({
       role: 'user',
-      content: prompt,
-    },
-  ]
+      content: codeBlock`
+        Here is my database schema for reference:
+        ${entityDefinitions.join('\n\n')}
+      `,
+    })
+  }
+
+  completionMessages.push({
+    role: 'user',
+    content: prompt,
+  })
+
+  console.log({ completionMessages })
 
   const completionOptions: CreateChatCompletionRequest = {
     model,

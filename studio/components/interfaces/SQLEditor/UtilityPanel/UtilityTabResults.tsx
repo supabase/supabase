@@ -1,4 +1,6 @@
 import { useSqlDebugMutation } from 'data/ai/sql-debug-mutation'
+import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
+import { useLocalStorage, useSelectedOrganization, useSelectedProject } from 'hooks'
 import { format } from 'sql-formatter'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { AiIcon, Button, IconLoader } from 'ui'
@@ -15,6 +17,23 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
   const snap = useSqlEditorStateSnapshot()
   const { mutateAsync: debugSql, isLoading: isDebugSqlLoading } = useSqlDebugMutation()
   const { setDebugSolution, setAiInput, setSqlDiff, sqlDiff } = useSqlEditor()
+  const selectedOrganization = useSelectedOrganization()
+  const selectedProject = useSelectedProject()
+  const isOptedInToAI =
+    selectedOrganization?.opt_in_tags?.includes('AI_SQL_GENERATOR_OPT_IN') ?? false
+  const [isOptedInToAISchema] = useLocalStorage('supabase_sql-editor-ai-schema', false)
+
+  const includeSchemaMetadata = isOptedInToAI && isOptedInToAISchema
+
+  const { data } = useEntityDefinitionsQuery(
+    {
+      projectRef: selectedProject?.ref,
+      connectionString: selectedProject?.connectionString,
+    },
+    { enabled: includeSchemaMetadata }
+  )
+
+  const entityDefinitions = includeSchemaMetadata ? data?.map((def) => def.sql.trim()) : undefined
 
   const snippet = snap.snippets[id]
   const result = snap.results[id]?.[0]
@@ -46,6 +65,7 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
               const { solution, sql } = await debugSql({
                 sql: snippet.snippet.content.sql.replace(sqlAiDisclaimerComment, '').trim(),
                 errorMessage: result.error.message,
+                entityDefinitions,
               })
 
               const formattedSql =
