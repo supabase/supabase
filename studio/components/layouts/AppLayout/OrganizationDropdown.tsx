@@ -46,7 +46,7 @@ const OrganizationDropdown = () => {
       <Link passHref href={slug ? `/org/${slug}` : '/'}>
         <a ref={orgNameRef} className="flex items-center space-x-2">
           <p className="text-sm">{orgName}</p>
-          {isSuccess && <Badge color="slate">{subscription?.plan.name}</Badge>}
+          {isSuccess && <Badge color="scale">{subscription?.plan.name}</Badge>}
         </a>
       </Link>
 
@@ -67,7 +67,7 @@ const OrganizationDropdown = () => {
           <Command_Shadcn_>
             <CommandInput_Shadcn_ placeholder="Find organization..." />
             <CommandList_Shadcn_>
-              <CommandEmpty_Shadcn_>No results found.</CommandEmpty_Shadcn_>
+              <CommandEmpty_Shadcn_>No organizations found</CommandEmpty_Shadcn_>
               <CommandGroup_Shadcn_>
                 {organizations?.map((org) => {
                   const href = router.pathname.includes('[slug]')
@@ -76,22 +76,29 @@ const OrganizationDropdown = () => {
                     ? `/org/${org.slug}/general`
                     : `/org/${org.slug}`
                   return (
-                    <CommandItem_Shadcn_
+                    <Link
+                      passHref
+                      href={href}
                       key={org.slug}
-                      value={org.name}
-                      className="cursor-pointer"
-                      onSelect={() => {
+                      onClick={() => {
                         setOpen(false)
-                        router.push(href)
                       }}
                     >
-                      <Link passHref href={href}>
-                        <a className="w-full flex items-center justify-between">
-                          <span>{org.name}</span>
-                          {org.slug === slug && <IconCheck className="text-brand-900" />}
+                      <CommandItem_Shadcn_
+                        asChild
+                        value={org.name}
+                        className="cursor-pointer w-full flex items-center justify-between"
+                        onSelect={() => {
+                          setOpen(false)
+                          router.push(href)
+                        }}
+                      >
+                        <a>
+                          {org.name}
+                          {org.slug === slug && <IconCheck />}
                         </a>
-                      </Link>
-                    </CommandItem_Shadcn_>
+                      </CommandItem_Shadcn_>
+                    </Link>
                   )
                 })}
               </CommandGroup_Shadcn_>
