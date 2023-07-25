@@ -32,7 +32,9 @@ export default function TicketsGrid({ loadedUsers, isLoading, pageCount, offset 
         const isOddRow = divider % 2 === 0
         // Delay should be no more than pageCount for new loaded users
         const recalculatedDelay = i >= pageCount * 2 ? (i - pageCount * (offset - 1)) / 15 : i / 15
-        const imgUrl = getTicketImageUrl(user.username!, !!user.golden)
+        const imgUrl =
+          getTicketImageUrl(user.username!, !!user.golden) ??
+          '/images/launchweek/8/lw8-ticket-empty.jpg'
 
         return (
           <Link
@@ -66,7 +68,7 @@ export default function TicketsGrid({ loadedUsers, isLoading, pageCount, offset 
                   objectFit="cover"
                   objectPosition="center"
                   placeholder="blur"
-                  blurDataURL="/images/blur.png"
+                  blurDataURL="/images/launchweek/8/lw8-ticket-empty.jpg"
                 />
               </div>
             </motion.a>
@@ -88,7 +90,7 @@ export default function TicketsGrid({ loadedUsers, isLoading, pageCount, offset 
               },
             }}
           >
-            <div className="absolute inset-0 rounded-lg sm:rounded-xl bg-gradient-to-b from-[#58585820] to-[#ffffff10] p-[1px] overflow-hidden">
+            <div className="absolute inset-0 rounded-lg sm:rounded-xl bg-gradient-to-b from-[#1c1c1c] to-[#121212] p-[1px] overflow-hidden">
               <div className="absolute inset-[1px] rounded-lg sm:rounded-xl bg-gradient-to-b from-[#1c1c1c] to-[#121212]" />
             </div>
           </motion.div>
