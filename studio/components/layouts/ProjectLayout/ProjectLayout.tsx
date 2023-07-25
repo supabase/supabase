@@ -17,6 +17,26 @@ import ProjectPausedState from './ProjectPausedState'
 import RestoringState from './RestoringState'
 import UpgradingState from './UpgradingState'
 
+// [Joshen] This is temporary while we unblock users from managing their project
+// if their project is not responding well for any reason. Eventually needs a bit of an overhaul
+const routesToIgnoreProjectDetailsRequest = [
+  '/project/[ref]/settings/general',
+  '/project/[ref]/settings/database',
+  '/project/[ref]/settings/storage',
+  '/project/[ref]/settings/billing/subscription',
+  '/project/[ref]/settings/billing/usage',
+  '/project/[ref]/settings/billing/invoices',
+]
+
+const routesToIgnorePostgrestConnection = [
+  '/project/[ref]/reports',
+  '/project/[ref]/settings/general',
+  '/project/[ref]/settings/database',
+  '/project/[ref]/settings/billing/subscription',
+  '/project/[ref]/settings/billing/usage',
+  '/project/[ref]/settings/billing/invoices',
+]
+
 export interface ProjectLayoutProps {
   title?: string
   isLoading?: boolean
@@ -108,8 +128,14 @@ interface MenuBarWrapperProps {
 }
 
 const MenuBarWrapper = ({ isLoading, productMenu, children }: MenuBarWrapperProps) => {
+  const router = useRouter()
   const selectedProject = useSelectedProject()
-  return <>{!isLoading && productMenu && selectedProject !== undefined ? children : null}</>
+  const requiresProjectDetails = !routesToIgnoreProjectDetailsRequest.includes(router.pathname)
+
+  const showMenuBar =
+    !requiresProjectDetails || (requiresProjectDetails && selectedProject !== undefined)
+
+  return <>{!isLoading && productMenu && showMenuBar ? children : null}</>
 }
 
 interface ContentWrapperProps {
@@ -133,17 +159,11 @@ const ContentWrapper = ({ isLoading, children }: ContentWrapperProps) => {
   const selectedProject = useSelectedProject()
   const router = useRouter()
 
-  const routesToIgnorePostgrestConnection = [
-    '/project/[ref]/reports',
-    '/project/[ref]/settings/general',
-    '/project/[ref]/settings/database',
-    '/project/[ref]/settings/billing/subscription',
-    '/project/[ref]/settings/billing/usage',
-    '/project/[ref]/settings/billing/invoices',
-  ]
-
-  const requiresDbConnection: boolean = router.pathname !== '/project/[ref]/settings/general'
+  const requiresDbConnection: boolean =
+    !router.pathname.includes('/project/[ref]/settings') ||
+    router.pathname.includes('/project/[ref]/settings/vault')
   const requiresPostgrestConnection = !routesToIgnorePostgrestConnection.includes(router.pathname)
+  const requiresProjectDetails = !routesToIgnoreProjectDetailsRequest.includes(router.pathname)
 
   const isProjectUpgrading = selectedProject?.status === PROJECT_STATUS.UPGRADING
   const isProjectRestoring = selectedProject?.status === PROJECT_STATUS.RESTORING
@@ -155,7 +175,7 @@ const ContentWrapper = ({ isLoading, children }: ContentWrapperProps) => {
 
   return (
     <>
-      {isLoading || selectedProject === undefined ? (
+      {isLoading || (requiresProjectDetails && selectedProject === undefined) ? (
         <Connecting />
       ) : isProjectUpgrading ? (
         <UpgradingState />
@@ -168,7 +188,7 @@ const ContentWrapper = ({ isLoading, children }: ContentWrapperProps) => {
       ) : requiresDbConnection && isProjectBuilding ? (
         <BuildingState project={selectedProject} />
       ) : (
-        <Fragment key={selectedProject.ref}>{children}</Fragment>
+        <Fragment key={selectedProject?.ref}>{children}</Fragment>
       )}
     </>
   )
