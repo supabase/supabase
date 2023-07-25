@@ -13,7 +13,7 @@ import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-quer
 import { m } from 'framer-motion'
 import {
   useCheckPermissions,
-  useLocalStorage,
+  useLocalStorageQuery,
   useSelectedOrganization,
   useSelectedProject,
   useStore,
@@ -42,7 +42,7 @@ const SQLTemplates = observer(() => {
   const selectedProject = useSelectedProject()
   const isOptedInToAI =
     selectedOrganization?.opt_in_tags?.includes('AI_SQL_GENERATOR_OPT_IN') ?? false
-  const [isOptedInToAISchema] = useLocalStorage('supabase_sql-editor-ai-schema', false)
+  const [isOptedInToAISchema] = useLocalStorageQuery('supabase_sql-editor-ai-schema', false)
 
   const includeSchemaMetadata = isOptedInToAI && isOptedInToAISchema
 

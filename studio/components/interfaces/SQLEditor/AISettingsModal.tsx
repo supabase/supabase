@@ -1,5 +1,5 @@
 import { ModalProps } from '@ui/components/Modal/Modal'
-import { useLocalStorage, useSelectedOrganization } from 'hooks'
+import { useLocalStorageQuery, useSelectedOrganization } from 'hooks'
 import Link from 'next/link'
 import { Alert, IconExternalLink, Modal, Toggle } from 'ui'
 
@@ -11,7 +11,7 @@ const AISettingsModal = (props: ModalProps) => {
   const selectedOrganization = useSelectedOrganization()
   const isOptedInToAI =
     selectedOrganization?.opt_in_tags?.includes('AI_SQL_GENERATOR_OPT_IN') ?? false
-  const [isOptedInToAISchema, setIsOptedInToAISchema] = useLocalStorage(
+  const [isOptedInToAISchema, setIsOptedInToAISchema] = useLocalStorageQuery(
     'supabase_sql-editor-ai-schema',
     false
   )

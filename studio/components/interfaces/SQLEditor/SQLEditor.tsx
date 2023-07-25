@@ -5,7 +5,13 @@ import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { AnimatePresence, m } from 'framer-motion'
-import { useLocalStorage, useSelectedOrganization, useSelectedProject, useStore } from 'hooks'
+import {
+  useLocalStorage,
+  useLocalStorageQuery,
+  useSelectedOrganization,
+  useSelectedProject,
+  useStore,
+} from 'hooks'
 import useLatest from 'hooks/misc/useLatest'
 import dynamic from 'next/dynamic'
 import {
@@ -76,7 +82,7 @@ const SQLEditor = () => {
   const selectedProject = useSelectedProject()
   const isOptedInToAI =
     selectedOrganization?.opt_in_tags?.includes('AI_SQL_GENERATOR_OPT_IN') ?? false
-  const [isOptedInToAISchema] = useLocalStorage('supabase_sql-editor-ai-schema', false)
+  const [isOptedInToAISchema] = useLocalStorageQuery('supabase_sql-editor-ai-schema', false)
 
   const includeSchemaMetadata = isOptedInToAI && isOptedInToAISchema
 
