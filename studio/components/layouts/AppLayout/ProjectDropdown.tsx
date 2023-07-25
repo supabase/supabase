@@ -174,6 +174,7 @@ const ProjectDropdown = () => {
                       setOpen(false)
                       router.push(`/new/${selectedOrganization?.slug}`)
                     }}
+                    onClick={() => setOpen(false)}
                   >
                     <a>
                       <IconPlus size={14} strokeWidth={1.5} />
