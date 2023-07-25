@@ -3,7 +3,7 @@ import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
 
 export const generateSettingsMenu = (
-  ref: string,
+  ref?: string,
   project?: ProjectBase,
   isVaultEnabled: boolean = false,
   isOrgBilling: boolean = false

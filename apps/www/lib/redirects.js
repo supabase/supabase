@@ -1928,11 +1928,6 @@ module.exports = [
     source: '/docs/support',
     destination: '/support',
   },
-  {
-    permanent: true,
-    source: '/docs/guides/cli/local-development',
-    destination: '/docs/guides/getting-started/local-development',
-  },
 
   // old case studies moved to /customers
 
@@ -2075,6 +2070,16 @@ module.exports = [
     permanent: true,
     source: '/docs/guides/ai/choosing-instance-type',
     destination: '/docs/guides/ai/choosing-compute-addon',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/cli/using-environment-variables-in-config',
+    destination: '/docs/guides/cli/managing-config',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/getting-started/local-development',
+    destination: '/docs/guides/cli/local-development',
   },
   {
     permanent: true,

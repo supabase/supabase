@@ -61,6 +61,12 @@ export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
   ],
   [
     {
+      label: 'Local Dev / CLI',
+      icon: 'reference-cli',
+      href: '/guides/cli',
+      level: 'reference_javascript',
+    },
+    {
       label: 'Platform',
       icon: 'platform',
       href: '/guides/platform',
@@ -77,13 +83,6 @@ export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
       icon: 'self-hosting',
       href: '/guides/self-hosting',
       level: 'self_hosting',
-    },
-    {
-      label: 'Integrations',
-      icon: 'integrations',
-      hasLightIcon: true,
-      href: 'https://supabase.com/partners/integrations',
-      level: 'integrations',
     },
   ],
   [
@@ -131,18 +130,19 @@ export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
       community: true,
     },
     {
-      label: 'Tools reference',
+      label: 'Tools',
+    },
+    {
+      label: 'Integrations',
+      icon: 'integrations',
+      hasLightIcon: true,
+      href: 'https://supabase.com/partners/integrations',
+      level: 'integrations',
     },
     {
       label: 'Management API',
       icon: 'reference-api',
       href: '/reference/api/introduction',
-      level: 'reference_javascript',
-    },
-    {
-      label: 'Supabase CLI',
-      icon: 'reference-cli',
-      href: '/guides/cli',
       level: 'reference_javascript',
     },
   ],
@@ -206,7 +206,6 @@ export const gettingstarted: NavMenuConstant = {
   items: [
     { name: 'Features', url: '/guides/getting-started/features' },
     { name: 'Architecture', url: '/guides/getting-started/architecture' },
-    { name: 'Local Development', url: '/guides/getting-started/local-development' },
     {
       name: 'Framework Quickstarts',
       items: [
@@ -976,14 +975,29 @@ export const ai: NavMenuConstant = {
 
 export const supabase_cli: NavMenuConstant = {
   icon: 'reference-cli',
-  title: 'Supabase CLI',
+  title: 'Local Dev / CLI',
   url: '/guides/cli',
   items: [
-    { name: 'Overview', url: '/guides/cli' },
-    { name: 'Managing Environments', url: '/guides/cli/managing-environments' },
+    { name: 'Getting started', url: '/guides/cli' },
+    { name: 'Local Development', url: '/guides/cli/local-development' },
+    { name: 'Managing environments', url: '/guides/cli/managing-environments' },
     {
-      name: 'Using environment variables in config.toml',
-      url: '/guides/cli/using-environment-variables-in-config',
+      name: 'Managing config and secrets',
+      url: '/guides/cli/managing-config',
+    },
+    {
+      name: 'Testing emails locally',
+      url: '/guides/cli/testing-emails',
+    },
+    {
+      name: 'GitHub Action',
+      url: undefined,
+      items: [
+        {
+          name: 'Generate types from your database',
+          url: '/guides/cli/github-action/generating-types',
+        },
+      ],
     },
     {
       name: 'Reference',
