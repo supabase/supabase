@@ -85,6 +85,7 @@ const OrganizationDropdown = () => {
                           setOpen(false)
                           router.push(href)
                         }}
+                        onClick={() => setOpen(false)}
                       >
                         <a>
                           {org.name}
@@ -98,12 +99,13 @@ const OrganizationDropdown = () => {
               <CommandGroup_Shadcn_ className="border-t">
                 <Link passHref href={orgCreationV2 ? `/new-with-subscription` : `/new`}>
                   <CommandItem_Shadcn_
+                    asChild
                     className="cursor-pointer flex items-center space-x-2 w-full"
                     onSelect={(e) => {
                       setOpen(false)
                       router.push(orgCreationV2 ? `/new-with-subscription` : `/new`)
                     }}
-                    asChild
+                    onClick={() => setOpen(false)}
                   >
                     <a>
                       <IconPlus size={14} strokeWidth={1.5} />
