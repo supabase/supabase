@@ -50,7 +50,7 @@ const UserSettingsDropdown = () => {
             <p className="text-sm text-scale-1000 truncate">{profile?.primary_email}</p>
           </div>
 
-          <DropdownMenuSeparator_Shadcn_ className="bg-scale-500" />
+          <DropdownMenuSeparator_Shadcn_ />
           <DropdownMenuItem_Shadcn_ onSelect={() => router.push('/account/me')}>
             <Link passHref href="/account/me">
               <a className="w-full">Preferences</a>
@@ -61,13 +61,12 @@ const UserSettingsDropdown = () => {
               <a className="w-full">Access tokens</a>
             </Link>
           </DropdownMenuItem_Shadcn_>
-          <DropdownMenuSeparator_Shadcn_ className="bg-scale-500" />
+          <DropdownMenuSeparator_Shadcn_ />
           <DropdownMenuItem_Shadcn_ className="cursor-pointer" onClick={() => setIsOpen(true)}>
             <span>Command menu</span>
             <DropdownMenuShortcut_Shadcn_>⌘K</DropdownMenuShortcut_Shadcn_>
           </DropdownMenuItem_Shadcn_>
-          <DropdownMenuSeparator_Shadcn_ className="bg-scale-500" />
-
+          <DropdownMenuSeparator_Shadcn_ />
           <DropdownMenuLabel_Shadcn_>Theme</DropdownMenuLabel_Shadcn_>
           <DropdownMenuCheckboxItem_Shadcn_
             checked={isDarkMode}
@@ -82,7 +81,7 @@ const UserSettingsDropdown = () => {
             Light
           </DropdownMenuCheckboxItem_Shadcn_>
 
-          <DropdownMenuSeparator_Shadcn_ className="bg-scale-500" />
+          <DropdownMenuSeparator_Shadcn_ />
           <DropdownMenuItem_Shadcn_ className="cursor-pointer" onClick={() => onClickLogout()}>
             <span>Log out</span>
           </DropdownMenuItem_Shadcn_>
