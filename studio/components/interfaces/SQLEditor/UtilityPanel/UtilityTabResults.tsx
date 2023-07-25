@@ -1,6 +1,6 @@
 import { useSqlDebugMutation } from 'data/ai/sql-debug-mutation'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
-import { useLocalStorage, useSelectedOrganization, useSelectedProject } from 'hooks'
+import { useLocalStorageQuery, useSelectedOrganization, useSelectedProject } from 'hooks'
 import { format } from 'sql-formatter'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { AiIcon, Button, IconLoader } from 'ui'
@@ -21,7 +21,7 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
   const selectedProject = useSelectedProject()
   const isOptedInToAI =
     selectedOrganization?.opt_in_tags?.includes('AI_SQL_GENERATOR_OPT_IN') ?? false
-  const [isOptedInToAISchema] = useLocalStorage('supabase_sql-editor-ai-schema', false)
+  const [isOptedInToAISchema] = useLocalStorageQuery('supabase_sql-editor-ai-schema', false)
 
   const includeSchemaMetadata = isOptedInToAI && isOptedInToAISchema
 

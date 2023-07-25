@@ -1,6 +1,7 @@
 // Reference: https://usehooks.com/useLocalStorage/
 
-import { useState } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { Dispatch, SetStateAction, useState } from 'react'
 
 export function useLocalStorage<T>(key: string, initialValue: T) {
   // State to store our value
@@ -38,6 +39,40 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
       // A more advanced implementation would handle the error case
       console.log(error)
     }
+  }
+
+  return [storedValue, setValue] as const
+}
+
+/**
+ * Hook to load/store values from local storage with an API similar
+ * to `useState()`.
+ *
+ * Differs from `useLocalStorage()` in that it uses `react-query` to
+ * invalidate stale values across hooks with the same key.
+ */
+export function useLocalStorageQuery<T>(key: string, initialValue: T) {
+  const queryClient = useQueryClient()
+  const queryKey = ['localStorage', key]
+
+  const { data: storedValue = initialValue } = useQuery(queryKey, () => {
+    if (typeof window === 'undefined') {
+      return undefined
+    }
+
+    const item = window.localStorage.getItem(key)
+
+    return item ? (JSON.parse(item) as T) : undefined
+  })
+
+  const setValue: Dispatch<SetStateAction<T>> = (value) => {
+    const valueToStore = value instanceof Function ? value(storedValue) : value
+
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem(key, JSON.stringify(valueToStore))
+    }
+
+    queryClient.invalidateQueries(queryKey)
   }
 
   return [storedValue, setValue] as const
