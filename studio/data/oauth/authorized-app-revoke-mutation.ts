@@ -1,6 +1,9 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'react-hot-toast'
+
 import { delete_ } from 'lib/common/fetch'
 import { API_ADMIN_URL } from 'lib/constants'
+import { ResponseError } from 'types'
 import { oauthAppKeys } from './keys'
 
 export type AuthorizedAppRevokeVariables = {
@@ -23,20 +26,28 @@ type AuthorizedAppRevokeData = Awaited<ReturnType<typeof revokeAuthorizedApp>>
 
 export const useAuthorizedAppRevokeMutation = ({
   onSuccess,
+  onError,
   ...options
 }: Omit<
-  UseMutationOptions<AuthorizedAppRevokeData, unknown, AuthorizedAppRevokeVariables>,
+  UseMutationOptions<AuthorizedAppRevokeData, ResponseError, AuthorizedAppRevokeVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<AuthorizedAppRevokeData, unknown, AuthorizedAppRevokeVariables>(
+  return useMutation<AuthorizedAppRevokeData, ResponseError, AuthorizedAppRevokeVariables>(
     (vars) => revokeAuthorizedApp(vars),
     {
       async onSuccess(data, variables, context) {
         const { slug } = variables
         await queryClient.invalidateQueries(oauthAppKeys.authorizedApps(slug))
         await onSuccess?.(data, variables, context)
+      },
+      async onError(data, variables, context) {
+        if (onError === undefined) {
+          toast.error(`Failed to revoke application: ${data.message}`)
+        } else {
+          onError(data, variables, context)
+        }
       },
       ...options,
     }

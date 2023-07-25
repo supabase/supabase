@@ -4,7 +4,7 @@ import CTABanner from 'components/CTABanner/index'
 import FlyOut from 'components/UI/FlyOut'
 import { AlphaNumbers, IntroductionSegments, PerformanceComparisonData } from 'data/BetaPage'
 import authors from 'lib/authors.json'
-import { APP_NAME, DESCRIPTION } from 'lib/constants'
+import { APP_NAME, DEFAULT_META_DESCRIPTION } from 'lib/constants'
 import { NextSeo } from 'next-seo'
 import Head from 'next/head'
 import Link from 'next/link'
@@ -975,7 +975,7 @@ const Beta = (props: Props) => {
         title={site_title}
         openGraph={{
           title: site_title,
-          description: DESCRIPTION,
+          description: DEFAULT_META_DESCRIPTION,
           url: `https://supabase.com/beta`,
           type: 'article',
           article: {

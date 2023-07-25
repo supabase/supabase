@@ -36,7 +36,7 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
     .map((organization) => ({
       isActive:
         router.pathname.startsWith('/org/') && selectedOrganization?.slug === organization.slug,
-      label: organization.name + (organization.subscription_id ? ' (V2)' : ''),
+      label: organization.name,
       href: `/org/${organization.slug}/general`,
       key: organization.slug,
     }))

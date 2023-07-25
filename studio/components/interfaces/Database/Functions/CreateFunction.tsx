@@ -10,6 +10,9 @@ import Panel from 'components/ui/Panel'
 import SqlEditor from 'components/ui/SqlEditor'
 import { POSTGRES_DATA_TYPES } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.constants'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
+import { isResponseOk } from 'lib/common/fetch'
+import { SupaResponse } from 'types'
+import { Function } from 'components/interfaces/Functions/Functions.types'
 
 // [Refactor] Remove local state, just use the Form component
 
@@ -318,15 +321,15 @@ const CreateFunction: FC<CreateFunctionProps> = ({ func, visible, setVisible }) 
         _localState.setLoading(true)
 
         const body = _localState.formState.requestBody
-        const response: any = body.id
+        const response: SupaResponse<Function> = body.id
           ? await (_localState!.meta as any).functions.update(body.id, body)
           : await (_localState!.meta as any).functions.create(body)
 
-        if (response.error) {
+        if (!isResponseOk(response)) {
           ui.setNotification({
             category: 'error',
             message: `Failed to create function: ${
-              response.error?.message ?? 'Submit request failed'
+              response.error.message ?? 'Submit request failed'
             }`,
           })
           _localState.setLoading(false)

@@ -71,8 +71,16 @@ The final activation step reconfigures your project to start serving traffic on 
 The auth service, in particular, will no longer work with the original URL (`foobarbaz.supabase.co`).
 As such, it is recommended that you schedule a downtime window of 20-30 minutes, depending on the complexity of your project, to update all the services that need to know about your custom domain:
 
-- any client code (e.g., frontends, mobile apps)
-- any OAuth providers (e.g., google, github)
+- Any client code (e.g., frontends, mobile apps). You can initialize a new Supabase client with your custom domain, `api.example.com`. For example:
+
+  ```js
+  import { createClient } from '@supabase/supabase-js'
+
+  // Use a custom domain as the supabase URL
+  const supabase = createClient('https://api.example.com', 'public-anon-key')
+  ```
+
+- Any OAuth providers (e.g., google, github)
 
 Additionally, update the DNS configuration for `api.example.com` to once more use a CNAME record that resolves to `foobarbaz.supabase.co`.
 Finally, you can use the `activate` subcommand to reconfigure your project:

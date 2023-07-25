@@ -786,6 +786,10 @@ export interface paths {
     /** Migrates org to org-level billing. */
     post: operations["BillingMigrationController_migrateToOrgLevelBilling"];
   };
+  "/system/billing/migrate/org-level-billing-preview": {
+    /** Previews the migration of the organization to the new org level billing. */
+    post: operations["BillingMigrationController_preview"];
+  };
   "/system/integrations/vercel/webhooks": {
     /** Processes Vercel event */
     post: operations["VercelWebhooksController_processEvent"];
@@ -3827,12 +3831,17 @@ export interface components {
     IntegrationConnection: {
       foreign_project_id: string;
       supabase_project_ref: string;
-      integration_id: string;
       metadata: Record<string, never>;
     };
     CreateVercelConnectionsBody: {
       organization_integration_id: string;
       connection: components["schemas"]["IntegrationConnection"];
+    };
+    CreateVercelConnectionResponse: {
+      id: string;
+    };
+    DeleteVercelConnectionResponse: {
+      id: string;
     };
     FunctionResponse: {
       id: string;
@@ -4140,6 +4149,16 @@ export interface components {
       website: string;
       redirect_uris: (string)[];
       icon?: string;
+    };
+    TokenDTO: {
+      /** @enum {string} */
+      grant_type: "authorization_code" | "refresh_token";
+      client_id: string;
+      client_secret: string;
+      code?: string;
+      code_verifier?: string;
+      redirect_uri?: string;
+      refresh_token?: string;
     };
     AuthorizationsApproveBody: {
       organization_id: string;
@@ -8290,7 +8309,11 @@ export interface operations {
       };
     };
     responses: {
-      201: never;
+      201: {
+        content: {
+          "application/json": components["schemas"]["CreateVercelConnectionResponse"];
+        };
+      };
       /** @description Failed to create project connections */
       500: never;
     };
@@ -8316,7 +8339,11 @@ export interface operations {
       };
     };
     responses: {
-      200: never;
+      200: {
+        content: {
+          "application/json": components["schemas"]["DeleteVercelConnectionResponse"];
+        };
+      };
       /** @description Failed to delete vercel integration project connection */
       500: never;
     };
@@ -8648,6 +8675,19 @@ export interface operations {
     responses: {
       201: never;
       /** @description Failed to migrate org. */
+      500: never;
+    };
+  };
+  /** Previews the migration of the organization to the new org level billing. */
+  BillingMigrationController_preview: {
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["MigrateToOrgLevelBillingBody"];
+      };
+    };
+    responses: {
+      201: never;
+      /** @description Failed to preview org billing organization */
       500: never;
     };
   };
@@ -9784,7 +9824,7 @@ export interface operations {
         state?: string;
         response_mode?: string;
         code_challenge?: string;
-        code_challenge_method?: "plain" | "sha256";
+        code_challenge_method?: "plain" | "sha256" | "S256";
       };
     };
     responses: {
@@ -9793,15 +9833,9 @@ export interface operations {
   };
   /** Exchange auth code for user's access and refresh token */
   OAuthController_token: {
-    parameters: {
-      query: {
-        grant_type: "authorization_code" | "refresh_token";
-        client_id: string;
-        client_secret: string;
-        code?: string;
-        code_verifier?: string;
-        redirect_uri?: string;
-        refresh_token?: string;
+    requestBody: {
+      content: {
+        "application/x-www-form-urlencoded": components["schemas"]["TokenDTO"];
       };
     };
     responses: {

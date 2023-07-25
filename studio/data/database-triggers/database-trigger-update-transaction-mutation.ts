@@ -1,7 +1,10 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'react-hot-toast'
+
 import { executeSql } from 'data/sql/execute-sql-query'
-import { databaseTriggerKeys } from './keys'
 import { quoteLiteral } from 'lib/pg-format'
+import { ResponseError } from 'types'
+import { databaseTriggerKeys } from './keys'
 
 // [Joshen] Writing this query within FE as the PATCH endpoint from pg-meta only supports updating
 // trigger name and enabled mode. So we'll delete and create the trigger, within a single transaction
@@ -45,20 +48,28 @@ type DatabaseTriggerUpdateTxnData = Awaited<ReturnType<typeof updateDatabaseTrig
 
 export const useDatabaseTriggerUpdateMutation = ({
   onSuccess,
+  onError,
   ...options
 }: Omit<
-  UseMutationOptions<DatabaseTriggerUpdateTxnData, unknown, DatabaseTriggerUpdateVariables>,
+  UseMutationOptions<DatabaseTriggerUpdateTxnData, ResponseError, DatabaseTriggerUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabaseTriggerUpdateTxnData, unknown, DatabaseTriggerUpdateVariables>(
+  return useMutation<DatabaseTriggerUpdateTxnData, ResponseError, DatabaseTriggerUpdateVariables>(
     (vars) => updateDatabaseTrigger(vars),
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
         await queryClient.invalidateQueries(databaseTriggerKeys.list(projectRef))
         await onSuccess?.(data, variables, context)
+      },
+      async onError(data, variables, context) {
+        if (onError === undefined) {
+          toast.error(`Failed to update database trigger: ${data.message}`)
+        } else {
+          onError(data, variables, context)
+        }
       },
       ...options,
     }

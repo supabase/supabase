@@ -86,7 +86,7 @@ const VercelIntegration: NextPageWithLayout = () => {
     : []
 
   /**
-   * Handle the correct route change based on wether the vercel integration
+   * Handle the correct route change based on whether the vercel integration
    * is following the 'marketplace' flow or 'deploy button' flow.
    *
    */
