@@ -238,13 +238,9 @@ const NotificationsPopover = ({ alt = false }: NotificationsPopoverProps) => {
         <Tooltip.Root delayDuration={0}>
           <Tooltip.Trigger asChild>
             <div className="relative flex items-center">
-              {/* hasNewNotifications */}
-              {true && (
+              {hasNewNotifications && (
                 <>
                   {alt ? null : (
-                    // <div className="translate-x-[10px] z-10 h-4 w-4 flex items-center justify-center rounded-full bg-white">
-                    //   <p className="text-xs text-scale-100">5</p>
-                    // </div>
                     <div className="absolute -top-1 -right-1 z-50 flex h-3 w-3 items-center justify-center">
                       <div className="h-full w-full animate-ping rounded-full bg-green-800 opacity-60"></div>
                       <div className="z-60 absolute top-0 right-0 h-full w-full rounded-full bg-green-900 opacity-80"></div>
