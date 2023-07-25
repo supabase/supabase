@@ -31,7 +31,7 @@ const AppHeader = () => {
         </Link>
         <OrganizationDropdown />
         {ref !== undefined && <ProjectDropdown />}
-        <BranchDropdown />
+        {ref !== undefined && <BranchDropdown />}
       </div>
 
       <div className="flex items-center space-x-4">
