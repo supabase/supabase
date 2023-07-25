@@ -1251,7 +1251,7 @@ export interface paths {
     /** Deletes objects */
     delete: operations["StorageObjectsController_deleteObjects"];
   };
-  "/v1/branch/{branch_id}": {
+  "/v1/branches/{branch_id}": {
     /**
      * Get database branch config 
      * @description Fetches configurations of the specified database branch
@@ -1343,7 +1343,7 @@ export interface paths {
     /** Updates project's postgrest config */
     patch: operations["PostgrestConfigController_updatePostgRESTConfig"];
   };
-  "/v1/projects/{ref}/query": {
+  "/v1/projects/{ref}/database/query": {
     /** Run sql query */
     post: operations["QueryController_runQuery"];
   };
@@ -1613,7 +1613,8 @@ export interface components {
       SMTP_HOST: string;
       SMTP_PORT: string;
       SMTP_USER: string;
-      SMTP_PASS: string;
+      SMTP_PASS?: string | null;
+      SMTP_PASS_ENCRYPTED?: string | null;
       SMTP_MAX_FREQUENCY: number;
       MAILER_AUTOCONFIRM: boolean;
       MAILER_URLPATHS_INVITE: string;
@@ -1688,7 +1689,6 @@ export interface components {
       EXTERNAL_SLACK_SECRET: string;
       SMS_MESSAGEBIRD_ACCESS_KEY: string;
       SMS_MESSAGEBIRD_ORIGINATOR: string;
-      SMTP_PASS_ENCRYPTED: string;
       REFRESH_TOKEN_ROTATION_ENABLED: boolean;
       EXTERNAL_LINKEDIN_ENABLED: boolean;
       EXTERNAL_LINKEDIN_CLIENT_ID: string;
@@ -1753,7 +1753,8 @@ export interface components {
       SMTP_HOST: string;
       SMTP_PORT: string;
       SMTP_USER: string;
-      SMTP_PASS: string;
+      SMTP_PASS?: string | null;
+      SMTP_PASS_ENCRYPTED?: string | null;
       SMTP_MAX_FREQUENCY: number;
       MAILER_AUTOCONFIRM: boolean;
       MAILER_URLPATHS_INVITE: string;
@@ -1828,7 +1829,6 @@ export interface components {
       EXTERNAL_SLACK_SECRET: string;
       SMS_MESSAGEBIRD_ACCESS_KEY: string;
       SMS_MESSAGEBIRD_ORIGINATOR: string;
-      SMTP_PASS_ENCRYPTED: string;
       REFRESH_TOKEN_ROTATION_ENABLED: boolean;
       EXTERNAL_LINKEDIN_ENABLED: boolean;
       EXTERNAL_LINKEDIN_CLIENT_ID: string;
@@ -1893,7 +1893,8 @@ export interface components {
       SMTP_HOST: string;
       SMTP_PORT: string;
       SMTP_USER: string;
-      SMTP_PASS: string;
+      SMTP_PASS?: string | null;
+      SMTP_PASS_ENCRYPTED?: string | null;
       SMTP_MAX_FREQUENCY: number;
       MAILER_AUTOCONFIRM: boolean;
       MAILER_URLPATHS_INVITE: string;
@@ -1968,7 +1969,6 @@ export interface components {
       EXTERNAL_SLACK_SECRET: string;
       SMS_MESSAGEBIRD_ACCESS_KEY: string;
       SMS_MESSAGEBIRD_ORIGINATOR: string;
-      SMTP_PASS_ENCRYPTED: string;
       REFRESH_TOKEN_ROTATION_ENABLED: boolean;
       EXTERNAL_LINKEDIN_ENABLED: boolean;
       EXTERNAL_LINKEDIN_CLIENT_ID: string;
@@ -3242,6 +3242,11 @@ export interface components {
       name: string;
       limit: number;
     };
+    PreviewTransferInvoiceItem: {
+      description: string;
+      quantity: number;
+      amount: number;
+    };
     PreviewProjectTransferResponse: {
       valid: boolean;
       warnings: (components["schemas"]["PreviewTransferInfo"])[];
@@ -3257,6 +3262,8 @@ export interface components {
       charge_on_target_organization: number;
       source_subscription_plan: Record<string, never>;
       target_subscription_plan: Record<string, unknown> | null;
+      source_invoice_items: (components["schemas"]["PreviewTransferInvoiceItem"])[];
+      target_invoice_items: (components["schemas"]["PreviewTransferInvoiceItem"])[];
     };
     AnalyticsResponse: {
       error?: OneOf<[{
