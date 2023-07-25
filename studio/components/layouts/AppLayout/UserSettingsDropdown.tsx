@@ -40,12 +40,8 @@ const UserSettingsDropdown = () => {
 
   return (
     <DropdownMenu_Shadcn_ open={open} onOpenChange={() => setOpen(!open)} modal={false}>
-      <DropdownMenuTrigger_Shadcn_
-        className="flex items-center justify-center border font-bold rounded-full h-7 w-7 text-scale-1100 bg-surface-100"
-        // onClick={() => setOpen(true)}
-      >
+      <DropdownMenuTrigger_Shadcn_ className="flex items-center justify-center border font-bold rounded-full h-7 w-7 text-scale-1100 bg-surface-100">
         {profile?.first_name ? profile?.first_name?.[0] : <IconUser size={14} strokeWidth={2} />}
-        {/* <IconUser onClick={() => setOpen(true)} size={14} strokeWidth={2} /> */}
       </DropdownMenuTrigger_Shadcn_>
       <DropdownMenuContent_Shadcn_ align="end" className="w-60">
         <DropdownMenuGroup_Shadcn_>
