@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+@import './../../../packages/ui/build/css/source/global.css';
+@import './../../../packages/ui/build/css/themes/dark.css';
+@import './../../../packages/ui/build/css/themes/light.css';
+
 @font-face {
   font-family: 'custom-font';
   src: url(../../../packages/common/assets/fonts/CustomFont-Book.woff2) format('woff2'),

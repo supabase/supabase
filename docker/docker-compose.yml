@@ -41,7 +41,7 @@ services:
     image: kong:2.8.1
     restart: unless-stopped
     # https://unix.stackexchange.com/a/294837
-    entrypoint: bash -c 'eval "echo \"$(cat ~/temp.yml)\"" > ~/kong.yml && /docker-entrypoint.sh kong docker-start'
+    entrypoint: bash -c 'eval "echo \"$$(cat ~/temp.yml)\"" > ~/kong.yml && /docker-entrypoint.sh kong docker-start'
     ports:
       - ${KONG_HTTP_PORT}:8000/tcp
       - ${KONG_HTTPS_PORT}:8443/tcp
@@ -247,7 +247,7 @@ services:
 
   functions:
     container_name: supabase-edge-functions
-    image: supabase/edge-runtime:v1.5.2
+    image: supabase/edge-runtime:v1.6.6
     restart: unless-stopped
     environment:
       JWT_SECRET: ${JWT_SECRET}

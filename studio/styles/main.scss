@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+@import './../../packages/ui/build/css/source/global.css';
+@import './../../packages/ui/build/css/themes/dark.css';
+@import './../../packages/ui/build/css/themes/light.css';
+
 @layer utilities {
   .btn-primary {
     @apply inline-block rounded border border-green-500 bg-green-500 py-1 px-3 text-sm;

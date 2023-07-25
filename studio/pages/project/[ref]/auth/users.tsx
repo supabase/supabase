@@ -11,6 +11,7 @@ import { NextPageWithLayout } from 'types'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import NoPermission from 'components/ui/NoPermission'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { toast } from 'react-hot-toast'
 
 export const PageContext = createContext(null)
 
@@ -67,7 +68,7 @@ const PageLayout = ({ children }: PropsWithChildren<{}>) => {
         this.totalUsers = 0
         this.users = []
         this.usersLoading = false
-        console.error(`Fetch user failed: ${response.error.message}`)
+        toast.error(`Failed to fetch users: ${response.error.message}`)
       } else {
         this.totalUsers = response.total
         this.users = response.users

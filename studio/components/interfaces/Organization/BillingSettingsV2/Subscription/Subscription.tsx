@@ -84,6 +84,7 @@ const Subscription = () => {
                 <ProjectUpdateDisabledTooltip projectUpdateDisabled={projectUpdateDisabled}>
                   <Button
                     type="default"
+                    className="pointer-events-auto"
                     disabled={!canChangeTier}
                     onClick={() => snap.setPanelKey('subscriptionPlan')}
                   >
@@ -141,7 +142,7 @@ const Subscription = () => {
                     )
                   }
                 >
-                  <p className="text-sm text-scale-1000 mr-2">
+                  <div className="text-sm text-scale-1000 mr-2">
                     When this organization exceeds its{' '}
                     <Link href="#breakdown">
                       <a className="text-sm text-green-900 transition hover:text-green-1000">
@@ -160,7 +161,7 @@ const Subscription = () => {
                         over-usage, you can adjust your Cost Control settings.
                       </p>
                     )}
-                  </p>
+                  </div>
                 </Alert>
               )}
 
