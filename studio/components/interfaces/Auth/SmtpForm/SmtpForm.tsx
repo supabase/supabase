@@ -32,7 +32,7 @@ const SmtpForm = () => {
     if (isLoaded && isSmtpEnabled(config)) {
       setEnableSmtp(true)
     }
-  }, [isLoaded])
+  }, [isLoaded, config])
 
   const schema = object({
     SMTP_ADMIN_EMAIL: string().when([], {
@@ -133,7 +133,7 @@ const SmtpForm = () => {
             const formValues = generateFormValues(config)
             resetForm({ values: formValues, initialValues: formValues })
           }
-        }, [isLoaded])
+        }, [isLoaded, config])
 
         const onResetForm = () => {
           setEnableSmtp(isSmtpEnabled(initialValues))

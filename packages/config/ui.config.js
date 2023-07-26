@@ -257,8 +257,8 @@ const uiConfig = {
         },
       },
       animation: {
-        'fade-in': 'fadeIn 300ms',
-        'fade-out': 'fadeOut 300ms',
+        'fade-in': 'fadeIn 300ms both',
+        'fade-out': 'fadeOut 300ms both',
 
         'dropdown-content-show': 'overlayContentShow 100ms cubic-bezier(0.16, 1, 0.3, 1)',
         'dropdown-content-hide': 'overlayContentHide 100ms cubic-bezier(0.16, 1, 0.3, 1)',

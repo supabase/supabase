@@ -35,9 +35,11 @@ export const SITE_URL =
     : 'http://localhost:3000/launch-week'
 export const SITE_ORIGIN = new URL(SITE_URL).origin
 export const TWITTER_USER_NAME = 'supabase'
-export const COOKIE = 'supa-launch-week-ticke-user-id'
-export const DATE = 'April 10th 2023'
+export const COOKIE = 'supa-lw8-ticket-user-id'
+export const LW7_DATE = 'April 10th 2023'
+export const LW8_DATE = 'August 7-11'
+export const LW8_LAUNCH_DATE = '2023-08-07T09:00:00.000-07:00'
 export const TWEET_TEXT =
-  "It's almost #SupaLaunchWeek 7! Generate your unique ticket here 👇 you can win a mechanical keyboard 🤩"
-export const TWEET_TEXT_GOLDEN = `I turned my #SupaLaunchWeek 7 ticket Gold! 🤩\n\n`
+  '#SupaLaunchWeek 8 is coming August 7-11! Join the party and generate your custom ticket for a chance to win swag ✨'
+export const TWEET_TEXT_GOLDEN = `I turned my #SupaLaunchWeek 8 ticket GOLD! 🌟😎🌟\n\n`
 export const SITE_NAME = 'Supabase'
