@@ -45,6 +45,7 @@ export default function TicketsPage({ users }: Props) {
   const OG_IMAGE = `${SITE_ORIGIN}/images/launchweek/8/lw8-og.jpg`
 
   const { isDarkMode, toggleTheme } = useTheme()
+  const [initialDarkMode] = useState(isDarkMode)
   const [isLoading, setIsLoading] = useState(false)
   const [offset, setOffset] = useState(1)
   const [isLast, setIsLast] = useState(false)
@@ -93,11 +94,11 @@ export default function TicketsPage({ users }: Props) {
   }, [])
 
   useEffect(() => {
-    if (!isDarkMode) toggleTheme(true)
+    toggleTheme(true)
     document.body.className = 'dark bg-[#020405]'
     return () => {
       document.body.className = ''
-      isDarkMode ? toggleTheme(true) : toggleTheme(false)
+      toggleTheme(initialDarkMode)
     }
   }, [])
 
