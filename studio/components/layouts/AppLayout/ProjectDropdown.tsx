@@ -100,7 +100,8 @@ const ProjectLink = ({
 
 const ProjectDropdown = () => {
   const router = useRouter()
-  const selectedProject = useSelectedProject()
+  const { ref } = useParams()
+  const projectDetails = useSelectedProject()
   const selectedOrganization = useSelectedOrganization()
   const projectNameRef = useRef<HTMLAnchorElement>(null)
   const { data: allProjects, isLoading: isLoadingProjects } = useProjectsQuery()
@@ -109,13 +110,14 @@ const ProjectDropdown = () => {
 
   const isOrgBilling = !!selectedOrganization?.subscription_id
   const { data: subscription, isSuccess } = useProjectSubscriptionV2Query(
-    { projectRef: selectedProject?.ref },
+    { projectRef: ref },
     { enabled: !isOrgBilling }
   )
   const projects = allProjects
     ?.filter((x) => x.status !== PROJECT_STATUS.INACTIVE)
     .filter((x) => x.organization_id === selectedOrganization?.id)
     .sort((a, b) => a.name.localeCompare(b.name))
+  const selectedProject = projectDetails || projects?.find((project) => project.ref === ref)
 
   const [open, setOpen] = useState(false)
   const popoverOffset = (projectNameRef.current?.offsetWidth ?? 0) + 12
