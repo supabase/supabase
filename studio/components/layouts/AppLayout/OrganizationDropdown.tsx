@@ -32,7 +32,11 @@ const OrganizationDropdown = () => {
 
   const slug = selectedOrganization?.slug
   const orgName = selectedOrganization?.name
-  const { data: subscription, isSuccess } = useOrgSubscriptionQuery({ orgSlug: slug })
+  const isOrgBilling = !!selectedOrganization?.subscription_id
+  const { data: subscription, isSuccess } = useOrgSubscriptionQuery(
+    { orgSlug: slug },
+    { enabled: isOrgBilling }
+  )
 
   const [open, setOpen] = useState(false)
   const popoverOffset = (orgNameRef.current?.offsetWidth ?? 0) + 12

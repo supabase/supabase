@@ -34,12 +34,16 @@ const AppHeader = () => {
         {ref !== undefined && <BranchDropdown />}
       </div>
 
-      <div className="flex items-center space-x-4">
-        <FeedbackDropdown alt />
-        <NotificationsPopover alt />
-        <HelpPopover alt />
-        <SettingsButton slug={organization?.slug ?? ''} />
-        <UserSettingsDropdown />
+      <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
+          <FeedbackDropdown alt />
+          <NotificationsPopover alt />
+          <HelpPopover alt />
+          <SettingsButton />
+        </div>
+        <div className="flex items-center gap-3">
+          <UserSettingsDropdown />
+        </div>
       </div>
     </div>
   )

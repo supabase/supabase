@@ -28,12 +28,11 @@ const HelpPopover = ({ alt = false }: HelpPopoverProps) => {
 
   return (
     <Popover_Shadcn_>
-      <PopoverTrigger_Shadcn_>
-        <Tooltip.Root delayDuration={0}>
+      <Tooltip.Root delayDuration={0}>
+        <PopoverTrigger_Shadcn_ asChild>
           <Tooltip.Trigger asChild>
-            <div>
+            <div className="relative flex items-center">
               <Button
-                asChild
                 type={alt ? 'text' : 'default'}
                 className={alt ? 'px-1' : ''}
                 icon={
@@ -44,29 +43,29 @@ const HelpPopover = ({ alt = false }: HelpPopoverProps) => {
                   />
                 }
               >
-                {alt ? <span></span> : <span>Help</span>}
+                {!alt && <span>Help</span>}
               </Button>
             </div>
           </Tooltip.Trigger>
-          {alt ? (
-            <Tooltip.Portal>
-              <Tooltip.Content side="bottom">
-                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                <div
-                  className={[
-                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                    'space-y-2 border border-scale-200',
-                  ].join(' ')}
-                >
-                  <p className="text-xs text-scale-1200">Help</p>
-                </div>
-              </Tooltip.Content>
-            </Tooltip.Portal>
-          ) : null}
-        </Tooltip.Root>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="w-[400px] space-y-4 p-0" align="end" side="bottom">
-        <div className="my-5 space-y-4 px-5">
+        </PopoverTrigger_Shadcn_>
+        {alt ? (
+          <Tooltip.Portal>
+            <Tooltip.Content side="bottom">
+              <Tooltip.Arrow className="radix-tooltip-arrow" />
+              <div
+                className={[
+                  'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                  'space-y-2 border border-scale-200',
+                ].join(' ')}
+              >
+                <p className="text-xs text-scale-1200">Help</p>
+              </div>
+            </Tooltip.Content>
+          </Tooltip.Portal>
+        ) : null}
+      </Tooltip.Root>
+      <PopoverContent_Shadcn_ className="w-[400px] space-y-4 p-0 py-5" align="end" side="bottom">
+        <div className="mb-5 space-y-4 px-5">
           <h5 className="text-scale-1200">Need help with your project?</h5>
           <p className="text-sm text-scale-900">
             For issues with your project hosted on supabase.com, or other inquiries about our hosted
