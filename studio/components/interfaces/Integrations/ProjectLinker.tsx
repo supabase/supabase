@@ -80,20 +80,40 @@ const ProjectLinker = ({
     },
   })
 
+  // create a flat array of foreign project ids. ie, ["prj_MlkO6AiLG5ofS9ojKrkS3PhhlY3f", ..]
+  const flatInstalledConnectionsIds = new Set(installedConnections.map((x) => x.foreign_project_id))
+
+  // check that vercel project is not already installed
+  const filteredForeignProjects: VercelProjectsResponse[] = foreignProjects.filter(
+    (foreignProject) => {
+      return !flatInstalledConnectionsIds.has(foreignProject.id)
+    }
+  )
+
+  const selectedSupabaseProject = supabaseProjectRef
+    ? supabaseProjects.find((x) => x.ref?.toLowerCase() === supabaseProjectRef?.toLowerCase())
+    : undefined
+
+  const selectedVercelProject = vercelProjectId
+    ? filteredForeignProjects.find((x) => x.id?.toLowerCase() === vercelProjectId?.toLowerCase())
+    : undefined
+
   function onCreateConnections() {
-    const projectDetails = foreignProjects.filter((x) => x.id === vercelProjectId)[0]
+    const projectDetails = selectedVercelProject
+
+    console.log('projectDetails', projectDetails)
 
     if (!organizationIntegrationId) return console.error('No integration ID set')
-    if (!vercelProjectId) return console.error('No Vercel project ID set')
-    if (!supabaseProjectRef) return console.error('No Supabase project ref set')
+    if (!selectedVercelProject?.id) return console.error('No Vercel project ID set')
+    if (!selectedSupabaseProject?.ref) return console.error('No Supabase project ref set')
 
     if (setLoading) setLoading(true)
 
     createConnections({
       organizationIntegrationId,
       connection: {
-        foreign_project_id: vercelProjectId,
-        supabase_project_ref: supabaseProjectRef,
+        foreign_project_id: selectedVercelProject?.id,
+        supabase_project_ref: selectedSupabaseProject?.ref,
         metadata: {
           ...projectDetails,
           supabaseConfig: {
@@ -120,23 +140,6 @@ const ProjectLinker = ({
       </div>
     )
   }
-
-  // create a flat array of foreign project ids. ie, ["prj_MlkO6AiLG5ofS9ojKrkS3PhhlY3f", ..]
-  const flatInstalledConnectionsIds = new Set(installedConnections.map((x) => x.foreign_project_id))
-
-  // check that vercel project is not already installed
-  const filteredForeignProjects: VercelProjectsResponse[] = foreignProjects.filter(
-    (foreignProject) => {
-      return !flatInstalledConnectionsIds.has(foreignProject.id)
-    }
-  )
-
-  const selectedSupabaseProject = supabaseProjectRef
-    ? supabaseProjects.find((x) => x.ref?.toLowerCase() === supabaseProjectRef?.toLowerCase())
-    : undefined
-  const selectedVercelProject = vercelProjectId
-    ? filteredForeignProjects.find((x) => x.id?.toLowerCase() === vercelProjectId?.toLowerCase())
-    : undefined
 
   return (
     <div className="flex flex-col gap-4">
@@ -230,7 +233,7 @@ const ProjectLinker = ({
                 viewBox="0 0 512 512"
                 className="w-6"
               >
-                <path fill-rule="evenodd" d="M256,48,496,464H16Z" />
+                <path fillRule="evenodd" d="M256,48,496,464H16Z" />
               </svg>
             </div>
 
