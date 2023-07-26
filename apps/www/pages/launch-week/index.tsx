@@ -51,6 +51,7 @@ export default function TicketHome({ users }: Props) {
   const [supabase, setSupabase] = useState<SupabaseClient | null>(null)
   const [session, setSession] = useState<Session | null>(null)
   const { isDarkMode, toggleTheme } = useTheme()
+  const [initialDarkMode] = useState(isDarkMode)
 
   const defaultUserData = {
     id: query.id?.toString(),
@@ -89,11 +90,11 @@ export default function TicketHome({ users }: Props) {
   }, [supabase])
 
   useEffect(() => {
-    if (!isDarkMode) toggleTheme(true)
+    toggleTheme(true)
     document.body.className = 'dark bg-[#020405]'
     return () => {
       document.body.className = ''
-      isDarkMode ? toggleTheme(true) : toggleTheme(false)
+      toggleTheme(initialDarkMode)
     }
   }, [])
 

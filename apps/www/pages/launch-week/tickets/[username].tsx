@@ -44,6 +44,7 @@ export default function UsernamePage({ user, users, ogImageUrl }: Props) {
   const [supabase, setSupabase] = useState<SupabaseClient | null>(null)
   const [session, setSession] = useState<Session | null>(null)
   const { isDarkMode, toggleTheme } = useTheme()
+  const [initialDarkMode] = useState(isDarkMode)
 
   const [pageState, setPageState] = useState<PageState>('ticket')
 
@@ -63,11 +64,11 @@ export default function UsernamePage({ user, users, ogImageUrl }: Props) {
   }, [])
 
   useEffect(() => {
-    if (!isDarkMode) toggleTheme(true)
+    toggleTheme(true)
     document.body.className = 'dark bg-[#020405]'
     return () => {
       document.body.className = ''
-      isDarkMode ? toggleTheme(true) : toggleTheme(false)
+      toggleTheme(initialDarkMode)
     }
   }, [])
 
