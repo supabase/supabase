@@ -371,6 +371,10 @@ const SQLEditor = () => {
 
                         // TODO: show error
                         if (formattedSql.trim() === sql.trim()) {
+                          ui.setNotification({
+                            category: 'error',
+                            message: 'Unable to edit SQL. Try adding more details to your prompt.',
+                          })
                           return
                         }
 
