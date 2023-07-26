@@ -178,7 +178,7 @@ test('bug: can edit query after selecting a log', async () => {
   const rowValue = await screen.findByText(/12345/) // row value
   // open up an show selection panel
   await userEvent.click(rowValue)
-  await screen.findByText(/Copy/)
+  await screen.findByText('Copy')
 
   // change the query
   let editor = container.querySelector('.monaco-editor')
@@ -197,7 +197,7 @@ test('bug: can edit query after selecting a log', async () => {
     { timeout: 1000 }
   )
   // closes the selection panel
-  await expect(screen.findByText(/Copy/)).rejects.toThrow()
+  await expect(screen.findByText('Copy')).rejects.toThrow()
 })
 
 test('query warnings', async () => {
