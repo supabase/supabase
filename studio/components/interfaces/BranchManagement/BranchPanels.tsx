@@ -1,5 +1,7 @@
+import clsx from 'clsx'
 import dayjs from 'dayjs'
-import { forwardRef, useState } from 'react'
+import { noop } from 'lodash'
+import { PropsWithChildren, forwardRef, useState } from 'react'
 import {
   Badge,
   Button,
@@ -16,10 +18,9 @@ import {
   cn,
 } from 'ui'
 
+import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
 import { Branch } from 'data/branches/branches-query'
-import { noop } from 'lodash'
-import { useParams } from 'common'
 
 interface BranchPanelProps {
   branch?: Branch
@@ -71,6 +72,22 @@ const MainBranchPanel = ({ branch, onSelectUpdate = noop }: BranchPanelProps) =>
   )
 }
 
+const BranchContainer = ({ className, children }: PropsWithChildren<{ className?: string }>) => {
+  return (
+    <div className="list-none ml-6 pl-8 pb-4 border-l border-scale-600 dark:border-scale-400 relative last:!border-transparent">
+      <div className="absolute w-[33px] rounded-bl-full border-b border-l border-scale-600 dark:border-scale-400 h-10 -left-px" />
+      <div
+        className={clsx(
+          'border shadow-sm flex justify-between items-center pl-8 pr-6 py-4 rounded-lg text-sm',
+          className
+        )}
+      >
+        {children}
+      </div>
+    </div>
+  )
+}
+
 const BranchPanel = ({
   branch,
   onSelectUpdate = noop,
@@ -85,40 +102,35 @@ const BranchPanel = ({
   const formattedCreatedAt = dayjs(branch?.created_at).format('DD MMM YYYY, HH:mm:ss (ZZ)')
 
   return (
-    <li className="list-none ml-6 pl-8 pb-4 border-l border-scale-600 dark:border-scale-400 relative last:!border-transparent">
-      <div className="absolute w-[33px] rounded-bl-full border-b border-l border-scale-600 dark:border-scale-400 h-10 -left-px" />
-      <div className="bg-surface-100 border shadow-sm flex justify-between items-center pl-8 pr-6 py-4 rounded-lg text-sm">
-        <div className="flex items-center space-x-4">
-          <IconGitBranch className="text-brand-900" size={16} strokeWidth={2} />
-          <p>{branch?.name}</p>
-          {isActive && <Badge color="green">Selected</Badge>}
-          <p className="text-scale-1000">
-            {daysFromNow > 1
-              ? `Created on ${formattedCreatedAt}`
-              : `Created ${formattedTimeFromNow}`}
-          </p>
-        </div>
-        <div>
-          <DropdownMenu_Shadcn_ open={open} onOpenChange={() => setOpen(!open)} modal={false}>
-            <DropdownMenuTrigger_Shadcn_>
-              <Button asChild type="text" className="px-1" icon={<IconMoreVertical size={14} />}>
-                <span></span>
-              </Button>
-            </DropdownMenuTrigger_Shadcn_>
-            <DropdownMenuContent_Shadcn_ side="bottom" align="end">
-              <DropdownMenuItem_Shadcn_ className="flex gap-2" onSelect={() => onSelectUpdate()}>
-                <IconEdit size={14} />
-                Edit branch
-              </DropdownMenuItem_Shadcn_>
-              <DropdownMenuItem_Shadcn_ className="flex gap-2" onSelect={() => onSelectDelete()}>
-                <IconTrash size={14} />
-                Delete branch
-              </DropdownMenuItem_Shadcn_>
-            </DropdownMenuContent_Shadcn_>
-          </DropdownMenu_Shadcn_>
-        </div>
+    <BranchContainer className="bg-surface-100">
+      <div className="flex items-center space-x-4">
+        <IconGitBranch className="text-brand-900" size={16} strokeWidth={2} />
+        <p>{branch?.name}</p>
+        {isActive && <Badge color="green">Selected</Badge>}
+        <p className="text-scale-1000">
+          {daysFromNow > 1 ? `Created on ${formattedCreatedAt}` : `Created ${formattedTimeFromNow}`}
+        </p>
       </div>
-    </li>
+      <div>
+        <DropdownMenu_Shadcn_ open={open} onOpenChange={() => setOpen(!open)} modal={false}>
+          <DropdownMenuTrigger_Shadcn_>
+            <Button asChild type="text" className="px-1" icon={<IconMoreVertical size={14} />}>
+              <span></span>
+            </Button>
+          </DropdownMenuTrigger_Shadcn_>
+          <DropdownMenuContent_Shadcn_ side="bottom" align="end">
+            <DropdownMenuItem_Shadcn_ className="flex gap-2" onSelect={() => onSelectUpdate()}>
+              <IconEdit size={14} />
+              Edit branch
+            </DropdownMenuItem_Shadcn_>
+            <DropdownMenuItem_Shadcn_ className="flex gap-2" onSelect={() => onSelectDelete()}>
+              <IconTrash size={14} />
+              Delete branch
+            </DropdownMenuItem_Shadcn_>
+          </DropdownMenuContent_Shadcn_>
+        </DropdownMenu_Shadcn_>
+      </div>
+    </BranchContainer>
   )
 }
 
@@ -145,4 +157,4 @@ const BranchHeader = forwardRef<HTMLDivElement, BranchHeader>(
 )
 
 BranchHeader.displayName = 'BranchHeader'
-export { BranchHeader, MainBranchPanel, BranchPanel }
+export { BranchHeader, BranchContainer, BranchPanel, MainBranchPanel }
