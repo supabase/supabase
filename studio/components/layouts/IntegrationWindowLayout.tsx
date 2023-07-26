@@ -50,7 +50,7 @@ const Header: FC<any> = ({ organization, project }) => {
                 viewBox="0 0 512 512"
                 className="w-4"
               >
-                <path fill-rule="evenodd" d="M256,48,496,464H16Z" />
+                <path fillRule="evenodd" d="M256,48,496,464H16Z" />
               </svg>
             </div>
           </div>
