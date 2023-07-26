@@ -61,15 +61,21 @@ export const PROVIDERS = {
   FLY: {
     id: 'FLY',
     name: 'Fly.io',
+    label: 'Fly.io',
     default_region: FLY_REGIONS_DEFAULT,
     regions: { ...FLY_REGIONS },
+    image_url: '/img/icons/fly.svg',
+    image_url_light: '/img/icons/aws-light.svg',
   },
   AWS: {
     id: 'AWS',
     name: 'AWS',
+    label: 'Amazon Web Services',
     DEFAULT_SSH_KEY: 'supabase-app-instance',
     default_region: AWS_REGIONS_DEFAULT,
     regions: { ...AWS_REGIONS },
+    image_url: '/img/icons/aws.svg',
+    image_url_light: '/img/icons/aws-light.svg',
     // regions: {
     //   EAST_US: 'us-east-1', // North Virginia
     //   // 'North EU': 'eu-north-1', // Stockholm

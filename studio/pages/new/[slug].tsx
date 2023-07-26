@@ -25,6 +25,7 @@ import { get, post } from 'lib/common/fetch'
 import {
   API_URL,
   AWS_REGIONS,
+  BASE_PATH,
   CloudProvider,
   DEFAULT_MINIMUM_PASSWORD_STRENGTH,
   DEFAULT_PROVIDER,
@@ -39,8 +40,11 @@ import {
 import { passwordStrength, pluckObjectFields } from 'lib/helpers'
 import { NextPageWithLayout } from 'types'
 import {
-  Alert,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
   Button,
+  IconAlertCircle,
   IconExternalLink,
   IconHelpCircle,
   IconInfo,
@@ -50,6 +54,7 @@ import {
   Toggle,
 } from 'ui'
 import Link from 'next/link'
+import Image from 'next/image'
 
 const Wizard: NextPageWithLayout = () => {
   const router = useRouter()
@@ -185,6 +190,13 @@ const Wizard: NextPageWithLayout = () => {
 
   function onDbPricingPlanChange(value: string) {
     setDbPricingTierKey(value)
+
+    // set AWS as default provider for non-free plans
+    if (value !== PRICING_TIER_FREE_KEY) {
+      setCloudProvider(PROVIDERS['AWS'].id)
+    } else {
+      setCloudProvider(PROVIDERS[DEFAULT_PROVIDER].id)
+    }
   }
 
   function onPaymentMethodAdded() {
@@ -359,7 +371,6 @@ const Wizard: NextPageWithLayout = () => {
                     autoFocus
                   />
                 </Panel.Content>
-
                 {showNonProdFields && (
                   <Panel.Content
                     className={[
@@ -386,35 +397,6 @@ const Wizard: NextPageWithLayout = () => {
                     />
                   </Panel.Content>
                 )}
-
-                {cloudProviderEnabled && showNonProdFields && (
-                  <Panel.Content
-                    className={[
-                      'border-b',
-                      'border-panel-border-interior-light dark:border-panel-border-interior-dark',
-                    ].join(' ')}
-                  >
-                    <Listbox
-                      layout="horizontal"
-                      label="Cloud Provider"
-                      type="select"
-                      value={cloudProvider}
-                      onChange={(value) => onCloudProviderChange(value)}
-                      descriptionText="Cloud Provider (only for staging/local)"
-                    >
-                      {Object.values(PROVIDERS).map((providerObj) => {
-                        const label = providerObj['name']
-                        const value = providerObj['id']
-                        return (
-                          <Listbox.Option key={value} label={label} value={value}>
-                            <span className="text-scale-1200">{label}</span>
-                          </Listbox.Option>
-                        )
-                      })}
-                    </Listbox>
-                  </Panel.Content>
-                )}
-
                 <Panel.Content className="border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
                   <Input
                     id="password"
@@ -436,39 +418,149 @@ const Wizard: NextPageWithLayout = () => {
                     error={passwordStrengthWarning}
                   />
                 </Panel.Content>
+                {isAdmin && (
+                  <Panel.Content>
+                    {!billedViaOrg && (
+                      <Listbox
+                        label="Pricing Plan"
+                        layout="horizontal"
+                        value={dbPricingTierKey}
+                        onChange={onDbPricingPlanChange}
+                        descriptionText={
+                          <>
+                            Select a plan that suits your needs.&nbsp;
+                            <a
+                              className="underline"
+                              target="_blank"
+                              rel="noreferrer"
+                              href="https://supabase.com/pricing"
+                            >
+                              More details
+                            </a>
+                            {!isSelectFreeTier && !isEmptyPaymentMethod && (
+                              <Alert_Shadcn_ variant="warning">
+                                <IconAlertCircle className="h-4 w-4" />
+                                <AlertTitle_Shadcn_>
+                                  Your payment method will be charged
+                                </AlertTitle_Shadcn_>
+                                <AlertDescription_Shadcn_>
+                                  By creating a new Pro Project, there will be an immediate charge
+                                  of $25 once the project has been created.
+                                </AlertDescription_Shadcn_>
+                              </Alert_Shadcn_>
+                            )}
+                          </>
+                        }
+                      >
+                        {Object.entries(PRICING_TIER_LABELS).map(([k, v]) => {
+                          const label = `${v}${k === 'PRO' ? ' - $25/month' : ' - $0/month'}`
+                          return (
+                            <Listbox.Option key={k} label={label} value={k}>
+                              {label}
+                            </Listbox.Option>
+                          )
+                        })}
+                      </Listbox>
+                    )}
 
-                <Panel.Content className="border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
-                  <Listbox
-                    layout="horizontal"
-                    label="Region"
-                    type="select"
-                    value={dbRegion}
-                    onChange={(value) => setDbRegion(value)}
-                    descriptionText="Select a region close to your users for the best performance."
-                  >
-                    {Object.keys(availableRegions).map((option: string, i) => {
-                      const label = Object.values(availableRegions)[i] as string
-                      return (
-                        <Listbox.Option
-                          key={option}
-                          label={label}
-                          value={label}
-                          addOnBefore={() => (
-                            <img
-                              alt="region icon"
-                              className="w-5 rounded-sm"
-                              src={`${router.basePath}/img/regions/${
-                                Object.keys(availableRegions)[i]
-                              }.svg`}
+                    {freePlanWithExceedingLimits && slug && (
+                      <div className={billedViaOrg ? '' : 'mt-4'}>
+                        <FreeProjectLimitWarning
+                          membersExceededLimit={membersExceededLimit || []}
+                          orgLevelBilling={billedViaOrg}
+                          orgSlug={slug}
+                        />
+                      </div>
+                    )}
+
+                    {!billedViaOrg && !isSelectFreeTier && isEmptyPaymentMethod && (
+                      <EmptyPaymentMethodWarning onPaymentMethodAdded={onPaymentMethodAdded} />
+                    )}
+                  </Panel.Content>
+                )}
+                {!billedViaOrg && !isSelectFreeTier && (
+                  <>
+                    <Panel.Content className="border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
+                      <Toggle
+                        id="project-name"
+                        layout="horizontal"
+                        label={
+                          <div className="flex gap-2 items-center">
+                            <span>Spend Cap</span>
+                            <IconHelpCircle
+                              size={16}
+                              strokeWidth={1.5}
+                              className="transition opacity-50 cursor-pointer hover:opacity-100"
+                              onClick={() => setShowSpendCapHelperModal(true)}
                             />
-                          )}
-                        >
-                          <span className="text-scale-1200">{label}</span>
-                        </Listbox.Option>
-                      )
-                    })}
-                  </Listbox>
-                </Panel.Content>
+                          </div>
+                        }
+                        placeholder="Project name"
+                        checked={isSpendCapEnabled}
+                        onChange={() => setIsSpendCapEnabled(!isSpendCapEnabled)}
+                        descriptionText={
+                          <p>
+                            By default, Pro projects have spend caps to control costs. When enabled,
+                            usage is limited to the plan's quota, with restrictions when limits are
+                            exceeded. To scale beyond Pro limits without restrictions, disable the
+                            spend cap and pay for over-usage beyond the quota.
+                          </p>
+                        }
+                      />
+                    </Panel.Content>
+
+                    <SpendCapModal
+                      visible={showSpendCapHelperModal}
+                      onHide={() => setShowSpendCapHelperModal(false)}
+                    />
+                  </>
+                )}
+
+                {
+                  // show for v1 org billing when on paid plan
+                  (cloudProviderEnabled && !billedViaOrg && !isSelectFreeTier) ||
+                  // show for v2 org billing on staging and local
+                  (cloudProviderEnabled && showNonProdFields && billedViaOrg) ? (
+                    <Panel.Content
+                      className={[
+                        'border-b',
+                        'border-panel-border-interior-light dark:border-panel-border-interior-dark',
+                      ].join(' ')}
+                    >
+                      <Listbox
+                        layout="horizontal"
+                        label="Cloud Provider"
+                        type="select"
+                        value={cloudProvider}
+                        onChange={(value) => onCloudProviderChange(value)}
+                      >
+                        {Object.values(PROVIDERS).map((providerObj) => {
+                          const label = providerObj['label']
+                          const value = providerObj['id']
+                          return (
+                            <Listbox.Option
+                              key={value}
+                              label={label}
+                              value={value}
+                              addOnBefore={() => (
+                                <Image
+                                  src={BASE_PATH + providerObj.image_url}
+                                  alt="provider icon"
+                                  width={16}
+                                  height={16}
+                                />
+                              )}
+                            >
+                              <span className="text-scale-1200">{label}</span>
+                            </Listbox.Option>
+                          )
+                        })}
+                      </Listbox>
+                    </Panel.Content>
+                  ) : (
+                    <></>
+                  )
+                }
               </>
             )}
 
@@ -507,108 +599,6 @@ const Wizard: NextPageWithLayout = () => {
                   }
                 />
               </Panel.Content>
-            )}
-
-            {isAdmin && (
-              <Panel.Content>
-                {!billedViaOrg && (
-                  <Listbox
-                    label="Pricing Plan"
-                    layout="horizontal"
-                    value={dbPricingTierKey}
-                    onChange={onDbPricingPlanChange}
-                    descriptionText={
-                      <>
-                        Select a plan that suits your needs.&nbsp;
-                        <a
-                          className="underline"
-                          target="_blank"
-                          rel="noreferrer"
-                          href="https://supabase.com/pricing"
-                        >
-                          More details
-                        </a>
-                        {!isSelectFreeTier && !isEmptyPaymentMethod && (
-                          <Alert
-                            title="Your payment method will be charged"
-                            variant="warning"
-                            withIcon
-                            className="mt-3"
-                          >
-                            <p>
-                              By creating a new Pro Project, there will be an immediate charge of
-                              $25 once the project has been created.
-                            </p>
-                          </Alert>
-                        )}
-                      </>
-                    }
-                  >
-                    {Object.entries(PRICING_TIER_LABELS).map(([k, v]) => {
-                      const label = `${v}${k === 'PRO' ? ' - $25/month' : ' - $0/month'}`
-                      return (
-                        <Listbox.Option key={k} label={label} value={k}>
-                          {label}
-                        </Listbox.Option>
-                      )
-                    })}
-                  </Listbox>
-                )}
-
-                {freePlanWithExceedingLimits && slug && (
-                  <div className={billedViaOrg ? '' : 'mt-4'}>
-                    <FreeProjectLimitWarning
-                      membersExceededLimit={membersExceededLimit || []}
-                      orgLevelBilling={billedViaOrg}
-                      orgSlug={slug}
-                    />
-                  </div>
-                )}
-
-                {!billedViaOrg && !isSelectFreeTier && isEmptyPaymentMethod && (
-                  <EmptyPaymentMethodWarning onPaymentMethodAdded={onPaymentMethodAdded} />
-                )}
-              </Panel.Content>
-            )}
-
-            {!billedViaOrg && !isSelectFreeTier && (
-              <>
-                <Panel.Content className="border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
-                  <Toggle
-                    id="project-name"
-                    layout="horizontal"
-                    label={
-                      <div className="flex space-x-4">
-                        <span>Spend Cap</span>
-                        <IconHelpCircle
-                          size={16}
-                          strokeWidth={1.5}
-                          className="transition opacity-50 cursor-pointer hover:opacity-100"
-                          onClick={() => setShowSpendCapHelperModal(true)}
-                        />
-                      </div>
-                    }
-                    placeholder="Project name"
-                    checked={isSpendCapEnabled}
-                    onChange={() => setIsSpendCapEnabled(!isSpendCapEnabled)}
-                    descriptionText={
-                      <div>
-                        <p>
-                          By default, Pro projects have spend caps to control costs. When enabled,
-                          usage is limited to the plan's quota, with restrictions when limits are
-                          exceeded. To scale beyond Pro limits without restrictions, disable the
-                          spend cap and pay for over-usage beyond the quota.
-                        </p>
-                      </div>
-                    }
-                  />
-                </Panel.Content>
-
-                <SpendCapModal
-                  visible={showSpendCapHelperModal}
-                  onHide={() => setShowSpendCapHelperModal(false)}
-                />
-              </>
             )}
           </>
         )}
