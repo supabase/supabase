@@ -64,8 +64,8 @@ const HelpPopover = ({ alt = false }: HelpPopoverProps) => {
           </Tooltip.Portal>
         ) : null}
       </Tooltip.Root>
-      <PopoverContent_Shadcn_ className="w-[400px] space-y-4 p-0" align="end" side="bottom">
-        <div className="my-5 space-y-4 px-5">
+      <PopoverContent_Shadcn_ className="w-[400px] space-y-4 p-0 py-5" align="end" side="bottom">
+        <div className="mb-5 space-y-4 px-5">
           <h5 className="text-scale-1200">Need help with your project?</h5>
           <p className="text-sm text-scale-900">
             For issues with your project hosted on supabase.com, or other inquiries about our hosted
