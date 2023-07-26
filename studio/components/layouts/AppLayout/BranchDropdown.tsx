@@ -21,20 +21,22 @@ import {
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
 } from 'ui'
+import { useSelectedProject } from 'hooks'
 
 const BranchDropdown = () => {
   const router = useRouter()
-  const { ref: projectRef } = useParams()
+  const { ref } = useParams()
+  const projectDetails = useSelectedProject()
   const branchNameRef = useRef<HTMLAnchorElement>(null)
+
+  const isBranch = projectDetails?.parent_project_ref !== undefined
+  const projectRef =
+    projectDetails !== undefined ? (isBranch ? projectDetails.parent_project_ref : ref) : undefined
   const { data: branches, isLoading, isError, isSuccess } = useBranchesQuery({ projectRef })
 
   const [open, setOpen] = useState(false)
   const popoverOffset = (branchNameRef.current?.offsetWidth ?? 0) + 12
-  const selectedBranch = branches?.find((branch) => branch.project_ref === projectRef)
-
-  const onSwitchBranch = async () => {
-    console.log('Fetch branch details and update connection string or something')
-  }
+  const selectedBranch = branches?.find((branch) => branch.project_ref === ref)
 
   return (
     <>
@@ -47,7 +49,11 @@ const BranchDropdown = () => {
           <Link passHref href={`/project/${projectRef}/branches`}>
             <a ref={branchNameRef} className="flex items-center space-x-2">
               <p className="text-sm">{selectedBranch?.name}</p>
-              {selectedBranch?.is_default && <Badge color="amber">Production</Badge>}
+              {selectedBranch?.is_default ? (
+                <Badge color="amber">Production</Badge>
+              ) : (
+                <Badge color="green">Branch</Badge>
+              )}
             </a>
           </Link>
 
@@ -84,11 +90,9 @@ const BranchDropdown = () => {
                             className="cursor-pointer w-full flex items-center justify-between"
                             onSelect={() => {
                               setOpen(false)
-                              onSwitchBranch()
                               router.push(href)
                             }}
                             onClick={() => {
-                              onSwitchBranch()
                               setOpen(false)
                             }}
                           >

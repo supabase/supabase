@@ -1489,7 +1489,6 @@ export interface paths {
     post: operations["OAuthAppsController_createOAuthApp"];
   };
   "/v1/organizations/{slug}/oauth/apps/{id}": {
-    get: operations["OAuthAppsController_getOAuthApp"];
     /** Update an oauth app */
     put: operations["OAuthAppsController_updateOAuthApp"];
     /** Remove a published oauth app */
@@ -3154,6 +3153,7 @@ export interface components {
       maxDatabasePreprovisionGb?: number;
       lastDatabaseResizeAt?: string;
       preview_branches: (components["schemas"]["BranchResponse"])[];
+      parent_project_ref?: string;
     };
     ProjectRefResponse: {
       id: number;
@@ -4146,19 +4146,56 @@ export interface components {
       created_at?: string;
       updated_at?: string;
     };
+    OAuthAppResponse: {
+      id: string;
+      name: string;
+      website: string;
+      icon?: string;
+      authorized_at?: string;
+      created_at?: string;
+      client_id?: string;
+      client_secret_alias?: string;
+      redirect_uris?: (string)[];
+    };
     CreateOAuthAppBody: {
       name: string;
       website: string;
       icon?: string;
       redirect_uris: (string)[];
     };
-    UpdateOAuthAppBody: {
+    CreateOAuthAppResponse: {
+      id: string;
+      client_id: string;
+      client_secret: string;
+    };
+    PutOAuthAppResponse: {
+      id: string;
+      client_id: string;
+      client_secret_alias: string;
+      created_at: string;
       name: string;
       website: string;
-      redirect_uris: (string)[];
       icon?: string;
+      redirect_uris: (string)[];
     };
-    TokenDTO: {
+    RevokeAuthorizedOAuthAppResponse: {
+      id: string;
+      name: string;
+      website: string;
+      icon?: string;
+      authorized_at: string;
+    };
+    DeleteOAuthAppResponse: {
+      id: string;
+      name: string;
+      website: string;
+      icon?: string;
+      created_at: string;
+      client_id: string;
+      client_secret_alias: string;
+      redirect_uris: (string)[];
+    };
+    OAuthTokenBody: {
       /** @enum {string} */
       grant_type: "authorization_code" | "refresh_token";
       client_id: string;
@@ -4168,8 +4205,30 @@ export interface components {
       redirect_uri?: string;
       refresh_token?: string;
     };
+    OAuthTokenResponse: {
+      /** @enum {string} */
+      token_type: "Bearer";
+      access_token: string;
+      refresh_token: string;
+      expires_in: number;
+    };
+    GetAuthorizationResponse: {
+      name: string;
+      website: string;
+      icon?: string;
+      domain: string;
+      expires_at: string;
+      approved_at?: string;
+      approved_organization_slug?: string;
+    };
     AuthorizationsApproveBody: {
       organization_id: string;
+    };
+    ApproveAuthorizationResponse: {
+      url: string;
+    };
+    DeclineAuthorizationResponse: {
+      id: string;
     };
   };
   responses: never;
@@ -9754,7 +9813,7 @@ export interface operations {
     responses: {
       200: {
         content: {
-          "application/json": Record<string, never>;
+          "application/json": (components["schemas"]["OAuthAppResponse"])[];
         };
       };
     };
@@ -9772,12 +9831,11 @@ export interface operations {
       };
     };
     responses: {
-      201: never;
-    };
-  };
-  OAuthAppsController_getOAuthApp: {
-    responses: {
-      200: never;
+      201: {
+        content: {
+          "application/json": components["schemas"]["CreateOAuthAppResponse"];
+        };
+      };
     };
   };
   /** Update an oauth app */
@@ -9790,11 +9848,15 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/json": components["schemas"]["UpdateOAuthAppBody"];
+        "application/json": components["schemas"]["CreateOAuthAppBody"];
       };
     };
     responses: {
-      200: never;
+      200: {
+        content: {
+          "application/json": components["schemas"]["PutOAuthAppResponse"];
+        };
+      };
     };
   };
   /** Remove a published oauth app */
@@ -9806,7 +9868,11 @@ export interface operations {
       };
     };
     responses: {
-      200: never;
+      200: {
+        content: {
+          "application/json": components["schemas"]["DeleteOAuthAppResponse"];
+        };
+      };
     };
   };
   /** Revoke an authorized oauth app */
@@ -9818,7 +9884,11 @@ export interface operations {
       };
     };
     responses: {
-      201: never;
+      201: {
+        content: {
+          "application/json": components["schemas"]["RevokeAuthorizedOAuthAppResponse"];
+        };
+      };
     };
   };
   /** Authorize user through oauth */
@@ -9836,18 +9906,22 @@ export interface operations {
       };
     };
     responses: {
-      200: never;
+      303: never;
     };
   };
   /** Exchange auth code for user's access and refresh token */
   OAuthController_token: {
     requestBody: {
       content: {
-        "application/x-www-form-urlencoded": components["schemas"]["TokenDTO"];
+        "application/x-www-form-urlencoded": components["schemas"]["OAuthTokenBody"];
       };
     };
     responses: {
-      201: never;
+      201: {
+        content: {
+          "application/json": components["schemas"]["OAuthTokenResponse"];
+        };
+      };
     };
   };
   AuthorizationsController_getAuthorizationRequest: {
@@ -9857,7 +9931,11 @@ export interface operations {
       };
     };
     responses: {
-      200: never;
+      200: {
+        content: {
+          "application/json": components["schemas"]["GetAuthorizationResponse"];
+        };
+      };
     };
   };
   /** Approve oauth app authorization request */
@@ -9873,7 +9951,11 @@ export interface operations {
       };
     };
     responses: {
-      201: never;
+      201: {
+        content: {
+          "application/json": components["schemas"]["ApproveAuthorizationResponse"];
+        };
+      };
     };
   };
   /** Decline oauth app authorization request */
@@ -9884,7 +9966,11 @@ export interface operations {
       };
     };
     responses: {
-      200: never;
+      200: {
+        content: {
+          "application/json": components["schemas"]["DeclineAuthorizationResponse"];
+        };
+      };
     };
   };
 }

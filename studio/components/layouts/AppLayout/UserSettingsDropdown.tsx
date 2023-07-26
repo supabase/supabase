@@ -1,4 +1,4 @@
-import Link from 'components/ui/ProjectLink'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import {
   DropdownMenuContent_Shadcn_,

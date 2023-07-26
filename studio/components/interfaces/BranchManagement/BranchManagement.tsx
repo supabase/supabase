@@ -9,12 +9,18 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useBranchDeleteMutation } from 'data/branches/branch-delete-mutation'
 import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
 import { Branch, useBranchesQuery } from 'data/branches/branches-query'
-import { useStore } from 'hooks'
+import { useSelectedProject, useStore } from 'hooks'
 import { BranchHeader, BranchPanel } from './BranchPanels'
 
 const BranchManagement = () => {
   const { ui } = useStore()
-  const { ref: projectRef } = useParams()
+  const { ref } = useParams()
+  const projectDetails = useSelectedProject()
+
+  const isBranch = projectDetails?.parent_project_ref !== undefined
+  const projectRef =
+    projectDetails !== undefined ? (isBranch ? projectDetails.parent_project_ref : ref) : undefined
+
   const [selectedBranchToUpdate, setSelectedBranchToUpdate] = useState<Branch>()
   const [selectedBranchToDelete, setSelectedBranchToDelete] = useState<Branch>()
 

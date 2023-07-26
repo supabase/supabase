@@ -106,7 +106,10 @@ const ProjectDropdown = () => {
   const projectNameRef = useRef<HTMLAnchorElement>(null)
   const { data: allProjects, isLoading: isLoadingProjects } = useProjectsQuery()
 
-  console.log({ selectedProject })
+  const isBranch = projectDetails?.parent_project_ref !== undefined
+  const parentProject = isBranch
+    ? allProjects?.find((project) => project.ref === projectDetails.parent_project_ref)
+    : undefined
 
   const isOrgBilling = !!selectedOrganization?.subscription_id
   const { data: subscription, isSuccess } = useProjectSubscriptionV2Query(
@@ -117,7 +120,9 @@ const ProjectDropdown = () => {
     ?.filter((x) => x.status !== PROJECT_STATUS.INACTIVE)
     .filter((x) => x.organization_id === selectedOrganization?.id)
     .sort((a, b) => a.name.localeCompare(b.name))
-  const selectedProject = projectDetails || projects?.find((project) => project.ref === ref)
+  const selectedProject = isBranch
+    ? parentProject
+    : projectDetails || projects?.find((project) => project.ref === ref)
 
   const [open, setOpen] = useState(false)
   const popoverOffset = (projectNameRef.current?.offsetWidth ?? 0) + 12

@@ -41,7 +41,7 @@ const BranchPanel = ({
 
   if (branch?.is_default) {
     return (
-      <div className="bg-scale-300 border shadow-sm flex justify-between items-center pl-8 pr-6 py-4 rounded-lg text-sm">
+      <div className="bg-surface-100 border shadow-sm flex justify-between items-center pl-8 pr-6 py-4 rounded-lg text-sm">
         <div className="flex items-center space-x-4">
           <IconShield size={16} strokeWidth={2} />
           <p>{branch?.name}</p>
@@ -71,7 +71,7 @@ const BranchPanel = ({
   return (
     <li className="list-none ml-6 pl-8 pb-4 border-l border-scale-600 dark:border-scale-400 relative last:!border-transparent">
       <div className="absolute w-[33px] rounded-bl-full border-b border-l border-scale-600 dark:border-scale-400 h-10 -left-px" />
-      <div className="bg-scale-300 border shadow-sm flex justify-between items-center pl-8 pr-6 py-4 rounded-lg text-sm">
+      <div className="bg-surface-100 border shadow-sm flex justify-between items-center pl-8 pr-6 py-4 rounded-lg text-sm">
         <div className="flex items-center space-x-4">
           <IconGitBranch className="text-brand-900" size={16} strokeWidth={2} />
           <p>{branch?.name}</p>
