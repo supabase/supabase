@@ -145,7 +145,7 @@ const SQLTemplates = observer(() => {
                       className="ml-1"
                       variants={{
                         visible: {
-                          rotate: 0,
+                          scale: 1,
                         },
                       }}
                       initial="visible"
@@ -230,7 +230,7 @@ const SQLTemplates = observer(() => {
                   key="ask-ai-loading-icon"
                   layoutId="ask-ai-input-icon"
                   animate={{
-                    rotate: 360,
+                    scale: [0.9, 1.1, 0.9],
                     transition: {
                       delay: 0.2,
                       ease: 'linear',
