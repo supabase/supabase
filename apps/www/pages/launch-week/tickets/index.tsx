@@ -93,7 +93,7 @@ export default function TicketsPage({ users }: Props) {
   }, [])
 
   useEffect(() => {
-    toggleTheme(true)
+    if (!isDarkMode) toggleTheme(true)
     document.body.className = 'dark bg-[#020405]'
     return () => {
       document.body.className = ''

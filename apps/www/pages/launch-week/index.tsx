@@ -89,7 +89,7 @@ export default function TicketHome({ users }: Props) {
   }, [supabase])
 
   useEffect(() => {
-    toggleTheme(true)
+    if (!isDarkMode) toggleTheme(true)
     document.body.className = 'dark bg-[#020405]'
     return () => {
       document.body.className = ''
