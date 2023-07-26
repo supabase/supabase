@@ -10,12 +10,11 @@ import { createSqlSnippetSkeleton } from 'components/interfaces/SQLEditor/SQLEdi
 import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { SqlSnippet, useSqlSnippetsQuery } from 'data/content/sql-snippets-query'
-import { useCheckPermissions, useFlag, useStore } from 'hooks'
-import { IS_PLATFORM } from 'lib/constants'
+import { useCheckPermissions, useStore } from 'hooks'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useSnippets, useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { Button, Dropdown, IconPlus, IconSearch, IconX, Input, Menu, useCommandMenu } from 'ui'
+import { IconSearch, IconX, Input, Menu, cn } from 'ui'
 import QueryItem from './QueryItem'
 
 const SideBarContent = observer(() => {
@@ -23,9 +22,11 @@ const SideBarContent = observer(() => {
   const { ref, id } = useParams()
   const router = useRouter()
   const { profile } = useProfile()
-  const [filterString, setFilterString] = useState('')
-  const { setPages, setIsOpen } = useCommandMenu()
-  const showCmdkHelper = useFlag('dashboardCmdk')
+
+  const [snippetsFilterString, setSnippetsFilterString] = useState('')
+  const [favoritesFilterString, setFavoritesFilterString] = useState('')
+  const [isSnippetsFilterOpen, setIsSnippetsFilterOpen] = useState(false)
+  const [isFavoritesFilterOpen, setIsFavoritesFilterOpen] = useState(false)
 
   const snap = useSqlEditorStateSnapshot()
   const { isLoading, isSuccess } = useSqlSnippetsQuery(ref, {
@@ -42,14 +43,17 @@ const SideBarContent = observer(() => {
   )
 
   const favouriteTabs =
-    filterString.length === 0
+    favoritesFilterString.length === 0
       ? favorites
-      : favorites.filter((tab) => tab.name.toLowerCase().includes(filterString.toLowerCase()))
+      : favorites.filter((tab) =>
+          tab.name.toLowerCase().includes(favoritesFilterString.toLowerCase())
+        )
 
-  const queryTabs =
-    filterString.length === 0
+  const snippetsTabs =
+    snippetsFilterString.length === 0
       ? queries
-      : queries.filter((tab) => tab.name.toLowerCase().includes(filterString.toLowerCase()))
+      : queries.filter((tab) => tab.name.toLowerCase().includes(snippetsFilterString.toLowerCase()))
+
   const canCreateSQLSnippet = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
     resource: { type: 'sql', owner_id: profile?.id },
     subject: { id: profile?.id },
@@ -85,66 +89,6 @@ const SideBarContent = observer(() => {
   return (
     <div className="mt-6">
       <Menu type="pills">
-        {IS_PLATFORM && (
-          <div className="my-4 mx-3 space-y-2 px-3">
-            <div className="flex items-center mb-3 w-full justify-center min-w-[210px] ">
-              <Dropdown
-                align="start"
-                side="bottom"
-                sideOffset={3}
-                className="max-w-[210px]"
-                overlay={[
-                  <Dropdown.Item key="new-blank-query" onClick={() => handleNewQuery()}>
-                    <div className="space-y-1">
-                      <p className="block text-scale-1200 text-xs">New blank query</p>
-                    </div>
-                  </Dropdown.Item>,
-                  <div key={'divider'} className="my-1 border-t border-scale-400" />,
-                  showCmdkHelper ? (
-                    <Dropdown.Item
-                      key="new-ai-query"
-                      onClick={() => {
-                        router.push(`/project/${ref}/sql`)
-                      }}
-                    >
-                      <div className="space-y-1">
-                        <p className="block text-scale-1200 text-xs">New AI query</p>
-                      </div>
-                    </Dropdown.Item>
-                  ) : null,
-                ]}
-              >
-                <Button
-                  block
-                  icon={<IconPlus />}
-                  className="min-w-[208px]"
-                  type="outline"
-                  disabled={isLoading}
-                  style={{ justifyContent: 'start' }}
-                >
-                  New query
-                </Button>
-              </Dropdown>
-            </div>
-            <Input
-              size="tiny"
-              icon={<IconSearch size="tiny" />}
-              placeholder="Search"
-              disabled={isLoading}
-              onChange={(e) => setFilterString(e.target.value)}
-              value={filterString}
-              actions={
-                filterString && (
-                  <IconX
-                    size={'tiny'}
-                    className="mr-2 cursor-pointer"
-                    onClick={() => setFilterString('')}
-                  />
-                )
-              }
-            />
-          </div>
-        )}
         {isLoading ? (
           <div className="px-5 my-4 space-y-2">
             <ShimmeringLoader />
@@ -153,20 +97,59 @@ const SideBarContent = observer(() => {
           </div>
         ) : isSuccess ? (
           <div className="space-y-6">
-            {IS_PLATFORM && (
-              <div className="px-3">
-                <Menu.Group title="Getting started" />
-                <ProductMenuItem
-                  name="Build a Query"
-                  isActive={id === undefined}
-                  url={`/project/${ref}/sql`}
-                />
-              </div>
-            )}
+            <div className="px-3 flex flex-col gap-2">
+              <ProductMenuItem
+                name="Build a query"
+                isActive={id === undefined}
+                url={`/project/${ref}/sql`}
+              />
+              <ProductMenuItem
+                name="New empty query"
+                isActive={false}
+                onClick={() => {
+                  handleNewQuery()
+                }}
+              />
+            </div>
             <div className="space-y-6 px-3">
-              {favouriteTabs.length >= 1 && (
+              {favorites.length >= 1 && (
                 <div className="editor-product-menu">
-                  <Menu.Group title="Favorites" />
+                  <div className="flex flex-row justify-between">
+                    <Menu.Group title="Favorites" />
+                    <IconSearch
+                      className={cn(
+                        'w-4',
+                        'h-4',
+                        'cursor-pointer',
+                        isFavoritesFilterOpen ? 'text-scale-1200' : 'text-scale-900'
+                      )}
+                      onClick={() => {
+                        setIsFavoritesFilterOpen((state) => !state)
+                      }}
+                    />
+                  </div>
+                  {isFavoritesFilterOpen && (
+                    <div className="pl-3 mb-2">
+                      <Input
+                        autoFocus
+                        size="tiny"
+                        icon={<IconSearch size="tiny" />}
+                        placeholder="Filter"
+                        disabled={isLoading}
+                        onChange={(e) => setFavoritesFilterString(e.target.value)}
+                        value={favoritesFilterString}
+                        actions={
+                          favoritesFilterString && (
+                            <IconX
+                              size={'tiny'}
+                              className="mr-2 cursor-pointer"
+                              onClick={() => setFavoritesFilterString('')}
+                            />
+                          )
+                        }
+                      />
+                    </div>
+                  )}
                   <div className="space-y-1">
                     {favouriteTabs.map((tabInfo) => {
                       const { id } = tabInfo || {}
@@ -175,22 +158,59 @@ const SideBarContent = observer(() => {
                   </div>
                 </div>
               )}
-              {queryTabs.length >= 1 && (
+              {queries.length >= 1 && (
                 <div className="editor-product-menu">
-                  <Menu.Group title="SQL snippets" />
+                  <div className="flex flex-row justify-between">
+                    <Menu.Group title="SQL snippets" />
+                    <IconSearch
+                      className={cn(
+                        'w-4',
+                        'h-4',
+                        'cursor-pointer',
+                        isSnippetsFilterOpen ? 'text-scale-1200' : 'text-scale-900'
+                      )}
+                      onClick={() => {
+                        setIsSnippetsFilterOpen((state) => !state)
+                      }}
+                    />
+                  </div>
+                  {isSnippetsFilterOpen && (
+                    <div className="pl-3 mb-2">
+                      <Input
+                        autoFocus
+                        size="tiny"
+                        icon={<IconSearch size="tiny" />}
+                        placeholder="Filter"
+                        disabled={isLoading}
+                        onChange={(e) => setSnippetsFilterString(e.target.value)}
+                        value={snippetsFilterString}
+                        actions={
+                          snippetsFilterString && (
+                            <IconX
+                              size={'tiny'}
+                              className="mr-2 cursor-pointer"
+                              onClick={() => setSnippetsFilterString('')}
+                            />
+                          )
+                        }
+                      />
+                    </div>
+                  )}
                   <div className="space-y-1 pb-8">
-                    {queryTabs.map((tabInfo) => {
+                    {snippetsTabs.map((tabInfo) => {
                       const { id } = tabInfo || {}
                       return <QueryItem key={id} tabInfo={tabInfo} />
                     })}
                   </div>
                 </div>
               )}
-              {filterString.length > 0 && favouriteTabs.length === 0 && queryTabs.length === 0 && (
-                <div className="px-4">
-                  <p className="text-sm">No queries found</p>
-                </div>
-              )}
+              {snippetsFilterString.length > 0 &&
+                favouriteTabs.length === 0 &&
+                snippetsTabs.length === 0 && (
+                  <div className="px-4">
+                    <p className="text-sm">No queries found</p>
+                  </div>
+                )}
             </div>
           </div>
         ) : (
