@@ -1,11 +1,15 @@
-import Link from 'next/link'
-import { Button, IconSettings } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
+import { useSelectedOrganization } from 'hooks'
+import Link from 'next/link'
+import { IconSettings } from 'ui'
 
-const SettingsButton = ({ slug }: { slug: string }) => {
+const SettingsButton = () => {
+  const selectedOrganization = useSelectedOrganization()
+  const slug = selectedOrganization?.slug
+
   return (
     <Tooltip.Root delayDuration={0}>
-      <Link href={`/org/${slug}/general`} passHref>
+      <Link href={slug ? `/org/${slug}/general` : '/'} passHref>
         <Tooltip.Trigger type="button" asChild className="px-1">
           <a>
             <IconSettings size={18} strokeWidth={1.5} className="text-scale-1100" />

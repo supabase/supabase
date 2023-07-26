@@ -37,7 +37,7 @@ const AppHeader = () => {
           <FeedbackDropdown alt />
           <NotificationsPopover alt />
           <HelpPopover alt />
-          <SettingsButton slug={organization?.slug ?? ''} />
+          <SettingsButton />
         </div>
         <div className="flex items-center gap-3">
           <UserSettingsDropdown />
