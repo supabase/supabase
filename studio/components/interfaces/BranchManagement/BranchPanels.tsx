@@ -9,6 +9,7 @@ import {
   DropdownMenu_Shadcn_,
   IconEdit,
   IconGitBranch,
+  IconGitHub,
   IconMoreVertical,
   IconShield,
   IconTrash,
@@ -26,30 +27,31 @@ interface BranchPanelProps {
   onSelectDelete?: () => void
 }
 
-const BranchPanel = ({
-  branch,
-  onSelectUpdate = noop,
-  onSelectDelete = noop,
-}: BranchPanelProps) => {
+const MainBranchPanel = ({ branch, onSelectUpdate = noop }: BranchPanelProps) => {
   const { ref } = useParams()
   const [open, setOpen] = useState(false)
-
   const isActive = ref === branch?.project_ref
-  const daysFromNow = dayjs().diff(dayjs(branch?.created_at), 'day')
-  const formattedTimeFromNow = dayjs(branch?.created_at).fromNow()
-  const formattedCreatedAt = dayjs(branch?.created_at).format('DD MMM YYYY, HH:mm:ss (ZZ)')
 
-  if (branch?.is_default) {
-    return (
-      <div className="bg-surface-100 border shadow-sm flex justify-between items-center pl-8 pr-6 py-4 rounded-lg text-sm">
+  return (
+    <div className="border rounded-lg">
+      <div className="bg-surface-200 shadow-sm flex justify-between items-center pl-8 pr-6 py-3 rounded-t-lg text-sm">
         <div className="flex items-center space-x-4">
-          <IconShield size={16} strokeWidth={2} />
+          <div className="w-8 h-8 bg-scale-200 rounded-md flex items-center justify-center">
+            <IconGitHub size={18} strokeWidth={2} />
+          </div>
+          <p>Github branch workflow</p>
+        </div>
+      </div>
+      <div className="bg-surface-100 border-t shadow-sm flex justify-between items-center pl-8 pr-6 py-3 rounded-b-lg text-sm">
+        <div className="flex items-center space-x-4">
+          <div className="w-8 h-8 bg-amber-300 rounded-md flex items-center justify-center">
+            <IconShield size={18} strokeWidth={2} className="text-amber-900" />
+          </div>
           <p>{branch?.name}</p>
           <Badge color="amber">Production</Badge>
           {isActive && <Badge color="green">Selected</Badge>}
         </div>
         <div className="flex items-center space-x-4">
-          <Button>Create new branch</Button>
           <DropdownMenu_Shadcn_ open={open} onOpenChange={() => setOpen(!open)} modal={false}>
             <DropdownMenuTrigger_Shadcn_>
               <Button asChild type="text" className="px-1" icon={<IconMoreVertical size={14} />}>
@@ -65,8 +67,22 @@ const BranchPanel = ({
           </DropdownMenu_Shadcn_>
         </div>
       </div>
-    )
-  }
+    </div>
+  )
+}
+
+const BranchPanel = ({
+  branch,
+  onSelectUpdate = noop,
+  onSelectDelete = noop,
+}: BranchPanelProps) => {
+  const { ref } = useParams()
+  const [open, setOpen] = useState(false)
+
+  const isActive = ref === branch?.project_ref
+  const daysFromNow = dayjs().diff(dayjs(branch?.created_at), 'day')
+  const formattedTimeFromNow = dayjs(branch?.created_at).fromNow()
+  const formattedCreatedAt = dayjs(branch?.created_at).format('DD MMM YYYY, HH:mm:ss (ZZ)')
 
   return (
     <li className="list-none ml-6 pl-8 pb-4 border-l border-scale-600 dark:border-scale-400 relative last:!border-transparent">
@@ -129,4 +145,4 @@ const BranchHeader = forwardRef<HTMLDivElement, BranchHeader>(
 )
 
 BranchHeader.displayName = 'BranchHeader'
-export { BranchHeader, BranchPanel }
+export { BranchHeader, MainBranchPanel, BranchPanel }

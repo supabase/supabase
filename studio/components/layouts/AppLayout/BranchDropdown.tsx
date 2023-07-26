@@ -52,7 +52,7 @@ const BranchDropdown = () => {
               {selectedBranch?.is_default ? (
                 <Badge color="amber">Production</Badge>
               ) : (
-                <Badge color="green">Branch</Badge>
+                <Badge color="green">Preview Branch</Badge>
               )}
             </a>
           </Link>
