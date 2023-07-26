@@ -4,7 +4,7 @@ export const TabPanel = Tabs.Panel
 
 export const meta = {
   id: 'ai-choosing-compute-addon',
-  title: 'Choosing you Compute Add-on',
+  title: 'Choosing your Compute Add-on',
   description: 'Choosing the right Compute Add-on for your vector workload.',
   subtitle: 'Choosing the right Compute Add-on for your vector workload.',
   sidebar_label: 'Choosing Compute Add-on',
@@ -66,6 +66,19 @@ For 1,000,000 vectors 40 probes results to precision of 0.98. Note that exact va
 
 </TabPanel>
 </Tabs>
+
+<div>
+  <img
+    alt="multi database"
+    className="dark:hidden"
+    src="/docs/img/ai/going-prod/size-to-rps--light.png"
+  />
+  <img
+    alt="multi database"
+    className="hidden dark:block"
+    src="/docs/img/ai/going-prod/size-to-rps--dark.png"
+  />
+</div>
 
 ### 960 Dimensions
 
@@ -157,6 +170,19 @@ It's useful to execute a few thousand “warm-up” queries before going into pr
 ### Increase the number of lists
 
 You can increase the Requests per Second by increasing the number of `lists`. This also has an important caveat: building the index takes longer with more lists.
+
+<div>
+  <img
+    alt="multi database"
+    className="dark:hidden"
+    src="/docs/img/ai/instance-type/lists-for-1m--light.png"
+  />
+  <img
+    alt="multi database"
+    className="hidden dark:block"
+    src="/docs/img/ai/instance-type/lists-for-1m--dark.png"
+  />
+</div>
 
 ## Benchmark Methodology
 
