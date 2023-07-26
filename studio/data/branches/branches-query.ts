@@ -11,8 +11,10 @@ export type BranchesVariables = {
 export type Branch = components['schemas']['BranchResponse']
 
 export async function getBranches({ projectRef }: BranchesVariables, signal?: AbortSignal) {
+  if (!projectRef) throw new Error('Project ref is required')
+
   const { data, error } = await get(`/v1/projects/{ref}/branches`, {
-    params: { path: { ref: projectRef ?? '' } },
+    params: { path: { ref: projectRef } },
     signal,
   })
 
