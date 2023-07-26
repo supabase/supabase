@@ -7,10 +7,11 @@ import AlertError from 'components/ui/AlertError'
 import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useBranchDeleteMutation } from 'data/branches/branch-delete-mutation'
-import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
 import { Branch, useBranchesQuery } from 'data/branches/branches-query'
 import { useSelectedProject, useStore } from 'hooks'
-import { BranchHeader, BranchPanel } from './BranchPanels'
+import { Button, IconSearch, Input } from 'ui'
+import { BranchHeader, BranchPanel, MainBranchPanel } from './BranchPanels'
+import UpdateBranchSidePanel from './UpdateBranchSidePanel'
 
 const BranchManagement = () => {
   const { ui } = useStore()
@@ -27,12 +28,6 @@ const BranchManagement = () => {
   const { data: branches, error, isLoading, isError, isSuccess } = useBranchesQuery({ projectRef })
   const [[mainBranch], previewBranches] = partition(branches, (branch) => branch.is_default)
 
-  const { mutate: updateBranch, isLoading: isUpdating } = useBranchUpdateMutation({
-    onSuccess: () => {
-      setSelectedBranchToUpdate(undefined)
-      ui.setNotification({ category: 'success', message: 'Successfully updated branch' })
-    },
-  })
   const { mutate: deleteBranch, isLoading: isDeleting } = useBranchDeleteMutation({
     onSuccess: () => {
       setSelectedBranchToDelete(undefined)
@@ -51,19 +46,25 @@ const BranchManagement = () => {
       <ScaffoldContainer>
         <ScaffoldSection>
           <div className="col-span-12">
-            <h3 className="text-lg">Branches</h3>
-            <div className="mt-8">
+            <h3 className="text-xl mb-8">Branch Manager</h3>
+            <div className="mb-6 flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Input placeholder="Search branch" size="small" icon={<IconSearch />} />
+              </div>
+              <Button>Create preview branch</Button>
+            </div>
+            <div className="">
               {isLoading && <GenericSkeletonLoader />}
               {isError && <AlertError error={error} subject="Failed to retrieve branches" />}
               {isSuccess && (
                 <>
-                  <BranchPanel branch={mainBranch} onSelectUpdate={() => {}} />
+                  <MainBranchPanel branch={mainBranch} onSelectUpdate={() => {}} />
                   <BranchHeader markdown={`#### Preview branches`} />
                   {previewBranches.map((branch) => (
                     <BranchPanel
                       key={branch.id}
                       branch={branch}
-                      onSelectUpdate={() => {}}
+                      onSelectUpdate={() => setSelectedBranchToUpdate(branch)}
                       onSelectDelete={() => setSelectedBranchToDelete(branch)}
                     />
                   ))}
@@ -86,6 +87,11 @@ const BranchManagement = () => {
         confirmString={selectedBranchToDelete?.name ?? ''}
         text={`This will delete your branch "${selectedBranchToDelete?.name}"`}
         alert="You cannot recover this branch once it is deleted!"
+      />
+
+      <UpdateBranchSidePanel
+        selectedBranch={selectedBranchToUpdate}
+        onClose={() => setSelectedBranchToUpdate(undefined)}
       />
     </>
   )
