@@ -6,7 +6,7 @@
   "license": "MIT",
   "dependencies": {
     "@headlessui/react": "^1.7.14",
-    "@supabase/gotrue-js": "2.42.0",
+    "@supabase/gotrue-js": "^2.46.1",
     "@supabase/ui": "^0.37.0-alpha.50",
     "react-use": "^17.4.0"
   },
