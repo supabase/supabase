@@ -221,8 +221,8 @@ const PROVIDER_PHONE = {
       units: 'seconds',
       show: {
         key: 'SMS_PROVIDER',
-        matches: ['twilio', 'messagebird', 'textlocal', 'vonage']
-      }
+        matches: ['twilio', 'messagebird', 'textlocal', 'vonage'],
+      },
     },
     SMS_OTP_LENGTH: {
       title: 'SMS OTP Length',
@@ -231,17 +231,17 @@ const PROVIDER_PHONE = {
       units: 'digits',
       show: {
         key: 'SMS_PROVIDER',
-        matches: ['twilio', 'messagebird', 'textlocal', 'vonage']
-      }
+        matches: ['twilio', 'messagebird', 'textlocal', 'vonage'],
+      },
     },
     SMS_TEMPLATE: {
       title: 'SMS Message',
-      type: 'string',
+      type: 'multiline-string',
       description: 'To format the OTP code use `{{ .Code }}`',
       show: {
         key: 'SMS_PROVIDER',
-        matches: ['twilio', 'messagebird', 'textlocal', 'vonage']
-      }
+        matches: ['twilio', 'messagebird', 'textlocal', 'vonage'],
+      },
     },
   },
   validationSchema: object().shape({
@@ -286,13 +286,16 @@ const PROVIDER_PHONE = {
       then: (schema) => schema.required('Twilio Verify Auth Token is required'),
       otherwise: (schema) => schema,
     }),
-    SMS_TWILIO_VERIFY_MESSAGE_SERVICE_SID: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
-      is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
-        return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'twilio-verify'
-      },
-      then: (schema) => schema.required('Twilio Verify Service SID is required'),
-      otherwise: (schema) => schema,
-    }),
+    SMS_TWILIO_VERIFY_MESSAGE_SERVICE_SID: string().when(
+      ['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'],
+      {
+        is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
+          return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'twilio-verify'
+        },
+        then: (schema) => schema.required('Twilio Verify Service SID is required'),
+        otherwise: (schema) => schema,
+      }
+    ),
 
     // Messagebird
     SMS_MESSAGEBIRD_ACCESS_KEY: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
