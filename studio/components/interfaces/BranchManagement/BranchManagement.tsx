@@ -12,6 +12,8 @@ import { useSelectedProject, useStore } from 'hooks'
 import { Button, IconSearch, Input } from 'ui'
 import { BranchHeader, BranchPanel, MainBranchPanel } from './BranchPanels'
 import UpdateBranchSidePanel from './UpdateBranchSidePanel'
+import PullRequests from './PullRequests'
+import PreviewBranches from './PreviewBranches'
 
 const BranchManagement = () => {
   const { ui } = useStore()
@@ -59,15 +61,12 @@ const BranchManagement = () => {
               {isSuccess && (
                 <>
                   <MainBranchPanel branch={mainBranch} onSelectUpdate={() => {}} />
-                  <BranchHeader markdown={`#### Preview branches`} />
-                  {previewBranches.map((branch) => (
-                    <BranchPanel
-                      key={branch.id}
-                      branch={branch}
-                      onSelectUpdate={() => setSelectedBranchToUpdate(branch)}
-                      onSelectDelete={() => setSelectedBranchToDelete(branch)}
-                    />
-                  ))}
+                  <PullRequests previewBranches={previewBranches} />
+                  <PreviewBranches
+                    previewBranches={previewBranches}
+                    onSelectUpdateBranch={setSelectedBranchToUpdate}
+                    onSelectDeleteBranch={setSelectedBranchToDelete}
+                  />
                 </>
               )}
             </div>
