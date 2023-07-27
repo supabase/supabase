@@ -5,6 +5,7 @@ import { serialize } from 'next-mdx-remote/serialize'
 import { relative } from 'path'
 import rehypeSlug from 'rehype-slug'
 import remarkGfm from 'remark-gfm'
+import emoji from 'remark-emoji'
 import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
 import components from '~/components'
 import Layout from '~/layouts/DefaultGuideLayout'
@@ -155,6 +156,7 @@ export const getStaticProps: GetStaticProps<WrappersDocsProps> = async ({ params
       remarkPlugins: [
         remarkGfm,
         remarkMkDocsAdmonition,
+        emoji,
         [removeTitle, meta.title],
         [remarkCodeHike, codeHikeOptions],
       ],
