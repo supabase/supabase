@@ -1,16 +1,16 @@
-import { Button, Dropdown, IconChevronDown, IconClipboard, IconDownload } from 'ui'
+import { useTelemetryProps } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useStore } from 'hooks'
 import { copyToClipboard } from 'lib/helpers'
 import Telemetry from 'lib/telemetry'
-import { compact } from 'lodash'
+import { compact, isString, map } from 'lodash'
+import { useRouter } from 'next/router'
 import { useMemo, useRef } from 'react'
 import { CSVLink } from 'react-csv'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
+import { Button, Dropdown, IconChevronDown, IconClipboard, IconDownload } from 'ui'
 // @ts-ignore
 import MarkdownTable from 'markdown-table'
-import { useTelemetryProps } from 'common'
-import { useRouter } from 'next/router'
 
 export type ResultsDropdownProps = {
   id: string
@@ -25,10 +25,22 @@ const ResultsDropdown = ({ id }: ResultsDropdownProps) => {
   const csvRef = useRef<CSVLink & HTMLAnchorElement & { link: HTMLAnchorElement }>(null)
   const router = useRouter()
 
-  const csvData = useMemo(
-    () => (result?.rows ? compact(Array.from(result.rows || [])) : ''),
-    [result?.rows]
-  )
+  const csvData = useMemo(() => {
+    if (result?.rows) {
+      const rows = Array.from(result.rows || []).map((row) => {
+        return map(row, (v, k) => {
+          if (isString(v)) {
+            // replace all newlines with the character \n
+            return v.replaceAll(/\n/g, '\\n')
+          }
+          return v
+        })
+      })
+
+      return compact(rows)
+    }
+    return ''
+  }, [result])
 
   function onDownloadCSV() {
     csvRef.current?.link.click()
