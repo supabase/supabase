@@ -26,7 +26,7 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
 
   const { data: organizations, isLoading: isLoadingOrganizations } = useOrganizationsQuery()
   const { data: requester, isLoading, isError, error } = useApiAuthorizationQuery({ id: auth_id })
-  const isApproved = requester?.approved_at !== null
+  const isApproved = (requester?.approved_at ?? null) !== null
   const isExpired = dayjs().isAfter(dayjs(requester?.expires_at))
 
   const { mutate: approveRequest, isLoading: isApproving } = useApiAuthorizationApproveMutation({
