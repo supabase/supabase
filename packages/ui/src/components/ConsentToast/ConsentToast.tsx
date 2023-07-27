@@ -15,9 +15,10 @@ const ConsentToast = ({ onAccept = noop, onOptOut = noop }: ConsentToastProps) =
     <div className="space-y-3">
       <div className="text-sm">
         <p>
-          This site <span className="underline font-medium">does not</span> use cookies 🍪
+          By default, we don't track you. This site{' '}
+          <span className="underline font-medium">does not</span> use cookies 🍪
         </p>
-        <p>We use friendly server side analytics to measure and improve your experience</p>
+        <p>Would you like to provide telemetry to improve your experience?</p>
       </div>
       <div className="flex items-center space-x-2">
         <Button type="default" onClick={onAccept}>
@@ -26,7 +27,7 @@ const ConsentToast = ({ onAccept = noop, onOptOut = noop }: ConsentToastProps) =
         <Button type="text" onClick={onOptOut}>
           Opt out
         </Button>
-        <Link href={`${basePath}/privacy`}>
+        <Link href="https://supabase.com/privacy">
           <a target="_blank" rel="noreferrer">
             <Button type="text">Learn more</Button>
           </a>
