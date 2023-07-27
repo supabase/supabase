@@ -76,6 +76,7 @@ export function useLocalStorageQuery<T>(key: string, initialValue: T) {
       window.localStorage.setItem(key, JSON.stringify(valueToStore))
     }
 
+    queryClient.setQueryData(queryKey, valueToStore)
     queryClient.invalidateQueries(queryKey)
   }
 
