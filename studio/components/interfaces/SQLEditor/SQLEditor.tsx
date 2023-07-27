@@ -2,6 +2,7 @@ import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useSqlEditMutation } from 'data/ai/sql-edit-mutation'
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
+import { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -13,7 +14,11 @@ import {
   useStore,
 } from 'hooks'
 import useLatest from 'hooks/misc/useLatest'
+import { IS_PLATFORM } from 'lib/constants'
+import { uuidv4 } from 'lib/helpers'
+import { useProfile } from 'lib/profile'
 import dynamic from 'next/dynamic'
+import { useRouter } from 'next/router'
 import {
   Dispatch,
   SetStateAction,
@@ -27,12 +32,23 @@ import {
 import Split from 'react-split'
 import { format } from 'sql-formatter'
 import { getSqlEditorStateSnapshot, useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { AiIcon, Button, IconCheck, IconCornerDownLeft, IconSettings, IconX, Input } from 'ui'
+import {
+  AiIcon,
+  Button,
+  Dropdown,
+  IconCheck,
+  IconChevronDown,
+  IconCornerDownLeft,
+  IconLoader,
+  IconSettings,
+  IconX,
+  Input,
+} from 'ui'
 import AISettingsModal from './AISettingsModal'
-import type { IStandaloneCodeEditor } from './MonacoEditor'
 import { sqlAiDisclaimerComment, untitledSnippetTitle } from './SQLEditor.constants'
+import { IStandaloneCodeEditor, IStandaloneDiffEditor } from './SQLEditor.types'
+import { createSqlSnippetSkeleton } from './SQLEditor.utils'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
-import { IS_PLATFORM } from 'lib/constants'
 
 // Load the monaco editor client-side only (does not behave well server-side)
 const MonacoEditor = dynamic(() => import('./MonacoEditor'), { ssr: false })
@@ -67,12 +83,47 @@ export function useSqlEditor() {
   return values
 }
 
+enum DiffType {
+  Modification = 'modification',
+  Addition = 'addition',
+  NewSnippet = 'new-snippet',
+}
+
+function getDiffTypeButtonLabel(diffType: DiffType) {
+  switch (diffType) {
+    case DiffType.Modification:
+      return 'Accept change'
+    case DiffType.Addition:
+      return 'Accept addition'
+    case DiffType.NewSnippet:
+      return 'Create new snippet'
+    default:
+      throw new Error(`Unknown diff type '${diffType}'`)
+  }
+}
+
+function getDiffTypeDropdownLabel(diffType: DiffType) {
+  switch (diffType) {
+    case DiffType.Modification:
+      return 'Compare as change'
+    case DiffType.Addition:
+      return 'Compare as addition'
+    case DiffType.NewSnippet:
+      return 'Compare as new snippet'
+    default:
+      throw new Error(`Unknown diff type '${diffType}'`)
+  }
+}
+
 const SQLEditor = () => {
   const { ui } = useStore()
   const { ref, id } = useParams()
+  const router = useRouter()
+  const { profile } = useProfile()
   const { project } = useProjectContext()
   const snap = useSqlEditorStateSnapshot()
   const { mutateAsync: editSql, isLoading: isEditSqlLoading } = useSqlEditMutation()
+  const { mutateAsync: titleSql } = useSqlTitleGenerateMutation()
   const { mutateAsync: generateSqlTitle } = useSqlTitleGenerateMutation()
   const [aiInput, setAiInput] = useState('')
   const [debugSolution, setDebugSolution] = useState<string>()
@@ -84,8 +135,11 @@ const SQLEditor = () => {
   const isOptedInToAI =
     selectedOrganization?.opt_in_tags?.includes('AI_SQL_GENERATOR_OPT_IN') ?? false
   const [isOptedInToAISchema] = useLocalStorageQuery('supabase_sql-editor-ai-schema', false)
+  const [isAcceptDiffLoading, setIsAcceptDiffLoading] = useState(false)
 
   const includeSchemaMetadata = (isOptedInToAI || !IS_PLATFORM) && isOptedInToAISchema
+
+  const [selectedDiffType, setSelectedDiffType] = useState(DiffType.Modification)
 
   const { data } = useEntityDefinitionsQuery(
     {
@@ -131,6 +185,7 @@ const SQLEditor = () => {
   }, [])
 
   const editorRef = useRef<IStandaloneCodeEditor | null>(null)
+  const diffEditorRef = useRef<IStandaloneDiffEditor | null>(null)
 
   /**
    * Sets the snippet title using AI if it is still untitled.
@@ -173,34 +228,70 @@ const SQLEditor = () => {
     }
   }, [isExecuting, isDiffOpen, execute, project, setAiTitle])
 
-  const acceptAiHandler = useCallback(() => {
-    if (!sqlDiff) {
-      return
-    }
+  const handleNewQuery = useCallback(
+    async (sql: string, name: string) => {
+      if (!ref) return console.error('Project ref is required')
 
-    // TODO: show error if undefined
-    if (id && editorRef.current) {
-      const editorModel = editorRef.current.getModel()
+      try {
+        const snippet = createSqlSnippetSkeleton({ name, sql, owner_id: profile?.id })
+        const data = { ...snippet, id: uuidv4() }
+        snap.addSnippet(data as SqlSnippet, ref, true)
+        router.push(`/project/${ref}/sql/${data.id}`)
+      } catch (error: any) {
+        ui.setNotification({
+          category: 'error',
+          message: `Failed to create new query: ${error.message}`,
+        })
+      }
+    },
+    [profile, ref, router, snap, ui]
+  )
 
-      if (!editorModel) {
+  const acceptAiHandler = useCallback(async () => {
+    try {
+      setIsAcceptDiffLoading(true)
+
+      if (!sqlDiff) {
         return
       }
 
-      editorRef.current.executeEdits('apply-ai-edit', [
-        {
-          text: sqlDiff.modified,
-          range: editorModel.getFullModelRange(),
-        },
-      ])
+      // TODO: show error if undefined
+      if (!editorRef.current || !diffEditorRef.current) {
+        return
+      }
+
+      const editorModel = editorRef.current.getModel()
+      const diffModel = diffEditorRef.current.getModel()
+
+      if (!editorModel || !diffModel) {
+        return
+      }
+
+      const sql = diffModel.modified.getValue()
+
+      if (selectedDiffType === DiffType.NewSnippet) {
+        const { title } = await titleSql({ sql })
+        await handleNewQuery(sql, title)
+      } else {
+        editorRef.current.executeEdits('apply-ai-edit', [
+          {
+            text: sql,
+            range: editorModel.getFullModelRange(),
+          },
+        ])
+      }
 
       setAiInput('')
+      setSelectedDiffType(DiffType.Modification)
       setDebugSolution(undefined)
       setSqlDiff(undefined)
       setTimeout(() => {
         inputRef.current?.focus()
       }, 0)
+    } finally {
+      setIsAcceptDiffLoading(false)
     }
-  }, [sqlDiff, id])
+  }, [sqlDiff, selectedDiffType, handleNewQuery, titleSql])
 
   const discardAiHandler = useCallback(() => {
     setDebugSolution(undefined)
@@ -230,6 +321,53 @@ const SQLEditor = () => {
 
     return () => window.removeEventListener('keydown', handler)
   }, [isDiffOpen, acceptAiHandler, discardAiHandler])
+
+  const compareAsModification = useCallback(() => {
+    const model = diffEditorRef.current?.getModel()
+
+    if (!model) {
+      throw new Error("Diff editor's model not available")
+    }
+
+    if (!sqlDiff) {
+      throw new Error('Returned SQL diff not available')
+    }
+
+    model.original.setValue(sqlDiff.original)
+    model.modified.setValue(sqlDiff.modified)
+  }, [sqlDiff])
+
+  const compareAsAddition = useCallback(() => {
+    const model = diffEditorRef.current?.getModel()
+
+    if (!model) {
+      throw new Error("Diff editor's model not available")
+    }
+
+    if (!sqlDiff) {
+      throw new Error('Returned SQL diff not available')
+    }
+
+    model.original.setValue(sqlDiff.original)
+    model.modified.setValue(
+      sqlDiff.original + '\n\n' + sqlDiff.modified.replace(sqlAiDisclaimerComment, '').trim()
+    )
+  }, [sqlDiff])
+
+  const compareAsNewSnippet = useCallback(() => {
+    const model = diffEditorRef.current?.getModel()
+
+    if (!model) {
+      throw new Error("Diff editor's model not available")
+    }
+
+    if (!sqlDiff) {
+      throw new Error('Returned SQL diff not available')
+    }
+
+    model.original.setValue('')
+    model.modified.setValue(sqlDiff.modified)
+  }, [sqlDiff])
 
   return (
     <SQLEditorContext.Provider
@@ -306,19 +444,60 @@ const SQLEditor = () => {
                     <div className="flex flex-row items-center gap-2 space-x-1 mr-6">
                       {isDiffOpen ? (
                         <>
-                          <Button
-                            type="primary"
-                            size="tiny"
-                            icon={<IconCheck />}
-                            iconRight={
-                              <div className="opacity-30">
-                                <IconCornerDownLeft size={12} strokeWidth={1.5} />
-                              </div>
-                            }
-                            onClick={acceptAiHandler}
-                          >
-                            Accept
-                          </Button>
+                          <div className="flex items-center">
+                            <Button
+                              className="rounded-r-none"
+                              type="primary"
+                              size="tiny"
+                              icon={
+                                !isAcceptDiffLoading ? (
+                                  <IconCheck />
+                                ) : (
+                                  <IconLoader className="animate-spin" size={14} />
+                                )
+                              }
+                              iconRight={
+                                <div className="opacity-30">
+                                  <IconCornerDownLeft size={12} strokeWidth={1.5} />
+                                </div>
+                              }
+                              onClick={acceptAiHandler}
+                            >
+                              {getDiffTypeButtonLabel(selectedDiffType)}
+                            </Button>
+                            <Dropdown
+                              align="end"
+                              side="bottom"
+                              overlay={Object.values(DiffType)
+                                .filter((diffType) => diffType !== selectedDiffType)
+                                .map((diffType) => (
+                                  <Dropdown.Item
+                                    key={diffType}
+                                    onClick={() => {
+                                      setSelectedDiffType(diffType)
+                                      switch (diffType) {
+                                        case DiffType.Modification:
+                                          return compareAsModification()
+                                        case DiffType.Addition:
+                                          return compareAsAddition()
+                                        case DiffType.NewSnippet:
+                                          return compareAsNewSnippet()
+                                        default:
+                                          throw new Error(`Unknown diff type '${diffType}'`)
+                                      }
+                                    }}
+                                  >
+                                    {getDiffTypeDropdownLabel(diffType)}
+                                  </Dropdown.Item>
+                                ))}
+                            >
+                              <Button
+                                type="primary"
+                                className="rounded-l-none border-l-0 px-[4px] py-[5px]"
+                                icon={<IconChevronDown />}
+                              />
+                            </Dropdown>
+                          </div>
                           <Button
                             type="alternative"
                             size="tiny"
@@ -488,6 +667,43 @@ const SQLEditor = () => {
                       language="pgsql"
                       original={sqlDiff.original}
                       modified={sqlDiff.modified}
+                      onMount={(editor) => {
+                        diffEditorRef.current = editor
+                        let isFirstLoad = true
+
+                        editor.onDidUpdateDiff(() => {
+                          if (!isFirstLoad) {
+                            return
+                          }
+
+                          const model = editor.getModel()
+                          const lineChanges = editor.getLineChanges()
+
+                          if (!model || !lineChanges || lineChanges.length === 0) {
+                            return
+                          }
+
+                          const lineStart = (sqlAiDisclaimerComment + '\n\n').split('\n').length
+                          const lineEnd = model.original.getLineCount()
+                          const totalLines = lineEnd - lineStart
+
+                          // If any change overwrites >50% of the existing code,
+                          // predict that this is an addition instead of a modification
+                          const isAddition = lineChanges.some(
+                            (lineChange) =>
+                              lineChange.originalEndLineNumber -
+                                lineChange.originalStartLineNumber >
+                              totalLines * 0.5
+                          )
+
+                          if (isAddition) {
+                            setSelectedDiffType(DiffType.Addition)
+                            compareAsAddition()
+                          }
+
+                          isFirstLoad = false
+                        })
+                      }}
                       options={{
                         fontSize: 13,
                       }}

@@ -3,8 +3,7 @@ import { timeout } from 'lib/helpers'
 import { editor } from 'monaco-editor'
 import { MutableRefObject, useRef, useState } from 'react'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
-
-export type IStandaloneCodeEditor = Parameters<OnMount>[0]
+import { IStandaloneCodeEditor } from './SQLEditor.types'
 
 export type MonacoEditorProps = {
   id: string
