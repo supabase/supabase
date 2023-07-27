@@ -1,5 +1,6 @@
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import { useSqlEditMutation } from 'data/ai/sql-edit-mutation'
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
@@ -57,6 +58,8 @@ const DiffEditor = dynamic(
   () => import('@monaco-editor/react').then(({ DiffEditor }) => DiffEditor),
   { ssr: false }
 )
+
+const destructiveSqlRegex = [/drop/i, /delete/i]
 
 type ContentDiff = {
   original: string
@@ -130,7 +133,10 @@ const SQLEditor = () => {
   const [debugSolution, setDebugSolution] = useState<string>()
   const [sqlDiff, setSqlDiff] = useState<ContentDiff>()
   const inputRef = useRef<HTMLInputElement>(null)
+
   const [isAISettingsOpen, setIsAISettingsOpen] = useState(false)
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false)
+
   const selectedOrganization = useSelectedOrganization()
   const selectedProject = useSelectedProject()
   const isOptedInToAI =
@@ -204,30 +210,41 @@ const SQLEditor = () => {
     }
   }, [id, snippet, generateSqlTitle, snap])
 
-  const executeQuery = useCallback(async () => {
-    if (isDiffOpen) {
-      return
-    }
+  const executeQuery = useCallback(
+    async (force: boolean = false) => {
+      if (isDiffOpen) {
+        return
+      }
 
-    // use the latest state
-    const state = getSqlEditorStateSnapshot()
-    const snippet = idRef.current && state.snippets[idRef.current]
+      // use the latest state
+      const state = getSqlEditorStateSnapshot()
+      const snippet = idRef.current && state.snippets[idRef.current]
 
-    if (project && snippet && !isExecuting && editorRef.current !== null) {
-      const editor = editorRef.current
-      const selection = editor.getSelection()
-      const selectedValue = selection ? editor.getModel()?.getValueInRange(selection) : undefined
-      const overrideSql = selectedValue || editorRef.current?.getValue()
+      if (project && snippet && !isExecuting && editorRef.current !== null) {
+        const editor = editorRef.current
+        const selection = editor.getSelection()
+        const selectedValue = selection ? editor.getModel()?.getValueInRange(selection) : undefined
+        const sql = (selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content.sql
 
-      setAiTitle()
+        const containsDestructiveOperations = destructiveSqlRegex.some((regex) => regex.test(sql))
 
-      execute({
-        projectRef: project.ref,
-        connectionString: project.connectionString,
-        sql: overrideSql ?? snippet.snippet.content.sql,
-      })
-    }
-  }, [isExecuting, isDiffOpen, execute, project, setAiTitle])
+        if (!force && containsDestructiveOperations) {
+          setIsConfirmModalOpen(true)
+          return
+        }
+
+        // Intentionally don't await title gen
+        setAiTitle()
+
+        execute({
+          projectRef: project.ref,
+          connectionString: project.connectionString,
+          sql,
+        })
+      }
+    },
+    [isExecuting, isDiffOpen, execute, project, setAiTitle]
+  )
 
   const handleNewQuery = useCallback(
     async (sql: string, name: string) => {
@@ -385,6 +402,19 @@ const SQLEditor = () => {
       }}
     >
       <AISettingsModal visible={isAISettingsOpen} onCancel={() => setIsAISettingsOpen(false)} />
+      <ConfirmModal
+        visible={isConfirmModalOpen}
+        title="Destructive operation"
+        description="We've detected a potentially destructive operation in the query. Please confirm that you would like to execute this query."
+        buttonLabel="Execute query"
+        onSelectCancel={() => {
+          setIsConfirmModalOpen(false)
+        }}
+        onSelectConfirm={() => {
+          setIsConfirmModalOpen(false)
+          executeQuery(true)
+        }}
+      />
       <div className="flex h-full flex-col">
         <motion.div
           key="ask-ai-input-container"
