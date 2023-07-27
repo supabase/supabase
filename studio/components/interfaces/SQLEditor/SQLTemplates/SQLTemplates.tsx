@@ -2,6 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition } from 'lodash'
 import { observer } from 'mobx-react-lite'
 
+import * as Popover from '@radix-ui/react-popover'
 import { useParams, useTelemetryProps } from 'common'
 import {
   SQL_TEMPLATES,
@@ -24,10 +25,10 @@ import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import Telemetry from 'lib/telemetry'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { format } from 'sql-formatter'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { AiIcon, IconCornerDownLeft, IconSettings, Input } from 'ui'
+import { AiIcon, Button, IconCornerDownLeft, IconInfo, IconSettings, Input } from 'ui'
 import AISettingsModal from '../AISettingsModal'
 import { createSqlSnippetSkeleton } from '../SQLEditor.utils'
 import SQLCard from './SQLCard'
@@ -45,6 +46,23 @@ const SQLTemplates = observer(() => {
   const isOptedInToAI =
     selectedOrganization?.opt_in_tags?.includes('AI_SQL_GENERATOR_OPT_IN') ?? false
   const [isOptedInToAISchema] = useLocalStorageQuery('supabase_sql-editor-ai-schema', false)
+  const [aiQueryCount, setAiQueryCount] = useLocalStorageQuery(
+    'supabase_sql-editor-ai-query-count',
+    0
+  )
+  const [isSchemaSuggestionDismissed, setIsSchemaSuggestionDismissed] = useLocalStorageQuery(
+    'supabase_sql-editor-schema-suggestion-dismissed',
+    false
+  )
+  const [isDelayComplete, setIsDelayComplete] = useState(false)
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => {
+      setIsDelayComplete(true)
+    }, 500)
+
+    return () => window.clearTimeout(timeout)
+  })
 
   const includeSchemaMetadata = (isOptedInToAI || !IS_PLATFORM) && isOptedInToAISchema
 
@@ -113,96 +131,160 @@ const SQLTemplates = observer(() => {
           </motion.h1>
           <div className="w-full flex justify-center">
             {!isSqlGenerateLoading ? (
-              <motion.div
-                key="ask-ai-input-container"
-                layoutId="ask-ai-input-container"
-                className="w-full max-w-2xl border border-brand-900"
-                variants={{
-                  visible: {
-                    y: 0,
-                    opacity: 1,
-                    borderRadius: 6,
-                  },
-                  hidden: {
-                    y: -50,
-                    opacity: 0,
-                    borderRadius: 6,
-                  },
-                }}
-                initial="hidden"
-                animate="visible"
+              <Popover.Root
+                open={
+                  isDelayComplete &&
+                  !includeSchemaMetadata &&
+                  aiQueryCount >= 3 &&
+                  !isSchemaSuggestionDismissed
+                }
               >
-                <Input
-                  size="xlarge"
-                  inputRef={(inputElement: HTMLInputElement) => {
-                    setTimeout(() => {
-                      inputElement?.focus()
-                    }, 200)
-                  }}
-                  icon={
+                <Popover.Anchor asChild>
+                  <motion.div
+                    key="ask-ai-input-container"
+                    layoutId="ask-ai-input-container"
+                    className="w-full max-w-2xl border border-brand-900"
+                    variants={{
+                      visible: {
+                        y: 0,
+                        opacity: 1,
+                        borderRadius: 6,
+                      },
+                      hidden: {
+                        y: -50,
+                        opacity: 0,
+                        borderRadius: 6,
+                      },
+                    }}
+                    initial="hidden"
+                    animate="visible"
+                  >
+                    <Input
+                      size="xlarge"
+                      inputRef={(inputElement: HTMLInputElement) => {
+                        setTimeout(() => {
+                          inputElement?.focus()
+                        }, 200)
+                      }}
+                      icon={
+                        <motion.div
+                          key="ask-ai-input-icon"
+                          layoutId="ask-ai-input-icon"
+                          className="ml-1"
+                          variants={{
+                            visible: {
+                              scale: 1,
+                            },
+                          }}
+                          initial="visible"
+                          animate="visible"
+                        >
+                          <AiIcon className="w-4 h-4" />
+                        </motion.div>
+                      }
+                      inputClassName="w-full border-none py-4 focus:!ring-0 pr-20"
+                      iconContainerClassName="transition text-scale-800 text-brand-900"
+                      placeholder="Ask Supabase AI to build a query"
+                      className="w-full"
+                      onKeyPress={async (e) => {
+                        if (e.key === 'Enter') {
+                          try {
+                            const value = e.currentTarget.value
+
+                            if (!value) {
+                              return
+                            }
+
+                            const { title, sql } = await generateSql({
+                              prompt: e.currentTarget.value,
+                              entityDefinitions,
+                            })
+
+                            setAiQueryCount((count) => count + 1)
+
+                            const formattedSql =
+                              sqlAiDisclaimerComment +
+                              '\n\n' +
+                              format(sql, {
+                                language: 'postgresql',
+                                keywordCase: 'lower',
+                              })
+
+                            await handleNewQuery(formattedSql, title)
+                          } catch (error: unknown) {
+                            if (isError(error)) {
+                              ui.setNotification({
+                                category: 'error',
+                                message: error.message,
+                              })
+                            }
+                          }
+                        }
+                      }}
+                      actions={
+                        <div className="flex items-center space-x-1 mr-4 gap-2">
+                          <IconCornerDownLeft size={16} strokeWidth={1.5} />
+                          <IconSettings
+                            className="cursor-pointer"
+                            onClick={() => {
+                              setIsSchemaSuggestionDismissed(true)
+                              setIsAISettingsOpen(true)
+                            }}
+                          />
+                        </div>
+                      }
+                    />
+                  </motion.div>
+                </Popover.Anchor>
+
+                <Popover.Portal>
+                  <Popover.Content side="bottom" sideOffset={5}>
                     <motion.div
-                      key="ask-ai-input-icon"
-                      layoutId="ask-ai-input-icon"
-                      className="ml-1"
                       variants={{
                         visible: {
-                          scale: 1,
+                          opacity: 1,
+                          y: 0,
+                        },
+                        hidden: {
+                          opacity: 0,
+                          y: -10,
                         },
                       }}
-                      initial="visible"
+                      initial="hidden"
                       animate="visible"
                     >
-                      <AiIcon className="w-4 h-4" />
+                      <Popover.Arrow className="fill-scale-300 dark:fill-scale-500" />
+                      <div className="flex flex-col gap-2 border border-scale-300 dark:border-scale-500 rounded-md p-4 bg-scale-300 shadow-xl">
+                        <div className="flex flex-row items-center gap-4 max-w-md">
+                          <IconInfo className="w-6 h-6" />
+                          <p className="text-sm">
+                            Generate more relevant snippets by including database metadata in your
+                            requests.
+                          </p>
+                        </div>
+                        <div className="flex flex-row gap-2 justify-end">
+                          <Button
+                            type="default"
+                            onClick={() => {
+                              setIsSchemaSuggestionDismissed(true)
+                            }}
+                          >
+                            Dismiss
+                          </Button>
+                          <Button
+                            onClick={() => {
+                              setIsSchemaSuggestionDismissed(true)
+                              setIsAISettingsOpen(true)
+                            }}
+                          >
+                            Open settings
+                          </Button>
+                        </div>
+                      </div>
                     </motion.div>
-                  }
-                  inputClassName="w-full border-none py-4 focus:!ring-0 pr-20"
-                  iconContainerClassName="transition text-scale-800 text-brand-900"
-                  placeholder="Ask Supabase AI to build a query"
-                  className="w-full"
-                  onKeyPress={async (e) => {
-                    if (e.key === 'Enter') {
-                      try {
-                        const value = e.currentTarget.value
-
-                        if (!value) {
-                          return
-                        }
-
-                        const { title, sql } = await generateSql({
-                          prompt: e.currentTarget.value,
-                          entityDefinitions,
-                        })
-
-                        const formattedSql =
-                          sqlAiDisclaimerComment +
-                          '\n\n' +
-                          format(sql, {
-                            language: 'postgresql',
-                            keywordCase: 'lower',
-                          })
-
-                        await handleNewQuery(formattedSql, title)
-                      } catch (error: unknown) {
-                        if (isError(error)) {
-                          ui.setNotification({
-                            category: 'error',
-                            message: error.message,
-                          })
-                        }
-                      }
-                    }
-                  }}
-                  actions={
-                    <div className="flex items-center space-x-1 mr-4 gap-2">
-                      <IconCornerDownLeft size={16} strokeWidth={1.5} />
-                      <IconSettings
-                        className="cursor-pointer"
-                        onClick={() => setIsAISettingsOpen(true)}
-                      />
-                    </div>
-                  }
-                />
-              </motion.div>
+                  </Popover.Content>
+                </Popover.Portal>
+              </Popover.Root>
             ) : (
               <motion.div
                 key="ask-ai-loading"
