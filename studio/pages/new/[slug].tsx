@@ -55,6 +55,7 @@ import {
 } from 'ui'
 import Link from 'next/link'
 import Image from 'next/image'
+import { useTheme } from 'common'
 
 const Wizard: NextPageWithLayout = () => {
   const router = useRouter()
@@ -279,13 +280,23 @@ const Wizard: NextPageWithLayout = () => {
     throw new Error('Invalid cloud provider')
   }
 
+  const isDarkMode = useTheme().isDarkMode
+
   return (
     <Panel
       hideHeaderStyling
       loading={!isOrganizationsSuccess || isLoadingFreeProjectLimitCheck}
       title={
-        <div key="panel-title">
-          <h3>Create a new project</h3>
+        <div className="flex flex-col gap-3">
+          <div key="panel-title">
+            <h3>Create a new project</h3>
+          </div>
+          <p className="text-sm text-scale-900">
+            Your project will have its own dedicated instance and full postgres database.
+            <br />
+            An API will be set up so you can easily interact with your new database.
+            <br />
+          </p>
         </div>
       }
       footer={
@@ -307,302 +318,311 @@ const Wizard: NextPageWithLayout = () => {
           </div>
         </div>
       }
+      className="divide-y divide-border"
     >
-      <>
-        <Panel.Content className="pt-0 pb-6">
-          <p className="text-sm text-scale-900">
-            Your project will have its own dedicated instance and full postgres database.
-            <br />
-            An API will be set up so you can easily interact with your new database.
-            <br />
-          </p>
+      {projectCreationDisabled ? (
+        <Panel.Content>
+          <DisabledWarningDueToIncident title="Project creation is currently disabled" />
         </Panel.Content>
-        {projectCreationDisabled ? (
-          <Panel.Content className="pb-8 border-t border-panel-border-interior-light dark:border-panel-border-interior-dark">
-            <DisabledWarningDueToIncident title="Project creation is currently disabled" />
-          </Panel.Content>
-        ) : (
-          <>
-            <Panel.Content
-              className={[
-                'space-y-4 border-t border-b',
-                'border-panel-border-interior-light dark:border-panel-border-interior-dark',
-              ].join(' ')}
-            >
-              {(organizations?.length ?? 0) > 0 && (
-                <Listbox
-                  label="Organization"
-                  layout="horizontal"
-                  value={currentOrg?.slug}
-                  onChange={(slug) => router.push(`/new/${slug}`)}
-                >
-                  {organizations?.map((x: any) => (
-                    <Listbox.Option
-                      key={x.id}
-                      label={x.name}
-                      value={x.slug}
-                      addOnBefore={() => <IconUsers />}
-                    >
-                      {x.name}
-                    </Listbox.Option>
-                  ))}
-                </Listbox>
-              )}
-
-              {!isAdmin && <NotOrganizationOwnerWarning />}
-            </Panel.Content>
-
-            {canCreateProject && (
-              <>
-                <Panel.Content
-                  className={[
-                    'border-b',
-                    'border-panel-border-interior-light dark:border-panel-border-interior-dark',
-                  ].join(' ')}
-                >
-                  <Input
-                    id="project-name"
-                    layout="horizontal"
-                    label="Name"
-                    type="text"
-                    placeholder="Project name"
-                    value={projectName}
-                    onChange={onProjectNameChange}
-                    autoFocus
-                  />
-                </Panel.Content>
-                {showNonProdFields && (
-                  <Panel.Content
-                    className={[
-                      'border-b',
-                      'border-panel-border-interior-light dark:border-panel-border-interior-dark',
-                    ].join(' ')}
+      ) : (
+        <>
+          <Panel.Content>
+            {(organizations?.length ?? 0) > 0 && (
+              <Listbox
+                label="Organization"
+                layout="horizontal"
+                value={currentOrg?.slug}
+                onChange={(slug) => router.push(`/new/${slug}`)}
+              >
+                {organizations?.map((x: any) => (
+                  <Listbox.Option
+                    key={x.id}
+                    label={x.name}
+                    value={x.slug}
+                    addOnBefore={() => <IconUsers />}
                   >
-                    <Input
-                      id="custom-postgres-version"
-                      layout="horizontal"
-                      label="Postgres Version"
-                      autoComplete="off"
-                      descriptionText={
-                        <p>
-                          Specify a custom version of Postgres (Defaults to the latest)
-                          <br />
-                          This is only applicable for local/staging projects
-                        </p>
-                      }
-                      type="text"
-                      placeholder="Postgres Version"
-                      value={postgresVersion}
-                      onChange={(event: any) => setPostgresVersion(event.target.value)}
-                    />
-                  </Panel.Content>
-                )}
-                <Panel.Content className="border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
-                  <Input
-                    id="password"
-                    copy={dbPass.length > 0}
-                    layout="horizontal"
-                    label="Database Password"
-                    type="password"
-                    placeholder="Type in a strong password"
-                    value={dbPass}
-                    onChange={onDbPassChange}
-                    descriptionText={
-                      <PasswordStrengthBar
-                        passwordStrengthScore={passwordStrengthScore}
-                        password={dbPass}
-                        passwordStrengthMessage={passwordStrengthMessage}
-                        generateStrongPassword={generateStrongPassword}
-                      />
-                    }
-                    error={passwordStrengthWarning}
-                  />
-                </Panel.Content>
-                {isAdmin && (
-                  <Panel.Content>
-                    {!billedViaOrg && (
-                      <Listbox
-                        label="Pricing Plan"
-                        layout="horizontal"
-                        value={dbPricingTierKey}
-                        onChange={onDbPricingPlanChange}
-                        descriptionText={
-                          <>
-                            Select a plan that suits your needs.&nbsp;
-                            <a
-                              className="underline"
-                              target="_blank"
-                              rel="noreferrer"
-                              href="https://supabase.com/pricing"
-                            >
-                              More details
-                            </a>
-                            {!isSelectFreeTier && !isEmptyPaymentMethod && (
-                              <Alert_Shadcn_ variant="warning">
-                                <IconAlertCircle className="h-4 w-4" />
-                                <AlertTitle_Shadcn_>
-                                  Your payment method will be charged
-                                </AlertTitle_Shadcn_>
-                                <AlertDescription_Shadcn_>
-                                  By creating a new Pro Project, there will be an immediate charge
-                                  of $25 once the project has been created.
-                                </AlertDescription_Shadcn_>
-                              </Alert_Shadcn_>
-                            )}
-                          </>
-                        }
-                      >
-                        {Object.entries(PRICING_TIER_LABELS).map(([k, v]) => {
-                          const label = `${v}${k === 'PRO' ? ' - $25/month' : ' - $0/month'}`
-                          return (
-                            <Listbox.Option key={k} label={label} value={k}>
-                              {label}
-                            </Listbox.Option>
-                          )
-                        })}
-                      </Listbox>
-                    )}
-
-                    {freePlanWithExceedingLimits && slug && (
-                      <div className={billedViaOrg ? '' : 'mt-4'}>
-                        <FreeProjectLimitWarning
-                          membersExceededLimit={membersExceededLimit || []}
-                          orgLevelBilling={billedViaOrg}
-                          orgSlug={slug}
-                        />
-                      </div>
-                    )}
-
-                    {!billedViaOrg && !isSelectFreeTier && isEmptyPaymentMethod && (
-                      <EmptyPaymentMethodWarning onPaymentMethodAdded={onPaymentMethodAdded} />
-                    )}
-                  </Panel.Content>
-                )}
-                {!billedViaOrg && !isSelectFreeTier && (
-                  <>
-                    <Panel.Content className="border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
-                      <Toggle
-                        id="project-name"
-                        layout="horizontal"
-                        label={
-                          <div className="flex gap-2 items-center">
-                            <span>Spend Cap</span>
-                            <IconHelpCircle
-                              size={16}
-                              strokeWidth={1.5}
-                              className="transition opacity-50 cursor-pointer hover:opacity-100"
-                              onClick={() => setShowSpendCapHelperModal(true)}
-                            />
-                          </div>
-                        }
-                        placeholder="Project name"
-                        checked={isSpendCapEnabled}
-                        onChange={() => setIsSpendCapEnabled(!isSpendCapEnabled)}
-                        descriptionText={
-                          <p>
-                            By default, Pro projects have spend caps to control costs. When enabled,
-                            usage is limited to the plan's quota, with restrictions when limits are
-                            exceeded. To scale beyond Pro limits without restrictions, disable the
-                            spend cap and pay for over-usage beyond the quota.
-                          </p>
-                        }
-                      />
-                    </Panel.Content>
-
-                    <SpendCapModal
-                      visible={showSpendCapHelperModal}
-                      onHide={() => setShowSpendCapHelperModal(false)}
-                    />
-                  </>
-                )}
-
-                {
-                  // show for v1 org billing when on paid plan
-                  (cloudProviderEnabled && !billedViaOrg && !isSelectFreeTier) ||
-                  // show for v2 org billing on staging and local
-                  (cloudProviderEnabled && showNonProdFields && billedViaOrg) ? (
-                    <Panel.Content
-                      className={[
-                        'border-b',
-                        'border-panel-border-interior-light dark:border-panel-border-interior-dark',
-                      ].join(' ')}
-                    >
-                      <Listbox
-                        layout="horizontal"
-                        label="Cloud Provider"
-                        type="select"
-                        value={cloudProvider}
-                        onChange={(value) => onCloudProviderChange(value)}
-                      >
-                        {Object.values(PROVIDERS).map((providerObj) => {
-                          const label = providerObj['label']
-                          const value = providerObj['id']
-                          return (
-                            <Listbox.Option
-                              key={value}
-                              label={label}
-                              value={value}
-                              addOnBefore={() => (
-                                <Image
-                                  src={BASE_PATH + providerObj.image_url}
-                                  alt="provider icon"
-                                  width={16}
-                                  height={16}
-                                />
-                              )}
-                            >
-                              <span className="text-scale-1200">{label}</span>
-                            </Listbox.Option>
-                          )
-                        })}
-                      </Listbox>
-                    </Panel.Content>
-                  ) : (
-                    <></>
-                  )
-                }
-              </>
+                    {x.name}
+                  </Listbox.Option>
+                ))}
+              </Listbox>
             )}
 
-            {billedViaOrg && (
+            {!isAdmin && <NotOrganizationOwnerWarning />}
+          </Panel.Content>
+
+          {canCreateProject && (
+            <>
               <Panel.Content>
-                <InformationBox
-                  icon={<IconInfo size="large" strokeWidth={1.5} />}
-                  defaultVisibility={true}
-                  hideCollapse
-                  title="Billed via organization"
-                  description={
-                    <div className="space-y-3">
-                      <p className="text-sm leading-normal">
-                        This organization uses organization level billing and is on the{' '}
-                        <span className="text-brand-900">{orgSubscription?.plan?.name} plan</span>.
-                      </p>
-
-                      {orgSubscription?.plan?.id !== 'free' && (
-                        <p>
-                          Your plan comes with $10 of Compute Credits. Launching another project
-                          incurs additional compute costs - if you exhaust your Compute Credits, the
-                          additional compute hours result in additional usage charges.
-                        </p>
-                      )}
-
-                      <div>
-                        <Link href="https://www.notion.so/supabase/Organization-Level-Billing-9c159d69375b4af095f0b67881276582?pvs=4">
-                          <a target="_blank" rel="noreferrer">
-                            <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                              Documentation
-                            </Button>
-                          </a>
-                        </Link>
-                      </div>
-                    </div>
-                  }
+                <Input
+                  id="project-name"
+                  layout="horizontal"
+                  label="Name"
+                  type="text"
+                  placeholder="Project name"
+                  value={projectName}
+                  onChange={onProjectNameChange}
+                  autoFocus
                 />
               </Panel.Content>
-            )}
-          </>
-        )}
-      </>
+              {showNonProdFields && (
+                <Panel.Content>
+                  <Input
+                    id="custom-postgres-version"
+                    layout="horizontal"
+                    label="Postgres Version"
+                    autoComplete="off"
+                    descriptionText={
+                      <p>
+                        Specify a custom version of Postgres (Defaults to the latest)
+                        <br />
+                        This is only applicable for local/staging projects
+                      </p>
+                    }
+                    type="text"
+                    placeholder="Postgres Version"
+                    value={postgresVersion}
+                    onChange={(event: any) => setPostgresVersion(event.target.value)}
+                  />
+                </Panel.Content>
+              )}
+              <Panel.Content>
+                <Input
+                  id="password"
+                  copy={dbPass.length > 0}
+                  layout="horizontal"
+                  label="Database Password"
+                  type="password"
+                  placeholder="Type in a strong password"
+                  value={dbPass}
+                  onChange={onDbPassChange}
+                  descriptionText={
+                    <PasswordStrengthBar
+                      passwordStrengthScore={passwordStrengthScore}
+                      password={dbPass}
+                      passwordStrengthMessage={passwordStrengthMessage}
+                      generateStrongPassword={generateStrongPassword}
+                    />
+                  }
+                  error={passwordStrengthWarning}
+                />
+              </Panel.Content>
+              {isAdmin && (
+                <Panel.Content>
+                  {!billedViaOrg && (
+                    <Listbox
+                      label="Pricing Plan"
+                      layout="horizontal"
+                      value={dbPricingTierKey}
+                      onChange={onDbPricingPlanChange}
+                      descriptionText={
+                        <>
+                          Select a plan that suits your needs.&nbsp;
+                          <a
+                            className="underline"
+                            target="_blank"
+                            rel="noreferrer"
+                            href="https://supabase.com/pricing"
+                          >
+                            More details
+                          </a>
+                          {!isSelectFreeTier && !isEmptyPaymentMethod && (
+                            <Alert_Shadcn_ variant="warning">
+                              <IconAlertCircle className="h-4 w-4" />
+                              <AlertTitle_Shadcn_>
+                                Your payment method will be charged
+                              </AlertTitle_Shadcn_>
+                              <AlertDescription_Shadcn_>
+                                By creating a new Pro Project, there will be an immediate charge of
+                                $25 once the project has been created.
+                              </AlertDescription_Shadcn_>
+                            </Alert_Shadcn_>
+                          )}
+                        </>
+                      }
+                    >
+                      {Object.entries(PRICING_TIER_LABELS).map(([k, v]) => {
+                        const label = `${v}${k === 'PRO' ? ' - $25/month' : ' - $0/month'}`
+                        return (
+                          <Listbox.Option key={k} label={label} value={k}>
+                            {label}
+                          </Listbox.Option>
+                        )
+                      })}
+                    </Listbox>
+                  )}
+
+                  {freePlanWithExceedingLimits && slug && (
+                    <div className={billedViaOrg ? '' : 'mt-4'}>
+                      <FreeProjectLimitWarning
+                        membersExceededLimit={membersExceededLimit || []}
+                        orgLevelBilling={billedViaOrg}
+                        orgSlug={slug}
+                      />
+                    </div>
+                  )}
+
+                  {!billedViaOrg && !isSelectFreeTier && isEmptyPaymentMethod && (
+                    <EmptyPaymentMethodWarning onPaymentMethodAdded={onPaymentMethodAdded} />
+                  )}
+                </Panel.Content>
+              )}
+              {!billedViaOrg && !isSelectFreeTier && (
+                <>
+                  <Panel.Content>
+                    <Toggle
+                      id="project-name"
+                      layout="horizontal"
+                      label={
+                        <div className="flex gap-2 items-center">
+                          <span>Spend Cap</span>
+                          <IconHelpCircle
+                            size={16}
+                            strokeWidth={1.5}
+                            className="transition opacity-50 cursor-pointer hover:opacity-100"
+                            onClick={() => setShowSpendCapHelperModal(true)}
+                          />
+                        </div>
+                      }
+                      placeholder="Project name"
+                      checked={isSpendCapEnabled}
+                      onChange={() => setIsSpendCapEnabled(!isSpendCapEnabled)}
+                      descriptionText={
+                        <p>
+                          By default, Pro projects have spend caps to control costs. When enabled,
+                          usage is limited to the plan's quota, with restrictions when limits are
+                          exceeded. To scale beyond Pro limits without restrictions, disable the
+                          spend cap and pay for over-usage beyond the quota.
+                        </p>
+                      }
+                    />
+                  </Panel.Content>
+
+                  <SpendCapModal
+                    visible={showSpendCapHelperModal}
+                    onHide={() => setShowSpendCapHelperModal(false)}
+                  />
+                </>
+              )}
+
+              {
+                // show for v1 org billing when on paid plan
+                (cloudProviderEnabled && !billedViaOrg && !isSelectFreeTier) ||
+                // show for v2 org billing on staging and local
+                (cloudProviderEnabled && showNonProdFields && billedViaOrg) ? (
+                  <Panel.Content className={['border-b'].join(' ')}>
+                    <Listbox
+                      layout="horizontal"
+                      label="Cloud Provider"
+                      type="select"
+                      value={cloudProvider}
+                      onChange={(value) => onCloudProviderChange(value)}
+                    >
+                      {Object.values(PROVIDERS).map((providerObj) => {
+                        const label = providerObj['label']
+                        const value = providerObj['id']
+
+                        const imageUrl =
+                          BASE_PATH +
+                          (!isDarkMode
+                            ? providerObj?.image_url.replace('.svg', '-light.svg')
+                            : providerObj.image_url)
+
+                        console.log('BASE_PATH:', BASE_PATH)
+                        console.log('imageUrl:', imageUrl)
+
+                        return (
+                          <Listbox.Option
+                            key={value}
+                            label={label}
+                            value={value}
+                            addOnBefore={() => (
+                              <Image src={imageUrl} alt="provider icon" width={21} height={21} />
+                            )}
+                          >
+                            <span className="text-scale-1200">{label}</span>
+                          </Listbox.Option>
+                        )
+                      })}
+                    </Listbox>
+                  </Panel.Content>
+                ) : (
+                  <></>
+                )
+              }
+            </>
+          )}
+
+          <Panel.Content className="border-b">
+            <Listbox
+              layout="horizontal"
+              label="Region"
+              type="select"
+              value={dbRegion}
+              onChange={(value) => setDbRegion(value)}
+              descriptionText="Select a region close to your users for the best performance."
+            >
+              {Object.keys(availableRegions).map((option: string, i) => {
+                const label = Object.values(availableRegions)[i] as string
+                return (
+                  <Listbox.Option
+                    key={option}
+                    label={label}
+                    value={label}
+                    addOnBefore={() => (
+                      <img
+                        alt="region icon"
+                        className="w-5 rounded-sm"
+                        src={`${router.basePath}/img/regions/${
+                          Object.keys(availableRegions)[i]
+                        }.svg`}
+                      />
+                    )}
+                  >
+                    <span className="text-scale-1200">{label}</span>
+                  </Listbox.Option>
+                )
+              })}
+            </Listbox>
+          </Panel.Content>
+
+          {billedViaOrg && (
+            <Panel.Content>
+              <InformationBox
+                icon={<IconInfo size="large" strokeWidth={1.5} />}
+                defaultVisibility={true}
+                hideCollapse
+                title="Billed via organization"
+                description={
+                  <div className="space-y-3">
+                    <p className="text-sm leading-normal">
+                      This organization uses organization level billing and is on the{' '}
+                      <span className="text-brand-900">{orgSubscription?.plan?.name} plan</span>.
+                    </p>
+
+                    {orgSubscription?.plan?.id !== 'free' && (
+                      <p>
+                        Your plan comes with $10 of Compute Credits. Launching another project
+                        incurs additional compute costs - if you exhaust your Compute Credits, the
+                        additional compute hours result in additional usage charges.
+                      </p>
+                    )}
+
+                    <div>
+                      <Link href="https://www.notion.so/supabase/Organization-Level-Billing-9c159d69375b4af095f0b67881276582?pvs=4">
+                        <a target="_blank" rel="noreferrer">
+                          <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                            Documentation
+                          </Button>
+                        </a>
+                      </Link>
+                    </div>
+                  </div>
+                }
+              />
+            </Panel.Content>
+          )}
+        </>
+      )}
     </Panel>
   )
 }
