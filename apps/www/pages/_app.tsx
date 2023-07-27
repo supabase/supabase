@@ -1,3 +1,8 @@
+import '../../../packages/ui/build/css/themes/light.css'
+import '../../../packages/ui/build/css/themes/dark.css'
+import '../styles/index.css'
+import 'config/code-hike.scss'
+
 import { useEffect } from 'react'
 import { AppProps } from 'next/app'
 import Head from 'next/head'
@@ -9,11 +14,6 @@ import Meta from '~/components/Favicons'
 import { post } from '~/lib/fetchWrapper'
 import PortalToast from 'ui/src/layout/PortalToast'
 import { AuthProvider, ThemeProvider, useConsent, useTelemetryProps } from 'common'
-
-import '../../../packages/ui/build/css/themes/light.css'
-import '../../../packages/ui/build/css/themes/dark.css'
-import '../styles/index.css'
-import 'config/code-hike.scss'
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter()
