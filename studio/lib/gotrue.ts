@@ -48,5 +48,17 @@ export const getReturnToPath = (fallback = '/projects') => {
 
   const remainingSearchParams = searchParams.toString()
 
-  return returnTo + (remainingSearchParams ? `?${remainingSearchParams}` : '')
+  let validReturnTo
+
+  // only allow returning to internal pages. e.g. /dashboard
+  try {
+    // if returnTo is a relative path, this will throw an error
+    new URL(returnTo)
+    // if no error, returnTo is a valid URL and NOT an internal page
+    validReturnTo = fallback
+  } catch (_) {
+    validReturnTo = returnTo
+  }
+
+  return validReturnTo + (remainingSearchParams ? `?${remainingSearchParams}` : '')
 }
