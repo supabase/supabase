@@ -28,6 +28,14 @@ const completionFunctions = {
     description: stripIndent`
       Debugs a Postgres SQL error and modifies the SQL to fix it.
       - Create extensions if they are missing (only for valid extensions)
+      - Suggest creating tables if they are missing
+      - Include all of the original SQL
+      - For primary keys, always use "id bigint primary key generated always as identity" (not serial)
+      - When creating tables, always add foreign key references inline
+      - Prefer 'text' over 'varchar'
+      - Prefer 'timestamp with time zone' over 'date'
+      - Use vector(384) data type for any embedding/vector related query
+      - Always use double apostrophe in SQL strings (eg. 'Night''s watch')
     `,
     parameters: debugSqlSchema.schema,
   },
