@@ -1,8 +1,8 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useState } from 'react'
+import { Alert, Button, Form, IconEye, IconEyeOff, Input, InputNumber, Toggle } from 'ui'
 import { number, object, string } from 'yup'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Alert, Button, Form, Input, InputNumber, Toggle, IconEye, IconEyeOff } from 'ui'
 
 import {
   FormActions,
@@ -12,7 +12,7 @@ import {
   FormSectionContent,
   FormSectionLabel,
 } from 'components/ui/Forms'
-import { useStore, useCheckPermissions } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import { urlRegex } from './../Auth.constants'
 import { defaultDisabledSmtpFormValues } from './SmtpForm.constants'
 import { generateFormValues, isSmtpEnabled } from './SmtpForm.utils'
@@ -180,10 +180,27 @@ const SmtpForm = () => {
                 </FormSectionContent>
               </FormSection>
 
-              {enableSmtp && !isValidSmtpConfig && (
+              {enableSmtp ? (
+                !isValidSmtpConfig && (
+                  <div className="mx-8 mb-8 -mt-4">
+                    <Alert withIcon variant="warning" title="All fields below must be filled">
+                      The following fields must be filled before custom SMTP can be properly enabled
+                    </Alert>
+                  </div>
+                )
+              ) : (
                 <div className="mx-8 mb-8 -mt-4">
-                  <Alert withIcon variant="warning" title="All fields below must be filled">
-                    The following fields must be filled before custom SMTP can be properly enabled
+                  <Alert withIcon variant="warning" title="Built-in email service is rate-limited!">
+                    You're using the built-in email service. The service has rate limits and it's
+                    not meant to be used for production apps. Check the{' '}
+                    <a
+                      href="https://supabase.com/docs/guides/platform/going-into-prod#auth-rate-limits"
+                      className="underline"
+                    >
+                      documentation
+                    </a>{' '}
+                    for an up-to-date information on the current rate limits. Please use a custom
+                    SMTP server if you're planning on having large number of users.
                   </Alert>
                 </div>
               )}
