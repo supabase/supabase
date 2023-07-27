@@ -58,11 +58,11 @@ const Announcement = ({
     return (
       <div
         onClick={() => window.location.assign(announcement.link)}
-        className={['relative w-full cursor-pointer', className].join(' ')}
+        className={['relative z-40 w-full cursor-pointer', className].join(' ')}
       >
         {!isLaunchWeekSection && (
           <div
-            className="absolute right-4 flex h-full items-center opacity-50 transition-opacity hover:opacity-100"
+            className="absolute z-50 right-4 flex h-full items-center opacity-100 text-white transition-opacity hover:opacity-100"
             onClick={handleClose}
           >
             <IconX size={16} />

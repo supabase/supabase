@@ -33,7 +33,7 @@ const frameworks = [
   },
   {
     name: 'Android Kotlin',
-    icon: '/images/logos/frameworks/kotlin.svg',
+    icon: 'M29.6,11.4L11.4,28.2V13.4c0-1.1,1-2,2.1-2H29.6z M45.1,14.7L25.4,32.9L11.6,45.5c-0.2-0.3-0.3-0.6-0.3-0.9V33.7l24.2-22.3h8C45.5,11.4,46.4,13.5,45.1,14.7z M44.5,46.6H16.5l16.5-15.2L46,43.3C47.3,44.5,46.4,46.6,44.5,46.6z',
     docs: '/docs/guides/getting-started/quickstarts/kotlin',
     gaEvent: 'www_hp_hero_frameworks_kotlin',
   },

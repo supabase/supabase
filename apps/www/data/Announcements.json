@@ -16,15 +16,15 @@
   },
   {
     "type": "Announcement",
-    "title": "Supabase Launch Week 7",
+    "title": "Supabase Launch Week 8",
     "description": "One new feature (or more) every day during a week.",
-    "imgUrl": "/images/launchweek/seven/launch-week-7.jpg",
-    "logoUrl": "/images/launchweek/seven/launch-week-7.jpg",
+    "imgUrl": "/images/launchweek/8/lw8-og.jpg",
+    "logoUrl": "/images/launchweek/8/lw8-og.jpg",
     "organization": "Supabase",
     "url": "/launch-week",
     "postMeta": {
       "name": "Paul Copplestone",
-      "publishDate": "Apr 03, 2023",
+      "publishDate": "Aug 07, 2023",
       "readLength": 5
     },
     "ctaText": "Learn more"
