@@ -10,6 +10,7 @@ import {
 import { useSqlGenerateMutation } from 'data/ai/sql-generate-mutation'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
+import { isError } from 'data/utils/error-check'
 import { motion } from 'framer-motion'
 import {
   useCheckPermissions,
@@ -182,12 +183,7 @@ const SQLTemplates = observer(() => {
 
                         await handleNewQuery(formattedSql, title)
                       } catch (error: unknown) {
-                        if (
-                          error &&
-                          typeof error === 'object' &&
-                          'message' in error &&
-                          typeof error.message === 'string'
-                        ) {
+                        if (isError(error)) {
                           ui.setNotification({
                             category: 'error',
                             message: error.message,

@@ -1,5 +1,6 @@
 import { SchemaBuilder } from '@serafin/schema-builder'
 import { stripIndent } from 'common-tags'
+import { isError } from 'data/utils/error-check'
 import apiWrapper from 'lib/api/apiWrapper'
 import { NextApiRequest, NextApiResponse } from 'next'
 import type {
@@ -116,17 +117,27 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     })
   }
 
-  const generateTitleResult: GenerateTitleResult = JSON.parse(titleResponseString)
+  try {
+    const generateTitleResult: GenerateTitleResult = JSON.parse(titleResponseString)
 
-  if (!generateTitleResult.title) {
-    console.error(`AI title generation failed: Unable to generate title for the given SQL`)
+    if (!generateTitleResult.title) {
+      console.error(`AI title generation failed: Unable to generate title for the given SQL`)
 
-    res.status(400).json({
-      error: 'Unable to generate title',
+      res.status(400).json({
+        error: 'Unable to generate title',
+      })
+    }
+
+    return res.json(generateTitleResult)
+  } catch (error) {
+    console.error(
+      `AI SQL editing failed: ${isError(error) ? error.message : 'An unknown error occurred'}`
+    )
+
+    return res.status(500).json({
+      error: 'There was an unknown error editing the SQL snippet. Please try again.',
     })
   }
-
-  return res.json(generateTitleResult)
 }
 
 const wrapper = (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)

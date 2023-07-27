@@ -1,5 +1,6 @@
 import { SchemaBuilder } from '@serafin/schema-builder'
 import { codeBlock, stripIndent } from 'common-tags'
+import { isError } from 'data/utils/error-check'
 import apiWrapper from 'lib/api/apiWrapper'
 import { NextApiRequest, NextApiResponse } from 'next'
 import type {
@@ -138,17 +139,27 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
   console.log({ sqlResponseString })
 
-  const editSqlResult: EditSqlResult = JSON.parse(sqlResponseString)
+  try {
+    const editSqlResult: EditSqlResult = JSON.parse(sqlResponseString)
 
-  if (!editSqlResult.sql) {
-    console.error(`AI SQL editing failed: Unable to edit SQL for the given prompt`)
+    if (!editSqlResult.sql) {
+      console.error(`AI SQL editing failed: Unable to edit SQL for the given prompt`)
 
-    return res.status(400).json({
-      error: 'Unable to edit SQL. Try adding more details to your prompt.',
+      return res.status(400).json({
+        error: 'Unable to edit SQL. Try adding more details to your prompt.',
+      })
+    }
+
+    return res.json(editSqlResult)
+  } catch (error) {
+    console.error(
+      `AI SQL editing failed: ${isError(error) ? error.message : 'An unknown error occurred'}`
+    )
+
+    return res.status(500).json({
+      error: 'There was an unknown error editing the SQL snippet. Please try again.',
     })
   }
-
-  return res.json(editSqlResult)
 }
 
 const wrapper = (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
