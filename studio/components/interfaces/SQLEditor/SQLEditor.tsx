@@ -5,6 +5,7 @@ import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
+import { isError } from 'data/utils/error-check'
 import { AnimatePresence, motion } from 'framer-motion'
 import {
   useLocalStorage,
@@ -562,12 +563,7 @@ const SQLEditor = () => {
                           modified: formattedSql,
                         })
                       } catch (error: unknown) {
-                        if (
-                          error &&
-                          typeof error === 'object' &&
-                          'message' in error &&
-                          typeof error.message === 'string'
-                        ) {
+                        if (isError(error)) {
                           ui.setNotification({
                             category: 'error',
                             message: error.message,

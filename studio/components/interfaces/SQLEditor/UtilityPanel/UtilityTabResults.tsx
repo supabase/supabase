@@ -1,13 +1,14 @@
 import { useSqlDebugMutation } from 'data/ai/sql-debug-mutation'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
-import { useLocalStorageQuery, useSelectedOrganization, useSelectedProject } from 'hooks'
+import { isError } from 'data/utils/error-check'
+import { useLocalStorageQuery, useSelectedOrganization, useSelectedProject, useStore } from 'hooks'
+import { IS_PLATFORM } from 'lib/constants'
 import { format } from 'sql-formatter'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { AiIcon, Button, IconLoader } from 'ui'
 import { useSqlEditor } from '../SQLEditor'
 import { sqlAiDisclaimerComment } from '../SQLEditor.constants'
 import Results from './Results'
-import { IS_PLATFORM } from 'lib/constants'
 
 export type UtilityTabResultsProps = {
   id: string
@@ -15,6 +16,7 @@ export type UtilityTabResultsProps = {
 }
 
 const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
+  const { ui } = useStore()
   const snap = useSqlEditorStateSnapshot()
   const { mutateAsync: debugSql, isLoading: isDebugSqlLoading } = useSqlDebugMutation()
   const { setDebugSolution, setAiInput, setSqlDiff, sqlDiff } = useSqlEditor()
@@ -63,25 +65,34 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
             }
             disabled={!!sqlDiff}
             onClick={async () => {
-              const { solution, sql } = await debugSql({
-                sql: snippet.snippet.content.sql.replace(sqlAiDisclaimerComment, '').trim(),
-                errorMessage: result.error.message,
-                entityDefinitions,
-              })
-
-              const formattedSql =
-                sqlAiDisclaimerComment +
-                '\n\n' +
-                format(sql, {
-                  language: 'postgresql',
-                  keywordCase: 'lower',
+              try {
+                const { solution, sql } = await debugSql({
+                  sql: snippet.snippet.content.sql.replace(sqlAiDisclaimerComment, '').trim(),
+                  errorMessage: result.error.message,
+                  entityDefinitions,
                 })
-              setAiInput('')
-              setDebugSolution(solution)
-              setSqlDiff({
-                original: snippet.snippet.content.sql,
-                modified: formattedSql,
-              })
+
+                const formattedSql =
+                  sqlAiDisclaimerComment +
+                  '\n\n' +
+                  format(sql, {
+                    language: 'postgresql',
+                    keywordCase: 'lower',
+                  })
+                setAiInput('')
+                setDebugSolution(solution)
+                setSqlDiff({
+                  original: snippet.snippet.content.sql,
+                  modified: formattedSql,
+                })
+              } catch (error: unknown) {
+                if (isError(error)) {
+                  ui.setNotification({
+                    category: 'error',
+                    message: error.message,
+                  })
+                }
+              }
             }}
           >
             Debug using AI

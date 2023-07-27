@@ -1,5 +1,6 @@
 import { SchemaBuilder } from '@serafin/schema-builder'
 import { codeBlock, stripIndent } from 'common-tags'
+import { isError } from 'data/utils/error-check'
 import apiWrapper from 'lib/api/apiWrapper'
 import { NextApiRequest, NextApiResponse } from 'next'
 import type {
@@ -132,20 +133,29 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       error: 'There was an unknown error generating the SQL snippet. Please try again.',
     })
   }
+  try {
+    const generateSqlResult: GenerateSqlResult = JSON.parse(sqlResponseString)
 
-  const generateSqlResult: GenerateSqlResult = JSON.parse(sqlResponseString)
+    if (!generateSqlResult.sql) {
+      console.error(`AI SQL generation failed: Unable to generate SQL for the given prompt`)
 
-  if (!generateSqlResult.sql) {
-    console.error(`AI SQL generation failed: Unable to generate SQL for the given prompt`)
+      res.status(400).json({
+        error: 'Unable to generate SQL. Try adding more details to your prompt.',
+      })
 
-    res.status(400).json({
-      error: 'Unable to generate SQL. Try adding more details to your prompt.',
+      return
+    }
+
+    return res.json(generateSqlResult)
+  } catch (error) {
+    console.error(
+      `AI SQL editing failed: ${isError(error) ? error.message : 'An unknown error occurred'}`
+    )
+
+    return res.status(500).json({
+      error: 'There was an unknown error editing the SQL snippet. Please try again.',
     })
-
-    return
   }
-
-  return res.json(generateSqlResult)
 }
 
 const wrapper = (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
