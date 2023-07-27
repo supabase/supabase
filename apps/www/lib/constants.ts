@@ -35,7 +35,6 @@ export const SITE_URL =
     : 'http://localhost:3000/launch-week'
 export const SITE_ORIGIN = new URL(SITE_URL).origin
 export const TWITTER_USER_NAME = 'supabase'
-export const COOKIE = 'supa-launch-week-ticke-user-id'
 export const DATE = 'April 10th 2023'
 export const TWEET_TEXT =
   "It's almost #SupaLaunchWeek 7! Generate your unique ticket here 👇 you can win a mechanical keyboard 🤩"

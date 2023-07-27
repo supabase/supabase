@@ -5,9 +5,16 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Tue, 11 Jul 2023 22:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Wed, 12 Jul 2023 22:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/pgvector-performance</guid>
+  <title>pgvector 0.4.0 performance</title>
+  <link>https://supabase.com/blog/pgvector-performance</link>
+  <description>There&apos;s been lot of talk about pgvector performance lately, so we took some datasets and pushed pgvector to the limits to find out its strengths and limitations.</description>
+  <pubDate>Wed, 12 Jul 2023 22:00:00 GMT</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/postgrest-11-1-release</guid>
   <title>What is new in PostgREST v11.1?</title>
   <link>https://supabase.com/blog/postgrest-11-1-release</link>
