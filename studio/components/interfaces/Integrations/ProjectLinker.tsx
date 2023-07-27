@@ -101,8 +101,6 @@ const ProjectLinker = ({
   function onCreateConnections() {
     const projectDetails = selectedVercelProject
 
-    console.log('projectDetails', projectDetails)
-
     if (!organizationIntegrationId) return console.error('No integration ID set')
     if (!selectedVercelProject?.id) return console.error('No Vercel project ID set')
     if (!selectedSupabaseProject?.ref) return console.error('No Supabase project ref set')
