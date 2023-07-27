@@ -33,9 +33,9 @@ const NotificationsPopover = () => {
 
   const [targetNotification, setTargetNotification] = useState<Notification>()
 
-  if (!notifications) return <></>
+  if (!notifications || !Array.isArray(notifications)) return <></>
 
-  const hasNewNotifications = notifications?.some(
+  const hasNewNotifications = notifications.some(
     (notification) => notification.notification_status === NotificationStatus.New
   )
 
