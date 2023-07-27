@@ -81,15 +81,22 @@ export const MultiAttributeTooltipContent = ({
         <p className="text-scale-1000 text-lg">No data yet</p>
       ) : (
         <div className="space-y-1 pb-1">
-          {attributes.map((attr) => (
-            <AttributeContent
-              key={attr.name}
-              attribute={attr}
-              attributeMeta={values.find((x) => x.dataKey === attr.key)}
-              sumValue={sumValue}
-              tooltipFormatter={tooltipFormatter}
-            />
-          ))}
+          {attributes.flatMap((attr) => {
+            const attributeMeta = values.find((x) => x.dataKey === attr.key)
+
+            // Filter out empty attributes
+            if (Number(attributeMeta?.value ?? 0) === 0) return []
+
+            return (
+              <AttributeContent
+                key={attr.name}
+                attribute={attr}
+                attributeMeta={attributeMeta}
+                sumValue={sumValue}
+                tooltipFormatter={tooltipFormatter}
+              />
+            )
+          })}
         </div>
       )}
     </>

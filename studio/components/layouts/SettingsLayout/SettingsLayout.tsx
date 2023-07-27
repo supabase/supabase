@@ -1,18 +1,19 @@
-import { FC, ReactNode, useEffect } from 'react'
+import { useFlag, useSelectedOrganization, useSelectedProject, useStore, withAuth } from 'hooks'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
-import { useFlag, useSelectedOrganization, useSelectedProject, useStore, withAuth } from 'hooks'
+import { PropsWithChildren, useEffect } from 'react'
 import { generateSettingsMenu } from './SettingsMenu.utils'
 
-import ProjectLayout from '../'
+import { useParams } from 'common'
 import ProductMenu from 'components/ui/ProductMenu'
+import ProjectLayout from '../'
 
-interface Props {
+interface SettingsLayoutProps {
   title?: string
-  children: ReactNode
 }
 
-const SettingsLayout: FC<Props> = ({ title, children }) => {
+const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutProps>) => {
+  const { ref } = useParams()
   const { ui, meta } = useStore()
   const project = useSelectedProject()
   const organization = useSelectedOrganization()
@@ -26,12 +27,7 @@ const SettingsLayout: FC<Props> = ({ title, children }) => {
     : router.pathname.split('/')[4]
 
   const isVaultEnabled = useFlag('vaultExtension')
-  const menuRoutes = generateSettingsMenu(
-    project?.ref as string,
-    project,
-    isVaultEnabled,
-    isOrgBilling
-  )
+  const menuRoutes = generateSettingsMenu(ref, project, isVaultEnabled, isOrgBilling)
 
   useEffect(() => {
     if (ui.selectedProjectRef) {

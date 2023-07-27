@@ -17,7 +17,7 @@ interface Props {
 const Footer = (props: Props) => {
   const { isDarkMode } = useTheme()
   const { pathname } = useRouter()
-  const isLaunchWeekPage = pathname.includes('launch-week')
+  const isLaunchWeekPage = pathname.includes('launch-week') || pathname === '/'
 
   return (
     <footer
@@ -109,30 +109,34 @@ const Footer = (props: Props) => {
                     <h6 className="text-scale-1200 overwrite text-base">{segment.title}</h6>
                     <ul className="mt-4 space-y-2">
                       {segment.links.map((link, idx) => {
-                        const LinkTag = link.url.startsWith('https') ? Fragment : Link
+                        const children = (
+                          <a
+                            // only add href key if link is external
+                            {...(link.url.startsWith('https') && { href: link.url })}
+                            className={`text-sm transition-colors ${
+                              link.url
+                                ? 'text-scale-1100 hover:text-scale-1200 '
+                                : 'text-scale-900 hover:text-scale-900'
+                            } `}
+                          >
+                            {link.text}
+                            {!link.url && (
+                              <div className="ml-2 inline text-xs xl:ml-0 xl:block 2xl:ml-2 2xl:inline">
+                                <Badge color="scale" size="small">
+                                  Coming soon
+                                </Badge>
+                              </div>
+                            )}
+                          </a>
+                        )
 
                         return (
                           <li key={`${segment.title}_link_${idx}`}>
-                            <LinkTag href={link.url}>
-                              <a
-                                // only add href key if link is external
-                                {...(link.url.startsWith('https') && { href: link.url })}
-                                className={`text-sm transition-colors ${
-                                  link.url
-                                    ? 'text-scale-1100 hover:text-scale-1200 '
-                                    : 'text-scale-900 hover:text-scale-900'
-                                } `}
-                              >
-                                {link.text}
-                                {!link.url && (
-                                  <div className="ml-2 inline text-xs xl:ml-0 xl:block 2xl:ml-2 2xl:inline">
-                                    <Badge color="scale" size="small">
-                                      Coming soon
-                                    </Badge>
-                                  </div>
-                                )}
-                              </a>
-                            </LinkTag>
+                            {link.url.startsWith('https') ? (
+                              <Fragment>{children}</Fragment>
+                            ) : (
+                              <Link href={link.url}>{children}</Link>
+                            )}
                           </li>
                         )
                       })}
@@ -145,7 +149,7 @@ const Footer = (props: Props) => {
         </div>
         <div className="border-scale-500 dark:border-scale-600 mt-32 flex justify-between border-t pt-8">
           <small className="small">&copy; Supabase Inc</small>
-          <DarkModeToggle />
+          <DarkModeToggle disabled={isLaunchWeekPage} />
         </div>
       </SectionContainer>
     </footer>
