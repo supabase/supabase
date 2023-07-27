@@ -22,6 +22,7 @@ const editSqlSchema = SchemaBuilder.emptySchema().addString('sql', {
       - Prefer 'timestamp with time zone' over 'date'
       - Use vector(384) data type for any embedding/vector related query
       - Always use double apostrophe in SQL strings (eg. 'Night''s watch')
+      - Use real examples when possible
     `,
 })
 
