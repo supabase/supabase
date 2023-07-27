@@ -1,5 +1,5 @@
 import dynamic from 'next/dynamic'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { getSortedPosts } from '~/lib/posts'
 import PostTypes from '~/types/post'
 import Layout from '~/components/Layouts/Default'
@@ -22,13 +22,14 @@ type Props = { customerStories: PostTypes[] }
 
 const Index = ({ customerStories }: Props) => {
   const { isDarkMode, toggleTheme } = useTheme()
+  const [initialDarkMode] = useState(isDarkMode)
 
   useEffect(() => {
     toggleTheme(true)
     document.body.className = 'dark'
     return () => {
       document.body.className = ''
-      isDarkMode ? toggleTheme(true) : toggleTheme(false)
+      toggleTheme(initialDarkMode)
     }
   }, [])
 
