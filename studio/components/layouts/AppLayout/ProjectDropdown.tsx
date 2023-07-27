@@ -133,7 +133,7 @@ const ProjectDropdown = () => {
 
   return IS_PLATFORM ? (
     <div className="flex items-center space-x-2 px-2">
-      <Link href={`/project/${selectedProject?.ref}`}>
+      <Link href={`/project/${ref}`}>
         <a ref={projectNameRef} className="flex items-center space-x-2">
           <p className="text-sm">{selectedProject?.name}</p>
           {isSuccess && !isOrgBilling && <Badge color="slate">{subscription?.plan.name}</Badge>}
