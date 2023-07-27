@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 
 import { useParams } from 'common'
 import AuthorizeRequesterDetails from 'components/interfaces/Organization/OAuthApps/AuthorizeRequesterDetails'
+import AuthorizeRequesterDetails2 from 'components/interfaces/Organization/OAuthApps/AuthorizeRequesterDetails2'
 import APIAuthorizationLayout from 'components/layouts/APIAuthorizationLayout'
 import { FormPanel } from 'components/ui/Forms'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
@@ -138,42 +139,18 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
     )
   }
 
+  // [Joshen] for when we come back to this
+  // - Double check if the DX can be improved
+  // - Double check if the component can be improved cause we need to use it in the preview as well
+  // - Check if the other states can use a similar UI (error, approved, etc etc)
+
   return (
-    <FormPanel
-      header={<p>Authorize API access for {requester?.name}</p>}
-      footer={
-        <div className="flex items-center justify-end py-4 px-8">
-          <div className="flex items-center space-x-2">
-            <Button type="default" disabled={isSubmitting || isExpired} onClick={onDeclineRequest}>
-              Decline
-            </Button>
-            <Button
-              loading={isSubmitting}
-              disabled={isSubmitting || isExpired}
-              onClick={onApproveRequest}
-            >
-              Authorize {requester?.name}
-            </Button>
-          </div>
-        </div>
-      }
-    >
-      <div className="w-full md:w-[500px] px-8 py-6 space-y-8">
-        {/* API Authorization requester details */}
-        <AuthorizeRequesterDetails
-          icon={requester.icon}
-          name={requester.name}
-          domain={requester.domain}
-        />
-
-        {/* Expiry warning */}
-        {isExpired && (
-          <Alert withIcon variant="warning" title="This authorization request is expired">
-            Please retry your authorization request from the requesting app
-          </Alert>
-        )}
-
-        {/* Organization selection */}
+    <>
+      <AuthorizeRequesterDetails2
+        icon={requester.icon}
+        name={requester.name}
+        domain={requester.domain}
+      >
         {isLoadingOrganizations ? (
           <div className="py-4 space-y-2">
             <ShimmeringLoader />
@@ -197,8 +174,69 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
             ))}
           </Listbox>
         )}
-      </div>
-    </FormPanel>
+      </AuthorizeRequesterDetails2>
+
+      {/* <FormPanel
+        footer={
+          <div className="flex items-center justify-end py-4 px-8">
+            <div className="flex items-center space-x-2">
+              <Button
+                type="default"
+                disabled={isSubmitting || isExpired}
+                onClick={onDeclineRequest}
+              >
+                Decline
+              </Button>
+              <Button
+                loading={isSubmitting}
+                disabled={isSubmitting || isExpired}
+                onClick={onApproveRequest}
+              >
+                Authorize {requester?.name}
+              </Button>
+            </div>
+          </div>
+        }
+      >
+        <div className="w-full md:w-[500px] px-8 py-6 space-y-8">
+          <AuthorizeRequesterDetails
+            icon={requester.icon}
+            name={requester.name}
+            domain={requester.domain}
+          />
+
+          {isExpired && (
+            <Alert withIcon variant="warning" title="This authorization request is expired">
+              Please retry your authorization request from the requesting app
+            </Alert>
+          )}
+
+          {isLoadingOrganizations ? (
+            <div className="py-4 space-y-2">
+              <ShimmeringLoader />
+              <ShimmeringLoader className="w-3/4" />
+            </div>
+          ) : (
+            <Listbox
+              label="Select an organization to grant API access to"
+              value={selectedOrg}
+              disabled={isExpired}
+              onChange={setSelectedOrg}
+            >
+              {(organizations ?? []).map((organization) => (
+                <Listbox.Option
+                  key={organization.id}
+                  label={organization.name}
+                  value={organization.slug}
+                >
+                  {organization.name}
+                </Listbox.Option>
+              ))}
+            </Listbox>
+          )}
+        </div>
+      </FormPanel> */}
+    </>
   )
 }
 
