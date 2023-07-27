@@ -2,6 +2,8 @@ import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { integrationKeys } from './keys'
+import { toast } from 'react-hot-toast'
+import { ResponseError } from 'types'
 
 export type VercelIntegrationCreateVariables = {
   code: string
@@ -41,13 +43,14 @@ type VercelIntegrationCreateData = Awaited<ReturnType<typeof createVercelIntegra
 
 export const useVercelIntegrationCreateMutation = ({
   onSuccess,
+  onError,
   ...options
 }: Omit<
-  UseMutationOptions<VercelIntegrationCreateData, unknown, VercelIntegrationCreateVariables>,
+  UseMutationOptions<VercelIntegrationCreateData, ResponseError, VercelIntegrationCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<VercelIntegrationCreateData, unknown, VercelIntegrationCreateVariables>(
+  return useMutation<VercelIntegrationCreateData, ResponseError, VercelIntegrationCreateVariables>(
     (vars) => createVercelIntegration(vars),
     {
       async onSuccess(data, variables, context) {
@@ -57,6 +60,13 @@ export const useVercelIntegrationCreateMutation = ({
           queryClient.invalidateQueries(integrationKeys.vercelProjectList(data.id)),
         ])
         await onSuccess?.(data, variables, context)
+      },
+      async onError(data, variables, context) {
+        if (onError === undefined) {
+          toast.error(`Failed to create Vercel integration: ${data.message}`)
+        } else {
+          onError(data, variables, context)
+        }
       },
       ...options,
     }

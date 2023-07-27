@@ -58,7 +58,6 @@ const Wizard: NextPageWithLayout = () => {
 
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
   const cloudProviderEnabled = useFlag('enableFlyCloudProvider')
-  const kpsEnabled = useFlag('initWithKps')
   const { data: membersExceededLimit, isLoading: isLoadingFreeProjectLimitCheck } =
     useFreeProjectLimitCheckQuery({ slug })
 
@@ -144,6 +143,12 @@ const Wizard: NextPageWithLayout = () => {
     const { data: paymentMethods, error } = await get(`${API_URL}/organizations/${slug}/payments`)
     if (!error) {
       setPaymentMethods(paymentMethods)
+    } else {
+      ui.setNotification({
+        error,
+        category: 'error',
+        message: `Failed to retrieve payment methods: ${error.message}`,
+      })
     }
   }
 
@@ -207,7 +212,6 @@ const Wizard: NextPageWithLayout = () => {
       db_pass: dbPass,
       db_region: dbRegion,
       db_pricing_tier_id: (PRICING_TIER_PRODUCT_IDS as any)[dbTier],
-      kps_enabled: kpsEnabled,
     }
     if (postgresVersion) {
       if (!postgresVersion.match(/1[2-9]\..*/)) {
@@ -227,6 +231,7 @@ const Wizard: NextPageWithLayout = () => {
     if (response.error) {
       setNewProjectLoading(false)
       ui.setNotification({
+        error: response.error,
         category: 'error',
         message: `Failed to create new project: ${response.error.message}`,
       })

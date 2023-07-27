@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'lib/common/fetch'
+import { get, isResponseOk } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { useCallback } from 'react'
 import { accessTokenKeys } from './keys'
@@ -14,14 +14,15 @@ export type AccessToken = {
 export type AccessTokensResponse = AccessToken[]
 
 export async function getAccessTokens(signal?: AbortSignal) {
-  const response = await get(`${API_URL}/profile/access-tokens`, {
+  const response = await get<AccessTokensResponse>(`${API_URL}/profile/access-tokens`, {
     signal,
   })
-  if (response.error) {
+
+  if (!isResponseOk(response)) {
     throw response.error
   }
 
-  return response as AccessTokensResponse
+  return response
 }
 
 export type AccessTokensData = Awaited<ReturnType<typeof getAccessTokens>>

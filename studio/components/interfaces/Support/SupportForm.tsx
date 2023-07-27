@@ -26,7 +26,7 @@ import { useProjectsQuery } from 'data/projects/projects-query'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 import { useFlag, useStore } from 'hooks'
 import useLatest from 'hooks/misc/useLatest'
-import { get, post } from 'lib/common/fetch'
+import { get, isResponseOk, post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { detectBrowser } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
@@ -36,6 +36,7 @@ import { CATEGORY_OPTIONS, SERVICE_OPTIONS, SEVERITY_OPTIONS } from './Support.c
 import { formatMessage, uploadAttachments } from './SupportForm.utils'
 
 const MAX_ATTACHMENTS = 5
+const INCLUDE_DISCUSSIONS = ['Problem', 'Database_unresponsive']
 
 export interface SupportFormProps {
   setSentCategory: (value: string) => void
@@ -187,8 +188,8 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
       }
     }
 
-    const response = await post(`${API_URL}/feedback/send`, payload)
-    if (response.error) {
+    const response = await post<void>(`${API_URL}/feedback/send`, payload)
+    if (!isResponseOk(response)) {
       ui.setNotification({
         category: 'error',
         message: `Failed to submit support ticket: ${response.error.message}`,
@@ -443,6 +444,28 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                         id="subject"
                         label="Subject"
                         placeholder="Summary of the problem you have"
+                        descriptionText={
+                          values.subject.length > 0 &&
+                          INCLUDE_DISCUSSIONS.includes(values.category) ? (
+                            <p className="flex items-center space-x-1">
+                              <span>Check our </span>
+                              <Link
+                                key="gh-discussions"
+                                href={`https://github.com/orgs/supabase/discussions?discussions_q=${values.subject}`}
+                              >
+                                <a
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="flex items-center space-x-2 text-scale-1000 underline hover:text-scale-1100 transition"
+                                >
+                                  Github discussions
+                                  <IconExternalLink size={14} strokeWidth={2} className="ml-1" />
+                                </a>
+                              </Link>
+                              <span> for a quick answer</span>
+                            </p>
+                          ) : null
+                        }
                       />
                     </div>
                     {values.category === 'Problem' && (
