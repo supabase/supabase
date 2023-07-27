@@ -19,9 +19,13 @@ export default function TileGrid({
   return (
     <>
       {featuredPartners.length > 0 ? (
-        <div key="featured" id="featured" className="space-y-8">
+        <div
+          key="featured"
+          id="featured"
+          className={`space-y-8 ${hideCategories ? `pb-8 border-b mb-8` : ''}`}
+        >
           <h2 className="h2">Featured</h2>
-          <div className="grid  grid-cols-1 gap-5 lg:max-w-none lg:grid-cols-2 xl:grid-cols-3">
+          <div className="grid grid-cols-1 gap-5 lg:max-w-none lg:grid-cols-2 xl:grid-cols-3">
             {featuredPartners.map((p) => (
               <Link key={p.slug} href={`/partners/${p.slug}`}>
                 <a>
