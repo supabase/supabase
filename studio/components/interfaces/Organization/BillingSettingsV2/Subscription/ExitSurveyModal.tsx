@@ -3,11 +3,10 @@ import { includes, without } from 'lodash'
 import { useReducer, useRef, useState } from 'react'
 
 import { useParams } from 'common'
+import { useSendDowngradeFeedbackMutation } from 'data/feedback/exit-survey-send'
 import { OrgSubscription } from 'data/subscriptions/org-subscription-query'
 import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
 import { useFlag, useStore } from 'hooks'
-import { post } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
 import { Alert, Button, Input, Modal } from 'ui'
 import ProjectUpdateDisabledTooltip from '../../BillingSettings/ProjectUpdateDisabledTooltip'
 import { CANCELLATION_REASONS } from '../BillingSettings.constants'
@@ -24,13 +23,23 @@ const ExitSurveyModal = ({ visible, subscription, onClose }: ExitSurveyModalProp
   const { slug } = useParams()
   const captchaRef = useRef<HCaptcha>(null)
 
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const [message, setMessage] = useState('')
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [selectedReasons, dispatchSelectedReasons] = useReducer(reducer, [])
 
   const subscriptionUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
-  const { mutateAsync: updateOrgSubscription } = useOrgSubscriptionUpdateMutation()
+  const { mutateAsync: sendExitSurvey, isLoading: isSubmittingFeedback } =
+    useSendDowngradeFeedbackMutation()
+  const { mutateAsync: updateOrgSubscription, isLoading: isUpdating } =
+    useOrgSubscriptionUpdateMutation({
+      onError: (error) => {
+        ui.setNotification({
+          category: 'error',
+          message: `Failed to downgrade project: ${error.message}`,
+        })
+      },
+    })
+  const isSubmitting = isUpdating || isSubmittingFeedback
 
   const projectsWithComputeInstances =
     subscription?.project_addons.filter((project) =>
@@ -59,26 +68,16 @@ const ExitSurveyModal = ({ visible, subscription, onClose }: ExitSurveyModalProp
       })
     }
 
-    setIsSubmitting(true)
     let token = captchaToken
 
-    try {
-      if (!token) {
-        const captchaResponse = await captchaRef.current?.execute({ async: true })
-        token = captchaResponse?.response ?? null
-        await downgradeOrganization()
-      }
-    } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to downgrade project: ${error.message}`,
-      })
-    } finally {
-      setIsSubmitting(false)
+    if (!token) {
+      const captchaResponse = await captchaRef.current?.execute({ async: true })
+      token = captchaResponse?.response ?? null
+      await downgradeOrganization()
     }
   }
 
-  const downgradeOrganization = async (values?: any) => {
+  const downgradeOrganization = async () => {
     // Update the subscription first, followed by posting the exit survey if successful
     // If compute instance is present within the existing subscription, then a restart will be triggered
     if (!slug) return console.error('Slug is required')
@@ -86,39 +85,27 @@ const ExitSurveyModal = ({ visible, subscription, onClose }: ExitSurveyModalProp
     try {
       await updateOrgSubscription({ slug, tier: 'tier_free' })
       resetCaptcha()
-    } catch (error: any) {
-      return ui.setNotification({
-        error,
-        category: 'error',
-        message: `Failed to downgrade subscription: ${error.message}`,
-      })
+    } finally {
     }
 
     try {
-      const feedbackRes = await post(`${API_URL}/feedback/downgrade`, {
+      await sendExitSurvey({
         orgSlug: slug,
         reasons: selectedReasons.reduce((a, b) => `${a}- ${b}\n`, ''),
-        additionalFeedback: message,
-        exitAction: 'downgrade',
-      })
-      if (feedbackRes.error) throw feedbackRes.error
-    } catch (error: any) {
-      return ui.setNotification({
-        error,
-        category: 'info',
-        message: `Failed to submit exit survey: ${error.message}`,
+        message,
       })
     } finally {
-      ui.setNotification({
-        category: 'success',
-        duration: hasComputeInstance ? 8000 : 4000,
-        message: hasComputeInstance
-          ? 'Your organization has been downgraded and your projects are currently restarting to update their compute instances'
-          : 'Successfully downgraded organization to the free plan',
-      })
-      onClose(true)
-      window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
     }
+
+    ui.setNotification({
+      category: 'success',
+      duration: hasComputeInstance ? 8000 : 4000,
+      message: hasComputeInstance
+        ? 'Your organization has been downgraded and your projects are currently restarting to update their compute instances'
+        : 'Successfully downgraded organization to the free plan',
+    })
+    onClose(true)
+    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
   }
 
   return (
@@ -222,6 +209,7 @@ const ExitSurveyModal = ({ visible, subscription, onClose }: ExitSurveyModalProp
             <ProjectUpdateDisabledTooltip projectUpdateDisabled={subscriptionUpdateDisabled}>
               <Button
                 type="danger"
+                className="pointer-events-auto"
                 loading={isSubmitting}
                 disabled={subscriptionUpdateDisabled || isSubmitting}
                 onClick={onSubmit}

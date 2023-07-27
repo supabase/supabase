@@ -17,43 +17,24 @@ export type CustomDomainActivateProps = {
 
 const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivateProps) => {
   const { ui } = useStore()
-
   const [isActivateConfirmModalVisible, setIsActivateConfirmModalVisible] = useState(false)
 
-  const { mutateAsync: activateCustomDomain } = useCustomDomainActivateMutation()
-  const { mutateAsync: deleteCustomDomain, isLoading: isDeleting } = useCustomDomainDeleteMutation()
+  const { mutate: activateCustomDomain } = useCustomDomainActivateMutation({
+    onSuccess: () => {
+      ui.setNotification({ category: 'success', message: `Successfully activated custom domain` })
+      setIsActivateConfirmModalVisible(false)
+    },
+  })
+  const { mutate: deleteCustomDomain, isLoading: isDeleting } = useCustomDomainDeleteMutation()
 
   const onActivateCustomDomain = async () => {
-    if (!projectRef) {
-      throw new Error('Project ref is required')
-    }
-
-    try {
-      await activateCustomDomain({ projectRef })
-
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully activated custom domain`,
-      })
-
-      setIsActivateConfirmModalVisible(false)
-    } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: error.message,
-      })
-    }
+    if (!projectRef) return console.error('Project ref is required')
+    activateCustomDomain({ projectRef })
   }
 
   const onCancelCustomDomain = async () => {
-    if (!projectRef) {
-      throw new Error('Project ref is required')
-    }
-    try {
-      await deleteCustomDomain({ projectRef })
-    } catch (error: any) {
-      ui.setNotification({ category: 'error', message: error.message })
-    }
+    if (!projectRef) return console.error('Project ref is required')
+    deleteCustomDomain({ projectRef })
   }
 
   return (

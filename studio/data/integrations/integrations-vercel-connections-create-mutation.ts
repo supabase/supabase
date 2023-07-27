@@ -1,6 +1,8 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'react-hot-toast'
 
 import { post } from 'data/fetchers'
+import { ResponseError } from 'types'
 import { integrationKeys } from './keys'
 import { IntegrationConnectionsCreateVariables } from './types'
 
@@ -31,11 +33,12 @@ export type IntegrationVercelConnectionsCreateData = Awaited<
 
 export const useIntegrationVercelConnectionsCreateMutation = ({
   onSuccess,
+  onError,
   ...options
 }: Omit<
   UseMutationOptions<
     IntegrationVercelConnectionsCreateData,
-    unknown,
+    ResponseError,
     IntegrationConnectionsCreateVariables
   >,
   'mutationFn'
@@ -43,7 +46,7 @@ export const useIntegrationVercelConnectionsCreateMutation = ({
   const queryClient = useQueryClient()
   return useMutation<
     IntegrationVercelConnectionsCreateData,
-    unknown,
+    ResponseError,
     IntegrationConnectionsCreateVariables
   >((vars) => createIntegrationVercelConnections(vars), {
     async onSuccess(data, variables, context) {
@@ -58,6 +61,13 @@ export const useIntegrationVercelConnectionsCreateMutation = ({
         ),
       ])
       await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create connection: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
     },
     ...options,
   })

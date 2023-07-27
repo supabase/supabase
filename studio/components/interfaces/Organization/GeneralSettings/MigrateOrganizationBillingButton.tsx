@@ -1,21 +1,20 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { observer } from 'mobx-react-lite'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
-import { Alert, Button, Form, IconHelpCircle, Listbox, Loading, Modal, Toggle } from 'ui'
+import { Alert, Button, IconHelpCircle, Listbox, Loading, Modal, Toggle } from 'ui'
 
 import { SpendCapModal } from 'components/interfaces/BillingV2'
 import { useOrganizationBillingMigrationMutation } from 'data/organizations/organization-migrate-billing-mutation'
 import { useOrganizationBillingMigrationPreview } from 'data/organizations/organization-migrate-billing-preview-query'
 import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
 import { PRICING_TIER_LABELS_ORG } from 'lib/constants'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
 import PaymentMethodSelection from '../BillingSettingsV2/Subscription/PaymentMethodSelection'
 
 const MigrateOrganizationBillingButton = observer(() => {
   const { ui } = useStore()
   const router = useRouter()
-
   const organization = useSelectedOrganization()
 
   const [isOpen, setIsOpen] = useState(false)
@@ -23,7 +22,6 @@ const MigrateOrganizationBillingButton = observer(() => {
   const [showSpendCapHelperModal, setShowSpendCapHelperModal] = useState(false)
   const [isSpendCapEnabled, setIsSpendCapEnabled] = useState(true)
   const [paymentMethodId, setPaymentMethodId] = useState('')
-  const [isSubmitting, setSubmitting] = useState(false)
 
   const dbTier = useMemo(() => {
     if (tier === '') return ''
@@ -34,8 +32,21 @@ const MigrateOrganizationBillingButton = observer(() => {
     }
   }, [tier, isSpendCapEnabled])
 
-  const { error: migrationError, mutateAsync: migrateBilling } =
-    useOrganizationBillingMigrationMutation()
+  const {
+    error: migrationError,
+    mutate: migrateBilling,
+    isLoading: isMigrating,
+  } = useOrganizationBillingMigrationMutation({
+    onSuccess: () => {
+      ui.setNotification({
+        message: 'Successfully migrated to organization-level billing',
+        category: 'success',
+        duration: 5000,
+      })
+      router.push('/projects')
+      setIsOpen(false)
+    },
+  })
 
   const {
     data: migrationPreviewData,
@@ -72,29 +83,13 @@ const MigrateOrganizationBillingButton = observer(() => {
 
   const onConfirmMigrate = async () => {
     if (!tier) return
-
     if (!canMigrateOrganization) {
       return ui.setNotification({
         category: 'error',
         message: 'You do not have the required permissions to migrate this organization',
       })
     }
-
-    setSubmitting(true)
-
-    try {
-      await migrateBilling({ organizationSlug: organization?.slug, tier: dbTier, paymentMethodId })
-      ui.setNotification({
-        message: 'Successfully migrated to organization-level billing',
-        category: 'success',
-        duration: 5000,
-      })
-      router.push('/projects')
-      setIsOpen(false)
-    } catch {
-    } finally {
-      setSubmitting(false)
-    }
+    migrateBilling({ organizationSlug: organization?.slug, tier: dbTier, paymentMethodId })
   }
 
   return (
@@ -123,8 +118,7 @@ const MigrateOrganizationBillingButton = observer(() => {
                 <div className="text-sm space-y-2">
                   <p>
                     Migrating to new organization-level billing combines subscriptions for all
-                    projects in the organization into a single subscription. This cannot be
-                    reversed.{' '}
+                    projects in the organization into a single subscription.
                   </p>
 
                   <p>
@@ -141,6 +135,15 @@ const MigrateOrganizationBillingButton = observer(() => {
                       </a>
                     </Link>
                     .
+                  </p>
+                </div>
+              </Alert>
+
+              <Alert title="Irreversible" withIcon variant="danger">
+                <div className="text-sm">
+                  <p>
+                    Once migrated to the new organization-level billing, you cannot go back to the
+                    old project-level billing.
                   </p>
                 </div>
               </Alert>
@@ -276,8 +279,8 @@ const MigrateOrganizationBillingButton = observer(() => {
               size="small"
               type="primary"
               htmlType="submit"
-              loading={isSubmitting}
-              disabled={migrationPreviewData === undefined || isSubmitting || !tier}
+              loading={isMigrating}
+              disabled={migrationPreviewData === undefined || isMigrating || !tier}
               onClick={() => onConfirmMigrate()}
             >
               I understand, migrate this organization
