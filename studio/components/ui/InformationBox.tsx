@@ -1,6 +1,14 @@
 import Link from 'next/link'
 import { FC, ReactNode, useState } from 'react'
-import { Button, IconExternalLink, IconMaximize2, IconMinimize2 } from 'ui'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  IconExternalLink,
+  IconMaximize2,
+  IconMinimize2,
+} from 'ui'
 
 interface Props {
   icon?: ReactNode
@@ -30,40 +38,30 @@ const InformationBox: FC<Props> = ({
   const [isExpanded, setIsExpanded] = useState<boolean>(defaultVisibility)
 
   return (
-    <div
-      className={`${block ? 'block w-full' : ''}
-      block w-full rounded border border-scale-600 bg-scale-100 py-3 dark:border-scale-500 dark:bg-scale-400 ${className}`}
-    >
-      <div className="flex flex-col px-4">
-        <div className="flex items-center justify-between">
-          <div className="flex w-full space-x-3 lg:items-start">
-            {icon && <span className="text-scale-900">{icon}</span>}
-            <div className="flex-grow">
-              <h5 className="text-sm text-scale-1200">{title}</h5>
-            </div>
+    <Alert_Shadcn_ className={block ? 'block w-full' : ''}>
+      {icon}
+      <AlertTitle_Shadcn_ className="flex gap-3 justify-between mt-1">
+        {title}
+
+        {description && !hideCollapse ? (
+          <div className="cursor-pointer text-scale-900" onClick={() => setIsExpanded(!isExpanded)}>
+            {isExpanded ? (
+              <IconMinimize2 size={14} strokeWidth={1.5} />
+            ) : (
+              <IconMaximize2 size={14} strokeWidth={1.5} />
+            )}
           </div>
-          {description && !hideCollapse ? (
-            <div
-              className="cursor-pointer text-scale-900"
-              onClick={() => setIsExpanded(!isExpanded)}
-            >
-              {isExpanded ? (
-                <IconMinimize2 size={14} strokeWidth={1.5} />
-              ) : (
-                <IconMaximize2 size={14} strokeWidth={1.5} />
-              )}
-            </div>
-          ) : null}
-        </div>
+        ) : null}
+      </AlertTitle_Shadcn_>
+      <AlertDescription_Shadcn_>
         {(description || url || button) && (
           <div
-            className={`flex flex-col space-y-3 overflow-hidden transition-all ${
+            className={`flex flex-col gap-3 overflow-hidden transition-all ${
               isExpanded ? 'mt-3' : ''
             }`}
             style={{ maxHeight: isExpanded ? 500 : 0 }}
           >
-            <div className="text-scale-1100 text-sm">{description}</div>
-
+            {description}
             {url && (
               <Link href={url}>
                 <a target="_blank" rel="noreferrer" className="pt-2">
@@ -73,12 +71,11 @@ const InformationBox: FC<Props> = ({
                 </a>
               </Link>
             )}
-
             {button && <div>{button}</div>}
           </div>
         )}
-      </div>
-    </div>
+      </AlertDescription_Shadcn_>
+    </Alert_Shadcn_>
   )
 }
 

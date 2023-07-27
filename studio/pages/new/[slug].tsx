@@ -407,7 +407,7 @@ const Wizard: NextPageWithLayout = () => {
                 />
               </Panel.Content>
               {isAdmin && (
-                <Panel.Content>
+                <Panel.Content className="flex flex-col gap-3">
                   {!billedViaOrg && (
                     <Listbox
                       label="Pricing Plan"
