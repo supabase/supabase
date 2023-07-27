@@ -349,10 +349,13 @@ const SQLEditor = () => {
       throw new Error('Returned SQL diff not available')
     }
 
+    const formattedOriginal = sqlDiff.original.replace(sqlAiDisclaimerComment, '').trim()
+    const formattedModified = sqlDiff.modified.replace(sqlAiDisclaimerComment, '').trim()
+    const newModified =
+      sqlAiDisclaimerComment + '\n\n' + formattedOriginal + '\n\n' + formattedModified
+
     model.original.setValue(sqlDiff.original)
-    model.modified.setValue(
-      sqlDiff.original + '\n\n' + sqlDiff.modified.replace(sqlAiDisclaimerComment, '').trim()
-    )
+    model.modified.setValue(newModified)
   }, [sqlDiff])
 
   const compareAsNewSnippet = useCallback(() => {
@@ -679,18 +682,32 @@ const SQLEditor = () => {
                             return
                           }
 
-                          const lineStart = (sqlAiDisclaimerComment + '\n\n').split('\n').length
+                          const original = model.original.getValue()
+                          const formattedOriginal = format(
+                            original.replace(sqlAiDisclaimerComment, '').trim(),
+                            {
+                              language: 'postgresql',
+                              keywordCase: 'lower',
+                            }
+                          )
+                          const modified = model.modified.getValue()
+
+                          const lineStart = original.includes(sqlAiDisclaimerComment)
+                            ? (sqlAiDisclaimerComment + '\n\n').split('\n').length
+                            : 0
                           const lineEnd = model.original.getLineCount()
                           const totalLines = lineEnd - lineStart
 
-                          // If any change overwrites >50% of the existing code,
+                          // If any change overwrites >50% of the original code,
+                          // and the the modified code doesn't contain the original code,
                           // predict that this is an addition instead of a modification
-                          const isAddition = lineChanges.some(
-                            (lineChange) =>
-                              lineChange.originalEndLineNumber -
-                                lineChange.originalStartLineNumber >
-                              totalLines * 0.5
-                          )
+                          const isAddition =
+                            lineChanges.some(
+                              (lineChange) =>
+                                lineChange.originalEndLineNumber -
+                                  lineChange.originalStartLineNumber >
+                                totalLines * 0.5
+                            ) && !modified.includes(formattedOriginal)
 
                           if (isAddition) {
                             setSelectedDiffType(DiffType.Addition)
