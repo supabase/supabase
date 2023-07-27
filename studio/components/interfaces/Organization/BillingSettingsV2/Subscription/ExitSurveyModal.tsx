@@ -209,6 +209,7 @@ const ExitSurveyModal = ({ visible, subscription, onClose }: ExitSurveyModalProp
             <ProjectUpdateDisabledTooltip projectUpdateDisabled={subscriptionUpdateDisabled}>
               <Button
                 type="danger"
+                className="pointer-events-auto"
                 loading={isSubmitting}
                 disabled={subscriptionUpdateDisabled || isSubmitting}
                 onClick={onSubmit}

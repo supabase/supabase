@@ -10,6 +10,7 @@ export * from './src/lib/Markdown'
 
 // // GENERAL
 
+export * from './src/components/Admonition'
 export * from './src/components/Button'
 export * from './src/components/Icon'
 export * from './src/components/Icon/IconContext'
@@ -62,6 +63,9 @@ export * from './src/components/Form'
 
 // CMD+K
 export * from './src/components/Command'
+
+// Widgets
+export * from './src/components/CountdownWidget'
 
 // layout
 export * from './src/components/LoadingLine'

@@ -5,9 +5,16 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Wed, 12 Jul 2023 22:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Mon, 17 Jul 2023 22:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/flutter-authentication</guid>
+  <title>Getting started with Flutter authentication</title>
+  <link>https://supabase.com/blog/flutter-authentication</link>
+  <description>Learn how authentication on Flutter works through Google sign in with Supabase auth.</description>
+  <pubDate>Mon, 17 Jul 2023 22:00:00 GMT</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/pgvector-performance</guid>
   <title>pgvector 0.4.0 performance</title>
   <link>https://supabase.com/blog/pgvector-performance</link>
@@ -407,9 +414,9 @@
   <pubDate>Wed, 23 Nov 2022 23:00:00 GMT</pubDate>
 </item>
 <item>
-  <guid>https://supabase.com/blog/flutter-authentication-and-authorization-with-rls</guid>
-  <title>Flutter Authentication and Authorization with RLS</title>
-  <link>https://supabase.com/blog/flutter-authentication-and-authorization-with-rls</link>
+  <guid>https://supabase.com/blog/flutter-authorization-with-rls</guid>
+  <title>Flutter Authorization with RLS</title>
+  <link>https://supabase.com/blog/flutter-authorization-with-rls</link>
   <description>Learn how you can secure your Flutter app using Supabase Row Level Security.</description>
   <pubDate>Mon, 21 Nov 2022 23:00:00 GMT</pubDate>
 </item>

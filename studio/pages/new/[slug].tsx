@@ -58,7 +58,6 @@ const Wizard: NextPageWithLayout = () => {
 
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
   const cloudProviderEnabled = useFlag('enableFlyCloudProvider')
-  const kpsEnabled = useFlag('initWithKps')
   const { data: membersExceededLimit, isLoading: isLoadingFreeProjectLimitCheck } =
     useFreeProjectLimitCheckQuery({ slug })
 
@@ -213,7 +212,6 @@ const Wizard: NextPageWithLayout = () => {
       db_pass: dbPass,
       db_region: dbRegion,
       db_pricing_tier_id: (PRICING_TIER_PRODUCT_IDS as any)[dbTier],
-      kps_enabled: kpsEnabled,
     }
     if (postgresVersion) {
       if (!postgresVersion.match(/1[2-9]\..*/)) {

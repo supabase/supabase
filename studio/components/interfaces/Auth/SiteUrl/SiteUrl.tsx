@@ -30,6 +30,7 @@ const SiteUrl = observer(() => {
     REFRESH_TOKEN_ROTATION_ENABLED: authConfig.config.REFRESH_TOKEN_ROTATION_ENABLED || false,
     SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: authConfig.config.SECURITY_REFRESH_TOKEN_REUSE_INTERVAL,
     SECURITY_CAPTCHA_ENABLED: authConfig.config.SECURITY_CAPTCHA_ENABLED || false,
+    SECURITY_CAPTCHA_PROVIDER: authConfig.config.SECURITY_CAPTCHA_PROVIDER || 'hcaptcha',
     SECURITY_CAPTCHA_SECRET: authConfig.config.SECURITY_CAPTCHA_SECRET || '',
   }
 
@@ -46,14 +47,13 @@ const SiteUrl = observer(() => {
     SECURITY_CAPTCHA_ENABLED: boolean().required(),
     SECURITY_CAPTCHA_SECRET: string().when('SECURITY_CAPTCHA_ENABLED', {
       is: true,
-      then: string().required('Must have a hCaptcha secret'),
+      then: string().required('Must have a Captcha secret'),
     }),
   })
 
   const onSubmit = async (values: any, { setSubmitting, resetForm }: any) => {
     const payload = { ...values }
     payload.DISABLE_SIGNUP = !values.DISABLE_SIGNUP
-    payload.SECURITY_CAPTCHA_PROVIDER = 'hcaptcha'
 
     setSubmitting(true)
     const { error } = await authConfig.update(payload)

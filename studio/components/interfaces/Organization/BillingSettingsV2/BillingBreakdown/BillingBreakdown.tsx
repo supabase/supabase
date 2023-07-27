@@ -42,7 +42,7 @@ const BillingBreakdown = () => {
     Boolean(
       usage?.usages.find(
         (metric) =>
-          !metric.unlimited && !metric.capped && metric.usage > (metric?.pricing_free_units ?? 0)
+          !metric.unlimited && metric.capped && metric.usage > (metric?.pricing_free_units ?? 0)
       )
     )
 
@@ -91,17 +91,17 @@ const BillingBreakdown = () => {
               <Alert
                 withIcon
                 variant="danger"
-                title="Your project's usage has exceeded its included quota"
+                title="Your organization's usage has exceeded its included quota"
                 actions={[
                   <Button key="upgrade-button" type="default" className="ml-8" onClick={() => {}}>
                     {currentPlan?.id === 'free' ? 'Upgrade plan' : 'Change spend cap'}
                   </Button>,
                 ]}
               >
-                Your project can become unresponsive or enter read only mode.{' '}
+                Your projects can become unresponsive or enter read only mode.{' '}
                 {currentPlan?.id === 'free'
-                  ? 'Please upgrade to the Pro plan to ensure that your project remains available.'
-                  : 'Please disable spend cap to ensure that your project remains available.'}
+                  ? 'Please upgrade to the Pro plan to ensure that your projects remain available.'
+                  : 'Please disable spend cap to ensure that your projects remain available.'}
               </Alert>
             )}
 
