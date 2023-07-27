@@ -16,6 +16,7 @@ import {
   Command_Shadcn_,
   IconCheck,
   IconCode,
+  IconGitBranch,
   IconPlus,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
@@ -46,9 +47,14 @@ const BranchDropdown = () => {
 
       {isSuccess && branches.length > 0 && (
         <div className="flex items-center space-x-2 px-2">
-          <Link passHref href={`/project/${projectRef}/branches`}>
+          <Link passHref href={`/project/${ref}`}>
+            <a ref={branchNameRef} className="flex items-center space-x-2 text-sm">
+              {selectedBranch?.name}
+            </a>
+          </Link>
+
+          <Link passHref href={`/project/${ref}/branches`}>
             <a ref={branchNameRef} className="flex items-center space-x-2">
-              <p className="text-sm">{selectedBranch?.name}</p>
               {selectedBranch?.is_default ? (
                 <Badge color="amber">Production</Badge>
               ) : (
@@ -86,7 +92,7 @@ const BranchDropdown = () => {
                         <Link passHref href={href} key={branch.id}>
                           <CommandItem_Shadcn_
                             asChild
-                            value={branch.id}
+                            value={branch.name}
                             className="cursor-pointer w-full flex items-center justify-between"
                             onSelect={() => {
                               setOpen(false)
@@ -105,24 +111,24 @@ const BranchDropdown = () => {
                       )
                     })}
                   </CommandGroup_Shadcn_>
-                  {/* <CommandGroup_Shadcn_ className="border-t">
-                    <Link passHref href={'/'}>
+                  <CommandGroup_Shadcn_ className="border-t">
+                    <Link passHref href={`/project/${ref}/branches`}>
                       <CommandItem_Shadcn_
                         asChild
                         className="cursor-pointer flex items-center space-x-2 w-full"
                         onSelect={(e) => {
                           setOpen(false)
-                          router.push('/')
+                          router.push(`/project/${ref}/branches`)
                         }}
                         onClick={() => setOpen(false)}
                       >
                         <a>
-                          <IconPlus size={14} strokeWidth={1.5} />
-                          <p>New branch</p>
+                          <IconGitBranch size={14} strokeWidth={1.5} />
+                          <p>Manage branches</p>
                         </a>
                       </CommandItem_Shadcn_>
                     </Link>
-                  </CommandGroup_Shadcn_> */}
+                  </CommandGroup_Shadcn_>
                 </CommandList_Shadcn_>
               </Command_Shadcn_>
             </PopoverContent_Shadcn_>

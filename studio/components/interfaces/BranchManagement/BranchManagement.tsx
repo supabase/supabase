@@ -1,5 +1,6 @@
 import { partition } from 'lodash'
 import { useState } from 'react'
+import { Button, IconSearch, Input } from 'ui'
 
 import { useParams } from 'common'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
@@ -9,11 +10,11 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useBranchDeleteMutation } from 'data/branches/branch-delete-mutation'
 import { Branch, useBranchesQuery } from 'data/branches/branches-query'
 import { useSelectedProject, useStore } from 'hooks'
-import { Button, IconSearch, Input } from 'ui'
-import { BranchHeader, BranchPanel, MainBranchPanel } from './BranchPanels'
-import UpdateBranchSidePanel from './UpdateBranchSidePanel'
-import PullRequests from './PullRequests'
+import { MainBranchPanel } from './BranchPanels'
+import CreateBranchSidePanel from './CreateBranchSidePanel'
 import PreviewBranches from './PreviewBranches'
+import PullRequests from './PullRequests'
+import UpdateBranchSidePanel from './UpdateBranchSidePanel'
 
 const BranchManagement = () => {
   const { ui } = useStore()
@@ -24,6 +25,7 @@ const BranchManagement = () => {
   const projectRef =
     projectDetails !== undefined ? (isBranch ? projectDetails.parent_project_ref : ref) : undefined
 
+  const [showCreateBranch, setShowCreateBranch] = useState(false)
   const [selectedBranchToUpdate, setSelectedBranchToUpdate] = useState<Branch>()
   const [selectedBranchToDelete, setSelectedBranchToDelete] = useState<Branch>()
 
@@ -53,7 +55,7 @@ const BranchManagement = () => {
               <div className="flex items-center space-x-2">
                 <Input placeholder="Search branch" size="small" icon={<IconSearch />} />
               </div>
-              <Button>Create preview branch</Button>
+              <Button onClick={() => setShowCreateBranch(true)}>Create preview branch</Button>
             </div>
             <div className="">
               {isLoading && <GenericSkeletonLoader />}
@@ -86,6 +88,11 @@ const BranchManagement = () => {
         confirmString={selectedBranchToDelete?.name ?? ''}
         text={`This will delete your branch "${selectedBranchToDelete?.name}"`}
         alert="You cannot recover this branch once it is deleted!"
+      />
+
+      <CreateBranchSidePanel
+        visible={showCreateBranch}
+        onClose={() => setShowCreateBranch(false)}
       />
 
       <UpdateBranchSidePanel
