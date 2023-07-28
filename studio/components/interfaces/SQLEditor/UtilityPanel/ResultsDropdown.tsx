@@ -31,7 +31,8 @@ const ResultsDropdown = ({ id }: ResultsDropdownProps) => {
         return map(row, (v, k) => {
           if (isString(v)) {
             // replace all newlines with the character \n
-            return v.replaceAll(/\n/g, '\\n')
+            // escape all quotation marks
+            return v.replaceAll(/\n/g, '\\n').replaceAll(/"/g, '""')
           }
           return v
         })
