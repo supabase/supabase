@@ -22,7 +22,7 @@ export interface ProjectBase {
   region: string
   inserted_at: string
   subscription_id: string
-  preview_branches: any[]
+  preview_branch_refs: string[]
 }
 
 export interface Project extends ProjectBase {
