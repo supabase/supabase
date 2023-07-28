@@ -1,4 +1,4 @@
-import { IconAward, IconCompass, IconDollarSign, IconGlobe } from 'ui'
+import { IconAward, IconCompass, IconDollarSign, IconGlobe, IconTrendingUp } from 'ui'
 
 export default {
   metaTitle: 'Partner with Supabase',
@@ -75,14 +75,14 @@ export default {
       icon: <IconGlobe strokeWidth={1.5} />,
     },
     {
-      title: 'Business Growth',
+      title: 'Business growth',
       description: 'Explore new revenue streams and growth potential.',
       icon: <IconDollarSign strokeWidth={1.5} />,
     },
     {
-      title: 'Scaling',
-      description: 'Invoke Edge Functions based on any event in your database',
-      icon: <IconAward strokeWidth={1.5} />,
+      title: 'Scale with us',
+      description: 'Scale automatically with the power of open-source Postgres technology.',
+      icon: <IconTrendingUp strokeWidth={1.5} />,
     },
   ],
   featuredApps: [
