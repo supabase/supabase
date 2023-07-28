@@ -59,12 +59,12 @@ const Partners = () => {
           <div className="absolute inset-0 z-[1] bg-[linear-gradient(to_top,var(--colors-scale5)_40%,var(--colors-scale3)_90%)] dark:bg-[linear-gradient(to_top,var(--colors-scale1)_40%,#121212_90%)]" />
         </div>
         <SectionContainer>
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-4">
             <div className="col-span-1 lg:col-span-2">
               <h2 className="text-2xl sm:text-3xl xl:text-4xl tracking-[-.5px]">
                 Explore our marketplace
               </h2>
-              <p className="text-scale-1000 text-xs sm:text-sm lg:text-base py-3 sm:w-3/5 lg:max-w-sm">
+              <p className="text-scale-1000 text-xs sm:text-sm lg:text-base py-3 lg:max-w-md">
                 Discover how technology and consulting partners are already working with Supabase.
               </p>
               <TextLink
@@ -178,13 +178,6 @@ const Partners = () => {
                   Supabase lets you build a third-party app that can control organizations or
                   projects programmatically.
                 </p>
-                {/* <Link href="https://supabase.com/docs/guides/platform/oauth-apps/publish-an-oauth-app">
-                  <a tabIndex={-1}>
-                    <Button type="default" size="small">
-                      Learn more
-                    </Button>
-                  </a>
-                </Link> */}
                 <TextLink
                   url="https://supabase.com/docs/guides/platform/oauth-apps/publish-an-oauth-app"
                   label="Learn more"
