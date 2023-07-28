@@ -7,104 +7,12 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import ProductHeaderCentered from '~/components/Sections/ProductHeaderCentered'
 
 import pageData from '~/data/partners'
-import {
-  Badge,
-  Button,
-  IconArrowUpRight,
-  IconAward,
-  IconCode,
-  IconCompass,
-  IconDollarSign,
-  IconFastForward,
-  IconGlobe,
-  IconRefreshCcw,
-  TextLink,
-} from 'ui'
+import { Badge, Button, IconCode, TextLink } from 'ui'
 import Link from 'next/link'
 import Image from 'next/image'
 import InteractiveShimmerCard from '../../components/InteractiveShimmerCard'
 import { range } from 'lodash'
 import { useBreakpoint } from 'common'
-
-const featureBlocks = [
-  {
-    title: 'Technical support',
-    description: 'Access technical support to back your integrations and customer projects.',
-    highlightLines: '8',
-    icon: <IconCompass strokeWidth={1.5} />,
-  },
-  {
-    title: 'Awareness',
-    description: 'Reach a fast growing community of users ready to use your tools.',
-    highlightLines: '8',
-    icon: <IconGlobe strokeWidth={1.5} />,
-  },
-  {
-    title: 'Business Growth',
-    description: 'Join forces with us to boost growth opportunities.',
-    highlightLines: '8',
-    icon: <IconDollarSign strokeWidth={1.5} />,
-  },
-  {
-    title: 'Scaling',
-    description: 'Invoke Edge Functions based on any event in your database',
-    highlightLines: '8',
-    icon: <IconAward strokeWidth={1.5} />,
-  },
-]
-
-const featuredApps = [
-  {
-    name: 'Arengu',
-    type: 'integration',
-    logo: 'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/integrations/arengu/arengu_logo.jpeg',
-  },
-  {
-    name: 'Auth0',
-    type: 'integration',
-    logo: 'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/integrations/auth0/auth0_dark.png?t=2023-07-19T19%3A13%3A04.189Z',
-  },
-  {
-    name: 'Appsmith',
-    type: 'integration',
-    logo: 'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/integrations/appsmith/appsmith-logo.png',
-  },
-  {
-    name: 'CALDA',
-    type: 'experts',
-    logo: 'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/experts/calda/calda_logo.jpeg',
-  },
-  {
-    name: 'Morrow',
-    type: 'experts',
-    logo: 'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/experts/morrow/morrow-logo.png',
-  },
-  {
-    name: 'Voypost',
-    type: 'experts',
-    logo: 'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/experts/voypost/33024474.png',
-  },
-  {
-    name: 'Vercel',
-    type: 'integration',
-    logo: 'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/integrations/vercel/vercel-icon.jpeg',
-  },
-  {
-    name: 'Prisma',
-    type: 'integration',
-    logo: 'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/integrations/prisma/prisma-icon.png',
-  },
-  {
-    name: 'Cloudflare-workers',
-    type: 'integration',
-    logo: 'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/integrations/cloudflare-integration/cloudflare_workers_logo.png?t=2023-07-21T11%3A07%3A47.005Z',
-  },
-  {
-    name: 'Codesandbox',
-    type: 'integration',
-    logo: 'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/integrations/codesandbox/codesandbox_logo.jpeg',
-  },
-]
 
 const Partners = () => {
   const router = useRouter()
@@ -128,53 +36,30 @@ const Partners = () => {
       />
       <DefaultLayout>
         <div className="relative bg-scale-500 dark:bg-scale-100 overflow-hidden">
-          <SectionContainer className="overflow-hidden">
-            <ProductHeaderCentered
-              {...pageData.heroSection}
-              footer={
-                <div className="relative w-full flex py-8 lg:mt-8 justify-center gap-2 overflow-hidden mx-auto max-w-2xl before:content[''] before:absolute before:inset-0 before:w-full before:bg-[linear-gradient(to_right,var(--colors-scale5)_0%,transparent_10%,transparent_90%,var(--colors-scale5)_100%)] dark:before:bg-[linear-gradient(to_right,var(--colors-scale1)_0%,transparent_10%,transparent_90%,var(--colors-scale1)_100%)] before:z-10">
-                  {range(0, 3).map((_) => (
-                    <div className="flex gap-2 animate-marquee">
-                      {featuredApps.map((app) => (
-                        // <InteractiveShimmerCard innerClassName="relative w-20 h-20 md:w-28 md:h-28 rounded bg-scale-100 !flex !items-center !justify-center">
-                        <div className="w-20 h-20 md:w-28 md:h-28 rounded-2xl bg-scale-200 border border-scale-200 flex items-center justify-center shadow-xl">
-                          <Image
-                            src={app.logo}
-                            alt={app.name}
-                            width={isSm ? 24 : 45}
-                            height={isSm ? 24 : 45}
-                            className="w-8 h-8  overflow-hidden rounded-full"
-                          />
-                        </div>
-                        // </InteractiveShimmerCard>
-                      ))}
-                    </div>
-                  ))}
-                </div>
-              }
-            />
+          <SectionContainer className="overflow-hidden pt-8 pb-12 md:pt-12">
+            <ProductHeaderCentered {...pageData.heroSection} />
           </SectionContainer>
-          <div className="absolute inset-0 z-[2] bg-[linear-gradient(to_top,var(--colors-scale5)_40%,var(--colors-scale3)_90%)] dark:bg-[linear-gradient(to_top,var(--colors-scale1)_40%,#121212_90%)]" />
-          {/* <div className="absolute inset-0 z-[1]">
-            <div className="absolute opacity-10 z-[1] -top-1/2 -translate-y-2/3 left-1/2 -translate-x-1/2 w-[3600px] aspect-square rounded-full bg-gradient-to-t from-scale-200 to-scale-100 shadow-lg" />
-            <div className="absolute opacity-20 z-[1] top-0 -translate-y-2/3 left-1/2 -translate-x-1/2 w-[2400px] aspect-square rounded-full bg-gradient-to-t from-scale-200 to-scale-100 shadow-lg" />
-            <div className="absolute opacity-40 z-[1] top-1/2 -translate-y-2/3 left-1/2 -translate-x-1/2 w-[1200px] aspect-square rounded-full bg-gradient-to-t from-scale-200 to-scale-100 shadow-lg" />
-            <div className="absolute opacity-60 z-[1] top-1/3 -translate-y-2/3 left-1/2 -translate-x-1/2 w-[900px] aspect-square rounded-full bg-gradient-to-t from-scale-200 to-scale-100 shadow-lg" />
-            <div className="absolute opacity-80 z-[1] top-1/4 -translate-y-2/3 left-1/2 -translate-x-1/2 w-[400px] aspect-square rounded-full bg-gradient-to-t from-scale-200 to-scale-100 shadow-lg" />
-          </div> */}
-          {/* <Image
-            src="/images/partners/partners-grid-2.png"
-            alt="Supabase partners"
-            layout="fill"
-            objectFit="cover"
-            objectPosition="bottom"
-            quality={100}
-            className="absolute inset-0 z-0"
-          /> */}
+          <div className="relative z-20 w-full flex py-8 mb-8 -mt-8 md:mb-16 md:-mt-16 justify-center gap-2 overflow-hidden mx-auto max-w-2xl before:content[''] before:absolute before:inset-0 before:w-full before:bg-[linear-gradient(to_right,var(--colors-scale5)_0%,transparent_10%,transparent_90%,var(--colors-scale5)_100%)] dark:before:bg-[linear-gradient(to_right,var(--colors-scale1)_0%,transparent_10%,transparent_90%,var(--colors-scale1)_100%)] before:z-10">
+            {range(0, 3).map((_) => (
+              <div className="flex gap-2 animate-marquee">
+                {pageData.featuredApps.map((app) => (
+                  <div className="w-20 h-20 md:w-28 md:h-28 rounded-2xl bg-gradient-to-t from-scale-300 dark:from-scale-200 to-scale-100 border border-scale-200 flex items-center justify-center shadow-xl">
+                    <Image
+                      src={app.logo}
+                      alt={app.name}
+                      width={isSm ? 24 : 45}
+                      height={isSm ? 24 : 45}
+                      className="w-8 h-8  overflow-hidden rounded-full"
+                    />
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+          <div className="absolute inset-0 z-[1] bg-[linear-gradient(to_top,var(--colors-scale5)_40%,var(--colors-scale3)_90%)] dark:bg-[linear-gradient(to_top,var(--colors-scale1)_40%,#121212_90%)]" />
         </div>
-        {/* <SectionContainer className="flex flex-col items-center gap-8"> */}
         <SectionContainer>
-          <div className="grid grid-cols-1 lg:grid-cols-5">
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
             <div className="col-span-1 lg:col-span-2">
               <h2 className="text-2xl sm:text-3xl xl:text-4xl tracking-[-.5px]">
                 Explore our marketplace
@@ -193,7 +78,6 @@ const Partners = () => {
                 hasActiveOnHover={true}
                 innerClassName="px-8 py-6 group flex flex-col gap-4"
               >
-                {/* <div className="bg-scale-100 dark:bg-scale-300 group flex flex-col gap-4 rounded border px-8 py-6"> */}
                 <div className="bg-scale-300 mb-4 dark:bg-scale-500 text-scale-1200 group-hover:text-brand-900 flex h-12 w-12 items-center justify-center rounded-md border transition-all group-hover:scale-105">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -221,14 +105,12 @@ const Partners = () => {
                 <Link href="/partners/experts">
                   <a className="absolute inset-0" />
                 </Link>
-                {/* </div> */}
               </InteractiveShimmerCard>
               <InteractiveShimmerCard
                 hasInnerShimmer={false}
                 hasActiveOnHover={true}
                 innerClassName="px-8 py-6 group flex flex-col gap-4"
               >
-                {/* <div className="bg-scale-100 dark:bg-scale-300 group flex flex-col gap-4 rounded border px-8 py-6"> */}
                 <div className="bg-scale-300 mb-4 dark:bg-scale-500 text-scale-1200 group-hover:text-brand-900 flex h-12 w-12 items-center justify-center rounded-md border transition-all group-hover:scale-105">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -253,7 +135,6 @@ const Partners = () => {
                 <Link href="/partners/integrations">
                   <a className="absolute inset-0" />
                 </Link>
-                {/* </div> */}
               </InteractiveShimmerCard>
             </div>
           </div>
@@ -265,18 +146,14 @@ const Partners = () => {
           <h2 className="text-2xl sm:text-3xl xl:text-4xl text-center tracking-[-.5px]">
             Partner benefits
           </h2>
-          {/* <p className="text-scale-1000 text-xs sm:text-sm lg:text-base pt-3 sm:w-3/5 lg:max-w-sm">
-            The Supabase Partner Program gives you exclusive benefits to scale your services.
-          </p> */}
           <div className="grid mt-8 lg:mt-16 gap-8 rounded md:grid-cols-2 xl:grid-cols-4">
-            {featureBlocks.map((item, i) => {
+            {pageData.featureBlocks.map((item, i) => {
               return (
                 <div
-                  // className="bg-scale-100 dark:bg-scale-300 group flex flex-col gap-4 rounded border px-8 py-6"
                   className="group flex flex-col items-center text-center gap-4 px-8 py-6"
                   key={i}
                 >
-                  <div className="bg-brand-300 dark:bg-brand-500 text-brand-1200 group-hover:text-brand-900 flex h-12 w-12 items-center justify-center rounded-md border border-brand-600 transition-all group-hover:scale-105">
+                  <div className="bg-brand-300 dark:bg-brand-500 text-brand-1200 group-hover:text-brand-800 dark:group-hover:text-brand-1000 flex h-12 w-12 items-center justify-center rounded-md border border-brand-800 dark:border-brand-800 transition-all group-hover:scale-105">
                     {item.icon ? item.icon : <IconCode strokeWidth={2} />}
                   </div>
 

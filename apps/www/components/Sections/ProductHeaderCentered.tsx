@@ -8,6 +8,7 @@ interface Types {
   h1: string | React.ReactNode
   subheader: string | React.ReactNode
   icon?: string
+  className?: string
   title?: string
   image?: string | React.ReactNode
   footer?: React.ReactNode
@@ -23,7 +24,12 @@ interface Types {
 }
 
 const ProductHeaderCentered = (props: Types) => (
-  <div className="container relative w-full mx-auto px-6 pt-4 pb-0 sm:px-16 xl:px-20">
+  <div
+    className={[
+      'container relative w-full mx-auto px-6 pt-4 pb-0 sm:px-16 xl:px-20',
+      props.className,
+    ].join(' ')}
+  >
     <div className="flex flex-col text-center items-center">
       {props.image && typeof props.image === 'string' ? (
         <div className="relative w-full max-w-[830px] mx-auto z-0 aspect-[2.3/1] -mb-8 md:-mb-12 lg:-mb-16">
