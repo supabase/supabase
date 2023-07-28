@@ -26,8 +26,17 @@ cd supabase/docker
 # Copy the fake env vars
 cp .env.example .env
 
-# Start
-docker compose up
+# Pull the latest images
+docker compose pull
+
+## Start the services (in detached mode)
+docker compose up -d
+```
+
+After all the services have started you should be able to see them running in the background:
+
+```sh
+docker compose ps
 ```
 
 Now visit [localhost:3000](http://localhost:3000) to start using Supabase Studio.
