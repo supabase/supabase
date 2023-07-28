@@ -13,7 +13,7 @@ export function useSelectedOrganization({ enabled = true } = {}) {
   const localStorageSlug = useMemo(() => {
     return typeof window !== 'undefined'
       ? localStorage.getItem(LOCAL_STORAGE_KEYS.RECENTLY_VISITED_ORGANIZATION)
-      : undefined
+      : null
   }, [])
 
   return useMemo(() => {
