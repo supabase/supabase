@@ -52,7 +52,7 @@ function ExpertPartnersPage(props: Props) {
           ],
         }}
       />
-      <DefaultLayout>
+      <DefaultLayout className="bg-scale-500 dark:bg-scale-100">
         <SectionContainer className="space-y-12">
           <div>
             <h1 className="h1">{meta_title}</h1>

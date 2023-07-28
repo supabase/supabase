@@ -40,7 +40,7 @@ const ProductHeaderCentered = (props: Types) => (
           {props.image}
         </div>
       )}
-      <div className="relative z-10 flex flex-col items-center space-y-2 mx-auto max-w-2xl">
+      <div className="relative overflow-hidden w-full z-10 flex flex-col items-center space-y-2 mx-auto max-w-2xl">
         <div>
           {props.icon || props.title ? (
             <div className="mb-4 flex justify-center items-center gap-3">
