@@ -3,7 +3,7 @@ import { Button, Form, Input, Listbox, SidePanel } from 'ui'
 
 import { useParams } from 'common'
 import { useBranchCreateMutation } from 'data/branches/branch-create-mutation'
-import { useStore } from 'hooks'
+import { useSelectedProject, useStore } from 'hooks'
 
 interface CreateBranchSidePanelProps {
   visible: boolean
@@ -18,7 +18,12 @@ const MOCK_BRANCHES = [
 const CreateBranchSidePanel = ({ visible, onClose }: CreateBranchSidePanelProps) => {
   const { ui } = useStore()
   const submitRef: any = useRef()
-  const { ref: projectRef } = useParams()
+  const { ref } = useParams()
+  const projectDetails = useSelectedProject()
+
+  const isBranch = projectDetails?.parent_project_ref !== undefined
+  const projectRef =
+    projectDetails !== undefined ? (isBranch ? projectDetails.parent_project_ref : ref) : undefined
 
   const formId = 'create-branch-form'
   const initialValues = { branchName: '', gitBranch: 'no-selection' }
@@ -99,7 +104,7 @@ const CreateBranchSidePanel = ({ visible, onClose }: CreateBranchSidePanelProps)
                       <Listbox.Option
                         key={branch.id}
                         id={branch.id.toString()}
-                        value={branch.id}
+                        value={branch.name}
                         label={branch.name}
                       >
                         <p className="text-scale-1200">{branch.name}</p>
