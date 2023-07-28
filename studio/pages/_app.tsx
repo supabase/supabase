@@ -70,8 +70,8 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   const [supabase] = useState(() =>
     IS_PLATFORM
       ? createClient(
-          process.env.NEXT_PUBLIC_SUPABASE_URL as string,
-          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string
+          process.env.NEXT_PUBLIC_IECHOR_URL as string,
+          process.env.NEXT_PUBLIC_IECHOR_ANON_KEY as string
         )
       : undefined
   )

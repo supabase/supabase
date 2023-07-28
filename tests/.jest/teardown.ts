@@ -2,8 +2,8 @@ import { createClient, User, UserResponse } from '@supabase/supabase-js'
 
 const removeAllUsers = async () => {
   const sb = createClient(
-    process.env.SUPABASE_URL as string,
-    process.env.SUPABASE_KEY_ADMIN as string
+    process.env.IECHOR_URL as string,
+    process.env.IECHOR_KEY_ADMIN as string
   )
 
   const {

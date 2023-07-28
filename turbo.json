@@ -7,16 +7,16 @@
     "www#build": {
       "dependsOn": ["^build"],
       "env": [
-        "SUPABASE_SERVICE_ROLE_SECRET",
+        "IECHOR_SERVICE_ROLE_SECRET",
         "EMAIL_TO_ID_SECRET",
-        "SUPABASE_URL",
+        "IECHOR_URL",
         "GITHUB_OAUTH_CLIENT_SECRET"
       ],
       "outputs": [".next/**", "!.next/cache/**"]
     },
     "docs#build": {
       "dependsOn": ["^build"],
-      "env": ["SUPABASE_SERVICE_ROLE_KEY", "OPENAI_KEY", "ALGOLIA_SEARCH_ADMIN_KEY"],
+      "env": ["IECHOR_SERVICE_ROLE_KEY", "OPENAI_KEY", "ALGOLIA_SEARCH_ADMIN_KEY"],
       "outputs": [".next/**", "!.next/cache/**"]
     },
     "studio#build": {
@@ -36,7 +36,7 @@
         "SENTRY_PROJECT",
         "SENTRY_URL",
         "SESSION_COOKIE_SECRET",
-        "SUPABASE_ENCRYPTION_KEY",
+        "IECHOR_ENCRYPTION_KEY",
         "PLATFORM_PG_META_URL",
         "NEXT_PUBLIC_VERCEL_ENV",
         "NEXT_PUBLIC_SITE_URL"

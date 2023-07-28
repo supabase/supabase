@@ -10,7 +10,7 @@ import { useCheckPermissions, useStore } from 'hooks'
 import SparkBar from 'components/ui/SparkBar'
 import { FormHeader } from 'components/ui/Forms'
 import RoleRow from './RoleRow'
-import { SUPABASE_ROLES } from './Roles.constants'
+import { IECHOR_ROLES } from './Roles.constants'
 import CreateRolePanel from './CreateRolePanel'
 import DeleteRoleModal from './DeleteRoleModal'
 import NoSearchResults from 'components/ui/NoSearchResults'
@@ -43,7 +43,7 @@ const RolesList = ({}) => {
       : meta.roles.list()
   ).filter((role: PostgresRole) => role.name.includes(filterString))
   const [supabaseRoles, otherRoles] = partition(filteredRoles, (role: PostgresRole) =>
-    SUPABASE_ROLES.includes(role.name)
+    IECHOR_ROLES.includes(role.name)
   )
 
   const totalActiveConnections = roles

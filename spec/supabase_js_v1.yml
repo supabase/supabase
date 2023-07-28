@@ -232,7 +232,7 @@ functions:
           const provider = 'google';
 
           AuthSession.startAsync({
-            authUrl: `https://MYSUPABASEAPP.supabase.co/auth/v1/authorize?provider=${provider}&redirect_to=${redirectUri}`,
+            authUrl: `https://MYIECHORAPP.supabase.co/auth/v1/authorize?provider=${provider}&redirect_to=${redirectUri}`,
             returnUrl: redirectUri,
           }).then(async (response: any) => {
             if (!response) return;

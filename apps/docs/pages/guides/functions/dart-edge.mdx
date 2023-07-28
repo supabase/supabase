@@ -94,8 +94,8 @@ import 'package:supabase/supabase.dart';
 
 void main() {
   final supabase = SupabaseClient(
-    Deno.env.get('SUPABASE_URL')!,
-    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!, // Use service role key to bypass RLS
+    Deno.env.get('IECHOR_URL')!,
+    Deno.env.get('IECHOR_SERVICE_ROLE_KEY')!, // Use service role key to bypass RLS
     httpClient: EdgeHttpClient(),
   );
 

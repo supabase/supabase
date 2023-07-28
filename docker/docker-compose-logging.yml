@@ -123,7 +123,7 @@ services:
       GOOGLE_PROJECT_ID: ${GOOGLE_PROJECT_ID}
       GOOGLE_PROJECT_NUMBER: ${GOOGLE_PROJECT_NUMBER}
       LOGFLARE_SINGLE_TENANT: true
-      LOGFLARE_SUPABASE_MODE: true
+      LOGFLARE_IECHOR_MODE: true
       LOGFLARE_MIN_CLUSTER_SIZE: 1
   vector:
     container_name: supabase-vector

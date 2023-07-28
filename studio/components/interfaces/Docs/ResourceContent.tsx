@@ -16,7 +16,7 @@ const ResourceContent = ({
 }: any) => {
   if (!paths || !definitions) return null
 
-  const keyToShow = !!showApiKey ? showApiKey : 'SUPABASE_KEY'
+  const keyToShow = !!showApiKey ? showApiKey : 'IECHOR_KEY'
   const resourcePaths = paths[`/${resourceId}`]
   const resourceDefinition = definitions[resourceId]
   const resourceMeta = resources[resourceId]

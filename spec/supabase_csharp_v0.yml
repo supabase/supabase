@@ -31,8 +31,8 @@ functions:
         name: Standard
         code: |
           ```c#
-          var url = Environment.GetEnvironmentVariable("SUPABASE_URL");
-          var key = Environment.GetEnvironmentVariable("SUPABASE_KEY");
+          var url = Environment.GetEnvironmentVariable("IECHOR_URL");
+          var key = Environment.GetEnvironmentVariable("IECHOR_KEY");
 
           var options = new Supabase.SupabaseOptions
           {
@@ -51,8 +51,8 @@ functions:
                 // ...
                 var builder = MauiApp.CreateBuilder();
 
-                var url = Environment.GetEnvironmentVariable("SUPABASE_URL");
-                var key = Environment.GetEnvironmentVariable("SUPABASE_KEY");
+                var url = Environment.GetEnvironmentVariable("IECHOR_URL");
+                var key = Environment.GetEnvironmentVariable("IECHOR_KEY");
                 var options = new SupabaseOptions
                 {
                   AutoRefreshToken = true,

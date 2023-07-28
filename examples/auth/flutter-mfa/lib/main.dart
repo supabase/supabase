@@ -10,7 +10,7 @@ import 'package:mfa_app/pages/mfa/enroll_page.dart';
 
 void main() async {
   await Supabase.initialize(
-    url: 'YOUR_SUPABASE_URL',
+    url: 'YOUR_IECHOR_URL',
     anonKey: 'YOUR_ANON_KEY',
   );
   runApp(const MyApp());

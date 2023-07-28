@@ -25,8 +25,8 @@ Retrieve your project's URL and anon key from your [API settings](https://supaba
 
 ```bash .env.local
 # Find these in your Supabase project settings https://supabase.com/dashboard/project/_/settings/api
-PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+PUBLIC_IECHOR_URL=https://your-project.supabase.co
+PUBLIC_IECHOR_ANON_KEY=your-anon-key
 ```
 
 ### Creating a Supabase Client
@@ -43,13 +43,13 @@ Create a new `hooks.server.js` file in the root of your project and populate wit
 
 ```js src/hooks.server.js
 // src/hooks.server.js
-import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public'
+import { PUBLIC_IECHOR_URL, PUBLIC_IECHOR_ANON_KEY } from '$env/static/public'
 import { createSupabaseServerClient } from '@supabase/auth-helpers-sveltekit'
 
 export const handle = async ({ event, resolve }) => {
   event.locals.supabase = createSupabaseServerClient({
-    supabaseUrl: PUBLIC_SUPABASE_URL,
-    supabaseKey: PUBLIC_SUPABASE_ANON_KEY,
+    supabaseUrl: PUBLIC_IECHOR_URL,
+    supabaseKey: PUBLIC_IECHOR_ANON_KEY,
     event,
   })
 
@@ -81,14 +81,14 @@ Create a new `hooks.server.ts` file in the root of your project and populate wit
 
 ```ts src/hooks.server.ts
 // src/hooks.server.ts
-import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public'
+import { PUBLIC_IECHOR_URL, PUBLIC_IECHOR_ANON_KEY } from '$env/static/public'
 import { createSupabaseServerClient } from '@supabase/auth-helpers-sveltekit'
 import type { Handle } from '@sveltejs/kit'
 
 export const handle: Handle = async ({ event, resolve }) => {
   event.locals.supabase = createSupabaseServerClient({
-    supabaseUrl: PUBLIC_SUPABASE_URL,
-    supabaseKey: PUBLIC_SUPABASE_ANON_KEY,
+    supabaseUrl: PUBLIC_IECHOR_URL,
+    supabaseKey: PUBLIC_IECHOR_ANON_KEY,
     event,
   })
 
@@ -259,15 +259,15 @@ To utilize Supabase in shared load functions and within pages, it is essential t
 
 ```ts src/routes/+layout.js
 // src/routes/+layout.js
-import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public'
+import { PUBLIC_IECHOR_ANON_KEY, PUBLIC_IECHOR_URL } from '$env/static/public'
 import { createSupabaseLoadClient } from '@supabase/auth-helpers-sveltekit'
 
 export const load = async ({ fetch, data, depends }) => {
   depends('supabase:auth')
 
   const supabase = createSupabaseLoadClient({
-    supabaseUrl: PUBLIC_SUPABASE_URL,
-    supabaseKey: PUBLIC_SUPABASE_ANON_KEY,
+    supabaseUrl: PUBLIC_IECHOR_URL,
+    supabaseKey: PUBLIC_IECHOR_ANON_KEY,
     event: { fetch },
     serverSession: data.session,
   })
@@ -286,7 +286,7 @@ export const load = async ({ fetch, data, depends }) => {
 
 ```ts src/routes/+layout.ts
 // src/routes/+layout.ts
-import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public'
+import { PUBLIC_IECHOR_ANON_KEY, PUBLIC_IECHOR_URL } from '$env/static/public'
 import { createSupabaseLoadClient } from '@supabase/auth-helpers-sveltekit'
 import type { Database } from '../DatabaseDefinitions'
 
@@ -294,8 +294,8 @@ export const load = async ({ fetch, data, depends }) => {
   depends('supabase:auth')
 
   const supabase = createSupabaseLoadClient<Database>({
-    supabaseUrl: PUBLIC_SUPABASE_URL,
-    supabaseKey: PUBLIC_SUPABASE_ANON_KEY,
+    supabaseUrl: PUBLIC_IECHOR_URL,
+    supabaseKey: PUBLIC_IECHOR_ANON_KEY,
     event: { fetch },
     serverSession: data.session,
   })
@@ -793,9 +793,9 @@ import { createClient } from '@supabase/auth-helpers-sveltekit'
 import { env } from '$env/dynamic/public'
 // or use the static env
 
-// import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public';
+// import { PUBLIC_IECHOR_URL, PUBLIC_IECHOR_ANON_KEY } from '$env/static/public';
 
-export const supabaseClient = createClient(env.PUBLIC_SUPABASE_URL, env.PUBLIC_SUPABASE_ANON_KEY)
+export const supabaseClient = createClient(env.PUBLIC_IECHOR_URL, env.PUBLIC_IECHOR_ANON_KEY)
 ```
 
 </TabPanel>
@@ -803,14 +803,14 @@ export const supabaseClient = createClient(env.PUBLIC_SUPABASE_URL, env.PUBLIC_S
 
 ```js src/hooks.server.ts
 // src/hooks.server.ts
-import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public'
+import { PUBLIC_IECHOR_URL, PUBLIC_IECHOR_ANON_KEY } from '$env/static/public'
 import { createSupabaseServerClient } from '@supabase/auth-helpers-sveltekit'
 import type { Handle } from '@sveltejs/kit'
 
 export const handle: Handle = async ({ event, resolve }) => {
   event.locals.supabase = createSupabaseServerClient({
-    supabaseUrl: PUBLIC_SUPABASE_URL,
-    supabaseKey: PUBLIC_SUPABASE_ANON_KEY,
+    supabaseUrl: PUBLIC_IECHOR_URL,
+    supabaseKey: PUBLIC_IECHOR_ANON_KEY,
     event,
   })
 
@@ -878,7 +878,7 @@ In order to use the Supabase library in your client code you will need to setup 
 ```ts src/routes/+layout.ts
 // src/routes/+layout.ts
 import { invalidate } from '$app/navigation'
-import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public'
+import { PUBLIC_IECHOR_ANON_KEY, PUBLIC_IECHOR_URL } from '$env/static/public'
 import { createSupabaseLoadClient } from '@supabase/auth-helpers-sveltekit'
 import type { LayoutLoad } from './$types'
 import type { Database } from '../DatabaseDefinitions'
@@ -887,8 +887,8 @@ export const load: LayoutLoad = async ({ fetch, data, depends }) => {
   depends('supabase:auth')
 
   const supabase = createSupabaseLoadClient<Database>({
-    supabaseUrl: PUBLIC_SUPABASE_URL,
-    supabaseKey: PUBLIC_SUPABASE_ANON_KEY,
+    supabaseUrl: PUBLIC_IECHOR_URL,
+    supabaseKey: PUBLIC_IECHOR_ANON_KEY,
     event: { fetch },
     serverSession: data.session,
   })
@@ -1144,9 +1144,9 @@ import { dev } from '$app/environment'
 import { env } from '$env/dynamic/public'
 // or use the static env
 
-// import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public';
+// import { PUBLIC_IECHOR_URL, PUBLIC_IECHOR_ANON_KEY } from '$env/static/public';
 
-export const supabaseClient = createClient(env.PUBLIC_SUPABASE_URL, env.PUBLIC_SUPABASE_ANON_KEY, {
+export const supabaseClient = createClient(env.PUBLIC_IECHOR_URL, env.PUBLIC_IECHOR_ANON_KEY, {
   persistSession: false,
   autoRefreshToken: false,
 })
@@ -1167,9 +1167,9 @@ import { createClient } from '@supabase/auth-helpers-sveltekit'
 import { env } from '$env/dynamic/public'
 // or use the static env
 
-// import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public';
+// import { PUBLIC_IECHOR_URL, PUBLIC_IECHOR_ANON_KEY } from '$env/static/public';
 
-export const supabaseClient = createClient(env.PUBLIC_SUPABASE_URL, env.PUBLIC_SUPABASE_ANON_KEY)
+export const supabaseClient = createClient(env.PUBLIC_IECHOR_URL, env.PUBLIC_IECHOR_ANON_KEY)
 ```
 
 </TabPanel>
@@ -1472,7 +1472,7 @@ There are numerous breaking changes in the latest 0.7.0 version of this library.
 
 #### Environment variable prefix
 
-The environment variable prefix is now `PUBLIC_` instead of `VITE_` (e.g., `VITE_SUPABASE_URL` is now `PUBLIC_SUPABASE_URL`).
+The environment variable prefix is now `PUBLIC_` instead of `VITE_` (e.g., `VITE_IECHOR_URL` is now `PUBLIC_IECHOR_URL`).
 
 #### Set up the Supabase client [#migration-set-up-supabase-client-0-7]
 
@@ -1488,8 +1488,8 @@ The environment variable prefix is now `PUBLIC_` instead of `VITE_` (e.g., `VITE
 import { createSupabaseClient } from '@supabase/auth-helpers-sveltekit';
 
 const { supabaseClient } = createSupabaseClient(
-  import.meta.env.VITE_SUPABASE_URL as string,
-  import.meta.env.VITE_SUPABASE_ANON_KEY as string
+  import.meta.env.VITE_IECHOR_URL as string,
+  import.meta.env.VITE_IECHOR_ANON_KEY as string
 );
 
 export { supabaseClient };
@@ -1505,9 +1505,9 @@ import { dev } from '$app/environment'
 import { env } from '$env/dynamic/public'
 // or use the static env
 
-// import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public';
+// import { PUBLIC_IECHOR_URL, PUBLIC_IECHOR_ANON_KEY } from '$env/static/public';
 
-export const supabaseClient = createClient(env.PUBLIC_SUPABASE_URL, env.PUBLIC_SUPABASE_ANON_KEY, {
+export const supabaseClient = createClient(env.PUBLIC_IECHOR_URL, env.PUBLIC_IECHOR_ANON_KEY, {
   persistSession: false,
   autoRefreshToken: false,
 })

@@ -19,8 +19,8 @@ async function generateEmbeddings() {
   const shouldRefresh = argv.refresh
 
   const requiredEnvVars = [
-    'NEXT_PUBLIC_SUPABASE_URL',
-    'SUPABASE_SERVICE_ROLE_KEY',
+    'NEXT_PUBLIC_IECHOR_URL',
+    'IECHOR_SERVICE_ROLE_KEY',
     'OPENAI_KEY',
     'SEARCH_GITHUB_APP_ID',
     'SEARCH_GITHUB_APP_INSTALLATION_ID',
@@ -36,8 +36,8 @@ async function generateEmbeddings() {
   }
 
   const supabaseClient = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.SUPABASE_SERVICE_ROLE_KEY,
+    process.env.NEXT_PUBLIC_IECHOR_URL,
+    process.env.IECHOR_SERVICE_ROLE_KEY,
     {
       auth: {
         persistSession: false,

@@ -50,12 +50,12 @@ export interface PageResult {
 }
 
 const getDocsUrl = () => {
-  if (!process.env.NEXT_PUBLIC_SITE_URL || !process.env.NEXT_PUBLIC_LOCAL_SUPABASE) {
+  if (!process.env.NEXT_PUBLIC_SITE_URL || !process.env.NEXT_PUBLIC_LOCAL_IECHOR) {
     return 'https://supabase.com/docs'
   }
 
   const isLocal =
-    process.env.NEXT_PUBLIC_SITE_URL.includes('localhost') || process.env.NEXT_PUBLIC_LOCAL_SUPABASE
+    process.env.NEXT_PUBLIC_SITE_URL.includes('localhost') || process.env.NEXT_PUBLIC_LOCAL_IECHOR
   return isLocal ? 'http://localhost:3001/docs' : 'https://supabase.com/docs'
 }
 

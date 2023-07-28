@@ -99,17 +99,17 @@ Say, **yes** and it will setup the Supabase client in your app and also provide 
   ✔ Installing packages...
   ✔ One more thing...
 
-  You will need to add your Supabase URL (SUPABASE_URL), public API KEY,
-  and JWT SECRET (SUPABASE_KEY, and SUPABASE_JWT_SECRET) to your .env file.
+  You will need to add your Supabase URL (IECHOR_URL), public API KEY,
+  and JWT SECRET (IECHOR_KEY, and IECHOR_JWT_SECRET) to your .env file.
 ```
 
 Next, we want to save the environment variables in a `.env`.
 We need the `API URL` as well as the `anon` and `jwt_secret` keys that you copied [earlier](#get-the-api-keys).
 
 ```bash .env
-SUPABASE_URL=YOUR_SUPABASE_URL
-SUPABASE_KEY=YOUR_SUPABASE_ANON_KEY
-SUPABASE_JWT_SECRET=YOUR_SUPABASE_JWT_SECRET
+IECHOR_URL=YOUR_IECHOR_URL
+IECHOR_KEY=YOUR_IECHOR_ANON_KEY
+IECHOR_JWT_SECRET=YOUR_IECHOR_JWT_SECRET
 ```
 
 And finally, you will also need to save **just** the `web side` environment variables to the `redwood.toml`.
@@ -119,7 +119,7 @@ And finally, you will also need to save **just** the `web side` environment vari
   title = "Supabase Redwood Tutorial"
   port = 8910
   apiProxyPath = "/.redwood/functions"
-  includeEnvironmentVariables = ["SUPABASE_URL", "SUPABASE_KEY"]
+  includeEnvironmentVariables = ["IECHOR_URL", "IECHOR_KEY"]
 [api]
   port = 8911
 [browser]
@@ -139,7 +139,7 @@ import { createClient } from '@supabase/supabase-js'
 
 // ...
 
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY)
+const supabase = createClient(process.env.IECHOR_URL, process.env.IECHOR_KEY)
 
 const App = () => (
   <FatalErrorBoundary page={FatalErrorPage}>

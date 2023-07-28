@@ -42,8 +42,8 @@ The `anon` key is your client-side API key. It allows "anonymous access" to your
 Create a file in this folder `.env.local`
 
 ```
-REACT_APP_SUPABASE_URL=
-REACT_APP_SUPABASE_ANON_KEY=
+REACT_APP_IECHOR_URL=
+REACT_APP_IECHOR_ANON_KEY=
 ```
 
 Populate this file with your URL and Key.

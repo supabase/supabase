@@ -70,10 +70,10 @@ Or from your application, using one of our client libraries:
 ```jsx
 import { createClient } from '@supabase/supabase-js'
 
-const SUPABASE_URL = 'https://xyzcompany.supabase.co'
-const SUPABASE_KEY = 'public-anon-key'
+const IECHOR_URL = 'https://xyzcompany.supabase.co'
+const IECHOR_KEY = 'public-anon-key'
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
+const supabase = createClient(IECHOR_URL, IECHOR_KEY)
 
 const { data: stripeCustomers, error } = supabase
   .from('products')

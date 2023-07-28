@@ -38,7 +38,7 @@ serve(async (_req) => {
     code: `import { serve } from "https://deno.land/std@0.114.0/http/server.ts";
 import * as postgres from "https://deno.land/x/postgres@v0.14.2/mod.ts";
 
-const databaseUrl = Deno.env.get("SUPABASE_DB_URL") ?? "";
+const databaseUrl = Deno.env.get("IECHOR_DB_URL") ?? "";
 const pool = new postgres.Pool(databaseUrl, 3, true);
 const connection = await pool.connect();
 
@@ -59,9 +59,9 @@ serve(async (req: Request) => {
 import { createClient } from "https://esm.sh/@supabase/supabase-js@1.33.1";
 
 serve(async (req) => {
-  const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
-  const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
-  const supabase = createClient(SUPABASE_URL, SERVICE_KEY);
+  const IECHOR_URL = Deno.env.get("IECHOR_URL") ?? "";
+  const SERVICE_KEY = Deno.env.get("IECHOR_SERVICE_ROLE_KEY") ?? "";
+  const supabase = createClient(IECHOR_URL, SERVICE_KEY);
   if (req.headers.get("Authorization") === "super-secret-key") {
     const { data } = await supabase.storage
       .from("newbucket")
@@ -81,9 +81,9 @@ serve(async (req) => {
 import { createClient } from "https://esm.sh/@supabase/supabase-js@1.33.1";
 
 serve(async () => {
-  const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
-  const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
-  const supabase = createClient(SUPABASE_URL, SERVICE_KEY);
+  const IECHOR_URL = Deno.env.get("IECHOR_URL") ?? "";
+  const SERVICE_KEY = Deno.env.get("IECHOR_SERVICE_ROLE_KEY") ?? "";
+  const supabase = createClient(IECHOR_URL, SERVICE_KEY);
   const { data } = await supabase.from("todos").select();
   return new Response(JSON.stringify(data), {
     status: 200,

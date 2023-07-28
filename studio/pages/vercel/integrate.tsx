@@ -297,17 +297,17 @@ const IntegrationProject: FC = observer(() => {
 const delayTimer = (ms: number) => new Promise((res) => setTimeout(res, ms))
 const defaultVercelEnvs = [
   {
-    key: 'NEXT_PUBLIC_SUPABASE_URL',
+    key: 'NEXT_PUBLIC_IECHOR_URL',
     alias: INTEGRATION_ENVS_ALIAS.ENDPOINT,
     type: 'encrypted',
   },
   {
-    key: 'NEXT_PUBLIC_SUPABASE_ANON_KEY',
+    key: 'NEXT_PUBLIC_IECHOR_ANON_KEY',
     alias: INTEGRATION_ENVS_ALIAS.ANONKEY,
     type: 'encrypted',
   },
   {
-    key: 'SUPABASE_SERVICE_ROLE_KEY',
+    key: 'IECHOR_SERVICE_ROLE_KEY',
     alias: INTEGRATION_ENVS_ALIAS.SERVICEKEY,
     type: 'encrypted',
   },
@@ -342,7 +342,7 @@ const ProjectLinks: FC = observer(() => {
           })
           continue
         }
-        const found = existedEnvs.find((x: any) => x.key.includes('SUPABASE'))
+        const found = existedEnvs.find((x: any) => x.key.includes('IECHOR'))
         if (!!found) {
           console.error('Existed Supabase env: ', found)
           runInAction(() => {

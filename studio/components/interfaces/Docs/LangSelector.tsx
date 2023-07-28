@@ -5,7 +5,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { showApiKey } from 'components/interfaces/Docs/Docs.types'
 
-const DEFAULT_KEY = { name: 'hide', key: 'SUPABASE_KEY' }
+const DEFAULT_KEY = { name: 'hide', key: 'IECHOR_KEY' }
 
 interface Props {
   selectedLang: string

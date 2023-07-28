@@ -79,7 +79,7 @@ Both of these routes require the `anon` key to be passed through an `apikey` hea
 You can interact with your API directly via HTTP requests, or you can use the client libraries which we provide.
 
 Let's see how to make a request to the `todos` table which we created in the first step,
-using the API URL (`SUPABASE_URL`) and Key (`SUPABASE_ANON_KEY`) we provided:
+using the API URL (`IECHOR_URL`) and Key (`IECHOR_ANON_KEY`) we provided:
 
 <Tabs
   scrollable
@@ -92,7 +92,7 @@ using the API URL (`SUPABASE_URL`) and Key (`SUPABASE_ANON_KEY`) we provided:
 ```javascript
 // Initialize the JS client
 import { createClient } from '@supabase/supabase-js'
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+const supabase = createClient(IECHOR_URL, IECHOR_ANON_KEY)
 
 // Make a request
 const { data: todos, error } = await supabase.from('todos').select('*')
@@ -103,9 +103,9 @@ const { data: todos, error } = await supabase.from('todos').select('*')
 
 ```bash
 # Append /rest/v1/ to your URL, and then use the table name as the route
-curl '<SUPABASE_URL>/rest/v1/todos' \
--H "apikey: <SUPABASE_ANON_KEY>" \
--H "Authorization: Bearer <SUPABASE_ANON_KEY>"
+curl '<IECHOR_URL>/rest/v1/todos' \
+-H "apikey: <IECHOR_ANON_KEY>" \
+-H "Authorization: Bearer <IECHOR_ANON_KEY>"
 ```
 
 </TabPanel>
@@ -135,14 +135,14 @@ import { createClient, useQuery } from 'urql'
 
 // Prepare API key and Authorization header
 const headers = {
-  apikey: <SUPABASE_ANON_KEY>,
-  authorization: `Bearer ${<SUPABASE_ANON_KEY>}`,
+  apikey: <IECHOR_ANON_KEY>,
+  authorization: `Bearer ${<IECHOR_ANON_KEY>}`,
 }
 
 // Create GraphQL client
 // See: https://formidable.com/open-source/urql/docs/basics/react-preact/#setting-up-the-client
 const client = createClient({
-  url: '<SUPABASE_URL>/graphql/v1',
+  url: '<IECHOR_URL>/graphql/v1',
   fetchOptions: function createFetchOptions() {
     return { headers }
   },
@@ -176,9 +176,9 @@ const { data, fetching, error } = result
 
 ```bash
 # Append /graphql/v1/ to your URL, and then use the table name as the route
-curl --request POST '<SUPABASE_URL>/graphql/v1' \
--H 'apikey: <SUPABASE_ANON_KEY>' \
--H 'Authorization: Bearer <SUPABASE_ANON_KEY>' \
+curl --request POST '<IECHOR_URL>/graphql/v1' \
+-H 'apikey: <IECHOR_ANON_KEY>' \
+-H 'Authorization: Bearer <IECHOR_ANON_KEY>' \
 -H 'Content-Type: application/json' \
 -d '{ "query":"{ todos(first: 3) { edges { node { id } } } }" }'
 ```
@@ -226,7 +226,7 @@ From the client, we can listen to any new data that is inserted into the `todos`
 ```javascript
 // Initialize the JS client
 import { createClient } from '@supabase/supabase-js'
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+const supabase = createClient(IECHOR_URL, IECHOR_ANON_KEY)
 
 // Create a function to handle inserts
 const handleInserts = (payload) => {

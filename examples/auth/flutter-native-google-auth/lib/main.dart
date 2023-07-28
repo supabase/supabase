@@ -5,7 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 void main() async {
   /// TODO: update Supabase credentials with your own
   await Supabase.initialize(
-    url: 'YOUR_SUPABASE_URL',
+    url: 'YOUR_IECHOR_URL',
     anonKey: 'YOUR_ANON_KEY',
   );
   runApp(const MyApp());

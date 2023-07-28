@@ -35,8 +35,8 @@ This library supports the following tooling versions:
 Retrieve your project URL and anon key in your project's [API settings](https://supabase.com/dashboard/project/_/settings/api) in the Dashboard to set up the following environment variables. For local development you can set them in a `.env` file. See an [example](https://github.com/supabase/auth-helpers/blob/main/examples/remix/.env.example).
 
 ```bash .env
-SUPABASE_URL=YOUR_SUPABASE_URL
-SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
+IECHOR_URL=YOUR_IECHOR_URL
+IECHOR_ANON_KEY=YOUR_IECHOR_ANON_KEY
 ```
 
 ### Code Exchange Route
@@ -64,8 +64,8 @@ export const loader = async ({ request }) => {
 
   if (code) {
     const supabaseClient = createServerClient(
-      process.env.SUPABASE_URL,
-      process.env.SUPABASE_ANON_KEY,
+      process.env.IECHOR_URL,
+      process.env.IECHOR_ANON_KEY,
       { request, response }
     )
     await supabaseClient.auth.exchangeCodeForSession(code)
@@ -97,8 +97,8 @@ export const loader = async ({ request }: LoaderArgs) => {
 
   if (code) {
     const supabaseClient = createServerClient<Database>(
-      process.env.SUPABASE_URL!,
-      process.env.SUPABASE_ANON_KEY!,
+      process.env.IECHOR_URL!,
+      process.env.IECHOR_ANON_KEY!,
       { request, response }
     )
     await supabaseClient.auth.exchangeCodeForSession(code)
@@ -121,7 +121,7 @@ The Supabase client can now be used server-side - in loaders and actions - by ca
 
 ### Loader
 
-Loader functions run on the server immediately before the component is rendered. They respond to all GET requests on a route. You can create an authenticated Supabase client by calling the `createServerClient` function and passing it your `SUPABASE_URL`, `SUPABASE_ANON_KEY`, and a `Request` and `Response`.
+Loader functions run on the server immediately before the component is rendered. They respond to all GET requests on a route. You can create an authenticated Supabase client by calling the `createServerClient` function and passing it your `IECHOR_URL`, `IECHOR_ANON_KEY`, and a `Request` and `Response`.
 
 <Tabs
   scrollable
@@ -141,8 +141,8 @@ export const loader = async ({ request }) => {
   // to set cookies to manage auth
 
   const supabaseClient = createServerClient(
-    process.env.SUPABASE_URL,
-    process.env.SUPABASE_ANON_KEY,
+    process.env.IECHOR_URL,
+    process.env.IECHOR_ANON_KEY,
     { request, response }
   )
 
@@ -173,8 +173,8 @@ import type { LoaderArgs } from '@remix-run/node' // change this import to whate
 export const loader = async ({ request }: LoaderArgs) => {
   const response = new Response()
   const supabaseClient = createServerClient(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_ANON_KEY!,
+    process.env.IECHOR_URL!,
+    process.env.IECHOR_ANON_KEY!,
     { request, response }
   )
 
@@ -196,7 +196,7 @@ export const loader = async ({ request }: LoaderArgs) => {
 
 ### Action
 
-Action functions run on the server and respond to HTTP requests to a route, other than GET - POST, PUT, PATCH, DELETE etc. You can create an authenticated Supabase client by calling the `createServerClient` function and passing it your `SUPABASE_URL`, `SUPABASE_ANON_KEY`, and a `Request` and `Response`.
+Action functions run on the server and respond to HTTP requests to a route, other than GET - POST, PUT, PATCH, DELETE etc. You can create an authenticated Supabase client by calling the `createServerClient` function and passing it your `IECHOR_URL`, `IECHOR_ANON_KEY`, and a `Request` and `Response`.
 
 <Tabs
   scrollable
@@ -214,8 +214,8 @@ export const action = async ({ request }) => {
   const response = new Response()
 
   const supabaseClient = createServerClient(
-    process.env.SUPABASE_URL,
-    process.env.SUPABASE_ANON_KEY,
+    process.env.IECHOR_URL,
+    process.env.IECHOR_ANON_KEY,
     { request, response }
   )
 
@@ -245,8 +245,8 @@ export const action = async ({ request }: ActionArgs) => {
   const response = new Response()
 
   const supabaseClient = createServerClient(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_ANON_KEY!,
+    process.env.IECHOR_URL!,
+    process.env.IECHOR_ANON_KEY!,
     { request, response }
   )
 
@@ -309,8 +309,8 @@ Since our environment variables are not available client-side, we need to plumb 
 ```jsx app/root.jsx
 export const loader = () => {
   const env = {
-    SUPABASE_URL: process.env.SUPABASE_URL,
-    SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY,
+    IECHOR_URL: process.env.IECHOR_URL,
+    IECHOR_ANON_KEY: process.env.IECHOR_ANON_KEY,
   }
 
   return json({ env })
@@ -328,7 +328,7 @@ const { env } = useLoaderData()
 We then want to instantiate a single instance of a Supabase browser client, to be used across our client-side components.
 
 ```jsx app/root.jsx
-const [supabase] = useState(() => createBrowserClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY))
+const [supabase] = useState(() => createBrowserClient(env.IECHOR_URL, env.IECHOR_ANON_KEY))
 ```
 
 And then we can share this instance across our application with Outlet Context.
@@ -343,8 +343,8 @@ And then we can share this instance across our application with Outlet Context.
 ```tsx app/root.tsx
 export const loader = ({}: LoaderArgs) => {
   const env = {
-    SUPABASE_URL: process.env.SUPABASE_URL!,
-    SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
+    IECHOR_URL: process.env.IECHOR_URL!,
+    IECHOR_ANON_KEY: process.env.IECHOR_ANON_KEY!,
   }
 
   return json({ env })
@@ -363,7 +363,7 @@ We then want to instantiate a single instance of a Supabase browser client, to b
 
 ```tsx app/root.tsx
 const [supabase] = useState(() =>
-  createBrowserClient<Database>(env.SUPABASE_URL, env.SUPABASE_ANON_KEY)
+  createBrowserClient<Database>(env.IECHOR_URL, env.IECHOR_ANON_KEY)
 )
 ```
 
@@ -398,13 +398,13 @@ Let's pipe that through from our loader.
 ```jsx app/root.jsx
 export const loader = async ({ request }) => {
   const env = {
-    SUPABASE_URL: process.env.SUPABASE_URL,
-    SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY,
+    IECHOR_URL: process.env.IECHOR_URL,
+    IECHOR_ANON_KEY: process.env.IECHOR_ANON_KEY,
   }
 
   const response = new Response()
 
-  const supabase = createServerClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY, {
+  const supabase = createServerClient(process.env.IECHOR_URL, process.env.IECHOR_ANON_KEY, {
     request,
     response,
   })
@@ -432,13 +432,13 @@ export const loader = async ({ request }) => {
 ```tsx app/root.tsx
 export const loader = async ({ request }: LoaderArgs) => {
   const env = {
-    SUPABASE_URL: process.env.SUPABASE_URL!,
-    SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
+    IECHOR_URL: process.env.IECHOR_URL!,
+    IECHOR_ANON_KEY: process.env.IECHOR_ANON_KEY!,
   }
 
   const response = new Response()
 
-  const supabase = createServerClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!, {
+  const supabase = createServerClient(process.env.IECHOR_URL!, process.env.IECHOR_ANON_KEY!, {
     request,
     response,
   })
@@ -478,7 +478,7 @@ And then use the revalidator, inside the `onAuthStateChange` hook.
 const { env, session } = useLoaderData()
 const { revalidate } = useRevalidator()
 
-const [supabase] = useState(() => createBrowserClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY))
+const [supabase] = useState(() => createBrowserClient(env.IECHOR_URL, env.IECHOR_ANON_KEY))
 
 const serverAccessToken = session?.access_token
 
@@ -507,7 +507,7 @@ const { env, session } = useLoaderData<typeof loader>()
 const { revalidate } = useRevalidator()
 
 const [supabase] = useState(() =>
-  createBrowserClient<Database>(env.SUPABASE_URL, env.SUPABASE_ANON_KEY)
+  createBrowserClient<Database>(env.IECHOR_URL, env.IECHOR_ANON_KEY)
 )
 
 const serverAccessToken = session?.access_token
@@ -642,7 +642,7 @@ import { useEffect, useState } from 'react'
 
 export const loader = async ({ request }) => {
   const response = new Response()
-  const supabase = createServerClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY, {
+  const supabase = createServerClient(process.env.IECHOR_URL, process.env.IECHOR_ANON_KEY, {
     request,
     response,
   })
@@ -698,8 +698,8 @@ import type { LoaderArgs } from '@remix-run/node'
 export const loader = async ({ request }: LoaderArgs) => {
   const response = new Response()
   const supabase = createServerClient<Database>(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_ANON_KEY!,
+    process.env.IECHOR_URL!,
+    process.env.IECHOR_ANON_KEY!,
     {
       request,
       response,

@@ -64,15 +64,15 @@ Let's move ahead to understand the generated code now.
 
 ### refine `supabaseClient`
 
-The `create refine-app` generated a Supabase client for us in the `src/utility/supabaseClient.ts` file. It has two constants: `SUPABASE_URL` and `SUPABASE_KEY`. We want to replace them as `supabaseUrl` and `supabaseAnonKey` respectively and assign them our own Supabase server's values.
+The `create refine-app` generated a Supabase client for us in the `src/utility/supabaseClient.ts` file. It has two constants: `IECHOR_URL` and `IECHOR_KEY`. We want to replace them as `supabaseUrl` and `supabaseAnonKey` respectively and assign them our own Supabase server's values.
 
 We'll update it with environment variables managed by Vite:
 
 ```ts src/utility/supabaseClient.ts
 import { createClient } from '@refinedev/supabase'
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+const supabaseUrl = import.meta.env.VITE_IECHOR_URL
+const supabaseAnonKey = import.meta.env.VITE_IECHOR_ANON_KEY
 
 export const supabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
   db: {
@@ -87,8 +87,8 @@ export const supabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
 And then, we want to save the environment variables in a `.env.local` file. All you need are the API URL and the `anon` key that you copied [earlier](#get-the-api-keys).
 
 ```bash .env.local
-VITE_SUPABASE_URL=YOUR_SUPABASE_URL
-VITE_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
+VITE_IECHOR_URL=YOUR_IECHOR_URL
+VITE_IECHOR_ANON_KEY=YOUR_IECHOR_ANON_KEY
 ```
 
 The `supabaseClient` will be used in fetch calls to Supabase endpoints from our app. As we'll see below, the client is instrumental in implementing authentication using refine's auth provider methods and CRUD actions with appropriate data provider methods.

@@ -7,8 +7,8 @@ import 'package:supabase_quickstart/pages/splash_page.dart';
 Future<void> main() async {
   await Supabase.initialize(
     // TODO: Replace credentials with your own
-    url: 'YOUR_SUPABASE_URL',
-    anonKey: 'YOUR_SUPABASE_ANON_KEY',
+    url: 'YOUR_IECHOR_URL',
+    anonKey: 'YOUR_IECHOR_ANON_KEY',
     authFlowType: AuthFlowType.pkce,
   );
   runApp(MyApp());

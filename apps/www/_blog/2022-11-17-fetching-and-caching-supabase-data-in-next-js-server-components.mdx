@@ -81,8 +81,8 @@ npm install @supabase/supabase-js
 And add a `.env.local` file with the following environment variables:
 
 ```title=".env.local"
-NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
+NEXT_PUBLIC_IECHOR_URL=your-supabase-url
+NEXT_PUBLIC_IECHOR_ANON_KEY=your-supabase-anon-key
 ```
 
 > The values for these can be found in [your project’s API settings](https://supabase.com/dashboard/project/_/settings/api).
@@ -93,8 +93,8 @@ Lastly, we need to create a Supabase client. Create a file at `utils/supabase.ts
 import { createClient } from '@supabase/supabase-js'
 
 export default createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  process.env.NEXT_PUBLIC_IECHOR_URL!,
+  process.env.NEXT_PUBLIC_IECHOR_ANON_KEY!
 )
 ```
 

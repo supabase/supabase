@@ -1,8 +1,8 @@
 import { createClient } from "@supabase/supabase-js";
 
 export default {
-  async fetch(request, { SUPABASE_URL, SUPABASE_ANON_KEY }) {
-    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  async fetch(request, { IECHOR_URL, IECHOR_ANON_KEY }) {
+    const supabase = createClient(IECHOR_URL, IECHOR_ANON_KEY);
 
     const { data } = await supabase.from("articles").select("*");
     return new Response(JSON.stringify(data), {

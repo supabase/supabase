@@ -48,8 +48,8 @@ import { createClient } from '@supabase/supabase-js'
 import { Database } from '../types/supabase'
 
 const supabase = createClient<Database>(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.SUPABASE_SECRET_KEY
+  process.env.NEXT_PUBLIC_IECHOR_URL,
+  process.env.IECHOR_SECRET_KEY
 )
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
@@ -82,7 +82,7 @@ jobs:
   update:
     runs-on: ubuntu-latest
     env:
-      SUPABASE_ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+      IECHOR_ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
       PROJECT_REF: <your-project-id>
     steps:
       - uses: actions/checkout@v2

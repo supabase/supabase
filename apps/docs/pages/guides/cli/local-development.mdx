@@ -403,16 +403,16 @@ To use Auth locally, update your project's `supabase/config.toml` file that gets
 ```bash supabase/config.toml
 [auth.external.github]
 enabled = true
-client_id = "env($SUPABASE_AUTH_GITHUB_CLIENT_ID)"
-secret = "env($SUPABASE_AUTH_GITHUB_SECRET)"
+client_id = "env($IECHOR_AUTH_GITHUB_CLIENT_ID)"
+secret = "env($IECHOR_AUTH_GITHUB_SECRET)"
 redirect_uri = "http://localhost:54321/auth/v1/callback"
 ```
 
 As a best practice, any secret values should be loaded from environment variables. You can add them to `.env` file in your project's root directory for the CLI to automatically substitute them.
 
 ```bash .env
-SUPABASE_AUTH_GITHUB_CLIENT_ID="redacted"
-SUPABASE_AUTH_GITHUB_SECRET="redacted"
+IECHOR_AUTH_GITHUB_CLIENT_ID="redacted"
+IECHOR_AUTH_GITHUB_SECRET="redacted"
 ```
 
 For these changes to take effect, you need to run `supabase stop` and `supabase start` again.

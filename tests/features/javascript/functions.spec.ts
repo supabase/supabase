@@ -27,7 +27,7 @@ class Functions extends Hooks {
       )
     })
     const { supabase } = await this.createSignedInSupaClient()
-    const sb = this.createSupaClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY)
+    const sb = this.createSupaClient(process.env.IECHOR_URL, process.env.IECHOR_ANON_KEY)
     const {
       data: { session },
     } = await supabase.auth.getSession()

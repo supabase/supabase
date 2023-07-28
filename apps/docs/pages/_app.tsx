@@ -16,7 +16,7 @@ import { CommandMenuProvider } from 'ui'
 import { TabsProvider } from 'ui/src/components/Tabs'
 import Favicons from '~/components/Favicons'
 import SiteLayout from '~/layouts/SiteLayout'
-import { API_URL, IS_PLATFORM, LOCAL_SUPABASE } from '~/lib/constants'
+import { API_URL, IS_PLATFORM, LOCAL_IECHOR } from '~/lib/constants'
 import { post } from '~/lib/fetchWrappers'
 
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
@@ -24,7 +24,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const telemetryProps = useTelemetryProps()
 
   const [supabase] = useState(() =>
-    IS_PLATFORM || LOCAL_SUPABASE ? createBrowserSupabaseClient() : undefined
+    IS_PLATFORM || LOCAL_IECHOR ? createBrowserSupabaseClient() : undefined
   )
 
   const handlePageTelemetry = useCallback(
@@ -136,7 +136,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const SITE_TITLE = 'Supabase Documentation'
 
   const AuthContainer = (props) => {
-    return IS_PLATFORM || LOCAL_SUPABASE ? (
+    return IS_PLATFORM || LOCAL_IECHOR ? (
       <SessionContextProvider supabaseClient={supabase}>
         <AuthProvider>{props.children}</AuthProvider>
       </SessionContextProvider>

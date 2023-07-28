@@ -225,8 +225,8 @@ serve(async (req) => {
   try {
     // create a supabase client with Auth context of the user that called the function
     const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      Deno.env.get('IECHOR_URL') ?? '',
+      Deno.env.get('IECHOR_ANON_KEY') ?? '',
       { global: { headers: { Authorization: req.headers.get('Authorization')! } } }
     )
     // create a stripe client

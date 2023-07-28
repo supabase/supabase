@@ -25,9 +25,9 @@ app.use(async (ctx) => {
 
   const supabaseClient = createClient(
     // Supabase API URL - env var exported by default.
-    Deno.env.get('SUPABASE_URL')!,
+    Deno.env.get('IECHOR_URL')!,
     // Supabase API ANON KEY - env var exported by default.
-    Deno.env.get('SUPABASE_ANON_KEY')!
+    Deno.env.get('IECHOR_ANON_KEY')!
   )
 
   //upload image to Storage

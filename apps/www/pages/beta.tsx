@@ -937,7 +937,7 @@ const WhatsNext = () => (
   </div>
 )
 
-const SUPABASE_AUTHOR_INDEX = 12
+const IECHOR_AUTHOR_INDEX = 12
 
 const Beta = (props: Props) => {
   const [menuOpen, setMenuOpen] = useState<boolean>(false)
@@ -986,7 +986,7 @@ const Beta = (props: Props) => {
             //
             // to do: author urls should be internal in future
             // currently we have external links to github profiles
-            authors: [authors[SUPABASE_AUTHOR_INDEX].author_url],
+            authors: [authors[IECHOR_AUTHOR_INDEX].author_url],
             tags: ['beta'],
           },
           images: [

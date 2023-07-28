@@ -84,11 +84,11 @@ import { SupabaseVectorStore } from 'langchain/vectorstores/supabase'
 import { OpenAIEmbeddings } from 'langchain/embeddings/openai'
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-if (!supabaseKey) throw new Error(`Expected SUPABASE_SERVICE_ROLE_KEY`)
+const supabaseKey = process.env.IECHOR_SERVICE_ROLE_KEY
+if (!supabaseKey) throw new Error(`Expected IECHOR_SERVICE_ROLE_KEY`)
 
-const url = process.env.SUPABASE_URL
-if (!url) throw new Error(`Expected env var SUPABASE_URL`)
+const url = process.env.IECHOR_URL
+if (!url) throw new Error(`Expected env var IECHOR_URL`)
 
 export const run = async () => {
   const client = createClient(url, supabaseKey)
@@ -121,11 +121,11 @@ import { createClient } from '@supabase/supabase-js'
 
 // First, follow set-up instructions above
 
-const privateKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-if (!privateKey) throw new Error(`Expected env var SUPABASE_SERVICE_ROLE_KEY`)
+const privateKey = process.env.IECHOR_SERVICE_ROLE_KEY
+if (!privateKey) throw new Error(`Expected env var IECHOR_SERVICE_ROLE_KEY`)
 
-const url = process.env.SUPABASE_URL
-if (!url) throw new Error(`Expected env var SUPABASE_URL`)
+const url = process.env.IECHOR_URL
+if (!url) throw new Error(`Expected env var IECHOR_URL`)
 
 export const run = async () => {
   const client = createClient(url, privateKey)
@@ -160,11 +160,11 @@ import { createClient } from '@supabase/supabase-js'
 
 // First, follow set-up instructions above
 
-const privateKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-if (!privateKey) throw new Error(`Expected env var SUPABASE_SERVICE_ROLE_KEY`)
+const privateKey = process.env.IECHOR_SERVICE_ROLE_KEY
+if (!privateKey) throw new Error(`Expected env var IECHOR_SERVICE_ROLE_KEY`)
 
-const url = process.env.SUPABASE_URL
-if (!url) throw new Error(`Expected env var SUPABASE_URL`)
+const url = process.env.IECHOR_URL
+if (!url) throw new Error(`Expected env var IECHOR_URL`)
 
 export const run = async () => {
   const client = createClient(url, privateKey)

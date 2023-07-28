@@ -23,9 +23,9 @@ interface Props {
 }
 
 const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL ?? 'http://localhost:54321',
-  process.env.SUPABASE_SERVICE_ROLE_SECRET ??
-    process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_SECRET ??
+  process.env.NEXT_PUBLIC_IECHOR_URL ?? 'http://localhost:54321',
+  process.env.IECHOR_SERVICE_ROLE_SECRET ??
+    process.env.NEXT_PUBLIC_IECHOR_SERVICE_ROLE_SECRET ??
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9idWxkYW5ycHRsb2t0eGNmZnZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE2Njk3MjcwMTIsImV4cCI6MTk4NTMwMzAxMn0.SZLqryz_-stF8dgzeVXmzZWPOqdOrBwqJROlFES8v3I'
 )
 
@@ -37,7 +37,7 @@ export default function UsernamePage({ user, users, ogImageUrl }: Props) {
   const OG_URL = `${SITE_URL}/tickets/${username}`
 
   const [supabase] = useState(() =>
-    createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
+    createClient(process.env.NEXT_PUBLIC_IECHOR_URL!, process.env.NEXT_PUBLIC_IECHOR_ANON_KEY!)
   )
 
   if (!ticketNumber) {

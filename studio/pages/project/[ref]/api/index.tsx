@@ -59,7 +59,7 @@ PageConfig.getLayout = (page) => <DocsLayout title="API">{page}</DocsLayout>
 
 export default observer(PageConfig)
 
-const DEFAULT_KEY = { name: 'hide', key: 'SUPABASE_KEY' }
+const DEFAULT_KEY = { name: 'hide', key: 'IECHOR_KEY' }
 
 const DocView: FC<any> = observer(({}) => {
   const PageState: any = useContext(PageContext)

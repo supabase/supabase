@@ -1,4 +1,4 @@
-export const SUPABASE_ROLES = [
+export const IECHOR_ROLES = [
   'anon',
   'service_role',
   'authenticated',

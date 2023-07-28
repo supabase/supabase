@@ -172,9 +172,9 @@ You need a _new_ project for staging. A project which has already been modified 
 
 The Supabase CLI requires a few environment variables to run in non-interactive mode.
 
-- `SUPABASE_ACCESS_TOKEN` is your personal access token
-- `SUPABASE_DB_PASSWORD` is your project specific database password
-- `SUPABASE_PROJECT_ID` is your project specific reference string
+- `IECHOR_ACCESS_TOKEN` is your personal access token
+- `IECHOR_DB_PASSWORD` is your project specific database password
+- `IECHOR_PROJECT_ID` is your project specific reference string
 
 We recommend adding these as [encrypted secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets) to your GitHub Actions runners.
 
@@ -236,9 +236,9 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-      SUPABASE_DB_PASSWORD: ${{ secrets.STAGING_DB_PASSWORD }}
-      SUPABASE_PROJECT_ID: ${{ secrets.STAGING_PROJECT_ID }}
+      IECHOR_ACCESS_TOKEN: ${{ secrets.IECHOR_ACCESS_TOKEN }}
+      IECHOR_DB_PASSWORD: ${{ secrets.STAGING_DB_PASSWORD }}
+      IECHOR_PROJECT_ID: ${{ secrets.STAGING_PROJECT_ID }}
 
     steps:
       - uses: actions/checkout@v3
@@ -247,7 +247,7 @@ jobs:
         with:
           version: latest
 
-      - run: supabase link --project-ref $SUPABASE_PROJECT_ID
+      - run: supabase link --project-ref $IECHOR_PROJECT_ID
       - run: supabase db push
 ```
 
@@ -268,9 +268,9 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-      SUPABASE_DB_PASSWORD: ${{ secrets.PRODUCTION_DB_PASSWORD }}
-      SUPABASE_PROJECT_ID: ${{ secrets.PRODUCTION_PROJECT_ID }}
+      IECHOR_ACCESS_TOKEN: ${{ secrets.IECHOR_ACCESS_TOKEN }}
+      IECHOR_DB_PASSWORD: ${{ secrets.PRODUCTION_DB_PASSWORD }}
+      IECHOR_PROJECT_ID: ${{ secrets.PRODUCTION_PROJECT_ID }}
 
     steps:
       - uses: actions/checkout@v3
@@ -279,7 +279,7 @@ jobs:
         with:
           version: latest
 
-      - run: supabase link --project-ref $SUPABASE_PROJECT_ID
+      - run: supabase link --project-ref $IECHOR_PROJECT_ID
       - run: supabase db push
 ```
 
@@ -290,7 +290,7 @@ The full example code is available in the [demo repository](https://github.com/s
 
 Commit these files to git and push to your `main` branch on GitHub. Update these environment variables to match your Supabase projects:
 
-- `SUPABASE_ACCESS_TOKEN`
+- `IECHOR_ACCESS_TOKEN`
 - `PRODUCTION_PROJECT_ID`
 - `PRODUCTION_DB_PASSWORD`
 - `STAGING_PROJECT_ID`

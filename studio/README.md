@@ -58,8 +58,8 @@ Once you've got that set up, update `.env` in the studio folder with the corresp
 
 ```
 POSTGRES_PASSWORD=
-SUPABASE_ANON_KEY=
-SUPABASE_SERVICE_KEY=
+IECHOR_ANON_KEY=
+IECHOR_SERVICE_KEY=
 ```
 
 Then run the following commands to install dependencies and start the dashboard.

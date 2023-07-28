@@ -1895,7 +1895,7 @@
         "type": "object",
         "properties": {
           "name": { "type": "string" },
-          "value": { "type": "string", "pattern": "/^(?!SUPABASE_).*/" }
+          "value": { "type": "string", "pattern": "/^(?!IECHOR_).*/" }
         },
         "required": ["name", "value"]
       },

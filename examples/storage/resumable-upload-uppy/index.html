@@ -44,12 +44,12 @@
         Tus,
       } from 'https://releases.transloadit.com/uppy/v3.6.1/uppy.min.mjs'
 
-      const SUPABASE_ANON_KEY = 'repace-with-your-anon-key'
-      const SUPABASE_PROJECT_ID = 'repace-with-your-project-id'
+      const IECHOR_ANON_KEY = 'repace-with-your-anon-key'
+      const IECHOR_PROJECT_ID = 'repace-with-your-project-id'
       const STORAGE_BUCKET = 'repace-with-your-bucket-id'
 
       const folder = ''
-      const supabaseStorageURL = `https://${SUPABASE_PROJECT_ID}.supabase.co/storage/v1/upload/resumable`
+      const supabaseStorageURL = `https://${IECHOR_PROJECT_ID}.supabase.co/storage/v1/upload/resumable`
 
       var uppy = new Uppy()
         .use(Dashboard, {
@@ -61,8 +61,8 @@
         .use(Tus, {
           endpoint: supabaseStorageURL,
           headers: {
-            authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-            apikey: SUPABASE_ANON_KEY,
+            authorization: `Bearer ${IECHOR_ANON_KEY}`,
+            apikey: IECHOR_ANON_KEY,
           },
           uploadDataDuringCreation: true,
           chunkSize: 6 * 1024 * 1024,

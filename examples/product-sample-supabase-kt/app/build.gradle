@@ -26,7 +26,7 @@ android {
         properties.load(project.rootProject.file("local.properties").newDataInputStream())
         buildConfigField("String", "API_KEY", "\"${properties.getProperty("API_KEY")}\"")
         buildConfigField("String", "SECRET", "\"${properties.getProperty("SECRET")}\"")
-        buildConfigField("String", "SUPABASE_URL", "\"${properties.getProperty("SUPABASE_URL")}\"")
+        buildConfigField("String", "IECHOR_URL", "\"${properties.getProperty("IECHOR_URL")}\"")
     }
 
     buildTypes {

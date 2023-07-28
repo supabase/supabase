@@ -2206,7 +2206,7 @@
                     },
                     "value": {
                       "type": "string",
-                      "pattern": "/^(?!SUPABASE_).*/"
+                      "pattern": "/^(?!IECHOR_).*/"
                     }
                   },
                   "required": ["name", "value"]
@@ -4852,7 +4852,7 @@
           },
           "value": {
             "type": "string",
-            "pattern": "/^(?!SUPABASE_).*/"
+            "pattern": "/^(?!IECHOR_).*/"
           }
         },
         "required": ["name", "value"]

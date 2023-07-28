@@ -1,7 +1,7 @@
 import { stripIndent } from 'common-tags'
 
 export function getEdgeFunctionUrl() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, '')
+  const supabaseUrl = process.env.NEXT_PUBLIC_IECHOR_URL?.replace(/\/$/, '')
 
   if (!supabaseUrl) return undefined
 

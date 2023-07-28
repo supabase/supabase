@@ -26,10 +26,10 @@ npm i @supabase/supabase-js
 npx wrangler secret put NAME
 ```
 
-**Add a secret for SUPABASE_URL**
+**Add a secret for IECHOR_URL**
 
 ```bash
-npx wrangler secret put SUPABASE_URL
+npx wrangler secret put IECHOR_URL
 ```
 
 **Run wrangler development server**
@@ -38,10 +38,10 @@ npx wrangler secret put SUPABASE_URL
 npx wrangler dev
 ```
 
-**Add a secret for SUPABASE_ANON_KEY**
+**Add a secret for IECHOR_ANON_KEY**
 
 ```bash
-npx wrangler secret put SUPABASE_ANON_KEY
+npx wrangler secret put IECHOR_ANON_KEY
 ```
 
 **Query data from Supabase**

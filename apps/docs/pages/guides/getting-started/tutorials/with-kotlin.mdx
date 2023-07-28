@@ -43,9 +43,9 @@ Create or edit `local.properties` file at top level (same level at build.gradle 
 > **Note**: This file should not be pushed directly to the repository, meaning that you should include this in `.gitignore` file
 
 ```kotlin
-API_KEY=YOUR_SUPABASE_API_KEY
-SECRET=YOUR_SUPABASE_SECRET
-SUPABASE_URL=YOUR_SUPABASE_URL
+API_KEY=YOUR_IECHOR_API_KEY
+SECRET=YOUR_IECHOR_SECRET
+IECHOR_URL=YOUR_IECHOR_URL
 
 ```
 
@@ -67,7 +67,7 @@ defaultConfig {
    properties.load(project.rootProject.file("local.properties").newDataInputStream())
    buildConfigField("String", "API_KEY", "\"${properties.getProperty("API_KEY")}\"")
    buildConfigField("String", "SECRET", "\"${properties.getProperty("SECRET")}\"")
-   buildConfigField("String", "SUPABASE_URL", "\"${properties.getProperty("SUPABASE_URL")}\"")
+   buildConfigField("String", "IECHOR_URL", "\"${properties.getProperty("IECHOR_URL")}\"")
 }
 ```
 
@@ -76,7 +76,7 @@ defaultConfig {
 Read value from `BuildConfig` (Remember to import the right class, it is one from your project). For example:
 
 ```kotlin
-val url = BuildConfig.SUPABASE_URL
+val url = BuildConfig.IECHOR_URL
 val apiKey = BuildConfig.API_KEY
 ```
 
@@ -182,7 +182,7 @@ object SupabaseModule {
     @Singleton
     fun provideSupabaseClient(): SupabaseClient {
         return createSupabaseClient(
-            supabaseUrl = BuildConfig.SUPABASE_URL,
+            supabaseUrl = BuildConfig.IECHOR_URL,
             supabaseKey = BuildConfig.API_KEY
         ) {
             install(Postgrest)
@@ -351,7 +351,7 @@ class ProductRepositoryImpl @Inject constructor(
     // Because I named the bucket as "Product Image" so when it turns to an url, it is "%20"
     // For better approach, you should create your bucket name without space symbol
     private fun buildImageUrl(imageFileName: String) =
-        "${BuildConfig.SUPABASE_URL}/storage/v1/object/public/${imageFileName}".replace(" ", "%20")
+        "${BuildConfig.IECHOR_URL}/storage/v1/object/public/${imageFileName}".replace(" ", "%20")
 }
 ```
 

@@ -26,7 +26,7 @@ const APIDocumentationPanel = ({ visible, onClose }: APIDocumentationPanelProps)
   } = useProjectJsonSchemaQuery({ projectRef: ref })
   const { data: settings } = useProjectApiQuery({ projectRef: ref })
 
-  const DEFAULT_KEY = { name: 'hide', key: 'SUPABASE_KEY' }
+  const DEFAULT_KEY = { name: 'hide', key: 'IECHOR_KEY' }
   const [selectedLang, setSelectedLang] = useState<any>('js')
   const [showApiKey, setShowApiKey] = useState<any>(DEFAULT_KEY)
 

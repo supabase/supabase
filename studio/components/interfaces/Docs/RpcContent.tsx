@@ -18,7 +18,7 @@ const RpcContent = ({
   const meta = rpcs[rpcId]
   const pathKey = `/rpc/${rpcId}`
   const path = paths && pathKey in paths ? paths[pathKey] : undefined
-  const keyToShow = !!showApiKey ? showApiKey : 'SUPABASE_KEY'
+  const keyToShow = !!showApiKey ? showApiKey : 'IECHOR_KEY'
 
   if (!path) return null
 

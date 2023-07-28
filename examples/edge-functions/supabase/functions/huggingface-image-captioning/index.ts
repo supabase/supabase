@@ -21,9 +21,9 @@ serve(async (req) => {
   const soRecord = payload.record
   const supabaseAdminClient = createClient<Database>(
     // Supabase API URL - env var exported by default when deployed.
-    Deno.env.get('SUPABASE_URL') ?? '',
+    Deno.env.get('IECHOR_URL') ?? '',
     // Supabase API SERVICE ROLE KEY - env var exported by default when deployed.
-    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    Deno.env.get('IECHOR_SERVICE_ROLE_KEY') ?? ''
   )
 
   // Construct image url from storage

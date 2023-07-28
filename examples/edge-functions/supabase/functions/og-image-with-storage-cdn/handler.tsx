@@ -198,9 +198,9 @@ export async function handler(req: Request) {
 
     const supabaseAdminClient = createClient(
       // Supabase API URL - env var exported by default when deployed.
-      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('IECHOR_URL') ?? '',
       // Supabase API SERVICE ROLE KEY - env var exported by default when deployed.
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+      Deno.env.get('IECHOR_SERVICE_ROLE_KEY') ?? ''
     )
 
     // Upload image to storage.

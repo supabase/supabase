@@ -18,10 +18,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 }
 
 const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
-  const response = await fetch(`${process.env.SUPABASE_URL}/rest/v1/`, {
+  const response = await fetch(`${process.env.IECHOR_URL}/rest/v1/`, {
     method: 'GET',
     headers: {
-      apikey: process.env.SUPABASE_SERVICE_KEY!,
+      apikey: process.env.IECHOR_SERVICE_KEY!,
     },
   })
   if (response.ok) {

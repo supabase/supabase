@@ -118,11 +118,11 @@ import { OpenAIEmbeddings } from 'langchain/embeddings/openai'
 import { createClient } from '@supabase/supabase-js'
 import { SupabaseHybridSearch } from 'langchain/retrievers/supabase'
 
-const privateKey = process.env.SUPABASE_PRIVATE_KEY
-if (!privateKey) throw new Error(`Expected env var SUPABASE_PRIVATE_KEY`)
+const privateKey = process.env.IECHOR_PRIVATE_KEY
+if (!privateKey) throw new Error(`Expected env var IECHOR_PRIVATE_KEY`)
 
-const url = process.env.SUPABASE_URL
-if (!url) throw new Error(`Expected env var SUPABASE_URL`)
+const url = process.env.IECHOR_URL
+if (!url) throw new Error(`Expected env var IECHOR_URL`)
 
 export const run = async () => {
   const client = createClient(url, privateKey)

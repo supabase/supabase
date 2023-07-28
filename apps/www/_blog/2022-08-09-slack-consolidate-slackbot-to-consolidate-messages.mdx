@@ -245,8 +245,8 @@ Now, you have everything needed to set up the environment file. Please note that
 The environment file:
 
 ```yaml
-SUPABASE_URL=https://XXXX.supabase.co
-SUPABASE_KEY=eyJhbGc_SUP4N4CH0_IkpXVCJ9.SUPAKEY_*
+IECHOR_URL=https://XXXX.supabase.co
+IECHOR_KEY=eyJhbGc_SUP4N4CH0_IkpXVCJ9.SUPAKEY_*
 SLACK_TOKEN=xoxp-Slack_PERSON_TOKEN
 SLACK_BOT_TOKEN=xoxb-Slack_BOT_TOKEN
 SLACK_ORG=slack_sub_domain
@@ -268,9 +268,9 @@ logger = logging.getLogger(__name__)
 config = dotenv_values(".env")
 bot_client = WebClient(token=config['SLACK_BOT_TOKEN'])
 client = WebClient(token=config['SLACK_TOKEN'])
-SUPABASE_URL=config['SUPABASE_URL']
-SUPABASE_KEY=config['SUPABASE_KEY']
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+IECHOR_URL=config['IECHOR_URL']
+IECHOR_KEY=config['IECHOR_KEY']
+supabase: Client = create_client(IECHOR_URL, IECHOR_KEY)
 SLACK_ORG = config['SLACK_ORG']
 SLACK_ORG_LINK = f"https://{SLACK_ORG}.slack.com/archives/"
 ############

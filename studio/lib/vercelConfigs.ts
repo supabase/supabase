@@ -3,11 +3,11 @@ import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.constan
 const QuickStart = SQL_TEMPLATES.filter((template) => template.type === 'quickstart')
 
 export const INTEGRATION_ENVS_ALIAS = {
-  ENDPOINT: 'SUPABASE_ENDPOINT',
-  ANONKEY: 'SUPABASE_ANON_KEY',
-  SERVICEKEY: 'SUPABASE_SERVICE_KEY',
-  DBHOST: 'SUPABASE_DB_HOST',
-  DBPASSWORD: 'SUPABASE_DB_PASSWORD',
+  ENDPOINT: 'IECHOR_ENDPOINT',
+  ANONKEY: 'IECHOR_ANON_KEY',
+  SERVICEKEY: 'IECHOR_SERVICE_KEY',
+  DBHOST: 'IECHOR_DB_HOST',
+  DBPASSWORD: 'IECHOR_DB_PASSWORD',
 }
 export const VERCEL_DEFAULT_EXTERNAL_ID = 'nextjs-initial-project'
 /*
@@ -31,12 +31,12 @@ export const VERCEL_INTEGRATION_CONFIGS = [
     },
     envs: [
       {
-        key: 'NEXT_PUBLIC_SUPABASE_ENDPOINT',
+        key: 'NEXT_PUBLIC_IECHOR_ENDPOINT',
         alias: INTEGRATION_ENVS_ALIAS.ENDPOINT,
         type: 'encrypted',
       },
       {
-        key: 'NEXT_PUBLIC_SUPABASE_APIKEY',
+        key: 'NEXT_PUBLIC_IECHOR_APIKEY',
         alias: INTEGRATION_ENVS_ALIAS.ANONKEY,
         type: 'encrypted',
       },
@@ -48,17 +48,17 @@ export const VERCEL_INTEGRATION_CONFIGS = [
     template: QuickStart.find((x) => x.title == 'Stripe Subscriptions'),
     envs: [
       {
-        key: 'NEXT_PUBLIC_SUPABASE_URL',
+        key: 'NEXT_PUBLIC_IECHOR_URL',
         alias: INTEGRATION_ENVS_ALIAS.ENDPOINT,
         type: 'encrypted',
       },
       {
-        key: 'NEXT_PUBLIC_SUPABASE_ANON_KEY',
+        key: 'NEXT_PUBLIC_IECHOR_ANON_KEY',
         alias: INTEGRATION_ENVS_ALIAS.ANONKEY,
         type: 'encrypted',
       },
       {
-        key: 'SUPABASE_SERVICE_ROLE_KEY',
+        key: 'IECHOR_SERVICE_ROLE_KEY',
         alias: INTEGRATION_ENVS_ALIAS.SERVICEKEY,
         type: 'encrypted',
       },
@@ -70,17 +70,17 @@ export const VERCEL_INTEGRATION_CONFIGS = [
     template: QuickStart.find((x) => x.title == 'OpenAI Vector Search'),
     envs: [
       {
-        key: 'NEXT_PUBLIC_SUPABASE_URL',
+        key: 'NEXT_PUBLIC_IECHOR_URL',
         alias: INTEGRATION_ENVS_ALIAS.ENDPOINT,
         type: 'encrypted',
       },
       {
-        key: 'NEXT_PUBLIC_SUPABASE_ANON_KEY',
+        key: 'NEXT_PUBLIC_IECHOR_ANON_KEY',
         alias: INTEGRATION_ENVS_ALIAS.ANONKEY,
         type: 'encrypted',
       },
       {
-        key: 'SUPABASE_SERVICE_ROLE_KEY',
+        key: 'IECHOR_SERVICE_ROLE_KEY',
         alias: INTEGRATION_ENVS_ALIAS.SERVICEKEY,
         type: 'encrypted',
       },
@@ -92,12 +92,12 @@ export const VERCEL_INTEGRATION_CONFIGS = [
     template: QuickStart.find((x) => x.title == 'Todo List'),
     envs: [
       {
-        key: 'NEXT_PUBLIC_SUPABASE_URL',
+        key: 'NEXT_PUBLIC_IECHOR_URL',
         alias: INTEGRATION_ENVS_ALIAS.ENDPOINT,
         type: 'encrypted',
       },
       {
-        key: 'NEXT_PUBLIC_SUPABASE_ANON_KEY',
+        key: 'NEXT_PUBLIC_IECHOR_ANON_KEY',
         alias: INTEGRATION_ENVS_ALIAS.ANONKEY,
         type: 'encrypted',
       },
@@ -111,27 +111,27 @@ export const VERCEL_INTEGRATION_CONFIGS = [
     },
     envs: [
       {
-        key: 'NEXT_PUBLIC_SUPABASE_URL',
+        key: 'NEXT_PUBLIC_IECHOR_URL',
         alias: INTEGRATION_ENVS_ALIAS.ENDPOINT,
         type: 'encrypted',
       },
       {
-        key: 'NEXT_PUBLIC_SUPABASE_ANON_KEY',
+        key: 'NEXT_PUBLIC_IECHOR_ANON_KEY',
         alias: INTEGRATION_ENVS_ALIAS.ANONKEY,
         type: 'encrypted',
       },
       {
-        key: 'SUPABASE_SERVICE_ROLE_KEY',
+        key: 'IECHOR_SERVICE_ROLE_KEY',
         alias: INTEGRATION_ENVS_ALIAS.SERVICEKEY,
         type: 'encrypted',
       },
       {
-        key: 'SUPABASE_DB_HOST',
+        key: 'IECHOR_DB_HOST',
         alias: INTEGRATION_ENVS_ALIAS.DBHOST,
         type: 'encrypted',
       },
       {
-        key: 'SUPABASE_DB_PASSWORD',
+        key: 'IECHOR_DB_PASSWORD',
         alias: INTEGRATION_ENVS_ALIAS.DBPASSWORD,
         type: 'encrypted',
       },
@@ -143,17 +143,17 @@ export const VERCEL_INTEGRATION_CONFIGS = [
     template: QuickStart.find((x) => x.title == 'User Management Starter'),
     envs: [
       {
-        key: 'NEXT_PUBLIC_SUPABASE_URL',
+        key: 'NEXT_PUBLIC_IECHOR_URL',
         alias: INTEGRATION_ENVS_ALIAS.ENDPOINT,
         type: 'encrypted',
       },
       {
-        key: 'NEXT_PUBLIC_SUPABASE_ANON_KEY',
+        key: 'NEXT_PUBLIC_IECHOR_ANON_KEY',
         alias: INTEGRATION_ENVS_ALIAS.ANONKEY,
         type: 'encrypted',
       },
       {
-        key: 'SUPABASE_SERVICE_ROLE_KEY',
+        key: 'IECHOR_SERVICE_ROLE_KEY',
         alias: INTEGRATION_ENVS_ALIAS.SERVICEKEY,
         type: 'encrypted',
       },
@@ -524,17 +524,17 @@ create or replace view comments_thread_with_user_vote as
     },
     envs: [
       {
-        key: 'NEXT_PUBLIC_SUPABASE_URL',
+        key: 'NEXT_PUBLIC_IECHOR_URL',
         alias: INTEGRATION_ENVS_ALIAS.ENDPOINT,
         type: 'encrypted',
       },
       {
-        key: 'NEXT_PUBLIC_SUPABASE_ANON_KEY',
+        key: 'NEXT_PUBLIC_IECHOR_ANON_KEY',
         alias: INTEGRATION_ENVS_ALIAS.ANONKEY,
         type: 'encrypted',
       },
       {
-        key: 'SUPABASE_SERVICE_ROLE_KEY',
+        key: 'IECHOR_SERVICE_ROLE_KEY',
         alias: INTEGRATION_ENVS_ALIAS.SERVICEKEY,
         type: 'encrypted',
       },

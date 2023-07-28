@@ -271,14 +271,14 @@ commands:
           STUDIO_URL="http://localhost:54323"
       - id: output-custom-name
         name: Customize the names of exported variables
-        code: supabase status -o env --override-name auth.anon_key=SUPABASE_ANON_KEY --override-name auth.service_role_key=SUPABASE_SERVICE_KEY
+        code: supabase status -o env --override-name auth.anon_key=IECHOR_ANON_KEY --override-name auth.service_role_key=IECHOR_SERVICE_KEY
         response: |
           Stopped services: [supabase_inbucket_cli supabase_rest_cli supabase_studio_cli]
-          SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0"
+          IECHOR_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0"
           DB_URL="postgresql://postgres:postgres@localhost:54322/postgres"
           GRAPHQL_URL="http://localhost:54321/graphql/v1"
           JWT_SECRET="super-secret-jwt-token-with-at-least-32-characters-long"
-          SUPABASE_SERVICE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU"
+          IECHOR_SERVICE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU"
     tags:
       - local-dev
     links: []
@@ -1321,7 +1321,7 @@ commands:
 
       Your access token is stored securely in [native credentials storage](https://github.com/zalando/go-keyring#dependencies). If native credentials storage is unavailable, it will be written to a plain text file at `~/.supabase/access-token`.
 
-      > If this behavior is not desired, such as in a CI environment, you may skip login by specifying the `SUPABASE_ACCESS_TOKEN` environment variable in other commands.
+      > If this behavior is not desired, such as in a CI environment, you may skip login by specifying the `IECHOR_ACCESS_TOKEN` environment variable in other commands.
 
       The Supabase CLI uses the stored token to access Management APIs for projects, functions, secrets, etc.
     examples:
@@ -1349,7 +1349,7 @@ commands:
 
       Optionally, database settings can be validated if you provide a password. Your database password is saved in native credentials storage if available.
 
-      > If you do not want to be prompted for the database password, such as in a CI environment, you may specify it explicitly via the `SUPABASE_DB_PASSWORD` environment variable.
+      > If you do not want to be prompted for the database password, such as in a CI environment, you may specify it explicitly via the `IECHOR_DB_PASSWORD` environment variable.
 
       Some commands like `db dump`, `db push`, and `db remote commit` require your project to be linked first.
     examples:
@@ -1442,7 +1442,7 @@ commands:
 
       A `supabase/config.toml` file is created in your current working directory. This configuration is specific to each local project.
 
-      > You may override the directory path by specifying the `SUPABASE_WORKDIR` environment variable or `--workdir` flag.
+      > You may override the directory path by specifying the `IECHOR_WORKDIR` environment variable or `--workdir` flag.
 
       In addition to `config.toml`, the `supabase` directory may also contain other Supabase objects, such as `migrations`, `functions`, `tests`, etc.
     examples:

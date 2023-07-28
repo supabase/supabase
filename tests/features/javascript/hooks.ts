@@ -15,11 +15,11 @@ import { JasmineAllureReporter, step } from '../../.jest/jest-custom-reporter'
 
 export abstract class Hooks {
   static sql = postgres({
-    host: process.env.SUPABASE_DB_HOST,
-    port: parseInt(process.env.SUPABASE_DB_PORT),
+    host: process.env.IECHOR_DB_HOST,
+    port: parseInt(process.env.IECHOR_DB_PORT),
     database: 'postgres',
     username: 'postgres',
-    password: process.env.SUPABASE_DB_PASS,
+    password: process.env.IECHOR_DB_PASS,
   })
 
   @step('terminate sql connection')
@@ -51,7 +51,7 @@ export abstract class Hooks {
     username: string
     id: string
   }> {
-    const supabase = this.createSupaClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ANON)
+    const supabase = this.createSupaClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ANON)
 
     const fakeUser = {
       email: faker.internet.exampleEmail(),
@@ -75,7 +75,7 @@ export abstract class Hooks {
   // todo: rework this
   @step((token: string) => `verify with token ${token}`)
   async verify(token: string, email: string): Promise<Response> {
-    return crossFetch(`${process.env.SUPABASE_GOTRUE}/verify`, {
+    return crossFetch(`${process.env.IECHOR_GOTRUE}/verify`, {
       method: 'POST',
       body: JSON.stringify({
         type: 'signup',
@@ -195,7 +195,7 @@ export abstract class Hooks {
     const fakeUser = await this.createUser()
 
     // sign in as user
-    const supabase = this.createSupaClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ANON)
+    const supabase = this.createSupaClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ANON)
     const {
       data: { user },
       error: signInError,

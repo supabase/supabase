@@ -30,8 +30,8 @@ All you need to persist the auth state is initialize Supabase and everything els
 ```dart
 // Before
 await Supabase.initialize(
-  url: 'SUPABASE_URL',
-  anonKey: 'SUPABASE_ANON_KEY',
+  url: 'IECHOR_URL',
+  anonKey: 'IECHOR_ANON_KEY',
 );
 ...
 
@@ -41,8 +41,8 @@ class AuthState<T extends StatefulWidget> extends SupabaseAuthState<T> {
 
 // After
 await Supabase.initialize(
-  url: 'SUPABASE_URL',
-  anonKey: 'SUPABASE_ANON_KEY',
+  url: 'IECHOR_URL',
+  anonKey: 'IECHOR_ANON_KEY',
 );
 ```
 
@@ -60,8 +60,8 @@ void onReceivedAuthDeeplink(Uri uri) {
 
 // After
 await Supabase.instance.initialize(
-  url: 'SUPABASE_URL',
-  anonKey: 'SUPABASE_ANON_KEY',
+  url: 'IECHOR_URL',
+  anonKey: 'IECHOR_ANON_KEY',
 );
 ```
 

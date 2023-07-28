@@ -27,8 +27,8 @@ interface RequestData {
 }
 
 const openAiKey = Deno.env.get('OPENAI_KEY')
-const supabaseUrl = Deno.env.get('SUPABASE_URL')
-const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+const supabaseUrl = Deno.env.get('IECHOR_URL')
+const supabaseServiceKey = Deno.env.get('IECHOR_SERVICE_ROLE_KEY')
 
 export const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -47,11 +47,11 @@ serve(async (req) => {
     }
 
     if (!supabaseUrl) {
-      throw new ApplicationError('Missing environment variable SUPABASE_URL')
+      throw new ApplicationError('Missing environment variable IECHOR_URL')
     }
 
     if (!supabaseServiceKey) {
-      throw new ApplicationError('Missing environment variable SUPABASE_SERVICE_ROLE_KEY')
+      throw new ApplicationError('Missing environment variable IECHOR_SERVICE_ROLE_KEY')
     }
 
     const requestData: RequestData = await req.json()

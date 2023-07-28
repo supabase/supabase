@@ -25,7 +25,7 @@ file_env() {
 
 # load secrets either from environment variables or files
 file_env 'POSTGRES_PASSWORD'
-file_env 'SUPABASE_ANON_KEY'
-file_env 'SUPABASE_SERVICE_KEY'
+file_env 'IECHOR_ANON_KEY'
+file_env 'IECHOR_SERVICE_KEY'
 
 exec "${@}"

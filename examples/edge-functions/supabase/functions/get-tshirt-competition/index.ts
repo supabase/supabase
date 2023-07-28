@@ -53,9 +53,9 @@ serve(async (req) => {
 
     const supabaseAdminClient = createClient(
       // Supabase API URL - env var exported by default when deployed.
-      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('IECHOR_URL') ?? '',
       // Supabase API SERVICE ROLE KEY - env var exported by default when deployed.
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+      Deno.env.get('IECHOR_SERVICE_ROLE_KEY') ?? ''
     )
     // Submit email to draw
     const { error } = await supabaseAdminClient.from('get-tshirt-competition-2').upsert(

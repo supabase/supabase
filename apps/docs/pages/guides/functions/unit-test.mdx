@@ -23,8 +23,8 @@ import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-
 import { delay } from 'https://deno.land/x/delay@v0.2.0/mod.ts'
 
 // Set up the configuration for the Supabase client
-const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? ''
-const supabaseKey = Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+const supabaseUrl = Deno.env.get('IECHOR_URL') ?? ''
+const supabaseKey = Deno.env.get('IECHOR_ANON_KEY') ?? ''
 const options = {
   auth: {
     autoRefreshToken: false,
@@ -117,10 +117,10 @@ To locally test and debug Edge Functions, you can utilize the Supabase CLI. Let'
    ```bash
    # creates the file
    touch .env.local
-   # adds the SUPABASE_URL secret
-   echo "SUPABASE_URL=http://localhost:54321" >> .env.local
-   # adds the SUPABASE_ANON_KEY secret
-   echo "SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0" >> .env.local
+   # adds the IECHOR_URL secret
+   echo "IECHOR_URL=http://localhost:54321" >> .env.local
+   # adds the IECHOR_ANON_KEY secret
+   echo "IECHOR_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0" >> .env.local
    # Alternatively, you can open it in your editor:
    open .env.local
    ```

@@ -37,11 +37,11 @@ npm install @supabase/supabase-js
 ```
 
 And finally we want to save the environment variables in a `.env`.
-All we need are the `SUPABASE_URL` and the `SUPABASE_KEY` key that you copied [earlier](#get-the-api-keys).
+All we need are the `IECHOR_URL` and the `IECHOR_KEY` key that you copied [earlier](#get-the-api-keys).
 
 ```bash .env
-PUBLIC_SUPABASE_URL="YOUR_SUPABASE_URL"
-PUBLIC_SUPABASE_ANON_KEY="YOUR_SUPABASE_KEY"
+PUBLIC_IECHOR_URL="YOUR_IECHOR_URL"
+PUBLIC_IECHOR_ANON_KEY="YOUR_IECHOR_KEY"
 ```
 
 Optionally, add `src/styles.css` with the [CSS from the example](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/sveltekit-user-management/src/styles.css).
@@ -62,14 +62,14 @@ Add the code below to your `src/hooks.server.ts` to initialize the client on the
 
 ```ts src/hooks.server.ts
 // src/hooks.server.ts
-import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public'
+import { PUBLIC_IECHOR_URL, PUBLIC_IECHOR_ANON_KEY } from '$env/static/public'
 import { createSupabaseServerClient } from '@supabase/auth-helpers-sveltekit'
 import type { Handle } from '@sveltejs/kit'
 
 export const handle: Handle = async ({ event, resolve }) => {
   event.locals.supabase = createSupabaseServerClient({
-    supabaseUrl: PUBLIC_SUPABASE_URL,
-    supabaseKey: PUBLIC_SUPABASE_ANON_KEY,
+    supabaseUrl: PUBLIC_IECHOR_URL,
+    supabaseKey: PUBLIC_IECHOR_ANON_KEY,
     event,
   })
 
@@ -131,15 +131,15 @@ Create a new `src/routes/+layout.ts` file to handle the session and the supabase
 ```ts src/routes/+layout.ts
 // src/routes/+layout.ts
 import { invalidate } from '$app/navigation'
-import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public'
+import { PUBLIC_IECHOR_ANON_KEY, PUBLIC_IECHOR_URL } from '$env/static/public'
 import { createSupabaseLoadClient } from '@supabase/auth-helpers-sveltekit'
 
 export const load = async ({ fetch, data, depends }) => {
   depends('supabase:auth')
 
   const supabase = createSupabaseLoadClient({
-    supabaseUrl: PUBLIC_SUPABASE_URL,
-    supabaseKey: PUBLIC_SUPABASE_ANON_KEY,
+    supabaseUrl: PUBLIC_IECHOR_URL,
+    supabaseKey: PUBLIC_IECHOR_ANON_KEY,
     event: { fetch },
     serverSession: data.session,
   })

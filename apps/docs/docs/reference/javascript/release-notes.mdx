@@ -42,7 +42,7 @@ The libraries now support typescript.
 ```ts
 // v2 - definitions are injected in `createClient()`
 import type { Database } from './DatabaseDefinitions'
-const supabase = createClient<Database>(SUPABASE_URL, ANON_KEY)
+const supabase = createClient<Database>(IECHOR_URL, ANON_KEY)
 const { data } = await supabase.from('messages').select().match({ id: 1 })
 
 // v1 -- previously definitions were injected in the `from()` method

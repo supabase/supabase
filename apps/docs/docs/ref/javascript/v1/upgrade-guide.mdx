@@ -42,7 +42,7 @@ _Optionally_ if you are using custom configuration with `createClient` then foll
 <TabPanel id="1.0x" label="Before">
 
 ```ts src/supabaseClient.ts
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+const supabase = createClient(IECHOR_URL, IECHOR_ANON_KEY, {
   schema: 'custom',
   persistSession: false,
 })
@@ -52,7 +52,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
 <TabPanel id="2.0x" label="After">
 
 ```ts src/supabaseClient.ts
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+const supabase = createClient(IECHOR_URL, IECHOR_ANON_KEY, {
   db: {
     schema: 'custom',
   },
@@ -424,8 +424,8 @@ const { user, error } = supabase.auth.setAuth(access_token)
 <TabPanel id="2.0x" label="After">
 ```ts
 const supabase = createClient(
-  SUPABASE_URL,
-  SUPABASE_ANON_KEY,
+  IECHOR_URL,
+  IECHOR_ANON_KEY,
   {
     global: {
       headers: {

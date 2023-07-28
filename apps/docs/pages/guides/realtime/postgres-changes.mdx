@@ -499,7 +499,7 @@ To use your own JWT with Realtime make sure to set the token after instantiating
 ```js
 const { createClient } = require('@supabase/supabase-js')
 
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY, {})
+const supabase = createClient(process.env.IECHOR_URL, process.env.IECHOR_KEY, {})
 
 // Set your custom JWT here
 supabase.realtime.setAuth('your-custom-jwt')

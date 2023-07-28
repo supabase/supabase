@@ -31,8 +31,8 @@ functions:
           import os
           from supabase import create_client, Client
 
-          url: str = os.environ.get("SUPABASE_URL")
-          key: str = os.environ.get("SUPABASE_KEY")
+          url: str = os.environ.get("IECHOR_URL")
+          key: str = os.environ.get("IECHOR_KEY")
           supabase: Client = create_client(url, key)
           ```
       - id: with-timeout-option
@@ -42,8 +42,8 @@ functions:
           import os
           from supabase import create_client, Client
 
-          url: str = os.environ.get("SUPABASE_URL")
-          key: str = os.environ.get("SUPABASE_KEY")
+          url: str = os.environ.get("IECHOR_URL")
+          key: str = os.environ.get("IECHOR_KEY")
           supabase: Client = create_client(url, key, options={'timeout': 10})
           ```
 

@@ -9,7 +9,7 @@ const randomPassword = makeRandomString(20)
 export default function UserManagement({ autoApiService, selectedLang, showApiKey }) {
   const router = useRouter()
 
-  const keyToShow = showApiKey ? showApiKey : 'SUPABASE_KEY'
+  const keyToShow = showApiKey ? showApiKey : 'IECHOR_KEY'
 
   return (
     <>

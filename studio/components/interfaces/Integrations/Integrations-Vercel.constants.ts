@@ -27,24 +27,24 @@ export const ENV_VAR_KEYS = {
     key: 'POSTGRES_DATABASE',
     type: 'encrypted',
   },
-  SUPABASE_ANON_KEY: {
-    key: 'SUPABASE_ANON_KEY',
+  IECHOR_ANON_KEY: {
+    key: 'IECHOR_ANON_KEY',
     type: 'encrypted',
   },
-  SUPABASE_URL: {
-    key: 'SUPABASE_URL',
+  IECHOR_URL: {
+    key: 'IECHOR_URL',
     type: 'encrypted',
   },
-  SUPABASE_SERVICE_ROLE_KEY: {
-    key: 'SUPABASE_SERVICE_ROLE_KEY',
+  IECHOR_SERVICE_ROLE_KEY: {
+    key: 'IECHOR_SERVICE_ROLE_KEY',
     type: 'encrypted',
   },
-  NEXT_PUBLIC_SUPABASE_ANON_KEY: {
-    key: 'NEXT_PUBLIC_SUPABASE_ANON_KEY',
+  NEXT_PUBLIC_IECHOR_ANON_KEY: {
+    key: 'NEXT_PUBLIC_IECHOR_ANON_KEY',
     type: 'encrypted',
   },
-  NEXT_PUBLIC_SUPABASE_URL: {
-    key: 'NEXT_PUBLIC_SUPABASE_URL',
+  NEXT_PUBLIC_IECHOR_URL: {
+    key: 'NEXT_PUBLIC_IECHOR_URL',
     type: 'encrypted',
   },
 } as const

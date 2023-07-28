@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      IECHOR_ACCESS_TOKEN: ${{ secrets.IECHOR_ACCESS_TOKEN }}
       PROJECT_ID: zdtdtxajzydjqzuktnqx
 
     steps:

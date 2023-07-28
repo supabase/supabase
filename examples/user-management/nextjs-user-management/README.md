@@ -50,8 +50,8 @@ The `anon` key is your client-side API key. It allows "anonymous access" to your
 Create a file in this folder `.env.local`
 
 ```
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
+NEXT_PUBLIC_IECHOR_URL=
+NEXT_PUBLIC_IECHOR_ANON_KEY=
 ```
 
 Populate this file with your URL and Key.

@@ -99,7 +99,7 @@ export const meta = {
 <StepHikeCompact.Step step={5}>
     <StepHikeCompact.Details title="Update `supabaseClient`">
 
-      You now have to update the `supabaseClient` with the `SUPABASE_URL` and `SUPABASE_KEY` of your Supabase API. The `supabaseClient` is used in auth provider and data provider methods that allow the refine app to connect to your Supabase backend.
+      You now have to update the `supabaseClient` with the `IECHOR_URL` and `IECHOR_KEY` of your Supabase API. The `supabaseClient` is used in auth provider and data provider methods that allow the refine app to connect to your Supabase backend.
 
     </StepHikeCompact.Details>
 
@@ -108,10 +108,10 @@ export const meta = {
       ```ts src/utility/supabaseClient.ts
       import { createClient } from "@refinedev/supabase";
 
-      const SUPABASE_URL = YOUR_SUPABASE_URL;
-      const SUPABASE_KEY = YOUR_SUPABASE_KEY
+      const IECHOR_URL = YOUR_IECHOR_URL;
+      const IECHOR_KEY = YOUR_IECHOR_KEY
 
-      export const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY, {
+      export const supabaseClient = createClient(IECHOR_URL, IECHOR_KEY, {
         db: {
           schema: "public",
         },

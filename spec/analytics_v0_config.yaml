@@ -35,8 +35,8 @@ parameters:
     type: 'string'
     description: |
       Allows you to pass in an API key that will used for authentication. This is intended for programmatic usage where an external program sets the API key. It is advised to use the UI to configure the access tokens instead. If this value is not provided, the default API key will be automatically generated.
-  - id: 'LOGFLARE_SUPABASE_MODE' # {string} A unique identifier for this param.
-    title: 'LOGFLARE_SUPABASE_MODE' # {string} Any name.
+  - id: 'LOGFLARE_IECHOR_MODE' # {string} A unique identifier for this param.
+    title: 'LOGFLARE_IECHOR_MODE' # {string} Any name.
     tags: ['general'] # {string[]} These tags are useful for grouping parameters
     links: [] # {string[]} These tags are useful for grouping parameters
     required: true

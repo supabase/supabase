@@ -40,8 +40,8 @@ And finally we want to save the environment variables in a `.env.local` file.
 All we need are the API URL and the `anon` key that you copied [earlier](#get-the-api-keys).
 
 ```bash .env
-VITE_SUPABASE_URL=YOUR_SUPABASE_URL
-VITE_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
+VITE_IECHOR_URL=YOUR_IECHOR_URL
+VITE_IECHOR_ANON_KEY=YOUR_IECHOR_ANON_KEY
 ```
 
 Now that we have the API credentials in place, let's create a helper file to initialize the Supabase client. These variables will be exposed
@@ -52,8 +52,8 @@ Create and edit `src/supabaseClient.js`:
 ```js src/supabaseClient.js
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+const supabaseUrl = import.meta.env.VITE_IECHOR_URL
+const supabaseAnonKey = import.meta.env.VITE_IECHOR_ANON_KEY
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 ```

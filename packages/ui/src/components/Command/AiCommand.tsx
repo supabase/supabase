@@ -50,7 +50,7 @@ type CreateChatCompletionResponseChoicesInnerDelta = Omit<
 }
 
 function getEdgeFunctionUrl() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, '')
+  const supabaseUrl = process.env.NEXT_PUBLIC_IECHOR_URL?.replace(/\/$/, '')
 
   if (!supabaseUrl) {
     return undefined
@@ -188,8 +188,8 @@ export function useAiChat({
 
       const eventSource = new SSE(`${edgeFunctionUrl}/ai-docs`, {
         headers: {
-          apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '',
-          Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
+          apikey: process.env.NEXT_PUBLIC_IECHOR_ANON_KEY ?? '',
+          Authorization: `Bearer ${process.env.NEXT_PUBLIC_IECHOR_ANON_KEY}`,
           'Content-Type': 'application/json',
         },
         payload: JSON.stringify({
@@ -289,8 +289,8 @@ export function queryAi(messages: Message[], timeout = 0) {
   return new Promise<string>((resolve, reject) => {
     const eventSource = new SSE(`${edgeFunctionUrl}/ai-docs`, {
       headers: {
-        apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '',
-        Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
+        apikey: process.env.NEXT_PUBLIC_IECHOR_ANON_KEY ?? '',
+        Authorization: `Bearer ${process.env.NEXT_PUBLIC_IECHOR_ANON_KEY}`,
         'Content-Type': 'application/json',
       },
       payload: JSON.stringify({

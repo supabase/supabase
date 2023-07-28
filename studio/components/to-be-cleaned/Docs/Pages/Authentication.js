@@ -5,13 +5,13 @@ import CodeSnippet from '../CodeSnippet'
 export default function Authentication({ autoApiService, selectedLang, showApiKey }) {
   // [Joshen] ShowApiKey should really be a boolean, its confusing
   const defaultApiKey =
-    showApiKey !== 'SUPABASE_KEY'
-      ? autoApiService?.defaultApiKey ?? 'SUPABASE_CLIENT_API_KEY'
-      : 'SUPABASE_CLIENT_API_KEY'
+    showApiKey !== 'IECHOR_KEY'
+      ? autoApiService?.defaultApiKey ?? 'IECHOR_CLIENT_API_KEY'
+      : 'IECHOR_CLIENT_API_KEY'
   const serviceApiKey =
-    showApiKey !== 'SUPABASE_KEY'
-      ? autoApiService?.serviceApiKey ?? 'SUPABASE_SERVICE_KEY'
-      : 'SUPABASE_SERVICE_KEY'
+    showApiKey !== 'IECHOR_KEY'
+      ? autoApiService?.serviceApiKey ?? 'IECHOR_SERVICE_KEY'
+      : 'IECHOR_SERVICE_KEY'
 
   return (
     <>
@@ -39,7 +39,7 @@ export default function Authentication({ autoApiService, selectedLang, showApiKe
             After logging in the keys will switch to the user's own login token.
           </p>
           <p>
-            In this documentation, we will refer to the key using the name <code>SUPABASE_KEY</code>
+            In this documentation, we will refer to the key using the name <code>IECHOR_KEY</code>
             .
           </p>
           <p>
@@ -54,7 +54,7 @@ export default function Authentication({ autoApiService, selectedLang, showApiKe
         <article className="code">
           <CodeSnippet
             selectedLang={selectedLang}
-            snippet={Snippets.authKey('CLIENT API KEY', 'SUPABASE_KEY', defaultApiKey)}
+            snippet={Snippets.authKey('CLIENT API KEY', 'IECHOR_KEY', defaultApiKey)}
           />
           <CodeSnippet
             selectedLang={selectedLang}

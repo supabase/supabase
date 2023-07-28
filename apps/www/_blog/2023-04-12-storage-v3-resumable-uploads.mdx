@@ -54,7 +54,7 @@ You can serve images from Storage with a simple Next.js loader for the Image com
 
 ```js
 // supabase-image-loader.js
-const projectId = '<SUPABASE_PROJECT_ID>'
+const projectId = '<IECHOR_PROJECT_ID>'
 export default function supabaseLoader({ src, width, quality }) {
   return `https://${projectId}.supabase.co/storage/v1/render/image/public/${src}?width=${width}&quality=${
     quality || 75

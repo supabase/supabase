@@ -141,7 +141,7 @@ Over the next few weeks, you'll be able to use it with the Supabase libraries. W
 ```tsx
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+const supabase = createClient(IECHOR_URL, IECHOR_ANON_KEY, {
   auth: {
     flowType: 'pkce',
   },
@@ -172,8 +172,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const supabase = createServerSupabaseClient(
     { req, res },
     {
-      supabaseUrl: process.env.SUPABASE_URL,
-      supabaseKey: process.env.SUPABASE_ANON_KEY,
+      supabaseUrl: process.env.IECHOR_URL,
+      supabaseKey: process.env.IECHOR_ANON_KEY,
     }
   )
 
@@ -205,8 +205,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const supabase = createServerSupabaseClient(
     { req, res },
     {
-      supabaseUrl: SUPABASE_URL,
-      supabaseKey: SUPABASE_ANON_KEY,
+      supabaseUrl: IECHOR_URL,
+      supabaseKey: IECHOR_ANON_KEY,
     }
   )
   // check for code in url querystring

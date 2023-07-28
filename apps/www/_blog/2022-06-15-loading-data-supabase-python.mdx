@@ -99,9 +99,9 @@ export <variable_name>=<variable_value>
 So for our example we will set them up like this:
 
 ```bash
-export SUPABASE_URL=<<the value under config > URL>>
-export SUPABASE_KEY=<<the value present in Project API keys > anon public>>
-export SUPABASE_SECRET_KEY=<<the value present in Project API keys > service_role secret>>
+export IECHOR_URL=<<the value under config > URL>>
+export IECHOR_KEY=<<the value present in Project API keys > anon public>>
+export IECHOR_SECRET_KEY=<<the value present in Project API keys > service_role secret>>
 ```
 
 ## Inserting data into Supabase
@@ -150,8 +150,8 @@ def add_entries_to_product_table(supabase, vendor_id):
 def main():
     vendor_count = 10
     load_dotenv()
-    url: str = os.environ.get("SUPABASE_URL")
-    key: str = os.environ.get("SUPABASE_KEY")
+    url: str = os.environ.get("IECHOR_URL")
+    key: str = os.environ.get("IECHOR_KEY")
     supabase: Client = create_client(url, key)
     fk_list = add_entries_to_vendor_table(supabase, vendor_count)
     for i in range(len(fk_list)):

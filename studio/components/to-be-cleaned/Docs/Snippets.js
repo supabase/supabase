@@ -30,7 +30,7 @@ const snippets = {
 import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = '${endpoint}'
-const supabaseKey = process.env.SUPABASE_KEY
+const supabaseKey = process.env.IECHOR_KEY
 const supabase = createClient(supabaseUrl, supabaseKey)`,
     },
     python: {
@@ -40,7 +40,7 @@ import os
 from supabase import create_client, Client
 
 url: str = '${endpoint}'
-key: str = os.environ.get("SUPABASE_KEY")
+key: str = os.environ.get("IECHOR_KEY")
 supabase: Client = create_client(url, key)
 `,
     },
@@ -48,7 +48,7 @@ supabase: Client = create_client(url, key)
       language: 'dart',
       code: `
 const supabaseUrl = '${endpoint}';
-const supabaseKey = String.fromEnvironment('SUPABASE_KEY');
+const supabaseKey = String.fromEnvironment('IECHOR_KEY');
 
 Future<void> main() async {
   await Supabase.initialize(url: supabaseUrl, anonKey: supabaseKey);
@@ -84,9 +84,9 @@ curl '${endpoint}/rest/v1/' \\
     js: {
       language: 'js',
       code: `
-const SUPABASE_URL = "${endpoint}"
+const IECHOR_URL = "${endpoint}"
 
-const supabase = createClient(SUPABASE_URL, process.env.${keyName || 'SUPABASE_KEY'});
+const supabase = createClient(IECHOR_URL, process.env.${keyName || 'IECHOR_KEY'});
 `,
     },
   }),

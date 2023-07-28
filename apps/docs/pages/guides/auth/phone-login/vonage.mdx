@@ -91,7 +91,7 @@ let { user, error } = await supabase.auth.signUp({
 
 ```bash
 curl -X POST 'https://xxx.supabase.co/auth/v1/signup' \
--H "apikey: SUPABASE_KEY" \
+-H "apikey: IECHOR_KEY" \
 -H "Content-Type: application/json" \
 -d '{
   "phone": "491512223334444",
@@ -126,7 +126,7 @@ let { session, error } = await supabase.auth.verifyOTP({
 
 ```bash
 curl -X POST 'https://xxx.supabase.co/auth/v1/verify' \
--H "apikey: SUPABASE_KEY" \
+-H "apikey: IECHOR_KEY" \
 -H "Content-Type: application/json" \
 -d '{
   "type": "sms",
@@ -173,7 +173,7 @@ let { user, error } = await supabase.auth.signInWithPassword({
 
 ```bash
 curl -X POST 'https://xxx.supabase.co/auth/v1/token?grant_type=password' \
--H "apikey: SUPABASE_KEY" \
+-H "apikey: IECHOR_KEY" \
 -H "Content-Type: application/json" \
 -d '{
   "phone": "491512223334444",
@@ -209,7 +209,7 @@ let { user, error } = await supabase.auth.signInWithOtp({
 
 ```bash
 curl -X POST 'https://xxx.supabase.co/auth/v1/otp' \
--H "apikey: SUPABASE_KEY" \
+-H "apikey: IECHOR_KEY" \
 -H "Content-Type: application/json" \
 -d '{
   "phone": "491512223334444"
@@ -241,7 +241,7 @@ let { session, error } = await supabase.auth.verifyOTP({
 
 ```bash
 curl -X POST 'https://xxx.supabase.co/auth/v1/verify' \
--H "apikey: SUPABASE_KEY" \
+-H "apikey: IECHOR_KEY" \
 -H "Content-Type: application/json" \
 -d '{
   "type": "sms",

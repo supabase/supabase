@@ -53,8 +53,8 @@ The `anon` key is your client-side API key. It allows "anonymous access" to your
 Create a file in this folder `.env.local`
 
 ```
-VITE_SUPABASE_URL=YOUR_SUPABASE_URL
-VITE_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
+VITE_IECHOR_URL=YOUR_IECHOR_URL
+VITE_IECHOR_ANON_KEY=YOUR_IECHOR_ANON_KEY
 ```
 
 Populate this file with your URL and Key.
