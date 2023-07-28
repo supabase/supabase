@@ -99,25 +99,6 @@ docker compose restart
 
 Be aware that this will result in downtime while the services are restarting.
 
-## Exposing services
-
-The services running on the machine are not exposed to the internet by default. We recommend using a reverse proxy such as [NGINX](https://www.nginx.com/) or [Caddy](https://caddyserver.com/) if you want to expose the services publicly:
-
-1. Install Caddy using the official [instructions](https://caddyserver.com/docs/install).
-2. Modify the `Caddyfile` at `./docker/deploy/caddy/Caddyfile`.
-    1. Replace `localhost` with your domain.
-    2. Uncomment the "Dashboard" section if you want to expose the Supabase Dashboard. You **MUST** set a password for this to be secure.
-3. Run `caddy run --config ./docker/deploy/caddy/Caddyfile` to start Caddy.
-
-You can now access your services at the following URLs:
-
-- REST: `https://<your-domain>/proxy/rest/v1/`
-- Auth: `https://<your-domain>/proxy/auth/v1/`
-- Storage: `https://<your-domain>/proxy/storage/v1/`
-- Functions: `https://<your-domain>/proxy/functions/v1/`
-- Realtime: `https://<your-domain>/proxy/realtime/v1/`
-- Dashboard: `https://<your-domain>/` (if you uncommented the Dashboard section in the Caddyfile)
-
 ## Stop 
 
 You can stop Supabase by running `docker compose stop` in same directory as your `docker-compose.yml` file.
