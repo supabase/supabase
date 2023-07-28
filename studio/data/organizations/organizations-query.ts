@@ -14,7 +14,6 @@ export async function getOrganizations(signal?: AbortSignal): Promise<Organizati
   }
 
   const sorted = (data as Organization[]).sort((a, b) => a.name.localeCompare(b.name))
-
   return sorted
 }
 

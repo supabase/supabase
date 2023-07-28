@@ -358,6 +358,11 @@ export const SocialLoginItems = [
     url: '/guides/auth/social-login/auth-discord',
   },
   {
+    name: 'Figma',
+    icon: '/docs/img/icons/figma-icon',
+    url: '/guides/auth/social-login/auth-figma',
+  },
+  {
     name: 'Kakao',
     icon: '/docs/img/icons/kakao-icon',
     url: '/guides/auth/social-login/auth-kakao',

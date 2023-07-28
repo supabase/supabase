@@ -1,18 +1,12 @@
-import { FC, ReactNode } from 'react'
-import { useFlag } from 'hooks'
+import { PropsWithChildren } from 'react'
 
-interface Props {
+interface ProductMenuBarProps {
   title: string
-  children: ReactNode
 }
 
-const ProductMenuBar: FC<Props> = ({ title, children }) => {
-  const ongoingIncident = useFlag('ongoingIncident')
-  const maxHeight = ongoingIncident ? 'calc(100vh - 44px)' : '100vh'
-
+const ProductMenuBar = ({ title, children }: PropsWithChildren<ProductMenuBarProps>) => {
   return (
     <div
-      style={{ height: maxHeight, maxHeight }}
       className={[
         'hide-scrollbar flex w-64 flex-col border-r', // Layout
         'bg-scale-200', // Light mode
@@ -25,7 +19,9 @@ const ProductMenuBar: FC<Props> = ({ title, children }) => {
       >
         <h4 className="text-lg">{title}</h4>
       </div>
-      <div className="flex-grow overflow-y-auto">{children}</div>
+      <div className="flex-grow overflow-y-auto" style={{ maxHeight: 'calc(100vh - 96px)' }}>
+        {children}
+      </div>
     </div>
   )
 }
