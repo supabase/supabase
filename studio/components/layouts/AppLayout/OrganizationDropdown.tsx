@@ -76,8 +76,6 @@ const OrganizationDropdown = () => {
                 {organizations?.map((org) => {
                   const href = router.pathname.includes('[slug]')
                     ? router.pathname.replace('[slug]', org.slug)
-                    : router.pathname.includes('[ref]/settings')
-                    ? `/org/${org.slug}/general`
                     : `/org/${org.slug}`
                   return (
                     <Link passHref href={href} key={org.slug}>
