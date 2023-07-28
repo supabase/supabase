@@ -1,5 +1,6 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import { isResponseOk, post } from 'lib/common/fetch'
+import { BASE_PATH } from 'lib/constants'
 
 export type SqlEditResponse = {
   sql: string
@@ -12,7 +13,7 @@ export type SqlEditVariables = {
 }
 
 export async function editSql({ prompt, sql, entityDefinitions }: SqlEditVariables) {
-  const response = await post<SqlEditResponse>('/api/ai/sql/edit', {
+  const response = await post<SqlEditResponse>(BASE_PATH + '/api/ai/sql/edit', {
     prompt,
     sql,
     entityDefinitions,
