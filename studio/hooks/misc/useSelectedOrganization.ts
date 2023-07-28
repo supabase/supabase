@@ -9,10 +9,12 @@ export function useSelectedOrganization({ enabled = true } = {}) {
   const { slug } = useParams()
   const { data } = useOrganizationsQuery({ enabled })
   const selectedProject = useSelectedProject()
-  const localStorageSlug =
-    typeof window !== 'undefined'
+
+  const localStorageSlug = useMemo(() => {
+    return typeof window !== 'undefined'
       ? localStorage.getItem(LOCAL_STORAGE_KEYS.RECENTLY_VISITED_ORGANIZATION)
-      : undefined
+      : null
+  }, [])
 
   return useMemo(() => {
     return data?.find((org) => {
