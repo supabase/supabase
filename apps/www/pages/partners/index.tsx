@@ -39,9 +39,47 @@ const Partners = () => {
           <SectionContainer className="overflow-hidden pt-8 pb-12 md:pt-12">
             <ProductHeaderCentered {...pageData.heroSection} />
           </SectionContainer>
-          <div className="relative z-20 w-full flex py-8 mb-8 -mt-8 md:mb-16 md:-mt-16 justify-center gap-2 overflow-hidden mx-auto max-w-2xl before:content[''] before:absolute before:inset-0 before:w-full before:bg-[linear-gradient(to_right,var(--colors-scale5)_0%,transparent_10%,transparent_90%,var(--colors-scale5)_100%)] dark:before:bg-[linear-gradient(to_right,var(--colors-scale1)_0%,transparent_10%,transparent_90%,var(--colors-scale1)_100%)] before:z-10">
+          <div className="relative z-20 w-full flex py-16 mb-16 -mt-10 md:mb-24 md:-mt-20 justify-center gap-2 overflow-hidden mx-auto max-w-4xl before:content[''] before:absolute before:inset-0 before:w-full before:bg-[linear-gradient(to_right,var(--colors-scale5)_0%,transparent_10%,transparent_90%,var(--colors-scale5)_100%)] dark:before:bg-[linear-gradient(to_right,var(--colors-scale1)_0%,transparent_10%,transparent_90%,var(--colors-scale1)_100%)] before:z-10">
+            <div className="absolute w-32 h-32 md:w-40 md:h-40 rounded-full bg-scale-100/90 backdrop-blur-2xl backdrop-filter from-scale-200 to-scale-100 border-4 border-scale-100 shadow-xl top-1/2 -translate-x-1/2 left-1/2 -translate-y-1/2 flex items-center justify-center z-30">
+              <div className="absolute inset-0 w-full h-full transform animate-spin">
+                <svg
+                  className="absolute inset-[-2px] transform !animate-[transformSpin_3s_both_cubic-bezier(.5,.2,.5,.8)_infinite] opacity-50"
+                  viewBox="0 0 182 183"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M91 1C120.005 1 145.841 14.5702 162.505 35.708"
+                    stroke="url(#paint0_linear_4766_6117)"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                  />
+                  <defs>
+                    <linearGradient
+                      id="paint0_linear_4766_6117"
+                      x1="107"
+                      y1="2.5"
+                      x2="151"
+                      y2="21.5"
+                      gradientUnits="userSpaceOnUse"
+                    >
+                      <stop stop-color="#1CF7C3" stop-opacity="0" />
+                      <stop offset="0.510417" stop-color="#1CF7C3" />
+                      <stop offset="1" stop-color="#1CF7C3" stop-opacity="0" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+              </div>
+
+              <Image
+                src="/images/supabase-logo-icon.svg"
+                alt="Supabase icon"
+                width={isSm ? 45 : 60}
+                height={isSm ? 45 : 60}
+              />
+            </div>
             {range(0, 3).map((_) => (
-              <div className="flex gap-2 animate-marquee">
+              <div className="flex gap-2 animate-marquee will-change-transform">
                 {pageData.featuredApps.map((app) => (
                   <div className="w-20 h-20 md:w-28 md:h-28 rounded-2xl bg-gradient-to-t from-scale-300 dark:from-scale-200 to-scale-100 border border-scale-200 flex items-center justify-center shadow-xl">
                     <Image
