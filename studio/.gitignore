@@ -33,5 +33,3 @@ yarn-error.log*
 .env.production.local
 
 .vercel
-
-/public/dashboard

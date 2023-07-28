@@ -2,7 +2,8 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
-import { Button, Badge, IconStar, IconChevronDown, Announcement, LW8CountdownBanner } from 'ui'
+import Announcement from '~/components/Announcement/Announcement'
+import { Button, Badge, IconStar, IconChevronDown, LW8CountdownBanner } from 'ui'
 import FlyOut from '~/components/UI/FlyOut'
 import Transition from 'lib/Transition'
 
@@ -18,8 +19,6 @@ import TextLink from '../TextLink'
 import Image from 'next/image'
 import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
-
-import * as supabaseLogoWordmarkWhite from 'common/assets/images/supabase-logo-wordmark--white.png'
 
 const Nav = () => {
   const { isDarkMode } = useTheme()
@@ -199,7 +198,7 @@ const Nav = () => {
 
   return (
     <>
-      <Announcement>
+      <Announcement link="/launch-week">
         <LW8CountdownBanner />
       </Announcement>
       <div className="sticky top-0 z-40 transform" style={{ transform: 'translate3d(0,0,999px)' }}>
