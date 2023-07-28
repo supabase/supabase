@@ -1,13 +1,15 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ParsedUrlQuery } from 'querystring'
-import { Button, Dropdown, IconPlus, Popover } from 'ui'
+import { Badge, Button, Dropdown, IconCode, IconPlus, Popover } from 'ui'
 
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useSelectedOrganization, useSelectedProject } from 'hooks'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { Organization, Project } from 'types'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 
 // [Fran] the idea is to let users change projects without losing the current page,
 // but at the same time we need to redirect correctly between urls that might be
@@ -71,12 +73,22 @@ const ProjectLink = ({
   )
 }
 
-const ProjectDropdown = () => {
+const ProjectDropdown = ({ alt }: { alt?: boolean }) => {
   const selectedProject = useSelectedProject()
   const selectedOrganization = useSelectedOrganization()
-  const { data: allProjects } = useProjectsQuery()
+  const { data: allProjects, isLoading: isLoadingProjects } = useProjectsQuery()
   const { data: allOrganizations } = useOrganizationsQuery()
   const selectedOrganizationSlug = selectedOrganization?.slug
+
+  const isOrgBilling = !!selectedOrganization?.subscription_id
+  const { data: subscription, isSuccess } = useProjectSubscriptionV2Query(
+    { projectRef: selectedProject?.ref },
+    { enabled: alt && !isOrgBilling }
+  )
+
+  if (isLoadingProjects && alt) {
+    return <ShimmeringLoader className="w-[90px]" />
+  }
 
   return IS_PLATFORM ? (
     <Dropdown
@@ -100,13 +112,23 @@ const ProjectDropdown = () => {
         </>
       }
     >
-      <Button asChild type="text" size="tiny" className="my-1">
-        <span>{selectedProject?.name}</span>
+      <Button
+        type="text"
+        iconRight={
+          alt ? <IconCode className="text-scale-1100 rotate-90" strokeWidth={2} size={12} /> : null
+        }
+      >
+        <span className="text-sm">{selectedProject?.name}</span>
+        {alt && isSuccess && !isOrgBilling && (
+          <Badge color="slate" className="ml-2">
+            {subscription?.plan.name}
+          </Badge>
+        )}
       </Button>
     </Dropdown>
   ) : (
-    <Button asChild type="text" size="tiny">
-      <span>{selectedProject?.name}</span>
+    <Button type="text">
+      <span className="text-sm">{selectedProject?.name}</span>
     </Button>
   )
 }
