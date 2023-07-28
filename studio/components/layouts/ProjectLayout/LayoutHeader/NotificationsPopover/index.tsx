@@ -37,7 +37,7 @@ const NotificationsPopover = ({ alt = false }: NotificationsPopoverProps) => {
 
   const [targetNotification, setTargetNotification] = useState<Notification>()
 
-  if (!notifications) return <></>
+  if (!notifications || !Array.isArray(notifications)) return null
 
   const newNotifications = notifications?.filter(
     (notification) => notification.notification_status === NotificationStatus.New
