@@ -339,6 +339,14 @@ functions:
           })
           const oAuthToken = data.session.provider_token // use to access provider API
           ```
+  - id: sign-in-with-id-token
+    title: 'signInWithIdToken'
+    $ref: '@supabase/gotrue-js.GoTrueClient.signInWithIdToken'
+    notes: |
+      -  Notes
+    examples:
+      - id: sign-in-with-id-token
+
   - id: sign-in-with-sso
     title: 'signInWithSSO()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signInWithSSO'
@@ -383,6 +391,7 @@ functions:
               window.location.href = data.url
             }
           ```
+
   - id: sign-out
     title: 'signOut()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signOut'
