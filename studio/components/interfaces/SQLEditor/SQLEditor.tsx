@@ -47,7 +47,11 @@ import {
   Input,
 } from 'ui'
 import AISettingsModal from './AISettingsModal'
-import { sqlAiDisclaimerComment, untitledSnippetTitle } from './SQLEditor.constants'
+import {
+  destructiveSqlRegex,
+  sqlAiDisclaimerComment,
+  untitledSnippetTitle,
+} from './SQLEditor.constants'
 import { IStandaloneCodeEditor, IStandaloneDiffEditor } from './SQLEditor.types'
 import { createSqlSnippetSkeleton } from './SQLEditor.utils'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
@@ -58,8 +62,6 @@ const DiffEditor = dynamic(
   () => import('@monaco-editor/react').then(({ DiffEditor }) => DiffEditor),
   { ssr: false }
 )
-
-const destructiveSqlRegex = [/drop/i, /delete/i]
 
 type ContentDiff = {
   original: string
