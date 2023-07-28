@@ -420,6 +420,12 @@
         "type": "cli-command"
       },
       {
+        "id": "supabase-orgs-create",
+        "title": "Create an organization",
+        "slug": "supabase-orgs-create",
+        "type": "cli-command"
+      },
+      {
         "id": "supabase-orgs-list",
         "title": "List all organizations",
         "slug": "supabase-orgs-list",
