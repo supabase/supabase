@@ -18,7 +18,8 @@ import ReactFlow, {
 import { PostgresTable } from '@supabase/postgres-meta'
 import { useTheme } from 'common/Providers'
 import { useStore } from 'hooks'
-import { IconLoader } from 'ui'
+import { IconHash, IconKey, IconLoader, IconLock } from 'ui'
+import { Diamond, Fingerprint } from 'lucide-react'
 
 import 'reactflow/dist/style.css'
 
@@ -28,6 +29,10 @@ type TableNodeData = {
   columns: {
     id: string
     isPrimary: boolean
+    isNullable: boolean
+    isUnique: boolean
+    isUpdateable: boolean
+    isIdentity: boolean
     name: string
     format: string
   }[]
@@ -48,6 +53,10 @@ async function getGraphDataFromTables(tables: PostgresTable[]): Promise<{
         isPrimary: table.primary_keys.some((pk) => pk.name === column.name),
         name: column.name,
         format: column.format,
+        isNullable: column.is_nullable,
+        isUnique: column.is_unique,
+        isUpdateable: column.is_updatable,
+        isIdentity: column.is_identity,
       }
     })
 
@@ -225,26 +234,47 @@ function TableNode({ data, targetPosition, sourcePosition }: NodeProps<TableNode
 
           {data.columns.map((column) => (
             <div
-              className="text-[8px] leading-5 relative flex justify-between odd:bg-scale-300 even:bg-scale-400"
+              className="text-[8px] leading-5 relative flex flex-row justify-items-start odd:bg-scale-300 even:bg-scale-400"
               key={column.id}
             >
-              <span
-                className={clsx(
-                  column.isPrimary && 'border-l-2 border-l-brand-900 pl-[6px] pr-2',
-                  'pl-2 text-ellipsis overflow-hidden whitespace-nowrap'
+              <div className="gap-[0.16rem] flex mx-2 align-middle basis-1/4 items-center justifty-start">
+                {column.isPrimary && (
+                  <IconKey
+                    size={8}
+                    strokeWidth={2}
+                    className="sb-grid-column-header__inner__primary-key flex-shrink-0"
+                  />
                 )}
-              >
-                {column.name}
-              </span>
-              <span
-                className={clsx(
-                  column.isPrimary && 'ml-[2px] pl-[6px]',
-                  'absolute top-0 left-0 right-0 pl-2 bg-scale-500 text-ellipsis overflow-hidden whitespace-nowrap opacity-0 hover:opacity-100'
+                {column.isNullable && (
+                  <Diamond size={8} strokeWidth={2} className="flex-shrink-0" />
                 )}
-              >
-                {column.name}
-              </span>
-              <span className="px-2">{column.format}</span>
+                {!column.isNullable && (
+                  <Diamond size={8} strokeWidth={2} fill="currentColor" className="flex-shrink-0" />
+                )}
+                {column.isUnique && (
+                  <Fingerprint size={8} strokeWidth={2} className="flex-shrink-0" />
+                )}
+                {column.isIdentity && (
+                  <IconHash size={8} strokeWidth={2} className="flex-shrink-0" />
+                )}
+                {!column.isUpdateable && (
+                  <IconLock size={8} strokeWidth={2} className="flex-shrink-0" />
+                )}
+              </div>
+              <div className="flex w-full justify-between">
+                <span className="text-ellipsis overflow-hidden whitespace-nowrap">
+                  {column.name}
+                </span>
+                <span
+                  className={clsx(
+                    column.isPrimary && 'pl-[6px]',
+                    'absolute top-0 left-0 right-0 pl-2 bg-scale-500 text-ellipsis overflow-hidden whitespace-nowrap opacity-0 hover:opacity-100'
+                  )}
+                >
+                  {column.name}
+                </span>
+                <span className="px-2 inline-flex justify-end">{column.format}</span>
+              </div>
               {targetPosition && (
                 <Handle
                   type="target"
