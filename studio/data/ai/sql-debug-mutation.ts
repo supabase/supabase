@@ -1,5 +1,6 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import { isResponseOk, post } from 'lib/common/fetch'
+import { BASE_PATH } from 'lib/constants'
 
 export type SqlDebugResponse = {
   solution: string
@@ -13,7 +14,7 @@ export type SqlDebugVariables = {
 }
 
 export async function debugSql({ errorMessage, sql, entityDefinitions }: SqlDebugVariables) {
-  const response = await post<SqlDebugResponse>('/api/ai/sql/debug', {
+  const response = await post<SqlDebugResponse>(BASE_PATH + '/api/ai/sql/debug', {
     errorMessage,
     sql,
     entityDefinitions,

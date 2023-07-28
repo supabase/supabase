@@ -1,5 +1,6 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import { isResponseOk, post } from 'lib/common/fetch'
+import { BASE_PATH } from 'lib/constants'
 
 export type SqlGenerateResponse = {
   title: string
@@ -12,7 +13,7 @@ export type SqlGenerateVariables = {
 }
 
 export async function generateSql({ prompt, entityDefinitions }: SqlGenerateVariables) {
-  const response = await post<SqlGenerateResponse>('/api/ai/sql/generate', {
+  const response = await post<SqlGenerateResponse>(BASE_PATH + '/api/ai/sql/generate', {
     prompt,
     entityDefinitions,
   })
