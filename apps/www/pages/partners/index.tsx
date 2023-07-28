@@ -21,6 +21,8 @@ import {
   TextLink,
 } from 'ui'
 import Link from 'next/link'
+import Image from 'next/image'
+import InteractiveShimmerCard from '../../components/InteractiveShimmerCard'
 
 const featureBlocks = [
   {
@@ -68,8 +70,8 @@ const Partners = () => {
           ],
         }}
       />
-      <DefaultLayout>
-        <div className="bg-scale-300 dark:bg-scale-100">
+      <DefaultLayout className="bg-scale-300 dark:bg-scale-100">
+        <div className="relative bg-scale-300 dark:bg-[#121212]">
           <SectionContainer>
             <ProductHeaderCentered {...pageData.heroSection} />
           </SectionContainer>
@@ -78,6 +80,25 @@ const Partners = () => {
               Featured apps or masonry of apps or slider here
             </p>
           </SectionContainer>
+          {/* <div className="absolute inset-0 z-0" style={{background: "radial"}} /> */}
+          <Image
+            src="/images/partners/soft-blur-02.png"
+            alt=""
+            layout="fill"
+            objectFit="cover"
+            objectPosition="top"
+            quality={100}
+            className="absolute inset-0 z-0"
+          />
+          <Image
+            src="/images/partners/partners-grid-2.png"
+            alt="Supabase partners"
+            layout="fill"
+            objectFit="cover"
+            objectPosition="bottom"
+            quality={100}
+            className="absolute inset-0 -z-10"
+          />
         </div>
         {/* <SectionContainer className="flex flex-col items-center gap-8"> */}
         <SectionContainer className="grid grid-cols-1 lg:grid-cols-5">
@@ -90,12 +111,17 @@ const Partners = () => {
             </p>
             <TextLink
               url="https://supabase.com/docs/guides/platform/marketplace"
-              label="Explore docs"
+              label="View docs"
             />
           </div>
           <div className="col-span-1 lg:col-span-3 w-full max-w-4xl grid gap-8 rounded md:grid-cols-2">
-            <div className="bg-scale-100 dark:bg-scale-300 group flex flex-col gap-4 rounded border px-8 py-6">
-              <div className="bg-scale-300 dark:bg-scale-500 text-scale-1200 group-hover:text-brand-900 flex h-12 w-12 items-center justify-center rounded-md border transition-all group-hover:scale-105">
+            <InteractiveShimmerCard
+              hasInnerShimmer={false}
+              hasActiveOnHover={true}
+              innerClassName="px-8 py-6 group flex flex-col gap-4"
+            >
+              {/* <div className="bg-scale-100 dark:bg-scale-300 group flex flex-col gap-4 rounded border px-8 py-6"> */}
+              <div className="bg-scale-300 mb-4 dark:bg-scale-500 text-scale-1200 group-hover:text-brand-900 flex h-12 w-12 items-center justify-center rounded-md border transition-all group-hover:scale-105">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-6 w-6"
@@ -118,20 +144,30 @@ const Partners = () => {
                   Find an expert to help build your next idea.
                 </p>
               </div>
-            </div>
-            <div className="bg-scale-100 dark:bg-scale-300 group flex flex-col gap-4 rounded border px-8 py-6">
-              <div className="bg-scale-300 dark:bg-scale-500 text-scale-1200 group-hover:text-brand-900 flex h-12 w-12 items-center justify-center rounded-md border transition-all group-hover:scale-105">
+
+              <Link href="/partners/experts">
+                <a className="absolute inset-0" />
+              </Link>
+              {/* </div> */}
+            </InteractiveShimmerCard>
+            <InteractiveShimmerCard
+              hasInnerShimmer={false}
+              hasActiveOnHover={true}
+              innerClassName="px-8 py-6 group flex flex-col gap-4"
+            >
+              {/* <div className="bg-scale-100 dark:bg-scale-300 group flex flex-col gap-4 rounded border px-8 py-6"> */}
+              <div className="bg-scale-300 mb-4 dark:bg-scale-500 text-scale-1200 group-hover:text-brand-900 flex h-12 w-12 items-center justify-center rounded-md border transition-all group-hover:scale-105">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-6 w-6"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
-                  stroke-width="1"
+                  strokeWidth="1"
                 >
                   <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
                     d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"
                   />
                 </svg>
@@ -139,9 +175,13 @@ const Partners = () => {
 
               <div>
                 <h3 className="text-scale-1200 text-lg">Integrations</h3>
-                <p className="text-scale-900 text-sm">Lorem</p>
+                <p className="text-scale-900 text-sm">Use your favorite tools with Supabase.</p>
               </div>
-            </div>
+              <Link href="/partners/integrations">
+                <a className="absolute inset-0" />
+              </Link>
+              {/* </div> */}
+            </InteractiveShimmerCard>
           </div>
         </SectionContainer>
         <SectionContainer>
