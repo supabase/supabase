@@ -39,9 +39,7 @@ After all the services have started you should be able to see them running in th
 docker compose ps
 ```
 
-Now visit [localhost:3000](http://localhost:3000) to start using Supabase Studio.
-
-That's everything you need to get started. The rest of this guide will help you to customize your setup.
+Now visit [localhost:8000](http://localhost:8000) to start using Supabase Studio. You will be prompted for a username and password. By default, the username is `supabase` and the password is `this_password_is_insecure_and_should_be_updated`. Please update the Dashboard Authentication as soon as possible using the instructions below.
 
 ## Securing your setup
 
@@ -62,6 +60,8 @@ Replace the values the `.env` file:
   - `ANON_KEY` - replace with an `anon` key
   - `SERVICE_ROLE_KEY` - replace with a `service` key
 
+You will need to restart the services for the changes to take effect.
+
 ### Update Secrets
 
 Update the `.env` file with your own secrets. In particular, these are required:
@@ -71,17 +71,33 @@ Update the `.env` file with your own secrets. In particular, these are required:
 - `SITE_URL`: the base URL of your site.
 - `SMTP_*`: mail server credentials. You can use any SMTP server.
 
-### Adding a firewall
+You will need to restart the services for the changes to take effect.
 
-We recommend using a firewall to restrict access to your Supabase setup (something like `ufw`). One thing to highlight is that Docker usually [makes changes to your iptables](https://askubuntu.com/questions/652556/uncomplicated-firewall-ufw-is-not-blocking-anything-when-using-docker). 
+### Dashboard Authentication
 
-To disable this behavior, you can add the following to your `/etc/docker/daemon.json` file and then run `sudo service docker restart`:
+The dashboard is protected with Basic Authentication. The default user and password MUST be updated before using Supabase in production. You can update the `./docker/volumes/api/kong.yml` file with your own credentials. For example:
 
-```json
-{
-  "iptables": false
-}
+```yaml
+basicauth_credentials:
+- consumer: DASHBOARD
+  username: user_one
+  password: password_one
+- consumer: DASHBOARD
+  username: user_two
+  password: password_two
 ```
+
+You will need to restart the services for the changes to take effect.
+
+## Restart
+
+You can restart services to pick up any configuration changes by running:
+
+```sh
+docker compose restart
+```
+
+Be aware that this will result in downtime while the services are restarting.
 
 ## Exposing services
 
